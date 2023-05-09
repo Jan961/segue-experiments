@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  # Database
+  db:
+    image: mariadb:10.3.32
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+        - MYSQL_ALLOW_EMPTY_PASSWORD=false
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+
+  phpmyadmin:
+    links:
+      - db:db
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      UPLOAD_LIMIT: 300M
+    ports:
+      - "8080:80"
+  nextjs:
+    build: ./
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+volumes:
+  dbdata:

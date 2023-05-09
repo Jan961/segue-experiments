@@ -1,0 +1,17 @@
+image: atlassian/default-image:2
+pipelines:
+  branches:
+    release/*:
+          - step:
+              name: Deploy to Staging
+              deployment: staging
+              script:
+                - pipe: atlassian/rsync-deploy:0.6.1
+                  variables:
+                    USER: $SFTP_USERNAME
+                    SERVER: $SFTP_HOST
+                    SSH_PORT: $SSH_PORT
+                    LOCAL_PATH: "${BITBUCKET_CLONE_DIR}/"
+                    REMOTE_PATH: /home/$SFTP_USERNAME/public_html/
+                    DELETE_FLAG: 'false' # Don't delete existing files
+                    EXTRA_ARGS: "--exclude=.bitbucket/ --exclude=.git/ --exclude=bitbucket-pipelines.yml --exclude=.gitignore" # Ignorethese
