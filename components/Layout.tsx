@@ -2,7 +2,7 @@ import React, {ReactNode, useState} from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 
-import HeaderNav from "./headerNav";
+import HeaderNav from "./HeaderNav";
 import {Nav} from "./nav";
 
 import PopoutMenu from './PopoutMenu';

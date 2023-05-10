@@ -1,84 +1,111 @@
-import * as React from "react";
-import { Router, useRouter } from "next/router";
-import { userService } from "../services/user.service";
-import user from "./accounts/manage-users/user";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import * as React from 'react'
+import { useRouter } from 'next/router'
+import { userService } from '../services/user.service'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import classNames from 'classnames'
+import { faHome, faUser, faSignOutAlt, IconDefinition } from '@fortawesome/free-solid-svg-icons'
 
-function headerNav({menuIsOpen, setMenuIsOpen}:any) {
-  const [username, setUsername] = React.useState("My Account")
-  const router = useRouter();
-
-  function logout() {
-    userService.logout();
-    router.push("/"); 
-  }
-  let user = userService.userValue;
-  React.useEffect(() => {
-    
-    if(user && user.name){
-      setUsername(user.name)
-    }
-  
-  
-  }, [user]);
-
-
-
-
-
-  return (
-      <nav className=" bg-none">
-        <div className="  px-2 sm:px-4 " >
-          <div className="flex h-16 justify-between items-center">
-            <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center">
-              <img
-                className="sticky h-24 w-auto"
-                src="/segue/logos/segue_logo.png"
-                alt="Your Company"
-              />
-            </div>
-            <div className="flex flex-row items-center">
-              <a
-                href="/"
-                className="border-indigo-500 rounded-full text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
-                aria-current="page"
-              >
-                <FontAwesomeIcon
-                  icon={faHome}
-                  className="mr-2 text-white rounded-full bg-primary-green  p-1 "
-                />
-                Platform Home
-              </a>
-              <span className="mx-2">{" | "}</span>
-              <a
-                href="/accounts"
-                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 text-sm font-medium"
-              >
-                <FontAwesomeIcon
-                  icon={faUser}
-                  className="mr-2 text-white rounded-full bg-primary-orange p-1"
-                />
-                {username}
-              </a>
-              <span className="mx-2">{" | "}</span>
-              <button
-              onClick={logout}
-              className=" border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 text-sm font-medium"
-            >
-              <FontAwesomeIcon
-                icon={faSignOutAlt}
-                className="mr-2 bg-primary-purple text-white rounded-full bg-primary-red p-1"
-              />
-              Log Out
-            </button>
-            </div>
-          </div>
-        </div>
-      </nav>
-  );
+interface HeaderNavButtonProps {
+  icon: IconDefinition;
+  onClick?: () => void;
+  className: string;
+  href?: string
 }
 
-export default headerNav;
+const HeaderNavButton = ({ icon, onClick, className, children, href }: React.PropsWithChildren<HeaderNavButtonProps>) => {
+  const ContainerClasses = 'text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 text-sm font-medium'
+  const ButtonClasses = 'rounded-full p-2 text-white ml-2'
 
+  if (href) {
+    return (
+      <a
+        href={href}
+        className={ContainerClasses}
+      >
+        { children }
+        <FontAwesomeIcon
+          icon={icon}
+          size='xs'
+          className={classNames(className, ButtonClasses)}
+        />
+      </a>
+    )
+  }
 
+  if (onClick) {
+    return (
+      <button
+        onClick={onClick}
+        className={ContainerClasses}
+      >
+        { children }
+        <FontAwesomeIcon
+          icon={icon}
+          size='xs'
+          className={classNames(className, ButtonClasses)}
+        />
+      </button>
+    )
+  }
+}
+
+const HeaderNavDivider = () => (<span className="mx-2">{' | '}</span>)
+
+const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
+  const [username, setUsername] = React.useState('My Account')
+  const router = useRouter()
+
+  function logout () {
+    userService.logout()
+    router.push('/')
+  }
+  const user = userService.userValue
+  React.useEffect(() => {
+    if (user && user.name) {
+      setUsername(user.name)
+    }
+  }, [user])
+
+  return (
+    <nav>
+      <div>
+        <div className="flex justify-between items-center">
+          <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center h-20">
+            <img
+              className="sticky h-full w-auto"
+              src="/segue/logos/segue_logo.png"
+              alt="Your Company"
+            />
+          </div>
+          <div className="flex flex-row items-center pr-2">
+            <HeaderNavButton
+              icon={faHome}
+              href='/'
+              className="bg-primary-green"
+            >
+              Home
+            </HeaderNavButton>
+            <HeaderNavDivider />
+            <HeaderNavButton
+              icon={faUser}
+              href='/accounts'
+              className="bg-primary-orange"
+            >
+              { username }
+            </HeaderNavButton>
+            <HeaderNavDivider />
+            <HeaderNavButton
+              icon={faSignOutAlt}
+              onClick={logout}
+              className="bg-purple-500"
+            >
+              Log Out
+            </HeaderNavButton>
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
+}
+
+export default HeaderNav

@@ -9,7 +9,7 @@ type Props = {
 const List = ({items}: Props) => (
     <div className=" flex flex-col align-center overflow-hidden bg-gray  sm:rounded-md">
         <ul role="list" className="divide-y divide-gray-200">
-        {items.map((item) => (
+        {items?.map((item) => (
             <li key={item.ShowId}>
                 <ListItem data={item}/>
             </li>
