@@ -11,7 +11,7 @@ export const DisplayArchived = ({ onChange, checked }: DisplayArchivedProps) => 
           type="checkbox"
           id="display-archive"
           name="display-archive"
-          className="mr-2"
+          className="mr-2 border-gray-300 rounded"
           onChange={onChange}
           checked={checked}
         />

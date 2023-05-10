@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import AddUser from "../../../pages/accounts/manage-users/addUser";
 import NewUser from "../forms/newUser";
 import { Show, User } from "../../../interfaces";
-import ListItem from "../../shows/ListItem";
+import ShowListItem from "../../shows/ShowListItem";
 import { userService } from "services/user.service";
 
 /**

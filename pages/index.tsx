@@ -17,11 +17,11 @@ export default function Index() {
     useEffect(() => {
         setLoading(true)
 
-        let  userid = sessionStorage.getItem("UserId")
-        let accoutnID = sessionStorage.getItem("accountId")
+        let userid = sessionStorage.getItem("UserId")
+        let accountId = sessionStorage.getItem("accountId")
 
 
-        fetch('/api/account/read/' + accoutnID)
+        fetch('/api/account/read/' + accountId)
             .then((res) => res.json())
             .then((data) => {
                 setData(data)
@@ -31,8 +31,6 @@ export default function Index() {
 
     if (isLoading) return <Loading></Loading>
     if (!data) return <p>No profile data</p>
-
-
 
     return (
         <div >

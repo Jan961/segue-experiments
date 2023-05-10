@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Layout from "../../components/Layout";
-import List from "../../components/shows/List";
+import ShowList from "../../components/shows/ShowList";
 import { Show, Tour, ITourTask, User } from "../../interfaces";
 import { GetStaticProps } from "next";
 import { sampleShowData, sampleUserData } from "../../utils/sample-data";

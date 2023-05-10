@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import Layout from '../../components/Layout'
-import List from '../../components/shows/List'
-import { Show } from '../../interfaces'
-import NewShow from '../../components/shows/forms/newShow'
-import { userService } from '../../services/user.service'
+import Layout from 'components/Layout'
+import ShowList from 'components/shows/ShowList'
+import { Show } from 'interfaces'
+import NewShow from 'components/shows/forms/newShow'
 import { SearchBox } from 'components/global/SearchBox'
 import { DisplayArchived } from 'components/global/DisplayArchived'
 
@@ -74,8 +73,8 @@ export default function Index () {
           <span className="text-primary-blue block xl:inline">Shows</span>
         </h1>
         <br className='clear' />
-        <div className={' max-w-3/4 justify-center flex flex-col items-center'}>
-          <List items={data} />
+        <div className='max-w-screen-md mx-auto'>
+          <ShowList items={data} />
         </div>
       </Layout>
     </>

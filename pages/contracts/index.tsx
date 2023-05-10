@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Layout from '../../components/Layout'
-import List from "../../components/shows/List";
+import ShowList from "../../components/shows/ShowList";
 import {Show, User} from "../../interfaces";
 import {GetStaticProps} from "next";
 import {sampleShowData} from "../../utils/sample-data";
@@ -51,7 +51,7 @@ const Index = ({ items }: Props) => {
 
         </div>
 
-        <List items={items} />
+        <ShowList items={items} />
     </Layout>
 )
 }
