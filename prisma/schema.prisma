@@ -778,17 +778,3 @@ model log {
   Detail String?  @db.Text
   Date   DateTime @default(now()) @db.Timestamp(0)
 }
-
-model CustomInputValues {
-  OwnerId Int     @id @default(autoincrement())
-  Name    String? @default("") @db.VarChar(100)
-  Value   String? @db.VarChar(75)
-  Type    String? @db.VarChar(50)
-}
-
-model MasterCustomInputValues {
-  OwnerId Int     @id @default(autoincrement())
-  Name    String? @default("") @db.VarChar(100)
-  Value   String? @db.VarChar(75)
-  Type    String? @db.VarChar(50)
-}
