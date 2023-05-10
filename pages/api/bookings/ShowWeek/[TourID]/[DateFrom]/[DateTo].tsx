@@ -10,7 +10,7 @@ export default async function handle(req, res) {
     let DateFrom = new Date(req.query.DateFrom)
     let DateTo = new Date(req.query.DateTo)
 
-    console.log(TourId + " " + DateTo + " " + DateFrom + " " + JSON.stringify(req.query))
+    //console.log(TourId + " " + DateTo + " " + DateFrom + " " + JSON.stringify(req.query))
     try {
         let result = await prisma.booking.findMany(
             {

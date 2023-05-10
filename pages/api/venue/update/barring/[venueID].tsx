@@ -15,7 +15,7 @@ export default async function handle(req, res) {
 
     let query: number = parseInt(req.query.venueID)
     try {
-        console.log(JSON.stringify(req.body))
+       // console.log(JSON.stringify(req.body))
         await prisma.venue.update({
             where: {
                 VenueId: query,

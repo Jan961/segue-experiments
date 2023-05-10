@@ -6,84 +6,144 @@ import {GetServerSideProps} from "next";
 import {dateService} from "../../../services/dateService";
 import {venueService} from "../../../services/venueService";
 import {bookingService} from "../../../services/bookingService";
+import {forceReload} from "../../../utils/forceReload";
+import {userService} from "../../../services/user.service";
 
 
-export default function TourGapsModal(data){
+export default function TourGapsModal(tourId){
     const [showModal, setShowModal] = React.useState(false);
 
     const [barringCheck, setBarringCheck] = React.useState(false);
-    let [gapsList, setGapsList] = React.useState([{venueId: "", name: "", ShowDate: undefined
+    let [gapsList, setGapsList] = React.useState([{venueId: "", name: "", ShowDate: undefined,
+        BookingId: undefined
     }])
-    let [venueList, setVenueList] = React.useState([{
-        "Venue1Id": "", "Venue2Id":"",  "Mileage": "", "TimeMins": "",
-        "Name": undefined
-    }])
+    let [venueList, setVenueList] = React.useState([])
     const [isLoading, setLoading] = useState(false)
 
-    useEffect(() => {
-
-        setLoading(true)
-
-        /**
-         * Get List of dates
-         */
-
-
-        //let gaps = tourService.getTourGaps(data.TourId)
-        fetch(`/api/tours/read/gaps/${data.data}`)
-            .then((res) => res.json())
-            .then((gaps) => {
-                setGapsList(gaps)
-            })
-        setLoading(false)
-
-    }, [])
-
-    function handleOnSubmit() {
-        // Create unconfrimed booking
-
-        bookingService.updateBookingDay(date, "venueid")
-
-
-    }
-
+    const [inputs, setInputs] = useState({
+        BookingId: 0,
+        Distance: 0,
+        VenueId: 0
+    });
 
     const [date, setDate] = useState('');
     const [distance, setDistance] = useState('');
     const [venue, setVenue] = useState('');
     const [lastVenue, setLastVenue] = useState(0);
+    const [submittable, setSubmittable] = useState(false);
+    /**
+     * Avalable dates
+     */
+    useEffect(() => {
 
-    async function formSearch(dist) {
-        setDistance(dist)
-
-
-        //get last venue
-
-        setLastVenue(561)
-
-
-
-        await fetch(`/api/venue/read/venueVenue/${lastVenue}/${distance}`)
+        // @ts-ignore
+        fetch(`/api/bookings/NotBooked/${tourId.TourId}`,{
+            method: "GET"
+        })
             .then((res) => res.json())
-            .then((data) => {
-                console.log(JSON.stringify(data))
-                setVenueList(data)
+            .then((bookings) => {
+                setGapsList(bookings)
             })
+    }, [tourId.TourId]);
+
+    /**
+     *  Venue List
+     * */
+    useEffect(() => {
+        if (lastVenue == 0) {
+
+            fetch(`/api/venue/read/venueVenue/${lastVenue}/${inputs.Distance}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setVenueList(data)
+                })
+        } else {
+
+            fetch(`/api/venue/read/allVenues/${userService.userValue.accountAdmin}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    setVenueList(data)
+                })
+        }
+    }, [inputs.Distance, lastVenue]);
+
+    useEffect(() => {
+        if(inputs.VenueId=== 0){
+            setSubmittable(false)
+        } else {
+            setSubmittable(true)
+        }
+    }, [inputs.VenueId]);
+
+
+    /**
+     * Last Vennue
+     */
+    useEffect(() => {
+        // @ts-ignore
+        if(inputs.BookingId !== 0) {
+            let data = {
+                BookingId: inputs.BookingId,
+                TourId: tourId.TourId
+            }
+            fetch(`/api/bookings/LastVenue/`, {
+                method: "POST",
+                body: JSON.stringify(data)
+            })
+                .then((res) => res.json())
+                .then((lastVenue) => {
+                    if(lastVenue !== null) {
+                        setLastVenue(lastVenue.venueId)
+                    } else {
+                        setLastVenue(0)
+                    }
+                })
+        }
+    }, [inputs.BookingId]);
+
+
+
+    function handleOnSubmit(e) {
+        e.preventDefault()
+
+        alert("Submit Possioble")
+        fetch(`/api/bookings/book/gap`,{
+            method: "POST",
+            body: JSON.stringify(inputs)
+        })
+            .then((res) => res.json())
+            .then((bookings) => {
+               alert(JSON.stringify(bookings))
+            })
+
+
     }
+
+
 
 
 
     function reset() {
         setVenue("")
-        setVenueList([{"Venue1Id": "", "Venue2Id":"",  "Mileage": "", "TimeMins": "", "Name" :""}])
+        setVenueList([])
         setDate("")
         setDistance("")
+    }
+
+    function handleOnChange(e) {
+        e.persist();
+        setInputs((prev) => ({
+            ...prev,
+            [e.target.id]: e.target.value,
+        }));
+
+        alert(JSON.stringify(inputs))
     }
 
     return (
         <>
             <button
-                className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="bg-white shadow-md hover:shadow-lg text-primary-blue font-bold py-2 px-5 rounded-l-md rounded-r-md mx-1"
                 type="button"
                 onClick={() => setShowModal(true)}
             >
@@ -123,14 +183,14 @@ export default function TourGapsModal(data){
                                     <div className="flex flex-row">
                                         <label htmlFor="date" className="">Tour Gap Date</label>
                                         <select
-                                            name={"date"}
-                                            id={"date"}
-                                            onChange={(e) => setDate(e.target.value)}
+                                            name={"BookingId"}
+                                            id={"BookingId"}
+                                            onChange={handleOnChange}
                                             >
                                                     <option value="">Select a Date</option>
                                             {gapsList.map((date) => (
                                                 <>
-                                                    <option value={date.ShowDate}>{dateService.dateToSimple(date.ShowDate)}</option>
+                                                    <option value={date.BookingId}>{dateService.dateToSimple(date.ShowDate)}</option>
                                                 </>
                                             ))}
                                         </select>
@@ -140,21 +200,21 @@ export default function TourGapsModal(data){
                                         <label htmlFor="venueDistance" className="">Select a Distance Miles (Estimated Time)</label>
 
                                         <select
-                                            name={"distance"}
-                                            id={"distance"}
-                                            disabled={date === ''}
-                                            onChange={(e) => formSearch(e.target.value)}
+                                            name={"Distance"}
+                                            id={"Distance"}
+                                            disabled={inputs.BookingId == 0}
+                                            onChange={handleOnChange}
                                         >
                                             <option value={""}>Select a Distance</option>
 
                                                 <>
-                                                    <option value="25">25 </option>
-                                                    <option value="50">50 </option>
-                                                    <option value="100">100 </option>
-                                                    <option value="125">125</option>
-                                                    <option value="150">150</option>
-                                                    <option value="175">175 </option>
-                                                    <option value="200">200</option>
+                                                    <option value={25}>25 </option>
+                                                    <option value={50}>50 </option>
+                                                    <option value={100}>100 </option>
+                                                    <option value={125}>125</option>
+                                                    <option value={150}>150</option>
+                                                    <option value={175}>175 </option>
+                                                    <option value={200}>200</option>
                                                 </>
                                             ))
                                         </select>
@@ -164,17 +224,25 @@ export default function TourGapsModal(data){
                                         <label htmlFor="venueDistance" className="">Select a Venue</label>
 
                                         <select
-                                            name={"distance"}
-                                            id={"distance"}
-                                            disabled={distance === ''}
-                                            onChange={(e) => setDistance(e.target.value)}
+                                            name={"VenueId"}
+                                            id={"VenueId"}
+                                            disabled={inputs.Distance === null}
+                                            onChange={handleOnChange}
                                         >
 
                                             {venueList.length > 0 ?
 
                                              venueList.map((venue) => (
                                                 <>
-                                                    <option value={venue.Venue1Id}>{venue.Name} Miles {venue.Mileage}, Time {venue.TimeMins})</option>
+                                                    <option value=
+
+                                                                {venue.Venue1Id}
+
+                                                              >{venue.Name}
+
+                                                        Miles {venue.Mileage}, Time {venue.TimeMins})
+
+                                                        </option>
                                                 </>
                                             )) :
                                                 <option value={""}>Select a Distance</option>
@@ -210,7 +278,11 @@ export default function TourGapsModal(data){
                                         </button>
                                         <button
                                             className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                                            type="submit" >
+                                            type="submit"
+                                            disabled={!submittable}
+                                        >
+                                            Add Booking
+
                                         </button>
                                     </div></form>
 
@@ -225,8 +297,6 @@ export default function TourGapsModal(data){
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-
-    console.log(JSON.stringify(ctx))
 
     return {
         props: {

@@ -14,7 +14,7 @@ export default async function handle(req, res) {
 
         });
 
-        res.json(dayTypes).status(200)
+        res.status(200).json(dayTypes)
 
     } catch (err) {
         console.log(err);

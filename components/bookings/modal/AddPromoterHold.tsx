@@ -97,7 +97,7 @@ export default function AddPromoterHold({AvailableHoldId}: BookingHoldProps) {
                 type="button"
                 onClick={() => setShowModal(true)}
             >
-                Edit
+                Add Hold
             </button>
             {showModal ? (
                 <div className="flex flex-col ">

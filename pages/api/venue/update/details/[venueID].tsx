@@ -15,7 +15,7 @@ const prisma = new PrismaClient()
 export default async function handle(req, res) {
 
     let VenueId: number = parseInt(req.query.venueID)
-            console.log(JSON.stringify(req.body))
+        //    console.log(JSON.stringify(req.body))
             try {
                  await prisma.venue.update({
                     where: {

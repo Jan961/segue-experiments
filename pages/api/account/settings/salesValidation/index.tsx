@@ -5,7 +5,7 @@ const prisma = new PrismaClient()
 
 export default  async function handle(req, res) {
 
-    console.log(req)
+    //console.log(req)
     const updateValidation = await prisma.accountSalesDataValidaton.upsert({
         where: {
             AccountId: parseInt(req.data.accountId),

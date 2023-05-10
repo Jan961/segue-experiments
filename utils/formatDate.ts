@@ -2,8 +2,13 @@
 
 
 function formatDate (inputDate){
-    let newDate = new Date(inputDate)
-    return newDate.toLocaleDateString()
+    if(inputDate){
+
+        let newDate = new Date(inputDate)
+        return newDate.toLocaleDateString()
+    } else {
+        return null
+    }
     }
 
 export default formatDate

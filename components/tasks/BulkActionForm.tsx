@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import {loggingService} from "../../services/loggingService";
+import getUsers from "utils/getUsers";
 
-function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
-  const [usersArray, setUsersArray] = useState([]);
+function BulkActionForm({userAccountId, taskIdArray, bulkActionField, closeModal }) {
   const [updateValue, setUpdateValue] = useState({});
 
     
@@ -10,7 +10,6 @@ function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
   const handleChange = (event) => {
     setUpdateValue(event.currentTarget.value);
     console.log("the update value", updateValue)
-    console.log("the users", usersArray)
   };
 
 
@@ -60,32 +59,30 @@ function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
   
 
 
-  async function fetchData() {
-    try {
-      const usersResponse = await fetch(`/api/users`);
-      if (usersResponse.ok) {
-        const parsedUsersResponse = await usersResponse.json();
-        setUsersArray(parsedUsersResponse);
-      }
-    } catch (error) {
-      console.error(error);
+  const [users, setUsers] = useState([])
+
+  async function requestAccountUsers(){
+    let foundUsers = await getUsers(userAccountId)
+    console.log("The found users",foundUsers)
+    loggingService.logAction("User Response",foundUsers)
+    if(foundUsers){
+      setUsers(foundUsers)
     }
   }
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    requestAccountUsers()
+  }, [])
 
   const renderInput = (bulkActionField) => {
     switch (bulkActionField) {
       case "Assignee":
         return (
           <select name="assignee" onChange={(e) => handleChange(e)}>
-            {usersArray.map((user) => (
-              <option key={user.id} value={user.id}>
-                {user.name}
-              </option>
-            ))}
+             <option value={0}>Assign a User</option>
+              {users.map(usr => {
+                   return <option value={usr.UserId}>{usr.UserName}</option>
+                  })} 
           </select>
         );
       case "Priority":

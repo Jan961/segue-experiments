@@ -54,7 +54,7 @@ const GlobalActivites = () => (
               scope="col"
               className="hidden px-3 py-3.5 text-left text-sm font-semibold text-white sm:table-cell"
             >
-              end
+              End
             </th>
             <th
               scope="col"
@@ -89,7 +89,7 @@ const GlobalActivites = () => (
               <td className="px-3 py-4 text-sm text-gray-500">
                 {venue.followup}
               </td>
-              <td className="px-3 py-4 text-sm text-gray-500">view</td>
+              <td className="px-3 py-4 text-sm text-gray-500">View</td>
             </tr>
           ))}
         </tbody>

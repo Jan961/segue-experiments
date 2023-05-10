@@ -27,7 +27,7 @@ export default async function handle(req, res) {
 
         // Create All the Bookings
         //Rehearsal
-        console.log("Tour ID:" + TourResult.TourId + "\r\n " + parseISO(req.body.TourStartDate) + "<-Date")
+        //console.log("Tour ID:" + TourResult.TourId + "\r\n " + parseISO(req.body.TourStartDate) + "<-Date")
 
         for (var rehearsalDate = new Date(parseISO(req.body.RehearsalStartDate)); rehearsalDate <= new Date(parseISO(req.body.RehearsalEndDate)); rehearsalDate.setDate(rehearsalDate.getDate() + 1)) {
             // Create Empty RehearsalDay

@@ -186,13 +186,8 @@ const Index = () => {
 
   return (
     <Layout title="Tasks | Seque">
-      <div className="flex flex-auto w-full h-screen">
-        {/* <SideMenu></SideMenu> */}
-        {/* <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                <h1 className="text-xl font-semibold text-gray-900 mt-10">{"item[0].Show.Name"}</h1>
-                </div>
-              </div> */}
+      {/* <div className="flex flex-auto w-full h-screen">
+
         <div
           className="flex-col px-12 w-full flex justify-between"
           style={{ minHeight: "60vh" }}
@@ -214,7 +209,7 @@ const Index = () => {
         </div>
       </div>
       <TaskModal isOpen={isOpen} onClose={setIsOpen}>
-        <NewTaskForm closeModal={closeModal} tourId={activeTourId} />
+        <NewTaskForm closeModal={closeModal} tourId={activeTourId} user={user} />
       </TaskModal>
       <TaskModal
         isOpen={updateTaskModalIsOpen}
@@ -223,7 +218,8 @@ const Index = () => {
         <UpdateTaskForm closeModal={closeUpdateModal} task={updateTask} />
       </TaskModal>
       <TaskModal isOpen={bulkIsOpen} onClose={setBulkIsOpen} ><BulkActionForm closeModal={closeBulkModal} taskIdArray={isSelectedArray} bulkActionField={bulkActionField}/></TaskModal>
-    </Layout>
+    */}
+    </Layout> 
   );
 };
 

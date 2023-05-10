@@ -31,8 +31,6 @@ export default async function handle(req, res) {
      */
 
     let query: number = parseInt(req.query.tourId)
-    console.log("TOUR" + JSON.stringify(req.query.tourId))
-
     /**
      * Simole qyerey to get the tour Start and End Date
      *

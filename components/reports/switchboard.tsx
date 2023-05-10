@@ -13,6 +13,7 @@ import MasterplanReport from "./modals/MasterplanReport";
 import ActivityLog from "./modals/ActivityLog";
 import SelectedVenues from "./modals/SelectedVenues";
 import SalesSummaryFix from "./modals/SalesSummaryFix";
+import SalesSummarySimple from "./modals/SalesSummarySimple";
 
 {
   /* <SideNavBar></SideNavBar> */
@@ -31,7 +32,8 @@ export default function Switchboard() {
               <h2>Sales and Marketing</h2>
             </div>
             <div className={"grid grid-cols-5 w-full mt-4"}>
-              <SalesSummary></SalesSummary>
+              <SalesSummarySimple></SalesSummarySimple>
+              {/* <SalesSummary></SalesSummary> */}
               <SalesSummaryFix></SalesSummaryFix>
               <SalesSummaryWeekly></SalesSummaryWeekly>
               <SalesVsCapacity></SalesVsCapacity>

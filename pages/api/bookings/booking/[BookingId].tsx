@@ -10,7 +10,7 @@ export default async function handle(req, res) {
 
         let bookingId = req.query.BookingId
 
-        const searchResults = await prisma.booking.findFirst({
+        const result = await prisma.booking.findFirst({
             where: {
                 BookingId: parseInt(bookingId),
             },
@@ -24,8 +24,9 @@ export default async function handle(req, res) {
                 },
             },
         })
-        res.json(searchResults)
+        res.json(result)
 
+        JSON.stringify(result)
     } catch (err) {
         console.log(err);
         res.status(403).json({ err: "Error occurred while generating search results." });

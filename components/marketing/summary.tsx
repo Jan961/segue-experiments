@@ -49,7 +49,7 @@ const Summary = ({ actionBookingId, activeTours }) => {
     if (actionBookingId) {
       (async () => {
         try {
-          const response = await fetch(`/api/bookings/saleable/19`);
+          const response = await fetch(`/api/bookings/saleable/${actionBookingId}`);
           const data = await response.json();
           setDate(data.date);
           setShows(data.shows);

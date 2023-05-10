@@ -97,7 +97,7 @@ export default function Index({userToActivate, userId, guid }) {
     //const guid = router.query.hash
     //const userId = router.query.userId
 
-    console.log("The UserToACtivate", userToActivate);
+    //console.log("The UserToACtivate", userToActivate);
 
     // userToActivate.guid = "";
 

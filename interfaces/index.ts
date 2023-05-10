@@ -53,7 +53,7 @@ export type Tour = {
   RehearsalStartDate: Date;
   RehearsalEndDate: Date;
   Show: Show;
-  TourTask: [ITourTask];
+  TourTask: ITourTask[];
 }
 
 // export type Venue = {

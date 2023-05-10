@@ -20,13 +20,13 @@ function logAction(action, details){
 }
 
 async function logError(error) {
-    console.log("Error" +  JSON.stringify(error))
-
-    await axios.post('http://localhost:3000/api/log', {
+    /**
+   await axios.post('/api/log', {
         UserID: 0, // This is a "system user"
         Action: "Error",
         Detail: error
     }).then(axiosResponce => axiosResponce)
+     */
 }
 
 function getErrorLogCount(){

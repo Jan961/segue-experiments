@@ -38,8 +38,18 @@ export default function Barring(){
     });
     const [barringVenues, setBarringVenues] = useState(null);
 
+
     useEffect(() => { (async() => {
-        fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`)
+        fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
+            {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8',
+                    "segue_admin": userService.userValue.segueAdmin,
+                    "account_admin": userService.userValue.accountAdmin,
+                    "user_id": userService.userValue.userId
+                },
+            })
             .then((res) => res.json())
             .then((data) => {
                 setActiveTours(data)
@@ -48,6 +58,19 @@ export default function Barring(){
             })
 
     })(); }, []);
+
+    useEffect(() => {
+        let MondayDate = moment(new Date("2000-01-01")) //moment(new Date(RawMondayDate)).format("yyyy-MM-DD")
+        // @ts-ignore
+        let SundayDate = moment(new Date("2036-01-01")) //moment(new Date(RawMondayDate)).add(6,"days").format("yyyy-MM-DD")
+        fetch(`/api/bookings/ShowWeek/${inputs.SetTour}/${MondayDate}/${SundayDate}`)
+            .then(res => res.json())
+            .then(res => {
+                SetSalesWeeksVenues(res)
+            })
+    }, [inputs.SetTour]);
+
+
 
 
     async function handleOnSubmit(e) {
@@ -100,11 +123,7 @@ export default function Barring(){
             [e.target.id]: e.target.value,
         }));
 
-        if (e.target.name == "SetTour") {
-            // Load Venues for this tour
-            await setVenueWeek()
 
-        }
 
 
     }
@@ -114,7 +133,7 @@ export default function Barring(){
         <>
 
             <button
-                className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                className="bg-white shadow-md hover:shadow-lg text-primary-blue font-bold py-2 px-5 rounded-l-md rounded-r-md mx-1"
                 type="button"
                 onClick={() => setShowModal(true)}
             >

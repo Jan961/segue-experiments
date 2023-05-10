@@ -251,11 +251,6 @@ export default function SalesSummaryFix(){
         let FirstDataColNum = ColNum + 1
         let LastDataColNum = FirstDataColNum
 
-        // @ts-ignore
-        //let weeks = await  getWeeks(tour.TourId)
-        // @ts-ignore
-
-
         for (let week of weeks) {
             worksheet.getCell(HeadingsFirstRowNum, LastDataColNum).value = week.WeekName
             worksheet.getCell(HeadingsFirstRowNum + 1, LastDataColNum).value = week.WeekDate

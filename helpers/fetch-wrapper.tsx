@@ -14,7 +14,7 @@ export const fetchWrapper = {
 function get(url) {
     const requestOptions = {
         method: 'GET',
-        headers: authHeader(url)
+        headers: {'Access-Control-Allow-Origin': '*', ...authHeader(url)}
     };
     return fetch(url, requestOptions).then(handleResponse);
 }
@@ -22,7 +22,7 @@ function get(url) {
 function post(url, body) {
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeader(url) },
+        headers: { 'Content-Type': 'application/json','Access-Control-Allow-Origin': '*', ...authHeader(url) },
         credentials: 'include',
         body: JSON.stringify(body)
     };

@@ -33,7 +33,7 @@ export default async function handle(req, res) {
                 ShowDate: 'asc',
             },
         });
-        console.log(latestBooking)
+        //console.log(latestBooking)
         res.json(latestBooking)
 
     } catch (err) {

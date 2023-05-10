@@ -49,7 +49,7 @@ const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: "Tasks",
-      link: "/tasks/20",
+      link: "/tasks",
       icon:faClipboardList, activeColor: "text-primary-purple" ,
 
     },

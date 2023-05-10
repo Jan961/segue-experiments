@@ -44,7 +44,7 @@ const TaskListItem = ({
   handleSelectedFunction: (taskId: any) => void;
 }) => { 
 
-  const taskDateStatusColor = getTaskDateStatusColor(task.DueDate)
+  const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status)
   
   return(
 
@@ -63,8 +63,8 @@ const TaskListItem = ({
       onClick={() => openUpdateModal(task)}
       className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap pr-3 text-sm font-medium text-gray-900 px-1`}
       >
-      <select className="border-none rounded-md ">
-        <option>-10</option>
+      <select disabled className="border-none rounded-md ">
+        <option>{task.StartByWeekCode ?? "-"}</option>
       </select>
     </td>
     <td
@@ -77,8 +77,8 @@ const TaskListItem = ({
       onClick={() => openUpdateModal(task)}
       className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap pr-3 text-sm font-medium text-gray-900`}
       >
- <select className="border-none rounded-md ">
-        <option>-10</option>
+ <select disabled className="border-none rounded-md ">
+        <option>{task.CompleteByWeekCode?? "-"}</option>
       </select>    </td>
     <td
       onClick={() => openUpdateModal(task)}
@@ -102,13 +102,14 @@ const TaskListItem = ({
       onClick={() => openUpdateModal(task)}
       className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
       >
-      {task.User_TourTask_AssignedByToUser.UserName}
+      {task.User_TourTask_AssigneeToUser?.UserName ?? "-"}
+
     </td>
     <td
       onClick={() => openUpdateModal(task)}
       className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
       >
-      {task.User_TourTask_AssigneeToUser.UserName}
+      {task.User_TourTask_AssignedByToUser?.UserName ?? "-"}
     </td>
     <td
       onClick={() => openUpdateModal(task)}

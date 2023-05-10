@@ -15,7 +15,6 @@ export default async function handle(req, res) {
                 TourId: parseInt(TourID),
                 AND: [
                     {
-                        DateTypeId: 1,  //null
                         DayTypeCrew: 1, //null
                         DayTypeCast: 1,  //null
                         VenueId: null

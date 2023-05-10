@@ -35,10 +35,10 @@ const FileUploadButton: React.FC<FileUploadProps> = ({
         type="file"
         id="fileInput"
         onChange={handleFileChange}
-        className="w-auto h-10 text-sm text-white ml-4 px-2 border-primary-pink border-2 bg-primary-pink hover:bg-primary-pink hover:text-white rounded-md transition-all duration-200 ease--in-out"
+        className="w-auto h-10 text-sm text-white mt-1 ml-4 px-2 border-primary-pink border-2 bg-primary-pink hover:bg-primary-pink hover:text-white rounded-md transition-all duration-200 ease--in-out"
         
         />
-      {fileData && <p>Selected file: {fileData.originalFilename}</p>}
+      {fileData && <p className="mt-2">Selected file: {fileData.originalFilename}</p>}
         </>
   );
 };

@@ -7,23 +7,24 @@ const prisma = new PrismaClient()
 
 export default async function handle(req, res) {
 
+    console.log(req.body)
     try {
         const  updateBooking = await prisma.booking.update({
             where:{
                 BookingId: req.body.BookingId
             },
             data: {
-               VenueId: req.body.VenueId,
+                VenueId: parseInt(req.body.VenueId),
                 Notes:req.body.Notes,
-                DateTypeId:req.body.DateTypeId,
                 BookingStatus:req.body.BookingStatus,
-                DayTypeCast: req.body.DayTypeCast,
+                DayTypeCast: parseInt(req.body.DayTypeCast),
                 LocationCast: req.body.LocationCast,
-                DayTypeCrew: req.body.DayTypeCast,
+                DayTypeCrew: parseInt(req.body.DayTypeCast),
                 LocationCrew: req.body.LocationCrew,
             },
         })
-        res.status(200).json(updateBooking)
+        console.log(updateBooking)
+        res.json(updateBooking)
     } catch (e){
 
         loggingService.logError(e)

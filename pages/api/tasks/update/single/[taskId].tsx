@@ -24,6 +24,13 @@ export default async function handle(req, res) {
       } = req.body;
 
       const taskId = parseInt(req.query.taskId)
+      // Check for reassignment of task
+      const assignedConfig:any = {}
+      if(assignee && assignee !== 0){
+        assignedConfig.Assignee = parseInt(req.body.assignee)
+        assignedConfig.AssignedBy = parseInt(assignedBy)
+      }
+
 
       const updateResult = await prisma.tourTask.update({
         where: { TourTaskId: taskId },
@@ -32,8 +39,7 @@ export default async function handle(req, res) {
           DueDate:  new Date(dueDate),
           Interval: interval,
           Progress: parseInt(progress),
-        //   Assignee: assignee ? parseInt(req.body.assignee) : undefined,
-        //   AssignedBy: assignedBy ? parseInt(assignedBy) : undefined,
+          ...assignedConfig,
           Status: status,
           Priority: parseInt(priority),
           FollowUp: new Date(followUp),

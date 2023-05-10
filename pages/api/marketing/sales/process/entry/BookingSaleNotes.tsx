@@ -11,7 +11,7 @@ const prisma = new PrismaClient()
  */
 export default async function handle(req, res) {
 
-    console.log(req.data)
+    //console.log(req.data)
     try{
         let result = await prisma.bookingSaleNotes.create({
             data: {
@@ -21,7 +21,7 @@ export default async function handle(req, res) {
                 BookingSaleNotes: req.data.BookingSaleNotes
             },
         })
-        console.log(result)
+       // console.log(result)
         res.json(result)
         res.status(200)
         // Return the inserted ID it is needed for related foreach inserts

@@ -62,7 +62,16 @@ export default function SalesSummary() {
 
   useEffect(() => {
     (async () => {
-      fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`)
+      fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
+          {
+            method: 'POST',
+            headers: {
+              'content-type': 'application/json;charset=UTF-8',
+              "segue_admin": userService.userValue.segueAdmin,
+              "account_admin": userService.userValue.accountAdmin,
+              "user_id": userService.userValue.userId
+            },
+          })
         .then((res) => res.json())
         .then((data) => {
           setActiveTours(data);
@@ -96,13 +105,6 @@ export default function SalesSummary() {
 
   function weeksBefore(date, weeks) {
     let weeksBefore = dateService.getDateDaysAgo(date, weeks);
-    alert(
-      dateService.dateToSimple(weeksBefore) +
-        " weeks: " +
-        weeks +
-        "Original date" +
-        date
-    );
     return weeksBefore;
   }
   function weeksAfter(date, weeks) {

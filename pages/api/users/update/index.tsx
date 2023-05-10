@@ -40,7 +40,7 @@ export default  async function handle(req, res) {
             data: FormData
         })
 
-        console.log(updateAccount)
+       // console.log(updateAccount)
         res.statusCode = 200
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify(updateAccount))

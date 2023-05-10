@@ -15,14 +15,14 @@ import {da} from "date-fns/locale";
 import {Value} from "devextreme-react/range-selector";
 
 
-export default function Report(TourID){
+export default function Report(TourId){
     const [pres, setPres] = useState([]);
     let BookingData = []
     const [isLoading, setLoading] = useState(true)
 
     useEffect(() => { (async() => {
-
-        fetch(`/api/bookings/${TourID.TourID.TourID}`)
+        setLoading(true)
+        fetch(`/api/bookings/${TourId.TourId}`)
             .then((res) => res.json())
             .then((data) => {
                 setPres(data)
@@ -31,7 +31,7 @@ export default function Report(TourID){
 
 
 
-    })(); }, []);
+    })(); }, [TourId]);
     if (isLoading) return <p>Loading...</p>
     function onClick() {
         //Fetch Data from API

@@ -38,7 +38,7 @@ const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch(`/api/bookings/saleable/19`);
+      const response = await fetch(`/api/bookings/saleable/${tourId}`);
       const data = await response.json();
       setActiveTours(data);
       // Call the passed callback function

@@ -12,11 +12,15 @@ import {Alert} from "../../alert";
 import Link from "next/link";
 import Button from "devextreme-react/button";
 import {loggingService} from "../../../services/loggingService";
+import {useRouter} from "next/router";
 
 
 export default function AddPerfomance({BookingId}){
     const [showModal, setShowModal] = React.useState(false);
 
+    function handelOnOpen(){
+        setShowModal(true)
+    }
     function   handleOnClose(){
 
      setShowModal(false)
@@ -47,6 +51,8 @@ export default function AddPerfomance({BookingId}){
                 PerfomanceId: null
             });
             setShowModal(false)
+            const router = useRouter();
+            router.replace(router.asPath);
         } else {
             // @ts-ignore
             setStatus(false);
@@ -92,10 +98,10 @@ export default function AddPerfomance({BookingId}){
     // @ts-ignore
     return (
     <>
-        <button onClick={()=> setShowModal(true)} className="inline-flex items-center rounded-md mr-1 border border-transparent bg-primary-blue px-2 py-1 text-sm font-medium
+        <div onClick={()=> setShowModal(true)}   className="inline-flex items-center rounded-md mr-1 border border-transparent bg-primary-blue px-2 py-1 text-sm font-medium
             leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
             +
-        </button>
+        </div>
         {showModal ? (
             <>
                 <div
@@ -154,7 +160,9 @@ export default function AddPerfomance({BookingId}){
                                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg
                                         outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                                         onClick={handleOnSubmit}
-                                        type="submit" >
+                                        type="submit"
+                                        disabled
+                                        >
                                         Save New Performance
                                     </button>
 

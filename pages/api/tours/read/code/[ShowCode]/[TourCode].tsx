@@ -15,20 +15,22 @@ export default async function handle(req, res) {
 
     let TourCode = req.query.TourCode
     let ShowCode = req.query.ShowCode
-
-    const result = await prisma.tour.findFirst(
-        {
-            where:{
-                Code: TourCode,
-                Show:{
-                    Code: ShowCode
+    try {
+        const result = await prisma.tour.findFirst(
+            {
+                where: {
+                    Code: TourCode,
+                    Show: {
+                        Code: ShowCode
+                    }
+                },
+                include: {
+                    Show: true,
                 }
-            },
-            include:{
-                Show: true,
-                Booking: false
             }
-        }
-    )
-    res.json(result)
+        )
+        res.json(result)
+    } catch (e){
+        console.log(e)
+    }
 }

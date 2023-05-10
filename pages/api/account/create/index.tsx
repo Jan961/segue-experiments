@@ -8,8 +8,8 @@ const prisma = new PrismaClient()
 
 async function callCreateUserApi(userData) {
   const baseUrl = process.env.BASE_URL;
-  console.log("the base url:", baseUrl);
-  console.log("the user data:", userData)
+  //console.log("the base url:", baseUrl);
+  //console.log("the user data:", userData)
   try {
     const response = await fetch(`${baseUrl}/api/users/create`, {
       method: 'POST',
@@ -73,7 +73,7 @@ export default async function handle(req, res) {
         
         res.statusCode = 200
         res.setHeader('Content-Type', 'application/json')
-        console.log("create new account result: ", result)
+       // console.log("create new account result: ", result)
         res.end(JSON.stringify( result ))
         //res.json(result)
 

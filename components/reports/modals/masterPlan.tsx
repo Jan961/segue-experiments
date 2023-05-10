@@ -97,7 +97,7 @@ export default function MasterPlan() {
   };
 
   async function getTourData(currentTourID) {
-    await fetch(`http://localhost:3000/api/bookings/${currentTourID}`)
+    await fetch(`/api/bookings/${currentTourID}`)
       .then((res) => res.json())
       .then((data) => {
         return data;
@@ -108,7 +108,7 @@ export default function MasterPlan() {
 
   async function getBookingData(date, TourTd) {
     await fetch(
-      `http://localhost:3000/api/reports/MasterPlan/booking/5/2022-02-20"`
+      `/api/reports/MasterPlan/booking/5/2022-02-20"`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -126,7 +126,7 @@ export default function MasterPlan() {
     var worksheet = ExcelJSWorkbook.addWorksheet("Report");
 
     await fetch(
-      `http://localhost:3000/api/reports/MasterPlan/shows/false/${sunday.toISOString()}`
+      `/api/reports/MasterPlan/shows/false/${sunday.toISOString()}`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -295,9 +295,7 @@ export default function MasterPlan() {
         // End Monday row
 
         await fetch(
-          `http://localhost:3000/api/reports/MasterPlan/booking/${
-            tour.TourId
-          }/${loop.toISOString()}`
+          `/api/reports/MasterPlan/booking/${tour.TourId}/${loop.toISOString()}`
         )
           .then((res) => res.json())
           .then((result) => {

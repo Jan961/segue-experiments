@@ -18,7 +18,17 @@ export default function TourJumpMenu()  {
 
         /**Get the tours for the jump meniu */
 
-        fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`)
+        fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
+            {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8',
+                    "segue_admin": '1',
+                    "account_admin": '1',
+                    "user_id": userService.userValue.userId,
+                    'Access-Control-Allow-Origin': '*'
+                },
+            })
             .then((res) => res.json())
             .then((data) => {
                 setActiveTours(data)
@@ -29,7 +39,7 @@ export default function TourJumpMenu()  {
     }, [])
 
     function changTour(e){
-        forceNavigate(`/bookings/${e.target.value}`)
+        forceNavigate(`/booking/${e.target.value}`)
     }
 
     return (

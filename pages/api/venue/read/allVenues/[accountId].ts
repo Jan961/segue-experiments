@@ -13,7 +13,7 @@ const prisma = new PrismaClient()
 export default async function handle(req, res) {
 
     const accountId = parseInt(req.query.accountId)
-    console.log(accountId)
+   // console.log(accountId)
     try {
         const result = await prisma.$queryRaw`SELECT * FROM Venue WHERE deleted = 0 AND AccountId = ${accountId};`
         res.json(result)

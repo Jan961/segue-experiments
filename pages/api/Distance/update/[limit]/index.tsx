@@ -29,10 +29,10 @@ export default  async function handle(req, res) {
 
            //console.log(JSON.stringify(venue))
             let postcode = venue.Postcode.replace(" ", "")
-            fetch(`http://localhost:3000/api/Distance/country/${postcode}`)
+            fetch(`http://127.0.0.1:3000/api/Distance/country/${postcode}`)
                 .then((latlong) => latlong.json())
                 .then((data) => {
-                    console.log(JSON.stringify((data)))
+                    //console.log(JSON.stringify((data)))
                         //[55.86948933321057,-3.0453811998693046,55.87721476835193,-3.0270227079065744]
                     let latLongCode = data.substring(1, data.indexOf(","));
                     latLongCode = latLongCode.replace("[", "")

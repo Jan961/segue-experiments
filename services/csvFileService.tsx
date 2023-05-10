@@ -11,7 +11,7 @@ function parseCSV(fileName){
 
     console.log(fileName)
 
-        fetch( 'http://localhost:3000/segue/logos/' + fileName )
+        fetch( 'http://127.0.0.1:3000/segue/logos/' + fileName )
             .then( response => response.text() )
             .then( responseText => {
                 return responseText

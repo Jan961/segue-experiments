@@ -95,7 +95,7 @@ export default function Status({ searchFilter}) {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:3000/api/marketing/venue/status/4`)
+    fetch(`http://127.0.0.1:3000/api/marketing/venue/status/4`)
       .then((res) => res.json())
       .then((data) => {
         console.log(data);

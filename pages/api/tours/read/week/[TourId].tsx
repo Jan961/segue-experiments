@@ -16,7 +16,7 @@ export default async function handle(req, res) {
 
 
     let tourId: number = parseInt(req.query.TourId)
-    console.log(tourId)
+    //console.log(tourId)
     const result = await prisma.$queryRaw`SELECT * From WeekView WHERE TourId = ${tourId} ORDER By WeekNum;`
     res.json(result)
 }

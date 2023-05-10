@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import NextCors from "nextjs-cors";
 const prisma = new PrismaClient()
 
 
@@ -11,12 +12,14 @@ const prisma = new PrismaClient()
  * @param res
  */
 export default  async function handle(req, res) {
-    let logInsert;
+
+
+    let logInsert
     try{
     if (req.body != null) {
         logInsert = await prisma.log.create({
             data: {
-                UserId: parseInt(req.body.UserID),
+                UserId: parseInt(req.body.UserID) !== undefined ? parseInt(req.body.UserID): 0,
                 Action: req.body.Action,
                 Detail: JSON.stringify(req.body.Detail),
             }
@@ -33,7 +36,7 @@ export default  async function handle(req, res) {
     }
 
 
+    res.status(200).json()
 
-    res.status(200).json(logInsert)
 
 }

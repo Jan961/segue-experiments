@@ -12,7 +12,7 @@ interface BookingHoldProps {
     TourID: null
 }
 
-export default function BookingHold({ TourId, TourID }){
+export default function BookingHold({ TourId }){
     const [showModal, setShowModal] = React.useState(false);
 
     let [datesList, getDatesList] = React.useState([])
@@ -39,7 +39,7 @@ export default function BookingHold({ TourId, TourID }){
 
 
         // Get Saleable Bookings
-        fetch(`/api/bookings/saleable/${TourId.TourID}`)
+        fetch(`/api/bookings/saleable/${TourId}`)
             .then((res) => res.json())
             .then((dates) => {
                 getDatesList(dates)

@@ -182,7 +182,7 @@ async function sendInvite(user) {
     );
     const subject = "Welcome to Segue - you have been invited";
 
-    const link = `http://localhost:3000/account-actions/${user.UserId}/activate/${user.Guid}`;
+    const link = `http://127.0.0.1:3000/account-actions/${user.UserId}/activate/${user.Guid}`;
 
     const plainText =
       `Hello ${user.UserName},\n` +

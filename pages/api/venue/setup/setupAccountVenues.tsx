@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 export default async function handle(req, res) {
   try {
-    console.log("account venues accountId ", req.body)
+   // console.log("account venues accountId ", req.body)
     if (!req.body.accountId) {
       return res.status(400).json({ error: 'AccountId is required.' });
     }

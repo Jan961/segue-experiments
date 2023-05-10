@@ -11,6 +11,7 @@ import ActionBar from "./ActionBar";
 export interface ActionBookingId {
   actionBookingId: null | number;
 }
+
 const tabs = [
   { name: "Sales", href: "#", current: true },
   { name: "Archived Sales", href: "#", current: false },
@@ -115,8 +116,8 @@ const MarketingPanel = (Tour) => {
       </div>
       <div className={"flex flex-col"}></div>
       <div className={"flex flex-row pt-8"}>
-        <Summary actionBookingId={actionBookingId} activeTours={activeTours} />
-        {ShowSales ? <Sales actionBookingId={actionBookingId} /> : null}
+        <Summary actionBookingId={actionBookingId} activeTours={activeTours}/>
+        {ShowSales ? <Sales actionBookingId={actionBookingId}/> : null}
         {ShowArchiveSales ? <ArchiveSales></ArchiveSales> : null}
         {ShowActivites ? <Activities></Activities> : null}
         {ShowContactNotes ? <ContactNotes></ContactNotes> : null}

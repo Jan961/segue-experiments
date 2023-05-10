@@ -9,7 +9,7 @@ const prisma = new PrismaClient()
 
 export default  async function handle(req, res) {
 
-    console.log(JSON.stringify(req.body))
+    //console.log(JSON.stringify(req.body))
 
     try {
         let vat_reg = false
@@ -38,7 +38,7 @@ export default  async function handle(req, res) {
 
         })
 
-        console.log(updateAccount)
+       // console.log(updateAccount)
         res.statusCode = 200
         res.setHeader('Content-Type', 'application/json')
         res.end(JSON.stringify(updateAccount))

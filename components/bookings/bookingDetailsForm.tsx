@@ -16,6 +16,7 @@ import { dateService } from "../../services/dateService";
 import PerfomancesList from "./perfomancesList";
 import {useEffect, useState} from "react";
 import AddPerfomance from "./modal/AddPerfomance";
+import {MouseEventHandler} from "inferno";
 
 let today = new Date();
 
@@ -24,39 +25,44 @@ export default function BookingDetailsForm({BookingId}) {
   const [loading, setLoading] = useState(false);
   const [inputs, setInputs] = useState({
     Date: null,
-    Venue_Name:null,
+    Venue_Name: null,
     Capacity: 9999, Notes: undefined
 
   });
 
 
+  useEffect(() => {
+    (async () => {
 
-  useEffect(() => { (async() => {
+      fetch(`/api/bookings/Performances/${BookingId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            alert("API Return" + JSON.stringify(data))
+            setInputs({
+              Date: null,
+              Venue_Name: "some Place",
+              Capacity: 22222,
+              Notes: BookingId
+            })
 
-    fetch(`/api/bookings/Performances/${BookingId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          alert("API Return" +  JSON.stringify(data))
-          setInputs({
-            Date: null,
-            Venue_Name: "some Place",
-            Capacity: 22222,
-            Notes: BookingId
           })
 
-        })
 
-
-
-  })(); }, []);
+    })();
+  }, []);
 
 
 
 
+  function handleOnChange() {
+  }
 
-  //
-  function handleOnChange() {}
-
+  const doSaveNext = () => {
+    alert("saveNext")
+  };
+  const doSave = () => {
+    alert("save")
+  };
   return (
       <div className="w-6/12 p-4 border-4">
         <form>
@@ -104,7 +110,8 @@ export default function BookingDetailsForm({BookingId}) {
                 required
                 onChange={handleOnChange}
             />
-            <button className="inline-flex items-center rounded-md border border-transparent bg-primary-blue px-8 py-1 text-xs font-normal leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 h-4/5">
+            <button
+                className="inline-flex items-center rounded-md border border-transparent bg-primary-blue px-8 py-1 text-xs font-normal leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 h-4/5">
               Change
             </button>
           </div>
@@ -212,10 +219,12 @@ export default function BookingDetailsForm({BookingId}) {
           </div>
 
           <div className="flex flex-row justify-between">
-            <button className="inline-flex items-center justify-center w-2/5 rounded-md border border-primary-blue bg-white px-2 py-2 text-xs font-medium leading-4 text-primary-blue shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 ml-0">
+            <button onClick={doSave}
+                    className="inline-flex items-center justify-center w-2/5 rounded-md border border-primary-blue bg-white px-2 py-2 text-xs font-medium leading-4 text-primary-blue shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 ml-0">
               Save
             </button>
-            <button className="inline-flex items-center justify-center w-3/5 rounded-md border border-transparent bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 mr-0">
+            <button onClick={doSaveNext}
+                    className="inline-flex items-center justify-center w-3/5 rounded-md border border-transparent bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 mr-0">
               Save & go to next
             </button>
           </div>
@@ -243,17 +252,21 @@ export default function BookingDetailsForm({BookingId}) {
           </div>
 
           <div className="flex flex-row justify-between mt-4">
-            <button className="inline-flex items-center justify-center w-2/5 rounded-full border border-transparent bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 ml-0">
+            <button
+                className="inline-flex items-center justify-center w-2/5 rounded-full border border-transparent bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 ml-0">
               <span className="flex-grow">View Venue Info</span>
-              <div className="bg-primary-blue border-2 border-white rounded-full w-5 h-5 text-white flex items-center justify-center">
-                <FontAwesomeIcon icon={faChevronRight} />
+              <div
+                  className="bg-primary-blue border-2 border-white rounded-full w-5 h-5 text-white flex items-center justify-center">
+                <FontAwesomeIcon icon={faChevronRight}/>
               </div>
             </button>
 
-            <button className="inline-flex items-center justify-center w-3/5 rounded-full border border-transparent bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 mr-0">
+            <button
+                className="inline-flex items-center justify-center w-3/5 rounded-full border border-transparent bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 mr-0">
               <span className="flex-grow">View Booking History</span>
-              <div className="bg-primary-blue border-2 border-white rounded-full w-5 h-5 text-white flex items-center justify-center">
-                <FontAwesomeIcon icon={faChevronRight} />
+              <div
+                  className="bg-primary-blue border-2 border-white rounded-full w-5 h-5 text-white flex items-center justify-center">
+                <FontAwesomeIcon icon={faChevronRight}/>
               </div>
             </button>
           </div>

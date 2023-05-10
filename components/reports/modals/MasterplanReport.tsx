@@ -72,7 +72,7 @@ export default function MasterPlan(){
             setStatus(false);
         }
     };
-    const handleOnChange = (e) => {
+    function handleOnChange(e) {
         e.persist();
 
         setInputs((prev) => ({
@@ -110,7 +110,7 @@ export default function MasterPlan(){
 
     async function getTourData(currentTourID){
 
-        await fetch(`http://localhost:3000/api/bookings/${currentTourID}`)
+        await fetch(`http://127.0.0.1:3000/api/bookings/${currentTourID}`)
             .then((res) => res.json())
             .then((data) => {
 
@@ -128,7 +128,7 @@ export default function MasterPlan(){
         var ExcelJSWorkbook = new ExcelJS.Workbook();
         var worksheet = ExcelJSWorkbook.addWorksheet("Report");
 
-        await fetch(`http://localhost:3000/api/reports/MasterPlan/shows/true/${sunday.toISOString()}`)
+        await fetch(`http://127.0.0.1:3000/api/reports/MasterPlan/shows/true/${sunday.toISOString()}`)
             .then((res) => res.json())
             .then((data) => {
                 setTours(data)
@@ -299,7 +299,7 @@ export default function MasterPlan(){
                 }
                 // End Monday row
 
-                await fetch(`http://localhost:3000/api/reports/MasterPlan/booking/${tour.TourId}/${loop.toISOString()}`)
+                await fetch(`http://127.0.0.1:3000/api/reports/MasterPlan/booking/${tour.TourId}/${loop.toISOString()}`)
                     .then((res) => res.json())
                     .then((result) => {
                         if(result != null) {

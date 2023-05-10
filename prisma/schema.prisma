@@ -84,70 +84,68 @@ model AttachedFile {
 }
 
 model Booking {
-  BookingId                              Int              @id @default(autoincrement())
-  VenueId                                Int?
-  TourId                                 Int
-  ShowDate                               DateTime         @db.DateTime(0)
-  PerformancesPerDay                     Int?             @default(1) @db.TinyInt
-  Performance1Time                       DateTime?        @db.DateTime(0)
-  Performance2Time                       DateTime?        @db.DateTime(0)
-  Notes                                  String?          @db.Text
-  Miles                                  Int?
-  Pencil                                 Int?             @db.TinyInt
-  TravelTime                             String?          @db.Char(5)
-  RunDays                                Int?             @db.TinyInt
-  DateTypeId                             Int
-  Last_change                            DateTime?        @default(now()) @db.Timestamp(0)
-  RehearsalTown                          String?          @db.VarChar(50)
-  FirstBookingId                         Int?
-  TravelTimeMins                         Int?
-  LandingPageURL                         String?          @db.VarChar(255)
-  VenueContractStatus                    String?          @db.VarChar(4)
-  ContractSignedDate                     DateTime?        @db.DateTime(0)
-  ContractSignedBy                       String?          @db.VarChar(30)
-  ContractReturnDate                     DateTime?        @db.DateTime(0)
-  ContractCheckedBy                      String?          @db.VarChar(30)
-  RoyaltyPC                              Decimal?         @db.Decimal(5, 2)
-  DealType                               String?          @db.VarChar(4)
-  DealNotes                              String?          @db.VarChar(100)
-  GP                                     Decimal?         @db.Decimal(8, 2)
-  MarketingDealNotes                     String?          @db.VarChar(100)
-  CrewNotes                              String?          @db.Text
-  BarringExemptions                      String?          @db.VarChar(100)
-  ContractNotes                          String?          @db.Text
-  TicketPriceNotes                       String?          @db.Text
-  OnSale                                 Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
-  OnSaleDate                             DateTime?        @db.DateTime(0)
-  ContractReceivedBackDate               DateTime?        @db.DateTime(0)
-  BankDetailsReceived                    String?          @db.VarChar(3)
-  MarketingPlanReceived                  Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PrintReqsReceived                      Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ContactInfoReceived                    Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SalesNotes                             String?          @db.Text
-  HoldNotes                              String?          @db.VarChar(1024)
-  CompNotes                              String?          @db.Text
-  BookingStatus                          String           @default("U") @db.Char(1)
-  MerchandiseNotes                       String?          @db.Text
-  DayTypeCast                            Int?
-  LocationCast                           String           @db.VarChar(255)
-  DayTypeCrew                            Int
-  LocationCrew                           String           @db.VarChar(255)
-  Tour                                   Tour             @relation(fields: [TourId], references: [TourId], onUpdate: Restrict, map: "Booking_ibfk_1")
-  Venue                                  Venue?           @relation(fields: [VenueId], references: [VenueId], onDelete: Restrict, onUpdate: Restrict, map: "Booking_ibfk_3")
-  Booking                                Booking?         @relation("BookingToBooking", fields: [FirstBookingId], references: [BookingId], onUpdate: Restrict, map: "Booking_ibfk_4")
-  other_Booking                          Booking[]        @relation("BookingToBooking")
-  DateType                               DateType         @relation(fields: [DateTypeId], references: [DateTypeId], onUpdate: Restrict, map: "Booking_ibfk_2")
-  DateType_Booking_DayTypeCastToDateType DateType?        @relation("Booking_DayTypeCastToDateType", fields: [DayTypeCast], references: [DateTypeId], onDelete: Restrict, onUpdate: Restrict, map: "Booking_ibfk_6")
-  DateType_Booking_DayTypeCrewToDateType DateType         @relation("Booking_DayTypeCrewToDateType", fields: [DayTypeCrew], references: [DateTypeId], onUpdate: Restrict, map: "Booking_ibfk_7")
-  BookingHistory                         BookingHistory[]
-  Contract                               Contract[]
+  BookingId                Int              @id @default(autoincrement())
+  VenueId                  Int?
+  TourId                   Int
+  ShowDate                 DateTime         @db.DateTime(0)
+  PerformancesPerDay       Int?             @default(1) @db.TinyInt
+  Performance1Time         DateTime?        @db.DateTime(0)
+  Performance2Time         DateTime?        @db.DateTime(0)
+  Notes                    String?          @db.Text
+  Miles                    Int?
+  Pencil                   Int?             @db.TinyInt
+  TravelTime               String?          @db.Char(5)
+  RunDays                  Int?             @db.TinyInt
+  DateTypeId               Int?
+  Last_change              DateTime?        @default(now()) @db.Timestamp(0)
+  RehearsalTown            String?          @db.VarChar(50)
+  FirstBookingId           Int?
+  TravelTimeMins           Int?
+  LandingPageURL           String?          @db.VarChar(255)
+  VenueContractStatus      String?          @db.VarChar(4)
+  ContractSignedDate       DateTime?        @db.DateTime(0)
+  ContractSignedBy         String?          @db.VarChar(30)
+  ContractReturnDate       DateTime?        @db.DateTime(0)
+  ContractCheckedBy        String?          @db.VarChar(30)
+  RoyaltyPC                Decimal?         @db.Decimal(5, 2)
+  DealType                 String?          @db.VarChar(4)
+  DealNotes                String?          @db.VarChar(100)
+  GP                       Decimal?         @db.Decimal(8, 2)
+  MarketingDealNotes       String?          @db.VarChar(100)
+  CrewNotes                String?          @db.Text
+  BarringExemptions        String?          @db.VarChar(100)
+  ContractNotes            String?          @db.Text
+  TicketPriceNotes         String?          @db.Text
+  OnSale                   Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
+  OnSaleDate               DateTime?        @db.DateTime(0)
+  ContractReceivedBackDate DateTime?        @db.DateTime(0)
+  BankDetailsReceived      String?          @db.VarChar(3)
+  MarketingPlanReceived    Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
+  PrintReqsReceived        Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ContactInfoReceived      Boolean          @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SalesNotes               String?          @db.Text
+  HoldNotes                String?          @db.VarChar(1024)
+  CompNotes                String?          @db.Text
+  BookingStatus            String           @default("U") @db.Char(1)
+  MerchandiseNotes         String?          @db.Text
+  DayTypeCast              Int?             @default(1)
+  LocationCast             String?          @db.VarChar(255)
+  DayTypeCrew              Int?             @default(1)
+  LocationCrew             String?          @db.VarChar(255)
+  Tour                     Tour             @relation(fields: [TourId], references: [TourId], onUpdate: Restrict, map: "Booking_ibfk_1")
+  Venue                    Venue?           @relation(fields: [VenueId], references: [VenueId], onDelete: Restrict, onUpdate: Restrict, map: "Booking_ibfk_3")
+  Booking                  Booking?         @relation("BookingToBooking", fields: [FirstBookingId], references: [BookingId], onUpdate: Restrict, map: "Booking_ibfk_4")
+  other_Booking            Booking[]        @relation("BookingToBooking")
+  DateType                 DateType?        @relation(fields: [DateTypeId], references: [DateTypeId], onDelete: Restrict, onUpdate: Restrict, map: "Booking_ibfk_5")
+  BookingHistory           BookingHistory[]
+  Contract                 Contract[]
 
-  @@index([DateTypeId], map: "DateType_Booking_fk")
-  @@index([TourId], map: "Tour_Booking_fk")
-  @@index([VenueId], map: "fk_Venue_Booking")
   @@index([FirstBookingId], map: "Booking_ibfk_4")
+  @@index([DateTypeId], map: "DateType_Booking_fk")
   @@index([DayTypeCast, DayTypeCrew], map: "DayTypeCast")
   @@index([DayTypeCrew], map: "DayTypeCrew")
+  @@index([TourId], map: "Tour_Booking_fk")
+  @@index([VenueId], map: "fk_Venue_Booking")
 }
 
 model BookingActivity {
@@ -184,13 +182,13 @@ model BookingHistory {
   BookingId        Int
   VenueId          Int?
   UpdateDT         DateTime @db.DateTime(0)
-  Booking          Booking  @relation(fields: [BookingId], references: [BookingId], onUpdate: Restrict, map: "Booking_BookingHistory_fk")
+  Booking          Booking  @relation(fields: [BookingId], references: [BookingId], onUpdate: Restrict, map: "BookingHistory_ibfk_1")
 
   @@index([BookingId], map: "Booking_BookingHistory")
 }
 
 model BookingPerformance {
-  PerformanceId Int       @id @default(autoincrement())
+  PerformanceId Int       @id
   BookingId     Int
   Time          DateTime? @db.Time(0)
 
@@ -332,18 +330,16 @@ model CustomInputValues {
 }
 
 model DateType {
-  DateTypeId                            Int       @id @default(autoincrement())
-  Name                                  String?   @db.VarChar(30)
-  IsAWorkday                            Boolean   @default(dbgenerated("(b'1')")) @db.Bit(1)
-  IsATravelDay                          Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  IsARehearsalDay                       Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  IsADeclaredHoliday                    Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  IsABooking                            Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  IsAGetInFitUpDay                      Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  IsATechDressDay                       Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  Booking                               Booking[]
-  Booking_Booking_DayTypeCastToDateType Booking[] @relation("Booking_DayTypeCastToDateType")
-  Booking_Booking_DayTypeCrewToDateType Booking[] @relation("Booking_DayTypeCrewToDateType")
+  DateTypeId         Int       @id @default(autoincrement())
+  Name               String?   @db.VarChar(30)
+  IsAWorkday         Boolean   @default(dbgenerated("(b'1')")) @db.Bit(1)
+  IsATravelDay       Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsARehearsalDay    Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsADeclaredHoliday Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsABooking         Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsAGetInFitUpDay   Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsATechDressDay    Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  Booking            Booking[]
 }
 
 model EmailImport {
@@ -547,8 +543,8 @@ model TourTask {
   TourId                         Int
   TaskCode                       Int       @db.SmallInt
   TaskName                       String    @db.VarChar(80)
-  StartByWeekCode                String    @db.VarChar(6)
-  CompleteByWeekCode             String    @db.VarChar(6)
+  StartByWeekCode                String    @db.Text
+  CompleteByWeekCode             String    @db.Text
   Priority                       Int       @default(0) @db.TinyInt
   Notes                          String?   @db.VarChar(500)
   DeptRCK                        Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
@@ -562,7 +558,7 @@ model TourTask {
   AssignedBy                     Int?
   CreatedDate                    DateTime? @db.Date
   Status                         String?   @db.VarChar(20)
-  Interval                       String    @default("once") @db.VarChar(20)
+  Interval                       String?   @default("once") @db.VarChar(20)
   User_TourTask_AssignedByToUser User?     @relation("TourTask_AssignedByToUser", fields: [AssignedBy], references: [UserId], onDelete: Restrict, onUpdate: Restrict, map: "FK_AssignedBy")
   User_TourTask_AssigneeToUser   User?     @relation("TourTask_AssigneeToUser", fields: [Assignee], references: [UserId], onDelete: Restrict, onUpdate: Restrict, map: "FK_Assignee")
   Tour                           Tour      @relation(fields: [TourId], references: [TourId], onDelete: Cascade, map: "Tour_TourTask_fk")
@@ -781,4 +777,18 @@ model log {
   Action String   @default("System Report") @db.Text
   Detail String?  @db.Text
   Date   DateTime @default(now()) @db.Timestamp(0)
+}
+
+model CustomInputValues {
+  OwnerId Int     @id @default(autoincrement())
+  Name    String? @default("") @db.VarChar(100)
+  Value   String? @db.VarChar(75)
+  Type    String? @db.VarChar(50)
+}
+
+model MasterCustomInputValues {
+  OwnerId Int     @id @default(autoincrement())
+  Name    String? @default("") @db.VarChar(100)
+  Value   String? @db.VarChar(75)
+  Type    String? @db.VarChar(50)
 }

@@ -16,15 +16,15 @@ export default async function handle(req, res) {
 
     let query: number = parseInt(req.query.venueId)
     try {
-   await prisma.venue.findMany(
-        {
-            where:{
-                VenueId:   query
-            },
+       let venue  = await prisma.venue.findFirst(
+            {
+                where:{
+                    VenueId:   query
+                },
+            }
+        )
+            res.status(200).json(venue).end();
         }
-    )
-        res.status(200).end();
-    }
 
     catch (error) {
         res.json(error);

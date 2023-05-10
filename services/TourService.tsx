@@ -96,7 +96,7 @@ function getTourVenueStatus(tourID){
 
     let tourId = parseInt(tourID)
     let result
-    fetch(`http://localhost:3000/api/marketing/venue/status/${tourId}`)
+    fetch(`http://127.0.0.1:3000/api/marketing/venue/status/${tourId}`)
         .then((res) => res.json())
         .then((data) => {
             console.log(data)

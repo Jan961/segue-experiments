@@ -27,9 +27,9 @@ export const dateService = {
 function dateToSimple(dateToFormat){
 
     let date = new Date(dateToFormat);
-    let options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    let options = { year: 'numeric', day: '2-digit', month: '2-digit', timeZone: 'UTC' };
     // @ts-ignore
-    return(date.toLocaleDateString('en-GB', options));
+    return(date.toLocaleDateString(options));
 }
 
 function dateTimeToTime(dateToFormat){
@@ -40,7 +40,7 @@ function dateTimeToTime(dateToFormat){
 
 function todayToSimple(){
     let date = new Date();
-    let options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+    let options = { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: 'UTC' };
     return(date.toDateString());
 }
 
@@ -65,7 +65,7 @@ function getDateDaysInFuture(date, daysToSubtract){
 
 function getWeekDay(dateToFormat){
     let date = new Date(dateToFormat);
-    let options = {weekday: 'short'};
+    let options = {weekday: 'short', timeZone: "utc"};
     // @ts-ignore
     return date.toLocaleDateString('en-US',options);
 

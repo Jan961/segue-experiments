@@ -21,7 +21,7 @@ export default async function handle(req, res) {
         query  =  query + ` AND Tour.TourId =  ${TourId}`
     }
     query  =  query +   " ORDER BY Tour.TourId;"
-    console.log(query)
+    //console.log(query)
 
     try {
         let result = await prisma.$queryRawUnsafe(`${query}`)

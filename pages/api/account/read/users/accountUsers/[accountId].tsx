@@ -18,7 +18,7 @@ const prisma = new PrismaClient()
  */
 export default async function handle(req, res) {
 
-    console.log(req.query.accountId)
+   // console.log(req.query.accountId)
     const acc = parseInt(req.query.accountId)
     try {
         const searchResults = await prisma.user.findMany(

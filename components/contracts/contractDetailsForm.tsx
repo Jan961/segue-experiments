@@ -445,12 +445,12 @@ const ContractDetailsForm = ({
                       formDataHandler("DealType", e.currentTarget.value, "")
                     }
                   >
-                    <option value="NULL">none</option>
-                    <option value="SPLT">split</option>
-                    <option value="GUA">guarantee</option>
-                    <option value="CS">call single</option>
-                    <option value="CM">call multiple</option>
-                    <option value="FCAS">first call against split</option>
+                    <option value="NULL">None</option>
+                    <option value="SPLT">Split</option>
+                    <option value="GUA">Guarantee</option>
+                    <option value="CS">Call Single</option>
+                    <option value="CM">Call Multiple</option>
+                    <option value="FCAS">First Call Against Split</option>
                   </select >
                 </div>
                   

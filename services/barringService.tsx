@@ -111,7 +111,7 @@ function gapSuggestion(tourID){
 function getTourDate(TourId){
 
     console.log(TourId)
-    let endpoint = (query) => `http://localhost:3000/api/tours/read/gaps/${query}`
+    let endpoint = (query) => `http://127.0.0.1:3000/api/tours/read/gaps/${query}`
     fetch(endpoint(TourId))
         .then(res => res.json())
         .then(res => {

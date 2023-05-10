@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+const colors = require('tailwindcss/colors')
 module.exports = {
   content: [
   "./pages/**/*.{js,ts,jsx,tsx}",
@@ -8,14 +9,6 @@ module.exports = {
     require('@tailwindcss/forms'),
   ],
   theme: {
-    /*
-    colors: {
-
-        'navbar-blue': '#22355a',
-        'booking-heading-text': '#2a77a3',
-        'form-backgrounds': '#22355a',
-    },
-    */
    extend:{
      colors:{
        "primary-orange": "#ec6255",
@@ -30,8 +23,10 @@ module.exports = {
        "soft-primary-grey": "#627293",
        "faded-primary-grey": "#f8f8fa",
        "soft-table-row-separation": "#e3ebf2",
-       "table-row-alternating": "#f8f8f8"
-     }
+       "table-row-alternating": "#f8f8f8",     },
+     fontSize: {
+        'default': '0.85rem',
+      }
    }
   },
 }

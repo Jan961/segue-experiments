@@ -1,4 +1,4 @@
-import React, {SetStateAction, Dispatch} from "react";
+import React, {SetStateAction, Dispatch, useEffect, useState} from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAnglesDown,
@@ -8,62 +8,90 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { Tour } from "interfaces";
+import { loggingService } from "services/loggingService";
+import getUsers from "utils/getUsers";
 
 interface ToolbarProps {
   openAddTask: (open: boolean) => void;
+  openAddRecurringTask: (open: boolean) => void;
   searchFilter: string;
-  setSearchFilter: Dispatch<SetStateAction<string>>
+  setSearchFilter: Dispatch<SetStateAction<string>>;
+  displayFilter?: boolean;
+  assignedBy?:number
+  setAssignedBy?:Dispatch<SetStateAction<number>>;
+  assignee?:number
+  setAssignee?:Dispatch<SetStateAction<number>>;
+  selectedTour?:number;
+  setSelectedTour?:any;
+  tours:Tour[];
+  userAccountId:number;
+  filtersOpen:boolean;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({searchFilter, setSearchFilter, openAddTask }) => {
-  return (
-    <div className=" px-2 flex flex-col w-screen-full">
-      <div className='w-full flex flex-row justify-end'>
-      <div className="flex flex-row">
-        <select className="rounded-md border-none drop-shadow-md" name='filter' id='filter'>
-            <option>
-              Select Filter
-            </option>
-          </select>
-        </div>
 
-      </div>
-      <div className="flex justify-between items-center mt-3">
-        <div className="flex items-center">
-          <h1 className="text-3xl font-bold mr-4 text-primary-purple">Tasks</h1>
-        </div>
-        <div className="flex flex-col items-center">
-  <form className="mt-4 relative">
-    <label htmlFor="searchBookings" className="sr-only">
-      Search Tasks
-    </label>
-    <div className="relative">
-      <input
-        onChange={(e) => setSearchFilter(e.currentTarget.value)}
-        value={searchFilter}
-        className="border-none pl-8 pr-2 py-1 rounded-md"
-        type="text"
-        placeholder="Search Tasks"
-      />
-      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-        <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-      </div>
-    </div>
-  </form>
-</div>
-      </div>
+const Toolbar: React.FC<ToolbarProps> = ({filtersOpen, openAddRecurringTask,userAccountId,tours, openAddTask, searchFilter, setSearchFilter, assignedBy, setAssignedBy, assignee, setAssignee, selectedTour, setSelectedTour }) => {
+const [users, setUsers] = useState([])
+
+  async function requestAccountUsers(){
+    let foundUsers = await getUsers(userAccountId)
+    console.log("The found users",foundUsers)
+    loggingService.logAction("User Response",foundUsers)
+    if(foundUsers){
+      setUsers(foundUsers)
+    }
+  }
+
+  useEffect(() => {
+    requestAccountUsers()
+  }, [])
+  
+
+  return (
+    <div className=" pt-4 flex flex-col w-screen-full">
       <div className="flex items-center">
         <button
           onClick={() => openAddTask(true)}
           className="flex flex-row justify-center w-44 text-center rounded-md border-gray-300 drop-shadow-md bg-white px-3 py-2 text-xs font-medium text-primary-purple shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 mr-4"
-        >
+          >
           Add Task
         </button>
-        <button className="flex flex-row justify-center w-44 text-center rounded-md border-gray-300 drop-shadow-md bg-white px-3 py-2 text-xs font-medium text-primary-purple shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+        <button
+          onClick={() => openAddRecurringTask(true)}
+         className="flex flex-row justify-center w-44 text-center rounded-md border-gray-300 drop-shadow-md bg-white px-3 py-2 text-xs font-medium text-primary-purple shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
           Add Recurring Task
         </button>
-      </div>
+
+
+      <div className={`${!filtersOpen && "hidden"} transition-all duration-100 flex flex-row items-center justify-evenly text-primary-purple w-full bg-transparent`}>
+
+
+        <label className=" sr-only" htmlFor={"date"}>Title</label>
+        <input placeholder="title..."  value={searchFilter} onChange={(e)=>setSearchFilter(e.currentTarget.value)} className="rounded-md border-none drop-shadow-md" type={"text"} />
+        <select className="rounded-md border-none drop-shadow-md" onChange={(e) => setAssignee(parseInt(e.currentTarget.value))} id={"assignee"} >
+          <option value={0}>Assignee</option>
+          {users.map(usr => {
+                   return <option value={usr.UserId}>{usr.UserName}</option>
+                  })} 
+        </select>
+        <select className="rounded-md border-none drop-shadow-md" id={"assignedBy"} onChange={(e) => setAssignedBy(parseInt(e.currentTarget.value))} >
+          <option value={0}>Assigned by</option>
+          {users.map(usr => {
+                   return <option value={usr.UserId}>{usr.UserName}</option>
+                  })} 
+        </select>
+        <label className=" sr-only" htmlFor={"assignedBy"}>Assigned By</label>
+        <select className="rounded-md border-none drop-shadow-md" id={"tourSelect"} onChange={(e) => setSelectedTour(parseInt(e.currentTarget.value))} >
+          <option value={0}>Select a Tour</option>
+          {tours.length > 0 && tours.map((tour) => (
+            <option key={tour.TourId} value={tour.TourId} >{tour.Show.Code}/{tour.Code}</option>
+        ))
+        }        </select>
+        <label className=" sr-only" htmlFor={"tourSelect"}>Tour</label>
+
     </div>
+    </div>
+  </div>
   );
 };
 

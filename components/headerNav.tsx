@@ -1,70 +1,32 @@
 import * as React from "react";
-import { Router } from "next/router";
+import { Router, useRouter } from "next/router";
 import { userService } from "../services/user.service";
 import user from "./accounts/manage-users/user";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faUser, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 
 function headerNav({menuIsOpen, setMenuIsOpen}:any) {
+  const [username, setUsername] = React.useState("My Account")
+  const router = useRouter();
+
   function logout() {
     userService.logout();
+    router.push("/"); 
   }
   let user = userService.userValue;
+  React.useEffect(() => {
+    
+    if(user && user.name){
+      setUsername(user.name)
+    }
+  
+  
+  }, [user]);
 
-  // return (
-  //     <>
-  //         <nav className="bg-transparent shadow-sm">
-  //             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-  //                 <div className="flex h-16 justify-between">
-  //                     <div className="flex">
-  //                         <div className="flex flex-shrink-0 items-center">
-  //                             <img className="block h-8 w-auto lg:hidden"
-  //                                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-  //                                  alt="Your Company"/>
-  //                             <img className="hidden h-8 w-auto lg:block"
-  //                                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-  //                                  alt="Your Company"/>
-  //                         </div>
-  //                         <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
 
-  //                         </div>
-  //                     </div>
-  //                     <div className="hidden sm:ml-6 sm:flex sm:items-center">
-  //                         <a href="/"
-  //                            className="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-  //                            aria-current="page">Platform Home</a>
 
-  //                         <a href="/shows"
-  //                            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                             Shows</a>
-  //                         <a href="/tasks"
-  //                            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                             Tasks</a>
-  //                         <a href="/reports"
-  //                            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                             Reports</a>
-  //                         <a href="/profile"
-  //                            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                             Profile</a>
 
-  //                         <a href="/accounts"
-  //                            className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                             Segue Account</a>
 
-  //                             <a href="/administration"
-  //                                className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                                 Global Administration</a>
-
-  //                         <a onClick={logout}  className="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-  //                             Logout</a>
-  //                     </div>
-
-  //                 </div>
-  //             </div>
-
-  //         </nav>
-  //     </>
-  // )
   return (
       <nav className=" bg-none">
         <div className="  px-2 sm:px-4 " >
@@ -76,7 +38,7 @@ function headerNav({menuIsOpen, setMenuIsOpen}:any) {
                 alt="Your Company"
               />
             </div>
-            <div >
+            <div className="flex flex-row items-center">
               <a
                 href="/"
                 className="border-indigo-500 rounded-full text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium"
@@ -97,8 +59,19 @@ function headerNav({menuIsOpen, setMenuIsOpen}:any) {
                   icon={faUser}
                   className="mr-2 text-white rounded-full bg-primary-orange p-1"
                 />
-                Your Account
+                {username}
               </a>
+              <span className="mx-2">{" | "}</span>
+              <button
+              onClick={logout}
+              className=" border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 inline-flex items-center px-1 pt-1 text-sm font-medium"
+            >
+              <FontAwesomeIcon
+                icon={faSignOutAlt}
+                className="mr-2 bg-primary-purple text-white rounded-full bg-primary-red p-1"
+              />
+              Log Out
+            </button>
             </div>
           </div>
         </div>
@@ -107,3 +80,5 @@ function headerNav({menuIsOpen, setMenuIsOpen}:any) {
 }
 
 export default headerNav;
+
+

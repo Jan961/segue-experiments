@@ -2,10 +2,12 @@ import { ITourTask } from "interfaces";
 import { useEffect, useState } from "react";
 import formatInputDate from "utils/dateInputFormat";
 import {loggingService} from "../../services/loggingService";
+import getUsers from "utils/getUsers";
+import { LocalUser } from "types/userTypes";
 
-function UpdateTaskForm({task, closeModal}:{task:ITourTask, closeModal:()=>void}) {
+function UpdateTaskForm({currentUser, userAccountId,task, closeModal}:{currentUser:LocalUser,userAccountId:number,task:ITourTask, closeModal:()=>void}) {
   
-    const [usersArray, setUsersArray] = useState([]);
+  const [users, setUsers] = useState([])
     const [showsArray, setShowsArray] = useState([]);
     const [taskTitle, setTaskTitle] = useState(task &&task.TaskName);
     const [dueDate, setDueDate] = useState(formatInputDate(task &&task.DueDate));
@@ -35,6 +37,10 @@ function UpdateTaskForm({task, closeModal}:{task:ITourTask, closeModal:()=>void}
 
   const handleAssigneeChange = (event) => {
     setAssignee(event.target.value);
+    if(parseInt(event.target.value) !==  0){
+    setAssignedBy(currentUser.id)} else{
+      setAssignedBy(0)
+    }
   };
 
   const handleStatusChange = (event) => {
@@ -89,29 +95,20 @@ function UpdateTaskForm({task, closeModal}:{task:ITourTask, closeModal:()=>void}
     event.preventDefault();
     updateTask()
   };
-async function fetchData(){
-try {
-  // fetches the users
-  const usersResponse = await fetch(`/api/users`)
-  if(usersResponse.ok){
-    const parsedUsersResponse = await usersResponse.json()
-    console.log(parsedUsersResponse)
-    loggingService.logAction( "Update Task", parsedUsersResponse)
-    setUsersArray(parsedUsersResponse)
+
+
+  async function requestAccountUsers(){
+    let foundUsers = await getUsers(userAccountId)
+    console.log("The found users",foundUsers)
+    loggingService.logAction("User Response",foundUsers)
+    if(foundUsers){
+      setUsers(foundUsers)
+    }
   }
-  // const showResponse = await fetch(`/api/tour/shows`)
-  // if(showResponse.ok){
-  //   const parsedShowResponse = await showResponse.json()
-  //   setShowsArray(parsedShowResponse)
-  // }
-} catch (error) {
-  loggingService.logError( error)
-  console.error(error)
-}
-}
-    useEffect(() => {
-        fetchData()
-    }, []);
+
+  useEffect(() => {
+    requestAccountUsers()
+  }, [])
 
   return (
     <div className="flex-col items-center pb-3">
@@ -123,9 +120,9 @@ try {
           <h3 className="text-lg font-medium leading-6 text-gray-900">
             ShowModal Title:
           </h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
+          {/* <p className="mt-1 max-w-2xl text-sm text-gray-500">
             Personal details and application.
-          </p>
+          </p> */}
         </div>
         <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
           <dl className="sm:divide-y sm:divide-gray-200">
@@ -202,9 +199,10 @@ try {
                 <select name="assignee"
                 onChange={handleAssigneeChange}
                 value={assignee}>
-                  {/* users that are connected to the tour will be mapped here */}
-                  <option value={1}>Peter Carlyle</option>
-        
+                <option value={0}>Assign a User</option>
+              {users.map(usr => {
+                   return <option value={usr.UserId}>{usr.UserName}</option>
+                  })} 
                 </select>
               </dd>
             </div>

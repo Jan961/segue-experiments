@@ -122,7 +122,7 @@ const Activities = () => (
             "inline-flex items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
           }
         >
-          Add Contact{" "}
+          Add another contact{" "}
         </button>
       </div>
     </div>
