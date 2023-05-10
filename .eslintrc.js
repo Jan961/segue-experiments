@@ -11,6 +11,7 @@ module.exports = {
     es2021: true
   },
   extends: [
+    'next',
     'plugin:react/recommended',
     'standard',
     'plugin:react/jsx-runtime'
@@ -28,6 +29,6 @@ module.exports = {
     '@typescript-eslint'
   ],
   rules: {
-    "indent": ["error", 2]
+    indent: ['error', 2]
   }
 }
