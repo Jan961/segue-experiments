@@ -6,7 +6,7 @@ type ShowListProps = {
 }
 
 const ShowList = ({ items }: ShowListProps) => (
-  <ul role="list" className="divide-y divide-gray-200">
+  <ul role="list">
     {items?.map((item) => (
       <ShowListItem data={item} key={item.ShowId} />
     ))}

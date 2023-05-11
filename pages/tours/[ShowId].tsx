@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Layout from 'components/Layout'
-import List from 'components/tours/List'
+import TourList from 'components/tours/TourList'
 import { Tour } from 'interfaces'
 import NewTour from 'components/tours/forms/newTour'
 import { GetStaticPaths, GetStaticProps } from 'next'
@@ -78,7 +78,7 @@ export default function Tours ({ showID }: Props) {
           <span className="text-primary-blue block xl:inline">Tours</span>
         </h1>
         <div className="w-full flex flex-col items-center md:px-8">
-          {data.length !== undefined && <List items={data}></List>}
+          {data.length !== undefined && <TourList items={data}></TourList>}
         </div>
       </Layout>
     </>

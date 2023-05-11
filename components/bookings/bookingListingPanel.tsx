@@ -8,7 +8,7 @@ import {
     faSearch
 } from "@fortawesome/free-solid-svg-icons";
 import {IconProp} from "@fortawesome/fontawesome-svg-core";
-import ListItem from "../tours/ListItem";
+import TourListItem from "../tours/TourListItem";
 import BookingDetailRow from "./bookingDetailRow";
 
 const weekday = ["SUN", "MON", "TUES", "WED", "THU", "FRI", "SAT"];
