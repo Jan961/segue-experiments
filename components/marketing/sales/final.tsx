@@ -1,18 +1,11 @@
-import * as React from 'react'
-import {faBook, faCopy, faEdit, faEnvelopeOpen, faPlus, faSquareXmark, faUser} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import {useEffect, useState} from "react";
-import Email from "../copyButton/email";
-import Loading from "../../global/loading";
-import {dateService} from "../../../services/dateService";
-import AccountId from "../../../pages/accounts/update-details/[account-id]";
-import emailLoader from "./email-loader";
-import {userService} from "../../../services/user.service";
-import axios from "axios";
-import {Notification} from "rxjs";
-import {alertService} from "../../../services/alert.service";
-import {Alert} from "../../alert";
+import { useEffect, useState } from 'react'
+import Email from '../copyButton/email'
+import { dateService } from 'services/dateService'
+import { userService } from 'services/user.service'
+import axios from 'axios'
+import { alertService } from 'services/alert.service'
+import { Alert } from '../../alert'
+import { LoadingPage } from 'components/global/LoadingPage'
 
 
 let faEnvelopeOpenOpen;
@@ -88,7 +81,7 @@ export default function FinalSales() {
         }
     };
 
-    if (isLoading) return <Loading></Loading>
+    if (isLoading) return <LoadingPage />
 
     /**
      * Onn update of activeSetTours

@@ -1,22 +1,10 @@
-import * as React from "react";
-import {
-  faBook,
-  faCopy,
-  faEdit,
-  faEnvelopeOpen,
-  faPlus,
-  faSquareXmark,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
-import { userService } from "../../../services/user.service";
-import Loading from "../../global/loading";
-import Email from "../copyButton/email";
-import { dateService } from "../../../services/dateService";
-import moment from "moment";
-import { func } from "prop-types";
-import axios from "axios";
+import { useEffect, useState } from 'react'
+import { userService } from 'services/user.service'
+import Email from '../copyButton/email'
+import { dateService } from 'services/dateService'
+import moment from 'moment'
+import axios from 'axios'
+import { LoadingPage } from 'components/global/LoadingPage'
 
 interface props {
   searchFilter: String;
@@ -190,7 +178,7 @@ export default function Entry({ searchFilter }: props) {
     }
   };
 
-  if (isLoading) return <Loading></Loading>;
+  if (isLoading) return <LoadingPage />
 
   /**
    * Onn update of activeSetTours

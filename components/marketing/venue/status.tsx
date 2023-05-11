@@ -1,8 +1,7 @@
-import * as React from "react";
-import { tourService } from "../../../services/TourService";
-import { useEffect, useState } from "react";
-import Loading from "../../global/loading";
-import Link from "next/link";
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { LoadingPage } from 'components/global/LoadingPage'
+
 
 const venues = [
   {
@@ -126,7 +125,7 @@ export default function Status({ searchFilter}) {
   }, [searchFilter]);
 
 
-  if (isLoading) return <Loading></Loading>;
+  if (isLoading) return <LoadingPage />
 
   return (
     <div className={"flex w-full"}>

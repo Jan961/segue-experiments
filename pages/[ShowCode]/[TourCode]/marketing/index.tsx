@@ -1,12 +1,8 @@
-import Layout from '../../../../components/Layout'
-import Toolbar from "../../../../components/marketing/ActionBar";
-import SideMenu from "../../../../components/sideMenu";
-import {ReactElement, useEffect, useState} from "react";
-import MarketingPanel from "../../../../components/marketing/marketing-panel";
-import Loading from "../../../../components/global/loading";
-import {tourService} from "../../../../services/TourService";
-import {showService} from "../../../../services/ShowService";
-import {Tour} from "../../../../interfaces";
+import Layout from 'components/Layout'
+import Toolbar from 'components/marketing/ActionBar'
+import SideMenu from 'components/sideMenu'
+import { useState } from 'react'
+import MarketingPanel from 'components/marketing/marketing-panel'
 
 export default function Index() {
     const [data, setData] = useState(null)

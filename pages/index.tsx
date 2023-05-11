@@ -1,12 +1,8 @@
-import Link from 'next/link'
 import Layout from '../components/Layout'
-import UserMessage from "../components/dashboard/userMessage";
-import Switchboard from "../components/dashboard/switchboard";
-import Loading from "../components/global/loading";
-import {useEffect, useState} from "react";
-import accountId from "./accounts/update-details/[account-id]";
-import {userService} from "../services/user.service";
-
+import UserMessage from '../components/dashboard/userMessage'
+import Switchboard from '../components/dashboard/switchboard'
+import { useEffect, useState } from 'react'
+import { LoadingPage } from 'components/global/LoadingPage'
 
 export default function Index() {
     const [data, setData] = useState(null)
@@ -29,7 +25,7 @@ export default function Index() {
             })
     }, [])
 
-    if (isLoading) return <Loading></Loading>
+    if (isLoading) return <LoadingPage />
     if (!data) return <p>No profile data</p>
 
     return (
