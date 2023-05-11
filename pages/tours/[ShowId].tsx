@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react'
 import Layout from 'components/Layout'
 import TourList from 'components/tours/TourList'
 import { Tour } from 'interfaces'
-import NewTour from 'components/tours/forms/newTour'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { SearchBox } from 'components/global/SearchBox'
 import { DisplayArchived } from 'components/global/DisplayArchived'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { MenuButton } from 'components/global/MenuButton'
+import { LoadingPage } from 'components/global/LoadingPage'
 
 /**
  * Send search request to the API
@@ -24,7 +26,6 @@ export default function Tours ({ showID }: Props) {
   const [searchQuery, setSearchQuery] = useState(' ')
   const [isLoading, setLoading] = useState(false)
 
-
   const [inputs, setInputs] = useState({
     search: ' '
   })
@@ -35,12 +36,11 @@ export default function Tours ({ showID }: Props) {
       .then((res) => res.json())
       .then((res) => {
         setData(res)
-
         setLoading(false)
       })
   }, [])
 
-  if (isLoading) return <p>Loading...</p>
+  if (isLoading) return <LoadingPage />
 
   function search () {
     fetch(searchEndpoint(searchQuery, archived))
@@ -71,7 +71,7 @@ export default function Tours ({ showID }: Props) {
       <div className="float-right">
         <DisplayArchived onChange={toggleAchive} checked={archived} />
         <SearchBox onChange={handleOnChange} value={inputs.search} />
-        <NewTour show={showID} items={[]}></NewTour>
+        <MenuButton href={`/tours/${showID}/create`} iconRight={faPlus}>Add Tour</MenuButton>
       </div>
       <h1 className="text-3xl font-bold tracking-tight">
         <span className="text-primary-blue block xl:inline">Tours</span>

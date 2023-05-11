@@ -6,6 +6,7 @@ import { SearchBox } from 'components/global/SearchBox'
 import { DisplayArchived } from 'components/global/DisplayArchived'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { MenuButton } from 'components/global/MenuButton'
+import { LoadingPage } from 'components/global/LoadingPage'
 
 /**
  * Send search request to the API
@@ -36,7 +37,7 @@ export default function Index () {
       })
   }, [])
 
-  if (isLoading) return <p>Loading...</p>
+  if (isLoading) return <LoadingPage />
 
   function search () {
     fetch(searchEndpoint(searchQuery, archived))

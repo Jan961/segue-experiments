@@ -99,7 +99,7 @@ const Create = () => {
   }
 
   return (
-    <Layout title="Create Show | Segue">
+    <Layout title="Add Show | Segue">
       <FormContainer>
         <div className="mb-4">
           <Link href="/shows"><FontAwesomeIcon icon={faChevronLeft} />&nbsp;Back</Link>
