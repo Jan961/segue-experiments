@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Show } from '../../interfaces'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
-import UpdateShow from './forms/updateShow'
+import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { forceReload } from '../../utils/forceReload'
 import { MenuButton } from 'components/global/MenuButton'
@@ -45,7 +44,7 @@ const ShowListItem = ({ data }: Props) => {
           </p>
         </div>
         <div className="whitespace-nowrap">
-          <UpdateShow items={data}></UpdateShow>
+          <MenuButton href={`/shows/edit/${data.ShowId}`} icon={faPencil} />
           <MenuButton intent='DANGER' onClick={deleteShow} icon={faTrash} />
         </div>
       </li>

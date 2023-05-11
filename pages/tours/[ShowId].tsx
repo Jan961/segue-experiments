@@ -67,21 +67,19 @@ export default function Tours ({ showID }: Props) {
 
   // @ts-ignore
   return (
-    <>
-      <Layout title="Tours | Segue">
-        <div className="float-right">
-          <DisplayArchived onChange={toggleAchive} checked={archived} />
-          <SearchBox onChange={handleOnChange} value={inputs.search} />
-          <NewTour show={showID} items={[]}></NewTour>
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          <span className="text-primary-blue block xl:inline">Tours</span>
-        </h1>
-        <div className="w-full flex flex-col items-center md:px-8">
-          {data.length !== undefined && <TourList items={data}></TourList>}
-        </div>
-      </Layout>
-    </>
+    <Layout title="Tours | Segue">
+      <div className="float-right">
+        <DisplayArchived onChange={toggleAchive} checked={archived} />
+        <SearchBox onChange={handleOnChange} value={inputs.search} />
+        <NewTour show={showID} items={[]}></NewTour>
+      </div>
+      <h1 className="text-3xl font-bold tracking-tight">
+        <span className="text-primary-blue block xl:inline">Tours</span>
+      </h1>
+      <div className="w-full flex flex-col items-center md:px-8">
+        {data.length !== undefined && <TourList items={data}></TourList>}
+      </div>
+    </Layout>
   )
 }
 

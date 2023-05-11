@@ -1,16 +1,18 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Link from 'next/link';
 import { PropsWithChildren } from 'react'
 
 interface MenuButtonProps {
-  onClick: (e: any) => void;
+  onClick?: (e: any) => void;
+  href?: string;
   iconRight?: IconDefinition;
   iconLeft?: IconDefinition;
   icon?: IconDefinition;
   intent?: undefined | 'DANGER'
 }
 
-export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, intent }: PropsWithChildren<MenuButtonProps>) => {
+export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, intent, href }: PropsWithChildren<MenuButtonProps>) => {
   let buttonClass = `font-bold
   text-sm px-3 py-2 rounded shadow hover:shadow-lg
   outline-none focus:outline-none ml-2 mr-1 mb-1 ease-linear
@@ -30,6 +32,16 @@ export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, inten
     onClick(e)
   }
 
+  if (href) {
+    return (
+      <Link href={href} className={buttonClass}>
+        { iconLeft && (<FontAwesomeIcon icon={iconLeft} className="mr-2"/>) }
+        { children }
+        { icon && (<FontAwesomeIcon icon={icon} />)}
+        { iconRight && (<FontAwesomeIcon icon={iconRight} className="ml-2"/>) }
+      </Link>
+    )
+  }
   return (
     <button
       className={buttonClass}

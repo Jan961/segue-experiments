@@ -1,15 +1,6 @@
-import {Venue} from "../interfaces";
+import { PrismaClient } from '@prisma/client'
 
-
-/**
- *
- * This Service represents the barring engine
- * @type {{salesReport: *}}
- */
-export const showService = {
-  getShowByCode,
-
-}
+const prisma = new PrismaClient()
 
 /**
  *
@@ -18,13 +9,21 @@ export const showService = {
  * @param ShowCode
  * @param TourCodde
  */
-function getShowByCode(ShowCode, TourCode){
+export const getShowByCode = (ShowCode, TourCode) => {
+  let Tour = {}
+  fetch(`/api/tours/read/code/${ShowCode}/${TourCode}`)
+    .then((res) => res.json())
+    .then((data) => {
+      Tour = data
+    })
+  return Tour
+}
 
-    let Tour ={}
-    fetch(`/api/tours/read/code/${ShowCode}/${TourCode}` )
-        .then((res) => res.json())
-        .then((data) => {
-            Tour = data
-        })
-    return Tour
+export const getShowById = async (showId: number) => {
+  return await prisma.show.findFirst({
+    where: {
+      ShowId: showId,
+      Archived: false
+    }
+  })
 }

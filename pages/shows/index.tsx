@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import Layout from 'components/Layout'
 import ShowList from 'components/shows/ShowList'
 import { Show } from 'interfaces'
-import NewShow from 'components/shows/forms/newShow'
 import { SearchBox } from 'components/global/SearchBox'
 import { DisplayArchived } from 'components/global/DisplayArchived'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { MenuButton } from 'components/global/MenuButton'
 
 /**
  * Send search request to the API
@@ -62,21 +63,19 @@ export default function Index () {
   }
 
   return (
-    <>
-      <Layout title="Shows | Segue">
-        <div className="float-right">
-          <DisplayArchived onChange={toggleAchive} checked={archived} />
-          <SearchBox onChange={handleOnChange} value={inputs.search} />
-          <NewShow />
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          <span className="text-primary-blue block xl:inline">Shows</span>
-        </h1>
-        <br className='clear' />
-        <div className='max-w-screen-md mx-auto'>
-          <ShowList items={data} />
-        </div>
-      </Layout>
-    </>
+    <Layout title="Shows | Segue">
+      <div className="float-right">
+        <DisplayArchived onChange={toggleAchive} checked={archived} />
+        <SearchBox onChange={handleOnChange} value={inputs.search} />
+        <MenuButton iconRight={faPlus} href='/shows/create'>Create Show</MenuButton>
+      </div>
+      <h1 className="text-3xl font-bold tracking-tight">
+        <span className="text-primary-blue block xl:inline">Shows</span>
+      </h1>
+      <br className='clear' />
+      <div className='max-w-screen-md mx-auto'>
+        <ShowList items={data} />
+      </div>
+    </Layout>
   )
 }
