@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { Tour } from 'interfaces'
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
-import UpdateTour from './forms/updateTour'
 import axios from 'axios'
 import { forceReload } from 'utils/forceReload'
 import { loggingService } from 'services/loggingService'
