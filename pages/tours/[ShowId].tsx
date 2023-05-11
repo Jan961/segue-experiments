@@ -71,7 +71,7 @@ export default function Tours ({ showID }: Props) {
       <div className="float-right">
         <DisplayArchived onChange={toggleAchive} checked={archived} />
         <SearchBox onChange={handleOnChange} value={inputs.search} />
-        <MenuButton href={`/tours/${showID}/create`} iconRight={faPlus}>Add Tour</MenuButton>
+        <MenuButton href={`/tours/create/${showID}`} iconRight={faPlus}>Add Tour</MenuButton>
       </div>
       <h1 className="text-3xl font-bold tracking-tight">
         <span className="text-primary-blue block xl:inline">Tours</span>

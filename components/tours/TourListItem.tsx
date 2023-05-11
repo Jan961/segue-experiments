@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Tour } from 'interfaces'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
 import UpdateTour from './forms/updateTour'
 import axios from 'axios'
 import { forceReload } from 'utils/forceReload'
@@ -23,11 +23,11 @@ const TourListDateDisplay = ({ startDate, endDate, label }: TourListDateDisplayP
   )
 }
 
-type TourLIstItemProps = {
+type TourListItemProps = {
   data: Tour;
 };
 
-const TourListItem = ({ data }: TourLIstItemProps) => {
+const TourListItem = ({ data }: TourListItemProps) => {
   const deleteTour = () => {
     const tourId = data.TourId
 
@@ -60,12 +60,12 @@ const TourListItem = ({ data }: TourLIstItemProps) => {
             {data.Show.Name} ({data.Show.Code}) - Tour {data.Code}
           </p>
           <p className="mt-2 flex justify-between text-sm text-gray-500">
-            <TourListDateDisplay label='Rehearsals' startDate={data.TourStartDate} endDate={data.RehearsalEndDate} />
+            <TourListDateDisplay label='Rehearsals' startDate={data.RehearsalStartDate} endDate={data.RehearsalEndDate} />
             <TourListDateDisplay label='Touring' startDate={data.TourStartDate} endDate={data.TourEndDate}/>
           </p>
         </div>
         <div className="whitespace-nowrap">
-          <UpdateTour items={data} />
+          <MenuButton icon={faPencil} href={`/tours/edit/${data.TourId}`} />
           <MenuButton intent='DANGER' icon={faTrash} onClick={deleteTour} />
         </div>
       </li>

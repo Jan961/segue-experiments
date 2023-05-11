@@ -1,34 +1,42 @@
-
 import { PrismaClient } from '@prisma/client'
-import {number} from "prop-types";
+import { parseISO } from 'date-fns'
 const prisma = new PrismaClient()
-import { parseISO, format } from 'date-fns';
 
-export default async function handle(req, res) {
+const safeParseDate = (date: string) => {
+  if (!date) return null
+  return parseISO(date)
+}
 
-    let query: number = parseInt(req.query.tourId)
-    try {
-        await prisma.tour.update({
-            where: {
-                TourId: query,
-            },
-            data: {
-                Code  : req.body.Code,
-                ShowId    : parseInt(req.body.ShowId),
-                TourStartDate : parseISO(req.body.TourStartDate),
-                TourEndDate : parseISO(req.body.TourEndDate),
-                Archived    : false,
-                Deleted: false,
-                RehearsalStartDate: parseISO(req.body.RehearsalStartDate),
-                RehearsalEndDate : parseISO(req.body.RehearsalEndDate),
-                TourOwner : parseInt(req.body.Owner),
-                Logo: req.body.logo,
-                CreatedBy:0
-            }
-        })
-        res.status(200).end();
-    } catch (e) {
-        res.status(501).end();
-    }
-    return res
+const safeParseInt = (value: string) => {
+  if (!value) return null
+  return parseInt(value)
+}
+
+export default async function handle (req, res) {
+  const query: number = parseInt(req.query.tourId)
+  try {
+    await prisma.tour.update({
+      where: {
+        TourId: query
+      },
+      data: {
+        Code: req.body.Code,
+        ShowId: safeParseInt(req.body.ShowId),
+        TourStartDate: safeParseDate(req.body.TourStartDate),
+        TourEndDate: safeParseDate(req.body.TourEndDate),
+        Archived: false,
+        Deleted: false,
+        RehearsalStartDate: safeParseDate(req.body.RehearsalStartDate),
+        RehearsalEndDate: safeParseDate(req.body.RehearsalEndDate),
+        TourOwner: safeParseInt(req.body.Owner), // null For some reason
+        Logo: req.body.logo,
+        CreatedBy: 0
+      }
+    })
+    res.status(200).end()
+  } catch (e) {
+    console.log(e)
+    res.status(500).end()
+  }
+  return res
 }
