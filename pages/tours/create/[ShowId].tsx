@@ -36,7 +36,6 @@ const Create = ({ show }: CreateProps) => {
     TourEndDate: '',
     RehearsalStartDate: '',
     RehearsalEndDate: '',
-    logo: null,
     AccountId: owner
   })
 
@@ -47,21 +46,12 @@ const Create = ({ show }: CreateProps) => {
         submitting: false,
         info: { error: false, msg }
       })
-      setInputs({
-        Code: inputs.Code,
-        ShowId: parseInt(String(show)),
-        TourStartDate: inputs.TourStartDate,
-        TourEndDate: inputs.TourEndDate,
-        RehearsalStartDate: inputs.RehearsalStartDate,
-        RehearsalEndDate: inputs.RehearsalEndDate,
-        logo: inputs.logo,
-        AccountId: owner
-      })
     } else {
       // @ts-ignore
       setStatus(false)
     }
   }
+
   const handleOnChange = async (e: any) => {
     e.persist()
 
@@ -79,22 +69,26 @@ const Create = ({ show }: CreateProps) => {
   const handleOnSubmit = async (e: any) => {
     e.preventDefault()
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
-    const fd = new FormData()
-    fd.append('file', image)
+    const formData: any = { ...inputs }
 
-    const res = await fetch('/api/fileUpload/upload', {
-      method: 'POST',
-      headers: {},
-      body: fd
-    })
+    if (image) {
+      const fd = new FormData()
+      fd.append('file', image)
 
-    const response = await res.json()
-    inputs.logo = response.data
+      const response = await fetch('/api/fileUpload/upload', {
+        method: 'POST',
+        headers: {},
+        body: fd
+      })
+
+      const json = await response.json()
+      formData.Logo = json.data
+    }
 
     axios({
       method: 'POST',
       url: '/api/tours/create/',
-      data: inputs
+      data: formData
     }).then((response) => {
       loggingService.logAction('Tour', 'Add  Tour')
       handleServerResponse(
@@ -111,14 +105,12 @@ const Create = ({ show }: CreateProps) => {
   }
 
   const [image, setImage] = useState(null)
-  const [createObjectURL, setCreateObjectURL] = useState(null)
 
   const uploadToClient = (event) => {
     if (event.target.files && event.target.files[0]) {
       const i = event.target.files[0]
 
       setImage(i)
-      setCreateObjectURL(URL.createObjectURL(i))
     }
   }
 
@@ -137,7 +129,7 @@ const Create = ({ show }: CreateProps) => {
           <FormInputDate label="Tour End Date" value={inputs.TourEndDate} name="TourEndDate" onChange={handleOnChange} required />
           <FormInputDate label="Rehearsal Start Date" value={inputs.RehearsalStartDate} name="RehearsalStartDate" onChange={handleOnChange} required />
           <FormInputDate label="Rehearsal End Date" value={inputs.RehearsalEndDate} name="RehearsalEndDate" onChange={handleOnChange} required />
-          <FormInputUpload label="Tour Logo" value={inputs.logo} name="Logo" onChange={uploadToClient} />
+          <FormInputUpload label="Tour Logo" name="Logo" onChange={uploadToClient} />
           <input id="ShowId"
             type="hidden"
             name="ShowId"

@@ -45,7 +45,7 @@ export  type Show = {
 export type Tour = {
   TourId: number;
   Code: string;
-  logo: string;
+  Logo: string;
   ShowId: Show;
   TourStartDate: Date;
   TourEndDate: Date;

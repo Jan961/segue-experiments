@@ -3,11 +3,10 @@ import { PropsWithChildren } from 'react'
 interface FormInputUploadProps {
   label: string;
   name: string;
-  value: string;
   onChange: (e: any) => void
 }
 
-export const FormInputUpload = ({ name, onChange, children, label, value }: PropsWithChildren<FormInputUploadProps>) => {
+export const FormInputUpload = ({ name, onChange, children, label }: PropsWithChildren<FormInputUploadProps>) => {
   return (
     <div className="mb-2">
       <label htmlFor="Tour Logo" className="">{ label }</label>
@@ -23,7 +22,6 @@ export const FormInputUpload = ({ name, onChange, children, label, value }: Prop
             id={name}
             type="file"
             name={name}
-            value={value}
             onChange={onChange}
             title=' '
           />

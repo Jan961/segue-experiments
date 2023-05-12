@@ -26,7 +26,6 @@ const Create = () => {
     Code: '',
     ShowId: '',
     Name: '',
-    Logo: '',
     ShowType: '',
     AccountId: userAccount
   })
@@ -42,7 +41,6 @@ const Create = () => {
         Code: inputs.Code,
         ShowId: inputs.ShowId,
         Name: inputs.Name,
-        Logo: inputs.Logo,
         ShowType: inputs.ShowType,
         AccountId: userAccount
       })
@@ -111,11 +109,10 @@ const Create = () => {
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
           <FormInputSelect label="ShowType" name="ShowType" value={inputs.ShowType} required onChange={handleOnChange} options={showTypes} />
-          <FormInputUpload label="Show Logo" name="Logo" value={inputs.Logo} onChange={uploadToClient} />
+          <FormInputUpload label="Show Logo" name="Logo" onChange={uploadToClient} />
           <input id="AccountId"
             type="hidden"
-            name="AccountId"
-            value={inputs.AccountId}/>
+            name="AccountId" />
           <FormButtonSubmit disabled={status.submitted} loading={status.submitting} text="Create" />
         </form>
       </FormContainer>

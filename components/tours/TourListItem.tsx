@@ -52,7 +52,7 @@ const TourListItem = ({ data }: TourListItemProps) => {
         items-center justify-between border-b border-gray-200
         hover:bg-blue-400 hover:bg-opacity-25">
         <div className="flex-shrink-0">
-          <ListItemThumbnail alt={data.Show.Name} src={data.logo} />
+          <ListItemThumbnail alt={data.Show.Name} src={data.Logo} />
         </div>
         <div className="flex-grow">
           <p className="text-sm text-gray-900">
