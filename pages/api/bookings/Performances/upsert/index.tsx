@@ -1,31 +1,32 @@
 import { PrismaClient } from '@prisma/client'
-import {loggingService} from "../../../../../services/loggingService";
+import { loggingService } from 'services/loggingService'
+
 const prisma = new PrismaClient()
 
-export default async function handle(req, res) {
-    try {
-        let upsertPerormance
-        if (req.body.PerfomanceId !== null){
-             upsertPerormance =  await  prisma.bookingPerformance.update({
-                where: {
-                    PerformanceId: parseInt(req.body.PerfomanceId),
-                },
-                data: {
-                    Time: new Date('06/06/1970 ' + req.body.Time ),
-                }
-            })
-        } else {
-            upsertPerormance =  await  prisma.bookingPerformance.create({
-                data: {
-                    Time: new Date('06/06/1970 ' + req.body.Time),
-                    BookingId: parseInt(req.body.BookingId),
-                }
-            })
+export default async function handle (req, res) {
+  try {
+    let upsertPerormance
+    if (req.body.PerfomanceId !== null) {
+      upsertPerormance = await prisma.bookingPerformance.update({
+        where: {
+          PerformanceId: parseInt(req.body.PerfomanceId)
+        },
+        data: {
+          Time: new Date('06/06/1970 ' + req.body.Time)
         }
-        res.status(200).json(upsertPerormance)
-
-    } catch (err) {
-        await loggingService.logError("Performance Create Update" + err)
-        res.status(403).json({ err: "Error occurred while generating search results." + err});
+      })
+    } else {
+      upsertPerormance = await prisma.bookingPerformance.create({
+        data: {
+          Time: new Date('06/06/1970 ' + req.body.Time),
+          BookingId: parseInt(req.body.BookingId),
+          PerformanceId: null // Insert
+        }
+      })
     }
+    res.status(200).json(upsertPerormance)
+  } catch (err) {
+    await loggingService.logError('Performance Create Update' + err)
+    res.status(403).json({ err: 'Error occurred while generating search results.' + err })
+  }
 }

@@ -1,13 +1,6 @@
-import React, {useEffect, useState} from "react";
-import {barringService} from "../../../services/barringService";
-import {tourService} from "../../../services/TourService";
-import {da} from "date-fns/locale";
-import {GetServerSideProps} from "next";
-import {dateService} from "../../../services/dateService";
-import {venueService} from "../../../services/venueService";
-import {bookingService} from "../../../services/bookingService";
-import {forceReload} from "../../../utils/forceReload";
-
+import React from 'react'
+import { GetServerSideProps } from 'next'
+import { forceReload } from 'utils/forceReload'
 
 export default function RemoveBooking(bookingId){
     const [showModal, setShowModal] = React.useState(false);

@@ -1,15 +1,7 @@
-import React, {useEffect, useState} from "react";
-import {barringService} from "../../../services/barringService";
-import {tourService} from "../../../services/TourService";
-import {da} from "date-fns/locale";
-import {GetServerSideProps} from "next";
-import {dateService} from "../../../services/dateService";
-import {venueService} from "../../../services/venueService";
-import {bookingService} from "../../../services/bookingService";
-import {forceReload} from "../../../utils/forceReload";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronRight} from "@fortawesome/free-solid-svg-icons";
-
+import React, { useEffect, useState } from 'react'
+import { GetServerSideProps } from 'next'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
 export default function ViewBookingHistory(VenueId){
     const [showModal, setShowModal] = React.useState(false);
