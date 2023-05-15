@@ -109,8 +109,8 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
   }
 
   return (
-    <div className="w-6/12 p-4 border-4" >
-      <form className={'sticky top-0'}>
+    <div className="w-6/12 pl-4" >
+      <form>
         <div className="bg-primary-blue rounded-xl flex flex-col justify-center mb-4 ">
           <div className="flex flex-row mx-4 mt-3 mb-1">
             <label htmlFor="date" className=""></label>
