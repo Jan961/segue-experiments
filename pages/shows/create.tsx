@@ -11,9 +11,10 @@ import { FormInputText } from 'components/global/forms/FormInputText'
 import showTypes from 'data/showTypes.json'
 import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
-import { FormInputUpload } from 'components/global/forms/FormInputUpload'
+import { useRouter } from 'next/router'
 
 const Create = () => {
+  const router = useRouter()
   const userAccount = userService.userValue.accountId
 
   const [status, setStatus] = useState({
@@ -37,18 +38,12 @@ const Create = () => {
         submitting: false,
         info: { error: false, msg }
       })
-      setInputs({
-        Code: inputs.Code,
-        ShowId: inputs.ShowId,
-        Name: inputs.Name,
-        ShowType: inputs.ShowType,
-        AccountId: userAccount
-      })
     } else {
       // @ts-ignore
       setStatus(false)
     }
   }
+
   const handleOnChange = (e) => {
     e.persist()
 
@@ -62,6 +57,7 @@ const Create = () => {
       info: { error: false, msg: null }
     })
   }
+
   const handleOnSubmit = async (e) => {
     e.preventDefault()
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
@@ -77,23 +73,12 @@ const Create = () => {
           true,
           'Thank you, your message has been submitted.'
         )
+        router.push('/shows')
       })
       .catch((error) => {
         loggingService.logError(error)
         handleServerResponse(false, error.response.data.error)
       })
-  }
-
-  const [image, setImage] = useState(null)
-  const [createObjectURL, setCreateObjectURL] = useState(null)
-
-  const uploadToClient = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      const i = event.target.files[0]
-
-      setImage(i)
-      setCreateObjectURL(URL.createObjectURL(i))
-    }
   }
 
   return (
@@ -109,7 +94,7 @@ const Create = () => {
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
           <FormInputSelect label="ShowType" name="ShowType" value={inputs.ShowType} required onChange={handleOnChange} options={showTypes} />
-          <FormInputUpload label="Show Logo" name="Logo" onChange={uploadToClient} />
+          {/* <ThumbnailUpload path={inputs.Logo} setPath={((Logo) => setInputs({ ...inputs, Logo }))} /> */}
           <input id="AccountId"
             type="hidden"
             name="AccountId" />

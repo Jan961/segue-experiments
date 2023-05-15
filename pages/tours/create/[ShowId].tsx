@@ -13,6 +13,7 @@ import Link from 'next/link'
 import Layout from 'components/Layout'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
+import { ThumbnailUpload } from 'components/files/ThumbnailUpload'
 
 type CreateProps = {
     show: number
@@ -34,6 +35,7 @@ const Create = ({ show }: CreateProps) => {
     ShowId: parseInt(String(show)),
     TourStartDate: '',
     TourEndDate: '',
+    Logo: '',
     RehearsalStartDate: '',
     RehearsalEndDate: '',
     AccountId: owner
@@ -69,26 +71,10 @@ const Create = ({ show }: CreateProps) => {
   const handleOnSubmit = async (e: any) => {
     e.preventDefault()
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
-    const formData: any = { ...inputs }
-
-    if (image) {
-      const fd = new FormData()
-      fd.append('file', image)
-
-      const response = await fetch('/api/fileUpload/upload', {
-        method: 'POST',
-        headers: {},
-        body: fd
-      })
-
-      const json = await response.json()
-      formData.Logo = json.data
-    }
-
     axios({
       method: 'POST',
       url: '/api/tours/create/',
-      data: formData
+      data: inputs
     }).then((response) => {
       loggingService.logAction('Tour', 'Add  Tour')
       handleServerResponse(
@@ -102,16 +88,6 @@ const Create = ({ show }: CreateProps) => {
       loggingService.logError(error)
       handleServerResponse(false, error.response.data.error)
     })
-  }
-
-  const [image, setImage] = useState(null)
-
-  const uploadToClient = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      const i = event.target.files[0]
-
-      setImage(i)
-    }
   }
 
   return (
@@ -129,7 +105,7 @@ const Create = ({ show }: CreateProps) => {
           <FormInputDate label="Tour End Date" value={inputs.TourEndDate} name="TourEndDate" onChange={handleOnChange} required />
           <FormInputDate label="Rehearsal Start Date" value={inputs.RehearsalStartDate} name="RehearsalStartDate" onChange={handleOnChange} required />
           <FormInputDate label="Rehearsal End Date" value={inputs.RehearsalEndDate} name="RehearsalEndDate" onChange={handleOnChange} required />
-          <FormInputUpload label="Tour Logo" name="Logo" onChange={uploadToClient} />
+          <ThumbnailUpload path={inputs.Logo} setPath={((Logo) => setInputs({ ...inputs, Logo }))} />
           <input id="ShowId"
             type="hidden"
             name="ShowId"

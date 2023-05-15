@@ -11,17 +11,16 @@ import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
-import { FormInputUpload } from 'components/global/forms/FormInputUpload'
 import { FormContainer } from 'components/global/forms/FormContainer'
 import showTypes from 'data/showTypes.json'
+import { useRouter } from 'next/router'
 
 type Props = {
   show: Show
 }
 
 const EditShow = ({ show }: Props) => {
-  const [image, setImage] = useState(null)
-  const [createObjectURL, setCreateObjectURL] = useState(null)
+  const router = useRouter()
 
   const [status, setStatus] = useState({
     submitted: true,
@@ -33,7 +32,6 @@ const EditShow = ({ show }: Props) => {
     Code: show.Code,
     ShowId: show.ShowId,
     Name: show.Name,
-    Logo: show.Logo,
     ShowType: show.ShowType,
     Published: show.published
   })
@@ -49,7 +47,6 @@ const EditShow = ({ show }: Props) => {
         Code: inputs.Code,
         ShowId: inputs.ShowId,
         Name: inputs.Name,
-        Logo: inputs.Logo,
         ShowType: inputs.ShowType,
         Published: show.published
       })
@@ -60,12 +57,6 @@ const EditShow = ({ show }: Props) => {
   }
 
   const handleOnChange = (e) => {
-    // e.persist();
-    if (e.target.files && e.target.files[0]) {
-      const i = e.target.files[0]
-      setImage(i)
-      setCreateObjectURL(URL.createObjectURL(i))
-    }
     setInputs((prev) => ({
       ...prev,
       [e.target.id]: e.target.value
@@ -76,23 +67,10 @@ const EditShow = ({ show }: Props) => {
       info: { error: false, msg: null }
     })
   }
+
   const handleOnSubmit = async (e) => {
     e.preventDefault()
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
-    /**
-         * If image hasn't changed imafge wont be set and wont overwrite
-         */
-    if (image) {
-      const fd = new FormData()
-      fd.append('file', image)
-      const res = await fetch('/api/fileUpload/upload', {
-        method: 'POST',
-        headers: {},
-        body: fd
-      })
-      const response = await res.json()
-      inputs.Logo = response.data
-    }
     axios({
       method: 'POST',
       url: '/api/shows/update/' + show.ShowId,
@@ -106,6 +84,8 @@ const EditShow = ({ show }: Props) => {
           true,
           'Thank you, your message has been submitted.'
         )
+
+        router.push('/shows')
       })
       .catch((error) => {
         loggingService.logError(error)
@@ -127,9 +107,7 @@ const EditShow = ({ show }: Props) => {
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
           <FormInputSelect label="Show Type" name="ShowType" value={inputs.ShowType} onChange={handleOnChange} options={showTypes} required />
-          <FormInputUpload label="Show Logo" name="Logo" value={inputs.Logo} onChange={handleOnChange}>
-            <img src={createObjectURL} height="200px" width="200px"/>
-          </FormInputUpload>
+          {/* <ThumbnailUpload path={inputs.Logo} setPath={((Logo) => setInputs({ ...inputs, Logo }))} /> */}
           <FormButtonSubmit disabled={status.submitted} loading={status.submitting} text="Save Changes" />
         </form>
       </FormContainer>

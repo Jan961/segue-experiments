@@ -29,7 +29,7 @@ export default async function handle (req, res) {
         RehearsalStartDate: safeParseDate(req.body.RehearsalStartDate),
         RehearsalEndDate: safeParseDate(req.body.RehearsalEndDate),
         TourOwner: safeParseInt(req.body.Owner), // null For some reason
-        Logo: req.body.logo,
+        Logo: req.body.Logo,
         CreatedBy: 0
       }
     })
