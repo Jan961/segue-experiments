@@ -8,6 +8,7 @@ import { fas } from '@fortawesome/free-solid-svg-icons'
 import {useContext, useEffect, useState} from "react";
 import { userService } from '../services/user.service';
 import {useRouter} from "next/router";
+import { RecoilRoot } from 'recoil'
 library.add(fab, fas)
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -83,5 +84,5 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     // Use the layout defined at the page level, if available
     const getLayout = Component.getLayout ?? ((page) => page)
 
-    return getLayout(<Component {...pageProps} />)
+    return getLayout(<RecoilRoot><Component {...pageProps} /></RecoilRoot>)
 }

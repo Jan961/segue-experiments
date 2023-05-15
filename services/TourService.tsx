@@ -5,21 +5,21 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 const { publicRuntimeConfig } = getConfig()
 const baseUrl = `${publicRuntimeConfig.apiUrl}`
-/**
- *
- * Convert Codes into a tour ID
- *
- * @param ShowCode
- * @param TourCodde
- */
-export const getTourByCode = (ShowCode, TourCode) => {
-  let Tour = {}
-  fetch(`/api/tours/read/code/${ShowCode}/${TourCode}`)
-    .then((res) => res.json())
-    .then((data) => {
-      Tour = data
-    })
-  return Tour
+
+export const getTourByCode = async (ShowCode: string, TourCode: string) => {
+  return prisma.tour.findFirst(
+    {
+      where: {
+        Code: TourCode as string,
+        Show: {
+          Code: ShowCode as string
+        }
+      },
+      include: {
+        Show: true
+      }
+    }
+  )
 }
 
 export const getTourVenueByDate = (TourId, Date) => {

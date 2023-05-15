@@ -10,10 +10,6 @@ export default function Index() {
     const [show, setShow] = useState({})
     const [tour, setTour] = useState({})
 
-
-    //setShow(showService.getShowByCode(show))
-    //setTour(tourService.getTourByCode(show, TourCode))
-
     return (
         <>
             <Layout title="Marketing | Seque">

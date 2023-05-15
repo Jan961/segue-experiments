@@ -13,9 +13,6 @@ export default function TourJumpMenu()  {
 
         setLoading(true)
 
-        // let currentTourID = tourService.getTourByCode(TourCode, ShowCode)
-
-
         /**Get the tours for the jump meniu */
 
         fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
