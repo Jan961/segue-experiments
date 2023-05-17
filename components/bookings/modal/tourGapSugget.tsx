@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
 import { dateService } from 'services/dateService'
 import { userService } from 'services/user.service'
 import { ToolbarButton } from '../ToolbarButton'
 import { StyledDialog } from 'components/global/StyledDialog'
+import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 
 export default function TourGapsModal (tourId) {
   const [showModal, setShowModal] = React.useState(false)
@@ -20,9 +20,6 @@ export default function TourGapsModal (tourId) {
     VenueId: 0
   })
 
-  const [date, setDate] = useState('')
-  const [distance, setDistance] = useState('')
-  const [venue, setVenue] = useState('')
   const [lastVenue, setLastVenue] = useState(0)
   const [submittable, setSubmittable] = useState(false)
   /**
@@ -106,10 +103,7 @@ export default function TourGapsModal (tourId) {
   }
 
   function reset () {
-    setVenue('')
     setVenueList([])
-    setDate('')
-    setDistance('')
   }
 
   function handleOnChange (e) {
@@ -118,62 +112,24 @@ export default function TourGapsModal (tourId) {
       ...prev,
       [e.target.id]: e.target.value
     }))
-
-    alert(JSON.stringify(inputs))
   }
+
+  const availableDatesOptions = gapsList.map(x => ({ text: dateService.dateStringToSimple(x.ShowDate), value: x.BookingId}))
+  const availableDistances = Array.from({ length: 8 }, (_, i) => ({ text: String((i + 1) * 25), value: String((i + 1) * 25) }));
 
   return (
     <>
       <ToolbarButton onClick={() => setShowModal(true)}>Gap Suggestions</ToolbarButton>
-      <StyledDialog title="Gap Suggestions" open={showModal} onClose={() => setShowModal(false)}>
+      <StyledDialog width="xl" title="Gap Suggestions" open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
-          <div className="flex flex-row">
-            <p>
-              Select a date then select a distance Segue will then search for possible
-              location
-            </p>
-          </div>
+          <p>
+            Select a date then select a distance Segue will then search for possible
+            location
+          </p>
 
-          <div className="flex flex-row">
-            <label htmlFor="date" className="">Tour Gap Date</label>
-            <select
-              name={'BookingId'}
-              id={'BookingId'}
-              onChange={handleOnChange}
-            >
-              <option value="">Select a Date</option>
-              {gapsList.map((date) => (
-                <>
-                  <option value={date.BookingId}>{dateService.dateToSimple(date.ShowDate)}</option>
-                </>
-              ))}
-            </select>
-
-          </div>
-          <div className="flex flex-row">
-            <label htmlFor="venueDistance" className="">Select a Distance Miles (Estimated Time)</label>
-
-            <select
-              name={'Distance'}
-              id={'Distance'}
-              disabled={inputs.BookingId == 0}
-              onChange={handleOnChange}
-            >
-              <option value={''}>Select a Distance</option>
-
-              <>
-                <option value={25}>25 </option>
-                <option value={50}>50 </option>
-                <option value={100}>100 </option>
-                <option value={125}>125</option>
-                <option value={150}>150</option>
-                <option value={175}>175 </option>
-                <option value={200}>200</option>
-              </>
-                                            ))
-            </select>
-
-          </div>
+          <FormInputSelect name="BookingId" label="Selected Date" onChange={handleOnChange} value={inputs.BookingId} options={availableDatesOptions} />
+          <FormInputSelect name="Distance" label="Distance" onChange={handleOnChange} value={inputs.Distance} options={availableDistances} />
+          <FormInputSelect name="VenuId" label="Venue" onChange={handleOnChange} value={inputs.VenueId} options={[]} disabled />
           <div className="flex flex-row">
             <label htmlFor="venueDistance" className="">Select a Venue</label>
 
@@ -187,17 +143,9 @@ export default function TourGapsModal (tourId) {
               {venueList.length > 0
 
                 ? venueList.map((venue) => (
-                  <>
-                    <option value=
-
-                      {venue.Venue1Id}
-
-                    >{venue.Name}
-
-                                                        Miles {venue.Mileage}, Time {venue.TimeMins})
-
-                    </option>
-                  </>
+                  <option value={venue.Venue1Id}>{venue.Name} key={venue.Venue1Id}>
+                      Miles {venue.Mileage}, Time {venue.TimeMins})
+                  </option>
                 ))
                 : <option value={''}>Select a Distance</option>
               }
@@ -215,12 +163,4 @@ export default function TourGapsModal (tourId) {
       </StyledDialog>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return {
-    props: {
-
-    }
-  }
 }

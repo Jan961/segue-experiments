@@ -8,14 +8,23 @@ interface StyledDialogProps {
   open: boolean;
   onClose: () => void;
   title: string;
+  width?: undefined | 'lg' | 'xl';
 }
 
-export const StyledDialog = ({ open, onClose, title, children }: PropsWithChildren<StyledDialogProps>) => {
+// Only use non-default classes on desktop only pages.
+const DEFAULT_WIDTH_CLASS = 'max-w-sm'
+
+const WIDTH_CLASSES = {
+  lg: 'max-w-lg',
+  xl: 'max-w-xl'
+}
+
+export const StyledDialog = ({ open, onClose, title, children, width }: PropsWithChildren<StyledDialogProps>) => {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30 overflow-y-auto" aria-hidden="true">
         <div className="flex min-h-full items-center justify-center p-5">
-          <Dialog.Panel className="mx-auto max-w-sm rounded bg-white">
+          <Dialog.Panel className={`mx-auto ${WIDTH_CLASSES[width] ? WIDTH_CLASSES[width] : DEFAULT_WIDTH_CLASS} rounded bg-white`}>
             <FontAwesomeIcon size='xl' icon={faClose} className="float-right p-4 cursor-pointer" onClick={onClose} />
             <Dialog.Title className="text-xl mb-2 p-4 border-gray-200 border-b">
               { title }

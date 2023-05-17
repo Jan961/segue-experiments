@@ -415,7 +415,7 @@ export default function Entry({ searchFilter }: props) {
                       {salesWeeksVenues.map((item) => (
                         <option key={item.BookingId} value={item.BookingId}>
                           {dateService.getWeekDay(item.ShowDate)}{" "}
-                          {dateService.dateToSimple(item.ShowDate)} |{" "}
+                          {dateService.dateStringToSimple(item.ShowDate)} |{" "}
                           {item.Venue.Name} ({item.Venue.Town})
                         </option>
                       ))}
@@ -1277,7 +1277,7 @@ export default function Entry({ searchFilter }: props) {
                     <button onClick={() => importEmail(item.Id)}>
                       <span>
                         {JSON.stringify(item)}
-                        {item.SetTour} {dateService.dateToSimple(item.Date)}{" "}
+                        {item.SetTour} {dateService.dateStringToSimple(item.Date)}{" "}
                         Import
                       </span>
                     </button>

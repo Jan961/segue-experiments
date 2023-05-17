@@ -7,14 +7,15 @@ export interface SelectOption {
 interface Input {
   placeholder?: string;
   onChange: (e: any) => void;
-  label: string;
-  value: string;
+  label?: string;
+  value: string | number;
   name: string; // Also ID
   required?: boolean;
-  options: SelectOption[]
+  options: SelectOption[];
+  disabled?: boolean;
 }
 
-export const FormInputSelect = ({ placeholder, onChange, value, name, label, required }: Input) => {
+export const FormInputSelect = ({ placeholder, onChange, value, name, label, required, options, disabled }: Input) => {
   return (
     <div>
       <label htmlFor={name} className="">{ label }
@@ -22,12 +23,12 @@ export const FormInputSelect = ({ placeholder, onChange, value, name, label, req
           id={name}
           name={name}
           onChange={onChange}
+          disabled={disabled}
           className="w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4"
           required={required}
           value={value}
         >
-          <option value="N">Normal</option>
-          <option value="P">Pantomime</option>
+          {options.map(x => (<option value={x.value} key={x.value}>{x.text}</option>))}
         </select>
       </label>
     </div>

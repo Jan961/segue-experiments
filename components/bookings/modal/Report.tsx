@@ -178,7 +178,7 @@ export default function Report (TourId) {
       b.value = dateService.getWeekDay((value.ShowDate))
 
       const c = worksheet.getCell(`C${dataRow}`)
-      c.value = dateService.dateToSimple(value.ShowDate)
+      c.value = dateService.dateStringToSimple(value.ShowDate)
 
       const d = worksheet.getCell(`D${dataRow}`)
       d.value = dateService.weeks(value.Tour.TourStartDate, value.ShowDate)

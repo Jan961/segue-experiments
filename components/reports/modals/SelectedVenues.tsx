@@ -166,7 +166,7 @@ export default function SelectedVenues(){
                     }
 
                     if(tourDate.OnSaleDate !== null) {
-                        worksheet.getCell(`G${row}`).value = dateService.dateToSimple(tourDate.OnSaleDate)
+                        worksheet.getCell(`G${row}`).value = dateService.dateStringToSimple(tourDate.OnSaleDate)
                     }
 
                     if (tourDate.MarketingPlanReceived === false){

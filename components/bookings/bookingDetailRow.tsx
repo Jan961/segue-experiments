@@ -1,48 +1,48 @@
-import * as React from 'react'
-import { dateService } from '../../services/dateService'
+import { dateService } from 'services/dateService'
 
-export default function BookingDetailRow (booking) {
-  // const date = dateService.dateToSimple(booking.booking.ShowDate);
-  const date = new Date(booking.booking.ShowDate)
-  const options = {
-    year: 'numeric',
-    day: '2-digit',
-    month: '2-digit',
-    timeZone: 'UTC'
-  }
-  // @ts-ignore
-  const ShowDate = date.toLocaleString('en-GB', options)
-  const day = dateService.getWeekDay(date)
+interface BookingDetailRowProps {
+  booking: any,
+  onClick: () => void,
+  selected: boolean;
+}
+
+export const BookingDetailRow = ({ booking, onClick, selected }: BookingDetailRowProps) => {
+  const ShowDate = dateService.dateToSimple(booking.ShowDate)
+  const day = dateService.getWeekDay(booking.ShowDate)
 
   const week = dateService.weeks(
-    booking.booking.Tour.TourStartDate,
-    booking.booking.ShowDate
+    booking.Tour.TourStartDate,
+    booking.ShowDate
   )
+
+  let rowClass = 'grid gap-1 grid-cols-10 py-3 w-full border-l-4 border-transparent'
+  if (selected) rowClass += ' bg-blue-200 border-blue-500'
+
   return (
-    <>
-      <div className="grid gap-1 grid-cols-10 border-b-2 border-gray-300 py-3 w-full">
+    <button onClick={onClick} className="even:bg-gray-100 border-b border-gray-300">
+
+      <div className={rowClass}>
         <div className="font-bold text-soft-primary-grey col-span-1 max-w-[50px]">
           {week}
         </div>
         <div className="col-span-3 font-medium text-soft-primary-grey max-w-[150px]">
-          {day} &nbsp; {ShowDate}
+          {day}<br />{ShowDate}
         </div>
-
         <div className="flex flex-col col-start-5 col-end-11"> {/* Added col-start-5 and col-end-11 */}
           <div className="capitalize font-medium flex">
-            {booking.booking.DateType.Name}
+            {booking.DateType.Name}
           </div>
-          {booking.booking.Venue != null
+          {booking.Venue != null
             ? (
               <div className="flex flex-col">
                 <div className="font-medium mb-1 flex">
-                  {booking.booking.Venue.Name} ({booking.booking.Venue.Town})
+                  {booking.Venue.Name} { booking.Venue.Town ? booking.Venue.Town : '' }
                 </div>
                 <div className="flex flex-wrap items-center space-x-4"> {/* Changed flex-row to flex-wrap and added space-x-4 */}
-                  <div>Seats: {booking.booking.Venue.Seats}</div>
+                  <div>Seats: {booking.Venue.Seats}</div>
                   <span>|</span>
                   <div>
-                  Performances: {booking.booking.PerformancesPerDay}
+                  Performances: {booking.PerformancesPerDay}
                   </div>
                   <span>|</span>
                   <div>Miles: 144</div>
@@ -50,14 +50,16 @@ export default function BookingDetailRow (booking) {
                   <div>Time: 1:22</div>
                 </div>
               </div>
-            ) :
-            (
+            )
+            : (
               <div></div>
             )}
         </div>
 
         <div>{/* booking details */}</div>
       </div>
-    </>
+    </button>
   )
 }
+
+export default BookingDetailRow

@@ -123,7 +123,7 @@ export default function BookingHold ({ TourId }: BookingHoldProps) {
 
                 ? datesList.map((date) => (
                   <>
-                    <option value={date.BookingId}>{dateService.getWeekDay(date.ShowDate)} {dateService.dateToSimple(date.ShowDate)} </option>
+                    <option value={date.BookingId}>{dateService.getWeekDay(date.ShowDate)} {dateService.dateStringToSimple(date.ShowDate)} </option>
                   </>
                 ))
                 : <option value={''}>Tour has no dates</option>

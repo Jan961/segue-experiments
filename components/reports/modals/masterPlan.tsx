@@ -151,9 +151,9 @@ export default function MasterPlan() {
 
     titleText.value =
       "Master Plan " +
-      dateService.dateToSimple(firstMonday) +
+      dateService.dateStringToSimple(firstMonday) +
       " " +
-      dateService.dateToSimple(sunday);
+      dateService.dateStringToSimple(sunday);
 
     worksheet.mergeCells("A2:CU2");
 

@@ -206,8 +206,8 @@ export default function SalesSummary() {
        */
 
       if (
-        dateService.dateToSimple(lastDate) !=
-          dateService.dateToSimple(perf.ShowDate) ||
+        dateService.dateStringToSimple(lastDate) !=
+          dateService.dateStringToSimple(perf.ShowDate) ||
         lastDate === null
       ) {
         ResultCol = "F";
@@ -219,7 +219,7 @@ export default function SalesSummary() {
         // ColB
         worksheet.getCell(`B${row}`).value = dateService.getWeekDay(ShowDate);
         // Colc
-        worksheet.getCell(`C${row}`).value = dateService.dateToSimple(ShowDate);
+        worksheet.getCell(`C${row}`).value = dateService.dateStringToSimple(ShowDate);
 
         // COld
         worksheet.getCell(`D${row}`).value = perf.Town;
@@ -259,7 +259,7 @@ export default function SalesSummary() {
 
     for (let week of weeks) {
       worksheet.getCell(`${dateCol}3`).value = week.WeekName;
-      worksheet.getCell(`${dateCol}4`).value = dateService.dateToSimple(
+      worksheet.getCell(`${dateCol}4`).value = dateService.dateStringToSimple(
         week.WeekDate
       );
       lastCol = dateCol;
@@ -428,8 +428,8 @@ export default function SalesSummary() {
                     {inputs.tourStartDate != null ? (
                       <p className="text-lg">
                         Tour Dates{" "}
-                        {dateService.dateToSimple(inputs.tourStartDate)} to{" "}
-                        {dateService.dateToSimple(inputs.tourEndDate)}
+                        {dateService.dateStringToSimple(inputs.tourStartDate)} to{" "}
+                        {dateService.dateStringToSimple(inputs.tourEndDate)}
                       </p>
                     ) : (
                       <p className="text-lg">

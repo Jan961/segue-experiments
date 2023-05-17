@@ -1,9 +1,11 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface FormButtonSubmitProps {
-  loading: boolean;
+  loading?: boolean;
   disabled: boolean;
   text: string;
+  onClick?: (e: any) => void
+  submit?: boolean;
 }
 
 const LoadingSpinner = () => {
@@ -16,7 +18,7 @@ const LoadingSpinner = () => {
   )
 }
 
-export const FormButtonSubmit = ({ loading, disabled, text }: FormButtonSubmitProps) => {
+export const FormButtonSubmit = ({ loading, disabled, text, onClick, submit = true }: FormButtonSubmitProps) => {
   const baseClasses = 'text-white rounded shadow outline text-sm px-6 py-3 font-bold cursor-pointer'
   const availableClasses = baseClasses + ' hover:shadow-lg bg-emerald-500 active:bg-emerald-600 ease-linear transition-all duration-150 '
   const loadingClasses = baseClasses + ' bg-gray-500'
@@ -28,7 +30,8 @@ export const FormButtonSubmit = ({ loading, disabled, text }: FormButtonSubmitPr
     <div className="text-right">
       <button
         className={className}
-        type="submit"
+        type={ submit ? 'submit' : 'button'}
+        onClick={onClick}
         disabled={disabled}>
         { text }
         { loading && (<LoadingSpinner />)}

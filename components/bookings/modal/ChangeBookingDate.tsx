@@ -1,55 +1,43 @@
 import React, { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
 import { dateService } from 'services/dateService'
 import { StyledDialog } from 'components/global/StyledDialog'
-import { ToolbarButton } from '../ToolbarButton'
+import { FormInputTextAttached } from 'components/global/forms/FormInputSetter'
+import { useRecoilValue } from 'recoil'
+import { bookingDictSelector } from 'state/selectors/bookingDictSelector'
+import { FormInfo } from 'components/global/forms/FormInfo'
+import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 
-export default function ChangeBookingDate ({ BookingId, currentTourId }) {
+interface ChangeBookingDateProps {
+  bookingId: number
+}
+
+export default function ChangeBookingDate ({ bookingId }: ChangeBookingDateProps) {
+  const bookingDict = useRecoilValue(bookingDictSelector)
   const [showModal, setShowModal] = React.useState(false)
-  const [originalDate, setOriginalDate] = useState(null)
-  const [data, setData] = useState([])
   const [availableDates, setAvailableDates] = useState([])
-  const [newBookingDate, setNewBookingDate] = useState(null)
-  const [newBookingId, setNewBookingId] = useState(null)
+  const [newBookingId, setNewBookingId] = useState(bookingId)
+
+  const booking = bookingDict[bookingId]
+  const currentTourId = booking.TourId
 
   // Get available Dates
-  const [inputs, setInputs] = useState({
-    ShowDate: '',
-    BookingId
-  })
-
-  useEffect(() => {
-    if (showModal) {
-      fetch(`/api/bookings/booking/${BookingId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setData(data)
-          setInputs({
-            ShowDate: data.ShowDate,
-            BookingId
-          })
-          setOriginalDate(data.ShowDate.substring(0, 10))
-        })
-    }
-  }, [BookingId, showModal])
-
   useEffect(() => {
     fetch(`/api/bookings/NotBooked/${currentTourId}`)
       .then((res) => res.json())
       .then((data) => {
         setAvailableDates(data)
       })
-  }, [currentTourId])
+  }, [])
 
-  function handleOnSubmit (e) {
+  const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    // Swap around the dates
     e.preventDefault()
 
-    alert(dateService.toSql(newBookingDate))
     // Update Booking with Date to Existing Date
     fetch('/api/bookings/update/date', {
       method: 'POST',
       body: JSON.stringify({
-        BookingId: inputs.BookingId,
+        BookingId: booking.BookingId,
         ShowDate: dateService.toISO(newBookingDate)
       })
     })
@@ -59,7 +47,7 @@ export default function ChangeBookingDate ({ BookingId, currentTourId }) {
       method: 'POST',
       body: JSON.stringify({
         BookingId: newBookingId,
-        ShowDate: dateService.toISO(new Date(originalDate))
+        ShowDate: dateService.toISO(booking.ShowDate)
       })
     })
 
@@ -69,54 +57,23 @@ export default function ChangeBookingDate ({ BookingId, currentTourId }) {
 
   function handleOnChange (e) {
     e.persist()
-
-    setInputs((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value
-    }))
-
-    const OtherBooking = JSON.parse(e.target.value)
-    setNewBookingDate(OtherBooking.date)
-    setNewBookingId(OtherBooking.BookingId)
+    setNewBookingId(e.target.value)
   }
+
+  const options = availableDates.map((date) => ({ text: dateService.dateStringToSimple(date.ShowDate), value: date.BookingId }))
 
   return (
     <>
-      <ToolbarButton onClick={() => setShowModal(true)}>Change Date</ToolbarButton>
-      <StyledDialog title="Change Booking Date" open={showModal} onClose={() => setShowModal(false)}>
+      <FormInputTextAttached name="ShowDate" value={dateService.dateStringToSimple(booking.ShowDate)} onClick={() => setShowModal(true)} />
+      <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.ShowDate)}`} open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
-          <div className="flex flex-row">
-            <div className={'flex flex-col m-2'}>
-              <p>
-                                            Warning! You are about to change the date of a booking!
-              </p>
-              <p>This will move the booking and all related items to the new date, inclusion contract and performances </p>
-            </div>
-          </div>
-          <div className="flex flex-row">
-            <div className={'flex flex-col m-2'}>
-                                            Original Date: {dateService.dateToSimple(originalDate)}
-            </div>
-          </div>
-          <div className="flex flex-row">
-            <div className={'flex flex-col m-2'}>
-
-              <select
-                id={'ShowDate'}
-                name={'ShowDate'}
-                onChange={handleOnChange}
-                value={inputs.ShowDate}>
-                { availableDates.length !== 0
-                  ? availableDates.map((date, index) => (
-                    <option id={date.BookingId} value={`\{"date":"${date.ShowDate}", "BookingId": "${date.BookingId}"\}`}>{dateService.dateToSimple(date.ShowDate)}</option>
-                  ))
-                  : null }
-              </select>
-            </div>
-          </div>
+          <FormInfo intent='DANGER' header="Warning">
+            Changing a booking will move all related items to the new date.
+          </FormInfo>
+          <FormInputSelect label="New Date" name="NewBookingId" value={newBookingId} onChange={handleOnChange} options={options} />
           <StyledDialog.FooterContainer>
             <StyledDialog.FooterCancel onClick={() => setShowModal(false)} />
-            <StyledDialog.FooterContinue submit>Change Date</StyledDialog.FooterContinue>
+            <StyledDialog.FooterContinue disabled={bookingId === newBookingId} submit>Change Date</StyledDialog.FooterContinue>
           </StyledDialog.FooterContainer>
         </form>
       </StyledDialog>
@@ -124,10 +81,3 @@ export default function ChangeBookingDate ({ BookingId, currentTourId }) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return {
-    props: {
-
-    }
-  }
-}

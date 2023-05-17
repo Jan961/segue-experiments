@@ -1,12 +1,14 @@
 interface Input {
   onChange: (e: any) => void;
-  label: string;
-  value: string;
+  label?: string;
+  value: string | Date;
   name: string; // Also ID
   required?: boolean;
 }
 
 export const FormInputDate = ({ onChange, value, name, label, required }: Input) => {
+  const stringValue = typeof value === 'object' ? value.toISOString().substr(0, 10) : value
+
   return (
     <div>
       <label htmlFor={name}>{ label }
@@ -15,7 +17,7 @@ export const FormInputDate = ({ onChange, value, name, label, required }: Input)
           name={name}
           onChange={onChange}
           required={required}
-          value={value}
+          value={stringValue}
           className="w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4"
           contentEditable={false}
         />

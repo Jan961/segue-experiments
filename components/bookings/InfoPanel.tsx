@@ -1,12 +1,17 @@
 import VenueInfo from './modal/VenueInfo'
 import ViewBookingHistory from './modal/ViewBookingHistory'
 import PerfomancesList from './perfomancesList'
-import React, { useEffect } from 'react'
-import { dateService } from 'services/dateService'
+import React from 'react'
 import axios from 'axios'
 import { venueState } from 'state/venueState'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { dayTypeState } from 'state/dayTypeState'
+import { bookingState } from 'state/bookingState'
+import { FormInputSelect } from 'components/global/forms/FormInputSelect'
+import { bookingDictSelector } from 'state/selectors/bookingDictSelector'
+import { FormInputTextAttached } from 'components/global/forms/FormInputSetter'
+import { dateService } from 'services/dateService'
+import ChangeBookingDate from './modal/ChangeBookingDate'
 
 interface InfoPanelProps {
   selectedBooking: number;
@@ -16,72 +21,61 @@ interface InfoPanelProps {
 export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProps) => {
   const venues = useRecoilValue(venueState)
   const dayTypes = useRecoilValue(dayTypeState)
+  const bookings = useRecoilValue(bookingState)
+  const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
+  const [inputs, setInputs] = React.useState(null)
 
-  const [inputs, setInputs] = React.useState({
-    ShowDate: dateService.formDate(new Date()),
-    VenueId: null,
-    Capacity: 0,
-    DayTypeCast: '',
-    CastLocation: null,
-    DayTypeCrew: '',
-    LocationCrew: null,
-    BookingStatus: 'U',
-    RunDays: '',
-    PencilNo: '',
-    Notes: '',
-    PerformancePerDay: 0,
-    Performance1: '',
-    Performance2: '',
-    BookingId: 0
-  })
+  const booking = bookingDict[selectedBooking]
 
-  useEffect(() => {
-    fetch(`/api/bookings/booking/${selectedBooking}`)
-      .then((res) => res.json())
-      .then((response) => {
-        if (response !== null) {
-          const VenueId = response.VenueId !== null ? response.Venue.VenueId : 0
-          const Capacity = response.Venue !== null ? response.Venue.Seats : 0
-          const DayTypeCast = response.DayTypeCast !== null ? response.DayTypeCast : 1
-          const CastLocation = response.CastLocation !== null ? response.CastLocation : null
-          const DayTypeCrew = response.DayTypeCrew !== null ? response.DayTypeCrew : 1
-          const LocationCrew = response.LocationCrew !== null ? response.LocationCrew : null
-          const BookingStatus = response.BookingStatus !== null ? response.BookingStatus : 'U'
-          const RunDays = response.RunDays !== null ? response.RunDays : 1
-          const PencilNo = response.PencilNo !== null ? response.PencilNo : 0
-          const Notes = response.Notes !== null ? response.Notes : ''
-          const PerformancePerDay = response.PerformancePerDay !== null ? response.PerformancePerDay : 0
-          const Performance1 = response.Venue !== null ? response.Venue.Seats : 0
-          const Performance2 = response.Venue !== null ? response.Venue.Seats : 0
+  const nextBookingId = React.useMemo(() => {
+    let next = false
 
-          setInputs({
-            ShowDate: dateService.formDate(response.ShowDate),
-            VenueId,
-            Capacity,
-            DayTypeCast,
-            CastLocation,
-            DayTypeCrew,
-            LocationCrew,
-            BookingStatus,
-            RunDays,
-            PencilNo,
-            Notes,
-            PerformancePerDay,
-            Performance1,
-            Performance2,
-            BookingId: response.BookingId
+    for (const booking of bookings) {
+      if (next === true) return booking.BookingId
+      if (booking.BookingId === selectedBooking) {
+        next = true
+      }
+    }
+  }, [bookings, selectedBooking])
 
-          })
-        }
-      })
-  }, [selectedBooking])
+  React.useEffect(() => {
+    const existing = bookingDict[selectedBooking]
+
+    // Commented out are not saved on backend? Should be simply displaying?
+    const newInputs = {
+      BookingId: existing.BookingId,
+      // ShowDate: existing.ShowDate,
+      VenueId: existing.VenueId || null,
+      // Capacity: existing.Venue?.Seats,
+      DayTypeCast: existing.DayTypeCast,
+      LocationCast: existing.LocationCast,
+      DayTypeCrew: existing.DayTypeCrew || 1,
+      LocationCrew: existing.LocationCrew,
+      BookingStatus: existing.BookingStatus || 'U',
+      // RunDays: existing.RunDays || 1,
+      // Pencil: existing.Pencil || 0,
+      // Notes: existing.Notes || '',
+      // PerformancesPerDay: existing.PerformancesPerDay,
+      // Performance1: existing.Venue?.Seats || 0,
+      // Performance2: existing.Venue?.Seats || 0
+    }
+
+    setInputs(newInputs)
+  }, [selectedBooking, bookings, setInputs])
 
   const saveDetails = async () => {
-    await axios({
+    const response = await axios({
       method: 'POST',
       url: '/api/bookings/update/',
       data: inputs
     })
+
+    const updated = response.data
+
+    // Can't find a a way to do this automatically, we need Date objects for typescript
+    updated.ShowDate = new Date(updated.ShowDate)
+
+    updateBooking(updated)
   }
 
   const save = async (e) => {
@@ -101,45 +95,23 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
   const saveAndNext = async (e) => {
     e.preventDefault()
     saveDetails()
-    setSelectedBooking(selectedBooking + 1)
+    setSelectedBooking(nextBookingId)
   }
 
   const changeCapacity = async (e) => {
     e.preventDefault()
   }
 
+  if (!inputs) return null
+
+  const venueOptions = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.VenueId) }))]
+
   return (
     <div className="w-6/12 pl-4" >
       <form>
-        <div className="bg-primary-blue rounded-xl flex flex-col justify-center mb-4 ">
-          <div className="flex flex-row mx-4 mt-3 mb-1">
-            <label htmlFor="date" className=""></label>
-            <input
-              className="block w-full min-w-0 flex-1 rounded-none rounded-l-md rounded-r-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              value={inputs.ShowDate}
-              id="Date"
-              name="Date"
-              type="date"
-              required
-              onChange={handleOnChange}
-            />
-
-          </div>
-          <div className="flex flex-row mx-4 mb-3 mt-1">
-            <label htmlFor="venueName" className=""></label>
-            <select
-              id="VenueId"
-              name="VenueId"
-              className="block w-full min-w-0 flex-1 rounded-none rounded-l-md rounded-r-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              onChange={handleOnChange}
-              value={inputs.VenueId}
-            >
-              <option >Please Select a Venue</option>
-              {venues.map((venue) => (
-                <option key={venue.VenueId} value={venue.VenueId}>{venue.Name}</option>
-              ))}
-            </select>
-          </div>
+        <div className="bg-primary-blue rounded-xl flex flex-col justify-center mb-4 p-4 pb-0">
+          <ChangeBookingDate bookingId={booking.BookingId} />
+          <FormInputSelect name="VenueId" value={inputs.VenueId ? inputs.VenueId : ''} options={venueOptions} onChange={handleOnChange} />
         </div>
 
         <div className="flex flex-row h-10 items-center mb-4">
@@ -322,14 +294,15 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 ml-0"
           onClick={save}
           >
-                                        Save
+            Save
           </button>
           <button className="inline-flex items-center justify-center w-3/5 rounded-md border border-transparent
                   bg-primary-blue px-2 py-2 text-xs font-medium leading-4 text-white shadow-sm hover:bg-indigo-700
                   focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 p-5 m-2 mr-0"
           onClick={saveAndNext}
+          disabled={!nextBookingId}
           >
-                                        Save & go to next
+            Save & go to next
           </button>
         </div>
 

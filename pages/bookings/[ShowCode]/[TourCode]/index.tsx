@@ -7,23 +7,26 @@ import BookingDetailRow from 'components/bookings/bookingDetailRow'
 import { userService } from 'services/user.service'
 import { getTourByCode } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
-import { useSetRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 import { venueState } from 'state/venueState'
 import { dayTypeState } from 'state/dayTypeState'
+import { bookingState } from 'state/bookingState'
+import { BookingsByTourIdType, getBookingsByTourId } from 'services/bookingService'
 
 interface bookingProps {
   TourCode: string,
   ShowCode: string,
   TourId: number,
+  initialBookings: BookingsByTourIdType[],
 }
 
-const BookingPage = ({ TourCode, ShowCode, TourId }: bookingProps) => {
-  const [bookings, setBookings] = useState([]) // This is all of the bookings list
+const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingProps) => {
   const [searchFilter, setSearchFilter] = useState('')
 
   const [selectedBooking, setSelectedBooking] = useState(0)
   const setVenues = useSetRecoilState(venueState)
   const setDayTypes = useSetRecoilState(dayTypeState)
+  const [bookings, setBookings] = useRecoilState(bookingState)
 
   useEffect(() => {
     fetch(`/api/venue/read/allVenues/${userService.userValue.accountId}`)
@@ -42,15 +45,12 @@ const BookingPage = ({ TourCode, ShowCode, TourId }: bookingProps) => {
   }, [])
 
   useEffect(() => {
-    fetch(`/api/bookings/${TourId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data[0] !== undefined) {
-          setSelectedBooking(data[0].BookingId)
-        }
-        setBookings(data)
-      })
-  }, [TourId])
+    // SSR - We need a better way to set this before the page is mounted.
+    if (initialBookings?.length > 0) {
+      setBookings(initialBookings)
+      setSelectedBooking(initialBookings[0].BookingId)
+    }
+  }, [])
 
   const gotoToday = () => {
     const element = new Date().toISOString().substring(0, 10)
@@ -59,10 +59,6 @@ const BookingPage = ({ TourCode, ShowCode, TourId }: bookingProps) => {
     } else {
       alert('Today is not a date on this tour')
     }
-  }
-
-  function handleClick (BookingId) {
-    setSelectedBooking(BookingId)
   }
 
   return (
@@ -91,20 +87,15 @@ const BookingPage = ({ TourCode, ShowCode, TourId }: bookingProps) => {
             </button>
           </div>
           <ul className="grid">
-            {bookings.map((booking, index) => (
-              <div
-                key={new Date(booking.ShowDate).toISOString().substring(0, 10)}
-                id={booking.ShowDate.substring(0, 10)}
-                className={`grid grid-cols-1 space-y-4 ${
-                  index % 2 === 0 ? 'bg-faded-primary-grey' : ''
-                }`}
-
-              >
-                <button type={'button'} onClick={() => handleClick(booking.BookingId)}>
-                  <BookingDetailRow booking={booking}></BookingDetailRow>
-                </button>
-              </div>
-            ))}
+            {
+              bookings.map((booking, index) => (
+                <BookingDetailRow
+                  key={booking.ShowDate.toISOString().substring(0, 10)}
+                  selected={booking.BookingId === selectedBooking}
+                  onClick={() => setSelectedBooking(booking.BookingId)}
+                  booking={booking} />
+              ))
+            }
           </ul>
         </div>
 
@@ -121,12 +112,16 @@ export default BookingPage
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ShowCode, TourCode } = ctx.query
   const { TourId } = await getTourByCode(ShowCode as string, TourCode as string)
+  const initialBookings = await getBookingsByTourId(TourId)
+
+  console.log(TourId)
 
   return {
     props: {
       TourCode,
       ShowCode,
-      TourId
+      TourId,
+      initialBookings
     }
   }
 }
