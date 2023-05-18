@@ -150,7 +150,7 @@ export default function MasterPlan(){
             fgColor: {argb: "8EA9DB"},
         };
 
-        titleText.value = "Master Plan " + dateService.dateStringToSimple(firstMonday) + " " + dateService.dateStringToSimple(sunday);
+        titleText.value = "Master Plan " + dateService.dateToSimple(firstMonday) + " " + dateService.dateToSimple(sunday);
 
 
         worksheet.mergeCells("A2:CU2");

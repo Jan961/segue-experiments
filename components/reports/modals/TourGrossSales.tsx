@@ -188,7 +188,7 @@ export default function SelectedVenues(){
                     }
 
 
-                    worksheet.getCell(6, colIndex).value = dateService.dateStringToSimple(day.ShowDate)
+                    worksheet.getCell(6, colIndex).value = dateService.dateToSimple(day.ShowDate)
                     worksheet.getColumn(colIndex).width = 20
                     worksheet.getCell(7, colIndex).value = dateService.getWeekDayLong(day.ShowDate)
                     worksheet.getCell(8, colIndex).value = day.Town

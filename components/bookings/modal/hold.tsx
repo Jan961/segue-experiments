@@ -131,7 +131,7 @@ export default function Holds(data){
 
                                                 datesList.map((date) => (
                                                     <>
-                                                        <option value={date.BookingId}>{dateService.getWeekDay(date.ShowDate)} {dateService.dateStringToSimple(date.ShowDate)} {dateService.dateTimeToTime(date.Performance1Time)}</option>
+                                                        <option value={date.BookingId}>{dateService.getWeekDay(date.ShowDate)} {dateService.dateToSimple(date.ShowDate)} {dateService.dateTimeToTime(date.Performance1Time)}</option>
                                                     </>
                                                 )) :
                                                 <option value={""}>Tour has no dates</option>

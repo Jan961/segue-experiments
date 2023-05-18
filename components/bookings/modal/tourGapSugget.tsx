@@ -114,7 +114,7 @@ export default function TourGapsModal (tourId) {
     }))
   }
 
-  const availableDatesOptions = gapsList.map(x => ({ text: dateService.dateStringToSimple(x.ShowDate), value: x.BookingId}))
+  const availableDatesOptions = gapsList.map(x => ({ text: dateService.dateToSimple(x.ShowDate), value: x.BookingId}))
   const availableDistances = Array.from({ length: 8 }, (_, i) => ({ text: String((i + 1) * 25), value: String((i + 1) * 25) }));
 
   return (

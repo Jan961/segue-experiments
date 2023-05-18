@@ -90,7 +90,7 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
             {
               bookings.map((booking, index) => (
                 <BookingDetailRow
-                  key={booking.ShowDate.toISOString().substring(0, 10)}
+                  key={booking.BookingId}
                   selected={booking.BookingId === selectedBooking}
                   onClick={() => setSelectedBooking(booking.BookingId)}
                   booking={booking} />

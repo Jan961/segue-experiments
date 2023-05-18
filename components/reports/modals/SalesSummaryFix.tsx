@@ -678,7 +678,7 @@ export default function SalesSummaryFix(){
 
                                     </div>
                                     <div className="flex flex-row space-x-2 space-y-2">
-                                        <span>Tour Dates {dateService.dateStringToSimple(inputs.tourStartDate)} to {dateService.dateStringToSimple(inputs.tourEndDate)}</span>
+                                        <span>Tour Dates {dateService.dateToSimple(inputs.tourStartDate)} to {dateService.dateToSimple(inputs.tourEndDate)}</span>
                                     </div>
 
                                     <div className="flex flex-row space-x-2 space-y-2">

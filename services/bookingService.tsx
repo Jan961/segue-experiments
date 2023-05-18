@@ -99,6 +99,47 @@ export const clearBookingById = async (BookingId: any) => {
   return result[0]
 }
 
+export const swapBookings = async (sourceId: number, destinationId: number) => {
+  const source = await prisma.booking.findUnique({
+    where: {
+      BookingId: sourceId
+    },
+    select: {
+      ShowDate: true
+    }
+  })
+
+  const destination = await prisma.booking.findUnique({
+    where: {
+      BookingId: destinationId
+    },
+    select: {
+      ShowDate: true
+    }
+  })
+
+  return await prisma.$transaction([
+    prisma.booking.update({
+      where: {
+        BookingId: sourceId
+      },
+      data: {
+        ShowDate: destination.ShowDate
+      },
+      include: bookingInclude
+    }),
+    prisma.booking.update({
+      where: {
+        BookingId: destinationId
+      },
+      data: {
+        ShowDate: source.ShowDate
+      },
+      include: bookingInclude
+    })
+  ])
+}
+
 export const updateBookingDay = (date: string, venueid: any) => {
 }
 

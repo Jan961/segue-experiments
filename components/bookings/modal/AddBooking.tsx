@@ -143,7 +143,7 @@ export default function AddBooking (BookingId : AddBookingProps) {
           <div className="bg-primary-blue rounded-xl flex flex-col justify-center mb-4 ">
             <div className="flex flex-row mx-4 mb-3 mt-1">
               <label htmlFor="Date" className=""></label>
-              <h1>{dateService.dateStringToSimple(inputs.ShowDate)}</h1>
+              <h1>{dateService.dateToSimple(inputs.ShowDate)}</h1>
             </div>
             <div className="flex flex-row mx-4 mb-3 mt-1">
               <label htmlFor="venueName" className=""></label>

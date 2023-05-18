@@ -1,34 +1,15 @@
 import moment from 'moment'
 
-export const dateService = {
-  dateToSimple,
-  toISO,
-  toSql,
-  getWeekDay,
-  weeks,
-  dateTimeToTime,
-  timeNow,
-  formatTime,
-  getMonday,
-  getWeekDayLong,
-  getSunday,
-  formatDateUK,
-  getDateDaysAgo,
-  getDateDaysInFuture,
-  quickISO,
-  formDate,
-  dateStringToSimple
+const safeDate = (date: Date | string) => {
+  if (typeof date === 'string') return new Date(date)
+  return date
 }
 
-function dateToSimple (date: Date) {
-  if (!date) return 'DD/MM/YYYY'
+const dateToSimple = (dateToFormat: Date | string) => {
+  if (!dateToFormat) return 'DD/MM/YYYY'
+  const date = safeDate(dateToFormat)
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', day: '2-digit', month: '2-digit', timeZone: 'UTC' }
   return date.toLocaleDateString('en-GB', options)
-}
-
-function dateStringToSimple (dateString: Date) {
-  const date = new Date(dateString)
-  return dateToSimple(date)
 }
 
 function dateTimeToTime (dateToFormat) {
@@ -54,16 +35,12 @@ function getDateDaysInFuture (date, daysToSubtract) {
 }
 
 function getWeekDay (dateToFormat: Date | string) {
-  if (typeof dateToFormat === 'object') return dateToFormat.toLocaleDateString('en-US', { weekday: 'short' })
-
-  const date = new Date(dateToFormat)
+  const date = safeDate(dateToFormat)
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
 
 function getWeekDayLong (dateToFormat: Date | string) {
-  if (typeof dateToFormat === 'object') return dateToFormat.toLocaleDateString('en-US', { weekday: 'long' })
-
-  const date = new Date(dateToFormat)
+  const date = safeDate(dateToFormat)
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
 
@@ -140,3 +117,23 @@ function formDate (DateString) {
   const formDateString = DateString.toString()
   return formDateString.substring(0, 10)
 }
+
+export const dateService = {
+  dateToSimple,
+  toISO,
+  toSql,
+  getWeekDay,
+  weeks,
+  dateTimeToTime,
+  timeNow,
+  formatTime,
+  getMonday,
+  getWeekDayLong,
+  getSunday,
+  formatDateUK,
+  getDateDaysAgo,
+  getDateDaysInFuture,
+  quickISO,
+  formDate
+}
+

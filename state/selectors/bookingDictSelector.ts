@@ -31,7 +31,8 @@ export const bookingDictSelector = selector({
 
     // Handle adding
     if (!found) replacement.push(newValue)
+    const sortedReplacement = replacement.sort((a, b) => new Date(a.ShowDate) < new Date(b.ShowDate) ? -1 : 1)
 
-    set(bookingState, replacement)
+    set(bookingState, sortedReplacement)
   }
 })

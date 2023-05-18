@@ -148,7 +148,7 @@ export default function Barring () {
             >
               <option value={0}>Select A Tour</option>
               {salesWeeksVenues.map((item) => (
-                <option value={item.VenueId}>{dateService.dateStringToSimple(new Date(item.ShowDate))} - {item.Venue.Name})</option>
+                <option value={item.VenueId}>{dateService.dateToSimple(new Date(item.ShowDate))} - {item.Venue.Name})</option>
               ))}
             </select>
           </div>

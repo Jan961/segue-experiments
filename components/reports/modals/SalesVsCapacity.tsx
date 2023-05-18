@@ -169,7 +169,7 @@ export default function SalesVsCapacity(){
              * Check if we need the heading row for the Showdate
              */
 
-            if (dateService.dateStringToSimple(lastDate) != dateService.dateStringToSimple(perf.ShowDate) || lastDate === null) {
+            if (dateService.dateToSimple(lastDate) != dateService.dateToSimple(perf.ShowDate) || lastDate === null) {
                 ResultCol = "F"
                 row = row + 1
 
@@ -179,7 +179,7 @@ export default function SalesVsCapacity(){
                 // ColB
                 worksheet.getCell(`B${row}`).value = dateService.getWeekDay(ShowDate)
                 // Colc
-                worksheet.getCell(`C${row}`).value = dateService.dateStringToSimple(ShowDate)
+                worksheet.getCell(`C${row}`).value = dateService.dateToSimple(ShowDate)
 
                 // COld
                 worksheet.getCell(`D${row}`).value = perf.Town
@@ -226,7 +226,7 @@ export default function SalesVsCapacity(){
         for( let week of weeks){
 
             worksheet.getCell(`${dateCol}3`).value = week.WeekName
-            worksheet.getCell(`${dateCol}4`).value = dateService.dateStringToSimple(week.WeekDate)
+            worksheet.getCell(`${dateCol}4`).value = dateService.dateToSimple(week.WeekDate)
             lastCol = dateCol
 
             worksheet.getCell(`${dateCol}${rowCount+2}`).value = { formula: `sum(${dateCol}${firstRow}:${dateCol}${rowCount})`}
