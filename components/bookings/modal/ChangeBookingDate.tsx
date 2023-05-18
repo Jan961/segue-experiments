@@ -22,17 +22,21 @@ export default function ChangeBookingDate ({ bookingId }: ChangeBookingDateProps
 
   // Get available Dates
   useEffect(() => {
+    if (!showModal) return
+
     fetch(`/api/bookings/NotBooked/${currentTourId}`)
       .then((res) => res.json())
       .then((data) => {
         setAvailableDates(data)
       })
-  }, [])
+  }, [showModal])
 
   const handleOnSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     // Swap around the dates
     e.preventDefault()
 
+    // Todo, this should be an atomic operation in a single call
+    /*
     // Update Booking with Date to Existing Date
     fetch('/api/bookings/update/date', {
       method: 'POST',
@@ -50,8 +54,8 @@ export default function ChangeBookingDate ({ bookingId }: ChangeBookingDateProps
         ShowDate: dateService.toISO(booking.ShowDate)
       })
     })
+    */
 
-    // forceReload();
     setShowModal(false)
   }
 
