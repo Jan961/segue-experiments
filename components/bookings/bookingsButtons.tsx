@@ -6,7 +6,12 @@ import TourGapsModal from './modal/tourGapSugget'
 import RemoveBooking from './modal/RemoveBooking'
 import Barring from './modal/barring'
 
-export default function BookingsButtons ({ selectedBooking, currentTourId }) {
+interface BookingButtonsProps {
+  selectedBooking: number
+  currentTourId: number
+}
+
+export default function BookingsButtons ({ selectedBooking, currentTourId }: BookingButtonsProps) {
   // @ts-ignore
   return (
     <>
@@ -16,7 +21,7 @@ export default function BookingsButtons ({ selectedBooking, currentTourId }) {
           <Report TourId={currentTourId}></Report>
           <BookingHold TourId={currentTourId} ></BookingHold>
           <Barring />
-          <RemoveBooking BookingId={selectedBooking}></RemoveBooking>
+          <RemoveBooking bookingId={selectedBooking}></RemoveBooking>
           <TourGapsModal TourId={currentTourId} ></TourGapsModal>
         </div>
         <div className="col-auto">

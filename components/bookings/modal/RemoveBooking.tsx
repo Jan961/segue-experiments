@@ -1,41 +1,38 @@
 import React from 'react'
-import { GetServerSideProps } from 'next'
-import { forceReload } from 'utils/forceReload'
 import { ToolbarButton } from '../ToolbarButton'
 import { StyledDialog } from 'components/global/StyledDialog'
+import { FormInfo } from 'components/global/forms/FormInfo'
+import { useSetRecoilState } from 'recoil'
+import { bookingDictSelector } from 'state/selectors/bookingDictSelector'
+import axios from 'axios'
 
-export default function RemoveBooking (bookingId) {
+interface RemoveBookingProps {
+  bookingId: number;
+}
+
+export default function RemoveBooking ({ bookingId }: RemoveBookingProps) {
   const [showModal, setShowModal] = React.useState(false)
+  const updateBooking = useSetRecoilState(bookingDictSelector)
 
-  function handleOnSubmit (e) {
+  const handleOnSubmit = async (e: any) => {
     e.preventDefault()
 
-    alert('deletre')
-    console.log('DELETE --------------------------')
-    fetch('/api/bookings/delete/', {
-      method: 'POST',
-      body: bookingId.BookingId
-    })
-    forceReload()
+    const response = await axios.post('/api/bookings/delete/', { bookingId })
+    const updated = response.data
+    updated.ShowDate = new Date(updated.ShowDate)
+    updateBooking(updated)
+
     setShowModal(false)
   }
 
   return (
     <>
       <ToolbarButton onClick={() => setShowModal(true)}>Remove Booking</ToolbarButton>
-      <StyledDialog title={`Delete Booking: ${bookingId?.BookingId}`}open={showModal} onClose={() => setShowModal(false)} >
+      <StyledDialog title={`Delete Booking: ${bookingId}`}open={showModal} onClose={() => setShowModal(false)} >
         <form onSubmit={handleOnSubmit}>
-          <div className="flex flex-row">
-            <div className={'flex flex-col m-2'}>
-              <p>
-                Warning! You are about to delete a booking!
-              </p>
-              <p>
-                This will remove it from the system All related data will also be discarded
-              </p>
-            </div>
-          </div>
-
+          <FormInfo header="Warning" intent='DANGER'>
+            This will remove the booking from the system. All related data will also be discarded
+          </FormInfo>
           <StyledDialog.FooterContainer>
             <StyledDialog.FooterCancel onClick={() => setShowModal(false)}>
               Cancel
@@ -48,12 +45,4 @@ export default function RemoveBooking (bookingId) {
       </StyledDialog>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  return {
-    props: {
-
-    }
-  }
 }

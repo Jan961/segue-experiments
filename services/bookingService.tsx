@@ -1,4 +1,4 @@
-import { Booking, Prisma, PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 export const updateBookingVenue = (date, venueID, tourID) => {
@@ -41,6 +41,62 @@ export const updateBooking = async (booking: any) => {
     data: booking,
     include: bookingInclude
   })
+}
+
+export const clearBookingById = async (BookingId: any) => {
+  const result = await prisma.$transaction([
+    prisma.booking.update({
+      where: {
+        BookingId
+      },
+      data: {
+        VenueId: null,
+        Notes: null,
+        Miles: null,
+        TravelTime: null,
+        RunDays: null,
+        DateTypeId: 1,
+        RehearsalTown: null,
+        TravelTimeMins: null,
+        LandingPageURL: null,
+        VenueContractStatus: null,
+        ContractSignedDate: null,
+        ContractCheckedBy: null,
+        ContractReturnDate: null,
+        ContractSignedBy: null,
+        ContractNotes: null,
+        DealNotes: null,
+        GP: null,
+        MarketingDealNotes: null,
+        MarketingPlanReceived: false,
+        CrewNotes: null,
+        BarringExemptions: null,
+        TicketPriceNotes: null,
+        OnSale: false,
+        ContractReceivedBackDate: null,
+        BankDetailsReceived: null,
+        PrintReqsReceived: false,
+        ContactInfoReceived: false,
+        SalesNotes: null,
+        HoldNotes: null,
+        CompNotes: null,
+        BookingStatus: 'U',
+        MerchandiseNotes: null,
+        DayTypeCast: 1,
+        DayTypeCrew: 1,
+        LocationCast: '',
+        LocationCrew: ''
+      },
+      include: bookingInclude
+    }),
+    prisma.bookingPerformance.deleteMany({
+      where: {
+        BookingId
+      }
+    })
+  ])
+
+  return result[0]
 }
 
 export const updateBookingDay = (date: string, venueid: any) => {

@@ -35,6 +35,8 @@ export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, inten
   }
 
   const nonPropogatedClick = (e: any) => {
+    if (!onClick) return
+
     e.preventDefault()
     onClick(e)
   }
