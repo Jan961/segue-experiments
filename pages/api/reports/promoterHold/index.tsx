@@ -1,13 +1,11 @@
+import prisma from 'lib/prisma'
+
 /**
 Parameters = TourId & ", "
 Parameters = Parameters & IIf(Nz(VenueId, INVALID_ID) > 0, VenueId, "Null") & ", "
 Parameters = Parameters & IIf(IsDate(FromDate), "'" & Format(FromDate, "yyyymmdd") & "', ", "Null, ")
 Parameters = Parameters & IIf(IsDate(ToDate), "'" & Format(ToDate, "yyyymmdd") & "'", "Null")
 */
-
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient()
-
 export default async function handle(req, res) {
 
     //console.log(JSON.stringify(req.body))

@@ -1,8 +1,5 @@
-
-import { PrismaClient } from '@prisma/client'
-import {number} from "prop-types";
-const prisma = new PrismaClient()
-import { parseISO, format } from 'date-fns';
+import prisma from 'lib/prisma'
+import { parseISO } from 'date-fns'
 
 export default async function handle(req, res) {
 

@@ -1,9 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import NextCors from "nextjs-cors";
-const prisma = new PrismaClient();
-
-
+import prisma from 'lib/prisma'
 
 const generateSearchResults = async (options) => {
   return await prisma.tour.findMany({

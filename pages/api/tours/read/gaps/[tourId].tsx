@@ -1,16 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
 
-/**
- *
- * Return a list of Dates within a tour that are "gaps"
- * A gap is a day that is within the tour (Between Tour Start and tour End)
- * that is not set as rehersal, show of fit-up
- *
- *
- * @param req TourID
- * @param res
- */
 export default async function handle(req, res) {
 
     /**

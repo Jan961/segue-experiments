@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-import NextCors from "nextjs-cors";
-const prisma = new PrismaClient()
-
+import prisma from 'lib/prisma'
 
 /**
  *

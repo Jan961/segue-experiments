@@ -1,9 +1,6 @@
-import { PrismaClient } from '@prisma/client'
-import axios from "axios";
-import {delay} from "rxjs";
-import {loggingService} from "../../../../../../services/loggingService";
-const prisma = new PrismaClient()
-
+import axios from 'axios'
+import { loggingService } from 'services/loggingService'
+import prisma from 'lib/prisma'
 
 /**
  * Get the Latitude and Longitude for a venue

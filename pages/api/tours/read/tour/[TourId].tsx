@@ -1,20 +1,6 @@
 
-import {NextApiRequest, NextApiResponse} from "next";
-import { PrismaClient } from '@prisma/client'
-import {useRouter} from "next/router";
-import Shows from "../../../shows";
-import {scalarOptions} from "yaml";
-import Int = scalarOptions.Int;
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
 
-/**
- *
- * Default query using Prisma to provide ORM
- *
- *
- * @param req ShowID
- * @param res
- */
 export default async function handle(req, res) {
 
 

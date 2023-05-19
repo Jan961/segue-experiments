@@ -1,7 +1,3 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
-
-
 /**
  * Get the Latitude and Longitude for a venue
  * @param req

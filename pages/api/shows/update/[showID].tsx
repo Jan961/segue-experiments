@@ -1,8 +1,4 @@
-
-import { PrismaClient } from '@prisma/client'
-import {number} from "prop-types";
-const prisma = new PrismaClient()
-
+import prisma from 'lib/prisma'
 
 export default async function handle(req, res) {
 

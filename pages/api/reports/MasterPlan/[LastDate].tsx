@@ -1,18 +1,6 @@
-import { PrismaClient } from '@prisma/client'
-import tempfile from "tempfile";
-const prisma = new PrismaClient()
+import tempfile from 'tempfile';
+import Excel from 'exceljs/dist/es5/exceljs.browser';
 
-
-import Excel from "exceljs/dist/es5/exceljs.browser";
-
-/**
- *
- * Default query using Prisma to provide ORM
- *
- *
- * @param req ShowID
- * @param res
- */
 export default async function handle(req, res) {
 
     try {

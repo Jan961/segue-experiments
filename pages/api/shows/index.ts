@@ -1,8 +1,4 @@
-import {executeQuery} from '../../../lib/db'
-import {NextApiRequest, NextApiResponse} from "next";
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
-
+import prisma from 'lib/prisma'
 
 export default async function handle(req, res) {
     const shows = await prisma.show.findMany(

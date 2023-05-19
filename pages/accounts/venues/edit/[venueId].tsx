@@ -1,15 +1,9 @@
-import Link from 'next/link'
-import Layout from '../../../../components/Layout'
-import Venuelist from "../../../../components/accounts/venues/venuelist";
-import VenueForm from "../../../../components/accounts/venues/venueForm";
-import {GetStaticPaths, GetStaticProps} from "next";
-import {Venue} from "../../../../interfaces";
-
-import { PrismaClient } from '@prisma/client'
-import Panel from "../../../../components/accounts/venues/edit/panel";
-import {userService} from "../../../../services/user.service";
-
-const prisma = new PrismaClient()
+import Layout from 'components/Layout'
+import { GetStaticPaths, GetStaticProps } from 'next'
+import { Venue } from 'interfaces'
+import Panel from 'components/accounts/venues/edit/panel'
+import { userService } from 'services/user.service'
+import prisma from 'lib/prisma'
 
 type Props = {
     items: Venue

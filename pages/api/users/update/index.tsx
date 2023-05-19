@@ -1,11 +1,5 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import { PrismaClient } from '@prisma/client'
-import {Tour} from "../../../../interfaces";
-import { parseISO, format } from 'date-fns';
-import accountId from "../../../accounts/update-details/[account-id]";
-
-const prisma = new PrismaClient()
-const bcrypt = require('bcryptjs');
+import prisma from 'lib/prisma'
+const bcrypt = require('bcryptjs')
 
 export default  async function handle(req, res) {
 

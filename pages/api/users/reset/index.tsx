@@ -1,8 +1,7 @@
-import { generateGUID } from "utils/guid";
-import { PrismaClient } from '@prisma/client'
-import { emailService } from "services/emailService";
-const bcrypt = require("bcryptjs");
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
+import { generateGUID } from 'utils/guid'
+import { emailService } from 'services/emailService'
+const bcrypt = require('bcryptjs')
 
 async function findUserByEmail(email:string) {
   return await prisma.user.findUnique({

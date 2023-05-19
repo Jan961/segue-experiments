@@ -1,14 +1,6 @@
-import {generateGUID} from "../../../utils/guid";
-
-const bcrypt = require('bcryptjs');
-
-import { apiHandler } from '../../../helpers/api/api-handler';
-import { usersRepo } from '../../../helpers/api/users-repo';
-
-import { PrismaClient } from '@prisma/client'
-import {ca} from "date-fns/locale";
-const prisma = new PrismaClient()
-
+import { generateGUID } from 'utils/guid'
+import prisma from 'lib/prisma'
+const bcrypt = require('bcryptjs')
 
 export default async function handle(req, res) {
 

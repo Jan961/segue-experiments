@@ -1,10 +1,5 @@
-
-
-import { PrismaClient } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
+import prisma from 'lib/prisma'
 import getMimeType from "utils/getMimeType";
-
-const prisma = new PrismaClient();
 
 export default async function handler(
   req,
