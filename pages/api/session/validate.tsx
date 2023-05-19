@@ -1,14 +1,5 @@
+import prisma from 'lib/prisma'
 
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
-
-/**
- *
- * Validate Session - Check that the user USERID + Session IS is active if not log user out
- *
- * @param req
- * @param res
- */
 export default async function handle(req, res) {
 
 

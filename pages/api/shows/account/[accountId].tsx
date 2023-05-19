@@ -1,10 +1,4 @@
-import {NextApiRequest, NextApiResponse} from "next";
-
-import {Show} from "../../../../interfaces";
-import {tr} from "date-fns/locale";
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
-
+import prisma from 'lib/prisma'
 
 export default async function handle(req, res) {
 

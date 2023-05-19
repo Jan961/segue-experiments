@@ -1,15 +1,6 @@
-import { PrismaClient } from '@prisma/client'
-import {dateService} from "../../../../../services/dateService";
-const prisma = new PrismaClient()
+import { dateService } from 'services/dateService'
+import prisma from 'lib/prisma'
 
-/**
- *
- * Default query using Prisma to provide ORM
- *
- *
- * @param req ShowID
- * @param res
- */
 export default async function handle(req, res) {
 
     const TourId =  parseInt(req.query.TourId)

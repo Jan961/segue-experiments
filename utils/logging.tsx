@@ -1,19 +1,4 @@
-/**
- *
- * Action logging
- *
- * - user who is actioning the change
- * - change | what part of the system a change is being made in
- * - account | what account they are in
- * - datetime ¬ added on save
- *
- */
-
-import { PrismaClient } from '@prisma/client';
-
 export async function Logging(action, user_id, account_id) {
-    const prisma = new PrismaClient();
-
     //todo impliment this
 /**
     try {

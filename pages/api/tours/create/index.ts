@@ -1,9 +1,27 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
 import { parseISO } from 'date-fns'
+import prisma from 'lib/prisma'
 
+export default async function handle(req, res) {
 const prisma = new PrismaClient()
 
+    try {
+        const TourResult = await prisma.tour.create({
+            data: {
+                Code  : req.body.Code,
+                ShowId: req.body.ShowId,
+                TourStartDate : parseISO(req.body.TourStartDate),
+                TourEndDate : parseISO(req.body.TourEndDate),
+                Archived    :false,
+                Deleted: false,
+                RehearsalStartDate: parseISO(req.body.RehearsalStartDate),
+                RehearsalEndDate : parseISO(req.body.RehearsalEndDate),
+                TourOwner : req.body.Owner,
+                Logo : req.body.logo,
+                CreatedBy: null
+            },
+        })
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
     const TourResult = await prisma.tour.create({

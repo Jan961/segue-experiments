@@ -1,15 +1,10 @@
-import {tr} from "date-fns/locale";
+import getConfig from 'next/config'
+import { apiHandler } from 'helpers/api/api-handler'
+import prisma from 'lib/prisma'
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-import getConfig from 'next/config';
-
-import { apiHandler } from 'helpers/api/api-handler';
-
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
-
-const { serverRuntimeConfig } = getConfig();
+const { serverRuntimeConfig } = getConfig()
 
 export default apiHandler({
     post: authenticate

@@ -1,10 +1,5 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import { PrismaClient } from '@prisma/client'
-import {Tour} from "../../../../interfaces";
-import { parseISO, format } from 'date-fns';
 import fetch from 'node-fetch'
-const prisma = new PrismaClient()
-
+import prisma from 'lib/prisma'
 
 async function callCreateUserApi(userData) {
   const baseUrl = process.env.BASE_URL;

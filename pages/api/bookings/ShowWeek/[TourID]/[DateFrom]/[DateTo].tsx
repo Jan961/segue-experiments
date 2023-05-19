@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-import {dateService} from "../../../../../../services/dateService";
-import moment from "moment";
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
 
 export default async function handle(req, res) {
 //SELECT * FROM `Booking` WHERE Booking.ShowDate BETWEEN date and date AND Booking.TourId = tourID

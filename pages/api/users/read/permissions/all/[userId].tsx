@@ -1,13 +1,5 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
 
-/**
- *
- * Default query using Prisma to provide ORM
- *
- * @param req
- * @param res
- */
 export default async function handle(req, res) {
 
     try {

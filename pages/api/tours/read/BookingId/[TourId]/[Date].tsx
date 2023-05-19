@@ -1,14 +1,6 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import { PrismaClient } from '@prisma/client'
-import {dateService} from "../../../../../../services/dateService";
-const prisma = new PrismaClient()
+import { dateService } from 'services/dateService'
+import prisma from 'lib/prisma'
 
-/**
- * SELECT * FROM `Booking` WHERE `TourId` = 4 AND `ShowDate` LIKE '%2022-02-07%'
- *
- * @param req
- * @param res
- */
 export default async function handle(req, res) {
 
     try {

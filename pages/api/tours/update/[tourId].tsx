@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client'
 import { parseISO } from 'date-fns'
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
+
 
 const safeParseDate = (date: string) => {
   if (!date) return null

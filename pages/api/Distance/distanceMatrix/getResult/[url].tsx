@@ -1,8 +1,3 @@
-import { PrismaClient } from '@prisma/client'
-import axios from "axios";
-import {da} from "date-fns/locale";
-const prisma = new PrismaClient()
-
 const key ="Aiy7xjDKh2qaGhAbWRnVQML0yMIRzghHla9KdBY-wLEXhr5Pb7fOGj3a9XcPrkpU"
 export default  async function handle(req, res) {
 

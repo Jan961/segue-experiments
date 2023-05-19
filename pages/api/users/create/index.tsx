@@ -1,18 +1,7 @@
-// @ts-ignore
-import { random } from "nanoid";
-
+import { emailService } from 'services/emailService'
+import { generateGUID } from 'utils/guid'
+import prisma from 'lib/prisma'
 const bcrypt = require("bcryptjs");
-
-import { NextApiRequest, NextApiResponse } from "next";
-import { PrismaClient } from "@prisma/client";
-import { Show } from "../../../../interfaces";
-import { Logging } from "../../../../utils/logging";
-import { emailService } from "../../../../services/emailService";
-import { generateGUID } from "../../../../utils/guid";
-import { userService } from "../../../../services/user.service";
-import accountId from "../../../accounts/update-details/[account-id]";
-
-const prisma = new PrismaClient();
 
 function makePassword(length) {
   var result = "";
@@ -102,7 +91,6 @@ async function createNewUser(user) {
 }
 
 async function createPermission(inputs, userId) {
-  // const prisma = new PrismaClient()
   try {
     for (let [input, value] of Object.entries(inputs)) {
       let show = null;

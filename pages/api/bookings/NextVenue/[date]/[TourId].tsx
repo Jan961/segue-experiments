@@ -1,20 +1,5 @@
-import {NextApiRequest, NextApiResponse} from "next";
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import prisma from 'lib/prisma'
 
-/**
- *
- *
- * SELECT theDate
- * FROM Bookings
- * WHERE ShowDate < '1990-01-29'
- * AND TourId = $tourId
- * ORDER BY theDate DESC
- * LIMIT 1
- *
- * @param req
- * @param res
- */
 export default async function handle(req, res) {
 
     try {
