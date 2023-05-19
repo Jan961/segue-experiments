@@ -14,8 +14,6 @@ import { bookingState } from 'state/bookingState'
 import { BookingsByTourIdType, getBookingsByTourId } from 'services/bookingService'
 
 interface bookingProps {
-  TourCode: string,
-  ShowCode: string,
   TourId: number,
   initialBookings: BookingsByTourIdType[],
 }
@@ -40,6 +38,7 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
     fetch('/api/utilities/dropdowns/dayTypes')
       .then((res) => res.json())
       .then((dayTypes) => {
+        console.log(dayTypes)
         setDayTypes(dayTypes)
       })
   }, [])
@@ -69,7 +68,6 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
         setSearchFilter={setSearchFilter}
         title={'Bookings'}
       ></GlobalToolbar>
-
       <BookingsButtons key={'toolbar'} selectedBooking={selectedBooking} currentTourId={TourId} ></BookingsButtons>
       <div className="flex flex-auto">
         {/* <SideMenu></SideMenu> */}
@@ -118,8 +116,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      TourCode,
-      ShowCode,
       TourId,
       initialBookings
     }

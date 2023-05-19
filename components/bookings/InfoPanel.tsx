@@ -9,9 +9,8 @@ import { dayTypeState } from 'state/dayTypeState'
 import { bookingState } from 'state/bookingState'
 import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 import { bookingDictSelector } from 'state/selectors/bookingDictSelector'
-import { FormInputTextAttached } from 'components/global/forms/FormInputSetter'
-import { dateService } from 'services/dateService'
 import ChangeBookingDate from './modal/ChangeBookingDate'
+import { FormInputText } from 'components/global/forms/FormInputText'
 
 interface InfoPanelProps {
   selectedBooking: number;
@@ -19,15 +18,17 @@ interface InfoPanelProps {
 }
 
 export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProps) => {
+  const defaultState: any = {}
   const venues = useRecoilValue(venueState)
   const dayTypes = useRecoilValue(dayTypeState)
   const bookings = useRecoilValue(bookingState)
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
-  const [inputs, setInputs] = React.useState(null)
+  const [inputs, setInputs] = React.useState(defaultState)
 
   const booking = bookingDict[selectedBooking]
 
   const nextBookingId = React.useMemo(() => {
+    console.log('useMemo')
     let next = false
 
     for (const booking of bookings) {
@@ -39,19 +40,17 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
   }, [bookings, selectedBooking])
 
   React.useEffect(() => {
-    const existing = bookingDict[selectedBooking]
-
     // Commented out are not saved on backend? Should be simply displaying?
     const newInputs = {
-      BookingId: existing.BookingId,
+      BookingId: booking.BookingId,
       // ShowDate: existing.ShowDate,
-      VenueId: existing.VenueId || null,
+      VenueId: booking.VenueId || null,
       // Capacity: existing.Venue?.Seats,
-      DayTypeCast: existing.DayTypeCast,
-      LocationCast: existing.LocationCast,
-      DayTypeCrew: existing.DayTypeCrew || 1,
-      LocationCrew: existing.LocationCrew,
-      BookingStatus: existing.BookingStatus || 'U',
+      DayTypeCast: booking.DayTypeCast,
+      LocationCast: booking.LocationCast,
+      DayTypeCrew: booking.DayTypeCrew || 1,
+      LocationCrew: booking.LocationCrew,
+      BookingStatus: booking.BookingStatus || 'U'
       // RunDays: existing.RunDays || 1,
       // Pencil: existing.Pencil || 0,
       // Notes: existing.Notes || '',
@@ -61,7 +60,9 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
     }
 
     setInputs(newInputs)
-  }, [selectedBooking, bookings, setInputs])
+  }, [booking])
+
+  if (!booking) return null
 
   const saveDetails = async () => {
     const response = await axios({
@@ -83,28 +84,26 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
     saveDetails()
   }
 
-  const handleOnChange = (e) => {
-    e.persist()
-
+  const handleOnChange = (e: any) => {
+    console.log('handleOnChange')
     setInputs((prev) => ({
       ...prev,
       [e.target.id]: e.target.value
     }))
   }
 
-  const saveAndNext = async (e) => {
+  const saveAndNext = async (e: any) => {
     e.preventDefault()
     saveDetails()
     setSelectedBooking(nextBookingId)
   }
 
-  const changeCapacity = async (e) => {
-    e.preventDefault()
-  }
-
-  if (!inputs) return null
-
   const venueOptions = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.VenueId) }))]
+
+  const dayTypeOptions = dayTypes.map((dayType) => ({
+    text: dayType.Name ? dayType.Name : 'None Selected',
+    value: dayType.DateTypeId
+  }))
 
   return (
     <div className="w-6/12 pl-4" >
@@ -114,98 +113,54 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
           <FormInputSelect name="VenueId" value={inputs.VenueId ? inputs.VenueId : ''} options={venueOptions} onChange={handleOnChange} />
         </div>
 
-        <div className="flex flex-row h-10 items-center mb-4">
+        { /* Not Implimented
           <label
             htmlFor="Capacity"
             className="flex-auto text-primary-blue font-bold text-sm self-center"
           >
                                         Capacity:
           </label>
-
           <input
             className="block w-full min-w-0 flex-1 rounded-none rounded-l-md rounded-r-md border-gray-300 px-3 py-2 mr-4 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm h-4/5"
             value={inputs.Capacity}
             id="Capacity"
             name="Capacity"
             type="text"
-
             onChange={handleOnChange}
           />
           <button
             className="inline-flex items-center rounded-md border border-transparent bg-primary-blue px-8 py-1 text-xs font-normal leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 h-4/5"
             onClick={changeCapacity}
           >
-                                        Change
+            Change
           </button>
-        </div>
-
-        <div className="flex flex-row mb-4">
-          <label
-            htmlFor="dayTypeCast"
-            className="flex-auto text-primary-blue font-bold text-sm self-center"
-          >
-                                        Day Type: (crew)
-          </label>
-
-          <select className="flex flex-auto h-4/5 rounded-l-md rounded-r-md text-xs"
-            onChange={handleOnChange}
-            value={inputs.DayTypeCrew}
-            name={'DayTypeCrew'}
-            id={'DayTypeCrew'}
-          >
-            <option >Please Select a Day Type</option>
-            { dayTypes.map((dayType) => (
-              <option key={dayType.DateTypeId} value={dayType.DateTypeId}>{dayType.Name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-row mr-0">
-          <label htmlFor="crewDetails" className="sr-only">
-                                        crew Details
-          </label>
-          <input
-            type="text"
-            value={inputs.LocationCrew}
-            id="LocationCrew"
-            name="LocationCrew"
-            onChange={handleOnChange}
-            className="flex flex-auto w-1/2 h-4/5 rounded-l-md rounded-r-md text-xs ml-auto mr-0"
-          />
-        </div>
-
-        <div className="flex flex-row">
-          <label
-            htmlFor="dayTypecrew"
-            className="flex-auto text-primary-blue font-bold text-sm self-center"
-          >
-                                        Day Type: (cast)
-          </label>
-
-          <select className="flex flex-auto m-3 h-4/5 rounded-l-md rounded-r-md text-xs mr-0"
-            onChange={handleOnChange}
-            id="DayTypeCast"
-            name="DayTypeCast"
-
-            value={inputs.DayTypeCast}>
-            <option >Please Select a Day Type</option>
-            {dayTypes.map((dayType) => (
-              <option key={dayType.DateTypeId} value={dayType.DateTypeId}>{dayType.Da}{dayType.Name}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-row">
-          <label htmlFor="LocationCrew" className="sr-only">
-                                        crew Details
-          </label>
-          <input
-            type="text"
-            id="CastLocation"
-            name="CastLocation"
-            onChange={handleOnChange}
-            value={inputs.CastLocation}
-            className="flex flex-auto w-1/2 h-4/5 rounded-l-md rounded-r-md text-xs ml-auto mr-0"
-          />
-        </div>
+          */ }
+        <FormInputSelect
+          value={inputs.DayTypeCrew}
+          onChange={handleOnChange}
+          name="DayTypeCrew"
+          label="Day Type: Crew"
+          inline
+          options={dayTypeOptions} />
+        <FormInputText
+          value={inputs.LocationCrew}
+          name="LocationCrew"
+          onChange={handleOnChange}
+          placeholder="Crew details"
+        />
+        <FormInputSelect
+          value={inputs.DayTypeCast}
+          onChange={handleOnChange}
+          name="DayTypeCast"
+          label="Day Type: Cast"
+          inline
+          options={dayTypeOptions} />
+        <FormInputText
+          value={inputs.LocationCast}
+          name="LocationCast"
+          onChange={handleOnChange}
+          placeholder="Cast details"
+        />
         <div className="flex flex-row">
           <label
             htmlFor="BookingStatus"
@@ -225,7 +180,8 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
             <option value={'X'}>Canceled (X)</option>
           </select>
         </div>
-        <div className="flex flex-row">
+        {/*
+          <div className="flex flex-row">
           <label
             htmlFor="runDays"
             className="flex-auto text-primary-blue font-bold text-sm self-center"
@@ -287,6 +243,7 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
             className="flex-auto rounded-l-md rounded-r-md w-full mb-1"
           >{inputs.Notes}</textarea>
         </div>
+        */}
 
         <div className="flex flex-row justify-between">
           <button className="inline-flex items-center justify-center w-2/5 rounded-md border border-primary-blue

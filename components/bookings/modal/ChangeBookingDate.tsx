@@ -77,7 +77,7 @@ export default function ChangeBookingDate ({ bookingId }: ChangeBookingDateProps
           { loading && <Spinner className="p-4" size='md'/> }
           { !loading && (
             <>
-              { datesAvailable && (<FormInputSelect label="New Date" name="NewBookingId" value={newBookingId} onChange={handleOnChange} options={options} />) }
+              { datesAvailable && (<FormInputSelect inline label="New Date" name="NewBookingId" value={newBookingId} onChange={handleOnChange} options={options} />) }
               { !datesAvailable && (<p>No free dates available.</p>)}
               <StyledDialog.FooterContainer>
                 <StyledDialog.FooterCancel onClick={() => setShowModal(false)} />
