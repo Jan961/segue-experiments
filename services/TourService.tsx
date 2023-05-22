@@ -1,10 +1,40 @@
+import prisma from 'lib/prisma'
 import { Venue } from '../interfaces'
-import getConfig from 'next/config'
-import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
-const { publicRuntimeConfig } = getConfig()
-const baseUrl = `${publicRuntimeConfig.apiUrl}`
+const getArrayOfDatesBetween = (start: Date, end: Date) => {
+  const arr = []
+
+  for (const dt = new Date(start); dt <= new Date(end); dt.setDate(dt.getUTCDate() + 1)) {
+    arr.push(new Date(dt))
+  }
+  return arr
+}
+
+export const createTour = async (tour) => {
+  const tourDates = getArrayOfDatesBetween(tour.TourStartDate, tour.TourEndDate)
+  const rehearsalDates = getArrayOfDatesBetween(tour.RehearsalStartDate, tour.RehearsalEndDate)
+
+  const getDefaultBooking = (date: Date, dateTypeId: number) => (
+    {
+      ShowDate: date,
+      Notes: 'Generated',
+      DateTypeId: dateTypeId,
+      OnSale: false,
+      MarketingPlanReceived: false,
+      PrintReqsReceived: false,
+      ContactInfoReceived: false,
+      BookingStatus: 'C'
+    }
+  )
+
+  // Generate default bookings
+  const allDates = [
+    ...tourDates.map(x => getDefaultBooking(x, 1)),
+    ...rehearsalDates.map(x => getDefaultBooking(x, 18))
+  ]
+
+  return prisma.tour.create({ data: { ...tour, Booking: { create: allDates } } })
+}
 
 export const getTourByCode = async (ShowCode: string, TourCode: string) => {
   return prisma.tour.findFirst(
@@ -44,50 +74,4 @@ export const getTourById = async (TourId: number) => {
       Show: true
     }
   })
-}
-
-function getLastTourVenue (TourID, Date) {
-  // Date - 1 day
-  let venue = null
-
-  /**
-     * Run a loop to find he last venue as it may not be the day before
-     */
-  while (venue === null) {
-    const result = getTourVenueByDate(TourID, Date)
-    venue = result.VenueId
-  }
-  // Only return the last venue
-  return venue
-}
-
-function getTourVenuesWithinDistance (VenueID, distance = null) {
-  const venues = [] // Empty array
-  // Call api
-
-  return venues
-}
-
-function getTourGaps (tourId) {
-  let gaps = []
-  fetch(`${baseUrl}/tours/read/gaps/${tourId}`)
-    .then((res) => res.json())
-    .then((data) => {
-      gaps = data
-    })
-
-  return gaps
-}
-
-function getTourVenueStatus (tourID) {
-  const tourId = parseInt(tourID)
-  let result
-  fetch(`http://127.0.0.1:3000/api/marketing/venue/status/${tourId}`)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log(data)
-
-      result = data
-    })
-  return result
 }

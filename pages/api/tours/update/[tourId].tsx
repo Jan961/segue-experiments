@@ -1,7 +1,6 @@
 import { parseISO } from 'date-fns'
 import prisma from 'lib/prisma'
 
-
 const safeParseDate = (date: string) => {
   if (!date) return null
   return parseISO(date)

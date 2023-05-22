@@ -1,5 +1,5 @@
-import { Prisma, PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import { Prisma } from '@prisma/client'
+import prisma from 'lib/prisma'
 
 export const updateBookingVenue = (date, venueID, tourID) => {
   fetch(`/api/tours/booking/update/${tourID}/${venueID}/${date}`)

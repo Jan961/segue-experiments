@@ -1,9 +1,9 @@
-import Layout from "../../components/Layout";
-import { Show, Tour, ITourTask, User } from "../../interfaces";
-import { ReactElement, useEffect, useState } from "react";
-import Toolbar from "../../components/tasks/toolbar";
-import Tasklist from "../../components/tasks/TaskList";
-import TaskModal from "../../components/tasks/modal/TaskModal";
+import Layout from "components/Layout";
+import { Tour, ITourTask, User } from "interfaces";
+import { useEffect, useState } from "react";
+import Toolbar from "components/tasks/toolbar";
+import Tasklist from "components/tasks/TaskList";
+import TaskModal from "components/tasks/modal/TaskModal";
 import TaskButtons from "components/tasks/TaskButtons";
 import NewTaskForm from "components/tasks/NewTaskForm";
 import { useRouter } from "next/router";

@@ -1,87 +1,26 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PrismaClient } from '@prisma/client'
-import { parseISO } from 'date-fns'
-import prisma from 'lib/prisma'
+import { createTour } from 'services/TourService'
 
-export default async function handle(req, res) {
-const prisma = new PrismaClient()
-
-    try {
-        const TourResult = await prisma.tour.create({
-            data: {
-                Code  : req.body.Code,
-                ShowId: req.body.ShowId,
-                TourStartDate : parseISO(req.body.TourStartDate),
-                TourEndDate : parseISO(req.body.TourEndDate),
-                Archived    :false,
-                Deleted: false,
-                RehearsalStartDate: parseISO(req.body.RehearsalStartDate),
-                RehearsalEndDate : parseISO(req.body.RehearsalEndDate),
-                TourOwner : req.body.Owner,
-                Logo : req.body.logo,
-                CreatedBy: null
-            },
-        })
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const TourResult = await prisma.tour.create({
-      data: {
-        Code: req.body.Code,
-        ShowId: req.body.ShowId,
-        TourStartDate: parseISO(req.body.TourStartDate),
-        TourEndDate: parseISO(req.body.TourEndDate),
-        Archived: false,
-        Deleted: false,
-        RehearsalStartDate: parseISO(req.body.RehearsalStartDate),
-        RehearsalEndDate: parseISO(req.body.RehearsalEndDate),
-        TourOwner: req.body.Owner,
-        Logo: req.body.Logo ? req.body.Logo : null,
-        CreatedBy: null
-      }
-    })
-
-    // Create All the Bookings
-    // Rehearsal
-    // console.log("Tour ID:" + TourResult.TourId + "\r\n " + parseISO(req.body.TourStartDate) + "<-Date")
-
-    for (let rehearsalDate = new Date(parseISO(req.body.RehearsalStartDate)); rehearsalDate <= new Date(parseISO(req.body.RehearsalEndDate)); rehearsalDate.setDate(rehearsalDate.getDate() + 1)) {
-      // Create Empty RehearsalDay
-
-      const [result] = await Promise.all([prisma.booking.create({
-        // @ts-ignore
-        data: {
-          TourId: parseInt(TourResult.TourId.toString()),
-          ShowDate: rehearsalDate,
-          Notes: 'Generated',
-          DateTypeId: 18,
-          OnSale: false,
-          MarketingPlanReceived: false,
-          PrintReqsReceived: false,
-          ContactInfoReceived: false,
-          BookingStatus: 'C'
-        }
-      })])
+    const tour = {
+      Code: req.body.Code,
+      ShowId: req.body.ShowId,
+      TourStartDate: new Date(req.body.TourStartDate),
+      TourEndDate: new Date(req.body.TourEndDate),
+      Archived: false,
+      Deleted: false,
+      RehearsalStartDate: new Date(req.body.RehearsalStartDate),
+      RehearsalEndDate: new Date(req.body.RehearsalEndDate),
+      TourOwner: req.body.Owner,
+      Logo: req.body.Logo ? req.body.Logo : null,
+      CreatedBy: null
     }
-    for (let bookingDate = new Date(parseISO(req.body.TourStartDate)); bookingDate <= new Date(parseISO(req.body.TourEndDate)); bookingDate.setDate(bookingDate.getDate() + 1)) {
-      const [result] = await Promise.all([prisma.booking.create({
-        // @ts-ignore
-        data: {
-          TourId: TourResult.TourId,
-          ShowDate: bookingDate,
-          Notes: 'Generated',
-          DateTypeId: 1,
-          OnSale: false,
-          MarketingPlanReceived: false,
-          PrintReqsReceived: false,
-          ContactInfoReceived: false,
-          BookingStatus: 'U'
 
-        }
-      })])
-    }
+    const result = await createTour(tour)
 
     res.statusCode = 200
-    res.status(200).json(TourResult)
+    res.status(200).json(result)
     res.setHeader('Content-Type', 'application/json')
   } catch (err) {
     console.log(err)

@@ -5,7 +5,6 @@ import { loggingService } from 'services/loggingService'
 import { FormContainer } from 'components/global/forms/FormContainer'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
-import { FormInputUpload } from 'components/global/forms/FormInputUpload'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -62,12 +61,15 @@ const Create = ({ show }: CreateProps) => {
       [e.target.id]: e.target.value
     }))
 
+    console.log(e.target.id)
+
     setStatus({
       submitted: false,
       submitting: false,
       info: { error: false, msg: null }
     })
   }
+
   const handleOnSubmit = async (e: any) => {
     e.preventDefault()
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
