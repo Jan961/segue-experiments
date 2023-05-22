@@ -24,8 +24,6 @@ export const FormInputText = (props: Input) => {
     return classNames(baseClass, className)
   }, [className, disabled])
 
-  console.log(value)
-
   const inputProps = {
     id: name,
     name,
