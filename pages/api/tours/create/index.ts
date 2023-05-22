@@ -19,11 +19,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const result = await createTour(tour)
 
-    res.statusCode = 200
-    res.status(200).json(result)
-    res.setHeader('Content-Type', 'application/json')
+    res.json(result)
   } catch (err) {
     console.log(err)
-    res.status(403).json({ err: 'Error occurred while generating search results.' })
+    res.status(500).json({ err: 'Error occurred while creating tour.' })
   }
 }

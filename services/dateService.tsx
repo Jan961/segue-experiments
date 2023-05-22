@@ -12,6 +12,10 @@ const dateToSimple = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-GB', options)
 }
 
+const dateToPicker = (dateToFormat: Date | string) => {
+  return typeof dateToFormat === 'object' ? dateToFormat.toISOString().slice(0, 10) : dateToFormat
+}
+
 function dateTimeToTime (dateToFormat) {
   return moment(dateToFormat).format('HH:mm')
 }
@@ -120,6 +124,7 @@ function formDate (DateString) {
 
 export const dateService = {
   dateToSimple,
+  dateToPicker,
   toISO,
   toSql,
   getWeekDay,

@@ -1,19 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { swapBookings } from 'services/bookingService'
-import { loggingService } from 'services/loggingService'
-
+import { changeBookingDate } from 'services/bookingService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const { sourceId, destinationId } = req.body
+  const { bookingId, showDate } = req.body
 
   try {
-    const results = await swapBookings(parseInt(sourceId), parseInt(destinationId))
+    const results = await changeBookingDate(parseInt(bookingId), new Date(showDate))
     res.status(200).json(results)
   } catch (e) {
     console.log(e)
-    loggingService.logError(e)
-      .then(
-        res.status(400)
-      )
+    res.status(500)
   }
 }

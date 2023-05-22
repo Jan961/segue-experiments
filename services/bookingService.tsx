@@ -43,51 +43,12 @@ export const updateBooking = async (booking: any) => {
   })
 }
 
-export const clearBookingById = async (BookingId: any) => {
-  const result = await prisma.$transaction([
-    prisma.booking.update({
+export const deleteBookingById = async (BookingId: any) => {
+  await prisma.$transaction([
+    prisma.booking.delete({
       where: {
         BookingId
-      },
-      data: {
-        VenueId: null,
-        Notes: null,
-        Miles: null,
-        TravelTime: null,
-        RunDays: null,
-        DateTypeId: 1,
-        RehearsalTown: null,
-        TravelTimeMins: null,
-        LandingPageURL: null,
-        VenueContractStatus: null,
-        ContractSignedDate: null,
-        ContractCheckedBy: null,
-        ContractReturnDate: null,
-        ContractSignedBy: null,
-        ContractNotes: null,
-        DealNotes: null,
-        GP: null,
-        MarketingDealNotes: null,
-        MarketingPlanReceived: false,
-        CrewNotes: null,
-        BarringExemptions: null,
-        TicketPriceNotes: null,
-        OnSale: false,
-        ContractReceivedBackDate: null,
-        BankDetailsReceived: null,
-        PrintReqsReceived: false,
-        ContactInfoReceived: false,
-        SalesNotes: null,
-        HoldNotes: null,
-        CompNotes: null,
-        BookingStatus: 'U',
-        MerchandiseNotes: null,
-        DayTypeCast: 1,
-        DayTypeCrew: 1,
-        LocationCast: '',
-        LocationCrew: ''
-      },
-      include: bookingInclude
+      }
     }),
     prisma.bookingPerformance.deleteMany({
       where: {
@@ -95,49 +56,18 @@ export const clearBookingById = async (BookingId: any) => {
       }
     })
   ])
-
-  return result[0]
 }
 
-export const swapBookings = async (sourceId: number, destinationId: number) => {
-  const source = await prisma.booking.findUnique({
+export const changeBookingDate = async (BookingId: number, ShowDate: Date) => {
+  return prisma.booking.update({
     where: {
-      BookingId: sourceId
+      BookingId
     },
-    select: {
-      ShowDate: true
-    }
-  })
-
-  const destination = await prisma.booking.findUnique({
-    where: {
-      BookingId: destinationId
+    data: {
+      ShowDate
     },
-    select: {
-      ShowDate: true
-    }
+    include: bookingInclude
   })
-
-  return await prisma.$transaction([
-    prisma.booking.update({
-      where: {
-        BookingId: sourceId
-      },
-      data: {
-        ShowDate: destination.ShowDate
-      },
-      include: bookingInclude
-    }),
-    prisma.booking.update({
-      where: {
-        BookingId: destinationId
-      },
-      data: {
-        ShowDate: source.ShowDate
-      },
-      include: bookingInclude
-    })
-  ])
 }
 
 export const updateBookingDay = (date: string, venueid: any) => {

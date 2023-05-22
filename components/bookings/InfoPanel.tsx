@@ -40,6 +40,10 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
   }, [bookings, selectedBooking])
 
   React.useEffect(() => {
+    if (!booking) {
+      setInputs({})
+      return
+    }
     // Commented out are not saved on backend? Should be simply displaying?
     const newInputs = {
       BookingId: booking.BookingId,
@@ -62,7 +66,7 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
     setInputs(newInputs)
   }, [booking])
 
-  if (!booking) return null
+  if (!booking) return (<div className="w-6/12 pl-4" />)
 
   const saveDetails = async () => {
     const response = await axios({

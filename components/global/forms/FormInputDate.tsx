@@ -1,13 +1,15 @@
+import { dateService } from "services/dateService";
+
 interface Input {
   onChange: (e: any) => void;
   label?: string;
   value: string | Date;
-  name: string; // Also ID
+  name?: string; // Also ID
   required?: boolean;
 }
 
 export const FormInputDate = ({ onChange, value, name, label, required }: Input) => {
-  const stringValue = typeof value === 'object' ? value.toISOString().substr(0, 10) : value
+  const stringValue = dateService.dateToPicker(value)
 
   return (
     <div>

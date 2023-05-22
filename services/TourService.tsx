@@ -1,5 +1,4 @@
 import prisma from 'lib/prisma'
-import { Venue } from '../interfaces'
 
 const getArrayOfDatesBetween = (start: Date, end: Date) => {
   const arr = []
@@ -50,19 +49,6 @@ export const getTourByCode = async (ShowCode: string, TourCode: string) => {
       }
     }
   )
-}
-
-export const getTourVenueByDate = (TourId, Date) => {
-  const venues: Venue = null
-  // Call api
-
-  return venues
-}
-
-export const getNextTourVenue = (TourID, Date) => {
-  // Date + 1 day
-
-  return getTourVenueByDate(TourID, Date)
 }
 
 export const getTourById = async (TourId: number) => {

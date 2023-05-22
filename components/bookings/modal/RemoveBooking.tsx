@@ -2,9 +2,9 @@ import React from 'react'
 import { ToolbarButton } from '../ToolbarButton'
 import { StyledDialog } from 'components/global/StyledDialog'
 import { FormInfo } from 'components/global/forms/FormInfo'
-import { useSetRecoilState } from 'recoil'
-import { bookingDictSelector } from 'state/selectors/bookingDictSelector'
+import { useRecoilState } from 'recoil'
 import axios from 'axios'
+import { bookingState } from 'state/bookingState'
 
 interface RemoveBookingProps {
   bookingId: number;
@@ -12,17 +12,21 @@ interface RemoveBookingProps {
 
 export default function RemoveBooking ({ bookingId }: RemoveBookingProps) {
   const [showModal, setShowModal] = React.useState(false)
-  const updateBooking = useSetRecoilState(bookingDictSelector)
+  const [loading, setLoading] = React.useState(false)
+  const [bookings, setBookings] = useRecoilState(bookingState)
 
   const handleOnSubmit = async (e: any) => {
     e.preventDefault()
+    setLoading(true)
 
-    const response = await axios.post('/api/bookings/delete/', { bookingId })
-    const updated = response.data
-    updated.ShowDate = new Date(updated.ShowDate)
-    updateBooking(updated)
-
-    setShowModal(false)
+    try {
+      await axios.post('/api/bookings/delete/', { bookingId })
+      const newBookings = bookings.filter(x => x.BookingId !== bookingId)
+      setBookings(newBookings)
+      setShowModal(false)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -37,7 +41,7 @@ export default function RemoveBooking ({ bookingId }: RemoveBookingProps) {
             <StyledDialog.FooterCancel onClick={() => setShowModal(false)}>
               Cancel
             </StyledDialog.FooterCancel>
-            <StyledDialog.FooterContinue submit intent='DANGER'>
+            <StyledDialog.FooterContinue submit intent='DANGER' disabled={loading} >
               Delete
             </StyledDialog.FooterContinue>
           </StyledDialog.FooterContainer>

@@ -103,22 +103,16 @@ const Edit = ({ tour }: EditProps) => {
         </h3>
         <form onSubmit={handleOnSubmit}>
           <FormInputText label="Code" value={inputs.Code} name="Code" placeholder="XYZABC" onChange={handleOnChange} required />
-          <FormInputDate label="Tour Start Date" value={convertDate(inputs.TourStartDate)} name="TourStartDate" onChange={handleOnChange} required />
-          <FormInputDate label="Tour End Date" value={convertDate(inputs.TourEndDate)} name="TourEndDate" onChange={handleOnChange} required />
-          <FormInputDate label="Rehearsal Start Date" value={convertDate(inputs.RehearsalStartDate)} name="RehearsalStartDate" onChange={handleOnChange} required />
-          <FormInputDate label="Rehearsal End Date" value={convertDate(inputs.RehearsalEndDate)} name="RehearsalEndDate" onChange={handleOnChange} required />
+          <FormInputDate label="Tour Start Date" value={inputs.TourStartDate} name="TourStartDate" onChange={handleOnChange} required />
+          <FormInputDate label="Tour End Date" value={inputs.TourEndDate} name="TourEndDate" onChange={handleOnChange} required />
+          <FormInputDate label="Rehearsal Start Date" value={inputs.RehearsalStartDate} name="RehearsalStartDate" onChange={handleOnChange} required />
+          <FormInputDate label="Rehearsal End Date" value={inputs.RehearsalEndDate} name="RehearsalEndDate" onChange={handleOnChange} required />
           <ThumbnailUpload path={inputs.Logo} setPath={(Logo) => setInputs({ ...inputs, Logo })}/>
           <FormButtonSubmit text="Save Tour" disabled={status.submitted} loading={status.submitting} />
         </form>
       </FormContainer>
     </Layout>
   )
-
-  function convertDate (date: Date) {
-    const dateObject = new Date(date)
-    if (dateObject.getTime() <= 0) return 'N/A'
-    return dateObject.toISOString().slice(0, 10).toString()
-  }
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
