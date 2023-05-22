@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 
 interface FormInfoProps {
   intent?: undefined | 'DANGER'
-  header: string;
+  header?: string;
 }
 
 export const FormInfo = ({ intent, children, header }: PropsWithChildren<FormInfoProps>) => {

@@ -13,7 +13,8 @@ const dateToSimple = (dateToFormat: Date | string) => {
 }
 
 const dateToPicker = (dateToFormat: Date | string) => {
-  return typeof dateToFormat === 'object' ? dateToFormat.toISOString().slice(0, 10) : dateToFormat
+  if (!dateToFormat) return ''
+  return typeof dateToFormat === 'object' ? dateToFormat.toISOString().slice(0, 10) : dateToFormat.slice(0, 10)
 }
 
 function dateTimeToTime (dateToFormat) {

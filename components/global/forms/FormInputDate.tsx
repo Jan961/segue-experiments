@@ -1,4 +1,4 @@
-import { dateService } from "services/dateService";
+import { dateService } from 'services/dateService'
 
 interface Input {
   onChange: (e: any) => void;

@@ -13,6 +13,8 @@ import Layout from 'components/Layout'
 import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { ThumbnailUpload } from 'components/files/ThumbnailUpload'
+import { FormInfo } from 'components/global/forms/FormInfo'
+import { isAfter, differenceInDays } from 'date-fns'
 
 type CreateProps = {
     show: number
@@ -92,6 +94,28 @@ const Create = ({ show }: CreateProps) => {
     })
   }
 
+  const dateError = (inputs: any) => {
+    const tStart = new Date(inputs.TourStartDate)
+    const tEnd = new Date(inputs.TourEndDate)
+    const rStart = new Date(inputs.RehearsalStartDate)
+    const rEnd = new Date(inputs.RehearsalEndDate)
+
+    if (!inputs.TourStartDate || !inputs.TourEndDate) return 'Tour dates must be selected'
+    else {
+      if (isAfter(tStart, tEnd)) return 'Tour End date must be after start date'
+      if (Math.abs(differenceInDays(tEnd, tStart)) > 365 * 2) return 'Tours cannot be longer than 2 years'
+    }
+
+    if (inputs.RehearsalStartDate || inputs.RehearsalEndDate) {
+      if (!inputs.RehearsalStartDate || !inputs.RehearsalEndDate) return 'If you select a rehearsal date it must be valid'
+      if (isAfter(rStart, rEnd)) return 'Rehearsal End date must be after start date'
+      if (Math.abs(differenceInDays(rEnd, rStart)) > 365) return 'Tours cannot be longer than 2 year'
+    }
+    return null
+  }
+
+  const error = dateError(inputs)
+
   return (
     <Layout title="Add Tour | Segue">
       <FormContainer>
@@ -116,7 +140,8 @@ const Create = ({ show }: CreateProps) => {
             value={parseInt(String(show))}
             contentEditable={false}
           />
-          <FormButtonSubmit text="Add Tour" disabled={status.submitted} loading={status.submitting} />
+          { !!error && (<FormInfo intent='DANGER'>{error}</FormInfo>)}
+          <FormButtonSubmit text="Add Tour" disabled={false} loading={status.submitting} />
         </form>
       </FormContainer>
     </Layout>
