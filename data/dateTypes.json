@@ -1,0 +1,222 @@
+[
+  {
+    "DateTypeId": 1,
+    "Name": null,
+    "IsAWorkday": true,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": true,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 2,
+    "Name": "Tech / Dress Day",
+    "IsAWorkday": true,
+    "IsATravelDay": false,
+    "IsARehearsalDay": true,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": true
+  },
+  {
+    "DateTypeId": 3,
+    "Name": "Easter Weekend",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 4,
+    "Name": "UK Bank Holiday",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 5,
+    "Name": "Irish Bank Holiday",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 6,
+    "Name": "UK / Irish Bank Holiday",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 7,
+    "Name": "Travel Day",
+    "IsAWorkday": true,
+    "IsATravelDay": true,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 8,
+    "Name": "Day Off",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 9,
+    "Name": "Scottish Dates",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 10,
+    "Name": "English Dates",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 11,
+    "Name": "Northern Irish Dates",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 12,
+    "Name": "Welsh Dates",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 13,
+    "Name": "Irish Dates",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 14,
+    "Name": "Start of Tour",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 15,
+    "Name": "End of Tour",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 16,
+    "Name": "Potential Tour Extension",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 17,
+    "Name": "TBA",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 18,
+    "Name": "Rehearsal Day",
+    "IsAWorkday": true,
+    "IsATravelDay": false,
+    "IsARehearsalDay": true,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 19,
+    "Name": "Declared Holiday",
+    "IsAWorkday": false,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": true,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": false,
+    "IsATechDressDay": false
+  },
+  {
+    "DateTypeId": 20,
+    "Name": "Get-In / Fit-Up Day",
+    "IsAWorkday": true,
+    "IsATravelDay": false,
+    "IsARehearsalDay": false,
+    "IsADeclaredHoliday": false,
+    "IsABooking": false,
+    "IsAGetInFitUpDay": true,
+    "IsATechDressDay": false
+  }
+]

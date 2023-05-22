@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import React from 'react';
+import React from 'react'
 
 interface Input {
   placeholder?: string;
@@ -12,9 +12,8 @@ interface Input {
   disabled?: boolean;
 }
 
-const Text = (props) => (<input type="text" {...props} />)
-
-export const FormInputText = ({ placeholder, onChange, value, name, label, required, disabled, className = '' }: Input) => {
+export const FormInputText = (props: Input) => {
+  const { placeholder, onChange, value, name, label, required, disabled, className = '' } = props
   const outputClass = React.useMemo(() => {
     let baseClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4'
 
@@ -25,7 +24,10 @@ export const FormInputText = ({ placeholder, onChange, value, name, label, requi
     return classNames(baseClass, className)
   }, [className, disabled])
 
+  console.log(value)
+
   const inputProps = {
+    id: name,
     name,
     onChange,
     placeholder,
@@ -40,11 +42,11 @@ export const FormInputText = ({ placeholder, onChange, value, name, label, requi
     return (
       <div>
         <label htmlFor={name}>{ label }
-          <Text {...inputProps} />
+          <input type="text" {...inputProps} />
         </label>
       </div>
     )
   }
 
-  return (<Text {...inputProps} />)
+  return (<input type="text" {...props} />)
 }
