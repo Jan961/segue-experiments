@@ -48,5 +48,5 @@ export const FormInputText = (props: Input) => {
     )
   }
 
-  return (<input type="text" {...props} />)
+  return (<input type="text" {...inputProps} />)
 }

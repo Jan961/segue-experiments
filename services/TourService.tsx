@@ -10,7 +10,7 @@ const getArrayOfDatesBetween = (start: Date, end: Date) => {
   return arr
 }
 
-export const createTour = async (tour) => {
+export const createTour = async (tour: any) => {
   const tourDates = getArrayOfDatesBetween(tour.TourStartDate, tour.TourEndDate)
   const rehearsalDates = getArrayOfDatesBetween(tour.RehearsalStartDate, tour.RehearsalEndDate)
 
