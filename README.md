@@ -1,30 +1,27 @@
 # Segue
 
-
-
-## Installation
-
-
 ## Running
 
-Ideal environment would be Nginx, Node 18 with PM2
-After each build rested pm2#
+Use local SQL database.
 
- `npm run build`
+```
+MYSQL_ROOT_PASSWORD="LOCAL_PASSWORD"
+MYSQL_DATABASE="segue"
+MYSQL_PORT=3306
+DATABASE_URL="mysql://root:LOCAL_PASSWORD@127.0.0.1:3306/segue"
+```
 
- `pm2 restart all`
+`docker-compose up` - Different tab for DB log
+`primsa db push` - First time schema generation. Do not run on shared datebase. Local only
+`tsx data/populateDatabase.ts` - Populate with dummy event data (WIP)
+`npm run dev`
 
 ## Requirements
 
 .env file with keys added 
-
-- Node | Dev | Prod
-  
-- Npm | Dev | Prod
-
-- PM2 | Prod
-
-- Nginx | Prod
+`tsx -g` - Execute scripts with same level of imports and support as NextJs code. Can share code with backend
+`docker`
+`prisma -g` - Database ORM
 
 ## External APIs 
 ### Bing Distance Matrix
