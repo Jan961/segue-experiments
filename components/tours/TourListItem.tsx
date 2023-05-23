@@ -58,6 +58,7 @@ const TourListItem = ({ tour }: TourListItemProps) => {
     <li
       onClick={navigateToShow}
       className="flex w-full
+        cursor-pointer
         items-center justify-between border-b border-gray-200
         hover:bg-blue-400 hover:bg-opacity-25">
       <div className="flex-shrink-0">
