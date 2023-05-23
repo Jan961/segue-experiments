@@ -1,14 +1,13 @@
 import TourListItem from './TourListItem'
-import { Tour } from 'interfaces'
 
 type Props = {
-    items: Tour[]
+    items: any[]
 }
 
 const TourList = ({ items }: Props) => (
   <ul role="list">
     {items.map((item) => (
-      <TourListItem data={item} key={item.TourId}/>
+      <TourListItem tour={item} key={item.TourId}/>
     ))}
   </ul>
 )

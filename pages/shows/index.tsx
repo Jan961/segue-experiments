@@ -1,35 +1,18 @@
 import Layout from 'components/Layout'
-import { ShowList } from 'components/shows/ShowList'
 import { SearchBox } from 'components/global/SearchBox'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { MenuButton } from 'components/global/MenuButton'
 import { GetServerSideProps } from 'next'
 import { getShows } from 'services/ShowService'
-import React, { Fragment, PropsWithChildren } from 'react'
+import React from 'react'
 import { Show } from 'interfaces'
 import { showMapper } from 'interfaces/mappers'
 import { Tab } from '@headlessui/react'
-import classNames from 'classnames'
+import { StyledTab } from 'components/global/StyledTabs'
+import { ShowList } from 'components/shows/ShowList'
 
 interface ShowsProps {
   shows: Show[]
-}
-
-const StyledTab = ({ children }: PropsWithChildren<unknown>) => {
-  const commonClass = 'p-2 px-4 rounded mr-2'
-
-  return (
-    <Tab as={Fragment}>
-      {({ selected }) => (
-        <button className={selected ?
-          classNames('bg-primary-blue text-white', commonClass) :
-          classNames('bg-gray-300 bg-opacity-50', commonClass)
-        } >
-          { children}
-        </button>
-      )}
-    </Tab>
-  )
 }
 
 export default function Index ({ shows }: ShowsProps) {
@@ -67,7 +50,6 @@ export default function Index ({ shows }: ShowsProps) {
           <Tab.Panel><ShowList items={archived} /></Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
-
     </Layout>
   )
 }

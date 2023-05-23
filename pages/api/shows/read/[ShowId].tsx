@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getShowById } from 'services/ShowService'
-import prisma from 'lib/prisma'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {

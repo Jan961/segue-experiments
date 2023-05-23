@@ -1,5 +1,6 @@
 import { Show as PrismaShow } from '@prisma/client'
 import { Show } from 'interfaces'
+import { ShowWithTours } from 'services/ShowService'
 
 /*
 
@@ -17,3 +18,17 @@ export const showMapper = (show: PrismaShow): Show => ({
   archived: show.IsArchived,
   deleted: show.IsDeleted
 })
+
+export const tourMapper = (show: ShowWithTours): any => {
+  return show.Tour.map(tour => {
+    return {
+      Id: tour.Id,
+      ShowId: show.Id,
+      Name: show.Name,
+      Code: tour.Code,
+      ShowCode: show.Code,
+      DateBlock: tour.DateBlock,
+      IsArchived: tour.IsArchived
+    }
+  })
+}

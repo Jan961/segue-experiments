@@ -1,14 +1,13 @@
 import { ShowListItem } from './ShowListItem'
-import { Show } from 'interfaces'
 
 type ShowListProps = {
-    items: Show[]
+  items: any[]
 }
 
 export const ShowList = ({ items }: ShowListProps) => (
   <ul role="list">
     {items?.map((item) => (
-      <ShowListItem data={item} key={item.ShowId} />
+      <ShowListItem show={item} key={item.ShowId} />
     ))}
   </ul>
 )
