@@ -23,7 +23,7 @@ export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, inten
   switch (intent) {
   case (undefined):
     buttonClass += ' bg-primary-blue text-white hover:bg-blue-400 active:bg-blue-600'
-    if (!disabled) buttonClass += 'hover:bg-blue-400'
+    if (!disabled) buttonClass += ' hover:bg-blue-400'
     break
   case ('DANGER'):
     buttonClass += ' bg-red-600 text-white hover:bg-red-400 active:bg-red-600'

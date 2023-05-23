@@ -1,12 +1,9 @@
 import prisma from 'lib/prisma'
 
-/**
- *
- * Convert Codes into a tour ID
- *
- * @param ShowCode
- * @param TourCodde
- */
+export const getShows = () => {
+  return prisma.show.findMany()
+}
+
 export const getShowByCode = (ShowCode, TourCode) => {
   let Tour = {}
   fetch(`/api/tours/read/code/${ShowCode}/${TourCode}`)

@@ -32,14 +32,9 @@ export  type Show = {
   ShowId: number
   Code: string
   Name: string
-  Logo: string
   ShowType: string
-  owner: number
-  archived: number
-  published: number
-  deleted: number
-  updated_at: string
-  created_at: string
+  archived: boolean
+  deleted: boolean
 }
 
 export type Tour = {

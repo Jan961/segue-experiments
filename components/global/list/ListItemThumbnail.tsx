@@ -4,7 +4,6 @@ const height = 80
 const width = 170
 
 export const ListItemThumbnail = ({ src, alt }: { src?: string; alt: string; }) => {
-  console.log(src)
   const fallbackSrc = src ? `/segue/logos/${src}` : '/segue/logos/segue_logo.png'
 
   return (
