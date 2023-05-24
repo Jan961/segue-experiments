@@ -45,7 +45,7 @@ function Login() {
             <div className="w-full max-w-md space-y-8">
                 <div>
                     <img className="mx-auto h-auto w-34"
-                         src="/segue/logos/segue_logo.png" alt="Segue Logo"/>
+                         src="/segue/segue_logo.png" alt="Segue Logo"/>
                         <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">Login</h1>
                         <p className="mt-2 text-center text-sm text-gray-600">
 

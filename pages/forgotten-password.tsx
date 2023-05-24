@@ -29,7 +29,7 @@ const forgottenPassword = () => {
         <div>
           <img
             className="mx-auto h-auto w-34"
-            src="/segue/logos/segue_logo.png"
+            src="/segue/segue_logo.png"
             alt="Segue Logo"
           />
           <h1 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">

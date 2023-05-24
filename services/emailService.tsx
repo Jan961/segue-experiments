@@ -27,7 +27,7 @@ async function createAttachmentsAndLogos() {
   const path = (await import("path")).default;
   const logoPath = path.join(
     process.cwd(),
-    "public/segue/logos/segue_logo.png"
+    "public/segue/segue_logo.png"
   );
   const facebookLogoPath = path.join(
     process.cwd(),

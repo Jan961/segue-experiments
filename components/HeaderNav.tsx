@@ -73,7 +73,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
           <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center h-20">
             <img
               className="sticky h-full w-auto"
-              src="/segue/logos/segue_logo.png"
+              src="/segue/segue_logo.png"
               alt="Your Company"
             />
           </div>

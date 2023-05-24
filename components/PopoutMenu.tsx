@@ -82,7 +82,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
         >
           <img
             className="h-24 w-auto"
-            src="/segue/logos/segue_logo.png"
+            src="/segue/segue_logo.png"
             alt="Your Company"
           />
         </div>

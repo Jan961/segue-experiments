@@ -169,7 +169,7 @@ function Register() {
               <img
                 // className="mx-auto h-12 w-auto sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40"
                 className="mx-auto w-auto h-32 aspect-[16/9]"
-                src="/segue/logos/segue_logo.png"
+                src="/segue/segue_logo.png"
                 alt="Your Company"
               />
               <h1 className=" text-center text-3xl font-bold tracking-tight text-gray-900">
