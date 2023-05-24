@@ -1,8 +1,8 @@
-import Layout from "../../../../components/guestLayout";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import axios from "axios";
-import { forceNavigate } from "../../../../utils/forceNavigate";
+import Layout from 'components/guestLayout'
+import { useState } from 'react'
+import { useRouter } from 'next/router'
+import axios from 'axios'
+import { forceNavigate } from 'utils/forceNavigate'
 
 export default function Index({userToActivate, userId, guid }) {
 
