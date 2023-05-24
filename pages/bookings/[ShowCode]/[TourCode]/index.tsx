@@ -5,20 +5,22 @@ import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
 import BookingDetailRow from 'components/bookings/bookingDetailRow'
 import { userService } from 'services/user.service'
-import { getTourByCode } from 'services/TourService'
+import { TourWithBookingsType, getTourWithBookingsById, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { venueState } from 'state/venueState'
 import { dayTypeState } from 'state/dayTypeState'
 import { bookingState } from 'state/bookingState'
-import { BookingsByTourIdType, getBookingsByTourId } from 'services/bookingService'
+import { bookingMapper } from 'interfaces/mappers'
+import { DateBlockDTO } from 'interfaces'
 
 interface bookingProps {
-  TourId: number,
-  initialBookings: BookingsByTourIdType[],
+  Id: number,
+  tour: TourWithBookingsType
 }
 
-const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingProps) => {
+const BookingPage = ({ tour, Id, initialBookings }: bookingProps) => {
+  const { DateBlock } = tour
   const [searchFilter, setSearchFilter] = useState('')
 
   const [selectedBooking, setSelectedBooking] = useState(0)
@@ -38,7 +40,6 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
     fetch('/api/utilities/dropdowns/dayTypes')
       .then((res) => res.json())
       .then((dayTypes) => {
-        console.log(dayTypes)
         setDayTypes(dayTypes)
       })
   }, [])
@@ -47,7 +48,7 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
     // SSR - We need a better way to set this before the page is mounted.
     if (initialBookings?.length > 0) {
       setBookings(initialBookings)
-      setSelectedBooking(initialBookings[0].BookingId)
+      setSelectedBooking(initialBookings[0].Id)
     }
   }, [])
 
@@ -68,7 +69,7 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
         setSearchFilter={setSearchFilter}
         title={'Bookings'}
       ></GlobalToolbar>
-      <BookingsButtons key={'toolbar'} selectedBooking={selectedBooking} currentTourId={TourId} ></BookingsButtons>
+      <BookingsButtons key={'toolbar'} selectedBooking={selectedBooking} currentTourId={Id} ></BookingsButtons>
       <div className="flex flex-auto">
         {/* <SideMenu></SideMenu> */}
         {/* need to pass the full list of booking */}
@@ -85,14 +86,19 @@ const BookingPage = ({ TourCode, ShowCode, TourId, initialBookings }: bookingPro
             </button>
           </div>
           <ul className="grid">
-            {
-              bookings.map((booking, index) => (
-                <BookingDetailRow
-                  key={booking.BookingId}
-                  selected={booking.BookingId === selectedBooking}
-                  onClick={() => setSelectedBooking(booking.BookingId)}
-                  booking={booking} />
-              ))
+            { DateBlock.map((block) => (
+              <>
+                <h3>{block.Name}</h3> {
+                  block.Booking.map((booking) => (
+                    <BookingDetailRow
+                      key={booking.Id}
+                      selected={booking.Id === selectedBooking}
+                      onClick={() => setSelectedBooking(booking.Id)}
+                      booking={booking} />
+                  ))
+                }
+              </>
+            ))
             }
           </ul>
         </div>
@@ -109,15 +115,15 @@ export default BookingPage
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ShowCode, TourCode } = ctx.query
-  const { TourId } = await getTourByCode(ShowCode as string, TourCode as string)
-  const initialBookings = await getBookingsByTourId(TourId)
-
-  console.log(TourId)
+  const { Id } = await lookupTourId(ShowCode as string, TourCode as string)
+  const tour = await getTourWithBookingsById(Id)
+  // const blocks = bookingMapper(tour)
+  // console.log(blocks)
 
   return {
     props: {
-      TourId,
-      initialBookings
+      Id,
+      tour
     }
   }
 }

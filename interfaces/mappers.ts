@@ -1,6 +1,8 @@
 import { Show as PrismaShow } from '@prisma/client'
-import { Show } from 'interfaces'
+import { BookingDTO, DateBlockDTO, Show } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
+import { TourWithBookingsType } from 'services/TourService'
+import { BookingsByTourIdType } from 'services/bookingService'
 
 /*
 
@@ -32,3 +34,11 @@ export const tourMapper = (show: ShowWithTours): any => {
     }
   })
 }
+
+export const bookingMapper = (tour: TourWithBookingsType): DateBlockDTO[] => (
+  tour.DateBlock.map((db) => ({
+    Id: db.Id,
+    Name: db.Name,
+    Bookings: db.Booking.map((b) => ({ Id: b.Id, ShowDate: b.FirstDate.toISOString() }))
+  }))
+)

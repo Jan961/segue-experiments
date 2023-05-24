@@ -6,7 +6,7 @@ import { StyledDialog } from 'components/global/StyledDialog'
 import { ToolbarButton } from '../ToolbarButton'
 
 interface BookingHoldProps {
-  TourID: null
+  TourId: number
 }
 
 export default function BookingHold ({ TourId }: BookingHoldProps) {

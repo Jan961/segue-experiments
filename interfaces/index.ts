@@ -51,53 +51,16 @@ export type Tour = {
   TourTask: ITourTask[];
 }
 
-// export type Venue = {
-//   VenueId: number   //                                              Int                   @id @default(autoincrement())
-//   Code: string   //                                                      String                @db.VarChar(6)
-//   Name : string   //                                                     String                @db.VarChar(255)
-//   Website : string   //                                                  String?               @db.VarChar(255)
-//   VenueFamily  : string   //                                             String?               @db.VarChar(100)
-//   Address1  : string   //                                                String?               @db.VarChar(50)
-//   Address2 : string   //                                                 String?               @db.VarChar(50)
-//   Address3 : string   //                                                 String?               @db.VarChar(50)
-//   Town     : string   //                                                 String?               @db.VarChar(50)
-//   County    : string   //                                                String?               @db.VarChar(50)
-//   Postcode  : string   //                                                String?               @db.VarChar(12)
-//   Country   : string   //                                                String?               @db.VarChar(30)
-//   Currency   : string   //                                               String                @default("GBP") @db.VarChar(3)
-//   VATIndicator  : boolean   //                                            Boolean               @default(dbgenerated("(b'0')")) @db.Bit(1)
-//   TechSpecsURL : string   //                                             String?               @db.VarChar(255)
-//   Seats      : number   //                                               Float?
-//   BarringClause   : string   //                                          String?               @db.VarChar(255)
-//   TownPopulation   : number   //                                         Float?
-//   Notes           : string   //                                          String?               @db.VarChar(255)
-//   DeliveryAddress1 : string   //                                         String?               @db.VarChar(50)
-//   DeliveryAddress2 : string   //                                         String?               @db.VarChar(50)
-//   DeliveryAddress3 : string   //                                         String?               @db.VarChar(50)
-//   DeliveryTown     : string   //                                         String?               @db.VarChar(50)
-//   DeliveryCounty   : string   //                                         String?               @db.VarChar(50)
-//   DeliveryPostcode: string   //                                          String?               @db.VarChar(50)
-//   DeliveryCountry    : string   //                                       String?               @db.VarChar(50)
-//   LXDesk          : string   //                                          String?               @db.VarChar(50)
-//   LXNotes        : string   //                                           String?               @db.VarChar(2000)
-//   SoundDesk      : string   //                                           String?               @db.VarChar(50)
-//   SoundNotes     : string   //                                           String?               @db.VarChar(2000)
-//   StageSize      : string   //                                           String?               @db.VarChar(50)
-//   GridHeight     : string   //                                           String?               @db.VarChar(50)
-//   VenueFlags     : string   //                                           String?               @db.VarChar(2000)
-//   PlaceID        : string   //                                           String?               @db.VarChar(255)
-//   BarringWeeksPre   : number   //                                        Int?                  @db.TinyInt
-//   BarringWeeksPost  :  number  //                                        Int?                  @db.TinyInt
-//   BarringMiles      : number   //                                        Int?
-//   CulturallyExempt  : boolean   //                                        Boolean               @default(false)
-//   VenueWarningNote  : string   //                                        String?               @db.Text
-//   VenueStatus      : string   //                                         String
-//   source       : number   //                                            Int                   @default(0)
-//   deleted       : number   //                                            Int                   @default(0)
-//   updated_at   : string   //                                            DateTime              @default(now()) @db.Timestamp(0)
-//   created_at    : string   //                                           DateTime              @default(now()) @db.Timestamp(0)
-// }
+export type BookingDTO = {
+  Id: number;
+  ShowDate: string;
+}
 
+export type DateBlockDTO = {
+  Id: number;
+  Name: string;
+  Bookings: BookingDTO[]
+}
 
 export type Venue = {
   Longitude: any;

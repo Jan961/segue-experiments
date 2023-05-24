@@ -5,16 +5,6 @@ export const getShows = () => {
   return prisma.show.findMany()
 }
 
-export const getShowByCode = (ShowCode, TourCode) => {
-  let Tour = {}
-  fetch(`/api/tours/read/code/${ShowCode}/${TourCode}`)
-    .then((res) => res.json())
-    .then((data) => {
-      Tour = data
-    })
-  return Tour
-}
-
 const showInclude = Prisma.validator<Prisma.ShowInclude>()({
   Tour: { include: { Show: true, DateBlock: true } }
 })

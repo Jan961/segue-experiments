@@ -1,3 +1,4 @@
+import { TourWithBookingsType } from 'services/TourService';
 import { dateService } from 'services/dateService'
 
 interface BookingDetailRowProps {
@@ -7,13 +8,15 @@ interface BookingDetailRowProps {
 }
 
 export const BookingDetailRow = ({ booking, onClick, selected }: BookingDetailRowProps) => {
-  const ShowDate = dateService.dateToSimple(booking.ShowDate)
-  const day = dateService.getWeekDay(booking.ShowDate)
+  const ShowDate = dateService.dateToSimple(booking.FirstDate)
+  const day = dateService.getWeekDay(booking.FirstDate)
 
+  /*
   const week = dateService.weeks(
     booking.Tour.TourStartDate,
     booking.ShowDate
   )
+  */
 
   let rowClass = 'grid gap-1 grid-cols-10 py-3 w-full border-l-4 border-transparent'
   if (selected) rowClass += ' bg-blue-200 border-blue-500'
@@ -23,7 +26,7 @@ export const BookingDetailRow = ({ booking, onClick, selected }: BookingDetailRo
 
       <div className={rowClass}>
         <div className="font-bold text-soft-primary-grey col-span-1 max-w-[50px]">
-          {week}
+          ?
         </div>
         <div className="col-span-3 font-medium text-soft-primary-grey max-w-[150px]">
           {day}<br />{ShowDate}

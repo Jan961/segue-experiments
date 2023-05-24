@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma'
 import { add } from 'date-fns'
+import { Prisma } from '@prisma/client'
 
 // const CHUNK_SIZE = 20
 
@@ -56,7 +57,7 @@ export const createTour = async (tour: any) => {
   */
 }
 
-export const getTourByCode = async (ShowCode: string, TourCode: string) => {
+export const lookupTourId = async (ShowCode: string, TourCode: string) => {
   return prisma.tour.findFirst(
     {
       where: {
@@ -65,11 +66,41 @@ export const getTourByCode = async (ShowCode: string, TourCode: string) => {
           Code: ShowCode as string
         }
       },
-      include: {
-        Show: true
+      select: {
+        Id: true
       }
     }
   )
+}
+
+const tourBookingsSelect = Prisma.validator<Prisma.TourSelect>()({
+  DateBlock: {
+    select: {
+      Id: true,
+      Booking: {
+        select: {
+          Id: true,
+          FirstDate: true,
+          DateType: true
+        }
+      },
+      Name: true
+    }
+  }
+}
+)
+
+export type TourWithBookingsType = Prisma.TourGetPayload<{
+  select: typeof tourBookingsSelect;
+}>;
+
+export const getTourWithBookingsById = async (Id: number) => {
+  return await prisma.tour.findUnique({
+    where: {
+      Id
+    },
+    select: tourBookingsSelect
+  })
 }
 
 export const getTourById = async (TourId: number) => {

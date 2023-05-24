@@ -1,15 +1,4 @@
-import Link from "next/link";
-import Layout from "../../../components/Layout";
-import ShowList from "../../tours/ShowList";
-import { Show, User, Venue } from "../../../interfaces";
-import { GetStaticProps } from "next";
-import { sampleShowData } from "../../../utils/sample-data";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { ReactElement } from "react";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
-
-import { PrismaClient } from "@prisma/client";
+import { Venue } from "../../../interfaces";
 import VenueListItem from "./venueListItem";
 import { useRouter } from "next/router";
 
