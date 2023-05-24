@@ -1,10 +1,9 @@
-import React, { useState } from "react";
-
-import Barring from "./barring";
-import Contacts from "./contacts";
-import Details from "./details";
-import TechnicalDetails from "./technicalDetails";
-import { Venue } from "../../../../interfaces";
+import { useState } from 'react'
+import Barring from './barring'
+import Contacts from './contacts'
+import Details from './details'
+import TechnicalDetails from './technicalDetails'
+import { Venue } from 'interfaces'
 
 type Props = {
   items: Venue;
