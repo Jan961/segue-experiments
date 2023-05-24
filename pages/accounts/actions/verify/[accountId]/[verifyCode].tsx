@@ -1,9 +1,6 @@
-/**
- * This page will recieve all verification
- */
-import Layout from "../../../../../components/Layout";
-import UserMessage from "../../../../../components/accounts/userMessage";
-import Switchboard from "../../../../../components/accounts/switchboard";
+import Layout from "components/Layout";
+import UserMessage from "components/accounts/userMessage";
+import Switchboard from "components/accounts/switchboard";
 
 const Verify = () => (
     <Layout title="Account | Segue">

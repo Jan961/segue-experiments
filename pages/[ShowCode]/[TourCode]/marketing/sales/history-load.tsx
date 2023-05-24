@@ -1,11 +1,9 @@
-import Link from 'next/link'
-import Layout from '../../../../../components/Layout'
-import Toolbar from "../../../../../components/marketing/venue/toolbar";
-import SideMenu from "../../../../../components/sideMenu";
-import {Show, User} from "../../../../../interfaces";
-
-import HistoryLoad from "../../../../../components/marketing/sales/historyload";
-import TemplateHelper from "../../../../../components/marketing/sales/templates-helper";
+import Layout from 'components/Layout'
+import Toolbar from "components/marketing/venue/toolbar";
+import SideMenu from "components/sideMenu";
+import {Show} from "interfaces";
+import HistoryLoad from "components/marketing/sales/historyload";
+import TemplateHelper from "components/marketing/sales/templates-helper";
 
 
 type Props = {
