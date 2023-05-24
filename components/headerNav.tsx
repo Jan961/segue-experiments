@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useRouter } from 'next/router'
-import { userService } from '../services/user.service'
+import { userService } from 'services/user.service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import classNames from 'classnames'
 import { faHome, faUser, faSignOutAlt, IconDefinition } from '@fortawesome/free-solid-svg-icons'
