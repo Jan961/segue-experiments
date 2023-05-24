@@ -1,21 +1,9 @@
-import * as React from "react";
-import userListItem from "./userListItem";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import TaskListItem from "../../tasks/TaskListItem";
-import UserListItem from "./userListItem";
-import { useEffect, useState } from "react";
-import AddUser from "../../../pages/accounts/manage-users/addUser";
-import NewUser from "../forms/newUser";
-import { Show, User } from "../../../interfaces";
-import { userService } from "services/user.service";
+
+import UserListItem from './userListItem'
+import { useEffect, useState } from 'react'
+import NewUser from 'components/accounts/forms/newUser'
+import { User } from 'interfaces'
+import { userService } from 'services/user.service'
 
 /**
  *
@@ -65,7 +53,7 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const UserList = () => {
+export const UserList = () => {
   const [showModal, setShowModal] = useState(false);
   const [results, setResults] = useState<User[]>([]);
   const [query, setQuery] = useState("");
@@ -74,6 +62,8 @@ const UserList = () => {
   let licences = 9; // This needs to be passed from the template
   let usedLicences = 8;
 
+  // Move to use Effect. Breaks build
+  /*
   function users() {
     fetch(searchEndpoint(accountId))
       .then((res) => res.json())
@@ -82,12 +72,11 @@ const UserList = () => {
       });
   }
 
-  useEffect(() => {}, []);
-
-  //Page load - users will always be at lease 1 ( Account must have an owner)
+  /*
   if (results.length === 0) {
     users();
   }
+  */
 
   return (
     <div className="mt-8 flex flex-col ml-10 mr-5">
@@ -122,7 +111,7 @@ const UserList = () => {
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {results.map((user) => (
-                  <UserListItem data={user} />
+                  <UserListItem key={user.UserId} data={user} />
                 ))}
               </tbody>
             </table>
@@ -134,5 +123,3 @@ const UserList = () => {
     </div>
   );
 };
-
-export default UserList;

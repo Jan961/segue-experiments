@@ -1,7 +1,5 @@
-import Link from 'next/link'
-import Layout from '../../../components/Layout'
-import Licence from "../../../components/accounts/manage-users/licence";
-import UserList from "../../../components/accounts/manage-users/userList";
+import Layout from 'components/Layout'
+import { UserList } from 'components/accounts/manage-users/userList'
 
 const Index = () => (
     <Layout title="Accounts | Segue">
