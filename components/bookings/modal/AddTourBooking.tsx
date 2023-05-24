@@ -1,16 +1,6 @@
 import React, {useEffect, useState} from "react";
-import ReactDOM from "react-dom";
-import PerfomancesList from "../perfomancesList";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronRight} from "@fortawesome/free-solid-svg-icons";
-import {dateService} from "../../../services/dateService";
 import {userService} from "../../../services/user.service";
-import Select
-    from "@react-buddy/ide-toolbox/dist/previews/tools-panel/props-edit-table/table-items/table-item/table-item-control/select";
 import axios from "axios";
-import {Alert} from "../../alert";
-import AddPerfomance from "./AddPerfomance";
-
 
 export default function AddTourBooking(tourId){
     const [showModal, setShowModal] = React.useState(false);

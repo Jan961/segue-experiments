@@ -15,18 +15,12 @@ XLSX.stream.set_readable(Readable);
 
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
-import Link from "next/link";
-import SalesSummaryExcel from "../excelTemplates/salesSummaryExcel";
 import {userService} from "../../../services/user.service";
 import {dateService} from "../../../services/dateService";
 XLSX.set_cptable(cpexcel);
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import saveAs from "file-saver";
-import {Alert} from "../../alert";
-import axios from "axios";
-import Tours from "../../../pages/tours/[ShowId]";
 import IconWithText from "../IconWithText";
-import { ChartBarIcon } from "@heroicons/react/20/solid";
 import { faChartLine } from "@fortawesome/free-solid-svg-icons";
 
 function formatWeekNumber(weekNumber){

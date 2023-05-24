@@ -1,13 +1,3 @@
-import {EnvelopeIcon, PhoneIcon} from '@heroicons/react/20/solid'
-import {faAnglesDown, faDollar, faGear, faHandHolding, faTent} from "@fortawesome/free-solid-svg-icons";
-import {IconProp} from "@fortawesome/fontawesome-svg-core";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faArrowRight,
-    faMap
-} from "@fortawesome/free-solid-svg-icons";
-import * as React from "react";
-
 import SideNavBar from "../sideMenu";
 
 const activitiy = [

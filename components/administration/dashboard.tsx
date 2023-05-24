@@ -1,15 +1,6 @@
-import {EnvelopeIcon, PhoneIcon} from '@heroicons/react/20/solid'
-import {faAnglesDown} from "@fortawesome/free-solid-svg-icons";
 import {IconProp} from "@fortawesome/fontawesome-svg-core";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faArrowRight
-} from "@fortawesome/free-solid-svg-icons";
-import * as React from "react";
-import {userService} from "../../services/user.service";
-import {tr} from "date-fns/locale";
-
-
+import {faArrowRight} from "@fortawesome/free-solid-svg-icons";
 
 export default function Switchboard(accountID ) {
     let user = {

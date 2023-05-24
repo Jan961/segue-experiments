@@ -1,14 +1,3 @@
-import {EnvelopeIcon, PhoneIcon} from '@heroicons/react/20/solid'
-import {faAnglesDown} from "@fortawesome/free-solid-svg-icons";
-import {IconProp} from "@fortawesome/fontawesome-svg-core";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faArrowRight
-} from "@fortawesome/free-solid-svg-icons";
-import * as React from "react";
-
-
-
 export default function AccountRegistration() {
     const text = "Its time to get the curtain up on your production login now and start adding users"
     return (

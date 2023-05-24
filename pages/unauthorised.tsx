@@ -1,20 +1,7 @@
 import Link from 'next/link'
 import Layout from '../components/guestLayout'
-import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
-
-
-import { alertService } from '../services/alert.service';
-import { userService } from '../services/user.service';
-import {  Alert } from '../components/alert';
-import user from "../components/accounts/manage-users/user";
-export default Unauthorised;
 
 function Unauthorised() {
-    const router = useRouter()
-
     return (
         <Layout title="Unauthorised | Segue">
             <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -33,3 +20,5 @@ function Unauthorised() {
         </Layout>
     );
 }
+
+export default Unauthorised;

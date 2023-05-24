@@ -1,18 +1,9 @@
-import {EnvelopeIcon, PhoneIcon} from '@heroicons/react/20/solid'
-import {faAnglesDown} from "@fortawesome/free-solid-svg-icons";
 import {IconProp} from "@fortawesome/fontawesome-svg-core";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {
     faArrowRight
 } from "@fortawesome/free-solid-svg-icons";
 import * as React from "react";
-import {random} from "nanoid";
-import accountId from "../../pages/accounts/update-details/[account-id]";
-import Accounts from "../../pages/accounts";
-import {useRef} from "react";
-import {array} from "yup";
-
-
 
 export default class Switchboard extends React.Component {
 

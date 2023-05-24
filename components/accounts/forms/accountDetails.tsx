@@ -1,21 +1,9 @@
-import * as React from "react";
 import {useRouter} from "next/router";
-import * as Yup from "yup";
-import {yupResolver} from "@hookform/resolvers/yup";
-import {useForm} from "react-hook-form";
-
-import {userService} from "../../../services/user.service";
 import {alertService} from "../../../services/alert.service";
-import {emailService} from "../../../services/emailService";
-import Link from "next/link";
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {da} from "date-fns/locale";
 import {Alert} from "../../alert";
-import {reportsService} from "../../../services/reportsService";
 import {loggingService} from "../../../services/loggingService";
-
-
 
 export default function AccountDetails(accountId) {
     const [data, setData] = useState(null)

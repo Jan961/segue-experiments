@@ -1,22 +1,11 @@
-import {EnvelopeIcon, PhoneIcon} from '@heroicons/react/20/solid'
-import {faAnglesDown} from "@fortawesome/free-solid-svg-icons";
-import {IconProp, text} from "@fortawesome/fontawesome-svg-core";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {
-    faArrowRight
-} from "@fortawesome/free-solid-svg-icons";
-import * as React from "react";
+export default function AccountInvite (data) {
+  const body: string = data.data.text
+  const hashString: string = data.data.hash
 
+  console.log(data.data.text)
+  return <>{
 
-
-export default function AccountInvite(data) {
-    let body: string = data.data.text
-    let hashString: string = data.data.hash
-
-    console.log(data.data.text)
-    return <>{
-
-        `<html lang="en">
+    `<html lang="en">
 
         <head>
             <meta charSet="UTF-8">
@@ -50,6 +39,6 @@ export default function AccountInvite(data) {
         </div>
         </body>
         </html>`
-    }
-    </>
+  }
+  </>
 }

@@ -1,8 +1,4 @@
-import ReactDOM from "react-dom";
-import { reportsService } from "../../../services/reportsService";
-
 import React, { useCallback, useEffect, useState } from "react";
-import { read, utils, writeFileXLSX } from "xlsx";
 
 import * as XLSX from "xlsx/xlsx.mjs";
 import * as fs from "fs";
@@ -14,15 +10,11 @@ XLSX.stream.set_readable(Readable);
 
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from "xlsx/dist/cpexcel.full.mjs";
-import Link from "next/link";
-import SalesSummaryExcel from "../excelTemplates/salesSummaryExcel";
 import { userService } from "../../../services/user.service";
 import { dateService } from "../../../services/dateService";
 XLSX.set_cptable(cpexcel);
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import saveAs from "file-saver";
-import { Alert } from "../../alert";
-import { da } from "date-fns/locale";
 import IconWithText from "../IconWithText";
 import { faChartPie } from "@fortawesome/free-solid-svg-icons";
 
