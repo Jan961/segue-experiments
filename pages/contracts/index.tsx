@@ -1,13 +1,10 @@
-import Link from 'next/link'
-import Layout from '../../components/Layout'
-import ShowList from "../../components/tours/ShowList";
-import {Show, User} from "../../interfaces";
-import {GetStaticProps} from "next";
-import {sampleShowData} from "../../utils/sample-data";
-import WithStaticProps from "../users";
+import Layout from 'components/Layout'
+import { ShowList } from 'components/shows/ShowList'
+import { Show } from '../../interfaces'
+import { GetStaticProps } from 'next'
+import { sampleShowData } from '../../utils/sample-data'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
-import {ReactElement} from "react";
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {

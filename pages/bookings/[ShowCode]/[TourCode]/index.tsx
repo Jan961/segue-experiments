@@ -11,15 +11,13 @@ import { useRecoilState, useSetRecoilState } from 'recoil'
 import { venueState } from 'state/venueState'
 import { dayTypeState } from 'state/dayTypeState'
 import { bookingState } from 'state/bookingState'
-import { bookingMapper } from 'interfaces/mappers'
-import { DateBlockDTO } from 'interfaces'
 
 interface bookingProps {
   Id: number,
   tour: TourWithBookingsType
 }
 
-const BookingPage = ({ tour, Id, initialBookings }: bookingProps) => {
+const BookingPage = ({ tour, Id }: bookingProps) => {
   const { DateBlock } = tour
   const [searchFilter, setSearchFilter] = useState('')
 
@@ -27,6 +25,8 @@ const BookingPage = ({ tour, Id, initialBookings }: bookingProps) => {
   const setVenues = useSetRecoilState(venueState)
   const setDayTypes = useSetRecoilState(dayTypeState)
   const [bookings, setBookings] = useRecoilState(bookingState)
+
+  const initialBookings = []
 
   useEffect(() => {
     fetch(`/api/venue/read/allVenues/${userService.userValue.accountId}`)

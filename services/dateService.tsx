@@ -5,6 +5,11 @@ const safeDate = (date: Date | string) => {
   return date
 }
 
+const todayToSimple = () => {
+  const date = new Date()
+  return date.toDateString()
+}
+
 const dateToSimple = (dateToFormat: Date | string) => {
   if (!dateToFormat) return 'DD/MM/YYYY'
   const date = safeDate(dateToFormat)
@@ -140,6 +145,6 @@ export const dateService = {
   getDateDaysAgo,
   getDateDaysInFuture,
   quickISO,
-  formDate
+  formDate,
+  todayToSimple
 }
-

@@ -1,7 +1,5 @@
-import React, {useEffect, useState} from "react";
-import {dateService} from "../../../services/dateService";
-import {bookingService} from "../../../services/bookingService";
-
+import React, { useEffect, useState } from "react";
+import { dateService } from "services/dateService";
 
 export default function Holds(data){
     const [showModal, setShowModal] = React.useState(false);

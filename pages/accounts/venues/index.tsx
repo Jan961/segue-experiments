@@ -1,15 +1,15 @@
 import Venuelist from 'components/accounts/venues/venuelist'
 import VenueForm from 'components/accounts/venues/venueForm'
-import { GetStaticProps } from 'next'
+import { GetServerSideProps } from 'next'
 import { Venue } from 'interfaces'
 import { userService } from 'services/user.service'
 import prisma from 'lib/prisma'
+import Layout from 'components/Layout'
 
 type Props = {
     items: Venue[]
 }
 
-// @ts-ignore
 const Index = ({ items }: Props) => (
     <Layout title="Account | Segue">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mt-5 text-center">
@@ -23,10 +23,7 @@ const Index = ({ items }: Props) => (
     </Layout>
 )
 
-
-export const getStaticProps: GetStaticProps = async () => {
-
-
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const venues = await prisma.venue.findMany(
         {
             where:{
@@ -46,6 +43,5 @@ export const getStaticProps: GetStaticProps = async () => {
         }
     }
 }
-
 
 export default Index

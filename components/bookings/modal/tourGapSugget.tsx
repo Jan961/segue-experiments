@@ -143,7 +143,7 @@ export default function TourGapsModal (tourId) {
               {venueList.length > 0
 
                 ? venueList.map((venue) => (
-                  <option value={venue.Venue1Id}>{venue.Name} key={venue.Venue1Id}>
+                  <option value={venue.Venue1Id} key={venue.Venue1Id}>
                       Miles {venue.Mileage}, Time {venue.TimeMins})
                   </option>
                 ))

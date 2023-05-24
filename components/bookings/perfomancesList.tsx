@@ -1,16 +1,7 @@
-import * as React from 'react'
-import Hold from "../marketing/tabs/hold";
-import BookingHold from "./modal/bookingHold";
-import { id } from 'date-fns/locale';
 import {useEffect, useState} from "react";
-import {bookingService} from "../../services/bookingService";
-import {userService} from "../../services/user.service";
 import EditPerfomance from "./modal/EditPerfomance";
 import AddPerfomance from "./modal/AddPerfomance";
 import PerfomanceHold from "./modal/perfomanceHold";
-
-
-const performances = [];
 
 interface PerformancesListProps {
     bookingId: number,

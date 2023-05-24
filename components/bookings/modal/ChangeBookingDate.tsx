@@ -20,7 +20,7 @@ export default function ChangeBookingDate ({ bookingId }: ChangeBookingDateProps
 
   React.useEffect(() => {
     const booking = bookingDict[bookingId]
-    setShowDate(dateService.dateToPicker(booking.ShowDate))
+    setShowDate(dateService.dateToPicker(booking.FirstDate))
   }, [bookingId, bookingDict])
 
   const booking = bookingDict[bookingId]
@@ -46,12 +46,12 @@ export default function ChangeBookingDate ({ bookingId }: ChangeBookingDateProps
     setShowDate(e.target.value)
   }
 
-  const disabled = loading || (dateService.dateToPicker(booking.ShowDate) === dateService.dateToPicker(showDate))
+  const disabled = loading || (dateService.dateToPicker(booking.FirstDate) === dateService.dateToPicker(showDate))
 
   return (
     <>
-      <FormInputTextAttached name="ShowDate" value={dateService.dateToSimple(booking.ShowDate)} onClick={() => setShowModal(true)} />
-      <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.ShowDate)}`} open={showModal} onClose={() => setShowModal(false)}>
+      <FormInputTextAttached name="ShowDate" value={dateService.dateToSimple(booking.FirstDate)} onClick={() => setShowModal(true)} />
+      <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.FirstDate)}`} open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent='DANGER' header="Warning">
             Changing a booking will move all related items to the new date.

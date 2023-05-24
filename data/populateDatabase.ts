@@ -1,11 +1,9 @@
-import { DateType, PrismaClient } from '@prisma/client'
+import prisma from 'lib/prisma'
 import dateTypes from './dateTypes.json'
 import venues from './venues.json'
 
-const prisma = new PrismaClient()
-
 const populateDateTypes = async () => {
-  await prisma.dateType.createMany({ data: dateTypes as DateType[] })
+  await prisma.dateType.createMany({ data: dateTypes })
 }
 
 const populateVenues = async () => {
@@ -13,7 +11,7 @@ const populateVenues = async () => {
 }
 
 const start = () => {
-  populateVenues()
+  // populateVenues()
 }
 
 start()

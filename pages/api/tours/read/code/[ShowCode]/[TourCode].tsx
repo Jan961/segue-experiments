@@ -1,6 +1,5 @@
-import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getTourByCode } from 'services/TourService'
+import { getTourById, lookupTourId } from 'services/TourService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   const { TourCode, ShowCode } = req.query
@@ -8,7 +7,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   if (!TourCode || !ShowCode) return res.end(400)
 
   try {
-    const result = getTourByCode(ShowCode as string, TourCode as string)
+    const { Id } = await lookupTourId(ShowCode as string, TourCode as string)
+    const result = await getTourById(Id)
     res.json(result)
   } catch (e) {
     console.log(e)

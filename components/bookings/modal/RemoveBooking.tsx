@@ -21,7 +21,7 @@ export default function RemoveBooking ({ bookingId }: RemoveBookingProps) {
 
     try {
       await axios.post('/api/bookings/delete/', { bookingId })
-      const newBookings = bookings.filter(x => x.BookingId !== bookingId)
+      const newBookings = bookings.filter(x => x.Id !== bookingId)
       setBookings(newBookings)
       setShowModal(false)
     } finally {

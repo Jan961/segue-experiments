@@ -21,8 +21,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     res.json(updated)
   } catch (e) {
     loggingService.logError(e)
-      .then(
+      .then(() => {
         res.status(500)
-      )
+      })
   }
 }

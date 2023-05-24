@@ -32,8 +32,8 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
     let next = false
 
     for (const booking of bookings) {
-      if (next === true) return booking.BookingId
-      if (booking.BookingId === selectedBooking) {
+      if (next === true) return booking.Id
+      if (booking.Id === selectedBooking) {
         next = true
       }
     }
@@ -46,15 +46,17 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
     }
     // Commented out are not saved on backend? Should be simply displaying?
     const newInputs = {
-      BookingId: booking.BookingId,
+      BookingId: booking.Id,
       // ShowDate: existing.ShowDate,
       VenueId: booking.VenueId || null,
       // Capacity: existing.Venue?.Seats,
+      /*
       DayTypeCast: booking.DayTypeCast,
       LocationCast: booking.LocationCast,
       DayTypeCrew: booking.DayTypeCrew || 1,
       LocationCrew: booking.LocationCrew,
       BookingStatus: booking.BookingStatus || 'U'
+      */
       // RunDays: existing.RunDays || 1,
       // Pencil: existing.Pencil || 0,
       // Notes: existing.Notes || '',
@@ -113,7 +115,7 @@ export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProp
     <div className="w-6/12 pl-4" >
       <form>
         <div className="bg-primary-blue rounded-xl flex flex-col justify-center mb-4 p-4 pb-0">
-          <ChangeBookingDate bookingId={booking.BookingId} />
+          <ChangeBookingDate bookingId={booking.Id} />
           <FormInputSelect name="VenueId" value={inputs.VenueId ? inputs.VenueId : ''} options={venueOptions} onChange={handleOnChange} />
         </div>
 

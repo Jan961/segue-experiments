@@ -33,7 +33,7 @@ const EditShow = ({ show }: Props) => {
     ShowId: show.ShowId,
     Name: show.Name,
     ShowType: show.ShowType,
-    Published: show.published
+    // Published: show.published
   })
 
   const handleServerResponse = (ok, msg) => {
@@ -47,8 +47,8 @@ const EditShow = ({ show }: Props) => {
         Code: inputs.Code,
         ShowId: inputs.ShowId,
         Name: inputs.Name,
-        ShowType: inputs.ShowType,
-        Published: show.published
+        ShowType: inputs.ShowType
+        // Published: show.published
       })
     } else {
       // @ts-ignore

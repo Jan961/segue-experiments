@@ -1,23 +1,7 @@
-import Link from "next/link";
-import Layout from "../../components/Layout";
-import ShowList from "../../components/tours/ShowList";
-import { Show, Tour, ITourTask, User } from "../../interfaces";
-import { GetStaticProps } from "next";
-import { sampleShowData, sampleUserData } from "../../utils/sample-data";
-import WithStaticProps from "../users";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { ReactElement, useEffect, useState } from "react";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import Toolbar from "../../components/tasks/toolbar";
-import Tasklist from "../../components/tasks/TaskList";
-import TaskModal from "../../components/tasks/modal/TaskModal";
-import SideMenu from "../../components/sideMenu";
-import TaskButtons from "components/tasks/TaskButtons";
-import NewTaskForm from "components/tasks/NewTaskForm";
-import { useRouter } from "next/router";
-import UpdateTaskForm from "components/tasks/UpdateTaskForm";
-import BulkActionForm from "components/tasks/BulkActionForm";
+import Layout from 'components/Layout'
+import { Tour, ITourTask } from 'interfaces'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
 const defaultTourTask: ITourTask = {
   TourTaskId: 0,

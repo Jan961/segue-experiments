@@ -1,11 +1,6 @@
-import Link from 'next/link'
-import Layout from '../../../components/Layout'
-import {Show, User} from "../../../interfaces";
-import {GetStaticPaths, GetStaticProps} from "next";
-import {sampleShowData} from "../../../utils/sample-data";
-import AccountDetails from "../../../components/accounts/forms/accountDetails";
-import SalesDataValidation from "../../../components/accounts/forms/salesDataValidation";
-
+import Layout from 'components/Layout'
+import { Show } from 'interfaces'
+import SalesDataValidation from 'components/accounts/forms/salesDataValidation'
 
 type Props = {
     items: Show[]

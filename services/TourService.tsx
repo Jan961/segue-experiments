@@ -80,8 +80,7 @@ const tourBookingsSelect = Prisma.validator<Prisma.TourSelect>()({
       Booking: {
         select: {
           Id: true,
-          FirstDate: true,
-          DateType: true
+          FirstDate: true
         }
       },
       Name: true

@@ -9,7 +9,7 @@ export const bookingDictSelector = selector({
 
     // Create lookup table
     const dictionary: Record<number, BookingsByTourIdType> = source.reduce((dictionary, booking) => {
-      dictionary[booking.BookingId] = booking
+      dictionary[booking.Id] = booking
       return dictionary
     }, {})
 
@@ -22,7 +22,7 @@ export const bookingDictSelector = selector({
 
     // Update existing
     const replacement = source.map(x => {
-      if (x.BookingId === newValue.BookingId) {
+      if (x.Id === newValue.Id) {
         found = true
         return newValue
       }
@@ -31,7 +31,7 @@ export const bookingDictSelector = selector({
 
     // Handle adding
     if (!found) replacement.push(newValue)
-    const sortedReplacement = replacement.sort((a, b) => new Date(a.ShowDate) < new Date(b.ShowDate) ? -1 : 1)
+    const sortedReplacement = replacement.sort((a, b) => new Date(a.FirstDate) < new Date(b.FirstDate) ? -1 : 1)
 
     set(bookingState, sortedReplacement)
   }
