@@ -51,7 +51,7 @@ const HeaderNavButton = ({ icon, onClick, className, children, href }: React.Pro
 
 const HeaderNavDivider = () => (<span className="mx-2">{' | '}</span>)
 
-const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
+export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
   const [username, setUsername] = React.useState('My Account')
   const router = useRouter()
 
@@ -107,5 +107,3 @@ const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
     </nav>
   )
 }
-
-export default HeaderNav

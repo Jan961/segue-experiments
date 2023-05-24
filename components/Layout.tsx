@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react'
 import Head from 'next/head'
-import HeaderNav from 'components/HeaderNav'
-import PopoutMenu from 'components/PopoutMenu'
+import { HeaderNav } from 'components/HeaderNav'
+import { PopoutMenu } from 'components/PopoutMenu'
 
 type Props = {
     children?: ReactNode

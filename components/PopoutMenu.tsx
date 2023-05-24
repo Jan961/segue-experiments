@@ -1,13 +1,9 @@
 import * as React from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faFileSignature, faUserGear } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-
-let tourId = 1;
-
-const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
+export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const toggleMenu = () => {
@@ -126,6 +122,4 @@ const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       </div>
     
   );
-};
-
-export default PopoutMenu;
+}
