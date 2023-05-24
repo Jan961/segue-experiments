@@ -2,8 +2,6 @@ import AccountInvite from "../../../components/emails/accountInvite";
 import ReactDOMServer from 'react-dom/server'
 
 export default function (req, res) {
-    require('.env').config()
-
     let text = "hello"// req.data.text
     let subject = "testi no call"// req.data.subject
     let hash = "1223" //req.data.hash
