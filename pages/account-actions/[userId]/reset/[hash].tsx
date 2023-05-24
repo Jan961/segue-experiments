@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import Layout from "../../../../components/guestLayout";
+import Layout from "components/guestLayout";
 
 const Index = () => {
   const router = useRouter();
