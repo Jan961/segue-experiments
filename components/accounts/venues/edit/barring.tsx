@@ -1,10 +1,7 @@
-import React, {useState} from 'react'
-import Link from 'next/link'
-import {JsConfigPathsPlugin} from "next/dist/build/webpack/plugins/jsconfig-paths-plugin";
-
-import axios from 'axios';
-import {Venue} from "../../../../interfaces";
-import {loggingService} from "../../../../services/loggingService";
+import { useState } from 'react'
+import axios from 'axios'
+import { Venue } from 'interfaces'
+import { loggingService } from 'services/loggingService'
 
 type Props = {
     items: Venue
