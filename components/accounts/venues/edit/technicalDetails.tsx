@@ -1,11 +1,7 @@
-import * as React from 'react'
-import {faBook, faEdit, faPlus, faSquareXmark, faUser} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {Venue} from "../../../../interfaces";
-import {useState} from "react";
-import axios from "axios";
-import {loggingService} from "../../../../services/loggingService";
-
+import { Venue } from 'interfaces'
+import { useState } from 'react'
+import axios from 'axios'
+import { loggingService } from 'services/loggingService'
 
 type Props = {
     items: Venue
