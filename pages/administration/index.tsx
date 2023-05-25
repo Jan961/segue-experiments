@@ -1,52 +1,38 @@
-import Link from 'next/link'
 import Layout from '../../components/Layout'
-import UserMessage from "../../components/dashboard/userMessage";
-import Switchboard from "../../components/administration/dashboard";
-import {useEffect, useState} from "react";
-import accountId from "./../accounts/update-details/[account-id]";
+import Switchboard from '../../components/administration/dashboard'
+import { useEffect, useState } from 'react'
 
+export default function Index () {
+  const [data, setData] = useState(null)
+  const [isLoading, setLoading] = useState(false)
 
+  const accoutnID = 0
 
-export default function Index() {
-    const [data, setData] = useState(null)
-    const [isLoading, setLoading] = useState(false)
+  useEffect(() => {
+    setLoading(true)
 
-    let accoutnID = 0
+    const userid = sessionStorage.getItem('UserId')
+    const accoutnID = sessionStorage.getItem('accountId')
 
-    useEffect(() => {
-        setLoading(true)
+    fetch('/api/account/read/' + accoutnID)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data)
+        setLoading(false)
+      })
+  }, [])
 
-        let  userid = sessionStorage.getItem("UserId")
-        let accoutnID = sessionStorage.getItem("accountId")
+  if (isLoading) return <p>Loading...</p>
+  if (!data) return <p>No profile data</p>
 
-
-        fetch('/api/account/read/' + accoutnID)
-            .then((res) => res.json())
-            .then((data) => {
-                setData(data)
-                setLoading(false)
-            })
-    }, [])
-
-    if (isLoading) return <p>Loading...</p>
-    if (!data) return <p>No profile data</p>
-
-
-
-    return (
-        <>
-            <Layout title="Super Admin | Segue">
+  return (
+    <>
+      <Layout title="Super Admin | Segue">
         <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mt-5 text-center">
-        <span className="block xl:inline">Global Administration</span>
-
-            </h1>
-
-            <UserMessage></UserMessage>
-            <div>
-
-            </div>
-            <Switchboard key={"sw"} data={accoutnID}  ></Switchboard>
-        </Layout>
-        </>
-)
+          <span className="block xl:inline">Global Administration</span>
+        </h1>
+        <Switchboard key={'sw'} data={accoutnID} ></Switchboard>
+      </Layout>
+    </>
+  )
 }

@@ -29,7 +29,6 @@ type TourListItemProps = {
 
 const TourListItem = ({ tour }: TourListItemProps) => {
   const router = useRouter()
-  console.log(tour)
 
   const deleteTour = () => {
     const tourId = tour.TourId

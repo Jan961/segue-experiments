@@ -1,6 +1,5 @@
 
 import Layout from '../../components/Layout'
-import UserMessage from "../../components/accounts/userMessage";
 import Switchboard from "../../components/accounts/switchboard";
 import { useState, useEffect } from 'react'
 import user from "../../components/accounts/manage-users/user";
@@ -37,8 +36,6 @@ export default function Profile() {
                 <span className="block xl:inline">Account</span>
 
             </h1>
-
-            <UserMessage></UserMessage>
             <Switchboard key={"sw"} ></Switchboard>
         </Layout>
             </>

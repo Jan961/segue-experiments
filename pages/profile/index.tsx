@@ -1,9 +1,6 @@
 
 import Layout from '../../components/Layout'
-import UserMessage from "../../components/accounts/userMessage";
-import Switchboard from "../../components/accounts/switchboard";
 import { useState, useEffect } from 'react'
-import user from "../../components/accounts/manage-users/user";
 
 import ProfileMessage from "../../components/profile/profile-message";
 import UpdateProfile from "../../components/profile/updateProfile";

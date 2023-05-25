@@ -15,7 +15,7 @@ interface ShowsProps {
   shows: Show[]
 }
 
-export default function Index ({ shows }: ShowsProps) {
+const Shows = ({ shows }: ShowsProps) => {
   const [search, setSearch] = React.useState('')
 
   const query = search.toLowerCase()
@@ -63,3 +63,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     }
   }
 }
+
+export default Shows
