@@ -1,6 +1,6 @@
 import Layout from 'components/Layout'
 import Toolbar from 'components/contracts/toolbar'
-import { Show } from 'interfaces'
+import { ShowDTO } from 'interfaces'
 import { GetServerSideProps } from 'next'
 import { sampleShowData } from 'utils/sample-data'
 import { useEffect, useState } from 'react'
@@ -10,7 +10,7 @@ import { useRouter } from 'next/router'
 import { IBooking } from 'types/BookingTypes'
 
 type Props = {
-  items: Show[];
+  items: ShowDTO[];
 };
 
 const Index = ({ items }: Props) => {
@@ -59,7 +59,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   // Example for including static props in a Next.js function component page.
   // Don't forget to include the respective types for any props passed into
   // the component.
-  const items: Show[] = sampleShowData
+  const items = sampleShowData
   return { props: { items } }
 }
 

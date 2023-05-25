@@ -1,11 +1,5 @@
-import {Show, Tour, User} from '../interfaces'
-import Shows from "../pages/shows";
-import shows from "../pages/shows";
-
+import { ShowDTO, User } from '../interfaces'
 
 /** Dummy user data. */
 export const sampleUserData: User[] = []
-
-
-export const  sampleShowData: Show[] = []
-
+export const sampleShowData: ShowDTO[] = []
