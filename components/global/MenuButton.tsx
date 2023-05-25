@@ -1,6 +1,7 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { PropsWithChildren } from 'react'
 
 interface MenuButtonProps {
@@ -15,6 +16,8 @@ interface MenuButtonProps {
 }
 
 export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, intent, href, submit, disabled }: PropsWithChildren<MenuButtonProps>) => {
+  const router = useRouter()
+
   let buttonClass = `font-bold
   text-sm px-3 py-2 rounded shadow
   outline-none focus:outline-none ml-2 mr-1 mb-1 ease-linear
@@ -41,9 +44,14 @@ export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, inten
     onClick(e)
   }
 
+  const nonPropogatedNav = (e: any) => {
+    e.stopPropagation()
+    router.push(href)
+  }
+
   if (href) {
     return (
-      <Link href={href} className={buttonClass}>
+      <Link href={href} className={buttonClass} onClick={nonPropogatedNav}>
         { iconLeft && (<FontAwesomeIcon icon={iconLeft} className="mr-2"/>) }
         { children }
         { icon && (<FontAwesomeIcon icon={icon} />)}

@@ -1,17 +1,16 @@
+import { ShowDTO } from 'interfaces'
 import prisma from 'lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handle (req, res) {
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  const show = req.body as ShowDTO
+
   try {
     await prisma.show.update({
       where: {
-        ShowId: req.body.ShowId
+        Id: show.Id
       },
-      data: {
-        Code: req.body.Code,
-        Name: req.body.Name,
-        ShowType: req.body.ShowType,
-        Logo: req.body.Logo
-      }
+      data: show
     })
     res.status(200).end()
   } catch (e) {

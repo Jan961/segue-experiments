@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import axios from 'axios'
-import { Show } from 'interfaces'
 import { loggingService } from 'services/loggingService'
 import Layout from 'components/Layout'
 import { getShowById } from 'services/ShowService'
@@ -14,9 +13,12 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { FormContainer } from 'components/global/forms/FormContainer'
 import showTypes from 'data/showTypes.json'
 import { useRouter } from 'next/router'
+import { showMapper } from 'interfaces/mappers'
+import { ShowDTO } from 'interfaces'
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 
 type Props = {
-  show: Show
+  show: ShowDTO
 }
 
 const EditShow = ({ show }: Props) => {
@@ -28,13 +30,7 @@ const EditShow = ({ show }: Props) => {
     info: { error: false, msg: null }
   })
 
-  const [inputs, setInputs] = useState({
-    Code: show.Code,
-    ShowId: show.ShowId,
-    Name: show.Name,
-    ShowType: show.ShowType,
-    // Published: show.published
-  })
+  const [inputs, setInputs] = useState({ ...show })
 
   const handleServerResponse = (ok, msg) => {
     if (ok) {
@@ -42,13 +38,6 @@ const EditShow = ({ show }: Props) => {
         submitted: true,
         submitting: false,
         info: { error: false, msg }
-      })
-      setInputs({
-        Code: inputs.Code,
-        ShowId: inputs.ShowId,
-        Name: inputs.Name,
-        ShowType: inputs.ShowType
-        // Published: show.published
       })
     } else {
       // @ts-ignore
@@ -73,25 +62,22 @@ const EditShow = ({ show }: Props) => {
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
     axios({
       method: 'POST',
-      url: '/api/shows/update/' + show.ShowId,
+      url: '/api/shows/update/' + show.Id,
       data: inputs
+    }).then((response) => {
+      loggingService.logAction('Show', 'Show Updated')
+
+      handleServerResponse(
+        true,
+        'Thank you, your message has been submitted.'
+      )
+
+      router.push('/shows')
+    }).catch((error) => {
+      loggingService.logError(error)
+
+      handleServerResponse(false, error.response.data.error)
     })
-      .then((response) => {
-        // @ts-ignore
-        loggingService.logAction('Show', 'Show Updated')
-
-        handleServerResponse(
-          true,
-          'Thank you, your message has been submitted.'
-        )
-
-        router.push('/shows')
-      })
-      .catch((error) => {
-        loggingService.logError(error)
-
-        handleServerResponse(false, error.response.data.error)
-      })
   }
 
   return (
@@ -106,7 +92,8 @@ const EditShow = ({ show }: Props) => {
         <form onSubmit={handleOnSubmit}>
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
-          <FormInputSelect label="Show Type" name="ShowType" value={inputs.ShowType} onChange={handleOnChange} options={showTypes} required />
+          <FormInputSelect label="Show Type" name="Type" value={inputs.Type} onChange={handleOnChange} options={showTypes} required />
+          <FormInputCheckbox label="Archived" name="IsArchived" value={inputs.IsArchived} onChange={(handleOnChange)} />
           {/* <ThumbnailUpload path={inputs.Logo} setPath={((Logo) => setInputs({ ...inputs, Logo }))} /> */}
           <FormButtonSubmit disabled={status.submitted} loading={status.submitting} text="Save Changes" />
         </form>
@@ -119,7 +106,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const showId = ctx.params.ShowId as string
   const show = await getShowById(parseInt(showId))
 
-  return { props: { show } }
+  return { props: { show: showMapper(show) } }
 }
 
 export default EditShow

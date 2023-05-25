@@ -28,6 +28,7 @@ export type User = {
 
 }
 
+// Existing show interface for old schema. Remove eventually
 export  type Show = {
   ShowId: number
   Code: string
@@ -35,6 +36,14 @@ export  type Show = {
   ShowType: string
   archived: boolean
   deleted: boolean
+}
+
+export type ShowDTO = {
+  Id: number
+  Code: string
+  Name: string
+  Type: string
+  IsArchived: boolean
 }
 
 export type Tour = {

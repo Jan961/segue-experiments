@@ -1,8 +1,7 @@
 import { Show as PrismaShow } from '@prisma/client'
-import { BookingDTO, DateBlockDTO, Show } from 'interfaces'
+import { DateBlockDTO, ShowDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithBookingsType } from 'services/TourService'
-import { BookingsByTourIdType } from 'services/bookingService'
 
 /*
 
@@ -12,13 +11,12 @@ leak implimentation details
 
 */
 
-export const showMapper = (show: PrismaShow): Show => ({
-  ShowId: show.Id,
+export const showMapper = (show: PrismaShow): ShowDTO => ({
+  Id: show.Id,
   Name: show.Name,
-  ShowType: show.Type,
+  Type: show.Type,
   Code: show.Code,
-  archived: show.IsArchived,
-  deleted: show.IsDeleted
+  IsArchived: show.IsArchived
 })
 
 export const tourMapper = (show: ShowWithTours): any => {

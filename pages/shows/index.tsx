@@ -5,14 +5,14 @@ import { MenuButton } from 'components/global/MenuButton'
 import { GetServerSideProps } from 'next'
 import { getShows } from 'services/ShowService'
 import React from 'react'
-import { Show } from 'interfaces'
+import { ShowDTO } from 'interfaces'
 import { showMapper } from 'interfaces/mappers'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import { ShowList } from 'components/shows/ShowList'
 
 interface ShowsProps {
-  shows: Show[]
+  shows: ShowDTO[]
 }
 
 const Shows = ({ shows }: ShowsProps) => {
@@ -25,7 +25,7 @@ const Shows = ({ shows }: ShowsProps) => {
 
   for (const show of shows) {
     if (show.Code?.toLowerCase().includes(query) || show.Name?.toLowerCase().includes(query)) {
-      if (show.archived) archived.push(show)
+      if (show.IsArchived) archived.push(show)
       else active.push(show)
     }
   }
