@@ -12,7 +12,6 @@ type Props = {
 };
 
 export const ShowListItem = ({ show }: Props) => {
-  console.log(show)
   const router = useRouter()
 
   const deleteShow = (e) => {

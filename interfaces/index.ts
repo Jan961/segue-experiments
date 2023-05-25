@@ -39,7 +39,7 @@ export  type Show = {
 }
 
 export type ShowDTO = {
-  Id: number
+  Id?: number
   Code: string
   Name: string
   Type: string

@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import axios from 'axios'
-import { userService } from 'services/user.service'
 import { loggingService } from 'services/loggingService'
 import Layout from 'components/Layout'
 import { FormContainer } from 'components/global/forms/FormContainer'
@@ -12,10 +11,17 @@ import showTypes from 'data/showTypes.json'
 import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
 import { useRouter } from 'next/router'
+import { ShowDTO } from 'interfaces'
+
+const DEFAULT_SHOW: ShowDTO = {
+  Code: '',
+  Name: '',
+  Type: '',
+  IsArchived: false
+}
 
 const Create = () => {
   const router = useRouter()
-  const userAccount = userService.userValue.accountId
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -23,13 +29,7 @@ const Create = () => {
     info: { error: false, msg: null }
   })
 
-  const [inputs, setInputs] = useState({
-    Code: '',
-    ShowId: '',
-    Name: '',
-    ShowType: '',
-    AccountId: userAccount
-  })
+  const [inputs, setInputs] = useState(DEFAULT_SHOW)
 
   const handleServerResponse = (ok, msg) => {
     if (ok) {
@@ -93,11 +93,8 @@ const Create = () => {
         <form onSubmit={handleOnSubmit}>
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
-          <FormInputSelect label="ShowType" name="ShowType" value={inputs.ShowType} required onChange={handleOnChange} options={showTypes} />
+          <FormInputSelect label="Show Type" name="Type" value={inputs.Type} required onChange={handleOnChange} options={showTypes} />
           {/* <ThumbnailUpload path={inputs.Logo} setPath={((Logo) => setInputs({ ...inputs, Logo }))} /> */}
-          <input id="AccountId"
-            type="hidden"
-            name="AccountId" />
           <FormButtonSubmit disabled={status.submitted} loading={status.submitting} text="Create" />
         </form>
       </FormContainer>

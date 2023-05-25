@@ -94,7 +94,6 @@ const EditShow = ({ show }: Props) => {
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
           <FormInputSelect label="Show Type" name="Type" value={inputs.Type} onChange={handleOnChange} options={showTypes} required />
           <FormInputCheckbox label="Archived" name="IsArchived" value={inputs.IsArchived} onChange={(handleOnChange)} />
-          {/* <ThumbnailUpload path={inputs.Logo} setPath={((Logo) => setInputs({ ...inputs, Logo }))} /> */}
           <FormButtonSubmit disabled={status.submitted} loading={status.submitting} text="Save Changes" />
         </form>
       </FormContainer>

@@ -1,25 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma'
-
+import { ShowDTO } from 'interfaces'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  const show: ShowDTO = req.body
+
   try {
-    let logo = null
-    if (req.body.Logo !== '') {
-      logo = req.body.Logo
-    }
     await prisma.show.create({
-      data: {
-        Code: req.body.Code,
-        Name: req.body.Name,
-        Logo: logo,
-        ShowType: req.body.ShowType,
-        Published: true,
-        Archived: false,
-        Deleted: false,
-        AccountId: req.body.AccountId,
-        Owner: req.body.AccountId
-      }
+      data: { ...show, AccountId: 1 }
     })
 
     res.status(200).end()
