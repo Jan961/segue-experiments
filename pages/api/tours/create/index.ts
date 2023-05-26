@@ -1,25 +1,27 @@
+import { TourDTO } from 'interfaces'
+import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { createTour } from 'services/TourService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  const tour: TourDTO = req.body
+
   try {
-    const tour = {
-      Code: req.body.Code,
-      ShowId: req.body.ShowId,
-      TourStartDate: new Date(req.body.TourStartDate),
-      TourEndDate: new Date(req.body.TourEndDate),
-      Archived: false,
-      Deleted: false,
-      RehearsalStartDate: new Date(req.body.RehearsalStartDate),
-      RehearsalEndDate: new Date(req.body.RehearsalEndDate),
-      TourOwner: req.body.Owner,
-      Logo: req.body.Logo ? req.body.Logo : null,
-      CreatedBy: null
-    }
+    await prisma.tour.create({
+      data: {
+        Code: tour.Code,
+        IsArchived: tour.IsArchived,
+        ShowId: tour.ShowId,
+        DateBlock: {
+          create: tour.DateBlock.map(dateBlock => ({
+            Name: dateBlock.Name,
+            StartDate: new Date(dateBlock.StartDate),
+            EndDate: new Date(dateBlock.EndDate)
+          }))
+        }
+      }
+    })
 
-    const result = await createTour(tour)
-
-    res.json(result)
+    res.status(200).end()
   } catch (err) {
     console.log(err)
     res.status(500).json({ err: 'Error occurred while creating tour.' })

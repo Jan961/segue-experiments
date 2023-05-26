@@ -7,10 +7,11 @@ import { ListItemThumbnail } from 'components/global/list/ListItemThumbnail'
 import { MenuButton } from 'components/global/MenuButton'
 import { dateService } from 'services/dateService'
 import { useRouter } from 'next/router'
+import { TourDTO } from 'interfaces'
 
 interface TourListDateDisplayProps {
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   label: string;
 }
 
@@ -24,23 +25,21 @@ const TourListDateDisplay = ({ startDate, endDate, label }: TourListDateDisplayP
 }
 
 type TourListItemProps = {
-  tour: any;
+  tour: TourDTO;
 };
 
 const TourListItem = ({ tour }: TourListItemProps) => {
   const router = useRouter()
 
   const deleteTour = () => {
-    const tourId = tour.TourId
-
     axios({
       method: 'POST',
-      url: '/api/tours/delete/' + tourId,
-      data: tourId
+      url: '/api/tours/delete/' + tour.Id,
+      data: tour.Id
     })
       .then((response) => {
-        console.log('Marked ' + tourId + ' As deleted')
-        loggingService.logAction('Tour', 'Deleted' + tourId)
+        console.log('Marked ' + tour.Id + ' As deleted')
+        loggingService.logAction('Tour', 'Deleted' + tour.Id)
         forceReload()
       })
       .catch((error) => {
@@ -61,18 +60,18 @@ const TourListItem = ({ tour }: TourListItemProps) => {
         items-center justify-between border-b border-gray-200
         hover:bg-blue-400 hover:bg-opacity-25">
       <div className="flex-shrink-0">
-        <ListItemThumbnail alt={tour.Name} src={tour.Logo} />
+        <ListItemThumbnail alt={tour.ShowName} src={undefined} />
       </div>
       <div className="flex-grow">
         <Link href={`/bookings/${tour.ShowCode}/${tour.Code}`} className="text-sm text-gray-900">
-          {tour.Name} ({tour.ShowCode}) - Tour {tour.Code}
+          {tour.ShowName} ({tour.ShowCode}) - Tour {tour.Code}
         </Link>
         <div className="mt-2 flex justify-between text-sm text-gray-500">
           { tour.DateBlock.map((x) => (<TourListDateDisplay key={x.Id} label={x.Name} startDate={x.StartDate} endDate={x.EndDate} />))}
         </div>
       </div>
       <div className="whitespace-nowrap">
-        <MenuButton icon={faPencil} href={`/tours/edit/${tour.TourId}`} />
+        <MenuButton icon={faPencil} href={`/tours/edit/${tour.Id}`} />
         <MenuButton intent='DANGER' icon={faTrash} onClick={deleteTour} />
       </div>
     </li>

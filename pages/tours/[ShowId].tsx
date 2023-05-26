@@ -9,10 +9,11 @@ import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import TourList from 'components/tours/TourList'
 import { tourMapper } from 'interfaces/mappers'
+import { TourDTO } from 'interfaces'
 
 type Props = {
-  tours: any
-  id
+  tours: TourDTO[]
+  id: number
 };
 
 export default function Tours ({ id, tours }: Props) {
@@ -22,7 +23,7 @@ export default function Tours ({ id, tours }: Props) {
   const archived = []
 
   for (const tour of tours) {
-    if (tour.Code?.toLowerCase().includes(query) || tour.Name?.toLowerCase().includes(query)) {
+    if (tour.Code?.toLowerCase().includes(query) || tour.ShowName?.toLowerCase().includes(query)) {
       if (tour.IsArchived) archived.push(tour)
       else active.push(tour)
     }

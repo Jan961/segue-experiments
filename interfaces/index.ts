@@ -46,6 +46,7 @@ export type ShowDTO = {
   IsArchived: boolean
 }
 
+// Existing tour interface for old schema. Remove eventually
 export type Tour = {
   TourId: number;
   Code: string;
@@ -60,15 +61,26 @@ export type Tour = {
   TourTask: ITourTask[];
 }
 
+export type TourDTO = {
+  Id?: number
+  ShowId: number
+  Code: string
+  ShowName: string
+  ShowCode: string
+  IsArchived: boolean
+  DateBlock: DateBlockDTO[]
+}
+
 export type BookingDTO = {
-  Id: number;
-  ShowDate: string;
+  Id: number
+  ShowDate: string
 }
 
 export type DateBlockDTO = {
-  Id: number;
-  Name: string;
-  Bookings: BookingDTO[]
+  Id?: number
+  Name: string
+  StartDate: string
+  EndDate: string
 }
 
 export type Venue = {

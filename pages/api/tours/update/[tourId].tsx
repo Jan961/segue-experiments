@@ -1,41 +1,51 @@
-import { parseISO } from 'date-fns'
+import { TourDTO } from 'interfaces'
 import prisma from 'lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-const safeParseDate = (date: string) => {
-  if (!date) return null
-  return parseISO(date)
-}
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  const dto = req.body as TourDTO
 
-const safeParseInt = (value: string) => {
-  if (!value) return null
-  return parseInt(value)
-}
+  const existingDateBlockIds = dto.DateBlock.filter(db => db.Id).map(db => db.Id)
+  const existingDateBlocks = dto.DateBlock.filter(db => db.Id)
+  const newDateBlocks = dto.DateBlock.filter(db => !db.Id)
 
-export default async function handle (req, res) {
-  const query: number = parseInt(req.query.tourId)
+  // No checking about losing events yet. That depends on booking structure.
   try {
-    await prisma.tour.update({
-      where: {
-        TourId: query
-      },
-      data: {
-        Code: req.body.Code,
-        ShowId: safeParseInt(req.body.ShowId),
-        TourStartDate: safeParseDate(req.body.TourStartDate),
-        TourEndDate: safeParseDate(req.body.TourEndDate),
-        Archived: false,
-        Deleted: false,
-        RehearsalStartDate: safeParseDate(req.body.RehearsalStartDate),
-        RehearsalEndDate: safeParseDate(req.body.RehearsalEndDate),
-        TourOwner: safeParseInt(req.body.Owner), // null For some reason
-        Logo: req.body.Logo,
-        CreatedBy: 0
-      }
-    })
+    await prisma.$transaction([
+      prisma.tour.update({
+        where: { Id: dto.Id },
+        data: {
+          Code: dto.Code,
+          IsArchived: dto.IsArchived,
+          DateBlock: {
+            // Remove DateBlocks not in the DTO
+            deleteMany: {
+              NOT: { Id: { in: existingDateBlockIds } },
+              TourId: dto.Id
+            },
+            // Update existing DateBlocks
+            updateMany: existingDateBlocks.map(db => ({
+              where: { Id: db.Id, TourId: dto.Id },
+              data: {
+                StartDate: new Date(db.StartDate),
+                EndDate: new Date(db.EndDate),
+                Name: db.Name
+              }
+            })),
+            // Create new DateBlocks. This has to come last (otherwise deleteMany will remove)
+            create: newDateBlocks.map(db => ({
+              StartDate: new Date(db.StartDate),
+              EndDate: new Date(db.EndDate),
+              Name: db.Name
+            }))
+          }
+        }
+      })
+    ])
+
     res.status(200).end()
-  } catch (e) {
-    console.log(e)
-    res.status(500).end()
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({ err: 'Error occurred while saving tour.' })
   }
-  return res
 }

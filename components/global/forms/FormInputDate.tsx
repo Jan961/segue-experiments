@@ -20,7 +20,7 @@ export const FormInputDate = ({ onChange, value, name, label, required }: Input)
           onChange={onChange}
           required={required}
           value={stringValue}
-          className="w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4"
+          className="w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2"
           contentEditable={false}
         />
       </label>

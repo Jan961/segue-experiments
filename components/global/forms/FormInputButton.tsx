@@ -8,6 +8,7 @@ interface FormInputButtonProps {
   onClick?: (e: any) => void
   submit?: boolean;
   className?: string;
+  intent?: undefined | 'DANGER'
 }
 
 const LoadingSpinner = () => {
@@ -21,17 +22,20 @@ const LoadingSpinner = () => {
 }
 
 // Larger button for submitting forms. Green in color
-export const FormInputButton = ({ loading, disabled, text, onClick, submit, className }: FormInputButtonProps) => {
+export const FormInputButton = ({ loading, disabled, text, onClick, submit, className, intent }: FormInputButtonProps) => {
   let baseClass = 'rounded shadow text-sm px-3 py-2 cursor-pointer border '
-  const availableClasses = baseClass + ' border-gray-200 bg-gray-200 hover:bg-gray-100 active:bg-blue-600 ease-linear transition-all duration-150 '
-  const loadingClasses = baseClass + ' bg-gray-500'
-  const disabledClasses = baseClass + ' opacity-50'
+
+  const intentClass = intent === 'DANGER' ? 'bg-red-500 hover:bg-red-400 border-red-500 text-white' : 'border-gray-200 bg-gray-200 hover:bg-gray-100'
+
+  const availableClasses = classNames(baseClass, intentClass, 'active:bg-blue-600 ease-linear transition-all duration-150')
+  const loadingClasses = classNames(availableClasses, 'bg-gray-500')
+  const disabledClasses = classNames(availableClasses + 'opacity-50')
 
   baseClass = disabled ? disabledClasses : !loading ? availableClasses : loadingClasses
 
   return (
     <button
-      className={classNames(className, baseClass)}
+      className={classNames(baseClass, className)}
       type={ submit ? 'submit' : 'button'}
       onClick={onClick}
       disabled={disabled}>
