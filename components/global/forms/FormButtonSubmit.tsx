@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import classNames from 'classnames';
 
 interface FormButtonSubmitProps {
   loading?: boolean;
@@ -6,6 +7,7 @@ interface FormButtonSubmitProps {
   text: string;
   onClick?: (e: any) => void
   submit?: boolean;
+  intent?: undefined | 'DANGER'
 }
 
 const LoadingSpinner = () => {
@@ -18,13 +20,13 @@ const LoadingSpinner = () => {
   )
 }
 
-export const FormButtonSubmit = ({ loading, disabled, text, onClick, submit = true }: FormButtonSubmitProps) => {
+export const FormButtonSubmit = ({ loading, disabled, text, onClick, submit = true, intent }: FormButtonSubmitProps) => {
   const baseClasses = 'text-white rounded shadow outline text-sm px-6 py-3 font-bold cursor-pointer'
-  const availableClasses = baseClasses + ' hover:shadow-lg bg-emerald-500 active:bg-emerald-600 ease-linear transition-all duration-150 '
-  const loadingClasses = baseClasses + ' bg-gray-500'
-  const disabledClasses = baseClasses + ' bg-gray-300'
+  const intentClasses = intent === 'DANGER' ? 'bg-red-500 hover:bg-red-400 active:bg-red-600' : ' bg-emerald-500 hover:bg-emerald-400'
+  const disabledClasses = classNames(baseClasses, 'bg-gray-300 cursor-not-allowed')
+  const availableClasses = classNames(baseClasses, intentClasses)
 
-  const className = disabled ? disabledClasses : !loading ? availableClasses : loadingClasses
+  const className = disabled || loading ? disabledClasses : availableClasses
 
   return (
     <div className="text-right">

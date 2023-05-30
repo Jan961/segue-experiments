@@ -29,7 +29,7 @@ export const FormInputButton = ({ loading, disabled, text, onClick, submit, clas
 
   const availableClasses = classNames(baseClass, intentClass, 'active:bg-blue-600 ease-linear transition-all duration-150')
   const loadingClasses = classNames(availableClasses, 'bg-gray-500')
-  const disabledClasses = classNames(availableClasses + 'opacity-50')
+  const disabledClasses = classNames(availableClasses + 'opacity-50 cursor-not-allowed')
 
   baseClass = disabled ? disabledClasses : !loading ? availableClasses : loadingClasses
 
