@@ -29,9 +29,6 @@ export const getShowById = async (Id: number) => {
   return await prisma.show.findFirst({
     where: {
       Id
-    },
-    include: {
-      Show: true
     }
   })
 }
