@@ -10,6 +10,7 @@ import { StyledTab } from 'components/global/StyledTabs'
 import TourList from 'components/tours/TourList'
 import { tourMapper } from 'interfaces/mappers'
 import { TourDTO } from 'interfaces'
+import { BreadCrumb } from 'components/global/BreadCrumb'
 
 type Props = {
   tours: TourDTO[]
@@ -29,17 +30,27 @@ export default function Tours ({ id, tours }: Props) {
     }
   }
 
+  const anyTour = active.length ? active[0] : archived[0]
+
   return (
     <Layout title="Tours | Segue">
       <div className="float-right">
         <SearchBox onChange={(e) => setQuery(e.target.value)} value={query} />
         <MenuButton href={`/tours/create/${id}`} iconRight={faPlus}>Add Tour</MenuButton>
       </div>
-      <h1 className="text-3xl font-bold tracking-tight">
-        <span className="text-primary-blue block xl:inline">Tours</span>
-      </h1>
+      <BreadCrumb>
+        <BreadCrumb.Item href="/">
+          Home
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/shows">
+          Shows
+        </BreadCrumb.Item>
+        <BreadCrumb.Item>
+          {anyTour.ShowName}
+        </BreadCrumb.Item>
+      </BreadCrumb>
       <Tab.Group className='max-w-screen-md mx-auto' as='div'>
-        <Tab.List className="mb-4">
+        <Tab.List className="mb-2">
           <StyledTab>Active ({active.length})</StyledTab>
           <StyledTab>Archived ({archived.length})</StyledTab>
         </Tab.List>

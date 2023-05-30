@@ -10,6 +10,7 @@ import { showMapper } from 'interfaces/mappers'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import { ShowList } from 'components/shows/ShowList'
+import { BreadCrumb } from 'components/global/BreadCrumb'
 
 interface ShowsProps {
   shows: ShowDTO[]
@@ -36,12 +37,16 @@ const Shows = ({ shows }: ShowsProps) => {
         <SearchBox onChange={(e) => setSearch(e.target.value)} value={search} />
         <MenuButton iconRight={faPlus} href='/shows/create'>Create Show</MenuButton>
       </div>
-      <h1 className="text-3xl font-bold tracking-tight">
-        <span className="text-primary-blue block xl:inline">Shows</span>
-      </h1>
-      <br className='clear' />
+      <BreadCrumb>
+        <BreadCrumb.Item href="/">
+          Home
+        </BreadCrumb.Item>
+        <BreadCrumb.Item>
+          Shows
+        </BreadCrumb.Item>
+      </BreadCrumb>
       <Tab.Group className='max-w-screen-md mx-auto' as='div'>
-        <Tab.List className="mb-4">
+        <Tab.List className="mb-2">
           <StyledTab>Active ({active.length})</StyledTab>
           <StyledTab>Archived ({archived.length})</StyledTab>
         </Tab.List>
