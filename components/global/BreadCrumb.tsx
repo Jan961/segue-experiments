@@ -13,7 +13,7 @@ export const BreadCrumb = ({ children }: PropsWithChildren<unknown>) => {
         return (
           <li key={index} className="inline-block">
             { x }
-            { index + 1 < items && (<FontAwesomeIcon className="mx-2 ml-1" icon={faChevronRight} />)}
+            { index + 1 < items && (<FontAwesomeIcon className="mx-2 ml-1 opacity-50" icon={faChevronRight} />)}
           </li>
         )
       })

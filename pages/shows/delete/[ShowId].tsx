@@ -14,6 +14,7 @@ import { useRouter } from 'next/router'
 import { showMapper } from 'interfaces/mappers'
 import { ShowDTO } from 'interfaces'
 import { FormInfo } from 'components/global/forms/FormInfo'
+import { BreadCrumb } from 'components/global/BreadCrumb'
 
 type Props = {
   show: ShowDTO
@@ -63,13 +64,18 @@ const DeleteShow = ({ show }: Props) => {
 
   return (
     <Layout title="Delete Show | Segue">
+      <BreadCrumb>
+        <BreadCrumb.Item href="/">
+            Home
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/shows">
+            Shows
+        </BreadCrumb.Item>
+        <BreadCrumb.Item>
+            Delete: {show.Name}
+        </BreadCrumb.Item>
+      </BreadCrumb>
       <FormContainer>
-        <div className="mb-4">
-          <Link href="/shows"><FontAwesomeIcon icon={faChevronLeft} />&nbsp;Back</Link>
-        </div>
-        <h3 className="text-3xl font-semibold mb-4">
-          Delete: {show.Name}
-        </h3>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent='DANGER'>
             Warning. This will delete the show and all tours, documents, and information associated with it.

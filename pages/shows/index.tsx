@@ -35,7 +35,7 @@ const Shows = ({ shows }: ShowsProps) => {
     <Layout title="Shows | Segue">
       <div className="float-right">
         <SearchBox onChange={(e) => setSearch(e.target.value)} value={search} />
-        <MenuButton iconRight={faPlus} href='/shows/create'>Create Show</MenuButton>
+        <MenuButton iconRight={faPlus} href='/shows/create'>Add Show</MenuButton>
       </div>
       <BreadCrumb>
         <BreadCrumb.Item href="/">

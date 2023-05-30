@@ -16,6 +16,7 @@ import { useRouter } from 'next/router'
 import { showMapper } from 'interfaces/mappers'
 import { ShowDTO } from 'interfaces'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { BreadCrumb } from 'components/global/BreadCrumb'
 
 type Props = {
   show: ShowDTO
@@ -82,13 +83,18 @@ const EditShow = ({ show }: Props) => {
 
   return (
     <Layout title="Edit Show | Segue">
-      <FormContainer>
-        <div className="mb-4">
-          <Link href="/shows"><FontAwesomeIcon icon={faChevronLeft} />&nbsp;Back</Link>
-        </div>
-        <h3 className="text-3xl font-semibold mb-4">
+      <BreadCrumb>
+        <BreadCrumb.Item href="/">
+          Home
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/shows">
+          Shows
+        </BreadCrumb.Item>
+        <BreadCrumb.Item>
           Edit: {show.Name}
-        </h3>
+        </BreadCrumb.Item>
+      </BreadCrumb>
+      <FormContainer>
         <form onSubmit={handleOnSubmit}>
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />

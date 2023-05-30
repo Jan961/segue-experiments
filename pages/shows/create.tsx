@@ -12,6 +12,7 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
 import { useRouter } from 'next/router'
 import { ShowDTO } from 'interfaces'
+import { BreadCrumb } from 'components/global/BreadCrumb'
 
 const DEFAULT_SHOW: ShowDTO = {
   Code: '',
@@ -83,13 +84,18 @@ const Create = () => {
 
   return (
     <Layout title="Add Show | Segue">
+      <BreadCrumb>
+        <BreadCrumb.Item href="/">
+          Home
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/shows">
+          Shows
+        </BreadCrumb.Item>
+        <BreadCrumb.Item>
+          Add Show
+        </BreadCrumb.Item>
+      </BreadCrumb>
       <FormContainer>
-        <div className="mb-4">
-          <Link href="/shows"><FontAwesomeIcon icon={faChevronLeft} />&nbsp;Back</Link>
-        </div>
-        <h3 className="text-3xl font-semibold mb-4">
-          Create Show
-        </h3>
         <form onSubmit={handleOnSubmit}>
           <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
           <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />

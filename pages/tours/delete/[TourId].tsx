@@ -14,6 +14,7 @@ import { tourEditorMapper } from 'interfaces/mappers'
 import { TourDTO } from 'interfaces'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import { getTourById } from 'services/TourService'
+import { BreadCrumb } from 'components/global/BreadCrumb'
 
 type Props = {
   tour: TourDTO
@@ -64,6 +65,20 @@ const Deletetour = ({ tour }: Props) => {
 
   return (
     <Layout title="Delete Show | Segue">
+      <BreadCrumb>
+        <BreadCrumb.Item href="/">
+          Home
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/shows">
+          Shows
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href={`/tours/${tour.ShowId}`}>
+          { tour.ShowName }
+        </BreadCrumb.Item>
+        <BreadCrumb.Item>
+          Delete: { tour.ShowCode}
+        </BreadCrumb.Item>
+      </BreadCrumb>
       <FormContainer>
         <div className="mb-4">
           <Link href={back}><FontAwesomeIcon icon={faChevronLeft} />&nbsp;Back</Link>

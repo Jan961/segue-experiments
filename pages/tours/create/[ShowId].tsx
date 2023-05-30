@@ -2,6 +2,7 @@ import Layout from 'components/Layout'
 import { GetServerSideProps } from 'next'
 import { TourEditor } from 'components/tours/TourEditor'
 import { TourDTO } from 'interfaces'
+import { getShowById } from 'services/ShowService'
 
 type CreateProps = {
   tour: TourDTO
@@ -57,7 +58,9 @@ const Create = ({ tour }: CreateProps) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ShowId } = ctx.params
 
-  const tour = { ...DEFAULT_TOUR, ShowId: parseInt(ShowId as string) }
+  const id = parseInt(ShowId as string)
+  const show = await getShowById(id)
+  const tour = { ...DEFAULT_TOUR, ShowId: id, ShowName: show.Name }
   return { props: { tour } }
 }
 
