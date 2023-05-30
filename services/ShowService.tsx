@@ -6,7 +6,10 @@ export const getShows = () => {
 }
 
 const showInclude = Prisma.validator<Prisma.ShowInclude>()({
-  Tour: { include: { Show: true, DateBlock: true } }
+  Tour: {
+    where: { IsDeleted: false },
+    include: { Show: true, DateBlock: true }
+  }
 })
 
 export type ShowWithTours = Prisma.ShowGetPayload<{
@@ -26,6 +29,9 @@ export const getShowById = async (Id: number) => {
   return await prisma.show.findFirst({
     where: {
       Id
+    },
+    include: {
+      Show: true
     }
   })
 }

@@ -1,8 +1,5 @@
 import Link from 'next/link'
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
-import axios from 'axios'
-import { forceReload } from 'utils/forceReload'
-import { loggingService } from 'services/loggingService'
 import { ListItemThumbnail } from 'components/global/list/ListItemThumbnail'
 import { MenuButton } from 'components/global/MenuButton'
 import { dateService } from 'services/dateService'
@@ -31,23 +28,6 @@ type TourListItemProps = {
 const TourListItem = ({ tour }: TourListItemProps) => {
   const router = useRouter()
 
-  const deleteTour = () => {
-    axios({
-      method: 'POST',
-      url: '/api/tours/delete/' + tour.Id,
-      data: tour.Id
-    })
-      .then((response) => {
-        console.log('Marked ' + tour.Id + ' As deleted')
-        loggingService.logAction('Tour', 'Deleted' + tour.Id)
-        forceReload()
-      })
-      .catch((error) => {
-        console.log(JSON.stringify(error))
-        loggingService.logError(error)
-      })
-  }
-
   const navigateToShow = () => {
     router.push(`/bookings/${tour.ShowCode}/${tour.Code}`)
   }
@@ -72,7 +52,7 @@ const TourListItem = ({ tour }: TourListItemProps) => {
       </div>
       <div className="whitespace-nowrap">
         <MenuButton icon={faPencil} href={`/tours/edit/${tour.Id}`} />
-        <MenuButton intent='DANGER' icon={faTrash} onClick={deleteTour} />
+        <MenuButton intent='DANGER' icon={faTrash} href={`/tours/delete/${tour.Id}`} />
       </div>
     </li>
   )

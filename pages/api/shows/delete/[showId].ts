@@ -15,6 +15,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     res.status(200).end()
   } catch (e) {
     console.log(e)
-    res.status(500).json({ err: 'Error occurred while generating search results.' })
+    res.status(500).json({ err: 'Error occurred while deleting show' })
   }
 }
