@@ -18,31 +18,31 @@ export const lookupTourId = async (ShowCode: string, TourCode: string) => {
 }
 
 // Booking List
-const tourContentSelect = Prisma.validator<Prisma.TourSelect>()({
+const tourContentInclude = Prisma.validator<Prisma.TourSelect>()({
+  Show: true,
   DateBlock: {
-    select: {
-      Id: true,
+    include: {
       Booking: {
-        select: {
-          Id: true,
-          FirstDate: true
+        include: {
+          Performance: true
         }
       },
-      Name: true
+      GetInFitUp: true,
+      Rehearsal: true
     }
   }
 })
 
-export type TourWithBookingsType = Prisma.TourGetPayload<{
-  select: typeof tourContentSelect
+export type TourContent = Prisma.TourGetPayload<{
+  include: typeof tourContentInclude
 }>
 
-export const getTourWithBookingsById = async (Id: number) => {
+export const getTourWithContent = async (Id: number) => {
   return await prisma.tour.findUnique({
     where: {
       Id
     },
-    select: tourContentSelect
+    include: tourContentInclude
   })
 }
 

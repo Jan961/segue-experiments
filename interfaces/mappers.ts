@@ -1,7 +1,7 @@
-import { Show } from '@prisma/client'
-import { ShowDTO, TourDTO } from 'interfaces'
+import { DateBlock, Show } from '@prisma/client'
+import { DateBlockDTO, DateDTO, ShowDTO, TourDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
-import { TourWithDateblocks } from 'services/TourService'
+import { TourContent, TourWithDateblocks } from 'services/TourService'
 
 /*
 
@@ -26,23 +26,15 @@ export const showMapper = (show: Show): ShowDTO => ({
 })
 
 export const tourMapper = (s: ShowWithTours): TourDTO[] => {
-  return s.Tour.map(t => {
-    return {
-      Id: t.Id,
-      ShowId: s.Id,
-      ShowName: s.Name,
-      Code: t.Code,
-      ShowCode: s.Code,
-      DateBlock: t.DateBlock.map(db => ({
-        Id: db.Id,
-        StartDate: db.StartDate.toISOString(),
-        EndDate: db.EndDate.toISOString(),
-        Name: db.Name
-      })),
-      IsArchived: t.IsArchived
-    }
-  })
+  return s.Tour.map(tourEditorMapper)
 }
+
+export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
+  Id: db.Id,
+  StartDate: db.StartDate.toISOString(),
+  EndDate: db.EndDate.toISOString(),
+  Name: db.Name
+})
 
 export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
   Id: t.Id,
@@ -50,21 +42,6 @@ export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
   ShowName: t.Show.Name,
   Code: t.Code,
   ShowCode: t.Show.Code,
-  DateBlock: t.DateBlock.map(db => ({
-    Id: db.Id,
-    StartDate: db.StartDate.toISOString(),
-    EndDate: db.EndDate.toISOString(),
-    Name: db.Name
-  })),
+  DateBlock: t.DateBlock.map(dateBlockMapper),
   IsArchived: t.IsArchived
 })
-
-/*
-export const bookingMapper = (tour: TourWithBookingsType): DateBlockDTO[] => (
-  tour.DateBlock.map((db) => ({
-    Id: db.Id,
-    Name: db.Name,
-    Bookings: db.Booking.map((b) => ({ Id: b.Id, ShowDate: b.FirstDate.toISOString() }))
-  }))
-)
-*/

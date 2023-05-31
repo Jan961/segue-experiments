@@ -71,9 +71,27 @@ export type TourDTO = {
   DateBlock: DateBlockDTO[]
 }
 
+export type RehearsalDTO = {
+  Id: number
+  Date: string
+}
+
+export type GetInFitUpDTO = {
+  Id: number
+  Date: string
+}
+
 export type BookingDTO = {
   Id: number
-  ShowDate: string
+  Date: string
+  Performances: string[]
+}
+
+export type DateDTO = {
+  Id: string
+  Booking?: BookingDTO[]
+  Tech?: GetInFitUpDTO[]
+  Rehearsal?: RehearsalDTO[]
 }
 
 export type DateBlockDTO = {
@@ -81,6 +99,7 @@ export type DateBlockDTO = {
   Name: string
   StartDate: string
   EndDate: string
+  Dates?: DateDTO[]
 }
 
 export type Venue = {

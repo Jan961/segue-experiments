@@ -28,9 +28,10 @@ export default function Barring () {
   })
   const [barringVenues, setBarringVenues] = useState(null)
 
+  /*
   useEffect(() => {
     (async () => {
-      fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
+      fetch('/api/tours/read/notArchived/0',
         {
           method: 'GET',
           headers: {
@@ -47,6 +48,7 @@ export default function Barring () {
         })
     })()
   }, [])
+  */
 
   useEffect(() => {
     const MondayDate = moment(new Date('2000-01-01')) // moment(new Date(RawMondayDate)).format("yyyy-MM-DD")

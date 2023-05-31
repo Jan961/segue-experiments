@@ -1,4 +1,3 @@
-import { TourWithBookingsType } from 'services/TourService';
 import { dateService } from 'services/dateService'
 
 interface BookingDetailRowProps {
@@ -8,6 +7,7 @@ interface BookingDetailRowProps {
 }
 
 export const BookingDetailRow = ({ booking, onClick, selected }: BookingDetailRowProps) => {
+  if (!booking) return null
   const ShowDate = dateService.dateToSimple(booking.FirstDate)
   const day = dateService.getWeekDay(booking.FirstDate)
 

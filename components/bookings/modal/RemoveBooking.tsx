@@ -4,7 +4,7 @@ import { StyledDialog } from 'components/global/StyledDialog'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import { useRecoilState } from 'recoil'
 import axios from 'axios'
-import { bookingState } from 'state/bookingState'
+import { bookingState } from 'state/booking/bookingState'
 
 interface RemoveBookingProps {
   bookingId: number;

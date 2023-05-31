@@ -3,12 +3,11 @@ import ViewBookingHistory from './modal/ViewBookingHistory'
 import PerfomancesList from './perfomancesList'
 import React from 'react'
 import axios from 'axios'
-import { venueState } from 'state/venueState'
+import { venueState } from 'state/booking/venueState'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { dayTypeState } from 'state/dayTypeState'
-import { bookingState } from 'state/bookingState'
+import { bookingState } from 'state/booking/bookingState'
 import { FormInputSelect } from 'components/global/forms/FormInputSelect'
-import { bookingDictSelector } from 'state/selectors/bookingDictSelector'
+import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import ChangeBookingDate from './modal/ChangeBookingDate'
 import { FormInputText } from 'components/global/forms/FormInputText'
 
@@ -20,7 +19,6 @@ interface InfoPanelProps {
 export const InfoPanel = ({ selectedBooking, setSelectedBooking }: InfoPanelProps) => {
   const defaultState: any = {}
   const venues = useRecoilValue(venueState)
-  const dayTypes = useRecoilValue(dayTypeState)
   const bookings = useRecoilValue(bookingState)
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
   const [inputs, setInputs] = React.useState(defaultState)

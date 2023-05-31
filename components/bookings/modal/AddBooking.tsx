@@ -6,8 +6,7 @@ import { loggingService } from 'services/loggingService'
 import { ToolbarButton } from '../ToolbarButton'
 import { StyledDialog } from 'components/global/StyledDialog'
 import { useRecoilValue } from 'recoil'
-import { venueState } from 'state/venueState'
-import { dayTypeState } from 'state/dayTypeState'
+import { venueState } from 'state/booking/venueState'
 
 interface AddBookingProps {
     BookingId: number,
@@ -16,7 +15,6 @@ interface AddBookingProps {
 export default function AddBooking (BookingId : AddBookingProps) {
   const [showModal, setShowModal] = React.useState(false)
   const venues = useRecoilValue(venueState)
-  const dayTypes = useRecoilValue(dayTypeState)
 
   const [previousDistance, setPreviousDistance] = useState({
     VenueID: null, Venue2Id: null, Mileage: null, TimeMins: null
@@ -46,6 +44,8 @@ export default function AddBooking (BookingId : AddBookingProps) {
   })
 
   useEffect(() => {
+    if (!showModal) return
+
     fetch(`/api/bookings/booking/${BookingId.BookingId}`)
       .then((res) => res.json())
       .then((response) => {
@@ -85,7 +85,7 @@ export default function AddBooking (BookingId : AddBookingProps) {
           })
         }
       })
-  }, [BookingId.BookingId])
+  }, [BookingId.BookingId, showModal])
 
   function handleOnSubmit (e) {
     e.preventDefault()
@@ -155,7 +155,7 @@ export default function AddBooking (BookingId : AddBookingProps) {
                 value={inputs.VenueId}
               >
                 <option >Please Select a Venue</option>
-                { venues.map((venue) => (
+                { [].map((venue) => (
                   <option key={venue.VenueId} value={venue.VenueId}>{venue.Name}</option>
                 ))}
               </select>
@@ -177,7 +177,7 @@ export default function AddBooking (BookingId : AddBookingProps) {
               id={'DayTypeCrew'}
             >
               <option >Please Select a Day Type</option>
-              {dayTypes.map((dayType) => (
+              {[].map((dayType) => (
                 <option key={dayType.DateTypeId} value={dayType.DateTypeId}>{dayType.Name}</option>
               ))}
             </select>
@@ -211,7 +211,7 @@ export default function AddBooking (BookingId : AddBookingProps) {
 
               value={inputs.DayTypeCast}>
               <option >Please Select a Day Type</option>
-              {dayTypes.map((dayType) => (
+              {[].map((dayType) => (
                 <option key={dayType.DateTypeId} value={dayType.DateTypeId}>{dayType.Da}{dayType.Name}</option>
               ))}
             </select>

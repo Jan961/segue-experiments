@@ -1,6 +1,6 @@
 import { selector } from 'recoil'
 import { BookingsByTourIdType } from 'services/bookingService'
-import { bookingState } from 'state/bookingState'
+import { bookingState } from 'state/booking/bookingState'
 
 export const bookingDictSelector = selector({
   key: 'bookingDictSelector',

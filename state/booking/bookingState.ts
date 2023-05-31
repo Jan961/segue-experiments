@@ -1,7 +1,7 @@
+import { BookingDTO } from 'interfaces'
 import { atom } from 'recoil'
-import { BookingsByTourIdType } from 'services/bookingService'
 
-const intialState: BookingsByTourIdType[] = []
+const intialState: BookingDTO[] = []
 
 export const bookingState = atom({
   key: 'bookingState',
