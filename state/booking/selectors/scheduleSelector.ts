@@ -83,8 +83,6 @@ export const scheduleSelector = selector({
       dates[key].Booking.push(b.Id)
     }
 
-    console.log(bookings)
-
     const result: ScheduleViewModel = {
       Sections: dateBlocks.map((db) => ({
         Name: db.Name,

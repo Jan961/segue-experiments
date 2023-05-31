@@ -1,7 +1,7 @@
-import { Venue } from 'interfaces'
+import { VenueMinimalDTO } from 'interfaces'
 import { atom } from 'recoil'
 
-const intialState: Venue[] = []
+const intialState: VenueMinimalDTO[] = []
 
 export const venueState = atom({
   key: 'venueState',

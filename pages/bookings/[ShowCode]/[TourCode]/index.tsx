@@ -8,7 +8,7 @@ import { TourContent, getTourWithContent, lookupTourId } from 'services/TourServ
 import { InfoPanel } from 'components/bookings/InfoPanel'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { venueState } from 'state/booking/venueState'
-import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO } from 'interfaces'
+import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO, VenueMinimalDTO } from 'interfaces'
 import { bookingState } from 'state/booking/bookingState'
 import { rehearsalState } from 'state/booking/rehearsalState'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
@@ -16,12 +16,14 @@ import { DateViewModel, ScheduleSectionViewModel, scheduleSelector } from 'state
 import { dateBlockState } from 'state/booking/dateBlockState'
 import { dateBlockMapper } from 'interfaces/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
+import { getAllVenuesMin } from 'services/venueService'
 
 interface InitialData {
   bookings: BookingDTO[],
   rehearsals: RehearsalDTO[],
   getInFitUp: GetInFitUpDTO[],
-  dateBlock: DateBlockDTO[]
+  dateBlock: DateBlockDTO[],
+  venue: VenueMinimalDTO[],
 }
 
 interface bookingProps {
@@ -32,21 +34,13 @@ interface bookingProps {
 const BookingPage = ({ initialData, Id }: bookingProps) => {
   const [searchFilter, setSearchFilter] = useState('')
 
-  const [selectedBooking, setSelectedBooking] = useState(0)
-  const setVenues = useSetRecoilState(venueState)
+  const setVenue = useSetRecoilState(venueState)
   const setBookings = useSetRecoilState(bookingState)
   const setRehearsals = useSetRecoilState(rehearsalState)
   const setGetInFitUp = useSetRecoilState(getInFitUpState)
   const setDateBlockState = useSetRecoilState(dateBlockState)
-  const { Sections } = useRecoilValue(scheduleSelector)
 
-  useEffect(() => {
-    fetch('/api/venue/read/allVenues/0')
-      .then((res) => res.json())
-      .then((venues) => {
-        setVenues(venues)
-      })
-  }, [])
+  const { Sections } = useRecoilValue(scheduleSelector)
 
   // Run only once
   const count = React.useRef(0)
@@ -56,10 +50,10 @@ const BookingPage = ({ initialData, Id }: bookingProps) => {
       setRehearsals(initialData.rehearsals)
       setGetInFitUp(initialData.getInFitUp)
       setDateBlockState(initialData.dateBlock)
+      setVenue(initialData.venue)
     }
     count.current++
   }, [])
-
 
   const gotoToday = () => {
     const element = new Date().toISOString().substring(0, 10)
@@ -78,7 +72,7 @@ const BookingPage = ({ initialData, Id }: bookingProps) => {
         setSearchFilter={setSearchFilter}
         title={'Bookings'}
       ></GlobalToolbar>
-      <BookingsButtons key={'toolbar'} selectedBooking={selectedBooking} currentTourId={Id} ></BookingsButtons>
+      <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
       <div className="flex flex-auto">
         {/* <SideMenu></SideMenu> */}
         {/* need to pass the full list of booking */}
@@ -107,9 +101,7 @@ const BookingPage = ({ initialData, Id }: bookingProps) => {
             }
           </ul>
         </div>
-
-        { selectedBooking && (<InfoPanel selectedBooking={selectedBooking} setSelectedBooking={setSelectedBooking} />) }
-
+        <InfoPanel />
       </div>
 
     </Layout>
@@ -119,8 +111,11 @@ const BookingPage = ({ initialData, Id }: bookingProps) => {
 export default BookingPage
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  // We get the data for the whole booking page here. We pass it to the constructor, then store it in state management.
+
   const { ShowCode, TourCode } = ctx.query
   const { Id } = await lookupTourId(ShowCode as string, TourCode as string)
+  const venues = await getAllVenuesMin()
   const tour: TourContent = await getTourWithContent(Id)
 
   let rehearsals: RehearsalDTO[] = []
@@ -144,13 +139,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getInFitUp = [...getInFitUp, ...db.GetInFitUp.map((gifu) => ({ Date: gifu.Date.toISOString(), Id: gifu.Id }))]
   }
 
-  console.log(bookings)
-
   const initialData: InitialData = {
     rehearsals,
     bookings,
     getInFitUp,
-    dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 })
+    dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
+    // Remove extra info
+    venue: venues.map((v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))
   }
 
   return {

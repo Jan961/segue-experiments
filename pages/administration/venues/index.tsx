@@ -52,26 +52,6 @@ const Index = () => {
       </div>
     </Layout>
   );
-};
+}
 
-// export const getStaticProps: GetStaticProps = async () => {
-
-//     const venues = await prisma.venue.findMany(
-//         {
-//             where:{
-//                 deleted: 0
-//             }
-//         }
-//     )
-
-//     // @ts-ignore
-//     const items: Venue[] = venues
-//    // return { props: { items } }
-//     return {
-//         props: {
-//             items: JSON.parse(JSON.stringify(items))
-//         }
-//     }
-// }
-
-export default Index;
+export default Index

@@ -29,7 +29,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
             where:{
                 deleted: 0,
                 AccountId: userService.userValue.AccountId
-
             }
         }
     )

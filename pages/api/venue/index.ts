@@ -1,13 +1,6 @@
-import prisma from 'lib/prisma'
+import { getAllVenues } from 'services/venueService'
 
-export default async function handle(req, res) {
-
-    const result = await prisma.venue.findMany(
-        {
-            where: {
-                deleted: 0
-            }
-        }
-    )
-    res.json(result)
+export default async function handle (req, res) {
+  const result = await getAllVenues()
+  res.json(result)
 }

@@ -76,6 +76,12 @@ export type RehearsalDTO = {
   Date: string
 }
 
+export type VenueMinimalDTO = {
+  Id: number
+  Name: string
+  Code: string
+}
+
 export type GetInFitUpDTO = {
   Id: number
   Date: string

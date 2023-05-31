@@ -1,8 +1,33 @@
-export const venueService = {
-    venuesWithinDistance,
+import prisma from "lib/prisma"
 
+export const venueService = {
+  venuesWithinDistance,
 }
 
+export const getAllVenuesMin = async () => {
+  return prisma.venue.findMany(
+    {
+      where: {
+        IsDeleted: false
+      },
+      select: {
+        Id: true,
+        Name: true,
+        Code: true
+      }
+    }
+  )
+}
+
+export const getAllVenues = async () => {
+  return prisma.venue.findMany(
+    {
+      where: {
+        IsDeleted: false
+      }
+    }
+  )
+}
 
 /**
  * Retunrn a list ov venues within a radius distance of another

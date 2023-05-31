@@ -253,6 +253,7 @@ model Venue {
   BarringWeeksPost                                     Int?               @db.TinyInt @map("VenueBarringWeeksPost")
   BarringMiles                                         Int? @map("VenueBarringMiles")
   CulturallyExempt                                     Boolean            @default(dbgenerated("(b'0')")) @db.Bit(1) @map("VenueCulturallyExempt")
+  IsDeleted                                                 Boolean            @map("VenueIsDeleted") @default(dbgenerated("(b'0')")) @db.Bit(1)
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[] @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
