@@ -61,7 +61,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
   // Hold the previous stop for distance lookup
   let prev = null
 
-  const journey: DateDistancesDTO[] = stops.map((stop: DistanceStop) => {
+  return stops.map((stop: DistanceStop) => {
     if (!prev || prev.Ids.length > 1) { // If the last stop has multiple options, we don't know which
       prev = stop
       return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: undefined, Mins: undefined })) }
@@ -70,7 +70,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
     return {
       Date: stop.Date,
       option: stop.Ids.map((id: number) => {
-        // Get any distances that match (optimisation possible
+        // Get any distances that match (optimisation possible)
         const match = distances.filter((x: VenueVenue) => (
           (x.Venue2Id === id && x.Venue1Id === prev.Ids[0]) ||
           (x.Venue1Id === id && x.Venue2Id === prev.Ids[0])
@@ -85,10 +85,6 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
       })
     }
   })
-
-  console.log(journey.map(x => x.option))
-
-  return journey
 }
 
 /**
