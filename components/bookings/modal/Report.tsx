@@ -9,6 +9,7 @@ export default function Report (TourId) {
   const [pres, setPres] = useState([])
   const [isLoading, setLoading] = useState(true)
 
+  /*
   useEffect(() => {
     (async () => {
       setLoading(true)
@@ -20,6 +21,7 @@ export default function Report (TourId) {
         })
     })()
   }, [TourId])
+  */
 
   if (isLoading) return (<ToolbarButton disabled>Tour Summary</ToolbarButton>)
 

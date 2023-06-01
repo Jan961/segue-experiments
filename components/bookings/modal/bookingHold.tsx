@@ -26,14 +26,15 @@ export default function BookingHold ({ TourId }: BookingHoldProps) {
     info: { error: false, msg: null }
   })
 
+  // Get Saleable Bookings
   useEffect(() => {
-    // Get Saleable Bookings
+    if (!showModal) return
     fetch(`/api/bookings/saleable/${TourId}`)
       .then((res) => res.json())
       .then((dates) => {
         getDatesList(dates)
       })
-  }, [TourId])
+  }, [TourId, showModal])
 
   async function handleOnSubmit (e) {
     e.preventDefault()

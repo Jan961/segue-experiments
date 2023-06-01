@@ -22,11 +22,11 @@ export default function TourGapsModal (tourId) {
 
   const [lastVenue, setLastVenue] = useState(0)
   const [submittable, setSubmittable] = useState(false)
-  /**
-     * Avalable dates
-     */
+
+  // Available
   useEffect(() => {
-    // @ts-ignore
+    if (!showModal) return
+
     fetch(`/api/bookings/NotBooked/${tourId.TourId}`, {
       method: 'GET'
     })
@@ -34,12 +34,12 @@ export default function TourGapsModal (tourId) {
       .then((bookings) => {
         setGapsList(bookings)
       })
-  }, [tourId.TourId])
+  }, [tourId.TourId, showModal])
 
-  /**
-     *  Venue List
-     * */
+  // Venue List
   useEffect(() => {
+    if (!showModal) return
+
     if (lastVenue == 0) {
       fetch(`/api/venue/read/venueVenue/${lastVenue}/${inputs.Distance}`)
         .then((res) => res.json())
@@ -53,7 +53,7 @@ export default function TourGapsModal (tourId) {
           setVenueList(data)
         })
     }
-  }, [inputs.Distance, lastVenue])
+  }, [inputs.Distance, lastVenue, showModal])
 
   useEffect(() => {
     if (inputs.VenueId === 0) {

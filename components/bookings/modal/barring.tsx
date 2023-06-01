@@ -51,6 +51,7 @@ export default function Barring () {
   */
 
   useEffect(() => {
+    if (!showModal) return
     const MondayDate = moment(new Date('2000-01-01')) // moment(new Date(RawMondayDate)).format("yyyy-MM-DD")
     // @ts-ignore
     const SundayDate = moment(new Date('2036-01-01')) // moment(new Date(RawMondayDate)).add(6,"days").format("yyyy-MM-DD")
@@ -59,7 +60,7 @@ export default function Barring () {
       .then(res => {
         SetSalesWeeksVenues(res)
       })
-  }, [inputs.SetTour])
+  }, [inputs.SetTour, showModal])
 
   async function handleOnSubmit (e) {
     e.preventDefault()
