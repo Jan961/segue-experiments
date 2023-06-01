@@ -1,8 +1,7 @@
+import React from 'react'
 import { GetServerSideProps } from 'next'
-import { useEffect, useState } from 'react'
 import GlobalToolbar from 'components/toolbar'
 import BookingsButtons from 'components/bookings/bookingsButtons'
-import React from 'react'
 import Layout from 'components/Layout'
 import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
@@ -14,15 +13,17 @@ import { rehearsalState } from 'state/booking/rehearsalState'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
 import { DateViewModel, ScheduleSectionViewModel, scheduleSelector } from 'state/booking/selectors/scheduleSelector'
 import { dateBlockState } from 'state/booking/dateBlockState'
-import { dateBlockMapper } from 'interfaces/mappers'
+import { bookingMapper, dateBlockMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
-import { getAllVenuesMin } from 'services/venueService'
+import { DateDistancesDTO, DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
+import { distanceState } from 'state/booking/distanceState'
 
 interface InitialData {
   bookings: BookingDTO[],
   rehearsals: RehearsalDTO[],
   getInFitUp: GetInFitUpDTO[],
   dateBlock: DateBlockDTO[],
+  distance: DateDistancesDTO[],
   venue: VenueMinimalDTO[],
 }
 
@@ -32,25 +33,27 @@ interface bookingProps {
 }
 
 const BookingPage = ({ initialData, Id }: bookingProps) => {
-  const [searchFilter, setSearchFilter] = useState('')
+  const [searchFilter, setSearchFilter] = React.useState('')
 
   const setVenue = useSetRecoilState(venueState)
   const setBookings = useSetRecoilState(bookingState)
   const setRehearsals = useSetRecoilState(rehearsalState)
   const setGetInFitUp = useSetRecoilState(getInFitUpState)
-  const setDateBlockState = useSetRecoilState(dateBlockState)
+  const setDateBlock = useSetRecoilState(dateBlockState)
+  const setDistance = useSetRecoilState(distanceState)
 
   const { Sections } = useRecoilValue(scheduleSelector)
 
   // Run only once
   const count = React.useRef(0)
-  useEffect(() => {
+  React.useEffect(() => {
     if (count.current !== 0) {
       setBookings(initialData.bookings)
       setRehearsals(initialData.rehearsals)
       setGetInFitUp(initialData.getInFitUp)
-      setDateBlockState(initialData.dateBlock)
+      setDateBlock(initialData.dateBlock)
       setVenue(initialData.venue)
+      setDistance(initialData.distance)
     }
     count.current++
   }, [])
@@ -111,38 +114,50 @@ const BookingPage = ({ initialData, Id }: bookingProps) => {
 export default BookingPage
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  // We get the data for the whole booking page here. We pass it to the constructor, then store it in state management.
+  /*
+    We get the data for the whole booking page here. We pass it to the constructor, then store it in state management.
+    This means we can update a single booking, and the schedule will update without having to redownload all the data.
+    We have effectively cloned the database for this tour, and populate it using the results of a single query which includes 'everything we want
+    to display'.
+
+    The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
+  */
 
   const { ShowCode, TourCode } = ctx.query
   const { Id } = await lookupTourId(ShowCode as string, TourCode as string)
   const venues = await getAllVenuesMin()
   const tour: TourContent = await getTourWithContent(Id)
 
-  let rehearsals: RehearsalDTO[] = []
-  let bookings: BookingDTO[] = []
-  let getInFitUp: GetInFitUpDTO[] = []
+  const rehearsals: RehearsalDTO[] = []
+  const bookings: BookingDTO[] = []
+  const getInFitUp: GetInFitUpDTO[] = []
   const dateBlock: DateBlockDTO[] = []
 
+  // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const db of tour.DateBlock) {
     dateBlock.push(dateBlockMapper(db))
-    rehearsals = [...rehearsals, ...db.Rehearsal.map((r) => ({ Date: r.Date.toISOString(), Id: r.Id }))]
-    bookings = [...bookings, ...db.Booking.map((b) => (
-      {
-        Date: b.FirstDate.toISOString(),
-        Id: b.Id,
-        Performances: b.Performance.map((p) => {
-          const day = p.Date.toISOString().split('T')[0]
-          const time = p.Time.toISOString().split('T')[1]
-          return `${day}T${time}`
-        })
-      }))]
-    getInFitUp = [...getInFitUp, ...db.GetInFitUp.map((gifu) => ({ Date: gifu.Date.toISOString(), Id: gifu.Id }))]
+
+    db.Rehearsal.forEach(r => rehearsals.push(rehearsalMapper(r)))
+    db.Booking.forEach(b => bookings.push(bookingMapper(b)))
+    db.GetInFitUp.forEach(gifu => getInFitUp.push(getInFitUpMapper(gifu)))
   }
+
+  // Get distances
+  const grouped = bookings.reduce((acc, { VenueId, Date }) => {
+    (acc[Date] = acc[Date] || []).push(VenueId)
+    return acc
+  }, {})
+
+  const stops = Object.entries(grouped).map(([Date, Ids]): DistanceStop => ({ Date, Ids: Ids as number[] }))
+  stops.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime())
+
+  const distance = await getDistances(stops)
 
   const initialData: InitialData = {
     rehearsals,
     bookings,
     getInFitUp,
+    distance,
     dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
     // Remove extra info
     venue: venues.map((v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))

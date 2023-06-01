@@ -1,22 +1,22 @@
-import { BookingDTO } from 'interfaces'
+import { RehearsalDTO } from 'interfaces'
 import { selector } from 'recoil'
-import { bookingState } from 'state/booking/bookingState'
+import { rehearsalState } from '../rehearsalState'
 
-export const bookingDictSelector = selector({
-  key: 'bookingDictSelector',
+export const rehearsalDictSelector = selector({
+  key: 'rehearsalDictSelector',
   get: ({ get }) => {
-    const source = get(bookingState)
+    const source = get(rehearsalState)
 
     // Create lookup table
-    const dictionary: Record<number, BookingDTO> = source.reduce((dictionary, booking) => {
-      dictionary[booking.Id] = booking
+    const dictionary: Record<number, RehearsalDTO> = source.reduce((dictionary, x) => {
+      dictionary[x.Id] = x
       return dictionary
     }, {})
 
     return dictionary
   },
-  set: ({ get, set }, newValue: BookingDTO) => {
-    const source = get(bookingState)
+  set: ({ get, set }, newValue: RehearsalDTO) => {
+    const source = get(rehearsalState)
 
     let found = false
 
@@ -31,8 +31,9 @@ export const bookingDictSelector = selector({
 
     // Handle adding
     if (!found) replacement.push(newValue)
+
     const sortedReplacement = replacement.sort((a, b) => new Date(a.Date) < new Date(b.Datee) ? -1 : 1)
 
-    set(bookingState, sortedReplacement)
+    set(rehearsalState, sortedReplacement)
   }
 })

@@ -68,7 +68,6 @@ export const scheduleSelector = selector({
     }
 
     for (const b of bookings) {
-      console.log(dates)
       const key = getKey(b.Date)
 
       if (!dates[key]) dates[key] = getDefaultDate(key)

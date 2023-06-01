@@ -6,10 +6,12 @@ import { forceNavigate } from 'utils/forceNavigate'
 export default function TourJumpMenu () {
   const [isLoading, setLoading] = useState(false)
   const [activeTours, setActiveTours] = useState([]) // Shory list of tours for the toolbar to switch
+
+  /*
   useEffect(() => {
     setLoading(true)
 
-    /** Get the tours for the jump meniu */
+    // Get the tours for the jump menu
 
     fetch('/api/tours/read/notArchived/0',
       {
@@ -28,6 +30,8 @@ export default function TourJumpMenu () {
         setLoading(false)
       })
   }, [])
+
+  */
 
   function changTour (e) {
     forceNavigate(`/booking/${e.target.value}`)

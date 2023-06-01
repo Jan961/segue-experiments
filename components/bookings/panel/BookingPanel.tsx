@@ -100,7 +100,6 @@ export const BookingPanel = () => {
   }
 
   const handleOnChange = (e: any) => {
-    console.log('handleOnChange')
     setInputs((prev) => ({
       ...prev,
       [e.target.id]: e.target.value

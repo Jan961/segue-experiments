@@ -1,9 +1,14 @@
 import classNames from 'classnames'
+import { BookingDTO } from 'interfaces'
 import { PropsWithChildren } from 'react'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { dateService } from 'services/dateService'
+import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { DateViewModel } from 'state/booking/selectors/scheduleSelector'
+import { venueDictSelector } from 'state/booking/selectors/venueDictSelector'
 import { viewState } from 'state/booking/viewState'
+import { VenueDisplay } from './VenueDisplay'
+import { RehearsalDisplay } from './RehearsalDisplay'
 
 interface ScheduleRowProps {
   date: DateViewModel
@@ -28,20 +33,19 @@ const CommonBadge = ({ children, className, onClick }: PropsWithChildren<CommonB
     onClick(e)
   }
 
-  return <button onClick={nonPropogatedClick} className={classNames(className, 'inline-blocked p-2 rounded mr-2')} >{ children }</button>
+  return <button onClick={nonPropogatedClick} className={classNames(className, 'inline-blocked px-2 rounded mr-2')} >{ children }</button>
 }
 
 const EventBadge = ({ rehearsal, booking, getInFitUp, performance, onClick }: EventBadgeProps) => {
-  if (rehearsal) return <CommonBadge onClick={onClick} className="bg-red-500 text-white">Rehearsal</CommonBadge>
-  if (booking) return <CommonBadge onClick={onClick} className="bg-blue-500 text-white">Booking</CommonBadge>
   if (performance) return <CommonBadge onClick={onClick} className="bg-blue-300 text-white">Performance</CommonBadge>
   if (getInFitUp) return <CommonBadge onClick={onClick} className="bg-amber-500 text-white">Get In Fit Up</CommonBadge>
 
-  return <CommonBadge onClick={onClick}>Unknown</CommonBadge>
+  return null
 }
 
 export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   const [view, setView] = useRecoilState(viewState)
+  const bookingDict = useRecoilValue(bookingDictSelector)
 
   const dateKey = date.Date.split('T')[0]
 
@@ -52,7 +56,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     setView({ selectedDate: dateKey })
   }
 
-  let rowClass = 'grid gap-1 grid-cols-10 py-3 w-full border-l-4 border-transparent'
+  let rowClass = 'grid gap-1 grid-cols-12 py-3 w-full border-l-4 border-transparent px-2'
   if (selected) rowClass += classNames(rowClass, 'bg-blue-200 border-blue-500')
 
   const select = async (newView: any) => {
@@ -61,32 +65,37 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     setView(replacement)
   }
 
+  const rehearsalId = date.RehearsalIds.length ? date.RehearsalIds[0] : undefined
+
   return (
-    <button className="even:bg-gray-100 border-b border-gray-300" onClick={selectDate}>
+    <div className="even:bg-gray-100 border-b border-gray-300" onClick={selectDate}>
       <div className={rowClass} >
-        <div className="font-bold text-soft-primary-grey col-span-1 max-w-[50px]">
+        <div className="col-span-1 font-bold text-soft-primary-grey max-w-[25px]">
           ?
         </div>
-        <div className="col-span-3 font-medium text-soft-primary-grey max-w-[150px]">
+        <div className="col-span-4 font-medium text-soft-primary-grey">
           { dateService.dateToSimple(date.Date) }
           <br />
           { dateService.getWeekDay(date.Date).slice(0, 3)}
         </div>
-        <ul>
-          { date.BookingIds.map((id) => (
-            <EventBadge onClick={() => select({ selectedBooking: id })} booking key={'b-' + id} />
+        <div className="col-span-7">
+          { date.BookingIds.map((id: number) => (
+            <VenueDisplay key={id} bookingId={id} />
           ))}
-          { date.RehearsalIds.map((id) => (
-            <EventBadge onClick={() => select({ selectedRehearsal: id })} rehearsal key={'r-' + id} />
-          ))}
-          { date.GetInFitUpIds.map((id) => (
-            <EventBadge onClick={() => select({ selectedGetInFitUp: id })} getInFitUp key={'g-' + id} />
-          ))}
-          { date.PerformanceIds.map((id, index) => (
-            <EventBadge onClick={() => alert('Not Implimented')} performance key={`p-${dateKey}-${index}`} />
-          ))}
-        </ul>
+          <RehearsalDisplay rehearsalId={rehearsalId} />
+          <ul>
+            { date.BookingIds.map((id) => (
+              <EventBadge onClick={() => select({ selectedBooking: id })} booking key={'b-' + id} />
+            ))}
+            { date.GetInFitUpIds.map((id) => (
+              <EventBadge onClick={() => select({ selectedGetInFitUp: id })} getInFitUp key={'g-' + id} />
+            ))}
+            { date.PerformanceIds.map((id, index) => (
+              <EventBadge onClick={() => select({ selectedBooking: id })} performance key={`p-${dateKey}-${index}`} />
+            ))}
+          </ul>
+        </div>
       </div>
-    </button>
+    </div>
   )
 }

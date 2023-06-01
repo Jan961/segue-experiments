@@ -72,8 +72,10 @@ export type TourDTO = {
 }
 
 export type RehearsalDTO = {
-  Id: number
+  Id?: number
   Date: string
+  Town: string
+  StatusCode?: string
 }
 
 export type VenueMinimalDTO = {
@@ -90,6 +92,7 @@ export type GetInFitUpDTO = {
 export type BookingDTO = {
   Id: number
   Date: string
+  VenueId: number
   Performances: string[]
 }
 

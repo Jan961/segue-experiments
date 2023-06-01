@@ -8,7 +8,7 @@ import { getShowWithToursById } from 'services/ShowService'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import TourList from 'components/tours/TourList'
-import { tourMapper } from 'interfaces/mappers'
+import { tourMapper } from 'lib/mappers'
 import { TourDTO } from 'interfaces'
 import { BreadCrumb } from 'components/global/BreadCrumb'
 

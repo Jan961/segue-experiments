@@ -300,16 +300,16 @@ model VenueRole {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model VenueVenue {
-  VVVenue1Id                         Int
-  VVVenue2Id                         Int
-  VVMileage                          Int?
-  VVTimeMins                         Int?
-  Venue_VenueVenue_VVVenue1IdToVenue Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [VVVenue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue_VenueVenue_VVVenue2IdToVenue Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [VVVenue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+  Venue1Id                         Int  @map("VVVenue1Id")
+  Venue2Id                         Int  @map("VVVenue2Id")
+  Mileage                          Int? @map("VVMileage")
+  TimeMins                         Int? @map("VVTimeMins")
+  Venue_VenueVenue_VVVenue1IdToVenue Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue_VenueVenue_VVVenue2IdToVenue Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
 
-  @@index([VVVenue1Id], map: "Venue_VenueVenue1_idx")
-  @@index([VVVenue2Id], map: "Venue_VenueVenue2_idx")
-  @@id([VVVenue1Id, VVVenue2Id])
+  @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
+  @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
+  @@id([Venue1Id, Venue2Id])
 }
 
 model DBSetting {

@@ -1,7 +1,7 @@
 import Layout from 'components/Layout'
 import { GetServerSideProps } from 'next'
 import { getTourById } from 'services/TourService'
-import { tourEditorMapper } from 'interfaces/mappers'
+import { tourEditorMapper } from 'lib/mappers'
 import { TourDTO } from 'interfaces'
 import { TourEditor } from 'components/tours/TourEditor'
 
