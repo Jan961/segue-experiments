@@ -259,8 +259,8 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[] @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[] @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
-  VenueVenue_VenueVenue_VVVenue1IdToVenue                   VenueVenue[]       @relation("VenueVenue_VVVenue1IdToVenue") @ignore
-  VenueVenue_VenueVenue_VVVenue2IdToVenue                   VenueVenue[]       @relation("VenueVenue_VVVenue2IdToVenue") @ignore
+  VenueVenue_VenueVenue_VVVenue1IdToVenue                   VenueVenue[]       @relation("VenueVenue_VVVenue1IdToVenue")
+  VenueVenue_VenueVenue_VVVenue2IdToVenue                   VenueVenue[]       @relation("VenueVenue_VVVenue2IdToVenue")
 }
 
 model VenueBarredVenue {
@@ -309,7 +309,7 @@ model VenueVenue {
 
   @@index([VVVenue1Id], map: "Venue_VenueVenue1_idx")
   @@index([VVVenue2Id], map: "Venue_VenueVenue2_idx")
-  @@ignore
+  @@id([VVVenue1Id, VVVenue2Id])
 }
 
 model DBSetting {
