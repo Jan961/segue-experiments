@@ -5,58 +5,22 @@ import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
 import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { venueState } from 'state/booking/venueState'
-import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO, VenueMinimalDTO } from 'interfaces'
-import { bookingState } from 'state/booking/bookingState'
-import { rehearsalState } from 'state/booking/rehearsalState'
-import { getInFitUpState } from 'state/booking/getInFitUpState'
+import { useRecoilValue } from 'recoil'
+import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO } from 'interfaces'
 import { DateViewModel, ScheduleSectionViewModel, scheduleSelector } from 'state/booking/selectors/scheduleSelector'
-import { dateBlockState } from 'state/booking/dateBlockState'
 import { bookingMapper, dateBlockMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
-import { DateDistancesDTO, DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
-import { distanceState } from 'state/booking/distanceState'
-
-interface InitialData {
-  bookings: BookingDTO[],
-  rehearsals: RehearsalDTO[],
-  getInFitUp: GetInFitUpDTO[],
-  dateBlock: DateBlockDTO[],
-  distance: DateDistancesDTO[],
-  venue: VenueMinimalDTO[],
-}
+import { DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
+import { InitialData } from 'lib/recoil'
 
 interface bookingProps {
   Id: number,
   initialData: InitialData
 }
 
-const BookingPage = ({ initialData, Id }: bookingProps) => {
+const BookingPage = ({ Id, initialData }: bookingProps) => {
   const [searchFilter, setSearchFilter] = React.useState('')
-
-  const setVenue = useSetRecoilState(venueState)
-  const setBookings = useSetRecoilState(bookingState)
-  const setRehearsals = useSetRecoilState(rehearsalState)
-  const setGetInFitUp = useSetRecoilState(getInFitUpState)
-  const setDateBlock = useSetRecoilState(dateBlockState)
-  const setDistance = useSetRecoilState(distanceState)
-
   const { Sections } = useRecoilValue(scheduleSelector)
-
-  // Run only once
-  const count = React.useRef(0)
-  React.useEffect(() => {
-    if (count.current !== 0) {
-      setBookings(initialData.bookings)
-      setRehearsals(initialData.rehearsals)
-      setGetInFitUp(initialData.getInFitUp)
-      setDateBlock(initialData.dateBlock)
-      setVenue(initialData.venue)
-      setDistance(initialData.distance)
-    }
-    count.current++
-  }, [])
 
   const gotoToday = () => {
     const element = new Date().toISOString().substring(0, 10)
@@ -128,8 +92,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const venues = await getAllVenuesMin()
   const tour: TourContent = await getTourWithContent(Id)
 
-  const rehearsals: RehearsalDTO[] = []
-  const bookings: BookingDTO[] = []
+  const rehearsal: RehearsalDTO[] = []
+  const booking: BookingDTO[] = []
   const getInFitUp: GetInFitUpDTO[] = []
   const dateBlock: DateBlockDTO[] = []
 
@@ -137,13 +101,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   for (const db of tour.DateBlock) {
     dateBlock.push(dateBlockMapper(db))
 
-    db.Rehearsal.forEach(r => rehearsals.push(rehearsalMapper(r)))
-    db.Booking.forEach(b => bookings.push(bookingMapper(b)))
+    db.Rehearsal.forEach(r => rehearsal.push(rehearsalMapper(r)))
+    db.Booking.forEach(b => booking.push(bookingMapper(b)))
     db.GetInFitUp.forEach(gifu => getInFitUp.push(getInFitUpMapper(gifu)))
   }
 
   // Get distances
-  const grouped = bookings.reduce((acc, { VenueId, Date }) => {
+  const grouped = booking.reduce((acc, { VenueId, Date }) => {
     (acc[Date] = acc[Date] || []).push(VenueId)
     return acc
   }, {})
@@ -153,9 +117,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const distance = await getDistances(stops)
 
+  // See _app.tsx for how this is picked up
   const initialData: InitialData = {
-    rehearsals,
-    bookings,
+    rehearsal,
+    booking,
     getInFitUp,
     distance,
     dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
