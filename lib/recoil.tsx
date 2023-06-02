@@ -1,7 +1,6 @@
-import { BookingDTO, RehearsalDTO, GetInFitUpDTO, DateBlockDTO, VenueMinimalDTO } from 'interfaces'
 import React from 'react'
-// eslint-disable-next-line camelcase
-import { useRecoilCallback } from 'recoil'
+import { BookingDTO, RehearsalDTO, GetInFitUpDTO, DateBlockDTO, VenueMinimalDTO } from 'interfaces'
+import { RecoilState, useRecoilCallback } from 'recoil'
 import { DateDistancesDTO } from 'services/venueService'
 import { bookingState } from 'state/booking/bookingState'
 import { dateBlockState } from 'state/booking/dateBlockState'
@@ -12,20 +11,20 @@ import { venueState } from 'state/booking/venueState'
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
-  Anything included as a prop in `initalData` that fits the following interface
+  Anything included as a prop in `initialState` that fits the following interface
   will be automatically instanciated, both client side and server side
 */
 
-export interface InitialData {
-  booking?: BookingDTO[],
-  rehearsal?: RehearsalDTO[],
-  getInFitUp?: GetInFitUpDTO[],
-  dateBlock?: DateBlockDTO[],
-  distance?: DateDistancesDTO[],
-  venue?: VenueMinimalDTO[],
-}
+export type InitialState = Partial<{
+  booking: BookingDTO[],
+  rehearsal: RehearsalDTO[],
+  getInFitUp: GetInFitUpDTO[],
+  dateBlock: DateBlockDTO[],
+  distance: DateDistancesDTO[],
+  venue: VenueMinimalDTO[],
+}>
 
-const states = {
+const states: Record<keyof InitialState, RecoilState<any>> = {
   booking: bookingState,
   rehearsal: rehearsalState,
   getInFitUp: getInFitUpState,
@@ -34,16 +33,16 @@ const states = {
   dateBlock: dateBlockState
 }
 
-export const setInitialStateServer = (snapshot, initialData) => {
-  for (const key in initialData) {
+export const setInitialStateServer = (snapshot, initialState: InitialState) => {
+  for (const key in initialState) {
     const state = states[key]
-    if (state) snapshot.set(state, initialData[key])
+    if (state) snapshot.set(state, initialState[key])
   }
 }
 
 // Helper function to prevent having to manually type in every state
-export const useSetMultipleRecoilStates = () => {
-  return useRecoilCallback(({ set }) => (initialData: InitialData) => {
+const useSetMultipleRecoilStates = () => {
+  return useRecoilCallback(({ set }) => (initialData: InitialState) => {
     for (const key in initialData) {
       const state = states[key]
       if (state) set(state, initialData[key])
@@ -51,18 +50,17 @@ export const useSetMultipleRecoilStates = () => {
   }, [])
 }
 
-interface ClientStateSetterProps {
-  initialData: InitialData
-}
-
-export const ClientStateSetter = ({ initialData }: ClientStateSetterProps) => {
+// Included at the root of the app to automatically set any states it can
+export const ClientStateSetter = ({ intitialState }: {
+  intitialState: InitialState
+}) => {
   const setMultipleRecoilStates = useSetMultipleRecoilStates()
 
   React.useEffect(() => {
-    if (initialData) {
-      setMultipleRecoilStates(initialData)
+    if (intitialState) {
+      setMultipleRecoilStates(intitialState)
     }
-  }, [initialData, setMultipleRecoilStates])
+  }, [intitialState, setMultipleRecoilStates])
 
   return null
 }

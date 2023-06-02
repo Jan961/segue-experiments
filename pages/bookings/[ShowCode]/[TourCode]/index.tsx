@@ -11,14 +11,14 @@ import { DateViewModel, ScheduleSectionViewModel, scheduleSelector } from 'state
 import { bookingMapper, dateBlockMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
-import { InitialData } from 'lib/recoil'
+import { InitialState } from 'lib/recoil'
 
 interface bookingProps {
   Id: number,
-  initialData: InitialData
+  intitialState: InitialState
 }
 
-const BookingPage = ({ Id, initialData }: bookingProps) => {
+const BookingPage = ({ Id }: bookingProps) => {
   const [searchFilter, setSearchFilter] = React.useState('')
   const { Sections } = useRecoilValue(scheduleSelector)
 
@@ -118,7 +118,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const distance = await getDistances(stops)
 
   // See _app.tsx for how this is picked up
-  const initialData: InitialData = {
+  const intitialState: InitialState = {
     rehearsal,
     booking,
     getInFitUp,
@@ -131,7 +131,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       Id,
-      initialData
+      intitialState
     }
   }
 }

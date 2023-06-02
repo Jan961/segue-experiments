@@ -76,7 +76,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
           (x.Venue1Id === id && x.Venue2Id === prev.Ids[0])
         ))[0]
         prev = stop
-        console.log(match)
+
         return {
           VenueId: id,
           Miles: match.Mileage ? match.Mileage : undefined,

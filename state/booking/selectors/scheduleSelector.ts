@@ -42,59 +42,36 @@ export const scheduleSelector = selector({
     const getInFitUp = get(getInFitUpState)
     const dateBlocks = get(dateBlockState)
 
-    const getDefaultDate = (Id: string) => ({
-      Id,
-      Booking: [],
-      Rehearsal: [],
-      GetInFitUp: [],
-      Performance: []
+    const getDefaultDate = (key: string) => ({
+      Date: key,
+      BookingIds: [],
+      RehearsalIds: [],
+      GetInFitUpIds: [],
+      PerformanceIds: []
     })
 
     const dates: Record<string, any> = {}
 
-    // We need to flip these
-    for (const r of rehearsals) {
-      const key = getKey(r.Date)
-
+    const addDate = (date: string, property: string, id: number) => {
+      const key = getKey(date)
       if (!dates[key]) dates[key] = getDefaultDate(key)
-      dates[key].Rehearsal.push(r.Id)
+      dates[key][property].push(id)
     }
 
-    for (const g of getInFitUp) {
-      const key = getKey(g.Date)
-
-      if (!dates[key]) dates[key] = getDefaultDate(key)
-      dates[key].GetInFitUp.push(g.Id)
-    }
-
+    for (const r of rehearsals) addDate(r.Date, 'RehearsalIds', r.Id)
+    for (const g of getInFitUp) addDate(g.Date, 'GetInFitUpIds', g.Id)
     for (const b of bookings) {
-      const key = getKey(b.Date)
-
-      if (!dates[key]) dates[key] = getDefaultDate(key)
-
-      for (const p of b.Performances) {
-        const pKey = getKey(p)
-        if (!dates[pKey]) dates[pKey] = getDefaultDate(pKey)
-        // Add a reference for all the perforances
-        dates[pKey].Performance.push(b.Id)
-      }
-
-      dates[key].Booking.push(b.Id)
+      // Add a reference for all the perforances so we can display Runs
+      for (const p of b.Performances) addDate(p, 'PerformanceIds', b.Id)
+      addDate(b.Date, 'BookingIds', b.Id)
     }
 
-    const result: ScheduleViewModel = {
+    return {
       Sections: dateBlocks.map((db) => ({
         Name: db.Name,
-        Dates: getArrayOfDatesBetween(db.StartDate, db.EndDate).map((date: string) => ({
-          Date: date,
-          RehearsalIds: dates[date] ? dates[date].Rehearsal : [],
-          GetInFitUpIds: dates[date] ? dates[date].GetInFitUp : [],
-          BookingIds: dates[date] ? dates[date].Booking : [],
-          PerformanceIds: dates[date] ? dates[date].Performance : []
-        }))
+        Dates: getArrayOfDatesBetween(db.StartDate, db.EndDate)
+          .map((date: string) => dates[date] ? dates[date] : getDefaultDate(date))
       }))
     }
-
-    return result
   }
 })

@@ -85,11 +85,11 @@ export default function MyApp ({ Component, pageProps }: AppPropsWithLayout) {
   }
   */
 
-  const { initialData } = pageProps
+  const { intitialState } = pageProps
 
   return (
-    <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialData)}>
-      <ClientStateSetter initialData={initialData} />
+    <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, intitialState)}>
+      <ClientStateSetter intitialState={intitialState} />
       <Component {...pageProps} />
     </RecoilRoot>
   )
