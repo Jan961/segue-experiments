@@ -1,18 +1,21 @@
+import classNames from 'classnames'
 import { dateService } from 'services/dateService'
 
 interface Input {
-  onChange: (e: any) => void;
-  label?: string;
-  value: string | Date;
-  name?: string; // Also ID
-  required?: boolean;
+  onChange: (e: any) => void
+  label?: string
+  value: string | Date
+  name?: string // Also ID
+  required?: boolean
+  className: string
 }
 
-export const FormInputDate = ({ onChange, value, name, label, required }: Input) => {
+export const FormInputDate = ({ onChange, value, name, label, required, className }: Input) => {
   const stringValue = dateService.dateToPicker(value)
+  const baseClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2'
 
   return (
-    <div>
+    <div className={className}>
       <label htmlFor={name}>{ label }
         <input id={name}
           type="date"
@@ -20,7 +23,7 @@ export const FormInputDate = ({ onChange, value, name, label, required }: Input)
           onChange={onChange}
           required={required}
           value={stringValue}
-          className="w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2"
+          className={baseClass}
           contentEditable={false}
         />
       </label>

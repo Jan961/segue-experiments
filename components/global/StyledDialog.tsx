@@ -8,13 +8,14 @@ interface StyledDialogProps {
   open: boolean;
   onClose: () => void;
   title: string;
-  width?: undefined | 'lg' | 'xl';
+  width?: undefined | 'lg' | 'xl' | 'md';
 }
 
 // Only use non-default classes on desktop only pages.
 const DEFAULT_WIDTH_CLASS = 'max-w-sm'
 
 const WIDTH_CLASSES = {
+  md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl'
 }

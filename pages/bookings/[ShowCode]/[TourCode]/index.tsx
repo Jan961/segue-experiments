@@ -41,12 +41,10 @@ const BookingPage = ({ Id }: bookingProps) => {
       ></GlobalToolbar>
       <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
       <div className="flex flex-auto">
-        {/* <SideMenu></SideMenu> */}
-        {/* need to pass the full list of booking */}
         <div className="w-full p-4 overflow-y-scroll max-h-1200">
           <div className="flex flex-row w-full mb-2">
             <button className="text-primary-blue font-bold text-sm self-center px-2">
-              Week
+              Week ??
             </button>
             <button
               className="inline-flex items-center rounded-md border border-transparent bg-primary-blue px-8 py-1 text-xs font-normal leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 h-4/5"

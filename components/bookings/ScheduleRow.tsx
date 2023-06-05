@@ -35,7 +35,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   const uniqueBookingIds = unique(date.BookingIds)
 
   return (
-    <div className="even:bg-gray-100 border-b border-gray-300 cursor-pointer" onClick={selectDate}>
+    <div className="even:bg-black even:bg-opacity-5 bg-blend-multiply border-b border-gray-300 cursor-pointer" onClick={selectDate}>
       <div className={rowClass} >
         <div className="col-span-1 font-bold text-soft-primary-grey max-w-[25px] text-center">
           { weekNos[date.Date] }

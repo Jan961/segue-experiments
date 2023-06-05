@@ -93,6 +93,11 @@ export type BookingDTO = {
   Id: number
   Date: string
   VenueId: number
+  StatusCode: 'C' | 'U' | 'X'
+  PencilNum: number
+  LandingSite: string
+  OnSaleDate: string
+  OnSale: boolean
   Performances: PerformanceDTO[]
 }
 

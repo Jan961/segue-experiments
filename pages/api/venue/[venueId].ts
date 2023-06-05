@@ -1,23 +1,18 @@
 import prisma from 'lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handle(req, res) {
-
-
-    let query: number = parseInt(req.query.venueId)
-    try {
-       let venue  = await prisma.venue.findFirst(
-            {
-                where:{
-                    VenueId:   query
-                },
-            }
-        )
-            res.status(200).json(venue).end();
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  const query: number = parseInt(req.query.venueId as string)
+  try {
+    const venue = await prisma.venue.findFirst(
+      {
+        where: {
+          Id: query
         }
-
-    catch (error) {
-        res.json(error);
-        res.status(405).end();
-    }
-
+      }
+    )
+    res.status(200).json(venue)
+  } catch (e) {
+    res.status(500).json({ err: e })
+  }
 }
