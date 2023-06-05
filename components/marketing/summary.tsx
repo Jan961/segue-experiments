@@ -128,7 +128,7 @@ const Summary = ({ actionBookingId, activeTours }) => {
                   .map((tour) => {
                     const showDate = new Date(tour.ShowDate);
                     const tourStartDate = tour.Tour.TourStartDate;
-                    const weekday = dateService.weeks(showDate, tourStartDate);
+                    const weekday = dateService.weeks(tour.showDate, tourStartDate);
                     const ukDate = dateService.formatDateUK(showDate);
                     const totalSeats = tour.Venue.Seats;
                     const grossProfit = tour.GP;

@@ -276,7 +276,7 @@ export default function MasterPlan() {
         // Formatted row before a monday row
         if (dateService.getWeekDayLong(loop) == "Monday") {
           // Insert Row
-          let cellValue = "Week " + dateService.weeks(tour.TourStartDate, loop);
+          let cellValue = "Week " + dateService.weeks(tour.TourStartDate, loop.toISOString());
           let weekly = worksheet.getRow(row);
           data.fill = {
             type: "pattern",
