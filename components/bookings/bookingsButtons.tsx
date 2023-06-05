@@ -15,20 +15,13 @@ export default function BookingsButtons ({ selectedBooking, currentTourId }: Boo
   // @ts-ignore
   return (
     <>
-      <div className="mt-1 mx-auto">
-        <div className="flex justify-between">
-          <AddBooking BookingId={selectedBooking}></AddBooking>
-          <Report TourId={currentTourId}></Report>
-          <BookingHold TourId={currentTourId} ></BookingHold>
-          <Barring />
-          <RemoveBooking bookingId={selectedBooking}></RemoveBooking>
-          <TourGapsModal TourId={currentTourId} ></TourGapsModal>
-        </div>
-        <div className="col-auto">
-          <div className="col-auto">
-            <div className="flex flex-row">&nbsp;</div>
-          </div>
-        </div>
+      <div className="mt-1 mx-auto mb-2 flex justify-between">
+        <AddBooking BookingId={selectedBooking}></AddBooking>
+        <Report TourId={currentTourId}></Report>
+        <BookingHold TourId={currentTourId} ></BookingHold>
+        <Barring />
+        <RemoveBooking bookingId={selectedBooking}></RemoveBooking>
+        <TourGapsModal TourId={currentTourId} ></TourGapsModal>
       </div>
     </>
   )
