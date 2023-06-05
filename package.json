@@ -5,7 +5,8 @@
     "build": "next build",
     "start": "next start",
     "cp-start": "NODE_ENV=production node server.js",
-    "type-check": "tsc"
+    "type-check": "tsc",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@devexpress/dx-react-grid": "^4.0.3",
