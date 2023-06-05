@@ -22,7 +22,7 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
   const venue = venueDict[booking.VenueId]
 
   const options = distanceDict[booking.Date]
-  const distance = options.option?.filter((o) => o.VenueId === venue.Id)[0]
+  const distance = options?.option?.filter((o) => o.VenueId === venue.Id)[0]
 
   const first = booking.Date.startsWith(date)
 
@@ -35,7 +35,7 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
         { children }
       </div>
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
-        { first && (
+        { first && distance && (
           <>
             <FontAwesomeIcon icon={faCar} className='opacity-50'/>
             <br />
@@ -44,7 +44,7 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
         ) }
       </div>
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
-        { first && (
+        { first && distance && (
           <>
             <FontAwesomeIcon icon={faClock} className='opacity-50'/>
             <br />

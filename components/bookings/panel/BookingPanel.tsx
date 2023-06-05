@@ -1,13 +1,12 @@
 import VenueInfo from '../modal/VenueInfo'
 import ViewBookingHistory from '../modal/ViewBookingHistory'
-import PerfomancesList from '../perfomancesList'
 import React from 'react'
 import axios from 'axios'
 import { venueState } from 'state/booking/venueState'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { FormInputSelect } from 'components/global/forms/FormInputSelect'
+import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
-import ChangeBookingDate from '../modal/ChangeBookingDate'
+import { ChangeBookingDate } from '../modal/ChangeBookingDate'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { viewState } from 'state/booking/viewState'
 import { bookingState } from 'state/booking/bookingState'
@@ -32,8 +31,6 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
   const bookings = useRecoilValue(bookingState)
   const [inputs, setInputs] = React.useState(defaultState)
-
-  const [view, setView] = useRecoilState(viewState)
   const booking = bookingDict[bookingId]
 
   const nextBookingId = getNextBookingId(bookings, bookingId)
@@ -114,12 +111,17 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     saveDetails()
   }
 
-  const venueOptions = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.Id) }))]
+  const venueOptions: SelectOption[] = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.Id) }))]
+  const statusOptions: SelectOption[] = [
+    { text: 'Confirmed (C)', value: 'C' },
+    { text: 'Unconfirmed (U)', value: 'U' },
+    { text: 'Canceled (X)', value: 'X' }
+  ]
 
   return (
 
     <form>
-      <div className="bg-primary-blue rounded-xl flex flex-col justify-center mb-4 p-4 pb-0">
+      <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-4 p-4 pb-0">
         <ChangeBookingDate bookingId={booking.Id} />
         <FormInputSelect name="VenueId" value={inputs.VenueId ? inputs.VenueId : ''} options={venueOptions} onChange={handleOnChange} />
       </div>
@@ -135,90 +137,13 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
         onChange={handleOnChange}
         placeholder="Cast details"
       />
-      <div className="flex flex-row">
-        <label
-          htmlFor="BookingStatus"
-          className="flex-auto text-primary-blue font-bold text-sm self-center"
-        >
-                                        Venue Status:
-        </label>
-        <select className="flex flex-auto m-3 mb-1 mr-0 rounded-l-md rounded-r-md text-xs"
-          value={inputs.BookingStatus}
-          onChange={handleOnChange}
-          id="BookingStatus"
-          name="BookingStatus"
-
-        >
-          <option value={'C'}>Confirmed (C)</option>
-          <option value={'U'}>Unconfirmed (U)</option>
-          <option value={'X'}>Canceled (X)</option>
-        </select>
-      </div>
-      {/*
-          <div className="flex flex-row">
-          <label
-            htmlFor="runDays"
-            className="flex-auto text-primary-blue font-bold text-sm self-center"
-          >
-                                        Run Days:
-          </label>
-          <select className="flex flex-auto m-3 rounded-l-md rounded-r-md text-xs"
-            value={inputs.RunDays}
-            onChange={handleOnChange}
-            id="RunDays"
-            name="RunDays">
-            <option value={1}>{1}</option>
-            <option value={2}>{2}</option>
-            <option value={3}>{2}</option>
-            <option value={4}>{4}</option>
-            <option value={5}>{5}</option>
-            <option value={6}>{6}</option>
-            <option value={6}>{7}</option>
-            <option value={8}>{8}</option>
-            <option value={9}>{9}</option>
-            <option value={10}>{10}</option>
-            <option value={11}>{11}</option>
-            <option value={12}>{12}</option>
-            <option value={13}>{13}</option>
-            <option value={14}>{14}</option>
-            <option value={15}>{15}</option>
-            <option value={16}>{16}</option>
-            <option value={17}>{17}</option>
-            <option value={18}>{18}</option>
-            <option value={19}>{19}</option>
-            <option value={20}>{20}</option>
-
-          </select>
-          <label
-            htmlFor="venuStatus"
-            className="flex-auto text-primary-blue font-bold text-sm self-center"
-          >
-                                        Pencil #:
-          </label>
-          <select className="flex flex-auto m-3 mr-0 rounded-l-md rounded-r-md text-xs"
-            value={inputs.PencilNo}
-            onChange={handleOnChange}
-            id="PencilNo"
-            name="PencilNo">
-            <option value={1}>{1}</option>
-            <option value={2}>{2}</option>
-            <option value={3}>{2}</option>
-          </select>
-        </div>
-        <div className="flex flex-row">
-          <label
-            htmlFor="notes"
-            className="flex-auto text-primary-blue font-bold text-sm self-center"
-          ></label>
-          <textarea
-            id="Notes"
-            name="Notes"
-            onChange={handleOnChange}
-            className="flex-auto rounded-l-md rounded-r-md w-full mb-1"
-          >{inputs.Notes}</textarea>
-        </div>
-        */}
-
+      <FormInputSelect inline
+        value={inputs.StatusCode}
+        onChange={handleOnChange}
+        options={statusOptions}
+        name="StatusCode"
+        label="Status"
+      />
       <div className="flex flex-row justify-between">
         <button className="inline-flex items-center justify-center w-2/5 rounded-md border border-primary-blue
                   bg-white px-2 py-2 text-xs font-medium leading-4 text-primary-blue shadow-sm hover:bg-indigo-700

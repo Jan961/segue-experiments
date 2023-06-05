@@ -44,8 +44,8 @@ const BookingPage = ({ Id }: bookingProps) => {
         {/* <SideMenu></SideMenu> */}
         {/* need to pass the full list of booking */}
         <div className="w-full p-4 overflow-y-scroll max-h-1200">
-          <div className="flex flex-row w-full mb-6">
-            <button className="text-primary-blue font-bold text-sm self-center mr-4 ml-4">
+          <div className="flex flex-row w-full mb-2">
+            <button className="text-primary-blue font-bold text-sm self-center px-2">
               Week
             </button>
             <button
@@ -58,7 +58,7 @@ const BookingPage = ({ Id }: bookingProps) => {
           <ul className="grid">
             { Sections.map((section: ScheduleSectionViewModel) => (
               <li key={section.Name}>
-                <h3 className='font-bold border-b-2 mt-8'>{section.Name}</h3> {
+                <h3 className='font-bold mt-3 mb-3'>{section.Name}</h3> {
                   section.Dates.map((date: DateViewModel) => (
                     <ScheduleRow key={date.Date} date={date} />
                   ))

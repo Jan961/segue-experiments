@@ -8,7 +8,8 @@ export const updateBookingVenue = (date, venueID, tourID) => {
 }
 
 const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
-  Venue: true
+  Venue: true,
+  Performance: true
 })
 
 export type BookingsByTourIdType = Prisma.BookingGetPayload<{
@@ -40,13 +41,13 @@ export const deleteBookingById = async (BookingId: any) => {
   ])
 }
 
-export const changeBookingDate = async (BookingId: number, ShowDate: Date) => {
+export const changeBookingDate = async (Id: number, FirstDate: Date) => {
   return prisma.booking.update({
     where: {
-      BookingId
+      Id
     },
     data: {
-      ShowDate
+      FirstDate
     },
     include: bookingInclude
   })

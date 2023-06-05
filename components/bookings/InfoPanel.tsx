@@ -5,7 +5,6 @@ import { RehearsalPanel } from './panel/RehearsalPanel'
 import { DateViewModel, scheduleSelector } from 'state/booking/selectors/scheduleSelector'
 import { first, flat, unique } from 'radash'
 import { PanelDrawer } from './panel/PanelDrawer'
-import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
 
 export const InfoPanel = () => {
   const view = useRecoilValue(viewState)
@@ -32,12 +31,12 @@ export const InfoPanel = () => {
     <div className="w-6/12 pl-2" >
       <div className="bg-white rounded-lg p-2">
         { bookingIds.map(id => (
-          <PanelDrawer key={id} title="Booking">
+          <PanelDrawer open key={id} title="Booking">
             <BookingPanel key={id} bookingId={id} />
           </PanelDrawer>
         ))}
         { rehearsalIds.map(id => (
-          <PanelDrawer key={id} title="Rehearsal">
+          <PanelDrawer open key={id} title="Rehearsal">
             <RehearsalPanel key={id} rehearsalId={id} />
           </PanelDrawer>
       ))}

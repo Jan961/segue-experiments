@@ -61,7 +61,7 @@ export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
   return (
     <form onSubmit={handleOnSubmit}>
       <FormInputText value={inputs.Town} name="Town" label="Town" onChange={handleOnChange}/>
-      <FormInputSelect
+      <FormInputSelect inline
         value={inputs.StatusCode}
         onChange={handleOnChange}
         options={statusOptions}

@@ -5,18 +5,19 @@ import { PropsWithChildren } from 'react'
 
 interface PanelDrawerProps {
   title: string
+  open: boolean
 }
 
-export const PanelDrawer = ({ children, title }: PropsWithChildren<PanelDrawerProps>) => {
+export const PanelDrawer = ({ children, title, open = false}: PropsWithChildren<PanelDrawerProps>) => {
   return (
-    <Disclosure>
+    <Disclosure defaultOpen={open}>
       {({ open }) => (
         /* Use the `open` state to conditionally change the direction of an icon. */
         <>
           <Disclosure.Button
             className="rounded bg-gray-200 hover:bg-gray-300
             flex justify-between
-            w-full py-2 px-3 mb-2 text-left">
+            w-full py-2 px-3 text-left">
             { title }
             <FontAwesomeIcon
               icon={faChevronRight}
@@ -31,7 +32,7 @@ export const PanelDrawer = ({ children, title }: PropsWithChildren<PanelDrawerPr
             leaveFrom="transform scale-100 opacity-100"
             leaveTo="transform scale-95 opacity-0"
           >
-            <Disclosure.Panel>{ children }</Disclosure.Panel>
+            <Disclosure.Panel className="mt-2">{ children }</Disclosure.Panel>
           </Transition>
         </>
       )}
