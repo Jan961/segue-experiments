@@ -1,4 +1,4 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show } from '@prisma/client'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType } from '@prisma/client'
 import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO, ShowDTO, TourDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
@@ -48,10 +48,15 @@ export const bookingMapper = (b: any): BookingDTO => ({
   Date: b.FirstDate.toISOString(),
   Id: b.Id,
   VenueId: b.VenueId,
-  Performances: b.Performance.map((p) => {
+  Performances: b.Performance.map((p: PerformanceType) => {
     const day = p.Date.toISOString().split('T')[0]
     const time = p.Time.toISOString().split('T')[1]
-    return `${day}T${time}`
+    const Date = `${day}T${time}`
+
+    return {
+      Id: p.Id,
+      Date
+    }
   })
 })
 

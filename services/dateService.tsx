@@ -58,12 +58,12 @@ function getWeekDayLong (dateToFormat: Date | string) {
  *
  * Calculate WeeKs Number Based on
  *
- * @param ShowDate
- * @param Date
+ * @param showDate
+ * @param firstShowDate
  */
-function weeks (ShowDate, Date) {
-  const date = moment(ShowDate, 'YYYY-MM-DD')
-  const TourStartDate = moment(Date, 'YYYY-MM-DD')
+function weeks (showDate: string, firstShowDate: string) {
+  const date = moment(showDate, 'YYYY-MM-DD')
+  const TourStartDate = moment(firstShowDate, 'YYYY-MM-DD')
   const diff = moment.duration(TourStartDate.diff(date))
 
   let week = Math.floor(diff.asWeeks())

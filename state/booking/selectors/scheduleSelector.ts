@@ -4,9 +4,7 @@ import { dateBlockState } from 'state/booking/dateBlockState'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
 import { rehearsalState } from 'state/booking/rehearsalState'
 
-const getKey = (date: string) => {
-  return date.split('T')[0]
-}
+const getKey = (date: string) => (date.split('T')[0])
 
 const getArrayOfDatesBetween = (start: string, end: string) => {
   const arr = []
@@ -17,11 +15,17 @@ const getArrayOfDatesBetween = (start: string, end: string) => {
   return arr.map(getKey)
 }
 
+export interface PerformanceViewModel {
+  BookingId: number
+  Id: number
+  Date: string
+}
+
 export interface DateViewModel {
   Date: string
   RehearsalIds: number[]
   GetInFitUpIds: number[]
-  PerformanceIds: number[]
+  Performances: PerformanceViewModel[]
   BookingIds: number[]
 }
 
@@ -47,22 +51,29 @@ export const scheduleSelector = selector({
       BookingIds: [],
       RehearsalIds: [],
       GetInFitUpIds: [],
-      PerformanceIds: []
+      Performances: []
     })
 
     const dates: Record<string, any> = {}
 
-    const addDate = (date: string, property: string, id: number) => {
+    const addDate = (date: string, property: string, data: number | PerformanceViewModel) => {
       const key = getKey(date)
       if (!dates[key]) dates[key] = getDefaultDate(key)
-      dates[key][property].push(id)
+      dates[key][property].push(data)
     }
 
     for (const r of rehearsals) addDate(r.Date, 'RehearsalIds', r.Id)
     for (const g of getInFitUp) addDate(g.Date, 'GetInFitUpIds', g.Id)
     for (const b of bookings) {
-      // Add a reference for all the perforances so we can display Runs
-      for (const p of b.Performances) addDate(p, 'PerformanceIds', b.Id)
+      for (const p of b.Performances) {
+        addDate(p.Date, 'Performances', {
+          BookingId: b.Id, // Reference for editings
+          Id: p.Id,
+          Date: p.Date
+        })
+        // Add a reference for runs
+        addDate(p.Date, 'BookingIds', b.Id)
+      }
       addDate(b.Date, 'BookingIds', b.Id)
     }
 

@@ -22,7 +22,11 @@ const getNextBookingId = (bookings: BookingDTO[], current: number) => {
   return undefined
 }
 
-export const BookingPanel = () => {
+interface BookingPanelProps {
+  bookingId: number
+}
+
+export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const defaultState: any = {}
   const venues = useRecoilValue(venueState)
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
@@ -30,10 +34,9 @@ export const BookingPanel = () => {
   const [inputs, setInputs] = React.useState(defaultState)
 
   const [view, setView] = useRecoilState(viewState)
-  const { selectedBooking } = view
-  const booking = bookingDict[selectedBooking]
+  const booking = bookingDict[bookingId]
 
-  const nextBookingId = getNextBookingId(bookings, selectedBooking)
+  const nextBookingId = getNextBookingId(bookings, bookingId)
   /*
   const nextBookingId = React.useMemo(() => {
     console.log('useMemo')
@@ -109,7 +112,6 @@ export const BookingPanel = () => {
   const saveAndNext = async (e: any) => {
     e.preventDefault()
     saveDetails()
-    setView({ selectedBooking: nextBookingId })
   }
 
   const venueOptions = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.Id) }))]
@@ -235,29 +237,11 @@ export const BookingPanel = () => {
         </button>
       </div>
 
-      <div className="flex flex-row">
-        <label
-          htmlFor="notes"
-          className="flex-auto text-primary-blue font-bold text-sm self-center"
-        >
-            Performances:
-        </label>
-
-      </div>
-
-      <PerfomancesList bookingId={selectedBooking}></PerfomancesList>
-
       <div className="flex flex-row justify-between mt-4">
         <VenueInfo VenueId={inputs.VenueId}></VenueInfo>
         <ViewBookingHistory VenueId={inputs.VenueId}></ViewBookingHistory>
       </div>
 
-      <div className="flex flex-row mt-1">
-        <p className="text-xs">Travel from previous venue: {}</p>
-      </div>
-      <div className="flex flex-row">
-        <p className="text-xs">{}</p>
-      </div>
     </form>
   )
 }

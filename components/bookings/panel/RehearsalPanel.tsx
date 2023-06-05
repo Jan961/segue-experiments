@@ -4,9 +4,8 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { RehearsalDTO } from 'interfaces'
 import React from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { rehearsalDictSelector } from 'state/booking/selectors/rehearsalDictSelector'
-import { viewState } from 'state/booking/viewState'
 
 const DEFAULTSTATE: RehearsalDTO = {
   Id: undefined,
@@ -14,20 +13,23 @@ const DEFAULTSTATE: RehearsalDTO = {
   Town: ''
 }
 
-export const RehearsalPanel = () => {
+interface RehearsalPanelProps {
+  rehearsalId: number
+}
+
+export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
   const [inputs, setInputs] = React.useState<RehearsalDTO>(DEFAULTSTATE)
-  const { selectedRehearsal } = useRecoilValue(viewState)
   const [status, setStatus] = React.useState({ loading: false, changed: false })
   const [rehearsalDict, addRehearsal] = useRecoilState(rehearsalDictSelector)
 
   React.useEffect(() => {
-    if (selectedRehearsal) {
-      setInputs(rehearsalDict[selectedRehearsal])
+    if (rehearsalId) {
+      setInputs(rehearsalDict[rehearsalId])
       setStatus({ changed: false, loading: false })
     } else {
       setInputs(DEFAULTSTATE)
     }
-  }, [selectedRehearsal, rehearsalDict])
+  }, [rehearsalId, rehearsalDict])
 
   const handleOnChange = (e: any) => {
     setInputs((prev) => ({
@@ -58,7 +60,6 @@ export const RehearsalPanel = () => {
 
   return (
     <form onSubmit={handleOnSubmit}>
-      <h3 className="mb-4 text-lg font-bold">Rehearsal</h3>
       <FormInputText value={inputs.Town} name="Town" label="Town" onChange={handleOnChange}/>
       <FormInputSelect
         value={inputs.StatusCode}

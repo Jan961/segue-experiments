@@ -93,7 +93,12 @@ export type BookingDTO = {
   Id: number
   Date: string
   VenueId: number
-  Performances: string[]
+  Performances: PerformanceDTO[]
+}
+
+export type PerformanceDTO = {
+  Id: number;
+  Date: string
 }
 
 export type DateDTO = {

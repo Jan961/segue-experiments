@@ -57,20 +57,19 @@ const BookingPage = ({ Id }: bookingProps) => {
           </div>
           <ul className="grid">
             { Sections.map((section: ScheduleSectionViewModel) => (
-              <>
+              <li key={section.Name}>
                 <h3 className='font-bold border-b-2 mt-8'>{section.Name}</h3> {
                   section.Dates.map((date: DateViewModel) => (
-                    <ScheduleRow key={date.Date} date={date}/>
+                    <ScheduleRow key={date.Date} date={date} />
                   ))
                 }
-              </>
+              </li>
             ))
             }
           </ul>
         </div>
         <InfoPanel />
       </div>
-
     </Layout>
   )
 }
@@ -88,9 +87,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   */
 
   const { ShowCode, TourCode } = ctx.query
+  console.log(`ServerSideProps: ${ShowCode}/${TourCode}`)
   const { Id } = await lookupTourId(ShowCode as string, TourCode as string)
+  console.log(`Found tour ${Id}`)
   const venues = await getAllVenuesMin()
+  console.log(`Retrieved venues (${venues.length})`)
   const tour: TourContent = await getTourWithContent(Id)
+  console.log(`Retrieved main content. Tour: ${tour.Id}`)
 
   const rehearsal: RehearsalDTO[] = []
   const booking: BookingDTO[] = []

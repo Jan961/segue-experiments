@@ -79,8 +79,8 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 
         return {
           VenueId: id,
-          Miles: match.Mileage ? match.Mileage : undefined,
-          Mins: match.TimeMins ? match.TimeMins : undefined
+          Miles: match?.Mileage ? match.Mileage : undefined,
+          Mins: match?.TimeMins ? match.TimeMins : undefined
         }
       })
     }

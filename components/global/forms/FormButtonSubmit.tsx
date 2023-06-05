@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 interface FormButtonSubmitProps {
   loading?: boolean;
-  disabled: boolean;
+  disabled?: boolean;
   text: string;
   onClick?: (e: any) => void
   submit?: boolean;

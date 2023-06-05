@@ -1,5 +1,6 @@
 import { faCar, faClock } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { PropsWithChildren } from 'react'
 import { useRecoilValue } from 'recoil'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { distanceDictSelector } from 'state/booking/selectors/distanceDictSelector'
@@ -7,12 +8,10 @@ import { venueDictSelector } from 'state/booking/selectors/venueDictSelector'
 
 interface VenueDisplayProps {
   bookingId: number
+  date: string
 }
 
-const DistanceDisplay = ({ miles }) => (<span className="mx-2">{ miles || '?' } mi</span>)
-const TimeDisplay = ({ mins }) => (<span className="mx-2">{ mins || '?' } mi</span>)
-
-export const VenueDisplay = ({ bookingId }: VenueDisplayProps) => {
+export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<VenueDisplayProps>) => {
   const bookingDict = useRecoilValue(bookingDictSelector)
   const venueDict = useRecoilValue(venueDictSelector)
   const distanceDict = useRecoilValue(distanceDictSelector)
@@ -25,18 +24,34 @@ export const VenueDisplay = ({ bookingId }: VenueDisplayProps) => {
   const options = distanceDict[booking.Date]
   const distance = options.option?.filter((o) => o.VenueId === venue.Id)[0]
 
+  const first = booking.Date.startsWith(date)
+
   return (
     <div className="grid grid-cols-7">
 
-      <div className="col-span-5">{ venue ? venue.Name : 'No Venue' }</div>
-      <div className="col-span-1 mx-2 whitespace-nowrap text-center">
-        <FontAwesomeIcon icon={faCar} className='opacity-50'/>
+      <div className="col-span-5">
+        { venue ? venue.Name : 'No Venue' }
         <br />
-        { distance.Miles ? distance.Miles + 'm' : 'N/A' }</div>
+        { children }
+      </div>
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
-        <FontAwesomeIcon icon={faClock} className='opacity-50'/>
-        <br />
-        { distance.Mins ? distance.Mins + 'm' : 'N/A' }</div>
+        { first && (
+          <>
+            <FontAwesomeIcon icon={faCar} className='opacity-50'/>
+            <br />
+            { distance.Miles ? distance.Miles + 'm' : 'N/A' }
+          </>
+        ) }
+      </div>
+      <div className="col-span-1 mx-2 whitespace-nowrap text-center">
+        { first && (
+          <>
+            <FontAwesomeIcon icon={faClock} className='opacity-50'/>
+            <br />
+            { distance.Mins ? distance.Mins + 'm' : 'N/A' }
+          </>
+        ) }
+      </div>
     </div>
   )
 }
