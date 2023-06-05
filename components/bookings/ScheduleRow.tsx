@@ -7,7 +7,8 @@ import { VenueDisplay } from './VenueDisplay'
 import { RehearsalDisplay } from './RehearsalDisplay'
 import { PerformanceBadge } from './table/PerformanceBadge'
 import { unique } from 'radash'
-import { weekNoSelector } from 'state/booking/selectors/weekNoSelector'
+import { DateDisplay } from './DateDisplay'
+import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 
 interface ScheduleRowProps {
   date: DateViewModel
@@ -15,7 +16,7 @@ interface ScheduleRowProps {
 
 export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   const [view, setView] = useRecoilState(viewState)
-  const weekNos = useRecoilValue(weekNoSelector)
+  const bookingDict = useRecoilValue(bookingDictSelector)
 
   const dateKey = date.Date.split('T')[0]
 
@@ -34,17 +35,14 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   // We get duplicates for each performance
   const uniqueBookingIds = unique(date.BookingIds)
 
+  for (const id of uniqueBookingIds) {
+    if (bookingDict[id].StatusCode === 'U') rowClass = classNames(rowClass, 'italic')
+  }
+
   return (
     <div className="even:bg-black even:bg-opacity-5 bg-blend-multiply border-b border-gray-300 cursor-pointer" onClick={selectDate}>
       <div className={rowClass} >
-        <div className="col-span-1 font-bold text-soft-primary-grey max-w-[25px] text-center">
-          { weekNos[date.Date] }
-        </div>
-        <div className="col-span-4 font-medium text-soft-primary-grey">
-          { dateService.dateToSimple(date.Date) }
-          <br />
-          { dateService.getWeekDay(date.Date).slice(0, 3)}
-        </div>
+        <DateDisplay date={date.Date} />
         <div className="col-span-7">
           { uniqueBookingIds.map((id: number) => (
             <VenueDisplay key={id} bookingId={id} date={date.Date}>

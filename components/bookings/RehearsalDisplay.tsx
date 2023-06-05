@@ -14,10 +14,8 @@ export const RehearsalDisplay = ({ rehearsalId }: RehearsalDisplayProps) => {
 
   return (
     <>
-      { r.Town ? r.Town : 'N/A' }
-      <br />
-      <span className="inline-block px-2 rounded bg-red-500 text-white">
-        Rehearsal
+      <span className="inline-block p-1 px-2 shadow-md rounded bg-red-500 text-white">
+        Rehearsal: { r.Town ? r.Town : 'N/A' }
       </span>
     </>
   )
