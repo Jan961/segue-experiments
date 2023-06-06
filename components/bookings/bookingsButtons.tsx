@@ -10,16 +10,13 @@ interface BookingButtonsProps {
 }
 
 export default function BookingsButtons ({ selectedBooking, currentTourId }: BookingButtonsProps) {
-  // @ts-ignore
   return (
-    <>
-      <div className="mt-1 mx-auto mb-2 flex justify-between">
-        <AddBooking BookingId={selectedBooking}></AddBooking>
-        <Report TourId={currentTourId}></Report>
-        <BookingHold TourId={currentTourId} ></BookingHold>
-        <Barring />
-        <TourGapsModal TourId={currentTourId} ></TourGapsModal>
-      </div>
-    </>
+    <div className="mt-1 mx-auto mb-2 flex justify-between">
+      <AddBooking BookingId={selectedBooking}></AddBooking>
+      <Report TourId={currentTourId}></Report>
+      <BookingHold TourId={currentTourId} ></BookingHold>
+      <Barring />
+      <TourGapsModal TourId={currentTourId} ></TourGapsModal>
+    </div>
   )
 }

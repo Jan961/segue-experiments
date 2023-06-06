@@ -1,11 +1,11 @@
 import { objectify } from 'radash'
 import { selector } from 'recoil'
-import { bookingState } from 'state/booking/bookingState'
+import { performanceState } from '../performanceState'
 
 export const performanceDictSelector = selector({
   key: 'performanceDictSelector',
   get: ({ get }) => {
-    const source = get(bookingState)
+    const source = get(performanceState)
     return objectify(source, b => b.Id)
   }
 })

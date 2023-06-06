@@ -14,7 +14,7 @@ export const PerformanceBadge = ({ performanceId }: PerformanceBadgeProps) => {
 
   return (
     <div className="px-2 rounded inline-block bg-teal-400 mr-2">
-      { format(new Date(performance), 'HH:mm') }
+      { format(new Date(performance.Date), 'HH:mm') }
     </div>
   )
 }

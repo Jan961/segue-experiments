@@ -5,6 +5,7 @@ import { RehearsalPanel } from './panel/RehearsalPanel'
 import { DateViewModel, scheduleSelector } from 'state/booking/selectors/scheduleSelector'
 import { first, flat, unique } from 'radash'
 import { PanelDrawer } from './panel/PanelDrawer'
+import { PerformancePanel } from './panel/PerformancePanel'
 
 export const InfoPanel = () => {
   const view = useRecoilValue(viewState)
@@ -40,9 +41,9 @@ export const InfoPanel = () => {
             <RehearsalPanel key={id} rehearsalId={id} />
           </PanelDrawer>
         ))}
-        { performances.map(p => (
-          <PanelDrawer open title="Performance" key={p}>
-            <h2>WIP</h2>
+        { performances.map(id => (
+          <PanelDrawer open title="Performance" key={id}>
+            <PerformancePanel key={id} performanceId={id} />
           </PanelDrawer>
         ))}
       </div>
