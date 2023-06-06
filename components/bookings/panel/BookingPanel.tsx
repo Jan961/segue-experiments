@@ -66,9 +66,9 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
 
   const save = async (e) => {
     e.preventDefault()
+    setStatus({ submitting: true, changed: true })
     try {
-      setStatus({ submitting: true, changed: true })
-      saveDetails()
+      await saveDetails()
       setStatus({ submitting: false, changed: false })
     } catch {
       alert('An error occured while submitting')
