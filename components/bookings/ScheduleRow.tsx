@@ -45,7 +45,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     <div className="even:bg-black even:bg-opacity-5 bg-blend-multiply border-b border-gray-300 cursor-pointer" onClick={selectDate}>
       <div className={rowClass} >
         <DateDisplay date={date.Date} />
-        <div className="col-span-7">
+        <div className="col-span-8">
           { uniqueBookingIds.map((id: number) => (
             <VenueDisplay key={id} bookingId={id} date={date.Date}>
               { date.PerformanceIds.map(p => (<PerformanceBadge key={p} performanceId={p} />))}
