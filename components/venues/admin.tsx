@@ -1,12 +1,10 @@
 import SideNavBar from "../sideMenu";
-import AppA from "./export";
 
 
 export default function Admin() {
     return (
         <>
             <SideNavBar></SideNavBar>
-                <AppA></AppA>
                 <div className="flex flex-auto flex-col bg-yellow-100 w-9/12">
                 <div className="flex ">
                     Manage Custom venue data

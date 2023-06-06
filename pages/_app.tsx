@@ -2,16 +2,11 @@ import '../styles/globals.css'
 import type { ReactElement, ReactNode } from 'react'
 import type { NextPage } from 'next'
 import type { AppProps } from 'next/app'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { fab } from '@fortawesome/free-brands-svg-icons'
-import { fas } from '@fortawesome/free-solid-svg-icons'
 // import { useEffect, useState } from 'react'
 // import { userService } from '../services/user.service'
 // import { useRouter } from 'next/router'
 import { RecoilRoot } from 'recoil'
 import { ClientStateSetter, setInitialStateServer } from 'lib/recoil'
-
-library.add(fab, fas)
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
     getLayout?: (page: ReactElement) => ReactNode

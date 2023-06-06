@@ -1,6 +1,6 @@
 
-import { useEffect, useState } from 'react'
-import ExcelJS from 'exceljs/dist/es5/exceljs.browser'
+import { useState } from 'react'
+import excelJsLoader from 'lib/excelJsLoader'
 import saveAs from 'file-saver'
 import { dateService } from '../../../services/dateService'
 import { ToolbarButton } from '../ToolbarButton'
@@ -23,10 +23,9 @@ export default function Report (TourId) {
   }, [TourId])
   */
 
-  if (isLoading) return (<ToolbarButton disabled>Tour Summary</ToolbarButton>)
-
-  function onClick () {
+  const onClick = async () => {
     // Fetch Data from API
+    const ExcelJS = await excelJsLoader()
 
     const ExcelJSWorkbook = new ExcelJS.Workbook()
     const worksheet = ExcelJSWorkbook.addWorksheet('Bookings')

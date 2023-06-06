@@ -1,13 +1,4 @@
 import React, {SetStateAction, Dispatch, useEffect, useState} from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { Tour } from "interfaces";
 import { loggingService } from "services/loggingService";
 import getUsers from "utils/getUsers";

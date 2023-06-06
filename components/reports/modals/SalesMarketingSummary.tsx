@@ -1,9 +1,5 @@
-
-import ReactDOM from "react-dom";
-import {reportsService} from "../../../services/reportsService";
-
 import React, { useCallback, useEffect, useState } from "react";
-import { read, utils, writeFileXLSX } from 'xlsx';
+import { utils, writeFileXLSX } from 'xlsx';
 
 import * as XLSX from 'xlsx/xlsx.mjs';
 import * as fs from 'fs';
@@ -15,8 +11,7 @@ XLSX.stream.set_readable(Readable);
 
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
-import Link from "next/link";
-import SalesSummaryExcel from "../excelTemplates/salesSummaryExcel";
+
 XLSX.set_cptable(cpexcel);
 
 export default function SalesMarketingSummary(){
