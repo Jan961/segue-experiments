@@ -29,7 +29,7 @@ export const InfoPanel = () => {
 
   return (
     <div className="w-6/12 pl-2" >
-      <div className="bg-white rounded-lg p-2">
+      <div className="bg-white rounded-lg px-2 pb-2 pt-1">
         { bookingIds.map(id => (
           <PanelDrawer open key={id} title="Booking">
             <BookingPanel key={id} bookingId={id} />
@@ -40,7 +40,11 @@ export const InfoPanel = () => {
             <RehearsalPanel key={id} rehearsalId={id} />
           </PanelDrawer>
         ))}
-        { performances.map(p => <span key={p}>{p}</span>)}
+        { performances.map(p => (
+          <PanelDrawer open title="Performance" key={p}>
+            <h2>WIP</h2>
+          </PanelDrawer>
+        ))}
       </div>
     </div>
   )

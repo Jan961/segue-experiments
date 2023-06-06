@@ -10,6 +10,8 @@ export const PerformanceBadge = ({ performanceId }: PerformanceBadgeProps) => {
   const perfromanceDict = useRecoilValue(performanceDictSelector)
   const performance = perfromanceDict[performanceId]
 
+  if (!performance) return
+
   return (
     <div className="px-2 rounded inline-block bg-teal-400 mr-2">
       { format(new Date(performance), 'HH:mm') }

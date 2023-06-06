@@ -38,8 +38,7 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
         { first && distance && (
           <>
-            <FontAwesomeIcon icon={faCar} className='opacity-50'/>
-            <br />
+            <FontAwesomeIcon icon={faCar} className='opacity-50 mr-2'/>
             { distance.Miles ? distance.Miles + 'm' : 'N/A' }
           </>
         ) }
@@ -47,8 +46,7 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
         { first && distance && (
           <>
-            <FontAwesomeIcon icon={faClock} className='opacity-50'/>
-            <br />
+            <FontAwesomeIcon icon={faClock} className='opacity-50 mr-2'/>
             { distance.Mins ? distance.Mins + 'm' : 'N/A' }
           </>
         ) }

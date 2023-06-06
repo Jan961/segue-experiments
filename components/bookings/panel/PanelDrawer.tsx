@@ -17,7 +17,7 @@ export const PanelDrawer = ({ children, title, open = false}: PropsWithChildren<
           <Disclosure.Button
             className="rounded bg-gray-200 hover:bg-gray-300
             flex justify-between
-            w-full py-2 px-3 text-left">
+            w-full py-2 px-3 mt-2 text-left">
             { title }
             <FontAwesomeIcon
               icon={faChevronRight}
