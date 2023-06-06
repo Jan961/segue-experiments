@@ -9,16 +9,17 @@ interface Input {
   value: string;
   name: string; // Also ID
   required?: boolean;
+  disabled?: boolean
 }
 
 // With a button on the side
-export const FormInputTextAttached = ({ placeholder, onChange, value, name, label, required, onClick }: Input) => {
+export const FormInputTextAttached = ({ placeholder, onChange, value, name, label, disabled, onClick }: Input) => {
   return (
     <div >
       <label htmlFor={name}>{ label }
         <div className="flex mb-4">
           <FormInputText disabled name={name} value={value} className="mb-0 rounded-r-none" />
-          <FormInputButton text="Change" onClick={onClick} className="rounded-l-none" />
+          <FormInputButton disabled={disabled} text="Change" onClick={onClick} className="rounded-l-none" />
         </div>
       </label>
     </div>

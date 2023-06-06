@@ -1,5 +1,6 @@
-import { Prisma } from '@prisma/client'
+import { Booking, Prisma } from '@prisma/client'
 import prisma from 'lib/prisma'
+import { omit } from 'radash'
 
 export const updateBookingVenue = (date, venueID, tourID) => {
   fetch(`/api/tours/booking/update/${tourID}/${venueID}/${date}`)
@@ -12,16 +13,16 @@ const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
   Performance: true
 })
 
-export type BookingsByTourIdType = Prisma.BookingGetPayload<{
+export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: any) => {
+export const updateBooking = async (booking: Booking) => {
   return prisma.booking.update({
     where: {
-      BookingId: booking.BookingId
+      Id: booking.Id
     },
-    data: booking,
+    data: omit(booking, ['Id']),
     include: bookingInclude
   })
 }

@@ -12,13 +12,8 @@ export const bookingDictSelector = selector({
   set: ({ get, set }, incoming: BookingDTO) => {
     const source = get(bookingState)
 
-    console.log(incoming)
-
-    console.log(source)
     const replacement = replaceOrAppend(source, incoming, b => b.Id === incoming.Id)
-    console.log(replacement)
     const sortedReplacement = sort(replacement, b => Date.parse(b.Date))
-    console.log(sortedReplacement)
 
     set(bookingState, sortedReplacement)
   }

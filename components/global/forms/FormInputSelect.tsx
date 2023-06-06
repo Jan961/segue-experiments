@@ -25,6 +25,8 @@ export const FormInputSelect = ({ placeholder, onChange, value, name, label, req
     baseClass = classNames(baseClass, 'flex items-baseline gap-x-4')
   }
 
+  const disabledClass = classNames(inputClass, 'bg-gray-100 text-gray-400')
+
   return (
     <div>
       <label htmlFor={name} className={baseClass}>{ label }
@@ -33,7 +35,7 @@ export const FormInputSelect = ({ placeholder, onChange, value, name, label, req
           name={name}
           onChange={onChange}
           disabled={disabled}
-          className={inputClass}
+          className={disabled ? disabledClass : inputClass}
           required={required}
           value={value}
         >

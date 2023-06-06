@@ -3,9 +3,10 @@ interface Input {
   label?: string;
   value: boolean;
   name?: string; // Also ID
+  disabled?: boolean
 }
 
-export const FormInputCheckbox = ({ onChange, value, name, label }: Input) => {
+export const FormInputCheckbox = ({ onChange, value, name, label, disabled }: Input) => {
   const modifyOnChange = (e: any) => {
     const newValue = !value
     const newEvent = { ...e, target: { ...e.target, value: newValue, id: name } }
@@ -21,6 +22,7 @@ export const FormInputCheckbox = ({ onChange, value, name, label }: Input) => {
         name={name}
         onChange={modifyOnChange}
         checked={value}
+        disabled={disabled}
         className="rounded border-gray-300 cursor-pointer p-3 my-2 ml-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4"
       />
     </label>

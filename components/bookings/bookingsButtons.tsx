@@ -1,9 +1,7 @@
-import { useState } from 'react'
 import Report from './modal/Report'
 import BookingHold from './modal/bookingHold'
 import AddBooking from './modal/AddBooking'
 import TourGapsModal from './modal/tourGapSugget'
-import RemoveBooking from './modal/RemoveBooking'
 import Barring from './modal/barring'
 
 interface BookingButtonsProps {
@@ -20,7 +18,6 @@ export default function BookingsButtons ({ selectedBooking, currentTourId }: Boo
         <Report TourId={currentTourId}></Report>
         <BookingHold TourId={currentTourId} ></BookingHold>
         <Barring />
-        <RemoveBooking bookingId={selectedBooking}></RemoveBooking>
         <TourGapsModal TourId={currentTourId} ></TourGapsModal>
       </div>
     </>

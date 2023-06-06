@@ -25,7 +25,7 @@ export const InfoPanel = () => {
 
   const bookingIds = unique(date.BookingIds)
   const rehearsalIds = date.RehearsalIds
-  const performances = date.Performances
+  const performances = date.PerformanceIds
 
   return (
     <div className="w-6/12 pl-2" >
@@ -39,10 +39,8 @@ export const InfoPanel = () => {
           <PanelDrawer open key={id} title="Rehearsal">
             <RehearsalPanel key={id} rehearsalId={id} />
           </PanelDrawer>
-      ))}
-        { performances.map(p => {
-
-        })}
+        ))}
+        { performances.map(p => <span key={p}>{p}</span>)}
       </div>
     </div>
   )

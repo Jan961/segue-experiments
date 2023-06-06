@@ -3,6 +3,7 @@ import { bookingState } from 'state/booking/bookingState'
 import { dateBlockState } from 'state/booking/dateBlockState'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
 import { rehearsalState } from 'state/booking/rehearsalState'
+import { performanceState } from '../performanceState'
 
 const getKey = (date: string) => (date.split('T')[0])
 
@@ -25,7 +26,7 @@ export interface DateViewModel {
   Date: string
   RehearsalIds: number[]
   GetInFitUpIds: number[]
-  Performances: PerformanceViewModel[]
+  PerformanceIds: number[]
   BookingIds: number[]
 }
 
@@ -45,13 +46,14 @@ export const scheduleSelector = selector({
     const bookings = get(bookingState)
     const getInFitUp = get(getInFitUpState)
     const dateBlocks = get(dateBlockState)
+    const performances = get(performanceState)
 
-    const getDefaultDate = (key: string) => ({
+    const getDefaultDate = (key: string): DateViewModel => ({
       Date: key,
       BookingIds: [],
       RehearsalIds: [],
       GetInFitUpIds: [],
-      Performances: []
+      PerformanceIds: []
     })
 
     const dates: Record<string, any> = {}
@@ -64,18 +66,8 @@ export const scheduleSelector = selector({
 
     for (const r of rehearsals) addDate(r.Date, 'RehearsalIds', r.Id)
     for (const g of getInFitUp) addDate(g.Date, 'GetInFitUpIds', g.Id)
-    for (const b of bookings) {
-      for (const p of b.Performances) {
-        addDate(p.Date, 'Performances', {
-          BookingId: b.Id, // Reference for editings
-          Id: p.Id,
-          Date: p.Date
-        })
-        // Add a reference for runs
-        addDate(p.Date, 'BookingIds', b.Id)
-      }
-      addDate(b.Date, 'BookingIds', b.Id)
-    }
+    for (const b of bookings) addDate(b.Date, 'BookingIds', b.Id)
+    for (const p of performances) addDate(p.Date, 'PerformanceIds', p.Id)
 
     return {
       Sections: dateBlocks.map((db) => ({

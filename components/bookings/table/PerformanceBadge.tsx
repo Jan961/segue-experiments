@@ -1,14 +1,18 @@
 import { format } from 'date-fns'
-import { PerformanceViewModel } from 'state/booking/selectors/scheduleSelector'
+import { useRecoilValue } from 'recoil'
+import { performanceDictSelector } from 'state/booking/selectors/performanceDictSelector'
 
 interface PerformanceBadgeProps {
-  performance: PerformanceViewModel
+  performanceId: number
 }
 
-export const PerformanceBadge = ({ performance }: PerformanceBadgeProps) => {
+export const PerformanceBadge = ({ performanceId }: PerformanceBadgeProps) => {
+  const perfromanceDict = useRecoilValue(performanceDictSelector)
+  const performance = perfromanceDict[performanceId]
+
   return (
     <div className="px-2 rounded inline-block bg-teal-400 mr-2">
-      { format(new Date(performance.Date), 'HH:mm') }
+      { format(new Date(performance), 'HH:mm') }
     </div>
   )
 }

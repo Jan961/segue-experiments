@@ -1,6 +1,5 @@
 import classNames from 'classnames'
 import { useRecoilState, useRecoilValue } from 'recoil'
-import { dateService } from 'services/dateService'
 import { DateViewModel } from 'state/booking/selectors/scheduleSelector'
 import { viewState } from 'state/booking/viewState'
 import { VenueDisplay } from './VenueDisplay'
@@ -9,6 +8,7 @@ import { PerformanceBadge } from './table/PerformanceBadge'
 import { unique } from 'radash'
 import { DateDisplay } from './DateDisplay'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
+import { performanceDictSelector } from 'state/booking/selectors/performanceDictSelector'
 
 interface ScheduleRowProps {
   date: DateViewModel
@@ -17,6 +17,7 @@ interface ScheduleRowProps {
 export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   const [view, setView] = useRecoilState(viewState)
   const bookingDict = useRecoilValue(bookingDictSelector)
+  const performanceDict = useRecoilValue(performanceDictSelector)
 
   const dateKey = date.Date.split('T')[0]
 
@@ -35,6 +36,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   // We get duplicates for each performance
   const uniqueBookingIds = unique(date.BookingIds)
 
+  // If any are unconfirmed, display whole row in italics
   for (const id of uniqueBookingIds) {
     if (bookingDict[id].StatusCode === 'U') rowClass = classNames(rowClass, 'italic')
   }
@@ -46,7 +48,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
         <div className="col-span-7">
           { uniqueBookingIds.map((id: number) => (
             <VenueDisplay key={id} bookingId={id} date={date.Date}>
-              { date.Performances?.filter(x => x.BookingId === id).map(p => (<PerformanceBadge key={p.Id} performance={p} />))}
+              { date.PerformanceIds.map(p => (<PerformanceBadge key={p} performanceId={p} />))}
             </VenueDisplay>
           ))}
           <RehearsalDisplay rehearsalId={rehearsalId} />

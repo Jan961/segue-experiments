@@ -307,13 +307,11 @@ const Index = () => {
             tourJump={false}
             title={"Tasks"}
             color={"text-primary-purple"}
-            filtersOpen={filtersOpen}
-            setFiltersOpen={setFiltersOpen}
             searchFilter={searchFilter}
             setSearchFilter={setSearchFilter}
             filterComponent={
               <Toolbar
-              filtersOpen={filtersOpen}
+                filtersOpen={filtersOpen}
                 userAccountId={user.accountId}
                 tours={masterTourData}
                 searchFilter={searchFilter}

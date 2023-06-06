@@ -11,7 +11,6 @@ import { FormInputText } from 'components/global/forms/FormInputText'
 import { bookingState } from 'state/booking/bookingState'
 import { BookingDTO } from 'interfaces'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
-import { range } from 'radash'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 
@@ -34,19 +33,24 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
   const bookings = useRecoilValue(bookingState)
   const [inputs, setInputs] = React.useState<BookingDTO>(defaultState)
-  const booking = bookingDict[bookingId]
+  const [status, setStatus] = React.useState({ submitting: false, changed: false })
+  const { submitting, changed } = status
 
   const nextBookingId = getNextBookingId(bookings, bookingId)
 
   React.useEffect(() => {
+    const booking = bookingDict[bookingId]
+
     if (!booking) {
       setInputs(undefined)
       return
     }
 
     setInputs(booking)
-  }, [bookingId])
+    setStatus({ submitting: false, changed: false })
+  }, [bookingId, bookingDict])
 
+  const booking = bookingDict[bookingId]
   if (!booking) return (<div className="w-6/12 pl-4" />)
 
   const saveDetails = async () => {
@@ -57,31 +61,41 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     })
 
     const updated = response.data
-
-    // Can't find a a way to do this automatically, we need Date objects for typescript
-
     updateBooking(updated)
   }
 
   const save = async (e) => {
     e.preventDefault()
-    saveDetails()
+    try {
+      setStatus({ submitting: true, changed: true })
+      saveDetails()
+      setStatus({ submitting: false, changed: false })
+    } catch {
+      alert('An error occured while submitting')
+      setStatus({ submitting: false, changed: true })
+    }
   }
 
   const handleOnChange = (e: any) => {
+    let { id, value } = e.target
+    // Handle numeric fields
+    if (id === 'PencilNum') value = value ? parseInt(value) : null
+    if (id === 'VenueId') value = value ? parseInt(value) : null
+
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value
+      [id]: value
     }))
+    setStatus({ submitting: false, changed: true })
   }
 
   const saveAndNext = async (e: any) => {
     e.preventDefault()
-    saveDetails()
+    if (changed) saveDetails()
   }
 
   const initiateDelete = () => {
-
+    alert('Not Implimented, but will confirm')
   }
 
   const venueOptions: SelectOption[] = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.Id) }))]
@@ -95,8 +109,14 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   return (
     <form>
       <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-4 p-4 pb-0">
-        <ChangeBookingDate bookingId={booking.Id} />
-        <FormInputSelect name="VenueId" value={inputs.VenueId ? inputs.VenueId : ''} options={venueOptions} onChange={handleOnChange} />
+        <ChangeBookingDate disabled={submitting} bookingId={booking.Id} />
+        <FormInputSelect
+          name="VenueId"
+          value={inputs.VenueId ? inputs.VenueId : ''}
+          options={venueOptions}
+          onChange={handleOnChange}
+          disabled={submitting}
+        />
         <div className="columns-2 mb-4">
           <VenueInfo venueId={inputs.VenueId} />
           <ViewBookingHistory venueId={inputs.VenueId}></ViewBookingHistory>
@@ -110,6 +130,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           options={pencilOptions}
           name="PencilNum"
           label="Pencil Num"
+          disabled={submitting}
         />
         <FormInputSelect inline
           value={inputs.StatusCode}
@@ -117,6 +138,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           options={statusOptions}
           name="StatusCode"
           label="Status"
+          disabled={submitting}
         />
       </div>
       <div className="bg-gray-100 rounded-lg p-4 pb-2">
@@ -126,6 +148,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           label="Landing Page"
           onChange={handleOnChange}
           placeholder="http://example.com"
+          disabled={submitting}
         />
         <div className="grid grid-cols-3">
           <FormInputCheckbox
@@ -133,12 +156,14 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             name="OnSale"
             label="On Sale"
             onChange={handleOnChange}
+            disabled={submitting}
           />
           <FormInputDate
             className="col-span-2"
             value={inputs.OnSaleDate}
             name="OnSaleDate"
             onChange={handleOnChange}
+            disabled={submitting}
           />
         </div>
       </div>
@@ -149,6 +174,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             text="Delete"
             intent="DANGER"
             onClick={initiateDelete}
+            disabled={submitting}
           />
         </div>
         <div className="col-span-2 grid grid-cols-2">
@@ -156,14 +182,15 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             className="rounded-br-none rounded-tr-none w-full border-r border-soft-primary-blue"
             text="Save"
             intent='PRIMARY'
+            disabled={submitting || !changed}
             onClick={save}
           />
           <FormInputButton
             className="rounded-bl-none rounded-tl-none w-full"
-            text="Save & Next"
+            text={!changed ? 'Next' : 'Save and Next'}
             intent='PRIMARY'
             onClick={saveAndNext}
-            disabled={!nextBookingId}
+            disabled={submitting || !nextBookingId}
           />
         </div>
       </div>

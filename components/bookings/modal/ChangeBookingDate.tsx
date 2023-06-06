@@ -11,9 +11,10 @@ import { UpdateDateParams } from 'pages/api/bookings/update/date'
 
 interface ChangeBookingDateProps {
   bookingId: number
+  disabled?: boolean
 }
 
-export const ChangeBookingDate = ({ bookingId }: ChangeBookingDateProps) => {
+export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProps) => {
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
   const [showModal, setShowModal] = React.useState(false)
   const [date, setDate] = React.useState(undefined)
@@ -48,11 +49,11 @@ export const ChangeBookingDate = ({ bookingId }: ChangeBookingDateProps) => {
     setDate(e.target.value)
   }
 
-  const disabled = loading || (dateService.dateToPicker(booking.FirstDate) === dateService.dateToPicker(date))
+  const modalDisabled = loading || (dateService.dateToPicker(booking.FirstDate) === dateService.dateToPicker(date))
 
   return (
     <>
-      <FormInputTextAttached name="ShowDate" value={dateService.dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
+      <FormInputTextAttached disabled={disabled} name="ShowDate" value={dateService.dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
       <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.FirstDate)}`} open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent='DANGER' header="Warning">
@@ -62,7 +63,7 @@ export const ChangeBookingDate = ({ bookingId }: ChangeBookingDateProps) => {
           <>
             <StyledDialog.FooterContainer>
               <StyledDialog.FooterCancel onClick={() => setShowModal(false)} />
-              <StyledDialog.FooterContinue disabled={disabled} submit>Change Date</StyledDialog.FooterContinue>
+              <StyledDialog.FooterContinue disabled={modalDisabled} submit>Change Date</StyledDialog.FooterContinue>
             </StyledDialog.FooterContainer>
           </>
         </form>

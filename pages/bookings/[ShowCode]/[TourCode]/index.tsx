@@ -6,12 +6,13 @@ import Layout from 'components/Layout'
 import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
 import { useRecoilValue } from 'recoil'
-import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO } from 'interfaces'
+import { BookingDTO, DateBlockDTO, GetInFitUpDTO, PerformanceDTO, RehearsalDTO } from 'interfaces'
 import { DateViewModel, ScheduleSectionViewModel, scheduleSelector } from 'state/booking/selectors/scheduleSelector'
-import { bookingMapper, dateBlockMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers'
+import { bookingMapper, dateBlockMapper, getInFitUpMapper, performanceMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
+import { BookingsWithPerformances } from 'services/bookingService'
 
 interface bookingProps {
   Id: number,
@@ -97,13 +98,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const booking: BookingDTO[] = []
   const getInFitUp: GetInFitUpDTO[] = []
   const dateBlock: DateBlockDTO[] = []
+  const performance: PerformanceDTO[] = []
 
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const db of tour.DateBlock) {
     dateBlock.push(dateBlockMapper(db))
 
     db.Rehearsal.forEach(r => rehearsal.push(rehearsalMapper(r)))
-    db.Booking.forEach(b => booking.push(bookingMapper(b)))
+    db.Booking.forEach(b => {
+      booking.push(bookingMapper(b as BookingsWithPerformances))
+      b.Performance.forEach(p => performance.push(performanceMapper(p)))
+    })
     db.GetInFitUp.forEach(gifu => getInFitUp.push(getInFitUpMapper(gifu)))
   }
 
@@ -124,6 +129,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     booking,
     getInFitUp,
     distance,
+    performance,
     dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
     // Remove extra info
     venue: venues.map((v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))

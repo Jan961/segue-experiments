@@ -98,11 +98,12 @@ export type BookingDTO = {
   LandingSite: string
   OnSaleDate: string
   OnSale: boolean
-  Performances: PerformanceDTO[]
+  PerformanceIds: number[]
 }
 
 export type PerformanceDTO = {
-  Id: number;
+  Id: number
+  BookingId: number
   Date: string
 }
 

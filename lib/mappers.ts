@@ -1,7 +1,8 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType } from '@prisma/client'
-import { BookingDTO, DateBlockDTO, GetInFitUpDTO, RehearsalDTO, ShowDTO, TourDTO } from 'interfaces'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, Booking } from '@prisma/client'
+import { BookingDTO, DateBlockDTO, GetInFitUpDTO, PerformanceDTO, RehearsalDTO, ShowDTO, TourDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
+import { BookingsWithPerformances } from 'services/bookingService'
 
 /*
 
@@ -44,26 +45,29 @@ export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
   StatusCode: r.StatusCode
 })
 
-export const bookingMapper = (b: any): BookingDTO => ({
+export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   Date: b.FirstDate.toISOString(),
   Id: b.Id,
   VenueId: b.VenueId,
   LandingSite: b.LandingPageURL,
-  StatusCode: b.StatusCode,
+  StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
-  OnSaleDate: b.OnSaleFromDate,
-  OnSale: b.Onsale,
-  Performances: b.Performance?.map((p: PerformanceType) => {
-    const day = p.Date.toISOString().split('T')[0]
-    const time = p.Time.toISOString().split('T')[1]
-    const Date = `${day}T${time}`
-
-    return {
-      Id: p.Id,
-      Date
-    }
-  })
+  OnSaleDate: b.TicketsOnSaleFromDate ? b.TicketsOnSaleFromDate.toISOString() : '',
+  OnSale: b.TicketsOnSale,
+  PerformanceIds: b.Performance?.map((p: PerformanceType) => p.Id)
 })
+
+export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
+  const day = p.Date.toISOString().split('T')[0]
+  const time = p.Time.toISOString().split('T')[1]
+  const Date = `${day}T${time}`
+
+  return {
+    Id: p.Id,
+    Date,
+    BookingId: p.BookingId
+  }
+}
 
 export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => (
   { Date: gifu.Date.toISOString(), Id: gifu.Id }

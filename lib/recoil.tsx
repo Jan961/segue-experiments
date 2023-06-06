@@ -1,5 +1,5 @@
 import React from 'react'
-import { BookingDTO, RehearsalDTO, GetInFitUpDTO, DateBlockDTO, VenueMinimalDTO } from 'interfaces'
+import { BookingDTO, RehearsalDTO, GetInFitUpDTO, DateBlockDTO, VenueMinimalDTO, PerformanceDTO } from 'interfaces'
 import { RecoilState, useRecoilCallback } from 'recoil'
 import { DateDistancesDTO } from 'services/venueService'
 import { bookingState } from 'state/booking/bookingState'
@@ -8,6 +8,7 @@ import { distanceState } from 'state/booking/distanceState'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
 import { rehearsalState } from 'state/booking/rehearsalState'
 import { venueState } from 'state/booking/venueState'
+import { performanceState } from 'state/booking/performanceState'
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -20,6 +21,7 @@ export type InitialState = Partial<{
   rehearsal: RehearsalDTO[],
   getInFitUp: GetInFitUpDTO[],
   dateBlock: DateBlockDTO[],
+  performance: PerformanceDTO[],
   distance: DateDistancesDTO[],
   venue: VenueMinimalDTO[],
 }>
@@ -30,7 +32,8 @@ const states: Record<keyof InitialState, RecoilState<any>> = {
   getInFitUp: getInFitUpState,
   venue: venueState,
   distance: distanceState,
-  dateBlock: dateBlockState
+  dateBlock: dateBlockState,
+  performance: performanceState
 }
 
 export const setInitialStateServer = (snapshot, initialState: InitialState) => {
