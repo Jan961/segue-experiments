@@ -141,7 +141,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           disabled={submitting}
         />
       </div>
-      <div className="bg-gray-100 rounded-lg p-4 pb-2">
+      <div className="bg-gray-100 rounded-lg p-2 pb-0">
         <FormInputText
           value={inputs.LandingSite}
           name="LandingSite"

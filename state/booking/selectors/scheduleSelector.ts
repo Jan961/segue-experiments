@@ -68,6 +68,7 @@ export const scheduleSelector = selector({
     for (const g of getInFitUp) addDate(g.Date, 'GetInFitUpIds', g.Id)
     for (const b of bookings) addDate(b.Date, 'BookingIds', b.Id)
     for (const p of performances) addDate(p.Date, 'PerformanceIds', p.Id)
+    for (const p of performances) addDate(p.Date, 'BookingIds', p.BookingId)
 
     return {
       Sections: dateBlocks.map((db) => ({

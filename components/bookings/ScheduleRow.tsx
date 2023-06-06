@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { DateViewModel } from 'state/booking/selectors/scheduleSelector'
 import { viewState } from 'state/booking/viewState'
-import { VenueDisplay } from './VenueDisplay'
+import { BookingDisplay } from './BookingDisplay'
 import { RehearsalDisplay } from './RehearsalDisplay'
 import { PerformanceBadge } from './table/PerformanceBadge'
 import { unique } from 'radash'
@@ -28,8 +28,8 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     setView({ selectedDate: dateKey })
   }
 
-  let rowClass = 'grid gap-1 grid-cols-12 items-center py-3 w-full border-l-4 border-transparent px-2'
-  if (selected) rowClass += classNames(rowClass, 'bg-blue-200 border-blue-500')
+  let rowClass = 'grid gap-1 grid-cols-12 items-center p-1 w-full border-l-4 border-transparent px-2'
+  if (selected) rowClass = classNames(rowClass, 'bg-blue-200 border-blue-500')
 
   const rehearsalId = date.RehearsalIds.length ? date.RehearsalIds[0] : undefined
 
@@ -47,9 +47,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
         <DateDisplay date={date.Date} />
         <div className="col-span-8">
           { uniqueBookingIds.map((id: number) => (
-            <VenueDisplay key={id} bookingId={id} date={date.Date}>
-              { date.PerformanceIds.map(p => (<PerformanceBadge key={p} performanceId={p} />))}
-            </VenueDisplay>
+            <BookingDisplay key={id} bookingId={id} date={date.Date} performanceCount={date.PerformanceIds.length} />
           ))}
           <RehearsalDisplay rehearsalId={rehearsalId} />
           <ul>

@@ -1,8 +1,5 @@
-import { faCar, faClock } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { PropsWithChildren } from 'react'
 import { useRecoilValue } from 'recoil'
-import { dateService } from 'services/dateService'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { distanceDictSelector } from 'state/booking/selectors/distanceDictSelector'
 import { venueDictSelector } from 'state/booking/selectors/venueDictSelector'
@@ -10,9 +7,15 @@ import { venueDictSelector } from 'state/booking/selectors/venueDictSelector'
 interface VenueDisplayProps {
   bookingId: number
   date: string
+  performanceCount: number;
 }
 
-export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<VenueDisplayProps>) => {
+const timeFormat = (mins?: number) => {
+  if (!mins) return 'N/A'
+  return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`
+}
+
+export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithChildren<VenueDisplayProps>) => {
   const bookingDict = useRecoilValue(bookingDictSelector)
   const venueDict = useRecoilValue(venueDictSelector)
   const distanceDict = useRecoilValue(distanceDictSelector)
@@ -27,18 +30,22 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
 
   const first = booking.Date.startsWith(date)
 
-  return (
-    <div className="grid grid-cols-7">
+  const venueClass = first ? '' : 'opacity-25'
 
-      <div className="col-span-5">
-        { venue ? venue.Name : 'No Venue' }
-        <br />
-        { children }
+  return (
+    <div className="grid grid-cols-10">
+
+      <div className="col-span-7">
+        <span className={venueClass}>
+          { venue ? venue.Name : 'No Venue' }
+        </span>
+      </div>
+      <div className="col-span-1">
+        x { performanceCount }
       </div>
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
         { first && distance && (
           <>
-            <FontAwesomeIcon icon={faCar} className='opacity-50 mr-2'/>
             { distance.Miles ? distance.Miles + 'm' : 'N/A' }
           </>
         ) }
@@ -46,8 +53,7 @@ export const VenueDisplay = ({ bookingId, children, date }: PropsWithChildren<Ve
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
         { first && distance && (
           <>
-            <FontAwesomeIcon icon={faClock} className='opacity-50 mr-2'/>
-            { distance.Mins ? distance.Mins + 'm' : 'N/A' }
+            { timeFormat(distance.Mins) }
           </>
         ) }
       </div>

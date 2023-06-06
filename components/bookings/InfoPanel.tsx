@@ -41,8 +41,8 @@ export const InfoPanel = () => {
             <RehearsalPanel key={id} rehearsalId={id} />
           </PanelDrawer>
         ))}
-        { performances.map(id => (
-          <PanelDrawer open title="Performance" key={id}>
+        { performances.map((id, index) => (
+          <PanelDrawer open title={`Performance ${index + 1}`} key={id}>
             <PerformancePanel key={id} performanceId={id} />
           </PanelDrawer>
         ))}
