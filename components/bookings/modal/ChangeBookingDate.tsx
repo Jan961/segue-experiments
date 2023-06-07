@@ -49,12 +49,12 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
     setDate(e.target.value)
   }
 
-  const modalDisabled = loading || (dateService.dateToPicker(booking.FirstDate) === dateService.dateToPicker(date))
+  const modalDisabled = loading || (dateService.dateToPicker(booking.Date) === dateService.dateToPicker(date))
 
   return (
     <>
       <FormInputTextAttached disabled={disabled} name="ShowDate" value={dateService.dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
-      <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.FirstDate)}`} open={showModal} onClose={() => setShowModal(false)}>
+      <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.Date)}`} open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent='DANGER' header="Warning">
             Changing a booking will move all related items to the new date.
