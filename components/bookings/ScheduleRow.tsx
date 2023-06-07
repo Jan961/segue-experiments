@@ -43,14 +43,14 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     <div className="even:bg-black even:bg-opacity-5 bg-blend-multiply border-b border-gray-300 cursor-pointer" onClick={selectDate}>
       <div className={rowClass} >
         <DateDisplay date={date.Date} />
-        <div className="col-span-8">
+        <div className="col-span-8 grid grid-rows-auto gap-y-2">
           { uniqueBookingIds.map((id: number) => (
             <BookingDisplay key={id} bookingId={id} date={date.Date} performanceCount={date.PerformanceIds.length} />
           ))}
           <RehearsalDisplay rehearsalId={rehearsalId} />
-          <ul>
+          { !!date.GetInFitUpIds?.length && (<ul>
             { date.GetInFitUpIds.map((id) => (<span key={id}>GetInFitUp</span>))}
-          </ul>
+          </ul>)}
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
+import { objectify } from 'radash'
 
 interface bookingProps {
   Id: number,
@@ -132,7 +133,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     performance,
     dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
     // Remove extra info
-    venue: venues.map((v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))
+    venue: objectify(venues, v => v.Id, (v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))
   }
 
   return {

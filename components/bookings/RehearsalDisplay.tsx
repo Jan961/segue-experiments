@@ -13,10 +13,8 @@ export const RehearsalDisplay = ({ rehearsalId }: RehearsalDisplayProps) => {
   const r = rehearsalDict[rehearsalId]
 
   return (
-    <>
-      <span className="inline-block p-1 px-2 shadow-md rounded bg-red-500 text-white">
-        Rehearsal: { r.Town ? r.Town : 'N/A' }
-      </span>
-    </>
+    <div className="inline-block p-1 px-2 shadow-md rounded bg-red-500 text-white">
+      Rehearsal: { r.Town ? r.Town : 'N/A' }
+    </div>
   )
 }

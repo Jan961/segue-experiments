@@ -8,7 +8,7 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { ChangeBookingDate } from '../modal/ChangeBookingDate'
 import { FormInputText } from 'components/global/forms/FormInputText'
-import { BookingDTO } from 'interfaces'
+import { BookingDTO, VenueMinimalDTO } from 'interfaces'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
@@ -99,7 +99,10 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     alert('Not Implimented, but will confirm')
   }
 
-  const venueOptions: SelectOption[] = [{ text: 'Please Select a Venue', value: '' }, ...venues.map(x => ({ text: x.Name, value: String(x.Id) }))]
+  const venueOptions: SelectOption[] = [
+    { text: 'Please Select a Venue', value: '' },
+    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: v.Name, value: String(v.Id) })
+    )]
   const statusOptions: SelectOption[] = [
     { text: 'Confirmed (C)', value: 'C' },
     { text: 'Unconfirmed (U)', value: 'U' },

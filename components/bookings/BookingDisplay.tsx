@@ -32,8 +32,13 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
 
   const venueClass = first ? '' : 'opacity-25'
 
+  console.log(booking.VenueId)
+  console.log(venue)
+  console.log(booking.Date)
+  console.log(distanceDict[booking.Date])
+
   return (
-    <div className="grid grid-cols-10">
+    <div className="grid grid-cols-10 p-1 px-2">
 
       <div className="col-span-7">
         <span className={venueClass}>
