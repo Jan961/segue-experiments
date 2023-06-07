@@ -3,6 +3,7 @@ import { sort } from 'radash'
 import { dateBlockState } from '../dateBlockState'
 import { bookingState } from '../bookingState'
 import { differenceInWeeks, startOfWeek, isBefore, addWeeks, parseISO } from 'date-fns'
+import { sortedBookingSelector } from './sortedBookingSelector'
 
 const calculateWeekNumber = (tourStart: Date, dateToNumber: Date): number => {
   const weekOneStart = startOfWeek(tourStart, { weekStartsOn: 1 })
@@ -33,8 +34,8 @@ export const weekNoSelector = selector({
   key: 'weekNoSelector',
   get: ({ get }) => {
     const dateBlocks = get(dateBlockState)
-    const bookings = get(bookingState)
-    const tourStart = sort(bookings, b => Date.parse(b.Date))[0]?.Date
+    const sorted = get(sortedBookingSelector)
+    const tourStart = sorted[0]?.Date
     const start = sort(dateBlocks, d => Date.parse(d.StartDate))[0]?.StartDate
     const end = sort(dateBlocks, d => Date.parse(d.EndDate)).reverse()[0]?.EndDate
 

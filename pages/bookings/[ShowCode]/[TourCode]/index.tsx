@@ -94,26 +94,26 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tour: TourContent = await getTourWithContent(Id)
   console.log(`Retrieved main content. Tour: ${tour.Id}`)
 
-  const rehearsal: RehearsalDTO[] = []
-  const booking: BookingDTO[] = []
-  const getInFitUp: GetInFitUpDTO[] = []
-  const dateBlock: DateBlockDTO[] = []
-  const performance: PerformanceDTO[] = []
+  const dateBlock = []
+  const rehearsal = {}
+  const booking = {}
+  const getInFitUp = {}
+  const performance = {}
 
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const db of tour.DateBlock) {
     dateBlock.push(dateBlockMapper(db))
 
-    db.Rehearsal.forEach(r => rehearsal.push(rehearsalMapper(r)))
+    db.Rehearsal.forEach(r => { rehearsal[r.Id] = rehearsalMapper(r) })
+    db.GetInFitUp.forEach(gifu => { getInFitUp[gifu.Id] = getInFitUpMapper(gifu) })
     db.Booking.forEach(b => {
-      booking.push(bookingMapper(b as BookingsWithPerformances))
-      b.Performance.forEach(p => performance.push(performanceMapper(p)))
+      booking[b.Id] = bookingMapper(b as BookingsWithPerformances)
+      b.Performance.forEach(p => { performance[p.Id] = performanceMapper(p) })
     })
-    db.GetInFitUp.forEach(gifu => getInFitUp.push(getInFitUpMapper(gifu)))
   }
 
   // Get distances
-  const grouped = booking.reduce((acc, { VenueId, Date }) => {
+  const grouped = Object.values(booking).reduce((acc, { VenueId, Date }) => {
     (acc[Date] = acc[Date] || []).push(VenueId)
     return acc
   }, {})

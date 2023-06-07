@@ -1,7 +1,7 @@
 import { PerformanceDTO } from 'interfaces'
 import { atom } from 'recoil'
 
-const intialState: PerformanceDTO[] = []
+const intialState: Record<number, PerformanceDTO> = {}
 
 export const performanceState = atom({
   key: 'performanceState',

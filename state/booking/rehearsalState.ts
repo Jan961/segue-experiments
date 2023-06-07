@@ -1,7 +1,7 @@
 import { RehearsalDTO } from 'interfaces'
 import { atom } from 'recoil'
 
-const intialState: RehearsalDTO[] = []
+const intialState: Record<number, RehearsalDTO> = {}
 
 export const rehearsalState = atom({
   key: 'rehearsalState',

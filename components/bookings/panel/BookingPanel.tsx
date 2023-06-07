@@ -8,15 +8,16 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { ChangeBookingDate } from '../modal/ChangeBookingDate'
 import { FormInputText } from 'components/global/forms/FormInputText'
-import { bookingState } from 'state/booking/bookingState'
 import { BookingDTO } from 'interfaces'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { sortedBookingSelector } from 'state/booking/selectors/sortedBookingSelector'
 
-const getNextBookingId = (bookings: BookingDTO[], current: number) => {
+const getNextBookingId = (sortedBookings: BookingDTO[], current: number) => {
   let found = false
-  for (const b of bookings) {
+
+  for (const b of sortedBookings) {
     if (found) return b.Id
     if (current === b.Id) found = true
   }
@@ -31,12 +32,12 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const defaultState: any = {}
   const venues = useRecoilValue(venueState)
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
-  const bookings = useRecoilValue(bookingState)
+  const sortedBookings = useRecoilValue(sortedBookingSelector)
   const [inputs, setInputs] = React.useState<BookingDTO>(defaultState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
 
-  const nextBookingId = getNextBookingId(bookings, bookingId)
+  const nextBookingId = getNextBookingId(sortedBookings, bookingId)
 
   React.useEffect(() => {
     const booking = bookingDict[bookingId]

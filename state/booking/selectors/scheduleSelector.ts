@@ -45,8 +45,9 @@ export const scheduleSelector = selector({
     const rehearsals = get(rehearsalState)
     const bookings = get(bookingState)
     const getInFitUp = get(getInFitUpState)
-    const dateBlocks = get(dateBlockState)
     const performances = get(performanceState)
+    // This one is an array (won't change on booking page)
+    const dateBlocks = get(dateBlockState)
 
     const getDefaultDate = (key: string): DateViewModel => ({
       Date: key,
@@ -64,11 +65,13 @@ export const scheduleSelector = selector({
       dates[key][property].push(data)
     }
 
-    for (const r of rehearsals) addDate(r.Date, 'RehearsalIds', r.Id)
-    for (const g of getInFitUp) addDate(g.Date, 'GetInFitUpIds', g.Id)
-    for (const b of bookings) addDate(b.Date, 'BookingIds', b.Id)
-    for (const p of performances) addDate(p.Date, 'PerformanceIds', p.Id)
-    for (const p of performances) addDate(p.Date, 'BookingIds', p.BookingId)
+    Object.values(rehearsals).forEach(r => addDate(r.Date, 'RehearsalIds', r.Id))
+    Object.values(getInFitUp).forEach(g => addDate(g.Date, 'GetInFitUpIds', g.Id))
+    Object.values(bookings).forEach(b => addDate(b.Date, 'BookingIds', b.Id))
+    Object.values(performances).forEach(p => {
+      addDate(p.Date, 'PerformanceIds', p.Id)
+      addDate(p.Date, 'BookingIds', p.BookingId)
+    })
 
     return {
       Sections: dateBlocks.map((db) => ({

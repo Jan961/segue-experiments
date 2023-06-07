@@ -17,13 +17,13 @@ import { performanceState } from 'state/booking/performanceState'
 */
 
 export type InitialState = Partial<{
-  booking: BookingDTO[],
-  rehearsal: RehearsalDTO[],
-  getInFitUp: GetInFitUpDTO[],
+  booking: Record<number, BookingDTO>,
+  rehearsal: Record<number, RehearsalDTO>,
+  getInFitUp: Record<number, GetInFitUpDTO>,
   dateBlock: DateBlockDTO[],
-  performance: PerformanceDTO[],
+  performance: Record<number, PerformanceDTO>,
   distance: DateDistancesDTO[],
-  venue: VenueMinimalDTO[],
+  venue: Record<number, VenueMinimalDTO>,
 }>
 
 const states: Record<keyof InitialState, RecoilState<any>> = {
