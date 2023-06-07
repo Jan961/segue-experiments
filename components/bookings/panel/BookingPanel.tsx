@@ -3,7 +3,7 @@ import React from 'react'
 import axios from 'axios'
 import { VenueInfo } from '../modal/VenueInfo'
 import { venueState } from 'state/booking/venueState'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { ChangeBookingDate } from '../modal/ChangeBookingDate'
@@ -13,6 +13,7 @@ import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 import { sortedBookingSelector } from 'state/booking/selectors/sortedBookingSelector'
+import { viewState } from 'state/booking/viewState'
 
 const getNextBookingId = (sortedBookings: BookingDTO[], current: number) => {
   let found = false
@@ -29,19 +30,17 @@ interface BookingPanelProps {
 }
 
 export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
-  const defaultState: any = {}
   const venues = useRecoilValue(venueState)
   const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
   const sortedBookings = useRecoilValue(sortedBookingSelector)
-  const [inputs, setInputs] = React.useState<BookingDTO>(defaultState)
+  const setView = useSetRecoilState(viewState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
-
+  const booking = bookingDict[bookingId]
   const nextBookingId = getNextBookingId(sortedBookings, bookingId)
+  const [inputs, setInputs] = React.useState<BookingDTO>(booking)
 
   React.useEffect(() => {
-    const booking = bookingDict[bookingId]
-
     if (!booking) {
       setInputs(undefined)
       return
@@ -49,9 +48,8 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
 
     setInputs(booking)
     setStatus({ submitting: false, changed: false })
-  }, [bookingId, bookingDict])
+  }, [bookingId, booking])
 
-  const booking = bookingDict[bookingId]
   if (!booking) return (<div className="w-6/12 pl-4" />)
 
   const saveDetails = async () => {
@@ -92,7 +90,9 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
 
   const saveAndNext = async (e: any) => {
     e.preventDefault()
-    if (changed) saveDetails()
+    if (changed) await save(e)
+    const nextBooking = bookingDict[nextBookingId]
+    setView({ selectedDate: nextBooking.Date.split('T')[0] })
   }
 
   const initiateDelete = () => {
@@ -168,7 +168,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-3 gap-4 py-4 pb-0">
+      <div className="grid grid-cols-3 gap-2 py-4 pb-0">
         <div>
           <FormInputButton
             className="w-full"
@@ -188,7 +188,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           />
           <FormInputButton
             className="rounded-bl-none rounded-tl-none w-full"
-            text={!changed ? 'Next' : 'Save and Next'}
+            text={!changed ? 'Next' : 'Save & Next'}
             intent='PRIMARY'
             onClick={saveAndNext}
             disabled={submitting || !nextBookingId}

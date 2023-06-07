@@ -1,13 +1,13 @@
 import { format } from 'date-fns'
 import { useRecoilValue } from 'recoil'
-import { performanceDictSelector } from 'state/booking/selectors/performanceDictSelector'
+import { performanceState } from 'state/booking/performanceState'
 
 interface PerformanceBadgeProps {
   performanceId: number
 }
 
 export const PerformanceBadge = ({ performanceId }: PerformanceBadgeProps) => {
-  const perfromanceDict = useRecoilValue(performanceDictSelector)
+  const perfromanceDict = useRecoilValue(performanceState)
   const performance = perfromanceDict[performanceId]
 
   if (!performance) return

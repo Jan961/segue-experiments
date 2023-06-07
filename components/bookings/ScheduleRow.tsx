@@ -4,11 +4,10 @@ import { DateViewModel } from 'state/booking/selectors/scheduleSelector'
 import { viewState } from 'state/booking/viewState'
 import { BookingDisplay } from './BookingDisplay'
 import { RehearsalDisplay } from './RehearsalDisplay'
-import { PerformanceBadge } from './table/PerformanceBadge'
 import { unique } from 'radash'
 import { DateDisplay } from './DateDisplay'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
-import { performanceDictSelector } from 'state/booking/selectors/performanceDictSelector'
+import { performanceState } from 'state/booking/performanceState'
 
 interface ScheduleRowProps {
   date: DateViewModel
@@ -17,7 +16,6 @@ interface ScheduleRowProps {
 export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   const [view, setView] = useRecoilState(viewState)
   const bookingDict = useRecoilValue(bookingDictSelector)
-  const performanceDict = useRecoilValue(performanceDictSelector)
 
   const dateKey = date.Date.split('T')[0]
 

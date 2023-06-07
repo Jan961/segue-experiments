@@ -1,7 +1,6 @@
 import { selector } from 'recoil'
 import { sort } from 'radash'
 import { dateBlockState } from '../dateBlockState'
-import { bookingState } from '../bookingState'
 import { differenceInWeeks, startOfWeek, isBefore, addWeeks, parseISO } from 'date-fns'
 import { sortedBookingSelector } from './sortedBookingSelector'
 

@@ -5,14 +5,14 @@ import { FormInputTime } from 'components/global/forms/FormInputTime'
 import { PerformanceDTO } from 'interfaces'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
-import { performanceDictSelector } from 'state/booking/selectors/performanceDictSelector'
+import { performanceState } from 'state/booking/performanceState'
 
 export interface PerformancePanelProps {
   performanceId: number
 }
 
 export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
-  const performanceDict = useRecoilValue(performanceDictSelector)
+  const performanceDict = useRecoilValue(performanceState)
   const perf: PerformanceDTO = performanceDict[performanceId]
   const [inputs, setInputs] = React.useState<PerformanceDTO>(perf)
   const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })

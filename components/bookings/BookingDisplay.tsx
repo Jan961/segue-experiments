@@ -2,7 +2,7 @@ import { PropsWithChildren } from 'react'
 import { useRecoilValue } from 'recoil'
 import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { distanceDictSelector } from 'state/booking/selectors/distanceDictSelector'
-import { venueDictSelector } from 'state/booking/selectors/venueDictSelector'
+import { venueState } from 'state/booking/venueState'
 
 interface VenueDisplayProps {
   bookingId: number
@@ -17,7 +17,7 @@ const timeFormat = (mins?: number) => {
 
 export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithChildren<VenueDisplayProps>) => {
   const bookingDict = useRecoilValue(bookingDictSelector)
-  const venueDict = useRecoilValue(venueDictSelector)
+  const venueDict = useRecoilValue(venueState)
   const distanceDict = useRecoilValue(distanceDictSelector)
 
   if (!bookingId) return null
