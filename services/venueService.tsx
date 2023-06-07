@@ -64,7 +64,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
   return stops.map((stop: DistanceStop) => {
     if (!prev || prev.Ids.length > 1) { // If the last stop has multiple options, we don't know which
       prev = stop
-      return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: undefined, Mins: undefined })) }
+      return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: null, Mins: null })) }
     }
 
     return {
@@ -79,8 +79,8 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 
         return {
           VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : undefined,
-          Mins: match?.TimeMins ? match.TimeMins : undefined
+          Miles: match?.Mileage ? match.Mileage : null,
+          Mins: match?.TimeMins ? match.TimeMins : null
         }
       })
     }

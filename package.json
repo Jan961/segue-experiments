@@ -58,7 +58,6 @@
     "recoil": "^0.7.7",
     "rxjs": "^7.5.7",
     "serverless-mysql": "^1.5.4",
-    "superjson": "^1.12.3",
     "tailwindcss": "^3.1.8",
     "tempfile": "^4.0.0",
     "tls": "file:./src/mock/tls",
