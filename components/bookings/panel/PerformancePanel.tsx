@@ -4,7 +4,7 @@ import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputTime } from 'components/global/forms/FormInputTime'
 import { PerformanceDTO } from 'interfaces'
 import React from 'react'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { performanceState } from 'state/booking/performanceState'
 
 export interface PerformancePanelProps {
@@ -12,8 +12,8 @@ export interface PerformancePanelProps {
 }
 
 export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
-  const performanceDict = useRecoilValue(performanceState)
-  const perf: PerformanceDTO = performanceDict[performanceId]
+  const [perfDict, setPerfDict] = useRecoilState(performanceState)
+  const perf: PerformanceDTO = perfDict[performanceId]
   const [inputs, setInputs] = React.useState<PerformanceDTO>(perf)
   const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })
 
@@ -39,14 +39,14 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
   }
 
   const saveDetails = async () => {
-    const response = await axios({
+    const { data } = await axios({
       method: 'POST',
-      url: '/api/bookings/update/',
+      url: '/api/bookings/Performances/upsert/',
       data: inputs
     })
 
-    // const updated = response.data
-    // updatePerformance(updated)
+    const newPerf = { ...perfDict, [data.Id]: data }
+    setPerfDict(newPerf)
   }
 
   const save = async (e) => {
@@ -79,21 +79,25 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
           onChange={handleOnChange}
         />
       </div>
-      <div className="grid grid-cols-2 gap-2 pb-0">
-        <FormInputButton
-          className="w-full"
-          text="Delete"
-          intent="DANGER"
-          onClick={initiateDelete}
-          disabled={submitting}
-        />
-        <FormInputButton
-          className="w-full"
-          text={'Save'}
-          intent='PRIMARY'
-          onClick={save}
-          disabled={submitting}
-        />
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <FormInputButton
+            className="w-full"
+            text="Delete"
+            intent="DANGER"
+            onClick={initiateDelete}
+            disabled={submitting}
+          />
+        </div>
+        <div className="col-span-2">
+          <FormInputButton
+            className="w-full"
+            text="Save"
+            intent='PRIMARY'
+            disabled={submitting || !changed}
+            onClick={save}
+          />
+        </div>
       </div>
     </>
   )

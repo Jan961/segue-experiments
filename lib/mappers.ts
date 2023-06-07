@@ -1,4 +1,4 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, Booking } from '@prisma/client'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType } from '@prisma/client'
 import { BookingDTO, DateBlockDTO, GetInFitUpDTO, PerformanceDTO, RehearsalDTO, ShowDTO, TourDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'

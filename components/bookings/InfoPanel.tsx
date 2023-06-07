@@ -28,25 +28,37 @@ export const InfoPanel = () => {
   const rehearsalIds = date.RehearsalIds
   const performances = date.PerformanceIds
 
+  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-4 shadow-md'
+
   return (
     <div className="w-6/12 pl-2" >
-      <div className="bg-white rounded-lg px-2 pb-2 pt-1">
-        { bookingIds.map(id => (
-          <PanelDrawer open key={id} title="Booking">
-            <BookingPanel key={id} bookingId={id} />
-          </PanelDrawer>
-        ))}
-        { rehearsalIds.map(id => (
-          <PanelDrawer open key={id} title="Rehearsal">
-            <RehearsalPanel key={id} rehearsalId={id} />
-          </PanelDrawer>
-        ))}
-        { performances.map((id, index) => (
-          <PanelDrawer open title={`Performance ${index + 1}`} key={id}>
-            <PerformancePanel key={id} performanceId={id} />
-          </PanelDrawer>
-        ))}
-      </div>
+      { !!bookingIds.length && (
+        <div className={sectionClass}>
+          { bookingIds.map(id => (
+            <PanelDrawer open key={id} title="Booking">
+              <BookingPanel key={id} bookingId={id} />
+            </PanelDrawer>
+          ))}
+        </div>
+      )}
+      { !!rehearsalIds.length && (
+        <div className={sectionClass}>
+          { rehearsalIds.map(id => (
+            <PanelDrawer open key={id} title="Rehearsal">
+              <RehearsalPanel key={id} rehearsalId={id} />
+            </PanelDrawer>
+          ))}
+        </div>
+      )}
+      { !!performances.length && (
+        <div className={sectionClass}>
+          { performances.map((id, index) => (
+            <PanelDrawer open title={`Performance ${index + 1}`} key={id}>
+              <PerformancePanel key={id} performanceId={id} />
+            </PanelDrawer>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
