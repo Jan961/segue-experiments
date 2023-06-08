@@ -7,6 +7,7 @@ import type { AppProps } from 'next/app'
 // import { useRouter } from 'next/router'
 import { RecoilRoot } from 'recoil'
 import { ClientStateSetter, setInitialStateServer } from 'lib/recoil'
+import { ClerkProvider } from '@clerk/nextjs'
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
     getLayout?: (page: ReactElement) => ReactNode
@@ -83,9 +84,11 @@ export default function MyApp ({ Component, pageProps }: AppPropsWithLayout) {
   const { intitialState } = pageProps
 
   return (
-    <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, intitialState)}>
-      <ClientStateSetter intitialState={intitialState} />
-      <Component {...pageProps} />
-    </RecoilRoot>
+    <ClerkProvider {...pageProps}>
+      <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, intitialState)}>
+        <ClientStateSetter intitialState={intitialState} />
+        <Component {...pageProps} />
+      </RecoilRoot>
+    </ClerkProvider>
   )
 }
