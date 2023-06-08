@@ -31,10 +31,10 @@ export const deleteBookingById = async (BookingId: any) => {
   await prisma.$transaction([
     prisma.booking.delete({
       where: {
-        BookingId
+        Id: BookingId
       }
     }),
-    prisma.bookingPerformance.deleteMany({
+    prisma.performance.deleteMany({
       where: {
         BookingId
       }
@@ -49,8 +49,7 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
     },
     data: {
       FirstDate
-    },
-    include: bookingInclude
+    }
   })
 }
 

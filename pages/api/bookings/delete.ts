@@ -2,7 +2,6 @@ import { deleteBookingById } from 'services/bookingService'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  // reset booking id to blank booking
   try {
     const bookingId = parseInt(req.body.bookingId)
     await deleteBookingById(bookingId)
@@ -10,6 +9,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({})
   } catch (e) {
     console.log(e)
-    res.status(500)
+    res.status(500).json({ err: 'Error Deleting Booking' })
   }
 }

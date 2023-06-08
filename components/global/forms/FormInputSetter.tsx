@@ -17,9 +17,9 @@ export const FormInputTextAttached = ({ placeholder, onChange, value, name, labe
   return (
     <div >
       <label htmlFor={name}>{ label }
-        <div className="flex mb-4">
-          <FormInputText disabled name={name} value={value} className="mb-0 rounded-r-none" />
-          <FormInputButton disabled={disabled} text="Change" onClick={onClick} className="rounded-l-none" />
+        <div className="flex">
+          <FormInputText disabled name={name} value={value} className="rounded-r-none" />
+          <FormInputButton disabled={disabled} text="Change" onClick={onClick} className="rounded-l-none mb-4" />
         </div>
       </label>
     </div>

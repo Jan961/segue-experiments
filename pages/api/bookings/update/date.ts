@@ -14,6 +14,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const result = await changeBookingDate(bookingId, new Date(date))
 
     if (result) {
+      console.log(result)
       res.status(200).json(bookingMapper(result))
     }
     res.status(404).json({})

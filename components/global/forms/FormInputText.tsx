@@ -38,7 +38,7 @@ export const FormInputText = (props: Input) => {
 
   if (label) {
     return (
-      <div>
+      <div className={className}>
         <label htmlFor={name}>{ label } { required ? '*' : null }
           <input type="text" {...inputProps} />
         </label>

@@ -3,11 +3,11 @@ import { dateService } from 'services/dateService'
 import { StyledDialog } from 'components/global/StyledDialog'
 import { FormInputTextAttached } from 'components/global/forms/FormInputSetter'
 import { useRecoilState } from 'recoil'
-import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import axios from 'axios'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { UpdateDateParams } from 'pages/api/bookings/update/date'
+import { bookingState } from 'state/booking/bookingState'
 
 interface ChangeBookingDateProps {
   bookingId: number
@@ -15,7 +15,7 @@ interface ChangeBookingDateProps {
 }
 
 export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProps) => {
-  const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
+  const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const [showModal, setShowModal] = React.useState(false)
   const [date, setDate] = React.useState(undefined)
   const [loading, setLoading] = React.useState(false)
@@ -31,14 +31,16 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
     e.preventDefault()
     setLoading(true)
 
-    const data: UpdateDateParams = {
+    const params: UpdateDateParams = {
       bookingId,
       date
     }
 
     try {
-      const response = await axios.post('/api/bookings/update/date', data)
-      updateBooking(response.data)
+      const { data } = await axios.post('/api/bookings/update/date', params)
+
+      const newState = { ...bookingDict, [data.Id]: data }
+      setBookingDict(newState)
       setShowModal(false)
     } finally {
       setLoading(false)
@@ -53,7 +55,7 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
 
   return (
     <>
-      <FormInputTextAttached disabled={disabled} name="ShowDate" value={dateService.dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
+      <FormInputTextAttached disabled={disabled} name="Date" value={dateService.dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
       <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.Date)}`} open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent='DANGER' header="Warning">

@@ -5,7 +5,6 @@ import { VenueInfo } from '../modal/VenueInfo'
 import { venueState } from 'state/booking/venueState'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
-import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
 import { ChangeBookingDate } from '../modal/ChangeBookingDate'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { BookingDTO, VenueMinimalDTO } from 'interfaces'
@@ -14,6 +13,9 @@ import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 import { sortedBookingSelector } from 'state/booking/selectors/sortedBookingSelector'
 import { viewState } from 'state/booking/viewState'
+import { bookingState } from 'state/booking/bookingState'
+import { omit } from 'radash'
+import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 
 const getNextBookingId = (sortedBookings: BookingDTO[], current: number) => {
   let found = false
@@ -31,7 +33,7 @@ interface BookingPanelProps {
 
 export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const venues = useRecoilValue(venueState)
-  const [bookingDict, updateBooking] = useRecoilState(bookingDictSelector)
+  const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const sortedBookings = useRecoilValue(sortedBookingSelector)
   const setView = useSetRecoilState(viewState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
@@ -39,6 +41,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const booking = bookingDict[bookingId]
   const nextBookingId = getNextBookingId(sortedBookings, bookingId)
   const [inputs, setInputs] = React.useState<BookingDTO>(booking)
+  const [deleting, setDeleting] = React.useState(false)
 
   React.useEffect(() => {
     if (!booking) {
@@ -59,8 +62,10 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
       data: inputs
     })
 
-    const updated = response.data
-    updateBooking(updated)
+    const incoming = response.data
+    const replacement = { ...bookingDict, [incoming.Id]: incoming }
+
+    setBookingDict(replacement)
   }
 
   const save = async (e) => {
@@ -95,8 +100,15 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     setView({ selectedDate: nextBooking.Date.split('T')[0] })
   }
 
-  const initiateDelete = () => {
-    alert('Not Implimented, but will confirm')
+  const initiateDelete = async () => {
+    setDeleting(true)
+  }
+
+  const performDelete = async () => {
+    setDeleting(false)
+    await axios.post('/api/bookings/delete', { bookingId })
+    const newState = omit(bookingDict, [bookingId])
+    setBookingDict(newState)
   }
 
   const venueOptions: SelectOption[] = [
@@ -112,6 +124,14 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
 
   return (
     <form>
+      { deleting && (
+        <DeleteConfirmation
+          title="Delete Booking"
+          onCancel={() => setDeleting(false)}
+          onConfirm={performDelete}>
+          <p>This will the delete the booking and related performances</p>
+        </DeleteConfirmation>
+      )}
       <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-4 p-4 pb-0">
         <ChangeBookingDate disabled={submitting} bookingId={booking.Id} />
         <FormInputSelect

@@ -6,8 +6,7 @@ import { BookingDisplay } from './BookingDisplay'
 import { RehearsalDisplay } from './RehearsalDisplay'
 import { unique } from 'radash'
 import { DateDisplay } from './DateDisplay'
-import { bookingDictSelector } from 'state/booking/selectors/bookingDictSelector'
-import { performanceState } from 'state/booking/performanceState'
+import { bookingState } from 'state/booking/bookingState'
 
 interface ScheduleRowProps {
   date: DateViewModel
@@ -15,7 +14,7 @@ interface ScheduleRowProps {
 
 export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   const [view, setView] = useRecoilState(viewState)
-  const bookingDict = useRecoilValue(bookingDictSelector)
+  const bookingDict = useRecoilValue(bookingState)
 
   const dateKey = date.Date.split('T')[0]
 
@@ -36,7 +35,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
 
   // If any are unconfirmed, display whole row in italics
   for (const id of uniqueBookingIds) {
-    if (bookingDict[id].StatusCode === 'U') rowClass = classNames(rowClass, 'italic')
+    if (bookingDict[id]?.StatusCode === 'U') rowClass = classNames(rowClass, 'italic')
   }
 
   return (
