@@ -1,21 +1,21 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma'
-import { PerformanceDTO } from 'interfaces'
+import { RehearsalDTO } from 'interfaces'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const perf = req.body as PerformanceDTO
+    const rehearsal = req.body as RehearsalDTO
     await prisma.$transaction([
-      prisma.performance.delete({
+      prisma.rehearsal.delete({
         where: {
-          Id: perf.Id
+          Id: rehearsal.Id
         }
       })
     ])
-    console.log(`Deleted Performance: ${perf.Id}`)
+    console.log(`Deleted Rehearsal: ${rehearsal.Id}`)
     res.status(200).json({})
   } catch (e) {
     console.log(e)
-    res.status(500).json({ err: 'Error Deleting Performance' })
+    res.status(500).json({ err: 'Error Deleting Rehearsal' })
   }
 }

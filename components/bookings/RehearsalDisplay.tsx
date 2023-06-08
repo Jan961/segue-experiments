@@ -1,12 +1,12 @@
 import { useRecoilValue } from 'recoil'
-import { rehearsalDictSelector } from 'state/booking/selectors/rehearsalDictSelector'
+import { rehearsalState } from 'state/booking/rehearsalState'
 
 interface RehearsalDisplayProps {
   rehearsalId: number
 }
 
 export const RehearsalDisplay = ({ rehearsalId }: RehearsalDisplayProps) => {
-  const rehearsalDict = useRecoilValue(rehearsalDictSelector)
+  const rehearsalDict = useRecoilValue(rehearsalState)
 
   if (!rehearsalId) return null
 
