@@ -11,7 +11,7 @@ import saveAs from "file-saver";
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
 import {userService} from "../../../services/user.service";
-import {dateService} from "../../../services/dateService";
+import {dateToSimple, getWeekDay, toSql} from "../../../services/dateService";
 import IconWithText from "../IconWithText";
 import { faChartLine, faChartPie } from "@fortawesome/free-solid-svg-icons";
 XLSX.set_cptable(cpexcel);
@@ -25,7 +25,7 @@ function formatWeekNumber(weekNumber){
 
 function formatDate(date){
 
-    return  dateService.toSql(date)
+    return  toSql(date)
 }
 
 export default function SalesVsCapacity(){
@@ -169,7 +169,7 @@ export default function SalesVsCapacity(){
              * Check if we need the heading row for the Showdate
              */
 
-            if (dateService.dateToSimple(lastDate) != dateService.dateToSimple(perf.ShowDate) || lastDate === null) {
+            if (dateToSimple(lastDate) != dateToSimple(perf.ShowDate) || lastDate === null) {
                 ResultCol = "F"
                 row = row + 1
 
@@ -177,9 +177,9 @@ export default function SalesVsCapacity(){
                 //Com A
                 worksheet.getCell(`A${row}`).value = "Week " + perf.TourWeekNum
                 // ColB
-                worksheet.getCell(`B${row}`).value = dateService.getWeekDay(ShowDate)
+                worksheet.getCell(`B${row}`).value = getWeekDay(ShowDate)
                 // Colc
-                worksheet.getCell(`C${row}`).value = dateService.dateToSimple(ShowDate)
+                worksheet.getCell(`C${row}`).value = dateToSimple(ShowDate)
 
                 // COld
                 worksheet.getCell(`D${row}`).value = perf.Town
@@ -226,7 +226,7 @@ export default function SalesVsCapacity(){
         for( let week of weeks){
 
             worksheet.getCell(`${dateCol}3`).value = week.WeekName
-            worksheet.getCell(`${dateCol}4`).value = dateService.dateToSimple(week.WeekDate)
+            worksheet.getCell(`${dateCol}4`).value = dateToSimple(week.WeekDate)
             lastCol = dateCol
 
             worksheet.getCell(`${dateCol}${rowCount+2}`).value = { formula: `sum(${dateCol}${firstRow}:${dateCol}${rowCount})`}

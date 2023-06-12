@@ -1,3 +1,4 @@
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore } from 'date-fns'
 import moment from 'moment'
 
 export const safeDate = (date: Date | string) => {
@@ -66,14 +67,8 @@ export const getWeekDayLong = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
 
-/**
- *
- * Calculate WeeKs Number Based on
- *
- * @param showDate
- * @param firstShowDate
- */
-export const weeks = (showDate: string, firstShowDate: string) => {
+// Broken week number calculation
+export const weeks = (showDate: string, firstShowDate: string): number => {
   const date = moment(showDate, 'YYYY-MM-DD')
   const TourStartDate = moment(firstShowDate, 'YYYY-MM-DD')
   const diff = moment.duration(TourStartDate.diff(date))
@@ -84,6 +79,21 @@ export const weeks = (showDate: string, firstShowDate: string) => {
   }
 
   return week
+}
+
+// Working one. AFAIK
+export const calculateWeekNumber = (tourStart: Date, dateToNumber: Date): number => {
+  const weekOneStart = startOfWeek(tourStart, { weekStartsOn: 1 })
+  let weekNumber = differenceInWeeks(dateToNumber, weekOneStart)
+
+  // Handle the week boundary condition
+  const adjustedStartDate = addWeeks(weekOneStart, weekNumber)
+  if (isBefore(dateToNumber, adjustedStartDate)) weekNumber -= 1
+  if (isBefore(dateToNumber, weekOneStart)) weekNumber -= 1
+
+  weekNumber += 1
+
+  return weekNumber
 }
 
 export const timeNow = () => {
@@ -123,25 +133,4 @@ export const quickISO = (DateString: string) =>{
 export const formDate = (DateString: string) => {
   const formDateString = DateString.toString()
   return formDateString.substring(0, 10)
-}
-
-export const dateService = {
-  dateToSimple,
-  dateToPicker,
-  toISO,
-  toSql,
-  getWeekDay,
-  weeks,
-  dateTimeToTime,
-  timeNow,
-  formatTime,
-  getMonday,
-  getWeekDayLong,
-  getSunday,
-  formatDateUK,
-  getDateDaysAgo,
-  getDateDaysInFuture,
-  quickISO,
-  formDate,
-  todayToSimple
 }

@@ -10,7 +10,7 @@ XLSX.stream.set_readable(Readable);
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
 import {userService} from "../../../services/user.service";
-import {dateService} from "../../../services/dateService";
+import {toSql} from "../../../services/dateService";
 import IconWithText from "../IconWithText";
 import { faChartLine } from "@fortawesome/free-solid-svg-icons";
 XLSX.set_cptable(cpexcel);
@@ -22,7 +22,7 @@ function formatWeekNumber(weekNumber){
 
 function formatDate(date){
 
-    return  dateService.toSql(date)
+    return  toSql(date)
 }
 
 export default function SalesSummaryWeekly(){

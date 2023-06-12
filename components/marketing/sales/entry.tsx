@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { userService } from 'services/user.service'
 import Email from '../copyButton/email'
-import { dateService } from 'services/dateService'
+import { dateToSimple, getWeekDay } from 'services/dateService'
 import moment from 'moment'
 import axios from 'axios'
 import { LoadingPage } from 'components/global/LoadingPage'
@@ -414,8 +414,8 @@ export default function Entry({ searchFilter }: props) {
                       <option value={0}>Select A Performance</option>
                       {salesWeeksVenues.map((item) => (
                         <option key={item.BookingId} value={item.BookingId}>
-                          {dateService.getWeekDay(item.ShowDate)}{" "}
-                          {dateService.dateToSimple(item.ShowDate)} |{" "}
+                          {getWeekDay(item.ShowDate)}{" "}
+                          {dateToSimple(item.ShowDate)} |{" "}
                           {item.Venue.Name} ({item.Venue.Town})
                         </option>
                       ))}
@@ -1277,7 +1277,7 @@ export default function Entry({ searchFilter }: props) {
                     <button onClick={() => importEmail(item.Id)}>
                       <span>
                         {JSON.stringify(item)}
-                        {item.SetTour} {dateService.dateToSimple(item.Date)}{" "}
+                        {item.SetTour} {dateToSimple(item.Date)}{" "}
                         Import
                       </span>
                     </button>

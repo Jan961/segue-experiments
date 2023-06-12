@@ -13,7 +13,7 @@ import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
 import Link from "next/link";
 import SalesSummaryExcel from "../excelTemplates/salesSummaryExcel";
 import {userService} from "../../../services/user.service";
-import {dateService} from "../../../services/dateService";
+import {dateToSimple} from "../../../services/dateService";
 XLSX.set_cptable(cpexcel);
 
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
@@ -161,7 +161,7 @@ export default function SelectedVenues(){
                     }
 
                     if(tourDate.OnSaleDate !== null) {
-                        worksheet.getCell(`G${row}`).value = dateService.dateToSimple(tourDate.OnSaleDate)
+                        worksheet.getCell(`G${row}`).value = dateToSimple(tourDate.OnSaleDate)
                     }
 
                     if (tourDate.MarketingPlanReceived === false){

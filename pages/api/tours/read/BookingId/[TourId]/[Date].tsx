@@ -1,4 +1,4 @@
-import { dateService } from 'services/dateService'
+import { toSql } from 'services/dateService'
 import prisma from 'lib/prisma'
 
 export default async function handle(req, res) {
@@ -6,7 +6,7 @@ export default async function handle(req, res) {
     try {
 
         let tourID = parseInt(req.query.TourId)
-        let date = dateService.toSql(req.query.Date)
+        let date = toSql(req.query.Date)
         const bookings = await prisma.booking.findFirst({
             where: {
                 TourId: tourID,

@@ -14,7 +14,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { useEffect, useState } from "react";
-import { dateService } from "services/dateService";
+import { formatDateUK, weeks } from "services/dateService";
 import { formatPerformanceTime } from "utils/formatPerformanceTimes";
 
 let show = "ST1"; // This needs to be passed from the template
@@ -128,8 +128,8 @@ const Summary = ({ actionBookingId, activeTours }) => {
                   .map((tour) => {
                     const showDate = new Date(tour.ShowDate);
                     const tourStartDate = tour.Tour.TourStartDate;
-                    const weekday = dateService.weeks(tour.showDate, tourStartDate);
-                    const ukDate = dateService.formatDateUK(showDate);
+                    const weekday = weeks(tour.showDate, tourStartDate);
+                    const ukDate = formatDateUK(showDate);
                     const totalSeats = tour.Venue.Seats;
                     const grossProfit = tour.GP;
                     console.log("Tour: ", tour);
@@ -205,7 +205,4 @@ const Summary = ({ actionBookingId, activeTours }) => {
   );
 };
 
-export default Summary;
-function weeks(Time: any) {
-  throw new Error("Function not implemented.");
-}
+export default Summary

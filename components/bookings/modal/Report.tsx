@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import excelJsLoader from 'lib/excelJsLoader'
 import saveAs from 'file-saver'
-import { dateService } from '../../../services/dateService'
+import { dateToSimple, formatTime, getWeekDay, timeNow, todayToSimple, weeks } from '../../../services/dateService'
 import { ToolbarButton } from '../ToolbarButton'
 
 export default function Report (TourId) {
@@ -65,7 +65,7 @@ export default function Report (TourId) {
       fgColor: { argb: '8EA9DB' }
     }
 
-    exportDetails.value = 'Exported: ' + dateService.todayToSimple() + ' ' + dateService.timeNow()
+    exportDetails.value = 'Exported: ' + todayToSimple() + ' ' + timeNow()
 
     var headerRow = worksheet.addRow()
     worksheet.getRow(3).fill = {
@@ -176,13 +176,13 @@ export default function Report (TourId) {
       a.value = value.Tour.Show.Code + value.Tour.Code
 
       const b = worksheet.getCell(`B${dataRow}`)
-      b.value = dateService.getWeekDay((value.ShowDate))
+      b.value = getWeekDay((value.ShowDate))
 
       const c = worksheet.getCell(`C${dataRow}`)
-      c.value = dateService.dateToSimple(value.ShowDate)
+      c.value = dateToSimple(value.ShowDate)
 
       const d = worksheet.getCell(`D${dataRow}`)
-      d.value = dateService.weeks(value.Tour.TourStartDate, value.ShowDate)
+      d.value = weeks(value.Tour.TourStartDate, value.ShowDate)
 
       if (b.value === 'Mon') {
         a.fill = {
@@ -280,11 +280,11 @@ export default function Report (TourId) {
         CellI.value = value.PerformancesPerDay
 
         const j = worksheet.getCell(`J${dataRow}`)
-        j.value = dateService.formatTime(value.Performance1Time)
+        j.value = formatTime(value.Performance1Time)
 
         if (value.PerformancesPerDay == 2) {
           const k = worksheet.getCell(`K${dataRow}`)
-          k.value = dateService.formatTime(value.Performance2Time)
+          k.value = formatTime(value.Performance2Time)
         }
 
         const l = worksheet.getCell(`L${dataRow}`)

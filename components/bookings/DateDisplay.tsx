@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil'
-import { dateService } from 'services/dateService'
+import { dateToSimple, getWeekDay } from 'services/dateService'
 import { weekNoSelector } from 'state/booking/selectors/weekNoSelector'
 import { isMonday, parseISO } from 'date-fns'
 import classNames from 'classnames'
@@ -22,10 +22,10 @@ export const DateDisplay = ({ date }: { date: string}) => {
               { weekNos[date] }
             </div>
             <div className="col-span-2">
-              { dateService.getWeekDay(date).slice(0, 3)}
+              { getWeekDay(date).slice(0, 3)}
             </div>
             <div className="col-span-3">
-              { dateService.dateToSimple(date) }
+              { dateToSimple(date) }
             </div>
           </div>
         </div>

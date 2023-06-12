@@ -1,22 +1,9 @@
 import { selector } from 'recoil'
 import { sort } from 'radash'
 import { dateBlockState } from '../dateBlockState'
-import { differenceInWeeks, startOfWeek, isBefore, addWeeks, parseISO } from 'date-fns'
+import { parseISO } from 'date-fns'
 import { sortedBookingSelector } from './sortedBookingSelector'
-
-const calculateWeekNumber = (tourStart: Date, dateToNumber: Date): number => {
-  const weekOneStart = startOfWeek(tourStart, { weekStartsOn: 1 })
-  let weekNumber = differenceInWeeks(dateToNumber, weekOneStart)
-
-  // Handle the week boundary condition
-  const adjustedStartDate = addWeeks(weekOneStart, weekNumber)
-  if (isBefore(dateToNumber, adjustedStartDate)) weekNumber -= 1
-  if (isBefore(dateToNumber, weekOneStart)) weekNumber -= 1
-
-  weekNumber += 1
-
-  return weekNumber
-}
+import { calculateWeekNumber } from 'services/dateService'
 
 const getKey = (date: string) => (date.split('T')[0])
 

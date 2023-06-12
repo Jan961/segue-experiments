@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import Email from '../copyButton/email'
-import { dateService } from 'services/dateService'
+import { dateToSimple, getWeekDay } from 'services/dateService'
 import { userService } from 'services/user.service'
 import axios from 'axios'
 import { alertService } from 'services/alert.service'
@@ -192,7 +192,7 @@ export default function FinalSales() {
                             >
                                 <option>Select A Venue</option>
                                 {activeSetTourDates.map((item) => (
-                                    <option value={item.BookingId}>{dateService.getWeekDay(item.ShowDate)} {dateService.dateToSimple(item.ShowDate)} {(item.Venue.Name)} ({(item.Venue.Town)})</option>
+                                    <option value={item.BookingId}>{getWeekDay(item.ShowDate)} {dateToSimple(item.ShowDate)} {(item.Venue.Name)} ({(item.Venue.Town)})</option>
                                 ))}
 
                             </select>
@@ -325,7 +325,7 @@ export default function FinalSales() {
                                     <button onClick={() => importEmail(item.Id)}>
                                         <span>
                                             {JSON.stringify(item)}
-                                            {item.SetTour} {dateService.dateToSimple(item.Date)} Import
+                                            {item.SetTour} {dateToSimple(item.Date)} Import
                                         </span>
                                     </button>
                                 </div>

@@ -13,7 +13,7 @@ import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
 import Link from "next/link";
 import SalesSummaryExcel from "../excelTemplates/salesSummaryExcel";
 import {userService} from "../../../services/user.service";
-import {dateService} from "../../../services/dateService";
+import {dateToSimple, formatDateUK, getWeekDay, getWeekDayLong, timeNow} from "../../../services/dateService";
 XLSX.set_cptable(cpexcel);
 
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
@@ -103,7 +103,7 @@ export default function SelectedVenues(){
                     }
                 }
                 titleText.value = title
-                worksheet.getCell("A2").value = "Exported: " + dateService.formatDateUK(new Date()) + " " + dateService.timeNow()
+                worksheet.getCell("A2").value = "Exported: " + formatDateUK(new Date()) + " " + timeNow()
 
                 let dataOutputStart = 4 // data will start from A4
                 let startCol = "A"
@@ -125,7 +125,7 @@ export default function SelectedVenues(){
                 let SumValue = 0.00
                 for (let day of response) {
 
-                    if (first === 1 && dateService.getWeekDay(day.ShowDate) !== "Mon") {
+                    if (first === 1 && getWeekDay(day.ShowDate) !== "Mon") {
 
                         // Work out how many days need be added
                         worksheet.mergeCells(row, colIndex, row, colIndex + 7);
@@ -149,7 +149,7 @@ export default function SelectedVenues(){
                         first = 2
                         colIndex = colIndex + nextCol
 
-                    } else if (dateService.getWeekDay(day.ShowDate) === "Mon") {
+                    } else if (getWeekDay(day.ShowDate) === "Mon") {
                         worksheet.mergeCells(row, colIndex, row, colIndex + 7);
                         let head = worksheet.getCell(5, colIndex)
                         head.border = {
@@ -183,9 +183,9 @@ export default function SelectedVenues(){
                     }
 
 
-                    worksheet.getCell(6, colIndex).value = dateService.dateToSimple(day.ShowDate)
+                    worksheet.getCell(6, colIndex).value = dateToSimple(day.ShowDate)
                     worksheet.getColumn(colIndex).width = 20
-                    worksheet.getCell(7, colIndex).value = dateService.getWeekDayLong(day.ShowDate)
+                    worksheet.getCell(7, colIndex).value = getWeekDayLong(day.ShowDate)
                     worksheet.getCell(8, colIndex).value = day.Town
                     worksheet.getCell(9, colIndex).value = day.DescriptionTruncated
                     if (day.Value !== null) {

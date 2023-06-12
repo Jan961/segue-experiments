@@ -1,10 +1,10 @@
 import prisma from 'lib/prisma'
-import { dateService } from 'services/dateService'
+import { dateToSimple } from 'services/dateService'
 
 export default async function handle(req, res) {
     const TourId =  parseInt(req.query.TourId)
     // Convert Show Date ito datetime
-    const ShowDate = new Date(dateService.dateToSimple(res.query.date + " 00:00:00"))
+    const ShowDate = new Date(dateToSimple(res.query.date + " 00:00:00"))
 
 
     try {

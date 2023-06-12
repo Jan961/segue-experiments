@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { dateService } from 'services/dateService'
+import { dateToPicker } from 'services/dateService'
 
 interface Input {
   onChange: (e: any) => void
@@ -12,7 +12,7 @@ interface Input {
 }
 
 export const FormInputDate = ({ onChange, value, name, label, required, className, disabled }: Input) => {
-  const stringValue = dateService.dateToPicker(value)
+  const stringValue = dateToPicker(value)
   const baseClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2'
   const disabledClass = classNames(baseClass, 'bg-gray-100 text-gray-400')
 

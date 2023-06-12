@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { dateService } from 'services/dateService'
+import { dateToSimple } from 'services/dateService'
 import { userService } from 'services/user.service'
 import { ToolbarButton } from '../ToolbarButton'
 import { StyledDialog } from 'components/global/StyledDialog'
@@ -114,7 +114,7 @@ export default function TourGapsModal (tourId) {
     }))
   }
 
-  const availableDatesOptions = [].map(x => ({ text: dateService.dateToSimple(x.ShowDate), value: x.BookingId}))
+  const availableDatesOptions = [].map(x => ({ text: dateToSimple(x.ShowDate), value: x.BookingId}))
   const availableDistances = Array.from({ length: 8 }, (_, i) => ({ text: String((i + 1) * 25), value: String((i + 1) * 25) }))
 
   return (
