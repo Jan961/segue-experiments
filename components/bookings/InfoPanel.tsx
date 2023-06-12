@@ -6,10 +6,14 @@ import { DateViewModel, scheduleSelector } from 'state/booking/selectors/schedul
 import { first, flat, unique } from 'radash'
 import { PanelDrawer } from './panel/PanelDrawer'
 import { PerformancePanel } from './panel/PerformancePanel'
+import AddBooking from './panel/CreatePanel'
+import { bookingState } from 'state/booking/bookingState'
 
 export const InfoPanel = () => {
   const view = useRecoilValue(viewState)
   const schedule = useRecoilValue(scheduleSelector)
+  const bookingDict = useRecoilValue(bookingState)
+
   const { selectedDate } = view
 
   if (!selectedDate) {
@@ -28,14 +32,22 @@ export const InfoPanel = () => {
   const rehearsalIds = date.RehearsalIds
   const performances = date.PerformanceIds
 
-  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-4 shadow-md'
+  let bookingsOpen = bookingIds.length < 2
+
+  // Check single booking is not on the selected Date
+  if (bookingsOpen && bookingIds.length === 1) {
+    const booking = bookingDict[bookingIds[0]]
+    if (!booking.Date.startsWith(selectedDate)) bookingsOpen = false
+  }
+
+  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-8 shadow-md'
 
   return (
     <div className="w-6/12 pl-2" >
       { !!bookingIds.length && (
         <div className={sectionClass}>
           { bookingIds.map(id => (
-            <PanelDrawer open key={id} title="Booking">
+            <PanelDrawer open={bookingsOpen} key={id} title="Booking">
               <BookingPanel key={id} bookingId={id} />
             </PanelDrawer>
           ))}
@@ -59,6 +71,11 @@ export const InfoPanel = () => {
           ))}
         </div>
       )}
+      <div className={ sectionClass }>
+        <PanelDrawer title={'Create New'} intent='PRIMARY'>
+          <AddBooking />
+        </PanelDrawer>
+      </div>
     </div>
   )
 }

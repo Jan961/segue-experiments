@@ -1,23 +1,29 @@
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Disclosure, Transition } from '@headlessui/react'
+import classNames from 'classnames'
 import { PropsWithChildren } from 'react'
 
 interface PanelDrawerProps {
   title: string
-  open: boolean
+  open?: boolean
+  intent?: undefined | 'PRIMARY'
 }
 
-export const PanelDrawer = ({ children, title, open = false}: PropsWithChildren<PanelDrawerProps>) => {
+export const PanelDrawer = ({ children, title, open = false, intent }: PropsWithChildren<PanelDrawerProps>) => {
+  let buttonClass = `rounded bg-gray-200 hover:bg-gray-300
+    flex justify-between
+    w-full py-2 px-3 mt-2 text-left`
+
+  if (intent === 'PRIMARY') buttonClass = classNames(buttonClass, 'bg-primary-blue text-white hover:bg-soft-primary-blue')
+
   return (
     <Disclosure defaultOpen={open}>
       {({ open }) => (
         /* Use the `open` state to conditionally change the direction of an icon. */
         <>
           <Disclosure.Button
-            className="rounded bg-gray-200 hover:bg-gray-300
-            flex justify-between
-            w-full py-2 px-3 mt-2 text-left">
+            className={buttonClass}>
             { title }
             <FontAwesomeIcon
               icon={faChevronRight}

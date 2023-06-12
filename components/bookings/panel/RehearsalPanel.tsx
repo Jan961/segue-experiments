@@ -11,12 +11,6 @@ import { rehearsalState } from 'state/booking/rehearsalState'
 import { sortedRehearsalSelector } from 'state/booking/selectors/sortedRehearsalSelector'
 import { viewState } from 'state/booking/viewState'
 
-const DEFAULTSTATE: RehearsalDTO = {
-  Id: undefined,
-  Date: new Date().toISOString().split('T')[0],
-  Town: ''
-}
-
 interface RehearsalPanelProps {
   rehearsalId: number
 }

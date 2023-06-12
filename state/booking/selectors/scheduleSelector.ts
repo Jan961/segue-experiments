@@ -33,6 +33,7 @@ export interface DateViewModel {
 export interface ScheduleSectionViewModel {
   Dates: DateViewModel[]
   Name: string
+  Id: number
 }
 
 export interface ScheduleViewModel {
@@ -75,6 +76,7 @@ export const scheduleSelector = selector({
 
     return {
       Sections: dateBlocks.map((db) => ({
+        Id: db.Id,
         Name: db.Name,
         Dates: getArrayOfDatesBetween(db.StartDate, db.EndDate)
           .map((date: string) => dates[date] ? dates[date] : getDefaultDate(date))

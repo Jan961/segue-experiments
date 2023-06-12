@@ -42,6 +42,27 @@ export const deleteBookingById = async (BookingId: any) => {
   ])
 }
 
+export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number) => {
+  console.log(FirstDate)
+
+  return prisma.booking.create({
+    data: {
+      FirstDate,
+      DateBlock: {
+        connect: {
+          Id: DateBlockId
+        }
+      },
+      Venue: {
+        connect: {
+          Id: VenueId
+        }
+      }
+    },
+    include: bookingInclude
+  })
+}
+
 export const changeBookingDate = async (Id: number, FirstDate: Date) => {
   return prisma.booking.update({
     where: {
