@@ -3,17 +3,13 @@ import prisma from 'lib/prisma'
 import { PerformanceDTO } from 'interfaces'
 import { performanceMapper } from 'lib/mappers'
 import { Performance as PerformanceType } from '@prisma/client'
+import { dateStringToPerformancePair } from 'services/dateService'
 
 export default async function handle (req, res) {
   try {
     const data = req.body as PerformanceDTO
 
-    const datePart = data.Date.split('T')[0]
-    const timePart = data.Date.split('T')[1]
-
-    console.log(datePart)
-
-    const defaultDatePart = '1970-01-01'
+    const { Date, Time } = dateStringToPerformancePair(data.Date)
 
     let result: PerformanceType
     if (req.body.PerfomanceId !== null) {
@@ -22,15 +18,15 @@ export default async function handle (req, res) {
           Id: data.Id
         },
         data: {
-          Time: new Date(`${defaultDatePart} ${timePart}`),
-          Date: new Date(`${datePart}`)
+          Time,
+          Date
         }
       })
     } else {
       result = await prisma.performance.create({
         data: {
-          Time: new Date(`${defaultDatePart} ${timePart}`),
-          Date: new Date(`${datePart}`),
+          Time,
+          Date,
           BookingId: data.BookingId,
           Id: null // Insert
         }

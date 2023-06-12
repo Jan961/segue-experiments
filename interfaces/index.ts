@@ -98,7 +98,6 @@ export type BookingDTO = {
   LandingSite: string
   OnSaleDate: string
   OnSale: boolean
-  PerformanceIds: number[]
 }
 
 export type PerformanceDTO = {

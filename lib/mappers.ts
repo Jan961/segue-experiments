@@ -53,8 +53,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
   OnSaleDate: b.TicketsOnSaleFromDate ? b.TicketsOnSaleFromDate.toISOString() : '',
-  OnSale: b.TicketsOnSale,
-  PerformanceIds: b.Performance?.map((p: PerformanceType) => p.Id)
+  OnSale: b.TicketsOnSale
 })
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {

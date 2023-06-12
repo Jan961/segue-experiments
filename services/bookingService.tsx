@@ -73,13 +73,3 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
     }
   })
 }
-
-export const getPerformances = (BookingId) => {
-  console.log('Booking Service Get Performances ' + BookingId)
-  fetch(`/api/bookings/Performances/${BookingId}/`)
-    .then(data => data)
-    .then((data) => {
-      console.log(data)
-      return data
-    })
-}

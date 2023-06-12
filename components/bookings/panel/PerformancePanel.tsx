@@ -44,7 +44,7 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
   const saveDetails = async () => {
     const { data } = await axios({
       method: 'POST',
-      url: '/api/bookings/Performances/upsert/',
+      url: '/api/performances/update',
       data: inputs
     })
 

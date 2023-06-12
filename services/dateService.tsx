@@ -1,55 +1,67 @@
 import moment from 'moment'
 
-const safeDate = (date: Date | string) => {
+export const safeDate = (date: Date | string) => {
   if (typeof date === 'string') return new Date(date)
   return date
 }
 
-const todayToSimple = () => {
+export const todayToSimple = () => {
   const date = new Date()
   return date.toDateString()
 }
 
-const dateToSimple = (dateToFormat: Date | string) => {
+export const dateStringToPerformancePair = (dateString: string) => {
+  const datePart = dateString.split('T')[0]
+  const timePart = dateString.split('T')[1]
+
+  const defaultDatePart = '1970-01-01'
+
+  return {
+    Time: new Date(`${defaultDatePart} ${timePart}`),
+    Date: new Date(`${datePart}`)
+  }
+}
+
+export const dateToSimple = (dateToFormat: Date | string) => {
   if (!dateToFormat) return 'DD/MM/YYYY'
   const date = safeDate(dateToFormat)
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', day: '2-digit', month: '2-digit', timeZone: 'UTC' }
   return date.toLocaleDateString('en-GB', options)
 }
 
-const dateToPicker = (dateToFormat: Date | string) => {
+export const dateToPicker = (dateToFormat: Date | string) => {
   if (!dateToFormat) return ''
   return typeof dateToFormat === 'object' ? dateToFormat.toISOString().slice(0, 10) : dateToFormat.slice(0, 10)
 }
 
-function dateTimeToTime (dateToFormat) {
+export const dateTimeToTime = (dateToFormat) => {
   return moment(dateToFormat).format('HH:mm')
 }
 
-function toISO (date) {
+export const toISO = (date) => {
   return date.toISOString()
 }
 
-function toSql (date) {
+export const toSql = (date) => {
   return date.slice(0, 10)
 }
 
-function getDateDaysAgo (date, daysToSubtract) {
+export const getDateDaysAgo = (date, daysToSubtract) => {
   date = new Date(date)
   return moment(date, 'dd/mm/yyyy').subtract(daysToSubtract, 'days')
 }
 
-function getDateDaysInFuture (date, daysToSubtract) {
+export const getDateDaysInFuture = (date, daysToSubtract) => {
   date = new Date(date)
   return moment(date, 'dd/mm/yyyy').add(daysToSubtract, 'days')
 }
 
-function getWeekDay (dateToFormat: Date | string) {
+export const getWeekDay = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat)
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
 
-function getWeekDayLong (dateToFormat: Date | string) {
+export const getWeekDayLong = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat)
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
@@ -61,7 +73,7 @@ function getWeekDayLong (dateToFormat: Date | string) {
  * @param showDate
  * @param firstShowDate
  */
-function weeks (showDate: string, firstShowDate: string) {
+export const weeks = (showDate: string, firstShowDate: string) => {
   const date = moment(showDate, 'YYYY-MM-DD')
   const TourStartDate = moment(firstShowDate, 'YYYY-MM-DD')
   const diff = moment.duration(TourStartDate.diff(date))
@@ -74,56 +86,41 @@ function weeks (showDate: string, firstShowDate: string) {
   return week
 }
 
-function timeNow () {
+export const timeNow = () => {
   const today = new Date()
   return today.getHours().toFixed() + ':' + today.getMinutes().toFixed() + ':' + today.getSeconds().toFixed()
 }
 
-function formatTime (timestamp) {
+export const formatTime = (timestamp) => {
   // This will ignre date
   const today = new Date(timestamp)
   const options = { hours: '2-digit', minutes: '2-digit', seconds: '2-digit' }
   return today.toLocaleTimeString()
 }
 
-function formatDateUK (date) {
+export const formatDateUK = (date) =>{
   // This will ignre date
   const today = new Date(date)
   return today.toLocaleDateString('en-GB')
 }
 
-/**
- * This is a get Week Start
- * @param inputDate
- */
-function getMonday (inputDate) {
+export const getMonday = (inputDate) => {
   const currentDateObj = new Date(inputDate)
   currentDateObj.setDate(currentDateObj.getDate() - (currentDateObj.getDay() + 6) % 7)
   return currentDateObj
 }
 
-/**
- * Get Week End
- * @param inputDate
- */
-function getSunday (inputDate) {
+export const getSunday = (inputDate) => {
   const currentDateObj = new Date(inputDate)
   currentDateObj.setDate(currentDateObj.getDate() - (currentDateObj.getDay() + 7) % 7 + 1)
   return currentDateObj
 }
 
-function quickISO (DateString) {
-  const date = new Date(DateString)
-  console.log(date)
-  return date// .toISOString().substr(0, 10);
+export const quickISO = (DateString: string) =>{
+  return new Date(DateString)
 }
 
-function formDate (DateString) {
-  // const date = new Date(DateString);
-  // return DateString.substring(0,10);
-
-  // return date.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')
-
+export const formDate = (DateString: string) => {
   const formDateString = DateString.toString()
   return formDateString.substring(0, 10)
 }
