@@ -1,10 +1,4 @@
-
-type Sortable = {
-  Date: string
-  Id: number
-}
-
-export const getNextId = (sorted: Sortable[], current: number) => {
+export const getNextId = (sorted: any[], current: number) => {
   let found = false
 
   for (const b of sorted) {
