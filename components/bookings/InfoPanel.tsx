@@ -9,6 +9,7 @@ import { PerformancePanel } from './panel/PerformancePanel'
 import AddBooking from './panel/CreatePanel'
 import { bookingState } from 'state/booking/bookingState'
 import { GifuPanel } from './panel/GifuPanel'
+import { OtherPanel } from './panel/OtherPanel'
 
 export const InfoPanel = () => {
   const view = useRecoilValue(viewState)
@@ -56,18 +57,20 @@ export const InfoPanel = () => {
           ))}
         </div>
       )}
-      { !!OtherIds.length && (
-        <div className={sectionClass}>
-          { OtherIds.map(id => (
-            <h3 className='text-xl bold p-2' key={id}>Other: {id}</h3>
-          ))}
-        </div>
-      )}
       { !!GetInFitUpIds.length && (
         <div className={sectionClass}>
           { GetInFitUpIds.map(id => (
             <PanelDrawer open={defaultOpen} key={id} title="Get-In Fit-Up">
               <GifuPanel key={id} gifuId={id} />
+            </PanelDrawer>
+          ))}
+        </div>
+      )}
+      { !!OtherIds.length && (
+        <div className={sectionClass}>
+          { OtherIds.map(id => (
+            <PanelDrawer open={defaultOpen} key={id} title="Other">
+              <OtherPanel key={id} otherId={id} />
             </PanelDrawer>
           ))}
         </div>

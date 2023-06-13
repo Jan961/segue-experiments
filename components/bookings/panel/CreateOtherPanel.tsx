@@ -22,7 +22,6 @@ export const CreateOtherPanel = ({ reset }: CreateOtherPanelProps) => {
   const schedule = useRecoilValue(scheduleSelector)
   const DateBlockId = getDateBlockId(schedule, selectedDate)
   const dateTypes = useRecoilValue(dateTypeState)
-  console.log(dateTypes)
 
   const createOther = async () => {
     const newOther: CreateOtherParams = { DateBlockId, Date: selectedDate, DateTypeId: dateType }

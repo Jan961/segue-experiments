@@ -70,8 +70,6 @@ export const scheduleSelector = selector({
       dates[key][property].push(data)
     }
 
-    console.log(getInFitUp)
-
     Object.values(rehearsals).forEach(r => addDate(r.Date, 'RehearsalIds', r.Id))
     Object.values(getInFitUp).forEach(g => addDate(g.Date, 'GetInFitUpIds', g.Id))
     Object.values(bookings).forEach(b => addDate(b.Date, 'BookingIds', b.Id))

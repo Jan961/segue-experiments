@@ -30,8 +30,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     })
     console.log(`Created Other: ${result.Id}`)
     res.status(200).json(otherMapper(result))
-  } catch (e) {
-    console.log(e)
+  } catch (err) {
+    console.log(err)
     res.status(500).json({ err: 'Error Creating Other' })
   }
 }

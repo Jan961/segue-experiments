@@ -1,0 +1,21 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from 'lib/prisma'
+import { OtherDTO } from 'interfaces'
+
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const other = req.body as OtherDTO
+    await prisma.$transaction([
+      prisma.other.delete({
+        where: {
+          Id: other.Id
+        }
+      })
+    ])
+    console.log(`Deleted Other: ${other.Id}`)
+    res.status(200).json({})
+  } catch (e) {
+    console.log(e)
+    res.status(500).json({ err: 'Error Deleting Other' })
+  }
+}
