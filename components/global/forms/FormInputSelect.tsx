@@ -1,4 +1,4 @@
-import classNames from "classnames"
+import classNames from 'classnames'
 
 export interface SelectOption {
   text: string
@@ -6,7 +6,6 @@ export interface SelectOption {
 }
 
 interface Input {
-  placeholder?: string
   onChange: (e: any) => void
   label?: string
   value: string | number
@@ -18,7 +17,7 @@ interface Input {
   className?: string
 }
 
-export const FormInputSelect = ({ placeholder, onChange, value, name, label, required, options, disabled, className = '', inline }: Input) => {
+export const FormInputSelect = ({ onChange, value, name, label, required, options, disabled, className = '', inline }: Input) => {
   const inputClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4'
   let baseClass = classNames(className, 'whitespace-nowrap')
   if (inline) {

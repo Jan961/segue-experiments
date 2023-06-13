@@ -28,7 +28,8 @@ const tourContentInclude = Prisma.validator<Prisma.TourSelect>()({
         }
       },
       GetInFitUp: true,
-      Rehearsal: true
+      Rehearsal: true,
+      Other: true
     }
   }
 })

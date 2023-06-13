@@ -1,7 +1,9 @@
 import { atom } from 'recoil'
 import { DateDistancesDTO } from 'services/venueService'
 
-const intialState: DateDistancesDTO[] = []
+export type DistanceState = DateDistancesDTO[]
+
+const intialState: DistanceState = []
 
 export const distanceState = atom({
   key: 'distanceState',

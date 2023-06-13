@@ -17,16 +17,7 @@ import { bookingState } from 'state/booking/bookingState'
 import { omit } from 'radash'
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { VenueSelector } from './components/VenueSelector'
-
-const getNextBookingId = (sortedBookings: BookingDTO[], current: number) => {
-  let found = false
-
-  for (const b of sortedBookings) {
-    if (found) return b.Id
-    if (current === b.Id) found = true
-  }
-  return undefined
-}
+import { getNextId } from './utils/getNextId'
 
 interface BookingPanelProps {
   bookingId: number
@@ -39,7 +30,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
   const booking = bookingDict[bookingId]
-  const nextBookingId = getNextBookingId(sortedBookings, bookingId)
+  const nextBookingId = getNextId(sortedBookings, bookingId)
   const [inputs, setInputs] = React.useState<BookingDTO>(booking)
   const [deleting, setDeleting] = React.useState(false)
 

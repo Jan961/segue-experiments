@@ -2,47 +2,49 @@ import axios from 'axios'
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
-import { FormInputText } from 'components/global/forms/FormInputText'
-import { RehearsalDTO } from 'interfaces'
+import { GetInFitUpDTO } from 'interfaces'
 import { omit } from 'radash'
 import React from 'react'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { rehearsalState } from 'state/booking/rehearsalState'
-import { sortedRehearsalSelector } from 'state/booking/selectors/sortedRehearsalSelector'
+import { getInFitUpState } from 'state/booking/getInFitUpState'
+import { sortedGifuSelector } from 'state/booking/selectors/sortedGifuSelector'
 import { viewState } from 'state/booking/viewState'
 import { getNextId } from './utils/getNextId'
+import { VenueSelector } from './components/VenueSelector'
 
-interface RehearsalPanelProps {
-  rehearsalId: number
+interface GifuPanelProps {
+  gifuId: number
 }
 
-export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
+export const GifuPanel = ({ gifuId }: GifuPanelProps) => {
   const [deleting, setDeleting] = React.useState(false)
   const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })
   const setView = useSetRecoilState(viewState)
-  const [rehearsalDict, setRehearsalDict] = useRecoilState(rehearsalState)
-  const rehearsal = rehearsalDict[rehearsalId]
-  const [inputs, setInputs] = React.useState<RehearsalDTO>(rehearsal)
-  const sorted = useRecoilValue(sortedRehearsalSelector)
+  const [gifuDict, setGifuDict] = useRecoilState(getInFitUpState)
+  const gifu = gifuDict[gifuId]
+  const [inputs, setInputs] = React.useState<GetInFitUpDTO>(gifu)
+  const sorted = useRecoilValue(sortedGifuSelector)
 
-  const nextRehearsalId = getNextId(sorted, rehearsalId)
+  const nextId = getNextId(sorted, gifuId)
 
   const handleOnChange = (e: any) => {
+    let { id, value } = e.target
+    if (id === 'VenueId') value = parseInt(value)
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value
+      [id]: value
     }))
     setStatus({ changed: true, submitting: false })
   }
 
   const save = async (e: any) => {
-    // Swap around the dates
     e.preventDefault()
     setStatus({ changed: true, submitting: true })
     try {
-      const { data } = await axios.post('/api/bookings/update/rehearsal', inputs)
-      const replacement = { ...rehearsalDict, [data.Id]: data }
-      setRehearsalDict(replacement)
+      const { data } = await axios.post('/api/gifu/update', inputs)
+      data.VenueId = parseInt(data.VenueId)
+      const replacement = { ...gifuDict, [data.Id]: data }
+      setGifuDict(replacement)
       setStatus({ changed: false, submitting: false })
     } catch {
       setStatus({ changed: true, submitting: false })
@@ -52,7 +54,7 @@ export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
   const saveAndNext = async (e: any) => {
     e.preventDefault()
     if (changed) await save(e)
-    const nextBooking = rehearsalDict[nextRehearsalId]
+    const nextBooking = gifuDict[nextId]
     setView({ selectedDate: nextBooking.Date.split('T')[0] })
   }
 
@@ -68,22 +70,22 @@ export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
 
   const performDelete = async () => {
     setDeleting(false)
-    await axios.post('/api/rehearsals/delete', { ...rehearsal })
-    const newState = omit(rehearsalDict, [rehearsalId])
-    setRehearsalDict(newState)
+    await axios.post('/api/gifu/delete', { ...gifu })
+    const newState = omit(gifuDict, [gifuId])
+    setGifuDict(newState)
   }
 
   return (
     <>
       { deleting && (
         <DeleteConfirmation
-          title="Delete Performance"
+          title="Delete Get-In Fit-Up"
           onCancel={() => setDeleting(false)}
           onConfirm={performDelete}>
-          <p>This will delete the performance permanently</p>
+          <p>This will delete the event permanently</p>
         </DeleteConfirmation>
       )}
-      <FormInputText value={inputs.Town ? inputs.Town : ''} name="Town" label="Town" onChange={handleOnChange}/>
+      <VenueSelector venueId={inputs.VenueId} onChange={handleOnChange} />
       <FormInputSelect inline
         value={inputs.StatusCode}
         onChange={handleOnChange}
@@ -114,7 +116,7 @@ export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
             text={!changed ? 'Next' : 'Save & Next'}
             intent='PRIMARY'
             onClick={saveAndNext}
-            disabled={submitting || !nextRehearsalId}
+            disabled={submitting || !nextId}
           />
         </div>
       </div>

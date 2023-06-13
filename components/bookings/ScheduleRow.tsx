@@ -7,6 +7,8 @@ import { RehearsalDisplay } from './RehearsalDisplay'
 import { unique } from 'radash'
 import { DateDisplay } from './DateDisplay'
 import { bookingState } from 'state/booking/bookingState'
+import { GifuDisplay } from './GifuDisplay'
+import { OtherDisplay } from './OtherDisplay'
 
 interface ScheduleRowProps {
   date: DateViewModel
@@ -25,10 +27,8 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     setView({ selectedDate: dateKey })
   }
 
-  let rowClass = 'grid gap-1 grid-cols-12 items-center p-1 w-full border-l-4 border-transparent px-2'
+  let rowClass = 'flex items-center p-1 px-0 w-full border-l-4 border-transparent gap-2'
   if (selected) rowClass = classNames(rowClass, 'bg-blue-200 border-blue-500')
-
-  const rehearsalId = date.RehearsalIds.length ? date.RehearsalIds[0] : undefined
 
   // We get duplicates for each performance
   const uniqueBookingIds = unique(date.BookingIds)
@@ -42,14 +42,13 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     <div className="even:bg-black even:bg-opacity-5 bg-blend-multiply border-b border-gray-300 cursor-pointer" onClick={selectDate}>
       <div className={rowClass} >
         <DateDisplay date={date.Date} />
-        <div className="col-span-8 grid grid-rows-auto gap-y-2">
+        <div className="grid grid-rows-auto gap-y-2 flex-grow">
           { uniqueBookingIds.map((id: number) => (
             <BookingDisplay key={id} bookingId={id} date={date.Date} performanceCount={date.PerformanceIds.length} />
           ))}
-          <RehearsalDisplay rehearsalId={rehearsalId} />
-          { !!date.GetInFitUpIds?.length && (<ul>
-            { date.GetInFitUpIds.map((id) => (<span key={id}>GetInFitUp</span>))}
-          </ul>)}
+          { date.RehearsalIds.map((id) => (<RehearsalDisplay key={id} rehearsalId={id} />))}
+          { date.GetInFitUpIds.map((id) => (<GifuDisplay key={id} gifuId={id} />))}
+          { date.OtherIds.map((id) => (<OtherDisplay key={id} otherId={id} />))}
         </div>
       </div>
     </div>

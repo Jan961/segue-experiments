@@ -10,11 +10,15 @@ import React from 'react'
 import { CreatePerformancePanel } from './CreatePerformancePanel'
 import { CreateBookingPanel } from './CreateBookingPanel'
 import { findClosestBooking } from './utils/findClosestBooking'
+import { CreateGifuPanel } from './CreateGifuPanel'
+import { CreateOtherPanel } from './CreateOtherPanel'
 
 enum PanelMode {
   Start = 0,
   Booking = 1,
   Peformance = 2,
+  Gifu = 3,
+  Other = 4,
 }
 
 export default function CreatePanel () {
@@ -25,7 +29,7 @@ export default function CreatePanel () {
   const [mode, setMode] = React.useState<PanelMode>(PanelMode.Start)
   const [bookingId, setBookingId] = React.useState<number>(undefined)
 
-  const commonButtonClasses = 'w-full p-4 text-lg mb-4'
+  const commonButtonClasses = 'w-full p-4 mb-4'
 
   const closestBookingIds = findClosestBooking(bookingDict, selectedDate)
   const closestBookings = closestBookingIds.map(id => bookingDict[id])
@@ -47,6 +51,18 @@ export default function CreatePanel () {
     )
   }
 
+  if (mode === PanelMode.Gifu) {
+    return (
+      <CreateGifuPanel reset={reset} />
+    )
+  }
+
+  if (mode === PanelMode.Other) {
+    return (
+      <CreateOtherPanel reset={reset} />
+    )
+  }
+
   const createPerformance = (bookingId: number) => {
     setBookingId(bookingId)
     setMode(PanelMode.Peformance)
@@ -55,7 +71,9 @@ export default function CreatePanel () {
   return (
     <div className='m-2 mt-4 mb-0'>
       <FormInputButton className={commonButtonClasses} text="Booking" onClick={() => setMode(PanelMode.Booking)} />
-      <FormInputButton className={commonButtonClasses} text="Rehearsal"  />
+      <FormInputButton className={commonButtonClasses} text="Rehearsal" />
+      <FormInputButton className={commonButtonClasses} text="Other" onClick={() => setMode(PanelMode.Other)} />
+      <FormInputButton className={commonButtonClasses} text="Get In Fit Up" onClick={() => setMode(PanelMode.Gifu)} />
       { !closestBookingIds.length && (<FormInputButton className={commonButtonClasses} disabled text="Performance" />)}
       { closestBookings.map(({ Id, VenueId }) =>
         <FormInputButton key={Id}

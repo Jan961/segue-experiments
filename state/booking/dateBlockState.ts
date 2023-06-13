@@ -1,7 +1,9 @@
 import { DateBlockDTO } from 'interfaces'
 import { atom } from 'recoil'
 
-const intialState: DateBlockDTO[] = []
+export type DateBlockState = DateBlockDTO[]
+
+const intialState: DateBlockState = []
 
 export const dateBlockState = atom({
   key: 'dateBlockState',

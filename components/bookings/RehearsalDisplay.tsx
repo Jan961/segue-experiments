@@ -13,7 +13,7 @@ export const RehearsalDisplay = ({ rehearsalId }: RehearsalDisplayProps) => {
   const r = rehearsalDict[rehearsalId]
 
   return (
-    <div className="inline-block p-1 px-2 shadow-md rounded bg-red-500 text-white">
+    <div className="inline-block p-1 px-2 rounded border border-l-8 border-red-500 bg-red-200">
       Rehearsal: { r.Town ? r.Town : 'N/A' }
     </div>
   )

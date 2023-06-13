@@ -39,6 +39,7 @@ export const CreatePerformancePanel = ({ reset, bookingId }: CreatePerformancePa
 
   return (
     <>
+      <h3 className='text-lg mb-2 text-center'>Performance</h3>
       <DateTimeSelector setDate={setDate} date={date} />
       <div className="grid grid-cols-2 gap-2">
         <FormInputButton onClick={reset} text="Cancel" />

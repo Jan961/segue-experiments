@@ -1,30 +1,30 @@
 import axios from 'axios'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
-import { CreateBookingsParams } from 'pages/api/bookings/create'
 import React from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { scheduleSelector } from 'state/booking/selectors/scheduleSelector'
 import { VenueSelector } from './components/VenueSelector'
 import { getDateBlockId } from './utils/getDateBlockId'
 import { viewState } from 'state/booking/viewState'
-import { bookingState } from 'state/booking/bookingState'
+import { CreateGifuParams } from 'pages/api/gifu/create'
+import { getInFitUpState } from 'state/booking/getInFitUpState'
 
-interface CreateBookingPanelProps {
+interface CreateGifuPanelProps {
   reset: () => void
 }
 
-export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
+export const CreateGifuPanel = ({ reset }: CreateGifuPanelProps) => {
   const [venueId, setVenueId] = React.useState<number>(undefined)
   const { selectedDate } = useRecoilValue(viewState)
-  const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const schedule = useRecoilValue(scheduleSelector)
   const DateBlockId = getDateBlockId(schedule, selectedDate)
+  const [gifuDict, setGifuDict] = useRecoilState(getInFitUpState)
 
-  const createBooking = async () => {
-    const newDate: CreateBookingsParams = { DateBlockId, Date: selectedDate, VenueId: venueId }
-    const { data } = await axios.post('/api/bookings/create', newDate)
-    const newState = { ...bookingDict, [data.Id]: data }
-    setBookingDict(newState)
+  const createGifu = async () => {
+    const newDate: CreateGifuParams = { DateBlockId, Date: selectedDate, VenueId: venueId }
+    const { data } = await axios.post('/api/gifu/create', newDate)
+    const newState = { ...gifuDict, [data.Id]: data }
+    setGifuDict(newState)
     cancel()
   }
 
@@ -35,13 +35,13 @@ export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
 
   return (
     <>
-      <h3 className='text-lg mb-2 text-center'>Booking</h3>
+      <h3 className='text-lg mb-2 text-center'>Get-In Fit-Up</h3>
       <div className="p-4 pb-px mb-4 rounded-lg bg-primary-blue">
         <VenueSelector venueId={venueId} onChange={(e) => setVenueId(parseInt(e.target.value))} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <FormInputButton onClick={cancel} text="Cancel" />
-        <FormInputButton onClick={createBooking} disabled={!venueId} intent="PRIMARY" text="Create" />
+        <FormInputButton onClick={createGifu} disabled={!venueId} intent="PRIMARY" text="Create" />
       </div>
     </>
   )

@@ -4,6 +4,7 @@ import { dateBlockState } from 'state/booking/dateBlockState'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
 import { rehearsalState } from 'state/booking/rehearsalState'
 import { performanceState } from '../performanceState'
+import { otherState } from '../otherState'
 
 const getKey = (date: string) => (date.split('T')[0])
 
@@ -27,6 +28,7 @@ export interface DateViewModel {
   RehearsalIds: number[]
   GetInFitUpIds: number[]
   PerformanceIds: number[]
+  OtherIds: number[]
   BookingIds: number[]
 }
 
@@ -47,6 +49,7 @@ export const scheduleSelector = selector({
     const bookings = get(bookingState)
     const getInFitUp = get(getInFitUpState)
     const performances = get(performanceState)
+    const other = get(otherState)
     // This one is an array (won't change on booking page)
     const dateBlocks = get(dateBlockState)
 
@@ -55,7 +58,8 @@ export const scheduleSelector = selector({
       BookingIds: [],
       RehearsalIds: [],
       GetInFitUpIds: [],
-      PerformanceIds: []
+      PerformanceIds: [],
+      OtherIds: []
     })
 
     const dates: Record<string, any> = {}
@@ -66,9 +70,12 @@ export const scheduleSelector = selector({
       dates[key][property].push(data)
     }
 
+    console.log(getInFitUp)
+
     Object.values(rehearsals).forEach(r => addDate(r.Date, 'RehearsalIds', r.Id))
     Object.values(getInFitUp).forEach(g => addDate(g.Date, 'GetInFitUpIds', g.Id))
     Object.values(bookings).forEach(b => addDate(b.Date, 'BookingIds', b.Id))
+    Object.values(other).forEach(o => addDate(o.Date, 'OtherIds', o.Id))
     Object.values(performances).forEach(p => {
       addDate(p.Date, 'PerformanceIds', p.Id)
       addDate(p.Date, 'BookingIds', p.BookingId)
