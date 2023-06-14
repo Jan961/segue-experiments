@@ -5,7 +5,7 @@ import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
 import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel, scheduleSelector } from 'state/booking/selectors/scheduleSelector'
 import { DateTypeMapper, bookingMapper, dateBlockMapper, getInFitUpMapper, otherMapper, performanceMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
@@ -14,6 +14,8 @@ import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
 import { objectify } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
+import { filterState } from 'state/booking/filterState'
+import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
 
 interface bookingProps {
   Id: number,
@@ -21,8 +23,8 @@ interface bookingProps {
 }
 
 const BookingPage = ({ Id }: bookingProps) => {
-  const [searchFilter, setSearchFilter] = React.useState('')
-  const { Sections } = useRecoilValue(scheduleSelector)
+  const { Sections } = useRecoilValue(filteredScheduleSelector)
+  const [filter, setFilter] = useRecoilState(filterState)
 
   const gotoToday = () => {
     const element = new Date().toISOString().substring(0, 10)
@@ -37,8 +39,8 @@ const BookingPage = ({ Id }: bookingProps) => {
     <Layout title="Booking | Seque">
       {/* <TourJumpMenu></TourJumpMenu> */}
       <GlobalToolbar
-        searchFilter={searchFilter}
-        setSearchFilter={setSearchFilter}
+        searchFilter={filter.venueText}
+        setSearchFilter={(venueText) => setFilter({ venueText })}
         title={'Bookings'}
       ></GlobalToolbar>
       <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>

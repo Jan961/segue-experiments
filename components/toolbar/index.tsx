@@ -11,7 +11,7 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 interface props {
   title: string;
   searchFilter?: string;
-  setSearchFilter?: React.Dispatch<React.SetStateAction<string>>;
+  setSearchFilter?: (filter: string) => void;
   color?: string;
   tourJump?: boolean;
   filterComponent?: any;
