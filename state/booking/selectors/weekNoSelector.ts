@@ -4,17 +4,7 @@ import { dateBlockState } from '../dateBlockState'
 import { parseISO } from 'date-fns'
 import { sortedBookingSelector } from './sortedBookingSelector'
 import { calculateWeekNumber } from 'services/dateService'
-
-const getKey = (date: string) => (date.split('T')[0])
-
-const getArrayOfDatesBetween = (start: string, end: string) => {
-  const arr = []
-
-  for (const dt = new Date(start); dt <= new Date(end); dt.setDate(dt.getUTCDate() + 1)) {
-    arr.push(new Date(dt).toISOString())
-  }
-  return arr.map(getKey)
-}
+import { getArrayOfDatesBetween } from 'utils/getDatesBetween'
 
 export const weekNoSelector = selector({
   key: 'weekNoSelector',

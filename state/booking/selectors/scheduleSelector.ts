@@ -5,17 +5,9 @@ import { getInFitUpState } from 'state/booking/getInFitUpState'
 import { rehearsalState } from 'state/booking/rehearsalState'
 import { performanceState } from '../performanceState'
 import { otherState } from '../otherState'
+import { getArrayOfDatesBetween } from 'utils/getDatesBetween'
 
 const getKey = (date: string) => (date.split('T')[0])
-
-const getArrayOfDatesBetween = (start: string, end: string) => {
-  const arr = []
-
-  for (const dt = new Date(start); dt <= new Date(end); dt.setDate(dt.getUTCDate() + 1)) {
-    arr.push(new Date(dt).toISOString())
-  }
-  return arr.map(getKey)
-}
 
 export interface PerformanceViewModel {
   BookingId: number
