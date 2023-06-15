@@ -10,6 +10,7 @@ import { venueState } from 'state/booking/venueState'
 import { performanceState } from 'state/booking/performanceState'
 import { DateTypeState, dateTypeState } from 'state/booking/dateTypeState'
 import { OtherState, otherState } from 'state/booking/otherState'
+import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -24,6 +25,7 @@ export type InitialState = Partial<{
   other: OtherState
   dateBlock: DateBlockState,
   dateType: DateTypeState,
+  tourJump: TourJump,
   performance: Record<number, PerformanceDTO>,
   distance: DistanceState,
   venue: Record<number, VenueMinimalDTO>,
@@ -36,6 +38,7 @@ const states: Record<keyof InitialState, RecoilState<any>> = {
   other: otherState,
   dateType: dateTypeState,
   venue: venueState,
+  tourJump: tourJumpState,
   distance: distanceState,
   dateBlock: dateBlockState,
   performance: performanceState

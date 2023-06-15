@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import TourJumpMenu from '../global/nav/TourJumpMenu'
 import { FormInputText } from 'components/global/forms/FormInputText';
+import { TourDTO } from 'interfaces';
 
 // This needs to be passed from the template
 // let show = "ST1";
@@ -63,7 +64,7 @@ const GlobalToolbar = ({
             <div className="rounded-l-md">
               <div className="flex items-center">
                 <p className="mx-2">Set Tour</p>
-                <TourJumpMenu></TourJumpMenu>
+                <TourJumpMenu />
               </div>
             </div>
           </div>

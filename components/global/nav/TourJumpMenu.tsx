@@ -1,50 +1,41 @@
-import * as React from 'react'
-import { useEffect, useState } from 'react'
-import { userService } from 'services/user.service'
-import { forceNavigate } from 'utils/forceNavigate'
+import { useRouter } from 'next/router'
+import { first } from 'radash'
+import { useRecoilState } from 'recoil'
+import { tourJumpState } from 'state/booking/tourJumpState'
 
 export default function TourJumpMenu () {
-  const [isLoading, setLoading] = useState(false)
-  const [activeTours, setActiveTours] = useState([]) // Shory list of tours for the toolbar to switch
+  const router = useRouter()
+  const [tourJump, setTourJump] = useRecoilState(tourJumpState)
 
-  /*
-  useEffect(() => {
-    setLoading(true)
+  if (!tourJump?.selected || !tourJump?.tours?.length) return null
 
-    // Get the tours for the jump menu
+  const { tours, selected } = tourJump
 
-    fetch('/api/tours/read/notArchived/0',
-      {
-        method: 'GET',
-        headers: {
-          'content-type': 'application/json;charset=UTF-8',
-          segue_admin: '1',
-          account_admin: '1',
-          user_id: '0',
-          'Access-Control-Allow-Origin': '*'
-        }
-      })
-      .then((res) => res.json())
-      .then((data) => {
-        setActiveTours(data)
-        setLoading(false)
-      })
-  }, [])
+  function goToTour (e: any) {
+    const showCode = first(tours)?.ShowCode
+    if (!showCode) return
 
-  */
 
-  function changTour (e) {
-    forceNavigate(`/booking/${e.target.value}`)
+    const { value } = e.target
+    setTourJump({ ...tourJump, loading: true, selected: value })
+    router.push(`/bookings/${showCode}/${value}`)
   }
 
   return (
 
-    <select onChange={changTour} id="selectedTour" className={'text-primary-blue border-y-0 border-r-0 border-l-1 border-gray-200 font-medium rounded-r-md'}>
-      {[].map((tour) => (
-        <option key={tour.TourId} value={`${tour.Show.Code}/${tour.Code}`} >{tour.Show.Code}/{tour.Code}</option>
+    <select onChange={goToTour}
+      id="selectedTour"
+      value={selected}
+      className={'text-primary-blue border-y-0 border-r-0 border-l-1 border-gray-200 font-medium rounded-r-md'}
+    >
+      {tours.map((tour) => (
+        <option
+          key={`${tour.ShowCode}/${tour.Code}`}
+          value={tour.Code}>
+          {tour.ShowCode}/{tour.Code}
+        </option>
       ))
       }
     </select>
-
   )
 }
