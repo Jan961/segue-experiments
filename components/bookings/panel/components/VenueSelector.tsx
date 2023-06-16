@@ -9,9 +9,11 @@ export interface VenueSelectorProps {
   venueId: number,
   onChange: (e: any) => void,
   disabled?: boolean
+  options?: SelectOption[]
+  label?: string
 }
 
-export const VenueSelector = ({ venueId, onChange, disabled }: VenueSelectorProps) => {
+export const VenueSelector = ({ venueId, onChange, disabled, options, label }: VenueSelectorProps) => {
   const venues = useRecoilValue(venueState)
 
   const venueOptions: SelectOption[] = [
@@ -24,7 +26,8 @@ export const VenueSelector = ({ venueId, onChange, disabled }: VenueSelectorProp
       <FormInputSelect
         name="VenueId"
         value={venueId || ''}
-        options={venueOptions}
+        label={label}
+        options={options || venueOptions}
         onChange={onChange}
         disabled={disabled}
       />

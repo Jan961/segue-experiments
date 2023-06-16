@@ -15,6 +15,7 @@ import { debounce } from 'radash'
 import { GapSuggestionParams, GapSuggestionReponse } from 'pages/api/venue/read/distance'
 import { timeFormat } from 'services/dateService'
 import { Spinner } from 'components/global/Spinner'
+import { VenueSelector } from './components/VenueSelector'
 
 interface GapPanelProps {
   reset: () => void
@@ -48,7 +49,8 @@ export const GapPanel = ({ reset }: GapPanelProps) => {
     Miles: [25, 200],
     Mins: [25, 200],
     StartVenue: startDropDown[0]?.value,
-    EndVenue: endDropDown[0]?.value
+    EndVenue: endDropDown[0]?.value,
+    VenueId: 0
   })
 
   const createBooking = async () => {
@@ -75,10 +77,11 @@ export const GapPanel = ({ reset }: GapPanelProps) => {
       MinMiles: inputs.Miles[0],
       MaxMiles: inputs.Miles[1]
     }
-    const { data } = await axios.post('/api/venue/read/distance', body)
+    const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body)
     console.log(data)
     setResults(data)
     setRefreshing(false)
+    setVenueId(data.VenueInfo[0]?.VenueId)
   }, [])
 
   const debouncedSearch = React.useMemo(
@@ -164,14 +167,16 @@ export const GapPanel = ({ reset }: GapPanelProps) => {
           <br />
           { refreshing && (<div className="p-6"><Spinner size='sm'/></div>)}
           { !refreshing && (
-            <FormInputSelect
-              label={`Results (${results.VenueInfo.length})`}
-              options={resultVenues}
-              disabled={results.VenueInfo.length === 0}
-              value={resultVenues?.length ? resultVenues[0].value : 0}
-              name="VenueId"
-              onChange={handleOnChange}
-            />
+
+            <>
+              <VenueSelector
+                label={`Results (${results.VenueInfo.length})`}
+                options={resultVenues}
+                disabled={results.VenueInfo.length === 0}
+                onChange={(e: any) => setVenueId(Number(e.target.value))}
+                venueId={venueId}
+              />
+            </>
           )}
         </div>
       )}
