@@ -21,5 +21,5 @@ export const findClosestBooking = (bookings: Record<number, BookingDTO>, specifi
       }
     }
   }
-  return closestDate ? closestBookings : undefined
+  return closestDate ? closestBookings : []
 }

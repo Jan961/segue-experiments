@@ -15,7 +15,6 @@ export default function TourJumpMenu () {
     const showCode = first(tours)?.ShowCode
     if (!showCode) return
 
-
     const { value } = e.target
     setTourJump({ ...tourJump, loading: true, selected: value })
     router.push(`/bookings/${showCode}/${value}`)

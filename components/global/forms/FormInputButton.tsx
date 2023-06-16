@@ -1,13 +1,15 @@
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import classNames from 'classnames'
 
 interface FormInputButtonProps {
-  loading?: boolean;
-  disabled?: boolean;
-  text: string;
+  loading?: boolean
+  disabled?: boolean
+  text: string
   onClick?: (e: any) => void
-  submit?: boolean;
-  className?: string;
+  submit?: boolean
+  className?: string
+  icon?: IconProp
   intent?: undefined | 'DANGER' | 'PRIMARY'
 }
 
@@ -22,7 +24,7 @@ const LoadingSpinner = () => {
 }
 
 // Larger button for submitting forms. Green in color
-export const FormInputButton = ({ loading, disabled, text, onClick, submit, className, intent }: FormInputButtonProps) => {
+export const FormInputButton = ({ loading, disabled, text, onClick, submit, className, intent, icon }: FormInputButtonProps) => {
   const baseClass = 'rounded shadow text-sm px-3 py-2 cursor-pointer '
 
   const intentClass = intent === 'DANGER'
@@ -43,6 +45,7 @@ export const FormInputButton = ({ loading, disabled, text, onClick, submit, clas
       onClick={onClick}
       disabled={disabled}>
       { text }
+      { icon && <FontAwesomeIcon icon={icon} className="ml-2" />}
       { loading && (<LoadingSpinner />)}
     </button>
   )

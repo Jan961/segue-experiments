@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 
-export interface SelectOption {
+export type SelectOption = {
   text: string
   value: string
 }
@@ -28,7 +28,8 @@ export const FormInputSelect = ({ onChange, value, name, label, required, option
 
   return (
     <div>
-      <label htmlFor={name} className={baseClass}>{ label }
+      <label htmlFor={name} className={baseClass}>
+        <span className="text-sm pb-1 inline-block">{ label }</span>
         <select
           id={name}
           name={name}

@@ -1,6 +1,5 @@
 import Report from './modal/Report'
 import BookingHold from './modal/bookingHold'
-import TourGapsModal from './modal/tourGapSugget'
 import Barring from './modal/barring'
 
 interface BookingButtonsProps {
@@ -14,7 +13,6 @@ export default function BookingsButtons ({ selectedBooking, currentTourId }: Boo
       <Report TourId={currentTourId}></Report>
       <BookingHold TourId={currentTourId} ></BookingHold>
       <Barring />
-      <TourGapsModal TourId={currentTourId} ></TourGapsModal>
     </div>
   )
 }

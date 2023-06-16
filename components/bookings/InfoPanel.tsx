@@ -7,14 +7,12 @@ import { first, flat, unique } from 'radash'
 import { PanelDrawer } from './panel/PanelDrawer'
 import { PerformancePanel } from './panel/PerformancePanel'
 import AddBooking from './panel/CreatePanel'
-import { bookingState } from 'state/booking/bookingState'
 import { GifuPanel } from './panel/GifuPanel'
 import { OtherPanel } from './panel/OtherPanel'
 
 export const InfoPanel = () => {
   const view = useRecoilValue(viewState)
   const schedule = useRecoilValue(scheduleSelector)
-  const bookingDict = useRecoilValue(bookingState)
 
   const { selectedDate } = view
 

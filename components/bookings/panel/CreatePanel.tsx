@@ -15,6 +15,9 @@ import { rehearsalState } from 'state/booking/rehearsalState'
 import axios from 'axios'
 import { CreateRehearsalParams } from 'pages/api/rehearsals/create'
 import { getDateBlockId } from './utils/getDateBlockId'
+import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons'
+import { GapPanel } from './GapPanel'
+import { findPrevAndNextBookings } from './utils/findPrevAndNextBooking'
 
 enum PanelMode {
   Start = 0,
@@ -22,6 +25,7 @@ enum PanelMode {
   Peformance = 2,
   Gifu = 3,
   Other = 4,
+  GapSuggest = 5,
 }
 
 export default function CreatePanel () {
@@ -38,6 +42,12 @@ export default function CreatePanel () {
 
   const closestBookingIds = findClosestBooking(bookingDict, selectedDate)
   const closestBookings = closestBookingIds.map(id => bookingDict[id])
+
+  const { prevBookings, nextBookings } = findPrevAndNextBookings(bookingDict, selectedDate)
+
+  React.useEffect(() => {
+    reset()
+  }, [selectedDate])
 
   const reset = () => {
     setBookingId(undefined)
@@ -68,6 +78,12 @@ export default function CreatePanel () {
     )
   }
 
+  if (mode === PanelMode.GapSuggest) {
+    return (
+      <GapPanel reset={reset} />
+    )
+  }
+
   const createRehearsal = async () => {
     const DateBlockId = getDateBlockId(schedule, selectedDate)
     const newRehearsal: CreateRehearsalParams = { Date: selectedDate, DateBlockId }
@@ -85,10 +101,20 @@ export default function CreatePanel () {
 
   return (
     <div className='m-2 mt-4 mb-0'>
-      <FormInputButton className={commonButtonClasses} text="Booking" onClick={() => setMode(PanelMode.Booking)} />
-      <FormInputButton className={commonButtonClasses} text="Rehearsal" onClick={createRehearsal}/>
-      <FormInputButton className={commonButtonClasses} text="Other" onClick={() => setMode(PanelMode.Other)} />
-      <FormInputButton className={commonButtonClasses} text="Get In Fit Up" onClick={() => setMode(PanelMode.Gifu)} />
+      <FormInputButton
+        className={commonButtonClasses}
+        text="Gap Suggest"
+        disabled={!prevBookings.length || !nextBookings.length}
+        icon={faMagicWandSparkles}
+        onClick={() => setMode(PanelMode.GapSuggest)} />
+      <div className="grid grid-cols-2 gap-2">
+        <FormInputButton className={commonButtonClasses} text="Booking" onClick={() => setMode(PanelMode.Booking)} />
+        <FormInputButton className={commonButtonClasses} text="Rehearsal" onClick={createRehearsal}/>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <FormInputButton className={commonButtonClasses} text="Other" onClick={() => setMode(PanelMode.Other)} />
+        <FormInputButton className={commonButtonClasses} text="Get In Fit Up" onClick={() => setMode(PanelMode.Gifu)} />
+      </div>
       { !closestBookingIds.length && (<FormInputButton className={commonButtonClasses} disabled text="Performance" />)}
       { closestBookings.map(({ Id, VenueId }) =>
         <FormInputButton key={Id}

@@ -104,8 +104,13 @@ export const timeNow = () => {
 export const formatTime = (timestamp) => {
   // This will ignre date
   const today = new Date(timestamp)
-  const options = { hours: '2-digit', minutes: '2-digit', seconds: '2-digit' }
+  // const options = { hours: '2-digit', minutes: '2-digit', seconds: '2-digit' }
   return today.toLocaleTimeString()
+}
+
+export const timeFormat = (mins?: number) => {
+  if (!mins) return 'N/A'
+  return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`
 }
 
 export const formatDateUK = (date) =>{
