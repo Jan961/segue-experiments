@@ -11,10 +11,19 @@ export interface GapSuggestionParams {
   EndVenue: number
 }
 
-type VenueWithDistance = {
+export interface GapSuggestionUnbalancedProps {
+  StartVenue: number
+  EndVenue: number
+  MinFromMiles: number
+  MaxFromMiles: number
+  MinToMiles: number
+  MaxToMiles: number
+}
+
+export type VenueWithDistance = {
   VenueId: number,
-  Mins: number,
-  Miles: number
+  MileageFromStart: number,
+  MileageFromEnd: number
 }
 
 export type GapSuggestionReponse = {
@@ -24,10 +33,10 @@ export type GapSuggestionReponse = {
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const { StartVenue, EndVenue, MinMiles, MaxMiles, MinMins, MaxMins } = req.body as GapSuggestionParams
+  const { StartVenue, EndVenue, MinFromMiles, MaxFromMiles, MinToMiles, MaxToMiles } = req.body as GapSuggestionUnbalancedProps
 
   try {
-    const initial = await prisma.venueVenue.findMany({
+    const initialPromise = prisma.venueVenue.findMany({
       select: {
         Mileage: true,
         TimeMins: true
@@ -50,75 +59,91 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       }
     })
 
-    const endVenue1Ids = await prisma.venueVenue
+    const startVenue1Promise = prisma.venueVenue
+      .findMany({
+        where: {
+          Venue1Id: StartVenue,
+          Mileage: { gte: MinFromMiles, lte: MaxFromMiles }
+        },
+        select: {
+          Venue2Id: true,
+          Mileage: true
+        }
+      })
+
+    const startVenue2Promise = prisma.venueVenue
+      .findMany({
+        where: {
+          Venue2Id: StartVenue,
+          Mileage: { gte: MinFromMiles, lte: MaxFromMiles }
+        },
+        select: {
+          Venue1Id: true,
+          Mileage: true
+        }
+      })
+
+    const endVenue1Promise = prisma.venueVenue
       .findMany({
         where: {
           Venue1Id: EndVenue,
-          Mileage: { gte: MinMiles, lte: MaxMiles },
-          TimeMins: { gte: MinMins, lte: MaxMins }
+          Mileage: { gte: MinToMiles, lte: MaxToMiles }
         },
         select: {
-          Venue2Id: true
+          Venue2Id: true,
+          Mileage: true
         }
       })
-      .then((venues) => venues.map((venue) => venue.Venue2Id))
 
-    const endVenue2Ids = await prisma.venueVenue
+    const endVenue2Promise = prisma.venueVenue
       .findMany({
         where: {
           Venue2Id: EndVenue,
-          Mileage: { gte: MinMiles, lte: MaxMiles },
-          TimeMins: { gte: MinMins, lte: MaxMins }
+          Mileage: { gte: MinToMiles, lte: MaxToMiles }
         },
         select: {
-          Venue1Id: true
+          Venue1Id: true,
+          Mileage: true
         }
       })
-      .then((venues) => venues.map((venue) => venue.Venue1Id))
 
-    const withinDistance = await prisma.venueVenue.findMany({
-      where: {
-        OR: [
-          {
-            Venue1Id: StartVenue,
-            Venue2Id: {
-              in: endVenue1Ids
-            },
-            Mileage: { gte: MinMiles, lte: MaxMiles },
-            TimeMins: { gte: MinMins, lte: MaxMins }
-          },
-          {
-            Venue2Id: StartVenue,
-            Venue1Id: {
-              in: endVenue2Ids
-            },
-            Mileage: { gte: MinMiles, lte: MaxMiles },
-            TimeMins: { gte: MinMins, lte: MaxMins }
-          }
-        ]
-      }
-    })
+    const [startVenue1, startVenue2, endVenue1, endVenue2] = await Promise.all([
+      startVenue1Promise, startVenue2Promise, endVenue1Promise, endVenue2Promise
+    ])
 
-    const idsWithDistance = withinDistance.map((x: VenueVenue): VenueWithDistance => {
-      if (x.Venue1Id === StartVenue && x.Venue2Id === EndVenue) {
-        return null
-      }
-      if (x.Venue1Id === EndVenue && x.Venue2Id === StartVenue) {
-        return null
-      }
-      if (x.Venue1Id === StartVenue) {
-        return { VenueId: x.Venue2Id, Mins: x.TimeMins, Miles: x.Mileage }
-      }
-      if (x.Venue2Id === StartVenue) {
-        return { VenueId: x.Venue1Id, Mins: x.TimeMins, Miles: x.Mileage }
-      }
-      return null
-    }).filter((x: any) => !!x)
+    // Combine the venue ids and mileages
+    const startVenueRelations = [
+      ...startVenue1
+        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage })),
+      ...startVenue2
+        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage }))]
+    const endVenueRelations = [
+      ...endVenue1
+        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage })),
+      ...endVenue2
+        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage }))]
+
+    // Create a Map for endVenueRelations
+    const endVenueRelationsMap = new Map()
+    for (const relation of endVenueRelations) {
+      endVenueRelationsMap.set(relation.VenueId, relation.Mileage)
+    }
+
+    // Find intersection of two sets (O(n))
+    const venuesWithDistanceData = startVenueRelations
+      .filter(startRelation => endVenueRelationsMap.has(startRelation.VenueId))
+      .map(startRelation => ({
+        VenueId: startRelation.VenueId,
+        MileageFromStart: startRelation.Mileage,
+        MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId)
+      }))
+
+    const initial = await initialPromise
 
     const result: GapSuggestionReponse = {
       OriginalMiles: initial[0] ? initial[0].Mileage : undefined,
       OriginalMins: initial[0] ? initial[0].TimeMins : undefined,
-      VenueInfo: idsWithDistance
+      VenueInfo: venuesWithDistanceData
     }
 
     res.status(200).json(result)
