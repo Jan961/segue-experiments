@@ -241,7 +241,7 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
       )}
       <div className="grid grid-cols-2 gap-2">
         <FormInputButton onClick={cancel} text="Cancel" />
-        <FormInputButton onClick={next} disabled={!venueId} intent="PRIMARY" text="Next" />
+        <FormInputButton onClick={next} disabled={!results?.VenueInfo} intent="PRIMARY" text="Next" />
       </div>
     </>
   )

@@ -1,4 +1,4 @@
-import { VenueVenue } from '@prisma/client'
+import { Venue, VenueVenue } from '@prisma/client'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -23,7 +23,8 @@ export interface GapSuggestionUnbalancedProps {
 export type VenueWithDistance = {
   VenueId: number,
   MileageFromStart: number,
-  MileageFromEnd: number
+  MileageFromEnd: number,
+  Capacity?: number
 }
 
 export type GapSuggestionReponse = {
@@ -65,9 +66,12 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     // Get default params if none provided
     const sliderMax = initial[0] ? Math.ceil((initial[0].Mileage * 1.5) / 10) * 10 : 200
 
-    if (!MinFromMiles) MinFromMiles = SLIDER_MIN
+    // Incase we are dealing with really close venues
+    const safeMin = sliderMax > SLIDER_MIN ? SLIDER_MIN : 0
+
+    if (!MinFromMiles) MinFromMiles = safeMin
     if (!MaxFromMiles) MaxFromMiles = sliderMax
-    if (!MinToMiles) MinToMiles = SLIDER_MIN
+    if (!MinToMiles) MinToMiles = safeMin
     if (!MaxToMiles) MaxToMiles = sliderMax
 
     const startVenue1Promise = prisma.venueVenue
@@ -149,12 +153,26 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId)
       }))
 
+    const capacities = await prisma.venue.findMany({
+      select: {
+        Id: true,
+        Seats: true
+      },
+      where: {
+        Id: {
+          in: venuesWithDistanceData.map(x => x.VenueId)
+        }
+      }
+    })
+
+    const capacityMap = new Map<number, number>(capacities.map((venue: Venue) => [venue.Id, venue.Seats]))
+
     const result: GapSuggestionReponse = {
       SliderMax: sliderMax,
-      DefaultMin: SLIDER_MIN,
+      DefaultMin: safeMin,
       OriginalMiles: initial[0] ? initial[0].Mileage : undefined,
       OriginalMins: initial[0] ? initial[0].TimeMins : undefined,
-      VenueInfo: venuesWithDistanceData
+      VenueInfo: venuesWithDistanceData.map((x) => ({ ...x, Capacity: capacityMap.get(x.VenueId) }))
     }
 
     res.status(200).json(result)
