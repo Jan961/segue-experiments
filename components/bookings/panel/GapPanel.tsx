@@ -42,7 +42,6 @@ interface GapPanelProps {
 }
 
 export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
-  const [venueId, setVenueId] = React.useState<number>(undefined)
   const { selectedDate } = useRecoilValue(viewState)
   const venueDict = useRecoilValue(venueState)
   const bookingDict = useRecoilValue(bookingState)
@@ -82,13 +81,10 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
   }
 
   const cancel = () => {
-    setVenueId(undefined)
     reset()
   }
 
   const search = React.useCallback(async (inputs: any) => {
-    setRefreshing(true)
-
     const body: GapSuggestionUnbalancedProps = {
       ...inputs,
       StartVenue: inputs.StartVenue,
@@ -102,16 +98,19 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
 
     setResults(data)
     setRefreshing(false)
-    setVenueId(data.VenueInfo[0]?.VenueId)
   }, [])
 
   const debouncedSearch = React.useMemo(
     () =>
-      debounce({ delay: 750 }, (inputs) => {
+      debounce({ delay: 500 }, (inputs) => {
         search(inputs)
       }),
     [search]
   )
+
+  React.useEffect(() => {
+    if (refreshing) debouncedSearch(inputs)
+  }, [inputs, debouncedSearch, refreshing])
 
   React.useEffect(() => {
     const intitalSearch = async (initialInputs) => {
@@ -135,7 +134,6 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
   }, [venueInputs]) // Trigger the debounced search here
 
   const handleVenueChange = (e: any) => {
-    console.log(e)
     e.persist()
     setVenueInputs((prev) => ({
       ...prev,
@@ -152,7 +150,7 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
       ...prev,
       [name]: value
     }))
-    debouncedSearch(inputs)
+    setRefreshing(true)
   }
 
   const resultVenues = results?.VenueInfo?.length ? results?.VenueInfo?.length : 0
@@ -231,7 +229,7 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
             </>
           )}
           <br />
-          { refreshing && (<div className="p-2"><Spinner size='sm'/></div>)}
+          { refreshing && (<div className="p-2 pt-0"><Spinner size='sm'/></div>)}
           { !refreshing && (
             <div className="text-lg text-center p-2">
               {resultVenues} Venue(s) matched
