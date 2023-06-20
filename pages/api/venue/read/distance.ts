@@ -14,10 +14,10 @@ export interface GapSuggestionParams {
 export interface GapSuggestionUnbalancedProps {
   StartVenue: number
   EndVenue: number
-  MinFromMiles: number
-  MaxFromMiles: number
-  MinToMiles: number
-  MaxToMiles: number
+  MinFromMiles?: number
+  MaxFromMiles?: number
+  MinToMiles?: number
+  MaxToMiles?: number
 }
 
 export type VenueWithDistance = {
@@ -28,15 +28,18 @@ export type VenueWithDistance = {
 
 export type GapSuggestionReponse = {
   VenueInfo?: VenueWithDistance[]
+  DefaultMin: number
+  SliderMax: number
   OriginalMiles: number
   OriginalMins: number
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const { StartVenue, EndVenue, MinFromMiles, MaxFromMiles, MinToMiles, MaxToMiles } = req.body as GapSuggestionUnbalancedProps
+  let { StartVenue, EndVenue, MinFromMiles, MaxFromMiles, MinToMiles, MaxToMiles } = req.body as GapSuggestionUnbalancedProps
+  const SLIDER_MIN = 25
 
   try {
-    const initialPromise = prisma.venueVenue.findMany({
+    const initial = await prisma.venueVenue.findMany({
       select: {
         Mileage: true,
         TimeMins: true
@@ -58,6 +61,14 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         ]
       }
     })
+
+    // Get default params if none provided
+    const sliderMax = initial[0] ? Math.ceil((initial[0].Mileage * 1.5) / 10) * 10 : 200
+
+    if (!MinFromMiles) MinFromMiles = SLIDER_MIN
+    if (!MaxFromMiles) MaxFromMiles = sliderMax
+    if (!MinToMiles) MinToMiles = SLIDER_MIN
+    if (!MaxToMiles) MaxToMiles = sliderMax
 
     const startVenue1Promise = prisma.venueVenue
       .findMany({
@@ -138,9 +149,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId)
       }))
 
-    const initial = await initialPromise
-
     const result: GapSuggestionReponse = {
+      SliderMax: sliderMax,
+      DefaultMin: SLIDER_MIN,
       OriginalMiles: initial[0] ? initial[0].Mileage : undefined,
       OriginalMins: initial[0] ? initial[0].TimeMins : undefined,
       VenueInfo: venuesWithDistanceData

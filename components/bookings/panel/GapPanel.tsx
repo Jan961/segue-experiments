@@ -49,10 +49,10 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
   const [results, setResults] = React.useState<GapSuggestionReponse>(undefined)
   const [refreshing, setRefreshing] = React.useState(false)
   const [sliderActive, setSlidersActive] = React.useState(false)
-
   const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, selectedDate)
   const startVIds = prevBookings.map(id => bookingDict[id].VenueId)
   const endVIds = nextBookings.map(id => bookingDict[id].VenueId)
+  const [sliderMax, setSliderMax] = React.useState<number>(undefined)
 
   const startDropDown = startVIds.map((vId): SelectOption => ({
     text: venueDict[vId].Name,
@@ -67,9 +67,14 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
   const [inputs, setInputs] = React.useState({
     From: [25, 200],
     To: [25, 200],
-    StartVenue: startDropDown[0]?.value,
-    EndVenue: endDropDown[0]?.value,
-    VenueId: 0
+    VenueId: 0,
+    StartVenue: Number(startDropDown[0]?.value),
+    EndVenue: Number(endDropDown[0]?.value)
+  })
+
+  const [venueInputs, setVenueInputs] = React.useState({
+    StartVenue: Number(startDropDown[0]?.value),
+    EndVenue: Number(endDropDown[0]?.value)
   })
 
   const next = () => {
@@ -83,16 +88,18 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
 
   const search = React.useCallback(async (inputs: any) => {
     setRefreshing(true)
+
     const body: GapSuggestionUnbalancedProps = {
       ...inputs,
-      StartVenue: Number(inputs.StartVenue),
-      EndVenue: Number(inputs.EndVenue),
+      StartVenue: inputs.StartVenue,
+      EndVenue: inputs.EndVenue,
       MinFromMiles: inputs.From[0],
       MaxFromMiles: inputs.From[1],
       MinToMiles: inputs.To[0],
       MaxToMiles: inputs.To[1]
     }
     const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body)
+
     setResults(data)
     setRefreshing(false)
     setVenueId(data.VenueInfo[0]?.VenueId)
@@ -107,17 +114,37 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
   )
 
   React.useEffect(() => {
-    debouncedSearch(inputs)
-  }, [inputs, debouncedSearch, selectedDate]) // Trigger the debounced search here
+    const intitalSearch = async (initialInputs) => {
+      setResults(undefined)
 
-  const handleOnChange = (e: any) => {
+      const body: GapSuggestionUnbalancedProps = {
+        StartVenue: venueInputs.StartVenue,
+        EndVenue: venueInputs.EndVenue
+      }
+
+      const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body)
+
+      const { DefaultMin, SliderMax } = data
+
+      setResults(data)
+      setInputs({ ...initialInputs, From: [DefaultMin, SliderMax], To: [DefaultMin, SliderMax] })
+      setSliderMax(SliderMax)
+    }
+
+    intitalSearch(venueInputs)
+  }, [venueInputs]) // Trigger the debounced search here
+
+  const handleVenueChange = (e: any) => {
     console.log(e)
     e.persist()
+    setVenueInputs((prev) => ({
+      ...prev,
+      [e.target.id]: Number(e.target.value)
+    }))
     setInputs((prev) => ({
       ...prev,
       [e.target.id]: Number(e.target.value)
     }))
-    search(inputs)
   }
 
   const handleRangeChange = (value: number[], name: string) => {
@@ -130,28 +157,22 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
 
   const resultVenues = results?.VenueInfo?.length ? results?.VenueInfo?.length : 0
 
-  // One and half times the distance rounded up to 10
-  const maxMiles = Math.ceil((results?.OriginalMiles * 1.5) / 10) * 10
-  const maxMins = Math.ceil((results?.OriginalMins * 1.5) / 10) * 10
-
-  // const availableDistances = Array.from({ length: 8 }, (_, i) => ({ text: String((i + 1) * 25), value: String((i + 1) * 25) }))
-
   return (
     <>
       <h3 className='text-lg mb-2 text-center'>Gap Suggest</h3>
       <FormInputSelect
         name="StartVenue"
         label="Start"
-        onChange={handleOnChange}
-        value={inputs.StartVenue}
+        onChange={handleVenueChange}
+        value={venueInputs.StartVenue}
         disabled={startDropDown.length <= 1}
         options={startDropDown}
       />
       <FormInputSelect
         name="EndVenue"
         label="End"
-        onChange={handleOnChange}
-        value={inputs.EndVenue}
+        onChange={handleVenueChange}
+        value={venueInputs.EndVenue}
         disabled={endDropDown.length <= 1}
         options={endDropDown}
       />
@@ -172,13 +193,13 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
               <label>
                 <div className='text-right inline-block text-xs mt-3'>Miles From Prev: ({inputs.From[0]} to {inputs.From[1]})</div>
                 <RangeSlider
-                  min={0} max={maxMiles} step={5} name="From"
+                  min={0} max={sliderMax} step={5} name="From"
                   onInput={(x: number[]) => handleRangeChange(x, 'From')} className="my-4" value={inputs.From} />
               </label>
               <label>
                 <div className='text-right inline-block text-xs mt-3'>Miles To Next: ({inputs.To[0]} to {inputs.To[1]})</div>
                 <RangeSlider
-                  min={0} max={maxMins} step={5} name="To"
+                  min={0} max={sliderMax} step={5} name="To"
                   onInput={(x: number[]) => handleRangeChange(x, 'To')} className="my-4 mb-0" value={inputs.To} />
               </label>
             </>

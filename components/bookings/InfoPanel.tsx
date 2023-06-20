@@ -31,7 +31,9 @@ export const InfoPanel = () => {
   const bookingIds = unique(date.BookingIds)
   const { RehearsalIds, PerformanceIds, GetInFitUpIds, OtherIds } = date
 
-  const defaultOpen = bookingIds.length + RehearsalIds.length + PerformanceIds.length + GetInFitUpIds.length + OtherIds.length <= 1
+  const total = bookingIds.length + RehearsalIds.length + PerformanceIds.length + GetInFitUpIds.length + OtherIds.length
+  const defaultOpen = total <= 1
+  const createOpen = total === 0
 
   const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-8 shadow-md'
 
@@ -83,7 +85,7 @@ export const InfoPanel = () => {
         </div>
       )}
       <div className={ sectionClass }>
-        <PanelDrawer title={'Create New'} intent='PRIMARY'>
+        <PanelDrawer open={createOpen} title={'Create New'} intent='PRIMARY'>
           <AddBooking />
         </PanelDrawer>
       </div>
