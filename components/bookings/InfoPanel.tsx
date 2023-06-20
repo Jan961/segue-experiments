@@ -6,15 +6,19 @@ import { DateViewModel, scheduleSelector } from 'state/booking/selectors/schedul
 import { first, flat, unique } from 'radash'
 import { PanelDrawer } from './panel/PanelDrawer'
 import { PerformancePanel } from './panel/PerformancePanel'
+import AddBooking from './panel/CreatePanel'
+import { GifuPanel } from './panel/GifuPanel'
+import { OtherPanel } from './panel/OtherPanel'
 
 export const InfoPanel = () => {
   const view = useRecoilValue(viewState)
   const schedule = useRecoilValue(scheduleSelector)
+
   const { selectedDate } = view
 
   if (!selectedDate) {
     return (
-      <div className="w-6/12 pl-4">
+      <div className="w-4/12 pl-4">
 
       </div>
     )
@@ -25,40 +29,66 @@ export const InfoPanel = () => {
   const date: DateViewModel = first(dates.filter(x => x.Date === selectedDate))
 
   const bookingIds = unique(date.BookingIds)
-  const rehearsalIds = date.RehearsalIds
-  const performances = date.PerformanceIds
+  const { RehearsalIds, PerformanceIds, GetInFitUpIds, OtherIds } = date
 
-  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-4 shadow-md'
+  const total = bookingIds.length + RehearsalIds.length + PerformanceIds.length + GetInFitUpIds.length + OtherIds.length
+  const defaultOpen = total <= 1
+  const createOpen = total === 0
+
+  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-8 shadow-md'
 
   return (
-    <div className="w-6/12 pl-2" >
+    <div className="w-4/12 pl-2" >
       { !!bookingIds.length && (
         <div className={sectionClass}>
           { bookingIds.map(id => (
-            <PanelDrawer open key={id} title="Booking">
+            <PanelDrawer open={defaultOpen} key={id} title="Booking">
               <BookingPanel key={id} bookingId={id} />
             </PanelDrawer>
           ))}
         </div>
       )}
-      { !!rehearsalIds.length && (
+      { !!RehearsalIds.length && (
         <div className={sectionClass}>
-          { rehearsalIds.map(id => (
-            <PanelDrawer open key={id} title="Rehearsal">
+          { RehearsalIds.map(id => (
+            <PanelDrawer open={defaultOpen} key={id} title="Rehearsal">
               <RehearsalPanel key={id} rehearsalId={id} />
             </PanelDrawer>
           ))}
         </div>
       )}
-      { !!performances.length && (
+      { !!GetInFitUpIds.length && (
         <div className={sectionClass}>
-          { performances.map((id, index) => (
-            <PanelDrawer open title={`Performance ${index + 1}`} key={id}>
+          { GetInFitUpIds.map(id => (
+            <PanelDrawer open={defaultOpen} key={id} title="Get-In Fit-Up">
+              <GifuPanel key={id} gifuId={id} />
+            </PanelDrawer>
+          ))}
+        </div>
+      )}
+      { !!OtherIds.length && (
+        <div className={sectionClass}>
+          { OtherIds.map(id => (
+            <PanelDrawer open={defaultOpen} key={id} title="Other">
+              <OtherPanel key={id} otherId={id} />
+            </PanelDrawer>
+          ))}
+        </div>
+      )}
+      { !!PerformanceIds.length && (
+        <div className={sectionClass}>
+          { PerformanceIds.map((id, index) => (
+            <PanelDrawer open={defaultOpen} title={`Performance ${index + 1}`} key={id}>
               <PerformancePanel key={id} performanceId={id} />
             </PanelDrawer>
           ))}
         </div>
       )}
+      <div className={ sectionClass }>
+        <PanelDrawer open={createOpen} title={'Create New'} intent='PRIMARY'>
+          <AddBooking />
+        </PanelDrawer>
+      </div>
     </div>
   )
 }

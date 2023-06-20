@@ -1,5 +1,6 @@
 import { PropsWithChildren } from 'react'
 import { useRecoilValue } from 'recoil'
+import { timeFormat } from 'services/dateService'
 import { bookingState } from 'state/booking/bookingState'
 import { distanceDictSelector } from 'state/booking/selectors/distanceDictSelector'
 import { venueState } from 'state/booking/venueState'
@@ -8,11 +9,6 @@ interface VenueDisplayProps {
   bookingId: number
   date: string
   performanceCount: number;
-}
-
-const timeFormat = (mins?: number) => {
-  if (!mins) return 'N/A'
-  return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`
 }
 
 export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithChildren<VenueDisplayProps>) => {

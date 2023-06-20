@@ -11,7 +11,7 @@ XLSX.stream.set_readable(Readable);
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from "xlsx/dist/cpexcel.full.mjs";
 import { userService } from "../../../services/user.service";
-import { dateService } from "../../../services/dateService";
+import { dateToSimple, getDateDaysAgo, getWeekDay, toSql } from "../../../services/dateService";
 XLSX.set_cptable(cpexcel);
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import saveAs from "file-saver";
@@ -23,7 +23,7 @@ function formatWeekNumber(weekNumber) {
 }
 
 function formatDate(date) {
-  return dateService.toSql(date);
+  return toSql(date);
 }
 
 export default function SalesSummary() {
@@ -96,7 +96,7 @@ export default function SalesSummary() {
   };
 
   function weeksBefore(date, weeks) {
-    let weeksBefore = dateService.getDateDaysAgo(date, weeks);
+    let weeksBefore = getDateDaysAgo(date, weeks);
     return weeksBefore;
   }
   function weeksAfter(date, weeks) {
@@ -198,8 +198,8 @@ export default function SalesSummary() {
        */
 
       if (
-        dateService.dateToSimple(lastDate) !=
-          dateService.dateToSimple(perf.ShowDate) ||
+        dateToSimple(lastDate) !=
+          dateToSimple(perf.ShowDate) ||
         lastDate === null
       ) {
         ResultCol = "F";
@@ -209,9 +209,9 @@ export default function SalesSummary() {
         //Com A
         worksheet.getCell(`A${row}`).value = "Week " + perf.TourWeekNum;
         // ColB
-        worksheet.getCell(`B${row}`).value = dateService.getWeekDay(ShowDate);
+        worksheet.getCell(`B${row}`).value = getWeekDay(ShowDate);
         // Colc
-        worksheet.getCell(`C${row}`).value = dateService.dateToSimple(ShowDate);
+        worksheet.getCell(`C${row}`).value = dateToSimple(ShowDate);
 
         // COld
         worksheet.getCell(`D${row}`).value = perf.Town;
@@ -251,7 +251,7 @@ export default function SalesSummary() {
 
     for (let week of weeks) {
       worksheet.getCell(`${dateCol}3`).value = week.WeekName;
-      worksheet.getCell(`${dateCol}4`).value = dateService.dateToSimple(
+      worksheet.getCell(`${dateCol}4`).value = dateToSimple(
         week.WeekDate
       );
       lastCol = dateCol;
@@ -420,8 +420,8 @@ export default function SalesSummary() {
                     {inputs.tourStartDate != null ? (
                       <p className="text-lg">
                         Tour Dates{" "}
-                        {dateService.dateToSimple(inputs.tourStartDate)} to{" "}
-                        {dateService.dateToSimple(inputs.tourEndDate)}
+                        {dateToSimple(inputs.tourStartDate)} to{" "}
+                        {dateToSimple(inputs.tourEndDate)}
                       </p>
                     ) : (
                       <p className="text-lg">

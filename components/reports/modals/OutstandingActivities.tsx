@@ -11,7 +11,7 @@ XLSX.stream.set_readable(Readable);
 /* load the codepage support library for extended support with older formats  */
 import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
 import {userService} from "../../../services/user.service";
-import {dateService} from "../../../services/dateService";
+import {toSql} from "../../../services/dateService";
 XLSX.set_cptable(cpexcel);
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import saveAs from "file-saver";
@@ -25,7 +25,7 @@ function formatWeekNumber(weekNumber){
 
 function formatDate(date){
 
-    return  dateService.toSql(date)
+    return  toSql(date)
 }
 
 export default function OutstandingActivities(){

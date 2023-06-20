@@ -1,5 +1,5 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType } from '@prisma/client'
-import { BookingDTO, DateBlockDTO, GetInFitUpDTO, PerformanceDTO, RehearsalDTO, ShowDTO, TourDTO } from 'interfaces'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other } from '@prisma/client'
+import { BookingDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
 import { BookingsWithPerformances } from 'services/bookingService'
@@ -53,8 +53,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
   OnSaleDate: b.TicketsOnSaleFromDate ? b.TicketsOnSaleFromDate.toISOString() : '',
-  OnSale: b.TicketsOnSale,
-  PerformanceIds: b.Performance?.map((p: PerformanceType) => p.Id)
+  OnSale: b.TicketsOnSale
 })
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
@@ -69,8 +68,20 @@ export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
   }
 }
 
+export const otherMapper = (o: Other): OtherDTO => ({
+  Id: o.Id,
+  Date: o.Date.toISOString(),
+  DateTypeId: o.DateTypeId,
+  StatusCode: o.StatusCode as StatusCode
+})
+
 export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => (
-  { Date: gifu.Date.toISOString(), Id: gifu.Id }
+  {
+    Date: gifu.Date.toISOString(),
+    Id: gifu.Id,
+    VenueId: gifu.VenueId,
+    StatusCode: gifu.StatusCode as StatusCode
+  }
 )
 
 export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
@@ -81,4 +92,9 @@ export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
   ShowCode: t.Show.Code,
   DateBlock: t.DateBlock.map(dateBlockMapper),
   IsArchived: t.IsArchived
+})
+
+export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({
+  Id: dt.Id,
+  Name: dt.Name
 })

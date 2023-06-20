@@ -3,7 +3,7 @@ import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import saveAs from "file-saver";
 import {userService} from "../../../services/user.service";
 import axios from "axios";
-import {dateService} from "../../../services/dateService";
+import { dateToSimple, formatTime, timeNow} from "../../../services/dateService";
 import { faUsers } from "@fortawesome/free-solid-svg-icons";
 import IconWithText from "../IconWithText";
 
@@ -135,7 +135,7 @@ export default function HoldsComps(){
                 titleText.value = "Promoter Holds"
 
                 let exportedDate = worksheet.getCell("A2")
-                exportedDate.value =  dateService.dateToSimple(new Date()) + " "  + dateService.timeNow()
+                exportedDate.value =  dateToSimple(new Date()) + " "  + timeNow()
 
                 worksheet.getCell("A3").value = "Tour"
                 worksheet.getCell("B3").value = "Venue"
@@ -174,8 +174,8 @@ export default function HoldsComps(){
                     worksheet.getCell(rowCount, 1).value = performance.f1
                     worksheet.getCell(rowCount, 2).value = performance.f4
                     worksheet.getCell(rowCount, 3).value = performance.f5
-                    worksheet.getCell(rowCount, 4).value = dateService.dateToSimple(performance.f6)
-                    worksheet.getCell(rowCount, 5).value = dateService.formatTime(performance.f7)
+                    worksheet.getCell(rowCount, 4).value = dateToSimple(performance.f6)
+                    worksheet.getCell(rowCount, 5).value = formatTime(performance.f7)
                     worksheet.getCell(rowCount, 6).value = performance.f8
                     worksheet.getCell(rowCount, 7).value = performance.f9
                     worksheet.getCell(rowCount, 8).value = performance.f10

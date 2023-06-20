@@ -1,16 +1,9 @@
-import * as React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import * as React from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
-let show = "ST1"; // This needs to be passed from the template
-let tour = "22";
+const show = 'ST1' // This needs to be passed from the template
+const tour = '22'
 
 interface props {
   title?: string;
@@ -18,8 +11,7 @@ interface props {
   setSearchFilter?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-
-const Toolbar = ({title, searchFilter, setSearchFilter}: props) => (
+const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
   <div className="py-4">
     <div className="col-auto">
       <div className="flex flex-row align-center justify-between">
@@ -48,7 +40,7 @@ const Toolbar = ({title, searchFilter, setSearchFilter}: props) => (
       </div>
       <div className="flex flex-row justify-between mt-4">
         <h1 className="text-3xl font-bold text-primary-green ">
-          {" "}
+          {' '}
           {show} / {tour} {title}
         </h1>
 
@@ -87,6 +79,6 @@ const Toolbar = ({title, searchFilter, setSearchFilter}: props) => (
       </div>
     </div>
   </div>
-);
+)
 
-export default Toolbar;
+export default Toolbar

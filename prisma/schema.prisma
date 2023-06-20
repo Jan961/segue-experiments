@@ -39,7 +39,7 @@ model Booking {
   TicketsOnSaleFromDate DateTime?         @db.Date @map("BookingTicketsOnSaleFromDate")
   TicketsOnSale         Boolean?          @db.Bit(1) @map("BookingTicketsOnSale")
   DateBlock                    DateBlock         @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
-  Venue                        Venue             @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
+  Venue                        Venue?             @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
   BookingActivity              BookingActivity[]
   Contract                     Contract?
   Performance                  Performance[]

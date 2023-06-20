@@ -1,7 +1,6 @@
 
 import React, { useEffect, useState } from 'react'
-import { userService } from 'services/user.service'
-import { dateService } from 'services/dateService'
+import { dateToSimple } from 'services/dateService'
 import moment from 'moment/moment'
 import { StyledDialog } from 'components/global/StyledDialog'
 
@@ -151,7 +150,7 @@ export default function Barring () {
             >
               <option value={0}>Select A Tour</option>
               {salesWeeksVenues.map((item) => (
-                <option value={item.VenueId}>{dateService.dateToSimple(new Date(item.ShowDate))} - {item.Venue.Name})</option>
+                <option value={item.VenueId}>{dateToSimple(new Date(item.ShowDate))} - {item.Venue.Name})</option>
               ))}
             </select>
           </div>

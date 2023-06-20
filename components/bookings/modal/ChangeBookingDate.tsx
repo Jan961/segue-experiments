@@ -1,5 +1,5 @@
 import React from 'react'
-import { dateService } from 'services/dateService'
+import { dateToPicker, dateToSimple } from 'services/dateService'
 import { StyledDialog } from 'components/global/StyledDialog'
 import { FormInputTextAttached } from 'components/global/forms/FormInputSetter'
 import { useRecoilState } from 'recoil'
@@ -23,7 +23,7 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
   const booking = bookingDict[bookingId]
 
   React.useEffect(() => {
-    setDate(dateService.dateToPicker(booking.Date))
+    setDate(dateToPicker(booking.Date))
   }, [bookingId, booking])
 
   const handleOnSubmit = async (e: any) => {
@@ -51,12 +51,12 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
     setDate(e.target.value)
   }
 
-  const modalDisabled = loading || (dateService.dateToPicker(booking.Date) === dateService.dateToPicker(date))
+  const modalDisabled = loading || (dateToPicker(booking.Date) === dateToPicker(date))
 
   return (
     <>
-      <FormInputTextAttached disabled={disabled} name="Date" value={dateService.dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
-      <StyledDialog title={`Move Date: ${dateService.dateToSimple(booking.Date)}`} open={showModal} onClose={() => setShowModal(false)}>
+      <FormInputTextAttached disabled={disabled} name="Date" value={dateToSimple(booking.Date)} onClick={() => setShowModal(true)} />
+      <StyledDialog title={`Move Date: ${dateToSimple(booking.Date)}`} open={showModal} onClose={() => setShowModal(false)}>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent='DANGER' header="Warning">
             Changing a booking will move all related items to the new date.

@@ -10,10 +10,22 @@ interface VenueInfoProps {
 }
 
 export const VenueInfoItem = ({ label, value }: { label: string, value: string}) => {
+  console.log(label)
+  if (label === 'Website') {
+    return (
+      <div className="flex">
+        <label className="w-48 font-bold">{ title(label) }:&nbsp;</label>
+        <div>
+          <a href={value} className="text-primary-blue hover:underline whitespace-nowrap overflow-ellipsis">[Link]</a>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex">
+    <div className={ value.length > 30 ? '' : 'flex'}>
       <label className="w-48 font-bold">{ title(label) }:&nbsp;</label>
-      <span className="col-span-1">{ value }</span>
+      <div>{ value }</div>
     </div>
   )
 }
@@ -43,9 +55,11 @@ export const VenueInfo = ({ venueId }: VenueInfoProps) => {
       { showModal && (
         <StyledDialog title="Venue Information" width="lg" open={showModal} onClose={() => setShowModal(false)}>
           <>
-            { venue && (Object.keys(venue).map((key) => (
-              <VenueInfoItem key={key} label={key} value={venue[key]} />
-            )))}
+            { venue && (Object.keys(venue).map((key) =>
+              venue[key]
+                ? <VenueInfoItem key={key} label={key} value={venue[key]} />
+                : null
+            ))}
           </>
         </StyledDialog>
       )}

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import IconWithText from "../IconWithText";
 import {faChartPie} from "@fortawesome/free-solid-svg-icons";
 import {userService} from "../../../services/user.service";
-import {dateService} from "../../../services/dateService";
+import {getDateDaysAgo, toISO, toSql} from "../../../services/dateService";
 import moment from "moment";
 import ExcelJS from "exceljs/dist/es5/exceljs.browser";
 import saveAs from "file-saver";
@@ -448,16 +448,16 @@ export default function SalesSummarySimple(){
     }
 
     function weeksBefore(date, weeks) {
-        return dateService.getDateDaysAgo(date, weeks);
+        return getDateDaysAgo(date, weeks);
     }
 
     function formatDate(date) {
-        return dateService.toSql(date);
+        return toSql(date);
     }
 
     function formatShortYearDate(dateString){
         var dateMomentObject = moment(dateString, "DD/MM/YY"); // 1st argument - string, 2nd argument - format
-        let day = dateService.toISO(dateMomentObject).substring(0,10)
+        let day = toISO(dateMomentObject).substring(0,10)
         return day //new Date( dateMomentObject.toDate());
     }
 

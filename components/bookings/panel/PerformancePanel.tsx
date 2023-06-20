@@ -1,8 +1,10 @@
 import axios from 'axios'
+import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { FormInputTime } from 'components/global/forms/FormInputTime'
 import { PerformanceDTO } from 'interfaces'
+import { omit } from 'radash'
 import React from 'react'
 import { useRecoilState } from 'recoil'
 import { performanceState } from 'state/booking/performanceState'
@@ -16,6 +18,7 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
   const perf: PerformanceDTO = perfDict[performanceId]
   const [inputs, setInputs] = React.useState<PerformanceDTO>(perf)
   const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })
+  const [deleting, setDeleting] = React.useState(false)
 
   const datePart = inputs.Date ? inputs.Date.split('T')[0] : ''
   const timePart = inputs.Date ? inputs.Date.split('T')[1] : ''
@@ -41,7 +44,7 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
   const saveDetails = async () => {
     const { data } = await axios({
       method: 'POST',
-      url: '/api/bookings/Performances/upsert/',
+      url: '/api/performances/update',
       data: inputs
     })
 
@@ -61,12 +64,27 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
     }
   }
 
-  const initiateDelete = () => {
-    alert('Not implimented')
+  const initiateDelete = async () => {
+    setDeleting(true)
+  }
+
+  const performDelete = async () => {
+    setDeleting(false)
+    await axios.post('/api/performances/delete', { ...perf })
+    const newState = omit(perfDict, [performanceId])
+    setPerfDict(newState)
   }
 
   return (
     <>
+      { deleting && (
+        <DeleteConfirmation
+          title="Delete Performance"
+          onCancel={() => setDeleting(false)}
+          onConfirm={performDelete}>
+          <p>This will delete the performance permanently</p>
+        </DeleteConfirmation>
+      )}
       <div className="grid grid-cols-2 gap-2">
         <FormInputDate
           name="datePart"

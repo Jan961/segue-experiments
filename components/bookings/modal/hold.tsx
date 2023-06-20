@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { dateService } from "services/dateService";
+import { dateTimeToTime, dateToSimple, getWeekDay } from "services/dateService";
 
 export default function Holds(data){
     const [showModal, setShowModal] = React.useState(false);
@@ -129,7 +129,7 @@ export default function Holds(data){
 
                                                 datesList.map((date) => (
                                                     <>
-                                                        <option value={date.BookingId}>{dateService.getWeekDay(date.ShowDate)} {dateService.dateToSimple(date.ShowDate)} {dateService.dateTimeToTime(date.Performance1Time)}</option>
+                                                        <option value={date.BookingId}>{getWeekDay(date.ShowDate)} {dateToSimple(date.ShowDate)} {dateTimeToTime(date.Performance1Time)}</option>
                                                     </>
                                                 )) :
                                                 <option value={""}>Tour has no dates</option>

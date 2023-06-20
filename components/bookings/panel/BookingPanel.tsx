@@ -16,30 +16,21 @@ import { viewState } from 'state/booking/viewState'
 import { bookingState } from 'state/booking/bookingState'
 import { omit } from 'radash'
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
-
-const getNextBookingId = (sortedBookings: BookingDTO[], current: number) => {
-  let found = false
-
-  for (const b of sortedBookings) {
-    if (found) return b.Id
-    if (current === b.Id) found = true
-  }
-  return undefined
-}
+import { VenueSelector } from './components/VenueSelector'
+import { getNextId } from './utils/getNextId'
 
 interface BookingPanelProps {
   bookingId: number
 }
 
 export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
-  const venues = useRecoilValue(venueState)
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const sortedBookings = useRecoilValue(sortedBookingSelector)
   const setView = useSetRecoilState(viewState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
   const booking = bookingDict[bookingId]
-  const nextBookingId = getNextBookingId(sortedBookings, bookingId)
+  const nextBookingId = getNextId(sortedBookings, bookingId)
   const [inputs, setInputs] = React.useState<BookingDTO>(booking)
   const [deleting, setDeleting] = React.useState(false)
 
@@ -111,10 +102,6 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     setBookingDict(newState)
   }
 
-  const venueOptions: SelectOption[] = [
-    { text: 'Please Select a Venue', value: '' },
-    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: v.Name, value: String(v.Id) })
-    )]
   const statusOptions: SelectOption[] = [
     { text: 'Confirmed (C)', value: 'C' },
     { text: 'Unconfirmed (U)', value: 'U' },
@@ -134,17 +121,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
       )}
       <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-4 p-4 pb-0">
         <ChangeBookingDate disabled={submitting} bookingId={booking.Id} />
-        <FormInputSelect
-          name="VenueId"
-          value={inputs.VenueId ? inputs.VenueId : ''}
-          options={venueOptions}
-          onChange={handleOnChange}
-          disabled={submitting}
-        />
-        <div className="columns-2 mb-4">
-          <VenueInfo venueId={inputs.VenueId} />
-          <ViewBookingHistory venueId={inputs.VenueId}></ViewBookingHistory>
-        </div>
+        <VenueSelector disabled={submitting} onChange={handleOnChange} venueId={inputs.VenueId} />
       </div>
 
       <div className="grid grid-cols-2 gap-4">

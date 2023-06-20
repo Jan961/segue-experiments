@@ -13,7 +13,7 @@ import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs';
 import {userService} from "../../../services/user.service";
 
 import {forceReload} from "../../../utils/forceReload";
-import {dateService} from "../../../services/dateService";
+import { dateToSimple, formatDateUK, getMonday, getSunday, getWeekDayLong, todayToSimple, weeks} from "../../../services/dateService";
 import axios from "axios";
 import {wait} from "next/dist/build/output/log";
 XLSX.set_cptable(cpexcel);
@@ -114,8 +114,8 @@ export default function MasterPlan(){
 
     async function  buildReport(){
 
-        let firstMonday = dateService.getMonday(inputs.DateFrom)
-        let sunday = dateService.getSunday(inputs.DateTo)
+        let firstMonday = getMonday(inputs.DateFrom)
+        let sunday = getSunday(inputs.DateTo)
 
         var ExcelJSWorkbook = new ExcelJS.Workbook();
         var worksheet = ExcelJSWorkbook.addWorksheet("Report");
@@ -142,7 +142,7 @@ export default function MasterPlan(){
             fgColor: {argb: "8EA9DB"},
         };
 
-        titleText.value = "Master Plan " + dateService.dateToSimple(firstMonday) + " " + dateService.dateToSimple(sunday);
+        titleText.value = "Master Plan " + dateToSimple(firstMonday) + " " + dateToSimple(sunday);
 
 
         worksheet.mergeCells("A2:CU2");
@@ -162,7 +162,7 @@ export default function MasterPlan(){
             fgColor: {argb: "8EA9DB"},
         };
 
-        exportDetails.value = "Exported: " + dateService.todayToSimple();
+        exportDetails.value = "Exported: " + todayToSimple();
 
         var headerRow = worksheet.addRow();
         worksheet.getRow(3).fill = {
@@ -220,7 +220,7 @@ export default function MasterPlan(){
             let day = worksheet.getCell(`A${row}`)
             let date = worksheet.getCell(`B${row}`)
 
-            let cellDayValue = dateService.getWeekDayLong(loop)
+            let cellDayValue = getWeekDayLong(loop)
 
             // Formatted row before a monday row
             if (cellDayValue == "Monday") {
@@ -242,7 +242,7 @@ export default function MasterPlan(){
                 date = worksheet.getCell(`B${row}`)
             }
             day.value = cellDayValue
-            date.value = dateService.formatDateUK(loop)
+            date.value = formatDateUK(loop)
             let newDate = loop.setDate(loop.getDate() + 1);
             loop = new Date(newDate);
             row = row + 1
@@ -271,9 +271,9 @@ export default function MasterPlan(){
 
 
                 // Formatted row before a monday row
-                if (dateService.getWeekDayLong(loop) == "Monday") {
+                if (getWeekDayLong(loop) == "Monday") {
                     // Insert Row
-                    let cellValue = 'Week ' + dateService.weeks(tour.TourStartDate, loop.toISOString())
+                    let cellValue = 'Week ' + weeks(tour.TourStartDate, loop.toISOString())
                     let weekly = worksheet.getRow(row)
                     data.fill = {
                         type: "pattern",

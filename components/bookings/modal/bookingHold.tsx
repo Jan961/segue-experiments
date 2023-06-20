@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { dateService } from 'services/dateService'
+import { dateToSimple, getWeekDay } from 'services/dateService'
 import axios from 'axios'
 import { loggingService } from 'services/loggingService'
 import { StyledDialog } from 'components/global/StyledDialog'
@@ -124,7 +124,7 @@ export default function BookingHold ({ TourId }: BookingHoldProps) {
 
                 ? datesList.map((date) => (
                   <>
-                    <option value={date.BookingId}>{dateService.getWeekDay(date.ShowDate)} {dateService.dateToSimple(date.ShowDate)} </option>
+                    <option value={date.BookingId}>{getWeekDay(date.ShowDate)} {dateToSimple(date.ShowDate)} </option>
                   </>
                 ))
                 : <option value={''}>Tour has no dates</option>

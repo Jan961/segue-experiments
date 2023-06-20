@@ -5,6 +5,8 @@
 // import { User } from 'path/to/interfaces';
 import {number} from "prop-types";
 
+export type StatusCode = 'C' | 'U' | 'X'
+
 export type Currency = {
   id: number
   fullTitle: string
@@ -86,19 +88,32 @@ export type VenueMinimalDTO = {
 
 export type GetInFitUpDTO = {
   Id: number
+  VenueId: number
   Date: string
+  StatusCode: StatusCode
+}
+
+export type OtherDTO = {
+  Id: number
+  Date: string
+  DateTypeId: number
+  StatusCode: StatusCode
 }
 
 export type BookingDTO = {
   Id: number
   Date: string
   VenueId: number
-  StatusCode: 'C' | 'U' | 'X'
+  StatusCode: StatusCode
   PencilNum: number
   LandingSite: string
   OnSaleDate: string
   OnSale: boolean
-  PerformanceIds: number[]
+}
+
+export type DateTypeDTO = {
+  Id: number
+  Name: string
 }
 
 export type PerformanceDTO = {

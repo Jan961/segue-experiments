@@ -11,7 +11,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import Salesreport from "./reports/salesreport";
 import { useEffect, useState } from "react";
 import { userService } from "services/user.service";
-import { dateService } from "services/dateService";
+import { formatDateUK, getWeekDay } from "services/dateService";
 import Tours from "pages/tours/[ShowId]";
 
 let show = "ST1"; // This needs to be passed from the template
@@ -126,8 +126,8 @@ const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
             >
               {activeTours.map((tour) => {
                 const date = new Date(tour.ShowDate);
-                const weekday = dateService.getWeekDay(date);
-                const ukDate = dateService.formatDateUK(date);
+                const weekday = getWeekDay(date);
+                const ukDate = formatDateUK(date);
                 return (
                   <option key={tour.BookingId} value={`${tour.BookingId}`}>
                     {weekday} {ukDate} {tour.Venue.Name} | {tour.Tour.Show.Code}

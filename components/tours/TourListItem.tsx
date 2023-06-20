@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { ListItemThumbnail } from 'components/global/list/ListItemThumbnail'
 import { MenuButton } from 'components/global/MenuButton'
-import { dateService } from 'services/dateService'
+import { dateToSimple } from 'services/dateService'
 import { useRouter } from 'next/router'
 import { TourDTO } from 'interfaces'
 
@@ -16,7 +16,7 @@ const TourListDateDisplay = ({ startDate, endDate, label }: TourListDateDisplayP
   return (
     <div className="flex basis-1 flex-col pr-2 mr-2">
       <b>{ label }</b>
-      <span className="whitespace-nowrap">{dateService.dateToSimple(startDate)} &#12297;{dateService.dateToSimple(endDate)}</span>
+      <span className="whitespace-nowrap">{dateToSimple(startDate)} &#12297;{dateToSimple(endDate)}</span>
     </div>
   )
 }
