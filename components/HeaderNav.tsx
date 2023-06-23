@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useRouter } from 'next/router'
+import { useClerk } from "@clerk/nextjs";
 import { userService } from 'services/user.service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import classNames from 'classnames'
@@ -54,9 +55,11 @@ const HeaderNavDivider = () => (<span className="mx-2">{' | '}</span>)
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
   const [username, setUsername] = React.useState('My Account')
   const router = useRouter()
+  const { signOut } = useClerk()
 
   function logout () {
     userService.logout()
+    signOut()
     router.push('/')
   }
   const user = userService.userValue
