@@ -14,7 +14,7 @@ export default function Page () {
             <p>Please sign up to continue</p>
           </FormInfo>
         )}
-        <SignUp />
+        <SignUp routing='hash' />
       </div>
     </div>
   )
