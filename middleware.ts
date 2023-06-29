@@ -6,7 +6,8 @@ const allowedEmails = [
   'neil@neilsutcliffe.com',
   'robert@robertckelly.co.uk',
   'kyle@chieftechofficer.co.uk',
-  'asara97911@gmail.com'
+  'asara97911@gmail.com',
+  'k@bhikstudio.co.uk'
 ]
 const publicPaths = ['/sign-in*', '/sign-up*', '/access-denied']
 
