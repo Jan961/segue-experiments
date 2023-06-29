@@ -20,20 +20,8 @@ const isPublic = (path: string) => {
 
 export default authMiddleware({
   afterAuth: async (auth, request, evt) => {
-    if (isPublic(request.nextUrl.pathname)) {
-      if (request.nextUrl.pathname === '/sign-in/sso-callback') {
-        // Accidentally signed in when signing up
-        const signUp = new URL('/sign-up?error=notfound', request.url)
-        return NextResponse.redirect(signUp)
-      }
-      if (request.nextUrl.pathname === '/sign-up/sso-callback') {
-        // Accidentially signed up when signing in
-        console.log(auth)
-        const signIn = new URL('/sign-in?error=exists', request.url)
-        return NextResponse.redirect(signIn)
-      }
-      return NextResponse.next()
-    }
+    if (isPublic(request.nextUrl.pathname)) return NextResponse.next()
+
     // if the user is not signed in redirect them to the sign in page.
     const { userId } = auth
 
