@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useRouter } from 'next/router'
-import { useClerk } from "@clerk/nextjs";
+import { useClerk } from '@clerk/nextjs'
 import { userService } from 'services/user.service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import classNames from 'classnames'
@@ -57,9 +57,9 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
   const router = useRouter()
   const { signOut } = useClerk()
 
-  function logout () {
+  const logout = async () => {
     userService.logout()
-    signOut()
+    await signOut()
     router.push('/')
   }
   const user = userService.userValue

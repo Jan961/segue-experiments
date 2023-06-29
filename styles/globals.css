@@ -4,10 +4,11 @@
 
 
 .background-gradient{
-background: rgb(236,99,86);
-background: 
-linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,1) 100%),
-linear-gradient(90deg, rgba(236,99,86,0.20) 3%, rgba(253,206,116,0.20) 25%, rgba(65,163,154,0.20) 56%, rgba(0,148,193,0.20) 78%, rgba(124,86,142,0.20) 100%);
+  min-height: 100vh;
+  background: rgb(236,99,86);
+  background: 
+  linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 40%, rgba(255,255,255,1) 100%),
+  linear-gradient(90deg, rgba(236,99,86,0.20) 3%, rgba(253,206,116,0.20) 25%, rgba(65,163,154,0.20) 56%, rgba(0,148,193,0.20) 78%, rgba(124,86,142,0.20) 100%);
 }
 
 
