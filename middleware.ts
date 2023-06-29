@@ -28,7 +28,6 @@ export default authMiddleware({
       }
       if (request.nextUrl.pathname === '/sign-up/sso-callback') {
         // Accidentially signed up when signing in
-        console.log(auth)
         const signIn = new URL('/sign-in?error=exists', request.url)
         return NextResponse.redirect(signIn)
       }
@@ -48,8 +47,6 @@ export default authMiddleware({
       const userEmail = user.emailAddresses.find((email) => email.id === user.primaryEmailAddressId).emailAddress
 
       if (allowedEmails.includes(userEmail)) return NextResponse.next()
-
-      console.log('Email Not Found')
       const denied = new URL('/access-denied', request.url)
       return NextResponse.redirect(denied)
     }
