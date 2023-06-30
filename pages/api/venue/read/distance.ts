@@ -25,6 +25,8 @@ export type VenueWithDistance = {
   MileageFromStart: number,
   MileageFromEnd: number,
   Capacity?: number
+  MinsFromStart?: number
+  MinsFromEnd?: number
 }
 
 export type GapSuggestionReponse = {
@@ -82,6 +84,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         },
         select: {
           Venue2Id: true,
+          TimeMins: true,
           Mileage: true
         }
       })
@@ -94,6 +97,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         },
         select: {
           Venue1Id: true,
+          TimeMins: true,
           Mileage: true
         }
       })
@@ -106,6 +110,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         },
         select: {
           Venue2Id: true,
+          TimeMins: true,
           Mileage: true
         }
       })
@@ -118,6 +123,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         },
         select: {
           Venue1Id: true,
+          TimeMins: true,
           Mileage: true
         }
       })
@@ -129,19 +135,19 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     // Combine the venue ids and mileages
     const startVenueRelations = [
       ...startVenue1
-        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage })),
+        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
       ...startVenue2
-        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage }))]
+        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins }))]
     const endVenueRelations = [
       ...endVenue1
-        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage })),
+        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
       ...endVenue2
-        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage }))]
+        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins }))]
 
     // Create a Map for endVenueRelations
     const endVenueRelationsMap = new Map()
     for (const relation of endVenueRelations) {
-      endVenueRelationsMap.set(relation.VenueId, relation.Mileage)
+      endVenueRelationsMap.set(relation.VenueId, { Mileage: relation.Mileage, Mins: relation.Mins })
     }
 
     // Find intersection of two sets (O(n))
@@ -150,7 +156,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       .map(startRelation => ({
         VenueId: startRelation.VenueId,
         MileageFromStart: startRelation.Mileage,
-        MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId)
+        MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mileage,
+        MinsFromStart: startRelation.Mins,
+        MinsFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mins
       }))
 
     const capacities = await prisma.venue.findMany({
@@ -166,6 +174,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     })
 
     const capacityMap = new Map<number, number>(capacities.map((venue: Venue) => [venue.Id, venue.Seats]))
+
+    console.log(venuesWithDistanceData)
 
     const result: GapSuggestionReponse = {
       SliderMax: sliderMax,

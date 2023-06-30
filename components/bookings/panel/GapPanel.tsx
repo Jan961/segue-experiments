@@ -5,7 +5,6 @@ import { useRecoilValue } from 'recoil'
 import { viewState } from 'state/booking/viewState'
 import { bookingState } from 'state/booking/bookingState'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
-import RangeSlider from 'react-range-slider-input'
 import { venueState } from 'state/booking/venueState'
 import { findPrevAndNextBookings } from './utils/findPrevAndNextBooking'
 import { debounce } from 'radash'
@@ -16,7 +15,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCalculator, faSliders } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import classNames from 'classnames'
-import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
+import { NumericSliderRange } from './components/NumericSliderRange'
 
 interface ToggleButtonProps {
   icon: IconProp
@@ -64,8 +63,8 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
   }))
 
   const [inputs, setInputs] = React.useState({
-    From: [25, 200],
-    To: [25, 200],
+    From: [25, 200] as [number, number],
+    To: [25, 200] as [number, number],
     VenueId: 0,
     StartVenue: Number(startDropDown[0]?.value),
     EndVenue: Number(endDropDown[0]?.value)
@@ -186,48 +185,24 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
             <br />
             <span>{results.OriginalMiles} mi - {timeFormat(results.OriginalMins)}</span>
           </div>
-          { sliderActive && (
-            <>
-              <label>
-                <div className='text-right inline-block text-xs mt-3'>Miles From Prev: ({inputs.From[0]} to {inputs.From[1]})</div>
-                <RangeSlider
-                  min={0} max={sliderMax} step={5} name="From"
-                  onInput={(x: number[]) => handleRangeChange(x, 'From')} className="my-4" value={inputs.From} />
-              </label>
-              <label>
-                <div className='text-right inline-block text-xs mt-3'>Miles To Next: ({inputs.To[0]} to {inputs.To[1]})</div>
-                <RangeSlider
-                  min={0} max={sliderMax} step={5} name="To"
-                  onInput={(x: number[]) => handleRangeChange(x, 'To')} className="my-4 mb-0" value={inputs.To} />
-              </label>
-            </>
-          )}
-          { !sliderActive && (
-            <>
-              <div className='grid grid-cols-3 clear-both gap-2 items-center'>
-                <label>From</label>
-                <FormInputNumeric className='mb-0'
-                  name="FromMin"
-                  onChange={(value) => handleRangeChange([value, inputs.From[1]], 'From')}
-                  value={inputs.From[0]}/>
-                <FormInputNumeric className='mb-0'
-                  name="FromMax"
-                  onChange={(value) => handleRangeChange([inputs.From[0], value], 'From')}
-                  value={inputs.From[1]}/>
-              </div>
-              <div className='grid grid-cols-3 mt-2 gap-2 items-center'>
-                <label>To</label>
-                <FormInputNumeric className='mb-0'
-                  name="ToMin"
-                  onChange={(value) => handleRangeChange([value, inputs.To[1]], 'To')}
-                  value={inputs.To[0]}/>
-                <FormInputNumeric className='mb-0'
-                  name="ToMax"
-                  onChange={(value) => handleRangeChange([inputs.To[0], value], 'To')}
-                  value={inputs.To[1]}/>
-              </div>
-            </>
-          )}
+          <NumericSliderRange
+            value={inputs.From}
+            label="From"
+            name="From"
+            isSlider={sliderActive}
+            handleRangeChange={handleRangeChange}
+            min={0}
+            max={sliderMax}
+          />
+          <NumericSliderRange
+            value={inputs.To}
+            label="To"
+            name="To"
+            isSlider={sliderActive}
+            handleRangeChange={handleRangeChange}
+            min={0}
+            max={sliderMax}
+          />
           <br />
           { refreshing && (<div className="p-2 pt-0"><Spinner size='sm'/></div>)}
           { !refreshing && (
