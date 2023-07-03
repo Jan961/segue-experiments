@@ -36,7 +36,7 @@ export const InfoPanel = () => {
 
   if (!selectedDate) {
     return (
-      <div className="w-4/12 pl-4 mt-40 text-center flex flex-col items-center" >
+      <div className="pl-4 mt-40 text-center flex flex-col items-center" >
         <h2 className="text-xl mb-2">No Date Selected</h2>
         <p>Select date to edit/create events</p>
       </div>
@@ -101,7 +101,7 @@ export const InfoPanel = () => {
   })
 
   return (
-    <div className="w-4/12 pl-2" >
+    <div>
       { !!bookings.length && (
         <div className={sectionClass}>
           { bookings.map(({ id, title, icon }) => (

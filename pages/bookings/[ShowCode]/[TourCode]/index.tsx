@@ -8,21 +8,61 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector'
 import { DateTypeMapper, bookingMapper, dateBlockMapper, getInFitUpMapper, otherMapper, performanceMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
-import { DistanceStop, getAllVenuesMin, getDistances } from 'services/venueService'
+import { getAllVenuesMin, getDistances } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
 import { objectify } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
 import { filterState } from 'state/booking/filterState'
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
-import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
 import { ParsedUrlQuery } from 'querystring'
 import { Spinner } from 'components/global/Spinner'
+import { ToolbarButton } from 'components/bookings/ToolbarButton'
+import { MileageCalculator } from 'components/bookings/MileageCalculator'
+import { ToolbarInfo } from 'components/bookings/ToolbarInfo'
+import { getStops } from 'utils/getStops'
+import React, { PropsWithChildren } from 'react'
+import classNames from 'classnames'
 
 interface bookingProps {
   Id: number,
   intitialState: InitialState
+}
+
+const toolbarHeight = 192
+
+interface ScrollablePanelProps {
+  className: string
+  reduceHeight: number
+}
+
+// Based on toolbar height. Adds a tasteful shadow when scrolled to prevent strange cut off
+const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildren<ScrollablePanelProps>) => {
+  const [scrolled, setScrolled] = React.useState(false)
+
+  const handleScroll = (e) => {
+    setScrolled(e.target.scrollTop > 0)
+  }
+
+  const panelClasses = classNames(
+    'overflow-y-auto',
+    {
+      'shadow-inner': scrolled
+    }
+  )
+
+  return (
+    <div
+      onScroll={handleScroll}
+      className={classNames(className, panelClasses)}
+      style={{
+        height: `calc(100vh - ${reduceHeight}px)`
+      }}
+    >
+      { children }
+    </div>
+  )
 }
 
 const BookingPage = ({ Id }: bookingProps) => {
@@ -41,46 +81,49 @@ const BookingPage = ({ Id }: bookingProps) => {
   }
 
   return (
-    <Layout title="Booking | Seque">
+    <Layout title="Booking | Segue" flush>
       {/* <TourJumpMenu></TourJumpMenu> */}
-      <GlobalToolbar
-        searchFilter={filter.venueText}
-        setSearchFilter={(venueText) => setFilter({ venueText })}
-        title={'Bookings'}
-      ></GlobalToolbar>
-      <div className='flex mb-4 items-center'>
-        <div>
-          <button className="text-primary-blue font-bold text-sm self-center px-2">
-            Week ??
-          </button>
-          <FormInputButton
-            intent='PRIMARY'
-            onClick={() => gotoToday()}
-            text="Go to Today" />
+      <div className='px-4'>
+        <GlobalToolbar
+          searchFilter={filter.venueText}
+          setSearchFilter={(venueText) => setFilter({ venueText })}
+          title={'Bookings'}
+        ></GlobalToolbar>
+        <div className='flex gap-2 mb-4 items-center'>
+          <ToolbarInfo label='Week' value="??" />
+          <MileageCalculator />
+          <ToolbarButton
+            onClick={() => gotoToday()}>
+            Go To Today
+          </ToolbarButton>
+          <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
         </div>
-        <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
       </div>
-      <div className="flex flex-auto">
-        <div className="w-full p-4 pt-0 max-h-1200">
+      <div className='grid grid-cols-12'>
+        <ScrollablePanel className="flex flex-auto mx-0 col-span-9 px-4" reduceHeight={toolbarHeight}>
           { loading && (
             <Spinner size="lg" className="mt-32 mb-8"/>
           )}
           { !loading && (
-            <ul className="grid">
-              { Sections.map((section: ScheduleSectionViewModel) => (
-                <li key={section.Name}>
-                  <h3 className='font-bold mt-3 mb-3'>{section.Name}</h3> {
-                    section.Dates.map((date: DateViewModel) => (
-                      <ScheduleRow key={date.Date} date={date} />
-                    ))
-                  }
-                </li>
-              ))
-              }
-            </ul>
+            <>
+              <ul className="grid w-full">
+                { Sections.map((section: ScheduleSectionViewModel) => (
+                  <li key={section.Name}>
+                    <h3 className='font-bold mt-3 mb-3'>{section.Name}</h3> {
+                      section.Dates.map((date: DateViewModel) => (
+                        <ScheduleRow key={date.Date} date={date} />
+                      ))
+                    }
+                  </li>
+                ))
+                }
+              </ul>
+            </>
           )}
-        </div>
-        <InfoPanel />
+        </ScrollablePanel>
+        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-3 px-2'>
+          <InfoPanel />
+        </ScrollablePanel>
       </div>
     </Layout>
   )
@@ -131,14 +174,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     })
   }
 
-  // Get distances
-  const grouped = Object.values(booking).reduce((acc, { VenueId, Date }) => {
-    (acc[Date] = acc[Date] || []).push(VenueId)
-    return acc
-  }, {})
-
-  const stops = Object.entries(grouped).map(([Date, Ids]): DistanceStop => ({ Date, Ids: Ids as number[] }))
-  stops.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime())
+  const stops = getStops(booking)
 
   // Extra info, Run in parallel
   const [toursRaw, dateTypeRaw, distance] = await Promise.all([
