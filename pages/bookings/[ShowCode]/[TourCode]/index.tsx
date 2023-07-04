@@ -177,11 +177,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const stops = getStops(booking)
 
   // Extra info, Run in parallel
-  const [toursRaw, dateTypeRaw, distance] = await Promise.all([
+  const [toursRaw, dateTypeRaw, distanceStops] = await Promise.all([
     getToursByShowCode(ShowCode as string),
     getDayTypes(),
     getDistances(stops)]
   )
+
+  const distance = {
+    stops: distanceStops,
+    outdated: false,
+    tourCode: TourCode
+  }
 
   const tourJump: TourJump = {
     tours: toursRaw.map((t: any) => (

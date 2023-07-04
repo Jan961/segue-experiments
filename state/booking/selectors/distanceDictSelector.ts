@@ -6,6 +6,6 @@ export const distanceDictSelector = selector({
   key: 'distanceDictSelector',
   get: ({ get }) => {
     const source = get(distanceState)
-    return objectify(source, d => d.Date)
+    return objectify(source.stops, d => d.Date)
   }
 })

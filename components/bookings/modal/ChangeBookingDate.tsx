@@ -8,6 +8,7 @@ import axios from 'axios'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { UpdateDateParams } from 'pages/api/bookings/update/date'
 import { bookingState } from 'state/booking/bookingState'
+import { distanceState } from 'state/booking/distanceState'
 
 interface ChangeBookingDateProps {
   bookingId: number
@@ -19,6 +20,7 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
   const [showModal, setShowModal] = React.useState(false)
   const [date, setDate] = React.useState(undefined)
   const [loading, setLoading] = React.useState(false)
+  const [distance, setDistance] = useRecoilState(distanceState)
 
   const booking = bookingDict[bookingId]
 
@@ -41,6 +43,7 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
 
       const newState = { ...bookingDict, [data.Id]: data }
       setBookingDict(newState)
+      setDistance({ ...distance, outdated: true })
       setShowModal(false)
     } finally {
       setLoading(false)

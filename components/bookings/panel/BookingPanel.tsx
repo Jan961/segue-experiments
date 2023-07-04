@@ -18,6 +18,7 @@ import { omit } from 'radash'
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { VenueSelector } from './components/VenueSelector'
 import { getNextId } from './utils/getNextId'
+import { distanceState } from 'state/booking/distanceState'
 
 interface BookingPanelProps {
   bookingId: number
@@ -26,6 +27,7 @@ interface BookingPanelProps {
 export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const sortedBookings = useRecoilValue(sortedBookingSelector)
+  const [distance, setDistance] = useRecoilState(distanceState)
   const setView = useSetRecoilState(viewState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
@@ -100,6 +102,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     await axios.post('/api/bookings/delete', { bookingId })
     const newState = omit(bookingDict, [bookingId])
     setBookingDict(newState)
+    setDistance({ ...distance, outdated: true })
   }
 
   const statusOptions: SelectOption[] = [
