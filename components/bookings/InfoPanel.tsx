@@ -54,7 +54,7 @@ export const InfoPanel = () => {
   const defaultOpen = total <= 1
   const createOpen = total === 0
 
-  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-8 shadow-md'
+  const sectionClass = 'bg-white rounded-lg px-2 pb-2 pt-px mb-4 shadow-md'
 
   const performances = PerformanceIds.map((id): PanelInfo => {
     const bookingId = perfDict[id].BookingId
