@@ -93,7 +93,7 @@ export default function Details({items}: Props){
     };
 
     async function getLatLong(PostCode){
-        await fetch(`/api/Distance/country/${PostCode}`)
+        await fetch(`/api/distance/country/${PostCode}`)
             .then((res) => res.json())
             .then((data) => {
                 inputs.Latitude = data.latitude
