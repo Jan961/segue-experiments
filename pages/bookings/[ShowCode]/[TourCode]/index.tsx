@@ -30,7 +30,7 @@ interface bookingProps {
   intitialState: InitialState
 }
 
-const toolbarHeight = 192
+const toolbarHeight = 136
 
 interface ScrollablePanelProps {
   className: string
@@ -88,19 +88,18 @@ const BookingPage = ({ Id }: bookingProps) => {
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
           title={'Bookings'}
-        ></GlobalToolbar>
-        <div className='flex gap-2 mb-4 items-center'>
-          <ToolbarInfo label='Week' value="??" />
+        >
+          { /* <ToolbarInfo label='Week' value={"??"} /> */ }
           <MileageCalculator />
           <ToolbarButton
             onClick={() => gotoToday()}>
             Go To Today
           </ToolbarButton>
           <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
-        </div>
+        </GlobalToolbar>
       </div>
       <div className='grid grid-cols-12'>
-        <ScrollablePanel className="flex flex-auto mx-0 col-span-9 px-4" reduceHeight={toolbarHeight}>
+        <ScrollablePanel className="mx-0 col-span-9 px-4" reduceHeight={toolbarHeight}>
           { loading && (
             <Spinner size="lg" className="mt-32 mb-8"/>
           )}

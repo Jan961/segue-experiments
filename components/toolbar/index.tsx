@@ -24,12 +24,16 @@ const GlobalToolbar = ({
   tourJump = true,
   setSearchFilter,
   color = 'text-primary-blue',
-  filterComponent
-}: props) => {
+  filterComponent,
+  children
+}: React.PropsWithChildren<props>) => {
   const [filtersOpen, setFiltersOpen] = React.useState(false)
 
   return (
     <div className="py-2 flex flex-row items-center gap-4">
+      <h1 className={`text-xl font-bold ${color} `}>
+        {title}
+      </h1>
       { filterComponent && (
         <div className="flex flex-row">
           <button
@@ -72,9 +76,7 @@ const GlobalToolbar = ({
         : (
           <div> </div>
         )}
-      <h1 className={`text-xl font-bold ${color} `}>
-        {title}
-      </h1>
+      { children }
       <div className="ml-auto">
         <label htmlFor="searchBookings" className="sr-only">
             Search Venues
