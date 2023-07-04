@@ -175,8 +175,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const capacityMap = new Map<number, number>(capacities.map((venue: Venue) => [venue.Id, venue.Seats]))
 
-    console.log(venuesWithDistanceData)
-
     const result: GapSuggestionReponse = {
       SliderMax: sliderMax,
       DefaultMin: safeMin,
