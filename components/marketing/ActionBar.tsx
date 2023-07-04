@@ -1,26 +1,18 @@
-import * as React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import Salesreport from "./reports/salesreport";
-import { useEffect, useState } from "react";
-import { userService } from "services/user.service";
-import { formatDateUK, getWeekDay } from "services/dateService";
-import Tours from "pages/tours/[ShowId]";
+import React, { useState } from 'react'
+import { formatDateUK, getWeekDay } from 'services/dateService'
 
-let show = "ST1"; // This needs to be passed from the template
-let tourId = "19";
-let venue = "www.kingstheatreglasgow.net";
-let landingPave = "www.kingstheatreglasgow.net/sleeping-beauty";
+const show = 'ST1' // This needs to be passed from the template
+const tourId = '19'
+const venue = 'www.kingstheatreglasgow.net'
+const landingPave = 'www.kingstheatreglasgow.net/sleeping-beauty'
 
-const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
-  const [activeTours, setActiveTours] = useState([]);
+type Props={
+  activeTours:any[];
+  onActiveToursChange:(props:any) => null;
+  onActionBookingIdChange:(props:any) => null;
+}
+const ActionBar = ({ onActionBookingIdChange, onActiveToursChange, activeTours }:Props) => {
+  // const [activeTours, setActiveTours] = useState([])
   const [inputs, setInputs] = useState({
     DateFrom: null,
     DateTo: null,
@@ -28,44 +20,44 @@ const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
     Venue: null,
     Selection: null,
     BookingId: null,
-    ShowDate: null,
-  });
+    ShowDate: null
+  })
 
   const handleBookingIdChange = (e) => {
-    const newActionBookingId = e.target.value;
-    onActionBookingIdChange(newActionBookingId);
-  };
+    const newActionBookingId = e.target.value
+    onActionBookingIdChange(newActionBookingId)
+  }
 
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(`/api/bookings/saleable/${tourId}`);
-      const data = await response.json();
-      setActiveTours(data);
-      // Call the passed callback function
-      onActiveToursChange(data);
-    })();
-  }, [tourId]);  
+  // useEffect(() => {
+  //   (async () => {
+  //     const response = await fetch(`/api/bookings/saleable/${tourId}`)
+  //     const data = await response.json()
+  //     setActiveTours(data)
+  //     // Call the passed callback function
+  //     onActiveToursChange(data)
+  //   })()
+  // }, [tourId])
 
-  async function handleOnChange(e) {
-    e.persist();
+  async function handleOnChange (e) {
+    e.persist()
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
-    }));
+      [e.target.id]: e.target.value
+    }))
 
-    if (e.target.name === "Tour") {
+    if (e.target.name === 'Tour') {
       // Load BookingId, ShowDate, Venue, and Tour for this tour
-      const response = await fetch(`/api/bookings/saleable/19`);
+      const response = await fetch('/api/bookings/saleable/19')
 
-      const data = await response.json();
+      const data = await response.json()
       setInputs((prev) => ({
         ...prev,
         BookingId: data.BookingId,
         ShowDate: data.ShowDate,
         Venue: data.Venue,
-        Tour: data.Tour,
-      }));
-      onActionBookingIdChange(data.BookingId);
+        Tour: data.Tour
+      }))
+      onActionBookingIdChange(data.BookingId)
     }
   }
 
@@ -93,21 +85,21 @@ const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
         <div className="grid grid-cols-5 gap-3">
           <button
             className={
-              "col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center"
+              'col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center'
             }
           >
             Go To Today
           </button>
           <button
             className={
-              "col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center"
+              'col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center'
             }
           >
             Previous Date
           </button>
           <button
             className={
-              "col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center"
+              'col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center'
             }
           >
             Next Date
@@ -119,20 +111,20 @@ const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
               id="Tour"
               name="Tour"
               onChange={(e) => {
-                const actionBookingId = e.target.value;
-                setInputs((prev) => ({ ...prev, BookingId: actionBookingId }));
-                onActionBookingIdChange(actionBookingId); // Call the callback function
+                const actionBookingId = e.target.value
+                setInputs((prev) => ({ ...prev, BookingId: actionBookingId }))
+                onActionBookingIdChange(actionBookingId) // Call the callback function
               }}
             >
               {activeTours.map((tour) => {
-                const date = new Date(tour.ShowDate);
-                const weekday = getWeekDay(date);
-                const ukDate = formatDateUK(date);
+                const date = new Date(tour.ShowDate)
+                const weekday = getWeekDay(date)
+                const ukDate = formatDateUK(date)
                 return (
                   <option key={tour.BookingId} value={`${tour.BookingId}`}>
-                    {weekday} {ukDate} {tour.Venue.Name} | {tour.Tour.Show.Code}
+                    {weekday} {ukDate} {tour?.Venue?.Name} | {tour?.ShowCode}
                   </option>
-                );
+                )
               })}
             </select>
           </div>
@@ -143,15 +135,15 @@ const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
             <Salesreport />
           </div> */}
     </div>
-  );
-};
-export default ActionBar;
+  )
+}
+export default ActionBar
 
 // Add default props
 ActionBar.defaultProps = {
-  onActionBookingIdChange: () => {},
-};
+  onActionBookingIdChange: () => {}
+}
 
-function setLoading(arg0: boolean) {
-  throw new Error("Function not implemented.");
+function setLoading (arg0: boolean) {
+  throw new Error('Function not implemented.')
 }
