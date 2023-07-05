@@ -46,7 +46,7 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   }
 
   const panelClasses = classNames(
-    'overflow-y-auto',
+    'overflow-y-auto relative',
     {
       'shadow-inner': scrolled
     }
@@ -99,16 +99,38 @@ const BookingPage = ({ Id }: bookingProps) => {
         </GlobalToolbar>
       </div>
       <div className='grid grid-cols-12'>
-        <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9 px-4" reduceHeight={toolbarHeight}>
+        <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
           { loading && (
             <Spinner size="lg" className="mt-32 mb-8"/>
           )}
           { !loading && (
             <>
-              <ul className="grid w-full">
+              <div className="grid grid-cols-11 font-bold
+                text-center
+                sticky inset-x-0 top-0 bg-gray-50 z-10
+                shadow-lg
+                text-primary-blue
+                ">
+                <div className='col-span-2 p-2 whitespace-nowrap border-r border-gray-400'>
+                  Wk # & Date
+                </div>
+                <div className='col-span-6 p-2 border-r border-gray-400'>
+                  Venue
+                </div>
+                <div className='col-span-1 p-2 border-r border-gray-400'>
+                  Perf.
+                </div>
+                <div className='col-span-1 p-2 border-r border-gray-400'>
+                  Miles
+                </div>
+                <div className='col-span-1 p-2'>
+                  Time
+                </div>
+              </div>
+              <ul className="grid w-full shadow">
                 { Sections.map((section: ScheduleSectionViewModel) => (
                   <li key={section.Name}>
-                    <h3 className='font-bold mt-3 mb-3'>{section.Name}</h3> {
+                    <h3 className='font-bold p-3 bg-gray-300'>{section.Name}</h3> {
                       section.Dates.map((date: DateViewModel) => (
                         <ScheduleRow key={date.Date} date={date} />
                       ))
