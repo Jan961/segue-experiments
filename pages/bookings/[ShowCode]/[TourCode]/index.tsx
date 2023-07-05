@@ -109,7 +109,7 @@ const BookingPage = ({ Id }: bookingProps) => {
                 text-center
                 sticky inset-x-0 top-0 bg-gray-50 z-10
                 shadow-lg
-                text-primary-blue
+                text-gray-400
                 ">
                 <div className='col-span-2 p-2 whitespace-nowrap border-r border-gray-400'>
                   Wk # & Date
