@@ -127,17 +127,19 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
         <VenueSelector disabled={submitting} onChange={handleOnChange} venueId={inputs.VenueId} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         <FormInputSelect inline
+          className="col-span-2"
           value={inputs.PencilNum}
           onChange={handleOnChange}
           options={pencilOptions}
           name="PencilNum"
-          label="Pencil Num"
+          label="Pencil"
           disabled={submitting}
         />
         <FormInputSelect inline
           value={inputs.StatusCode}
+          className="col-span-4"
           onChange={handleOnChange}
           options={statusOptions}
           name="StatusCode"
@@ -154,16 +156,17 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           placeholder="http://example.com"
           disabled={submitting}
         />
-        <div className="grid grid-cols-3">
+        <div className="grid grid-cols-6 gap-2">
           <FormInputCheckbox
             value={inputs.OnSale}
+            className="col-span-2"
             name="OnSale"
             label="On Sale"
             onChange={handleOnChange}
             disabled={submitting}
           />
           <FormInputDate
-            className="col-span-2"
+            className="col-span-4"
             value={inputs.OnSaleDate}
             name="OnSaleDate"
             onChange={handleOnChange}

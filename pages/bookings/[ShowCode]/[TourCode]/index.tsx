@@ -99,7 +99,7 @@ const BookingPage = ({ Id }: bookingProps) => {
         </GlobalToolbar>
       </div>
       <div className='grid grid-cols-12'>
-        <ScrollablePanel className="mx-0 col-span-9 px-4" reduceHeight={toolbarHeight}>
+        <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9 px-4" reduceHeight={toolbarHeight}>
           { loading && (
             <Spinner size="lg" className="mt-32 mb-8"/>
           )}
@@ -120,7 +120,7 @@ const BookingPage = ({ Id }: bookingProps) => {
             </>
           )}
         </ScrollablePanel>
-        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-3 px-2'>
+        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-5 lg:col-span-4 xl:col-span-3 px-2'>
           <InfoPanel />
         </ScrollablePanel>
       </div>
