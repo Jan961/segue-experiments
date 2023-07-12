@@ -1,36 +1,42 @@
 import prisma from 'lib/prisma'
 
-export default async function handle(req, res) {
+export default async function handle (req, res) {
   try {
-
-    let tourId = req.query.tourId //req.query.tourId;
+    const tourId = req.query.tourId // req.query.tourId;
 
     const searchResults = await prisma.booking.findMany({
       where: {
-        TourId: parseInt(tourId),
-        VenueId: {
-          not: null,
+        DateBlock: {
+          is: {
+            TourId: parseInt(tourId)
+          }
         },
+        VenueId: {
+          not: undefined
+        }
       },
       include: {
-        DateType: true,
         Venue: true,
-        Tour: {
+        DateBlock: {
           include: {
-            Show: true,
-          },
-        },
+            Tour: {
+              include: {
+                Show: true
+              }
+            }
+          }
+        }
       },
       orderBy: {
-        ShowDate: "asc",
-      },
-    });
+        FirstDate: 'asc'
+      }
+    })
 
-    res.json(searchResults);
+    const result = searchResults.map(x => ({ ...x, Tour: x.DateBlock.Tour }))
+
+    return res.json(result)
   } catch (err) {
-    console.log(err);
-    res
-      .status(403)
-      .json({ err: "Error occurred while generating search results." });
+    console.log(err)
+    return res.status(500).json({ err: 'Error occurred while generating search results.' })
   }
 }

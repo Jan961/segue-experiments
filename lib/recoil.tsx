@@ -54,6 +54,7 @@ export const setInitialStateServer = (snapshot, initialState: InitialState) => {
 // Helper function to prevent having to manually type in every state
 const useSetMultipleRecoilStates = () => {
   return useRecoilCallback(({ set }) => (initialData: InitialState) => {
+    console.log(initialData)
     for (const key in initialData) {
       const state = states[key]
       if (state) set(state, initialData[key])

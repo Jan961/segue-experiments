@@ -221,7 +221,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   // See _app.tsx for how this is picked up
-  const intitialState: InitialState = {
+  const initialState: InitialState = {
     rehearsal,
     booking,
     getInFitUp,
@@ -238,7 +238,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       Id,
-      intitialState
+      initialState
     }
   }
 }
