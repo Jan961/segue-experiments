@@ -63,6 +63,36 @@ export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: num
   })
 }
 
+export const getSaleableBookings = async (TourId: number) => {
+  return await prisma.booking.findMany({
+    where: {
+      DateBlock: {
+        is: {
+          TourId
+        }
+      },
+      VenueId: {
+        not: undefined
+      }
+    },
+    include: {
+      Venue: true,
+      DateBlock: {
+        include: {
+          Tour: {
+            include: {
+              Show: true
+            }
+          }
+        }
+      }
+    },
+    orderBy: {
+      FirstDate: 'asc'
+    }
+  })
+}
+
 export const changeBookingDate = async (Id: number, FirstDate: Date) => {
   return prisma.booking.update({
     where: {

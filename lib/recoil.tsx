@@ -11,6 +11,7 @@ import { performanceState } from 'state/booking/performanceState'
 import { DateTypeState, dateTypeState } from 'state/booking/dateTypeState'
 import { OtherState, otherState } from 'state/booking/otherState'
 import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
+import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState'
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -19,49 +20,72 @@ import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
 */
 
 export type InitialState = Partial<{
-  booking: Record<number, BookingDTO>,
-  rehearsal: Record<number, RehearsalDTO>,
-  getInFitUp: Record<number, GetInFitUpDTO>,
-  other: OtherState
-  dateBlock: DateBlockState,
-  dateType: DateTypeState,
-  tourJump: TourJump,
-  performance: Record<number, PerformanceDTO>,
-  distance: DistanceState,
-  venue: Record<number, VenueMinimalDTO>,
+  global: {
+    tourJump: TourJump,
+  }
+  booking: {
+    booking: Record<number, BookingDTO>,
+    rehearsal: Record<number, RehearsalDTO>,
+    getInFitUp: Record<number, GetInFitUpDTO>,
+    other: OtherState
+    dateBlock: DateBlockState,
+    dateType: DateTypeState,
+    performance: Record<number, PerformanceDTO>,
+    distance: DistanceState,
+    venue: Record<number, VenueMinimalDTO>,
+  }
+  marketing: {
+    bookingJump: BookingJump
+  }
 }>
 
-const states: Record<keyof InitialState, RecoilState<any>> = {
-  booking: bookingState,
-  rehearsal: rehearsalState,
-  getInFitUp: getInFitUpState,
-  other: otherState,
-  dateType: dateTypeState,
-  venue: venueState,
-  tourJump: tourJumpState,
-  distance: distanceState,
-  dateBlock: dateBlockState,
-  performance: performanceState
-}
+type GlobalStateLookup = Record<keyof InitialState['global'], RecoilState<any>>
+type BookingStateLookup = Record<keyof InitialState['booking'], RecoilState<any>>
+type MarketingStateLookup = Record<keyof InitialState['marketing'], RecoilState<any>>
 
-export const setInitialStateServer = (snapshot, initialState: InitialState) => {
-  for (const key in initialState) {
-    const state = states[key]
-    if (state) snapshot.set(state, initialState[key])
+const states: {
+  global: GlobalStateLookup,
+  booking: BookingStateLookup,
+  marketing: MarketingStateLookup,
+} = {
+  global: {
+    tourJump: tourJumpState
+  },
+  booking: {
+    booking: bookingState,
+    rehearsal: rehearsalState,
+    getInFitUp: getInFitUpState,
+    other: otherState,
+    dateType: dateTypeState,
+    venue: venueState,
+    distance: distanceState,
+    dateBlock: dateBlockState,
+    performance: performanceState
+  },
+  marketing: {
+    bookingJump: bookingJumpState
   }
 }
 
-// Helper function to prevent having to manually type in every state
+export const setInitialStateServer = (snapshot, initialState: InitialState) => {
+  for (const pageKey in initialState) {
+    for (const key in initialState[pageKey]) {
+      const state = states[pageKey][key]
+      if (state) snapshot.set(state, initialState[pageKey][key])
+    }
+  }
+}
+
 const useSetMultipleRecoilStates = () => {
   return useRecoilCallback(({ set }) => (initialData: InitialState) => {
-    console.log(initialData)
-    for (const key in initialData) {
-      const state = states[key]
-      if (state) set(state, initialData[key])
+    for (const pageKey in initialData) {
+      for (const key in initialData[pageKey]) {
+        const state = states[pageKey][key]
+        if (state) set(state, initialData[pageKey][key])
+      }
     }
   }, [])
 }
-
 // Included at the root of the app to automatically set any states it can
 export const ClientStateSetter = ({ intitialState }: {
   intitialState: InitialState

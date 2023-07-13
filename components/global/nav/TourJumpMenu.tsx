@@ -6,7 +6,6 @@ import { tourJumpState } from 'state/booking/tourJumpState'
 export default function TourJumpMenu () {
   const router = useRouter()
   const [tourJump, setTourJump] = useRecoilState(tourJumpState)
-  console.log(tourJump)
 
   if (!tourJump?.selected || !tourJump?.tours?.length) return null
 

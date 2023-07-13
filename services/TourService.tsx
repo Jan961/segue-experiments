@@ -25,6 +25,7 @@ export const getToursByShowCode = (Code: string) => {
       }
     },
     select: {
+      Id: true,
       Code: true,
       IsArchived: true,
       Show: {

@@ -18,8 +18,8 @@ interface Input {
 }
 
 export const FormInputSelect = ({ onChange, value, name, label, required, options, disabled, className = '', inline }: Input) => {
-  const inputClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4'
-  let baseClass = classNames(className, 'whitespace-nowrap')
+  const inputClass = 'w-full pr-8 block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+  let baseClass = classNames('whitespace-nowrap mb-4', className)
   if (inline) {
     baseClass = classNames(baseClass, 'flex items-baseline gap-x-2')
   }
@@ -36,7 +36,7 @@ export const FormInputSelect = ({ onChange, value, name, label, required, option
         disabled={disabled}
         className={disabled ? disabledClass : inputClass}
         required={required}
-        value={value}
+        value={value || ''}
       >
         {options.map(x => (<option value={x.value} key={x.value}>{x.text}</option>))}
       </select>

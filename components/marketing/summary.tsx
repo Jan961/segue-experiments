@@ -1,34 +1,24 @@
-import * as React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
   faBook,
-  faCalendarXmark,
-  faCross,
-  faFileExcel,
-  faLocationDot,
-  faSearch,
   faSquareXmark,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { useEffect, useState } from "react";
-import { formatDateUK, weeks } from "services/dateService";
-import { formatPerformanceTime } from "utils/formatPerformanceTimes";
+  faUser
+} from '@fortawesome/free-solid-svg-icons'
+import { useEffect, useState } from 'react'
+import { formatDateUK, weeks } from 'services/dateService'
+import { formatPerformanceTime } from 'utils/formatPerformanceTimes'
+import { bookingJumpState } from 'state/marketing/bookingJumpState'
+import { useRecoilValue } from 'recoil'
 
-let show = "ST1"; // This needs to be passed from the template
-let tour = "22";
-let venue = "www.kingstheatreglasgow.net";
-let landingPave = "www.kingstheatreglasgow.net/sleeping-beauty";
+const Summary = () => {
+  const { selected } = useRecoilValue(bookingJumpState)
 
-const Summary = ({ actionBookingId, activeTours }) => {
-  const [date, setDate] = useState("");
-  const [shows, setShows] = useState("");
-  const [venueWeek, setVenueWeek] = useState("");
-  const [totalSeatsSold, setTotalSeatsSold] = useState("");
-  const [performances, setPerformances] = useState([]);
-  const [salesSummary, setSalesSummary] = useState([]);
+  const [date, setDate] = useState('')
+  const [shows, setShows] = useState('')
+  const [venueWeek, setVenueWeek] = useState('')
+  const [totalSeatsSold, setTotalSeatsSold] = useState('')
+  const [performances, setPerformances] = useState([])
+  const [salesSummary, setSalesSummary] = useState([])
   const [inputs, setInputs] = useState({
     DateFrom: null,
     DateTo: null,
@@ -36,8 +26,8 @@ const Summary = ({ actionBookingId, activeTours }) => {
     Venue: null,
     Selection: null,
     BookingId: null,
-    ShowDate: null,
-  });
+    ShowDate: null
+  })
 
   // Usage example
   // const showDate = "2023-05-01";
@@ -46,93 +36,93 @@ const Summary = ({ actionBookingId, activeTours }) => {
   // console.log("Week number:", weekNumber);
 
   useEffect(() => {
-    if (actionBookingId) {
+    if (selected) {
       (async () => {
         try {
-          const response = await fetch(`/api/bookings/saleable/${actionBookingId}`);
-          const data = await response.json();
-          setDate(data.date);
-          setShows(data.shows);
-          setVenueWeek(data.venueWeek);
-          setTotalSeatsSold(data.totalSeatsSold);
-          getPerformances();
-          getSalesSummary();
+          const response = await fetch(`/api/bookings/saleable/${selected}`)
+          const data = await response.json()
+          setDate(data.date)
+          setShows(data.shows)
+          setVenueWeek(data.venueWeek)
+          setTotalSeatsSold(data.totalSeatsSold)
+          getPerformances()
+          getSalesSummary()
           // set the remaining state variables with the corresponding API data
         } catch (error) {
-          console.error(error);
+          console.error(error)
         }
-        //getSaleSummary();
-      })();
+        // getSaleSummary();
+      })()
     }
-  }, [actionBookingId]);
+  }, [selected])
 
-  async function getPerformances() {
+  async function getPerformances () {
     try {
-      let response = await fetch(
-        `/api/bookings/performances/performanceBookings/${actionBookingId}`
-      );
+      const response = await fetch(
+        `/api/bookings/performances/performanceBookings/${selected}`
+      )
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json()
         if (data.length > 0) {
-          let performanceTimes = data.map((obj) =>
+          const performanceTimes = data.map((obj) =>
             formatPerformanceTime(obj.Time)
-          );
-          setPerformances(performanceTimes);
+          )
+          setPerformances(performanceTimes)
         }
         // setPerformances(data)
       }
     } catch (error: any) {
-      console.error(error);
+      console.error(error)
     }
   }
 
-  async function getSalesSummary() {
+  async function getSalesSummary () {
     try {
       const response = await fetch(
-        `/api/marketing/sales/marketingSales/${actionBookingId}`
-      );
-      console.log("Response:", response); // Debug: check the response object
+        `/api/marketing/sales/marketingSales/${selected}`
+      )
+      console.log('Response:', response) // Debug: check the response object
       if (response.ok) {
-        const data = await response.json();
-        console.log("Fetched data:", data); // Debug: check the fetched data
-        setSalesSummary(data);
+        const data = await response.json()
+        console.log('Fetched data:', data) // Debug: check the fetched data
+        setSalesSummary(data)
       } else {
-        console.error("Error fetching sales summary:", response.statusText);
+        console.error('Error fetching sales summary:', response.statusText)
       }
     } catch (error: any) {
-      console.error(error);
+      console.error(error)
     }
   }
 
   useEffect(() => {
-    console.log("salesSummary updated: ", salesSummary);
-    console.log("actionBookingId:", actionBookingId); // Debug: check the value of actionBookingId
+    console.log('salesSummary updated: ', salesSummary)
+    console.log('actionBookingId:', selected) // Debug: check the value of actionBookingId
 
     salesSummary.forEach((sale) => {
-      console.log(`Sale object :`, sale);
-    });
-  }, [salesSummary]);
+      console.log('Sale object :', sale)
+    })
+  }, [salesSummary])
 
   return (
-    <div className={"flex bg-transparent w-3/12 "}>
-      <div className={" h-auto clear-both"}>
+    <div className={'flex bg-transparent'}>
+      <div className={'h-auto clear-both'}>
         <div className="relative">
           {/* <div className="">Contacts</div> */}
           <div>
             <div>
               <div>
-                {activeTours
+                {[]
                   .filter(
                     (tour) => Number(actionBookingId) === Number(tour.BookingId)
                   )
                   .map((tour) => {
-                    const showDate = new Date(tour.ShowDate);
-                    const tourStartDate = tour.Tour.TourStartDate;
-                    const weekday = weeks(tour.showDate, tourStartDate);
-                    const ukDate = formatDateUK(showDate);
-                    const totalSeats = tour.Venue.Seats;
-                    const grossProfit = tour.GP;
-                    console.log("Tour: ", tour);
+                    const showDate = new Date(tour.ShowDate)
+                    const tourStartDate = tour.Tour.TourStartDate
+                    const weekday = weeks(tour.showDate, tourStartDate)
+                    const ukDate = formatDateUK(showDate)
+                    const totalSeats = tour.Venue.Seats
+                    const grossProfit = tour.GP
+                    console.log('Tour: ', tour)
 
                     return (
                       <div key={tour.BookingId}>
@@ -141,10 +131,10 @@ const Summary = ({ actionBookingId, activeTours }) => {
                             <strong>Date: </strong> {ukDate}
                           </div>
                           <div>
-                            <strong>Shows:</strong>{" "}
-                            <span>{performances.join(",")}</span>
+                            <strong>Shows:</strong>{' '}
+                            <span>{performances.join(',')}</span>
                           </div>
-                          <div className={"mt-2"}>
+                          <div className={'mt-2'}>
                             {/* TBF - ADD THE VENUE WEEK */}
                             <strong>Venue Week:</strong> <span>{weekday}</span>
                           </div>
@@ -161,16 +151,16 @@ const Summary = ({ actionBookingId, activeTours }) => {
                           <div>Currency: GBP</div>
                         </>
                       </div>
-                    );
+                    )
                   })}
               </div>
             </div>
 
-            <div className={"mt-3"}>Marketing deal: TBA</div>
+            <div className={'mt-3'}>Marketing deal: TBA</div>
             <div>
-              <strong className={"mt-5 mb-2"}>Booking Notes:</strong>
+              <strong className={'mt-5 mb-2'}>Booking Notes:</strong>
               <p>
-                {" "}
+                {' '}
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quae
                 autem natura suae primae institutionis oblita est? Quem Tiberina
                 descensio festo illo die tanto gaudio affecit, quanto L. Sed in
@@ -178,9 +168,9 @@ const Summary = ({ actionBookingId, activeTours }) => {
               </p>
             </div>
             <div>
-              <strong className={"mt-5 mb-2"}>Contract Notes:</strong>
+              <strong className={'mt-5 mb-2'}>Contract Notes:</strong>
               <p>
-                {" "}
+                {' '}
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quae
                 autem natura suae primae institutionis oblita est? Quem Tiberina
                 descensio festo illo die tanto gaudio affecit, quanto L. Sed in
@@ -188,7 +178,7 @@ const Summary = ({ actionBookingId, activeTours }) => {
               </p>
             </div>
             <div className="border-y space-y-2">
-              <div className={"mt-5"}>
+              <div className={'mt-5'}>
                 <FontAwesomeIcon icon={faUser} /> Single Seat
               </div>
               <div>
@@ -202,7 +192,7 @@ const Summary = ({ actionBookingId, activeTours }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Summary

@@ -6,13 +6,15 @@ import { GetServerSideProps } from 'next'
 import { getToursByShowCode } from 'services/TourService'
 import { TourJump } from 'state/booking/tourJumpState'
 import { InitialState } from 'lib/recoil'
+import { getSaleableBookings } from 'services/bookingService'
+import { BookingJump } from 'state/marketing/bookingJumpState'
+import { bookingMapperWithVenue } from 'lib/mappers'
 
 type Props = {
   initialState: InitialState
 };
 
 const Index = ({ initialState }: Props) => {
-  console.log(initialState)
   const [searchFilter, setSearchFilter] = useState('')
 
   return (
@@ -22,7 +24,7 @@ const Index = ({ initialState }: Props) => {
           searchFilter={searchFilter}
           setSearchFilter={setSearchFilter}
           title={'Marketing'} />
-        <MarketingPanel></MarketingPanel>
+        <MarketingPanel />
       </div>
     </Layout>
   )
@@ -36,6 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tourJump: TourJump = {
     tours: toursRaw.map((t: any) => (
       {
+        Id: t.Id,
         Code: t.Code,
         IsArchived: t.IsArchived,
         ShowCode: t.Show.Code
@@ -43,8 +46,24 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     selected: TourCode as string
   }
 
+  const tourId = tourJump.tours.filter(x => x.Code === TourCode)[0].Id
+
+  const bookings = await getSaleableBookings(tourId)
+
+  const bookingJump: BookingJump = {
+    selected: bookings[0] ? bookings[0].Id : undefined,
+    bookings: bookings.map(bookingMapperWithVenue)
+  }
+
+  console.log(bookings[0].Venue)
+
   const initialState: InitialState = {
-    tourJump
+    global: {
+      tourJump
+    },
+    marketing: {
+      bookingJump
+    }
   }
 
   return { props: { initialState } }

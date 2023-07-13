@@ -1,129 +1,65 @@
-import { useEffect, useState } from 'react'
+import { ToolbarButton } from 'components/bookings/ToolbarButton'
+import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
+import { useRecoilState } from 'recoil'
 import { formatDateUK, getWeekDay } from 'services/dateService'
+import { bookingJumpState } from 'state/marketing/bookingJumpState'
 
-const show = 'ST1' // This needs to be passed from the template
-const tourId = '19'
-const venue = 'www.kingstheatreglasgow.net'
-const landingPave = 'www.kingstheatreglasgow.net/sleeping-beauty'
+const ActionBar = () => {
+  const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
 
-const ActionBar = ({ onActionBookingIdChange, onActiveToursChange }) => {
-  const [activeTours, setActiveTours] = useState([])
-  const [inputs, setInputs] = useState({
-    DateFrom: null,
-    DateTo: null,
-    Tour: null,
-    Venue: null,
-    Selection: null,
-    BookingId: null,
-    ShowDate: null
+  const tourOptions: SelectOption[] = bookingJump.bookings.map((b) => {
+    const date = new Date(b.Date)
+    const weekday = getWeekDay(date)
+    const ukDate = formatDateUK(date)
+    return { text: `${weekday} ${ukDate} | ${b.Venue.Name}`, value: b.Id }
   })
 
-  const handleBookingIdChange = (e) => {
-    const newActionBookingId = e.target.value
-    onActionBookingIdChange(newActionBookingId)
+  const changeBooking = (e) => {
+    const selected = e.target.value
+    setBookingJump({ ...bookingJump, selected })
   }
 
-  useEffect(() => {
-    (async () => {
-      const response = await fetch(`/api/bookings/saleable/${tourId}`)
-      const data = await response.json()
-      setActiveTours(data)
-      // Call the passed callback function
-      onActiveToursChange(data)
-    })()
-  }, [tourId])
-
-  async function handleOnChange (e) {
-    e.persist()
-    setInputs((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value
-    }))
-
-    if (e.target.name === 'Tour') {
-      // Load BookingId, ShowDate, Venue, and Tour for this tour
-      const response = await fetch('/api/bookings/saleable/19')
-
-      const data = await response.json()
-      setInputs((prev) => ({
-        ...prev,
-        BookingId: data.BookingId,
-        ShowDate: data.ShowDate,
-        Venue: data.Venue,
-        Tour: data.Tour
-      }))
-      onActionBookingIdChange(data.BookingId)
-    }
-  }
+  const matching = bookingJump.bookings.filter(x => x.Id === bookingJump.selected)[0]
+  console.log(matching)
 
   return (
     <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">
-      <div className="col-span-2 flex space-x-2">
-        <a
-          className="px-2 text-primary-green whitespace-pre hover:text-white bg-transparent hover:bg-primary-green transition-all duration-75 cursor-pointer py-2  border border-primary-green rounded-md"
-          href={`http://${venue}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {venue}
-        </a>
-        <a
-          className="px-2 text-primary-green whitespace-pre hover:text-white bg-transparent hover:bg-primary-green transition-all duration-75 cursor-pointer py-2  border border-primary-green rounded-md"
-          href={`http://${landingPave}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Landing Page
-        </a>
-      </div>
-      <div className="col-span-4">
-        <div className="grid grid-cols-5 gap-3">
-          <button
-            className={
-              'col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center'
-            }
+      {matching && (
+
+        <div className="col-span-2 flex space-x-2">
+          <a
+            className="px-2 text-primary-green whitespace-pre hover:text-white bg-transparent hover:bg-primary-green transition-all duration-75 cursor-pointer py-2  border border-primary-green rounded-md"
+            href={`https://${matching.Venue.Website}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Go To Today
-          </button>
-          <button
-            className={
-              'col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center'
-            }
-          >
-            Previous Date
-          </button>
-          <button
-            className={
-              'col-span-1 items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 text-center'
-            }
-          >
-            Next Date
-          </button>
-          <div className="col-span-2">
-            <select
-              className="col-span-2 appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              value={inputs.Tour}
-              id="Tour"
-              name="Tour"
-              onChange={(e) => {
-                const actionBookingId = e.target.value
-                setInputs((prev) => ({ ...prev, BookingId: actionBookingId }))
-                onActionBookingIdChange(actionBookingId) // Call the callback function
-              }}
+            {matching.Venue.Website}
+          </a>
+          { matching.LandingSite && (
+
+            <a
+              className="px-2 text-primary-green whitespace-pre hover:text-white bg-transparent hover:bg-primary-green transition-all duration-75 cursor-pointer py-2  border border-primary-green rounded-md"
+              href={`https://${matching.LandingSite}`}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              {activeTours.map((tour) => {
-                const date = new Date(tour.ShowDate)
-                const weekday = getWeekDay(date)
-                const ukDate = formatDateUK(date)
-                return (
-                  <option key={tour.BookingId} value={`${tour.BookingId}`}>
-                    {weekday} {ukDate} {tour.Venue.Name} | {tour.Tour.Show.Code}
-                  </option>
-                )
-              })}
-            </select>
-          </div>
+          Landing Page
+            </a>
+          )}
         </div>
+      )}
+      <div className="col-span-4 flex grid-cols-5 gap-2 items-center">
+        <ToolbarButton>Go To Today</ToolbarButton>
+        <ToolbarButton>Previous Date</ToolbarButton>
+        <ToolbarButton>Next Date</ToolbarButton>
+
+        <FormInputSelect
+          className="mb-0"
+          value={bookingJump.selected}
+          name="Tour"
+          onChange={changeBooking}
+          options={tourOptions}
+        />
       </div>
       {/* SALES REPORT DOES NOT EXIST IN THE DESIGNS */}
       {/* <div>

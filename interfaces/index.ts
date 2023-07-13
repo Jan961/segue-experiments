@@ -111,6 +111,13 @@ export type BookingDTO = {
   OnSale: boolean
 }
 
+export type BookingWithVenueDTO = BookingDTO & {
+  Venue: {
+    Website: string
+    Name: string
+  }
+}
+
 export type DateTypeDTO = {
   Id: number
   Name: string

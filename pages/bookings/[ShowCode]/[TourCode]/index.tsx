@@ -20,7 +20,6 @@ import { ParsedUrlQuery } from 'querystring'
 import { Spinner } from 'components/global/Spinner'
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
 import { MileageCalculator } from 'components/bookings/MileageCalculator'
-import { ToolbarInfo } from 'components/bookings/ToolbarInfo'
 import { getStops } from 'utils/getStops'
 import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
@@ -222,17 +221,21 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
-    rehearsal,
-    booking,
-    getInFitUp,
-    other,
-    tourJump,
-    dateType: dateTypeRaw.map(DateTypeMapper),
-    distance,
-    performance,
-    dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
-    // Remove extra info
-    venue: objectify(venues, v => v.Id, (v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))
+    global: {
+      tourJump
+    },
+    booking: {
+      rehearsal,
+      booking,
+      getInFitUp,
+      other,
+      dateType: dateTypeRaw.map(DateTypeMapper),
+      distance,
+      performance,
+      dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
+      // Remove extra info
+      venue: objectify(venues, v => v.Id, (v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name }))
+    }
   }
 
   return {
