@@ -144,6 +144,21 @@ export type DateBlockDTO = {
   Dates?: DateDTO[]
 }
 
+export type VenueContactDTO = {
+  Id: number
+  FirstName: string
+  LastName: string
+  Phone: string
+  Email: string
+  RoleId: number
+  VenueId?: number
+}
+
+export type VenueRoleDTO = {
+  Id: number
+  Name: string
+}
+
 export type Venue = {
   Longitude: any;
     Latitude: any;

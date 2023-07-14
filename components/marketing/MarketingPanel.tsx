@@ -3,7 +3,7 @@ import ArchiveSales from './tabs/ArchiveSales'
 import Summary from './summary'
 import Activities from './tabs/activites'
 import ContactNotes from './tabs/contact-notes'
-import VenueContacts from './tabs/venue-contacts'
+import { VenueContactsTab } from './tabs/VenueContactsTab'
 import PromoterHolds from './tabs/hold'
 import ActionBar from './ActionBar'
 import { Tab } from '@headlessui/react'
@@ -37,7 +37,7 @@ const MarketingPanel = (Tour) => {
               <Tab.Panel><ArchiveSales /></Tab.Panel>
               <Tab.Panel><Activities /></Tab.Panel>
               <Tab.Panel><ContactNotes /></Tab.Panel>
-              <Tab.Panel><VenueContacts /></Tab.Panel>
+              <Tab.Panel><VenueContactsTab /></Tab.Panel>
               <Tab.Panel><PromoterHolds /></Tab.Panel>
             </Tab.Panels>
           </div>

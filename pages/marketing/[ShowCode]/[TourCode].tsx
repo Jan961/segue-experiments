@@ -8,7 +8,8 @@ import { TourJump } from 'state/booking/tourJumpState'
 import { InitialState } from 'lib/recoil'
 import { getSaleableBookings } from 'services/bookingService'
 import { BookingJump } from 'state/marketing/bookingJumpState'
-import { bookingMapperWithVenue } from 'lib/mappers'
+import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers'
+import { getRoles } from 'services/contactService'
 
 type Props = {
   initialState: InitialState
@@ -50,19 +51,20 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const bookings = await getSaleableBookings(tourId)
 
+  const venueRoles = await getRoles()
+
   const bookingJump: BookingJump = {
     selected: bookings[0] ? bookings[0].Id : undefined,
     bookings: bookings.map(bookingMapperWithVenue)
   }
-
-  console.log(bookings[0].Venue)
 
   const initialState: InitialState = {
     global: {
       tourJump
     },
     marketing: {
-      bookingJump
+      bookingJump,
+      venueRole: venueRoles.map(venueRoleMapper)
     }
   }
 

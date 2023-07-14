@@ -32,7 +32,7 @@ const HeaderCell = ({ children }: PropsWithChildren<unknown>) => {
   return (
     <th
       scope="col"
-      className="py-3.5 p1-4 pr-3 text-center text-sm font-normal text-white  sm:pl-6"
+      className="py-2 px-2 text-left text-sm font-normal text-white"
     >
       { children }
     </th>
@@ -41,15 +41,24 @@ const HeaderCell = ({ children }: PropsWithChildren<unknown>) => {
 
 const Body = ({ children }: PropsWithChildren<unknown>) => {
   return (
-    <tbody className="bg-white">
+    <tbody className="bg-white divide-y divide-gray-200">
       { children }
     </tbody>
   )
 }
 
-const Row = ({ children }: PropsWithChildren<unknown>) => {
+interface RowProps extends ClassNameable {
+  hover?: boolean
+  onClick?: () => void
+}
+
+const Row = ({ children, hover, onClick }: PropsWithChildren<RowProps>) => {
+  let baseClass = 'bg-white even:bg-gray-50'
+
+  if (hover) baseClass = classNames(baseClass, 'hover:bg-gray-100 cursor-pointer')
+
   return (
-    <tr className="bg-white even:bg-gray-50">
+    <tr className={baseClass} onClick={onClick}>
       { children }
     </tr>
   )
@@ -59,8 +68,8 @@ interface CellProps extends ClassNameable {
   right?: boolean
 }
 
-const Cell = ({children, className, right}: PropsWithChildren<CellProps>) => {
-  let baseClass = classNames('px-3 py-4 text-sm text-gray-500 border border-gray-200', className)
+const Cell = ({ children, className, right }: PropsWithChildren<CellProps>) => {
+  let baseClass = classNames('px-2 py-4 text-sm text-gray-500 border border-gray-200', className)
   if (right) baseClass = classNames(baseClass, 'text-right')
 
   return (
