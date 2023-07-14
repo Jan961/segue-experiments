@@ -1,23 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import * as XLSX from 'xlsx/xlsx.mjs'
-import * as fs from 'fs'
-
-/* load 'stream' for stream support */
-import { Readable } from 'stream'
-
-/* load the codepage support library for extended support with older formats  */
-import * as cpexcel from 'xlsx/dist/cpexcel.full.mjs'
-import { userService } from '../../../services/user.service'
-import { toSql } from '../../../services/dateService'
+import React, { useState } from 'react'
+import moment from 'moment';
+import { getDateDaysAgo, toISO, toSql } from '../../../services/dateService'
 import IconWithText from '../IconWithText'
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
-XLSX.set_fs(fs)
-XLSX.stream.set_readable(Readable)
-XLSX.set_cptable(cpexcel)
 
-function formatWeekNumber (weekNumber) {
-  return weekNumber.split(':')[1]
-}
 
 function formatDate (date) {
   return toSql(date)
@@ -37,8 +23,46 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
     order: null
   })
 
-  function handleOnSubmit () {
+  function formatShortYearDate (dateString) {
+    const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY') // 1st argument - string, 2nd argument - format
+    const day = toISO(dateMomentObject).substring(0, 10)
+    return day // new Date( dateMomentObject.toDate());
+  }
 
+  function handleOnSubmit (e) {
+    e.preventDefault()
+    const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.Tour))
+    const toWeek = formatShortYearDate(inputs.TourWeek)
+    const fromWeek = formatShortYearDate(getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7))
+    // /api/reports/v1/call/salesSummary/s/s/s/s/s/s?type=1
+    fetch('/api/reports/sales-summary-simple', { method: 'POST', body: JSON.stringify({ tourId: inputs.Tour, fromWeek, toWeek, isWeeklyReport: true }) }).then(async response => {
+      if (response.status >= 200 && response.status < 300) {
+        const tourName:string = selectedTour?.name
+        let suggestedName:string|any[] = response.headers.get('Content-Disposition')
+        if (suggestedName) {
+          suggestedName = suggestedName.match(/filename="(.+)"/)
+          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null
+        }
+        if (!suggestedName) {
+          suggestedName = `${tourName}.xlsx`
+        }
+        const content = await response.blob()
+        if (content) {
+          const anchor:any = document.createElement('a')
+          anchor.download = suggestedName
+          anchor.href = (window.webkitURL || window.URL).createObjectURL(content)
+          anchor.dataset.downloadurl = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', anchor.download, anchor.href].join(':')
+          anchor.click()
+        }
+        setShowModal(false)
+        setInputs({
+          Tour: null,
+          TourWeek: null,
+          numberOfWeeks: null,
+          order: null
+        })
+      }
+    })
   }
 
   function handleOnChange (e) {

@@ -1,97 +1,97 @@
-import React, { useState } from "react";
-import Sales from "./tabs/sales";
-import ArchiveSales from "./tabs/ArchiveSales";
-import Summary from "./summary";
-import Activities from "./tabs/activites";
-import ContactNotes from "./tabs/contact-notes";
-import VenueContacts from "./tabs/venue-contacts";
-import PromoterHolds from "./tabs/hold";
-import ActionBar from "./ActionBar";
+import React, { useState } from 'react'
+import Sales from './tabs/sales'
+import ArchiveSales from './tabs/ArchiveSales'
+import Summary from './summary'
+import Activities from './tabs/activites'
+import ContactNotes from './tabs/contact-notes'
+import VenueContacts from './tabs/venue-contacts'
+import PromoterHolds from './tabs/hold'
+import ActionBar from './ActionBar'
 
 export interface ActionBookingId {
   actionBookingId: null | number;
 }
 
 const tabs = [
-  { name: "Sales", href: "#", current: true },
-  { name: "Archived Sales", href: "#", current: false },
-  { name: "Activities", href: "#", current: false },
-  { name: "Contact Notes", href: "#", current: false },
-  { name: "Venue Contacts", href: "#", current: false },
-  { name: "Promoter Holds", href: "#", current: false },
-];
+  { name: 'Sales', href: '#', current: true },
+  { name: 'Archived Sales', href: '#', current: false },
+  { name: 'Activities', href: '#', current: false },
+  { name: 'Contact Notes', href: '#', current: false },
+  { name: 'Venue Contacts', href: '#', current: false },
+  { name: 'Promoter Holds', href: '#', current: false }
+]
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
+function classNames (...classes) {
+  return classes.filter(Boolean).join(' ')
 }
 
-function showTab(tab) {
-  //
+type Props={
+  tour:any;
+  activeTours:any[];
 }
 
-const MarketingPanel = (Tour) => {
-  const [ShowSales, setShowSales] = useState(true);
-  const [ShowArchiveSales, setShowArchiveSales] = useState(false);
-  const [ShowActivites, setShowActivies] = useState(false);
-  const [ShowContactNotes, setShowContactNotes] = useState(false);
-  const [ShowVenueContact, setShowVenueContact] = useState(false);
-  const [ShowPromoterHolds, setShowPromoterHold] = useState(false);
-  const [tour, setTour] = useState(Tour.tour);
-  const [actionBookingId, setActionBookingId] = useState(null);
-  const [activeTours, setActiveTours] = useState([]);
+const MarketingPanel = ({ tour, activeTours }:Props) => {
+  const [ShowSales, setShowSales] = useState(true)
+  const [ShowArchiveSales, setShowArchiveSales] = useState(false)
+  const [ShowActivites, setShowActivies] = useState(false)
+  const [ShowContactNotes, setShowContactNotes] = useState(false)
+  const [ShowVenueContact, setShowVenueContact] = useState(false)
+  const [ShowPromoterHolds, setShowPromoterHold] = useState(false)
+  const [actionBookingId, setActionBookingId] = useState(null)
 
   const handleActionBookingIdChange = (newActionBookingId) => {
-    setActionBookingId(newActionBookingId);
-  };
+    setActionBookingId(newActionBookingId)
+  }
 
   const handleActiveToursChange = (newActiveTours) => {
-    setActiveTours(newActiveTours);
-  };
-
-  function changeActive(tab) {
-    tab.current = false;
+    setActiveTours(newActiveTours)
   }
-  function showTab(tab) {
-    tabs.forEach(changeActive);
 
-    setShowSales(false);
-    setShowArchiveSales(false);
-    setShowActivies(false);
-    setShowContactNotes(false);
-    setShowVenueContact(false);
-    setShowPromoterHold(false);
+  function changeActive (tab) {
+    tab.current = false
+  }
+  function showTab (tab) {
+    tabs.forEach(changeActive)
 
-    if (tab.name == "Sales") {
-      setShowSales(true);
+    setShowSales(false)
+    setShowArchiveSales(false)
+    setShowActivies(false)
+    setShowContactNotes(false)
+    setShowVenueContact(false)
+    setShowPromoterHold(false)
+
+    if (tab.name === 'Sales') {
+      setShowSales(true)
     }
-    if (tab.name == "Archived Sales") {
-      setShowArchiveSales(true);
+    if (tab.name === 'Archived Sales') {
+      setShowArchiveSales(true)
     }
-    if (tab.name == "Activities") {
-      setShowActivies(true);
+    if (tab.name === 'Activities') {
+      setShowActivies(true)
     }
-    if (tab.name == "Contact Notes") {
-      setShowContactNotes(true);
+    if (tab.name === 'Contact Notes') {
+      setShowContactNotes(true)
     }
-    if (tab.name == "Venue Contacts") {
-      setShowVenueContact(true);
+    if (tab.name === 'Venue Contacts') {
+      setShowVenueContact(true)
     }
-    if (tab.name == "Promoter Holds") {
-      setShowPromoterHold(true);
+    if (tab.name === 'Promoter Holds') {
+      setShowPromoterHold(true)
     }
-    tab.current = true;
+    tab.current = true
   }
 
   return (
-    <div className={"flex md:flex-col"}>
+    <div className={'flex md:flex-col'}>
       <ActionBar
+        activeTours={activeTours}
         onActionBookingIdChange={handleActionBookingIdChange}
         onActiveToursChange={handleActiveToursChange}
       />
-      <div className={"flex md:flex-col  mt-5 "}>
+      <div className={'flex md:flex-col  mt-5 '}>
         <div className="sm:hidden">
-          {tabs.map((tab) => (
-            <button onClick={() => showTab({ tab })}>{tab.name}</button>
+          {tabs.map((tab, i) => (
+            <button key={i} onClick={() => showTab({ tab })}>{tab.name}</button>
           ))}
         </div>
         <div className="hidden sm:block">
@@ -102,11 +102,11 @@ const MarketingPanel = (Tour) => {
                 key={tab.name}
                 className={classNames(
                   tab.current
-                    ? "bg-white text-primary-green border-primary-green border border-b-2 font-semibold"
-                    : "font-normal bg-white border-primary-gray-100 border hover:text-gray-700",
-                  "px-8 py-2  text-sm rounded-t-md"
+                    ? 'bg-white text-primary-green border-primary-green border border-b-2 font-semibold'
+                    : 'font-normal bg-white border-primary-gray-100 border hover:text-gray-700',
+                  'px-8 py-2  text-sm rounded-t-md'
                 )}
-                aria-current={tab.current ? "page" : undefined}
+                aria-current={tab.current ? 'page' : undefined}
               >
                 {tab.name}
               </button>
@@ -114,8 +114,8 @@ const MarketingPanel = (Tour) => {
           </nav>
         </div>
       </div>
-      <div className={"flex flex-col"}></div>
-      <div className={"flex flex-row pt-8"}>
+      <div className={'flex flex-col'}></div>
+      <div className={'flex flex-row pt-8'}>
         <Summary actionBookingId={actionBookingId} activeTours={activeTours}/>
         {ShowSales ? <Sales actionBookingId={actionBookingId}/> : null}
         {ShowArchiveSales ? <ArchiveSales></ArchiveSales> : null}
@@ -125,7 +125,7 @@ const MarketingPanel = (Tour) => {
         {ShowPromoterHolds ? <PromoterHolds></PromoterHolds> : null}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default MarketingPanel;
+export default MarketingPanel

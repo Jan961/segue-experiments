@@ -41,7 +41,7 @@ export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
   }
 
   function formatShortYearDate (dateString) {
-    const dateMomentObject = moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY') // 1st argument - string, 2nd argument - format
+    const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY') // 1st argument - string, 2nd argument - format
     const day = toISO(dateMomentObject).substring(0, 10)
     return day // new Date( dateMomentObject.toDate());
   }
@@ -49,7 +49,8 @@ export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
     const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.tour))
     const toWeek = formatShortYearDate(inputs.tourWeek)
     const fromWeek = formatShortYearDate(weeksBefore(toWeek, inputs.numberOfWeeks * 7))
-    fetch('/api/reports/v1/call/salesSummary/s/s/s/s/s/s?type=1', { method: 'POST', body: JSON.stringify({ ...inputs, fromWeek, toWeek, showName: selectedTour?.ShowName }) }).then(async response => {
+    // /api/reports/v1/call/salesSummary/s/s/s/s/s/s?type=1
+    fetch('/api/reports/sales-summary-simple', { method: 'POST', body: JSON.stringify({ tourId: inputs.tour, fromWeek, toWeek }) }).then(async response => {
       if (response.status >= 200 && response.status < 300) {
         const tourName:string = selectedTour?.name
         let suggestedName:string|any[] = response.headers.get('Content-Disposition')
