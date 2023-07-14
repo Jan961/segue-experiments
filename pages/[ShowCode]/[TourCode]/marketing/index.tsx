@@ -2,7 +2,7 @@ import Layout from 'components/Layout'
 import Toolbar from 'components/marketing/ActionBar'
 import SideMenu from 'components/sideMenu'
 import { useState } from 'react'
-import MarketingPanel from 'components/marketing/marketing-panel'
+import MarketingPanel from 'components/marketing/MarketingPanel'
 
 export default function Index() {
     const [data, setData] = useState(null)

@@ -1,6 +1,6 @@
 import Layout from 'components/Layout'
 import { useState } from 'react'
-import MarketingPanel from 'components/marketing/marketing-panel'
+import MarketingPanel from 'components/marketing/MarketingPanel'
 import GlobalToolbar from 'components/toolbar'
 import { GetServerSideProps } from 'next'
 import { getToursByShowCode } from 'services/TourService'

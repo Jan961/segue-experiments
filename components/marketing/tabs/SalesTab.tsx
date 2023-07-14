@@ -5,32 +5,40 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios'
+import { Spinner } from 'components/global/Spinner'
 import { Table } from 'components/global/table/Table'
-import { useEffect, useState } from 'react'
+import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
+import { NoDataWarning } from '../NoDataWarning'
 
-
-const Sales = () => {
-  const [bookingSales, setBookingSales] = useState([])
+export const SalesTab = () => {
+  const [bookingSales, setBookingSales] = React.useState([])
+  const [loading, setLoading] = React.useState(false)
   const { selected } = useRecoilValue(bookingJumpState)
 
-  useEffect(() => {
+  React.useEffect(() => {
     const getBookingSales = async () => {
+      setLoading(true)
       try {
         const { data } = await axios.get(`/api/marketing/sales/read/${selected}`)
         console.log('bookingSale data: ', data)
         setBookingSales(data)
       } catch (error:any) {
         console.error(error)
+      } finally {
+        setLoading(false)
       }
     }
 
     if (selected) {
-      console.log('trigger')
       getBookingSales()
     }
   }, [selected])
+
+  if (loading) return (<Spinner size='lg' className="mt-8" />)
+
+  if (!bookingSales || !bookingSales.length) return (<NoDataWarning />)
 
   return (
     <div className={'flex bg-transparent'}>
@@ -135,5 +143,3 @@ const Sales = () => {
     </div>
   )
 }
-
-export default Sales

@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import Sales from './tabs/sales'
+import { SalesTab } from './tabs/SalesTab'
 import ArchiveSales from './tabs/ArchiveSales'
 import Summary from './summary'
 import Activities from './tabs/activites'
@@ -34,7 +33,7 @@ const MarketingPanel = (Tour) => {
           </div>
           <div className="col-span-3">
             <Tab.Panels>
-              <Tab.Panel><Sales/></Tab.Panel>
+              <Tab.Panel><SalesTab/></Tab.Panel>
               <Tab.Panel><ArchiveSales /></Tab.Panel>
               <Tab.Panel><Activities /></Tab.Panel>
               <Tab.Panel><ContactNotes /></Tab.Panel>
