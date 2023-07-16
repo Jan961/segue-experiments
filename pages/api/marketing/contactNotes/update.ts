@@ -1,26 +1,22 @@
 import { loggingService } from 'services/loggingService'
 import prisma from 'lib/prisma'
-import { VenueContactDTO } from 'interfaces'
+import { BookingContactNoteDTO } from 'interfaces'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const vc = req.body as VenueContactDTO
+    const bcn = req.body as BookingContactNoteDTO
 
-    await prisma.venueContact.update({
+    await prisma.bookingContactNotes.update({
       where: {
-        Id: vc.Id
+        Id: bcn.Id
       },
       data: {
-        FirstName: vc.FirstName,
-        LastName: vc.LastName,
-        Email: vc.Email,
-        Phone: vc.Phone,
-        VenueRole: {
-          connect: {
-            Id: vc.RoleId
-          }
-        }
+        BookingId: bcn.BookingId,
+        Notes: bcn.Notes,
+        ContactDate: bcn.ContactDate ? new Date(bcn.ContactDate) : null,
+        ActionByDate: bcn.ActionByDate ? new Date(bcn.ActionByDate) : null,
+        CoContactName: bcn.CoContactName
       }
     })
     res.status(200).json({})

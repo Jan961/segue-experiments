@@ -5,11 +5,11 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
 import React from 'react'
 import axios from 'axios'
-import { Spinner } from 'components/global/Spinner'
 import { venueRoleState } from 'state/marketing/venueRoleState'
 import { objectify } from 'radash'
 import { VenueContactsEditor } from '../editors/VenueContactsEditor'
 import { VenueContactDTO } from 'interfaces'
+import { LoadingTab } from './LoadingTab'
 
 export const VenueContactsTab = () => {
   const { selected, bookings } = useRecoilValue(bookingJumpState)
@@ -52,10 +52,10 @@ export const VenueContactsTab = () => {
     setModalOpen(false)
   }
 
-  if (loading) return (<Spinner size='lg' className="mt-8" />)
+  if (loading) return (<LoadingTab />)
 
   return (
-    <div className="flex-auto mx-4 mt-0overflow-hidden   ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
+    <>
       <div className='text-right pb-4'>
         <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
         {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
@@ -100,6 +100,6 @@ export const VenueContactsTab = () => {
           ))}
         </Table.Body>
       </Table>
-    </div>
+    </>
   )
 }

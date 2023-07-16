@@ -1,8 +1,9 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, Tour, Booking, VenueContact } from '@prisma/client'
-import { BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, VenueContactDTO, VenueRoleDTO } from 'interfaces'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes } from '@prisma/client'
+import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, VenueContactDTO, VenueRoleDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
 import { BookingsWithPerformances } from 'services/bookingService'
+import { toISO } from 'services/dateService'
 
 /*
 
@@ -19,6 +20,11 @@ We also have full control of types here so we can get type safety to child objec
 
 */
 
+const convertDate = (date: Date) => {
+  if (date) return toISO(date)
+  return ''
+}
+
 export const showMapper = (show: Show): ShowDTO => ({
   Id: show.Id,
   Name: show.Name,
@@ -33,26 +39,26 @@ export const tourMapper = (s: ShowWithTours): TourDTO[] => {
 
 export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
   Id: db.Id,
-  StartDate: db.StartDate.toISOString(),
-  EndDate: db.EndDate.toISOString(),
+  StartDate: convertDate(db.StartDate),
+  EndDate: convertDate(db.EndDate),
   Name: db.Name
 })
 
 export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
   Id: r.Id,
-  Date: r.Date.toISOString(),
+  Date: convertDate(r.Date),
   Town: r.Town,
   StatusCode: r.StatusCode
 })
 
 export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
-  Date: b.FirstDate.toISOString(),
+  Date: convertDate(b.FirstDate),
   Id: b.Id,
   VenueId: b.VenueId,
   LandingSite: b.LandingPageURL,
   StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
-  OnSaleDate: b.TicketsOnSaleFromDate ? b.TicketsOnSaleFromDate.toISOString() : '',
+  OnSaleDate: convertDate(b.TicketsOnSaleFromDate),
   OnSale: b.TicketsOnSale
 })
 
@@ -78,14 +84,14 @@ export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
 
 export const otherMapper = (o: Other): OtherDTO => ({
   Id: o.Id,
-  Date: o.Date.toISOString(),
+  Date: convertDate(o.Date),
   DateTypeId: o.DateTypeId,
   StatusCode: o.StatusCode as StatusCode
 })
 
 export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => (
   {
-    Date: gifu.Date.toISOString(),
+    Date: convertDate(gifu.Date),
     Id: gifu.Id,
     VenueId: gifu.VenueId,
     StatusCode: gifu.StatusCode as StatusCode
@@ -115,6 +121,26 @@ export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
   Email: vc.Email,
   RoleId: vc.VenueRoleId
 })
+
+export const activityMapper = (a: BookingActivity): ActivityDTO => ({
+  Id: a.Id,
+  Date: convertDate(a.Date),
+  Name: a.Name,
+  ActivityTypeId: a.ActivityTypeId,
+  CompanyCost: Number(a.CompanyCost),
+  VenueCost: Number(a.VenueCost),
+  FollowUpRequired: a.FollowUpRequired
+})
+
+export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({
+  Id: a.Id,
+  BookingId: a.BookingId,
+  CoContactName: a.CoContactName,
+  ContactDate: convertDate(a.ContactDate),
+  ActionByDate: convertDate(a.ActionByDate),
+  Notes: a.Notes
+})
+
 
 export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Id: vr.Id,

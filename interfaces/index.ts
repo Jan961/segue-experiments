@@ -154,6 +154,25 @@ export type VenueContactDTO = {
   VenueId?: number
 }
 
+export type ActivityDTO = {
+  Id: number
+  Date: string
+  Name: string
+  ActivityTypeId: number
+  CompanyCost: number
+  VenueCost: number
+  FollowUpRequired: boolean
+}
+
+export type BookingContactNoteDTO = {
+  Id?: number
+  BookingId: number
+  CoContactName: string
+  ContactDate: string
+  ActionByDate: string
+  Notes: string
+}
+
 export type VenueRoleDTO = {
   Id: number
   Name: string

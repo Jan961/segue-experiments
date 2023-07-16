@@ -18,7 +18,8 @@ export const FormInputDate = ({ onChange, value, name, label, required, classNam
 
   return (
     <div className={className}>
-      <label htmlFor={name}>{ label }
+      <label htmlFor={name}>
+        <div className='text-sm pb-2'>{ label } { required ? '*' : null }</div>
         <input id={name}
           type="date"
           name={name}

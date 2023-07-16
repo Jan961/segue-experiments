@@ -39,7 +39,7 @@ export const dateTimeToTime = (dateToFormat) => {
   return moment(dateToFormat).format('HH:mm')
 }
 
-export const toISO = (date) => {
+export const toISO = (date: Date) => {
   return date.toISOString()
 }
 
