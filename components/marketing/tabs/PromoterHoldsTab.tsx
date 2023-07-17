@@ -8,9 +8,12 @@ import { LoadingTab } from './LoadingTab'
 import axios from 'axios'
 import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
+import { AllocatedSeatsEditor } from '../editors/AllocatedSeatsEditor'
+import { AvailableSeatEditor } from '../editors/AvailableSeatsEditor'
 
-const holdsTh = [
+const availableSeatsFakeData = [
   {
+    Id: 1,
     day: 'Monday',
     date: '10/10/2022',
     time: '17:30',
@@ -23,8 +26,9 @@ const holdsTh = [
   }
 ]
 
-const holdsPromoter = [
+const allocatedSeatsFakeData = [
   {
+    Id: 1,
     date: '10/10/2010',
     time: '17:30',
     name: 'Sam Smith',
@@ -33,6 +37,7 @@ const holdsPromoter = [
     email: 'sam.smith@somedomain.co.uk'
   },
   {
+    Id: 2,
     date: '10/10/2010',
     time: '17:30',
     name: 'Sam Smith',
@@ -41,6 +46,7 @@ const holdsPromoter = [
     email: 'sam.smith@somedomain.co.uk'
   },
   {
+    Id: 3,
     date: '11/05/2011',
     time: '17:30',
     name: 'Sam Smith',
@@ -57,7 +63,7 @@ const venueHold = [
     Qty: 4
   },
   {
-    Id: 1,
+    Id: 2,
     Role: 'Sound Desk',
     Qty: 8
   }
@@ -74,11 +80,19 @@ export const PromoterHoldsTab = () => {
   const [loading, setLoading] = React.useState(true)
 
   // Venue Holds
-  const [venueHolds, setVenueHolds] = React.useState(venueHold)
+  const [venueHolds, setVenueHolds] = React.useState([])
   const [venueHoldsModalOpen, setVenueHoldsModalOpen] = React.useState(false)
   const [venueHoldsEditing, setVenueHoldsEditing] = React.useState(undefined)
 
+  // Available Seats
+  const [availableSeats, setAvailableSeats] = React.useState([])
+  const [availableSeatsModalOpen, setAvailableSeatsModalOpen] = React.useState(false)
+  const [availableSeatsEditing, setAvailableSeatsEditing] = React.useState(undefined)
+
   // Allocated Seats
+  const [allocatedSeats, setAllocatedSeats] = React.useState([])
+  const [allocatedSeatsModalOpen, setAllocatedSeatsModalOpen] = React.useState(false)
+  const [allocatedSeatsEditing, setAllocatedSeatsEditing] = React.useState(undefined)
 
   // Common
 
@@ -88,10 +102,12 @@ export const PromoterHoldsTab = () => {
 
     // Temp
     setVenueHolds(venueHold)
+    setAvailableSeats(availableSeatsFakeData)
+    setAllocatedSeats(allocatedSeatsFakeData)
     setLoading(false)
 
     return
-    const { data } = await axios.get(`/api/marketing/contactNotes/${selected}`)
+    const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`)
     const { venueHolds } = data
     setVenueHolds(venueHolds)
     setLoading(false)
@@ -99,11 +115,12 @@ export const PromoterHoldsTab = () => {
 
   const triggerClose = async (refresh: boolean) => {
     setVenueHoldsModalOpen(false)
+    setAllocatedSeatsModalOpen(false)
+    setAvailableSeatsModalOpen(false)
     if (refresh) await search()
   }
 
   // Venue Hold
-
   const createVenueHold = () => {
     setVenueHoldsEditing(defaultVenueHold)
     setVenueHoldsModalOpen(true)
@@ -112,6 +129,28 @@ export const PromoterHoldsTab = () => {
   const editVenueHold = (venueHold: any) => {
     setVenueHoldsEditing(venueHold)
     setVenueHoldsModalOpen(true)
+  }
+
+  // Available Seats
+  const createAvailableSeat = () => {
+    setAvailableSeatsEditing(defaultVenueHold)
+    setAvailableSeatsModalOpen(true)
+  }
+
+  const editAvailableSeat = (as: any) => {
+    setAvailableSeatsEditing(as)
+    setAvailableSeatsModalOpen(true)
+  }
+
+  // Allocated Seats
+  const createAllocatedSeat = () => {
+    setAllocatedSeatsEditing(defaultVenueHold)
+    setAllocatedSeatsModalOpen(true)
+  }
+
+  const editAllocatedSeat = (as: any) => {
+    setAllocatedSeatsEditing(as)
+    setAllocatedSeatsModalOpen(true)
   }
 
   React.useEffect(() => {
@@ -126,7 +165,7 @@ export const PromoterHoldsTab = () => {
       <div className="flex justify-between pb-4">
         <h3 className='text-xl mt-2'>Venue Holds</h3>
         <FormInputButton text="Add New Venue Hold" onClick={createVenueHold} icon={faPlus}/>
-        {venueHoldsModalOpen && (<VenueHoldsEditor open={venueHoldsModalOpen} triggerClose={triggerClose} bookingId={selected} venueHold={venueHoldsEditing} />)}
+        {venueHoldsModalOpen && (<VenueHoldsEditor open={venueHoldsModalOpen} triggerClose={triggerClose} venueHold={venueHoldsEditing} />)}
       </div>
       <Table className="mb-8">
         <Table.HeaderRow>
@@ -149,9 +188,11 @@ export const PromoterHoldsTab = () => {
         ))
         }
       </Table>
+
       <div className="flex justify-between pb-4">
         <h3 className='text-xl mt-2'>Available Seats</h3>
-        <FormInputButton text="Add Available Seats" onClick={console.log} icon={faPlus}/>
+        <FormInputButton text="Add Available Seats" onClick={createAvailableSeat} icon={faPlus}/>
+        {availableSeatsModalOpen && (<AvailableSeatEditor open={availableSeatsModalOpen} triggerClose={triggerClose} availableSeat={availableSeatsEditing} />)}
       </div>
       <Table className='mb-8'>
         <Table.HeaderRow>
@@ -181,39 +222,41 @@ export const PromoterHoldsTab = () => {
           </Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
-          {holdsTh.map((holdTh, idx) => (
-            <Table.Row key={holdTh.date + holdTh.time}>
+          {availableSeats.map((avS, idx) => (
+            <Table.Row key={avS.Id} hover onClick={() => editAvailableSeat(avS)}>
               <Table.Cell>
-                {holdTh.day}
+                {avS.day}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.date}{' '}
+                {avS.date}{' '}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.time}
+                {avS.time}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.name}
+                {avS.name}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.numberSeats}
+                {avS.numberSeats}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.allocations}
+                {avS.allocations}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.available}
+                {avS.available}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.range} {holdTh.note}
+                {avS.range} {avS.note}
               </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
       </Table>
+
       <div className="flex justify-between pb-4">
         <h3 className='text-xl mt-2'>Allocated Seats</h3>
-        <FormInputButton text="Add Allocated Seats" onClick={console.log} icon={faPlus}/>
+        <FormInputButton text="Add Allocated Seats" onClick={createAllocatedSeat} icon={faPlus}/>
+        {allocatedSeatsModalOpen && (<AllocatedSeatsEditor open={allocatedSeatsModalOpen} triggerClose={triggerClose} allocatedSeat={allocatedSeatsEditing} />)}
       </div>
       <Table className='mb-8'>
         <Table.HeaderRow>
@@ -234,22 +277,22 @@ export const PromoterHoldsTab = () => {
           </Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
-          {holdsPromoter.map((holdTh, idx) => (
-            <Table.Row key={holdTh.date + holdTh.time}>
+          {allocatedSeats.map((as) => (
+            <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
               <Table.Cell>
-                {holdTh.date} {holdTh.time}{' '}
+                {as.date} {as.time}{' '}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.name}
+                {as.name}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.numberSeats}
+                {as.numberSeats}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.allocatedSeats}
+                {as.allocatedSeats}
               </Table.Cell>
               <Table.Cell>
-                {holdTh.email}
+                {as.email}
               </Table.Cell>
             </Table.Row>
           ))}

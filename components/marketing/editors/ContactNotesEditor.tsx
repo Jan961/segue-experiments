@@ -25,7 +25,6 @@ export const ContactNotesEditor = ({ bookingContactNote, open, triggerClose, boo
 
     if (creating) {
       try {
-        console.log(inputs)
         await axios.post('/api/marketing/contactNotes/create', inputs)
         triggerClose(true)
       } catch {

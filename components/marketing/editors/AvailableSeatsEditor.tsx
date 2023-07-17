@@ -1,17 +1,16 @@
 import axios from 'axios'
 import { StyledDialog } from 'components/global/StyledDialog'
-import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import React from 'react'
 
-interface VenueHoldsEditorProps {
-  venueHold?: any
+interface AvailableSeatEditorProps {
+  availableSeat?: any
   open: boolean
   triggerClose: (refresh: boolean) => void
 }
 
-export const VenueHoldsEditor = ({ venueHold, open, triggerClose }: VenueHoldsEditorProps) => {
-  const [inputs, setInputs] = React.useState<Partial<any>>(venueHold)
+export const AvailableSeatEditor = ({ availableSeat, open, triggerClose }: AvailableSeatEditorProps) => {
+  const [inputs, setInputs] = React.useState<Partial<any>>(availableSeat)
   const [status, setStatus] = React.useState({ submitting: false, submitted: true })
 
   const creating = !inputs.Id
@@ -23,14 +22,14 @@ export const VenueHoldsEditor = ({ venueHold, open, triggerClose }: VenueHoldsEd
 
     if (creating) {
       try {
-        await axios.post('/api/marketing/venueHold/create', inputs)
+        await axios.post('/api/marketing/availableSeats/create', inputs)
         triggerClose(true)
       } catch {
         setStatus({ ...status, submitting: false })
       }
     } else {
       try {
-        await axios.post('/api/marketing/venueHold/update', inputs)
+        await axios.post('/api/marketing/availableSeats/update', inputs)
         triggerClose(true)
       } catch {
         setStatus({ ...status, submitting: false })
@@ -41,7 +40,7 @@ export const VenueHoldsEditor = ({ venueHold, open, triggerClose }: VenueHoldsEd
   const handleDelete = async () => {
     setStatus({ ...status, submitting: true })
     try {
-      await axios.post('/api/marketing/venueHold/delete', inputs)
+      await axios.post('/api/marketing/availableSeats/delete', inputs)
       triggerClose(true)
     } catch {
       setStatus({ ...status, submitting: false })
@@ -64,10 +63,9 @@ export const VenueHoldsEditor = ({ venueHold, open, triggerClose }: VenueHoldsEd
   }
 
   return (
-    <StyledDialog title={creating ? 'Create Venue Hold' : 'Edit Venue Hold'} open={open} onClose={() => triggerClose(false)}>
+    <StyledDialog title={creating ? 'Create Available Seat' : 'Edit Available Seat'} open={open} onClose={() => triggerClose(false)}>
       <form onSubmit={handleOnSubmit}>
-        <FormInputText name="Role" label="Role" value={inputs.Role} onChange={handleOnChange} />
-        <FormInputNumeric name="Qty" label="Quantity" value={inputs.Qty} onChange={handleOnChange} />
+        <FormInputText name="Temp" label="Temp" value={inputs.Temp} onChange={handleOnChange} />
         <StyledDialog.FooterContainer>
           <StyledDialog.FooterCancel onClick={() => triggerClose(false)} />
           <StyledDialog.FooterDelete onClick={handleDelete} disabled={creating || status.submitting}>Delete</StyledDialog.FooterDelete>
