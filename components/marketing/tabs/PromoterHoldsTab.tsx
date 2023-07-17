@@ -3,71 +3,12 @@ import { HardCodedWarning } from '../HardCodedWarning'
 import { Table } from 'components/global/table/Table'
 import React from 'react'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
-import { VenueHoldsEditor } from '../editors/VenueHoldsEditor'
 import { LoadingTab } from './LoadingTab'
 import axios from 'axios'
 import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { AllocatedSeatsEditor } from '../editors/AllocatedSeatsEditor'
 import { AvailableSeatEditor } from '../editors/AvailableSeatsEditor'
-
-const availableSeatsFakeData = [
-  {
-    Id: 1,
-    day: 'Monday',
-    date: '10/10/2022',
-    time: '17:30',
-    name: 'Peter Griffin',
-    numberSeats: '4',
-    allocations: '1-50',
-    available: '1-50',
-    range: '1-2',
-    note: 'Some note'
-  }
-]
-
-const allocatedSeatsFakeData = [
-  {
-    Id: 1,
-    date: '10/10/2010',
-    time: '17:30',
-    name: 'Sam Smith',
-    numberSeats: '1',
-    allocatedSeats: '49',
-    email: 'sam.smith@somedomain.co.uk'
-  },
-  {
-    Id: 2,
-    date: '10/10/2010',
-    time: '17:30',
-    name: 'Sam Smith',
-    numberSeats: '1',
-    allocatedSeats: '49',
-    email: 'sam.smith@somedomain.co.uk'
-  },
-  {
-    Id: 3,
-    date: '11/05/2011',
-    time: '17:30',
-    name: 'Sam Smith',
-    numberSeats: '1',
-    allocatedSeats: '49',
-    email: 'sam.smith@somedomain.co.uk'
-  }
-]
-
-const venueHold = [
-  {
-    Id: 1,
-    Role: 'Lighting Desk',
-    Qty: 4
-  },
-  {
-    Id: 2,
-    Role: 'Sound Desk',
-    Qty: 8
-  }
-]
 
 const defaultVenueHold = {
   Id: undefined,
@@ -79,10 +20,12 @@ export const PromoterHoldsTab = () => {
   const { selected } = useRecoilValue(bookingJumpState)
   const [loading, setLoading] = React.useState(true)
 
+  /*
   // Venue Holds
   const [venueHolds, setVenueHolds] = React.useState([])
   const [venueHoldsModalOpen, setVenueHoldsModalOpen] = React.useState(false)
   const [venueHoldsEditing, setVenueHoldsEditing] = React.useState(undefined)
+  */
 
   // Available Seats
   const [availableSeats, setAvailableSeats] = React.useState([])
@@ -98,28 +41,25 @@ export const PromoterHoldsTab = () => {
 
   const search = async () => {
     setLoading(true)
-    setVenueHolds(undefined)
 
     // Temp
-    setVenueHolds(venueHold)
-    setAvailableSeats(availableSeatsFakeData)
-    setAllocatedSeats(allocatedSeatsFakeData)
     setLoading(false)
 
-    return
     const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`)
-    const { venueHolds } = data
-    setVenueHolds(venueHolds)
-    setLoading(false)
+
+    const { available } = data
+    console.log(available)
+    return
   }
 
   const triggerClose = async (refresh: boolean) => {
-    setVenueHoldsModalOpen(false)
+    // setVenueHoldsModalOpen(false)
     setAllocatedSeatsModalOpen(false)
     setAvailableSeatsModalOpen(false)
     if (refresh) await search()
   }
 
+  /*
   // Venue Hold
   const createVenueHold = () => {
     setVenueHoldsEditing(defaultVenueHold)
@@ -130,6 +70,7 @@ export const PromoterHoldsTab = () => {
     setVenueHoldsEditing(venueHold)
     setVenueHoldsModalOpen(true)
   }
+  */
 
   // Available Seats
   const createAvailableSeat = () => {
@@ -162,6 +103,7 @@ export const PromoterHoldsTab = () => {
   return (
     <>
       <HardCodedWarning />
+      {/*
       <div className="flex justify-between pb-4">
         <h3 className='text-xl mt-2'>Venue Holds</h3>
         <FormInputButton text="Add New Venue Hold" onClick={createVenueHold} icon={faPlus}/>
@@ -188,7 +130,7 @@ export const PromoterHoldsTab = () => {
         ))
         }
       </Table>
-
+      */}
       <div className="flex justify-between pb-4">
         <h3 className='text-xl mt-2'>Available Seats</h3>
         <FormInputButton text="Add Available Seats" onClick={createAvailableSeat} icon={faPlus}/>

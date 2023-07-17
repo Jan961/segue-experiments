@@ -173,6 +173,19 @@ export type BookingContactNoteDTO = {
   Notes: string
 }
 
+export type AllocatedHoldDTO = {
+  Id?: number
+  AvailableCompId: number
+  TicketHolderName: string
+  Seats: number
+  Comments?: string
+  RequestedBy?: string
+  ArrangedBy?: string
+  VenueConfirmationNotes?: string
+  TicketHolderEmail?: string
+  SeatsAllocated?: string
+}
+
 export type VenueRoleDTO = {
   Id: number
   Name: string
