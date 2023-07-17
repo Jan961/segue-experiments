@@ -19,7 +19,6 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
     TourWeek: null,
     numberOfWeeks: 2,
     order: null
-
   })
 
   function handleOnSubmit () {
