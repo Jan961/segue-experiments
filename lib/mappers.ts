@@ -20,6 +20,7 @@ We also have full control of types here so we can get type safety to child objec
 
 */
 
+// This is so we can change the implimentation if needed. We had some issues with timezone.
 const convertDate = (date: Date) => {
   if (date) return toISO(date)
   return ''

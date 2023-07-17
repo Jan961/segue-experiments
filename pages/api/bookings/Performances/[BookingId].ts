@@ -4,15 +4,15 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const searchResults = await prisma.performance.findFirst({
+    const searchResults = await prisma.performance.findMany({
       where: {
-        PerformanceId: parseInt(req.query.PerformanceId as string)
+        BookingId: parseInt(req.query.BookingId as string)
       }
     })
 
     res.status(200).json(searchResults)
   } catch (err) {
     await loggingService.logError('Performance Issue' + err)
-    res.status(500).json({ err: 'Error occurred while generating search results.' + err })
+    res.status(403).json({ err: 'Error occurred while generating search results.' + err })
   }
 }

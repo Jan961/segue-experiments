@@ -1,6 +1,6 @@
 import { SalesTab } from './tabs/SalesTab'
-import ArchiveSales from './tabs/ArchiveSales'
-import Summary from './summary'
+import { ArchivedSalesTab } from './tabs/ArchivedSalesTab'
+import { Summary } from './Summary'
 import { ActivitiesTab } from './tabs/ActivitiesTab'
 import { ContactNotesTab } from './tabs/ContactNotesTab'
 import { VenueContactsTab } from './tabs/VenueContactsTab'
@@ -9,11 +9,7 @@ import ActionBar from './ActionBar'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 
-export interface ActionBookingId {
-  actionBookingId: null | number;
-}
-
-const MarketingPanel = (Tour) => {
+const MarketingPanel = () => {
   return (
     <div className={'flex md:flex-col'}>
       <ActionBar />
@@ -27,14 +23,14 @@ const MarketingPanel = (Tour) => {
           <StyledTab>Venue Contacts</StyledTab>
           <StyledTab>Promoter Holds</StyledTab>
         </Tab.List>
-        <div className='grid grid-cols-4'>
+        <div className='grid grid-cols-4 gap-2'>
           <div className='col-span-1'>
             <Summary/>
           </div>
           <div className="col-span-3 mb-4">
             <Tab.Panels>
               <Tab.Panel><SalesTab/></Tab.Panel>
-              <Tab.Panel><ArchiveSales /></Tab.Panel>
+              <Tab.Panel><ArchivedSalesTab /></Tab.Panel>
               <Tab.Panel><ActivitiesTab /></Tab.Panel>
               <Tab.Panel><ContactNotesTab /></Tab.Panel>
               <Tab.Panel><VenueContactsTab /></Tab.Panel>
