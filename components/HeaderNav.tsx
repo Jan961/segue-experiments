@@ -4,7 +4,8 @@ import { useClerk } from '@clerk/nextjs'
 import { userService } from 'services/user.service'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import classNames from 'classnames'
-import { faHome, faUser, faSignOutAlt, IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { faHome, faUser, faSignOutAlt, IconDefinition, faBars } from '@fortawesome/free-solid-svg-icons'
+import { SegueLogo } from './global/SegueLogo'
 
 interface HeaderNavButtonProps {
   icon: IconDefinition;
@@ -73,12 +74,13 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }:any) => {
     <nav>
       <div>
         <div className="flex justify-between items-center">
-          <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center h-20">
-            <img
-              className="sticky h-full w-auto"
-              src="/segue/segue_logo.png"
-              alt="Your Company"
-            />
+          <div onClick={() => setMenuIsOpen(!menuIsOpen)}
+            className="flex items-center h-20 cursor-pointer hover:opacity-70"
+          >
+            <div className='p-2 px-4 pr-2 text-primary-blue'>
+              <FontAwesomeIcon size="xl" icon={faBars} />
+            </div>
+            <SegueLogo />
           </div>
           <div className="flex flex-row items-center pr-2">
             <HeaderNavButton

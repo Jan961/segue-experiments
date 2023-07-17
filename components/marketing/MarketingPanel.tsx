@@ -4,7 +4,7 @@ import { Summary } from './Summary'
 import { ActivitiesTab } from './tabs/ActivitiesTab'
 import { ContactNotesTab } from './tabs/ContactNotesTab'
 import { VenueContactsTab } from './tabs/VenueContactsTab'
-import PromoterHolds from './tabs/hold'
+import { PromoterHoldsTab } from './tabs/PromoterHoldsTab'
 import ActionBar from './ActionBar'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
@@ -34,7 +34,7 @@ const MarketingPanel = () => {
               <Tab.Panel><ActivitiesTab /></Tab.Panel>
               <Tab.Panel><ContactNotesTab /></Tab.Panel>
               <Tab.Panel><VenueContactsTab /></Tab.Panel>
-              <Tab.Panel><PromoterHolds /></Tab.Panel>
+              <Tab.Panel><PromoterHoldsTab /></Tab.Panel>
             </Tab.Panels>
           </div>
         </div>

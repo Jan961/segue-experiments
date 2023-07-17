@@ -20,7 +20,6 @@ const ActionBar = () => {
   }
 
   const matching = bookingJump.bookings.filter(x => x.Id === bookingJump.selected)[0]
-  console.log(matching)
 
   return (
     <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">

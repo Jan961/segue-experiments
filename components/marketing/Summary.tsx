@@ -4,7 +4,7 @@ import {
   faSquareXmark,
   faUser
 } from '@fortawesome/free-solid-svg-icons'
-import { calculateWeekNumber, dateToSimple, formatTime } from 'services/dateService'
+import { calculateWeekNumber, dateToSimple, dateTimeToTime } from 'services/dateService'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
 import axios from 'axios'
@@ -53,7 +53,7 @@ export const Summary = () => {
         <strong>Shows:</strong> {summary.Performances.length}
       </div>
       <div>
-        <strong>Times:</strong> {summary.Performances.map(x => formatTime(x.Date)).join(', ') || 'N/A' }
+        <strong>Times:</strong> {summary.Performances.map(x => dateTimeToTime(x.Date)).join(', ') || 'N/A' }
       </div>
       <div className={'mt-2'}>
         <strong>Venue Week:</strong> <span>{weekNo}</span>

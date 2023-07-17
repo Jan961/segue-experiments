@@ -10,9 +10,9 @@ interface ClassNameable {
   If additional classes are needed, consider adding additional props such as 'minimal' 'center' etc.
 */
 
-export const Table = ({ children }: PropsWithChildren<unknown>) => {
+export const Table = ({ children, className }: PropsWithChildren<ClassNameable>) => {
   return (
-    <table className="min-w-full">
+    <table className={ classNames('min-w-full', className) }>
       { children }
     </table>
   )
