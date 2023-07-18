@@ -21,9 +21,11 @@ export default async function handle (req, res) {
       let totalAllocated = 0
       let totalAvailable = 0
       const allocated = []
+      let availableCompId: number
 
       for (const ac of p.AvailableComp) {
         totalAvailable += ac.Seats
+        availableCompId = ac.Id
 
         for (const ca of ac.CompAllocation) {
           allocated.push(ca)
@@ -33,6 +35,7 @@ export default async function handle (req, res) {
 
       return {
         info: performanceMapper(p),
+        availableCompId,
         totalAvailable,
         totalAllocated,
         allocated

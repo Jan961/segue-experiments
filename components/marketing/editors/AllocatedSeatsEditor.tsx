@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { StyledDialog } from 'components/global/StyledDialog'
+import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import React from 'react'
 
@@ -7,10 +8,11 @@ interface AllocatedSeatsEditorProps {
   allocatedSeat?: any
   open: boolean
   triggerClose: (refresh: boolean) => void
+  max: number
 }
 
-export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose }: AllocatedSeatsEditorProps) => {
-  const [inputs, setInputs] = React.useState<Partial<any>>(allocatedSeat)
+export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose, max }: AllocatedSeatsEditorProps) => {
+  const [inputs, setInputs] = React.useState<Partial<any>>({ ...allocatedSeat, Seats: Math.min(max, 1) })
   const [status, setStatus] = React.useState({ submitting: false, submitted: true })
 
   const creating = !inputs.Id
@@ -62,10 +64,27 @@ export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose }: Allo
     })
   }
 
+  const changeSeats = (seats: number) => {
+    setInputs({ ...inputs, Seats: seats })
+    setStatus({
+      submitted: false,
+      submitting: false
+    })
+  }
+
+  const maxSeats = max + allocatedSeat.Seats
+
   return (
     <StyledDialog title={creating ? 'Create Allocated Seat' : 'Edit Allocated Seat'} open={open} onClose={() => triggerClose(false)}>
       <form onSubmit={handleOnSubmit}>
-        <FormInputText name="Temp" label="Temp" value={inputs.Temp} onChange={handleOnChange} />
+        <FormInputText name="ArrangedBy" label="Arranged By" value={inputs.ArrangedBy} onChange={handleOnChange} />
+        <FormInputText name="RequestedBy" label="Requested By" value={inputs.RequestedBy} onChange={handleOnChange} />
+        <FormInputNumeric min={1} max={maxSeats} name="Seats" label="Seats" value={inputs.Seats} onChange={changeSeats} />
+        <FormInputText name="SeatsAllocated" label="Seats Allocated" value={inputs.SeatsAllocated} onChange={handleOnChange} />
+        <FormInputText required name="TicketHolderName" label="Name" value={inputs.TicketHolderName} onChange={handleOnChange} />
+        <FormInputText name="TicketHolderEmail" label="Email" value={inputs.TicketHolderEmail} onChange={handleOnChange} />
+        <FormInputText area name="Comments" label="Comments" value={inputs.Comments} onChange={handleOnChange} />
+        <FormInputText area name="VenueConfirmationNotes" label="Venue Confirmation Notes" value={inputs.VenueConfirmationNotes} onChange={handleOnChange} />
         <StyledDialog.FooterContainer>
           <StyledDialog.FooterCancel onClick={() => triggerClose(false)} />
           <StyledDialog.FooterDelete onClick={handleDelete} disabled={creating || status.submitting}>Delete</StyledDialog.FooterDelete>
