@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 import IconWithText from '../IconWithText'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
+import { getDateDaysAgo, toISO } from 'services/dateService'
 
 type Props={
     activeTours:any[]
@@ -9,26 +11,59 @@ type Props={
 export default function PromotorHolds ({ activeTours }:Props) {
   const [showModal, setShowModal] = React.useState(false)
   const [inputs, setInputs] = useState({
-    DateFrom: null,
-    DateTo: null,
-    Tour: null,
-    Venue: null
+    dateFrom: null,
+    dateTo: null,
+    tour: null,
+    venue: null
   })
   const [venues, setVenues] = useState([])
   function handleOnSubmit (e) {
     e.preventDefault()
+    downloadReport()
   }
 
   function closeForm () {
     setInputs({
-      DateFrom: null,
-      DateTo: null,
-      Tour: null,
-      Venue: null
+      dateFrom: null,
+      dateTo: null,
+      tour: null,
+      venue: null
     })
     setVenues([])
 
     setShowModal(false)
+  }
+
+  const downloadReport = async () => {
+    const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.tour))
+    fetch('/api/reports/promoter-holds', { method: 'POST', body: JSON.stringify({ tourCode: inputs.tour, fromDate: inputs.dateFrom, toDate: inputs.dateTo, venue: inputs.venue }) }).then(async response => {
+      if (response.status >= 200 && response.status < 300) {
+        const tourName:string = selectedTour?.name
+        let suggestedName:string|any[] = response.headers.get('Content-Disposition')
+        if (suggestedName) {
+          suggestedName = suggestedName.match(/filename="(.+)"/)
+          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null
+        }
+        if (!suggestedName) {
+          suggestedName = `${tourName}.xlsx`
+        }
+        const content = await response.blob()
+        if (content) {
+          const anchor:any = document.createElement('a')
+          anchor.download = suggestedName
+          anchor.href = (window.webkitURL || window.URL).createObjectURL(content)
+          anchor.dataset.downloadurl = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', anchor.download, anchor.href].join(':')
+          anchor.click()
+        }
+        setShowModal(false)
+        setInputs({
+          tour: null,
+          dateFrom: null,
+          dateTo: null,
+          venue: null
+        })
+      }
+    })
   }
 
   async function handleOnChange (e) {
@@ -38,7 +73,7 @@ export default function PromotorHolds ({ activeTours }:Props) {
       [e.target.id]: e.target.value
     }))
 
-    if (e.target.name === 'Tour') {
+    if (e.target.name === 'tour') {
       // Load Venues for this tour
       setVenues([])
       await fetch(`api/tours/read/venues/${e.target.value}`)
@@ -83,26 +118,27 @@ export default function PromotorHolds ({ activeTours }:Props) {
                       <div className="flex flex-col space-y-2">
                         <label htmlFor="date" className="">Tour</label>
                         <select
+                          required
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.Tour}
-                          id="Tour"
-                          name="Tour"
+                          value={inputs.tour}
+                          id="tour"
+                          name="tour"
                           onChange={handleOnChange}>
                           <option>Select a Tour</option>
                           {
                             activeTours.map((tour) => (
-                              <option key={tour.Id} value={`${tour.Id}`} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
+                              <option key={tour.Id} value={tour.Id} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
                             ))
                           }
                         </select>
                       </div>
                       <div className="flex flex-col space-y-2 mt-4">
-                        <label htmlFor="date" className="">From Date</label>
+                        <label htmlFor="dateFrom" className="">From Date</label>
                         <input
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.DateFrom}
-                          id="DateFrom"
-                          name="DateFrom"
+                          value={inputs.dateFrom}
+                          id="dateFrom"
+                          name="dateFrom"
                           type="date"
                           onChange={handleOnChange}
                         />
@@ -111,9 +147,9 @@ export default function PromotorHolds ({ activeTours }:Props) {
                         <label htmlFor="date" className="">To Date</label>
                         <input
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.DateTo}
-                          id="DateTo"
-                          name="DateTo"
+                          value={inputs.dateTo}
+                          id="dateTo"
+                          name="dateTo"
                           type="date"
                           onChange={handleOnChange}
                         />
@@ -122,13 +158,13 @@ export default function PromotorHolds ({ activeTours }:Props) {
                         <label htmlFor="date" className="">Venue</label>
                         <select
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.Venue}
-                          id="Venue"
-                          name="Venue"
+                          value={inputs.venue}
+                          id="venue"
+                          name="venue"
                           onChange={handleOnChange}>
                           <option key={'all'} value={null}>All</option>
                           {venues.map((venue) => (
-                            <option key={venue.Id} value={`${venue.Id}`}>{venue.Name}</option>
+                            <option key={venue.Id} value={venue.Code}>{venue.Name}</option>
                           ))
                           }
                         </select>
@@ -141,7 +177,6 @@ export default function PromotorHolds ({ activeTours }:Props) {
                           onClick={() => closeForm()}
                           // THis will not save anything and discard the form
                         >
-
                          Close and Discard
                         </button>
                         <button
