@@ -16,6 +16,7 @@ export const VenueContactsTab = () => {
   const venueRoles = useRecoilValue(venueRoleState)
   const venueRoleDict = objectify(venueRoles, (x) => x.Id)
   const matching = bookings.filter(x => x.Id === selected)
+
   const venueId = matching[0]?.VenueId
 
   const [contacts, setContacts] = React.useState(undefined)

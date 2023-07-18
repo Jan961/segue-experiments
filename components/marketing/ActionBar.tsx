@@ -16,7 +16,7 @@ const ActionBar = () => {
   })
 
   const changeBooking = (e) => {
-    const selected = e.target.value
+    const selected = Number(e.target.value)
     setBookingJump({ ...bookingJump, selected })
   }
 

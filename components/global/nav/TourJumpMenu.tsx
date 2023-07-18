@@ -10,7 +10,6 @@ export default function TourJumpMenu () {
   if (!tourJump?.selected || !tourJump?.tours?.length) return null
 
   const { tours, selected } = tourJump
-  console.log("=====tourJump====", tourJump)
   function goToTour (e: any) {
     const showCode = first(tours)?.ShowCode
     if (!showCode) return
