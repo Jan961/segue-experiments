@@ -1,7 +1,7 @@
 
 import Decimal from 'decimal.js'
 import moment from 'moment'
-import { TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFieldsFinalFormat, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregates } from 'types/SalesSummaryTypes'
+import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFieldsFinalFormat, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregateSeatsDetailCurrencyWise, WeekAggregates } from 'types/SalesSummaryTypes'
 
 export const COLOR_HEXCODE = {
   PURPLE: 'ff7030a0',
@@ -29,10 +29,14 @@ export const getAggregateKey = (
 export const LEFT_PORTION_KEYS: string[] = ['Week', 'Day', 'Date', 'Town', 'Venue']
 export const getValuesFromObject = (obj: object, array: any[]): any[] => array.map(key => obj[key])
 
-export const CONSTANTS: {[key:string]: string} = { CHANGE_VS: 'Change VS' }
+export const CONSTANTS: {[key:string]: string} = {
+  CHANGE_VS: 'Change VS',
+  RUN_SEATS: 'Run Seats',
+  RUN_SALES: 'Run Sales'
+}
 
 export const assignBackgroundColor = ({ worksheet, row, col, props: { SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetTourWeekDate, NotOnSalesDate }, meta: { weekCols } }: {worksheet: any, row: number, col: number, props: {SetIsCopy:TSalesView['SetIsCopy'], SetBrochureReleased: TSalesView['SetBrochureReleased'], BookingStatusCode: TSalesView['BookingStatusCode'], Date: TRequiredFieldsFinalFormat['Date'], SetTourWeekDate:TRequiredFields['SetTourWeekDate'], NotOnSalesDate: TRequiredFields['NotOnSalesDate']}, meta: {weekCols: number}}) => {
-  if (BookingStatusCode == 'X') {
+  if (BookingStatusCode === BOOK_STATUS_CODES.X) {
     const startPoint = 6
     for (let i = 0; i < weekCols; i++) {
       colorCell({ worksheet, row, col: i + startPoint, argbColor: COLOR_HEXCODE.GREY })
@@ -118,7 +122,9 @@ export const groupBasedOnVenueWeeksKeepingVenueCommon = ({ modifiedFetchedValues
             FormattedSetTourWeekNum: obj.FormattedSetTourWeekNum,
             SetTourWeekDate: obj.SetTourWeekDate,
             SetIsCopy: obj.SetIsCopy,
-            SetBrochureReleased: obj.SetBrochureReleased
+            SetBrochureReleased: obj.SetBrochureReleased,
+            Seats: obj.Seats,
+            TotalCapacity: obj.TotalCapacity
           // FormattedFinalFiguresValue: obj.FormattedFinalFiguresValue,
           }
         ]
@@ -154,11 +160,11 @@ export const groupBasedOnVenueWeeksKeepingVenueCommon = ({ modifiedFetchedValues
   }
 }, {})
 
-export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({ worksheet, headerWeekNums, totalRowWeekWise, currencySymbol, lastBookingWeek }: { worksheet: any, headerWeekNums: string[], totalRowWeekWise: WeekAggregates, currencySymbol: TSalesView['VenueCurrencySymbol'], lastBookingWeek: string}): {
-    numberOfRowsAdded: number
-  } => {
+export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({ worksheet, headerWeekNums, totalRowWeekWise, currencySymbol, lastBookingWeek, totalCurrencyAndWeekWiseSeatsTotal, isSeatsDataRequired = 0 }: { worksheet: any, headerWeekNums: string[], totalRowWeekWise: WeekAggregates, currencySymbol: TSalesView['VenueCurrencySymbol'], lastBookingWeek: string, totalCurrencyAndWeekWiseSeatsTotal: WeekAggregateSeatsDetail, isSeatsDataRequired: number}): {
+  numberOfRowsAdded: number
+} => {
   const weekWiseDataInEuro: string[] = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks: totalRowWeekWise, setTourWeekNum: weekNum, currencySymbol }))
-  const rowData: string[] = ['', '', '', '', `Tour ${lastBookingWeek}`, ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro)]
+  const rowData: string[] = ['', '', '', '', `Tour ${lastBookingWeek}`, ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...(isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol, totalCurrencyWiseSeatsMapping: totalCurrencyAndWeekWiseSeatsTotal }) : [])]
   if (rowData.slice(5, rowData.length).filter(x => x !== `${currencySymbol}0`)?.length) {
     worksheet.addRow(rowData)
     return {
@@ -170,13 +176,13 @@ export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({ worksheet, header
   }
 }
 
-export const handleAddingWeeklyTotalRow = ({ worksheet, headerWeekNums, totalRowWeekWise, lastBookingWeek }: { worksheet: any, headerWeekNums: string[], totalRowWeekWise: WeekAggregates, lastBookingWeek: string}): number => {
-  const rowsAdded: number = Object.values(VENUE_CURRENCY_SYMBOLS).reduce((acc, currencySymbol) => acc + handleAddingWeeklyTotalRowForOneCurrencyOnly({ worksheet, headerWeekNums, totalRowWeekWise, currencySymbol, lastBookingWeek }).numberOfRowsAdded, 0)
+export const handleAddingWeeklyTotalRow = ({ worksheet, headerWeekNums, totalRowWeekWise, lastBookingWeek, totalCurrencyAndWeekWiseSeatsTotal, isSeatsDataRequired = 0 }: { worksheet: any, headerWeekNums: string[], totalRowWeekWise: WeekAggregates, lastBookingWeek: string, totalCurrencyAndWeekWiseSeatsTotal: WeekAggregateSeatsDetail, isSeatsDataRequired: number}): number => {
+  const rowsAdded: number = Object.values(VENUE_CURRENCY_SYMBOLS).reduce((acc, currencySymbol) => acc + handleAddingWeeklyTotalRowForOneCurrencyOnly({ worksheet, headerWeekNums, totalRowWeekWise, currencySymbol, lastBookingWeek, totalCurrencyAndWeekWiseSeatsTotal, isSeatsDataRequired }).numberOfRowsAdded, 0)
   return rowsAdded
 }
 
-export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayOnly: string[] }): string | null => {
-  if (valuesArrayOnly?.length == 1) {
+export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayOnly: string[] }): string => {
+  if (valuesArrayOnly?.length === 1) {
     return valuesArrayOnly[0]
   } else {
     const len = valuesArrayOnly.length
@@ -193,7 +199,7 @@ export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayO
       // Nothing in this condition
     }
   }
-  return null
+  return ''
 }
 
 export const makeTextBoldOfNRows = ({ worksheet, startingRow, numberOfRowsAdded }: {worksheet: any, startingRow: number, numberOfRowsAdded: number}) => {
@@ -245,4 +251,29 @@ export const getWeekWiseGrandTotalInPound = ({ totalForWeeks, setTourWeekNum }: 
 
   const finalValue = arr.map(x => x.ConvertedValue).reduce((acc, x) => new Decimal(acc).plus(x), 0)
   return `£${finalValue}`
+}
+
+export const getSeatsColumnForWeekTotal = ({ currencySymbol, totalCurrencyWiseSeatsMapping }: {currencySymbol: VENUE_CURRENCY_SYMBOLS, totalCurrencyWiseSeatsMapping: WeekAggregateSeatsDetail}): string[] => {
+  const arr: WeekAggregateSeatsDetailCurrencyWise[] = totalCurrencyWiseSeatsMapping[currencySymbol]
+  if (!arr || !arr?.length) {
+    return []
+  }
+
+  const { Seats, TotalCapacity }: { Seats: number, TotalCapacity: number} = arr.reduce((acc, x) => ({ Seats: acc.Seats + x.Seats, TotalCapacity: acc.TotalCapacity + x.TotalCapacity }), { Seats: 0, TotalCapacity: 0 })
+  return [String(Seats), String(TotalCapacity), (Seats === 0 || TotalCapacity === 0) ? '0.00%' : `${new Decimal(Seats).div(TotalCapacity).mul(100).toFixed(2)}%`]
+}
+
+export const getSeatsDataForTotal = ({ seatsDataForEuro, seatsDataForPound }: {seatsDataForEuro: string[], seatsDataForPound: string[]}): string[] => {
+  if (!seatsDataForEuro || !seatsDataForEuro?.length) {
+    return seatsDataForPound
+  }
+
+  if (!seatsDataForPound || !seatsDataForPound?.length) {
+    return seatsDataForEuro
+  }
+
+  const seats: number = parseInt(seatsDataForEuro[0]) + parseInt(seatsDataForPound[0])
+  const totalSeats: number = parseInt(seatsDataForEuro[1]) + parseInt(seatsDataForPound[1])
+  const percentage: string = (seats === 0 || totalSeats === 0) ? '0.00%' : `${new Decimal(seats).div(totalSeats).mul(100).toFixed(2)}%`
+  return [String(seats), String(totalSeats), percentage]
 }

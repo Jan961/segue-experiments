@@ -2,11 +2,11 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, LEFT_PORTION_KEY, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS } from 'services/salesSummaryService'
-import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregates } from 'types/SalesSummaryTypes'
+import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, LEFT_PORTION_KEY, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal } from 'services/salesSummaryService'
+import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
 
 const handler = async (req, res) => {
-  const { tourId, fromWeek, toWeek, isWeeklyReport } = JSON.parse(req.body) || {}
+  const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {}
   const workbook = new ExcelJS.Workbook()
 
   console.log(`select * FROM SalesView where  TourId = ${parseInt(tourId)} AND setTourWeekDate between ${fromWeek} and ${toWeek} order by BookingFirstDate, SetSalesFiguresDate;`)
@@ -35,9 +35,9 @@ const handler = async (req, res) => {
   worksheet.addRow([])
 
   // Adding Table Columns
-  const columns: string[] = ['Tour', '', '', '', '', ...uniqueTourColumns.map(x => x.FormattedSetTourWeekNum), CONSTANTS.CHANGE_VS]
+  const columns: string[] = ['Tour', '', '', '', '', ...uniqueTourColumns.map(x => x.FormattedSetTourWeekNum), CONSTANTS.CHANGE_VS, ...(isSeatsDataRequired ? [CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SALES] : [])]
   worksheet.addRow(columns)
-  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue', ...uniqueTourColumns.map(x => x.SetTourWeekDate), 'Last Week'])
+  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue', ...uniqueTourColumns.map(x => x.SetTourWeekDate), 'Last Week', ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : [])])
   worksheet.addRow([])
 
   for (let char = 'A', i = 0; i < columns.length; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
@@ -48,20 +48,24 @@ const handler = async (req, res) => {
 
   const totalForWeeks: WeekAggregates = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {})
   let totalRowWeekWise: WeekAggregates = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {})
+  let totalCurrencyAndWeekWiseSeatsTotal: WeekAggregateSeatsDetail = Object.values(VENUE_CURRENCY_SYMBOLS).reduce((acc, symbol) => ({ ...acc, [symbol]: [] }), {})
+  const totalCurrencyWiseSeatsTotal: WeekAggregateSeatsDetail = Object.values(VENUE_CURRENCY_SYMBOLS).reduce((acc, symbol) => ({ ...acc, [symbol]: [] }), {})
 
   const variableColsLength: number = headerWeekNums.length
   let row: number = 6
 
   let lastBookingWeek: string = finalFormattedValues?.[0]?.Week
+  let seatsData: { Seats?: number, TotalCapacity?: number, Percentage?: string, Currency?: TRequiredFieldsFinalFormat['VenueCurrencySymbol'] } = {}
   Object.values(groupBasedOnVenue).forEach((rowAsJSON: TGroupBasedOnWeeksKeepingVenueCommon) => {
     // Adding Weekly Totals
     if (isWeeklyReport) {
       if (lastBookingWeek !== rowAsJSON.Week) {
-        const rowsAdded: number = handleAddingWeeklyTotalRow({ worksheet, headerWeekNums, totalRowWeekWise, lastBookingWeek })
+        const rowsAdded: number = handleAddingWeeklyTotalRow({ worksheet, headerWeekNums, totalRowWeekWise, lastBookingWeek, totalCurrencyAndWeekWiseSeatsTotal, isSeatsDataRequired })
         makeTextBoldOfNRows({ worksheet, startingRow: row, numberOfRowsAdded: rowsAdded })
         row += rowsAdded
         totalRowWeekWise = headerWeekNums.reduce((acc, x) => ({ ...acc, [x]: [] }), {})
         lastBookingWeek = rowAsJSON.Week
+        totalCurrencyAndWeekWiseSeatsTotal = Object.values(VENUE_CURRENCY_SYMBOLS).reduce((acc, symbol) => ({ ...acc, [symbol]: [] }), {})
       }
     }
 
@@ -75,6 +79,11 @@ const handler = async (req, res) => {
       if (val) {
         values.push(val.FormattedValue)
         totalObjToPush = { Value: val.Value, ConversionRate: val.ConversionRate, VenueCurrencySymbol: val.VenueCurrencySymbol }
+        if (isSeatsDataRequired) {
+          seatsData = { Seats: parseInt(val.Seats as any as string), TotalCapacity: val.TotalCapacity, Percentage: (val.Seats === 0 || val.TotalCapacity === 0) ? '0.00%' : `${new Decimal(val.Seats).div(val.TotalCapacity).mul(100).toFixed(2)}%` }
+          totalCurrencyAndWeekWiseSeatsTotal[val.VenueCurrencySymbol].push({ Seats: seatsData.Seats as number, TotalCapacity: seatsData.TotalCapacity as number, VenueCurrencySymbol: val.VenueCurrencySymbol })
+          totalCurrencyWiseSeatsTotal[val.VenueCurrencySymbol].push({ Seats: seatsData.Seats as number, TotalCapacity: seatsData.TotalCapacity as number, VenueCurrencySymbol: val.VenueCurrencySymbol })
+        }
       } else {
         if (moment(rowAsJSON.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
           totalObjToPush = { Value: new Decimal(rowAsJSON.FormattedFinalFiguresValue.substring(1)) as any as number, ConversionRate: rowAsJSON.ConversionRate, VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol }
@@ -91,8 +100,8 @@ const handler = async (req, res) => {
     }
 
     // Calculating Current Vs Prev Week Value
-    const currVSPrevWeekValue: string | null = calculateCurrVSPrevWeekValue({ valuesArrayOnly: values })
-    const rowData: string[] = currVSPrevWeekValue ? [...arr, ...values, currVSPrevWeekValue] : [...arr, ...values]
+    const currVSPrevWeekValue: string = calculateCurrVSPrevWeekValue({ valuesArrayOnly: values })
+    const rowData: string[] = [...arr, ...values, currVSPrevWeekValue, ...(seatsData?.Seats !== undefined ? [seatsData.Seats, seatsData.TotalCapacity, seatsData.Percentage] : [])]
     worksheet.addRow(rowData)
 
     // For Color Coding
@@ -116,7 +125,7 @@ const handler = async (req, res) => {
 
   // Filling Last Week wise totals
   if (isWeeklyReport) {
-    const rowsAdded: number = handleAddingWeeklyTotalRow({ worksheet, headerWeekNums, totalRowWeekWise, lastBookingWeek })
+    const rowsAdded: number = handleAddingWeeklyTotalRow({ worksheet, headerWeekNums, totalRowWeekWise, lastBookingWeek, totalCurrencyAndWeekWiseSeatsTotal, isSeatsDataRequired })
     makeTextBoldOfNRows({ worksheet, startingRow: row, numberOfRowsAdded: rowsAdded })
     row += rowsAdded
   }
@@ -124,7 +133,7 @@ const handler = async (req, res) => {
   // STYLINGS
   // Column Styling
   alignCellTextRight({ worksheet, colAsChar: 'C' })
-  for (let char = 'F', i = 0; i <= variableColsLength; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+  for (let char = 'F', i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)); i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
     alignCellTextRight({ worksheet, colAsChar: char })
   }
   // Row Styling
@@ -135,22 +144,25 @@ const handler = async (req, res) => {
   row++
 
   // Add Euro Total Row
+  const seatsDataForEuro: string[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
   const weekWiseDataInEuro = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO }))
-  worksheet.addRow(['', '', '', '', 'Total Sales €', ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro)])
+  worksheet.addRow(['', '', '', '', 'Total Sales €', ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...seatsDataForEuro])
   row++
   // Add Pound Total Row
+  const seatsDataForPound: string[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
   const weekWiseDataInPound = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND }))
-  worksheet.addRow(['', '', '', '', 'Total Sales £', ...weekWiseDataInPound, getChangeVsLastWeekValue(weekWiseDataInPound)])
+  worksheet.addRow(['', '', '', '', 'Total Sales £', ...weekWiseDataInPound, getChangeVsLastWeekValue(weekWiseDataInPound), ...seatsDataForPound])
   row++
   // Add empty row
   worksheet.addRow([])
   row++
   // Add Grand Total Row
+  const seatsDataForTotal: string[] = isSeatsDataRequired ? getSeatsDataForTotal({ seatsDataForEuro, seatsDataForPound }) : []
   const weekWiseGrandTotalInPound = headerWeekNums.map(weekNum => getWeekWiseGrandTotalInPound({ totalForWeeks, setTourWeekNum: weekNum }))
-  worksheet.addRow(['', '', '', '', 'Grand Total £', ...weekWiseGrandTotalInPound, getChangeVsLastWeekValue(weekWiseGrandTotalInPound)])
+  worksheet.addRow(['', '', '', '', 'Grand Total £', ...weekWiseGrandTotalInPound, getChangeVsLastWeekValue(weekWiseGrandTotalInPound), ...seatsDataForTotal])
 
   // Coloring this row
-  for (let i = 0; i <= variableColsLength + 1; i++) {
+  for (let i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)) + 1; i++) {
     colorCell({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW })
   }
   row++

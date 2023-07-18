@@ -82,9 +82,6 @@ export type UniqueHeadersObject = {
     SetTourWeekDate: string
   }
 
-export type TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping = {
-    [key: string]: TGroupBasedOnWeeksKeepingVenueCommon
-  }
 export type TGroupBasedOnWeeksKeepingVenueCommon = {
     Week: TRequiredFieldsFinalFormat['Week']
     Day: TRequiredFieldsFinalFormat['Day']
@@ -108,8 +105,8 @@ export type TGroupBasedOnWeeksKeepingVenueCommon = {
     }[]
   }
 
-export type WeekAggregates = {
-    [key: string]: TotalForSheet[]
+export type TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping = {
+    [key: string]: TGroupBasedOnWeeksKeepingVenueCommon
   }
 
 export type TotalForSheet = {
@@ -117,4 +114,19 @@ export type TotalForSheet = {
     ConversionRate: TRequiredFieldsFinalFormat['ConversionRate']
     VenueCurrencySymbol: TRequiredFieldsFinalFormat['VenueCurrencySymbol']
     ConvertedValue: number
+  }
+
+export type WeekAggregates = {
+  [key: string]: TotalForSheet[]
+}
+
+export type WeekAggregateSeatsDetailCurrencyWise = {
+    Seats: number
+    TotalCapacity: number
+    VenueCurrencySymbol: TRequiredFieldsFinalFormat['VenueCurrencySymbol']
+  }
+
+// Key is currency symbol
+export type WeekAggregateSeatsDetail = {
+    [key: string] : WeekAggregateSeatsDetailCurrencyWise[]
   }

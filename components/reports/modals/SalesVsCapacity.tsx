@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { toSql } from 'services/dateService'
+import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
 import IconWithText from '../IconWithText'
 import { faChartPie } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
 
 function formatDate (date) {
   return toSql(date)
@@ -21,7 +22,49 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
     order: null
   })
 
-  function handleOnSubmit () {
+  function formatShortYearDate (dateString) {
+    const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY') // 1st argument - string, 2nd argument - format
+    const day = toISO(dateMomentObject).substring(0, 10)
+    return day // new Date( dateMomentObject.toDate());
+  }
+
+  const downloadReport = async () => {
+    const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.Tour))
+    const toWeek = formatShortYearDate(inputs.TourWeek)
+    const fromWeek = formatShortYearDate(getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7))
+    fetch('/api/reports/sales-summary-simple', { method: 'POST', body: JSON.stringify({ tourId: inputs.Tour, fromWeek, toWeek, isSeatsDataRequired: true }) }).then(async response => {
+      if (response.status >= 200 && response.status < 300) {
+        const tourName:string = selectedTour?.name
+        let suggestedName:string|any[] = response.headers.get('Content-Disposition')
+        if (suggestedName) {
+          suggestedName = suggestedName.match(/filename="(.+)"/)
+          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null
+        }
+        if (!suggestedName) {
+          suggestedName = `${tourName}.xlsx`
+        }
+        const content = await response.blob()
+        if (content) {
+          const anchor:any = document.createElement('a')
+          anchor.download = suggestedName
+          anchor.href = (window.webkitURL || window.URL).createObjectURL(content)
+          anchor.dataset.downloadurl = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', anchor.download, anchor.href].join(':')
+          anchor.click()
+        }
+        setShowModal(false)
+        setInputs({
+          Tour: null,
+          TourWeek: null,
+          numberOfWeeks: null,
+          order: null
+        })
+      }
+    })
+  }
+
+  function handleOnSubmit (e) {
+    e.preventDefault()
+    downloadReport()
   }
 
   function handleOnChange (e) {
@@ -87,7 +130,7 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
                           name="Tour"
 
                           onChange={handleOnChange}>
-
+                          <option key="default">Select a Tour</option>
                           {activeTours.map((tour) => (
                             <option key={tour.Id} value={`${tour.Id}`} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
                           ))
@@ -102,6 +145,7 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
                           id="TourWeek"
                           name="TourWeek"
                           onChange={handleOnChange}>
+                          <option key="default">Select a Tour Week</option>
                           {tourWeeks.map((week) => (
                             <option key={week.TourWeekId} value={`${week.MondayDate}`}>
                               {/* {formatWeekNumber(week.WeekCode)}  */}
@@ -119,6 +163,7 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
                           id="numberOfWeeks"
                           name="numberOfWeeks"
                           onChange={handleOnChange}>
+                          <option key="default">Select number of weeks</option>
                           <option value={2}>2</option>
                           <option value={3}>3</option>
                           <option value={4}>4</option>

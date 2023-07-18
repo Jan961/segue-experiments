@@ -33,7 +33,7 @@ export default function Switchboard ({ activeTours, activeTour }:SwitchboardProp
             <div className={'flex flex-row space-x-4 justify-center text-center text-gray-500'}>
               <h2>Sales and Marketing</h2>
             </div>
-            <div className={'grid grid-cols-6 w-full mt-4 gap-y-5'}>
+            <div className={'flex flex-row py-4 justify-between px-6'}>
               <SalesSummarySimple activeTour={activeTour} activeTours={activeTours}></SalesSummarySimple>
               {/* <SalesSummary activeTours={activeTours}></SalesSummary> */}
               {/* <SalesSummaryFix activeTours={activeTours}></SalesSummaryFix> */}
@@ -64,7 +64,7 @@ export default function Switchboard ({ activeTours, activeTour }:SwitchboardProp
             </div>
           </div>
         </div>
-        <div className={'flex py-4 flex-row justify-center'}>
+        <div className={'flex py-4 flex-row justify-center hidden'}>
           <div className={'flex-col w-full'}>
             <div className={'flex flex-row space-x-4 justify-center text-center text-gray-500'}>
               <h2>Activities</h2>

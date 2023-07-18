@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import moment from 'moment';
+import moment from 'moment'
 import { getDateDaysAgo, toISO, toSql } from '../../../services/dateService'
 import IconWithText from '../IconWithText'
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
-
 
 function formatDate (date) {
   return toSql(date)
@@ -135,7 +134,7 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           name="Tour"
 
                           onChange={handleOnChange}>
-
+                          <option key="default">Select a Tour</option>
                           {activeTours.map((tour) => (
                             <option key={tour.Id} value={`${tour.Id}`} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
                           ))
@@ -153,9 +152,8 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           name="TourWeek"
 
                           onChange={handleOnChange}>
-
+                          <option key="default">Select a Tour Week</option>
                           {tourWeeks.map((week) => (
-
                             <option key={week.TourWeekId} value={`${week.MondayDate}`}>
                               {/* {formatWeekNumber(week.WeekCode)}  */}
                               {formatDate(week.MondayDate)}
@@ -167,7 +165,6 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                       </div>
                       <div className="flex flex-col space-y-2 mt-4">
                         <label htmlFor="date" className="">Number of weeks</label>
-
                         <select
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           value={inputs.numberOfWeeks}
@@ -175,15 +172,13 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           name="numberOfWeeks"
 
                           onChange={handleOnChange}>
-
+                          <option key="default">Select number of weeks</option>
                           <option value={2}>2</option>
                           <option value={3}>3</option>
                           <option value={4}>4</option>
                           <option value={5}>5</option>
                           <option value={6}>6</option>
-
                         </select>
-
                       </div>
                       {/* footer */}
                       <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
@@ -193,7 +188,6 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           onClick={() => setShowModal(false)}
                           // THis will not save anything and discard the form
                         >
-
                                             Close and Discard
                         </button>
                         <button
