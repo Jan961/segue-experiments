@@ -82,7 +82,7 @@ export const SalesTab = () => {
         <Table.Body>
           {bookingSales.map((sale) => (
             <Table.Row key={sale.week}>
-              <Table.Cell className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-white border border-l-0 sm:w-auto sm:max-w-none sm:pl-6">
+              <Table.Cell className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium border border-l-0 sm:w-auto sm:max-w-none sm:pl-6">
                 {sale.week}
               </Table.Cell>
               <Table.Cell>
@@ -92,7 +92,7 @@ export const SalesTab = () => {
                 {sale.seatsSold}
               </Table.Cell>
               <Table.Cell>
-                {/* TO BE ADDED {sale.seatsSold.percentage} */}
+                {sale.seatsSalePercentage}
               </Table.Cell>
               <Table.Cell>
                 {sale.reservations}
@@ -101,7 +101,7 @@ export const SalesTab = () => {
                 {sale.reserved}
               </Table.Cell>
               <Table.Cell>
-                {/* TO BE ADDED {sale.totalValue} */}
+                {sale.totalValue}
               </Table.Cell>
               <Table.Cell>
                 {sale.valueChange}
