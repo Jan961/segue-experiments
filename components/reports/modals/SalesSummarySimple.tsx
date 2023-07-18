@@ -457,7 +457,7 @@ export default function SalesSummarySimple(){
 
     function formatShortYearDate(dateString){
         var dateMomentObject = moment(dateString, "DD/MM/YY"); // 1st argument - string, 2nd argument - format
-        let day = toISO(dateMomentObject).substring(0,10)
+        let day = toISO(new Date(dateString)).substring(0,10)
         return day //new Date( dateMomentObject.toDate());
     }
 

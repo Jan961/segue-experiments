@@ -254,8 +254,6 @@ model VenueRole {
   VenueContact VenueContact[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model VenueVenue {
   Venue1Id                           Int   @map("VVVenue1Id")
   Venue2Id                           Int   @map("VVVenue2Id")
@@ -266,7 +264,7 @@ model VenueVenue {
 
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
   @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
-  @@ignore
+  @@id([Venue1Id, Venue2Id])
 }
 
 model Address {
