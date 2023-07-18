@@ -1,7 +1,7 @@
-import React, {useCallback} from 'react'
+// import React, {useCallback} from 'react'
 // import SideNavBar from '../sideMenu'
 import MasterPlan from './modals/masterPlan'
-import SalesSummary from './modals/SalesSummary'
+// import SalesSummary from './modals/SalesSummary'
 import SalesVsCapacity from './modals/SalesVsCapacity'
 import TourGrossSales from './modals/TourGrossSales'
 import SalesSummaryWeekly from './modals/SalesSummaryWeekly'
@@ -11,7 +11,7 @@ import OutstandingActivities from './modals/OutstandingActivities'
 import MasterplanReport from './modals/MasterplanReport'
 import ActivityLog from './modals/ActivityLog'
 import SelectedVenues from './modals/SelectedVenues'
-import SalesSummaryFix from './modals/SalesSummaryFix'
+// import SalesSummaryFix from './modals/SalesSummaryFix'
 import SalesSummarySimple from './modals/SalesSummarySimple'
 
 /* <SideNavBar></SideNavBar> */
