@@ -1,4 +1,5 @@
 import {
+  IconDefinition,
   faBook,
   faSquareXmark,
   faUser
@@ -12,6 +13,19 @@ import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { NoDataWarning } from '../NoDataWarning'
 import { LoadingTab } from './LoadingTab'
+import classNames from 'classnames'
+
+interface IndicatorProps { icon: IconDefinition, active: boolean, tooltip: string }
+const Indicator = ({ icon, active = false, tooltip }: IndicatorProps) => {
+  let baseClass = 'text-primary-blue p-1'
+  baseClass = active ? baseClass : classNames(baseClass, 'opacity-10')
+  return (
+    <li title={tooltip} className={baseClass}>
+      <FontAwesomeIcon icon={icon} />
+      <span className="sr-only">{ tooltip }</span>
+    </li>
+  )
+}
 
 export const SalesTab = () => {
   const [bookingSales, setBookingSales] = React.useState([])
@@ -43,7 +57,7 @@ export const SalesTab = () => {
 
   return (
     <>
-      <Table>
+      <Table className='mt-8'>
         <Table.HeaderRow>
           <Table.HeaderCell>
               Week
@@ -83,7 +97,7 @@ export const SalesTab = () => {
           {bookingSales.map((sale) => (
             <Table.Row key={sale.week}>
               <Table.Cell className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium border border-l-0 sm:w-auto sm:max-w-none sm:pl-6">
-                {sale.week}
+                {sale.week.replace('Week-', '')}
               </Table.Cell>
               <Table.Cell>
                 {sale.weekOf}
@@ -92,7 +106,7 @@ export const SalesTab = () => {
                 {sale.seatsSold}
               </Table.Cell>
               <Table.Cell>
-                {sale.seatsSalePercentage}
+                {sale.seatsSalePercentage ? sale.seatsSalePercentage.toFixed(1) : ''} %
               </Table.Cell>
               <Table.Cell>
                 {sale.reservations}
@@ -112,28 +126,24 @@ export const SalesTab = () => {
               <Table.Cell>
                 {sale.seatsChange}
               </Table.Cell>
-              <Table.Cell right className="py-4 pl-3 pr-4 font-medium sm:pr-6 border-r-0">
-                <a
-                  href="#"
-                  className="text-primary-blue hover:text-soft-primary-blue mr-1"
-                >
-                  <FontAwesomeIcon icon={faUser} />
-                  <span className="sr-only">Single Seat</span>
-                </a>
-                <a
-                  href="#"
-                  className="text-primary-blue hover:text-soft-primary-blue mr-1"
-                >
-                  <FontAwesomeIcon icon={faBook} />
-                  <span className="sr-only">Brochure Released</span>
-                </a>
-                <a
-                  href="#"
-                  className="text-primary-blue hover:text-soft-primary-blue mr-1"
-                >
-                  <FontAwesomeIcon icon={faSquareXmark} />
-                  <span className="sr-only">Not on Sale</span>
-                </a>
+              <Table.Cell >
+                <ul className="flex">
+                  <Indicator
+                    tooltip='Single Seat'
+                    active={sale.isSingleSeats}
+                    icon={faUser}
+                  />
+                  <Indicator
+                    tooltip='Brochure Released'
+                    active={sale.isBrochureReleased}
+                    icon={faBook}
+                  />
+                  <Indicator
+                    tooltip='Not on Sale'
+                    active={sale.isNotOnSale}
+                    icon={faSquareXmark}
+                  />
+                </ul>
               </Table.Cell>
             </Table.Row>
           ))}
