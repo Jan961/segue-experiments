@@ -8,6 +8,7 @@ const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
 
   const tourOptions: SelectOption[] = bookingJump.bookings.map((b) => {
+    console.log("==bookingJump.bookings==", bookingJump)
     const date = new Date(b.Date)
     const weekday = getWeekDay(date)
     const ukDate = formatDateUK(date)
