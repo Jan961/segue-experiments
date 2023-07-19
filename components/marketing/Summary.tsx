@@ -1,9 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faBook,
-  faSquareXmark,
-  faUser
-} from '@fortawesome/free-solid-svg-icons'
 import { calculateWeekNumber, dateToSimple, dateTimeToTime } from 'services/dateService'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
@@ -11,6 +5,7 @@ import axios from 'axios'
 import React from 'react'
 import { LoadingTab } from './tabs/LoadingTab'
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]'
+import { DescriptionList as DL } from 'components/global/DescriptionList'
 
 export const Summary = () => {
   const { selected } = useRecoilValue(bookingJumpState)
@@ -46,53 +41,100 @@ export const Summary = () => {
 
   return (
     <>
-      <div>
-        <strong>Date: </strong> {dateToSimple(summary.Info.Date)}
-      </div>
-      <div>
-        <strong>Shows:</strong> {summary.Performances.length}
-      </div>
-      <div>
-        <strong>Times:</strong> {summary.Performances.map(x => dateTimeToTime(x.Date)).join(', ') || 'N/A' }
-      </div>
-      <div className={'mt-2'}>
-        <strong>Venue Week:</strong> <span>{weekNo}</span>
-      </div>
-
-      <div>Total seats sold: </div>
-
-      <div>Total sales (£): </div>
-      <div>GP (£): {summary.Info.GrossProfit}</div>
-      <div>AVG Ticket Price (£): </div>
-      <div>Booking %: </div>
-      <div>Capacity: </div>
-      <div>Total Seats: {summary.Info.Seats}</div>
-      <div>Currency: {summary.Info.Currency}</div>
-
-      <div className={'mt-3'}>Marketing deal: TBA</div>
-      <div>
-        <strong className={'mt-5 mb-2'}>Booking Notes:</strong>
-        <p>
+      <h3 className='my-4 mb-2'>General Info</h3>
+      <DL>
+        <DL.Term>
+          Date
+        </DL.Term>
+        <DL.Desc>
+          {dateToSimple(summary.Info.Date)}
+        </DL.Desc>
+        <DL.Term>
+          Week No
+        </DL.Term>
+        <DL.Desc>
+          {weekNo}
+        </DL.Desc>
+        <DL.Term>
+          Shows
+        </DL.Term>
+        <DL.Desc>
+          {summary.Performances.length}
+        </DL.Desc>
+        <DL.Term>
+          Times
+        </DL.Term>
+        <DL.Desc>
+          {summary.Performances.map(x => dateTimeToTime(x.Date)).join(', ') || 'N/A' }
+        </DL.Desc>
+      </DL>
+      <hr className='border-gray-500 border-opacity-50 my-4'/>
+      <h3 className='mb-2'>Sales Summary</h3>
+      <DL>
+        <DL.Term>
+          Total Seats Sold
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Gross Profit
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Avg Ticket Price
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Percent Booked
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Capacity
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Total Seats
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Currency
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+      </DL>
+      <hr className='border-gray-500 border-opacity-50 my-4'/>
+      <h3 className='mb-2'>Notes</h3>
+      <DL inline={false}>
+        <DL.Term>
+          Marketing Deal
+        </DL.Term>
+        <DL.Desc>
+          TODO
+        </DL.Desc>
+        <DL.Term>
+          Booking Notes
+        </DL.Term>
+        <DL.Desc>
           { summary.Notes.Booking }
-        </p>
-      </div>
-      <div>
-        <strong className={'mt-5 mb-2'}>Contract Notes:</strong>
-        <p>
+        </DL.Desc><DL.Term>
+          Marketing Deal
+        </DL.Term>
+        <DL.Desc>
           { summary.Notes.Contract }
-        </p>
-      </div>
-      <div className="border-y space-y-2">
-        <div className={'mt-5'}>
-          <FontAwesomeIcon icon={faUser} /> Single Seat
-        </div>
-        <div>
-          <FontAwesomeIcon icon={faBook} /> Brochure released
-        </div>
-        <div>
-          <FontAwesomeIcon icon={faSquareXmark} /> Not on sale
-        </div>
-      </div>
+        </DL.Desc>
+      </DL>
     </>
   )
 }
