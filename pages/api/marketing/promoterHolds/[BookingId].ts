@@ -1,3 +1,4 @@
+import { AvailableComp } from '@prisma/client'
 import { performanceMapper } from 'lib/mappers'
 import prisma from 'lib/prisma'
 
@@ -17,7 +18,19 @@ export default async function handle (req, res) {
       }
     })
 
-    const result = performanceRaw.map((p) => {
+    const result = []
+    for (const p of performanceRaw) {
+      const availableCompIds = p.AvailableComp.map((x: AvailableComp) => x.Id)
+
+      const note = availableCompIds.length
+        ? await prisma.note.findFirst({
+          where: {
+            OwnerId: availableCompIds[0],
+            OwnerType: 'AvailableComp'
+          }
+        })
+        : null
+
       let totalAllocated = 0
       let totalAvailable = 0
       const allocated = []
@@ -33,14 +46,15 @@ export default async function handle (req, res) {
         }
       }
 
-      return {
+      result.push({
         info: performanceMapper(p),
+        note: note ? note.Text : '',
         availableCompId,
         totalAvailable,
         totalAllocated,
         allocated
-      }
-    })
+      })
+    }
 
     res.json(result)
   } catch (err) {

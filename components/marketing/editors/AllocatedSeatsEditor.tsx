@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { StyledDialog } from 'components/global/StyledDialog'
+import { FormInfo } from 'components/global/forms/FormInfo'
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import React from 'react'
@@ -12,7 +13,7 @@ interface AllocatedSeatsEditorProps {
 }
 
 export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose, max }: AllocatedSeatsEditorProps) => {
-  const [inputs, setInputs] = React.useState<Partial<any>>({ ...allocatedSeat, Seats: Math.min(max, 1) })
+  const [inputs, setInputs] = React.useState<Partial<any>>({ ...allocatedSeat, Seats: Math.max(1, allocatedSeat.Seats) })
   const [status, setStatus] = React.useState({ submitting: false, submitted: true })
 
   const creating = !inputs.Id
@@ -79,7 +80,8 @@ export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose, max }:
       <form onSubmit={handleOnSubmit}>
         <FormInputText name="ArrangedBy" label="Arranged By" value={inputs.ArrangedBy} onChange={handleOnChange} />
         <FormInputText name="RequestedBy" label="Requested By" value={inputs.RequestedBy} onChange={handleOnChange} />
-        <FormInputNumeric min={1} max={maxSeats} name="Seats" label="Seats" value={inputs.Seats} onChange={changeSeats} />
+        <FormInputNumeric min={1} name="Seats" label="Seats" value={inputs.Seats} onChange={changeSeats} />
+        {inputs.Seats > maxSeats && (<FormInfo intent='DANGER'>You have allocated more seats than available</FormInfo>)}
         <FormInputText name="SeatsAllocated" label="Seats Allocated" value={inputs.SeatsAllocated} onChange={handleOnChange} />
         <FormInputText required name="TicketHolderName" label="Name" value={inputs.TicketHolderName} onChange={handleOnChange} />
         <FormInputText name="TicketHolderEmail" label="Email" value={inputs.TicketHolderEmail} onChange={handleOnChange} />
