@@ -125,6 +125,7 @@ export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
 
 export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   Id: a.Id,
+  BookingId: a.BookingId,
   Date: convertDate(a.Date),
   Name: a.Name,
   ActivityTypeId: a.ActivityTypeId,

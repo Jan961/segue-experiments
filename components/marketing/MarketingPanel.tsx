@@ -23,11 +23,11 @@ const MarketingPanel = () => {
           <StyledTab>Venue Contacts</StyledTab>
           <StyledTab>Promoter Holds</StyledTab>
         </Tab.List>
-        <div className='grid grid-cols-4 gap-2'>
-          <div className='col-span-1'>
+        <div className='grid grid-cols-12 gap-2'>
+          <div className='col-span-4 md:col-span-3 lg:col-span-2'>
             <Summary/>
           </div>
-          <div className="col-span-3 mb-4">
+          <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
             <Tab.Panels>
               <Tab.Panel><SalesTab/></Tab.Panel>
               <Tab.Panel><ArchivedSalesTab /></Tab.Panel>

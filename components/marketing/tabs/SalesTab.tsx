@@ -6,7 +6,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios'
-import { Spinner } from 'components/global/Spinner'
 import { Table } from 'components/global/table/Table'
 import React from 'react'
 import { useRecoilValue } from 'recoil'

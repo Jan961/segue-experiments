@@ -1,47 +1,44 @@
 import * as React from 'react'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
-import { HardCodedWarning } from '../HardCodedWarning'
 import { Table } from 'components/global/table/Table'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import axios from 'axios'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { LoadingTab } from './LoadingTab'
 import { useRecoilValue } from 'recoil'
-
-const activities = [
-  { Id: 1, activityName: 'hello World!', type: 'Type 1', created: '10/10/2022', followup: '20/12/2022', co: 'cs', venue: 'The kings, Glasgow', notes: 'loripsuim' },
-  { Id: 2, activityName: 'hello World!', type: 'Type 1', created: '10/10/2022', followup: '20/12/2022', co: 'cs', venue: 'The kings, Glasgow', notes: 'loripsuim' },
-  { Id: 3, activityName: 'hello World!', type: 'Type 1', created: '10/10/2022', followup: '20/12/2022', co: 'cs', venue: 'The kings, Glasgow', notes: 'loripsuim' },
-  { Id: 4, activityName: 'hello World!', type: 'Type 1', created: '10/10/2022', followup: '20/12/2022', co: 'cs', venue: 'The kings, Glasgow', notes: 'loripsuim' },
-  { Id: 5, activityName: 'hello World!', type: 'Type 1', created: '10/10/2022', followup: '20/12/2022', co: 'cs', venue: 'The kings, Glasgow', notes: 'loripsuim' },
-  { Id: 6, activityName: 'hello World!', type: 'Type 1', created: '10/10/2022', followup: '20/12/2022', co: 'cs', venue: 'The kings, Glasgow', notes: 'loripsuim' }
-]
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { ActivitiesResponse } from 'pages/api/marketing/activities/[BookingId]'
+import { FormInputDate } from 'components/global/forms/FormInputDate'
+import { ActivitiesEditor } from '../editors/ActivitiesEditor'
+import { objectify } from 'radash'
+import { dateToSimple } from 'services/dateService'
+import { NoDataWarning } from '../NoDataWarning'
 
 export const ActivitiesTab = () => {
-  const { selected, bookings } = useRecoilValue(bookingJumpState)
+  const { selected } = useRecoilValue(bookingJumpState)
 
-  const [activites, setActivites] = React.useState(undefined)
+  const [data, setData] = React.useState<Partial<ActivitiesResponse>>({})
   const [loading, setLoading] = React.useState(true)
+  const [inputs, setInputs] = React.useState(undefined)
   const [modalOpen, setModalOpen] = React.useState(false)
   const [editing, setEditing] = React.useState(undefined)
+  const [status, setStatus] = React.useState({ submitting: false, submitted: true })
 
   const search = async () => {
     setLoading(true)
-    setActivites([])
-
     const { data } = await axios.get(`/api/marketing/activities/${selected}`)
-    setActivites(data)
+    setData(data)
+    setInputs(data.info)
     setLoading(false)
   }
 
   const create = () => {
-    setEditing(undefined)
+    setEditing({ CompanyCost: 0, VenueCost: 0, BookingId: selected, Date: '' })
     setModalOpen(true)
   }
 
-  const edit = (vc: any) => {
-    console.log(vc)
-    setEditing(vc)
+  const edit = (activity: any) => {
+    setEditing(activity)
     setModalOpen(true)
   }
 
@@ -56,88 +53,131 @@ export const ActivitiesTab = () => {
 
   if (loading) return (<LoadingTab />)
 
+  const handleOnSubmit = async (e: any) => {
+    // Swap around the dates
+    e.preventDefault()
+    setStatus({ submitted: false, submitting: true })
+
+    try {
+      await axios.post('/api/marketing/activities/booking/update', { ...inputs, Id: selected })
+    } catch {
+      setStatus({ submitted: false, submitting: false })
+    }
+    setStatus({ submitted: true, submitting: false })
+  }
+
+  const handleOnChange = async (e: any) => {
+    const { id, value } = e.target
+
+    setInputs((prev) => ({
+      ...prev,
+      [id]: value
+    }))
+
+    setStatus({
+      submitted: false,
+      submitting: false
+    })
+  }
+
+  const activityDict = objectify(data.activityTypes, (x) => x.Id)
+
   return (
     <>
-      <HardCodedWarning />
-      <div className={'mb-3'}>
-        <form className="grid grid-cols-5">
-          <div className="flex flex-row items-center space-x-4 ">
-            <input type={'checkbox'} className={''} name={'onSale'} value={'off'} />
-            <label htmlFor={'onSale'} className={''}>On Sale</label>
-          </div>
-          <div className="flex flex-row items-center space-x-4 ">
-
-            <label htmlFor={'date'} className={'sr-only'}>Date</label>
-            <input className="border border-gray-300  rounded-md" type={'date'} id={'date'} value={new Date().toDateString()} name={'date'}/>
-          </div>
-          <div className="flex flex-row items-center space-x-4 ">
-
-            <input type={'checkbox'} className={''} name={'onSale'} value={'off'} />
-            <label htmlFor={'onSale'} className={''}> Marketing Plans Received </label>
-          </div>
-          <div className="flex flex-row items-center space-x-4 ">
-
-            <input type={'checkbox'} className={''} name={'onSale'} value={'off'} />
-            <label htmlFor={'onSale'} className={''}> Print requirements received </label>
-          </div>
-          <div className="flex flex-row items-center space-x-4 ">
-
-            <input type={'checkbox'} className={''} name={'onSale'} value={'off'} />
-            <label htmlFor={'onSale'} className={''}> Contact info Received </label>
-          </div>
-
-        </form>
+      <h3 className="text-lg mb-2">Booking Info</h3>
+      <form className="bg-gray-200 mb-4 p-4 pb-2 rounded-lg">
+        <div className="lg:flex lg:justify-between">
+          <FormInputCheckbox
+            name="IsOnSale"
+            label="On Sale"
+            value={inputs.IsOnSale}
+            onChange={handleOnChange}/>
+          <FormInputDate
+            inline
+            name="OnSaleDate"
+            label="On Sale Date"
+            value={inputs.OnSaleDate}
+            onChange={handleOnChange} />
+          <FormInputCheckbox
+            name="MarketingPlanReceived"
+            label="Marketing Plans Received"
+            value={inputs.MarketingPlanReceived}
+            onChange={handleOnChange} />
+          <FormInputCheckbox
+            name="PrintReqsReceived"
+            label="Print Reqs Received"
+            value={inputs.PrintReqsReceived}
+            onChange={handleOnChange} />
+          <FormInputCheckbox
+            name="ContactInfoReceived"
+            label="Contact Info Received"
+            value={inputs.ContactInfoReceived}
+            onChange={handleOnChange} />
+        </div>
+        <div className="text-right mb-2">
+          <FormInputButton
+            submit
+            intent='PRIMARY'
+            onClick={handleOnSubmit}
+            disabled={status.submitted || status.submitting}
+            text="Save Changes" />
+        </div>
+      </form>
+      <div className='flex justify-between pb-4'>
+        <h3 className="text-lg">Activities</h3>
+        <FormInputButton text="Add New Activity" onClick={create} icon={faPlus}/>
+        {modalOpen && <ActivitiesEditor types={data.activityTypes} open={modalOpen} triggerClose={triggerClose} activity={editing} />}
 
       </div>
-      <div className='text-right pb-4'>
-        <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
-      </div>
-      <Table>
-        <Table.HeaderRow>
-          <Table.HeaderCell>
-          Activity Name
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-          type
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-          week created / Follow up Date
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-          co
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-          Venue
-          </Table.HeaderCell>
-          <Table.HeaderCell>
-          Notes
-          </Table.HeaderCell>
-        </Table.HeaderRow>
-        <Table.Body>
-          {activities.map((activity, idx) => (
-            <Table.Row key={activity.Id} >
-              <Table.Cell>
-                {activity.activityName}
-              </Table.Cell>
-              <Table.Cell>
-                {activity.type}
-              </Table.Cell>
-              <Table.Cell>
-                {activity.created} - {activity.followup}
-              </Table.Cell>
-              <Table.Cell>
-                {activity.co}
-              </Table.Cell>
-              <Table.Cell>
-                {activity.venue}
-              </Table.Cell>
-              <Table.Cell>
-                {activity.notes}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+      { data.activities.length === 0 && (<NoDataWarning message="No activities recorded" />) }
+      { data.activities.length > 0 && (
+        <Table>
+          <Table.HeaderRow>
+            <Table.HeaderCell>
+            Activity Name
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+            Type
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+            Date
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+            Follow Up Required
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+            Company Cost
+            </Table.HeaderCell>
+            <Table.HeaderCell>
+            Venue Cost
+            </Table.HeaderCell>
+          </Table.HeaderRow>
+          <Table.Body>
+            {data.activities.map((activity) => (
+              <Table.Row hover key={activity.Id} onClick={() => edit(activity)}>
+                <Table.Cell>
+                  {activity.Name}
+                </Table.Cell>
+                <Table.Cell>
+                  {activityDict[activity.ActivityTypeId].Name}
+                </Table.Cell>
+                <Table.Cell>
+                  {dateToSimple(activity.Date)}
+                </Table.Cell>
+                <Table.Cell>
+                  {activity.FollowUpRequired ? 'Y' : 'N'}
+                </Table.Cell>
+                <Table.Cell>
+                  {activity.CompanyCost ? `£${activity.CompanyCost}` : ''}
+                </Table.Cell>
+                <Table.Cell>
+                  {activity.VenueCost ? `£${activity.VenueCost}` : ''}
+                </Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      )}
     </>
   )
 }

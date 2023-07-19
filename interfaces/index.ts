@@ -158,6 +158,7 @@ export type ActivityDTO = {
   Id: number
   Date: string
   Name: string
+  BookingId: number
   ActivityTypeId: number
   CompanyCost: number
   VenueCost: number

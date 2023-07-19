@@ -39,7 +39,6 @@ export const VenueContactsTab = () => {
   }
 
   const edit = (vc: VenueContactDTO) => {
-    console.log(vc)
     setEditing(vc)
     setModalOpen(true)
   }
