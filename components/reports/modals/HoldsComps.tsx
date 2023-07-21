@@ -35,7 +35,7 @@ export default function HoldsComps ({ activeTours }:Props) {
 
   const downloadReport = async () => {
     const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.tour))
-    fetch('/api/reports/holds-comps', { method: 'POST', body: JSON.stringify({ tourCode: inputs.tour, fromDate: inputs.dateFrom, toDate: inputs.dateTo, venue: inputs.venue, bookingStatus: inputs.status }) }).then(async response => {
+    fetch('/api/reports/holds-comps', { method: 'POST', body: JSON.stringify({ tourCode: selectedTour ? `${selectedTour?.ShowCode}${selectedTour?.Code}` : null, fromDate: inputs.dateFrom, toDate: inputs.dateTo, venue: inputs.venue, bookingStatus: inputs.status }) }).then(async response => {
       if (response.status >= 200 && response.status < 300) {
         const tourName:string = selectedTour?.name
         let suggestedName:string|any[] = response.headers.get('Content-Disposition')
@@ -158,8 +158,8 @@ export default function HoldsComps ({ activeTours }:Props) {
                         <select
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           value={inputs.venue}
-                          id="Venue"
-                          name="Venue"
+                          id="venue"
+                          name="venue"
                           onChange={handleOnChange}>
                           <option key={'all'} value={null}>All</option>
                           {venues.map((venue) => (

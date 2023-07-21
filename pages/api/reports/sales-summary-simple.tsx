@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
@@ -8,9 +9,17 @@ import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBase
 const handler = async (req, res) => {
   const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {}
   const workbook = new ExcelJS.Workbook()
+  
+  const conditions: Prisma.Sql[] = []
+  if (tourId) {
+    conditions.push(Prisma.sql`TourId = ${parseInt(tourId)}`)
+  }
+  if (fromWeek && toWeek) {
+    conditions.push(Prisma.sql`setTourWeekDate BETWEEN ${fromWeek} AND ${toWeek}`)
+  }
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, 'and ')}` : Prisma.empty
+  const data: TSalesView[] = await prisma.$queryRaw`select * FROM SalesView ${where} order by BookingFirstDate, SetSalesFiguresDate;`
 
-  console.log(`select * FROM SalesView where  TourId = ${parseInt(tourId)} AND setTourWeekDate between ${fromWeek} and ${toWeek} order by BookingFirstDate, SetSalesFiguresDate;`)
-  const data: TSalesView[] = await prisma.$queryRaw`select * FROM SalesView where  TourId = ${parseInt(tourId)} AND setTourWeekDate between ${fromWeek} and ${toWeek} order by BookingFirstDate, SetSalesFiguresDate;`
   const jsonArray: TRequiredFields[] = data.filter(x => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES).map(({ BookingTourWeekNum, BookingFirstDate, VenueTown, VenueName, Value, VenueCurrencySymbol, SetTourWeekNum, SetTourWeekDate, ConversionRate, SetIsCopy, SetBrochureReleased, BookingStatusCode, FinalFiguresValue, TotalCapacity, Seats, NotOnSalesDate }) => ({ BookingTourWeekNum, BookingFirstDate, VenueTown, VenueName, Value, VenueCurrencySymbol, SetTourWeekNum, SetTourWeekDate, ConversionRate, SetIsCopy, SetBrochureReleased, BookingStatusCode, FinalFiguresValue, TotalCapacity, Seats, NotOnSalesDate }))
   const finalFormattedValues: TRequiredFieldsFinalFormat[] = jsonArray.map((x: TRequiredFields) => ({ ...x, Week: formatWeek(x.BookingTourWeekNum), FormattedValue: x.Value ? `${x.VenueCurrencySymbol}${x.Value}` : '', Value: x.Value || 0, FormattedSetTourWeekNum: formatWeek(x.SetTourWeekNum), FormattedFinalFiguresValue: x.FinalFiguresValue ? `${x.VenueCurrencySymbol}${x.FinalFiguresValue}` : '', Day: moment(x.BookingFirstDate).format('dddd'), Date: x.BookingFirstDate, Town: x.VenueTown, Venue: x.VenueName }))
 

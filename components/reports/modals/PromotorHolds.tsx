@@ -36,7 +36,7 @@ export default function PromotorHolds ({ activeTours }:Props) {
 
   const downloadReport = async () => {
     const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.tour))
-    fetch('/api/reports/promoter-holds', { method: 'POST', body: JSON.stringify({ tourCode: inputs.tour, fromDate: inputs.dateFrom, toDate: inputs.dateTo, venue: inputs.venue }) }).then(async response => {
+    fetch('/api/reports/promoter-holds', { method: 'POST', body: JSON.stringify({ tourId: inputs?.tour, tourCode: selectedTour ? `${selectedTour?.ShowCode}${selectedTour?.Code}` : null, fromDate: inputs.dateFrom, toDate: inputs.dateTo, venue: inputs.venue }) }).then(async response => {
       if (response.status >= 200 && response.status < 300) {
         const tourName:string = selectedTour?.name
         let suggestedName:string|any[] = response.headers.get('Content-Disposition')

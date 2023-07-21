@@ -1,7 +1,9 @@
 
+import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
+import { COLOR_HEXCODE } from 'services/salesSummaryService'
 
 type TPromoter = {
   TourId : number,
@@ -23,10 +25,6 @@ type TPromoter = {
   CompAllocationVenueConfirmationNotes : string | null
 }
 
-const COLORS = {
-  WHITE: 'ffffffff',
-  BLACK: 'ff000000'
-}
 const alignColumnTextRight = ({ worksheet, colAsChar }: {worksheet: any, colAsChar: string}) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: 'right' }
@@ -42,28 +40,39 @@ const alignCellTextCenter = ({ worksheet, colAsChar }: {worksheet: any, colAsCha
 const makeRowTextBoldAndAllignLeft = ({ worksheet, row, numberOfColumns }: {worksheet: any, row: number, numberOfColumns: number}) => {
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col)
-    cell.font = { bold: true, color: { argb: COLORS.WHITE } }
+    cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } }
     cell.alignment = { horizontal: 'left' }
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: 'ff000000' }
+      fgColor: { argb: COLOR_HEXCODE.BLUE }
     }
-    cell.border = {
-      top: { style: 'double', color: { argb: COLORS.WHITE } },
-      left: { style: 'double', color: { argb: COLORS.WHITE } },
-      bottom: { style: 'double', color: { argb: COLORS.WHITE } },
-      right: { style: 'double', color: { argb: COLORS.WHITE } }
-    }
+    // cell.border = {
+    //   top: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
+    //   left: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
+    //   bottom: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
+    //   right: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } }
+    // }
   }
 }
 
 const handler = async (req, res) => {
-  const { tourCode, fromDate, toDate, venue } = JSON.parse(req.body) || {}
+  const { tourCode, fromDate, toDate, venue, tourId } = JSON.parse(req.body) || {}
 
   const workbook = new ExcelJS.Workbook()
-  console.log(`select * FROM PromoterHoldsView where  TourId = ${tourCode} ${venue ? `AND VenueCode=${venue}` : ''} ${fromDate && toDate ? `AND PerformanceDate between ${fromDate} and ${toDate}` : ''} order by PerformanceDate;`)
-  const data: TPromoter[] = await prisma.$queryRaw`select * FROM PromoterHoldsView where  TourId = ${tourCode} ${venue ? `AND VenueCode=${venue}` : ''} ${fromDate && toDate ? `AND PerformanceDate between ${fromDate} and ${toDate}` : ''} order by PerformanceDate;`
+
+  const conditions: Prisma.Sql[] = []
+  if (tourId) {
+    conditions.push(Prisma.sql`TourId = ${tourId}`)
+  }
+  if (venue) {
+    conditions.push(Prisma.sql`VenueCode = ${venue}`)
+  }
+  if (fromDate && toDate) {
+    conditions.push(Prisma.sql`PerformanceDate BETWEEN ${fromDate} AND ${toDate}`)
+  }
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
+  const data: TPromoter[] = await prisma.$queryRaw`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`
 
   const worksheet = workbook.addWorksheet('My Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
@@ -115,7 +124,7 @@ const handler = async (req, res) => {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns })
   }
 
-  const filename = 'Dummy File.xlsx'
+  const filename = `Promoter_Holds_${tourCode}_${fromDate}_${toDate}.xlsx`
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 

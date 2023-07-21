@@ -5,10 +5,12 @@ import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBa
 
 export const COLOR_HEXCODE = {
   PURPLE: 'ff7030a0',
-  BLUE: 'ff9bc2e6',
+  BLUE: 'ff8faadc',
   YELLOW: 'ffffff00',
   GREY: 'ffc8c8c8',
-  RED: 'ffff0000'
+  RED: 'ffff0000',
+  WHITE: 'ffffffff',
+  BLACK: 'ff000000'
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`

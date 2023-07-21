@@ -9,8 +9,8 @@ export default function SelectedVenues ({ activeTours }:Props) {
   const [showModal, setShowModal] = React.useState(false)
 
   const [inputs, setInputs] = useState({
-    Tour: 'ALL',
-    Options: 'ALL'
+    tour: 'ALL',
+    options: 'ALL'
   })
 
   const [status, setStatus] = useState({
@@ -19,9 +19,39 @@ export default function SelectedVenues ({ activeTours }:Props) {
     info: { error: false, msg: null }
   })
 
+  const downloadReport = async () => {
+    const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.tour))
+    fetch('/api/reports/venues', { method: 'POST', body: JSON.stringify({ tourCode: selectedTour ? `${selectedTour?.ShowCode}${selectedTour?.Code}` : null, tourId: selectedTour?.Id, showId: selectedTour?.ShowId, options: inputs.options }) }).then(async response => {
+      if (response.status >= 200 && response.status < 300) {
+        const tourName:string = selectedTour?.name
+        let suggestedName:string|any[] = response.headers.get('Content-Disposition')
+        if (suggestedName) {
+          suggestedName = suggestedName.match(/filename="(.+)"/)
+          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null
+        }
+        if (!suggestedName) {
+          suggestedName = `${tourName}.xlsx`
+        }
+        const content = await response.blob()
+        if (content) {
+          const anchor:any = document.createElement('a')
+          anchor.download = suggestedName
+          anchor.href = (window.webkitURL || window.URL).createObjectURL(content)
+          anchor.dataset.downloadurl = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', anchor.download, anchor.href].join(':')
+          anchor.click()
+        }
+        setShowModal(false)
+        setInputs({
+          tour: 'ALL',
+          options: 'ALL'
+        })
+      }
+    })
+  }
+
   async function handleOnSubmit (e) {
     e.preventDefault()
-    setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
+    downloadReport()
   }
 
   function handleOnChange (e) {
@@ -67,14 +97,14 @@ export default function SelectedVenues ({ activeTours }:Props) {
 
                         <select
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.Tour}
-                          id="Tour"
-                          name="Tour"
+                          value={inputs.tour}
+                          id="tour"
+                          name="tour"
 
                           onChange={handleOnChange}>
                           <option key="ALL" value="ALL">All</option>
                           {activeTours.map((tour) => (
-                            <option key={tour.Id} value={`${tour.Id}`} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
+                            <option key={tour.Id} value={tour.Id} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
                           ))
                           }
                         </select>
@@ -83,9 +113,9 @@ export default function SelectedVenues ({ activeTours }:Props) {
                         <label htmlFor="date" className="">Tour</label>
                         <select
                           className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.Options}
-                          id="Options"
-                          name="Options"
+                          value={inputs.options}
+                          id="options"
+                          name="options"
                           onChange={handleOnChange}>
                           <option key="ALL" value={'null'} >All</option>
                           <option key="ON SALE" value="ON SALE" >ON SALE</option>

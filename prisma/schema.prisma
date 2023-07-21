@@ -38,6 +38,11 @@ model Booking {
   LandingPageURL        String?           @db.VarChar(255) @map("BookingLandingPageURL")
   TicketsOnSaleFromDate DateTime?         @db.Date @map("BookingTicketsOnSaleFromDate")
   TicketsOnSale         Boolean?          @db.Bit(1) @map("BookingTicketsOnSale")
+  IsOnSale              Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1)  @map("BookingIsOnSale")
+  OnSaleDate            DateTime?            @db.Date @map("BookingOnSaleDate")
+  MarketingPlanReceived Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingMarketingPlanReceived")
+  ContactInfoReceived   Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingContactInfoReceived")
+  PrintReqsReceived     Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingPrintReqsReceived")
   DateBlock                    DateBlock         @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
   Venue                        Venue?             @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
   BookingActivity              BookingActivity[]
