@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import moment from 'moment'
 import IconWithText from '../IconWithText'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { dateToSimple, getMonday } from 'services/dateService'
 
 export default function MasterPlan () {
   const [showModal, setShowModal] = React.useState(false)
@@ -12,9 +14,39 @@ export default function MasterPlan () {
   })
 
   const [inputs, setInputs] = useState({
-    DateFrom: '2020-01-02',
-    DateTo: '2023-02-01'
+    fromDate: '2020-01-02',
+    toDate: '2023-02-01'
   })
+
+  const downloadReport = async () => {
+    fetch('/api/reports/masterplan', { method: 'POST', body: JSON.stringify({ fromDate: moment(getMonday(inputs.fromDate)).format('YYYY-MM-DD'), toDate: moment(new Date(inputs.toDate)).format('YYYY-MM-DD') }) }).then(async response => {
+      if (response.status >= 200 && response.status < 300) {
+        let suggestedName:string|any[] = response.headers.get('Content-Disposition')
+        if (suggestedName) {
+          suggestedName = suggestedName.match(/filename="(.+)"/)
+          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null
+        }
+        if (!suggestedName) {
+          suggestedName = 'Report.xlsx'
+        }
+        const content = await response.blob()
+        if (content) {
+          const anchor:any = document.createElement('a')
+          anchor.download = suggestedName
+          anchor.href = (window.webkitURL || window.URL).createObjectURL(content)
+          anchor.dataset.downloadurl = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', anchor.download, anchor.href].join(':')
+          anchor.click()
+        }
+        setShowModal(false)
+        setInputs({
+          fromDate: null,
+          toDate: null
+        })
+      }
+    }).finally(() => {
+      setStatus(prev => ({ ...prev, submitting: false, submitted: true }))
+    })
+  }
 
   const handleOnChange = (e) => {
     e.persist()
@@ -31,6 +63,7 @@ export default function MasterPlan () {
   const handleOnSubmit = async (e) => {
     e.preventDefault()
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
+    downloadReport()
   }
 
   return (
@@ -73,7 +106,7 @@ export default function MasterPlan () {
                           className="text-xl text-center leading-6 font-medium text-gray-900"
                           id="modal-headline"
                         >
-                      Master Plan
+                          Master Plan
                         </h3>
                       </div>
                       <div className="absolute top-0 right-0 pt-4 pr-4">
@@ -103,14 +136,14 @@ export default function MasterPlan () {
                           htmlFor="DateFrom"
                           className="block text-sm font-medium text-gray-700"
                         >
-                      First Date
+                          From Date
                         </label>
                         <div className="mt-1">
                           <input
                             type="date"
-                            id="DateFrom"
-                            name="DateFrom"
-                            value={inputs.DateFrom}
+                            id="fromDate"
+                            name="fromDate"
+                            value={inputs.fromDate}
                             onChange={handleOnChange}
                             className="py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm"
                           />
@@ -122,13 +155,13 @@ export default function MasterPlan () {
                           htmlFor="DateTo"
                           className="block text-sm font-medium text-gray-700"
                         >
-                      Last Date
+                        Last Date
                         </label>
                         <input
                           className="block w-full min-w-0 flex-1 shadow-sm rounded-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                          value={inputs.DateTo}
-                          id="DateTo"
-                          name="DateTo"
+                          value={inputs.toDate}
+                          id="toDate"
+                          name="toDate"
                           type="date"
                           onChange={handleOnChange}
                         />
@@ -141,7 +174,7 @@ export default function MasterPlan () {
                           onClick={() => setShowModal(false)}
                           // THis will not save anything and discard the form
                         >
-                      Close and Discard
+                        Close and Discard
                         </button>
                         <button
                           className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
