@@ -194,10 +194,10 @@ export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayO
       const prev = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2].substring(1) : 0
       const curr = valuesArrayOnly[len - 1] ? valuesArrayOnly[len - 1].substring(1) : 0
 
-      const val = new Decimal(curr).minus(prev).toFixed(2)
+      const val = Number(new Decimal(curr).minus(prev).toFixed(2))
       const symbol = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2].substring(0, 1) : valuesArrayOnly[len - 1].substring(0, 1)
-      const prefix = val as any >= 0 ? `${symbol}` : `-${symbol}`
-      return `${prefix}${val as any > 0 ? val : -1 * (val as any)}`
+      const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
+      return `${prefix}${val > 0 ? val : -1 * (val)}`
     } else {
       // Nothing in this condition
     }
@@ -235,10 +235,10 @@ export const getChangeVsLastWeekValue = (weeksDataArray: string[]): string => {
       const prev = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(1) : 0
       const curr = weeksDataArray[len - 1] ? weeksDataArray[len - 1].substring(1) : 0
 
-      const val = new Decimal(curr).minus(prev).toFixed(2)
+      const val = Number(new Decimal(curr).minus(prev).toFixed(2))
       const symbol = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(0, 1) : weeksDataArray[len - 1].substring(0, 1)
-      const prefix = val as any  >= 0 ? `${symbol}` : `-${symbol}`
-      return `${prefix}${val as any > 0 ? val : -1 * (val as any)}`
+      const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
+      return `${prefix}${val > 0 ? val : -1 * (val)}`
     } else {
       // This case should not occur
     }
@@ -281,16 +281,6 @@ export const getSeatsDataForTotal = ({ seatsDataForEuro, seatsDataForPound }: {s
   const percentage: string = (seats === 0 || totalSeats === 0) ? '0.00%' : `${new Decimal(seats).div(totalSeats).mul(100).toFixed(2)}%`
   return [String(seats), String(totalSeats), percentage]
 }
-
-// export const colorCell = ({ worksheet, row, col, color }: {worksheet: any, row: number, col: number, color: COLOR_HEXCODE}) => {
-//   const cell = worksheet.getCell(row, col)
-//   cell.font = { color: { argb: COLOR_HEXCODE.BLACK } }
-//   cell.fill = {
-//     type: 'pattern',
-//     pattern: 'solid',
-//     fgColor: { argb: color }
-//   }
-// }
 
 export const colorTextAndBGCell = ({ worksheet, row, col, textColor, cellColor }: {worksheet: any, row: number, col: number, textColor: COLOR_HEXCODE, cellColor: COLOR_HEXCODE}) => {
   const cell = worksheet.getCell(row, col)
