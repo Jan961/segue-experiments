@@ -111,6 +111,13 @@ export type BookingDTO = {
   OnSale: boolean
 }
 
+export type BookingWithVenueDTO = BookingDTO & {
+  Venue: {
+    Website: string
+    Name: string
+  }
+}
+
 export type DateTypeDTO = {
   Id: number
   Name: string
@@ -135,6 +142,54 @@ export type DateBlockDTO = {
   StartDate: string
   EndDate: string
   Dates?: DateDTO[]
+}
+
+export type VenueContactDTO = {
+  Id: number
+  FirstName: string
+  LastName: string
+  Phone: string
+  Email: string
+  RoleId: number
+  VenueId?: number
+}
+
+export type ActivityDTO = {
+  Id: number
+  Date: string
+  Name: string
+  BookingId: number
+  ActivityTypeId: number
+  CompanyCost: number
+  VenueCost: number
+  FollowUpRequired: boolean
+}
+
+export type BookingContactNoteDTO = {
+  Id?: number
+  BookingId: number
+  CoContactName: string
+  ContactDate: string
+  ActionByDate: string
+  Notes: string
+}
+
+export type AllocatedHoldDTO = {
+  Id?: number
+  AvailableCompId: number
+  TicketHolderName: string
+  Seats: number
+  Comments?: string
+  RequestedBy?: string
+  ArrangedBy?: string
+  VenueConfirmationNotes?: string
+  TicketHolderEmail?: string
+  SeatsAllocated?: string
+}
+
+export type VenueRoleDTO = {
+  Id: number
+  Name: string
 }
 
 export type Venue = {

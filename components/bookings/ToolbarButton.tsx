@@ -10,7 +10,7 @@ export const ToolbarButton = ({ submit, onClick, children, disabled }: PropsWith
   return (
     <button onClick={onClick}
       disabled={disabled}
-      className="bg-white shadow-md hover:shadow-lg text-primary-blue font-bold py-2 px-5 rounded-l-md rounded-r-md"
+      className="bg-white shadow-md hover:shadow-lg text-primary-blue whitespace-nowrap font-bold py-2 px-5 rounded-l-md rounded-r-md"
       type={ submit ? 'submit' : 'button' } >
       { children }
     </button>

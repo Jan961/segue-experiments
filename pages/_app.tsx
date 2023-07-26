@@ -19,15 +19,15 @@ type AppPropsWithLayout = AppProps & {
 
 // Login disabled due to lack of support. DO NOT PUT PUBLIC
 export default function MyApp ({ Component, pageProps }: AppPropsWithLayout) {
-  const { intitialState } = pageProps
+  const { initialState } = pageProps
   const router = useRouter()
 
   return (
     <ClerkProvider {...pageProps}
       navigate={(to) => router.push(to)}
     >
-      <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, intitialState)}>
-        <ClientStateSetter intitialState={intitialState} />
+      <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
+        <ClientStateSetter intitialState={initialState} />
         <Component {...pageProps} />
       </RecoilRoot>
     </ClerkProvider>

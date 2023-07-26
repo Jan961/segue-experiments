@@ -5,6 +5,8 @@ interface Input {
   placeholder?: string;
   onChange?: (value: number) => void;
   label?: string;
+  min?: number
+  max?: number
   value?: number;
   name: string; // Also ID
   required?: boolean;
@@ -13,7 +15,7 @@ interface Input {
 }
 
 export const FormInputNumeric = (props: Input) => {
-  const { placeholder, onChange, name, label, required, disabled, className = '', value = 0 } = props
+  const { placeholder, onChange, name, label, required, disabled, min, max, className = '', value = 0 } = props
   const outputClass = React.useMemo(() => {
     let baseClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4'
 
@@ -40,6 +42,8 @@ export const FormInputNumeric = (props: Input) => {
     value,
     className: outputClass,
     disabled,
+    min,
+    max,
     onFocus: handleFocus,
     readOnly: disabled
   }
