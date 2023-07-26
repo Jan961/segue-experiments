@@ -24,7 +24,7 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
 
   function formatShortYearDate (dateString) {
     const dateMomentObject = moment(dateString) || moment(moment(dateString).format('DD/MM/YY'), 'DD/MM/YY') // 1st argument - string, 2nd argument - format
-    const day = toISO(dateMomentObject).substring(0, 10)
+    const day = toISO(dateMomentObject as any).substring(0, 10)
     return day // new Date( dateMomentObject.toDate());
   }
 

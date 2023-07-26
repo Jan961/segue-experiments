@@ -5,7 +5,7 @@ import SalesSummaryExcel from "../../../components/reports/excelTemplates/salesS
 
 const ShowId = () => (
     <Layout title="ShowId | Segue">
-        <Toolbar></Toolbar>
+        {/* <Toolbar></Toolbar> */}
         <div className="flex flex-auto">
             <SalesSummaryExcel></SalesSummaryExcel>
             <Salesmarketsearch></Salesmarketsearch>

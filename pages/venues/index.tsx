@@ -5,7 +5,7 @@ import Toolbar from "../../components/reports/toolbar";
 import Admin from "../../components/venues/admin";
 const Index = () => (
     <Layout title="Admin Global Venues| Segue">
-        <Toolbar></Toolbar>
+        {/* <Toolbar></Toolbar> */}
         <div className="flex flex-auto">
             <Admin></Admin>
 
