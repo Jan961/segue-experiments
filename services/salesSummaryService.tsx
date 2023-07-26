@@ -1,16 +1,17 @@
 
 import Decimal from 'decimal.js'
 import moment from 'moment'
-import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFieldsFinalFormat, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregateSeatsDetailCurrencyWise, WeekAggregates } from 'types/SalesSummaryTypes'
+import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFieldsFinalFormat, TSalesView, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregateSeatsDetailCurrencyWise, WeekAggregates } from 'types/SalesSummaryTypes'
 
-export const COLOR_HEXCODE = {
-  PURPLE: 'ff7030a0',
-  BLUE: 'ff8faadc',
-  YELLOW: 'ffffff00',
-  GREY: 'ffc8c8c8',
-  RED: 'ffff0000',
-  WHITE: 'ffffffff',
-  BLACK: 'ff000000'
+export enum COLOR_HEXCODE {
+  PURPLE= 'ff7030a0',
+  BLUE= 'ff8faadc',
+  YELLOW= 'ffffff00',
+  GREY= 'ffc8c8c8',
+  RED= 'ffff0000',
+  WHITE= 'ffffffff',
+  BLACK= 'ff000000',
+  ORANGE= 'ffff6347',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`
@@ -79,7 +80,7 @@ export const alignCellTextRight = ({ worksheet, colAsChar }: {worksheet: any, co
   })
 }
 
-export const colorCell = ({ worksheet, row, col, argbColor }: {worksheet: any, row: number, col: number, argbColor: string}) => {
+export const colorCell = ({ worksheet, row, col, argbColor }: {worksheet: any, row: number, col: number, argbColor: COLOR_HEXCODE}) => {
   worksheet.getCell(row, col).fill = {
     type: 'pattern',
     pattern: 'solid',
@@ -278,4 +279,24 @@ export const getSeatsDataForTotal = ({ seatsDataForEuro, seatsDataForPound }: {s
   const totalSeats: number = parseInt(seatsDataForEuro[1]) + parseInt(seatsDataForPound[1])
   const percentage: string = (seats === 0 || totalSeats === 0) ? '0.00%' : `${new Decimal(seats).div(totalSeats).mul(100).toFixed(2)}%`
   return [String(seats), String(totalSeats), percentage]
+}
+
+// export const colorCell = ({ worksheet, row, col, color }: {worksheet: any, row: number, col: number, color: COLOR_HEXCODE}) => {
+//   const cell = worksheet.getCell(row, col)
+//   cell.font = { color: { argb: COLOR_HEXCODE.BLACK } }
+//   cell.fill = {
+//     type: 'pattern',
+//     pattern: 'solid',
+//     fgColor: { argb: color }
+//   }
+// }
+
+export const colorTextAndBGCell = ({ worksheet, row, col, textColor, cellColor }: {worksheet: any, row: number, col: number, textColor: COLOR_HEXCODE, cellColor: COLOR_HEXCODE}) => {
+  const cell = worksheet.getCell(row, col)
+  cell.font = { color: { argb: textColor } }
+  cell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: cellColor }
+  }
 }

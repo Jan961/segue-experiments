@@ -4,7 +4,7 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE } from 'services/salesSummaryService'
+import { COLOR_HEXCODE, colorCell, colorTextAndBGCell } from 'services/salesSummaryService'
 
 type SCHEDULE_VIEW = {
   TourId : number,
@@ -80,7 +80,7 @@ const handler = async (req, res) => {
     ...x,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
     TourStartDate: moment(x.TourStartDate).format('YYYY-MM-DD'),
-    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD'),
+    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD')
   }))
 
   const showNameAndTourCode: {[key: string]: string[]} = formattedData.reduce((acc, x) => {
@@ -160,6 +160,7 @@ const handler = async (req, res) => {
 
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days')
 
+  let rowNo = 6
   for (let i = 1; i <= daysDiff; i++) {
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd')
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD')
@@ -175,9 +176,22 @@ const handler = async (req, res) => {
     })
 
     worksheet.addRow([weekDay, date, ...values])
+    rowNo++
+    if (weekDay === 'Monday') {
+      colorCell({ worksheet, row: rowNo + 1, col: 1, argbColor: COLOR_HEXCODE.ORANGE })
+      colorCell({ worksheet, row: rowNo + 1, col: 2, argbColor: COLOR_HEXCODE.ORANGE })
+    }
+
+    const targetCellIdx: number[] = values.map((value, idx) => {
+      if (['Rehearsal Day', 'Day Off', 'Travel Day'].includes(value)) {
+        return idx + 1 + 2
+      }
+    }).filter(x => !!x) as number[]
+    targetCellIdx.forEach(col => colorTextAndBGCell({ worksheet, row: rowNo + 1, col, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.RED }))
 
     if (i % 7 === 0) {
       worksheet.addRow([])
+      rowNo++
       const weeks = destinctShowNames.reduce((acc, { FullTourCode, ShowName }) => {
         const key = getShowAndTourKey({ FullTourCode, ShowName })
         const value = headerWeeks[key]
@@ -194,6 +208,7 @@ const handler = async (req, res) => {
         return [...acc, `Week ${value}`]
       }, [])
       worksheet.addRow(['Week Minus', '', ...weeks])
+      rowNo++
     }
   }
 
