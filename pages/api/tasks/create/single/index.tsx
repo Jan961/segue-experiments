@@ -1,75 +1,76 @@
 import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+export type TaskCreateParams = {
+  Id: number | undefined,
+  TourId: number,
+  Title: string,
+  DueDate: string,
+  Interval: string,
+  Progress: number,
+  AssignedTo: string,
+  AssignedBy: string,
+  Status: string,
+  Priority: number,
+  FollowUp: string,
+  Notes: string,
+}
+
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
+    const task = req.body as TaskCreateParams
 
-    const {
-      taskTitle,
-      dueDate,
-    
-      progress,
-      assignee,
-      assignedBy,
-      status,
-      priority,
-      followUp,
-      tourId,
-      notes
-    } = req.body;
-
-      // Fetch tour weeks
-      const tourWeeks = await prisma.tourWeek.findMany({
-        where: {
-          TourId: parseInt(tourId),
-        },
-      });
-  
-      const dueDateObj = dueDate ? new Date(dueDate) : undefined;
-      let startByWeekCode = "-";
-      let completeByWeekCode = "-";
-  
-      if (dueDateObj) {
-        const matchedTourWeek = tourWeeks.find((tourWeek) => {
-          const mondayDate = new Date(tourWeek.MondayDate);
-          const sundayDate = new Date(tourWeek.SundayDate);
-  
-          return dueDateObj >= mondayDate && dueDateObj <= sundayDate;
-        });
-  
-        if (matchedTourWeek) {
-          startByWeekCode = matchedTourWeek.WeekCode;
-          completeByWeekCode = matchedTourWeek.WeekCode;
-        }
+    // Fetch tour weeks
+    const tourWeeks = await prisma.tourWeek.findMany({
+      where: {
+        TourId: task.TourId
       }
+    })
+
+    const dueDateObj = task.DueDate ? new Date(task.DueDate) : undefined
+    let startByWeekCode = '-'
+    let completeByWeekCode = '-'
+
+    if (dueDateObj) {
+      const matchedTourWeek = tourWeeks.find((tourWeek) => {
+        const mondayDate = new Date(tourWeek.MondayDate)
+        const sundayDate = new Date(tourWeek.SundayDate)
+
+        return dueDateObj >= mondayDate && dueDateObj <= sundayDate
+      })
+
+      if (matchedTourWeek) {
+        startByWeekCode = matchedTourWeek.WeekCode
+        completeByWeekCode = matchedTourWeek.WeekCode
+      }
+    }
 
     const createResult = await prisma.tourTask.create({
       data: {
-        TourId: parseInt(tourId),
-        TaskCode: parseInt('0'),
-        TaskName: taskTitle,
+        TourId: task.TourId,
+        TaskCode: 0,
+        TaskName: task.Title,
         StartByWeekCode: startByWeekCode,
         CompleteByWeekCode: completeByWeekCode,
-        Priority: parseInt(priority),
-        Notes: notes,
-        DeptRCK: req.body.DeptRCK === "true",
-        DeptMarketing: req.body.DeptMarketing === "true",
-        DeptProduction: req.body.DeptProduction === "true",
-        DeptAccounts: req.body.DeptAccounts === "true",
-        Progress: parseInt(progress),
-        DueDate: dueDate ? new Date(dueDate) : undefined,
-        FollowUp: followUp ? new Date(followUp) : undefined,
-        Assignee: assignee ? parseInt(req.body.assignee) : undefined,
-        AssignedBy: assignedBy ? parseInt(assignedBy) : undefined,
+        Priority: task.Priority,
+        Notes: task.Notes,
+        DeptRCK: 0,
+        DeptMarketing: 0,
+        DeptProduction: 0,
+        DeptAccounts: 0,
+        Progress: task.Progress,
+        DueDate: task.DueDate ? new Date(task.DueDate) : undefined,
+        FollowUp: task.FollowUp ? new Date(task.FollowUp) : undefined,
+        AssignedTo: task.AssignedBy,
+        AssignedBy: task.AssignedTo,
         CreatedDate: new Date(),
-        Status: status,
-      },
-    });
+        Status: task.Status
+      }
+    })
 
-    
-    res.json(createResult);
+    res.json(createResult)
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Error creating TourTask" });
+    console.log(err)
+    res.status(500).json({ error: 'Error creating TourTask' })
   }
 }

@@ -1,27 +1,26 @@
-import React, {Fragment, useEffect} from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import React, { Fragment, useEffect } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
 
-function TaskModal({ isOpen, onClose, children }) {
+function TaskModal ({ isOpen, onClose, children }) {
+  // useEffect(() => {
+  //     // Add event listener to window
+  //     window.addEventListener("click", handleClickOutside);
 
-    // useEffect(() => {
-    //     // Add event listener to window
-    //     window.addEventListener("click", handleClickOutside);
-    
-    //     // Remove event listener on cleanup
-    //     return () => {
-    //       window.removeEventListener("click", handleClickOutside);
-    //     };
-    //   }, []);
-    
-    //   function handleClickOutside(event) {
-    //     // Check if click is outside the modal
-    //     const modal = document.getElementById("modal-root");
-    //     // console.log("outside")
-    //     if (event.target !== modal && isOpen) {
-    //         console.log("inside", isOpen)
-    //       onClose(false);
-    //     }
-    //   }
+  //     // Remove event listener on cleanup
+  //     return () => {
+  //       window.removeEventListener("click", handleClickOutside);
+  //     };
+  //   }, []);
+
+  //   function handleClickOutside(event) {
+  //     // Check if click is outside the modal
+  //     const modal = document.getElementById("modal-root");
+  //     // console.log("outside")
+  //     if (event.target !== modal && isOpen) {
+  //         console.log("inside", isOpen)
+  //       onClose(false);
+  //     }
+  //   }
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -57,30 +56,29 @@ function TaskModal({ isOpen, onClose, children }) {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            
-            <div className="inline-block min-w-1/2 max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
-            <div className="w-full flex justify-end">
 
-<div className="modal-close cursor-pointer z-50" onClick={()=>onClose(false)}>
-  <svg
-    className="fill-current text-black"
-    xmlns="http://www.w3.org/2000/svg"
-    width="18"
-    height="18"
-    viewBox="0 0 18 18"
-    >
-    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
-  </svg>
-</div> 
-      </div>
+            <div className="inline-block min-w-1/2 max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+              <div className="w-full flex justify-end">
+
+                <div className="modal-close cursor-pointer z-50" onClick={() => onClose(false)}>
+                  <svg
+                    className="fill-current text-black"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 18 18"
+                  >
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                  </svg>
+                </div>
+              </div>
               {children}
             </div>
           </Transition.Child>
         </div>
       </Dialog>
     </Transition>
-  );
+  )
 }
 
-
-export default TaskModal;
+export default TaskModal

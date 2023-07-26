@@ -85,3 +85,19 @@ export const getTourById = async (Id: number) => {
     include: tourDateBlockIndlude
   })
 }
+
+export const getToursAndTasks = async () => {
+  return await prisma.tour.findMany({
+    where: {
+      IsArchived: false
+    },
+    include: {
+      Show: true,
+      TourTask: {
+        orderBy: {
+          DueDate: 'desc'
+        }
+      }
+    }
+  })
+}

@@ -13,6 +13,7 @@ import { OtherState, otherState } from 'state/booking/otherState'
 import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
 import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState'
 import { VenueRole, venueRoleState } from 'state/marketing/venueRoleState'
+import { TaskState, taskState } from 'state/tasks/taskState'
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -23,6 +24,9 @@ import { VenueRole, venueRoleState } from 'state/marketing/venueRoleState'
 export type InitialState = Partial<{
   global?: {
     tourJump?: TourJump,
+  }
+  tasks?: {
+    tasks: TaskState
   }
   booking?: {
     booking?: Record<number, BookingDTO>,
@@ -42,16 +46,21 @@ export type InitialState = Partial<{
 }>
 
 type GlobalStateLookup = Record<keyof InitialState['global'], RecoilState<any>>
+type TaskStateLookup = Record<keyof InitialState['tasks'], RecoilState<any>>
 type BookingStateLookup = Record<keyof InitialState['booking'], RecoilState<any>>
 type MarketingStateLookup = Record<keyof InitialState['marketing'], RecoilState<any>>
 
 const states: {
   global: GlobalStateLookup,
+  tasks: TaskStateLookup,
   booking: BookingStateLookup,
   marketing: MarketingStateLookup,
 } = {
   global: {
     tourJump: tourJumpState
+  },
+  tasks: {
+    tasks: taskState
   },
   booking: {
     booking: bookingState,
