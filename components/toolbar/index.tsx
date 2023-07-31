@@ -2,8 +2,8 @@ import * as React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import TourJumpMenu from '../global/nav/TourJumpMenu'
-import { FormInputText } from 'components/global/forms/FormInputText';
-import { TourDTO } from 'interfaces';
+import { FormInputText } from 'components/global/forms/FormInputText'
+import { TourDTO } from 'interfaces'
 
 // This needs to be passed from the template
 // let show = "ST1";
@@ -30,7 +30,7 @@ const GlobalToolbar = ({
   const [filtersOpen, setFiltersOpen] = React.useState(false)
 
   return (
-    <div className="py-2 flex flex-row items-center gap-4">
+    <div className="py-2 flex flex-row items-center justify-between gap-4">
       <h1 className={`text-xl font-bold ${color} `}>
         {title}
       </h1>
@@ -77,23 +77,26 @@ const GlobalToolbar = ({
           <div> </div>
         )}
       { children }
-      <div className="ml-auto">
-        <label htmlFor="searchBookings" className="sr-only">
+      { setSearchFilter && (
+        <div className="ml-auto">
+          <label htmlFor="searchBookings" className="sr-only">
             Search Venues
-        </label>
-        <div className="relative">
-          <FormInputText
-            name="Search"
-            onChange={(e) => setSearchFilter(e.currentTarget.value)}
-            value={searchFilter}
-            placeholder="Search Venues..."
-            className="mb-0"
-          />
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
+          </label>
+          <div className="relative">
+            <FormInputText
+              name="Search"
+              onChange={(e) => setSearchFilter(e.currentTarget.value)}
+              value={searchFilter}
+              placeholder="Search Venues..."
+              className="mb-0"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       {/* @ts-ignore */}
       {filterComponent && filterComponent}
     </div>

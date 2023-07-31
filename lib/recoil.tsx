@@ -13,7 +13,8 @@ import { OtherState, otherState } from 'state/booking/otherState'
 import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
 import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState'
 import { VenueRole, venueRoleState } from 'state/marketing/venueRoleState'
-import { TaskState, taskState } from 'state/tasks/taskState'
+import { TourState, tourState } from 'state/tasks/tourState'
+import { BulkSelectionState, bulkSelectionState } from 'state/tasks/bulkSelectionState'
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -23,10 +24,11 @@ import { TaskState, taskState } from 'state/tasks/taskState'
 
 export type InitialState = Partial<{
   global?: {
-    tourJump?: TourJump,
+    tourJump?: TourJump
   }
   tasks?: {
-    tasks: TaskState
+    tours?: TourState
+    bulkSelection?: BulkSelectionState
   }
   booking?: {
     booking?: Record<number, BookingDTO>,
@@ -60,7 +62,8 @@ const states: {
     tourJump: tourJumpState
   },
   tasks: {
-    tasks: taskState
+    tours: tourState,
+    bulkSelection: bulkSelectionState
   },
   booking: {
     booking: bookingState,
@@ -103,7 +106,6 @@ export const ClientStateSetter = ({ intitialState }: {
   intitialState: InitialState
 }) => {
   const setMultipleRecoilStates = useSetMultipleRecoilStates()
-
   React.useEffect(() => {
     if (intitialState) {
       setMultipleRecoilStates(intitialState)

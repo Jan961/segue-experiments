@@ -113,7 +113,7 @@ export const timeFormat = (mins?: number) => {
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`
 }
 
-export const formatDateUK = (date) =>{
+export const formatDateUK = (date) => {
   // This will ignre date
   const today = new Date(date)
   return today.toLocaleDateString('en-GB')
@@ -131,7 +131,7 @@ export const getSunday = (inputDate) => {
   return currentDateObj
 }
 
-export const quickISO = (DateString: string) =>{
+export const quickISO = (DateString: string) => {
   return new Date(DateString)
 }
 

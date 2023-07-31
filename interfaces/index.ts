@@ -268,10 +268,6 @@ export type BarringVenue = {
   barredVenue: Venue
 }
 
-export type TaskDTO = {
-  Id: number
-}
-
 export type TourTaskDTO = {
   Id: number
   TourId: number

@@ -3,25 +3,20 @@ import { Tour } from 'interfaces'
 import { useState } from 'react'
 import Toolbar from 'components/tasks/toolbar'
 import Tasklist from 'components/tasks/TaskList'
-import TaskModal from 'components/tasks/modal/TaskModal'
 import TaskButtons from 'components/tasks/TaskButtons'
-import UpdateTaskForm from 'components/tasks/UpdateTaskForm'
-import BulkActionForm from 'components/tasks/BulkActionForm'
 import GlobalToolbar from 'components/toolbar'
-import { Spinner } from 'spinner'
 import { GetServerSideProps } from 'next'
 import { getToursAndTasks } from 'services/TourService'
+import { useRecoilValue } from 'recoil'
+import { ToursWithTasks, tourState } from 'state/tasks/tourState'
+import { InitialState } from 'lib/recoil'
+import { mapToTourTaskDTO } from 'lib/mappers'
 
-const TaskPage = () => {
-  const [isLoading, setIsLoading] = useState(false)
+const Index = () => {
   const [bulkIsOpen, setBulkIsOpen] = useState(false)
-  const [masterTourData, setMasterTourData] = useState<Tour[]>([])
-  const [tourData, setTourData] = useState<Tour[]>([])
-  const [isSelectedArray, setIsSelectedArray] = useState<String[]>([])
   const [bulkActionField, setBulkActionField] = useState<String>('')
-  const [updateTask, setUpdateTask] = useState<any>()
-  const [updateTaskModalIsOpen, setUpdateTaskModalIsOpen] =
-    useState<boolean>(false)
+
+  const tours = useRecoilValue(tourState)
 
   /*
   function applyFilters () {
@@ -59,32 +54,6 @@ const TaskPage = () => {
     setIsLoading(true)
   }
   */
-
-  function isTaskSelected (taskId: string): boolean {
-    return isSelectedArray.includes(taskId)
-  }
-
-  function handleSelectedFunction (taskId: string): void {
-    console.log('the selected task array', isSelectedArray)
-    if (isSelectedArray.includes(taskId)) {
-      setIsSelectedArray(isSelectedArray.filter((id) => id !== taskId))
-    } else {
-      setIsSelectedArray([...isSelectedArray, taskId])
-    }
-  }
-
-  function handleSelectAll (taskIds: string[]): void {
-    const alreadySelectedTaskIds = taskIds.filter((id) =>
-      isSelectedArray.includes(id)
-    )
-    if (isSelectedArray.length === taskIds.length) {
-      // If all taskIds are already in the isSelectedArray, remove them all
-      setIsSelectedArray([])
-    } else {
-      // If not all taskIds are already selected, add all taskIds to the isSelectedArray
-      setIsSelectedArray(taskIds)
-    }
-  }
 
   function openBulkModal (key) {
     switch (key) {
@@ -128,32 +97,24 @@ const TaskPage = () => {
             tourJump={false}
             title={'Tasks'}
             color={'text-primary-purple'}
-            filterComponent={
-              <Toolbar
-                tours={masterTourData}
-              />
-            }
-          />
-          {isLoading && <Spinner />}
-          {tourData.length > 0
-            ? tourData.map((tour, idx) => {
+          >
+            <Toolbar />
+          </GlobalToolbar>
+          {tours.length > 0
+            ? tours.map((tour) => {
               return (
                 <>
-                  <p className="text-primary-purple text-xl font-bold">
-                    {tour.Show.Name && tour.Show.Name}
-                  </p>
+                  <h3 className=" text-xl font-bold mt-8 mb-2">
+                    { tour.ShowName }
+                  </h3>
                   <Tasklist
-                    openUpdateModal={console.log}
-                    handleSelectAll={handleSelectAll}
-                    handleSelectedFunction={handleSelectedFunction}
-                    isTaskSelected={isTaskSelected}
-                    tasks={tour.TourTask}
-                    key={idx}
+                    tourId={tour.Id}
+                    key={tour.Id}
                   />
                 </>
               )
             })
-            : !isLoading && (
+            : (
               <div className="text-center font-bold text-lg">
                 <p>No Tasks Found</p>
               </div>
@@ -161,33 +122,33 @@ const TaskPage = () => {
           <TaskButtons openBulkModal={openBulkModal} />
         </div>
       </div>
-      <TaskModal
-        isOpen={updateTaskModalIsOpen}
-        onClose={setUpdateTaskModalIsOpen}
-      >
-        <UpdateTaskForm
-          userAccountId={0}
-          closeModal={console.log} task={updateTask} />
-      </TaskModal>
-      <TaskModal isOpen={bulkIsOpen} onClose={setBulkIsOpen}>
+      {/*
         <BulkActionForm
           userAccountId={0}
           closeModal={console.log}
           taskIdArray={isSelectedArray}
           bulkActionField={bulkActionField}
         />
-      </TaskModal>
+        */}
     </Layout>
   )
 }
 
-export default TaskPage
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const toursWithTasks = await getToursAndTasks()
-  const tasks = toursWithTasks.map((t: any) => t.TourTask).flat()
 
-  console.log(tasks)
+  const tours: ToursWithTasks[] = toursWithTasks.map((t: any) =>
+    ({
+      Id: t.Id,
+      ShowName: t.Show.Name,
+      ShowCode: t.Show.Code,
+      ShowId: t.Show.Id,
+      Code: t.Code,
+      Tasks: t.TourTask.map(mapToTourTaskDTO)
+    }))
 
-  return { props: { tasks: { tasks } } }
+  const initialState: InitialState = { tasks: { tours, bulkSelection: {} } }
+  return { props: { initialState } }
 }
+
+export default Index

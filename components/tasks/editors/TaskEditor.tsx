@@ -1,50 +1,54 @@
 import React from 'react'
-import { loggingService } from '../../services/loggingService'
-import { Tour } from 'interfaces'
+import { loggingService } from '../../../services/loggingService'
+import { TourTaskDTO } from 'interfaces'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
 import { StyledDialog } from 'components/global/StyledDialog'
 import axios from 'axios'
-import { TaskCreateParams } from 'pages/api/tasks/create/single'
+import { tourState } from 'state/tasks/tourState'
+import { useRecoilValue } from 'recoil'
+import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
 
 interface NewTaskFormProps {
-  tours: Tour[];
+  task?: TourTaskDTO
   triggerClose: () => void
   open: boolean
   recurring?: boolean
 }
 
-const DEFAULT_TASK: TaskCreateParams = {
+const DEFAULT_TASK: TourTaskDTO = {
   Id: undefined,
   TourId: 0,
-  Title: '',
-  DueDate: '',
-  AssignedTo: '',
-  AssignedBy: '',
+  Code: 0,
+  Name: '',
   Interval: 'once',
+  CompleteByPostTour: false,
+  StartByPostTour: false,
   Progress: 0,
-  Status: 'todo',
-  Priority: 0,
-  FollowUp: '',
-  Notes: ''
+  Priority: 0
 }
 
-const NewTaskForm = ({ tours, triggerClose, open, recurring = false }:NewTaskFormProps) => {
+const TaskEditor = ({ task, triggerClose, open, recurring = false }:NewTaskFormProps) => {
   const [alert, setAlert] = React.useState<string>('')
-  const [inputs, setInputs] = React.useState(DEFAULT_TASK)
+  const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK)
   const [status, setStatus] = React.useState({ submitted: true, submitting: false })
+  const tours = useRecoilValue(tourState)
+
   const creating = !inputs.Id
 
-  const handleOnChange = (e) => {
-    e.persist()
+  const handleOnChange = (e: any) => {
+    let { id, value } = e.target
 
-    setInputs((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value
-    }))
+    if (id === 'TourId') value = Number(value)
 
+    const newInputs = { ...inputs, [id]: value }
+    setInputs(newInputs)
     setStatus({ ...status, submitted: false })
+  }
+
+  const handleCodeChange = (code: number) => {
+    setInputs({ ...inputs, Code: code })
   }
 
   const handleOnSubmit = async (event) => {
@@ -63,7 +67,8 @@ const NewTaskForm = ({ tours, triggerClose, open, recurring = false }:NewTaskFor
     }
   }
 
-  const tourOptions: SelectOption[] = tours.map(x => ({ text: x.Show.Name, value: x.TourId }))
+  const tourOptions: SelectOption[] = [{ text: '-- Select Tour --', value: '' },
+    ...tours.map(x => ({ text: `${x.ShowName}/${x.Code}`, value: x.Id }))]
   const progressOptions: SelectOption[] = [
     { text: 'Not Started', value: 0 },
     { text: '10%', value: 10 },
@@ -90,8 +95,9 @@ const NewTaskForm = ({ tours, triggerClose, open, recurring = false }:NewTaskFor
       <form onSubmit={handleOnSubmit}>
         <p className="text-center text-red-500">{alert ?? ''}</p>
         <FormInputSelect name="TourId" label="Tour" value={inputs.TourId} onChange={handleOnChange} options={tourOptions} />
-        <FormInputText name="Title" label="Description" onChange={handleOnChange} value={inputs.Title} />
-        <FormInputText name="Assignee" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
+        <FormInputNumeric name="Code" label="Code" value={inputs.Code} onChange={handleCodeChange} />
+        <FormInputText name="Name" label="Description" onChange={handleOnChange} value={inputs.Name} />
+        <FormInputText name="AssigneeTo" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
         <FormInputText name="AssignedBy" label="Assigned By" onChange={handleOnChange} value={inputs.AssignedBy} />
         <FormInputDate name="DueDate" label="Due" onChange={handleOnChange} value={inputs.DueDate} />
         <FormInputSelect name="Progress" label="Progress" onChange={handleOnChange} value={inputs.Progress} options={progressOptions} />
@@ -109,4 +115,4 @@ const NewTaskForm = ({ tours, triggerClose, open, recurring = false }:NewTaskFor
   )
 }
 
-export default NewTaskForm
+export default TaskEditor

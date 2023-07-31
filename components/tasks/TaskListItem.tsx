@@ -1,125 +1,84 @@
-import { ITourTask } from "interfaces";
-import formatDate from "utils/formatDate";
-import getTaskDateStatusColor from "utils/getTaskDateStatus";
-import formatDateDoubleDigits from "utils/formatDateDoubleDigits";
+import { TourTaskDTO } from 'interfaces'
+import formatDate from 'utils/formatDate'
+import getTaskDateStatusColor from 'utils/getTaskDateStatus'
+import formatDateDoubleDigits from 'utils/formatDateDoubleDigits'
+import { Table } from 'components/global/table/Table'
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import React from 'react'
+import TaskEditor from './editors/TaskEditor'
+import { bulkSelectionState } from 'state/tasks/bulkSelectionState'
+import { useRecoilState } from 'recoil'
 
-
-
-function getPriority(priority){
-
+function getPriority (priority) {
   switch (priority) {
-    case 0:
-      return "low"
-      break;
-    case 1:
-      return "Medium"
-      break;
-    case 2:
-      return "High"
-      break;
-  
-    default:
-      break;
+  case 0:
+    return 'low'
+  case 1:
+    return 'Medium'
+  case 2:
+    return 'High'
+  default:
+    break
   }
 }
-const TaskListItem = ({
-  task,
-  handleSelectedFunction,
-  isTaskSelected,
-  openUpdateModal,
-}: {
-  openUpdateModal: (task:ITourTask) => void;
-  task: ITourTask;
-  isTaskSelected: (taskId: any) => boolean;
-  handleSelectedFunction: (taskId: any) => void;
-}) => { 
+
+interface TaskListItemProps {
+  task: TourTaskDTO;
+}
+
+const TaskListItem = ({ task }: TaskListItemProps) => {
+  const [modalOpen, setModalOpen] = React.useState(false)
+  const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState)
 
   const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status)
-  
-  return(
 
-  <tr className={``}>
-    
-    <td className="relative w-12 px-6 sm:w-16 sm:px-8">
+  const toggleSelected = () => {
+    setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] })
+  }
 
-      <input
-        onChange={() => handleSelectedFunction(task.TourTaskId)}
-        checked={isTaskSelected(task.TourTaskId)}
-        type="checkbox"
-        className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
-        />
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap pr-3 text-sm font-medium text-gray-900 px-1`}
-      >
-      <select disabled className="border-none rounded-md ">
-        <option>{task.StartByWeekCode ?? "-"}</option>
-      </select>
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap pr-3 text-sm font-medium text-gray-900`}
-      >
-      {formatDateDoubleDigits(task.DueDate) ?? "-"}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap pr-3 text-sm font-medium text-gray-900`}
-      >
- <select disabled className="border-none rounded-md ">
-        <option>{task.CompleteByWeekCode?? "-"}</option>
-      </select>    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap pr-3 text-sm font-medium text-gray-900`}
-      >
-      {formatDateDoubleDigits(task.DueDate) ?? "-"}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {task.Progress + "%"}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {task.TaskName}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {task.User_TourTask_AssigneeToUser?.UserName ?? "-"}
+  return (
+    <>
+      { modalOpen && (<TaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)}/>)}
+      <Table.Row className={taskDateStatusColor} hover onClick={() => setModalOpen(true)}>
+        <Table.Cell>
+          <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal/>
+        </Table.Cell>
+        <Table.Cell>
+          {task.StartByWeekNum}
+        </Table.Cell>
+        <Table.Cell>
+          {formatDateDoubleDigits(task.DueDate) ?? 'N/A'}
+        </Table.Cell>
+        <Table.Cell>
+          {task.CompleteByWeekNum}
+        </Table.Cell>
+        <Table.Cell>
+          {formatDateDoubleDigits(task.DueDate) ?? 'N/A'}
+        </Table.Cell>
+        <Table.Cell>
+          {task.Progress + '%'}
+        </Table.Cell>
+        <Table.Cell>
+          {task.Name}
+        </Table.Cell>
+        <Table.Cell>
+          {task.AssignedTo ?? '-'}
+        </Table.Cell>
+        <Table.Cell>
+          {task.AssignedBy ?? '-'}
+        </Table.Cell>
+        <Table.Cell>
+          {task.Status}
+        </Table.Cell>
+        <Table.Cell >
+          {getPriority(task.Priority)}
+        </Table.Cell>
+        <Table.Cell>
+          {formatDate(task.FollowUp) ?? '-'}
+        </Table.Cell>
+      </Table.Row>
+    </>
+  )
+}
 
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {task.User_TourTask_AssignedByToUser?.UserName ?? "-"}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {task.Status}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {getPriority(task.Priority)}
-    </td>
-    <td
-      onClick={() => openUpdateModal(task)}
-      className={`cursor-pointer ${taskDateStatusColor} my-12 whitespace-nowrap px-3 text-sm text-gray-500`}
-      >
-      {formatDate(task.FollowUp) ?? "-"}
-    </td>
-  </tr>
-)};
-
-export default TaskListItem;
+export default TaskListItem
