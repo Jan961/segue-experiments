@@ -41,6 +41,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }:NewTaskFormP
     let { id, value } = e.target
 
     if (id === 'TourId') value = Number(value)
+    if (id === 'Progress') value = Number(value)
 
     const newInputs = { ...inputs, [id]: value }
     setInputs(newInputs)
@@ -53,7 +54,20 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }:NewTaskFormP
 
   const handleOnSubmit = async (event) => {
     event.preventDefault()
-    if (inputs.TourId !== 0) {
+    if (inputs.TourId === 0) {
+      setAlert('Select a Tour to add a task')
+      return
+    }
+
+    if (inputs.Id) {
+      try {
+        await axios.post('/api/tasks/update', inputs)
+        triggerClose()
+      } catch (error) {
+        loggingService.logError(error)
+        console.error(error)
+      }
+    } else {
       try {
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/'
         await axios.post(endpoint, inputs)
@@ -62,8 +76,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }:NewTaskFormP
         loggingService.logError(error)
         console.error(error)
       }
-    } else {
-      setAlert('Select a Tour to add a task')
     }
   }
 

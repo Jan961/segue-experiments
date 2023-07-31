@@ -95,8 +95,9 @@ export const getToursAndTasks = async () => {
       Show: true,
       TourTask: {
         orderBy: {
-          DueDate: 'desc'
-        }
+          Id: 'desc'
+        },
+        take: 10
       }
     }
   })

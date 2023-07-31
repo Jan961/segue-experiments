@@ -35,6 +35,8 @@ const Tasklist = ({ tourId } : TaskListProps) => {
     setBulkSelection(newState)
   }
 
+  if (match.Tasks.length === 0) return <p>No tasks for this tour</p>
+
   return (
     <>
       <Table>
@@ -76,19 +78,13 @@ const Tasklist = ({ tourId } : TaskListProps) => {
             Follow Up
           </Table.HeaderCell>
         </Table.HeaderRow>
-        <Table.Body>
-          {match.Tasks.length > 0
-            ? (
-              match.Tasks.slice(0, 10).map((task) => (
-                <TaskListItem
-                  task={task}
-                  key={task.Id}
-                ></TaskListItem>
-              ))
-            )
-            : (
-              <></>
-            )}
+        <Table.Body> {
+          match.Tasks.map((task) => (
+            <TaskListItem
+              task={task}
+              key={task.Id}
+            ></TaskListItem>
+          ))}
         </Table.Body>
       </Table>
       {match.Tasks.length < 1 && (
