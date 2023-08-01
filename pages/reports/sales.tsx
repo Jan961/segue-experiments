@@ -5,7 +5,7 @@ import SalesMarketingSummary from '../../components/reports/modals/SalesMarketin
 
 const ShowId = () => (
   <Layout title="ShowId | Segue">
-    <Toolbar></Toolbar>
+    {/* <Toolbar></Toolbar> */}
     <div className="flex flex-auto">
       <SalesMarketingSummary></SalesMarketingSummary>
       <Salesmarketsearch></Salesmarketsearch>
