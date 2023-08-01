@@ -1,6 +1,24 @@
 import prisma from 'lib/prisma'
 import { Prisma } from '@prisma/client'
 
+// Edit Tour Page
+const tourDateBlockIndlude = Prisma.validator<Prisma.TourSelect>()({
+  Show: true,
+  DateBlock: true
+})
+
+export const getActiveTours = async (accountId:number) => {
+  return prisma.tour.findMany({
+    where: {
+      IsArchived: false,
+      Show: {
+        AccountId: accountId
+      }
+    },
+    include: tourDateBlockIndlude
+  })
+}
+
 export const lookupTourId = async (ShowCode: string, TourCode: string) => {
   return prisma.tour.findFirst(
     {
@@ -66,12 +84,6 @@ export const getTourWithContent = async (Id: number) => {
     include: tourContentInclude
   })
 }
-
-// Edit Tour Page
-const tourDateBlockIndlude = Prisma.validator<Prisma.TourSelect>()({
-  Show: true,
-  DateBlock: true
-})
 
 export type TourWithDateblocks = Prisma.TourGetPayload<{
   include: typeof tourDateBlockIndlude
