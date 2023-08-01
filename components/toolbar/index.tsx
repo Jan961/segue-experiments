@@ -16,6 +16,7 @@ interface props {
   color?: string;
   tourJump?: boolean;
   filterComponent?: any;
+  page?:string;
 }
 
 const GlobalToolbar = ({
@@ -68,7 +69,7 @@ const GlobalToolbar = ({
             <div className="rounded-l-md">
               <div className="flex items-center">
                 <p className="mx-2">Set Tour</p>
-                <TourJumpMenu />
+                <TourJumpMenu page={page} />
               </div>
             </div>
           </div>
