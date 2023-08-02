@@ -41,7 +41,7 @@ const BookingDetailsListingPanel = ({
               <div
                 onClick={() => handleContractChange(idx)}
                 key={booking.Id}
-                className={`p-2 mr-4 border-y border-gray-200 
+                className={`p-2 mr-4 border-y border-gray-200 text-sm
                     
                   hover:bg-slate-300 bg-slate-200 odd:bg-opacity-0 
                     cursor-pointer bg-opacity-50`}
