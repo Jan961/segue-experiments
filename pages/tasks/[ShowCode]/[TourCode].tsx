@@ -6,11 +6,14 @@ import Tasklist from 'components/tasks/TaskList'
 import TaskButtons from 'components/tasks/TaskButtons'
 import GlobalToolbar from 'components/toolbar'
 import { GetServerSideProps } from 'next'
-import { getToursAndTasks } from 'services/TourService'
+import { getToursAndTasks, getToursByShowCode } from 'services/TourService'
 import { useRecoilValue } from 'recoil'
 import { ToursWithTasks, tourState } from 'state/tasks/tourState'
 import { InitialState } from 'lib/recoil'
 import { mapToTourTaskDTO } from 'lib/mappers'
+import { TourJump } from 'state/booking/tourJumpState'
+import { ParsedUrlQuery } from 'querystring'
+import { getTourJumpState } from 'utils/getTourJumpState'
 
 const Index = () => {
   const [bulkIsOpen, setBulkIsOpen] = useState(false)
@@ -135,6 +138,7 @@ const Index = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const tourJump = await getTourJumpState(ctx, 'tasks')
   const toursWithTasks = await getToursAndTasks()
 
   const tours: ToursWithTasks[] = toursWithTasks.map((t: any) =>
@@ -147,7 +151,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       Tasks: t.TourTask.map(mapToTourTaskDTO)
     }))
 
-  const initialState: InitialState = { tasks: { tours, bulkSelection: {} } }
+  const initialState: InitialState = { global: { tourJump }, tasks: { tours, bulkSelection: {} } }
   return { props: { initialState } }
 }
 

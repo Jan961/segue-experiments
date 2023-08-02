@@ -45,7 +45,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: 'Contracts',
-      link: `/contract/${path}`,
+      link: `/contracts/${path}`,
       disabled: noTourSelected,
       icon: faFileSignature,
       activeColor: 'text-primary-pink'
@@ -60,7 +60,8 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: 'Tasks',
-      link: '/tasks',
+      link: `/tasks/${path}`,
+      disabled: noTourSelected,
       icon: faClipboardList,
       activeColor: 'text-primary-purple'
 
@@ -93,12 +94,12 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     <>
       <div
         className={`bg-black transition-colors duration-300 
-        absolute inset-0 
+        fixed inset-0 z-20
         ${menuIsOpen ? '  bg-opacity-50 cursor-pointer' : 'pointer-events-none bg-transparent bg-opacity-100'}`}
         onClick={close}
       />
       <div
-        className={`absolute left-0 top-0 z-50 w-60 shadow-lg
+        className={`fixed left-0 top-0 bottom-0 z-50 w-60 shadow-lg
         min-h-full
        bg-primary-navy px-1 transform ease-in-out duration-300 ${
     menuIsOpen ? 'translate-x-0' : '-translate-x-full'
@@ -115,8 +116,9 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
           </button>
           <SegueLogo />
         </div>
-        <div className="overflow-y-auto overflow-x-hidden max-h-screen">
-
+        <div className="overflow-y-auto overflow-x-hidden max-h-screen"
+          style={{ height: 'calc(100vh - 88px)' }}
+        >
           <ul >
             {menuItems.map((menuItem, index) => {
               return (

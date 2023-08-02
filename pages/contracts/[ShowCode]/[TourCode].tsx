@@ -3,12 +3,12 @@ import { GetServerSideProps } from 'next'
 import { useState } from 'react'
 import ContractDetailsForm from 'components/contracts/contractDetailsForm'
 import ContractListingPanel from 'components/contracts/contractListingPanel'
-import { TourContent, getTourWithContent, getToursByShowCode, lookupTourId } from 'services/TourService'
-import { TourJump } from 'state/booking/tourJumpState'
+import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { ParsedUrlQuery } from 'querystring'
 import GlobalToolbar from 'components/toolbar'
 import { bookingMapper } from 'lib/mappers'
 import { BookingDTO } from 'interfaces'
+import { getTourJumpState } from 'utils/getTourJumpState'
 
 interface ContractsProps {
   bookings: BookingDTO[]
@@ -49,18 +49,7 @@ interface Params extends ParsedUrlQuery {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ShowCode, TourCode } = ctx.query as Params
-  const toursRaw = await getToursByShowCode(ShowCode as string)
-
-  const tourJump: TourJump = {
-    tours: toursRaw.map((t: any) => (
-      {
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code
-      })),
-    selected: TourCode
-  }
-
+  const tourJump = await getTourJumpState(ctx, 'contracts')
   const { Id } = await lookupTourId(ShowCode, TourCode)
   const tour: TourContent = await getTourWithContent(Id)
   const bookings = tour.DateBlock.map(x => x.Booking).flat().map(bookingMapper)
