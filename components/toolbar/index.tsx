@@ -30,7 +30,7 @@ const GlobalToolbar = ({
   const [filtersOpen, setFiltersOpen] = React.useState(false)
 
   return (
-    <div className="py-2 flex flex-row items-center justify-between gap-4">
+    <div className="py-2 flex flex-row items-center gap-4">
       <h1 className={`text-xl font-bold ${color} `}>
         {title}
       </h1>

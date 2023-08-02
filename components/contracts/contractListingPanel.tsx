@@ -1,98 +1,79 @@
-import * as React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
-  faSearch,
-} from "@fortawesome/free-solid-svg-icons";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { IBooking } from "types/BookingTypes";
+import { BookingDTO } from 'interfaces'
+import * as React from 'react'
 
-const weekday = ["SUN", "MON", "TUES", "WED", "THU", "FRI", "SAT"];
-let today = "ST1"; // This needs to be passed from the template
-let dateBooing = new Date("October 10, 2023");
+const weekday = ['SUN', 'MON', 'TUES', 'WED', 'THU', 'FRI', 'SAT']
 
-function gotoToday() {
-  return undefined;
+function selectDay (showDate) {
+  const newDate = new Date(showDate)
+  return newDate.getDay()
+}
+function formatDate (showDate) {
+  const newDate = new Date(showDate)
+  return newDate.toLocaleDateString()
 }
 
-function selectDay(showDate) {
-  let newDate = new Date(showDate);
-  return newDate.getDay();
-}
-function formatDate(showDate) {
-  let newDate = new Date(showDate);
-  return newDate.toLocaleDateString();
-}
-
-function getDayType(booking) {
+function getDayType (booking) {
   if (booking.Performance1Time || booking.Performance2Time) {
-    return "Performance";
+    return 'Performance'
   }
   if (booking.RehearsalTown) {
-    return "Rehearsal";
+    return 'Rehearsal'
   }
-  return "-";
+  return '-'
+}
+
+interface BookingDetailsListingPanelProps {
+  bookings: BookingDTO[]
+  activeContractIndex:number
+  setActiveContractIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
 const BookingDetailsListingPanel = ({
-  tourData,
+  bookings,
   setActiveContractIndex,
   activeContractIndex
-}: {
-  tourData: IBooking[] | [];
-  activeContractIndex:number;
-  setActiveContractIndex: React.Dispatch<React.SetStateAction<number>>;
-}) => {
-  function handleContractChange(index) {
-    setActiveContractIndex(index);
+}: BookingDetailsListingPanelProps) => {
+  function handleContractChange (index) {
+    setActiveContractIndex(index)
   }
 
   return (
     <div className="flex-col w-4/12 max-h-screen overflow-y-scroll">
-    <h1 className="text-primary-pink mb-6">Week</h1>
-      {tourData.length > 0 ? (
-        tourData.map((booking, idx) => {
-          return (
-            <div
-              onClick={() => handleContractChange(idx)}
-              key={idx + "" + booking.BookingId}
-              className={`w-100 p-4 border-y-1 border-gray-300  max-h-20 ${
-                idx%2===0
-                  ? "bg-none hover:bg-gray-100"
-                  : "bg-slate-200 hover:bg-slate-300"
-              }
+      <h1 className="text-primary-pink mb-6">Week</h1>
+      {bookings.length > 0 &&
+          bookings.map((booking, idx) => {
+            return (
+              <div
+                onClick={() => handleContractChange(idx)}
+                key={booking.Id}
+                className={`w-100 p-2 border-y-1 border-gray-300 
+                    bg-none hover:bg-slate-300 odd:bg-slate-200 
+                    cursor-pointer first-letter:`}
+              >
+                <div
+                  onClick={() => handleContractChange(idx)}
+                  className={`w-100 p-4 border-y-1 border-gray-300 ${
+                    idx === activeContractIndex &&
+                  'bg-blue-400 rounded-md text-white'
+
+                  }
                     cursor-pointer `}
-            >
-            <div
-              onClick={() => handleContractChange(idx)}
-              key={idx + "" + booking.BookingId}
-              className={`w-100 p-4 border-y-1 border-gray-300  max-h-20 ${
-                idx===activeContractIndex
-                  && "bg-primary-pink rounded-md text-white"
-                  
-              }
-                    cursor-pointer `}
-            >
-              <div className="flex flex-row justify-between ">
-                <div className="">-1</div>
-                <div className="">{weekday[selectDay(booking.ShowDate)]}</div>
-                <div className="">
-                  {booking.ShowDate && formatDate(booking.ShowDate)}
+                >
+                  <div className="flex flex-row justify-between ">
+                    <div className="">-1</div>
+                    <div className="">{weekday[selectDay(booking.Date)]}</div>
+                    <div className="">
+                      {booking.Date && formatDate(booking.Date)}
+                    </div>
+                    <div className="capitalize">{getDayType(booking)}</div>
+                    <div className=""></div>
+                  </div>
                 </div>
-                <div className="capitalize">{getDayType(booking)}</div>
-                <div className=""></div>
               </div>
-            </div>
-            </div>
-          );
-        })
-      ) : (
-        <></>
-      )}
+            )
+          })
+      }
     </div>
-  );
-};
-export default BookingDetailsListingPanel;
+  )
+}
+export default BookingDetailsListingPanel
