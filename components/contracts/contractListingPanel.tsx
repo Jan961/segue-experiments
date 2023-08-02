@@ -1,25 +1,10 @@
 import { BookingDTO } from 'interfaces'
 import * as React from 'react'
+import { calculateWeekNumber, getWeekDayShort } from 'services/dateService'
 
-const weekday = ['SUN', 'MON', 'TUES', 'WED', 'THU', 'FRI', 'SAT']
-
-function selectDay (showDate) {
-  const newDate = new Date(showDate)
-  return newDate.getDay()
-}
 function formatDate (showDate) {
   const newDate = new Date(showDate)
   return newDate.toLocaleDateString()
-}
-
-function getDayType (booking) {
-  if (booking.Performance1Time || booking.Performance2Time) {
-    return 'Performance'
-  }
-  if (booking.RehearsalTown) {
-    return 'Rehearsal'
-  }
-  return '-'
 }
 
 interface BookingDetailsListingPanelProps {
@@ -37,36 +22,49 @@ const BookingDetailsListingPanel = ({
     setActiveContractIndex(index)
   }
 
+  const sortedBookings = bookings.sort((a, b) => {
+    if (a.Date < b.Date) {
+      return -1
+    }
+    if (a.Date > b.Date) {
+      return 1
+    }
+    return 0 // a must be equal to b
+  })
+
   return (
     <div className="flex-col w-4/12 max-h-screen overflow-y-scroll">
-      <h1 className="text-primary-pink mb-6">Week</h1>
-      {bookings.length > 0 &&
-          bookings.map((booking, idx) => {
+      <h1 className="text-primary-pink mt-4 mb-8 font-bold">Week</h1>
+      {sortedBookings.length > 0 &&
+          sortedBookings.map((booking, idx) => {
             return (
               <div
                 onClick={() => handleContractChange(idx)}
                 key={booking.Id}
-                className={`w-100 p-2 border-y-1 border-gray-300 
-                    bg-none hover:bg-slate-300 odd:bg-slate-200 
-                    cursor-pointer first-letter:`}
+                className={`p-2 mr-4 border-y border-gray-200 
+                    
+                  hover:bg-slate-300 bg-slate-200 odd:bg-opacity-0 
+                    cursor-pointer bg-opacity-50`}
               >
                 <div
                   onClick={() => handleContractChange(idx)}
-                  className={`w-100 p-4 border-y-1 border-gray-300 ${
+                  className={`w-100 p-2 border-y-1 border-gray-300 ${
                     idx === activeContractIndex &&
-                  'bg-blue-400 rounded-md text-white'
+                  'bg-primary-pink rounded-md text-white'
 
                   }
                     cursor-pointer `}
                 >
-                  <div className="flex flex-row justify-between ">
-                    <div className="">-1</div>
-                    <div className="">{weekday[selectDay(booking.Date)]}</div>
-                    <div className="">
-                      {booking.Date && formatDate(booking.Date)}
+                  <div className="grid grid-cols-12 justify-between ">
+                    <div className="col-span-1">
+                      { calculateWeekNumber(new Date(bookings[0].Date), new Date(booking.Date)) }
                     </div>
-                    <div className="capitalize">{getDayType(booking)}</div>
-                    <div className=""></div>
+                    <div className="col-span-4">
+                      { getWeekDayShort(booking.Date)}&nbsp;{formatDate(booking.Date) }
+                    </div>
+                    <div className="col-span-7">
+                      {booking.VenueName}
+                    </div>
                   </div>
                 </div>
               </div>

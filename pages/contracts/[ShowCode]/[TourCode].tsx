@@ -31,7 +31,7 @@ const Index = ({ bookings }: ContractsProps) => {
             bookings={bookings}
             activeContractIndex={activeContractIndex}
             setActiveContractIndex={setActiveContractIndex}></ContractListingPanel>
-          {activeContractIndex &&
+          {activeContractIndex !== null &&
             <ContractDetailsForm
               incrementActiveContractIndex={incrementActiveContractIndex}
               activeContract={bookings[activeContractIndex].Id} />

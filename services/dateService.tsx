@@ -62,6 +62,11 @@ export const getWeekDay = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-US', { weekday: 'long' })
 }
 
+export const getWeekDayShort = (dateToFormat: Date | string) => {
+  const date = safeDate(dateToFormat)
+  return date.toLocaleDateString('en-US', { weekday: 'short' })
+}
+
 export const getWeekDayLong = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat)
   return date.toLocaleDateString('en-US', { weekday: 'long' })

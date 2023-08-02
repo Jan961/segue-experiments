@@ -104,6 +104,7 @@ export type BookingDTO = {
   Id: number
   Date: string
   VenueId: number
+  VenueName?: string
   StatusCode: StatusCode
   PencilNum: number
   LandingSite: string
