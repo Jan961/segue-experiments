@@ -88,63 +88,65 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   ]
 
   return (
-    <div
-      className={`absolute left-0 top-0 z-50 w-60 shadow-lg
+    <>
+      <div className={`bg-black transition-colors duration-300 absolute inset-0 pointer-events-none ${menuIsOpen ? '  bg-opacity-50' : 'bg-transparent bg-opacity-100'}`} />
+      <div
+        className={`absolute left-0 top-0 z-50 w-60 shadow-lg
         min-h-full
        bg-primary-navy px-1 transform ease-in-out duration-300 ${
     menuIsOpen ? 'translate-x-0' : '-translate-x-full'
     }`}
-    >
-      <div
-        onClick={() => setMenuIsOpen(!menuIsOpen)}
-        className="flex items-center cursor-pointer hover:opacity-80"
       >
-        <SegueLogo />
-      </div>
-      <div className="overflow-y-auto overflow-x-hidden max-h-screen">
+        <div
+          onClick={() => setMenuIsOpen(!menuIsOpen)}
+          className="flex items-center cursor-pointer hover:opacity-80"
+        >
+          <SegueLogo />
+        </div>
+        <div className="overflow-y-auto overflow-x-hidden max-h-screen">
 
-        <ul >
-          {menuItems.map((menuItem, index) => {
-            return (
-              <li key={index} >
-                <a className={`flex items-center text-sm py-2 px-4
+          <ul >
+            {menuItems.map((menuItem, index) => {
+              return (
+                <li key={index} >
+                  <a className={`flex items-center text-sm py-2 px-4
                   size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
                   hover:bg-gray-100 transition duration-300
                   ${menuItem.disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}
                   ease-in-out text-white`}
-                href={menuItem.link}>
-                  {menuItem.icon && (
-                    <span className="mr-2">
-                      <FontAwesomeIcon icon={menuItem.icon} className="h-5 w-5" />
-                    </span>
-                  )}
-                  {menuItem.label}
-                </a>
-                {menuItem.subItems && (
-                  <ul className="pl-10 text-sm">
-                    {menuItem.subItems.map((subMenuItem, subIndex) => {
-                      const isSubItemActive = data?.menuLabel === subMenuItem.label
-                      return (
-                        <li key={subIndex} >
-                          <a className={`flex items-center text-sm py-1 px-2 
+                  href={menuItem.link}>
+                    {menuItem.icon && (
+                      <span className="mr-2">
+                        <FontAwesomeIcon icon={menuItem.icon} className="h-5 w-5" />
+                      </span>
+                    )}
+                    {menuItem.label}
+                  </a>
+                  {menuItem.subItems && (
+                    <ul className="pl-10 text-sm">
+                      {menuItem.subItems.map((subMenuItem, subIndex) => {
+                        const isSubItemActive = data?.menuLabel === subMenuItem.label
+                        return (
+                          <li key={subIndex} >
+                            <a className={`flex items-center text-sm py-1 px-2 
                             text-ellipsis whitespace-nowrap rounded
                              hover:text-gray-900 hover:bg-gray-100 
                              transition duration-300 ease-in-out 
                              ${isSubItemActive ? menuItem.activeColor : 'text-white'}`}
-                          href={subMenuItem.link}>
-                            {subMenuItem.label}
-                          </a>
-                        </li>
-                      )
-                    })}
-                  </ul>
-                )}
-              </li>
-            )
-          })}
-        </ul>
+                            href={subMenuItem.link}>
+                              {subMenuItem.label}
+                            </a>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       </div>
-    </div>
-
+    </>
   )
 }
