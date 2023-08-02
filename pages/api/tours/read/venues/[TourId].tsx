@@ -1,41 +1,31 @@
 import prisma from 'lib/prisma'
 
-export default async function handle(req, res) {
-
-
-    let TourId = parseInt(req.query.TourId)
-
-/*
-    TO be implimnented when Prisma supports this
-    const result = await prisma.booking.findMany(
-        {
-            where:{
-                TourId:   query,
-                NOT: {
-                    VenueId: null
-                }
-
-            },
-            include:{
-                Venue: true
-            },
-            orderBy: {
-                ShowDate: "desc"
-            },
-
+export default async function handle (req, res) {
+  try {
+    const TourId = parseInt(req.query.TourId)
+    // TO be implimnented when Prisma supports this
+    const result = await prisma.DateBlock.findFirst(
+      {
+        where: {
+          TourId,
+          Name: 'Tour'
+        },
+        include: {
+          Booking: {
+            include: {
+              Venue: true
+            }
+          }
+        },
+        orderBy: {
+          StartDate: 'desc'
         }
+      }
     )
-    res.json(result)
- */
-    let query = `SELECT DISTINCT Venue.VenueId, Venue.Name  FROM Booking LEFT JOIN Venue On Booking.VenueId = Venue.VenueId WHERE Booking.TourId =${TourId} AND Booking.VenueId IS NOT NULL;`
-    try {
-        let  result =  await prisma.$queryRawUnsafe(`${query}`)
-        res.json(result)
-        res.status(200)
-    } catch (e){
-
-        res.status(401)
-
-    }
-
+    res.json({ data: result.Booking.map(booking => booking.Venue) })
+    // res.json(result)
+  } catch (error) {
+    console.log('==Error fetching Venue bookings==', error)
+    res.status(500).send()
+  }
 }
