@@ -1,4 +1,4 @@
-import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faFileSignature, faHome, faUserGear } from '@fortawesome/free-solid-svg-icons'
+import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faClose, faFileSignature, faHome, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { SegueLogo } from './global/SegueLogo'
 import { useRecoilValue } from 'recoil'
@@ -87,9 +87,16 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     }
   ]
 
+  const close = () => setMenuIsOpen(!menuIsOpen)
+
   return (
     <>
-      <div className={`bg-black transition-colors duration-300 absolute inset-0 pointer-events-none ${menuIsOpen ? '  bg-opacity-50' : 'bg-transparent bg-opacity-100'}`} />
+      <div
+        className={`bg-black transition-colors duration-300 
+        absolute inset-0 
+        ${menuIsOpen ? '  bg-opacity-50 cursor-pointer' : 'pointer-events-none bg-transparent bg-opacity-100'}`}
+        onClick={close}
+      />
       <div
         className={`absolute left-0 top-0 z-50 w-60 shadow-lg
         min-h-full
@@ -98,9 +105,14 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     }`}
       >
         <div
-          onClick={() => setMenuIsOpen(!menuIsOpen)}
+          onClick={close}
           className="flex items-center cursor-pointer hover:opacity-80"
         >
+          <button
+            className="absolute top-7 right-7 text-white"
+          >
+            <FontAwesomeIcon size='xl' icon={faClose} />
+          </button>
           <SegueLogo />
         </div>
         <div className="overflow-y-auto overflow-x-hidden max-h-screen">
