@@ -1,4 +1,4 @@
-import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faFileSignature, faUserGear } from '@fortawesome/free-solid-svg-icons'
+import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faFileSignature, faHome, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { SegueLogo } from './global/SegueLogo'
 import { useRecoilValue } from 'recoil'
@@ -9,15 +9,21 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   const { selected, tours } = useRecoilValue(tourJumpState)
   const tour = tours.filter(x => x.Code === selected)[0]
   const path = tour ? `${tour.ShowCode}/${tour.Code}` : ''
-  const noTourSelected = !path
+  const noTourSelected = !tour?.ShowCode && !tour?.Code
 
   const menuItems = [
+    {
+      label: 'Home',
+      link: '/',
+      icon: faHome,
+      activeColor: 'text-primary-blue'
+    },
     {
       label: 'Bookings',
       link: `/bookings/${path}`,
       disabled: noTourSelected,
       icon: faCalendarCheck,
-      activeColor: 'text-primary-blue' 
+      activeColor: 'text-primary-blue'
     },
     {
       label: 'Marketing',
@@ -83,9 +89,11 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
 
   return (
     <div
-      className={`absolute rounded-tr-[34px] left-0 top-0 z-50 w-60 shadow-md bg-primary-navy px-1 transform ease-in-out duration-300 ${
-        menuIsOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      className={`absolute left-0 top-0 z-50 w-60 shadow-lg
+        min-h-full
+       bg-primary-navy px-1 transform ease-in-out duration-300 ${
+    menuIsOpen ? 'translate-x-0' : '-translate-x-full'
+    }`}
     >
       <div
         onClick={() => setMenuIsOpen(!menuIsOpen)}
@@ -93,16 +101,16 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       >
         <SegueLogo />
       </div>
-      <div className="overflow-y-scroll max-h-screen">
+      <div className="overflow-y-auto overflow-x-hidden max-h-screen">
 
         <ul >
           {menuItems.map((menuItem, index) => {
             return (
               <li key={index} >
-                <a className={`flex items-center text-sm py-4 px-6 h-12
+                <a className={`flex items-center text-sm py-2 px-4
                   size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
                   hover:bg-gray-100 transition duration-300
-                  ${ menuItem.disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}
+                  ${menuItem.disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}
                   ease-in-out text-white`}
                 href={menuItem.link}>
                   {menuItem.icon && (
@@ -113,16 +121,16 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
                   {menuItem.label}
                 </a>
                 {menuItem.subItems && (
-                  <ul className="pl-7">
+                  <ul className="pl-10 text-sm">
                     {menuItem.subItems.map((subMenuItem, subIndex) => {
                       const isSubItemActive = data?.menuLabel === subMenuItem.label
                       return (
                         <li key={subIndex} >
-                          <a className={`flex items-center text-sm py-4 px-6 h-12 
-                            size-md text-ellipsis whitespace-nowrap rounded
+                          <a className={`flex items-center text-sm py-1 px-2 
+                            text-ellipsis whitespace-nowrap rounded
                              hover:text-gray-900 hover:bg-gray-100 
                              transition duration-300 ease-in-out 
-                             ${isSubItemActive ? menuItem.activeColor : 'text-white'}`} 
+                             ${isSubItemActive ? menuItem.activeColor : 'text-white'}`}
                           href={subMenuItem.link}>
                             {subMenuItem.label}
                           </a>
