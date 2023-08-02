@@ -138,7 +138,6 @@ const Index = () => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const tourJump = await getTourJumpState(ctx, 'tasks')
   const toursWithTasks = await getToursAndTasks()
 
   const tours: ToursWithTasks[] = toursWithTasks.map((t: any) =>
@@ -151,7 +150,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       Tasks: t.TourTask.map(mapToTourTaskDTO)
     }))
 
-  const initialState: InitialState = { global: { tourJump }, tasks: { tours, bulkSelection: {} } }
+  const initialState: InitialState = { tasks: { tours, bulkSelection: {} } }
   return { props: { initialState } }
 }
 

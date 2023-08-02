@@ -1,15 +1,33 @@
 import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faClose, faFileSignature, faHome, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { SegueLogo } from './global/SegueLogo'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
+import React from 'react'
 
 export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
-  const { selected, tours } = useRecoilValue(tourJumpState)
-  const tour = tours.filter(x => x.Code === selected)[0]
+  const [tourJump, setTourJump] = useRecoilState(tourJumpState)
+
+  const isClient = typeof window !== 'undefined'
+
+  React.useEffect(() => {
+    if (isClient) {
+      if (tourJump && tourJump.selected) {
+        localStorage.setItem('tourJumpState', JSON.stringify(tourJump))
+      } else {
+        setTourJump(JSON.parse(localStorage.getItem('tourJumpState') || null)
+        )
+      }
+    }
+  }, [tourJump, setTourJump, isClient])
+
+  const { selected, tours } = tourJump
+  console.log(tourJump)
+
+  const tour = tours.filter(x => x.Code === selected.toString())[0]
   const path = tour ? `${tour.ShowCode}/${tour.Code}` : ''
-  const noTourSelected = !tour?.ShowCode && !tour?.Code
+  const noTourSelected = !path
 
   const menuItems = [
     {
@@ -60,12 +78,12 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: 'Tasks',
-      link: `/tasks/${path}`,
-      disabled: noTourSelected,
+      link: '/tasks',
       icon: faClipboardList,
       activeColor: 'text-primary-purple'
 
-    },
+    }
+    /*
     {
       label: 'Admin',
       link: '#',
@@ -75,17 +93,10 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
         {
           label: 'Venues',
           link: '/venues/20'
-        },
-        {
-          label: 'Shows',
-          link: '/shows'
-        },
-        {
-          label: 'Tours',
-          link: '/tours/1'
         }
       ]
     }
+    */
   ]
 
   const close = () => setMenuIsOpen(!menuIsOpen)
