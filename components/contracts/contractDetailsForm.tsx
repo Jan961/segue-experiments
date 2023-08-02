@@ -318,7 +318,7 @@ const ContractDetailsForm = ({
           />
         </StyledDialog>
 
-        <div className="w-8/12 p-4 border-l-2 ">
+        <div className="w-6/12 lg:w-7/12 xl:w-8/12 p-4 border-l-2 ">
           <div className="flex flex-row pb-6 mb-6 border-b-2">
             <div className='flex gap-4 text-xl'>
 

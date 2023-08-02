@@ -23,7 +23,7 @@ const Index = ({ bookings }: ContractsProps) => {
 
   return (
     <Layout title="Contracts | Seque">
-      <div className=" px-2 sm:px-4 md:px-6 lg:px-12 pt-6 flex flex-auto flex-col w-full">
+      <div className="flex flex-auto flex-col w-full">
         <GlobalToolbar
           title={'Contracts'} />
         <div className="flex-row flex">

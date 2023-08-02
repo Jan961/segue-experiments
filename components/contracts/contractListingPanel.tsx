@@ -33,7 +33,7 @@ const BookingDetailsListingPanel = ({
   })
 
   return (
-    <div className="flex-col w-4/12 max-h-screen overflow-y-scroll">
+    <div className="flex-col w-6/12 lg:w-5/12 xl:w-4/12 max-h-screen overflow-y-scroll">
       <h1 className="text-primary-pink mt-4 mb-8 font-bold">Week</h1>
       {sortedBookings.length > 0 &&
           sortedBookings.map((booking, idx) => {
