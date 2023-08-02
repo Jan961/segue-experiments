@@ -38,7 +38,7 @@ export const FormInputSelect = ({ onChange, value, name, label, required, option
         required={required}
         value={value || ''}
       >
-        {options.map(x => (<option value={x.value} key={x.value}>{x.text}</option>))}
+        {options?.map?.(x => (<option value={x.value} key={x.value}>{x.text}</option>))}
       </select>
     </label>
   )

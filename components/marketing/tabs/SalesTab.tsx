@@ -93,7 +93,7 @@ export const SalesTab = () => {
           </Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
-          {bookingSales.map((sale) => (
+          {bookingSales.map((sale, i) => (
             <Table.Row key={sale.week}>
               <Table.Cell className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium border border-l-0 sm:w-auto sm:max-w-none sm:pl-6">
                 {sale.week.replace('Week-', '')}
@@ -114,7 +114,7 @@ export const SalesTab = () => {
                 {sale.reserved}
               </Table.Cell>
               <Table.Cell>
-                {sale.totalValue}
+                {`${sale.VenueCurrencySymbol} ${sale.totalValue}`}
               </Table.Cell>
               <Table.Cell>
                 {sale.valueChange}

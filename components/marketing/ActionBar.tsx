@@ -7,8 +7,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState'
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
 
-  const tourOptions: SelectOption[] = bookingJump.bookings.map((b) => {
-    console.log("==bookingJump.bookings==", bookingJump)
+  const tourOptions: SelectOption[] = bookingJump?.bookings?.map?.((b) => {
     const date = new Date(b.Date)
     const weekday = getWeekDay(date)
     const ukDate = formatDateUK(date)
@@ -20,7 +19,7 @@ const ActionBar = () => {
     setBookingJump({ ...bookingJump, selected })
   }
 
-  const matching = bookingJump.bookings.filter(x => x.Id === bookingJump.selected)[0]
+  const matching = bookingJump?.bookings?.filter?.(x => x.Id === bookingJump.selected)[0]
 
   return (
     <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">
