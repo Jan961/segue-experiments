@@ -8,13 +8,21 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
   const { selected, tours } = useRecoilValue(tourJumpState)
   const tour = tours.filter(x => x.Code === selected)[0]
-  const path = tour ? `/${tour.ShowCode}/${tour.Code}` : ''
+  const path = tour ? `${tour.ShowCode}/${tour.Code}` : ''
+  const noTourSelected = !path
 
   const menuItems = [
-    { label: 'Bookings', link: `/bookings${path}`, icon: faCalendarCheck, activeColor: 'text-primary-blue' },
+    {
+      label: 'Bookings',
+      link: `/bookings/${path}`,
+      disabled: noTourSelected,
+      icon: faCalendarCheck,
+      activeColor: 'text-primary-blue' 
+    },
     {
       label: 'Marketing',
-      link: `/marketing${path}`,
+      link: `/marketing/${path}`,
+      disabled: noTourSelected,
       icon: faBullhorn,
       activeColor: 'text-primary-green',
       subItems: [
@@ -31,7 +39,8 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: 'Contracts',
-      link: '/contracts/2/19',
+      link: `/contract/${path}`,
+      disabled: noTourSelected,
       icon: faFileSignature,
       activeColor: 'text-primary-pink'
     },
@@ -90,7 +99,12 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
           {menuItems.map((menuItem, index) => {
             return (
               <li key={index} >
-                <a className={'flex items-center text-sm py-4 px-6 h-12  size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out text-white'} href={menuItem.link} data-mdb-ripple="true" data-mdb-ripple-color="dark">
+                <a className={`flex items-center text-sm py-4 px-6 h-12
+                  size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
+                  hover:bg-gray-100 transition duration-300
+                  ${ menuItem.disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}
+                  ease-in-out text-white`}
+                href={menuItem.link}>
                   {menuItem.icon && (
                     <span className="mr-2">
                       <FontAwesomeIcon icon={menuItem.icon} className="h-5 w-5" />
@@ -104,7 +118,12 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
                       const isSubItemActive = data?.menuLabel === subMenuItem.label
                       return (
                         <li key={subIndex} >
-                          <a className={`flex items-center text-sm py-4 px-6 h-12 size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out ${isSubItemActive ? menuItem.activeColor : 'text-white'}`} href={subMenuItem.link} data-mdb-ripple="true" data-mdb-ripple-color="dark">
+                          <a className={`flex items-center text-sm py-4 px-6 h-12 
+                            size-md text-ellipsis whitespace-nowrap rounded
+                             hover:text-gray-900 hover:bg-gray-100 
+                             transition duration-300 ease-in-out 
+                             ${isSubItemActive ? menuItem.activeColor : 'text-white'}`} 
+                          href={subMenuItem.link}>
                             {subMenuItem.label}
                           </a>
                         </li>
