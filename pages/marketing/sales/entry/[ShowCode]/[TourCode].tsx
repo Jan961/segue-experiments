@@ -10,6 +10,7 @@ import { getSaleableBookings } from 'services/bookingService'
 import { BookingJump } from 'state/marketing/bookingJumpState'
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers'
 import { getRoles } from 'services/contactService'
+import { getSaleTypeOptions } from 'services/salesService'
 
 type Props = {
   initialState: InitialState
@@ -51,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tourId = tourJump.tours.filter(x => x.Code === TourCode)[0].Id
 
   const bookings = await getSaleableBookings(tourId)
-
   const venueRoles = await getRoles()
 
   const bookingJump: BookingJump = {

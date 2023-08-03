@@ -88,7 +88,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     })
 
     if (!salesSet) {
-      throw new Error('No such SalesSet exists')
+      return res.status(200).json({ SetComp: [], SetHold: [], Sale: null })
+      // throw new Error('No such SalesSet exists')
     }
 
     const holdData: HoldResponse[] = salesSet.SetHold.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue, HoldType }) => ({
@@ -121,7 +122,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     res.status(200).json({ ...salesSet, SetComp: compData, SetHold: holdData, Sale: finalSalesData })
   } catch (err) {
-    console.log(err)
+    console.log('error', err)
     res.status(500).json({ err: err?.message || 'Error updating AvailableComp' })
   }
 }

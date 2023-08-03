@@ -69,7 +69,7 @@ const GlobalToolbar = ({
             <div className="rounded-l-md">
               <div className="flex items-center">
                 <p className="mx-2">Set Tour</p>
-                <TourJumpMenu page={page} />
+                <TourJumpMenu />
               </div>
             </div>
           </div>
