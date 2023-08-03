@@ -33,7 +33,9 @@ export const FormInputDate = ({ onChange, value, name, label, required, classNam
   return (
     <div className={className}>
       <label htmlFor={name} className={flexClass}>
-        <div className='text-sm pb-2 pr-2'>{ label } { required ? '*' : null }</div>
+        { label && (
+          <div className='text-sm pb-2 pr-2'>{ label } { required ? '*' : null }</div>
+        )}
         <input {...inputProps}/>
       </label>
     </div>
