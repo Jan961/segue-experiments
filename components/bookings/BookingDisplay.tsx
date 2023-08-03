@@ -28,23 +28,21 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
 
   const first = booking.Date.startsWith(date)
 
-  const venueClass = first ? '' : 'opacity-25'
-
   return (
     <div className="grid grid-cols-10 p-1 px-2">
 
       <div className="col-span-7">
-        <span className={venueClass}>
+        <span>
           { venue ? venue.Name : 'No Venue' }
         </span>
       </div>
       <div className="col-span-1">
-        x { performanceCount }
+        { performanceCount }
       </div>
       <div className="col-span-1 mx-2 whitespace-nowrap text-center">
         { first && distance && (
           <>
-            { distance.Miles ? distance.Miles + 'm' : 'N/A' }
+            { distance.Miles ? distance.Miles : '' }
           </>
         ) }
       </div>

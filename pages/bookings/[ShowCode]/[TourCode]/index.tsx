@@ -115,16 +115,16 @@ const BookingPage = ({ Id }: bookingProps) => {
                 shadow-lg
                 text-gray-400
                 ">
-                <div className='col-span-2 p-2 whitespace-nowrap border-r border-gray-400'>
-                  Wk # & Date
+                <div className='col-span-2 p-2 whitespace-nowrap'>
+                  Week No. & Date
                 </div>
-                <div className='col-span-6 p-2 border-r border-gray-400'>
+                <div className='col-span-6 p-2'>
                   Venue
                 </div>
-                <div className='col-span-1 p-2 border-r border-gray-400'>
-                  Perf.
+                <div className='col-span-1 p-2'>
+                  Perf(s)
                 </div>
-                <div className='col-span-1 p-2 border-r border-gray-400'>
+                <div className='col-span-1 p-2'>
                   Miles
                 </div>
                 <div className='col-span-1 p-2'>
