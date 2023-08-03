@@ -114,7 +114,7 @@ export const formatTime = (timestamp) => {
 }
 
 export const timeFormat = (mins?: number) => {
-  if (!mins) return 'N/A'
+  if (!mins) return ''
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`
 }
 

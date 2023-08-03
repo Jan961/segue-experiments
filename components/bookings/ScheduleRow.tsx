@@ -39,7 +39,11 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   }
 
   return (
-    <div className="even:bg-black even:bg-opacity-5 bg-blend-multiply border-b border-gray-300 cursor-pointer" onClick={selectDate}>
+    <div className="even:bg-black even:bg-opacity-5
+      bg-blend-multiply border-b border-gray-300
+      cursor-pointer scroll-mt-20"
+    id={`booking-${date.Date.replace('/', '-')}`}
+    onClick={selectDate}>
       <div className={rowClass} >
         <DateDisplay date={date.Date} />
         <div className="grid grid-rows-auto gap-y-2 flex-grow pr-1">

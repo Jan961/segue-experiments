@@ -21,7 +21,6 @@ type AppPropsWithLayout = AppProps & {
 export default function MyApp ({ Component, pageProps }: AppPropsWithLayout) {
   const { initialState } = pageProps
   const router = useRouter()
-  console.log(initialState)
 
   return (
     <ClerkProvider {...pageProps}

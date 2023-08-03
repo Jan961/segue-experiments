@@ -4,14 +4,14 @@ import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
 import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector'
 import { DateTypeMapper, bookingMapper, dateBlockMapper, getInFitUpMapper, otherMapper, performanceMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { getAllVenuesMin, getDistances } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
-import { objectify } from 'radash'
+import { first, objectify } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
 import { filterState } from 'state/booking/filterState'
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
@@ -24,6 +24,7 @@ import { getStops } from 'utils/getStops'
 import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
 import { getTourJumpState } from 'utils/getTourJumpState'
+import { viewState } from 'state/booking/viewState'
 
 interface bookingProps {
   Id: number,
@@ -69,14 +70,16 @@ const BookingPage = ({ Id }: bookingProps) => {
   const schedule = useRecoilValue(filteredScheduleSelector)
   const { Sections } = schedule
   const [filter, setFilter] = useRecoilState(filterState)
+  const [view, setView] = useRecoilState(viewState)
   const { loading } = useRecoilValue(tourJumpState)
+  const todayKey = new Date().toISOString().substring(0, 10)
+  const todayOnSchedule = Sections.map(x => x.Dates).flat().filter(x => x.Date === todayKey).length > 0
 
   const gotoToday = () => {
-    const element = new Date().toISOString().substring(0, 10)
-    if (document.getElementById(`${element}`) !== null) {
-      document.getElementById(`${element}`).scrollIntoView({ behavior: 'smooth' })
-    } else {
-      alert('Today is not a date on this tour')
+    const idToScrollTo = `booking-${todayKey}`
+    if (todayOnSchedule) {
+      document.getElementById(`${idToScrollTo}`).scrollIntoView({ behavior: 'smooth' })
+      setView({ ...view, selectedDate: todayKey })
     }
   }
 
@@ -92,6 +95,7 @@ const BookingPage = ({ Id }: bookingProps) => {
           { /* <ToolbarInfo label='Week' value={"??"} /> */ }
           <MileageCalculator />
           <ToolbarButton
+            disabled={!todayOnSchedule}
             onClick={() => gotoToday()}>
             Go To Today
           </ToolbarButton>
@@ -111,16 +115,16 @@ const BookingPage = ({ Id }: bookingProps) => {
                 shadow-lg
                 text-gray-400
                 ">
-                <div className='col-span-2 p-2 whitespace-nowrap border-r border-gray-400'>
-                  Wk # & Date
+                <div className='col-span-2 p-2 whitespace-nowrap'>
+                  Week No. & Date
                 </div>
-                <div className='col-span-6 p-2 border-r border-gray-400'>
+                <div className='col-span-6 p-2'>
                   Venue
                 </div>
-                <div className='col-span-1 p-2 border-r border-gray-400'>
-                  Perf.
+                <div className='col-span-1 p-2'>
+                  Perf(s)
                 </div>
-                <div className='col-span-1 p-2 border-r border-gray-400'>
+                <div className='col-span-1 p-2'>
                   Miles
                 </div>
                 <div className='col-span-1 p-2'>

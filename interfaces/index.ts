@@ -50,17 +50,17 @@ export type ShowDTO = {
 
 // Existing tour interface for old schema. Remove eventually
 export type Tour = {
-  TourId: number;
-  Code: string;
-  Logo: string;
-  ShowId: Show;
-  TourStartDate: Date;
-  TourEndDate: Date;
-  Archived: boolean;
-  RehearsalStartDate: Date;
-  RehearsalEndDate: Date;
-  Show: Show;
-  TourTask: ITourTask[];
+  TourId: number
+  Code: string
+  Logo: string
+  ShowId: Show
+  TourStartDate: Date
+  TourEndDate: Date
+  Archived: boolean
+  RehearsalStartDate: Date
+  RehearsalEndDate: Date
+  Show: Show
+  TourTask: TourTaskDTO[]
 }
 
 export type TourDTO = {

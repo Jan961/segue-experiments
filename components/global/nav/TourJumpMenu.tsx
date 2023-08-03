@@ -30,7 +30,7 @@ export default function TourJumpMenu () {
         <option
           key={`${tour.ShowCode}/${tour.Code}`}
           value={tour.Code}>
-          {tour.ShowCode}/{tour.Code}
+          {tour.ShowCode}/{tour.Code} {tour.IsArchived ? '(Archived)' : ''}
         </option>
       ))
       }

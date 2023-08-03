@@ -12,6 +12,7 @@ export const ToolbarButton = ({ submit, onClick, children, disabled, className }
   let baseClass = 'bg-white shadow-md hover:shadow-lg text-primary-blue whitespace-nowrap font-bold py-2 px-5 rounded-l-md rounded-r-md'
 
   baseClass = classNames(baseClass, className)
+  if (disabled) baseClass = classNames(baseClass, 'opacity-50')
 
   return (
     <button onClick={onClick}
