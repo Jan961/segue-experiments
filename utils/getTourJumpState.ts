@@ -12,7 +12,7 @@ export const getTourJumpState = async (ctx, path: string): Promise<TourJump> => 
   const toursRaw = await getToursByShowCode(ShowCode as string)
 
   return {
-    tours: toursRaw.map((t: any) => (
+    tours: toursRaw.filter((x: any) => !x.IsArchived || x.Code === TourCode).map((t: any) => (
       {
         Code: t.Code,
         IsArchived: t.IsArchived,
