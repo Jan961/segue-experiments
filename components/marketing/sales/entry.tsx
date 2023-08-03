@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import Email from '../copyButton/email'
-import { dateToSimple, getWeekDay } from 'services/dateService'
-import moment from 'moment'
+import { dateToSimple } from 'services/dateService'
 import axios from 'axios'
 import { LoadingPage } from 'components/global/LoadingPage'
 import { useRecoilValue } from 'recoil'
@@ -12,22 +10,13 @@ interface props {
 }
 export default function Entry ({ searchFilter }: props) {
   const [isLoading, setLoading] = useState(false)
-  const [loadedEmails, setLoadedEmails] = useState([])
   const [salesWeeks, SetSalesWeeks] = useState([])
   const [salesWeeksVenues, SetSalesWeeksVenues] = useState([])
-  const [bookingSaleId, setBookingSaleId] = useState(null)
   const [options, setOptions] = useState<any>(null)
   const [holds, setHolds] = useState<any>({})
   const [comps, setComps] = useState<any>({})
-  const [status, setStatus] = useState({
-    submitted: false,
-    submitting: false,
-    info: { error: false, msg: null }
-  })
   const [inputs, setInputs] = useState<any>({})
   const { tours } = useRecoilValue(tourJumpState)
-  const type = 1
-  const AccountId = 1
   // tours===>`/api/tours/read/notArchived/${userService.userValue.accountId}
   // loaded emails====>/api/marketing/sales/emailImport/${AccountId}/${type}
   // Tour Dates====>`/api/tours/read/tourDates/${TourID}`
@@ -48,7 +37,6 @@ export default function Entry ({ searchFilter }: props) {
         .then((res) => res.json())
         .then(data => data.data)
         .then((data) => {
-          console.log('===Venues==', data)
           SetSalesWeeksVenues(data)
         })
     }
@@ -56,7 +44,6 @@ export default function Entry ({ searchFilter }: props) {
   const fetchSales = (SetSalesFiguresDate, SetBookingId) => {
     axios.post('/api/marketing/sales/read', { SetSalesFiguresDate, SetBookingId })
       .then((data) => {
-        console.log('===Sales==', data)
         // SetSalesWeeksVenues(data)
       }).catch(error => console.log(error))
   }
@@ -81,62 +68,8 @@ export default function Entry ({ searchFilter }: props) {
       fetchSales(inputs.SaleWeek, parseInt(inputs.Venue, 10))
     }
   }, [inputs.SaleWeek, inputs.Venue])
-  // const handleServerResponse = (ok, msg) => {
-  //   if (ok) {
-  //     setStatus({
-  //       submitted: true,
-  //       submitting: false,
-  //       info: { error: false, msg }
-  //     })
-  //     setInputs({})
-  //   } else {
-  //     // @ts-ignore
-  //     setStatus(false)
-  //   }
-  // }
 
   if (isLoading) return <LoadingPage />
-
-  // /**
-  //  * Onn update of activeSetTours
-  //  * Venues need updated
-  //  */
-  // function setTour (TourID) {
-  //   fetch(`/api/tours/read/tourDates/${TourID}`)
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       // setActiveSetTourDates(res)
-  //     })
-  // }
-
-  // /**
-  //  *  Booking ID set from Venue/Date
-  //  */
-  // function setVenueDate (TourId) {
-  //   // alert(TourId)
-  //   fetch(`/api/tours/read/week/${TourId}`)
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       SetSalesWeeksVenues([])
-  //       SetSalesWeeks(res)
-  //     })
-  //   inputs.BookingId = 999 // "Found Booking ID"
-  // }
-
-  // function setVenueWeek (RawMondayDate) {
-  //   const MondayDate = moment(new Date(RawMondayDate)).format('yyyy-MM-DD')
-  //   const SundayDate = moment(new Date(RawMondayDate))
-  //     .add(6, 'days')
-  //     .format('yyyy-MM-DD')
-
-  //   fetch(
-  //     `/api/bookings/ShowWeek/${inputs.SetTour}/${MondayDate}/${SundayDate}`
-  //   )
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       SetSalesWeeksVenues(res)
-  //     })
-  // }
 
   const handleOnChange = (e) => {
     e.persist()
@@ -148,26 +81,6 @@ export default function Entry ({ searchFilter }: props) {
       ...prev,
       [e.target.id]: e.target.value
     }))
-    setStatus({
-      submitted: false,
-      submitting: false,
-      info: { error: false, msg: null }
-    })
-  }
-
-  function importEmail (id) {
-    setInputs({})
-  }
-
-  function copyToClipboard () {}
-
-  async function addNotes () {
-    alert('hello')
-    await axios({
-      method: 'POST',
-      url: '/api/marketing/sales/process/entry/BookingSaleNotes',
-      data: inputs
-    })
   }
 
   async function onSubmit () {
@@ -187,8 +100,7 @@ export default function Entry ({ searchFilter }: props) {
     ]
     await axios.post('/api/marketing/sales/upsert', { Holds, Comps, Sales, SetBookingId: inputs.Venue, SetSalesFiguresDate: inputs.SalesWeek })
       .then((res) => {
-        setBookingSaleId(res.data.BookingSaleId)
-        addNotes()
+        console.log('Updated Sales', res)
       }).catch(error => {
         console.log('Error updating Sales', error)
       })
@@ -283,10 +195,7 @@ export default function Entry ({ searchFilter }: props) {
                       <option value={0}>Select A Performance</option>
                       {salesWeeksVenues?.sort((a, b) => a.Name?.localCompare?.(b.Name))?.map?.((venue) => (
                         <option key={venue.BookingId} value={venue.BookingId}>
-                          {/* {getWeekDay(item.ShowDate)}{' '}
-                          {dateToSimple(item.ShowDate)} |{' '} */}
                           {venue.Name}
-                          {/* ({item.Venue.Town}) */}
                         </option>
                       ))}
                     </select>
@@ -518,7 +427,7 @@ export default function Entry ({ searchFilter }: props) {
             </button>
           </form>
           <div>
-            <Email></Email>
+            {/* <Email></Email> */}
           </div>
         </div>
       </div>
@@ -526,12 +435,12 @@ export default function Entry ({ searchFilter }: props) {
         {/* Buttons go here  */}
         <div className="grid grid-cols-2 gap-1 mb-4">
 
-          <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Copy Last Weeks Sales Data</button>
-          <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Insert Data From Email</button>
+          {/* <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Copy Last Weeks Sales Data</button> */}
+          {/* <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Insert Data From Email</button> */}
         </div>
         <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border   ring-opacity-5 sm:-mx-6 md:mx-0 ">
           <div className={'mb-1'}></div>
-          <div>
+          {/* <div>
             {loadedEmails.length > 0 && (
               <>
                 <span>Click Email to load Data</span>
@@ -553,9 +462,9 @@ export default function Entry ({ searchFilter }: props) {
                 <span></span>
               </>
             )}
-          </div>
+          </div> */}
         </div>
-        <span>Our system found the following sales emails which matches the tour sale</span>
+        {/* <span>Our system found the following sales emails which matches the tour sale</span> */}
       </div>
     </div>
   )
