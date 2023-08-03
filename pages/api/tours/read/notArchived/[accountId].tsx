@@ -25,12 +25,6 @@ const generateSearchResults = async (options) => {
 }
 
 export default async function handle (req, res) {
-  // await NextCors(req, res, {
-  //   // Options
-  //   methods: ['GET', 'POST'],
-  //   origin: '*',
-  //   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  // });
   try {
     if (req.method === 'POST') {
       // To be changed back to headers once ssl cert is placed

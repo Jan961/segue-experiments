@@ -2,7 +2,7 @@ import classNames from 'classnames'
 
 export type SelectOption = {
   text: string
-  value: string
+  value: string | number
 }
 
 interface Input {

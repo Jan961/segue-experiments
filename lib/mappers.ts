@@ -1,5 +1,5 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes } from '@prisma/client'
-import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, VenueContactDTO, VenueRoleDTO } from 'interfaces'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes, TourTask } from '@prisma/client'
+import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, TourTaskDTO, VenueContactDTO, VenueRoleDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
 import { BookingsWithPerformances } from 'services/bookingService'
@@ -56,6 +56,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   Date: convertDate(b.FirstDate),
   Id: b.Id,
   VenueId: b.VenueId,
+  VenueName: b.Venue ? b.Venue.Name : undefined,
   LandingSite: b.LandingPageURL,
   StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
@@ -144,6 +145,14 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   Notes: a.Notes
 })
 
+export const mapToTourTaskDTO = (tourTask: TourTask): TourTaskDTO => {
+  return {
+    ...tourTask,
+    DueDate: convertDate(tourTask.DueDate),
+    FollowUp: convertDate(tourTask.FollowUp),
+    CreatedDate: convertDate(tourTask.CreatedDate)
+  }
+}
 
 export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Id: vr.Id,

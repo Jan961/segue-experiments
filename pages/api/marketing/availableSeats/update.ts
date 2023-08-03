@@ -13,8 +13,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   try {
     const x = req.body as UpdateAvailableSeatsParams
 
-    console.log(x)
-
     await prisma.$transaction(async (tx) => {
       let existing = await tx.availableComp.findFirst({
         where: {

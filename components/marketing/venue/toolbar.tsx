@@ -44,25 +44,27 @@ const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
           {show} / {tour} {title}
         </h1>
 
-        <div className="flex flex-row">
-          <form className="mt-4 relative">
-            <label htmlFor="searchBookings" className="sr-only">
+        { setSearchFilter && (
+          <div className="flex flex-row">
+            <form className="mt-4 relative">
+              <label htmlFor="searchBookings" className="sr-only">
               Search Venues
-            </label>
-            <div className="relative">
-              <input
-                onChange={(e) => setSearchFilter(e.currentTarget.value)}
-                value={searchFilter}
-                className="border-none pl-8 pr-2 py-1 rounded-md"
-                type="text"
-                placeholder="Search Venues..."
-              />
-              <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
+              </label>
+              <div className="relative">
+                <input
+                  onChange={(e) => setSearchFilter(e.currentTarget.value)}
+                  value={searchFilter}
+                  className="border-none pl-8 pr-2 py-1 rounded-md"
+                  type="text"
+                  placeholder="Search Venues..."
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
+                </div>
               </div>
-            </div>
-          </form>
-        </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
 

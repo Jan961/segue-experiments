@@ -50,17 +50,17 @@ export type ShowDTO = {
 
 // Existing tour interface for old schema. Remove eventually
 export type Tour = {
-  TourId: number;
-  Code: string;
-  Logo: string;
-  ShowId: Show;
-  TourStartDate: Date;
-  TourEndDate: Date;
-  Archived: boolean;
-  RehearsalStartDate: Date;
-  RehearsalEndDate: Date;
-  Show: Show;
-  TourTask: ITourTask[];
+  TourId: number
+  Code: string
+  Logo: string
+  ShowId: Show
+  TourStartDate: Date
+  TourEndDate: Date
+  Archived: boolean
+  RehearsalStartDate: Date
+  RehearsalEndDate: Date
+  Show: Show
+  TourTask: TourTaskDTO[]
 }
 
 export type TourDTO = {
@@ -104,6 +104,7 @@ export type BookingDTO = {
   Id: number
   Date: string
   VenueId: number
+  VenueName?: string
   StatusCode: StatusCode
   PencilNum: number
   LandingSite: string
@@ -269,30 +270,25 @@ export type BarringVenue = {
   barredVenue: Venue
 }
 
-export interface ITourTask {
-  TourTaskId: number;
-  TourId: number;
-  TaskCode: number;
-  TaskName: string;
-  StartByWeekCode: string;
-  CompleteByWeekCode: string;
-  Priority: number;
-  Notes?: string;
-  DeptRCK: boolean;
-  DeptMarketing: boolean;
-  DeptProduction: boolean;
-  DeptAccounts: boolean;
-  Progress: number;
-  DueDate?: Date;
-  FollowUp?: Date;
-  Assignee?: number;
-  AssignedBy?: number;
-  CreatedDate?: Date;
-  Interval?: intervalEnum;
-  User_TourTask_AssignedByToUser?: User;
-  User_TourTask_AssigneeToUser?: User;
-  Tour: Tour;
-  Status: string,
+export type TourTaskDTO = {
+  Id: number
+  TourId: number
+  Code: number
+  Name: string
+  Priority: number
+  Notes?: string
+  Progress: number
+  DueDate?: string
+  FollowUp?: string
+  CreatedDate?: string
+  Status?: string
+  Interval: string
+  AssignedBy?: string
+  AssignedTo?: string
+  StartByWeekNum?: number
+  CompleteByWeekNum?: number
+  CompleteByPostTour: boolean
+  StartByPostTour: boolean
 }
 
 enum intervalEnum {

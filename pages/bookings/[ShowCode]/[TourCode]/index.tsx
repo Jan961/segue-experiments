@@ -2,20 +2,20 @@ import { GetServerSideProps } from 'next'
 import GlobalToolbar from 'components/toolbar'
 import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
-import { TourContent, getToursByShowCode, getTourWithContent, lookupTourId } from 'services/TourService'
+import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector'
 import { DateTypeMapper, bookingMapper, dateBlockMapper, getInFitUpMapper, otherMapper, performanceMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { getAllVenuesMin, getDistances } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
-import { objectify } from 'radash'
+import { first, objectify } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
 import { filterState } from 'state/booking/filterState'
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
-import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
+import { tourJumpState } from 'state/booking/tourJumpState'
 import { ParsedUrlQuery } from 'querystring'
 import { Spinner } from 'components/global/Spinner'
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
@@ -23,6 +23,8 @@ import { MileageCalculator } from 'components/bookings/MileageCalculator'
 import { getStops } from 'utils/getStops'
 import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
+import { getTourJumpState } from 'utils/getTourJumpState'
+import { viewState } from 'state/booking/viewState'
 
 interface bookingProps {
   Id: number,
@@ -68,14 +70,16 @@ const BookingPage = ({ Id }: bookingProps) => {
   const schedule = useRecoilValue(filteredScheduleSelector)
   const { Sections } = schedule
   const [filter, setFilter] = useRecoilState(filterState)
+  const [view, setView] = useRecoilState(viewState)
   const { loading } = useRecoilValue(tourJumpState)
+  const todayKey = new Date().toISOString().substring(0, 10)
+  const todayOnSchedule = Sections.map(x => x.Dates).flat().filter(x => x.Date === todayKey).length > 0
 
   const gotoToday = () => {
-    const element = new Date().toISOString().substring(0, 10)
-    if (document.getElementById(`${element}`) !== null) {
-      document.getElementById(`${element}`).scrollIntoView({ behavior: 'smooth' })
-    } else {
-      alert('Today is not a date on this tour')
+    const idToScrollTo = `booking-${todayKey}`
+    if (todayOnSchedule) {
+      document.getElementById(`${idToScrollTo}`).scrollIntoView({ behavior: 'smooth' })
+      setView({ ...view, selectedDate: todayKey })
     }
   }
 
@@ -91,10 +95,11 @@ const BookingPage = ({ Id }: bookingProps) => {
           { /* <ToolbarInfo label='Week' value={"??"} /> */ }
           <MileageCalculator />
           <ToolbarButton
+            disabled={!todayOnSchedule}
             onClick={() => gotoToday()}>
             Go To Today
           </ToolbarButton>
-          <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
+          <BookingsButtons key={'toolbar'} currentTourId={Id} ></BookingsButtons>
         </GlobalToolbar>
       </div>
       <div className='grid grid-cols-12'>
@@ -110,16 +115,16 @@ const BookingPage = ({ Id }: bookingProps) => {
                 shadow-lg
                 text-gray-400
                 ">
-                <div className='col-span-2 p-2 whitespace-nowrap border-r border-gray-400'>
-                  Wk # & Date
+                <div className='col-span-2 p-2 whitespace-nowrap'>
+                  Week No. & Date
                 </div>
-                <div className='col-span-6 p-2 border-r border-gray-400'>
+                <div className='col-span-6 p-2'>
                   Venue
                 </div>
-                <div className='col-span-1 p-2 border-r border-gray-400'>
-                  Perf.
+                <div className='col-span-1 p-2'>
+                  Perf(s)
                 </div>
-                <div className='col-span-1 p-2 border-r border-gray-400'>
+                <div className='col-span-1 p-2'>
                   Miles
                 </div>
                 <div className='col-span-1 p-2'>
@@ -197,8 +202,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const stops = getStops(booking)
 
   // Extra info, Run in parallel
-  const [toursRaw, dateTypeRaw, distanceStops] = await Promise.all([
-    getToursByShowCode(ShowCode as string),
+  const [dateTypeRaw, distanceStops] = await Promise.all([
     getDayTypes(),
     getDistances(stops)]
   )
@@ -209,15 +213,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     tourCode: TourCode
   }
 
-  const tourJump: TourJump = {
-    tours: toursRaw.map((t: any) => (
-      {
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code
-      })),
-    selected: TourCode
-  }
+  const tourJump = await getTourJumpState(ctx, 'bookings')
 
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
