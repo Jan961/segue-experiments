@@ -47,6 +47,9 @@ const rearrangeArray = ({ arr, bookingIds }: {arr: TSalesView[], bookingIds: num
 export default async function handle (req, res) {
   try {
     const bookingIds: number[] = req.body.bookingIds
+    if (!bookingIds) {
+      throw new Error('Params are missing')
+    }
     const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${bookingIds.join(',')}) order by BookingFirstDate, SetSalesFiguresDate`
 
     const formattedData: TSalesView[] = data.filter((x: TSalesView) => bookingIds.includes(x.BookingId))
@@ -74,7 +77,7 @@ export default async function handle (req, res) {
         }
       ]), [])
     })
-  } catch (err) {
-    res.status(403).json({ err: 'Error occurred while generating search results.' })
+  } catch (error) {
+    res.status(403).json({ error: 'Error occurred while generating search results.', message: error.message })
   }
 }

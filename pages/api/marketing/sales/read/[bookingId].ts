@@ -20,7 +20,8 @@ export default async function handle (req, res) {
             ...val,
             ...(sale.SaleTypeName === 'General Sales' && {
               seatsSold: sale.Seats,
-              totalValue: sale.Value ? `${sale.VenueCurrencySymbol} ${sale.Value}` : ''
+              venueCurrencySymbol: sale.VenueCurrencySymbol,
+              totalValue: sale.Value
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
               reserved: sale.Seats,
@@ -38,7 +39,7 @@ export default async function handle (req, res) {
           seatsSalePercentage: (sale.Seats / sale.TotalCapacity) * 100,
           reservations: '',
           reserved: '',
-          VenueCurrencySymbol: sale.VenueCurrencySymbol,
+          venueCurrencySymbol: sale.VenueCurrencySymbol,
           totalValue: sale.Value || 0,
           valueChange: '',
           totalHolds: sale.TotalHoldSeats,
@@ -51,7 +52,7 @@ export default async function handle (req, res) {
           // saleType: sale.SaleTypeName,
           ...(sale.SaleTypeName === 'General Sales' && {
             seatsSold: sale.Seats,
-            totalValue: sale.Value ? `${sale.VenueCurrencySymbol} ${sale.Value}` : ''
+            totalValue: sale.Value
           }),
           ...(sale.SaleTypeName === 'General Reservations' && {
             reserved: sale.Seats,
