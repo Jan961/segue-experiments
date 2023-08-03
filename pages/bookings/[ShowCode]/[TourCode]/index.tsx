@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next'
 import GlobalToolbar from 'components/toolbar'
 import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
-import { TourContent, getToursByShowCode, getTourWithContent, lookupTourId } from 'services/TourService'
+import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector'
@@ -15,7 +15,7 @@ import { objectify } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
 import { filterState } from 'state/booking/filterState'
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
-import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
+import { tourJumpState } from 'state/booking/tourJumpState'
 import { ParsedUrlQuery } from 'querystring'
 import { Spinner } from 'components/global/Spinner'
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
@@ -23,6 +23,7 @@ import { MileageCalculator } from 'components/bookings/MileageCalculator'
 import { getStops } from 'utils/getStops'
 import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
+import { getTourJumpState } from 'utils/getTourJumpState'
 
 interface bookingProps {
   Id: number,
@@ -94,7 +95,7 @@ const BookingPage = ({ Id }: bookingProps) => {
             onClick={() => gotoToday()}>
             Go To Today
           </ToolbarButton>
-          <BookingsButtons key={'toolbar'} selectedBooking={undefined} currentTourId={Id} ></BookingsButtons>
+          <BookingsButtons key={'toolbar'} currentTourId={Id} ></BookingsButtons>
         </GlobalToolbar>
       </div>
       <div className='grid grid-cols-12'>
@@ -197,8 +198,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const stops = getStops(booking)
 
   // Extra info, Run in parallel
-  const [toursRaw, dateTypeRaw, distanceStops] = await Promise.all([
-    getToursByShowCode(ShowCode as string),
+  const [dateTypeRaw, distanceStops] = await Promise.all([
     getDayTypes(),
     getDistances(stops)]
   )
@@ -209,15 +209,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     tourCode: TourCode
   }
 
-  const tourJump: TourJump = {
-    tours: toursRaw.map((t: any) => (
-      {
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code
-      })),
-    selected: TourCode
-  }
+  const tourJump = await getTourJumpState(ctx, 'bookings')
 
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {

@@ -29,27 +29,27 @@ model AttachedFile {
 }
 
 model Booking {
-  Id                           Int                  @default(autoincrement()) @map("BookingId") @unique
-  DateBlockId                  Int                  @map("BookingDateBlockId")
-  VenueId                      Int                  @map("BookingVenueId")
-  FirstDate                    DateTime             @map("BookingFirstDate") @db.Date
-  StatusCode                   String               @default("U") @map("BookingStatusCode") @db.Char(1)
-  PencilNum                    Int?                 @map("BookingPencilNum")
-  LandingPageURL               String?              @map("BookingLandingPageURL") @db.VarChar(255)
-  TicketsOnSaleFromDate        DateTime?            @map("BookingTicketsOnSaleFromDate") @db.Date
-  TicketsOnSale                Boolean?             @map("BookingTicketsOnSale") @db.Bit(1)
-  IsOnSale                     Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingIsOnSale")
-  OnSaleDate                   DateTime?            @db.Date @map("BookingOnSaleDate")
-  MarketingPlanReceived        Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingMarketingPlanReceived")
-  ContactInfoReceived          Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingContactInfoReceived")
-  PrintReqsReceived            Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("BookingPrintReqsReceived")
-  BookedVenueHistory           BookedVenueHistory[]
-  DateBlock                    DateBlock            @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
-  Venue                        Venue                @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
-  BookingActivity              BookingActivity[]
-  Contract                     Contract?
-  Performance                  Performance[]
-  SalesSet                     SalesSet[]
+  Id                    Int                  @default(autoincrement()) @map("BookingId") @unique
+  DateBlockId           Int                  @map("BookingDateBlockId")
+  VenueId               Int                  @map("BookingVenueId")
+  FirstDate             DateTime             @map("BookingFirstDate") @db.Date
+  StatusCode            String               @default("U") @map("BookingStatusCode") @db.Char(1)
+  PencilNum             Int?                 @map("BookingPencilNum")
+  LandingPageURL        String?              @map("BookingLandingPageURL") @db.VarChar(255)
+  TicketsOnSaleFromDate DateTime?            @map("BookingTicketsOnSaleFromDate") @db.Date
+  TicketsOnSale         Boolean?             @map("BookingTicketsOnSale") @db.Bit(1)
+  IsOnSale              Boolean              @default(dbgenerated("(b'0')")) @map("BookingIsOnSale") @db.Bit(1)
+  OnSaleDate            DateTime?            @map("BookingOnSaleDate") @db.Date
+  MarketingPlanReceived Boolean              @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
+  ContactInfoReceived   Boolean              @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
+  PrintReqsReceived     Boolean              @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
+  BookedVenueHistory    BookedVenueHistory[]
+  DateBlock             DateBlock            @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
+  Venue                 Venue                @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
+  BookingActivity       BookingActivity[]
+  Contract              Contract?
+  Performance           Performance[]
+  SalesSet              SalesSet[]
 
   @@id([Id, DateBlockId])
   @@unique([DateBlockId, VenueId, FirstDate, StatusCode], map: "SECONDARY")
@@ -151,33 +151,27 @@ model Tour {
 }
 
 model TourTask {
-  Id                             Int       @id @default(autoincrement()) @map("TourTaskId")
-  TourId                         Int
-  TaskCode                       Int       @db.SmallInt
-  TaskName                       String    @db.VarChar(80)
-  StartByWeekCode                String    @db.VarChar(6)
-  CompleteByWeekCode             String    @db.VarChar(6)
-  Priority                       Int       @default(0) @db.TinyInt
-  Notes                          String?   @db.VarChar(500)
-  DeptRCK                        Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  DeptMarketing                  Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  DeptProduction                 Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  DeptAccounts                   Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  Progress                       Int       @default(0) @db.TinyInt
-  DueDate                        DateTime? @db.Date
-  FollowUp                       DateTime? @db.Date
-  Assignee                       Int?
-  AssignedBy                     Int?
-  CreatedDate                    DateTime? @db.Date
-  Status                         String?   @db.VarChar(20)
-  Interval                       String    @default("once") @db.VarChar(20)
-  User_TourTask_AssignedByToUser User?     @relation("TourTask_AssignedByToUser", fields: [AssignedBy], references: [UserId], onDelete: Restrict, onUpdate: Restrict, map: "FK_AssignedBy")
-  User_TourTask_AssigneeToUser   User?     @relation("TourTask_AssigneeToUser", fields: [Assignee], references: [UserId], onDelete: Restrict, onUpdate: Restrict, map: "FK_Assignee")
-  Tour                           Tour      @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
+  Id                     Int       @id @default(autoincrement()) @map("TourTaskId")
+  TourId                 Int
+  Code                   Int       @db.SmallInt @map("TaskCode")
+  Name                   String    @db.VarChar(80) @map("TaskName")
+  Priority               Int       @default(0) @db.TinyInt
+  Notes                  String?   @db.VarChar(500)
+  Progress               Int       @default(0) @db.TinyInt
+  DueDate                DateTime? @db.Date
+  FollowUp               DateTime? @db.Date
+  CreatedDate            DateTime? @db.Date
+  Status                 String?   @db.VarChar(20)
+  Interval               String    @default("once") @db.VarChar(20)
+  AssignedBy             String?   @db.VarChar(30) @map("TaskAssignedBy")
+  AssignedTo             String?   @db.VarChar(30) @map("TaskAssignedTo")
+  StartByWeekNum         Int?      @db.SmallInt @map("TaskStartByWeekNum")
+  CompleteByWeekNum      Int?      @db.SmallInt @map("TaskCompleteByWeekNum")
+  CompleteByPostTour     Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1) @map("TaskCompleteByPostTour")
+  StartByPostTour        Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1) @map("TaskStartByPostTour")
+  Tour                   Tour      @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
 
   @@index([TourId], map: "Tour_TourTask_fk")
-  @@index([AssignedBy], map: "FK_AssignedBy")
-  @@index([Assignee], map: "FK_Assignee")
 }
 
 model Venue {
@@ -373,15 +367,15 @@ model Account {
   Updated_at      DateTime @default(now()) @db.DateTime(0)
   Created_at      DateTime @default(now()) @db.DateTime(0)
   Show            Show[]
-  User            User[]
 }
 
 model AvailableComp {
-  Id                         Int              @id @default(autoincrement()) @map("AvailableCompId")
-  PerformanceId              Int              @map("AvailableCompPerformanceId")
-  Seats                      Int              @default(1) @db.TinyInt @map("AvailableCompSeats")
-  Performance                Performance      @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "PerformanceMayHaveAvailableComps")
-  CompAllocation             CompAllocation[]
+  Id                 Int              @id @default(autoincrement()) @map("AvailableCompId")
+  PerformanceId      Int              @map("AvailableCompPerformanceId")
+  Seats              Int              @default(1) @map("AvailableCompSeats") @db.TinyInt
+  AvailableCompNotes String?          @db.LongText
+  Performance        Performance      @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "PerformanceMayHaveAvailableComps")
+  CompAllocation     CompAllocation[]
 
   @@index([PerformanceId], map: "fkBooking_BookingPromoterHoldAvailable")
 }
@@ -399,17 +393,17 @@ model BookedVenueHistory {
 }
 
 model CompAllocation {
-  Id                                   Int           @id @default(autoincrement()) @map("CompAllocationId")
-  AvailableCompId                      Int           @map("CompAllocationAvailableCompId")
-  TicketHolderName                     String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                                Int           @default(1) @db.TinyInt @map("CompAllocationSeats")
-  Comments                             String?       @db.VarChar(100) @map("CompAllocationComments")
-  RequestedBy                          String?       @db.VarChar(50) @map("CompAllocationRequestedBy")
-  ArrangedBy                           String?       @db.VarChar(50) @map("CompAllocationArrangedBy")
-  VenueConfirmationNotes               String?       @db.VarChar(100) @map("CompAllocationVenueConfirmationNotes")
-  TicketHolderEmail                    String?       @db.VarChar(80) @map("CompAllocationTicketHolderEmail")
-  SeatsAllocated                       String?       @db.VarChar(50) @map("CompAllocationSeatsAllocated")
-  AvailableComp                        AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
+  Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
+  AvailableCompId        Int           @map("CompAllocationAvailableCompId")
+  TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
+  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
+  RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
+  ArrangedBy             String?       @map("CompAllocationArrangedBy") @db.VarChar(50)
+  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
+  SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
 }
@@ -519,25 +513,4 @@ model SetHold {
 
   @@index([SetHoldHoldTypeId], map: "HoldType_SetHold")
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
-}
-
-model User {
-  UserId                             Int        @id @default(autoincrement())
-  UserCode                           String?    @unique(map: "User_UserCode_un") @db.VarChar(3)
-  UserName                           String     @unique(map: "User_UserName_un") @db.VarChar(30)
-  IsActive                           Boolean    @default(dbgenerated("(b'1')")) @db.Bit(1)
-  EmailAddress                       String     @unique(map: "EmailAddress") @db.VarChar(255)
-  Password                           String     @db.VarChar(255)
-  AccountId                          Int
-  Guid                               String     @db.VarChar(255)
-  AccountOwner                       Int        @default(0)
-  AccountAdmin                       Int        @default(0)
-  SegueAdmin                         Int        @default(0)
-  Updated_at                         DateTime   @default(now()) @db.DateTime(0)
-  Created_at                         DateTime   @default(now()) @db.DateTime(0)
-  TourTask_TourTask_AssignedByToUser TourTask[] @relation("TourTask_AssignedByToUser")
-  TourTask_TourTask_AssigneeToUser   TourTask[] @relation("TourTask_AssigneeToUser")
-  Account                            Account    @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_User")
-
-  @@index([AccountId], map: "Account_User_idx")
 }

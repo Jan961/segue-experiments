@@ -3,24 +3,20 @@ import { first } from 'radash'
 import { useRecoilState } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
 
-type props = {
-  page?:string;
-}
-
-export default function TourJumpMenu ({ page = '/bookings' }:props) {
+export default function TourJumpMenu () {
   const router = useRouter()
   const [tourJump, setTourJump] = useRecoilState(tourJumpState)
 
   if (!tourJump?.selected || !tourJump?.tours?.length) return null
 
-  const { tours, selected } = tourJump
+  const { tours, selected, path } = tourJump
   function goToTour (e: any) {
     const showCode = first(tours)?.ShowCode
     if (!showCode) return
 
     const { value } = e.target
     setTourJump({ ...tourJump, loading: true, selected: value })
-    router.push(`${page}/${showCode}/${value}`)
+    router.push(`/${path}/${showCode}/${value}`)
   }
 
   return (

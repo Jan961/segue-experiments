@@ -10,6 +10,7 @@ import { getSaleableBookings } from 'services/bookingService'
 import { BookingJump } from 'state/marketing/bookingJumpState'
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers'
 import { getRoles } from 'services/contactService'
+import { getTourJumpState } from 'utils/getTourJumpState'
 
 type Props = {
   initialState: InitialState
@@ -32,22 +33,9 @@ const Index = ({ initialState }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { ShowCode, TourCode } = ctx.params
+  const tourJump = await getTourJumpState(ctx, 'marketing')
 
-  const toursRaw = await getToursByShowCode(ShowCode as string)
-
-  const tourJump: TourJump = {
-    tours: toursRaw.map((t: any) => (
-      {
-        Id: t.Id,
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code
-      })),
-    selected: TourCode as string
-  }
-
-  const tourId = tourJump.tours.filter(x => x.Code === TourCode)[0].Id
+  const tourId = tourJump.tours.filter(x => x.Code === tourJump.selected)[0].Id
 
   const bookings = await getSaleableBookings(tourId)
 
