@@ -7,7 +7,11 @@ import { LoadingTab } from './tabs/LoadingTab'
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]'
 import { DescriptionList as DL } from 'components/global/DescriptionList'
 
-export const Summary = () => {
+type props={
+  salesSummary:any;
+}
+
+export const Summary = ({ salesSummary }:props) => {
   const { selected } = useRecoilValue(bookingJumpState)
   const [summary, setSummary] = React.useState<Partial<SummaryResponseDTO>>({})
   const [loading, setLoading] = React.useState(true)
@@ -75,7 +79,7 @@ export const Summary = () => {
           Total Seats Sold
         </DL.Term>
         <DL.Desc>
-          TODO
+          {salesSummary?.seatsSold || '-'}
         </DL.Desc>
         <DL.Term>
           Gross Profit
@@ -93,25 +97,25 @@ export const Summary = () => {
           Percent Booked
         </DL.Term>
         <DL.Desc>
-          TODO
+          {salesSummary?.seatsSalePercentage || '-'}
         </DL.Desc>
         <DL.Term>
           Capacity
         </DL.Term>
         <DL.Desc>
-          TODO
+          {salesSummary?.capacity || '-'}
         </DL.Desc>
         <DL.Term>
           Total Seats
         </DL.Term>
         <DL.Desc>
-          TODO
+          {salesSummary?.capacity || '-'}
         </DL.Desc>
         <DL.Term>
           Currency
         </DL.Term>
         <DL.Desc>
-          TODO
+          {`${salesSummary?.venueCurrencySymbol}${salesSummary?.totalValue}` || '-'}
         </DL.Desc>
       </DL>
       <hr className='border-gray-500 border-opacity-50 my-4'/>

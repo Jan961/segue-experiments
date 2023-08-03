@@ -28,11 +28,11 @@ const HeaderRow = ({ children }: PropsWithChildren<unknown>) => {
   )
 }
 
-const HeaderCell = ({ children }: PropsWithChildren<unknown>) => {
+const HeaderCell = ({ children, className }: PropsWithChildren<ClassNameable>) => {
   return (
     <th
       scope="col"
-      className="py-2 px-2 text-left text-sm font-normal text-white"
+      className={classNames('py-2 px-2 text-left text-sm font-normal text-white', className) }
     >
       { children }
     </th>

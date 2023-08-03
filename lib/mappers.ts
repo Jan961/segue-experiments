@@ -66,6 +66,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
   ...bookingMapper(b),
   Venue: {
+    Code: b.Venue.Code,
     Name: b.Venue.Name,
     Website: b.Venue.Website
   }
