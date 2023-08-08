@@ -28,12 +28,13 @@ export const OtherDisplay = ({ otherId, date }: OtherDisplayProps) => {
   return (
     <div
       onClick={select}
-      className={`inline-block p-1 px-2 border-l-8
+      className={`p-1 px-2 border-l-8
       border rounded
+      grid grid-cols-10
       border-lime-500 bg-lime-200
       ${active ? 'shadow bg-lime-400' : 'hover:bg-lime-300'}
       `}>
-      Other: { match?.Name }
+      <div className="col-span-7 text-center">Other: { match?.Name }</div>
     </div>
   )
 }

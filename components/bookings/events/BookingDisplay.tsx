@@ -42,10 +42,8 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
     ${active ? 'border-gray-400 bg-gray-300 shadow bg-opacity-100' : 'hover:bg-opacity-100 hover:bg-gray-200'}
     `}
     onClick={select}>
-      <div className="col-span-7">
-        <span>
-          { venue ? venue.Name : 'No Venue' }
-        </span>
+      <div className="col-span-7 text-center">
+        { venue ? venue.Name : 'No Venue' }
       </div>
       <div className="col-span-1">
         { performanceCount }

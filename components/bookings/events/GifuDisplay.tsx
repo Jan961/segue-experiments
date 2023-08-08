@@ -26,13 +26,14 @@ export const GifuDisplay = ({ gifuId, date }: GifuDisplayProps) => {
 
   return (
     <div
-      className={`inline-block p-1 px-2 border-l-8 border rounded
+      className={`p-1 px-2 border-l-8 border rounded
       border-amber-500 bg-amber-100
+      grid grid-cols-10
       ${active ? 'bg-amber-300 shadow' : 'hover:bg-amber-200'}
       `}
       onClick={select}
     >
-      GIFU: { Name }
+      <div className="col-span-7 text-center">GIFU: { Name }</div>
     </div>
   )
 }
