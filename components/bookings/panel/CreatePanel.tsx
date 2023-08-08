@@ -18,6 +18,8 @@ import { getDateBlockId } from './utils/getDateBlockId'
 import { faMagicWandSparkles } from '@fortawesome/free-solid-svg-icons'
 import { GapPanel } from './GapPanel'
 import { findPrevAndNextBookings } from './utils/findPrevAndNextBooking'
+import { VenueWithDistance } from 'pages/api/venue/read/distance'
+import { GapChoicePanel } from './GapChoicePanel'
 
 enum PanelMode {
   Start = 0,
@@ -25,7 +27,8 @@ enum PanelMode {
   Peformance = 2,
   Gifu = 3,
   Other = 4,
-  GapSuggest = 5,
+  Gap = 5,
+  GapChoice = 6,
 }
 
 export default function CreatePanel () {
@@ -37,6 +40,7 @@ export default function CreatePanel () {
 
   const [mode, setMode] = React.useState<PanelMode>(PanelMode.Start)
   const [bookingId, setBookingId] = React.useState<number>(undefined)
+  const [gapVenues, setGapVenues] = React.useState<VenueWithDistance[]>([])
 
   const commonButtonClasses = 'w-full p-4 mb-4'
 
@@ -51,7 +55,13 @@ export default function CreatePanel () {
 
   const reset = () => {
     setBookingId(undefined)
+    setGapVenues(undefined)
     setMode(PanelMode.Start)
+  }
+
+  const setGapVenueIds = (venues: VenueWithDistance[]) => {
+    setMode(PanelMode.GapChoice)
+    setGapVenues(venues)
   }
 
   if (mode === PanelMode.Peformance) {
@@ -78,9 +88,15 @@ export default function CreatePanel () {
     )
   }
 
-  if (mode === PanelMode.GapSuggest) {
+  if (mode === PanelMode.Gap) {
     return (
-      <GapPanel reset={reset} />
+      <GapPanel reset={reset} setGapVenueIds={setGapVenueIds} />
+    )
+  }
+
+  if (mode === PanelMode.GapChoice) {
+    return (
+      <GapChoicePanel reset={reset} gapVenues={gapVenues} />
     )
   }
 
@@ -106,7 +122,7 @@ export default function CreatePanel () {
         text="Gap Suggest"
         disabled={!prevBookings.length || !nextBookings.length}
         icon={faMagicWandSparkles}
-        onClick={() => setMode(PanelMode.GapSuggest)} />
+        onClick={() => setMode(PanelMode.Gap)} />
       <div className="grid grid-cols-2 gap-2">
         <FormInputButton className={commonButtonClasses} text="Booking" onClick={() => setMode(PanelMode.Booking)} />
         <FormInputButton className={commonButtonClasses} text="Rehearsal" onClick={createRehearsal}/>

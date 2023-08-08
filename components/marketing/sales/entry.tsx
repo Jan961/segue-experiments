@@ -9,47 +9,47 @@ import { LoadingPage } from 'components/global/LoadingPage'
 interface props {
   searchFilter: String;
 }
-export default function Entry({ searchFilter }: props) {
-  const [activeSetTours, setActiveSetTours] = useState([]);
-  const [activeSetTourDates, setActiveSetTourDates] = useState([]);
-  const [isLoading, setLoading] = useState(false);
-  const [loadedEmails, setLoadedEmails] = useState([]);
-  const [salesWeeks, SetSalesWeeks] = useState([]);
-  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
-  const [bookingSaleId, setBookingSaleId] = useState(null);
-  const type = 1;
-  const AccountId = userService.userValue.accountId;
+export default function Entry ({ searchFilter }: props) {
+  const [activeSetTours, setActiveSetTours] = useState([])
+  const [activeSetTourDates, setActiveSetTourDates] = useState([])
+  const [isLoading, setLoading] = useState(false)
+  const [loadedEmails, setLoadedEmails] = useState([])
+  const [salesWeeks, SetSalesWeeks] = useState([])
+  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([])
+  const [bookingSaleId, setBookingSaleId] = useState(null)
+  const type = 1
+  const AccountId = 1
 
-  useEffect(() => {
-    setLoading(true);
-    fetch(`/api/marketing/sales/emailImport/${AccountId}/${type}`)
-      .then((res) => res.json())
-      .then((res) => {
-        setLoadedEmails(res);
-      });
-    fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
-        {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json;charset=UTF-8',
-            "segue_admin": userService.userValue.segueAdmin,
-            "account_admin": userService.userValue.accountAdmin,
-            "user_id": userService.userValue.userId
-          },
-        })
-      .then((res) => res.json())
-      .then((res) => {
-        setActiveSetTours(res);
+  // useEffect(() => {
+  //   setLoading(true)
+  //   fetch(`/api/marketing/sales/emailImport/${AccountId}/${type}`)
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       setLoadedEmails(res)
+  //     })
+  //   fetch(`/api/tours/read/notArchived/${userService.userValue.accountId}`,
+  //     {
+  //       method: 'POST',
+  //       headers: {
+  //         'content-type': 'application/json;charset=UTF-8',
+  //         segue_admin: userService.userValue.segueAdmin,
+  //         account_admin: userService.userValue.accountAdmin,
+  //         user_id: userService.userValue.userId
+  //       }
+  //     })
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       setActiveSetTours(res)
 
-        setLoading(false);
-      });
-  }, []);
+  //       setLoading(false)
+  //     })
+  // }, [])
 
   const [status, setStatus] = useState({
     submitted: false,
     submitting: false,
-    info: { error: false, msg: null },
-  });
+    info: { error: false, msg: null }
+  })
 
   const [inputs, setInputs] = useState({
     SetTour: null,
@@ -102,24 +102,24 @@ export default function Entry({ searchFilter }: props) {
     PressHoldsValue: 0,
     PromoterHoldsValue: 0,
     PromoterHoldsSeats: 0,
-    BookingSaleNotes: "",
-    CompNotes: "",
-    HoldNotes: "",
-    BookingSaleId: null,
-  });
+    BookingSaleNotes: '',
+    CompNotes: '',
+    HoldNotes: '',
+    BookingSaleId: null
+  })
 
   const handleServerResponse = (ok, msg) => {
     if (ok) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
-      });
+        info: { error: false, msg }
+      })
       setInputs({
         BookingSaleId: null,
-        BookingSaleNotes: "",
-        CompNotes: "",
-        HoldNotes: "",
+        BookingSaleNotes: '',
+        CompNotes: '',
+        HoldNotes: '',
         CastCrewHoldsSeats: 0,
         CastCrewHoldsValue: 0,
         CastCrewSeats: 0,
@@ -170,13 +170,13 @@ export default function Entry({ searchFilter }: props) {
         SchoolsSeatsSoldValue: 0,
         Confirmed: false,
 
-        BookingId: 0,
-      });
+        BookingId: 0
+      })
     } else {
       // @ts-ignore
-      setStatus(false);
+      setStatus(false)
     }
-  };
+  }
 
   if (isLoading) return <LoadingPage />
 
@@ -184,78 +184,78 @@ export default function Entry({ searchFilter }: props) {
    * Onn update of activeSetTours
    * Venues need updated
    */
-  function setTour(TourID) {
+  function setTour (TourID) {
     fetch(`/api/tours/read/tourDates/${TourID}`)
       .then((res) => res.json())
       .then((res) => {
-        setActiveSetTourDates(res);
-      });
+        setActiveSetTourDates(res)
+      })
   }
 
   /**
    *  Booking ID set from Venue/Date
    */
-  function setVenueDate(TourId) {
-    //alert(TourId)
+  function setVenueDate (TourId) {
+    // alert(TourId)
     fetch(`/api/tours/read/week/${TourId}`)
       .then((res) => res.json())
       .then((res) => {
-        SetSalesWeeksVenues([]);
-        SetSalesWeeks(res);
-      });
+        SetSalesWeeksVenues([])
+        SetSalesWeeks(res)
+      })
 
-    inputs.BookingId = 999; //"Found Booking ID"
+    inputs.BookingId = 999 // "Found Booking ID"
   }
 
-  function setVenueWeek(RawMondayDate) {
-    let MondayDate = moment(new Date(RawMondayDate)).format("yyyy-MM-DD");
-    let SundayDate = moment(new Date(RawMondayDate))
-      .add(6, "days")
-      .format("yyyy-MM-DD");
+  function setVenueWeek (RawMondayDate) {
+    const MondayDate = moment(new Date(RawMondayDate)).format('yyyy-MM-DD')
+    const SundayDate = moment(new Date(RawMondayDate))
+      .add(6, 'days')
+      .format('yyyy-MM-DD')
 
     fetch(
       `/api/bookings/ShowWeek/${inputs.SetTour}/${MondayDate}/${SundayDate}`
     )
       .then((res) => res.json())
       .then((res) => {
-        SetSalesWeeksVenues(res);
-      });
+        SetSalesWeeksVenues(res)
+      })
   }
 
   const handleOnChange = (e) => {
-    e.persist();
+    e.persist()
 
-    if (e.target.name === "SetTour") {
-      setTour(e.target.value);
-      setVenueDate(e.target.value);
+    if (e.target.name === 'SetTour') {
+      setTour(e.target.value)
+      setVenueDate(e.target.value)
     }
-    if (e.target.name === "SaleWeek") {
-      setVenueWeek(e.target.value);
+    if (e.target.name === 'SaleWeek') {
+      setVenueWeek(e.target.value)
     }
 
-    if (e.target.name === "Venue") {
-      inputs.BookingId = e.target.value;
+    if (e.target.name === 'Venue') {
+      inputs.BookingId = e.target.value
     }
 
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
-    }));
+      [e.target.id]: e.target.value
+    }))
     setStatus({
       submitted: false,
       submitting: false,
-      info: { error: false, msg: null },
-    });
-  };
+      info: { error: false, msg: null }
+    })
+  }
 
-  function importEmail(id) {
+  function importEmail (id) {
     setInputs({
       BookingSaleId: null,
-      BookingSaleNotes: "",
-      CompNotes: "",
-      HoldNotes: "",
+      BookingSaleNotes: '',
+      CompNotes: '',
+      HoldNotes: '',
       PromoterSeats: undefined,
-      SetTour: "",
+      SetTour: '',
       CastCrewHoldsSeats: undefined,
       CastCrewHoldsValue: undefined,
       CastCrewSeats: undefined,
@@ -302,33 +302,33 @@ export default function Entry({ searchFilter }: props) {
       SchoolsSeatsSold: 0,
       SchoolsSeatsSoldValue: 0,
       Confirmed: false,
-      BookingId: 0,
-    });
+      BookingId: 0
+    })
   }
 
-  function copyToClipboard() {}
+  function copyToClipboard () {}
 
-  async function addNotes() {
-    alert("hello");
+  async function addNotes () {
+    alert('hello')
     await axios({
-      method: "POST",
-      url: "/api/marketing/sales/process/entry/BookingSaleNotes",
-      data: inputs,
-    });
+      method: 'POST',
+      url: '/api/marketing/sales/process/entry/BookingSaleNotes',
+      data: inputs
+    })
   }
 
-  async function onSubmit() {
-    //Validation  TODO: Validation rules based on last weeks entires
-    //alert("submit" + JSON.stringify(inputs))
+  async function onSubmit () {
+    // Validation  TODO: Validation rules based on last weeks entires
+    // alert("submit" + JSON.stringify(inputs))
 
     await axios({
-      method: "POST",
-      url: "/api/marketing/sales/process/entry/BookingSale",
-      data: inputs,
+      method: 'POST',
+      url: '/api/marketing/sales/process/entry/BookingSale',
+      data: inputs
     }).then((res) => {
-      setBookingSaleId(res.data.BookingSaleId);
-      addNotes();
-    });
+      setBookingSaleId(res.data.BookingSaleId)
+      addNotes()
+    })
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -345,9 +345,9 @@ export default function Entry({ searchFilter }: props) {
 
   return (
     <div className="flex flex-row w-full">
-      <div className={"flex bg-transparent w-5/8 p-5"}>
+      <div className={'flex bg-transparent w-5/8 p-5'}>
         <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-          <div className={"mb-1"}></div>
+          <div className={'mb-1'}></div>
           <form onSubmit={onSubmit}>
             <div>
               <div className="bg-soft-primary-green p-4 rounded-md mb-4">
@@ -414,8 +414,8 @@ export default function Entry({ searchFilter }: props) {
                       <option value={0}>Select A Performance</option>
                       {salesWeeksVenues.map((item) => (
                         <option key={item.BookingId} value={item.BookingId}>
-                          {getWeekDay(item.ShowDate)}{" "}
-                          {dateToSimple(item.ShowDate)} |{" "}
+                          {getWeekDay(item.ShowDate)}{' '}
+                          {dateToSimple(item.ShowDate)} |{' '}
                           {item.Venue.Name} ({item.Venue.Town})
                         </option>
                       ))}
@@ -424,7 +424,7 @@ export default function Entry({ searchFilter }: props) {
                 </div>
 
                 <div className="columns-2">
-                  <div className={"columns-1"}>
+                  <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
                       <label
                         htmlFor="SeatSoldValue"
@@ -463,7 +463,7 @@ export default function Entry({ searchFilter }: props) {
                       </div>
                     </div>
                   </div>
-                  <div className={"columns-1"}>
+                  <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
                       <label
                         htmlFor="street-address"
@@ -508,11 +508,11 @@ export default function Entry({ searchFilter }: props) {
 
               <div className="grid-cols-2 grid gap-4  md:gap-6 pt-10">
                 <div className="sm:col-span-1" >
-                  <div className={"flex flex-col"}>
+                  <div className={'flex flex-col'}>
                     <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:pt-2">
-                        <div className=" sm:col-span-1 sm:mt-0">Holds</div>
-                        <div className=" sm:col-span-1 text-center sm:mt-0">Seats</div>
-                        <div className=" sm:col-span-1 text-center sm:mt-0">Value</div>
+                      <div className=" sm:col-span-1 sm:mt-0">Holds</div>
+                      <div className=" sm:col-span-1 text-center sm:mt-0">Seats</div>
+                      <div className=" sm:col-span-1 text-center sm:mt-0">Value</div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                       <label
@@ -907,9 +907,9 @@ export default function Entry({ searchFilter }: props) {
                     </div>
                   </div>
                 </div>
-                <div className={"col-span-1"}>
+                <div className={'col-span-1'}>
                   <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 pt-2">
-                  <div className={" sm:col-span-1 "}>Comps</div>
+                    <div className={' sm:col-span-1 '}>Comps</div>
                     <div className=" text-right sm:col-span-2 ">Seats</div>
                   </div>
                   <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
@@ -1184,71 +1184,71 @@ export default function Entry({ searchFilter }: props) {
                 </div>
               </div>
 
-                <div className={"columns-1"}>
-                  <div className="sm:grid sm:grid-cols-2 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
-                    <div className="flex flex-col w-full col-span-1">
+              <div className={'columns-1'}>
+                <div className="sm:grid sm:grid-cols-2 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
+                  <div className="flex flex-col w-full col-span-1">
                     <label
                       htmlFor="street-address"
                       className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
+                    >
                       Hold Notes
                     </label>
                     <div className="mt-1 sm:col-span-2 sm:mt-0">
                       <textarea
                         className="w-full"
                         onChange={handleOnChange}
-                        name={"HoldNotes"}
-                        id={"HoldNotes"}
+                        name={'HoldNotes'}
+                        id={'HoldNotes'}
                         value={inputs.HoldNotes}
-                        ></textarea>
-                    </div>
-                        </div>
-                <div className={"col-span-1"}>
-                  <div className="flex flex-col px-2 sm:items-start sm:border-none sm:border-gray-200 w-full">
-                    <label
-                      htmlFor="street-address"
-                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                    >
-                      Comp Notes
-                    </label>
-                    <div className="mt-1 sm:mt-0">
-                      <textarea
-                        onChange={handleOnChange}
-                        name={"CompNotes"}
-                        id={"CompNotes"}
-                        value={inputs.CompNotes}
-                        className="w-full"
-
                       ></textarea>
                     </div>
                   </div>
-                </div>
+                  <div className={'col-span-1'}>
+                    <div className="flex flex-col px-2 sm:items-start sm:border-none sm:border-gray-200 w-full">
+                      <label
+                        htmlFor="street-address"
+                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                      >
+                      Comp Notes
+                      </label>
+                      <div className="mt-1 sm:mt-0">
+                        <textarea
+                          onChange={handleOnChange}
+                          name={'CompNotes'}
+                          id={'CompNotes'}
+                          value={inputs.CompNotes}
+                          className="w-full"
+
+                        ></textarea>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
               </div>
-              <div className={"flex flex-col"}>
-                  <label
-                    htmlFor="street-address"
-                    className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                  >
+              <div className={'flex flex-col'}>
+                <label
+                  htmlFor="street-address"
+                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                >
                     Booking Sale Notes
-                  </label>
-                  <div className="mt-1 sm:mt-0 w-full">
-                    <textarea
-                      onChange={handleOnChange}
-                      name={"BookingSaleNotes"}
-                      id={"BookingSaleNotes"}
-                      value={inputs.BookingSaleNotes}
-                      className="w-full"
-                    ></textarea>
-                  </div>
+                </label>
+                <div className="mt-1 sm:mt-0 w-full">
+                  <textarea
+                    onChange={handleOnChange}
+                    name={'BookingSaleNotes'}
+                    id={'BookingSaleNotes'}
+                    value={inputs.BookingSaleNotes}
+                    className="w-full"
+                  ></textarea>
+                </div>
               </div>
             </div>
 
             <button
-              type={"submit"}
+              type={'submit'}
               className={
-                "inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2"
+                'inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
               }
             >
               Add Sales Data
@@ -1259,15 +1259,15 @@ export default function Entry({ searchFilter }: props) {
           </div>
         </div>
       </div>
-      <div className={"flex bg-transparent flex flex-col w-1/3 p-5"}>
+      <div className={'flex bg-transparent flex flex-col w-1/3 p-5'}>
         {/* Buttons go here  */}
         <div className="grid grid-cols-2 gap-1 mb-4">
 
-        <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Copy Last Weeks Sales Data</button>
-        <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Insert Data From Email</button>
+          <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Copy Last Weeks Sales Data</button>
+          <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Insert Data From Email</button>
         </div>
         <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border   ring-opacity-5 sm:-mx-6 md:mx-0 ">
-          <div className={"mb-1"}></div>
+          <div className={'mb-1'}></div>
           <div>
             {loadedEmails.length > 0 && (
               <>
@@ -1277,7 +1277,7 @@ export default function Entry({ searchFilter }: props) {
                     <button onClick={() => importEmail(item.Id)}>
                       <span>
                         {JSON.stringify(item)}
-                        {item.SetTour} {dateToSimple(item.Date)}{" "}
+                        {item.SetTour} {dateToSimple(item.Date)}{' '}
                         Import
                       </span>
                     </button>
@@ -1295,5 +1295,5 @@ export default function Entry({ searchFilter }: props) {
         <span>Our system found the following sales emails which matches the tour sale</span>
       </div>
     </div>
-  );
+  )
 }

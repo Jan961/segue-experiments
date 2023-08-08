@@ -8,6 +8,7 @@ import { VenueSelector } from './components/VenueSelector'
 import { getDateBlockId } from './utils/getDateBlockId'
 import { viewState } from 'state/booking/viewState'
 import { bookingState } from 'state/booking/bookingState'
+import { distanceState } from 'state/booking/distanceState'
 
 interface CreateBookingPanelProps {
   reset: () => void
@@ -17,6 +18,7 @@ export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
   const [venueId, setVenueId] = React.useState<number>(undefined)
   const { selectedDate } = useRecoilValue(viewState)
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
+  const [distance, setDistance] = useRecoilState(distanceState)
   const schedule = useRecoilValue(scheduleSelector)
   const DateBlockId = getDateBlockId(schedule, selectedDate)
 
@@ -25,6 +27,7 @@ export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
     const { data } = await axios.post('/api/bookings/create', newDate)
     const newState = { ...bookingDict, [data.Id]: data }
     setBookingDict(newState)
+    setDistance({ ...distance, outdated: true })
     cancel()
   }
 

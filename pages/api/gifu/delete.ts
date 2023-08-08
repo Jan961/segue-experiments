@@ -13,9 +13,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       })
     ])
     console.log(`Deleted GIFU: ${gifu.Id}`)
-    res.status(200).json({})
+    return res.status(200).json({})
   } catch (e) {
     console.log(e)
-    res.status(500).json({ err: 'Error Deleting GIFU' })
+    return res.status(500).json({ err: 'Error Deleting GIFU' })
   }
 }

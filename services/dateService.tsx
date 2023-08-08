@@ -35,11 +35,11 @@ export const dateToPicker = (dateToFormat: Date | string) => {
   return typeof dateToFormat === 'object' ? dateToFormat.toISOString().slice(0, 10) : dateToFormat.slice(0, 10)
 }
 
-export const dateTimeToTime = (dateToFormat) => {
+export const dateTimeToTime = (dateToFormat: string) => {
   return moment(dateToFormat).format('HH:mm')
 }
 
-export const toISO = (date) => {
+export const toISO = (date: Date) => {
   return date.toISOString()
 }
 
@@ -60,6 +60,11 @@ export const getDateDaysInFuture = (date, daysToSubtract) => {
 export const getWeekDay = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat)
   return date.toLocaleDateString('en-US', { weekday: 'long' })
+}
+
+export const getWeekDayShort = (dateToFormat: Date | string) => {
+  const date = safeDate(dateToFormat)
+  return date.toLocaleDateString('en-US', { weekday: 'short' })
 }
 
 export const getWeekDayLong = (dateToFormat: Date | string) => {
@@ -109,11 +114,11 @@ export const formatTime = (timestamp) => {
 }
 
 export const timeFormat = (mins?: number) => {
-  if (!mins) return 'N/A'
+  if (!mins) return ''
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`
 }
 
-export const formatDateUK = (date) =>{
+export const formatDateUK = (date) => {
   // This will ignre date
   const today = new Date(date)
   return today.toLocaleDateString('en-GB')
@@ -131,7 +136,7 @@ export const getSunday = (inputDate) => {
   return currentDateObj
 }
 
-export const quickISO = (DateString: string) =>{
+export const quickISO = (DateString: string) => {
   return new Date(DateString)
 }
 

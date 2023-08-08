@@ -43,6 +43,7 @@ export const getToursByShowCode = (Code: string) => {
       }
     },
     select: {
+      Id: true,
       Code: true,
       IsArchived: true,
       Show: {
@@ -61,7 +62,8 @@ const tourContentInclude = Prisma.validator<Prisma.TourSelect>()({
     include: {
       Booking: {
         include: {
-          Performance: true
+          Performance: true,
+          Venue: true
         }
       },
       GetInFitUp: true,
@@ -94,5 +96,22 @@ export const getTourById = async (Id: number) => {
       Id
     },
     include: tourDateBlockIndlude
+  })
+}
+
+export const getToursAndTasks = async () => {
+  return await prisma.tour.findMany({
+    where: {
+      IsArchived: false
+    },
+    include: {
+      Show: true,
+      TourTask: {
+        orderBy: {
+          Id: 'desc'
+        },
+        take: 10
+      }
+    }
   })
 }

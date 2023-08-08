@@ -6,9 +6,10 @@ import { PopoutMenu } from 'components/PopoutMenu'
 type Props = {
     children?: ReactNode
     title?: string
+    flush?: boolean
 }
 
-const Layout = ({ children, title = 'Your tour assistant' }: Props) => {
+const Layout = ({ children, title = 'Your tour assistant', flush = false }: Props) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   return (
     <div className="background-gradient">
@@ -17,14 +18,12 @@ const Layout = ({ children, title = 'Your tour assistant' }: Props) => {
         <meta charSet="utf-8"/>
         <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
       </Head>
-      <header className="flex  flex-col">
+      <header className="flex flex-col">
         <HeaderNav menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen}></HeaderNav>
       </header>
       <main className="h-full w-full flex flex-rows  ">
-        <div className={`${menuIsOpen ? 'w-60 ' : 'w-0 '}  ease-in-out duration-200`}>
-          <PopoutMenu menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen}/>
-        </div>
-        <div className='flex-1 px-4'>
+        <PopoutMenu menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen}/>
+        <div className={flush ? 'flex-1' : 'flex-1 px-4'}>
           {children}
         </div>
       </main>

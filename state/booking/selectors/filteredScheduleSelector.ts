@@ -35,7 +35,7 @@ export const filteredScheduleSelector = selector({
       Sections: source.Sections.map((sec: ScheduleSectionViewModel) => ({
         ...sec,
         Dates: sec.Dates.filter(d => isMatch(d))
-      }))
+      })).filter(x => x.Dates.length > 0)
     }
   }
 })

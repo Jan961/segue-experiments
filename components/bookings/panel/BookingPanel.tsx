@@ -18,6 +18,7 @@ import { omit } from 'radash'
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { VenueSelector } from './components/VenueSelector'
 import { getNextId } from './utils/getNextId'
+import { distanceState } from 'state/booking/distanceState'
 
 interface BookingPanelProps {
   bookingId: number
@@ -26,6 +27,7 @@ interface BookingPanelProps {
 export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const sortedBookings = useRecoilValue(sortedBookingSelector)
+  const [distance, setDistance] = useRecoilState(distanceState)
   const setView = useSetRecoilState(viewState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
@@ -100,6 +102,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     await axios.post('/api/bookings/delete', { bookingId })
     const newState = omit(bookingDict, [bookingId])
     setBookingDict(newState)
+    setDistance({ ...distance, outdated: true })
   }
 
   const statusOptions: SelectOption[] = [
@@ -124,49 +127,25 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
         <VenueSelector disabled={submitting} onChange={handleOnChange} venueId={inputs.VenueId} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-6 gap-4">
         <FormInputSelect inline
+          className="col-span-2"
           value={inputs.PencilNum}
           onChange={handleOnChange}
           options={pencilOptions}
           name="PencilNum"
-          label="Pencil Num"
+          label="Pencil"
           disabled={submitting}
         />
         <FormInputSelect inline
           value={inputs.StatusCode}
+          className="col-span-4"
           onChange={handleOnChange}
           options={statusOptions}
           name="StatusCode"
           label="Status"
           disabled={submitting}
         />
-      </div>
-      <div className="bg-gray-100 rounded-lg p-2 pb-0">
-        <FormInputText
-          value={inputs.LandingSite}
-          name="LandingSite"
-          label="Landing Page"
-          onChange={handleOnChange}
-          placeholder="http://example.com"
-          disabled={submitting}
-        />
-        <div className="grid grid-cols-3">
-          <FormInputCheckbox
-            value={inputs.OnSale}
-            name="OnSale"
-            label="On Sale"
-            onChange={handleOnChange}
-            disabled={submitting}
-          />
-          <FormInputDate
-            className="col-span-2"
-            value={inputs.OnSaleDate}
-            name="OnSaleDate"
-            onChange={handleOnChange}
-            disabled={submitting}
-          />
-        </div>
       </div>
       <div className="grid grid-cols-3 gap-2 py-4 pb-0">
         <div>

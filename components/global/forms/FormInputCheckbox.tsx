@@ -1,29 +1,38 @@
+import classNames from 'classnames'
+
 interface Input {
-  onChange: (e: any) => void;
-  label?: string;
-  value: boolean;
-  name?: string; // Also ID
+  onChange: (e: any) => void
+  label?: string
+  value: boolean
+  name?: string // Also ID
   disabled?: boolean
+  className?: string
+  minimal?: boolean
 }
 
-export const FormInputCheckbox = ({ onChange, value, name, label, disabled }: Input) => {
+export const FormInputCheckbox = ({ onChange, value, name, label, disabled, className, minimal = false }: Input) => {
   const modifyOnChange = (e: any) => {
+    e.stopPropagation()
     const newValue = !value
     const newEvent = { ...e, target: { ...e.target, value: newValue, id: name } }
     onChange(newEvent)
   }
 
+  let baseInputClass = 'rounded border-gray-300 cursor-pointer p-3 m-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm '
+
+  if (!minimal) baseInputClass = classNames(baseInputClass, 'm-2 mb-4')
+
   return (
-    <label htmlFor={name} className="flex items-center">
-      <span className="w-32">{ label }</span>
+    <label htmlFor={name} className={ classNames(className, 'flex items-center justify-between')}>
+      {label && (<div className="text-sm pb-2">{ label }</div>)}
       <input
         id={name}
         type="checkbox"
         name={name}
-        onChange={modifyOnChange}
+        onClick={modifyOnChange}
         checked={value}
         disabled={disabled}
-        className="rounded border-gray-300 cursor-pointer p-3 my-2 ml-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4"
+        className={baseInputClass}
       />
     </label>
   )

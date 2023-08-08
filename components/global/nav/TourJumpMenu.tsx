@@ -9,15 +9,14 @@ export default function TourJumpMenu () {
 
   if (!tourJump?.selected || !tourJump?.tours?.length) return null
 
-  const { tours, selected } = tourJump
-
+  const { tours, selected, path } = tourJump
   function goToTour (e: any) {
     const showCode = first(tours)?.ShowCode
     if (!showCode) return
 
     const { value } = e.target
     setTourJump({ ...tourJump, loading: true, selected: value })
-    router.push(`/bookings/${showCode}/${value}`)
+    router.push(`/${path}/${showCode}/${value}`)
   }
 
   return (
@@ -31,7 +30,7 @@ export default function TourJumpMenu () {
         <option
           key={`${tour.ShowCode}/${tour.Code}`}
           value={tour.Code}>
-          {tour.ShowCode}/{tour.Code}
+          {tour.ShowCode}/{tour.Code} {tour.IsArchived ? '(Archived)' : ''}
         </option>
       ))
       }

@@ -29,7 +29,7 @@ export default function ViewBookingHistory ({ venueId }: ViewBookingHistoryProps
   return (
     <>
       <FormInputButton
-        text="Venue History"
+        text="History"
         disabled
         className="w-full block"
         onClick={() => setShowModal(true)}

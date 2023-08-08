@@ -1,5 +1,4 @@
 import ExcelJS from 'exceljs'
-import data from '../../../../../../../../salesSummary/data.json'
 import prisma from 'lib/prisma'
 
 export default async function handle (req, res) {

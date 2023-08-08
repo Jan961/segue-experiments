@@ -47,7 +47,7 @@ export const VenueInfo = ({ venueId }: VenueInfoProps) => {
   return (
     <>
       <FormInputButton
-        text="Venue Info"
+        text="Info"
         disabled={!venueId}
         className="w-full block"
         onClick={() => setShowModal(true)}

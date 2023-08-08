@@ -1,7 +1,7 @@
 import { PropsWithChildren } from 'react'
 import { Dialog } from '@headlessui/react'
 import { MenuButton } from './MenuButton'
-import { faClose } from '@fortawesome/free-solid-svg-icons'
+import { faClose, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 interface StyledDialogProps {
@@ -55,6 +55,10 @@ const FooterCancel = ({ onClick, submit, children = 'Cancel' }: PropsWithChildre
   )
 }
 
+const FooterDelete = ({ onClick, children, disabled }: PropsWithChildren<FooterButton>) => {
+  return <MenuButton onClick={onClick} intent={'DANGER'} disabled={disabled}>{ children }</MenuButton>
+}
+
 const FooterContinue = ({ onClick, submit, children, intent, disabled }: PropsWithChildren<FooterButton>) => {
   return <MenuButton onClick={onClick} submit={submit} intent={intent} disabled={disabled}>{ children }</MenuButton>
 }
@@ -66,3 +70,4 @@ const FooterContainer = ({ children }: PropsWithChildren<unknown>) => {
 StyledDialog.FooterCancel = FooterCancel
 StyledDialog.FooterContinue = FooterContinue
 StyledDialog.FooterContainer = FooterContainer
+StyledDialog.FooterDelete = FooterDelete

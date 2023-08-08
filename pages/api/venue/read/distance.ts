@@ -1,4 +1,4 @@
-import { VenueVenue } from '@prisma/client'
+import { Venue, VenueVenue } from '@prisma/client'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -11,20 +11,35 @@ export interface GapSuggestionParams {
   EndVenue: number
 }
 
-type VenueWithDistance = {
+export interface GapSuggestionUnbalancedProps {
+  StartVenue: number
+  EndVenue: number
+  MinFromMiles?: number
+  MaxFromMiles?: number
+  MinToMiles?: number
+  MaxToMiles?: number
+}
+
+export type VenueWithDistance = {
   VenueId: number,
-  Mins: number,
-  Miles: number
+  MileageFromStart: number,
+  MileageFromEnd: number,
+  Capacity?: number
+  MinsFromStart?: number
+  MinsFromEnd?: number
 }
 
 export type GapSuggestionReponse = {
   VenueInfo?: VenueWithDistance[]
+  DefaultMin: number
+  SliderMax: number
   OriginalMiles: number
   OriginalMins: number
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const { StartVenue, EndVenue, MinMiles, MaxMiles, MinMins, MaxMins } = req.body as GapSuggestionParams
+  let { StartVenue, EndVenue, MinFromMiles, MaxFromMiles, MinToMiles, MaxToMiles } = req.body as GapSuggestionUnbalancedProps
+  const SLIDER_MIN = 25
 
   try {
     const initial = await prisma.venueVenue.findMany({
@@ -50,75 +65,122 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       }
     })
 
-    const endVenue1Ids = await prisma.venueVenue
+    // Get default params if none provided
+    const sliderMax = initial[0] ? Math.ceil((initial[0].Mileage * 1.5) / 10) * 10 : 200
+
+    // Incase we are dealing with really close venues
+    const safeMin = sliderMax > SLIDER_MIN ? SLIDER_MIN : 0
+
+    if (!MinFromMiles) MinFromMiles = safeMin
+    if (!MaxFromMiles) MaxFromMiles = sliderMax
+    if (!MinToMiles) MinToMiles = safeMin
+    if (!MaxToMiles) MaxToMiles = sliderMax
+
+    const startVenue1Promise = prisma.venueVenue
+      .findMany({
+        where: {
+          Venue1Id: StartVenue,
+          Mileage: { gte: MinFromMiles, lte: MaxFromMiles }
+        },
+        select: {
+          Venue2Id: true,
+          TimeMins: true,
+          Mileage: true
+        }
+      })
+
+    const startVenue2Promise = prisma.venueVenue
+      .findMany({
+        where: {
+          Venue2Id: StartVenue,
+          Mileage: { gte: MinFromMiles, lte: MaxFromMiles }
+        },
+        select: {
+          Venue1Id: true,
+          TimeMins: true,
+          Mileage: true
+        }
+      })
+
+    const endVenue1Promise = prisma.venueVenue
       .findMany({
         where: {
           Venue1Id: EndVenue,
-          Mileage: { gte: MinMiles, lte: MaxMiles },
-          TimeMins: { gte: MinMins, lte: MaxMins }
+          Mileage: { gte: MinToMiles, lte: MaxToMiles }
         },
         select: {
-          Venue2Id: true
+          Venue2Id: true,
+          TimeMins: true,
+          Mileage: true
         }
       })
-      .then((venues) => venues.map((venue) => venue.Venue2Id))
 
-    const endVenue2Ids = await prisma.venueVenue
+    const endVenue2Promise = prisma.venueVenue
       .findMany({
         where: {
           Venue2Id: EndVenue,
-          Mileage: { gte: MinMiles, lte: MaxMiles },
-          TimeMins: { gte: MinMins, lte: MaxMins }
+          Mileage: { gte: MinToMiles, lte: MaxToMiles }
         },
         select: {
-          Venue1Id: true
+          Venue1Id: true,
+          TimeMins: true,
+          Mileage: true
         }
       })
-      .then((venues) => venues.map((venue) => venue.Venue1Id))
 
-    const withinDistance = await prisma.venueVenue.findMany({
+    const [startVenue1, startVenue2, endVenue1, endVenue2] = await Promise.all([
+      startVenue1Promise, startVenue2Promise, endVenue1Promise, endVenue2Promise
+    ])
+
+    // Combine the venue ids and mileages
+    const startVenueRelations = [
+      ...startVenue1
+        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
+      ...startVenue2
+        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins }))]
+    const endVenueRelations = [
+      ...endVenue1
+        .map((v: VenueVenue) => ({ VenueId: v.Venue2Id, Mileage: v.Mileage, Mins: v.TimeMins })),
+      ...endVenue2
+        .map((v: VenueVenue) => ({ VenueId: v.Venue1Id, Mileage: v.Mileage, Mins: v.TimeMins }))]
+
+    // Create a Map for endVenueRelations
+    const endVenueRelationsMap = new Map()
+    for (const relation of endVenueRelations) {
+      endVenueRelationsMap.set(relation.VenueId, { Mileage: relation.Mileage, Mins: relation.Mins })
+    }
+
+    // Find intersection of two sets (O(n))
+    const venuesWithDistanceData = startVenueRelations
+      .filter(startRelation => endVenueRelationsMap.has(startRelation.VenueId))
+      .map(startRelation => ({
+        VenueId: startRelation.VenueId,
+        MileageFromStart: startRelation.Mileage,
+        MileageFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mileage,
+        MinsFromStart: startRelation.Mins,
+        MinsFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mins
+      }))
+
+    const capacities = await prisma.venue.findMany({
+      select: {
+        Id: true,
+        Seats: true
+      },
       where: {
-        OR: [
-          {
-            Venue1Id: StartVenue,
-            Venue2Id: {
-              in: endVenue1Ids
-            },
-            Mileage: { gte: MinMiles, lte: MaxMiles },
-            TimeMins: { gte: MinMins, lte: MaxMins }
-          },
-          {
-            Venue2Id: StartVenue,
-            Venue1Id: {
-              in: endVenue2Ids
-            },
-            Mileage: { gte: MinMiles, lte: MaxMiles },
-            TimeMins: { gte: MinMins, lte: MaxMins }
-          }
-        ]
+        Id: {
+          in: venuesWithDistanceData.map(x => x.VenueId)
+        }
       }
     })
 
-    const idsWithDistance = withinDistance.map((x: VenueVenue): VenueWithDistance => {
-      if (x.Venue1Id === StartVenue && x.Venue2Id === EndVenue) {
-        return null
-      }
-      if (x.Venue1Id === EndVenue && x.Venue2Id === StartVenue) {
-        return null
-      }
-      if (x.Venue1Id === StartVenue) {
-        return { VenueId: x.Venue2Id, Mins: x.TimeMins, Miles: x.Mileage }
-      }
-      if (x.Venue2Id === StartVenue) {
-        return { VenueId: x.Venue1Id, Mins: x.TimeMins, Miles: x.Mileage }
-      }
-      return null
-    }).filter((x: any) => !!x)
+    const capacityMap = new Map<number, number>(capacities.map((venue: Venue) => [venue.Id, venue.Seats]))
 
     const result: GapSuggestionReponse = {
+      SliderMax: sliderMax,
+      DefaultMin: safeMin,
       OriginalMiles: initial[0] ? initial[0].Mileage : undefined,
       OriginalMins: initial[0] ? initial[0].TimeMins : undefined,
-      VenueInfo: idsWithDistance
+      VenueInfo: venuesWithDistanceData.map((x) => ({ ...x, Capacity: capacityMap.get(x.VenueId) }))
     }
 
     res.status(200).json(result)

@@ -5,12 +5,14 @@ export interface TourJump {
   tours: Partial<TourDTO>[]
   loading?: boolean
   selected: string
+  path?: string
 }
 
 const intialState: TourJump = {
   tours: [],
   loading: false,
-  selected: undefined
+  selected: undefined,
+  path: undefined
 }
 
 export const tourJumpState = atom({

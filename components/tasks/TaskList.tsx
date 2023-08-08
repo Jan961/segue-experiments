@@ -1,134 +1,99 @@
-import TaskListItem from "./TaskListItem";
-import { ITourTask } from "interfaces";
+import { TourState, tourState } from 'state/tasks/tourState'
+import TaskListItem from './TaskListItem'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { Table } from 'components/global/table/Table'
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { bulkSelectionState } from 'state/tasks/bulkSelectionState'
 
-const Tasklist = ({
-  tasks,
-  handleSelectedFunction,
-  handleSelectAll,
-  isTaskSelected,
-  openUpdateModal,
-}: {
-  openUpdateModal: (task: ITourTask) => void;
-  tasks: ITourTask[];
-  handleSelectAll: (taskIds: any) => void;
-  isTaskSelected: (taskId: any) => boolean;
-  handleSelectedFunction: (taskId: any) => void;
-}) => {
-  const taskIds = tasks && tasks.map((task) => task.TourTaskId);
+interface TaskListProps {
+  tourId: number
+}
+
+const Tasklist = ({ tourId } : TaskListProps) => {
+  const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState)
+  const tours: TourState = useRecoilValue(tourState)
+  const match = tours.filter(x => x.Id === tourId)[0]
+  console.log(tours)
+
+  if (!match) return null
+
+  const countSelected = match.Tasks.filter(x => bulkSelection[x.Id]).length
+  const allSelected = countSelected === match.Tasks.length
+
+  const toggleAll = () => {
+    const ids = match.Tasks.map(x => x.Id)
+    const newState = { ...bulkSelection }
+    if (allSelected) {
+      for (const id of ids) {
+        delete newState[id]
+      }
+    } else {
+      for (const id of ids) {
+        newState[id] = true
+      }
+    }
+    setBulkSelection(newState)
+  }
+
+  if (match.Tasks.length === 0) return <p>No tasks for this tour</p>
 
   return (
-    <div className=" flex flex-col">
-      <div className="bg-red-300 bg-amber-300 hidden"></div>
-      <div className="mb-2 overflow-x-auto">
-        <div className="inline-block min-w-full align-middle ">
-          <div className="relative overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-            <table className="min-w-full table-fixed divide-y divide-gray-300">
-              <thead className="bg-transparent">
-                <tr>
-                  <th
-                    scope="col"
-                    className="relative w-12 px-6 sm:w-16 sm:px-8"
-                  >
-                    <input
-                      type="checkbox"
-                      onChange={() => handleSelectAll(taskIds)}
-                      className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 sm:left-6"
-                    />
-                  </th>
-                  <th
-                    scope="col"
-                    className=" py-3.5 pr-3 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Start by (wk)
-                  </th>
-                  <th
-                    scope="col"
-                    className=" py-3.5 pr-3 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Start by
-                  </th>
-                  <th
-                    scope="col"
-                    className=" py-3.5 pr-3 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Due (wk)
-                  </th>
-                  <th
-                    scope="col"
-                    className=" py-3.5 pr-3 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Due
-                  </th>
-                  <th
-                    scope="col"
-                    className=" py-3.5 pr-3 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Progress
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Title
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Assignee
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Assigned By
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Status
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Priority
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-purple"
-                  >
-                    Follow Up
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 bg-transparent">
-                {tasks.length > 0 ? (
-                  tasks.map((task) => (
-                    <TaskListItem
-                      openUpdateModal={openUpdateModal}
-                      handleSelectedFunction={handleSelectedFunction}
-                      isTaskSelected={isTaskSelected}
-                      task={task}
-                      key={task.TourTaskId}
-                    ></TaskListItem>
-                  ))
-                ) : (
-                  <></>
-                )}
-              </tbody>
-            </table>
-            {tasks.length < 1 && (
-              <div className="w-full-screen text-center font-bold my-4">
-                <p className="">No Tasks Available</p>
-              </div>
-            )}
-          </div>
+    <>
+      <Table>
+        <Table.HeaderRow>
+          <Table.HeaderCell>
+            <FormInputCheckbox value={allSelected} onChange={toggleAll} minimal/>
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Start by (wk)
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Start by
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Due (wk)
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Due
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Progress
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Title
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Assignee
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Assigned By
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Status
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Priority
+          </Table.HeaderCell>
+          <Table.HeaderCell>
+            Follow Up
+          </Table.HeaderCell>
+        </Table.HeaderRow>
+        <Table.Body> {
+          match.Tasks.map((task) => (
+            <TaskListItem
+              task={task}
+              key={task.Id}
+            ></TaskListItem>
+          ))}
+        </Table.Body>
+      </Table>
+      {match.Tasks.length < 1 && (
+        <div className="w-full-screen text-center font-bold my-4">
+          <p className="">No Tasks Available</p>
         </div>
-      </div>
-    </div>
-  );
-};
+      )}
+    </>
+  )
+}
 
-export default Tasklist;
+export default Tasklist

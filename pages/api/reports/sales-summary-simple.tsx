@@ -9,7 +9,6 @@ import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBase
 const handler = async (req, res) => {
   const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {}
   const workbook = new ExcelJS.Workbook()
-
   const conditions: Prisma.Sql[] = []
   if (tourId) {
     conditions.push(Prisma.sql`TourId = ${parseInt(tourId)}`)

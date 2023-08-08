@@ -1,7 +1,7 @@
 
 import Decimal from 'decimal.js'
 import moment from 'moment'
-import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFieldsFinalFormat, TSalesView, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregateSeatsDetailCurrencyWise, WeekAggregates } from 'types/SalesSummaryTypes'
+import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregateSeatsDetailCurrencyWise, WeekAggregates } from 'types/SalesSummaryTypes'
 
 export enum COLOR_HEXCODE {
   PURPLE= 'ff7030a0',
@@ -217,7 +217,7 @@ export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayO
       const val = Number(new Decimal(curr).minus(prev).toFixed(2))
       const symbol = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2].substring(0, 1) : valuesArrayOnly[len - 1].substring(0, 1)
       const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
-      return `${prefix}${val > 0 ? val : -1 * val}`
+      return `${prefix}${val > 0 ? val : -1 * (val)}`
     } else {
       // Nothing in this condition
     }
@@ -240,7 +240,8 @@ export const getCurrencyWiseTotal = ({ totalForWeeks, setTourWeekNum, currencySy
     return `${currencySymbol}0`
   }
 
-  const finalValue = arr.filter(x => x.VenueCurrencySymbol === currencySymbol).map(x => x.Value).reduce((acc, x) => new Decimal(acc).plus(x), 0)
+  const finalValue = arr.filter(x => x.VenueCurrencySymbol === currencySymbol)
+    .map(x => x.Value).reduce((acc, x) => new Decimal(acc).plus(x) as any, 0)
   return `${currencySymbol}${finalValue}`
 }
 
@@ -257,7 +258,7 @@ export const getChangeVsLastWeekValue = (weeksDataArray: string[]): string => {
       const val = Number(new Decimal(curr).minus(prev).toFixed(2))
       const symbol = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(0, 1) : weeksDataArray[len - 1].substring(0, 1)
       const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
-      return `${prefix}${val > 0 ? val : -1 * val}`
+      return `${prefix}${val > 0 ? val : -1 * (val)}`
     } else {
       // This case should not occur
     }
@@ -272,7 +273,7 @@ export const getWeekWiseGrandTotalInPound = ({ totalForWeeks, setTourWeekNum }: 
     return '£0'
   }
 
-  const finalValue = arr.map(x => x.ConvertedValue).reduce((acc, x) => new Decimal(acc).plus(x), 0)
+  const finalValue = arr.map(x => x.ConvertedValue).reduce((acc, x) => new Decimal(acc).plus(x) as any, 0)
   return `£${finalValue}`
 }
 
