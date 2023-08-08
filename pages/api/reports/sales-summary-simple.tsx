@@ -187,16 +187,19 @@ const handler = async (req, res) => {
   const lastColumn: number = 'A'.charCodeAt(totalColumns)
   worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
   worksheet.getCell(1, 1).font = { size: 16, bold: true }
-  worksheet.columns.forEach(function (column, i) {
+  const widths = ['D', 'E'].map((col) => {
     let maxLength = 0
-    column.eachCell({ includeEmpty: true }, function (cell) {
+    worksheet.getColumn(col).eachCell({ includeEmpty: true }, function (cell) {
       const columnLength = cell.value ? cell.value.toString().length : 10
       if (columnLength > maxLength) {
         maxLength = columnLength
       }
     })
-    column.width = maxLength < 10 ? 10 : maxLength
+    return maxLength
   })
+  worksheet.getColumn('D').width = widths[0]
+  worksheet.getColumn('E').width = widths[1]
+
   const filename = getFileName(worksheet)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
