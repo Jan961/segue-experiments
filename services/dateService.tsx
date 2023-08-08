@@ -18,7 +18,7 @@ export const dateStringToPerformancePair = (dateString: string) => {
   const defaultDatePart = '1970-01-01'
 
   return {
-    Time: new Date(`${defaultDatePart} ${timePart}`),
+    Time: new Date(`${defaultDatePart}T${timePart}Z`),
     Date: new Date(`${datePart}`)
   }
 }

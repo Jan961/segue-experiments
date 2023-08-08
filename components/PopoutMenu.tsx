@@ -22,7 +22,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     }
   }, [tourJump, setTourJump, isClient])
 
-  const { selected, tours } = tourJump
+  const { selected, tours } = tourJump || { tours: [] }
   const tour = tours.filter(x => x.Code === selected.toString())[0]
   const path = tour ? `${tour.ShowCode}/${tour.Code}` : ''
   const noTourSelected = !path
