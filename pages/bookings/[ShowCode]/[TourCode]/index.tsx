@@ -109,26 +109,32 @@ const BookingPage = ({ Id }: bookingProps) => {
           )}
           { !loading && (
             <>
-              <div className="grid grid-cols-11 font-bold
+              <div className="grid grid-cols-12 font-bold
                 text-center
+                text-sm xl:text-md
                 sticky inset-x-0 top-0 bg-gray-50 z-10
                 shadow-lg
                 text-gray-400
                 ">
-                <div className='col-span-2 p-2 whitespace-nowrap'>
+                <div className="col-span-1 p-2 hidden xl:inline-block ">
+                  Tour
+                </div>
+                <div className='col-span-4 lg:col-span-3 xl:col-span-2 p-2 whitespace-nowrap'>
                   Week No. & Date
                 </div>
-                <div className='col-span-6 p-2'>
-                  Venue
-                </div>
-                <div className='col-span-1 p-2'>
-                  Perf(s)
-                </div>
-                <div className='col-span-1 p-2'>
-                  Miles
-                </div>
-                <div className='col-span-1 p-2'>
-                  Time
+                <div className="col-span-8 lg:col-span-9 grid grid-cols-10">
+                  <div className='col-span-7 p-2'>
+                    Venue
+                  </div>
+                  <div className='col-span-1 p-2'>
+                    Perf(s)
+                  </div>
+                  <div className='col-span-1 p-2'>
+                    Miles
+                  </div>
+                  <div className='col-span-1 p-2'>
+                    Time
+                  </div>
                 </div>
               </div>
               <ul className="grid w-full shadow">

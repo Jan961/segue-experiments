@@ -38,6 +38,7 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
 
   return (
     <div className={`grid grid-cols-10 p-1 px-2 rounded border border-l-8
+    text-center
     border-gray-300 bg-gray-50 bg-opacity-50
     ${active ? 'border-gray-400 bg-gray-300 shadow bg-opacity-100' : 'hover:bg-opacity-100 hover:bg-gray-200'}
     `}
@@ -48,14 +49,14 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
       <div className="col-span-1">
         { performanceCount }
       </div>
-      <div className="col-span-1 mx-2 whitespace-nowrap text-center">
+      <div className="col-span-1 mx-2 whitespace-nowrap">
         { first && distance && (
           <>
             { distance.Miles ? distance.Miles : '' }
           </>
         ) }
       </div>
-      <div className="col-span-1 mx-2 whitespace-nowrap text-center">
+      <div className="col-span-1 mx-2 whitespace-nowrap">
         { first && distance && (
           <>
             { timeFormat(distance.Mins) }
