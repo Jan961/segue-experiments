@@ -73,14 +73,14 @@ const getBooleanAsString = (val: boolean | null): string => {
 
 const handler = async (req, res) => {
   try {
-    const { tourId, showId, tourCode } = JSON.parse(req.body)
+    const { tourId, showId, tourCode, options } = JSON.parse(req.body)
     const data = await prisma.DateBlock.findFirst({
       where: {
         ...(tourId && { TourId: tourId }),
         Name: 'Tour',
         Tour: {
           is: {
-            ...(showId && { ShowId: showId }),
+            ...(showId && { ShowId: showId })
           }
         }
       },
@@ -127,6 +127,7 @@ const handler = async (req, res) => {
     worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
     worksheet.addRow((['TOUR', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']))
     worksheet.addRow((['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']))
+    worksheet.addRow(([]))
 
     response?.bookings.forEach((booking: BOOKING) => {
       const ShowDate = moment(booking.FirstDate).format('DD/MM/YYYY')
@@ -137,12 +138,11 @@ const handler = async (req, res) => {
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived)
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived)
 
-      worksheet.addRow([TourCode, ShowDate, ShowCode, ShowName, ShowTown, OnSale, OnSaleDate, MarketingPlan, ContactInfo, PrintReqsReceived])
+      worksheet.addRow([ShowCode + TourCode, ShowDate, ShowCode, ShowName, ShowTown, OnSale, OnSaleDate, MarketingPlan, ContactInfo, PrintReqsReceived])
     })
 
     const numberOfColumns = worksheet.columnCount
 
-    worksheet.mergeCells('A1:D1')
     worksheet.mergeCells('A2:D2')
 
     for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
@@ -151,6 +151,9 @@ const handler = async (req, res) => {
 
     alignColumn({ worksheet, colAsChar: 'B', align: ALIGNMENT.RIGHT })
 
+    const lastColumn: number = 'A'.charCodeAt(numberOfColumns)
+    worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
+   
     for (let row = 1; row <= 4; row++) {
       styleHeader({ worksheet, row, numberOfColumns })
     }
@@ -163,7 +166,9 @@ const handler = async (req, res) => {
 
     alignCellText({ worksheet, row: 4, col: 5, align: ALIGNMENT.CENTER })
 
-    const filename = `Venues_${tourCode}.xlsx`
+    worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
+
+    const filename = `Venues_${tourCode || options}.xlsx`
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 

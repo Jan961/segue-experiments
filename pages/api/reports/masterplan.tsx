@@ -4,7 +4,7 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, colorCell, colorTextAndBGCell } from 'services/salesSummaryService'
+import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService'
 
 type SCHEDULE_VIEW = {
   TourId : number,
@@ -73,7 +73,6 @@ const handler = async (req, res) => {
   const conditions: Prisma.Sql[] = [Prisma.sql`EntryDate BETWEEN ${fromDate} AND ${toDate}`]
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
   const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`
-  console.log(`EntryDate BETWEEN ${fromDate} AND ${toDate}`, '==========================', data)
 
   const workbook = new ExcelJS.Workbook()
   const formattedData = data.map(x => ({
@@ -157,6 +156,7 @@ const handler = async (req, res) => {
     return [...acc, `Week ${value}`]
   }, [])
   worksheet.addRow(['Week Minus', '', ...weeks])
+  fillRowBGColorAndTextColor({worksheet, row: 7, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.BLUE, isBold: true})
 
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days')
 
@@ -209,15 +209,16 @@ const handler = async (req, res) => {
       }, [])
       worksheet.addRow(['Week Minus', '', ...weeks])
       rowNo++
+      fillRowBGColorAndTextColor({ worksheet, row: rowNo + 1, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.BLUE, isBold: true })
     }
   }
 
   const numberOfColumns = worksheet.columnCount
 
-  worksheet.mergeCells('A1:C1')
+  worksheet.mergeCells('A1:D1')
   worksheet.mergeCells('A2:C2')
 
-  for (let row = 1; row <= 6; row++) {
+  for (let row = 1; row < 6; row++) {
     styleHeader({ worksheet, row, numberOfColumns })
   }
 
@@ -235,6 +236,8 @@ const handler = async (req, res) => {
   alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT })
   alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT })
   alignCellText({ worksheet, row: 5, col: 2, align: ALIGNMENT.LEFT })
+
+  worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
 
   const filename = 'Master Plan.xlsx'
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

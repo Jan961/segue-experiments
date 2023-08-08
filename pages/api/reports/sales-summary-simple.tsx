@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, LEFT_PORTION_KEYS, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, getSeatsColumnForWeekTotal, getSeatsDataForTotal } from 'services/salesSummaryService'
+import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName } from 'services/salesSummaryService'
 import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
 
 const handler = async (req, res) => {
@@ -38,8 +38,8 @@ const handler = async (req, res) => {
   const headerWeekDates: string[] = uniqueTourColumns.map(x => x.SetTourWeekDate)
 
   // Adding Heading
-  worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullTourCode + ')' : 'Dummy Report'
-  worksheet.getCell(1, 1).font = { size: 24 }
+  worksheet.addRow([salesReportName({ tourId, isWeeklyReport, isSeatsDataRequired, data })])
+  // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullTourCode + ')' : 'Dummy Report'
   worksheet.addRow([])
 
   // Adding Table Columns
@@ -172,8 +172,32 @@ const handler = async (req, res) => {
   // Coloring this row
   for (let i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)) + 1; i++) {
     colorCell({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW })
+    makeCellTextBold({ worksheet, row, col: i + 5 })
   }
   row++
+
+  makeColumnTextBold({ worksheet, colAsChar: 'A' })
+  makeColumnTextBold({ worksheet, colAsChar: 'B' })
+  makeColumnTextBold({ worksheet, colAsChar: 'C' })
+  makeColumnTextBold({ worksheet, colAsChar: 'D' })
+  makeColumnTextBold({ worksheet, colAsChar: 'E' })
+
+  const totalColumns: number = worksheet.columnCount
+  const lastColumn: number = 'A'.charCodeAt(totalColumns)
+  worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
+  worksheet.getCell(1, 1).font = { size: 16, bold: true }
+  const widths = ['D', 'E'].map((col) => {
+    let maxLength = 0
+    worksheet.getColumn(col).eachCell({ includeEmpty: true }, function (cell) {
+      const columnLength = cell.value ? cell.value.toString().length : 10
+      if (columnLength > maxLength) {
+        maxLength = columnLength
+      }
+    })
+    return maxLength
+  })
+  worksheet.getColumn('D').width = widths[0]
+  worksheet.getColumn('E').width = widths[1]
 
   const filename = getFileName(worksheet)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
