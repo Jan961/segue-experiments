@@ -67,6 +67,21 @@ export const makeRowTextBold = ({ worksheet, row }: {worksheet: any, row: number
   })
 }
 
+export const fillRowBGColorAndTextColor = ({ worksheet, row, textColor, cellColor, isBold }: {worksheet: any, row: number, textColor: COLOR_HEXCODE, cellColor: COLOR_HEXCODE, isBold?: boolean}) => {
+  worksheet.getRow(row).eachCell((cell) => {
+    cell.font = { color: { argb: textColor }, ...(isBold && {bold: true}) }
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: cellColor }
+    }
+  })
+}
+
+export const makeCellTextBold = ({ worksheet, row, col }: {worksheet: any, row: number, col: number}) => {
+  worksheet.getCell(row, col).font = { bold: true }
+}
+
 export const makeRowTextBoldAndALignCenter = ({ worksheet, row }: {worksheet: any, row: number}) => {
   worksheet.getRow(row).eachCell((cell) => {
     cell.font = { bold: true }
@@ -166,6 +181,11 @@ export const groupBasedOnVenueWeeksKeepingVenueCommon = ({ modifiedFetchedValues
 export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({ worksheet, headerWeekNums, totalRowWeekWise, currencySymbol, lastBookingWeek, totalCurrencyAndWeekWiseSeatsTotal, isSeatsDataRequired = 0 }: { worksheet: any, headerWeekNums: string[], totalRowWeekWise: WeekAggregates, currencySymbol: TSalesView['VenueCurrencySymbol'], lastBookingWeek: string, totalCurrencyAndWeekWiseSeatsTotal: WeekAggregateSeatsDetail, isSeatsDataRequired: number}): {
   numberOfRowsAdded: number
 } => {
+  if (!lastBookingWeek) {
+    return {
+      numberOfRowsAdded: 0
+    }
+  }
   const weekWiseDataInEuro: string[] = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks: totalRowWeekWise, setTourWeekNum: weekNum, currencySymbol }))
   const rowData: string[] = ['', '', '', '', `Tour ${lastBookingWeek}`, ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...(isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol, totalCurrencyWiseSeatsMapping: totalCurrencyAndWeekWiseSeatsTotal }) : [])]
   if (rowData.slice(5, rowData.length).filter(x => x !== `${currencySymbol}0`)?.length) {
@@ -289,4 +309,25 @@ export const colorTextAndBGCell = ({ worksheet, row, col, textColor, cellColor }
     pattern: 'solid',
     fgColor: { argb: cellColor }
   }
+}
+
+export const makeColumnTextBold = ({ worksheet, colAsChar }: {worksheet: any, colAsChar: string}) => {
+  worksheet.getColumn(colAsChar).eachCell((cell) => {
+    cell.font = { bold: true }
+  })
+}
+
+export const salesReportName = ({ tourId, isWeeklyReport, isSeatsDataRequired, data }): string => {
+  if (data.length) {
+    return data[0].ShowName + ' (' + data[0].FullTourCode + ')'
+  }
+
+  if (isWeeklyReport) {
+    return tourId ? `Sales Summary Weekly - Tour ${tourId},` : 'Sales Summary Weekly'
+  }
+
+  if (isSeatsDataRequired) {
+    return tourId ? `Sales Vs Capacity - Tour ${tourId},` : 'Sales Vs Capacity'
+  }
+  return tourId ? `Sales Summary -Tour  ${tourId},` : 'Sales Summary'
 }

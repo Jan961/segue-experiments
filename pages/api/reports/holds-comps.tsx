@@ -5,13 +5,18 @@ import prisma from 'lib/prisma'
 import moment from 'moment'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
 
+enum HOLD_OR_COMP {
+  HOLD = 'Hold',
+  COMP = 'Comp'
+}
+
 type TBookingHolds = {
   FullTourCode : string,
   VenueCode : string,
   VenueName : string,
   VenueSeats : number,
   BookingFirstDate : string,
-  HoldOrComp : string,
+  HoldOrComp : HOLD_OR_COMP,
   Code : string,
   Name : string,
   Seats : string,
@@ -180,39 +185,90 @@ const handler = async (req, res) => {
   const groupBasedOnVenueAndDateForAllTypes: TBookingHoldsGrouped[] = Object.values(groupBasedOnVenueAndDate).map((x: TBookingHoldsGrouped) => ({ ...x, data: groupBasedOnTypeAndCode({ allBookingCodeAndNameForADate: x.data }) }))
 
   let row = 5
+  let currentEntryRowSize = 0
   Object.values(groupBasedOnVenueAndDateForAllTypes).forEach((x: TBookingHoldsGrouped) => {
+    currentEntryRowSize = 0
     worksheet.addRow([])
     row++
+    worksheet.mergeCells(`A${row - 1}:J${row - 1}`)
     worksheet.addRow([x.FullTourCode, x.VenueCode, x.VenueName, x.BookingFirstDate, '', '', 'Capacity', '', x.VenueSeats])
+    worksheet.mergeCells(`E${row}:F${row}`)
+    worksheet.mergeCells(`G${row}:H${row}`)
     makeCellTextBold({ worksheet, row, col: 7 })
     makeCellTextBold({ worksheet, row, col: 9 })
     row++
 
-    let totalBooked = '0'
+    let totalHoldBooked = '0'
+    let totalCompBooked = '0'
+    const holdAndCompMap = {
+      [HOLD_OR_COMP.HOLD]: [],
+      [HOLD_OR_COMP.COMP]: []
+    }
     x.data.forEach(({ HoldOrComp, Code, Name, Seats }: TBookingCodeAndName) => {
-      totalBooked = String(parseInt(totalBooked) + parseInt(Seats))
-      worksheet.addRow(['', '', '', '', HoldOrComp, Code, Name, parseInt(Seats)])
-      row++
+      totalHoldBooked = HoldOrComp === HOLD_OR_COMP.HOLD ? String(parseInt(totalHoldBooked) + parseInt(Seats)) : totalHoldBooked
+      totalCompBooked = HoldOrComp === HOLD_OR_COMP.COMP ? String(parseInt(totalCompBooked) + parseInt(Seats)) : totalCompBooked
+      const rowValue = ['', '', '', '', HoldOrComp, Code, Name, parseInt(Seats)]
+      holdAndCompMap[HoldOrComp].push(rowValue)
     })
 
-    worksheet.addRow(['', '', '', '', '', '', 'Total Holds', '', getZeroOrNegativeValue(parseInt(totalBooked))])
-    makeRowTextBold({ worksheet, row })
-    for (let i = 7; i <= 9; i++) {
-      makeTopBorderDouble({ worksheet, row, col: i })
+    if (holdAndCompMap[HOLD_OR_COMP.COMP].length) {
+      holdAndCompMap[HOLD_OR_COMP.COMP].forEach(r => {
+        worksheet.addRow(r)
+        row++
+        currentEntryRowSize++
+      })
+      worksheet.addRow(['', '', '', '', '', '', 'Total Comps', '', getZeroOrNegativeValue(parseInt(totalCompBooked))])
+      makeRowTextBold({ worksheet, row })
+      worksheet.mergeCells(`E${row}:F${row}`)
+      worksheet.mergeCells(`G${row}:H${row}`)
+      for (let i = 7; i <= 9; i++) {
+        makeTopBorderDouble({ worksheet, row, col: i })
+      }
+      row++
+      currentEntryRowSize++
     }
-    row++
+    if (holdAndCompMap[HOLD_OR_COMP.HOLD].length) {
+      holdAndCompMap[HOLD_OR_COMP.HOLD].forEach(r => {
+        worksheet.addRow(r)
+        row++
+        currentEntryRowSize++
+      })
+      worksheet.addRow(['', '', '', '', '', '', 'Total Holds', '', getZeroOrNegativeValue(parseInt(totalHoldBooked))])
+      makeRowTextBold({ worksheet, row })
+      worksheet.mergeCells(`E${row}:F${row}`)
+      worksheet.mergeCells(`G${row}:H${row}`)
+      for (let i = 7; i <= 9; i++) {
+        makeTopBorderDouble({ worksheet, row, col: i })
+      }
+      row++
+      currentEntryRowSize++
+    }
+
     worksheet.addRow(['', '', '', '', '', '', 'Seats Sold', '', getZeroOrNegativeValue(x.SoldSeats)])
     makeRowTextBold({ worksheet, row })
+    worksheet.mergeCells(`E${row}:F${row}`)
+    worksheet.mergeCells(`G${row}:H${row}`)
     row++
     worksheet.addRow(['', '', '', '', '', '', 'Seats Reserved', '', getZeroOrNegativeValue(x.ReservedSeats)])
     makeRowTextBold({ worksheet, row })
+    worksheet.mergeCells(`E${row}:F${row}`)
+    worksheet.mergeCells(`G${row}:H${row}`)
     row++
-    worksheet.addRow(['', '', '', '', '', '', 'Remaining Seats', '', '', parseInt(x.VenueSeats as any as string) - (parseInt(totalBooked) + (parseInt(x.SoldSeats as any as string) || 0) + (parseInt(x.ReservedSeats as any as string) || 0))])
+    worksheet.addRow(['', '', '', '', '', '', 'Remaining Seats', '', '', parseInt(x.VenueSeats as any as string) - (parseInt(totalHoldBooked) + parseInt(totalCompBooked) + (parseInt(x.SoldSeats as any as string) || 0) + (parseInt(x.ReservedSeats as any as string) || 0))])
     for (let i = 7; i <= 10; i++) {
       makeTopBorderDouble({ worksheet, row, col: i })
     }
     makeRowTextBold({ worksheet, row })
+    worksheet.mergeCells(`E${row}:F${row}`)
+    worksheet.mergeCells(`G${row}:I${row}`)
     row++
+
+    currentEntryRowSize += 3
+
+    worksheet.mergeCells(`A${row - currentEntryRowSize - 1}:A${row - 1}`)
+    worksheet.mergeCells(`B${row - currentEntryRowSize - 1}:B${row - 1}`)
+    worksheet.mergeCells(`C${row - currentEntryRowSize - 1}:C${row - 1}`)
+    worksheet.mergeCells(`D${row - currentEntryRowSize - 1}:D${row - 1}`)
   })
 
   worksheet.mergeCells('A1:C1')
@@ -235,7 +291,15 @@ const handler = async (req, res) => {
     worksheet.getColumn(char).width = 15
   }
 
-  const filename = `Holds_Comps_${tourCode}_${fromDate}_${toDate}.xlsx`
+  worksheet.getColumn('A').alignment = { vertical: 'top', horizontal: 'left' }
+  worksheet.getColumn('B').alignment = { vertical: 'top', horizontal: 'left' }
+  worksheet.getColumn('C').alignment = { vertical: 'top', horizontal: 'left' }
+  worksheet.getColumn('D').alignment = { vertical: 'top', horizontal: 'right' }
+  worksheet.getColumn('G').alignment = { vertical: 'top', horizontal: 'left' }
+
+  worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
+
+  const filename = `Holds_Comps${tourCode ? '_' + tourCode : ''}${(fromDate && toDate) ? '_' + (fromDate + '_' + toDate) : ''}.xlsx`
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 

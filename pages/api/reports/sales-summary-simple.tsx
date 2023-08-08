@@ -3,13 +3,13 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, LEFT_PORTION_KEY, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal } from 'services/salesSummaryService'
+import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, LEFT_PORTION_KEY, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName } from 'services/salesSummaryService'
 import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
 
 const handler = async (req, res) => {
   const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {}
   const workbook = new ExcelJS.Workbook()
-  
+
   const conditions: Prisma.Sql[] = []
   if (tourId) {
     conditions.push(Prisma.sql`TourId = ${parseInt(tourId)}`)
@@ -17,7 +17,7 @@ const handler = async (req, res) => {
   if (fromWeek && toWeek) {
     conditions.push(Prisma.sql`setTourWeekDate BETWEEN ${fromWeek} AND ${toWeek}`)
   }
-  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, 'and ')}` : Prisma.empty
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
   const data: TSalesView[] = await prisma.$queryRaw`select * FROM SalesView ${where} order by BookingFirstDate, SetSalesFiguresDate;`
 
   const jsonArray: TRequiredFields[] = data.filter(x => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES).map(({ BookingTourWeekNum, BookingFirstDate, VenueTown, VenueName, Value, VenueCurrencySymbol, SetTourWeekNum, SetTourWeekDate, ConversionRate, SetIsCopy, SetBrochureReleased, BookingStatusCode, FinalFiguresValue, TotalCapacity, Seats, NotOnSalesDate }) => ({ BookingTourWeekNum, BookingFirstDate, VenueTown, VenueName, Value, VenueCurrencySymbol, SetTourWeekNum, SetTourWeekDate, ConversionRate, SetIsCopy, SetBrochureReleased, BookingStatusCode, FinalFiguresValue, TotalCapacity, Seats, NotOnSalesDate }))
@@ -39,8 +39,8 @@ const handler = async (req, res) => {
   const headerWeekDates: string[] = uniqueTourColumns.map(x => x.SetTourWeekDate)
 
   // Adding Heading
-  worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullTourCode + ')' : 'Dummy Report'
-  worksheet.getCell(1, 1).font = { size: 24 }
+  worksheet.addRow([salesReportName({ tourId, isWeeklyReport, isSeatsDataRequired, data })])
+  // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullTourCode + ')' : 'Dummy Report'
   worksheet.addRow([])
 
   // Adding Table Columns
@@ -173,9 +173,30 @@ const handler = async (req, res) => {
   // Coloring this row
   for (let i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)) + 1; i++) {
     colorCell({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW })
+    makeCellTextBold({ worksheet, row, col: i + 5 })
   }
   row++
 
+  makeColumnTextBold({ worksheet, colAsChar: 'A' })
+  makeColumnTextBold({ worksheet, colAsChar: 'B' })
+  makeColumnTextBold({ worksheet, colAsChar: 'C' })
+  makeColumnTextBold({ worksheet, colAsChar: 'D' })
+  makeColumnTextBold({ worksheet, colAsChar: 'E' })
+
+  const totalColumns: number = worksheet.columnCount
+  const lastColumn: number = 'A'.charCodeAt(totalColumns)
+  worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
+  worksheet.getCell(1, 1).font = { size: 16, bold: true }
+  worksheet.columns.forEach(function (column, i) {
+    let maxLength = 0
+    column.eachCell({ includeEmpty: true }, function (cell) {
+      const columnLength = cell.value ? cell.value.toString().length : 10
+      if (columnLength > maxLength) {
+        maxLength = columnLength
+      }
+    })
+    column.width = maxLength < 10 ? 10 : maxLength
+  })
   const filename = getFileName(worksheet)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
