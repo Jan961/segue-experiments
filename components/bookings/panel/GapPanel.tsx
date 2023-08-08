@@ -36,11 +36,11 @@ const ToggleButton = ({ icon, className, active, onClick }: ToggleButtonProps) =
 }
 
 interface GapPanelProps {
-  reset: () => void
+  finish: () => void
   setGapVenueIds: (ids: VenueWithDistance[]) => void
 }
 
-export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
+export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
   const { selectedDate } = useRecoilValue(viewState)
   const venueDict = useRecoilValue(venueState)
   const bookingDict = useRecoilValue(bookingState)
@@ -77,10 +77,6 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
 
   const next = () => {
     setGapVenueIds(results.VenueInfo)
-  }
-
-  const cancel = () => {
-    reset()
   }
 
   const search = React.useCallback(async (inputs: any) => {
@@ -213,7 +209,7 @@ export const GapPanel = ({ reset, setGapVenueIds }: GapPanelProps) => {
         </div>
       )}
       <div className="grid grid-cols-2 gap-2">
-        <FormInputButton onClick={cancel} text="Cancel" />
+        <FormInputButton onClick={finish} text="Cancel" />
         <FormInputButton onClick={next} disabled={!results?.VenueInfo} intent="PRIMARY" text="Next" />
       </div>
     </>

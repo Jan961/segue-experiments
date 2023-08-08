@@ -12,10 +12,10 @@ import axios from 'axios'
 import { otherState } from 'state/booking/otherState'
 
 interface CreateOtherPanelProps {
-  reset: () => void
+  finish: () => void
 }
 
-export const CreateOtherPanel = ({ reset }: CreateOtherPanelProps) => {
+export const CreateOtherPanel = ({ finish }: CreateOtherPanelProps) => {
   const [dateType, setDateType] = React.useState<number>(undefined)
   const [otherDict, setOtherDict] = useRecoilState(otherState)
   const { selectedDate } = useRecoilValue(viewState)
@@ -28,7 +28,7 @@ export const CreateOtherPanel = ({ reset }: CreateOtherPanelProps) => {
     const { data } = await axios.post('/api/other/create', newOther)
     const newState = { ...otherDict, [data.Id]: data }
     setOtherDict(newState)
-    cancel()
+    finish()
   }
 
   const dayTypeOptions: SelectOption[] = [
@@ -42,17 +42,12 @@ export const CreateOtherPanel = ({ reset }: CreateOtherPanelProps) => {
     else setDateType(undefined)
   }
 
-  const cancel = () => {
-    setDateType(undefined)
-    reset()
-  }
-
   return (
     <>
       <h3 className='text-lg mb-2 text-center'>Other</h3>
       <FormInputSelect name="DateType" value={dateType} options={dayTypeOptions} onChange={changeDayType} />
       <div className="grid grid-cols-2 gap-2">
-        <FormInputButton onClick={cancel} text="Cancel" />
+        <FormInputButton onClick={finish} text="Cancel" />
         <FormInputButton onClick={createOther} disabled={!dateType} intent="PRIMARY" text="Create" />
       </div>
     </>

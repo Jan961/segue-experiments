@@ -10,10 +10,10 @@ import { CreateGifuParams } from 'pages/api/gifu/create'
 import { getInFitUpState } from 'state/booking/getInFitUpState'
 
 interface CreateGifuPanelProps {
-  reset: () => void
+  finish: () => void
 }
 
-export const CreateGifuPanel = ({ reset }: CreateGifuPanelProps) => {
+export const CreateGifuPanel = ({ finish }: CreateGifuPanelProps) => {
   const [venueId, setVenueId] = React.useState<number>(undefined)
   const { selectedDate } = useRecoilValue(viewState)
   const schedule = useRecoilValue(scheduleSelector)
@@ -25,12 +25,7 @@ export const CreateGifuPanel = ({ reset }: CreateGifuPanelProps) => {
     const { data } = await axios.post('/api/gifu/create', newDate)
     const newState = { ...gifuDict, [data.Id]: data }
     setGifuDict(newState)
-    cancel()
-  }
-
-  const cancel = () => {
-    setVenueId(undefined)
-    reset()
+    finish()
   }
 
   return (
@@ -40,7 +35,7 @@ export const CreateGifuPanel = ({ reset }: CreateGifuPanelProps) => {
         <VenueSelector venueId={venueId} onChange={(e) => setVenueId(parseInt(e.target.value))} />
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <FormInputButton onClick={cancel} text="Cancel" />
+        <FormInputButton onClick={finish} text="Cancel" />
         <FormInputButton onClick={createGifu} disabled={!venueId} intent="PRIMARY" text="Create" />
       </div>
     </>

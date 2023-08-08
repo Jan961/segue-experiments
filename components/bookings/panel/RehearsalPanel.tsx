@@ -52,8 +52,8 @@ export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
   const saveAndNext = async (e: any) => {
     e.preventDefault()
     if (changed) await save(e)
-    const nextBooking = rehearsalDict[nextRehearsalId]
-    setView({ selectedDate: nextBooking.Date.split('T')[0] })
+    const nextRehearsal = rehearsalDict[nextRehearsalId]
+    setView({ selectedDate: nextRehearsal.Date.split('T')[0], selected: { type: 'rehearsal', id: nextRehearsalId } })
   }
 
   const statusOptions: SelectOption[] = [
@@ -70,6 +70,7 @@ export const RehearsalPanel = ({ rehearsalId }: RehearsalPanelProps) => {
     setDeleting(false)
     await axios.post('/api/rehearsals/delete', { ...rehearsal })
     const newState = omit(rehearsalDict, [rehearsalId])
+    setView({ selectedDate: undefined, selected: undefined })
     setRehearsalDict(newState)
   }
 

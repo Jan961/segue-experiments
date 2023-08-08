@@ -146,7 +146,7 @@ const BookingPage = ({ Id }: bookingProps) => {
             </>
           )}
         </ScrollablePanel>
-        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-5 lg:col-span-4 xl:col-span-3 px-2'>
+        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue'>   
           <InfoPanel />
         </ScrollablePanel>
       </div>

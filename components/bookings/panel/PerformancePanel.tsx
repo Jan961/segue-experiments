@@ -1,3 +1,4 @@
+import { faClose } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
@@ -17,7 +18,7 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
   const [perfDict, setPerfDict] = useRecoilState(performanceState)
   const perf: PerformanceDTO = perfDict[performanceId]
   const [inputs, setInputs] = React.useState<PerformanceDTO>(perf)
-  const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })
+  const [{ submitting }, setStatus] = React.useState({ submitting: false, changed: false })
   const [deleting, setDeleting] = React.useState(false)
 
   const datePart = inputs.Date ? inputs.Date.split('T')[0] : ''
@@ -41,6 +42,11 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
     setStatus({ submitting: false, changed: true })
   }
 
+  const handleOnBlur = (e: any) => {
+    e.preventDefault()
+    save()
+  }
+
   const saveDetails = async () => {
     const { data } = await axios({
       method: 'POST',
@@ -52,8 +58,7 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
     setPerfDict(newPerf)
   }
 
-  const save = async (e) => {
-    e.preventDefault()
+  const save = async () => {
     setStatus({ submitting: true, changed: true })
     try {
       await saveDetails()
@@ -85,35 +90,31 @@ export const PerformancePanel = ({ performanceId }: PerformancePanelProps) => {
           <p>This will delete the performance permanently</p>
         </DeleteConfirmation>
       )}
-      <div className="grid grid-cols-2 gap-2">
-        <FormInputDate
-          name="datePart"
-          value={datePart}
-          onChange={handleOnChange}
-        />
-        <FormInputTime
-          name="timePart"
-          value={timePart}
-          onChange={handleOnChange}
-        />
-      </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex gap-2 justify-between mb-2">
+        <div className='flex'>
+          <FormInputDate
+            inputClass='rounded-r-none h-10 mb-0'
+            name="datePart"
+            disabled
+            value={datePart}
+            onChange={handleOnChange}
+            onBlur={handleOnBlur}
+          />
+          <FormInputTime
+            inputClass="rounded-l-none border-l-0 h-10 mb-0"
+            name="timePart"
+            value={timePart}
+            onChange={handleOnChange}
+            onBlur={handleOnBlur}
+          />
+        </div>
         <div>
           <FormInputButton
-            className="w-full"
-            text="Delete"
+            className="w-full h-10"
+            icon={faClose}
             intent="DANGER"
             onClick={initiateDelete}
             disabled={submitting}
-          />
-        </div>
-        <div className="col-span-2">
-          <FormInputButton
-            className="w-full"
-            text="Save"
-            intent='PRIMARY'
-            disabled={submitting || !changed}
-            onClick={save}
           />
         </div>
       </div>
