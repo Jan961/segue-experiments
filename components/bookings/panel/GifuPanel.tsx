@@ -54,8 +54,8 @@ export const GifuPanel = ({ gifuId }: GifuPanelProps) => {
   const saveAndNext = async (e: any) => {
     e.preventDefault()
     if (changed) await save(e)
-    const nextBooking = gifuDict[nextId]
-    setView({ selectedDate: nextBooking.Date.split('T')[0] })
+    const nextGifu = gifuDict[nextId]
+    setView({ selectedDate: nextGifu.Date.split('T')[0], selected: { type: 'rehearsal', id: nextId } })
   }
 
   const statusOptions: SelectOption[] = [
@@ -72,6 +72,7 @@ export const GifuPanel = ({ gifuId }: GifuPanelProps) => {
     setDeleting(false)
     await axios.post('/api/gifu/delete', { ...gifu })
     const newState = omit(gifuDict, [gifuId])
+    setView({ selectedDate: undefined, selected: undefined })
     setGifuDict(newState)
   }
 

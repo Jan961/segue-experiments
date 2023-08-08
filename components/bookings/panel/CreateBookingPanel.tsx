@@ -11,10 +11,10 @@ import { bookingState } from 'state/booking/bookingState'
 import { distanceState } from 'state/booking/distanceState'
 
 interface CreateBookingPanelProps {
-  reset: () => void
+  finish: () => void
 }
 
-export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
+export const CreateBookingPanel = ({ finish }: CreateBookingPanelProps) => {
   const [venueId, setVenueId] = React.useState<number>(undefined)
   const { selectedDate } = useRecoilValue(viewState)
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
@@ -28,12 +28,7 @@ export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
     const newState = { ...bookingDict, [data.Id]: data }
     setBookingDict(newState)
     setDistance({ ...distance, outdated: true })
-    cancel()
-  }
-
-  const cancel = () => {
-    setVenueId(undefined)
-    reset()
+    finish()
   }
 
   return (
@@ -43,7 +38,7 @@ export const CreateBookingPanel = ({ reset }: CreateBookingPanelProps) => {
         <VenueSelector venueId={venueId} onChange={(e) => setVenueId(parseInt(e.target.value))} />
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <FormInputButton onClick={cancel} text="Cancel" />
+        <FormInputButton onClick={finish} text="Cancel" />
         <FormInputButton onClick={createBooking} disabled={!venueId} intent="PRIMARY" text="Create" />
       </div>
     </>

@@ -5,7 +5,7 @@ import classNames from 'classnames'
 interface FormInputButtonProps {
   loading?: boolean
   disabled?: boolean
-  text: string
+  text?: string
   onClick?: (e: any) => void
   submit?: boolean
   className?: string
@@ -45,7 +45,7 @@ export const FormInputButton = ({ loading, disabled, text, onClick, submit, clas
       onClick={onClick}
       disabled={disabled}>
       { text }
-      { icon && <FontAwesomeIcon icon={icon} className="ml-2" />}
+      { icon && <FontAwesomeIcon icon={icon} className={ text ? 'ml-2' : ''} />}
       { loading && (<LoadingSpinner />)}
     </button>
   )

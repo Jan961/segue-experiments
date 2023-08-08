@@ -3,12 +3,9 @@ import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { viewState } from 'state/booking/viewState'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { bookingState } from 'state/booking/bookingState'
-import { venueState } from 'state/booking/venueState'
 import { scheduleSelector } from 'state/booking/selectors/scheduleSelector'
 import React from 'react'
-import { CreatePerformancePanel } from './CreatePerformancePanel'
 import { CreateBookingPanel } from './CreateBookingPanel'
-import { findClosestBooking } from './utils/findClosestBooking'
 import { CreateGifuPanel } from './CreateGifuPanel'
 import { CreateOtherPanel } from './CreateOtherPanel'
 import { rehearsalState } from 'state/booking/rehearsalState'
@@ -24,37 +21,38 @@ import { GapChoicePanel } from './GapChoicePanel'
 enum PanelMode {
   Start = 0,
   Booking = 1,
-  Peformance = 2,
   Gifu = 3,
   Other = 4,
   Gap = 5,
   GapChoice = 6,
 }
 
-export default function CreatePanel () {
+interface CreatePanelProps {
+  finish: () => void
+}
+
+export default function CreatePanel ({ finish }: CreatePanelProps) {
   const bookingDict = useRecoilValue(bookingState)
   const { selectedDate } = useRecoilValue(viewState)
-  const venueDict = useRecoilValue(venueState)
   const schedule = useRecoilValue(scheduleSelector)
   const [rehearsalDict, setRehearsalDict] = useRecoilState(rehearsalState)
 
   const [mode, setMode] = React.useState<PanelMode>(PanelMode.Start)
-  const [bookingId, setBookingId] = React.useState<number>(undefined)
   const [gapVenues, setGapVenues] = React.useState<VenueWithDistance[]>([])
 
   const commonButtonClasses = 'w-full p-4 mb-4'
 
-  const closestBookingIds = findClosestBooking(bookingDict, selectedDate)
-  const closestBookings = closestBookingIds.map(id => bookingDict[id])
-
   const { prevBookings, nextBookings } = findPrevAndNextBookings(bookingDict, selectedDate)
+
+  console.log(selectedDate)
+  console.log(prevBookings)
+  console.log(nextBookings)
 
   React.useEffect(() => {
     reset()
   }, [selectedDate])
 
   const reset = () => {
-    setBookingId(undefined)
     setGapVenues(undefined)
     setMode(PanelMode.Start)
   }
@@ -64,33 +62,27 @@ export default function CreatePanel () {
     setGapVenues(venues)
   }
 
-  if (mode === PanelMode.Peformance) {
-    return (
-      <CreatePerformancePanel reset={reset} bookingId={bookingId} />
-    )
-  }
-
   if (mode === PanelMode.Booking) {
     return (
-      <CreateBookingPanel reset={reset} />
+      <CreateBookingPanel finish={finish}/>
     )
   }
 
   if (mode === PanelMode.Gifu) {
     return (
-      <CreateGifuPanel reset={reset} />
+      <CreateGifuPanel finish={finish}/>
     )
   }
 
   if (mode === PanelMode.Other) {
     return (
-      <CreateOtherPanel reset={reset} />
+      <CreateOtherPanel finish={finish}/>
     )
   }
 
   if (mode === PanelMode.Gap) {
     return (
-      <GapPanel reset={reset} setGapVenueIds={setGapVenueIds} />
+      <GapPanel setGapVenueIds={setGapVenueIds} finish={finish}/>
     )
   }
 
@@ -110,11 +102,6 @@ export default function CreatePanel () {
     reset()
   }
 
-  const createPerformance = (bookingId: number) => {
-    setBookingId(bookingId)
-    setMode(PanelMode.Peformance)
-  }
-
   return (
     <div className='m-2 mt-4 mb-0'>
       <FormInputButton
@@ -131,14 +118,6 @@ export default function CreatePanel () {
         <FormInputButton className={commonButtonClasses} text="Other" onClick={() => setMode(PanelMode.Other)} />
         <FormInputButton className={commonButtonClasses} text="Get In Fit Up" onClick={() => setMode(PanelMode.Gifu)} />
       </div>
-      { !closestBookingIds.length && (<FormInputButton className={commonButtonClasses} disabled text="Performance" />)}
-      { closestBookings.map(({ Id, VenueId }) =>
-        <FormInputButton key={Id}
-          className={commonButtonClasses}
-          onClick={() => createPerformance(Id)}
-          text={`Performance: ${venueDict[VenueId].Name}`} />
-      )
-      }
     </div>
   )
 }
