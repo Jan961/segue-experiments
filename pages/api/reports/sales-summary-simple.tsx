@@ -3,7 +3,7 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName } from 'services/salesSummaryService'
+import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName, addCellBorder } from 'services/salesSummaryService'
 import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
 
 const handler = async (req, res) => {
@@ -24,7 +24,8 @@ const handler = async (req, res) => {
 
   // Write data to the worksheet
   const worksheet = workbook.addWorksheet('My Sales', {
-    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
+    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+    views: [{ state: 'frozen', xSplit: 5, ySplit: 5 }]
   })
 
   const mapOfCreatedKeyAndModifiedFetchedValue: {[key: string]: TRequiredFieldsFinalFormat} = finalFormattedValues.reduce((acc, x) => ({
@@ -172,6 +173,7 @@ const handler = async (req, res) => {
   // Coloring this row
   for (let i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)) + 1; i++) {
     colorCell({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW })
+    addCellBorder({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW })
     makeCellTextBold({ worksheet, row, col: i + 5 })
   }
   row++
@@ -198,10 +200,13 @@ const handler = async (req, res) => {
   })
   worksheet.getColumn('D').width = widths[0]
   worksheet.getColumn('E').width = widths[1]
+  worksheet.getColumn('A').width = 9
+  worksheet.getColumn('B').width = 11
+  worksheet.getColumn('C').width = 10
 
   const filename = getFileName(worksheet)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+  res.setHeader('Content-Disposition', `attachment; filename="Sales Summary ${isWeeklyReport ? 'plus Weekly ' : ''} for ${filename}"`)
 
   workbook.xlsx.write(res).then(() => {
     res.end()
