@@ -1,16 +1,10 @@
-import ViewBookingHistory from '../modal/ViewBookingHistory'
 import React from 'react'
 import axios from 'axios'
-import { VenueInfo } from '../modal/VenueInfo'
-import { venueState } from 'state/booking/venueState'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
 import { ChangeBookingDate } from '../modal/ChangeBookingDate'
-import { FormInputText } from 'components/global/forms/FormInputText'
-import { BookingDTO, VenueMinimalDTO } from 'interfaces'
+import { BookingDTO } from 'interfaces'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
-import { FormInputDate } from 'components/global/forms/FormInputDate'
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 import { sortedBookingSelector } from 'state/booking/selectors/sortedBookingSelector'
 import { viewState } from 'state/booking/viewState'
 import { bookingState } from 'state/booking/bookingState'
@@ -19,6 +13,7 @@ import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { VenueSelector } from './components/VenueSelector'
 import { getNextId } from './utils/getNextId'
 import { distanceState } from 'state/booking/distanceState'
+import { scheduleDictSelector } from 'state/booking/selectors/scheduleDictSelector'
 
 interface BookingPanelProps {
   bookingId: number
@@ -28,7 +23,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
   const sortedBookings = useRecoilValue(sortedBookingSelector)
   const [distance, setDistance] = useRecoilState(distanceState)
-  const setView = useSetRecoilState(viewState)
+  const [view, setView] = useRecoilState(viewState)
   const [status, setStatus] = React.useState({ submitting: false, changed: false })
   const { submitting, changed } = status
   const booking = bookingDict[bookingId]
@@ -90,7 +85,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     e.preventDefault()
     if (changed) await save(e)
     const nextBooking = bookingDict[nextBookingId]
-    setView({ selectedDate: nextBooking.Date.split('T')[0] })
+    setView({ selectedDate: nextBooking.Date.split('T')[0], selected: { type: 'booking', id: nextBookingId } })
   }
 
   const initiateDelete = async () => {
@@ -101,6 +96,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     setDeleting(false)
     await axios.post('/api/bookings/delete', { bookingId })
     const newState = omit(bookingDict, [bookingId])
+    setView({ selectedDate: undefined, selected: undefined })
     setBookingDict(newState)
     setDistance({ ...distance, outdated: true })
   }
@@ -112,6 +108,8 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   ]
   const pencilOptions: SelectOption[] = [1, 2, 3].map((i) => ({ text: i.toString(), value: i.toString() }))
 
+  const notFirst = !booking.Date.startsWith(view.selectedDate)
+
   return (
     <form>
       { deleting && (
@@ -122,39 +120,42 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           <p>This will the delete the booking and related performances</p>
         </DeleteConfirmation>
       )}
-      <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-4 p-4 pb-0">
-        <ChangeBookingDate disabled={submitting} bookingId={booking.Id} />
-        <VenueSelector disabled={submitting} onChange={handleOnChange} venueId={inputs.VenueId} />
+      <div className={notFirst ? 'opacity-50' : ''}>
+        <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-2 p-4 pb-0">
+          <ChangeBookingDate disabled={submitting || notFirst} bookingId={booking.Id} />
+          <VenueSelector disabled={submitting || notFirst} onChange={handleOnChange} venueId={inputs.VenueId} />
+        </div>
+
+        <div className="flex flex-row justify-between gap-4">
+          <FormInputSelect inline
+            className="w-28 mb-0"
+            value={inputs.PencilNum}
+            onChange={handleOnChange}
+            options={pencilOptions}
+            name="PencilNum"
+            label="Pencil"
+            disabled={submitting || notFirst}
+          />
+          <FormInputSelect inline
+            value={inputs.StatusCode}
+            className="mb-0"
+            onChange={handleOnChange}
+            options={statusOptions}
+            name="StatusCode"
+            label="Status"
+            disabled={submitting || notFirst}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-6 gap-4">
-        <FormInputSelect inline
-          className="col-span-2"
-          value={inputs.PencilNum}
-          onChange={handleOnChange}
-          options={pencilOptions}
-          name="PencilNum"
-          label="Pencil"
-          disabled={submitting}
-        />
-        <FormInputSelect inline
-          value={inputs.StatusCode}
-          className="col-span-4"
-          onChange={handleOnChange}
-          options={statusOptions}
-          name="StatusCode"
-          label="Status"
-          disabled={submitting}
-        />
-      </div>
-      <div className="grid grid-cols-3 gap-2 py-4 pb-0">
+      <div className="grid grid-cols-3 gap-2">
         <div>
           <FormInputButton
             className="w-full"
             text="Delete"
             intent="DANGER"
             onClick={initiateDelete}
-            disabled={submitting}
+            disabled={submitting || notFirst}
           />
         </div>
         <div className="col-span-2 grid grid-cols-2">

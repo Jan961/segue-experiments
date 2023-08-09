@@ -5,9 +5,10 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { OtherDTO } from 'interfaces'
 import { omit } from 'radash'
 import React from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { otherState } from 'state/booking/otherState'
 import { dateTypeState } from 'state/booking/dateTypeState'
+import { viewState } from 'state/booking/viewState'
 
 interface OtherPanelProps {
   otherId: number
@@ -15,6 +16,7 @@ interface OtherPanelProps {
 
 export const OtherPanel = ({ otherId }: OtherPanelProps) => {
   const [deleting, setDeleting] = React.useState(false)
+  const setView = useSetRecoilState(viewState)
   const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })
   const [otherDict, setOtherDict] = useRecoilState(otherState)
   const dateTypes = useRecoilValue(dateTypeState)
@@ -60,6 +62,7 @@ export const OtherPanel = ({ otherId }: OtherPanelProps) => {
     setDeleting(false)
     await axios.post('/api/other/delete', { ...other })
     const newState = omit(otherDict, [otherId])
+    setView({ selectedDate: undefined, selected: undefined })
     setOtherDict(newState)
   }
 

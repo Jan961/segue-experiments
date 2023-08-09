@@ -16,7 +16,7 @@ interface Input {
 export const FormInputText = (props: Input) => {
   const { placeholder, onChange, value, name, label, required, disabled, className = '', area } = props
   const outputClass = React.useMemo(() => {
-    let baseClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-4'
+    let baseClass = 'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mb-2'
 
     if (disabled) {
       baseClass = classNames('bg-gray-100 text-gray-400 cursor-not-allowed', baseClass)

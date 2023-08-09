@@ -13,7 +13,7 @@ export const DateDisplay = ({ date }: { date: string}) => {
   if (monday) baseClass = classNames(baseClass, 'bg-orange-200 border-orange-500')
 
   return (
-    <div className="w-40 text-sm p-1 text-soft-primary-grey">
+    <div className="w-40 text-sm p-1 text-soft-primary-grey col-span-4 lg:col-span-3 xl:col-span-2">
       <div className={baseClass}>
         <div className="grid grid-cols-8">
           <div className="col-span-1 font-bold pr-2">

@@ -26,7 +26,7 @@ export const findPrevAndNextBookings = (bookings: Record<number, BookingDTO>, sp
     }
 
     if (bDate > specifiedDate) {
-      // Get the more recent event that is after the date
+      // Get the earliest event that is after the date
       if (bDate < nextDate) {
         nextDate = bDate
         nextBookings = [id]

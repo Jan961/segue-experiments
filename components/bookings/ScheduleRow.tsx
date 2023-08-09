@@ -1,34 +1,24 @@
 import classNames from 'classnames'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { DateViewModel } from 'state/booking/selectors/scheduleSelector'
-import { viewState } from 'state/booking/viewState'
-import { BookingDisplay } from './BookingDisplay'
-import { RehearsalDisplay } from './RehearsalDisplay'
+import { BookingDisplay } from './events/BookingDisplay'
+import { RehearsalDisplay } from './events/RehearsalDisplay'
 import { unique } from 'radash'
-import { DateDisplay } from './DateDisplay'
+import { DateDisplay } from './events/DateDisplay'
 import { bookingState } from 'state/booking/bookingState'
-import { GifuDisplay } from './GifuDisplay'
+import { GifuDisplay } from './events/GifuDisplay'
 import { OtherDisplay } from './OtherDisplay'
+import { CreateModal } from './modal/CreateModal'
+import { TourDisplay } from './TourDisplay'
 
 interface ScheduleRowProps {
   date: DateViewModel
 }
 
 export const ScheduleRow = ({ date }: ScheduleRowProps) => {
-  const [view, setView] = useRecoilState(viewState)
   const bookingDict = useRecoilValue(bookingState)
 
-  const dateKey = date.Date.split('T')[0]
-
-  const selected = view.selectedDate === date.Date.split('T')[0]
-
-  const selectDate = (e: any) => {
-    e.stopPropagation()
-    setView({ selectedDate: dateKey })
-  }
-
-  let rowClass = 'flex items-center p-1 px-0 w-full border-l-4 border-transparent gap-2'
-  if (selected) rowClass = classNames(rowClass, 'bg-blue-200 border-blue-500')
+  let rowClass = 'grid grid-cols-12 items-center p-1 px-0 w-full border-l-4 border-transparent gap-2'
 
   // We get duplicates for each performance
   const uniqueBookingIds = unique(date.BookingIds)
@@ -38,21 +28,24 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
     if (bookingDict[id]?.StatusCode === 'U') rowClass = classNames(rowClass, 'italic')
   }
 
+  const total = date.BookingIds.length + date.RehearsalIds.length + date.OtherIds.length + date.GetInFitUpIds.length
+
   return (
     <div className="even:bg-black even:bg-opacity-5
       bg-blend-multiply border-b border-gray-300
       cursor-pointer scroll-mt-20"
-    id={`booking-${date.Date.replace('/', '-')}`}
-    onClick={selectDate}>
+    id={`booking-${date.Date.replace('/', '-')}`}>
       <div className={rowClass} >
+        <TourDisplay />
         <DateDisplay date={date.Date} />
-        <div className="grid grid-rows-auto gap-y-2 flex-grow pr-1">
+        <div className="col-span-8 lg:col-span-9 grid grid-rows-auto gap-y-2 flex-grow pr-1">
           { uniqueBookingIds.map((id: number) => (
             <BookingDisplay key={id} bookingId={id} date={date.Date} performanceCount={date.PerformanceIds.length} />
           ))}
-          { date.RehearsalIds.map((id) => (<RehearsalDisplay key={id} rehearsalId={id} />))}
-          { date.GetInFitUpIds.map((id) => (<GifuDisplay key={id} gifuId={id} />))}
-          { date.OtherIds.map((id) => (<OtherDisplay key={id} otherId={id} />))}
+          { date.RehearsalIds.map((id) => (<RehearsalDisplay key={id} date={date.Date} rehearsalId={id} />))}
+          { date.GetInFitUpIds.map((id) => (<GifuDisplay key={id} date={date.Date} gifuId={id} />))}
+          { date.OtherIds.map((id) => (<OtherDisplay key={id} date={date.Date} otherId={id} />))}
+          { total === 0 && (<div className="grid grid-cols-10"><CreateModal minimal date={date.Date}/></div>)}
         </div>
       </div>
     </div>

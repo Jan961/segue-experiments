@@ -105,7 +105,7 @@ const handler = async (req, res) => {
 
   const numberOfColumns = worksheet.columnCount
 
-  worksheet.mergeCells('A1:C1')
+  worksheet.mergeCells('A1:E1')
   worksheet.mergeCells('A2:C2')
   worksheet.mergeCells('B3:C3')
   worksheet.mergeCells('D3:E3')
@@ -124,7 +124,9 @@ const handler = async (req, res) => {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns })
   }
 
-  const filename = `Promoter_Holds_${tourCode}_${fromDate}_${toDate}.xlsx`
+  worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
+
+  const filename = `Promoter_Holds${(tourCode || tourId) ? '_' + (tourCode || tourId) : ''}${(fromDate && toDate) ? '_' + (fromDate + '_' + toDate) : ''}.xlsx`
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 

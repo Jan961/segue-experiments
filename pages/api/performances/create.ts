@@ -11,6 +11,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     console.log(perf.Date)
     const { Date, Time } = dateStringToPerformancePair(perf.Date)
 
+    console.log(Date)
+    console.log(Time)
+
     const result = await prisma.performance.create({
       data: {
         Date,
