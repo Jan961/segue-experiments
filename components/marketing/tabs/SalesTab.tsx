@@ -69,7 +69,7 @@ export const SalesTab = () => {
     <>
       <div className='grid grid-cols-12 gap-2'>
         <div className='col-span-4 md:col-span-3 lg:col-span-2'>
-          <Summary salesSummary={bookingSales[bookingSales.length-1]} />
+          <Summary salesSummary={bookingSales[bookingSales.length - 1]} />
         </div>
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
           <Table className='mt-8'>
