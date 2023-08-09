@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import prisma from 'lib/prisma'
 import { TSalesView } from 'types/MarketingTypes'
 
@@ -50,9 +51,8 @@ export default async function handle (req, res) {
     if (!bookingIds) {
       throw new Error('Params are missing')
     }
-    const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${bookingIds.join(',')}) order by BookingFirstDate, SetSalesFiguresDate`
-
-    const formattedData: TSalesView[] = data.filter((x: TSalesView) => bookingIds.includes(x.BookingId))
+    const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(bookingIds)}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate`
+    const formattedData: TSalesView[] = data.filter((x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales')
     const commonData = formattedData.filter((x: TSalesView) => x.BookingId === bookingIds[0]).map(({ SetTourWeekNum, SetTourWeekDate }) => ({ SetTourWeekNum, SetTourWeekDate }))
     commonData.sort((a, b) => {
       const t1 = Number(a.SetTourWeekNum)
@@ -62,7 +62,7 @@ export default async function handle (req, res) {
 
     const result: TSalesView[][] = commonData.map(({ SetTourWeekNum, SetTourWeekDate }) => formattedData.reduce(
       (acc, y) =>
-        (y.SetTourWeekDate === SetTourWeekDate && y.SetTourWeekNum === SetTourWeekNum) ? [...acc, y] : [...acc]
+        (y.SetTourWeekNum === SetTourWeekNum) ? [...acc, y] : [...acc]
       , [])
     )
 
