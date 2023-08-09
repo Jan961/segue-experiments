@@ -69,7 +69,7 @@ export const makeRowTextBold = ({ worksheet, row }: {worksheet: any, row: number
 
 export const fillRowBGColorAndTextColor = ({ worksheet, row, textColor, cellColor, isBold }: {worksheet: any, row: number, textColor: COLOR_HEXCODE, cellColor: COLOR_HEXCODE, isBold?: boolean}) => {
   worksheet.getRow(row).eachCell((cell) => {
-    cell.font = { color: { argb: textColor }, ...(isBold && {bold: true}) }
+    cell.font = { color: { argb: textColor }, ...(isBold && { bold: true }) }
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -100,6 +100,14 @@ export const colorCell = ({ worksheet, row, col, argbColor }: {worksheet: any, r
     type: 'pattern',
     pattern: 'solid',
     fgColor: { argb: argbColor }
+  }
+}
+export const addCellBorder = ({ worksheet, row, col, argbColor }: {worksheet: any, row: number, col: number, argbColor: COLOR_HEXCODE}) => {
+  worksheet.getCell(row, col).border = {
+    top: { style: 'thin' },
+    left: { style: 'thin' },
+    bottom: { style: 'thin' },
+    right: { style: 'thin' }
   }
 }
 
