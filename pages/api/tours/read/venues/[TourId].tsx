@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma'
+import { omit, pick } from 'radash'
 
 export default async function handle (req, res) {
   try {
@@ -22,7 +23,7 @@ export default async function handle (req, res) {
         }
       }
     )
-    res.json({ data: result.Booking.map(booking => booking.Venue) })
+    res.json({ data: result.Booking.map(booking => ({ booking: omit(booking, ['Venue']), ...booking.Venue, BookingId: booking.Id })) })
     // res.json(result)
   } catch (error) {
     console.log('==Error fetching Venue bookings==', error)

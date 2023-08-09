@@ -16,6 +16,7 @@ interface props {
   color?: string;
   tourJump?: boolean;
   filterComponent?: any;
+  page?:string;
 }
 
 const GlobalToolbar = ({
