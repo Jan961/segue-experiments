@@ -13,16 +13,16 @@ export const DateDisplay = ({ date }: { date: string}) => {
   if (monday) baseClass = classNames(baseClass, 'bg-orange-200 border-orange-500')
 
   return (
-    <div className="w-40 text-sm p-1 text-soft-primary-grey col-span-4 lg:col-span-3 xl:col-span-2">
+    <div className="w-41 text-sm p-1 text-soft-primary-grey col-span-4 lg:col-span-3 xl:col-span-2">
       <div className={baseClass}>
-        <div className="grid grid-cols-8">
-          <div className="col-span-1 font-bold pr-2">
-            { weekNos[date] }
+        <div className="grid grid-cols-12">
+          <div className="col-span-3 font-bold ">
+            {`Wk ${weekNos[date]}`}
           </div>
-          <div className="col-span-7 flex justify-end gap-1 px-1 overflow-hidden">
-            <div>
-              { getWeekDay(date).slice(0, 3)}
-            </div>
+          <div className="col-span-3">
+            { getWeekDay(date).slice(0, 3)}
+          </div>
+          <div className="col-span-6 flex justify-end gap-1 px-1 overflow-hidden">
             <div>
               { dateToSimple(date) }
             </div>

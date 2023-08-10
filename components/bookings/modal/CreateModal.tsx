@@ -32,9 +32,9 @@ export const CreateModal = ({ minimal = false, date }: CreateModalProps) => {
         <CreatePanel finish={close}/>
       </StyledDialog>
       <FormInputButton
-        text={ minimal ? 'Add Event' : 'Add Additional Event'}
-        className={minimal ? 'col-span-7 bg-transparent shadow-none hover:bg-gray-200 opacity-25 hover:opacity-100' : 'w-full'}
-        icon={faPlus}
+        text={ minimal ? '' : 'Add Additional Event'}
+        className={minimal ? 'col-span-7 bg-transparent shadow-none hover:bg-gray-200 opacity-25 hover:opacity-100 py-3' : 'w-full'}
+        icon={minimal ? null : faPlus}
         onClick={triggerOpen} />
     </>
   )
