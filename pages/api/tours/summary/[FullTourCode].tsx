@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma'
-import moment from 'moment';
+import moment from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { group, mapValues, sum } from 'radash'
 
@@ -14,7 +14,7 @@ type ScheduleView={
 
 const ShowStatusCodeMap = {
   C: 'Confirmed Performances',
-  U: 'Unconfirmed Performances',
+  U: 'Pencilled Performances',
   X: 'Suspended Performances'
 }
 
@@ -30,14 +30,23 @@ const getSummaryByKey = (data:any[], key) => {
 export default async function handler (req: NextApiRequest, res: NextApiResponse) {
   try {
     const { FullTourCode } = req.query
+    let showDays = 0
     const data: ScheduleView[] = await prisma.$queryRaw`SELECT EntryType, EntryStatusCode, EntryName, VenueId, TourStartDate, TourEndDate FROM ScheduleView where FullTourCode=${FullTourCode}`
     const tourStartDate = moment(data?.[0]?.TourStartDate)
     const tourEndDate = moment(data?.[0]?.TourEndDate)
     const numberOfWeeks = tourEndDate.diff(tourStartDate, 'weeks')
     const numberOfDays = tourEndDate.diff(tourStartDate, 'days')
     const workingDays = numberOfDays - numberOfWeeks
-    const entryTypeSummary = getSummaryByKey(data, 'EntryType')?.map((summaryItem:any) => ({ ...summaryItem, name: summaryItem.name === 'Booking' ? 'Show Days' : summaryItem.name }))
     const summaryByEntryStatus = getSummaryByKey(data, 'EntryStatusCode')?.map((summaryItem:any) => ({ ...summaryItem, name: ShowStatusCodeMap[summaryItem.name] }))
+    const entryTypeSummary = getSummaryByKey(data.filter(item => item.EntryStatusCode !== 'X'), 'EntryType')?.map((summaryItem:any) => {
+      if (summaryItem.name === 'Booking') {
+        showDays = summaryItem.value
+        return { name: 'Show Days', value: showDays }
+      }
+      return summaryItem
+    })
+    const nonBookings = sum(entryTypeSummary.filter(item => item.name === 'Show Days').map(item => item.value))
+    const totalPerformances = sum(summaryByEntryStatus.map(item => item.value))
     const totalVenuesonTour:number = Object.keys(group(data, (item:any) => item?.VenueId)).length
     res.status(200).json({
       ok: true,
@@ -45,8 +54,20 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
         ...entryTypeSummary,
         ...summaryByEntryStatus,
         {
-          name: 'Total Venues on Tour',
+          name: 'Total Performances',
+          value: totalPerformances
+        },
+        {
+          name: 'Venues on Tour',
           value: totalVenuesonTour
+        },
+        {
+          name: 'Tour Duration',
+          value: numberOfDays
+        },
+        {
+          name: 'Available Days',
+          value: workingDays - nonBookings
         },
         {
           name: 'Available Working Days',
