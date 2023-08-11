@@ -36,10 +36,11 @@ export const SalesTab = () => {
     const getBookingSales = async () => {
       setLoading(true)
       try {
+        setBookingSales([])
         const { data } = await axios.get(`/api/marketing/sales/read/${selected}`)
-        console.log('bookingSale data: ', data)
         setBookingSales(data)
       } catch (error:any) {
+        setLoading(false)
         console.error(error)
       } finally {
         setLoading(false)
