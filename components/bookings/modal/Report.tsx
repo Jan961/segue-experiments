@@ -1,314 +1,82 @@
-
-import { useState } from 'react'
-import excelJsLoader from 'lib/excelJsLoader'
-import saveAs from 'file-saver'
-import { dateToSimple, formatTime, getWeekDay, timeNow, todayToSimple, weeks } from '../../../services/dateService'
+import { useRouter } from 'next/router'
 import { ToolbarButton } from '../ToolbarButton'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import axios from 'axios'
 
 export default function Report (TourId) {
-  const [pres, setPres] = useState([])
-  const [isLoading, setLoading] = useState(true)
-
-  /*
-  useEffect(() => {
-    (async () => {
-      setLoading(true)
-      fetch(`/api/bookings/${TourId.TourId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setPres(data)
-          setLoading(false)
-        })
-    })()
-  }, [TourId])
-  */
-
-  const onClick = async () => {
-    // Fetch Data from API
-    const ExcelJS = await excelJsLoader()
-
-    const ExcelJSWorkbook = new ExcelJS.Workbook()
-    const worksheet = ExcelJSWorkbook.addWorksheet('Bookings')
-
-    worksheet.mergeCells('A1:CU1')
-    const titleText = worksheet.getCell('A1')
-    titleText.font = {
-      name: 'Arial',
-      family: 4,
-      size: 16,
-      underline: false,
-      bold: true,
-      color: { argb: 'FFFFFF' }
-    }
-    titleText.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '8EA9DB' }
-    }
-
-    titleText.value = 'Schedule for ' + pres[0].Tour.Show.Name
-
-    worksheet.mergeCells('A2:CU2')
-
-    const exportDetails = worksheet.getCell('A2')
-    exportDetails.font = {
-      name: 'Arial',
-      family: 4,
-      size: 12,
-      underline: false,
-      bold: true,
-      color: { argb: 'FFFFFF' }
-    }
-    exportDetails.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '8EA9DB' }
-    }
-
-    exportDetails.value = 'Exported: ' + todayToSimple() + ' ' + timeNow()
-
-    var headerRow = worksheet.addRow()
-    worksheet.getRow(3).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '8EA9DB' }
-    }
-    worksheet.getRow(3).font = {
-      bold: true,
-      color: { argb: 'FFFFFF' }
-    }
-
-    const columns = [
-      { header: '', key: '', width: 60 },
-      { header: '', key: 'Date', width: 60 }
-
-      // For Each Show
-
-      // End Foreach
-
-    ]
-
-    for (let i = 0; i < columns.length; i++) {
-      const currentColumnWidth = columns[i].width
-      worksheet.getColumn(i + 1).width =
-                currentColumnWidth !== undefined ? currentColumnWidth / 6 : 20
-      const cell = headerRow.getCell(i + 1)
-      cell.value = columns[i].header
-    }
-
-    var headerRow = worksheet.addRow()
-    worksheet.getRow(4).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '8EA9DB' }
-    }
-    worksheet.getRow(4).font = {
-      bold: true,
-      color: { argb: 'FFFFFF' }
-    }
-
-    const columnsHead = [
-      { header: '', key: '', width: 60 },
-      { header: '', key: '', width: 60 },
-      { header: 'Show', key: '', width: 60 },
-      { header: '', key: '', width: 30 },
-      { header: '', key: '', width: 120 },
-      { header: '', key: '', width: 60 },
-      { header: '', key: '', width: 60 },
-      { header: 'Tour', key: '', width: 60 },
-      { header: 'Perfs', key: '', width: 60 },
-      { header: 'PERF1', key: '', width: 60 },
-      { header: 'PERF2', key: '', width: 60 },
-      { header: 'TRAVEL', key: '', width: 60 },
-      { header: '', key: '', width: 60 }
-
-    ]
-
-    for (let i = 0; i < columnsHead.length; i++) {
-      const currentColumnWidth = columnsHead[i].width
-      worksheet.getColumn(i + 1).width =
-                currentColumnWidth !== undefined ? currentColumnWidth / 6 : 20
-      const cell = headerRow.getCell(i + 1)
-      cell.value = columnsHead[i].header
-    }
-
-    const headerRow1 = worksheet.addRow()
-    worksheet.getRow(5).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '8EA9DB' }
-    }
-    worksheet.getRow(5).font = {
-      bold: true,
-      color: { argb: 'FFFFFF' }
-    }
-
-    const columnsHeads = [
-      { value: 'Tour', width: 60 },
-      { value: 'DOW', key: '', width: 60 },
-      { value: 'Date', key: '', width: 60 },
-      { value: 'Week', key: '', width: 30 },
-      { value: 'Venue/Details', key: '', width: 120 },
-      { value: 'Town', key: '', width: 60 },
-      { value: 'Pencil', key: '', width: 60 },
-      { value: 'Seats', key: '', width: 60 },
-      { value: '/Day', key: '', width: 60 },
-      { value: 'Time', key: '', width: 60 },
-      { value: 'Time', key: '', width: 60 },
-      { value: 'Mins', key: '', width: 60 },
-      { value: 'Time', key: '', width: 60 }
-
-    ]
-
-    for (let i = 0; i < columnsHeads.length; i++) {
-      const currentColumnWidth = columnsHeads[i].width
-      worksheet.getColumn(i + 1).width =
-                currentColumnWidth !== undefined ? currentColumnWidth / 6 : 20
-      const cell = headerRow1.getCell(i + 1)
-      cell.value = columnsHeads[i].value
-    }
-
-    let dataRow = 6 // first row of data in the report
-
-    for (const [key, value] of Object.entries(pres)) {
-      let i = 0
-      const a = worksheet.getCell(`A${dataRow}`)
-      a.value = value.Tour.Show.Code + value.Tour.Code
-
-      const b = worksheet.getCell(`B${dataRow}`)
-      b.value = getWeekDay((value.ShowDate))
-
-      const c = worksheet.getCell(`C${dataRow}`)
-      c.value = dateToSimple(value.ShowDate)
-
-      const d = worksheet.getCell(`D${dataRow}`)
-      d.value = weeks(value.Tour.TourStartDate, value.ShowDate)
-
-      if (b.value === 'Mon') {
-        a.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'F7C09B' }
-        }
-        b.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'F7C09B' }
-        }
-        c.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'F7C09B' }
-        }
-        d.fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'F7C09B' }
-        }
+  const [tourSummary, setTourSummary] = useState<any[]>([])
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [error, setError] = useState<string>('Oops! Something went wrong. Please try again after some time')
+  const router = useRouter()
+  const fullTourCode = useMemo(() => `${router.query.ShowCode}${router.query.TourCode}`, [router.query])
+  const fetchTourSummary = useCallback((tourCode) => {
+    axios.get(`/api/tours/summary/${tourCode}`).then((response:any) => {
+      if (response?.data?.ok) {
+        setTourSummary(response.data.data)
       }
-
-      /**
-             * Column can hold different information Depending on the Day Type
-             *
-             * If it is a "show" day we have a formatted Venue otherwise we have
-             * a formatted Description
-             *
-             * if day has no entry the value will be empty
-             */
-      const e = worksheet.getCell(`E${dataRow}`)
-
-      if (value.VenueId == null) {
-        // Types need Red Letter and Yellow Background
-        if (value.DateType.DateTypeId === 2 || value.DateType.DateTypeId === 8 || value.DateType.DateTypeId === 18 || value.DateType.DateTypeId === 20) {
-          e.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: 'ff0000' }
-          }
-          e.font = {
-            color: { argb: 'FFFF00' }
-          }
-        }
-
-        e.value = value.DateType.Name
-      } else {
-        if (value.Venue !== null) {
-          /**
-           * Conditional formatting of this Cell
-           *
-           * U - Unconfirmed
-           * C - Confirmed
-           * X - ?
-           * " " - ?
-           */
-          if (value.BookingStatus == 'U') {
-            e.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: '8EA9DB' }
-            }
-          }
-          if (value.BookingStatus == 'C') {
-            // HERE FOR FORMATTING LATER
-          }
-          if (value.BookingStatus == 'X') {
-            e.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: '000000' }
-            }
-            e.font = {
-              color: { argb: 'FFFFFF' }
-            }
-          }
-
-          e.value = value.Venue.Name
-        }
-
-        const f = worksheet.getCell(`F${dataRow}`)
-        f.value = value.Venue.Town
-      }
-
-      const g = worksheet.getCell(`G${dataRow}`)
-      g.value = value.Pencil
-
-      const h = worksheet.getCell(`H${dataRow}`)
-
-      if (value.VenueId !== null) {
-        h.value = value.Venue.Seats
-        const CellI = worksheet.getCell(`I${dataRow}`)
-        CellI.value = value.PerformancesPerDay
-
-        const j = worksheet.getCell(`J${dataRow}`)
-        j.value = formatTime(value.Performance1Time)
-
-        if (value.PerformancesPerDay == 2) {
-          const k = worksheet.getCell(`K${dataRow}`)
-          k.value = formatTime(value.Performance2Time)
-        }
-
-        const l = worksheet.getCell(`L${dataRow}`)
-        l.value = value.TravelTime
-
-        const m = worksheet.getCell(`M${dataRow}`)
-        m.value = value.Miles
-      }
-
-      dataRow = dataRow + 1
-      i = i + 1
-    }
-
-    ExcelJSWorkbook.xlsx.writeBuffer().then(function (buffer) {
-      saveAs(
-        new Blob([buffer], { type: 'application/octet-stream' }),
-        `TourSummary-${new Date()}.xlsx`
-      )
+    }).catch(error => {
+      console.log('====Error===', error)
     })
-  }
-
+  }, [])
+  useEffect(() => {
+    if (fullTourCode)fetchTourSummary(fullTourCode)
+  }, [fullTourCode])
   return (
-    <ToolbarButton onClick={onClick} submit>
+    <>
+      <ToolbarButton onClick={() => setShowModal(true)} submit>
       Tour Summary
-    </ToolbarButton>
+      </ToolbarButton>
+      {
+        showModal
+          ? <>
+            <div
+              className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10"
+            >
+              <div className="relative w-auto my-6 mx-auto max-w-6xl">
+                {/* content */}
+                <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                  {/* header */}
+                  <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
+                    <h3 className="text-3xl font-semibold">
+                                        Tour Summary
+                    </h3>
+                    <button
+                      className="p-1 ml-auto bg-transparent border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                      onClick={() => setShowModal(false)}
+                    >
+                      <span className="bg-transparent text-black h-6 w-6 text-2xl block outline-none focus:outline-none">
+                      x
+                      </span>
+                    </button>
+                  </div>
+                  {/* body */}
+                  <div className="p-2">
+                    {
+                      tourSummary.length
+                        ? (<div className="grid grid-cols-1">
+                          {
+                            tourSummary.map((summaryItem, i) => (
+                              <div key={i} className='grid gap-4 grid-cols-[50px_1fr_50px]'>
+                                <div>{fullTourCode}</div>
+                                <div>{summaryItem.name}</div>
+                                <div>{summaryItem.value}</div>
+                              </div>
+                            ))
+                          }
+                        </div>)
+                        : ''
+                    }
+                    {
+                      !tourSummary.length && <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+          </>
+          : <></>
+      }
+    </>
   )
 }
