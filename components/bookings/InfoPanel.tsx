@@ -30,7 +30,7 @@ export const InfoPanel = () => {
     panel = <BookingPanel key={id} bookingId={id} />
     headerClass = classNames(headerClass, 'bg-gray-300')
     headerText = 'Booking'
-    const ids = scheduleDict[view.selectedDate].PerformanceIds
+    const ids = scheduleDict[view.selectedDate]?.PerformanceIds
     for (const perfId of ids) {
       if (perfState[perfId]?.BookingId === id) performanceIds.push(perfId)
     }

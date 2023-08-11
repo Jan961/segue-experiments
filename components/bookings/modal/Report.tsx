@@ -50,13 +50,13 @@ export default function Report (TourId) {
                     </button>
                   </div>
                   {/* body */}
-                  <div className="p-2">
+                  <div className="py-4">
                     {
                       tourSummary.length
                         ? (<div className="grid grid-cols-1">
                           {
                             tourSummary.map((summaryItem, i) => (
-                              <div key={i} className='grid gap-4 grid-cols-[50px_1fr_50px]'>
+                              <div key={i} className={`grid rounded px-2 gap-4 grid-cols-[70px_1fr_50px] ${i % 2 ? 'bg-table-row-alternating' : ''}`}>
                                 <div>{fullTourCode}</div>
                                 <div>{summaryItem.name}</div>
                                 <div>{summaryItem.value}</div>
