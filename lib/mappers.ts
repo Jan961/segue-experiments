@@ -70,7 +70,8 @@ export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
     Code: b.Venue.Code,
     Name: b.Venue.Name,
     Website: b.Venue.Website
-  }
+  },
+  TourId: b.DateBlock?.TourId
 })
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {

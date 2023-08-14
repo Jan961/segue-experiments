@@ -31,7 +31,7 @@ export type TSalesView = {
     ConversionToCurrencyCode: string // GBP,
     ConversionRate: number
     SetSalesFiguresDate: string
-    SetTourWeekNum: number
+    SetBookingWeekNum: number
     SetTourWeekDate: string
     SetNotOnSale: string
     SetIsFinalFigures: string

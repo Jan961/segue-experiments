@@ -3,8 +3,8 @@ import { dateToSimple } from 'services/dateService'
 import { TSalesView } from 'types/MarketingTypes'
 
 const getMapKey = (
-  { FullTourCode, TourStartDate, BookingFirstDate, BookingStatusCode, VenueTown, VenueCode, SetSalesFiguresDate, SetTourWeekNum, SetTourWeekDate }: Pick<TSalesView, 'FullTourCode' | 'TourStartDate' | 'BookingFirstDate' | 'BookingStatusCode' | 'VenueTown' | 'VenueCode' | 'SetSalesFiguresDate' | 'SetTourWeekNum' | 'SetTourWeekDate'>
-): string => `${FullTourCode} | ${TourStartDate} | ${BookingFirstDate} | ${BookingStatusCode} | ${VenueTown} | ${VenueCode} | ${SetSalesFiguresDate} | ${SetTourWeekNum} | ${SetTourWeekDate}`
+  { FullTourCode, TourStartDate, BookingFirstDate, BookingStatusCode, VenueTown, VenueCode, SetSalesFiguresDate, SetBookingWeekNum, SetTourWeekDate }: Pick<TSalesView, 'FullTourCode' | 'TourStartDate' | 'BookingFirstDate' | 'BookingStatusCode' | 'VenueTown' | 'VenueCode' | 'SetSalesFiguresDate' | 'SetBookingWeekNum' | 'SetTourWeekDate'>
+): string => `${FullTourCode} | ${TourStartDate} | ${BookingFirstDate} | ${BookingStatusCode} | ${VenueTown} | ${VenueCode} | ${SetSalesFiguresDate} | ${SetBookingWeekNum} | ${SetTourWeekDate}`
 
 export default async function handle (req, res) {
   try {
@@ -33,7 +33,7 @@ export default async function handle (req, res) {
       return {
         ...acc,
         [key]: {
-          week: sale.SetTourWeekNum ? `Week-${sale.SetTourWeekNum}` : '',
+          week: sale.SetBookingWeekNum ? `Week-${sale.SetBookingWeekNum}` : '',
           weekOf: dateToSimple(sale.SetSalesFiguresDate),
           seatsSold: sale.Seats || 0,
           seatsSalePercentage: (sale.Seats / sale.TotalCapacity) * 100,

@@ -1,20 +1,23 @@
 import { loggingService } from 'services/loggingService'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { performanceMapper } from 'lib/mappers'
 import { PerformanceDTO } from 'interfaces'
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[]
   Info: {
-    Date: string
     Seats: number
     GrossProfit: number
-    AvgTicketPrice: number
-    Currency: string
+    SalesValue:number
+    VenueCurrencyCode:string
+    VenueCurrencySymbol:string
+    ConversionRate:number
+    AvgTicketPrice:number
   }
   TourInfo: {
+    Date: string
     StartDate: string
+    week:number
   }
   Notes: {
     Booking: string
@@ -24,23 +27,27 @@ export type SummaryResponseDTO = {
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const performances = await prisma.performance.findMany({
-      where: {
-        BookingId: parseInt(req.query.BookingId as string)
-      }
-    })
-
+    const { BookingId } = req.query
+    const saleSummary:any[] = await prisma.$queryRaw`Select * from SalesSummaryView where EntryId=${BookingId}`
+    const { TourWeekNum, EntryDate, Value, TourStartDate, VenueCurrencyCode, VenueCurrencySymbol, ConversionRate, Capacity = 0, Seats = 0, Perfromances = 0 } = saleSummary?.[0] || {}
+    const AvgTicketPrice = Value / Seats
+    const TotalSeats = Capacity * Perfromances
+    const GrossProfit = AvgTicketPrice * TotalSeats
     const result: SummaryResponseDTO = {
-      Performances: performances.map(performanceMapper),
+      Performances: [],
       Info: {
-        Date: '2023-02-08T00:00:00.000Z',
-        Seats: 1234,
-        GrossProfit: 1234.59,
-        AvgTicketPrice: 12.34,
-        Currency: 'GBP'
+        Seats,
+        SalesValue: Value,
+        AvgTicketPrice,
+        GrossProfit,
+        VenueCurrencyCode,
+        VenueCurrencySymbol,
+        ConversionRate
       },
       TourInfo: {
-        StartDate: '2023-01-01T00:00:00.000Z' // .toIsoString
+        StartDate: TourStartDate,
+        Date: EntryDate,
+        week: TourWeekNum
       },
       Notes: {
         Booking: 'Notes about the booking...',

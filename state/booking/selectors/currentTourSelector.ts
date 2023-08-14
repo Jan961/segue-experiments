@@ -5,6 +5,6 @@ export const currentTourSelector = selector({
   key: 'currentTourSelector',
   get: ({ get }) => {
     const { tours, selected } = get(tourJumpState)
-    return tours.filter(x => x.Code === selected.toString())[0]
+    return tours.find(x => x.Id === parseInt(selected, 10))
   }
 })

@@ -41,7 +41,7 @@ export const Summary = ({ salesSummary }:props) => {
   if (loading) return (<LoadingTab />)
 
   if (!summary) return null
-  const weekNo = calculateWeekNumber(new Date(summary.TourInfo.StartDate), new Date(summary.Info.Date))
+  const weekNo = calculateWeekNumber(new Date(summary.TourInfo.StartDate), new Date(summary.TourInfo.Date))
 
   return (
     <>
@@ -51,7 +51,7 @@ export const Summary = ({ salesSummary }:props) => {
           Date
         </DL.Term>
         <DL.Desc>
-          {dateToSimple(summary.Info.Date)}
+          {dateToSimple(summary.TourInfo.Date)}
         </DL.Desc>
         <DL.Term>
           Week No
@@ -82,7 +82,7 @@ export const Summary = ({ salesSummary }:props) => {
           {salesSummary?.seatsSold || '-'}
         </DL.Desc>
         <DL.Term>
-          Gross Profit
+          Gross Potential
         </DL.Term>
         <DL.Desc>
           TODO

@@ -53,16 +53,16 @@ export default async function handle (req, res) {
     }
     const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(bookingIds)}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate`
     const formattedData: TSalesView[] = data.filter((x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales')
-    const commonData = formattedData.filter((x: TSalesView) => x.BookingId === bookingIds[0]).map(({ SetTourWeekNum, SetTourWeekDate }) => ({ SetTourWeekNum, SetTourWeekDate }))
+    const commonData = formattedData.filter((x: TSalesView) => x.BookingId === bookingIds[0]).map(({ SetBookingWeekNum, SetTourWeekDate }) => ({ SetBookingWeekNum, SetTourWeekDate }))
     commonData.sort((a, b) => {
-      const t1 = Number(a.SetTourWeekNum)
-      const t2 = Number(b.SetTourWeekNum)
+      const t1 = Number(a.SetBookingWeekNum)
+      const t2 = Number(b.SetBookingWeekNum)
       return t1 - t2
     })
 
-    const result: TSalesView[][] = commonData.map(({ SetTourWeekNum, SetTourWeekDate }) => formattedData.reduce(
+    const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum, SetTourWeekDate }) => formattedData.reduce(
       (acc, y) =>
-        (y.SetTourWeekNum === SetTourWeekNum) ? [...acc, y] : [...acc]
+        (y.SetBookingWeekNum === SetBookingWeekNum) ? [...acc, y] : [...acc]
       , [])
     )
 
@@ -71,7 +71,7 @@ export default async function handle (req, res) {
       response: commonData.reduce((acc, x, idx) => ([
         ...acc,
         {
-          SetTourWeekNum: x.SetTourWeekNum,
+          SetBookingWeekNum: x.SetBookingWeekNum,
           SetTourWeekDate: x.SetTourWeekDate,
           data: rearrangeArray({ arr: result[idx], bookingIds })
         }

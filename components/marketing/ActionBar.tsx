@@ -1,19 +1,20 @@
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { formatDateUK, getWeekDay } from 'services/dateService'
+import { tourJumpState } from 'state/booking/tourJumpState'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
-
-  const tourOptions: SelectOption[] = bookingJump?.bookings?.map?.((b) => {
-    const date = new Date(b.Date)
-    const weekday = getWeekDay(date)
-    const ukDate = formatDateUK(date)
-    return { text: `${weekday} ${ukDate} | ${b.Venue.Name}`, value: b.Id }
-  })
-
+  const { selected } = useRecoilValue(tourJumpState)
+  const tourOptions: SelectOption[] = bookingJump?.bookings?.filter(booking => booking.TourId === selected)
+    .map?.((b) => {
+      const date = new Date(b.Date)
+      const weekday = getWeekDay(date)
+      const ukDate = formatDateUK(date)
+      return { text: `${weekday} ${ukDate} | ${b.Venue.Name}`, value: b.Id }
+    })
   const changeBooking = (e) => {
     const selected = Number(e.target.value)
     setBookingJump({ ...bookingJump, selected })

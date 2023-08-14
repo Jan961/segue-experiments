@@ -118,6 +118,7 @@ export type BookingWithVenueDTO = BookingDTO & {
     Website: string
     Name: string
   }
+  TourId?:number
 }
 
 export type DateTypeDTO = {
