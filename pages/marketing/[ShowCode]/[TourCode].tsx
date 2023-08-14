@@ -33,14 +33,13 @@ const Index = ({ initialState }: Props) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const tourJump = await getTourJumpState(ctx, 'marketing')
 
-  const tourId = tourJump.tours.filter(x => x.Code === tourJump.selected)[0].Id
+  const tourId = tourJump.selected
 
-  const bookings = await getSaleableBookings(tourId)
-
+  const bookings:any[] = await getSaleableBookings(parseInt(tourId, 10))
+  const selected = bookings.filter((booking:any) => booking?.DateBlock?.TourId === tourId)?.[0]?.Id || null
   const venueRoles = await getRoles()
-
   const bookingJump: BookingJump = {
-    selected: bookings[0] ? bookings[0].Id : undefined,
+    selected,
     bookings: bookings.map(bookingMapperWithVenue)
   }
 

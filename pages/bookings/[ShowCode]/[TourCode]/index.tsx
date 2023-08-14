@@ -152,7 +152,7 @@ const BookingPage = ({ Id }: bookingProps) => {
             </>
           )}
         </ScrollablePanel>
-        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue'>   
+        <ScrollablePanel reduceHeight={toolbarHeight} className='col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue'>
           <InfoPanel />
         </ScrollablePanel>
       </div>
@@ -179,7 +179,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const { ShowCode, TourCode } = ctx.query as Params
   console.log(`ServerSideProps: ${ShowCode}/${TourCode}`)
-  const { Id } = await lookupTourId(ShowCode, TourCode)
+  const { Id } = await lookupTourId(ShowCode, TourCode) || {}
   console.log(`Found tour ${Id}`)
   const venues = await getAllVenuesMin()
   console.log(`Retrieved venues (${venues.length})`)
