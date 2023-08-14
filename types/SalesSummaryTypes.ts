@@ -30,7 +30,7 @@ export type TSalesView = {
     ConversionToCurrencyCode: string // GBP,
     ConversionRate: number
     SetSalesFiguresDate: string
-    SetTourWeekNum: number
+    SetBookingWeekNum: number
     SetTourWeekDate: string
     SetNotOnSale: string
     SetIsFinalFigures: string
@@ -54,7 +54,7 @@ export type TRequiredFields = {
     Value: TSalesView['Value']
     BookingTourWeekNum: TSalesView['BookingTourWeekNum']
     VenueCurrencySymbol: TSalesView['VenueCurrencySymbol']
-    SetTourWeekNum: TSalesView['SetTourWeekNum']
+    SetBookingWeekNum: TSalesView['SetBookingWeekNum']
     SetTourWeekDate: TSalesView['SetTourWeekDate']
     ConversionRate: TSalesView['ConversionRate']
     SetIsCopy: TSalesView['SetIsCopy']

@@ -115,7 +115,7 @@ export const SalesTab = () => {
                 return (
                   <Table.Row key={sale.week}>
                     <Table.Cell className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium border border-l-0 sm:w-auto sm:max-w-none sm:pl-6">
-                      {sale.week.replace('Week-', '')}
+                      {sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>
                     <Table.Cell>
                       {sale.weekOf}
