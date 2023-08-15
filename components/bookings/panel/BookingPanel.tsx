@@ -14,6 +14,7 @@ import { VenueSelector } from './components/VenueSelector'
 import { getNextId } from './utils/getNextId'
 import { distanceState } from 'state/booking/distanceState'
 import { scheduleDictSelector } from 'state/booking/selectors/scheduleDictSelector'
+import { FormInputText } from 'components/global/forms/FormInputText'
 
 interface BookingPanelProps {
   bookingId: number
@@ -146,6 +147,13 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             disabled={submitting || notFirst}
           />
         </div>
+
+        <FormInputText
+          value={inputs.Notes}
+          onChange={handleOnChange}
+          name="Notes"
+          label="Notes"
+          area />
       </div>
 
       <div className="grid grid-cols-3 gap-2">

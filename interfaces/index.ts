@@ -107,9 +107,7 @@ export type BookingDTO = {
   VenueName?: string
   StatusCode: StatusCode
   PencilNum: number
-  LandingSite: string
-  OnSaleDate: string
-  OnSale: boolean
+  Notes?: string
 }
 
 export type BookingWithVenueDTO = BookingDTO & {
