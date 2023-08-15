@@ -110,11 +110,11 @@ export type BookingDTO = {
   LandingSite: string
   OnSaleDate: string
   OnSale: boolean
-  DealNotes:string,
-  Notes:string,
-  MarketingDealNotes:string,
-  HoldNotes:string,
-  CompNotes:string
+  DealNotes?:string,
+  Notes?:string,
+  MarketingDealNotes?:string,
+  HoldNotes?:string,
+  CompNotes?:string
 }
 
 export type BookingWithVenueDTO = BookingDTO & {
@@ -135,7 +135,7 @@ export type PerformanceDTO = {
   Id: number
   BookingId: number
   Date: string
-  Time: string
+  Time?: string
 }
 
 export type DateDTO = {
