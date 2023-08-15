@@ -24,6 +24,7 @@ import { getStops } from 'utils/getStops'
 import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
 import { getTourJumpState } from 'utils/getTourJumpState'
+import { all } from 'radash'
 import { viewState } from 'state/booking/viewState'
 
 interface bookingProps {
@@ -181,9 +182,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   console.log(`ServerSideProps: ${ShowCode}/${TourCode}`)
   const { Id } = await lookupTourId(ShowCode, TourCode) || {}
   console.log(`Found tour ${Id}`)
-  const venues = await getAllVenuesMin()
-  console.log(`Retrieved venues (${venues.length})`)
-  const tour: TourContent = await getTourWithContent(Id)
+
+  // Get in parallel
+  const [venues, tour, dateTypeRaw, tourJump] = await all([
+    getAllVenuesMin(),
+    getTourWithContent(Id),
+    getDayTypes(),
+    getTourJumpState(ctx, 'bookings')
+  ])
+
   console.log(`Retrieved main content. Tour: ${tour.Id}`)
 
   const dateBlock = []
@@ -206,20 +213,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   const stops = getStops(booking)
-
-  // Extra info, Run in parallel
-  const [dateTypeRaw, distanceStops] = await Promise.all([
-    getDayTypes(),
-    getDistances(stops)]
-  )
+  const distanceStops = await getDistances(stops)
 
   const distance = {
     stops: distanceStops,
     outdated: false,
     tourCode: TourCode
   }
-
-  const tourJump = await getTourJumpState(ctx, 'bookings')
 
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
