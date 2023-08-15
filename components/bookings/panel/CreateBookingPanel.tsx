@@ -35,7 +35,7 @@ export const CreateBookingPanel = ({ finish }: CreateBookingPanelProps) => {
     <>
       <h3 className='text-lg mb-2 text-center'>Booking</h3>
       <div className="p-4 pb-px mb-4 rounded-lg bg-primary-blue">
-        <VenueSelector venueId={venueId} onChange={(e) => setVenueId(parseInt(e.target.value))} />
+        <VenueSelector venueId={venueId} onChange={(value) => setVenueId(parseInt(value))} />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <FormInputButton onClick={finish} text="Cancel" />
