@@ -16,7 +16,7 @@ export const DateDisplay = ({ date }: { date: string}) => {
     <div className="w-41 text-sm p-1 text-soft-primary-grey col-span-4 lg:col-span-3 xl:col-span-2">
       <div className={baseClass}>
         <div className="grid grid-cols-12">
-          <div className="col-span-3 font-bold ">
+          <div className="col-span-3 font-bold whitespace-nowrap ">
             {`Wk ${weekNos[date]}`}
           </div>
           <div className="col-span-3">

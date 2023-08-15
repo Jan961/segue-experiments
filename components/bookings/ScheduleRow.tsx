@@ -33,7 +33,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
   return (
     <div className="even:bg-black even:bg-opacity-5
       bg-blend-multiply border-b border-gray-300
-      cursor-pointer scroll-mt-20"
+      scroll-mt-20"
     id={`booking-${date.Date.replace('/', '-')}`}>
       <div className={rowClass} >
         <TourDisplay />
