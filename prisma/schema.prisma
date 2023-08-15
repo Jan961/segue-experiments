@@ -17,39 +17,39 @@ model ActivityType {
   BookingActivity BookingActivity[]
 }
 
-model AttachedFile {
-  Id               Int      @id @default(autoincrement()) @map("FileId")
-  OwnerType        String?  @map("FileOwnerType") @db.VarChar(30)
-  OwnerId          Int      @map("FileOwnerId")
-  Description      String   @map("FileDescription") @db.VarChar(100)
-  OriginalFilename String   @map("FileOriginalFilename") @db.VarChar(100)
-  DT               DateTime @map("FileDT") @db.DateTime(0)
-  UploadedDT       DateTime @map("FileUploadedDT") @db.DateTime(0)
-  Content          Bytes    @map("FileContent")
-}
-
 model Booking {
-  Id                    Int                  @default(autoincrement()) @map("BookingId") @unique
-  DateBlockId           Int                  @map("BookingDateBlockId")
-  VenueId               Int                  @map("BookingVenueId")
-  FirstDate             DateTime             @map("BookingFirstDate") @db.Date
-  StatusCode            String               @default("U") @map("BookingStatusCode") @db.Char(1)
-  PencilNum             Int?                 @map("BookingPencilNum")
-  LandingPageURL        String?              @map("BookingLandingPageURL") @db.VarChar(255)
-  TicketsOnSaleFromDate DateTime?            @map("BookingTicketsOnSaleFromDate") @db.Date
-  TicketsOnSale         Boolean?             @map("BookingTicketsOnSale") @db.Bit(1)
-  IsOnSale              Boolean              @default(dbgenerated("(b'0')")) @map("BookingIsOnSale") @db.Bit(1)
-  OnSaleDate            DateTime?            @map("BookingOnSaleDate") @db.Date
-  MarketingPlanReceived Boolean              @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
-  ContactInfoReceived   Boolean              @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
-  PrintReqsReceived     Boolean              @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
-  BookedVenueHistory    BookedVenueHistory[]
-  DateBlock             DateBlock            @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
-  Venue                 Venue                @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
-  BookingActivity       BookingActivity[]
-  Contract              Contract?
-  Performance           Performance[]
-  SalesSet              SalesSet[]
+  Id                         Int                   @default(autoincrement()) @map("BookingId") @unique
+  DateBlockId                Int                   @map("BookingDateBlockId")
+  VenueId                    Int                   @map("BookingVenueId")
+  FirstDate                  DateTime              @map("BookingFirstDate") @db.Date
+  StatusCode                 String                @default("U") @map("BookingStatusCode") @db.Char(1)
+  PencilNum                  Int?                  @map("BookingPencilNum")
+  LandingPageURL             String?               @map("BookingLandingPageURL") @db.VarChar(255)
+  TicketsOnSaleFromDate      DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
+  TicketsOnSale              Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
+  IsOnSale                   Boolean               @default(dbgenerated("(b'0')")) @map("BookingIsOnSale") @db.Bit(1)
+  OnSaleDate                 DateTime?             @map("BookingOnSaleDate") @db.Date
+  MarketingPlanReceived      Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
+  ContactInfoReceived        Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
+  PrintReqsReceived          Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
+  Notes                      String?               @db.LongText @map("BookingNotes")
+  DealNotes                  String?               @db.LongText @map("BookingDealNotes")
+  TicketPriceNotes           String?               @db.LongText @map("BookingTicketPriceNotes")
+  MarketingDealNotes         String?               @db.LongText @map("BookingMarketingDealNotes")
+  CrewNotes                  String?               @db.LongText @map("BookingCrewNotes")
+  SalesNotes                 String?               @db.LongText @map("BookingSalesNotes")
+  HoldNotes                  String?               @db.LongText @map("BookingHoldNotes")
+  CompNotes                  String?               @db.LongText @map("BookingCompNotes")
+  MerchandiseNotes           String?               @db.LongText @map("BookingMerchandiseNotes")
+  CastRateTicketNotes        String?               @db.LongText @map("BookingCastRateTicketNotes")
+  BookedVenueHistory         BookedVenueHistory[]
+  DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
+  Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
+  BookingActivity            BookingActivity[]
+  BookingAttachedFile        BookingAttachedFile[]
+  Contract                   Contract?
+  Performance                Performance[]
+  SalesSet                   SalesSet[]
 
   @@id([Id, DateBlockId])
   @@unique([DateBlockId, VenueId, FirstDate, StatusCode], map: "SECONDARY")
@@ -68,6 +68,7 @@ model BookingActivity {
   FollowUpRequired Boolean       @default(dbgenerated("(b'0')")) @map("ActivityFollowUpRequired") @db.Bit(1)
   DueByDate        DateTime?     @map("ActivityDueByDate") @db.Date
   CreatedDT        DateTime?     @map("ActivityCreatedDT") @db.DateTime(0)
+  ActivityNotes    String?       @db.LongText
   ActivityType     ActivityType? @relation(fields: [ActivityTypeId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "ActivityType_BookingActivity")
   Booking          Booking       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Activity")
 
@@ -85,15 +86,17 @@ model BookingContactNotes {
 }
 
 model Contract {
-  BookingId       Int       @id @map("ContractBookingId")
-  StatusCode      String?   @map("ContactStatusCode") @db.VarChar(4)
-  SignedDate      DateTime? @map("ContractSignedDate") @db.Date
-  SignedBy        String?   @map("ContractSignedBy") @db.VarChar(30)
-  ReturnDate      DateTime? @map("ContractReturnDate") @db.Date
-  CheckedBy       String?   @map("ContractCheckedBy") @db.VarChar(30)
-  RoyalPercentage Decimal?  @map("RoyaltyPercentage") @db.Decimal(5, 2)
-  DealType        String?   @db.VarChar(4)
-  Booking         Booking   @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  BookingId            Int                    @id @map("ContractBookingId")
+  StatusCode           String?                @map("ContactStatusCode") @db.VarChar(4)
+  SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
+  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(30)
+  ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
+  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(30)
+  RoyalPercentage      Decimal?               @map("RoyaltyPercentage") @db.Decimal(5, 2)
+  DealType             String?                @db.VarChar(4)
+  ContractNotes        String?                @db.LongText
+  Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  ContractAttachedFile ContractAttachedFile[]
 }
 
 model Currency {
@@ -109,14 +112,6 @@ model DateType {
   Name      String      @unique(map: "OtherDayTypeName_UNIQUE") @map("DateTypeName") @db.VarChar(30)
   Other     Other[]
   Rehearsal Rehearsal[]
-}
-
-model Note {
-  Id        Int    @id @default(autoincrement()) @map("NoteId")
-  OwnerType String @map("NoteOwnerType") @db.VarChar(30)
-  OwnerId   Int    @map("NoteOwnerId")
-  TypeName  String @map("NoteTypeName") @db.VarChar(15)
-  Text      String @map("NoteText") @db.LongText
 }
 
 model Show {
@@ -151,25 +146,25 @@ model Tour {
 }
 
 model TourTask {
-  Id                     Int       @id @default(autoincrement()) @map("TourTaskId")
-  TourId                 Int
-  Code                   Int       @db.SmallInt @map("TaskCode")
-  Name                   String    @db.VarChar(80) @map("TaskName")
-  Priority               Int       @default(0) @db.TinyInt
-  Notes                  String?   @db.VarChar(500)
-  Progress               Int       @default(0) @db.TinyInt
-  DueDate                DateTime? @db.Date
-  FollowUp               DateTime? @db.Date
-  CreatedDate            DateTime? @db.Date
-  Status                 String?   @db.VarChar(20)
-  Interval               String    @default("once") @db.VarChar(20)
-  AssignedBy             String?   @db.VarChar(30) @map("TaskAssignedBy")
-  AssignedTo             String?   @db.VarChar(30) @map("TaskAssignedTo")
-  StartByWeekNum         Int?      @db.SmallInt @map("TaskStartByWeekNum")
-  CompleteByWeekNum      Int?      @db.SmallInt @map("TaskCompleteByWeekNum")
-  CompleteByPostTour     Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1) @map("TaskCompleteByPostTour")
-  StartByPostTour        Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1) @map("TaskStartByPostTour")
-  Tour                   Tour      @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
+  Id                 Int       @id @default(autoincrement()) @map("TourTaskId")
+  TourId             Int
+  Code               Int       @map("TaskCode") @db.SmallInt
+  Name               String    @map("TaskName") @db.VarChar(80)
+  Priority           Int       @default(0) @db.TinyInt
+  Notes              String?   @db.VarChar(500)
+  Progress           Int       @default(0) @db.TinyInt
+  DueDate            DateTime? @db.Date
+  FollowUp           DateTime? @db.Date
+  CreatedDate        DateTime? @db.Date
+  Status             String?   @db.VarChar(20)
+  Interval           String    @default("once") @db.VarChar(20)
+  AssignedBy         String?   @map("TaskAssignedBy") @db.VarChar(30)
+  AssignedTo         String?   @map("TaskAssignedTo") @db.VarChar(30)
+  CompleteByWeekNum  Int?      @map("TaskCompleteByWeekNum") @db.SmallInt
+  StartByWeekNum     Int?      @map("TaskStartByWeekNum") @db.SmallInt
+  CompleteByPostTour Boolean   @default(dbgenerated("(b'0')")) @map("TaskCompleteByPostTour") @db.Bit(1)
+  StartByPostTour    Boolean   @default(dbgenerated("(b'0')")) @map("TaskStartByPostTour") @db.Bit(1)
+  Tour               Tour      @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
 
   @@index([TourId], map: "Tour_TourTask_fk")
 }
@@ -200,10 +195,13 @@ model Venue {
   CulturallyExempt                                          Boolean              @default(dbgenerated("(b'0')")) @map("VenueCulturallyExempt") @db.Bit(1)
   VenueAccountId                                            Int
   IsDeleted                                                 Boolean              @default(dbgenerated("(b'0')")) @map("VenueIsDeleted") @db.Bit(1)
+  VenueNotes                                                String?              @db.LongText
+  VenueWarningNotes                                         String?              @db.LongText
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
   Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [CurrencyCode], onUpdate: Restrict, map: "Currency_Venue")
+  VenueAddress                                              VenueAddress[]
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]   @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]   @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
@@ -259,22 +257,6 @@ model VenueVenue {
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
   @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
   @@id([Venue1Id, Venue2Id])
-}
-
-model Address {
-  Id        Int     @id @default(autoincrement()) @map("AddressId")
-  OwnerType String  @map("AddressOwnerType") @db.VarChar(30)
-  OwnerId   Int     @map("AddressOwnerId")
-  TypeName  String  @map("AddressTypeName") @db.VarChar(15)
-  Line1     String? @map("Address1") @db.VarChar(50)
-  Line2     String? @map("Address2") @db.VarChar(50)
-  Line3     String? @map("Address3") @db.VarChar(50)
-  Town      String? @map("AddressTown") @db.VarChar(50)
-  County    String? @map("AddressCounty") @db.VarChar(50)
-  Postcode  String? @map("AddressPostcode") @db.VarChar(12)
-  Country   String? @map("AddressCountry") @db.VarChar(30)
-
-  @@unique([OwnerType, OwnerId, TypeName], map: "SECONDARY")
 }
 
 model DateBlock {
@@ -456,8 +438,8 @@ model Sale {
   SaleSetId      Int?
   SaleSeats      Int?      @db.SmallInt
   SaleValue      Decimal?  @db.Decimal(8, 2)
-  SalesSet       SalesSet? @relation(fields: [SaleSetId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
-  SaleType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
+  SaleType       SalesSet? @relation(fields: [SaleSaleTypeId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
+  SalesSet       SaleType? @relation(fields: [SaleSetId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
 
   @@index([SaleSaleTypeId], map: "BookingSale_Sale_idx")
   @@index([SaleSetId], map: "SaleType_Sale_idx")
@@ -513,4 +495,46 @@ model SetHold {
 
   @@index([SetHoldHoldTypeId], map: "HoldType_SetHold")
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
+}
+
+model BookingAttachedFile {
+  FileId               Int      @id @default(autoincrement())
+  FileBookingBookingId Int
+  FileDescription      String   @db.VarChar(100)
+  FileOriginalFilename String   @db.VarChar(100)
+  FileDateTime         DateTime @db.DateTime(0)
+  FileUploadedDateTime DateTime @db.DateTime(0)
+  FileContent          Bytes
+  Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
+
+  @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
+}
+
+model ContractAttachedFile {
+  FileId                Int      @id @default(autoincrement())
+  FileContractBookingId Int
+  FileDescription       String   @db.VarChar(100)
+  FileOriginalFilename  String   @db.VarChar(100)
+  FileDateTime          DateTime @db.DateTime(0)
+  FileUploadedDateTime  DateTime @db.DateTime(0)
+  FileContent           Bytes
+  Contract              Contract @relation(fields: [FileContractBookingId], references: [BookingId], onDelete: Cascade, map: "Contract_ContractAttachedFile")
+
+  @@index([FileContractBookingId], map: "Contract_ContractAttachedFile")
+}
+
+model VenueAddress {
+  VenueAddressId       Int     @id @default(autoincrement())
+  VenueAddressVenueId  Int
+  VenueAddressTypeName String  @db.VarChar(15)
+  VenueAddress1        String? @db.VarChar(50)
+  VenueAddress2        String? @db.VarChar(50)
+  VenueAddress3        String? @db.VarChar(50)
+  VenueAddressTown     String? @db.VarChar(50)
+  VenueAddressCounty   String? @db.VarChar(50)
+  VenueAddressPostcode String? @db.VarChar(12)
+  VenueAddressCountry  String? @db.VarChar(30)
+  Venue                Venue   @relation(fields: [VenueAddressVenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+
+  @@index([VenueAddressVenueId], map: "Venue_VenueAddress")
 }
