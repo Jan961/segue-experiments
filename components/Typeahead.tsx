@@ -18,14 +18,13 @@ const Typeahead = ({ options, placeholder, onChange, disabled, value }:props) =>
   const [inputValue, setInputValue] = useState('')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
   const inputRef = useRef(null)
-  const filteredOptions:Option[] = useMemo(() => options.filter(option =>
-    option?.text?.toLowerCase?.().includes?.(inputValue?.toLowerCase?.())
-  ), [inputValue, options])
+  const filteredOptions:Option[] = useMemo(() => options.filter((option:Option) => option.text?.toLowerCase().includes(inputValue.toLowerCase())), [inputValue, options])
   useEffect(() => {
     const selectedOption = options.find(option => option.value === String(value))
     setInputValue(selectedOption?.text || '')
   }, [value])
   const handleInputChange = (e: { target: { value: any } }) => {
+    console.log('===InputValue===', inputValue)
     setInputValue(e.target.value)
   }
   const handleSelectOption = (selectedOption:Option) => {
