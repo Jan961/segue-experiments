@@ -24,7 +24,6 @@ const Typeahead = ({ options, placeholder, onChange, disabled, value }:props) =>
     setInputValue(selectedOption?.text || '')
   }, [value])
   const handleInputChange = (e: { target: { value: any } }) => {
-    console.log('===InputValue===', inputValue)
     setInputValue(e.target.value)
   }
   const handleSelectOption = (selectedOption:Option) => {
