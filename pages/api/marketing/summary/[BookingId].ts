@@ -1,18 +1,21 @@
 import { loggingService } from 'services/loggingService'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PerformanceDTO } from 'interfaces'
+import { PerformanceDTO, BookingDTO } from 'interfaces'
+import { calculateWeekNumber } from 'services/dateService'
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[]
   Info: {
     Seats: number
-    GrossProfit: number
+    GrossPotential: number
     SalesValue:number
     VenueCurrencyCode:string
     VenueCurrencySymbol:string
     ConversionRate:number
     AvgTicketPrice:number
+    seatsSalePercentage:number
+    Capacity:number
   }
   TourInfo: {
     Date: string
@@ -20,38 +23,138 @@ export type SummaryResponseDTO = {
     week:number
   }
   Notes: {
-    Booking: string
-    Contract: string
+    BookingDealNotes:string,
+    BookingNotes:string,
+    MarketingDealNotes:string,
+    HoldNotes:string,
+    CompNotes:string
   }
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { BookingId } = req.query
-    const saleSummary:any[] = await prisma.$queryRaw`Select * from SalesSummaryView where EntryId=${BookingId}`
-    const { TourWeekNum, EntryDate, Value, TourStartDate, VenueCurrencyCode, VenueCurrencySymbol, ConversionRate, Capacity = 0, Seats = 0, Perfromances = 0 } = saleSummary?.[0] || {}
-    const AvgTicketPrice = Value / Seats
-    const TotalSeats = Capacity * Perfromances
+    const BookingId = parseInt(req.query?.BookingId as string, 10)
+    const performance: any = await prisma.performance.findFirst({
+      where: {
+        BookingId
+      },
+      orderBy: {
+        Date: 'asc'
+      },
+      take: 1
+    })
+
+    const performances:any[] = await prisma.performance.findMany({
+      distinct: ['Date'],
+      select: {
+        Date: true,
+        Time: true
+      },
+      where: {
+        BookingId
+      }
+    })
+    const NumberOfPerformances: number = performances.length
+
+    const SalesSetTotalsView: any = await prisma.$queryRaw`select
+    SetSalesFiguresDate as SaleFiguresDate,
+    SetIsFinalFigures,
+    Seats as TotalSeats,
+    Value as TotalSales
+    from SalesSetTotalsView
+    where
+        SaleTypeName in ('General Sales','School Sales')
+        and SetBookingId = ${BookingId}
+    order by SetSalesFiguresDate desc
+    limit 1;`
+    const salesSummary:any = SalesSetTotalsView?.[0]
+    const booking: any = await prisma.booking.findFirst({
+      select: {
+        FirstDate: true,
+        VenueId: true,
+        DealNotes: true,
+        Notes: true,
+        MarketingDealNotes: true,
+        HoldNotes: true,
+        CompNotes: true,
+        Venue: {
+          select: {
+            Seats: true,
+            CurrencyCode: true,
+            Currency: {
+              select: {
+                CurrencySymbol: true
+              }
+            }
+          }
+        },
+        DateBlock: {
+          select: {
+            StartDate: true,
+            EndDate: true,
+            Tour: {
+              select: {
+                ConversionRate: {
+                  select: {
+                    ConversionRate: true
+                  }
+                }
+              }
+            }
+          }
+          // where: {
+          //   Name: 'Tour'
+          // }
+        }
+      },
+      where: {
+        Id: BookingId,
+        NOT: {
+          VenueId: {
+            equals: undefined
+          }
+        }
+      }
+    })
+    const {
+      DealNotes: BookingDealNotes,
+      Notes: BookingNotes,
+      MarketingDealNotes,
+      HoldNotes,
+      CompNotes
+    } = booking || {}
+    const { Seats: Capacity, CurrencyCode } = booking?.Venue || {}
+    const { CurrencySymbol } = booking?.Venue?.Currency || {}
+    const { ConversionRate } = performance?.DateBlock?.Tour?.ConversionRate || {}
+    const AvgTicketPrice = salesSummary.TotalSales / salesSummary.TotalSeats
+    const TotalSeats = Capacity * NumberOfPerformances
     const GrossProfit = AvgTicketPrice * TotalSeats
+    const seatsSalePercentage = (salesSummary.TotalSeats / TotalSeats) * 100
+    const currentTourWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate))
     const result: SummaryResponseDTO = {
-      Performances: [],
+      Performances: performances,
       Info: {
-        Seats,
-        SalesValue: Value,
-        AvgTicketPrice,
-        GrossProfit,
-        VenueCurrencyCode,
-        VenueCurrencySymbol,
+        Seats: salesSummary.TotalSeats,
+        SalesValue: salesSummary.TotalSales,
+        AvgTicketPrice: parseFloat(AvgTicketPrice.toFixed(2)),
+        GrossPotential: parseFloat(GrossProfit.toFixed(2)),
+        VenueCurrencyCode: CurrencyCode,
+        VenueCurrencySymbol: CurrencySymbol,
+        seatsSalePercentage: parseFloat(seatsSalePercentage.toFixed(2)),
+        Capacity: TotalSeats,
         ConversionRate
       },
       TourInfo: {
-        StartDate: TourStartDate,
-        Date: EntryDate,
-        week: TourWeekNum
+        StartDate: booking?.DateBlock.StartDate,
+        Date: salesSummary.SaleFiguresDate,
+        week: currentTourWeekNum
       },
       Notes: {
-        Booking: 'Notes about the booking...',
-        Contract: 'Notes about the contract...'
+        BookingDealNotes,
+        BookingNotes,
+        MarketingDealNotes,
+        HoldNotes,
+        CompNotes
       }
     }
 
