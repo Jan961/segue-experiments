@@ -68,8 +68,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     }
   }
 
-  const handleOnChange = (e: any) => {
-    let { id, value } = e.target
+  const handleOnChange = (id:string, value:any) => {
     // Handle numeric fields
     if (id === 'PencilNum') value = value ? parseInt(value) : null
     if (id === 'VenueId') value = value ? parseInt(value) : null
@@ -123,14 +122,14 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
       <div className={notFirst ? 'opacity-50' : ''}>
         <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-2 p-4 pb-0">
           <ChangeBookingDate disabled={submitting || notFirst} bookingId={booking.Id} />
-          <VenueSelector disabled={submitting || notFirst} onChange={handleOnChange} venueId={inputs.VenueId} />
+          <VenueSelector disabled={submitting || notFirst} onChange={(value:any) => handleOnChange('VenueId', value)} venueId={inputs.VenueId} />
         </div>
 
         <div className="flex flex-row justify-between gap-4">
           <FormInputSelect inline
             className="w-28 mb-0"
             value={inputs.PencilNum}
-            onChange={handleOnChange}
+            onChange={(e:any) => handleOnChange('PencilNum', e.target.value)}
             options={pencilOptions}
             name="PencilNum"
             label="Pencil"
@@ -139,7 +138,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           <FormInputSelect inline
             value={inputs.StatusCode}
             className="mb-0"
-            onChange={handleOnChange}
+            onChange={(e:any) => handleOnChange('StatusCode', e.target.value)}
             options={statusOptions}
             name="StatusCode"
             label="Status"

@@ -27,8 +27,7 @@ export const GifuPanel = ({ gifuId }: GifuPanelProps) => {
 
   const nextId = getNextId(sorted, gifuId)
 
-  const handleOnChange = (e: any) => {
-    let { id, value } = e.target
+  const handleOnChange = (id:string, value:any) => {
     if (id === 'VenueId') value = parseInt(value)
     setInputs((prev) => ({
       ...prev,
@@ -86,10 +85,10 @@ export const GifuPanel = ({ gifuId }: GifuPanelProps) => {
           <p>This will delete the event permanently</p>
         </DeleteConfirmation>
       )}
-      <VenueSelector venueId={inputs.VenueId} onChange={handleOnChange} />
+      <VenueSelector venueId={inputs.VenueId} onChange={(value:any) => handleOnChange('VenueId', value)} />
       <FormInputSelect inline
         value={inputs.StatusCode}
-        onChange={handleOnChange}
+        onChange={(e:any) => handleOnChange('StatusCode', e.target.value)}
         options={statusOptions}
         name="StatusCode"
         label="Status"
