@@ -47,6 +47,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const performances:any[] = await prisma.performance.findMany({
       distinct: ['Date'],
       select: {
+        Id: true,
         Date: true,
         Time: true
       },

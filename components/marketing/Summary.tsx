@@ -63,7 +63,7 @@ export const Summary = ({ salesSummary }:props) => {
           Shows
         </DL.Term>
         <DL.Desc>
-          {summary?.Performances?.length}
+          {summary?.Performances?.map?.(performance => performance.Id)?.join?.('&')}
         </DL.Desc>
         <DL.Term>
           Times
@@ -82,19 +82,25 @@ export const Summary = ({ salesSummary }:props) => {
           {summary?.Info?.Seats || '-'}
         </DL.Desc>
         <DL.Term>
-          Gross Potential
+          Total Sales({summary?.Info?.VenueCurrencySymbol})
+        </DL.Term>
+        <DL.Desc>
+          {`${summary?.Info?.VenueCurrencySymbol}${summary?.Info?.SalesValue}` || '-'}
+        </DL.Desc>
+        <DL.Term>
+          GP({summary?.Info?.VenueCurrencySymbol})
         </DL.Term>
         <DL.Desc>
           {summary?.Info?.GrossPotential}
         </DL.Desc>
         <DL.Term>
-          Avg Ticket Price
+          AVG Ticket Price({summary?.Info?.VenueCurrencySymbol})
         </DL.Term>
         <DL.Desc>
           {summary?.Info?.AvgTicketPrice}
         </DL.Desc>
         <DL.Term>
-          Percent Booked
+          Booking %:
         </DL.Term>
         <DL.Desc>
           {summary?.Info?.seatsSalePercentage ? `${summary?.Info?.seatsSalePercentage}%` : '-'}
@@ -106,6 +112,12 @@ export const Summary = ({ salesSummary }:props) => {
           {summary?.Info?.Capacity || '-'}
         </DL.Desc>
         <DL.Term>
+          Performances
+        </DL.Term>
+        <DL.Desc>
+          {summary?.Performances?.length}
+        </DL.Desc>
+        <DL.Term>
           Total Seats
         </DL.Term>
         <DL.Desc>
@@ -115,40 +127,40 @@ export const Summary = ({ salesSummary }:props) => {
           Currency
         </DL.Term>
         <DL.Desc>
-          {`${summary?.Info?.VenueCurrencySymbol}${summary?.Info?.SalesValue}` || '-'}
+          {summary?.Info?.VenueCurrencyCode || '-'}
         </DL.Desc>
       </DL>
       <hr className='border-gray-500 border-opacity-50 my-4'/>
       <h3 className='mb-2'>Notes</h3>
       <DL inline={false}>
         <DL.Term>
-          Booking Notes
-        </DL.Term>
-        <DL.Desc>
-          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.BookingNotes }}></span>
-        </DL.Desc>
-        <DL.Term>
           Marketing Deal
         </DL.Term>
-        <DL.Desc>
+        <DL.Desc className='mb-4'>
           <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.MarketingDealNotes }}></span>
+        </DL.Desc>
+        <DL.Term>
+          Booking Notes
+        </DL.Term>
+        <DL.Desc className='mb-4'>
+          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.BookingNotes }}></span>
         </DL.Desc>
         <DL.Term>
           Booking Deal Notes
         </DL.Term>
-        <DL.Desc>
+        <DL.Desc className='mb-4'>
           <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.BookingDealNotes }}></span>
         </DL.Desc>
         <DL.Term>
           Hold Notes
         </DL.Term>
-        <DL.Desc>
+        <DL.Desc className='mb-4'>
           <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.HoldNotes }}></span>
         </DL.Desc>
         <DL.Term>
           Comp Notes
         </DL.Term>
-        <DL.Desc>
+        <DL.Desc className='mb-4'>
           <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.CompNotes }}></span>
         </DL.Desc>
       </DL>
