@@ -22,7 +22,7 @@ export const VenueSelector = ({ venueId, onChange, disabled, options, label }: V
     ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: v.Name, value: String(v.Id) })
     )]
   const onSelect = (option:SelectOption) => {
-    onChange({ target: { value: option.value } })
+    onChange(option.value)
   }
   return (
     <>
