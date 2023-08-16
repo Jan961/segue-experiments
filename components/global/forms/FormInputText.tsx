@@ -31,7 +31,7 @@ export const FormInputText = (props: Input) => {
     onChange,
     placeholder,
     required,
-    value,
+    value: value || '',
     className: outputClass,
     disabled,
     readOnly: disabled

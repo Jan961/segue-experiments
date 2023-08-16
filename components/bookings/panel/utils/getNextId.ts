@@ -1,6 +1,5 @@
 export const getNextId = (sorted: any[], current: number) => {
   let found = false
-  console.log(current)
 
   for (const b of sorted) {
     if (found) return b.Id

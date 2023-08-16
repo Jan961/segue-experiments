@@ -56,12 +56,9 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   Date: convertDate(b.FirstDate),
   Id: b.Id,
   VenueId: b.VenueId,
-  VenueName: b.Venue ? b.Venue.Name : undefined,
-  LandingSite: b.LandingPageURL,
   StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
-  OnSaleDate: convertDate(b.TicketsOnSaleFromDate),
-  OnSale: b.TicketsOnSale
+  Notes: b.Notes
 })
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({

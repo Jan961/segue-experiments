@@ -107,11 +107,8 @@ export type BookingDTO = {
   VenueName?: string
   StatusCode: StatusCode
   PencilNum: number
-  LandingSite: string
-  OnSaleDate: string
-  OnSale: boolean
   DealNotes?:string,
-  Notes?:string,
+  Notes?: string,
   MarketingDealNotes?:string,
   HoldNotes?:string,
   CompNotes?:string

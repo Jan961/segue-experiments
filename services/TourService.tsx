@@ -77,8 +77,7 @@ const tourContentInclude = Prisma.validator<Prisma.TourSelect>()({
     include: {
       Booking: {
         include: {
-          Performance: true,
-          Venue: true
+          Performance: true
         }
       },
       GetInFitUp: true,

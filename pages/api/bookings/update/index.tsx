@@ -10,14 +10,11 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const booking: Partial<Booking> = {
       Id: inc.Id, // Where
-      // Dateblock never change
       FirstDate: new Date(inc.Date),
       StatusCode: inc.StatusCode,
       VenueId: inc.VenueId,
       PencilNum: inc.PencilNum,
-      LandingPageURL: inc.LandingSite,
-      TicketsOnSaleFromDate: inc.OnSaleDate ? new Date(inc.OnSaleDate) : null,
-      TicketsOnSale: inc.OnSale
+      Notes: inc.Notes
     }
 
     const updated = await updateBooking(booking as Booking)
