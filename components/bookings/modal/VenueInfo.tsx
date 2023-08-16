@@ -16,7 +16,7 @@ export const VenueInfoItem = ({ label, value }: { label: string, value: string})
       <div className="flex">
         <label className="w-48 font-bold">{ title(label) }:&nbsp;</label>
         <div>
-          <a href={value} className="text-primary-blue hover:underline whitespace-nowrap overflow-ellipsis">[Link]</a>
+          <a href={value} target="_blank" rel="noreferrer" className="text-primary-blue hover:underline whitespace-nowrap overflow-ellipsis">[Link]</a>
         </div>
       </div>
     )
