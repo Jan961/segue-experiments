@@ -9,7 +9,9 @@ const allowedEmails = [
   'asara97911@gmail.com',
   'k@bhikstudio.co.uk',
   'sb@steve-baxter.co.uk',
-  'projects@robertckelly.co.uk'
+  'projects@robertckelly.co.uk',
+  'marketing@robertckelly.co.uk',
+  'production@robertckelly.co.uk'
 ]
 const publicPaths = ['/sign-in*', '/sign-up*', '/access-denied']
 
