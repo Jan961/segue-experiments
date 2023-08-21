@@ -15,7 +15,7 @@ export type BarredVenue = {
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const { venueId, tourId } = req.body
+  const { venueId, tourId, excludeLondon } = req.body
   try {
     console.log('', tourId, typeof tourId)
     const result = await prisma.VenueVenue.findMany({
@@ -23,6 +23,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         Venue1Id: venueId
       },
       select: {
+        Mileage: true,
+        TimeMins: true,
         Venue2: {
           select: {
             Name: true,
@@ -66,7 +68,12 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         Date: FirstDate,
         town
       }
-    }).filter(x => x).sort((a:BarredVenue, b:BarredVenue) => new Date(a.Date) - new Date(b.Date))
+    }).filter(x => {
+      if (excludeLondon) {
+        return x && x.town !== 'London'
+      }
+      return x
+    }).sort((a:BarredVenue, b:BarredVenue) => b.Mileage - a.Mileage)
     res.json(filteredResults)
   } catch (e) {
     console.log(e)
