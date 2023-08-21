@@ -8,16 +8,17 @@ interface StyledDialogProps {
   open: boolean;
   onClose: () => void;
   title: string;
-  width?: undefined | 'lg' | 'xl' | 'md';
+  width?: undefined | 'lg' | 'xl' | 'md'
 }
 
 // Only use non-default classes on desktop only pages.
 const DEFAULT_WIDTH_CLASS = 'max-w-sm w-96'
 
 const WIDTH_CLASSES = {
-  md: 'max-w-md w-96',
-  lg: 'max-w-lg w-96',
-  xl: 'max-w-xl w-96'
+  md: 'max-w-md',
+  lg: 'max-w-lg',
+  xl: 'max-w-3xl',
+  none: ''
 }
 
 export const StyledDialog = ({ open, onClose, title, children, width }: PropsWithChildren<StyledDialogProps>) => {
