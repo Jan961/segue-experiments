@@ -1,6 +1,5 @@
 import { addDays } from 'date-fns'
-
-const getKey = (date: string) => (date.split('T')[0])
+import { getKey } from 'services/dateService'
 
 export const getArrayOfDatesBetween = (start: string, end: string) => {
   const arr = []
