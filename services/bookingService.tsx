@@ -1,4 +1,5 @@
 import { Booking, Prisma } from '@prisma/client'
+import { addDays, differenceInDays, parseISO } from 'date-fns'
 import prisma from 'lib/prisma'
 import { omit } from 'radash'
 
@@ -94,12 +95,52 @@ export const getSaleableBookings = async (TourId: number) => {
 }
 
 export const changeBookingDate = async (Id: number, FirstDate: Date) => {
-  return prisma.booking.update({
+  const booking = await prisma.booking.findUnique({
     where: {
       Id
     },
-    data: {
-      FirstDate
+    include: {
+      Performance: true
+    }
+  })
+
+  const daysDiff = differenceInDays(FirstDate, booking.FirstDate)
+
+  console.log(booking)
+  console.log(FirstDate)
+  console.log(booking.FirstDate)
+
+  console.log(`Moving booking by ${daysDiff} day(s)`)
+
+  await prisma.$transaction(async (tx) => {
+    for (const perf of booking.Performance) {
+      await tx.performance.update({
+        where: {
+          Id: perf.Id
+        },
+        data: {
+          Date: addDays(perf.Date, daysDiff)
+        }
+      })
+    }
+
+    await prisma.booking.update({
+      where: {
+        Id
+      },
+      data: {
+        FirstDate
+      }
+    })
+  })
+
+  // Return new booking for client side update
+  return prisma.booking.findUnique({
+    where: {
+      Id
+    },
+    include: {
+      Performance: true
     }
   })
 }

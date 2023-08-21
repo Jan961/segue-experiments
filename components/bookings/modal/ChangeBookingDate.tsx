@@ -6,15 +6,15 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import axios from 'axios'
 import { FormInputDate } from 'components/global/forms/FormInputDate'
-import { UpdateDateParams } from 'pages/api/bookings/update/date'
+import { UpdateDateParams, UpdateDateResponse } from 'pages/api/bookings/update/date'
 import { bookingState } from 'state/booking/bookingState'
 import { distanceState } from 'state/booking/distanceState'
 import { scheduleDictSelector } from 'state/booking/selectors/scheduleDictSelector'
 import { performanceState } from 'state/booking/performanceState'
-import { PerformanceDTO } from 'interfaces'
+import { BookingDTO, PerformanceDTO } from 'interfaces'
 import { DateViewModel } from 'state/booking/selectors/scheduleSelector'
 import { differenceInDays, parseISO } from 'date-fns'
-import { unique } from 'radash'
+import { objectify, unique } from 'radash'
 import { venueState } from 'state/booking/venueState'
 
 interface ChangeBookingDateProps {
@@ -54,8 +54,8 @@ const getDatesRange = (performances: PerformanceDTO[]): string[] => {
 export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProps) => {
   const scheduleDict = useRecoilValue(scheduleDictSelector)
   const [bookingDict, setBookingDict] = useRecoilState(bookingState)
+  const [perfDict, setPerfDict] = useRecoilState(performanceState)
   const booking = bookingDict[bookingId]
-  const perfDict = useRecoilValue(performanceState)
   const venueDict = useRecoilValue(venueState)
   const [showModal, setShowModal] = React.useState(false)
   const [date, setDate] = React.useState(dateToPicker(booking.Date))
@@ -81,9 +81,12 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
 
     try {
       const { data } = await axios.post('/api/bookings/update/date', params)
+      const { performances, bookings } = data as UpdateDateResponse
 
-      const newState = { ...bookingDict, [data.Id]: data }
-      setBookingDict(newState)
+      const newBookingState = { ...bookingDict, ...objectify(bookings, (x: BookingDTO) => x.Id) }
+      const newPerfState = { ...perfDict, ...objectify(performances, (x: PerformanceDTO) => x.Id) }
+      setBookingDict(newBookingState)
+      setPerfDict(newPerfState)
       setDistance({ ...distance, outdated: true })
       setShowModal(false)
     } finally {
