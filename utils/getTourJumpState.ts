@@ -17,7 +17,8 @@ export const getTourJumpState = async (ctx, path: string): Promise<TourJump> => 
         Id: t.Id,
         Code: t.Code,
         IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code
+        ShowCode: t.Show.Code,
+        ShowName: t.Show.Name
       })),
     selected: selectedTour,
     path

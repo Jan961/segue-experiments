@@ -39,9 +39,9 @@ const HeaderCell = ({ children, className }: PropsWithChildren<ClassNameable>) =
   )
 }
 
-const Body = ({ children }: PropsWithChildren<unknown>) => {
+const Body = ({ children, className }: PropsWithChildren<ClassNameable>) => {
   return (
-    <tbody className="bg-white divide-y divide-gray-200">
+    <tbody className={classNames('bg-white divide-y divide-gray-200', className)}>
       { children }
     </tbody>
   )
@@ -49,13 +49,14 @@ const Body = ({ children }: PropsWithChildren<unknown>) => {
 
 interface RowProps extends ClassNameable {
   hover?: boolean
+  className?:string
   onClick?: () => void
 }
 
-const Row = ({ children, hover, onClick }: PropsWithChildren<RowProps>) => {
+const Row = ({ children, hover, onClick, className }: PropsWithChildren<RowProps>) => {
   let baseClass = 'bg-white even:bg-gray-50'
 
-  if (hover) baseClass = classNames(baseClass, 'hover:bg-gray-100 cursor-pointer')
+  if (hover) baseClass = classNames(baseClass, 'hover:bg-gray-100 cursor-pointer', className)
 
   return (
     <tr className={baseClass} onClick={onClick}>

@@ -205,8 +205,8 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]   @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]   @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
-  VenueVenue_VenueVenue_VVVenue1IdToVenue                   VenueVenue[]         @relation("VenueVenue_VVVenue1IdToVenue") @ignore
-  VenueVenue_VenueVenue_VVVenue2IdToVenue                   VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue") @ignore
+  VenueVenue1                                               VenueVenue[]         @relation("VenueVenue_VVVenue1IdToVenue") 
+  VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([CurrencyCode], map: "Currency_Venue")
 }
@@ -251,8 +251,8 @@ model VenueVenue {
   Venue2Id                           Int   @map("VVVenue2Id")
   Mileage                            Int?  @map("VVMileage")
   TimeMins                           Int?  @map("VVTimeMins")
-  Venue_VenueVenue_VVVenue1IdToVenue Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue_VenueVenue_VVVenue2IdToVenue Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+  Venue1                             Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2                             Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
 
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
   @@index([Venue2Id], map: "Venue_VenueVenue2_idx")

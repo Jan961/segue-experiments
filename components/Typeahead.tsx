@@ -11,10 +11,12 @@ type props={
     disabled?:boolean
     selectedOption?:Option
     value?:string|number
+    name?:string
+    label?:string
     onChange:(option:Option)=>void
 }
 
-const Typeahead = ({ options, placeholder, onChange, disabled, value }:props) => {
+const Typeahead = ({ options, placeholder, onChange, disabled, value, name, label }:props) => {
   const [inputValue, setInputValue] = useState('')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
   const inputRef = useRef(null)
@@ -40,6 +42,9 @@ const Typeahead = ({ options, placeholder, onChange, disabled, value }:props) =>
   }
   return (
     <div className="mb-2">
+      <label htmlFor={name}>
+        {label && (<span className="text-sm pb-2 inline-block">{ label }</span>)}
+      </label>
       <input
         ref={inputRef}
         type="text"

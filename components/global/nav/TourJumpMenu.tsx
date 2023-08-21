@@ -21,7 +21,6 @@ export default function TourJumpMenu () {
     setTourJump({ ...tourJump, loading: true, selected: `${Id}` })
     router.push(`/${path}/${ShowCode}/${TourCode}`)
   }
-
   return (
     <>
       <select onChange={goToTour}
@@ -33,7 +32,9 @@ export default function TourJumpMenu () {
           <option
             key={`${tour.ShowCode}/${tour.Code}`}
             value={tour.Id}>
-            {tour.ShowCode}/{tour.Code} {tour.IsArchived ? '(Archived)' : ''}
+            <span className='w-[50px] block'>{tour.ShowCode}/{tour.Code}</span> |&nbsp;
+            <span>{tour.ShowName}</span>
+            {tour.IsArchived && <span> | (Archived)</span>}
           </option>
         ))
         }

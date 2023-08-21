@@ -13,7 +13,7 @@ const ActionBar = () => {
       const date = new Date(b.Date)
       const weekday = getWeekDay(date)
       const ukDate = formatDateUK(date)
-      return { text: `${weekday} ${ukDate} | ${b.Venue.Name}`, value: b.Id }
+      return { text: `${weekday} ${ukDate} | ${b.Venue.Name} (${b.StatusCode})`, value: b.Id }
     })
   const changeBooking = (e) => {
     const selected = Number(e.target.value)
