@@ -7,6 +7,10 @@ import { tourJumpState } from 'state/booking/tourJumpState'
 import axios from 'axios'
 import { Table } from 'components/global/table/Table'
 import { BarredVenue } from 'pages/api/tours/venue/barred'
+import { FormInputSelect } from 'components/global/forms/FormInputSelect'
+import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { ToolbarButton } from '../ToolbarButton'
 
 export default function Barring () {
   const { tours } = useRecoilValue(tourJumpState)
@@ -28,12 +32,12 @@ export default function Barring () {
       setBarringVenues(response?.data)
     })
   }
-  async function handleOnSubmit (e) {
+  const handleOnSubmit = async (e) => {
     e.preventDefault()
     fetchBarredVenues()
   }
 
-  function closeForm () {
+  const closeForm = () => {
     setInputs({
       tour: null,
       venue: null,
@@ -46,8 +50,8 @@ export default function Barring () {
     setShowModal(false)
   }
 
-  async function handleOnChange (e) {
-    e.persist()
+  const handleOnChange = async (e: any) => {
+    console.log(e)
     setInputs((prev) => ({
       ...prev,
       [e.target.id]: e.target.value
@@ -64,126 +68,90 @@ export default function Barring () {
     }
   }
 
+  const tourOptions = tours.map((tour) => ({ text: `${tour.ShowCode}/${tour.Code} | ${tour.ShowName}`, value: tour.Id }))
+  const venueOptions = venues.map((venue) => ({ text: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name})`, value: venue.Id }))
+
   // @ts-ignore
   return (
     <>
-
-      <button
-        className="bg-white shadow-md hover:shadow-lg text-primary-blue font-bold py-2 px-5 rounded-l-md rounded-r-md mx-1"
-        type="button"
+      <ToolbarButton
         onClick={() => setShowModal(true)}
       >
         Barring
-      </button>
+      </ToolbarButton>
       <StyledDialog open={showModal} onClose={() => setShowModal(false)} title="Barring" width='xl'>
-        <form className='' onSubmit={handleOnSubmit}>
-          <div className="grid grid-cols-1 gap-4">
-            <div className="flex flex-col space-y-2">
-              <label htmlFor="tour" className="text-lg font-medium">Tour</label>
-              <select
-                required
-                id="tour"
-                name="tour"
-                value={inputs.tour}
-                onChange={handleOnChange}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
-              >
-                <option value={0}>Select A Tour</option>
-                {tours.filter(tour => !tour.IsArchived).map((tour) => (
-                  <option key={tour.Id} value={`${tour.Id}`}>{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
-                ))}
-              </select>
-            </div>
-            <div className="flex flex-col space-y-2 mt-4">
-              <label htmlFor="venue" className="text-lg font-medium">Venue/Date</label>
-              <select
-                required
-                id="venue"
-                name="venue"
-                value={inputs.venue}
-                onChange={handleOnChange}
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
-              >
-                <option value={0}>Select A Tour</option>
-                {venues.map((venue, key) => (
-                  <option key={key} value={venue.Id}>{dateToSimple(new Date(venue.booking.FirstDate))} - {venue.Name})</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col space-y-2 mt-4">
-              <label htmlFor="date" className="text-lg font-medium">Bar Distance</label>
-              <input
-                required
-                type={'number'}
-                id="barDistance"
-                name="barDistance"
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
-                onChange={handleOnChange}
-                value={inputs.barDistance}
-              />
-
-            </div>
-            <div className="flex flex-col space-y-2 mt-4">
-              <label htmlFor="date" className="text-lg font-medium">Min Seats</label>
-              <input
-                type={'number'}
-                id="Seats"
-                name="Seats"
-                className="block w-full max-w-lg rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:max-w-xs sm:text-sm"
-                onChange={handleOnChange}
-                value={inputs.Seats}
-              />
-            </div>
-            <div className="flex flex-col space-y-2 mt-4">
-              <label htmlFor="date" className="text-lg font-medium">London Only</label>
-              <input
-                type={'checkbox'}
-                id="London"
-                name="London"
-                className="block  rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                onChange={handleOnChange}
-                checked={inputs.London}
-              />
-            </div>
-          </div>
-          <div className="flex flex-col space-x-2 space-y-2 max-h-[300px] overflow-auto">
-            <h4>Barred Venue List</h4>
-            <div>
-              <Table>
-                <Table.HeaderRow>
-                  <Table.HeaderCell>
+        <form onSubmit={handleOnSubmit}>
+          <FormInputSelect
+            label="Tour"
+            name="tour"
+            value={inputs.tour}
+            options={[{ value: 0, text: '-- Select Tour --' }, ...tourOptions]}
+            onChange={handleOnChange}
+            required
+          />
+          <FormInputSelect
+            label="Venue"
+            name="venue"
+            value={inputs.venue}
+            options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
+            onChange={handleOnChange}
+            required
+          />
+          <FormInputNumeric
+            label="Bar Distance"
+            name="barDistance"
+            onChange={(value) => handleOnChange({ target: { value, id: 'barDistance' } })}
+            value={inputs.barDistance}
+            required
+          />
+          <FormInputNumeric
+            label="Seats"
+            name="Seats"
+            onChange={(value) => handleOnChange({ target: { value, id: 'Seats' } })}
+            value={inputs.Seats}
+            required
+          />
+          <FormInputCheckbox
+            label="London"
+            name="London"
+            value={inputs.London}
+            onChange={handleOnChange}
+          />
+          <h4 className='text-xl mb-2'>Barred Venue List</h4>
+          {barringVenues.length > 0 && (
+            <Table>
+              <Table.HeaderRow>
+                <Table.HeaderCell>
                           Venue
-                  </Table.HeaderCell>
-                  <Table.HeaderCell>
+                </Table.HeaderCell>
+                <Table.HeaderCell>
                           Date
-                  </Table.HeaderCell>
-                  <Table.HeaderCell>
+                </Table.HeaderCell>
+                <Table.HeaderCell>
                           Miles
-                  </Table.HeaderCell>
-                </Table.HeaderRow>
-                <Table.Body>
-                  {barringVenues.map((venue) => {
-                    const isMore = venue.Mileage > inputs.barDistance
-                    return (
-                      <Table.Row className={`${isMore ? 'bg-red' : ''}`} hover key={venue.Name}>
-                        <Table.Cell>
-                          {venue.Name}
-                        </Table.Cell>
-                        <Table.Cell>
-                          {dateToSimple(venue.Date)}
-                        </Table.Cell>
-                        <Table.Cell>
-                          {venue.Mileage}
-                        </Table.Cell>
-                      </Table.Row>
-                    )
-                  })}
-                </Table.Body>
-              </Table>
-            </div>
-          </div>
-
+                </Table.HeaderCell>
+              </Table.HeaderRow>
+              <Table.Body>
+                {barringVenues.map((venue) => {
+                  const isMore = venue.Mileage > inputs.barDistance
+                  return (
+                    <Table.Row className={`${isMore ? 'bg-red' : ''}`} hover key={venue.Name}>
+                      <Table.Cell>
+                        {venue.Name}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {dateToSimple(venue.Date)}
+                      </Table.Cell>
+                      <Table.Cell>
+                        {venue.Mileage}
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Body>
+            </Table>
+          )}
+          {barringVenues.length === 0 && (<p className="bg-gray-100 p-1 rounded text-gray-400 text-center">No barring venues</p>)}
           {/* footer */}
           <StyledDialog.FooterContainer>
             <StyledDialog.FooterCancel onClick={closeForm}>Cancel</StyledDialog.FooterCancel>
