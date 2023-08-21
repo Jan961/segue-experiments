@@ -81,42 +81,44 @@ export default function Barring () {
       </ToolbarButton>
       <StyledDialog open={showModal} onClose={() => setShowModal(false)} title="Barring" width='xl'>
         <form onSubmit={handleOnSubmit}>
-          <FormInputSelect
-            label="Tour"
-            name="tour"
-            value={inputs.tour}
-            options={[{ value: 0, text: '-- Select Tour --' }, ...tourOptions]}
-            onChange={handleOnChange}
-            required
-          />
-          <FormInputSelect
-            label="Venue"
-            name="venue"
-            value={inputs.venue}
-            options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
-            onChange={handleOnChange}
-            required
-          />
-          <FormInputNumeric
-            label="Bar Distance"
-            name="barDistance"
-            onChange={(value) => handleOnChange({ target: { value, id: 'barDistance' } })}
-            value={inputs.barDistance}
-            required
-          />
-          <FormInputNumeric
-            label="Seats"
-            name="Seats"
-            onChange={(value) => handleOnChange({ target: { value, id: 'Seats' } })}
-            value={inputs.Seats}
-            required
-          />
-          <FormInputCheckbox
-            label="London"
-            name="London"
-            value={inputs.London}
-            onChange={handleOnChange}
-          />
+          <div className='grid grid-cols-1 xl:grid-cols-4 gap-2'>
+            <FormInputSelect
+              label="Tour"
+              name="tour"
+              value={inputs.tour}
+              options={[{ value: 0, text: '-- Select Tour --' }, ...tourOptions]}
+              onChange={handleOnChange}
+              required
+            />
+            <FormInputSelect
+              label="Venue"
+              name="venue"
+              value={inputs.venue}
+              options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
+              onChange={handleOnChange}
+              required
+            />
+            <FormInputNumeric
+              label="Bar Distance"
+              name="barDistance"
+              onChange={(value) => handleOnChange({ target: { value, id: 'barDistance' } })}
+              value={inputs.barDistance}
+              required
+            />
+            <FormInputNumeric
+              label="Seats"
+              name="Seats"
+              onChange={(value) => handleOnChange({ target: { value, id: 'Seats' } })}
+              value={inputs.Seats}
+              required
+            />
+            <FormInputCheckbox
+              label="London"
+              name="London"
+              value={inputs.London}
+              onChange={handleOnChange}
+            />
+          </div>
           <h4 className='text-xl mb-2'>Barred Venue List</h4>
           {barringVenues.length > 0 && (
             <Table>
