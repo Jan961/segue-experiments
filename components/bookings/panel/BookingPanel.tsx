@@ -13,7 +13,6 @@ import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
 import { VenueSelector } from './components/VenueSelector'
 import { getNextId } from './utils/getNextId'
 import { distanceState } from 'state/booking/distanceState'
-import { scheduleDictSelector } from 'state/booking/selectors/scheduleDictSelector'
 import { FormInputText } from 'components/global/forms/FormInputText'
 
 interface BookingPanelProps {
@@ -69,7 +68,9 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     }
   }
 
-  const handleOnChange = (id:string, value:any) => {
+  const handleOnChange = (e: any) => {
+    let { id, value } = e
+
     // Handle numeric fields
     if (id === 'PencilNum') value = value ? parseInt(value) : null
     if (id === 'VenueId') value = value ? parseInt(value) : null
@@ -123,14 +124,16 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
       <div className={notFirst ? 'opacity-50' : ''}>
         <div className="bg-primary-blue rounded-lg flex flex-col justify-center mb-2 p-4 pb-0">
           <ChangeBookingDate disabled={submitting || notFirst} bookingId={booking.Id} />
-          <VenueSelector disabled={submitting || notFirst} onChange={(value:any) => handleOnChange('VenueId', value)} venueId={inputs.VenueId} />
+          <VenueSelector
+            onChange={(value:any) => handleOnChange({ target: { id: 'VenueId', value } })}
+            venueId={inputs.VenueId} />
         </div>
 
         <div className="flex flex-row justify-between gap-4">
           <FormInputSelect inline
             className="w-28 mb-0"
             value={inputs.PencilNum}
-            onChange={(e:any) => handleOnChange('PencilNum', e.target.value)}
+            onChange={handleOnChange}
             options={pencilOptions}
             name="PencilNum"
             label="Pencil"
@@ -139,14 +142,13 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           <FormInputSelect inline
             value={inputs.StatusCode}
             className="mb-0"
-            onChange={(e:any) => handleOnChange('StatusCode', e.target.value)}
+            onChange={handleOnChange}
             options={statusOptions}
             name="StatusCode"
             label="Status"
             disabled={submitting || notFirst}
           />
         </div>
-
         <FormInputText
           value={inputs.Notes}
           onChange={handleOnChange}

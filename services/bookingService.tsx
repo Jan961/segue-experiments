@@ -106,10 +106,6 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
 
   const daysDiff = differenceInDays(FirstDate, booking.FirstDate)
 
-  console.log(booking)
-  console.log(FirstDate)
-  console.log(booking.FirstDate)
-
   console.log(`Moving booking by ${daysDiff} day(s)`)
 
   await prisma.$transaction(async (tx) => {

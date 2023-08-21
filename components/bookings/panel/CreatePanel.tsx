@@ -44,10 +44,6 @@ export default function CreatePanel ({ finish }: CreatePanelProps) {
 
   const { prevBookings, nextBookings } = findPrevAndNextBookings(bookingDict, selectedDate)
 
-  console.log(selectedDate)
-  console.log(prevBookings)
-  console.log(nextBookings)
-
   React.useEffect(() => {
     reset()
   }, [selectedDate])

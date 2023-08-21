@@ -3,26 +3,23 @@ import { VenueInfo } from 'components/bookings/modal/VenueInfo'
 import ViewBookingHistory from 'components/bookings/modal/ViewBookingHistory'
 import { SelectOption } from 'components/global/forms/FormInputSelect'
 import { VenueMinimalDTO } from 'interfaces'
-import { useMemo } from 'react'
 import { useRecoilValue } from 'recoil'
 import { venueState } from 'state/booking/venueState'
 
 export interface VenueSelectorProps {
   venueId: number,
-  onChange: (e: any) => void,
-  disabled?: boolean
+  onChange: (e: number) => void,
   options?: SelectOption[]
-  label?: string
 }
 
-export const VenueSelector = ({ venueId, onChange, disabled, options, label }: VenueSelectorProps) => {
+export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps) => {
   const venues = useRecoilValue(venueState)
   const venueOptions: SelectOption[] = [
     { text: 'Please Select a Venue', value: '' },
-    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: v.Name, value: String(v.Id) })
+    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: v.Name, value: v.Id })
     )]
   const onSelect = (option:SelectOption) => {
-    onChange(option.value)
+    onChange(option.value as number)
   }
   return (
     <>
