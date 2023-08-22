@@ -211,12 +211,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     })
   }
 
-  const stops = getStops(booking)
-  const distanceStops = await getDistances(stops)
-
   const distance = {
-    stops: distanceStops,
-    outdated: false,
+    stops: [],
+    outdated: true,
     tourCode: TourCode
   }
 
@@ -226,12 +223,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       tourJump
     },
     booking: {
+      distance,
       rehearsal,
       booking,
       getInFitUp,
       other,
       dateType: dateTypeRaw.map(DateTypeMapper),
-      distance,
       performance,
       dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
       // Remove extra info
