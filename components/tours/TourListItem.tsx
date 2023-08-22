@@ -26,9 +26,10 @@ type TourListItemProps = {
 
 const TourListItem = ({ tour }: TourListItemProps) => {
   const router = useRouter()
+  const path = router.pathname.split('/')[1]
 
   const navigateToShow = () => {
-    router.push(`/bookings/${tour.ShowCode}/${tour.Code}`)
+    router.push(`/${path}/${tour.ShowCode}/${tour.Code}`)
   }
 
   return (
@@ -39,7 +40,7 @@ const TourListItem = ({ tour }: TourListItemProps) => {
         items-center justify-between border-b border-gray-200
         hover:bg-blue-400 hover:bg-opacity-25 p-4">
       <div className="flex-grow">
-        <Link href={`/bookings/${tour.ShowCode}/${tour.Code}`} className="text-sm text-gray-900">
+        <Link href={`/${path}/${tour.ShowCode}/${tour.Code}`} className="text-sm text-gray-900">
           {tour.ShowName} ({tour.ShowCode}) - Tour {tour.Code}
         </Link>
         <div className="mt-2 flex justify-between text-sm text-gray-500">

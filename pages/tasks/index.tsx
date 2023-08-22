@@ -1,19 +1,15 @@
 import Layout from 'components/Layout'
-import { Tour } from 'interfaces'
 import { useState } from 'react'
 import Toolbar from 'components/tasks/toolbar'
 import Tasklist from 'components/tasks/TaskList'
 import TaskButtons from 'components/tasks/TaskButtons'
 import GlobalToolbar from 'components/toolbar'
 import { GetServerSideProps } from 'next'
-import { getToursAndTasks, getToursByShowCode } from 'services/TourService'
+import { getToursAndTasks } from 'services/TourService'
 import { useRecoilValue } from 'recoil'
 import { ToursWithTasks, tourState } from 'state/tasks/tourState'
 import { InitialState } from 'lib/recoil'
 import { mapToTourTaskDTO } from 'lib/mappers'
-import { TourJump } from 'state/booking/tourJumpState'
-import { ParsedUrlQuery } from 'querystring'
-import { getTourJumpState } from 'utils/getTourJumpState'
 
 const Index = () => {
   const [bulkIsOpen, setBulkIsOpen] = useState(false)

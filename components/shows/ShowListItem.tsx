@@ -12,6 +12,7 @@ type Props = {
 
 export const ShowListItem = ({ show }: Props) => {
   const router = useRouter()
+  const path = router.pathname.split('/')[1]
 
   const deleteShow = (e) => {
     e.preventDefault()
@@ -32,7 +33,7 @@ export const ShowListItem = ({ show }: Props) => {
   }
 
   const navigateToShow = () => {
-    router.push(`/tours/${show.Id}`)
+    router.push(`/${path}/${show.Code}`)
   }
 
   return (
@@ -43,7 +44,7 @@ export const ShowListItem = ({ show }: Props) => {
       items-center justify-between border-b border-gray-200
       hover:bg-blue-400 hover:bg-opacity-25 h-16">
       <div className="min-w-0 flex-grow px-4">
-        <Link href={`/tours/${show.Id}`}>
+        <Link href={`/${path}/${show.Code}`}>
           <p className="text-lg  text-primary-blue text-center">
             {show.Name} - ({show.Code})
           </p>

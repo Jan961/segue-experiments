@@ -25,7 +25,10 @@ export const OtherPanel = ({ otherId }: OtherPanelProps) => {
 
   const handleOnChange = (e: any) => {
     let { id, value } = e.target
-    if (id === 'DateTypeId') value = parseInt(value)
+    if (id === 'DateTypeId') {
+      value = parseInt(value)
+      if (value === 0) return performDelete()
+    }
     setInputs((prev) => ({
       ...prev,
       [id]: value
@@ -46,7 +49,10 @@ export const OtherPanel = ({ otherId }: OtherPanelProps) => {
     }
   }
 
-  const dateTypeOptions: SelectOption[] = dateTypes.map(x => ({ value: x.Id.toString(), text: x.Name }))
+  const dateTypeOptions: SelectOption[] = [
+    { value: 0, text: '-- None (Remove) --' },
+    ...dateTypes.map(x => ({ value: x.Id.toString(), text: x.Name }))
+  ]
 
   const statusOptions: SelectOption[] = [
     { text: 'Confirmed (C)', value: 'C' },

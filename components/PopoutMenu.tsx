@@ -1,29 +1,16 @@
 import { faBullhorn, faCalendarCheck, faChartLine, faClipboardList, faClose, faFileSignature, faHome, faUserGear } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { SegueLogo } from './global/SegueLogo'
-import { useRecoilState } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
-import React from 'react'
 
 export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
-  const [tourJump, setTourJump] = useRecoilState(tourJumpState)
-
-  const isClient = typeof window !== 'undefined'
-
-  React.useEffect(() => {
-    if (isClient) {
-      if (tourJump && tourJump.selected) {
-        localStorage.setItem('tourJumpState', JSON.stringify(tourJump))
-      } else {
-        setTourJump(JSON.parse(localStorage.getItem('tourJumpState') || null)
-        )
-      }
-    }
-  }, [tourJump, setTourJump, isClient])
+  const tourJump = useRecoilValue(tourJumpState)
 
   const { selected, tours } = tourJump || { tours: [] }
-  const tour = tours.filter(x => x.Code === selected.toString())[0]
+  const tour = tours.filter(x => x.Id === selected)[0]
+
   const path = tour ? `${tour.ShowCode}/${tour.Code}` : ''
   const noTourSelected = !path
 
@@ -36,15 +23,13 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: 'Bookings',
-      link: `/bookings/${path}`,
-      disabled: noTourSelected,
+      link: noTourSelected ? '/bookings' : `/bookings/${path}`,
       icon: faCalendarCheck,
       activeColor: 'text-primary-blue'
     },
     {
       label: 'Marketing',
-      link: `/marketing/${path}`,
-      disabled: noTourSelected,
+      link: noTourSelected ? '/marketing' : `/marketing/${path}`,
       icon: faBullhorn,
       activeColor: 'text-primary-green',
       subItems: [
@@ -61,8 +46,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
     {
       label: 'Contracts',
-      link: `/contracts/${path}`,
-      disabled: noTourSelected,
+      link: noTourSelected ? '/contracts' : `/contracts/${path}`,
       icon: faFileSignature,
       activeColor: 'text-primary-pink'
     },
@@ -135,7 +119,6 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
                   <a className={`flex items-center text-sm py-2 px-4
                   size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
                   hover:bg-gray-100 transition duration-300
-                  ${menuItem.disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}
                   ease-in-out text-white`}
                   href={menuItem.link}>
                     {menuItem.icon && (
