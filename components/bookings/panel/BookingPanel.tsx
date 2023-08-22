@@ -151,7 +151,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
         </div>
         <FormInputText
           value={inputs.Notes}
-          onChange={(e:any) => handleOnChange('Notes', e.target.value)}
+          onChange={handleOnChange}
           name="Notes"
           label="Notes"
           area />
