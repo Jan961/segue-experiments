@@ -1,26 +1,27 @@
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
-import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { FormInputSelect } from 'components/global/forms/FormInputSelect'
+import { useRecoilState } from 'recoil'
 import { formatDateUK, getWeekDay } from 'services/dateService'
-import { tourJumpState } from 'state/booking/tourJumpState'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
-  const { selected } = useRecoilValue(tourJumpState)
-  const tourOptions: SelectOption[] = bookingJump?.bookings?.filter(booking => booking.TourId === selected)
-    .map?.((b) => {
+
+  const bookingOptions = bookingJump.bookings
+    ? bookingJump.bookings.map((b) => {
       const date = new Date(b.Date)
       const weekday = getWeekDay(date)
       const ukDate = formatDateUK(date)
       return { text: `${weekday} ${ukDate} | ${b.Venue.Name}`, value: b.Id }
     })
+    : []
+
   const changeBooking = (e) => {
     const selected = Number(e.target.value)
     setBookingJump({ ...bookingJump, selected })
   }
 
-  const matching = bookingJump?.bookings?.filter?.(x => x.Id === bookingJump.selected)[0]
+  const matching = bookingJump.bookings.filter(x => x.Id === bookingJump.selected)[0]
 
   return (
     <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">
@@ -58,7 +59,7 @@ const ActionBar = () => {
           value={bookingJump.selected}
           name="Tour"
           onChange={changeBooking}
-          options={tourOptions}
+          options={bookingOptions}
         />
       </div>
       {/* SALES REPORT DOES NOT EXIST IN THE DESIGNS */}

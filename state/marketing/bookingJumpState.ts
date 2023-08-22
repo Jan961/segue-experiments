@@ -6,6 +6,7 @@ export interface BookingJump {
 }
 
 const intialState: BookingJump = {
+  bookings: []
 }
 
 export const bookingJumpState = atom({

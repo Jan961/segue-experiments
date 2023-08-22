@@ -1,8 +1,24 @@
 import { Prisma } from '@prisma/client'
+import { ShowDTO } from 'interfaces'
+import { showMapper } from 'lib/mappers'
 import prisma from 'lib/prisma'
 
 export const getShows = () => {
   return prisma.show.findMany()
+}
+
+export interface ShowPageProps {
+  shows: ShowDTO[]
+}
+
+export const getShowPageProps = async () => {
+  const shows = await getShows()
+
+  return {
+    props: {
+      shows: shows.map(showMapper)
+    }
+  }
 }
 
 const showInclude = Prisma.validator<Prisma.ShowInclude>()({
