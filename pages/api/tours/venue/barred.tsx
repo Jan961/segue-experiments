@@ -73,7 +73,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         return x && x.town !== 'London'
       }
       return x
-    }).sort((a:BarredVenue, b:BarredVenue) => b.Mileage - a.Mileage)
+    }).sort((a:BarredVenue, b:BarredVenue) => a.Mileage - b.Mileage)
     res.json(filteredResults)
   } catch (e) {
     console.log(e)
