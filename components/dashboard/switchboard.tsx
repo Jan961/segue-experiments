@@ -1,12 +1,12 @@
-import { faArrowRight, faCalendar, faCalendarAlt, faChartBar, faChartLine, faCheckSquare, faFile, faUserCog, faVolumeHigh } from '@fortawesome/free-solid-svg-icons'
+import { faCalendarAlt, faChartLine, faCheckSquare, faFile, faUserCog, faVolumeHigh } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export const Switchboard = () => {
   const links = [
     {
-      title: 'Shows',
-      route: '/shows',
+      title: 'Bookings',
+      route: '/bookings',
       icon: faCalendarAlt,
       color: 'bg-primary-orange'
     },
@@ -47,7 +47,7 @@ export const Switchboard = () => {
 
     <ul
       role="list"
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4"
+      className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4 max-w-2xl mx-auto"
     >
       {links.map((link) => (
         <li key={link.title}>
@@ -57,7 +57,7 @@ export const Switchboard = () => {
               shadow-lg
               flex flex-col items-center
              text-white text-center rounded-lg p-6`}>
-            <FontAwesomeIcon icon={link.icon as IconProp} className="text-4xl" />
+            <FontAwesomeIcon icon={link.icon as IconProp} className="text-5xl" />
             <span className="text-center text-lg pt-2">{link.title}</span>
           </a>
         </li>
