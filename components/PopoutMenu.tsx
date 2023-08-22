@@ -119,7 +119,6 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
                   <a className={`flex items-center text-sm py-2 px-4
                   size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
                   hover:bg-gray-100 transition duration-300
-                  ${menuItem.disabled ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}
                   ease-in-out text-white`}
                   href={menuItem.link}>
                     {menuItem.icon && (

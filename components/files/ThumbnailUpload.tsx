@@ -1,5 +1,4 @@
 import { FormInputUpload } from 'components/global/forms/FormInputUpload'
-import { ListItemThumbnail } from 'components/global/list/ListItemThumbnail'
 import React from 'react'
 
 interface ThumbnailUploadProps {
@@ -37,7 +36,7 @@ export const ThumbnailUpload = ({ path, setPath }: ThumbnailUploadProps) => {
   return (
     <FormInputUpload label="Tour Logo" name="Logo" onChange={uploadToClient}>
       { loading && (<p>Uploading...</p>)}
-      { path && (<ListItemThumbnail src={path} alt="Preview" />)}
+      { path && (<img src={path} alt="Preview" />)}
     </FormInputUpload>
   )
 }
