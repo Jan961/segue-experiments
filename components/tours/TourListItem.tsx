@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { ListItemThumbnail } from 'components/global/list/ListItemThumbnail'
 import { MenuButton } from 'components/global/MenuButton'
 import { dateToSimple } from 'services/dateService'
 import { useRouter } from 'next/router'
@@ -38,10 +37,7 @@ const TourListItem = ({ tour }: TourListItemProps) => {
       className="flex w-full
         cursor-pointer
         items-center justify-between border-b border-gray-200
-        hover:bg-blue-400 hover:bg-opacity-25">
-      <div className="flex-shrink-0">
-        <ListItemThumbnail alt={tour.ShowName} src={undefined} />
-      </div>
+        hover:bg-blue-400 hover:bg-opacity-25 p-4">
       <div className="flex-grow">
         <Link href={`/bookings/${tour.ShowCode}/${tour.Code}`} className="text-sm text-gray-900">
           {tour.ShowName} ({tour.ShowCode}) - Tour {tour.Code}

@@ -3,7 +3,6 @@ import { faPencil, faTrash } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { forceReload } from 'utils/forceReload'
 import { MenuButton } from 'components/global/MenuButton'
-import { ListItemThumbnail } from 'components/global/list/ListItemThumbnail'
 import { useRouter } from 'next/router'
 import { ShowDTO } from 'interfaces'
 
@@ -42,10 +41,7 @@ export const ShowListItem = ({ show }: Props) => {
       className="flex w-full
       cursor-pointer
       items-center justify-between border-b border-gray-200
-      hover:bg-blue-400 hover:bg-opacity-25">
-      <div className="flex-shrink-0">
-        <ListItemThumbnail src={undefined} alt={show.Name} />
-      </div>
+      hover:bg-blue-400 hover:bg-opacity-25 h-16">
       <div className="min-w-0 flex-grow px-4">
         <Link href={`/tours/${show.Id}`}>
           <p className="text-lg  text-primary-blue text-center">
