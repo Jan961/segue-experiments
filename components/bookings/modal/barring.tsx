@@ -140,7 +140,7 @@ export default function Barring () {
                 </Table.HeaderRow>
                 <Table.Body>
                   {barringVenues.map((venue) => {
-                    const isMore = venue.Mileage > inputs.barDistance
+                    const isMore = venue.Mileage < inputs.barDistance
                     return (
                       <Table.Row className={`${isMore ? '!bg-primary-orange even:bg-primary-orange hover:bg-primary-orange' : ''}`} hover key={venue.Name}>
                         <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
