@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { dateToSimple } from 'services/dateService'
 import { StyledDialog } from 'components/global/StyledDialog'
 import { useRecoilValue } from 'recoil'
@@ -12,6 +12,8 @@ import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 import { ToolbarButton } from '../ToolbarButton'
 import Typeahead from 'components/Typeahead'
+import { Spinner } from 'components/global/Spinner'
+import { MenuButton } from 'components/global/MenuButton'
 
 export default function Barring () {
   const { tours } = useRecoilValue(tourJumpState)
@@ -26,10 +28,16 @@ export default function Barring () {
     Seats: 0
   })
   const [barringVenues, setBarringVenues] = useState<BarredVenue[]>([])
-
+  const [loading, setIsLoading] = useState<boolean>(false)
+  const formRef = useRef(null)
   const fetchBarredVenues = async () => {
+    setIsLoading(true)
     axios.post('/api/tours/venue/barred', { tourId: parseInt(inputs.tour), venueId: parseInt(inputs.venue), excludeLondon: inputs.London }).then((response) => {
       setBarringVenues(response?.data)
+      setIsLoading(false)
+    }).catch(error => {
+      setIsLoading(false)
+      console.log('Error fetching Barred Venues', error)
     })
   }
   const handleOnSubmit = async (e) => {
@@ -59,11 +67,21 @@ export default function Barring () {
 
     if (e.target.name === 'tour') {
       // Load Venues for this tour
+      // setIsLoading(true)
       await axios.get(`/api/tours/read/venues/${e.target.value}`)
         .then(data => data?.data?.data)
         .then((data) => {
+          // setIsLoading(false)
           setInputs(prevState => ({ ...prevState, Venue: null }))
           setVenues(data)
+          setInputs((prev) => ({
+            ...prev,
+            venue: null
+          }))
+        })
+        .catch(error => {
+          // setIsLoading(false)
+          console.log('Error fetching Venues:', error)
         })
     }
   }
@@ -79,9 +97,10 @@ export default function Barring () {
       >
         Barring
       </ToolbarButton>
-      <StyledDialog open={showModal} onClose={() => setShowModal(false)} title="Barring" width='xl'>
-        <form onSubmit={handleOnSubmit}>
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-2'>
+      <StyledDialog className='w-4/5 max-w-full h-[90vh] relative' open={showModal} onClose={() => setShowModal(false)} title="Barring" width='xl'>
+        {loading && <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95"><Spinner className="w-full" size='lg'/></div>}
+        <form ref={formRef} onSubmit={handleOnSubmit}>
+          <div className='grid grid-cols-1 lg:grid-cols-4 lg:gap-x-2 items-center'>
             <FormInputSelect
               label="Tour"
               name="tour"
@@ -113,55 +132,58 @@ export default function Barring () {
               required
             />
             <FormInputCheckbox
-              label="Exclude London"
+              label="EXCLUDE LONDON VENUES"
               name="London"
+              className="!justify-start"
               value={inputs.London}
               onChange={handleOnChange}
             />
-          </div>
-          <StyledDialog.FooterContainer>
-            <StyledDialog.FooterCancel onClick={closeForm}>Cancel</StyledDialog.FooterCancel>
-            <StyledDialog.FooterContinue submit>Get Venues</StyledDialog.FooterContinue>
-          </StyledDialog.FooterContainer>
-          <div className="max-h-[400px] overflow-auto">
-            <h4 className='text-xl mb-2'>Barred Venue List</h4>
-            {barringVenues.length > 0 && (
-              <Table>
-                <Table.HeaderRow>
-                  <Table.HeaderCell>
-                          Venue
-                  </Table.HeaderCell>
-                  <Table.HeaderCell>
-                          Date
-                  </Table.HeaderCell>
-                  <Table.HeaderCell>
-                          Miles
-                  </Table.HeaderCell>
-                </Table.HeaderRow>
-                <Table.Body>
-                  {barringVenues.map((venue) => {
-                    const isMore = venue.Mileage < inputs.barDistance
-                    return (
-                      <Table.Row className={`${isMore ? '!bg-primary-orange even:bg-primary-orange hover:bg-primary-orange' : ''}`} hover key={venue.Name}>
-                        <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
-                          {venue.Name}
-                        </Table.Cell>
-                        <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
-                          {dateToSimple(venue.Date)}
-                        </Table.Cell>
-                        <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
-                          {venue.Mileage}
-                        </Table.Cell>
-                      </Table.Row>
-                    )
-                  })}
-                </Table.Body>
-              </Table>
-            )}
-            {barringVenues.length === 0 && (<p className="bg-gray-100 p-1 rounded text-gray-400 text-center">No barring venues</p>)}
-            {/* footer */}
+            <div />
+            <div />
+            <div className="text-right">
+              {/* <StyledDialog.FooterCancel disabled={loading} onClick={closeForm}>Cancel</StyledDialog.FooterCancel> */}
+              <MenuButton disabled={loading} submit>Get Venues</MenuButton>
+            </div>
           </div>
         </form>
+        <div className={'max-h-[48vh] lg:max-h-[65vh] overflow-auto'}>
+          <h4 className='text-xl mb-2'>Barred Venue List</h4>
+          {barringVenues.length > 0 && (
+            <Table>
+              <Table.HeaderRow>
+                <Table.HeaderCell>
+                          Venue
+                </Table.HeaderCell>
+                <Table.HeaderCell>
+                          Date
+                </Table.HeaderCell>
+                <Table.HeaderCell>
+                          Miles
+                </Table.HeaderCell>
+              </Table.HeaderRow>
+              <Table.Body>
+                {barringVenues.map((venue) => {
+                  const isMore = venue.Mileage < inputs.barDistance
+                  return (
+                    <Table.Row className={`${isMore ? '!bg-primary-orange even:bg-primary-orange hover:bg-primary-orange' : ''}`} hover key={venue.Name}>
+                      <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
+                        {venue.Name}
+                      </Table.Cell>
+                      <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
+                        {dateToSimple(venue.Date)}
+                      </Table.Cell>
+                      <Table.Cell className={`${isMore ? 'text-white' : 'text-grey'}`}>
+                        {venue.Mileage}
+                      </Table.Cell>
+                    </Table.Row>
+                  )
+                })}
+              </Table.Body>
+            </Table>
+          )}
+          {barringVenues.length === 0 && (<p className="bg-gray-100 p-1 rounded text-gray-400 text-center">No barring venues</p>)}
+          {/* footer */}
+        </div>
       </StyledDialog>
     </>
 

@@ -1,5 +1,6 @@
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import classNames from 'classnames';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { PropsWithChildren } from 'react'
@@ -13,9 +14,10 @@ interface MenuButtonProps {
   intent?: undefined | 'DANGER';
   submit?: boolean;
   disabled?: boolean;
+  className?:string;
 }
 
-export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, intent, href, submit, disabled }: PropsWithChildren<MenuButtonProps>) => {
+export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, intent, href, submit, disabled, className }: PropsWithChildren<MenuButtonProps>) => {
   const router = useRouter()
 
   let buttonClass = `font-bold
@@ -51,7 +53,7 @@ export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, inten
 
   if (href) {
     return (
-      <Link href={href} className={buttonClass} onClick={nonPropogatedNav}>
+      <Link href={href} className={classNames(buttonClass, className)} onClick={nonPropogatedNav}>
         { iconLeft && (<FontAwesomeIcon icon={iconLeft} className="mr-2"/>) }
         { children }
         { icon && (<FontAwesomeIcon icon={icon} />)}
@@ -62,7 +64,7 @@ export const MenuButton = ({ children, iconLeft, iconRight, icon, onClick, inten
   return (
     <button
       disabled={disabled}
-      className={buttonClass}
+      className={classNames(buttonClass, className)}
       type={submit ? 'submit' : 'button'}
       onClick={nonPropogatedClick}
     >
