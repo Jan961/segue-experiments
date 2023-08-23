@@ -23,7 +23,7 @@ export const FormInputCheckbox = ({ onChange, value, name, label, disabled, clas
   if (!minimal) baseInputClass = classNames(baseInputClass, 'm-2 mb-4')
 
   return (
-    <label htmlFor={name} className={ classNames(className, 'flex items-center justify-between')}>
+    <label htmlFor={name} className={ classNames('flex items-center justify-between', className)}>
       {label && (<div className="text-sm pb-2">{ label }</div>)}
       <input
         id={name}
