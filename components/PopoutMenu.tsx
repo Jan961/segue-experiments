@@ -8,7 +8,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
   const tourJump = useRecoilValue(tourJumpState)
 
-  const { selected, tours } = tourJump || { tours: [] }
+  const { selected, tours } = tourJump
   const tour = tours.filter(x => x.Id === selected)[0]
 
   const path = tour ? `${tour.ShowCode}/${tour.Code}` : ''

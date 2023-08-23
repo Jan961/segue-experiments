@@ -4,7 +4,7 @@ import { atom } from 'recoil'
 export interface TourJump {
   tours: Partial<TourDTO>[]
   loading?: boolean
-  selected: string
+  selected: number
   path?: string
 }
 
