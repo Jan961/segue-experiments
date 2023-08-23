@@ -6,6 +6,8 @@ export const safeDate = (date: Date | string) => {
   return date
 }
 
+export const getKey = (date: string) => (date.split('T')[0])
+
 export const todayToSimple = () => {
   const date = new Date()
   return date.toDateString()

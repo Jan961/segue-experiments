@@ -2,9 +2,9 @@ import { GetServerSideProps } from 'next'
 import GlobalToolbar from 'components/toolbar'
 import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
-import { TourContent, getTourWithContent, lookupTourId } from 'services/TourService'
+import { getTourWithContent, lookupTourId } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector'
 import { DateTypeMapper, bookingMapper, dateBlockMapper, getInFitUpMapper, otherMapper, performanceMapper, rehearsalMapper } from 'lib/mappers'
 import { ScheduleRow } from 'components/bookings/ScheduleRow'
@@ -211,12 +211,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     })
   }
 
-  const stops = getStops(booking)
-  const distanceStops = await getDistances(stops)
-
   const distance = {
-    stops: distanceStops,
-    outdated: false,
+    stops: [],
+    outdated: true,
     tourCode: TourCode
   }
 
@@ -226,12 +223,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       tourJump
     },
     booking: {
+      distance,
       rehearsal,
       booking,
       getInFitUp,
       other,
       dateType: dateTypeRaw.map(DateTypeMapper),
-      distance,
       performance,
       dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
       // Remove extra info

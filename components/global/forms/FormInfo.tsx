@@ -2,7 +2,7 @@ import classNames from 'classnames'
 import { PropsWithChildren } from 'react'
 
 interface FormInfoProps {
-  intent?: undefined | 'DANGER'
+  intent?: undefined | 'DANGER' | 'WARNING'
   header?: String
   className?: string
 }
@@ -13,6 +13,9 @@ export const FormInfo = ({ intent, children, header, className }: PropsWithChild
   switch (intent) {
   case 'DANGER':
     baseClass = classNames(baseClass, 'bg-red-200')
+    break
+  case 'WARNING':
+    baseClass = classNames(baseClass, 'bg-amber-200')
     break
   default:
     baseClass = classNames(baseClass, 'bg-blue-200')

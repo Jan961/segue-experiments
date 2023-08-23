@@ -1,24 +1,25 @@
-import { useState } from 'react'
 import Layout from 'components/Layout'
-import { GetServerSideProps } from 'next'
 import { SearchBox } from 'components/global/SearchBox'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { MenuButton } from 'components/global/MenuButton'
-import { getShowWithToursById } from 'services/ShowService'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import TourList from 'components/tours/TourList'
-import { tourMapper } from 'lib/mappers'
 import { TourDTO } from 'interfaces'
 import { BreadCrumb } from 'components/global/BreadCrumb'
+import React from 'react'
+import { useRouter } from 'next/router'
+import { title } from 'radash'
 
 type Props = {
   tours: TourDTO[]
   id: number
 };
 
-export default function Tours ({ id, tours }: Props) {
-  const [query, setQuery] = useState('')
+export const Tours = ({ id, tours }: Props) => {
+  const [query, setQuery] = React.useState('')
+  const router = useRouter()
+  const path = router.pathname.split('/')[1]
 
   const active = []
   const archived = []
@@ -42,8 +43,8 @@ export default function Tours ({ id, tours }: Props) {
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href="/shows">
-          Shows
+        <BreadCrumb.Item href={`/${path}`}>
+          { title(path) }
         </BreadCrumb.Item>
         <BreadCrumb.Item>
           {anyTour.ShowName}
@@ -61,12 +62,4 @@ export default function Tours ({ id, tours }: Props) {
       </Tab.Group>
     </Layout>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const { ShowId } = ctx.params
-  const show = await getShowWithToursById(parseInt(ShowId as string))
-  const tours = tourMapper(show)
-
-  return { props: { tours, id: show.Id } }
 }

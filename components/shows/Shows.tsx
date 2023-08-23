@@ -2,22 +2,23 @@ import Layout from 'components/Layout'
 import { SearchBox } from 'components/global/SearchBox'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { MenuButton } from 'components/global/MenuButton'
-import { GetServerSideProps } from 'next'
-import { getShows } from 'services/ShowService'
 import React from 'react'
 import { ShowDTO } from 'interfaces'
-import { showMapper } from 'lib/mappers'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import { ShowList } from 'components/shows/ShowList'
 import { BreadCrumb } from 'components/global/BreadCrumb'
+import { useRouter } from 'next/router'
+import { title } from 'radash'
 
 interface ShowsProps {
   shows: ShowDTO[]
 }
 
-const Shows = ({ shows }: ShowsProps) => {
+export const Shows = ({ shows }: ShowsProps) => {
   const [search, setSearch] = React.useState('')
+  const router = useRouter()
+  const path = router.pathname.split('/')[1]
 
   const query = search.toLowerCase()
 
@@ -42,7 +43,7 @@ const Shows = ({ shows }: ShowsProps) => {
           Home
         </BreadCrumb.Item>
         <BreadCrumb.Item>
-          Shows
+          { title(path) }
         </BreadCrumb.Item>
       </BreadCrumb>
       <Tab.Group className='max-w-screen-md mx-auto' as='div'>
@@ -58,15 +59,3 @@ const Shows = ({ shows }: ShowsProps) => {
     </Layout>
   )
 }
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const shows = await getShows()
-
-  return {
-    props: {
-      shows: shows.map(showMapper)
-    }
-  }
-}
-
-export default Shows
