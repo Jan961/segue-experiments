@@ -15,8 +15,8 @@ interface DescriptionListProps extends ClassNameable {
 }
 
 export const DescriptionList = ({ children, className, inline = true}: PropsWithChildren<DescriptionListProps>) => {
-  let baseClass = 'text-sm'
-  if (inline) baseClass = classNames(baseClass, 'grid grid-cols-2 text-sm')
+  let baseClass = ''
+  if (inline) baseClass = classNames(baseClass, 'grid grid-cols-2 justify-items-start place-items-center')
 
   return (
     <dl className={classNames(baseClass, className)}>
@@ -26,7 +26,7 @@ export const DescriptionList = ({ children, className, inline = true}: PropsWith
 }
 
 const Term = ({ children, className }: PropsWithChildren<ClassNameable>) => {
-  const baseClass = classNames('font-bold', className)
+  const baseClass = classNames('mb-1 opacity-50 mr-2', className)
 
   return (
     <dt className={baseClass}>
@@ -40,7 +40,7 @@ interface DescriptionProps extends ClassNameable {
 }
 
 const Desc = ({ children, italic, className }: PropsWithChildren<DescriptionProps>) => {
-  let baseClass = classNames('text-gray-500', className)
+  let baseClass = classNames('mb-1', className)
 
   if (italic) baseClass = classNames(baseClass, 'italic')
 

@@ -12,7 +12,7 @@ type Props = {
 const Layout = ({ children, title = 'Your tour assistant', flush = false }: Props) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false)
   return (
-    <div className="background-gradient">
+    <div className="background-gradient font-primary">
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8"/>
