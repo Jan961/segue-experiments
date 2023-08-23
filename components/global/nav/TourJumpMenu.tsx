@@ -18,7 +18,7 @@ export default function TourJumpMenu () {
     const selectedTour = tours.find(tour => tour.Id === parseInt(e.target.value))
     if (!selectedTour) return
     const { ShowCode, Code: TourCode, Id } = selectedTour
-    setTourJump({ ...tourJump, loading: true, selected: `${Id}` })
+    setTourJump({ ...tourJump, loading: true, selected: Id })
     router.push(`/${path}/${ShowCode}/${TourCode}`)
   }
   return (
@@ -44,7 +44,7 @@ export default function TourJumpMenu () {
           type="checkbox"
           name="vatRegistered"
           onChange={(e) => setIncludeArchived(e.target.checked)}
-          className=" w-[15px] flex-1 rounded-none rounded border-gray-300focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className=" w-[15px] flex-1 rounded border-gray-300focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           placeholder="0141 000 0000"
           value={includeArchived}
           contentEditable={true}

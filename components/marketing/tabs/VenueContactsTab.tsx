@@ -74,14 +74,14 @@ export const VenueContactsTab = () => {
           <Table.HeaderCell>
           Phone
           </Table.HeaderCell>
-          <Table.HeaderCell>
+          <Table.HeaderCell className='w-3/4'>
           Email
           </Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
           {contacts.map((vc) => (
             <Table.Row key={vc.Id} onClick={() => edit(vc)} hover>
-              <Table.Cell>
+              <Table.Cell className='whitespace-nowrap'>
                 {venueRoleDict[vc.RoleId].Name}
               </Table.Cell>
               <Table.Cell>
@@ -90,8 +90,8 @@ export const VenueContactsTab = () => {
               <Table.Cell>
                 {vc.LastName}
               </Table.Cell>
-              <Table.Cell>
-                {vc.Phone}
+              <Table.Cell className='whitespace-nowrap underline'>
+                {vc.Phone ? (<a href={`tel://${vc.Phone}`}>{vc.Phone}</a>) : '' }
               </Table.Cell>
               <Table.Cell>
                 <a className="underline" href={'mailto:' + vc.Email}>{vc.Email}</a>

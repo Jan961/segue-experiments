@@ -143,12 +143,12 @@ export const ActivitiesTab = () => {
             Date
             </Table.HeaderCell>
             <Table.HeaderCell>
-            Follow Up Required
+            Follow Up Req.
             </Table.HeaderCell>
             <Table.HeaderCell>
             Company Cost
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className="w-1/2">
             Venue Cost
             </Table.HeaderCell>
           </Table.HeaderRow>
@@ -158,14 +158,14 @@ export const ActivitiesTab = () => {
                 <Table.Cell>
                   {activity.Name}
                 </Table.Cell>
-                <Table.Cell>
+                <Table.Cell className="whitespace-nowrap">
                   {activityDict[activity.ActivityTypeId].Name}
                 </Table.Cell>
                 <Table.Cell>
                   {dateToSimple(activity.Date)}
                 </Table.Cell>
-                <Table.Cell>
-                  {activity.FollowUpRequired ? 'Y' : 'N'}
+                <Table.Cell className='text-center'>
+                  {activity.FollowUpRequired ? 'Yes' : 'No'}
                 </Table.Cell>
                 <Table.Cell>
                   {activity.CompanyCost ? `£${activity.CompanyCost}` : ''}

@@ -69,7 +69,7 @@ export const ContactNotesTab = () => {
             <Table.HeaderCell>
               Action By
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-3/4'>
               Notes
             </Table.HeaderCell>
           </Table.HeaderRow>

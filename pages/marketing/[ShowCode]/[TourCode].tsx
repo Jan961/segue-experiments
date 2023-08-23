@@ -35,7 +35,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const tourId = tourJump.selected
 
-  const bookings:any[] = await getSaleableBookings(parseInt(tourId, 10))
+  const bookings:any[] = await getSaleableBookings(tourId)
   const selected = bookings.filter((booking:any) => booking?.DateBlock?.TourId === tourId)?.[0]?.Id || null
   const venueRoles = await getRoles()
   const bookingJump: BookingJump = {

@@ -73,7 +73,7 @@ export const SalesTab = () => {
           <Summary salesSummary={bookingSales[bookingSales.length - 1]} />
         </div>
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
-          <Table className='mt-8'>
+          <Table className='mt-4 text-sm'>
             <Table.HeaderRow>
               <Table.HeaderCell>
               Week
@@ -81,17 +81,17 @@ export const SalesTab = () => {
               <Table.HeaderCell>
               Week of
               </Table.HeaderCell>
-              <Table.HeaderCell>
-              Seat Sold (n)
+              <Table.HeaderCell className='w-20'>
+              Seats Sold
               </Table.HeaderCell>
-              <Table.HeaderCell>
-              Seat Sold %
+              <Table.HeaderCell className='w-20'>
+              Seats Sold %
               </Table.HeaderCell>
-              <Table.HeaderCell>
-              Reservations (n)
+              <Table.HeaderCell className='w-20'>
+              Reserved
               </Table.HeaderCell>
-              <Table.HeaderCell>
-              Reserved (%)
+              <Table.HeaderCell className='w-20'>
+              Reserved %
               </Table.HeaderCell>
               <Table.HeaderCell>
               Total Value
@@ -114,7 +114,7 @@ export const SalesTab = () => {
                 const { valueChange, seatsChange } = getChange(i)
                 return (
                   <Table.Row key={sale.week}>
-                    <Table.Cell className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium border border-l-0 sm:w-auto sm:max-w-none sm:pl-6">
+                    <Table.Cell className="whitespace-nowrap">
                       {sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>
                     <Table.Cell>
@@ -136,7 +136,7 @@ export const SalesTab = () => {
                       {`${sale.venueCurrencySymbol} ${sale.totalValue}`}
                     </Table.Cell>
                     <Table.Cell>
-                      {valueChange}
+                      {Number(valueChange).toFixed(0)}
                     </Table.Cell>
                     <Table.Cell>
                       {sale.totalHolds}

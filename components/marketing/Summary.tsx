@@ -11,6 +11,16 @@ type props={
   salesSummary:any;
 }
 
+const formatCurrency = (ammount, currency: string) => {
+  const formatter = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 0
+  })
+
+  return formatter.format(ammount)
+}
+
 export const Summary = ({ salesSummary }:props) => {
   const { selected } = useRecoilValue(bookingJumpState)
   const [summary, setSummary] = React.useState<Partial<SummaryResponseDTO>>({})
@@ -43,9 +53,15 @@ export const Summary = ({ salesSummary }:props) => {
   if (!summary) return null
   const weekNo = calculateWeekNumber(new Date(summary?.TourInfo?.StartDate), new Date(summary?.TourInfo?.Date))
 
+  if (!summary?.Info) return null
+
+  const currency = summary?.Info?.VenueCurrencyCode
+  const info = summary?.Info
+  const notes = summary?.Notes
+
   return (
-    <>
-      <h3 className='my-4 mb-2'>General Info</h3>
+    <div className='text-sm mt-4'>
+      <h3 className='mb-1 text-base font-bold text-primary-blue'>General Info</h3>
       <DL>
         <DL.Term>
           Date
@@ -60,59 +76,52 @@ export const Summary = ({ salesSummary }:props) => {
           {weekNo}
         </DL.Desc>
         <DL.Term>
-          Shows
-        </DL.Term>
-        <DL.Desc>
-          {summary?.Performances?.map?.(performance => performance.Id)?.join?.('&')}
-        </DL.Desc>
-        <DL.Term>
           Times
         </DL.Term>
         <DL.Desc>
           {summary.Performances?.map?.(x => dateTimeToTime(x.Time)).join(', ') || 'N/A' }
         </DL.Desc>
       </DL>
-      <hr className='border-gray-500 border-opacity-50 my-4'/>
-      <h3 className='mb-2'>Sales Summary</h3>
+      <h3 className='mb-1 mt-4 text-base font-bold text-primary-blue'>Sales Summary</h3>
       <DL>
         <DL.Term>
           Total Seats Sold
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.Seats || '-'}
+          {info.Seats || '-'}
         </DL.Desc>
         <DL.Term>
-          Total Sales({summary?.Info?.VenueCurrencySymbol})
+          Total Sales
         </DL.Term>
         <DL.Desc>
-          {`${summary?.Info?.VenueCurrencySymbol}${summary?.Info?.SalesValue}` || '-'}
+          {info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'}
         </DL.Desc>
         <DL.Term>
-          GP({summary?.Info?.VenueCurrencySymbol})
+          Gross Profit
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.GrossPotential}
+          {formatCurrency(info.GrossPotential, currency)}
         </DL.Desc>
         <DL.Term>
-          AVG Ticket Price({summary?.Info?.VenueCurrencySymbol})
+          AVG Ticket Price
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.AvgTicketPrice}
+          {formatCurrency(info.AvgTicketPrice, currency)}
         </DL.Desc>
         <DL.Term>
-          Booking %:
+          Booking %
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.seatsSalePercentage ? `${summary?.Info?.seatsSalePercentage}%` : '-'}
+          {info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-'}
         </DL.Desc>
         <DL.Term>
           Capacity
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.Capacity || '-'}
+          {info.Capacity || '-'}
         </DL.Desc>
         <DL.Term>
-          Performances
+          Perf(s)
         </DL.Term>
         <DL.Desc>
           {summary?.Performances?.length}
@@ -121,49 +130,53 @@ export const Summary = ({ salesSummary }:props) => {
           Total Seats
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.Seats || '-'}
+          {info.Seats || '-'}
         </DL.Desc>
         <DL.Term>
           Currency
         </DL.Term>
         <DL.Desc>
-          {summary?.Info?.VenueCurrencyCode || '-'}
+          {info.VenueCurrencyCode || '-'}
         </DL.Desc>
       </DL>
-      <hr className='border-gray-500 border-opacity-50 my-4'/>
-      <h3 className='mb-2'>Notes</h3>
-      <DL inline={false}>
-        <DL.Term>
-          Marketing Deal
-        </DL.Term>
-        <DL.Desc className='mb-4'>
-          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.MarketingDealNotes }}></span>
-        </DL.Desc>
-        <DL.Term>
-          Booking Notes
-        </DL.Term>
-        <DL.Desc className='mb-4'>
-          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.BookingNotes }}></span>
-        </DL.Desc>
-        <DL.Term>
-          Booking Deal Notes
-        </DL.Term>
-        <DL.Desc className='mb-4'>
-          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.BookingDealNotes }}></span>
-        </DL.Desc>
-        <DL.Term>
-          Hold Notes
-        </DL.Term>
-        <DL.Desc className='mb-4'>
-          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.HoldNotes }}></span>
-        </DL.Desc>
-        <DL.Term>
-          Comp Notes
-        </DL.Term>
-        <DL.Desc className='mb-4'>
-          <span dangerouslySetInnerHTML={{ __html: summary?.Notes?.CompNotes }}></span>
-        </DL.Desc>
-      </DL>
-    </>
+      { notes && (
+        <>
+          <h3 className="mb-1 mt-4 text-base font-bold text-primary-blue">Notes</h3>
+          <DL inline={false}>
+            <DL.Term>
+              Marketing Deal
+            </DL.Term>
+            <DL.Desc className='mb-4'>
+              <span>{ notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'  }</span>
+            </DL.Desc>
+            <DL.Term>
+              Booking Notes
+            </DL.Term>
+            <DL.Desc className='mb-4'>
+              <span>{ notes.BookingNotes ? notes.BookingNotes : 'None'  }</span>
+            </DL.Desc>
+            <DL.Term>
+              Booking Deal Notes
+            </DL.Term>
+            <DL.Desc className='mb-4'>
+              <span>{ notes.BookingDealNotes ? notes.BookingDealNotes : 'None' }</span>
+            </DL.Desc>
+            <DL.Term>
+              Hold Notes
+            </DL.Term>
+            <DL.Desc className='mb-4'>
+              <span>{ notes.HoldNotes ? notes.HoldNotes : 'None' }</span>
+            </DL.Desc>
+            <DL.Term>
+              Comp Notes
+            </DL.Term>
+            <DL.Desc className='mb-4'>
+              <span>{ notes.CompNotes ? notes.CompNotes : 'None' }</span>
+            </DL.Desc>
+          </DL>
+        </>
+      )}
+
+    </div>
   )
 }
