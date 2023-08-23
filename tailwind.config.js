@@ -28,6 +28,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+	  fontFamily: {
+        primary: ['Ubuntu']
+      },
       colors: colorsConfig,
       fontSize: {
         default: '0.85rem'
