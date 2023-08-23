@@ -26,7 +26,7 @@ export const DescriptionList = ({ children, className, inline = true}: PropsWith
 }
 
 const Term = ({ children, className }: PropsWithChildren<ClassNameable>) => {
-  const baseClass = classNames('mb-1 opacity-50 mr-2', className)
+  const baseClass = classNames('mb-1', className)
 
   return (
     <dt className={baseClass}>
@@ -40,7 +40,7 @@ interface DescriptionProps extends ClassNameable {
 }
 
 const Desc = ({ children, italic, className }: PropsWithChildren<DescriptionProps>) => {
-  let baseClass = classNames('mb-1', className)
+  let baseClass = classNames('mb-1 font-bold', className)
 
   if (italic) baseClass = classNames(baseClass, 'italic')
 
