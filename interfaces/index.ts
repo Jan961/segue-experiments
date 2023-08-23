@@ -84,6 +84,7 @@ export type VenueMinimalDTO = {
   Id: number
   Name: string
   Code: string
+  Town?: string
 }
 
 export type GetInFitUpDTO = {

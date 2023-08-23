@@ -17,7 +17,6 @@ export type BarredVenue = {
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   const { venueId, tourId, excludeLondon } = req.body
   try {
-    console.log('', tourId, typeof tourId)
     const result = await prisma.VenueVenue.findMany({
       where: {
         Venue1Id: venueId

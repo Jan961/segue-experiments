@@ -16,7 +16,7 @@ export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps
   const venues = useRecoilValue(venueState)
   const venueOptions: SelectOption[] = [
     { text: 'Please Select a Venue', value: '' },
-    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: v.Name, value: v.Id })
+    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: `${v.Code} - ${v.Name}, ${v.Town}`, value: String(v.Id), code: v.Code, town: v.Town })
     )]
   const onSelect = (option:SelectOption) => {
     onChange(option.value as number)
@@ -28,6 +28,7 @@ export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps
         onChange={onSelect}
         placeholder={'Please Select a Venue'}
         value={venueId}
+        searchKeys={['code', 'Town']}
       />
       <div className="columns-2 mb-4">
         <VenueInfo venueId={venueId} />
