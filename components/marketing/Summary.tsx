@@ -11,7 +11,7 @@ type props={
   salesSummary:any;
 }
 
-const formatCurrency = (ammount, currency: string) => {
+export const formatCurrency = (ammount, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: 'GBP',

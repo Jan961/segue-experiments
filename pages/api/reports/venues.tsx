@@ -122,18 +122,18 @@ const handler = async (req, res) => {
 
     const { Code: TourCode, ShowCode, ShowName } = response?.tour || {}
 
-    worksheet.addRow(([`${TourCode || ''} (${ShowName || ''}) VENUES : ALL`]))
+    worksheet.addRow(([`${ShowCode + TourCode || ''} (${ShowName || ''}) VENUES : ALL`]))
     const date = new Date()
-    worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
+    worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]))
     worksheet.addRow((['TOUR', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']))
     worksheet.addRow((['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']))
     worksheet.addRow(([]))
 
     response?.bookings.forEach((booking: BOOKING) => {
-      const ShowDate = moment(booking.FirstDate).format('DD/MM/YYYY')
+      const ShowDate = moment(booking.FirstDate).format('DD/MM/YY')
       const ShowTown = booking.VenueTown
       const OnSale = getBooleanAsString(booking.IsOnSale)
-      const OnSaleDate = booking.OnSaleDate ? moment(booking.OnSaleDate).format('DD/MM/YYYY') : ''
+      const OnSaleDate = booking.OnSaleDate ? moment(booking.OnSaleDate).format('DD/MM/YY') : ''
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived)
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived)
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived)
@@ -153,7 +153,7 @@ const handler = async (req, res) => {
 
     const lastColumn: number = 'A'.charCodeAt(numberOfColumns)
     worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
-   
+
     for (let row = 1; row <= 4; row++) {
       styleHeader({ worksheet, row, numberOfColumns })
     }
