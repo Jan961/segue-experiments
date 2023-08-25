@@ -60,21 +60,21 @@ export const VenueContactsTab = () => {
         <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
         {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
       </div>
-      <Table>
+      <Table className='table-auto !min-w-0'>
         <Table.HeaderRow>
-          <Table.HeaderCell>
+          <Table.HeaderCell className='w-20'>
           Role
           </Table.HeaderCell>
-          <Table.HeaderCell>
+          <Table.HeaderCell className='w-20'>
           First Name
           </Table.HeaderCell>
-          <Table.HeaderCell>
+          <Table.HeaderCell className='w-20'>
           Last Name
           </Table.HeaderCell>
-          <Table.HeaderCell>
+          <Table.HeaderCell className='w-20'>
           Phone
           </Table.HeaderCell>
-          <Table.HeaderCell className='w-3/4'>
+          <Table.HeaderCell className='w-20'>
           Email
           </Table.HeaderCell>
         </Table.HeaderRow>

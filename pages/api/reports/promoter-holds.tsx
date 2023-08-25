@@ -56,6 +56,7 @@ const makeRowTextBoldAndAllignLeft = ({ worksheet, row, numberOfColumns }: {work
   }
 }
 
+// TODO - Issue with Performance Time
 const handler = async (req, res) => {
   const { tourCode, fromDate, toDate, venue, tourId } = JSON.parse(req.body) || {}
 
@@ -80,7 +81,7 @@ const handler = async (req, res) => {
 
   worksheet.addRow((['PROMOTER HOLDS']))
   const date = new Date()
-  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
+  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]))
   worksheet.addRow((['TOUR', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']))
   worksheet.addRow((['CODE', 'CODE', 'NAME', 'DATE', 'TIME', 'SEATS', 'NOTES', 'SEATS', 'NAME', 'SEAT NUMBERS', 'EMAIL', 'NOTES', 'REQUESTED BY', 'ARRANGED BY', 'VENUE CONFIRMATION']))
 
@@ -88,7 +89,7 @@ const handler = async (req, res) => {
     const tourCode = x.FullTourCode || ''
     const venueCode = x.VenueCode || ''
     const venueName = x.VenueName || ''
-    const showDate = x.PerformanceDate || ''
+    const showDate = x.PerformanceDate ? moment(x.PerformanceDate).format('DD/MM/YY') : ''
     const showTime = x.PerformanceTime || ''
     const availableSeats = x.AvailableCompSeats || ''
     const availableNotes = x.AvailableCompNotes || ''
@@ -100,6 +101,9 @@ const handler = async (req, res) => {
     const requestedBy = x.CompAllocationRequestedBy || ''
     const arrangedBy = x.CompAllocationArrangedBy || ''
     const venueConfirmation = x.CompAllocationVenueConfirmationNotes || ''
+
+    console.log(x)
+    console.log('showTime ->>>>>>>>>>>>>>>>>', showTime)
     worksheet.addRow([tourCode, venueCode, venueName, showDate, showTime, availableSeats, availableNotes, allocatedSeats, allocatedName, seatNumber, email, notes, requestedBy, arrangedBy, venueConfirmation])
   })
 

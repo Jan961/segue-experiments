@@ -109,7 +109,7 @@ const handler = async (req, res) => {
 
   worksheet.addRow([`Jendagi Rolling Masterplan ${formatedFromDate} to ${formatedToDate}`])
   const date = new Date()
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`])
+  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`])
   worksheet.addRow([])
   worksheet.addRow(['', '', ...destinctShowNames.map(x => x.ShowName)])
   worksheet.addRow(['DAY', 'DATE', ...destinctShowNames.map(x => x.FullTourCode)])

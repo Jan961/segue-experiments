@@ -58,7 +58,7 @@ export const ContactNotesTab = () => {
       { contactNotes.length === 0 && (<NoDataWarning />)}
       { contactNotes.length > 0 && (
 
-        <Table>
+        <Table className='table-auto !min-w-0'>
           <Table.HeaderRow>
             <Table.HeaderCell>
               Who

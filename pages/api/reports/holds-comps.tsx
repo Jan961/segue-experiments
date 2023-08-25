@@ -175,7 +175,7 @@ const handler = async (req, res) => {
 
   worksheet.addRow((['BOOKING HOLDS/COMPS REPORT']))
   const date = new Date()
-  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
+  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]))
   worksheet.addRow((['TOUR', 'VENUE', '', 'SHOW']))
   worksheet.addRow((['CODE', 'CODE', 'NAME', 'DATE', 'TYPE', 'CODE', 'NAME', 'SEATS', 'TOTAL', 'REMAINING']))
 

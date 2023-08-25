@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import axios from 'axios'
 import { Table } from 'components/global/table/Table'
 import React from 'react'
+import numeral from 'numeral'
 import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { NoDataWarning } from '../NoDataWarning'
@@ -68,17 +69,17 @@ export const SalesTab = () => {
   }
   return (
     <>
-      <div className='grid grid-cols-12 gap-2'>
-        <div className='col-span-4 md:col-span-3 lg:col-span-2'>
+      <div className='grid grid-cols-12 gap-2 overflow-hidden h-[calc(100vh - 300px)]' style={{ height: 'calc(100vh - 300px)' }}>
+        <div className='col-span-4 md:col-span-3 lg:col-span-2 h-full overflow-y-auto'>
           <Summary salesSummary={bookingSales[bookingSales.length - 1]} />
         </div>
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
-          <Table className='mt-4 text-sm'>
+          <Table className='mt-4 text-sm table-auto !min-w-0 h-full'>
             <Table.HeaderRow>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Week
               </Table.HeaderCell>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Week of
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
@@ -93,55 +94,55 @@ export const SalesTab = () => {
               <Table.HeaderCell className='w-20'>
               Reserved %
               </Table.HeaderCell>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Total Value
               </Table.HeaderCell>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Value Change
               </Table.HeaderCell>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Total Hold
               </Table.HeaderCell>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Seats Change
               </Table.HeaderCell>
-              <Table.HeaderCell>
+              <Table.HeaderCell className='w-20'>
               Activity
               </Table.HeaderCell>
             </Table.HeaderRow>
-            <Table.Body>
+            <Table.Body className='h-full overflow-y-auto'>
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i)
                 return (
                   <Table.Row key={sale.week}>
-                    <Table.Cell className="whitespace-nowrap">
+                    <Table.Cell className="whitespace-nowrap max-w-fit">
                       {sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>
                     <Table.Cell>
                       {sale.weekOf}
                     </Table.Cell>
-                    <Table.Cell>
-                      {sale.seatsSold}
+                    <Table.Cell className='text-right'>
+                      {numeral(sale.seatsSold).format('0,0')}
                     </Table.Cell>
-                    <Table.Cell>
-                      {sale.seatsSalePercentage ? sale.seatsSalePercentage.toFixed(1) : ''} %
+                    <Table.Cell className='text-right'>
+                      {sale.seatsSalePercentage ? sale.seatsSalePercentage.toFixed(2) : ''} %
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell className='text-right'>
                       {sale.reservations}
                     </Table.Cell>
-                    <Table.Cell>
-                      {sale.reserved}
+                    <Table.Cell className='text-right'>
+                      {numeral(sale.reserved).format('0,0')}
                     </Table.Cell>
-                    <Table.Cell>
-                      {`${sale.venueCurrencySymbol} ${sale.totalValue}`}
+                    <Table.Cell className='text-right'>
+                      {numeral(sale.totalValue).format(sale.venueCurrencySymbol + '0,0.00')}
                     </Table.Cell>
-                    <Table.Cell>
-                      {Number(valueChange).toFixed(0)}
+                    <Table.Cell className='text-right'>
+                      {numeral(valueChange).format(sale.venueCurrencySymbol + '0,0.00')}
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell className='text-right'>
                       {sale.totalHolds}
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell className='text-right'>
                       {seatsChange}
                     </Table.Cell>
                     <Table.Cell >

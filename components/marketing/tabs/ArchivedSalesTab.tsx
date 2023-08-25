@@ -52,16 +52,16 @@ export const ArchivedSalesTab = () => {
         }
       </div>
       {archivedSales?.length
-        ? <Table>
+        ? <Table className="table-auto !min-w-0">
           <Table.HeaderRow>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             </Table.HeaderCell>
             {
               tours.map((tour, i) => (
                 <>
-                  <Table.HeaderCell className="text-right" key={i}>
+                  <Table.HeaderCell className="text-right w-20" key={i}>
                     {tour.FullTourCode}
                   </Table.HeaderCell>
                   <Table.HeaderCell>
@@ -71,19 +71,19 @@ export const ArchivedSalesTab = () => {
             }
           </Table.HeaderRow>
           <Table.HeaderRow>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
           Week
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
           Week of
             </Table.HeaderCell>
             {
               tours.map((_, i) => (
                 <>
-                  <Table.HeaderCell>
+                  <Table.HeaderCell className='w-20'>
                     Num
                   </Table.HeaderCell>
-                  <Table.HeaderCell>
+                  <Table.HeaderCell className='w-20'>
                     S Value
                   </Table.HeaderCell>
                 </>
