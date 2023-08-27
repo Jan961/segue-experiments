@@ -12,6 +12,8 @@ export enum COLOR_HEXCODE {
   WHITE= 'ffffffff',
   BLACK= 'ff000000',
   ORANGE= 'ffff6347',
+  CREAM = 'ffedb150',
+  DARK_BLUE= 'ff2f75b5',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`
