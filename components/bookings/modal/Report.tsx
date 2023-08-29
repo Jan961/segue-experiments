@@ -52,7 +52,7 @@ export default function Report (TourId) {
                   </div>
                   {/* body */}
                   <div className="py-4">
-                    {/* {
+                    {
                       tourSummary.length
                         ? (<div className="grid grid-cols-1">
                           {
@@ -65,9 +65,9 @@ export default function Report (TourId) {
                             ))
                           }
                         </div>)
-                        : ''
-                    } */}
-                    { tourSummary.length
+                        : <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
+                    }
+                    {/* { tourSummary.length
                       ? <DL>
                         {
                           tourSummary.map((summaryItem, i) => (
@@ -83,7 +83,7 @@ export default function Report (TourId) {
                         }
                       </DL>
                       : <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
-                    }
+                    } */}
                   </div>
                 </div>
               </div>
