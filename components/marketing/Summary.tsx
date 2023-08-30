@@ -3,10 +3,10 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
 import axios from 'axios'
 import React from 'react'
+import numeral from 'numeral'
 import { LoadingTab } from './tabs/LoadingTab'
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]'
 import { DescriptionList as DL } from 'components/global/DescriptionList'
-
 
 export const formatCurrency = (ammount, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
@@ -80,7 +80,7 @@ export const Summary = () => {
           Total Seats Sold
         </DL.Term>
         <DL.Desc>
-          {info.Seats || '-'}
+          {numeral(info.Seats).format('0,0') || '-'}
         </DL.Desc>
         <DL.Term>
           Total Sales
@@ -110,7 +110,7 @@ export const Summary = () => {
           Capacity
         </DL.Term>
         <DL.Desc>
-          {info.Capacity || '-'}
+          {numeral(info.Capacity).format('0,0') || '-'}
         </DL.Desc>
         <DL.Term>
           Perf(s)
@@ -122,7 +122,7 @@ export const Summary = () => {
           Total Seats
         </DL.Term>
         <DL.Desc>
-          {info.Seats || '-'}
+          {numeral(info.Seats).format('0,0') || '-'}
         </DL.Desc>
         <DL.Term>
           Currency
