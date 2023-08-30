@@ -3,6 +3,8 @@ import moment from 'moment'
 import { getDateDaysAgo, toISO, toSql } from '../../../services/dateService'
 import IconWithText from '../IconWithText'
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
+import axios from 'axios'
+import { range } from 'services/reportsService'
 
 function formatDate (date) {
   return toSql(date)
@@ -72,13 +74,13 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
         const { StartDate, EndDate } = currentTour.DateBlock.find(date => date.Name === 'Tour') || {}
         setInputs(prev => ({ ...prev, tourStartDate: StartDate, tourEndDate: EndDate }))
       }
-      fetch(`/api/reports/tourWeek/${e.target.value}`)
-        .then((res) => res.json())
+      axios.get(`/api/reports/tourWeek/${e.target.value}`)
+        .then((res) => res.data)
         .then((data) => {
           // Make sure tour weeks are empty
           setTourWeeks([])
           // Set tour weeks with data
-          setTourWeeks(data?.data || [])
+          setTourWeeks(data || [])
         })
     }
     setInputs((prev) => ({
@@ -154,9 +156,9 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           onChange={handleOnChange}>
                           <option key="default">Select a Tour Week</option>
                           {tourWeeks.map((week) => (
-                            <option key={week.TourWeekId} value={`${week.MondayDate}`}>
+                            <option key={week.TourWeekId} value={`${week.mondayDate}`}>
                               {/* {formatWeekNumber(week.WeekCode)}  */}
-                              {formatDate(week.MondayDate)}
+                              {` Wk ${week.tourWeekNum} | ${formatDate(week.mondayDate)}`}
                             </option>
                           ))
                           }
@@ -173,11 +175,11 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
 
                           onChange={handleOnChange}>
                           <option key="default">Select number of weeks</option>
-                          <option value={2}>2</option>
-                          <option value={3}>3</option>
-                          <option value={4}>4</option>
-                          <option value={5}>5</option>
-                          <option value={6}>6</option>
+                          {
+                            range(2, 99).map((week, i) => (
+                              <option key={i} value={week}>{week}</option>
+                            ))
+                          }
                         </select>
                       </div>
                       {/* footer */}

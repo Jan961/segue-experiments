@@ -4,6 +4,9 @@ import IconWithText from '../IconWithText'
 import { faChartPie } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { getDateDaysAgo, toISO } from 'services/dateService'
+import formatDate from 'utils/formatDate'
+import { range } from 'services/reportsService'
+import axios from 'axios'
 
 type Props={
   activeTours:any[];
@@ -12,7 +15,8 @@ type Props={
 
 type TourWeek = {
   Id:number,
-  MondayDate:string,
+  mondayDate:string,
+  tourWeekNum:number,
 }
 
 export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
@@ -33,7 +37,7 @@ export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
   })
 
   const fetchTourWeek = async (tourId:number) => {
-    const weeks:TourWeek[] = await fetch(`/api/reports/tourWeek/${tourId}`).then(data => data.json()).then(data => data.data)
+    const weeks:TourWeek[] = await axios.get(`/api/reports/tourWeek/${tourId}`).then(data => data.data)
     setTourWeeks(weeks)
   }
   function weeksBefore (date, weeks) {
@@ -203,10 +207,10 @@ export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
                           <option>Select a Tour Week</option>
                           {tourWeeks.map((week) => (
                             <option
-                              key={week.MondayDate}
-                              value={`${week.MondayDate}`}
+                              key={week.mondayDate}
+                              value={`${week.mondayDate}`}
                             >
-                              {moment(week.MondayDate).format('YYYY-MM-DD')}{' '}
+                              {` Wk ${week.tourWeekNum} | ${formatDate(week.mondayDate)}`}
                             </option>
                           ))}
                         </select>
@@ -223,16 +227,12 @@ export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
                           name="numberOfWeeks"
                           onChange={handleOnChange}
                         >
-                          <option>Select a timespan</option>
-                          <option value={2}>2</option>
-                          <option value={3}>3</option>
-                          <option value={4}>4</option>
-                          <option value={5}>5</option>
-                          <option value={6}>6</option>
-                          <option value={7}>7</option>
-                          <option value={8}>8</option>
-                          <option value={9}>9</option>
-                          <option value={10}>10</option>
+                          <option key="default">Select a timespan</option>
+                          {
+                            range(2, 99).map((week, i) => (
+                              <option key={i} value={week}>{week}</option>
+                            ))
+                          }
                         </select>
                       </div>
 
