@@ -146,3 +146,21 @@ export const formDate = (DateString: string) => {
   const formDateString = DateString.toString()
   return formDateString.substring(0, 10)
 }
+
+export const getWeeksBetweenDates = (startDate:string, endDate:string) => {
+  const currentSunday = moment(startDate).startOf('isoWeek') // Find the first Sunday
+  const end = moment(endDate)
+  const weeks = []
+
+  while (currentSunday.isBefore(end)) {
+    const nextMonday = currentSunday.clone().add(1, 'day')
+    const sundayDate = currentSunday.toISOString()
+    const mondayDate = nextMonday.toISOString()
+
+    weeks.push({ sundayDate, mondayDate })
+
+    currentSunday.add(7, 'days') // Move to the next Sunday
+  }
+
+  return weeks
+}

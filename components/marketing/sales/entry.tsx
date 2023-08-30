@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { dateToSimple } from 'services/dateService'
+import { dateToSimple, toSql } from 'services/dateService'
 import axios from 'axios'
 import { LoadingPage } from 'components/global/LoadingPage'
 import { useRecoilValue } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
+import Typeahead from 'components/Typeahead'
+import moment from 'moment'
 
 interface props {
   searchFilter: String;
@@ -17,41 +19,51 @@ export default function Entry ({ searchFilter }: props) {
   const [comps, setComps] = useState<any>({})
   const [inputs, setInputs] = useState<any>({})
   const { tours } = useRecoilValue(tourJumpState)
-  // tours===>`/api/tours/read/notArchived/${userService.userValue.accountId}
-  // loaded emails====>/api/marketing/sales/emailImport/${AccountId}/${type}
-  // Tour Dates====>`/api/tours/read/tourDates/${TourID}`
-  // Venue Date=====> `/api/tours/read/week/${TourId}`
-  // Sales Week Venues====> `/api/bookings/ShowWeek/${inputs.SetTour}/${MondayDate}/${SundayDate}`
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
-      fetch(`/api/reports/tourWeek/${tourId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          SetSalesWeeks(data?.data || [])
-        })
+      axios.get(`/api/reports/tourWeek/${tourId}`)
+        .then((data:any) => SetSalesWeeks(data.data || []))
     }
   }
   const fetchVenues = (tourId) => {
     if (tourId) {
-      fetch(`/api/tours/read/venues/${tourId}`)
-        .then((res) => res.json())
+      axios.get(`/api/tours/read/venues/${tourId}`)
         .then(data => data.data)
         .then((data) => {
-          SetSalesWeeksVenues(data)
+          SetSalesWeeksVenues(data.data)
         })
     }
   }
   const fetchSales = (SetSalesFiguresDate, SetBookingId) => {
-    axios.post('/api/marketing/sales/read', { SetSalesFiguresDate, SetBookingId })
+    setHolds({})
+    setComps({})
+    setInputs({})
+    axios.post('/api/marketing/sales/read', { SetSalesFiguresDate: moment(SetSalesFiguresDate).toISOString().split('T')[0], SetBookingId })
+      .then(data => data.data)
       .then((data) => {
-        // SetSalesWeeksVenues(data)
+        const { Notes, SetHold, SetComp } = data || {}
+        const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
+        const holdValues = SetHold?.reduce?.((holds, hold) => {
+          holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
+          return holds
+        }, {})
+        setHolds(holdValues)
+        setComps(SetComp?.reduce?.((comps, comp) => {
+          comps[comp.CompTypeId] = comp.CompSeats
+          return comps
+        }, {}))
+        setInputs(prev => ({
+          ...prev,
+          BookingSaleNotes,
+          CompNotes,
+          HoldNotes
+        }))
       }).catch(error => console.log(error))
   }
   const fetchOptionTypes = () => {
     axios.get('/api/marketing/sales/options')
       .then((data) => {
         setOptions(data.data)
-        // SetSalesWeeksVenues(data)
       }).catch(error => console.log(error))
   }
   useEffect(() => {
@@ -72,7 +84,7 @@ export default function Entry ({ searchFilter }: props) {
   if (isLoading) return <LoadingPage />
 
   const handleOnChange = (e) => {
-    e.persist()
+    e.persist?.()
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value })
       return
@@ -148,9 +160,9 @@ export default function Entry ({ searchFilter }: props) {
                       className="block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green  text-sm"
                     >
                       <option value={0}>Select A Tour</option>
-                      {tours?.map?.((tour) => (
+                      {tours?.filter?.(tour => !tour.IsArchived)?.map?.((tour) => (
                         <option key={tour.Id} value={tour.Id}>
-                          {tour.ShowCode}/{tour.Code}
+                          {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
                         </option>
                       ))}
                     </select>
@@ -171,15 +183,27 @@ export default function Entry ({ searchFilter }: props) {
                       <option value={0}>Select A Tour</option>
                       {salesWeeks?.map?.((week) => (
                         <option
-                          key={week.MondayDate}
-                          value={week.MondayDate}
+                          key={week.mondayDate}
+                          value={week.mondayDate}
                         >
-                          {week.MondayDate ? dateToSimple(week.MondayDate) : ''}
+                          {`Wk ${week.tourWeekNum} | Monday ${dateToSimple(new Date(week.mondayDate))}`}
                         </option>
                       ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between">
+                  <div className="flex flex-row items-center justify-between relative">
+                    {/* <Typeahead
+                      placeholder="Venue/Date"
+                      label="Venue/Date"
+                      name="Venue"
+                      className='flex flex-row items-center justify-between w-1/2'
+                      value={inputs.Venue}
+                      options={salesWeeksVenues.map((venue) => ({
+                        text: `${venue.Code} ${venue.Name}, ${venue.VenueAddressTown} ${dateToSimple(venue.booking.FirstDate)}`,
+                        value: venue.BookingId
+                      }))}
+                      onChange={(option) => handleOnChange({ target: { id: 'Venue', value: option.value } })}
+                    /> */}
                     <label
                       htmlFor="Venue"
                       className="text-sm font-medium text-gray-700"
@@ -193,9 +217,9 @@ export default function Entry ({ searchFilter }: props) {
                       onChange={handleOnChange}
                     >
                       <option value={0}>Select A Performance</option>
-                      {salesWeeksVenues?.sort((a, b) => a.Name?.localCompare?.(b.Name))?.map?.((venue) => (
+                      {salesWeeksVenues?.sort?.((a, b) => a.Name?.localCompare?.(b.Name))?.map?.((venue) => (
                         <option key={venue.BookingId} value={venue.BookingId}>
-                          {venue.Name}
+                          {`${venue.Code} ${venue.Name}, ${venue.VenueAddressTown} ${dateToSimple(venue.booking.FirstDate)}`}
                         </option>
                       ))}
                     </select>
