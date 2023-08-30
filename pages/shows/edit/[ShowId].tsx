@@ -72,8 +72,7 @@ const EditShow = ({ show }: Props) => {
         true,
         'Thank you, your message has been submitted.'
       )
-
-      router.push('/shows')
+      router.back()
     }).catch((error) => {
       loggingService.logError(error)
 
