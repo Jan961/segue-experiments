@@ -1,18 +1,8 @@
 import { Clerk } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 import { authMiddleware } from '@clerk/nextjs'
+import prismaEdge from 'lib/prismaEdge'
 
-const allowedEmails = [
-  'neil@neilsutcliffe.com',
-  'robert@robertckelly.co.uk',
-  'kyle@chieftechofficer.co.uk',
-  'asara97911@gmail.com',
-  'k@bhikstudio.co.uk',
-  'sb@steve-baxter.co.uk',
-  'projects@robertckelly.co.uk',
-  'marketing@robertckelly.co.uk',
-  'production@robertckelly.co.uk'
-]
 const publicPaths = ['/sign-in*', '/sign-up*', '/access-denied']
 
 const clerk = Clerk({ apiKey: process.env.CLERK_SECRET_KEY })
@@ -40,7 +30,14 @@ export default authMiddleware({
       const user = await clerk.users.getUser(userId)
       const userEmail = user.emailAddresses.find((email) => email.id === user.primaryEmailAddressId).emailAddress
 
-      if (allowedEmails.includes(userEmail)) return NextResponse.next()
+      /*
+        Uses MIDDLEWARE_DATABASE_URL in .env
+        This is as standard database calls don't work on Vercel Edge. This middleware flagged an error if you tried a lookup
+        https://www.prisma.io/docs/data-platform/classic-projects/data-proxy/use-data-proxy#enable-the-data-proxy-for-a-project
+      */
+      const access = await prismaEdge.user.findUnique({ where: { Email: userEmail } })
+
+      if (access) return NextResponse.next()
       const denied = new URL('/access-denied', request.url)
       return NextResponse.redirect(denied)
     }
