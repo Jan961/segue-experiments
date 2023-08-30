@@ -11,7 +11,7 @@ import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { getAllVenuesMin } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
-import { first, objectify, all } from 'radash'
+import { objectify, all } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
 import { filterState } from 'state/booking/filterState'
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
@@ -24,6 +24,7 @@ import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
 import { getTourJumpState } from 'utils/getTourJumpState'
 import { viewState } from 'state/booking/viewState'
+import { checkAccess, getEmailFromReq } from 'services/userService'
 
 interface bookingProps {
   Id: number,
@@ -179,7 +180,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ShowCode, TourCode } = ctx.query as Params
   console.log(`ServerSideProps: ${ShowCode}/${TourCode}`)
   const { Id } = await lookupTourId(ShowCode, TourCode) || {}
+
+  if (!Id) return { notFound: true }
+
   console.log(`Found tour ${Id}`)
+
+  const email = await getEmailFromReq(ctx.req)
+  const access = await checkAccess(email, { TourId: Id })
+
+  if (!access) return { notFound: true }
 
   // Get in parallel
   const [venues, tour, dateTypeRaw, tourJump] = await all([

@@ -14,9 +14,10 @@ import { title } from 'radash'
 type Props = {
   tours: TourDTO[]
   id: number
+  name: string
 };
 
-export const Tours = ({ id, tours }: Props) => {
+export const Tours = ({ id, tours, name }: Props) => {
   const [query, setQuery] = React.useState('')
   const router = useRouter()
   const path = router.pathname.split('/')[1]
@@ -30,8 +31,6 @@ export const Tours = ({ id, tours }: Props) => {
       else active.push(tour)
     }
   }
-
-  const anyTour = active.length ? active[0] : archived[0]
 
   return (
     <Layout title="Tours | Segue">
@@ -47,7 +46,7 @@ export const Tours = ({ id, tours }: Props) => {
           { title(path) }
         </BreadCrumb.Item>
         <BreadCrumb.Item>
-          {anyTour.ShowName}
+          { name }
         </BreadCrumb.Item>
       </BreadCrumb>
       <Tab.Group className='max-w-screen-md mx-auto' as='div'>

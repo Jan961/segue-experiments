@@ -349,6 +349,7 @@ model Account {
   Updated_at      DateTime @default(now()) @db.DateTime(0)
   Created_at      DateTime @default(now()) @db.DateTime(0)
   Show            Show[]
+  User            User[]
 }
 
 model AvailableComp {
@@ -537,4 +538,14 @@ model VenueAddress {
   Venue                Venue   @relation(fields: [VenueAddressVenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueAddressVenueId], map: "Venue_VenueAddress")
+}
+
+model User {
+  Id            Int      @id @default(autoincrement()) @map("UserId")
+  Email         String   @unique(map: "UserEmail_uk") @db.VarChar(120) @map("UserEmail")
+  Name          String   @db.VarChar(50) @map("UserName")
+  AccountId     Int? @map("UserAccountId")
+  Account       Account? @relation(fields: [AccountId], references: [AccountId], onDelete: Restrict, onUpdate: Restrict, map: "Account_User")
+
+  @@index([AccountId], map: "Account_User")
 }

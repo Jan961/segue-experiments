@@ -2,6 +2,7 @@ import prisma from 'lib/prisma'
 import { Prisma } from '@prisma/client'
 import { tourMapper } from 'lib/mappers'
 import { getShowWithToursById } from './ShowService'
+import { getAccountId, getEmailFromReq } from './userService'
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -23,17 +24,25 @@ export const getActiveTours = async (accountId:number) => {
 
 export const getTourPageProps = async (ctx) => {
   const { ShowCode } = ctx.params
+  const email = await getEmailFromReq(ctx.req)
+  const AccountId = await getAccountId(email)
 
-  const showRaw = await prisma.show.findUnique({
+  const showRaw = await prisma.show.findFirst({
     where: {
-      Code: ShowCode
+      Code: ShowCode,
+      AccountId
+    },
+    select: {
+      Id: true
     }
   })
+
+  if (!showRaw) return { notFound: true }
 
   const show = await getShowWithToursById(showRaw.Id)
   const tours = tourMapper(show)
 
-  return { props: { tours, id: show.Id } }
+  return { props: { tours, id: show.Id, name: show.Name } }
 }
 
 export const lookupTourId = async (ShowCode: string, TourCode: string) => {
