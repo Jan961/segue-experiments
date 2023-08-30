@@ -69,10 +69,7 @@ export const SalesTab = () => {
   }
   return (
     <>
-      <div className='grid grid-cols-12 gap-2 overflow-hidden h-[calc(100vh - 300px)]' style={{ height: 'calc(100vh - 300px)' }}>
-        <div className='col-span-4 md:col-span-3 lg:col-span-2 h-full overflow-y-auto'>
-          <Summary salesSummary={bookingSales[bookingSales.length - 1]} />
-        </div>
+      <div className='grid grid-cols-12 gap-2 overflow-hidden'>
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
           <Table className='mt-4 text-sm table-auto !min-w-0 h-full'>
             <Table.HeaderRow>
@@ -134,10 +131,10 @@ export const SalesTab = () => {
                       {numeral(sale.reserved).format('0,0')}
                     </Table.Cell>
                     <Table.Cell className='text-right'>
-                      {numeral(sale.totalValue).format(sale.venueCurrencySymbol + '0,0.00')}
+                      {sale.venueCurrencySymbol + numeral(sale.totalValue).format('0,0.00')}
                     </Table.Cell>
                     <Table.Cell className='text-right'>
-                      {numeral(valueChange).format(sale.venueCurrencySymbol + '0,0.00')}
+                      {sale.venueCurrencySymbol + numeral(valueChange).format('0,0.00')}
                     </Table.Cell>
                     <Table.Cell className='text-right'>
                       {sale.totalHolds}

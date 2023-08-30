@@ -18,6 +18,8 @@ export default function Entry ({ searchFilter }: props) {
   const [holds, setHolds] = useState<any>({})
   const [comps, setComps] = useState<any>({})
   const [inputs, setInputs] = useState<any>({})
+  const [sale, setSale] = useState<any>({})
+  const [notes, setNotes] = useState<any>({})
   const { tours } = useRecoilValue(tourJumpState)
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
@@ -37,11 +39,13 @@ export default function Entry ({ searchFilter }: props) {
   const fetchSales = (SetSalesFiguresDate, SetBookingId) => {
     setHolds({})
     setComps({})
-    setInputs({})
+    setNotes({})
+    setSale({})
+    setLoading(false)
     axios.post('/api/marketing/sales/read', { SetSalesFiguresDate: moment(SetSalesFiguresDate).toISOString().split('T')[0], SetBookingId })
       .then(data => data.data)
       .then((data) => {
-        const { Notes, SetHold, SetComp } = data || {}
+        const { Notes, SetHold, SetComp, Sale } = data || {}
         const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
         const holdValues = SetHold?.reduce?.((holds, hold) => {
           holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
@@ -52,13 +56,19 @@ export default function Entry ({ searchFilter }: props) {
           comps[comp.CompTypeId] = comp.CompSeats
           return comps
         }, {}))
-        setInputs(prev => ({
+        setNotes(prev => ({
           ...prev,
           BookingSaleNotes,
           CompNotes,
           HoldNotes
         }))
-      }).catch(error => console.log(error))
+        setSale(prev => ({
+          ...prev,
+          ...Sale
+        }))
+      })
+      .catch(error => console.log(error))
+      .finally(() => setLoading(false))
   }
   const fetchOptionTypes = () => {
     axios.get('/api/marketing/sales/options')
@@ -95,19 +105,35 @@ export default function Entry ({ searchFilter }: props) {
     }))
   }
 
+  const handleOnSaleChange = (e) => {
+    e.persist?.()
+    setSale((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value
+    }))
+  }
+
+  const handleOnNotesChange = (e) => {
+    e.persist?.()
+    setNotes((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value
+    }))
+  }
+
   async function onSubmit () {
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({ SetHoldHoldTypeId, SetHoldSeats: holds[SetHoldHoldTypeId].seats, SetHoldValue: holds[SetHoldHoldTypeId].value }))
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({ SetCompCompTypeId, SetCompSeats: comps[SetCompCompTypeId] }))
     const Sales = [
       {
         SaleSaleTypeId: 1,
-        SaleSeats: inputs.Seats,
-        SaleValue: inputs.Value
+        SaleSeats: sale.Seats,
+        SaleValue: sale.Value
       },
       {
         SaleSaleTypeId: 2,
-        SaleSeats: inputs.ReservedSeats,
-        SaleValue: inputs.ReservedValue
+        SaleSeats: sale.ReservedSeats,
+        SaleValue: sale.ReservedValue
       }
     ]
     await axios.post('/api/marketing/sales/upsert', { Holds, Comps, Sales, SetBookingId: inputs.Venue, SetSalesFiguresDate: inputs.SalesWeek })
@@ -130,9 +156,11 @@ export default function Entry ({ searchFilter }: props) {
     // BookingSaleId, HoldNotes, CompNotes, BookingSaleNotes
   }
   const handleOnHoldsChange = (e, key) => {
+    e.persist?.()
     setHolds(prev => ({ ...prev, [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value } }))
   }
   const handleOnCompsChange = (e) => {
+    e.persist?.()
     setComps(prev => ({ ...prev, [e.target.id]: e.target.value }))
   }
 
@@ -177,6 +205,7 @@ export default function Entry ({ searchFilter }: props) {
                     <select
                       id="SaleWeek"
                       name="SaleWeek"
+                      value={inputs.SaleWeek}
                       className="block w-full  max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
@@ -213,6 +242,7 @@ export default function Entry ({ searchFilter }: props) {
                     <select
                       id="Venue"
                       name="Venue"
+                      value={inputs.Venue}
                       className="block bg-dark-primary-green w-full text-white max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
@@ -240,8 +270,8 @@ export default function Entry ({ searchFilter }: props) {
                           type="text"
                           name="Value"
                           id="Value"
-                          value={inputs.Value}
-                          onChange={handleOnChange}
+                          value={sale.Value}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
@@ -259,8 +289,8 @@ export default function Entry ({ searchFilter }: props) {
                           name="ReservedValue"
                           id="ReservedValue"
                           autoComplete="ReservedValue"
-                          value={inputs.ReservedValue}
-                          onChange={handleOnChange}
+                          value={sale.ReservedValue}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
@@ -269,7 +299,7 @@ export default function Entry ({ searchFilter }: props) {
                   <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
                       <label
-                        htmlFor="street-address"
+                        htmlFor="Seats"
                         className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                       >
                         Seats Sold
@@ -280,15 +310,15 @@ export default function Entry ({ searchFilter }: props) {
                           name="Seats"
                           id="Seats"
                           autoComplete="Seats"
-                          value={inputs.Seats}
-                          onChange={handleOnChange}
+                          value={sale.Seats}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
                       <label
-                        htmlFor="street-address"
+                        htmlFor="ReservedSeats"
                         className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                       >
                         Reserved Seats
@@ -299,8 +329,8 @@ export default function Entry ({ searchFilter }: props) {
                           name="ReservedSeats"
                           id="ReservedSeats"
                           autoComplete="ReservedSeats"
-                          value={inputs.ReservedSeats}
-                          onChange={handleOnChange}
+                          value={sale.ReservedSeats}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
@@ -321,7 +351,7 @@ export default function Entry ({ searchFilter }: props) {
                       options?.holdTypes.map((hold, i) => (
                         <div key={i} className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                           <label
-                            htmlFor="street-address"
+                            htmlFor={hold.HoldTypeId}
                             className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                           >
                             {hold.HoldTypeName}
@@ -362,7 +392,7 @@ export default function Entry ({ searchFilter }: props) {
                     options?.compTypes?.map((comp, j) => (
                       <div key={j} className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                         <label
-                          htmlFor="street-address"
+                          htmlFor={comp.CompTypeId}
                           className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                         >
                           {comp.CompTypeName}
@@ -384,39 +414,41 @@ export default function Entry ({ searchFilter }: props) {
                 </div>
               </div>
               <div className={'columns-1'}>
-                <div className="sm:grid sm:grid-cols-2 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
-                  <div className="flex flex-col w-full col-span-1">
+                <div className="sm:grid sm:grid-cols-2 px-2 sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
+                  <div className="flex flex-col w-full col-span-1 cursor-not-allowed">
                     <label
-                      htmlFor="street-address"
+                      htmlFor="HoldNotes"
                       className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                     >
                       Hold Notes
                     </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                    <div className="mt-1 sm:col-span-2 sm:mt-0 cursor-not-allowed">
                       <textarea
-                        className="w-full"
-                        onChange={handleOnChange}
+                        className="w-full cursor-not-allowed"
+                        onChange={handleOnNotesChange}
                         name={'HoldNotes'}
                         id={'HoldNotes'}
-                        value={inputs.HoldNotes}
+                        value={notes.HoldNotes}
+                        disabled
                       ></textarea>
                     </div>
                   </div>
                   <div className={'col-span-1'}>
-                    <div className="flex flex-col px-2 sm:items-start sm:border-none sm:border-gray-200 w-full">
+                    <div className="flex flex-col px-2 sm:border-none sm:border-gray-200 w-full cursor-not-allowed">
                       <label
-                        htmlFor="street-address"
+                        htmlFor="CompNotes"
                         className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                       >
                       Comp Notes
                       </label>
                       <div className="mt-1 sm:mt-0">
                         <textarea
-                          onChange={handleOnChange}
+                          onChange={handleOnNotesChange}
                           name={'CompNotes'}
                           id={'CompNotes'}
-                          value={inputs.CompNotes}
-                          className="w-full"
+                          value={notes.CompNotes}
+                          className="w-full cursor-not-allowed"
+                          disabled
                         ></textarea>
                       </div>
                     </div>
@@ -425,18 +457,19 @@ export default function Entry ({ searchFilter }: props) {
               </div>
               <div className={'flex flex-col'}>
                 <label
-                  htmlFor="street-address"
+                  htmlFor="BookingSaleNotes"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                 >
                     Booking Sale Notes
                 </label>
                 <div className="mt-1 sm:mt-0 w-full">
                   <textarea
-                    onChange={handleOnChange}
+                    onChange={handleOnNotesChange}
                     name={'BookingSaleNotes'}
                     id={'BookingSaleNotes'}
-                    value={inputs.BookingSaleNotes}
-                    className="w-full"
+                    value={notes.BookingSaleNotes}
+                    className="w-full cursor-not-allowed"
+                    disabled
                   ></textarea>
                 </div>
               </div>

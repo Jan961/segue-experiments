@@ -94,7 +94,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
             SaleSaleTypeId: true,
             SaleSeats: true,
             SaleValue: true,
-            SalesSet: {
+            SaleType: {
               select: {
                 SaleTypeName: true
               }
@@ -119,7 +119,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       CompSeats: SetCompSeats,
       CompTypeName: CompType.CompTypeName
     }))
-    console.log("Sales", salesSet.Sale)
     const saleData: SalesData[] = salesSet.Sale.map(({ SaleSaleTypeId, SaleSeats, SaleValue, SaleType }) => ({
       SaleTypeId: SaleSaleTypeId,
       SaleSeats,

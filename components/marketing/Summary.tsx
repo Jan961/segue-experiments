@@ -7,9 +7,6 @@ import { LoadingTab } from './tabs/LoadingTab'
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]'
 import { DescriptionList as DL } from 'components/global/DescriptionList'
 
-type props={
-  salesSummary:any;
-}
 
 export const formatCurrency = (ammount, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
@@ -21,7 +18,7 @@ export const formatCurrency = (ammount, currency: string) => {
   return formatter.format(ammount)
 }
 
-export const Summary = ({ salesSummary }:props) => {
+export const Summary = () => {
   const { selected } = useRecoilValue(bookingJumpState)
   const [summary, setSummary] = React.useState<Partial<SummaryResponseDTO>>({})
   const [loading, setLoading] = React.useState(true)
@@ -29,11 +26,6 @@ export const Summary = ({ salesSummary }:props) => {
   const search = async () => {
     try {
       setLoading(true)
-      // Original endpoints
-      // `/api/bookings/saleable/${selected}`
-      // `/api/bookings/Performances/${selected}`
-      // `/api/marketing/sales/marketingSales/${selected}`
-
       const { data } = await axios.get(`/api/marketing/summary/${selected}`)
       setSummary(data)
     } catch (error) {
@@ -79,7 +71,7 @@ export const Summary = ({ salesSummary }:props) => {
           Times
         </DL.Term>
         <DL.Desc>
-          {summary.Performances?.map?.(x => dateTimeToTime(x.Time)).join(', ') || 'N/A' }
+          {summary.Performances?.map?.(x => `${dateToSimple(x.Date)} ${dateTimeToTime(x.Time)}`).join(', ') || 'N/A' }
         </DL.Desc>
       </DL>
       <h3 className='mb-1 mt-4 text-base font-bold text-primary-blue'>Sales Summary</h3>
@@ -97,7 +89,7 @@ export const Summary = ({ salesSummary }:props) => {
           {info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'}
         </DL.Desc>
         <DL.Term>
-          Gross Profit
+          Gross Potential
         </DL.Term>
         <DL.Desc>
           {formatCurrency(info.GrossPotential, currency)}
@@ -147,13 +139,13 @@ export const Summary = ({ salesSummary }:props) => {
               Marketing Deal
             </DL.Term>
             <DL.Desc className='mb-4'>
-              <span>{ notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'  }</span>
+              <span>{ notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None' }</span>
             </DL.Desc>
             <DL.Term>
               Booking Notes
             </DL.Term>
             <DL.Desc className='mb-4'>
-              <span>{ notes.BookingNotes ? notes.BookingNotes : 'None'  }</span>
+              <span>{ notes.BookingNotes ? notes.BookingNotes : 'None' }</span>
             </DL.Desc>
             <DL.Term>
               Booking Deal Notes
