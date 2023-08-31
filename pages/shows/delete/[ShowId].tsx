@@ -6,15 +6,13 @@ import { getShowById } from 'services/ShowService'
 import { GetServerSideProps } from 'next'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Link from 'next/link'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { FormContainer } from 'components/global/forms/FormContainer'
 import { useRouter } from 'next/router'
 import { showMapper } from 'lib/mappers'
 import { ShowDTO } from 'interfaces'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import { BreadCrumb } from 'components/global/BreadCrumb'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 type Props = {
   show: ShowDTO
@@ -22,6 +20,7 @@ type Props = {
 
 const DeleteShow = ({ show }: Props) => {
   const router = useRouter()
+  const { path } = router.query
 
   const [status, setStatus] = useState({
     submitted: true,
@@ -53,7 +52,7 @@ const DeleteShow = ({ show }: Props) => {
     }).then((response) => {
       loggingService.logAction('Show', 'Show Updated')
       setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: true }))
-      router.push('/shows')
+      router.push(`/${path}`)
     }).catch((error) => {
       loggingService.logError(error)
       setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: false }))
@@ -90,8 +89,14 @@ const DeleteShow = ({ show }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const showId = ctx.params.ShowId as string
-  const show = await getShowById(parseInt(showId))
+  const ShowId = parseInt(ctx.params.ShowId as string)
+
+  const email = await getEmailFromReq(ctx.req)
+  const access = await checkAccess(email, { ShowId })
+
+  if (!access) return { notFound: true }
+
+  const show = await getShowById(ShowId)
 
   return { props: { show: showMapper(show) } }
 }

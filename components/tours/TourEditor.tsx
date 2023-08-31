@@ -13,11 +13,13 @@ import { loggingService } from 'services/loggingService'
 
 interface TourEditorProps {
   tour: TourDTO
+  showCode: string
 }
 
-export const TourEditor = ({ tour } : TourEditorProps) => {
+export const TourEditor = ({ showCode, tour } : TourEditorProps) => {
   const router = useRouter()
-  const back = `/tours/${tour.ShowId}`
+  const { path } = router.query
+  const back = `/${path}/${showCode}`
   const editMode = !!tour.Id
 
   const [status, setStatus] = useState({
@@ -101,10 +103,10 @@ export const TourEditor = ({ tour } : TourEditorProps) => {
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href="/shows">
+        <BreadCrumb.Item href={`/${path}`}>
           Shows
         </BreadCrumb.Item>
-        <BreadCrumb.Item href={`/tours/${tour.ShowId }`}>
+        <BreadCrumb.Item href={back}>
           { tour.ShowName }
         </BreadCrumb.Item>
         <BreadCrumb.Item>
@@ -128,7 +130,7 @@ export const TourEditor = ({ tour } : TourEditorProps) => {
             </div>
           ))}
           <FormInputButton text="Add Date Block" className="block w-full mb-2" onClick={addBlock} />
-          <FormButtonSubmit text={editMode ? 'Edit Tour' : 'Create Tour'} disabled={status.submitted} loading={status.submitting} />
+          <FormButtonSubmit text={editMode ? 'Save Tour' : 'Create Tour'} disabled={status.submitted} loading={status.submitting} />
         </form>
       </FormContainer>
     </>

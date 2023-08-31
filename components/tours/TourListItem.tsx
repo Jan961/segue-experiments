@@ -48,8 +48,8 @@ const TourListItem = ({ tour }: TourListItemProps) => {
         </div>
       </div>
       <div className="whitespace-nowrap">
-        <MenuButton icon={faPencil} href={`/tours/edit/${tour.Id}`} />
-        <MenuButton intent='DANGER' icon={faTrash} href={`/tours/delete/${tour.Id}`} />
+        <MenuButton icon={faPencil} href={`/tours/edit/${tour.Id}?path=${path}`} />
+        <MenuButton intent='DANGER' icon={faTrash} href={`/tours/delete/${tour.Id}?path=${path}`} />
       </div>
     </li>
   )

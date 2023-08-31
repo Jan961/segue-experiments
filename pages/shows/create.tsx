@@ -20,6 +20,7 @@ const DEFAULT_SHOW: ShowDTO = {
 
 const Create = () => {
   const router = useRouter()
+  const { path } = router.query
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -71,7 +72,7 @@ const Create = () => {
           true,
           'Thank you, your message has been submitted.'
         )
-        router.push('/shows')
+        router.push(`/${path}`)
       })
       .catch((error) => {
         loggingService.logError(error)

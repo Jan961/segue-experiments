@@ -6,6 +6,7 @@ interface AccessCheck {
   ShowId?: number
   TourId?: number
   AccountId?: number
+  DateBlockId?: number
 }
 
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
@@ -42,7 +43,6 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
   })
 
   if (!user) return false
-  console.log(user)
 
   // We default to true for simple user checks
   const successes = [true]
@@ -61,11 +61,10 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
 
     successes.push(!!show)
   }
-
   if (items.TourId) {
     const tour = await prisma.tour.findMany({
       where: {
-        Id: items.ShowId,
+        Id: items.TourId,
         Show: {
           is: {
             AccountId: user.AccountId // replace with the ID you're looking for
@@ -77,9 +76,28 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
       }
     })
 
-    console.log(tour)
-
     successes.push(tour.length > 0)
+  }
+  if (items.DateBlockId) {
+    const dateblock = await prisma.dateblock.findFirst({
+      where: {
+        Id: items.DateBlockId,
+        Tour: {
+          is: {
+            Show: {
+              is: {
+                AccountId: user.AccountId // replace with the ID you're looking for
+              }
+            }
+          }
+        }
+      },
+      select: {
+        Id: true
+      }
+    })
+
+    successes.push(dateblock.length > 0)
   }
 
   return successes.filter(x => !x).length === 0

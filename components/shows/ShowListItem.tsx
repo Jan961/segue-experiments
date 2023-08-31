@@ -51,8 +51,8 @@ export const ShowListItem = ({ show }: Props) => {
         </Link>
       </div>
       <div className="whitespace-nowrap">
-        <MenuButton href={`/shows/edit/${show.Id}`} icon={faPencil} />
-        <MenuButton href={`/shows/delete/${show.Id}`} intent='DANGER' onClick={deleteShow} icon={faTrash} />
+        <MenuButton href={`/shows/edit/${show.Id}?path=${path}`} icon={faPencil} />
+        <MenuButton href={`/shows/delete/${show.Id}?path=${path}`} intent='DANGER' onClick={deleteShow} icon={faTrash} />
       </div>
     </li>
   )

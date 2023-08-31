@@ -13,11 +13,11 @@ import { title } from 'radash'
 
 type Props = {
   tours: TourDTO[]
-  id: number
+  code: string
   name: string
 };
 
-export const Tours = ({ id, tours, name }: Props) => {
+export const Tours = ({ code, tours, name }: Props) => {
   const [query, setQuery] = React.useState('')
   const router = useRouter()
   const path = router.pathname.split('/')[1]
@@ -36,7 +36,7 @@ export const Tours = ({ id, tours, name }: Props) => {
     <Layout title="Tours | Segue">
       <div className="float-right">
         <SearchBox onChange={(e) => setQuery(e.target.value)} value={query} />
-        <MenuButton href={`/tours/create/${id}`} iconRight={faPlus}>Add Tour</MenuButton>
+        <MenuButton href={`/tours/create/${code}?path=${path}`} iconRight={faPlus}>Add Tour</MenuButton>
       </div>
       <BreadCrumb>
         <BreadCrumb.Item href="/">

@@ -22,7 +22,7 @@ export const getActiveTours = async (accountId:number) => {
   })
 }
 
-export const getTourPageProps = async (ctx) => {
+export const getTourPageProps = async (ctx: any) => {
   const { ShowCode } = ctx.params
   const email = await getEmailFromReq(ctx.req)
   const AccountId = await getAccountId(email)
@@ -33,25 +33,27 @@ export const getTourPageProps = async (ctx) => {
       AccountId
     },
     select: {
-      Id: true
+      Id: true,
+      Code: true
     }
   })
 
-  if (!showRaw) return { notFound: true }
+  if (!showRaw) return { notFound: true, props: {} }
 
   const show = await getShowWithToursById(showRaw.Id)
   const tours = tourMapper(show)
 
-  return { props: { tours, id: show.Id, name: show.Name } }
+  return { props: { tours, code: show.Code, name: show.Name } }
 }
 
-export const lookupTourId = async (ShowCode: string, TourCode: string) => {
+export const lookupTourId = async (ShowCode: string, TourCode: string, AccountId: number) => {
   return prisma.tour.findFirst(
     {
       where: {
         Code: TourCode as string,
         Show: {
-          Code: ShowCode as string
+          Code: ShowCode as string,
+          AccountId
         }
       },
       select: {

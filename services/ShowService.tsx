@@ -51,3 +51,17 @@ export const getShowById = async (Id: number) => {
     }
   })
 }
+
+export const lookupShowCode = async (Code: string, AccountId: number) => {
+  const show = await prisma.show.findUnique({
+    where: {
+      Code,
+      AccountId
+    },
+    select: {
+      Id: true
+    }
+  })
+
+  return show ? show.Id : undefined
+}

@@ -7,9 +7,6 @@ import { GetServerSideProps } from 'next'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Link from 'next/link'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { FormContainer } from 'components/global/forms/FormContainer'
 import showTypes from 'data/showTypes.json'
 import { useRouter } from 'next/router'
@@ -17,6 +14,7 @@ import { showMapper } from 'lib/mappers'
 import { ShowDTO } from 'interfaces'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 import { BreadCrumb } from 'components/global/BreadCrumb'
+import { checkAccess, getEmailFromReq } from 'services/userService'
 
 type Props = {
   show: ShowDTO
@@ -24,6 +22,7 @@ type Props = {
 
 const EditShow = ({ show }: Props) => {
   const router = useRouter()
+  const { path } = router.query
 
   const [status, setStatus] = useState({
     submitted: true,
@@ -73,7 +72,7 @@ const EditShow = ({ show }: Props) => {
         'Thank you, your message has been submitted.'
       )
 
-      router.push('/shows')
+      router.push(`/${path}`)
     }).catch((error) => {
       loggingService.logError(error)
 
@@ -108,8 +107,14 @@ const EditShow = ({ show }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const showId = ctx.params.ShowId as string
-  const show = await getShowById(parseInt(showId))
+  const ShowId = parseInt(ctx.params.ShowId as string)
+
+  const email = await getEmailFromReq(ctx.req)
+  const access = await checkAccess(email, { ShowId })
+
+  if (!access) return { notFound: true }
+
+  const show = await getShowById(ShowId)
 
   return { props: { show: showMapper(show) } }
 }
