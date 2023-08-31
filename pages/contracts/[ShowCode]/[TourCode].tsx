@@ -9,6 +9,7 @@ import GlobalToolbar from 'components/toolbar'
 import { bookingMapper } from 'lib/mappers'
 import { BookingDTO } from 'interfaces'
 import { getTourJumpState } from 'utils/getTourJumpState'
+import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService'
 
 interface ContractsProps {
   bookings: BookingDTO[]
@@ -50,7 +51,15 @@ interface Params extends ParsedUrlQuery {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ShowCode, TourCode } = ctx.query as Params
   const tourJump = await getTourJumpState(ctx, 'contracts')
-  const { Id } = await lookupTourId(ShowCode, TourCode)
+
+  const email = await getEmailFromReq(ctx.req)
+  const AccountId = await getAccountId(email)
+
+  const { Id } = await lookupTourId(ShowCode, TourCode, AccountId)
+
+  const access = checkAccess(email, { TourId: Id })
+  if (!access) return { notFound: true }
+
   const tour: TourContent = await getTourWithContent(Id)
   const bookings = tour.DateBlock.map(x => x.Booking).flat().map(bookingMapper)
 

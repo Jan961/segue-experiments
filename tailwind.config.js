@@ -1,7 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-const colors = require('tailwindcss/colors')
 const colorsConfig = {
-  ...colors,
   'primary-orange': '#ec6255',
   'primary-yellow': '#fdce74',
   'primary-green': '#41a29a',
@@ -28,7 +26,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-	  fontFamily: {
+	    fontFamily: {
         primary: ['Ubuntu']
       },
       colors: colorsConfig,

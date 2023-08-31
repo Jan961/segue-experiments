@@ -24,7 +24,7 @@ import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
 import { getTourJumpState } from 'utils/getTourJumpState'
 import { viewState } from 'state/booking/viewState'
-import { checkAccess, getEmailFromReq } from 'services/userService'
+import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService'
 
 interface bookingProps {
   Id: number,
@@ -176,16 +176,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
+  const email = await getEmailFromReq(ctx.req)
+  const AccountId = await getAccountId(email)
 
   const { ShowCode, TourCode } = ctx.query as Params
   console.log(`ServerSideProps: ${ShowCode}/${TourCode}`)
-  const { Id } = await lookupTourId(ShowCode, TourCode) || {}
+  const { Id } = await lookupTourId(ShowCode, TourCode, AccountId) || {}
 
   if (!Id) return { notFound: true }
 
   console.log(`Found tour ${Id}`)
 
-  const email = await getEmailFromReq(ctx.req)
   const access = await checkAccess(email, { TourId: Id })
 
   if (!access) return { notFound: true }
