@@ -122,8 +122,14 @@ const BookingPage = ({ Id }: bookingProps) => {
                   Week No. & Date
                 </div>
                 <div className="col-span-8 lg:col-span-9 grid grid-cols-10">
-                  <div className='col-span-7 p-2'>
+                  <div className='col-span-5 p-2'>
                     Venue
+                  </div>
+                  <div className='col-span-1 p-2'>
+                    Town
+                  </div>
+                  <div className='col-span-1 p-2'>
+                    Seats
                   </div>
                   <div className='col-span-1 p-2'>
                     Perf(s)
@@ -231,7 +237,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       performance,
       dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
       // Remove extra info
-      venue: objectify(venues, v => v.Id, (v: any) => ({ Id: v.Id, Code: v.Code, Name: v.Name, Town: v.VenueAddress?.[0]?.VenueAddressTown || null }))
+      venue: objectify(venues, v => v.Id, (v: any) => {
+        const Town:string|null = v.VenueAddress.find((address:any) => address?.VenueAddressTypeName === 'Main')?.VenueAddressTown || null
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats }
+      })
     }
   }
 
