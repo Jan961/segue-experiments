@@ -14,6 +14,7 @@ import { VenueSelector } from './components/VenueSelector'
 import { getNextId } from './utils/getNextId'
 import { distanceState } from 'state/booking/distanceState'
 import { FormInputText } from 'components/global/forms/FormInputText'
+import classNames from 'classnames'
 
 interface BookingPanelProps {
   bookingId: number
@@ -129,8 +130,8 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             venueId={inputs.VenueId} />
         </div>
 
-        <div className="flex flex-row justify-between gap-4">
-          <FormInputSelect inline
+        <div className={classNames('flex flex-row justify-between gap-4', { '!justify-end': inputs.StatusCode === 'C' })}>
+          {inputs.StatusCode !== 'C' && <FormInputSelect inline
             className="w-28 mb-0"
             value={inputs.PencilNum}
             onChange={handleOnChange}
@@ -138,7 +139,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             name="PencilNum"
             label="Pencil"
             disabled={submitting || notFirst}
-          />
+          />}
           <FormInputSelect inline
             value={inputs.StatusCode}
             className="mb-0"

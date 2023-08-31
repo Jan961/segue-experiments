@@ -35,7 +35,6 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
   }
 
   const active = view.selected?.id === bookingId && view.selected?.type === 'booking' && date.startsWith(view.selectedDate)
-
   return (
     <div className={`grid grid-cols-10 p-1 px-2 rounded border border-l-8
     text-center
@@ -43,8 +42,14 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
     ${active ? 'border-gray-400 bg-gray-300 shadow bg-opacity-100' : 'hover:bg-opacity-100 hover:bg-gray-200'}
     `}
     onClick={select}>
-      <div className="col-span-7 text-center">
+      <div className="col-span-5 text-center">
         { venue ? venue.Name : 'No Venue' }
+      </div>
+      <div className="col-span-1 text-center">
+        { venue ? venue.Town : '' }
+      </div>
+      <div className="col-span-1 text-center">
+        { venue ? venue.Seats : '' }
       </div>
       <div className="col-span-1">
         { performanceCount }

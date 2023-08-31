@@ -30,7 +30,7 @@ export const getTourPageProps = async (ctx) => {
     }
   })
 
-  const show = await getShowWithToursById(showRaw.Id)
+  const show = await getShowWithToursById(showRaw?.Id)
   const tours = tourMapper(show)
 
   return { props: { tours, id: show.Id } }

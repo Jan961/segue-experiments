@@ -11,9 +11,11 @@ export const getAllVenuesMin = async () => {
         Id: true,
         Name: true,
         Code: true,
+        Seats: true,
         VenueAddress: {
           select: {
-            VenueAddressTown: true
+            VenueAddressTown: true,
+            VenueAddressTypeName: true
           }
         }
       }
