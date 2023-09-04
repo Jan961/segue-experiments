@@ -6,7 +6,7 @@ import axios from 'axios'
 import { StyledDialog } from 'components/global/StyledDialog'
 import { Spinner } from 'components/global/Spinner'
 
-export default function Report (TourId) {
+export default function Report ({ TourId }:{TourId:number}) {
   const [tourSummary, setTourSummary] = useState<any[]>([])
   const [showModal, setShowModal] = useState<boolean>(false)
   const [loading, setIsLoading] = useState<boolean>(false)
@@ -20,12 +20,12 @@ export default function Report (TourId) {
         setTourSummary(response.data.data)
       }
     }).catch(error => {
-      console.log('====Error===', error)
+      console.log('Error:', error)
     }).finally(() => setIsLoading(false))
   }, [])
   useEffect(() => {
-    if (fullTourCode)fetchTourSummary(fullTourCode)
-  }, [fullTourCode])
+    if (TourId)fetchTourSummary(TourId)
+  }, [TourId])
   return (
     <>
       <ToolbarButton
@@ -58,29 +58,6 @@ export default function Report (TourId) {
               </div>)
               : <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
           }
-          {/* { tourSummary.length
-            ? <DL>
-              {
-                tourSummary.map((summaryGroup, i) => (
-                  <div key={i}>
-                    {
-                      summaryGroup.map((summaryItem, j) => (
-                        <div key={j}>
-                          <DL.Term>
-                            {summaryItem.name}
-                          </DL.Term>
-                          <DL.Desc>
-                            {summaryItem.value}
-                          </DL.Desc>
-                        </div>
-                      ))
-                    }
-                  </div>
-                ))
-              }
-            </DL>
-            : <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
-          } */}
         </div>
       </StyledDialog>
     </>

@@ -5,7 +5,7 @@ import { faChartPie } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import { getDateDaysAgo, toISO } from 'services/dateService'
 import formatDate from 'utils/formatDate'
-import { range } from 'services/reportsService'
+import { getCurrentMondayDate, range } from 'services/reportsService'
 import axios from 'axios'
 
 type Props={
@@ -39,6 +39,8 @@ export default function SalesSummarySimple ({ activeTours, activeTour }:Props) {
   const fetchTourWeek = async (tourId:number) => {
     const weeks:TourWeek[] = await axios.get(`/api/reports/tourWeek/${tourId}`).then(data => data.data)
     setTourWeeks(weeks)
+    const currentWeekMonday = getCurrentMondayDate()
+    setInputs(prev => ({ ...prev, tourWeek: currentWeekMonday }))
   }
   function weeksBefore (date, weeks) {
     return getDateDaysAgo(date, weeks)
