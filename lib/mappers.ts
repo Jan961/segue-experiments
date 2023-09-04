@@ -131,7 +131,8 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   ActivityTypeId: a.ActivityTypeId,
   CompanyCost: Number(a.CompanyCost),
   VenueCost: Number(a.VenueCost),
-  FollowUpRequired: a.FollowUpRequired
+  FollowUpRequired: a.FollowUpRequired,
+  Notes: a.ActivityNotes
 })
 
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({
