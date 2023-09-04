@@ -3,6 +3,7 @@ import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { PerformanceDTO, BookingDTO } from 'interfaces'
 import { calculateWeekNumber } from 'services/dateService'
+import { group } from 'radash'
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[]
@@ -21,6 +22,9 @@ export type SummaryResponseDTO = {
     Date: string
     StartDate: string
     week:number
+    numberOfDays:number
+    lastDate:string
+    salesFigureDate:string
   }
   Notes: {
     BookingDealNotes:string,
@@ -45,14 +49,16 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     })
 
     const performances:any[] = await prisma.performance.findMany({
-      distinct: ['Date'],
+      where: {
+        BookingId
+      },
       select: {
         Id: true,
         Date: true,
         Time: true
       },
-      where: {
-        BookingId
+      orderBy: {
+        Date: 'asc'
       }
     })
     const NumberOfPerformances: number = performances.length
@@ -147,8 +153,11 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       },
       TourInfo: {
         StartDate: booking?.DateBlock.StartDate,
-        Date: salesSummary.SaleFiguresDate,
-        week: currentTourWeekNum
+        Date: performances?.[0]?.Date,
+        salesFigureDate: salesSummary.SaleFiguresDate,
+        week: currentTourWeekNum,
+        lastDate: performances?.[performances?.length - 1]?.Date,
+        numberOfDays: Object.keys(group(performances, performance => performance.Date)).length
       },
       Notes: {
         BookingDealNotes,
