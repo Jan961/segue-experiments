@@ -171,6 +171,7 @@ export type ActivityDTO = {
   CompanyCost: number
   VenueCost: number
   FollowUpRequired: boolean
+  Notes: string
 }
 
 export type BookingContactNoteDTO = {

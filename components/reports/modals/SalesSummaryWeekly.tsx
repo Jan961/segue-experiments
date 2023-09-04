@@ -4,7 +4,7 @@ import { getDateDaysAgo, toISO, toSql } from '../../../services/dateService'
 import IconWithText from '../IconWithText'
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
-import { range } from 'services/reportsService'
+import { getCurrentMondayDate, range } from 'services/reportsService'
 
 function formatDate (date) {
   return toSql(date)
@@ -81,6 +81,8 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
           setTourWeeks([])
           // Set tour weeks with data
           setTourWeeks(data || [])
+          const currentWeekMonday = getCurrentMondayDate()
+          setInputs(prev => ({ ...prev, TourWeek: currentWeekMonday }))
         })
     }
     setInputs((prev) => ({
@@ -152,7 +154,6 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           value={inputs.TourWeek}
                           id="TourWeek"
                           name="TourWeek"
-
                           onChange={handleOnChange}>
                           <option key="default">Select a Tour Week</option>
                           {tourWeeks.map((week) => (

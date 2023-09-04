@@ -14,28 +14,10 @@ type ScheduleView = {
   DateTypeName: string;
   SeqNo: string;
   DateTypeId: number;
+  StatusCode?:string;
+  Count?:number;
 };
 
-const ShowStatusCodeMap = {
-  C: 'Confirmed Performances',
-  U: 'Pencilled Performances',
-  X: 'Suspended Performances'
-}
-
-const getSummaryByKey = (data: any[], key, include = []): any => {
-  return Object.values(
-    mapValues(
-      group(data, (item) => item[key]),
-      (group, name) => {
-        return {
-          name,
-          value: group.length,
-          ...pick(group?.[0], include)
-        }
-      }
-    )
-  )
-}
 
 export default async function handler (
   req: NextApiRequest,
@@ -43,76 +25,48 @@ export default async function handler (
 ) {
   try {
     const { FullTourCode } = req.query
-    let showDays = 0
     const data: ScheduleView[] =
-      await prisma.$queryRaw`SELECT TourId, RehearsalStartDate, EntryType, EntryStatusCode, EntryName, VenueId, TourStartDate, TourEndDate, DateTypeName, SeqNo, DateTypeId, AffectsAvailability FROM ScheduleView where FullTourCode=${FullTourCode}`
+      await prisma.$queryRaw`SELECT TourId, RehearsalStartDate, EntryType, EntryStatusCode, EntryName, VenueId, TourStartDate, TourEndDate, DateTypeName, SeqNo, DateTypeId, AffectsAvailability FROM ScheduleView where TourId=${FullTourCode}`
+    const tourView:any[] = await prisma.$queryRaw`SELECT * from TourView where TourId=${FullTourCode}`
+    const tourPerformanceSummary:Partial<ScheduleView>[] = await prisma.$queryRaw`SELECT * from TourPerformanceSummaryView where TourId=${FullTourCode}`
+    const tourSummary:any[] = await prisma.$queryRaw`SELECT * from TourSummaryView where TourId=${FullTourCode}`
+    console.log(data)
     // const tourStartDate = moment(data?.[0]?.TourStartDate)
-    const tourEndDate = moment(data?.[0]?.TourEndDate)
-    const rehearsalStartDate = moment(data?.[0]?.RehearsalStartDate)
+    const tour = tourView?.[0]
+    const tourEndDate = moment(tour.TourEndDate)
+    const rehearsalStartDate = moment(tour.RehearsalStartDate)
     const numberOfWeeks = tourEndDate.diff(rehearsalStartDate, 'weeks')
     const numberOfDays = tourEndDate.diff(rehearsalStartDate, 'days') + 1
     const workingDays = numberOfDays - numberOfWeeks
-    const workingDayTypes = [
-      'Show Days',
-      'Rehearsal',
-      'GetInFitUp',
-      'Travel Day',
-      'Declared Holiday'
-    ]
-    const summaryByEntryStatus = getSummaryByKey(data, 'EntryStatusCode')?.map(
-      (summaryItem: any) => ({
-        ...summaryItem,
-        name: ShowStatusCodeMap[summaryItem.name]
-      })
-    )
-    const pencilledBookings = data.filter(
+    const pencilledBookings = sum(tourSummary.filter(
       (entry) =>
-        entry.DateTypeName === 'Booking' && entry.EntryStatusCode === 'U'
-    ).length
-    const cancelledBookings = data.filter(
+        entry.Item === 'Booking' && entry.StatusCode === 'U'
+    ).map(summary => Number(summary.Count)))
+    const cancelledBookings = sum(tourSummary.filter(
       (entry) =>
-        entry.DateTypeName === 'Booking' && entry.EntryStatusCode === 'X'
-    ).length
-    const bookings = data.filter(
+        entry.Item === 'Booking' && entry.StatusCode === 'X'
+    ).map(summary => Number(summary.Count)))
+    const bookings = sum(tourSummary.filter(
       (entry) =>
-        entry.DateTypeName === 'Booking' && entry.EntryStatusCode === 'C'
-    ).length
-    const pencilledRehearsals = data.filter(
+        entry.Item === 'Booking' && entry.StatusCode === 'C'
+    ).map(summary => Number(summary.Count)))
+    const pencilledRehearsals = sum(tourSummary.filter(
       (entry) =>
-        entry.DateTypeName === 'Rehearsal' && entry.EntryStatusCode === 'U'
-    ).length
-    const pencilledDayOff = data.filter(
-      (entry) => entry.DateTypeId === 6 && entry.EntryStatusCode === 'U'
-    ).length
-    console.log('====', {
-      pencilledBookings,
-      bookings,
-      pencilledRehearsals,
-      cancelledBookings,
-      pencilledDayOff
-    })
-    const entryTypeSummary = getSummaryByKey(
-      data.filter((item) => item.EntryStatusCode !== 'X'),
-      'DateTypeName',
-      ['AffectsAvailability', 'DateTypeId', 'DateTypeName', 'SeqNo']
-    )
-      ?.filter((summaryItem: any) => {
-        if (summaryItem.name === 'Booking') {
-          showDays = summaryItem.value
-          // return { ...summaryItem, name: 'Bookings', value: showDays }
-          return false
-        }
-        return summaryItem
-      })
-      .sort((a, b) => parseInt(a.SeqNo) - parseInt(b.SeqNo))
+        entry.Item === 'Rehearsal' && entry.StatusCode === 'U'
+    ).map(summary => Number(summary.Count)))
+    const pencilledDayOff = sum(tourSummary.filter(
+      (entry) => entry.DateTypeId === 6 && entry.StatusCode === 'U'
+    ).map(summary => Number(summary.Count)))
+    const entryTypeSummary = tourSummary.filter(summaryItem => summaryItem.StatusCode === 'C' && !['Booking', 'Rehearsal'].includes(summaryItem.Item)).sort((a, b) => a.DateTypeSeqNo - b.DateTypeSeqNo).map(item => ({ name: item.Item, value: Number(item.Count) }))
     const otherDays = sum(
-      entryTypeSummary
-        .filter((item) => workingDayTypes.includes(item.name))
-        .map((item) => item.value)
+      tourSummary
+        .filter((item) => item.StatusCode === 'C' && item.Item !== 'Rehearsal')
+        .map((item) => Number(item.Count))
     )
     const totalPerformances = sum(
-      summaryByEntryStatus.map((item) => item.value)
+      tourPerformanceSummary.filter(item => item.StatusCode === 'C').map((item) => Number(item.Count))
     )
+    const cancelledPerformances = tourPerformanceSummary.find(summary => summary.StatusCode === 'X')?.Count || 0
     const totalVenuesonTour: number = Object.keys(
       group(data, (item: any) => item?.VenueId)
     ).length
@@ -122,56 +76,60 @@ export default async function handler (
         [
           {
             name: 'Tour Duration Days',
-            value: numberOfDays
+            value: numberOfDays || 0
           }
         ],
         [
           {
             name: 'Available Working Days',
-            value: workingDays
+            value: workingDays || 0
           }
         ],
         [
           {
             name: 'Bookings(Pencilled)',
-            value: pencilledBookings
+            value: pencilledBookings || 0
           },
           {
             name: 'Bookings',
-            value: bookings
+            value: bookings || 0
           },
           ...entryTypeSummary
         ],
         [
           {
             name: 'Remaining Days',
-            value: workingDays - otherDays
+            value: (workingDays - otherDays) || 0
           }
         ],
         [
           {
             name: 'Bookings(Cancelled)',
-            value: cancelledBookings
+            value: cancelledBookings || 0
           },
           {
             name: 'Rehearsals(Pencilled)',
-            value: pencilledRehearsals
+            value: pencilledRehearsals || 0
           },
           {
             name: 'Day Off(Pencilled)',
-            value: pencilledDayOff
+            value: pencilledDayOff || 0
           }
         ],
         [
           {
             name: 'Total Performances',
-            value: totalPerformances
+            value: totalPerformances || 0
+          },
+          {
+            name: 'Performances(Cancelled)',
+            value: Number(cancelledPerformances) || 0
           }
         ],
         [
           {
             name: 'Venues on Tour',
-            value: totalVenuesonTour
+            value: totalVenuesonTour || 0
           }
         ]
       ]

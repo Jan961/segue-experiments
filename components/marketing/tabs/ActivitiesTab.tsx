@@ -152,6 +152,9 @@ export const ActivitiesTab = () => {
             <Table.HeaderCell className="w-20">
             Venue Cost
             </Table.HeaderCell>
+            <Table.HeaderCell className='w-3/4'>
+              Notes
+            </Table.HeaderCell>
           </Table.HeaderRow>
           <Table.Body>
             {data.activities.map((activity) => (
@@ -173,6 +176,9 @@ export const ActivitiesTab = () => {
                 </Table.Cell>
                 <Table.Cell className='text-right'>
                   {activity.VenueCost ? numeral(activity.VenueCost).format('£0,0.00') : ''}
+                </Table.Cell>
+                <Table.Cell className=''>
+                  {activity.Notes}
                 </Table.Cell>
               </Table.Row>
             ))}
