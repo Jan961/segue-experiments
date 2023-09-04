@@ -81,6 +81,10 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
           setTourWeeks([])
           // Set tour weeks with data
           setTourWeeks(data || [])
+          const currentSunday = moment(new Date().toDateString()).startOf('isoWeek')
+          const currentWeekMonday = currentSunday.clone().add(1, 'day').toISOString()
+          console.log(data.find(x => x.mondayDate === currentWeekMonday), currentWeekMonday)
+          setInputs(prev => ({ ...prev, TourWeek: currentWeekMonday }))
         })
     }
     setInputs((prev) => ({
@@ -152,7 +156,6 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
                           value={inputs.TourWeek}
                           id="TourWeek"
                           name="TourWeek"
-
                           onChange={handleOnChange}>
                           <option key="default">Select a Tour Week</option>
                           {tourWeeks.map((week) => (
