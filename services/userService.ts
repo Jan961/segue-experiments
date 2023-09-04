@@ -41,6 +41,7 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email)
 }
 
+// Check access based on the second paramater. Can pass multiple to it if wanted (but will increase workload)
 export const checkAccess = async (email: string, items: AccessCheck): Promise<boolean> => {
   const user = await prisma.user.findUnique({
     where: {
@@ -82,7 +83,7 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
       }
     })
 
-    successes.push(tour.length > 0)
+    successes.push(!!tour)
   }
   if (items.DateBlockId) {
     const dateblock = await prisma.dateblock.findFirst({
@@ -102,33 +103,34 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
         Id: true
       }
     })
-    if (items.BookingId) {
-      const booking = await prisma.booking.findMany({
-        where: {
-          Id: items.BookingId,
-          DateBlock: {
-            is: {
-              Tour: {
-                is: {
-                  Show: {
-                    is: {
-                      AccountId: user.AccountId
-                    }
+
+    successes.push(!!dateblock)
+  }
+
+  if (items.BookingId) {
+    const booking = await prisma.booking.findFirst({
+      where: {
+        Id: items.BookingId,
+        DateBlock: {
+          is: {
+            Tour: {
+              is: {
+                Show: {
+                  is: {
+                    AccountId: user.AccountId
                   }
                 }
               }
             }
           }
-        },
-        select: {
-          Id: true
         }
-      })
+      },
+      select: {
+        Id: true
+      }
+    })
 
-      successes.push(booking.length > 0)
-    }
-
-    successes.push(dateblock.length > 0)
+    successes.push(!!booking)
   }
 
   return successes.filter(x => !x).length === 0
