@@ -4,7 +4,7 @@ import { getDateDaysAgo, toISO, toSql } from '../../../services/dateService'
 import IconWithText from '../IconWithText'
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
-import { range } from 'services/reportsService'
+import { getCurrentMondayDate, range } from 'services/reportsService'
 
 function formatDate (date) {
   return toSql(date)
@@ -81,9 +81,7 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
           setTourWeeks([])
           // Set tour weeks with data
           setTourWeeks(data || [])
-          const currentSunday = moment(new Date().toDateString()).startOf('isoWeek')
-          const currentWeekMonday = currentSunday.clone().add(1, 'day').toISOString()
-          console.log(data.find(x => x.mondayDate === currentWeekMonday), currentWeekMonday)
+          const currentWeekMonday = getCurrentMondayDate()
           setInputs(prev => ({ ...prev, TourWeek: currentWeekMonday }))
         })
     }

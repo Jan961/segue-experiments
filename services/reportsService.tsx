@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export const addWidthAsPerContent = ({ worksheet, fromColNumber, toColNumber, startingColAsCharWIthCapsOn, minColWidth = 10, maxColWidth = 60, bufferWidth = 0, rowsToIgnore, htmlFields = [] }: { worksheet: any, fromColNumber: number, toColNumber: number, startingColAsCharWIthCapsOn: string, minColWidth?: number, maxColWidth?: number, bufferWidth?: number, rowsToIgnore: number, htmlFields?: string[] }) => {
   for (let char = startingColAsCharWIthCapsOn, i = fromColNumber; i <= toColNumber; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
     let maxWidth = 0
@@ -32,3 +34,8 @@ const getHTMLFieldMaxWidth = (text:string) => {
 }
 
 export const range = (start:number, end:number) => Array.from({ length: end - start + 1 }, (_, index) => start + index)
+
+export const getCurrentMondayDate = () => {
+  const currentSunday = moment(new Date().toDateString()).startOf('isoWeek')
+  return currentSunday.clone().add(1, 'day').toISOString()
+}

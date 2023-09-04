@@ -4,7 +4,7 @@ import IconWithText from '../IconWithText'
 import { faChartPie } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import axios from 'axios'
-import { range } from 'services/reportsService'
+import { getCurrentMondayDate, range } from 'services/reportsService'
 
 function formatDate (date) {
   return toSql(date)
@@ -84,6 +84,8 @@ export default function SalesVsCapacity ({ activeTours }:Props) {
           setTourWeeks([])
           // Set tour weeks with data
           setTourWeeks(data || [])
+          const currentWeekMonday = getCurrentMondayDate()
+          setInputs(prev => ({ ...prev, TourWeek: currentWeekMonday }))
         })
     }
     setInputs((prev) => ({
