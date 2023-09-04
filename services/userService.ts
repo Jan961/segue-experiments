@@ -7,6 +7,7 @@ interface AccessCheck {
   TourId?: number
   AccountId?: number
   DateBlockId?: number
+  BookingId?: number
 }
 
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
@@ -35,6 +36,11 @@ export const getEmailFromReq = async (req: any) => {
   return getEmailAddressForClerkId(userId)
 }
 
+export const getAccountIdFromReq = async (req: any) => {
+  const email = await getEmailFromReq(req)
+  return getAccountId(email)
+}
+
 export const checkAccess = async (email: string, items: AccessCheck): Promise<boolean> => {
   const user = await prisma.user.findUnique({
     where: {
@@ -48,7 +54,7 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
   const successes = [true]
 
   if (items.ShowId) {
-    const show = await prisma.show.findUnique({
+    const show = await prisma.show.findFirst({
       where: {
         Id: items.ShowId,
         AccountId: user.AccountId
@@ -62,12 +68,12 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     successes.push(!!show)
   }
   if (items.TourId) {
-    const tour = await prisma.tour.findMany({
+    const tour = await prisma.tour.findFirst({
       where: {
         Id: items.TourId,
         Show: {
           is: {
-            AccountId: user.AccountId // replace with the ID you're looking for
+            AccountId: user.AccountId
           }
         }
       },
@@ -86,7 +92,7 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
           is: {
             Show: {
               is: {
-                AccountId: user.AccountId // replace with the ID you're looking for
+                AccountId: user.AccountId
               }
             }
           }
@@ -96,6 +102,31 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
         Id: true
       }
     })
+    if (items.BookingId) {
+      const booking = await prisma.booking.findMany({
+        where: {
+          Id: items.BookingId,
+          DateBlock: {
+            is: {
+              Tour: {
+                is: {
+                  Show: {
+                    is: {
+                      AccountId: user.AccountId
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        select: {
+          Id: true
+        }
+      })
+
+      successes.push(booking.length > 0)
+    }
 
     successes.push(dateblock.length > 0)
   }
