@@ -20,17 +20,7 @@ export default async function handle (req, res) {
 
     const result = []
     for (const p of performanceRaw) {
-      const availableCompIds = p.AvailableComp.map((x: AvailableComp) => x.Id)
-
-      const note = availableCompIds.length
-        ? await prisma.note.findFirst({
-          where: {
-            OwnerId: availableCompIds[0],
-            OwnerType: 'AvailableComp'
-          }
-        })
-        : null
-
+      const note = p.AvailableComp[0]?.AvailableCompNotes || ''
       let totalAllocated = 0
       let totalAvailable = 0
       const allocated = []
@@ -48,7 +38,7 @@ export default async function handle (req, res) {
 
       result.push({
         info: performanceMapper(p),
-        note: note ? note.Text : '',
+        note,
         availableCompId,
         totalAvailable,
         totalAllocated,
