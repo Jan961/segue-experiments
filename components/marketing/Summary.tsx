@@ -56,19 +56,31 @@ export const Summary = () => {
       <h3 className='mb-1 text-base font-bold text-primary-blue'>General Info</h3>
       <DL>
         <DL.Term>
-          Date
+          First Date
         </DL.Term>
         <DL.Desc>
           {dateToSimple(summary?.TourInfo?.Date)}
         </DL.Desc>
         <DL.Term>
-          Week No
+          Last Date
+        </DL.Term>
+        <DL.Desc>
+          {dateToSimple(summary?.TourInfo?.lastDate)}
+        </DL.Desc>
+        <DL.Term>
+          Number of Day(s)
+        </DL.Term>
+        <DL.Desc>
+          {summary?.TourInfo?.numberOfDays}
+        </DL.Desc>
+        <DL.Term>
+          Tour Week No
         </DL.Term>
         <DL.Desc>
           {weekNo}
         </DL.Desc>
         <DL.Term>
-          Times
+          Performance Time(s)
         </DL.Term>
         <DL.Desc>
           {summary.Performances?.map?.(x => `${dateToSimple(x.Date)} ${dateTimeToTime(x.Time)}`).join(', ') || 'N/A' }
@@ -83,7 +95,7 @@ export const Summary = () => {
           {numeral(info.Seats).format('0,0') || '-'}
         </DL.Desc>
         <DL.Term>
-          Total Sales
+          Total Sales ({currency})
         </DL.Term>
         <DL.Desc>
           {info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'}

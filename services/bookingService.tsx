@@ -69,7 +69,8 @@ export const getSaleableBookings = async (TourId: number) => {
     where: {
       DateBlock: {
         is: {
-          TourId
+          TourId,
+          Name: 'Tour'
         }
       },
       VenueId: {

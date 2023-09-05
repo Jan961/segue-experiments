@@ -110,10 +110,11 @@ export const SalesTab = () => {
             <Table.Body className='h-full overflow-y-auto'>
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i)
+                const isLast = (bookingSales?.length - 1) === i
                 return (
                   <Table.Row key={sale.week}>
                     <Table.Cell className="whitespace-nowrap max-w-fit">
-                      {sale.week.replace('Week-', 'Wk ')}
+                      {isLast ? 'Final' : sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>
                     <Table.Cell>
                       {sale.weekOf}
