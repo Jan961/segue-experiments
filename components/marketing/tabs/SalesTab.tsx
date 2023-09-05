@@ -14,7 +14,6 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { NoDataWarning } from '../NoDataWarning'
 import { LoadingTab } from './LoadingTab'
 import classNames from 'classnames'
-import { Summary } from '../Summary'
 
 interface IndicatorProps { icon: IconDefinition, active: boolean, tooltip: string }
 const Indicator = ({ icon, active = false, tooltip }: IndicatorProps) => {
