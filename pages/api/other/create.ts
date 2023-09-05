@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma'
 import { otherMapper } from 'lib/mappers'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 export interface CreateOtherParams {
   Date: string
@@ -11,6 +12,10 @@ export interface CreateOtherParams {
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
     const other = req.body as CreateOtherParams
+
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { DateBlockId: other.DateBlockId })
+    if (!access) return res.status(401)
 
     const result = await prisma.other.create({
       data: {
