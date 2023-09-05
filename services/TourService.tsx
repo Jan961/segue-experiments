@@ -63,7 +63,7 @@ export const lookupTourId = async (ShowCode: string, TourCode: string, AccountId
   )
 }
 
-export const getAllTours = async () => {
+export const getAllTours = async (AccountId: number) => {
   return prisma.tour.findMany({
     select: {
       Id: true,
@@ -73,6 +73,13 @@ export const getAllTours = async () => {
         select: {
           Code: true,
           Name: true
+        }
+      }
+    },
+    where: {
+      Show: {
+        is: {
+          AccountId
         }
       }
     }
