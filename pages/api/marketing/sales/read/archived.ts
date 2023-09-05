@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client'
 import prisma from 'lib/prisma'
 import { TSalesView } from 'types/MarketingTypes'
+import numeral from 'numeral'
 
 export type SeatsInfo = {
     Seats: number | null,
@@ -12,7 +13,7 @@ export type SeatsInfo = {
 const getSeatsRelatedInfo = (param:TSalesView): SeatsInfo => (
   {
     Seats: param.Seats,
-    ValueWithCurrencySymbol: param.Value ? `${param.VenueCurrencySymbol}${param.Value}` : '',
+    ValueWithCurrencySymbol: param.Value ? `${param.VenueCurrencySymbol + numeral(param.Value).format('0,0.00')}` : '',
     BookingId: param.BookingId,
     DataFound: true
   }
@@ -33,6 +34,7 @@ const rearrangeArray = ({ arr, bookingIds }: {arr: TSalesView[], bookingIds: num
   for (let i = 0; i < totalBookings; i++) {
     for (let j = 0; j < arr.length; j++) {
       if (arr[j].BookingId === bookingIds[i]) {
+        console.log('===', arr[j])
         arrangedArray.push(getSeatsRelatedInfo(arr[j]))
         break
       }

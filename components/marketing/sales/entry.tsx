@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
-import { dateToSimple } from 'services/dateService'
+import { dateToSimple, toSql } from 'services/dateService'
 import axios from 'axios'
 import { LoadingPage } from 'components/global/LoadingPage'
 import { useRecoilValue } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
+import Typeahead from 'components/Typeahead'
+import moment from 'moment'
 
 interface props {
   searchFilter: String;
@@ -16,42 +18,62 @@ export default function Entry ({ searchFilter }: props) {
   const [holds, setHolds] = useState<any>({})
   const [comps, setComps] = useState<any>({})
   const [inputs, setInputs] = useState<any>({})
+  const [sale, setSale] = useState<any>({})
+  const [notes, setNotes] = useState<any>({})
   const { tours } = useRecoilValue(tourJumpState)
-  // tours===>`/api/tours/read/notArchived/${userService.userValue.accountId}
-  // loaded emails====>/api/marketing/sales/emailImport/${AccountId}/${type}
-  // Tour Dates====>`/api/tours/read/tourDates/${TourID}`
-  // Venue Date=====> `/api/tours/read/week/${TourId}`
-  // Sales Week Venues====> `/api/bookings/ShowWeek/${inputs.SetTour}/${MondayDate}/${SundayDate}`
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
-      fetch(`/api/reports/tourWeek/${tourId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          SetSalesWeeks(data?.data || [])
-        })
+      axios.get(`/api/reports/tourWeek/${tourId}`)
+        .then((data:any) => SetSalesWeeks(data.data || []))
     }
   }
   const fetchVenues = (tourId) => {
     if (tourId) {
-      fetch(`/api/tours/read/venues/${tourId}`)
-        .then((res) => res.json())
+      axios.get(`/api/tours/read/venues/${tourId}`)
         .then(data => data.data)
         .then((data) => {
-          SetSalesWeeksVenues(data)
+          SetSalesWeeksVenues(data.data)
         })
     }
   }
   const fetchSales = (SetSalesFiguresDate, SetBookingId) => {
-    axios.post('/api/marketing/sales/read', { SetSalesFiguresDate, SetBookingId })
+    setHolds({})
+    setComps({})
+    setNotes({})
+    setSale({})
+    setLoading(false)
+    axios.post('/api/marketing/sales/read', { SetSalesFiguresDate: moment(SetSalesFiguresDate).toISOString().split('T')[0], SetBookingId })
+      .then(data => data.data)
       .then((data) => {
-        // SetSalesWeeksVenues(data)
-      }).catch(error => console.log(error))
+        const { Notes, SetHold, SetComp, Sale } = data || {}
+        const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
+        const holdValues = SetHold?.reduce?.((holds, hold) => {
+          holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
+          return holds
+        }, {})
+        setHolds(holdValues)
+        setComps(SetComp?.reduce?.((comps, comp) => {
+          comps[comp.CompTypeId] = comp.CompSeats
+          return comps
+        }, {}))
+        setNotes(prev => ({
+          ...prev,
+          BookingSaleNotes,
+          CompNotes,
+          HoldNotes
+        }))
+        setSale(prev => ({
+          ...prev,
+          ...Sale
+        }))
+      })
+      .catch(error => console.log(error))
+      .finally(() => setLoading(false))
   }
   const fetchOptionTypes = () => {
     axios.get('/api/marketing/sales/options')
       .then((data) => {
         setOptions(data.data)
-        // SetSalesWeeksVenues(data)
       }).catch(error => console.log(error))
   }
   useEffect(() => {
@@ -72,12 +94,28 @@ export default function Entry ({ searchFilter }: props) {
   if (isLoading) return <LoadingPage />
 
   const handleOnChange = (e) => {
-    e.persist()
+    e.persist?.()
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value })
       return
     }
     setInputs((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value
+    }))
+  }
+
+  const handleOnSaleChange = (e) => {
+    e.persist?.()
+    setSale((prev) => ({
+      ...prev,
+      [e.target.id]: e.target.value
+    }))
+  }
+
+  const handleOnNotesChange = (e) => {
+    e.persist?.()
+    setNotes((prev) => ({
       ...prev,
       [e.target.id]: e.target.value
     }))
@@ -89,13 +127,13 @@ export default function Entry ({ searchFilter }: props) {
     const Sales = [
       {
         SaleSaleTypeId: 1,
-        SaleSeats: inputs.Seats,
-        SaleValue: inputs.Value
+        SaleSeats: sale.Seats,
+        SaleValue: sale.Value
       },
       {
         SaleSaleTypeId: 2,
-        SaleSeats: inputs.ReservedSeats,
-        SaleValue: inputs.ReservedValue
+        SaleSeats: sale.ReservedSeats,
+        SaleValue: sale.ReservedValue
       }
     ]
     await axios.post('/api/marketing/sales/upsert', { Holds, Comps, Sales, SetBookingId: inputs.Venue, SetSalesFiguresDate: inputs.SalesWeek })
@@ -118,9 +156,11 @@ export default function Entry ({ searchFilter }: props) {
     // BookingSaleId, HoldNotes, CompNotes, BookingSaleNotes
   }
   const handleOnHoldsChange = (e, key) => {
+    e.persist?.()
     setHolds(prev => ({ ...prev, [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value } }))
   }
   const handleOnCompsChange = (e) => {
+    e.persist?.()
     setComps(prev => ({ ...prev, [e.target.id]: e.target.value }))
   }
 
@@ -148,9 +188,9 @@ export default function Entry ({ searchFilter }: props) {
                       className="block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green  text-sm"
                     >
                       <option value={0}>Select A Tour</option>
-                      {tours?.map?.((tour) => (
+                      {tours?.filter?.(tour => !tour.IsArchived)?.map?.((tour) => (
                         <option key={tour.Id} value={tour.Id}>
-                          {tour.ShowCode}/{tour.Code}
+                          {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
                         </option>
                       ))}
                     </select>
@@ -165,21 +205,34 @@ export default function Entry ({ searchFilter }: props) {
                     <select
                       id="SaleWeek"
                       name="SaleWeek"
+                      value={inputs.SaleWeek}
                       className="block w-full  max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
                       <option value={0}>Select A Tour</option>
                       {salesWeeks?.map?.((week) => (
                         <option
-                          key={week.MondayDate}
-                          value={week.MondayDate}
+                          key={week.mondayDate}
+                          value={week.mondayDate}
                         >
-                          {week.MondayDate ? dateToSimple(week.MondayDate) : ''}
+                          {`Wk ${week.tourWeekNum} | Monday ${dateToSimple(new Date(week.mondayDate))}`}
                         </option>
                       ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between">
+                  <div className="flex flex-row items-center justify-between relative">
+                    {/* <Typeahead
+                      placeholder="Venue/Date"
+                      label="Venue/Date"
+                      name="Venue"
+                      className='flex flex-row items-center justify-between w-1/2'
+                      value={inputs.Venue}
+                      options={salesWeeksVenues.map((venue) => ({
+                        text: `${venue.Code} ${venue.Name}, ${venue.VenueAddressTown} ${dateToSimple(venue.booking.FirstDate)}`,
+                        value: venue.BookingId
+                      }))}
+                      onChange={(option) => handleOnChange({ target: { id: 'Venue', value: option.value } })}
+                    /> */}
                     <label
                       htmlFor="Venue"
                       className="text-sm font-medium text-gray-700"
@@ -189,13 +242,14 @@ export default function Entry ({ searchFilter }: props) {
                     <select
                       id="Venue"
                       name="Venue"
+                      value={inputs.Venue}
                       className="block bg-dark-primary-green w-full text-white max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
                       <option value={0}>Select A Performance</option>
-                      {salesWeeksVenues?.sort((a, b) => a.Name?.localCompare?.(b.Name))?.map?.((venue) => (
+                      {salesWeeksVenues?.sort?.((a, b) => a.Name?.localCompare?.(b.Name))?.map?.((venue) => (
                         <option key={venue.BookingId} value={venue.BookingId}>
-                          {venue.Name}
+                          {`${venue.Code} ${venue.Name}, ${venue.VenueAddressTown} ${dateToSimple(venue.booking.FirstDate)}`}
                         </option>
                       ))}
                     </select>
@@ -216,8 +270,8 @@ export default function Entry ({ searchFilter }: props) {
                           type="text"
                           name="Value"
                           id="Value"
-                          value={inputs.Value}
-                          onChange={handleOnChange}
+                          value={sale.Value}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
@@ -235,8 +289,8 @@ export default function Entry ({ searchFilter }: props) {
                           name="ReservedValue"
                           id="ReservedValue"
                           autoComplete="ReservedValue"
-                          value={inputs.ReservedValue}
-                          onChange={handleOnChange}
+                          value={sale.ReservedValue}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
@@ -245,7 +299,7 @@ export default function Entry ({ searchFilter }: props) {
                   <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
                       <label
-                        htmlFor="street-address"
+                        htmlFor="Seats"
                         className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                       >
                         Seats Sold
@@ -256,15 +310,15 @@ export default function Entry ({ searchFilter }: props) {
                           name="Seats"
                           id="Seats"
                           autoComplete="Seats"
-                          value={inputs.Seats}
-                          onChange={handleOnChange}
+                          value={sale.Seats}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
                       <label
-                        htmlFor="street-address"
+                        htmlFor="ReservedSeats"
                         className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                       >
                         Reserved Seats
@@ -275,8 +329,8 @@ export default function Entry ({ searchFilter }: props) {
                           name="ReservedSeats"
                           id="ReservedSeats"
                           autoComplete="ReservedSeats"
-                          value={inputs.ReservedSeats}
-                          onChange={handleOnChange}
+                          value={sale.ReservedSeats}
+                          onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                       </div>
@@ -297,7 +351,7 @@ export default function Entry ({ searchFilter }: props) {
                       options?.holdTypes.map((hold, i) => (
                         <div key={i} className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                           <label
-                            htmlFor="street-address"
+                            htmlFor={hold.HoldTypeId}
                             className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                           >
                             {hold.HoldTypeName}
@@ -338,7 +392,7 @@ export default function Entry ({ searchFilter }: props) {
                     options?.compTypes?.map((comp, j) => (
                       <div key={j} className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                         <label
-                          htmlFor="street-address"
+                          htmlFor={comp.CompTypeId}
                           className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                         >
                           {comp.CompTypeName}
@@ -360,39 +414,41 @@ export default function Entry ({ searchFilter }: props) {
                 </div>
               </div>
               <div className={'columns-1'}>
-                <div className="sm:grid sm:grid-cols-2 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
-                  <div className="flex flex-col w-full col-span-1">
+                <div className="sm:grid sm:grid-cols-2 px-2 sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
+                  <div className="flex flex-col w-full col-span-1 cursor-not-allowed">
                     <label
-                      htmlFor="street-address"
+                      htmlFor="HoldNotes"
                       className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                     >
                       Hold Notes
                     </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                    <div className="mt-1 sm:col-span-2 sm:mt-0 cursor-not-allowed">
                       <textarea
-                        className="w-full"
-                        onChange={handleOnChange}
+                        className="w-full cursor-not-allowed"
+                        onChange={handleOnNotesChange}
                         name={'HoldNotes'}
                         id={'HoldNotes'}
-                        value={inputs.HoldNotes}
+                        value={notes.HoldNotes}
+                        disabled
                       ></textarea>
                     </div>
                   </div>
                   <div className={'col-span-1'}>
-                    <div className="flex flex-col px-2 sm:items-start sm:border-none sm:border-gray-200 w-full">
+                    <div className="flex flex-col px-2 sm:border-none sm:border-gray-200 w-full cursor-not-allowed">
                       <label
-                        htmlFor="street-address"
+                        htmlFor="CompNotes"
                         className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                       >
                       Comp Notes
                       </label>
                       <div className="mt-1 sm:mt-0">
                         <textarea
-                          onChange={handleOnChange}
+                          onChange={handleOnNotesChange}
                           name={'CompNotes'}
                           id={'CompNotes'}
-                          value={inputs.CompNotes}
-                          className="w-full"
+                          value={notes.CompNotes}
+                          className="w-full cursor-not-allowed"
+                          disabled
                         ></textarea>
                       </div>
                     </div>
@@ -401,18 +457,19 @@ export default function Entry ({ searchFilter }: props) {
               </div>
               <div className={'flex flex-col'}>
                 <label
-                  htmlFor="street-address"
+                  htmlFor="BookingSaleNotes"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
                 >
                     Booking Sale Notes
                 </label>
                 <div className="mt-1 sm:mt-0 w-full">
                   <textarea
-                    onChange={handleOnChange}
+                    onChange={handleOnNotesChange}
                     name={'BookingSaleNotes'}
                     id={'BookingSaleNotes'}
-                    value={inputs.BookingSaleNotes}
-                    className="w-full"
+                    value={notes.BookingSaleNotes}
+                    className="w-full cursor-not-allowed"
+                    disabled
                   ></textarea>
                 </div>
               </div>

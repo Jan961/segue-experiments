@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
+import { addWidthAsPerContent } from 'services/reportsService'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
 
 enum HOLD_OR_COMP {
@@ -59,7 +60,7 @@ const makeRowTextBold = ({ worksheet, row }: {worksheet: any, row: number}) => {
 }
 
 const makeTopBorderDouble = ({ worksheet, row, col }: {worksheet: any, row: number, col: number}) => {
-  worksheet.getCell(row, col).border = { top: { style: 'double', color: { argb: COLOR_HEXCODE.BLACK } } }
+  worksheet.getCell(row, col).border = { top: { style: 'thin', color: { argb: COLOR_HEXCODE.BLACK } } }
 }
 
 const styleHeader = ({ worksheet, row, numberOfColumns }: {worksheet: any, row: number, numberOfColumns: number}) => {
@@ -175,7 +176,7 @@ const handler = async (req, res) => {
 
   worksheet.addRow((['BOOKING HOLDS/COMPS REPORT']))
   const date = new Date()
-  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
+  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]))
   worksheet.addRow((['TOUR', 'VENUE', '', 'SHOW']))
   worksheet.addRow((['CODE', 'CODE', 'NAME', 'DATE', 'TYPE', 'CODE', 'NAME', 'SEATS', 'TOTAL', 'REMAINING']))
 
@@ -186,12 +187,17 @@ const handler = async (req, res) => {
 
   let row = 5
   let currentEntryRowSize = 0
+  let skipFirstRowFormatting = true
   Object.values(groupBasedOnVenueAndDateForAllTypes).forEach((x: TBookingHoldsGrouped) => {
     currentEntryRowSize = 0
     worksheet.addRow([])
     row++
-    worksheet.mergeCells(`A${row - 1}:J${row - 1}`)
-    worksheet.addRow([x.FullTourCode, x.VenueCode, x.VenueName, x.BookingFirstDate, '', '', 'Capacity', '', x.VenueSeats])
+    if (skipFirstRowFormatting) {
+      skipFirstRowFormatting = false
+    } else {
+      worksheet.mergeCells(`A${row - 1}:J${row - 1}`)
+    }
+    worksheet.addRow([x.FullTourCode, x.VenueCode, x.VenueName, x.BookingFirstDate ? moment(x.BookingFirstDate).format('DD/MM/YY') : '', '', '', 'Capacity', '', x.VenueSeats])
     worksheet.mergeCells(`E${row}:F${row}`)
     worksheet.mergeCells(`G${row}:H${row}`)
     makeCellTextBold({ worksheet, row, col: 7 })
@@ -283,10 +289,6 @@ const handler = async (req, res) => {
   alignColumnTextRight({ worksheet, colAsChar: 'I' })
   alignColumnTextRight({ worksheet, colAsChar: 'J' })
 
-  for (let row = 1; row <= 4; row++) {
-    styleHeader({ worksheet, row, numberOfColumns })
-  }
-
   for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
     worksheet.getColumn(char).width = 15
   }
@@ -297,7 +299,13 @@ const handler = async (req, res) => {
   worksheet.getColumn('D').alignment = { vertical: 'top', horizontal: 'right' }
   worksheet.getColumn('G').alignment = { vertical: 'top', horizontal: 'left' }
 
+  for (let row = 1; row <= 4; row++) {
+    styleHeader({ worksheet, row, numberOfColumns })
+  }
+
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
+  worksheet.getColumn('A').width = 8
+  addWidthAsPerContent({ worksheet, fromColNumber: 2, toColNumber: numberOfColumns, startingColAsCharWIthCapsOn: 'B', minColWidth: 10, bufferWidth: 0, rowsToIgnore: 4, maxColWidth: Infinity })
 
   const filename = `Holds_Comps${tourCode ? '_' + tourCode : ''}${(fromDate && toDate) ? '_' + (fromDate + '_' + toDate) : ''}.xlsx`
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

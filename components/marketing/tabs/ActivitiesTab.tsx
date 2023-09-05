@@ -13,6 +13,7 @@ import { ActivitiesEditor } from '../editors/ActivitiesEditor'
 import { objectify } from 'radash'
 import { dateToSimple } from 'services/dateService'
 import { NoDataWarning } from '../NoDataWarning'
+import numeral from 'numeral'
 
 export const ActivitiesTab = () => {
   const { selected } = useRecoilValue(bookingJumpState)
@@ -131,25 +132,28 @@ export const ActivitiesTab = () => {
       </div>
       { data.activities.length === 0 && (<NoDataWarning message="No activities recorded" />) }
       { data.activities.length > 0 && (
-        <Table>
+        <Table className='table-auto !min-w-0'>
           <Table.HeaderRow>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             Activity Name
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             Type
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             Date
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             Follow Up Req.
             </Table.HeaderCell>
-            <Table.HeaderCell>
+            <Table.HeaderCell className='w-20'>
             Company Cost
             </Table.HeaderCell>
-            <Table.HeaderCell className="w-1/2">
+            <Table.HeaderCell className="w-20">
             Venue Cost
+            </Table.HeaderCell>
+            <Table.HeaderCell className='w-3/4'>
+              Notes
             </Table.HeaderCell>
           </Table.HeaderRow>
           <Table.Body>
@@ -167,11 +171,14 @@ export const ActivitiesTab = () => {
                 <Table.Cell className='text-center'>
                   {activity.FollowUpRequired ? 'Yes' : 'No'}
                 </Table.Cell>
-                <Table.Cell>
-                  {activity.CompanyCost ? `£${activity.CompanyCost}` : ''}
+                <Table.Cell className='text-right'>
+                  {activity.CompanyCost ? numeral(activity.CompanyCost).format('£0,0.00') : ''}
                 </Table.Cell>
-                <Table.Cell>
-                  {activity.VenueCost ? `£${activity.VenueCost}` : ''}
+                <Table.Cell className='text-right'>
+                  {activity.VenueCost ? numeral(activity.VenueCost).format('£0,0.00') : ''}
+                </Table.Cell>
+                <Table.Cell className=''>
+                  {activity.Notes}
                 </Table.Cell>
               </Table.Row>
             ))}

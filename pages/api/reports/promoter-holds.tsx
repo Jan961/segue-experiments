@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
+import { addWidthAsPerContent } from 'services/reportsService'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
 
 type TPromoter = {
@@ -56,6 +57,7 @@ const makeRowTextBoldAndAllignLeft = ({ worksheet, row, numberOfColumns }: {work
   }
 }
 
+// TODO - Issue with Performance Time
 const handler = async (req, res) => {
   const { tourCode, fromDate, toDate, venue, tourId } = JSON.parse(req.body) || {}
 
@@ -75,12 +77,13 @@ const handler = async (req, res) => {
   const data: TPromoter[] = await prisma.$queryRaw`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`
 
   const worksheet = workbook.addWorksheet('My Sales', {
-    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
+    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+    views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }]
   })
 
   worksheet.addRow((['PROMOTER HOLDS']))
   const date = new Date()
-  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
+  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]))
   worksheet.addRow((['TOUR', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']))
   worksheet.addRow((['CODE', 'CODE', 'NAME', 'DATE', 'TIME', 'SEATS', 'NOTES', 'SEATS', 'NAME', 'SEAT NUMBERS', 'EMAIL', 'NOTES', 'REQUESTED BY', 'ARRANGED BY', 'VENUE CONFIRMATION']))
 
@@ -88,11 +91,11 @@ const handler = async (req, res) => {
     const tourCode = x.FullTourCode || ''
     const venueCode = x.VenueCode || ''
     const venueName = x.VenueName || ''
-    const showDate = x.PerformanceDate || ''
-    const showTime = x.PerformanceTime || ''
-    const availableSeats = x.AvailableCompSeats || ''
+    const showDate = x.PerformanceDate ? moment(x.PerformanceDate).format('DD/MM/YY') : ''
+    const showTime = x.PerformanceTime ? moment(x.PerformanceTime).format('hh:mm') : ''
+    const availableSeats = x.AvailableCompSeats || 0
     const availableNotes = x.AvailableCompNotes || ''
-    const allocatedSeats = x.CompAllocationSeats || ''
+    const allocatedSeats = x.CompAllocationSeats || 0
     const allocatedName = x.CompAllocationTicketHolderName || ''
     const seatNumber = x.CompAllocationSeatsAllocated || ''
     const email = x.CompAllocationTicketHolderEmail || ''
@@ -100,6 +103,7 @@ const handler = async (req, res) => {
     const requestedBy = x.CompAllocationRequestedBy || ''
     const arrangedBy = x.CompAllocationArrangedBy || ''
     const venueConfirmation = x.CompAllocationVenueConfirmationNotes || ''
+
     worksheet.addRow([tourCode, venueCode, venueName, showDate, showTime, availableSeats, availableNotes, allocatedSeats, allocatedName, seatNumber, email, notes, requestedBy, arrangedBy, venueConfirmation])
   })
 
@@ -112,9 +116,9 @@ const handler = async (req, res) => {
   worksheet.mergeCells('F3:G3')
   worksheet.mergeCells('H3:I3')
 
-  for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
-    worksheet.getColumn(char).width = 15
-  }
+  // for (let char = 'A', i = 0; i < numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+  //   worksheet.getColumn(char).width = 15
+  // }
   alignColumnTextRight({ worksheet, colAsChar: 'D' })
   alignColumnTextRight({ worksheet, colAsChar: 'E' })
   alignCellTextCenter({ worksheet, colAsChar: 'F' })
@@ -123,10 +127,13 @@ const handler = async (req, res) => {
   for (let row = 1; row <= 4; row++) {
     makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns })
   }
+  worksheet.getColumn('A').width = 8
+  addWidthAsPerContent({ worksheet, fromColNumber: 2, toColNumber: numberOfColumns, startingColAsCharWIthCapsOn: 'B', minColWidth: 10, bufferWidth: 0, rowsToIgnore: 4, maxColWidth: 120, htmlFields: ['G', 'L'] })
+  worksheet.getColumn('G').alignment = { wrapText: true }
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
 
-  const filename = `Promoter_Holds${(tourCode || tourId) ? '_' + (tourCode || tourId) : ''}${(fromDate && toDate) ? '_' + (fromDate + '_' + toDate) : ''}.xlsx`
+  const filename = `Promoter_Holds_${(tourCode || tourId) ? '_' + (tourCode || tourId) : ''}${(fromDate && toDate) ? '_' + (fromDate + '_' + toDate) : ''}.xlsx`
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
 

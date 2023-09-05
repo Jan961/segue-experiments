@@ -14,7 +14,11 @@ export default async function handle (req, res) {
         include: {
           Booking: {
             include: {
-              Venue: true
+              Venue: {
+                include: {
+                  VenueAddress: true
+                }
+              }
             }
           }
         },
@@ -23,7 +27,7 @@ export default async function handle (req, res) {
         }
       }
     )
-    res.json({ data: result.Booking.map(booking => ({ booking: omit(booking, ['Venue']), ...booking.Venue, BookingId: booking.Id })) })
+    res.json({ data: result.Booking.map(booking => ({ booking: omit(booking, ['Venue']), ...(booking.Venue || {}), ...(booking.Venue?.VenueAddress?.[0] || {}), BookingId: booking.Id })) })
     // res.json(result)
   } catch (error) {
     console.log('==Error fetching Venue bookings==', error)

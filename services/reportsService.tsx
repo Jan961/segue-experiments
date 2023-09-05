@@ -1,35 +1,41 @@
-/**
- *
- * This Service will call the stored procedures to fenerate the reprots sending backthe data to generate the
- * excel files
- *
- *
- * @type {{salesReport: *}}
- */
-export const reportsService = {
-    salesReport,
-    MasterPlanReport
+import moment from 'moment'
+
+export const addWidthAsPerContent = ({ worksheet, fromColNumber, toColNumber, startingColAsCharWIthCapsOn, minColWidth = 10, maxColWidth = 60, bufferWidth = 0, rowsToIgnore, htmlFields = [] }: { worksheet: any, fromColNumber: number, toColNumber: number, startingColAsCharWIthCapsOn: string, minColWidth?: number, maxColWidth?: number, bufferWidth?: number, rowsToIgnore: number, htmlFields?: string[] }) => {
+  for (let char = startingColAsCharWIthCapsOn, i = fromColNumber; i <= toColNumber; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+    let maxWidth = 0
+    worksheet.getColumn(char).eachCell((cell:any, i) => {
+      if (i > rowsToIgnore) {
+        maxWidth = Math.max(maxWidth, htmlFields.includes(char) ? getHTMLFieldMaxWidth(cell.text) : cell.text.length)
+      }
+    })
+    worksheet.getColumn(char).width = getWidthConsideringThresholds({ max: maxColWidth, min: minColWidth, val: maxWidth, buffer: bufferWidth })
+  }
 }
 
+const getWidthConsideringThresholds = ({ max, min, val, buffer = 0 }) => {
+  if (!max && !min) {
+    return val + buffer
+  }
 
-function salesReport(params: any){
-    /**
-     * Call the Sored Proceduee
-     */
-    console.log("SalesReportCalled")
-    return true
+  if (max && min) {
+    return Math.min(Math.max(min, val + buffer), max)
+  }
+
+  return max ? Math.min(val + buffer, max) : Math.max(val + buffer, min)
 }
 
+const getHTMLFieldMaxWidth = (text:string) => {
+  let maxWidth = 0
+  // eslint-disable-next-line array-callback-return
+  text.split('\n').map(line => {
+    maxWidth = Math.max(maxWidth, line.length)
+  })
+  return maxWidth
+}
 
-function MasterPlanReport(startDate?: Date, endDate?: Date){
+export const range = (start:number, end:number) => Array.from({ length: end - start + 1 }, (_, index) => start + index)
 
-
-    return [
-        { Name: "Bill Clinton", Index: 1111 },
-        { Name: "GeorgeW Bush", Index: 44444 },
-        { Name: "Barack Obama", Index: 66666 },
-        { Name: "Donald Trump", Index: 900878897987},
-        { Name: "Joseph Biden", Index: 696996969696969646 }
-    ]
-
+export const getCurrentMondayDate = () => {
+  const currentSunday = moment(new Date().toDateString()).startOf('isoWeek')
+  return currentSunday.clone().add(1, 'day').toISOString()
 }

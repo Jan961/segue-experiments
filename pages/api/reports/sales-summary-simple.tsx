@@ -3,8 +3,13 @@ import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName, addCellBorder } from 'services/salesSummaryService'
+import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName, addCellBorder, formatCurrencyNumberWithNDecimal, convertDateFormat, makeRowTextNormal } from 'services/salesSummaryService'
 import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
+import { addWidthAsPerContent } from 'services/reportsService'
+
+// TODO
+// Decimal upto 2 places fix
+// Tour row height fix
 
 const handler = async (req, res) => {
   const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {}
@@ -46,12 +51,12 @@ const handler = async (req, res) => {
   // Adding Table Columns
   const columns: string[] = ['Tour', '', '', '', '', ...uniqueTourColumns.map(x => x.FormattedSetTourWeekNum), CONSTANTS.CHANGE_VS, ...(isSeatsDataRequired ? [CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SALES] : [])]
   worksheet.addRow(columns)
-  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue', ...uniqueTourColumns.map(x => x.SetTourWeekDate), 'Last Week', ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : [])])
+  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue', ...uniqueTourColumns.map(x => convertDateFormat(x.SetTourWeekDate)), 'Last Week', ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : [])])
   worksheet.addRow([])
 
-  for (let char = 'A', i = 0; i < columns.length; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
-    worksheet.getColumn(char).width = 17
-  }
+  // for (let char = 'A', i = 0; i < columns.length; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+  //   worksheet.getColumn(char).width = 17
+  // }
 
   const groupBasedOnVenue: TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping = groupBasedOnVenueWeeksKeepingVenueCommon({ modifiedFetchedValues: finalFormattedValues })
 
@@ -110,7 +115,7 @@ const handler = async (req, res) => {
 
     // Calculating Current Vs Prev Week Value
     const currVSPrevWeekValue: string = calculateCurrVSPrevWeekValue({ valuesArrayOnly: values })
-    const rowData: string[] = [...arr, ...values, currVSPrevWeekValue, ...(seatsData?.Seats !== undefined ? [seatsData.Seats, seatsData.TotalCapacity, seatsData.Percentage] : [])]
+    const rowData: string[] = [...arr, ...values.map(num => formatCurrencyNumberWithNDecimal(num, 2)), formatCurrencyNumberWithNDecimal(currVSPrevWeekValue), ...(seatsData?.Seats !== undefined ? [seatsData.Seats, seatsData.TotalCapacity, seatsData.Percentage] : [])]
     worksheet.addRow(rowData)
 
     // For Color Coding
@@ -140,15 +145,6 @@ const handler = async (req, res) => {
   }
 
   // STYLINGS
-  // Column Styling
-  alignCellTextRight({ worksheet, colAsChar: 'C' })
-  for (let char = 'F', i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)); i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
-    alignCellTextRight({ worksheet, colAsChar: char })
-  }
-  // Row Styling
-  makeRowTextBold({ worksheet, row: 1 })
-  makeRowTextBoldAndALignCenter({ worksheet, row: 3 })
-  makeRowTextBoldAndALignCenter({ worksheet, row: 4 })
   worksheet.addRow([])
   row++
 
@@ -184,25 +180,28 @@ const handler = async (req, res) => {
   makeColumnTextBold({ worksheet, colAsChar: 'D' })
   makeColumnTextBold({ worksheet, colAsChar: 'E' })
 
+  makeRowTextNormal({ worksheet, row: row - 4 })
+  makeRowTextNormal({ worksheet, row: row - 3 })
+
   const totalColumns: number = worksheet.columnCount
   const lastColumn: number = 'A'.charCodeAt(totalColumns)
   worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
   worksheet.getCell(1, 1).font = { size: 16, bold: true }
-  const widths = ['D', 'E'].map((col) => {
-    let maxLength = 0
-    worksheet.getColumn(col).eachCell({ includeEmpty: true }, function (cell) {
-      const columnLength = cell.value ? cell.value.toString().length : 10
-      if (columnLength > maxLength) {
-        maxLength = columnLength
-      }
-    })
-    return maxLength
-  })
-  worksheet.getColumn('D').width = widths[0]
-  worksheet.getColumn('E').width = widths[1]
+  const numberOfColumns = worksheet.columnCount
   worksheet.getColumn('A').width = 9
-  worksheet.getColumn('B').width = 11
+  worksheet.getColumn('B').width = 5
   worksheet.getColumn('C').width = 10
+  addWidthAsPerContent({ worksheet, fromColNumber: 4, toColNumber: numberOfColumns, startingColAsCharWIthCapsOn: 'D', minColWidth: 10, bufferWidth: 2, rowsToIgnore: 4, maxColWidth: Infinity })
+
+  // Column Styling
+  alignCellTextRight({ worksheet, colAsChar: 'C' })
+  for (let char = 'F', i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)); i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+    alignCellTextRight({ worksheet, colAsChar: char })
+  }
+  // Row Styling
+  makeRowTextBold({ worksheet, row: 1 })
+  makeRowTextBoldAndALignCenter({ worksheet, row: 3 })
+  makeRowTextBoldAndALignCenter({ worksheet, row: 4 })
 
   const filename = getFileName(worksheet)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

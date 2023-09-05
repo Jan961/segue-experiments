@@ -439,8 +439,8 @@ model Sale {
   SaleSetId      Int?
   SaleSeats      Int?      @db.SmallInt
   SaleValue      Decimal?  @db.Decimal(8, 2)
-  SaleType       SalesSet? @relation(fields: [SaleSaleTypeId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
-  SalesSet       SaleType? @relation(fields: [SaleSetId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
+  SaleType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
+  SalesSet       SalesSet? @relation(fields: [SaleSetId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
 
   @@index([SaleSaleTypeId], map: "BookingSale_Sale_idx")
   @@index([SaleSetId], map: "SaleType_Sale_idx")

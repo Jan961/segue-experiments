@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
+import { StyledDialog } from 'components/global/StyledDialog'
 
 type props = {
     venueCode:string;
@@ -62,57 +63,10 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit 
     }))
   }
   return (<>
-    <div className="fixed z-50 inset-0 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div
-          className="fixed inset-0 transition-opacity"
-          aria-hidden="true"
-        >
-          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-        </div>
-        <span
-          className="hidden sm:inline-block sm:align-middle sm:h-screen"
-          aria-hidden="true"
-        >
-      &#8203;
-        </span>
-        <div
-          className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-headline"
-        >
-          <div className="sm:flex justify-center">
-
-            <div className="mt-3 justify-center text-center sm:mt-0 sm:ml-4 sm:text-left">
-              <h3
-                className="text-xl text-center leading-6 font-medium text-gray-900"
-                id="modal-headline"
-              >
-                  Select Archived Tours for Display
-              </h3>
-            </div>
-            <div className="absolute top-0 right-0 pt-4 pr-4">
-              <button
-                className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                onClick={() => onClose()}
-              >
-                <span className="sr-only">Close</span>
-                <svg
-                  className="h-6 w-6"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <form onSubmit={handleOnSubmit}>
+    <div>
+      <StyledDialog className='max-w-full relative max-h-full' open={true} onClose={() => onClose()} title="Select Archived Tours for Display" width='xl'>
+        <form onSubmit={handleOnSubmit}>
+          <div className='h-[50vh] overflow-auto'>
             {
               bookings.map((booking, i) => (
                 <div className="mt-6" key={i}>
@@ -137,26 +91,25 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit 
                 </div>
               ))
             }
-            <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
-              <button
-                className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                type="button"
-                onClick={() => onClose()}
-              >
+          </div>
+          <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+            <button
+              className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              type="button"
+              onClick={() => onClose()}
+            >
                   Close and Discard
-              </button>
-              <button
-                className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                type="submit"
-              >
+            </button>
+            <button
+              className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              type="submit"
+            >
                 Apply
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+            </button>
+          </div>
+        </form>
+      </StyledDialog>
     </div>
-    <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
   </>)
 }
 

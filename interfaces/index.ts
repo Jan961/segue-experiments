@@ -85,6 +85,7 @@ export type VenueMinimalDTO = {
   Name: string
   Code: string
   Town?: string
+  Seats?: string
 }
 
 export type GetInFitUpDTO = {
@@ -170,6 +171,7 @@ export type ActivityDTO = {
   CompanyCost: number
   VenueCost: number
   FollowUpRequired: boolean
+  Notes: string
 }
 
 export type BookingContactNoteDTO = {

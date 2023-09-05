@@ -19,7 +19,8 @@ type SCHEDULE_VIEW = {
   PencilNum : number | null,
   VenueSeats : number | null,
   Mileage : number | null,
-  TimeMins : number | null
+  TimeMins : number | null,
+  RehearsalStartDate : string
 }
 
 type UniqueHeadersObject = {
@@ -43,7 +44,7 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: {worksheet: any, row: 
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col)
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } }
-    cell.alignment = { horizontal: ALIGNMENT.LEFT }
+    cell.alignment = { horizontal: ALIGNMENT.CENTER }
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -63,8 +64,6 @@ const getShowAndTourKey = ({ FullTourCode, ShowName }) => `${FullTourCode} - ${S
 const handler = async (req, res) => {
   const { fromDate, toDate } = JSON.parse(req.body) || {}
 
-  //   const fromDate = '2021-11-01'
-  //   const toDate = '2024-05-05'
   const formatedFromDate = formatDate(fromDate)
   const formatedToDate = formatDate(toDate)
   if (!fromDate || !toDate) {
@@ -104,12 +103,13 @@ const handler = async (req, res) => {
   }).reduce((acc, arr) => ([...acc, ...arr]), [])
 
   const worksheet = workbook.addWorksheet('My Sales', {
-    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
+    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+    views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }]
   })
 
   worksheet.addRow([`Jendagi Rolling Masterplan ${formatedFromDate} to ${formatedToDate}`])
   const date = new Date()
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`])
+  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`])
   worksheet.addRow([])
   worksheet.addRow(['', '', ...destinctShowNames.map(x => x.ShowName)])
   worksheet.addRow(['DAY', 'DATE', ...destinctShowNames.map(x => x.FullTourCode)])
@@ -156,9 +156,16 @@ const handler = async (req, res) => {
     return [...acc, `Week ${value}`]
   }, [])
   worksheet.addRow(['Week Minus', '', ...weeks])
-  fillRowBGColorAndTextColor({worksheet, row: 7, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.BLUE, isBold: true})
+  fillRowBGColorAndTextColor({ worksheet, row: 7, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.DARK_BLUE, isBold: true })
 
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days')
+
+  const minRehersalStartTimeInEpoch = data.reduce((acc, x) => {
+    if (x.RehearsalStartDate && (new Date(x.RehearsalStartDate)).getTime() < acc) {
+      acc = (new Date(x.RehearsalStartDate)).getTime()
+    }
+    return acc
+  }, Infinity)
 
   let rowNo = 6
   for (let i = 1; i <= daysDiff; i++) {
@@ -177,9 +184,10 @@ const handler = async (req, res) => {
 
     worksheet.addRow([weekDay, date, ...values])
     rowNo++
-    if (weekDay === 'Monday') {
-      colorCell({ worksheet, row: rowNo + 1, col: 1, argbColor: COLOR_HEXCODE.ORANGE })
-      colorCell({ worksheet, row: rowNo + 1, col: 2, argbColor: COLOR_HEXCODE.ORANGE })
+
+    if (weekDay === 'Monday' && (new Date(dateInIncomingFormat)).getTime() >= minRehersalStartTimeInEpoch) {
+      colorCell({ worksheet, row: rowNo + 1, col: 1, argbColor: COLOR_HEXCODE.CREAM })
+      colorCell({ worksheet, row: rowNo + 1, col: 2, argbColor: COLOR_HEXCODE.CREAM })
     }
 
     const targetCellIdx: number[] = values.map((value, idx) => {
@@ -190,8 +198,8 @@ const handler = async (req, res) => {
     targetCellIdx.forEach(col => colorTextAndBGCell({ worksheet, row: rowNo + 1, col, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.RED }))
 
     if (i % 7 === 0) {
-      worksheet.addRow([])
-      rowNo++
+      // worksheet.addRow([])
+      // rowNo++
       const weeks = destinctShowNames.reduce((acc, { FullTourCode, ShowName }) => {
         const key = getShowAndTourKey({ FullTourCode, ShowName })
         const value = headerWeeks[key]
@@ -209,7 +217,7 @@ const handler = async (req, res) => {
       }, [])
       worksheet.addRow(['Week Minus', '', ...weeks])
       rowNo++
-      fillRowBGColorAndTextColor({ worksheet, row: rowNo + 1, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.BLUE, isBold: true })
+      fillRowBGColorAndTextColor({ worksheet, row: rowNo + 1, textColor: COLOR_HEXCODE.YELLOW, cellColor: COLOR_HEXCODE.DARK_BLUE, isBold: true })
     }
   }
 
@@ -233,9 +241,20 @@ const handler = async (req, res) => {
     }
   }
 
+  worksheet.getColumn('A').width = 11
+  worksheet.getColumn('B').width = 10
+  for (let char = 'C', i = 0; i <= numberOfColumns; i++, char = String.fromCharCode(char.charCodeAt(0) + 1)) {
+    let maxWidth = 0
+    worksheet.getColumn(char).eachCell((cell:any, i) => {
+      if (i > 2) {
+        maxWidth = Math.max(maxWidth, cell.text.length)
+      }
+    })
+    worksheet.getColumn(char).width = maxWidth
+  }
+
   alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT })
   alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT })
-  alignCellText({ worksheet, row: 5, col: 2, align: ALIGNMENT.LEFT })
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
 

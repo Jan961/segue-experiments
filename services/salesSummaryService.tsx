@@ -12,6 +12,8 @@ export enum COLOR_HEXCODE {
   WHITE= 'ffffffff',
   BLACK= 'ff000000',
   ORANGE= 'ffff6347',
+  CREAM = 'ffedb150',
+  DARK_BLUE= 'ff2f75b5',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`
@@ -24,16 +26,29 @@ export const getMapKeyForValue = (
   { FormattedSetTourWeekNum: setTourWeekNumVar, SetTourWeekDate: setTourWeekDateVar }: Pick<TRequiredFieldsFinalFormat, 'FormattedSetTourWeekNum' | 'SetTourWeekDate'>
 ): string => `${Week} | ${Town} | ${Venue} | ${setTourWeekNumVar} | ${setTourWeekDateVar}`
 
+export const convertDateFormat = (date) => {
+  const parsedDate = moment(date, 'DD-MM-YYYY')
+  return parsedDate.format('DD/MM/YY')
+}
+
 export const getAggregateKey = (
   { Week, Town, Venue }
     :{Week: TRequiredFieldsFinalFormat['Week'], Town: TRequiredFieldsFinalFormat['Town'], Venue: TRequiredFieldsFinalFormat['Venue']}
 ) => `${Week} | ${Town} | ${Venue}`
 
 export const LEFT_PORTION_KEYS: string[] = ['Week', 'Day', 'Date', 'Town', 'Venue']
-export const getValuesFromObject = (obj: object, array: any[]): any[] => array.map(key => obj[key])
+export const getValuesFromObject = (obj: object, array: any[]): any[] => array.map(key => {
+  if (key === 'Day') {
+    return obj[key].substring(0, 3)
+  }
+  if (key === 'Date') {
+    return convertDateFormat(obj[key])
+  }
+  return obj[key]
+})
 
 export const CONSTANTS: {[key:string]: string} = {
-  CHANGE_VS: 'Change VS',
+  CHANGE_VS: 'Change vs',
   RUN_SEATS: 'Run Seats',
   RUN_SALES: 'Run Sales'
 }
@@ -64,6 +79,12 @@ export const assignBackgroundColor = ({ worksheet, row, col, props: { SetIsCopy,
 export const makeRowTextBold = ({ worksheet, row }: {worksheet: any, row: number}) => {
   worksheet.getRow(row).eachCell((cell) => {
     cell.font = { bold: true }
+  })
+}
+
+export const makeRowTextNormal = ({ worksheet, row }: {worksheet: any, row: number}) => {
+  worksheet.getRow(row).eachCell((cell) => {
+    cell.font = { bold: false }
   })
 }
 
@@ -250,7 +271,7 @@ export const getCurrencyWiseTotal = ({ totalForWeeks, setTourWeekNum, currencySy
 
   const finalValue = arr.filter(x => x.VenueCurrencySymbol === currencySymbol)
     .map(x => x.Value).reduce((acc, x) => new Decimal(acc).plus(x) as any, 0)
-  return `${currencySymbol}${finalValue}`
+  return `${currencySymbol}${formatNumberWithNDecimal(finalValue, 2)}`
 }
 
 export const getChangeVsLastWeekValue = (weeksDataArray: string[]): string => {
@@ -274,6 +295,19 @@ export const getChangeVsLastWeekValue = (weeksDataArray: string[]): string => {
   return ''
 }
 
+export const formatNumberWithNDecimal = (num, numberOfDecimals) => {
+  if (num === '') {
+    return ''
+  }
+  if (num === 0) return '0.00'
+  return parseFloat(num).toFixed(numberOfDecimals)
+}
+
+export const formatCurrencyNumberWithNDecimal = (valAsString, numberOfDecimals = 2) => {
+  if (valAsString === '') return ''
+  return `${valAsString[0]}${formatNumberWithNDecimal(Number(valAsString.substring(1)), numberOfDecimals)}`
+}
+
 export const getWeekWiseGrandTotalInPound = ({ totalForWeeks, setTourWeekNum }: {totalForWeeks: WeekAggregates, setTourWeekNum: string}): string => {
   const arr = totalForWeeks[setTourWeekNum]
 
@@ -282,7 +316,7 @@ export const getWeekWiseGrandTotalInPound = ({ totalForWeeks, setTourWeekNum }: 
   }
 
   const finalValue = arr.map(x => x.ConvertedValue).reduce((acc, x) => new Decimal(acc).plus(x) as any, 0)
-  return `£${finalValue}`
+  return `£${formatNumberWithNDecimal(finalValue, 2)}`
 }
 
 export const getSeatsColumnForWeekTotal = ({ currencySymbol, totalCurrencyWiseSeatsMapping }: {currencySymbol: VENUE_CURRENCY_SYMBOLS, totalCurrencyWiseSeatsMapping: WeekAggregateSeatsDetail}): string[] => {

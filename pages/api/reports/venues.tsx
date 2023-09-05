@@ -3,6 +3,7 @@ import { pick, omit } from 'radash'
 import ExcelJS from 'exceljs'
 import moment from 'moment'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
+import { addWidthAsPerContent } from 'services/reportsService'
 
 type BOOKING = {
   Id: number,
@@ -55,7 +56,7 @@ const alignCellText = ({ worksheet, row, col, align }: { worksheet: any, row: nu
 const styleHeader = ({ worksheet, row, numberOfColumns }: {worksheet: any, row: number, numberOfColumns: number}) => {
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col)
-    cell.font = { color: { argb: COLOR_HEXCODE.WHITE } }
+    cell.font = { color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
     cell.alignment = { horizontal: 'left' }
     cell.fill = {
       type: 'pattern',
@@ -78,16 +79,25 @@ const handler = async (req, res) => {
       where: {
         ...(tourId && { TourId: tourId }),
         Name: 'Tour',
-        Tour: {
-          is: {
-            ...(showId && { ShowId: showId })
+        ...(showId && {
+          Tour: {
+            is: {
+              ShowId: showId
+            }
           }
-        }
+        })
       },
       include: {
         Booking: {
           include: {
-            Venue: true
+            Venue: {
+              include: {
+                VenueAddress: true
+              }
+            }
+          },
+          orderBy: {
+            FirstDate: 'asc'
           }
         },
         Tour: {
@@ -110,35 +120,38 @@ const handler = async (req, res) => {
         VenueId: venue.Id,
         VenueCode: venue.Code,
         VenueName: venue.Name,
-        VenueTown: ''
+        VenueTown: venue.VenueAddress?.[0]?.VenueAddressTown || ''
       }
     })
 
     const workbook = new ExcelJS.Workbook()
     const response: TOUR_DATA = { tour, bookings }
-    const worksheet = workbook.addWorksheet('My Sales', {
-      pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
+    const worksheet = workbook.addWorksheet('SELECTED VENUES', {
+      pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+      views: [{ state: 'frozen', ySplit: 5 }]
     })
 
     const { Code: TourCode, ShowCode, ShowName } = response?.tour || {}
 
-    worksheet.addRow(([`${TourCode || ''} (${ShowName || ''}) VENUES : ALL`]))
+    worksheet.addRow(([`${ShowCode + TourCode || ''} (${ShowName || ''}) VENUES : ALL`]))
     const date = new Date()
-    worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
+    worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]))
     worksheet.addRow((['TOUR', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']))
     worksheet.addRow((['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']))
     worksheet.addRow(([]))
 
     response?.bookings.forEach((booking: BOOKING) => {
-      const ShowDate = moment(booking.FirstDate).format('DD/MM/YYYY')
+      const ShowDate = moment(booking.FirstDate).format('DD/MM/YY')
+      const VenueCode = booking.VenueCode
       const ShowTown = booking.VenueTown
+      const VenueName = booking.VenueName
       const OnSale = getBooleanAsString(booking.IsOnSale)
-      const OnSaleDate = booking.OnSaleDate ? moment(booking.OnSaleDate).format('DD/MM/YYYY') : ''
+      const OnSaleDate = booking.OnSaleDate ? moment(booking.OnSaleDate).format('DD/MM/YY') : ''
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived)
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived)
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived)
 
-      worksheet.addRow([ShowCode + TourCode, ShowDate, ShowCode, ShowName, ShowTown, OnSale, OnSaleDate, MarketingPlan, ContactInfo, PrintReqsReceived])
+      worksheet.addRow([ShowCode + TourCode, ShowDate, VenueCode, VenueName, ShowTown, OnSale, OnSaleDate, MarketingPlan, ContactInfo, PrintReqsReceived])
     })
 
     const numberOfColumns = worksheet.columnCount
@@ -153,7 +166,7 @@ const handler = async (req, res) => {
 
     const lastColumn: number = 'A'.charCodeAt(numberOfColumns)
     worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`)
-   
+
     for (let row = 1; row <= 4; row++) {
       styleHeader({ worksheet, row, numberOfColumns })
     }
@@ -165,6 +178,10 @@ const handler = async (req, res) => {
     alignColumn({ worksheet, colAsChar: 'J', align: ALIGNMENT.CENTER })
 
     alignCellText({ worksheet, row: 4, col: 5, align: ALIGNMENT.CENTER })
+
+    worksheet.getColumn('A').width = 8
+    worksheet.getColumn('B').width = 10
+    addWidthAsPerContent({ worksheet, fromColNumber: 3, toColNumber: numberOfColumns, startingColAsCharWIthCapsOn: 'C', minColWidth: 10, bufferWidth: 0, rowsToIgnore: 2 })
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }
 

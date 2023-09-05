@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import IconWithText from '../IconWithText'
 import { faChartPie } from '@fortawesome/free-solid-svg-icons'
 import { dateToSimple } from 'services/dateService';
+import { getCurrentMondayDate } from 'services/reportsService';
 
 type Props={
   activeTours:any[];
@@ -60,6 +61,8 @@ export default function SalesSummary ({ activeTours }:Props) {
           setTourWeeks([])
           // Set tour weeks with data
           setTourWeeks(data?.data || [])
+          const currentWeekMonday = getCurrentMondayDate()
+          setInputs(prev => ({ ...prev, TourWeek: currentWeekMonday }))
         })
     }
 

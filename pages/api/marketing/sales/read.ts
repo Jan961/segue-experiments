@@ -11,7 +11,7 @@ type SaleResponse = {
   Seats: number,
   Value: string,
   ReservedSeats: number,
-  ReservedValue: string
+  ReservedValue: string,
 }
 
 type CompResponse = {
@@ -34,21 +34,38 @@ type SalesData = {
   SaleTypeName: string
 }
 
+type BookingNotes = {
+  HoldNotes:string
+  CompNotes:string
+  SalesNotes:string
+}
+
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
     const { SetBookingId, SetPerformanceId, SetSalesFiguresDate } = req.body as UpsertSalesParams
-    const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate).toISOString()
+    const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate)
 
     const salesSet = await prisma.salesSet.findFirst({
       where: {
         SetBookingId: parseInt(SetBookingId),
         ...(SetPerformanceId && { SetPerformanceId }),
-        ...(SetSalesFiguresDateInISO && { SetSalesFiguresDate: SetSalesFiguresDateInISO })
+        ...(SetSalesFiguresDate && {
+          SetSalesFiguresDate: {
+            equals: SetSalesFiguresDateInISO
+          }
+        })
       },
       select: {
         SetBookingId: true,
         SetPerformanceId: true,
         SetSalesFiguresDate: true,
+        Booking: {
+          select: {
+            SalesNotes: true,
+            HoldNotes: true,
+            CompNotes: true
+          }
+        },
         SetComp: {
           select: {
             SetCompCompTypeId: true,
@@ -86,7 +103,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         }
       }
     })
-
     if (!salesSet) {
       return res.status(200).json({ SetComp: [], SetHold: [], Sale: null })
       // throw new Error('No such SalesSet exists')
@@ -110,6 +126,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       SaleTypeName: SaleType.SaleTypeName
     }))
 
+    const Notes: BookingNotes = salesSet.Booking
     const generalSalesData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'General Sales')
     const generalReservationsData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'General Reservations')
 
@@ -120,7 +137,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       ReservedValue: generalReservationsData?.[0]?.SaleValue
     }
 
-    res.status(200).json({ ...salesSet, SetComp: compData, SetHold: holdData, Sale: finalSalesData })
+    res.status(200).json({ ...salesSet, SetComp: compData, SetHold: holdData, Sale: finalSalesData, Notes })
   } catch (err) {
     console.log('error', err)
     res.status(500).json({ err: err?.message || 'Error updating AvailableComp' })

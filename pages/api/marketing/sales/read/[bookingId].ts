@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma'
 import { dateToSimple } from 'services/dateService'
 import { TSalesView } from 'types/MarketingTypes'
+import numeral from 'numeral'
 
 const getMapKey = (
   { FullTourCode, TourStartDate, BookingFirstDate, BookingStatusCode, VenueTown, VenueCode, SetSalesFiguresDate, SetBookingWeekNum, SetTourWeekDate }: Pick<TSalesView, 'FullTourCode' | 'TourStartDate' | 'BookingFirstDate' | 'BookingStatusCode' | 'VenueTown' | 'VenueCode' | 'SetSalesFiguresDate' | 'SetBookingWeekNum' | 'SetTourWeekDate'>
@@ -19,13 +20,13 @@ export default async function handle (req, res) {
           [key]: {
             ...val,
             ...(sale.SaleTypeName === 'General Sales' && {
-              seatsSold: sale.Seats,
+              seatsSold: parseInt(sale.Seats),
               venueCurrencySymbol: sale.VenueCurrencySymbol,
-              totalValue: sale.Value
+              totalValue: parseFloat(sale.Value)
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
               reserved: sale.Seats,
-              reservations: sale.Value ? `${sale.VenueCurrencySymbol} ${sale.Value}` : ''
+              reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : ''
             })
           }
         }
@@ -35,12 +36,12 @@ export default async function handle (req, res) {
         [key]: {
           week: sale.SetBookingWeekNum ? `Week-${sale.SetBookingWeekNum}` : '',
           weekOf: dateToSimple(sale.SetSalesFiguresDate),
-          seatsSold: sale.Seats || 0,
+          seatsSold: parseInt(sale.Seats) || 0,
           seatsSalePercentage: (sale.Seats / sale.TotalCapacity) * 100,
           reservations: '',
           reserved: '',
           venueCurrencySymbol: sale.VenueCurrencySymbol,
-          totalValue: sale.Value || 0,
+          totalValue: parseFloat(sale.Value) || 0,
           valueChange: '',
           totalHolds: sale.TotalHoldSeats,
           seatsChange: '',
@@ -51,12 +52,12 @@ export default async function handle (req, res) {
           capacity: sale.TotalCapacity,
           // saleType: sale.SaleTypeName,
           ...(sale.SaleTypeName === 'General Sales' && {
-            seatsSold: sale.Seats,
-            totalValue: sale.Value
+            seatsSold: parseInt(sale.Seats),
+            totalValue: parseFloat(sale.Value)
           }),
           ...(sale.SaleTypeName === 'General Reservations' && {
-            reserved: sale.Seats,
-            reservations: sale.Value ? `${sale.VenueCurrencySymbol} ${sale.Value}` : ''
+            reserved: parseInt(sale.Seats),
+            reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : ''
           })
         }
       }
