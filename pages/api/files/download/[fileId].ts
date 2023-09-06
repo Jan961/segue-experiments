@@ -1,8 +1,9 @@
 import prisma from 'lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default async function handler (req, res) {
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const fileId:number = parseInt(req.query.fileId)
+    const fileId:number = parseInt(req.query.fileId as string)
 
     const attachedFile = await prisma.attachedFile.findUnique({
       where: {
