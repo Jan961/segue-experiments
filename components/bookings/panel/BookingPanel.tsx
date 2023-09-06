@@ -70,7 +70,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   }
 
   const handleOnChange = (e: any) => {
-    let { id, value } = e
+    let { id, value } = e.target
 
     // Handle numeric fields
     if (id === 'PencilNum') value = value ? parseInt(value) : null
