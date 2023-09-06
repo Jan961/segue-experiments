@@ -1,23 +1,45 @@
+import { useMemo } from 'react'
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
 import { FormInputSelect } from 'components/global/forms/FormInputSelect'
+import moment from 'moment'
 import { useRecoilState } from 'recoil'
 import { formatDateUK, getWeekDay } from 'services/dateService'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
-
   const bookingOptions = bookingJump.bookings
     ? bookingJump.bookings.map((b) => {
       const date = new Date(b.Date)
       const weekday = getWeekDay(date)
       const ukDate = formatDateUK(date)
-      return { text: `${weekday} ${ukDate} | ${b.Venue.Name} (${b.StatusCode})`, value: b.Id }
+      return { text: `${weekday} ${ukDate} | ${b.Venue.Name} (${b.StatusCode})`, value: b.Id, date: ukDate }
     })
     : []
 
+  const selectedBookingIndex = useMemo(() => bookingOptions.findIndex(booking => booking.value === bookingJump.selected), [bookingJump.selected])
   const changeBooking = (e) => {
     const selected = Number(e.target.value)
+    setBookingJump({ ...bookingJump, selected })
+  }
+
+  const goToToday = () => {
+    const currentDate = moment()
+    const sortedBookings = bookingOptions.sort((a, b) => {
+      const distA = Math.abs(currentDate.diff(moment(a.date, 'DD/MM/YYYY'), 'days'))
+      const distB = Math.abs(currentDate.diff(moment(b.date, 'DD/MM/YYYY'), 'days'))
+      return distA - distB
+    })
+    const closestDateBooking = sortedBookings[0]
+    const selected = closestDateBooking.value
+    setBookingJump({ ...bookingJump, selected })
+  }
+  const previousVenue = () => {
+    const selected = bookingOptions[selectedBookingIndex - 1]?.value
+    setBookingJump({ ...bookingJump, selected })
+  }
+  const nextVenue = () => {
+    const selected = bookingOptions[selectedBookingIndex + 1]?.value
     setBookingJump({ ...bookingJump, selected })
   }
 
@@ -50,9 +72,9 @@ const ActionBar = () => {
         </div>
       )}
       <div className="col-span-4 flex grid-cols-5 gap-2 items-center">
-        <ToolbarButton>Go To Today</ToolbarButton>
-        <ToolbarButton>Previous Date</ToolbarButton>
-        <ToolbarButton>Next Date</ToolbarButton>
+        <ToolbarButton onClick={goToToday}>Go To Today</ToolbarButton>
+        <ToolbarButton disabled={selectedBookingIndex === 0} onClick={previousVenue}>Previous Venue</ToolbarButton>
+        <ToolbarButton disabled={selectedBookingIndex === bookingOptions?.length - 1} onClick={nextVenue}>Next Venue</ToolbarButton>
 
         <FormInputSelect
           className="mb-0"
