@@ -18,7 +18,7 @@ export const MileageCalculator = () => {
 
     const refresh = async () => {
       const stops = getStops(bookingDict)
-      const { data } = await axios.post(`/api/distance/${distance.tourCode}`, stops)
+      const { data } = await axios.post('/api/distance', stops)
       setDistance({ ...distance, stops: data, outdated: false })
     }
 

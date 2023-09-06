@@ -68,7 +68,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
   // Hold the previous stop for distance lookup
   let prev = null
 
-  return stops.map((stop: DistanceStop) => {
+  return stops.reverse().map((stop: DistanceStop) => {
     if (!prev || prev.Ids.length > 1) { // If the last stop has multiple options, we don't know which
       prev = stop
       return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: null, Mins: null })) }
@@ -92,28 +92,4 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
       })
     }
   })
-}
-
-/**
- * Retunrn a list ov venues within a radius distance of another
- *
- * from VenueVenue table
- *
- * Venue1Id current venue
- * distance miles willing to travel
- *
- * SELECT * FROM `VenueVenue` WHERE `Venue1Id` = 343 AND `Mileage` <= 50;
- *
- * this query returns 124  records
- *
- * @param venue
- * @param travelDistance
- */
-export const venuesWithinDistance = (venue, travelDistance) => {
-  console.log(venue + ' ' + travelDistance)
-  fetch(`/api/venue/read/venueVenue/${venue}/${travelDistance}`)
-    .then((res) => res.json())
-    .then((data) => {
-      return data
-    })
 }
