@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { getEmailFromReq, checkAccess } from 'services/userService'
+import { checkAccess, getEmailFromReq } from 'services/userService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -10,20 +10,18 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const access = await checkAccess(email, { BookingId })
     if (!access) return res.status(401)
 
-    const searchResults = await prisma.booking.findMany({
-      include: {
-        Contract: true,
-        Venue: true,
-        Performance: true
-      },
-      where: {
-        Id: BookingId
+    const createResult = await prisma.contract.create({
+      data: {
+        BookingId,
+        BarringClauseBreaches: req.body.BarringClauseBreaches
       }
     })
 
-    await res.json(searchResults)
+    return res.json(createResult)
   } catch (err) {
     console.log(err)
-    res.status(403).json({ err: 'Error occurred while generating search results.' })
+    res
+      .status(403)
+      .json({ err: 'Error occurred while creating the contract.' })
   }
 }

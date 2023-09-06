@@ -2,6 +2,7 @@ import { BookingDTO, PerformanceDTO } from 'interfaces'
 import { bookingMapper, performanceMapper } from 'lib/mappers'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { changeBookingDate } from 'services/bookingService'
+import { checkAccess, getEmailFromReq } from 'services/userService'
 
 export interface UpdateDateParams {
   date: string
@@ -17,6 +18,10 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   const { bookingId, date } = req.body as UpdateDateParams
 
   try {
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { BookingId: bookingId })
+    if (!access) return res.status(401)
+
     const result = await changeBookingDate(bookingId, new Date(date))
 
     const response: UpdateDateResponse = { bookings: [bookingMapper(result)], performances: result.Performance.map(performanceMapper) }
