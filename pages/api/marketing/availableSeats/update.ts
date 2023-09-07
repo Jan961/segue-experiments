@@ -33,40 +33,16 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
             Id: existing.Id
           },
           data: {
-            Seats: x.Seats
+            Seats: x.Seats,
+            AvailableCompNotes: x.Note
           }
         })
       } else {
         existing = await tx.availableComp.create({
           data: {
             PerformanceId: x.PerformanceId,
-            Seats: x.Seats
-          }
-        })
-      }
-
-      const note = await tx.note.findFirst({
-        where: {
-          OwnerId: existing.Id,
-          OwnerType: 'AvailableComp'
-        }
-      })
-
-      // Update Note
-      if (note) {
-        await tx.note.update({
-          where: { Id: note.Id },
-          data: {
-            Text: x.Note
-          }
-        })
-      } else {
-        await tx.note.create({
-          data: {
-            OwnerId: existing.Id,
-            OwnerType: 'AvailableComp',
-            TypeName: 'Main',
-            Text: x.Note
+            Seats: x.Seats,
+            AvailableCompNotes: x.Note
           }
         })
       }

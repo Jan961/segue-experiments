@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma'
 import moment from 'moment'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { group, mapValues, pick, sum } from 'radash'
+import { group, mapValues, objectify, pick, sum } from 'radash'
 
 type ScheduleView = {
   RehearsalStartDate: string;
@@ -17,7 +17,6 @@ type ScheduleView = {
   StatusCode?:string;
   Count?:number;
 };
-
 
 export default async function handler (
   req: NextApiRequest,
@@ -57,7 +56,9 @@ export default async function handler (
     const pencilledDayOff = sum(tourSummary.filter(
       (entry) => entry.DateTypeId === 6 && entry.StatusCode === 'U'
     ).map(summary => Number(summary.Count)))
-    const entryTypeSummary = tourSummary.filter(summaryItem => summaryItem.StatusCode === 'C' && !['Booking', 'Rehearsal'].includes(summaryItem.Item)).sort((a, b) => a.DateTypeSeqNo - b.DateTypeSeqNo).map(item => ({ name: item.Item, value: Number(item.Count) }))
+    const entryTypeSummary = tourSummary.filter(summaryItem => summaryItem.StatusCode === 'C' && !['Booking'].includes(summaryItem.Item)).sort((a, b) => a.DateTypeSeqNo - b.DateTypeSeqNo).map(item => ({ name: item.Item, value: Number(item.Count), order: item.DateTypeSeqNo }))
+    const summary = objectify(entryTypeSummary, s => s.name)
+    const others = entryTypeSummary.filter(summary => !['Get-In / Fit-Up', 'Travel Day', 'Rehearsal', 'Declared Holiday'].includes(summary.name))
     const otherDays = sum(
       tourSummary
         .filter((item) => item.StatusCode === 'C' && item.Item !== 'Rehearsal')
@@ -94,7 +95,23 @@ export default async function handler (
             name: 'Bookings',
             value: bookings || 0
           },
-          ...entryTypeSummary
+          {
+            name: 'Rehearsal',
+            value: summary?.Rehearsal?.value || 0
+          },
+          {
+            name: 'Get-In / Fit-Up',
+            value: summary?.['Get-In / Fit-Up']?.value || 0
+          },
+          {
+            name: 'Travel Day',
+            value: summary?.['Travel Day']?.value || 0
+          },
+          {
+            name: 'Declared Holiday',
+            value: summary?.['Declared Holiday']?.value || 0
+          },
+          ...(others || [])
         ],
         [
           {
