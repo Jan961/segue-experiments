@@ -10,7 +10,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { ActivityId: data.Id })
-    if (!access) return res.status(401)
+    if (!access) return res.status(401).end()
 
     await prisma.bookingActivity.delete({
       where: {

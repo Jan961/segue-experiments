@@ -1,7 +1,9 @@
-import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  return res.status(501).end()
+
+  /*
   try {
     const fileId:number = parseInt(req.query.fileId as string)
 
@@ -23,4 +25,5 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     console.error(error)
     res.status(500).send('Internal server error')
   }
+  */
 }

@@ -20,7 +20,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   try {
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { BookingId: bookingId })
-    if (!access) return res.status(401)
+    if (!access) return res.status(401).end()
 
     const result = await changeBookingDate(bookingId, new Date(date))
 

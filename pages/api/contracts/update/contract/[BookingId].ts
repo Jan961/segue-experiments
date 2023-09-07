@@ -4,26 +4,26 @@ import { getEmailFromReq, checkAccess } from 'services/userService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const BookingId = parseInt(req.query.bookingId as string)
+    const BookingId:number = parseInt(req.query.BookingId as string)
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { BookingId })
     if (!access) return res.status(401).end()
 
-    const searchResults = await prisma.booking.findMany({
-      include: {
-        Contract: true,
-        Venue: true,
-        Performance: true
-      },
+    const updateResult = await prisma.contract.updateMany({
       where: {
-        Id: BookingId
+        BookingId
+      },
+      data: {
+        BarringClauseBreaches: req.body.BarringClauseBreaches
       }
     })
 
-    await res.json(searchResults)
+    await res.json(updateResult)
   } catch (err) {
     console.log(err)
-    res.status(403).json({ err: 'Error occurred while generating search results.' })
+    res
+      .status(403)
+      .json({ err: 'Error occurred while generating search results.' })
   }
 }

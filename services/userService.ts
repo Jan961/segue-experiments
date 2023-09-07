@@ -14,6 +14,8 @@ interface AccessCheck {
   PerformanceId?: number
   RehearsalId?: number
   ActivityId?: number
+  AvailableCompId?: number
+  TaskId?: number
 }
 
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
@@ -60,6 +62,8 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
 
   if (!user) return false
 
+  console.log(user.AccountId)
+
   // We just need the minimal for checking existence
   const select = {
     Id: true
@@ -93,6 +97,8 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
       },
       select
     })
+
+    console.log(tour)
     successes.push(!!tour)
   }
 
@@ -213,6 +219,38 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     })
 
     successes.push(!!bookingActivity)
+  }
+
+  if (items.AvailableCompId) {
+    const availableComp = await prisma.availableComp.findFirst({
+      where: {
+        Id: items.AvailableCompId,
+        // Slightly different. This is based on booking
+        Performance: {
+          is: {
+            Booking: {
+              is: EventWhere
+            }
+          }
+        }
+      },
+      select
+    })
+
+    successes.push(!!availableComp)
+  }
+
+  if (items.TaskId) {
+    const task = await prisma.tourTask.findFirst({
+      where: {
+        Id: items.TaskId,
+        // Slightly different. This is based on booking
+        Tour: EventWhere.DateBlock.is.Tour
+      },
+      select
+    })
+
+    successes.push(!!task)
   }
 
   return successes.filter(x => !x).length === 0

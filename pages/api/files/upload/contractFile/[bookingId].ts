@@ -1,8 +1,9 @@
-import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import getMimeType from 'utils/getMimeType'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  return res.status(501).end()
+
+  /*
   if (req.method === 'POST') {
     try {
       const bookingId:number = parseInt(req.query.bookingId as string)
@@ -47,4 +48,5 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   } else {
     res.status(405).json({ success: false, error: 'Method Not Allowed' })
   }
+  */
 }

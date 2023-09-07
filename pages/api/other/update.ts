@@ -9,7 +9,7 @@ export default async function handle (req, res) {
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { OtherId: other.Id })
-    if (!access) return res.status(401)
+    if (!access) return res.status(401).end()
 
     const result = await prisma.other.update({
       where: {

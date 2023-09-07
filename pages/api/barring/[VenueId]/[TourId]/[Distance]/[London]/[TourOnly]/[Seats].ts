@@ -19,7 +19,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
   const email = await getEmailFromReq(req)
   const access = await checkAccess(email, { TourId })
-  if (!access) return res.status(401)
+  if (!access) return res.status(401).end()
 
   const query = `CALL GetBarringVenues(${VenueId},${TourId},${London},${Seats},${TourOnly});`
 

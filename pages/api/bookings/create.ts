@@ -16,7 +16,7 @@ export default async function handle (req, res) {
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { DateBlockId })
-    if (!access) return res.status(401)
+    if (!access) return res.status(401).end()
 
     const created = await createBooking(VenueId, new Date(data.Date), DateBlockId)
     res.status(200).json(bookingMapper(created))

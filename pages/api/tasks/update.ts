@@ -1,11 +1,17 @@
 import { TourTaskDTO } from 'interfaces'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
       const task = req.body as TourTaskDTO
+      const { Id } = task
+
+      const email = await getEmailFromReq(req)
+      const access = await checkAccess(email, { TaskId: Id })
+      if (!access) return res.status(401).end()
 
       await prisma.tourTask.update({
         where: { Id: task.Id },

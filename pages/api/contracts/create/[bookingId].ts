@@ -8,7 +8,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { BookingId })
-    if (!access) return res.status(401)
+    if (!access) return res.status(401).end()
 
     const createResult = await prisma.contract.create({
       data: {

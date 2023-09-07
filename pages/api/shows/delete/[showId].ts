@@ -7,8 +7,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
   const email = await getEmailFromReq(req)
   const access = await checkAccess(email, { ShowId })
-
-  if (!access) return res.status(401).json({})
+  if (!access) return res.status(401).end()
 
   try {
     await prisma.show.update({

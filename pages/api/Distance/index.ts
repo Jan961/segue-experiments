@@ -5,6 +5,8 @@ import { DistanceStop, getDistances } from 'services/venueService'
 export type DistanceParams = DistanceStop[]
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+  // This takes all content from the client. No point checking
+
   if (req.method === 'POST') {
     try {
       const stops: DistanceParams = req.body

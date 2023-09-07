@@ -58,7 +58,7 @@ export default async function handle (req, res) {
     const email = await getEmailFromReq(req)
     for (const BookingId of bookingIds) {
       const access = await checkAccess(email, { BookingId })
-      if (!access) return res.status(401)
+      if (!access) return res.status(401).end()
     }
 
     const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(bookingIds)}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate`

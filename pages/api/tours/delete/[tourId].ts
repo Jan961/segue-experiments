@@ -1,25 +1,26 @@
-import { RehearsalDTO } from 'interfaces'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getEmailFromReq, checkAccess } from 'services/userService'
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const rehearsal = req.body as RehearsalDTO
+  const TourId: number = parseInt(req.query.tourId as string)
 
   const email = await getEmailFromReq(req)
-  const access = await checkAccess(email, { RehearsalId: rehearsal.Id })
+  const access = await checkAccess(email, { TourId })
   if (!access) return res.status(401).end()
 
   try {
-    const results = await prisma.rehearsal.update({
+    await prisma.tour.update({
       where: {
-        Id: rehearsal.Id
+        Id: TourId
       },
-      data: rehearsal
+      data: {
+        IsDeleted: true
+      }
     })
-    res.status(200).json(results)
+    res.status(200).end()
   } catch (e) {
     console.log(e)
-    res.status(500)
+    res.status(500).json({ err: 'Error occurred while deleting tour.' })
   }
 }

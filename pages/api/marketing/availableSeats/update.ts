@@ -18,7 +18,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { PerformanceId })
-    if (!access) return res.status(401)
+    if (!access) return res.status(401).end()
 
     await prisma.$transaction(async (tx) => {
       let existing = await tx.availableComp.findFirst({
