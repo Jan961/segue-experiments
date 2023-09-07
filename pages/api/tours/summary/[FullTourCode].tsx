@@ -58,7 +58,7 @@ export default async function handler (
     ).map(summary => Number(summary.Count)))
     const entryTypeSummary = tourSummary.filter(summaryItem => summaryItem.StatusCode === 'C' && !['Booking'].includes(summaryItem.Item)).sort((a, b) => a.DateTypeSeqNo - b.DateTypeSeqNo).map(item => ({ name: item.Item, value: Number(item.Count), order: item.DateTypeSeqNo }))
     const summary = objectify(entryTypeSummary, s => s.name)
-    const others = entryTypeSummary.filter(summary => !['Get-In / Fit-Up', 'Travel day', 'Rehearsal', 'Declared Holiday'].includes(summary.name))
+    const others = entryTypeSummary.filter(summary => !['Get-In / Fit-Up', 'Travel Day', 'Rehearsal', 'Declared Holiday'].includes(summary.name))
     const otherDays = sum(
       tourSummary
         .filter((item) => item.StatusCode === 'C' && item.Item !== 'Rehearsal')
