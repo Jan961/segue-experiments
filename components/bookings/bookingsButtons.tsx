@@ -1,3 +1,4 @@
+import BookingSchedule from './modal/BookingSchedule'
 import Report from './modal/Report'
 import Barring from './modal/barring'
 
@@ -10,6 +11,7 @@ export default function BookingsButtons ({ currentTourId }: BookingButtonsProps)
     <>
       <Report TourId={currentTourId}></Report>
       <Barring />
+      <BookingSchedule TourId={currentTourId} />
     </>
   )
 }
