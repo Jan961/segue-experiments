@@ -62,8 +62,6 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
 
   if (!user) return false
 
-  console.log(user.AccountId)
-
   // We just need the minimal for checking existence
   const select = {
     Id: true
@@ -98,7 +96,6 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
       select
     })
 
-    console.log(tour)
     successes.push(!!tour)
   }
 
