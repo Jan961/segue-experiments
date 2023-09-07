@@ -2,6 +2,7 @@ import prisma from 'lib/prisma'
 import { dateToSimple } from 'services/dateService'
 import { TSalesView } from 'types/MarketingTypes'
 import numeral from 'numeral'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 const getMapKey = (
   { FullTourCode, TourStartDate, BookingFirstDate, BookingStatusCode, VenueTown, VenueCode, SetSalesFiguresDate, SetBookingWeekNum, SetTourWeekDate }: Pick<TSalesView, 'FullTourCode' | 'TourStartDate' | 'BookingFirstDate' | 'BookingStatusCode' | 'VenueTown' | 'VenueCode' | 'SetSalesFiguresDate' | 'SetBookingWeekNum' | 'SetTourWeekDate'>
@@ -9,8 +10,14 @@ const getMapKey = (
 
 export default async function handle (req, res) {
   try {
-    const bookingId = parseInt(req.query.bookingId)
-    const data = await prisma.$queryRaw`select * from SalesView where BookingId=${bookingId} order by BookingFirstDate, SetSalesFiguresDate`
+    const BookingId = parseInt(req.query.bookingId)
+
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { BookingId })
+    console.log(access)
+    if (!access) return res.status(401).end()
+
+    const data = await prisma.$queryRaw`select * from SalesView where BookingId=${BookingId} order by BookingFirstDate, SetSalesFiguresDate`
     const groupedData = data.reduce((acc, sale) => {
       const key = getMapKey(sale)
       const val = acc[key]

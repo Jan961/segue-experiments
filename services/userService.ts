@@ -2,6 +2,7 @@ import { clerkClient } from '@clerk/nextjs'
 import { getAuth } from '@clerk/nextjs/server'
 import prisma from 'lib/prisma'
 
+// This may need to be expanded to include Tasks, Contracts, Files
 interface AccessCheck {
   ShowId?: number
   TourId?: number
@@ -12,6 +13,7 @@ interface AccessCheck {
   GifuId?: number
   PerformanceId?: number
   RehearsalId?: number
+  ActivityId?: number
 }
 
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {
@@ -36,6 +38,7 @@ export const getAccountId = async (email: string) => {
 }
 
 export const getEmailFromReq = async (req: any) => {
+  // It is definitely worth caching this!
   const { userId } = getAuth(req)
   return getEmailAddressForClerkId(userId)
 }
@@ -46,6 +49,8 @@ export const getAccountIdFromReq = async (req: any) => {
 }
 
 // Check access based on the second paramater. Can pass multiple to it if wanted (but will increase workload)
+// POTENTIAL BOTTLENECK: All API calls and page renders should come through here, unless the result of an AccountId lookup
+// Adding a console log with timer here would be very useful for debug purposes.
 export const checkAccess = async (email: string, items: AccessCheck): Promise<boolean> => {
   const user = await prisma.user.findUnique({
     where: {
@@ -192,6 +197,22 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     })
 
     successes.push(!!perf)
+  }
+
+  // Performance
+  if (items.ActivityId) {
+    const bookingActivity = await prisma.bookingActivity.findFirst({
+      where: {
+        Id: items.ActivityId,
+        // Slightly different. This is based on booking
+        Booking: {
+          is: EventWhere
+        }
+      },
+      select
+    })
+
+    successes.push(!!bookingActivity)
   }
 
   return successes.filter(x => !x).length === 0
