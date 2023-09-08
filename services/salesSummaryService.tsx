@@ -354,6 +354,28 @@ export const colorTextAndBGCell = ({ worksheet, row, col, textColor, cellColor }
   }
 }
 
+export const colorTextAndBGAndItalicCell = ({ worksheet, row, col, textColor, cellColor }: {worksheet: any, row: number, col: number, textColor: COLOR_HEXCODE, cellColor: COLOR_HEXCODE}) => {
+  const cell = worksheet.getCell(row, col)
+  cell.font = { color: { argb: textColor }, italic: true }
+  cell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: cellColor }
+  }
+}
+
+export const topAndBottomBorder = ({ worksheet, row, colFrom, colTo, borderStyle }: {worksheet: any, row: number, colFrom: number, colTo: number, borderStyle: string }) => {
+  for (let col = colFrom; col <= colTo; col++) {
+    worksheet.getCell(row, col).border = {
+      top: { style: borderStyle },
+      bottom: { style: borderStyle }
+    }
+  }
+}
+
+export const minutesInHHmmFormat = (min: number) => {
+  return moment.utc(moment.duration(min, 'minutes').asMilliseconds()).format('HH:mm')
+}
 export const makeColumnTextBold = ({ worksheet, colAsChar }: {worksheet: any, colAsChar: string}) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.font = { bold: true }
