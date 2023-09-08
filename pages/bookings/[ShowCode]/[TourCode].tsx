@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next'
 import GlobalToolbar from 'components/toolbar'
 import BookingsButtons from 'components/bookings/bookingsButtons'
 import Layout from 'components/Layout'
-import { getTourWithContent, lookupTourId } from 'services/TourService'
+import { getTourWithContent } from 'services/TourService'
 import { InfoPanel } from 'components/bookings/InfoPanel'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector'
@@ -11,12 +11,11 @@ import { ScheduleRow } from 'components/bookings/ScheduleRow'
 import { getAllVenuesMin } from 'services/venueService'
 import { InitialState } from 'lib/recoil'
 import { BookingsWithPerformances } from 'services/bookingService'
-import { first, objectify, all } from 'radash'
+import { objectify, all } from 'radash'
 import { getDayTypes } from 'services/dayTypeService'
 import { filterState } from 'state/booking/filterState'
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector'
 import { tourJumpState } from 'state/booking/tourJumpState'
-import { ParsedUrlQuery } from 'querystring'
 import { Spinner } from 'components/global/Spinner'
 import { ToolbarButton } from 'components/bookings/ToolbarButton'
 import { MileageCalculator } from 'components/bookings/MileageCalculator'
@@ -24,9 +23,10 @@ import React, { PropsWithChildren } from 'react'
 import classNames from 'classnames'
 import { getTourJumpState } from 'utils/getTourJumpState'
 import { viewState } from 'state/booking/viewState'
+import { getAccountIdFromReq } from 'services/userService'
 
 interface bookingProps {
-  Id: number,
+  TourId: number,
   intitialState: InitialState
 }
 
@@ -65,7 +65,7 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   )
 }
 
-const BookingPage = ({ Id }: bookingProps) => {
+const BookingPage = ({ TourId }: bookingProps) => {
   const schedule = useRecoilValue(filteredScheduleSelector)
   const { Sections } = schedule
   const [filter, setFilter] = useRecoilState(filterState)
@@ -98,7 +98,7 @@ const BookingPage = ({ Id }: bookingProps) => {
             onClick={() => gotoToday()}>
             Go To Today
           </ToolbarButton>
-          <BookingsButtons key={'toolbar'} currentTourId={Id} ></BookingsButtons>
+          <BookingsButtons key={'toolbar'} currentTourId={TourId} ></BookingsButtons>
         </GlobalToolbar>
       </div>
       <div className='grid grid-cols-12'>
@@ -167,11 +167,6 @@ const BookingPage = ({ Id }: bookingProps) => {
 
 export default BookingPage
 
-interface Params extends ParsedUrlQuery {
-  ShowCode: string
-  TourCode: string
-}
-
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   /*
     We get the data for the whole booking page here. We pass it to the constructor, then store it in state management.
@@ -181,18 +176,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
+  const AccountId = await getAccountIdFromReq(ctx.req)
+  const tourJump = await getTourJumpState(ctx, 'bookings', AccountId)
 
-  const { ShowCode, TourCode } = ctx.query as Params
-  console.log(`ServerSideProps: ${ShowCode}/${TourCode}`)
-  const { Id } = await lookupTourId(ShowCode, TourCode) || {}
-  console.log(`Found tour ${Id}`)
+  const TourId = tourJump.selected
+  // TourJumpState is checking if it's valid to access by accountId
+  if (!TourId) return { notFound: true }
 
   // Get in parallel
-  const [venues, tour, dateTypeRaw, tourJump] = await all([
+  const [venues, tour, dateTypeRaw] = await all([
     getAllVenuesMin(),
-    getTourWithContent(Id),
-    getDayTypes(),
-    getTourJumpState(ctx, 'bookings')
+    getTourWithContent(TourId),
+    getDayTypes()
   ])
 
   console.log(`Retrieved main content. Tour: ${tour.Id}`)
@@ -219,7 +214,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const distance = {
     stops: [],
     outdated: true,
-    tourCode: TourCode
+    tourCode: tour.Code
   }
 
   // See _app.tsx for how this is picked up
@@ -246,7 +241,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      Id,
+      TourId,
       initialState
     }
   }

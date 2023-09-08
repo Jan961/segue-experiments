@@ -3,8 +3,10 @@ import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
+import { lookupTourId } from 'services/TourService'
 import { addWidthAsPerContent } from 'services/reportsService'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 enum HOLD_OR_COMP {
   HOLD = 'Hold',
@@ -155,7 +157,13 @@ const makeCellTextBold = ({ worksheet, row, col }: {worksheet: any, row: number,
 }
 
 const handler = async (req, res) => {
-  const { tourCode, fromDate, toDate, venue, bookingStatus } = JSON.parse(req.body) || {}
+  const { TourId, tourCode, fromDate, toDate, venue } = JSON.parse(req.body) || {}
+
+  // This doesn't check tourCode
+  const email = await getEmailFromReq(req)
+  const access = await checkAccess(email, { TourId })
+  if (!access) return res.status(401).end()
+
   const workbook = new ExcelJS.Workbook()
   const conditions: Prisma.Sql[] = []
   if (tourCode) {

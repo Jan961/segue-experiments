@@ -1,17 +1,8 @@
-import Link from 'next/link'
 import Layout from '../../../components/Layout'
 import Toolbar from '../../../components/marketing/venue/toolbar'
-import SideMenu from '../../../components/sideMenu'
-import { Show, User } from '../../../interfaces'
-import { GetStaticPaths, GetStaticProps } from 'next'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IconProp } from '@fortawesome/fontawesome-svg-core'
-import { ReactElement, useState } from 'react'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import Status from '../../../components/marketing/venue/status'
+import { Show } from '../../../interfaces'
+import { useState } from 'react'
 import Entry from '../../../components/marketing/sales/entry'
-import EmailLoader from '../../../components/marketing/sales/email-loader'
 
 type Props = {
   items: Show[];

@@ -15,14 +15,17 @@ import { TourDTO } from 'interfaces'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import { getTourById } from 'services/TourService'
 import { BreadCrumb } from 'components/global/BreadCrumb'
+import { checkAccess, getEmailFromReq } from 'services/userService'
 
 type Props = {
   tour: TourDTO
+  showCode: string
 }
 
-const Deletetour = ({ tour }: Props) => {
+const Deletetour = ({ tour, showCode }: Props) => {
   const router = useRouter()
-  const back = `/tours/${tour.ShowId}`
+  const { path } = router.query
+  const back = `/${path}/${showCode}`
 
   const [status, setStatus] = useState({
     submitted: true,
@@ -69,10 +72,10 @@ const Deletetour = ({ tour }: Props) => {
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href="/shows">
+        <BreadCrumb.Item href={`/${path}`}>
           Shows
         </BreadCrumb.Item>
-        <BreadCrumb.Item href={`/tours/${tour.ShowId}`}>
+        <BreadCrumb.Item href={back}>
           { tour.ShowName }
         </BreadCrumb.Item>
         <BreadCrumb.Item>
@@ -100,10 +103,15 @@ const Deletetour = ({ tour }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const tourId = ctx.params.TourId as string
-  const tour = await getTourById(parseInt(tourId))
+  const TourId = parseInt(ctx.params.TourId as string)
+  const email = await getEmailFromReq(ctx.req)
 
-  return { props: { tour: tourEditorMapper(tour) } }
+  const access = await checkAccess(email, { TourId })
+  if (!access) return { notFound: true }
+
+  const tour = await getTourById(TourId)
+
+  return { props: { tour: tourEditorMapper(tour), showCode: tour.Show.Code } }
 }
 
 export default Deletetour

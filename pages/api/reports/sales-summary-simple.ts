@@ -6,13 +6,20 @@ import Decimal from 'decimal.js'
 import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName, addCellBorder, formatCurrencyNumberWithNDecimal, convertDateFormat, makeRowTextNormal } from 'services/salesSummaryService'
 import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
 import { addWidthAsPerContent } from 'services/reportsService'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 // TODO
 // Decimal upto 2 places fix
 // Tour row height fix
 
-const handler = async (req, res) => {
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {}
+
+  const email = await getEmailFromReq(req)
+  const access = await checkAccess(email, { TourId: tourId })
+  if (!access) return res.status(401).end()
+
   const workbook = new ExcelJS.Workbook()
   const conditions: Prisma.Sql[] = []
   if (tourId) {
@@ -211,5 +218,3 @@ const handler = async (req, res) => {
     res.end()
   })
 }
-
-export default handler

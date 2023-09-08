@@ -2,6 +2,7 @@ import prisma from 'lib/prisma'
 import { Prisma } from '@prisma/client'
 import { tourMapper } from 'lib/mappers'
 import { getShowWithToursById } from './ShowService'
+import { getAccountId, getEmailFromReq } from './userService'
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -21,28 +22,38 @@ export const getActiveTours = async (accountId:number) => {
   })
 }
 
-export const getTourPageProps = async (ctx) => {
+export const getTourPageProps = async (ctx: any) => {
   const { ShowCode } = ctx.params
+  const email = await getEmailFromReq(ctx.req)
+  const AccountId = await getAccountId(email)
 
-  const showRaw = await prisma.show.findUnique({
+  const showRaw = await prisma.show.findFirst({
     where: {
-      Code: ShowCode
+      Code: ShowCode,
+      AccountId
+    },
+    select: {
+      Id: true,
+      Code: true
     }
   })
 
-  const show = await getShowWithToursById(showRaw?.Id)
+  if (!showRaw) return { notFound: true, props: {} }
+
+  const show = await getShowWithToursById(showRaw.Id)
   const tours = tourMapper(show)
 
-  return { props: { tours, id: show.Id } }
+  return { props: { tours, code: show.Code, name: show.Name } }
 }
 
-export const lookupTourId = async (ShowCode: string, TourCode: string) => {
+export const lookupTourId = async (ShowCode: string, TourCode: string, AccountId: number) => {
   return prisma.tour.findFirst(
     {
       where: {
         Code: TourCode as string,
         Show: {
-          Code: ShowCode as string
+          Code: ShowCode as string,
+          AccountId
         }
       },
       select: {
@@ -52,7 +63,7 @@ export const lookupTourId = async (ShowCode: string, TourCode: string) => {
   )
 }
 
-export const getAllTours = async () => {
+export const getAllTours = async (AccountId: number) => {
   return prisma.tour.findMany({
     select: {
       Id: true,
@@ -62,6 +73,13 @@ export const getAllTours = async () => {
         select: {
           Code: true,
           Name: true
+        }
+      }
+    },
+    where: {
+      Show: {
+        is: {
+          AccountId
         }
       }
     }
@@ -131,10 +149,15 @@ export const getTourById = async (Id: number) => {
   })
 }
 
-export const getToursAndTasks = async () => {
+export const getToursAndTasks = async (AccountId: number) => {
   return await prisma.tour.findMany({
     where: {
-      IsArchived: false
+      IsArchived: false,
+      Show: {
+        is: {
+          AccountId
+        }
+      }
     },
     include: {
       Show: true,

@@ -1,56 +1,46 @@
-import Link from "next/link";
-import Layout from "../../components/guestLayout";
-import AccountPaymentDetails from "../../components/accounts/forms/paymentDetails";
-import AccountDetails from "../../components/accounts/forms/accountDetails";
+import Link from 'next/link'
+import Layout from 'components/guestLayout'
 
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
-import { userService } from "../../services/user.service";
-import { alertService } from "../../services/alert.service";
-import { useRouter } from "next/router";
-import * as React from "react";
-import { emailService } from "../../services/emailService";
-import Licence from "../../components/accounts/manage-users/licence";
-import terms from "../terms";
-import axios from "axios";
-import { forceReload } from "../../utils/forceReload";
-import accountId from "../accounts/update-details/[account-id]";
-import Image from "next/image";
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import * as Yup from 'yup'
+import { userService } from 'services/user.service'
+import { alertService } from 'services/alert.service'
+import { useRouter } from 'next/router'
+import * as React from 'react'
+import { emailService } from 'services/emailService'
+import axios from 'axios'
 import { Switch } from '@headlessui/react'
-import { Spinner } from "spinner";
+import { Spinner } from 'spinner'
+import classNames from 'classnames'
 
-function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
-  }
-
-export default Register;
-function Register() {
-    const [toggle, setToggle] = React.useState(false);
-  const router = useRouter();
+export default Register
+function Register () {
+  const [toggle, setToggle] = React.useState(false)
+  const router = useRouter()
 
   // form validation rules
   const validationSchema = Yup.object().shape({
     // User
-    name: Yup.string().required("Name is required"),
+    name: Yup.string().required('Name is required'),
     email: Yup.string().required(
-      "Your Email is required, to allow login and notifications"
+      'Your Email is required, to allow login and notifications'
     ),
     password: Yup.string()
-      .required("Password is required")
-      .min(8, "Password must be at least 8 characters"),
+      .required('Password is required')
+      .min(8, 'Password must be at least 8 characters'),
     password_confirm: Yup.string().oneOf(
-      [Yup.ref("password"), null],
-      "Passwords must match"
+      [Yup.ref('password'), null],
+      'Passwords must match'
     ),
 
     // Account
 
     telephone: Yup.string()
-      .required("You need to enter your business building")
-      .min(10, "Please include your full phone number"),
-    business_name: Yup.string().required("We need your business name"),
-    address_line_1: Yup.string().required("We need your business address"),
+      .required('You need to enter your business building')
+      .min(10, 'Please include your full phone number'),
+    business_name: Yup.string().required('We need your business name'),
+    address_line_1: Yup.string().required('We need your business address'),
     address_line_2: Yup.string().notRequired(),
     address_line_3: Yup.string().notRequired(),
     postcode: Yup.string().notRequired(),
@@ -58,39 +48,39 @@ function Register() {
     company_website: Yup.string().notRequired(),
     var_reg: Yup.string().notRequired(),
     business_type: Yup.string().required(
-      "What kind of business are you will you use this software with"
+      'What kind of business are you will you use this software with'
     ),
 
     // Account Payment
     card_number: Yup.string().notRequired(),
     card_expiration_date: Yup.string()
-      .required("Expiration Date is required")
+      .required('Expiration Date is required')
       .matches(
         /^(0[1-9]|1[0-2])?([0-9]{2})$/,
-        "Must be Date in 0112 (Month)(Year)"
+        'Must be Date in 0112 (Month)(Year)'
       )
-      .min(4, "Must be exactly 4 digits")
-      .max(4, "Must be exactly 4 digits"),
+      .min(4, 'Must be exactly 4 digits')
+      .max(4, 'Must be exactly 4 digits'),
     card_cvc: Yup.string()
-      .required("CVC is required")
-      .matches(/^[0-9]+$/, "Must be only digits")
-      .min(3, "Must be exactly 3 digits")
-      .max(3, "Must be exactly 3 digits"),
+      .required('CVC is required')
+      .matches(/^[0-9]+$/, 'Must be only digits')
+      .min(3, 'Must be exactly 3 digits')
+      .max(3, 'Must be exactly 3 digits'),
     card_postcode: Yup.string().notRequired(),
 
     // Accepted Terms and Conditions
     terms_agree: Yup.boolean().oneOf(
       [true],
-      "You must accept the terms and conditions"
-    ),
-  });
-  const formOptions = { resolver: yupResolver(validationSchema) };
+      'You must accept the terms and conditions'
+    )
+  })
+  const formOptions = { resolver: yupResolver(validationSchema) }
 
   // get functions to build form with useForm() hook
-  const { register, handleSubmit, formState } = useForm(formOptions);
-  const { errors } = formState;
+  const { register, handleSubmit, formState } = useForm(formOptions)
+  const { errors } = formState
 
-  function createPayload(user) {
+  function createPayload (user) {
     return {
       businessName: user.business_name,
       telephoneNumber: user.telephone,
@@ -99,65 +89,65 @@ function Register() {
       addressLine2: user.address_line_2,
       addressLine3: user.address_line_3,
       county: user.county,
-      country: null, //user.country,
+      country: null, // user.country,
       postcode: user.postcode,
       vatRegistered: user.var_reg,
       businessType: parseInt(user.business_type),
       companyWebsite: user.company_website,
       password: user.password,
-      name:user.name
-    };
-  }
-
-  async function createAccount(user) {
-    try {
-      const response = await axios.post(
-        "/api/account/create/",
-        createPayload(user)
-      );
-
-      console.log("RESPONSE DATA:", response.data.accountId);
-      const accountID = await response.data.AccountId;
-
-      if (accountID) {
-        try {
-          await axios.post("/api/venue/setup/setupAccountVenues", {
-            accountId: accountID,
-          });
-        } catch (error) {
-          console.error(error);
-        }
-      }
-
-      return accountID;
-    } catch (error) {
-      console.error(error);
-      return null;
+      name: user.name
     }
   }
 
-  async function onSubmit(user) {
-    //Create Account get Account ID
-    let paymentSuccess: boolean;
+  async function createAccount (user) {
+    try {
+      const response = await axios.post(
+        '/api/account/create/',
+        createPayload(user)
+      )
 
-    paymentSuccess = true;
+      console.log('RESPONSE DATA:', response.data.accountId)
+      const accountID = await response.data.AccountId
 
-    user.accountId = await createAccount(user);
+      if (accountID) {
+        try {
+          await axios.post('/api/venue/setup/setupAccountVenues', {
+            accountId: accountID
+          })
+        } catch (error) {
+          console.error(error)
+        }
+      }
 
-    //Send User to UserService to Register
+      return accountID
+    } catch (error) {
+      console.error(error)
+      return null
+    }
+  }
+
+  async function onSubmit (user) {
+    // Create Account get Account ID
+    let paymentSuccess: boolean
+
+    paymentSuccess = true
+
+    user.accountId = await createAccount(user)
+
+    // Send User to UserService to Register
     return userService
       .register(user)
       .then(() => {
         // Send an alert to say account has been registered
-        alertService.success("Registration successful", {
-          keepAfterRouteChange: true,
-        });
+        alertService.success('Registration successful', {
+          keepAfterRouteChange: true
+        })
         // Email users registered email with information about account
-        emailService.send("confirmation", user);
+        emailService.send('confirmation', user)
         // Send user to Login Page to access the new Account with User Details
-        router.push("login");
+        router.push('login')
       })
-      .catch(alertService.error("Error Registering", null));
+      .catch(alertService.error('Error Registering', null))
   }
 
   return (
@@ -191,7 +181,7 @@ function Register() {
                         id="email"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="Your email"
-                        {...register("email")}
+                        {...register('email')}
                       />
                       <div className="invalid-feedback">
                         {errors.email?.message}
@@ -204,7 +194,7 @@ function Register() {
                         id="name"
                         placeholder="Your Name"
                         className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("name")}
+                        {...register('name')}
                       />
                       <div className="invalid-feedback">
                         {errors.name?.message}
@@ -217,7 +207,7 @@ function Register() {
                         id="password"
                         placeholder="Password"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("password")}
+                        {...register('password')}
                       />
                       <div className="invalid-feedback">
                         {errors.password?.message}
@@ -228,7 +218,7 @@ function Register() {
                         type="password"
                         placeholder="Password Repeat"
                         className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("password_confirm")}
+                        {...register('password_confirm')}
                       />
                       <div className="invalid-feedback">
                         {errors.password_confirm?.message}
@@ -240,19 +230,19 @@ function Register() {
                         type="tel"
                         placeholder="Telephone number"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("telephone")}
+                        {...register('telephone')}
                       />
                       <div className="invalid-feedback">
                         {errors.telephone?.message}
                       </div>
                     </div>
                     <div>
-    
+
                       <input
                         type="text"
                         placeholder="Business Name"
                         className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("business_name")}
+                        {...register('business_name')}
                       />
                       <div className="invalid-feedback">
                         {errors.business_name?.message}
@@ -263,7 +253,7 @@ function Register() {
                         type="text"
                         placeholder="Address line 1"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("address_line_1")}
+                        {...register('address_line_1')}
                       />
                       <div className="invalid-feedback">
                         {errors.address_line_1?.message}
@@ -275,7 +265,7 @@ function Register() {
                           type="text"
                           className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           placeholder="Website URL"
-                          {...register("company_website")}
+                          {...register('company_website')}
                         />
                         <div className="invalid-feedback">
                           {errors.company_website?.message}
@@ -287,14 +277,14 @@ function Register() {
                         type="text"
                         placeholder="Address line 2"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("address_line_2")}
+                        {...register('address_line_2')}
                       />
                       <div className="invalid-feedback">
                         {errors.address_line_2?.message}
                       </div>
                     </div>
                     <div className="flex flex-row items-center">
-                      <input type="checkbox" {...register("var_reg")} />
+                      <input type="checkbox" {...register('var_reg')} />
                       <span className="text-sm mr-3 text-gray-500"> </span>
                       <label className="font-bold text-gray-500">Business is Vat Registered</label>
                     </div>
@@ -303,7 +293,7 @@ function Register() {
                         type="text"
                         placeholder="Address line 3"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("address_line_3")}
+                        {...register('address_line_3')}
                       />
                       <div className="invalid-feedback">
                         {errors.address_line_3?.message}
@@ -312,8 +302,8 @@ function Register() {
                     <div>
                       <select
                         className="relative block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        defaultValue={"Select one"}
-                        {...register("business_type")}
+                        defaultValue={'Select one'}
+                        {...register('business_type')}
                       >
                         <option value="0" disabled>
                           Select one
@@ -331,7 +321,7 @@ function Register() {
                         type="text"
                         placeholder="County"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("county")}
+                        {...register('county')}
                       />
                       <div className="invalid-feedback">
                         {errors.county?.message}
@@ -344,7 +334,7 @@ function Register() {
                         type="text"
                         placeholder="Postcode"
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        {...register("postcode")}
+                        {...register('postcode')}
                       />
                       <div className="invalid-feedback">
                         {errors.postcode?.message}
@@ -356,29 +346,29 @@ function Register() {
                 </fieldset>
               </div>
 
-                <div className="flex flex-row items-center justify-between h-24 border-y-2 border-gray-500 my-4">
-                    <span className="text-4xl font-bold text-gray-900">Total Per Month: £ 120 (inc VAT)</span>
+              <div className="flex flex-row items-center justify-between h-24 border-y-2 border-gray-500 my-4">
+                <span className="text-4xl font-bold text-gray-900">Total Per Month: £ 120 (inc VAT)</span>
                 <Switch
-      checked={toggle}
-      onChange={() => setToggle(!toggle)}
-      className={classNames(
-        toggle ? 'bg-primary-green ' : 'bg-gray-200',
-        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:primary-green focus:ring-offset-2'
-      )}
-    >
-      <span className="sr-only">Use setting</span>
-      <span
-        aria-hidden="true"
-        className={classNames(
-          toggle ? 'translate-x-5' : 'translate-x-0',
-          'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
-        )}
-      />
-    </Switch>
-    <span className="text-xl text-gray-500 font-bold ">
-        Pay Monthly 
-    </span>
-                </div>
+                  checked={toggle}
+                  onChange={() => setToggle(!toggle)}
+                  className={classNames(
+                    toggle ? 'bg-primary-green ' : 'bg-gray-200',
+                    'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:primary-green focus:ring-offset-2'
+                  )}
+                >
+                  <span className="sr-only">Use setting</span>
+                  <span
+                    aria-hidden="true"
+                    className={classNames(
+                      toggle ? 'translate-x-5' : 'translate-x-0',
+                      'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out'
+                    )}
+                  />
+                </Switch>
+                <span className="text-xl text-gray-500 font-bold ">
+        Pay Monthly
+                </span>
+              </div>
               <div>
                 <fieldset id="Payment" className="flex flex-col items-center">
                   <legend className="block w-full text-center text-2xl font-bold text-gray-700 ">
@@ -390,7 +380,7 @@ function Register() {
                         type="text"
                         className="block w-full min-w-0 flex-1 rounded-none rounded-t-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         placeholder="Long Card #"
-                        {...register("card_number")}
+                        {...register('card_number')}
                       />
                       <div className="invalid-feedback">
                         {errors.card_number?.message}
@@ -402,7 +392,7 @@ function Register() {
                           type="text"
                           className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           placeholder="Valid MM / YY"
-                          {...register("card_expiration_date")}
+                          {...register('card_expiration_date')}
                         />
                         <div className="invalid-feedback">
                           {errors.card_expiration_date?.message}
@@ -413,7 +403,7 @@ function Register() {
                           type="text"
                           className="block w-full min-w-0 flex-1   rounded-md drop-shadow-md border-gray-300  px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           placeholder="CVC"
-                          {...register("card_cvc")}
+                          {...register('card_cvc')}
                         />
                         <div className="invalid-feedback">
                           {errors.card_cvc?.message}
@@ -427,7 +417,7 @@ function Register() {
                           type="text"
                           className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                           placeholder="Postcode"
-                          {...register("card_postcode")}
+                          {...register('card_postcode')}
                         />
                         <div className="invalid-feedback">
                           {errors.card_postcode?.message}
@@ -443,18 +433,18 @@ function Register() {
                   <div className="flex flex-col">
                     <div className="w-full flex flex-row justify-center items-center my-4">
 
-                    <label htmlFor="terms_agree" className="sr-only">
+                      <label htmlFor="terms_agree" className="sr-only">
                       Agree with Segue terms and conditions
-                    </label>
-                    <input type="checkbox" className="mr-2" {...register("terms_agree")} />
-                    <div className="invalid-feedback">
-                      {errors.terms_agree?.message}
-                    </div>
-                    <span className="inline text-sm text-gray-500">
+                      </label>
+                      <input type="checkbox" className="mr-2" {...register('terms_agree')} />
+                      <div className="invalid-feedback">
+                        {errors.terms_agree?.message}
+                      </div>
+                      <span className="inline text-sm text-gray-500">
                       I agree to the
-                      <Link href={"terms"} className="text-blue-500 font-bold"> Terms and conditions </Link> and
-                      <Link href={"privacy"} className="text-blue-500 font-bold"> Privacy Policy</Link>
-                    </span>
+                        <Link href={'terms'} className="text-blue-500 font-bold"> Terms and conditions </Link> and
+                        <Link href={'privacy'} className="text-blue-500 font-bold"> Privacy Policy</Link>
+                      </span>
                     </div>
                   </div>
                   <div className="w-full flex flex-row justify-center">
@@ -476,5 +466,5 @@ function Register() {
         </div>
       </Layout>
     </>
-  );
+  )
 }

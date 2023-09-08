@@ -1,124 +1,120 @@
-import { Subject } from "rxjs";
-import { filter } from "rxjs/operators";
-import AccountRegistration from "../components/emails/accountRegistration";
-import { User } from "../interfaces";
-import fs from "fs";
+import fs from 'fs'
 
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer')
 
 export const emailService = {
   send,
   sendInvite,
   deleteUser,
-  sendForgottenPassword,
-};
-
-async function getLogoBase64(logoPath) {
-  const logoBase64 = fs.readFileSync(logoPath).toString("base64");
-  return logoBase64;
+  sendForgottenPassword
 }
 
-async function getSocialLogoBase64(socialLogoPath) {
-  const socialLogoBase64 = await getLogoBase64(socialLogoPath);
-  return socialLogoBase64;
+async function getLogoBase64 (logoPath) {
+  const logoBase64 = fs.readFileSync(logoPath).toString('base64')
+  return logoBase64
 }
 
-async function createAttachmentsAndLogos() {
-  const path = (await import("path")).default;
+async function getSocialLogoBase64 (socialLogoPath) {
+  const socialLogoBase64 = await getLogoBase64(socialLogoPath)
+  return socialLogoBase64
+}
+
+async function createAttachmentsAndLogos () {
+  const path = (await import('path')).default
   const logoPath = path.join(
     process.cwd(),
-    "public/segue/segue_logo.png"
-  );
+    'public/segue/segue_logo.png'
+  )
   const facebookLogoPath = path.join(
     process.cwd(),
-    "public/segue/icons/social/facebookLogo.png"
-  );
+    'public/segue/icons/social/facebookLogo.png'
+  )
   const twitterLogoPath = path.join(
     process.cwd(),
-    "public/segue/icons/social/twitterLogo.png"
-  );
+    'public/segue/icons/social/twitterLogo.png'
+  )
   const instagramLogoPath = path.join(
     process.cwd(),
-    "public/segue/icons/social/instagramLogo.png"
-  );
+    'public/segue/icons/social/instagramLogo.png'
+  )
   const linkedinLogoPath = path.join(
     process.cwd(),
-    "public/segue/icons/social/linkedinLogo.png"
-  );
+    'public/segue/icons/social/linkedinLogo.png'
+  )
 
-  const logoBase64 = await getLogoBase64(logoPath);
-  const facebookLogoBase64 = await getSocialLogoBase64(facebookLogoPath);
-  const twitterLogoBase64 = await getSocialLogoBase64(twitterLogoPath);
-  const instagramLogoBase64 = await getSocialLogoBase64(instagramLogoPath);
-  const linkedinLogoBase64 = await getSocialLogoBase64(linkedinLogoPath);
+  const logoBase64 = await getLogoBase64(logoPath)
+  const facebookLogoBase64 = await getSocialLogoBase64(facebookLogoPath)
+  const twitterLogoBase64 = await getSocialLogoBase64(twitterLogoPath)
+  const instagramLogoBase64 = await getSocialLogoBase64(instagramLogoPath)
+  const linkedinLogoBase64 = await getSocialLogoBase64(linkedinLogoPath)
 
   const attachments = [
     {
-      filename: "logo.png",
+      filename: 'logo.png',
       content: logoBase64,
-      encoding: "base64",
-      cid: "logo",
+      encoding: 'base64',
+      cid: 'logo'
     },
     {
-      filename: "facebook_logo.png",
+      filename: 'facebook_logo.png',
       content: facebookLogoBase64,
-      encoding: "base64",
-      cid: "facebookLogo",
+      encoding: 'base64',
+      cid: 'facebookLogo'
     },
     {
-      filename: "twitter_logo.png",
+      filename: 'twitter_logo.png',
       content: twitterLogoBase64,
-      encoding: "base64",
-      cid: "twitterLogo",
+      encoding: 'base64',
+      cid: 'twitterLogo'
     },
     {
-      filename: "instagram_logo.png",
+      filename: 'instagram_logo.png',
       content: instagramLogoBase64,
-      encoding: "base64",
-      cid: "instagramLogo",
+      encoding: 'base64',
+      cid: 'instagramLogo'
     },
     {
-      filename: "linkedin_logo.png",
+      filename: 'linkedin_logo.png',
       content: linkedinLogoBase64,
-      encoding: "base64",
-      cid: "linkedinLogo",
-    },
-  ];
+      encoding: 'base64',
+      cid: 'linkedinLogo'
+    }
+  ]
 
   const completeContent = {
-    attachments: attachments,
-    logoBase64: logoBase64,
-    facebookLogoBase64: facebookLogoBase64,
-    twitterLogoBase64: twitterLogoBase64,
-    instagramLogoBase64: instagramLogoBase64,
-    linkedinLogoBase64: linkedinLogoBase64,
-  };
-  return completeContent;
+    attachments,
+    logoBase64,
+    facebookLogoBase64,
+    twitterLogoBase64,
+    instagramLogoBase64,
+    linkedinLogoBase64
+  }
+  return completeContent
 }
 
 // enable subscribing to alerts observable
-function send(confirmation: string, emailAddress: string) {
-  const to = "noreply@website.dev"; // WHo the email is to
-  const from = "noreply@website.dev"; // Add this to ENV
+function send (confirmation: string, emailAddress: string) {
+  const to = 'noreply@website.dev' // WHo the email is to
+  const from = 'noreply@website.dev' // Add this to ENV
 
-  const htmlBody = "";
+  const htmlBody = ''
 }
 
 const socialLogos = {
-  facebookLogo: "facebookLogo",
-  twitterLogo: "twitterLogo",
-  instagramLogo: "instagramLogo",
-  linkedinLogo: "linkedinLogo",
-};
+  facebookLogo: 'facebookLogo',
+  twitterLogo: 'twitterLogo',
+  instagramLogo: 'instagramLogo',
+  linkedinLogo: 'linkedinLogo'
+}
 
-function createHeader() {
+function createHeader () {
   return `
     <div style="display: flex; justify-content: center; width: 100%;">
       <img src="cid:logo" alt="Logo" style="width: auto; height: 200px;">
-    </div>`;
+    </div>`
 }
 
-function createFooter(
+function createFooter (
   facebookUrl,
   twitterUrl,
   instagramUrl,
@@ -132,23 +128,23 @@ function createFooter(
           <table cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; margin-bottom: 15px;">
             <tr>
               <td style="padding-right: 10px;"><a href="${encodeURIComponent(
-                facebookUrl
-              )}"><img src="cid:${
-    socialLogos.facebookLogo
-  }" alt="Logo" style="width: auto; height: 50px;"/></a></td>
+    facebookUrl
+  )}"><img src="cid:${
+  socialLogos.facebookLogo
+}" alt="Logo" style="width: auto; height: 50px;"/></a></td>
               <td style="padding-right: 10px;"><a href="${encodeURIComponent(
-                twitterUrl
-              )}"><img src="cid:${
-    socialLogos.twitterLogo
-  }" alt="Logo" style="width: auto; height: 50px;"/></a></td>
+    twitterUrl
+  )}"><img src="cid:${
+  socialLogos.twitterLogo
+}" alt="Logo" style="width: auto; height: 50px;"/></a></td>
               <td style="padding-right: 10px;"><a href="${encodeURIComponent(
-                instagramUrl
-              )}"><img src="cid:${
-    socialLogos.instagramLogo
-  }" alt="Logo" style="width: auto; height: 50px;"/></a></td>
+    instagramUrl
+  )}"><img src="cid:${
+  socialLogos.instagramLogo
+}" alt="Logo" style="width: auto; height: 50px;"/></a></td>
               <td><a href="${encodeURIComponent(linkedinUrl)}"><img src="cid:${
-    socialLogos.linkedinLogo
-  }" alt="Logo" style="width: auto; height: 50px;"/></a></td>
+  socialLogos.linkedinLogo
+}" alt="Logo" style="width: auto; height: 50px;"/></a></td>
             </tr>
           </table>
         </td>
@@ -161,39 +157,39 @@ function createFooter(
           <small style="font-size: small;">SEGUE is a trading name of JENDAGI PRODUCTIONS LIMITED (SC546989), registered in Scotland at 10 Newton Terrace, Glasgow, Scotland, G3 7PJ</small>
         </td>
       </tr>
-    </table>`;
+    </table>`
 }
 
-async function sendInvite(user) {
+async function sendInvite (user) {
   try {
-    const facebookUrl = process.env.facebookUrl;
-    const twitterUrl = process.env.twitterUrl;
-    const instagramUrl = process.env.instagramUrl;
-    const linkedinUrl = process.env.linkedinUrl;
+    const facebookUrl = process.env.facebookUrl
+    const twitterUrl = process.env.twitterUrl
+    const instagramUrl = process.env.instagramUrl
+    const linkedinUrl = process.env.linkedinUrl
 
-    const { attachments, logoBase64 } = await createAttachmentsAndLogos();
-    const header = createHeader();
+    const { attachments, logoBase64 } = await createAttachmentsAndLogos()
+    const header = createHeader()
     const footer = createFooter(
       facebookUrl,
       twitterUrl,
       instagramUrl,
       linkedinUrl,
       socialLogos
-    );
-    const subject = "Welcome to Segue - you have been invited";
+    )
+    const subject = 'Welcome to Segue - you have been invited'
 
-    const link = `http://127.0.0.1:3000/account-actions/${user.UserId}/activate/${user.Guid}`;
+    const link = `http://127.0.0.1:3000/account-actions/${user.UserId}/activate/${user.Guid}`
 
     const plainText =
       `Hello ${user.UserName},\n` +
-      "\n" +
+      '\n' +
       "Thank you for signing up for our service! We're glad to have you on board.\n" +
-      "\n" +
-      "To activate your account and start using our service, please click the link below:\n" +
-      "\n" +
+      '\n' +
+      'To activate your account and start using our service, please click the link below:\n' +
+      '\n' +
       `"${link}\n` +
-      "\n" +
-      "If you have any questions or need help getting started, please don't hesitate to reach out. We're here to help!\n";
+      '\n' +
+      "If you have any questions or need help getting started, please don't hesitate to reach out. We're here to help!\n"
 
     const htmlBody = `
     <div style="display: flex; flex-direction: column; align-items: center; width: 100%;">
@@ -210,42 +206,42 @@ async function sendInvite(user) {
         </div>
           </div>
       </div>
-      `;
-    sendEmail(user.EmailAddress, subject, plainText, htmlBody, attachments);
+      `
+    sendEmail(user.EmailAddress, subject, plainText, htmlBody, attachments)
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 }
 
-async function sendForgottenPassword(user) {
-  const facebookUrl = process.env.facebookUrl;
-  const twitterUrl = process.env.twitterUrl;
-  const instagramUrl = process.env.instagramUrl;
-  const linkedinUrl = process.env.linkedinUrl;
+async function sendForgottenPassword (user) {
+  const facebookUrl = process.env.facebookUrl
+  const twitterUrl = process.env.twitterUrl
+  const instagramUrl = process.env.instagramUrl
+  const linkedinUrl = process.env.linkedinUrl
 
-  const { attachments, logoBase64 } = await createAttachmentsAndLogos();
-  const header = createHeader();
+  const { attachments, logoBase64 } = await createAttachmentsAndLogos()
+  const header = createHeader()
   const footer = createFooter(
     facebookUrl,
     twitterUrl,
     instagramUrl,
     linkedinUrl,
     socialLogos
-  );
-  const subject = "Password Reset Request";
+  )
+  const subject = 'Password Reset Request'
 
-  const link = `${process.env.BASE_URL}/account-actions/${user.UserId}/reset/${user.Guid}`;
+  const link = `${process.env.BASE_URL}/account-actions/${user.UserId}/reset/${user.Guid}`
 
   const plainText =
     `Dear ${user.UserName},\n` +
-    "\n" +
-    "We have received a request to reset the password for your Segue account. If you did not make this request, you can safely ignore this email.\n" +
-    "\n" +
+    '\n' +
+    'We have received a request to reset the password for your Segue account. If you did not make this request, you can safely ignore this email.\n' +
+    '\n' +
     `To reset your password, please click on the following link: ${link}\n` +
-    "\n" +
-    `If you are unable to click on the link, you can also visit the password reset page at [Insert password reset page URL] and enter the following reset code: [Insert reset code]\n` +
-    "\n" +
-    "This password reset link is only valid for the next 24 hours. After that, you will need to request a new password reset.";
+    '\n' +
+    'If you are unable to click on the link, you can also visit the password reset page at [Insert password reset page URL] and enter the following reset code: [Insert reset code]\n' +
+    '\n' +
+    'This password reset link is only valid for the next 24 hours. After that, you will need to request a new password reset.'
 
   const htmlBody = `
     <div>
@@ -270,34 +266,34 @@ async function sendForgottenPassword(user) {
             </tr>
             </table>
             ${footer}
-    </div>`;
+    </div>`
 
-  sendEmail(user.EmailAddress, subject, plainText, htmlBody, attachments);
+  sendEmail(user.EmailAddress, subject, plainText, htmlBody, attachments)
 }
 
-function deleteUser(details) {
-  const subject = "User Deletion";
+function deleteUser (details) {
+  const subject = 'User Deletion'
 
   const plainText =
-    `Dear Administrator,\n` +
-    "\n" +
-    "An User has been deleted from Segue and taske Reallocated to \n" +
-    "\n";
+    'Dear Administrator,\n' +
+    '\n' +
+    'An User has been deleted from Segue and taske Reallocated to \n' +
+    '\n'
 
   const htmlBody =
-    `<p>Dear Administator</p>\n` + "<p>A user has been removed from Segue</p>";
-  sendEmail("test@test.com", subject, plainText, htmlBody);
+    '<p>Dear Administator</p>\n' + '<p>A user has been removed from Segue</p>'
+  sendEmail('test@test.com', subject, plainText, htmlBody)
 }
 
 /**
  * Set this up in .env
  */
 const transporter = nodemailer.createTransport({
-  service: "Gmail",
+  service: 'Gmail',
   auth: {
     user: process.env.GMAIL_EMAIL,
-    pass: process.env.GMAIL_PASS,
-  },
+    pass: process.env.GMAIL_PASS
+  }
   // host: process.env.MAIL_HOST,
   // port: process.env.MAIL_PORT,
   // secure: false,//process.env.MAIL_SSL,
@@ -305,7 +301,7 @@ const transporter = nodemailer.createTransport({
   // tls: {
   //      ciphers:'SSLv3'
   // }
-});
+})
 /**
  *
  * Below Functions are used to send an email generated above
@@ -317,25 +313,25 @@ const transporter = nodemailer.createTransport({
  * @param html
  */
 
-function sendEmail(recipient, subject, text, html, attachment = []) {
-  console.log("EMAIL", process.env.GMAIL_EMAIL, process.env.GMAIL_PASS);
+function sendEmail (recipient, subject, text, html, attachment = []) {
+  console.log('EMAIL', process.env.GMAIL_EMAIL, process.env.GMAIL_PASS)
   const mailOptions = {
     from: process.env.MAIL_FROM_ADDRESS,
     to: recipient,
-    subject: subject,
-    text: text,
-    html: html,
+    subject,
+    text,
+    html,
 
-    attachments: attachment,
-  };
+    attachments: attachment
+  }
 
   transporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      console.log(error);
+      console.log(error)
     } else {
-      console.log("Email sent: " + info.response);
+      console.log('Email sent: ' + info.response)
     }
-  });
+  })
 }
 
 /**

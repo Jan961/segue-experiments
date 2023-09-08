@@ -9,6 +9,7 @@ import { BookingJump } from 'state/marketing/bookingJumpState'
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers'
 import { getRoles } from 'services/contactService'
 import { getTourJumpState } from 'utils/getTourJumpState'
+import { getAccountId, getEmailFromReq } from 'services/userService'
 
 type Props = {
   initialState: InitialState
@@ -31,12 +32,17 @@ const Index = ({ initialState }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const tourJump = await getTourJumpState(ctx, 'marketing')
+  const email = await getEmailFromReq(ctx.req)
+  const AccountId = await getAccountId(email)
 
-  const tourId = tourJump.selected
+  const tourJump = await getTourJumpState(ctx, 'marketing', AccountId)
 
-  const bookings:any[] = await getSaleableBookings(tourId)
-  const selected = bookings.filter((booking:any) => booking?.DateBlock?.TourId === tourId)?.[0]?.Id || null
+  const TourId = tourJump.selected
+  // TourJumpState is checking if it's valid to access by accountId
+  if (!TourId) return { notFound: true }
+
+  const bookings:any[] = await getSaleableBookings(TourId)
+  const selected = bookings.filter((booking:any) => booking?.DateBlock?.TourId === TourId)?.[0]?.Id || null
   const venueRoles = await getRoles()
   const bookingJump: BookingJump = {
     selected,

@@ -35,7 +35,20 @@ export default function HoldsComps ({ activeTours }:Props) {
 
   const downloadReport = async () => {
     const selectedTour = activeTours.find(tour => tour.Id === parseInt(inputs.tour))
-    fetch('/api/reports/holds-comps', { method: 'POST', body: JSON.stringify({ tourCode: selectedTour ? `${selectedTour?.ShowCode}${selectedTour?.Code}` : null, fromDate: inputs.dateFrom, toDate: inputs.dateTo, venue: inputs.venue, bookingStatus: inputs.status }) }).then(async response => {
+
+    if (!selectedTour) return
+
+    fetch('/api/reports/holds-comps', {
+      method: 'POST',
+      body: JSON.stringify({
+        TourId: selectedTour.Id,
+        tourCode: `${selectedTour?.ShowCode}${selectedTour?.Code}`,
+        fromDate: inputs.dateFrom,
+        toDate: inputs.dateTo,
+        venue: inputs.venue,
+        bookingStatus: inputs.status
+      })
+    }).then(async response => {
       if (response.status >= 200 && response.status < 300) {
         const tourName:string = selectedTour?.name
         let suggestedName:string|any[] = response.headers.get('Content-Disposition')

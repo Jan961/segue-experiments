@@ -1,8 +1,15 @@
 import prisma from 'lib/prisma'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
-export default async function handle (req, res) {
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const bookingId = req.query.bookingId
+    const BookingId = parseInt(req.query.bookingId as string)
+
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { BookingId })
+    if (!access) return res.status(401).end()
+
     const searchResults = await prisma.booking.findMany({
       include: {
         Contract: true,
@@ -10,7 +17,7 @@ export default async function handle (req, res) {
         Performance: true
       },
       where: {
-        Id: parseInt(bookingId)
+        Id: BookingId
       }
     })
 

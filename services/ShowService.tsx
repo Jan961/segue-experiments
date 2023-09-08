@@ -2,17 +2,20 @@ import { Prisma } from '@prisma/client'
 import { ShowDTO } from 'interfaces'
 import { showMapper } from 'lib/mappers'
 import prisma from 'lib/prisma'
+import { getAccountId, getEmailFromReq } from './userService'
 
-export const getShows = () => {
-  return prisma.show.findMany()
+export const getShows = (AccountId: number) => {
+  return prisma.show.findMany({ where: { AccountId } })
 }
 
 export interface ShowPageProps {
   shows: ShowDTO[]
 }
 
-export const getShowPageProps = async () => {
-  const shows = await getShows()
+export const getShowPageProps = async (ctx: any) => {
+  const email = await getEmailFromReq(ctx.req)
+  const accountId = await getAccountId(email)
+  const shows = await getShows(accountId)
 
   return {
     props: {
@@ -47,4 +50,18 @@ export const getShowById = async (Id: number) => {
       Id
     }
   })
+}
+
+export const lookupShowCode = async (Code: string, AccountId: number) => {
+  const show = await prisma.show.findUnique({
+    where: {
+      Code,
+      AccountId
+    },
+    select: {
+      Id: true
+    }
+  })
+
+  return show ? show.Id : undefined
 }

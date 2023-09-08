@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { PerformanceDTO, BookingDTO } from 'interfaces'
 import { calculateWeekNumber } from 'services/dateService'
 import { group } from 'radash'
+import { checkAccess, getEmailFromReq } from 'services/userService'
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[]
@@ -38,6 +39,11 @@ export type SummaryResponseDTO = {
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId = parseInt(req.query?.BookingId as string, 10)
+
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { BookingId })
+    if (!access) return res.status(401).end()
+
     const performance: any = await prisma.performance.findFirst({
       where: {
         BookingId

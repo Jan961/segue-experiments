@@ -23,7 +23,7 @@ const Index = () => {
         
 
     // TBC   Change to dynamic based on User
-    const response = await fetch('/api/venue/read/venue/1')
+    const response = await fetch('/api/venue')
     if(response.ok){
         let venueItems = await response.json();
         setItems(venueItems);

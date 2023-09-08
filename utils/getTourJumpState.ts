@@ -7,9 +7,9 @@ interface Params extends ParsedUrlQuery {
   TourCode: string
 }
 
-export const getTourJumpState = async (ctx, path: string): Promise<TourJump> => {
+export const getTourJumpState = async (ctx, path: string, AccountId: number): Promise<TourJump> => {
   const { TourCode, ShowCode } = ctx.params as Params
-  const toursRaw = await getAllTours()
+  const toursRaw = await getAllTours(AccountId)
   const selectedTour = toursRaw.find((tour:any) => tour.Code === TourCode && tour.Show.Code === ShowCode)?.Id
   return {
     tours: toursRaw.map((t: any) => (

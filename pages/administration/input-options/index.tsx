@@ -1,45 +1,28 @@
-import Link from "next/link";
-import Layout from "../../../components/Layout";
-import Venuelist from "../../../components/accounts/venues/venuelist";
-import VenueForm from "../../../components/accounts/venues/venueForm";
-import { GetStaticProps } from "next";
-import { Venue } from "../../../interfaces";
-
-import { PrismaClient } from "@prisma/client";
-import ExcelExport from "../../../components/administration/venues/excelExport";
-import { useEffect, useState } from "react";
-import NewValue from "components/administration/inputValues/NewValue";
-import ManageInputOptions from "components/administration/inputValues/ManageInputOptions";
-
-
-type Props = {
-  items: Venue[];
-};
+import Layout from '../../../components/Layout'
+import { Venue } from '../../../interfaces'
+import { useEffect, useState } from 'react'
 
 // @ts-ignore
 const Index = () => {
-
-  const [items, setItems] = useState<Venue[]>([]);
-  async function getVenues() {
+  const [items, setItems] = useState<Venue[]>([])
+  async function getVenues () {
     try {
-        
-
-    // TBC   Change to dynamic based on User
-    const response = await fetch('/api/venue/read/venue/1')
-    if(response.ok){
-        let venueItems = await response.json();
-        setItems(venueItems);
-    } else {
+      // TBC   Change to dynamic based on User
+      const response = await fetch('/api/venue')
+      if (response.ok) {
+        const venueItems = await response.json()
+        setItems(venueItems)
+      } else {
         throw new Error('Error fetching Venues')
+      }
+    } catch (error) {
+      console.error(error)
     }
-} catch (error) {
- console.error(error)       
-}
   }
 
   useEffect(() => {
-     getVenues();
-  }, []);
+    getVenues()
+  }, [])
   return (
     <Layout title="Account | Segue">
       <div className="w-full px-8">
@@ -47,13 +30,11 @@ const Index = () => {
           <span className="block lg:inline">Administrator: Manage Dropdown Input values</span>
         </h1>
         <div>
-            <ManageInputOptions/>
-        </div>
 
+        </div>
       </div>
     </Layout>
-  );
-};
+  )
+}
 
-
-export default Index;
+export default Index

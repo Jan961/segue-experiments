@@ -3,8 +3,10 @@ import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
+import { NextApiRequest, NextApiResponse } from 'next'
 import { addWidthAsPerContent } from 'services/reportsService'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 type TPromoter = {
   TourId : number,
@@ -58,8 +60,12 @@ const makeRowTextBoldAndAllignLeft = ({ worksheet, row, numberOfColumns }: {work
 }
 
 // TODO - Issue with Performance Time
-const handler = async (req, res) => {
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   const { tourCode, fromDate, toDate, venue, tourId } = JSON.parse(req.body) || {}
+
+  const email = await getEmailFromReq(req)
+  const access = await checkAccess(email, { TourId: tourId })
+  if (!access) return res.status(401).end()
 
   const workbook = new ExcelJS.Workbook()
 
@@ -141,5 +147,3 @@ const handler = async (req, res) => {
     res.end()
   })
 }
-
-export default handler

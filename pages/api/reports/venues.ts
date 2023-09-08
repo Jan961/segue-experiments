@@ -4,6 +4,8 @@ import ExcelJS from 'exceljs'
 import moment from 'moment'
 import { COLOR_HEXCODE } from 'services/salesSummaryService'
 import { addWidthAsPerContent } from 'services/reportsService'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 type BOOKING = {
   Id: number,
@@ -72,9 +74,14 @@ const getBooleanAsString = (val: boolean | null): string => {
   return ''
 }
 
-const handler = async (req, res) => {
+export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
     const { tourId, showId, tourCode, options } = JSON.parse(req.body)
+
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { TourId: tourId })
+    if (!access) return res.status(401).end()
+
     const data = await prisma.DateBlock.findFirst({
       where: {
         ...(tourId && { TourId: tourId }),
@@ -193,8 +200,6 @@ const handler = async (req, res) => {
       res.end()
     })
   } catch (error) {
-    res.status(500).send()
+    res.status(500).end()
   }
 }
-
-export default handler

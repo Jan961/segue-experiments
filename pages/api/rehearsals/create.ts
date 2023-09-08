@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import prisma from 'lib/prisma'
 import { rehearsalMapper } from 'lib/mappers'
+import { getEmailFromReq, checkAccess } from 'services/userService'
 
 export interface CreateRehearsalParams {
   Date: string
@@ -10,13 +11,18 @@ export interface CreateRehearsalParams {
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
     const rehearsal = req.body as CreateRehearsalParams
+    const { DateBlockId } = rehearsal
+
+    const email = await getEmailFromReq(req)
+    const access = await checkAccess(email, { DateBlockId })
+    if (!access) return res.status(401).end()
 
     const result = await prisma.rehearsal.create({
       data: {
         Date: new Date(rehearsal.Date),
         DateBlock: {
           connect: {
-            Id: rehearsal.DateBlockId
+            Id: DateBlockId
           }
         }
       }
