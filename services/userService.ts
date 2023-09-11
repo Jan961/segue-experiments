@@ -2,13 +2,17 @@ import { clerkClient } from '@clerk/nextjs'
 import { getAuth } from '@clerk/nextjs/server'
 import prisma from 'lib/prisma'
 import { AccessCheck, checkAccess as checkAccessDirect } from './accessService'
+import { userMapper } from 'lib/mappers'
+import { UserDto } from 'interfaces'
 
-export const getUsers = (AccountId: number) => {
-  return prisma.user.findMany({
+export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
+  const result = await prisma.user.findMany({
     where: {
       AccountId
     }
   })
+
+  return result.map(userMapper)
 }
 
 export const getEmailAddressForClerkId = async (userId: string): Promise<string> => {

@@ -1,5 +1,5 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes, TourTask } from '@prisma/client'
-import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, TourTaskDTO, VenueContactDTO, VenueRoleDTO } from 'interfaces'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes, TourTask, User } from '@prisma/client'
+import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, TourTaskDTO, UserDto, VenueContactDTO, VenueRoleDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
 import { BookingsWithPerformances } from 'services/bookingService'
@@ -156,4 +156,10 @@ export const mapToTourTaskDTO = (tourTask: TourTask): TourTaskDTO => {
 export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Id: vr.Id,
   Name: vr.Name
+})
+
+export const userMapper = (user: User): UserDto => ({
+  Id: user.Id,
+  Name: user.Name,
+  Email: user.Email
 })

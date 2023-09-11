@@ -1,36 +1,28 @@
 
+import { Table } from 'components/global/table/Table'
 import UserListItem from './userListItem'
+import { useRecoilValue } from 'recoil'
+import { userState } from 'state/account/userState'
 
-interface UserListProps {
-  users: any[]
-}
+export const UserList = () => {
+  const users = useRecoilValue(userState)
+  const userList = Object.values(users)
 
-export const UserList = ({ users }: UserListProps) => {
   return (
-    <div className="my-8 mt-2">
-      <table className="min-w-full table-fixed divide-y divide-gray-300 [&>tbody>*:nth-child(odd)]:bg-white [&>tbody>*:nth-child(even)]:bg-table-row-alternating">
-        <thead className="bg-gray-50 text-sm">
-          <tr>
-            <th
-              scope="col"
-              className="border-r border-white border-1 bg-primary-orange text-left min-w-[12rem] py-2 px-3 text-white"
-            >
-                Name
-            </th>
-            <th
-              scope="col"
-              className="border-r border-white border-1 bg-primary-orange text-left min-w-[12rem] py-2 px-3 text-white"
-            >
-                Email
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-gray-200">
-          {users.map((user) => (
-            <UserListItem key={user.UserId} data={user} />
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table className="my-8 mt-2">
+      <Table.HeaderRow bg='bg-primary-orange'>
+        <Table.HeaderCell>
+            Name
+        </Table.HeaderCell>
+        <Table.HeaderCell>
+            Email
+        </Table.HeaderCell>
+      </Table.HeaderRow>
+      <Table.Body>
+        {userList.map((user) => (
+          <UserListItem key={user.UserId} data={user} />
+        ))}
+      </Table.Body>
+    </Table>
   )
 }
