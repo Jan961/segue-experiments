@@ -201,6 +201,12 @@ export type VenueRoleDTO = {
   Name: string
 }
 
+export type UserDto = {
+  Id?: number
+  Email: string
+  Name: string
+}
+
 export type Venue = {
   Longitude: any;
     Latitude: any;
