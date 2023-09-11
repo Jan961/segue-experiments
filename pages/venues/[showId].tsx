@@ -1,5 +1,5 @@
 import Layout from 'components/Layout'
-import Venuelist from 'components/accounts/venues/venuelist'
+import Venuelist from 'components/account/venues/venuelist'
 import { Venue } from 'interfaces'
 import { useEffect, useState } from 'react'
 

@@ -18,10 +18,14 @@ export const Table = ({ children, className }: PropsWithChildren<ClassNameable>)
   )
 }
 
-const HeaderRow = ({ children }: PropsWithChildren<unknown>) => {
+interface HeaderRowProps {
+  bg?: string
+}
+
+const HeaderRow = ({ children, bg }: PropsWithChildren<HeaderRowProps>) => {
   return (
     <thead>
-      <tr className="bg-primary-green ">
+      <tr className={bg || 'bg-primary-green'}>
         { children }
       </tr>
     </thead>
