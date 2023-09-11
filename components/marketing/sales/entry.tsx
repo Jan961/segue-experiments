@@ -1,11 +1,79 @@
 import { useEffect, useState } from 'react'
-import { dateToSimple, toSql } from 'services/dateService'
+import { dateToSimple } from 'services/dateService'
 import axios from 'axios'
 import { LoadingPage } from 'components/global/LoadingPage'
 import { useRecoilValue } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
-import Typeahead from 'components/Typeahead'
-import moment from 'moment'
+import { getSales } from './Api'
+import yup from 'yup'
+
+const schema = yup.object().shape({
+  // ... other validation rules ...
+
+  // Warning checks
+  warningSoldSeats: yup
+    .mixed()
+    .test(
+      'warningSoldSeats',
+      'Warning: Check sold seats or value',
+      function () {
+        const {
+          Seats: currentWeekSalesSeats,
+          Value: currentWeekSalesValue,
+          PreviousSeats: previousWeekSalesSeats,
+          PreviousValue: previousWeekSalesValue
+        } = this.parent
+
+        // Calculate the percentage increase
+        const seatsPercentageIncrease =
+          (currentWeekSalesSeats - previousWeekSalesSeats) /
+          previousWeekSalesSeats
+        const valuePercentageIncrease =
+          (currentWeekSalesValue - previousWeekSalesValue) /
+          previousWeekSalesValue
+
+        if (
+          (currentWeekSalesSeats < 100 &&
+            (seatsPercentageIncrease > 0.5 || valuePercentageIncrease > 0.5)) ||
+          (currentWeekSalesSeats >= 100 &&
+            (seatsPercentageIncrease > 0.15 || valuePercentageIncrease > 0.15))
+        ) {
+          return 'Warning: Check sold seats or value'
+        }
+
+        return true
+      }
+    ),
+
+  warningReservedSeatsValue: yup
+    .mixed()
+    .test(
+      'warningReservedSeatsValue',
+      'Warning: Check reserved seats or value',
+      function () {
+        const {
+          ReservedSeats: currentWeekReservationSeats,
+          ReservedValue: currentWeekReservationValue,
+          PreviousReservedSeats: previousWeekReservationSeats,
+          PreviousReservedValue: previousWeekReservationValue
+        } = this.parent
+
+        // Calculate the percentage increase
+        const seatsPercentageIncrease =
+          (currentWeekReservationSeats - previousWeekReservationSeats) /
+          previousWeekReservationSeats
+        const valuePercentageIncrease =
+          (currentWeekReservationValue - previousWeekReservationValue) /
+          previousWeekReservationValue
+
+        if (seatsPercentageIncrease > 0.15 || valuePercentageIncrease > 0.15) {
+          return 'Warning: Check reserved seats or value'
+        }
+
+        return true
+      }
+    )
+})
 
 interface props {
   searchFilter: String;
@@ -14,11 +82,13 @@ export default function Entry ({ searchFilter }: props) {
   const [isLoading, setLoading] = useState(false)
   const [salesWeeks, SetSalesWeeks] = useState([])
   const [salesWeeksVenues, SetSalesWeeksVenues] = useState([])
+  const [previousSaleWeek, setPreviousSaleWeek] = useState(null)
   const [options, setOptions] = useState<any>(null)
   const [holds, setHolds] = useState<any>({})
   const [comps, setComps] = useState<any>({})
   const [inputs, setInputs] = useState<any>({})
   const [sale, setSale] = useState<any>({})
+  const [previousSale, setPreviousSale] = useState<any>({})
   const [notes, setNotes] = useState<any>({})
   const { tours } = useRecoilValue(tourJumpState)
   const fetchTourWeeks = (tourId) => {
@@ -36,39 +106,32 @@ export default function Entry ({ searchFilter }: props) {
         })
     }
   }
-  const fetchSales = (SetSalesFiguresDate, SetBookingId) => {
-    setHolds({})
-    setComps({})
-    setNotes({})
-    setSale({})
-    setLoading(false)
-    axios.post('/api/marketing/sales/read', { SetSalesFiguresDate: moment(SetSalesFiguresDate).toISOString().split('T')[0], SetBookingId })
-      .then(data => data.data)
-      .then((data) => {
-        const { Notes, SetHold, SetComp, Sale } = data || {}
-        const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
-        const holdValues = SetHold?.reduce?.((holds, hold) => {
-          holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
-          return holds
-        }, {})
-        setHolds(holdValues)
-        setComps(SetComp?.reduce?.((comps, comp) => {
-          comps[comp.CompTypeId] = comp.CompSeats
-          return comps
-        }, {}))
-        setNotes(prev => ({
-          ...prev,
-          BookingSaleNotes,
-          CompNotes,
-          HoldNotes
-        }))
-        setSale(prev => ({
-          ...prev,
-          ...Sale
-        }))
-      })
-      .catch(error => console.log(error))
-      .finally(() => setLoading(false))
+
+  const handleSalesResponse = (data) => {
+    const { Notes, SetHold, SetComp, Sale } = data || {}
+    const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
+    const holdValues = SetHold?.reduce?.((holds, hold) => {
+      holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
+      return holds
+    }, {})
+    const compValues = SetComp?.reduce?.((comps, comp) => {
+      comps[comp.CompTypeId] = comp.CompSeats
+      return comps
+    }, {})
+    return {
+      holds: holdValues,
+      comps: compValues,
+      notes: {
+        BookingSaleNotes,
+        CompNotes,
+        HoldNotes
+      },
+      sale: Sale
+    }
+  }
+  const fetchSales = async (SetSalesFiguresDate, SetBookingId) => {
+    const data = await getSales({ SetSalesFiguresDate, SetBookingId })
+    return handleSalesResponse(data)
   }
   const fetchOptionTypes = () => {
     axios.get('/api/marketing/sales/options')
@@ -87,10 +150,29 @@ export default function Entry ({ searchFilter }: props) {
   }, [])
   useEffect(() => {
     if (inputs.SaleWeek && inputs.Venue) {
+      setHolds({})
+      setComps({})
+      setNotes({})
+      setSale({})
+      setLoading(false)
       fetchSales(inputs.SaleWeek, parseInt(inputs.Venue, 10))
+        .then(({ holds, comps, notes, sale }) => {
+          setHolds(holds)
+          setComps(comps)
+          setNotes(notes)
+          setSale(sale)
+        })
+        .catch(error => console.log(error))
+        .finally(() => setLoading(false))
     }
   }, [inputs.SaleWeek, inputs.Venue])
-
+  useEffect(() => {
+    if (inputs.Venue && previousSaleWeek) {
+      fetchSales(previousSaleWeek, parseInt(inputs.Venue, 10)).then(({ sale }) => {
+        setPreviousSale(sale)
+      }).catch(error => console.log(error))
+    }
+  }, [inputs.Venue, previousSaleWeek])
   if (isLoading) return <LoadingPage />
 
   const handleOnChange = (e) => {
@@ -98,6 +180,15 @@ export default function Entry ({ searchFilter }: props) {
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value })
       return
+    }
+    if (e.target.id === 'SaleWeek') {
+      const index = salesWeeks.findIndex(week => week.mondayDate === e.target.value)
+      if (index <= 0) {
+        setPreviousSaleWeek(null)
+        setPreviousSale(null)
+      } else {
+        setPreviousSaleWeek(salesWeeks[index - 1]?.mondayDate)
+      }
     }
     setInputs((prev) => ({
       ...prev,
@@ -120,10 +211,70 @@ export default function Entry ({ searchFilter }: props) {
       [e.target.id]: e.target.value
     }))
   }
+  function validateSale (sale, previousSale) {
+    schema
+      .validate(
+        {
+          ...sale,
+          ...{
+            PreviousSeats: previousSale.Seats,
+            PreviousValue: previousSale.Value,
+            PreviousReservedSeats: previousSale.ReservedSeats,
+            PreviousReservedValue: previousSale.ReservedValue
+          }
+        },
+        { abortEarly: false }
+      )
+      .then((validData) => {
+        // Form data is valid
+        console.log("Valid data",validData)
+      })
+      .catch((validationErrors) => {
+        // Form data is invalid, handle errors and warnings
+        const newErrors = {}
+        const newWarnings = {}
+        console.log("errors", validationErrors)
+        validationErrors.inner.forEach((error) => {
+          if (error.path.startsWith('warning')) {
+            newWarnings[error.path] = error.message
+          } else {
+            newErrors[error.path] = error.message
+          }
+        })
+
+        // setErrors(newErrors)
+        // setWarnings(newWarnings) // You can create a state variable for warnings
+      })
+
+    const messages = []
+    if (sale.Seats < previousSale.Seats || sale.Value < previousSale.Value || sale.ReservedSeats < previousSale.ReservedSeats || sale.ReservedValue < previousSale.ReservedValue) {
+      messages.push('Seat count or Value cannot be less than previous week')
+    }
+
+    if (sale.Seats < 100) {
+      if (sale.Seats > (0.5 * previousSale.Seats) || (sale.Value > (0.5 * previousSale.Value))) {
+        messages.push('Invalid Sales: Sold Seats or Value cannot be more than 50% of previous week sale')
+      }
+    }
+
+    if (sale.Seats >= 100) {
+      if (sale.Seats > (0.15 * previousSale.Seats) || (sale.Value > (0.15 * previousSale.Value))) {
+        messages.push('Invalid Sales: Sold Seats or Value cannot be more than 15% of previous week sale')
+      }
+    }
+    if (sale.ReservedSeats > (0.15 * previousSale.ReservedSeats) || (sale.ReservedValue > (0.15 * previousSale.ReservedValue))) {
+      messages.push("Invalid Sales: Reserved Seats or Value cannot be more than 15% of previous week's")
+    }
+    return messages
+  }
 
   async function onSubmit () {
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({ SetHoldHoldTypeId, SetHoldSeats: holds[SetHoldHoldTypeId].seats, SetHoldValue: holds[SetHoldHoldTypeId].value }))
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({ SetCompCompTypeId, SetCompSeats: comps[SetCompCompTypeId] }))
+    const errors = validateSale(sale, previousSale)
+    if (errors.length) {
+      return
+    }
     const Sales = [
       {
         SaleSaleTypeId: 1,
@@ -136,6 +287,7 @@ export default function Entry ({ searchFilter }: props) {
         SaleValue: sale.ReservedValue
       }
     ]
+    // const validateSales
     await axios.post('/api/marketing/sales/upsert', { Holds, Comps, Sales, SetBookingId: inputs.Venue, SetSalesFiguresDate: inputs.SalesWeek })
       .then((res) => {
         console.log('Updated Sales', res)
@@ -163,7 +315,11 @@ export default function Entry ({ searchFilter }: props) {
     e.persist?.()
     setComps(prev => ({ ...prev, [e.target.id]: e.target.value }))
   }
-
+  const copyLastWeekSalesData = () => {
+    if (previousSale) {
+      setSale(previousSale)
+    }
+  }
   return (
     <div className="flex flex-row w-full">
       <div className={'flex bg-transparent w-5/8 p-5'}>
@@ -492,7 +648,7 @@ export default function Entry ({ searchFilter }: props) {
         {/* Buttons go here  */}
         <div className="grid grid-cols-2 gap-1 mb-4">
 
-          {/* <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Copy Last Weeks Sales Data</button> */}
+          <button disabled={!previousSaleWeek} onClick={copyLastWeekSalesData} className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Copy Last Week Sales Data</button>
           {/* <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Insert Data From Email</button> */}
         </div>
         <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border   ring-opacity-5 sm:-mx-6 md:mx-0 ">
