@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next'
 import { TourEditor } from 'components/tours/TourEditor'
 import { TourDTO } from 'interfaces'
 import { getShowById, lookupShowCode } from 'services/ShowService'
-import { getEmailFromReq, checkAccess, getAccountId } from 'services/userService'
+import { getEmailFromReq, getAccountId } from 'services/userService'
 
 type CreateProps = {
   tour: TourDTO

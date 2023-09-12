@@ -6,9 +6,9 @@ import { useRouter } from 'next/router'
 import { TourDTO } from 'interfaces'
 
 interface TourListDateDisplayProps {
-  startDate: string;
-  endDate: string;
-  label: string;
+  startDate: string
+  endDate: string
+  label: string
 }
 
 const TourListDateDisplay = ({ startDate, endDate, label }: TourListDateDisplayProps) => {
@@ -21,36 +21,45 @@ const TourListDateDisplay = ({ startDate, endDate, label }: TourListDateDisplayP
 }
 
 type TourListItemProps = {
-  tour: TourDTO;
+  tour: TourDTO
+  editable: boolean
 };
 
-const TourListItem = ({ tour }: TourListItemProps) => {
+const TourListItem = ({ tour, editable }: TourListItemProps) => {
   const router = useRouter()
   const path = router.pathname.split('/')[1]
 
   const navigateToShow = () => {
-    router.push(`/${path}/${tour.ShowCode}/${tour.Code}`)
+    if (!editable) router.push(`/${path}/${tour.ShowCode}/${tour.Code}`)
   }
 
   return (
     <li
       onClick={navigateToShow}
-      className="flex w-full
-        cursor-pointer
+      className={`flex w-full
+        
+        ${editable ? '' : 'cursor-pointer hover:bg-blue-400 hover:bg-opacity-25'}
         items-center justify-between border-b border-gray-200
-        hover:bg-blue-400 hover:bg-opacity-25 p-4">
+         p-4`}>
       <div className="flex-grow">
-        <Link href={`/${path}/${tour.ShowCode}/${tour.Code}`} className="text-sm text-gray-900">
-          {tour.ShowName} ({tour.ShowCode}) - Tour {tour.Code}
-        </Link>
+        { !editable && (
+          <Link href={`/${path}/${tour.ShowCode}/${tour.Code}`} className="text-sm text-gray-900">
+            {tour.ShowName} ({tour.ShowCode}) - Tour {tour.Code}
+          </Link>
+        )}
+        { editable && (
+          <>{tour.ShowName} ({tour.ShowCode}) - Tour {tour.Code}</>
+        )}
         <div className="mt-2 flex justify-between text-sm text-gray-500">
           { tour.DateBlock.map((x) => (<TourListDateDisplay key={x.Id} label={x.Name} startDate={x.StartDate} endDate={x.EndDate} />))}
         </div>
       </div>
-      <div className="whitespace-nowrap">
-        <MenuButton icon={faPencil} href={`/tours/edit/${tour.Id}?path=${path}`} />
-        <MenuButton intent='DANGER' icon={faTrash} href={`/tours/delete/${tour.Id}?path=${path}`} />
-      </div>
+      { editable && (
+        <div className="whitespace-nowrap">
+          <MenuButton icon={faPencil} href={`/account/shows/${tour.ShowCode}/${tour.Code}/edit`} />
+          <MenuButton intent='DANGER' icon={faTrash} href={`/account/shows/${tour.ShowCode}/${tour.Code}/delete`} />
+        </div>
+      )}
     </li>
   )
 }
