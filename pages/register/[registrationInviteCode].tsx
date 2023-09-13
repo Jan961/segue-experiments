@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import Layout from '../../components/guestLayout'
-import AccountPaymentDetails from "../../components/accounts/forms/paymentDetails";
-import AccountDetails from "../../components/accounts/forms/accountDetails";
-import UserRegistration from "../../components/accounts/forms/userRegistration";
+import AccountPaymentDetails from "../../components/account/forms/paymentDetails";
+import AccountDetails from "../../components/account/forms/accountDetails";
+import UserRegistration from "../../components/account/forms/userRegistration";
 
 const RegisterPage = () => (
     <Layout title="Login | Segue">

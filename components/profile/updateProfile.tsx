@@ -12,7 +12,7 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import {da} from "date-fns/locale";
 import {Alert} from "../alert";
-import user from "../accounts/manage-users/user";
+import user from "../account/manage-users/user";
 
 
 
