@@ -2,7 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import { loggingService } from 'services/loggingService'
 import Layout from 'components/Layout'
-import { getShowById } from 'services/ShowService'
+import { getShowById, lookupShowCode } from 'services/ShowService'
 import { GetServerSideProps } from 'next'
 import { FormInputText } from 'components/global/forms/FormInputText'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
@@ -12,7 +12,7 @@ import { showMapper } from 'lib/mappers'
 import { ShowDTO } from 'interfaces'
 import { FormInfo } from 'components/global/forms/FormInfo'
 import { BreadCrumb } from 'components/global/BreadCrumb'
-import { getEmailFromReq, checkAccess } from 'services/userService'
+import { getEmailFromReq, checkAccess, getAccountId } from 'services/userService'
 
 type Props = {
   show: ShowDTO
@@ -91,12 +91,14 @@ const DeleteShow = ({ show }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const ShowId = parseInt(ctx.params.ShowId as string)
+  const { ShowCode } = ctx.params
 
   const email = await getEmailFromReq(ctx.req)
+  const accountId = await getAccountId(email)
+  const ShowId = await lookupShowCode(ShowCode as string, accountId)
   const access = await checkAccess(email, { ShowId })
-
   if (!access) return { notFound: true }
+
 
   const show = await getShowById(ShowId)
 

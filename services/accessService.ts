@@ -26,8 +26,6 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     }
   })
 
-  console.log(items)
-
   if (!user) return false
 
   // We just need the minimal for checking existence
