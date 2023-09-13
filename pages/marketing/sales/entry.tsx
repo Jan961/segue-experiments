@@ -18,11 +18,14 @@ const Index = ({ activeTours }: Props) => {
   return (
     <Layout title={pagetitle + "| Seque"}>
       <div className="flex flex-col px-4 flex-auto">
-        <Toolbar
+        {/* <Toolbar
           searchFilter={searchFilter}
           setSearchFilter={setSearchFilter}
           title={pagetitle}
-        ></Toolbar>
+        ></Toolbar> */}
+        <h1 className="text-3xl font-bold text-primary-green ">
+          {pagetitle + " | Seque"}
+        </h1>
         <Entry tours={activeTours} searchFilter={searchFilter}></Entry>
       </div>
     </Layout>
