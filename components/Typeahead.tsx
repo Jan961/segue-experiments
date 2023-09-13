@@ -1,52 +1,74 @@
-import { useState, useRef, useMemo, useEffect } from 'react'
-import Fuse from 'fuse.js'
+import { useState, useRef, useMemo, useEffect } from "react";
+import Fuse from "fuse.js";
+import classNames from "classnames";
 
-type Option={
-    text:string
-    value:string|number
-}
+type Option = {
+  text: string;
+  value: string | number;
+};
 
-type props={
-    options:Option[]
-    placeholder:string
-    disabled?:boolean
-    selectedOption?:Option
-    value?:string|number
-    name?:string
-    label?:string
-    searchKeys?:string[]
-    onChange:(option:Option)=>void
-}
+type props = {
+  options: Option[];
+  placeholder: string;
+  disabled?: boolean;
+  selectedOption?: Option;
+  value?: string | number;
+  name?: string;
+  label?: string;
+  searchKeys?: string[];
+  className?: string;
+  dropdownClassName?: string;
+  onChange: (option: Option) => void;
+};
 
-const Typeahead = ({ options, placeholder, onChange, disabled, value, name, label, searchKeys = [] }:props) => {
-  const [inputValue, setInputValue] = useState('')
-  const [isDropdownOpen, setDropdownOpen] = useState(false)
-  const inputRef = useRef(null)
-  const fuse = useRef(new Fuse(options, { keys: ['text', ...searchKeys] }))
-  const filteredOptions:Option[] = useMemo(() => inputValue ? fuse.current.search(inputValue).map(result => result.item) : options, [inputValue, options])
+const Typeahead = ({
+  options,
+  placeholder,
+  onChange,
+  disabled,
+  value,
+  name,
+  label,
+  className,
+  dropdownClassName,
+  searchKeys = [],
+}: props) => {
+  const [inputValue, setInputValue] = useState("");
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const inputRef = useRef(null);
+  const fuse = useRef(new Fuse(options, { keys: ["text", ...searchKeys] }));
+  const filteredOptions: Option[] = useMemo(
+    () =>
+      inputValue
+        ? fuse.current.search(inputValue).map((result) => result.item)
+        : options,
+    [inputValue, options]
+  );
   useEffect(() => {
-    const selectedOption = options.find(option => option.value === String(value))
-    setInputValue(selectedOption?.text || '')
-  }, [value])
+    const selectedOption = options.find(
+      (option) => option.value === String(value)
+    );
+    setInputValue(selectedOption?.text || "");
+  }, [value]);
   const handleInputChange = (e: { target: { value: any } }) => {
-    setInputValue(e.target.value)
-  }
-  const handleSelectOption = (selectedOption:Option) => {
-    setInputValue(selectedOption.text)
-    onChange?.(selectedOption)
-  }
+    setInputValue(e.target.value);
+  };
+  const handleSelectOption = (selectedOption: Option) => {
+    setInputValue(selectedOption.text);
+    onChange?.(selectedOption);
+  };
   const handleInputFocus = () => {
-    setDropdownOpen(true)
-  }
+    setDropdownOpen(true);
+  };
   const handleInputBlur = () => {
     setTimeout(() => {
-      setDropdownOpen(false)
-    }, 200)
-  }
+      setDropdownOpen(false);
+    }, 200);
+  };
   return (
-    <div className="mb-2 w-full">
+    <div className={classNames("mb-2 w-full", className)}>
       <label htmlFor={name}>
-        {label && (<span className="text-sm mb-2 pr-2">{ label }</span>)}
+        {label && <span className="text-sm mb-2 pr-2">{label}</span>}
       </label>
       <input
         ref={inputRef}
@@ -57,10 +79,18 @@ const Typeahead = ({ options, placeholder, onChange, disabled, value, name, labe
         disabled={disabled}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
-        className={`w-full py-2 px-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${disabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+        className={`w-full py-2 px-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
+          disabled ? "bg-gray-100 cursor-not-allowed" : ""
+        }`}
       />
       {isDropdownOpen && filteredOptions.length > 0 && !disabled && (
-        <ul className="absolute z-10 mt-1 border rounded shadow bg-white max-h-[300px] overflow-y-auto" style={{ minWidth: inputRef.current.offsetWidth }}>
+        <ul
+          className={classNames(
+            `absolute z-10 mt-1 border rounded shadow bg-white max-h-[300px] overflow-y-auto`,
+            dropdownClassName
+          )}
+          style={{ minWidth: inputRef.current.offsetWidth }}
+        >
           {filteredOptions.map((option, index) => (
             <li
               key={index}
@@ -73,7 +103,7 @@ const Typeahead = ({ options, placeholder, onChange, disabled, value, name, labe
         </ul>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Typeahead
+export default Typeahead;

@@ -1,29 +1,49 @@
-import Layout from '../../../components/Layout'
-import Toolbar from '../../../components/marketing/venue/toolbar'
-import { Show } from '../../../interfaces'
-import { useState } from 'react'
-import Entry from '../../../components/marketing/sales/entry'
+import Layout from "../../../components/Layout";
+import Toolbar from "../../../components/marketing/venue/toolbar";
+import { Show } from "../../../interfaces";
+import { useState } from "react";
+import Entry from "../../../components/marketing/sales/entry";
+import { GetServerSideProps } from "next";
+import { getAccountId, getEmailFromReq } from "services/userService";
+import { getActiveTours } from "services/TourService";
 
 type Props = {
-  items: Show[];
+  activeTours: any[];
 };
-const pagetitle = 'Marketing - Sale Entry'
+const pagetitle = "Marketing - Sale Entry";
 
-const Index = ({ items }: Props) => {
-  const [searchFilter, setSearchFilter] = useState('')
+const Index = ({ activeTours }: Props) => {
+  const [searchFilter, setSearchFilter] = useState("");
 
   return (
-    <Layout title={pagetitle + '| Seque'}>
+    <Layout title={pagetitle + "| Seque"}>
       <div className="flex flex-col px-4 flex-auto">
         <Toolbar
           searchFilter={searchFilter}
           setSearchFilter={setSearchFilter}
           title={pagetitle}
         ></Toolbar>
-        <Entry searchFilter={searchFilter}></Entry>
+        <Entry tours={activeTours} searchFilter={searchFilter}></Entry>
       </div>
     </Layout>
-  )
-}
+  );
+};
 
-export default Index
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const email = await getEmailFromReq(ctx.req);
+  const AccountId = await getAccountId(email);
+  const toursRaw = await getActiveTours(AccountId);
+  return {
+    props: {
+      activeTours: toursRaw.map((t: any) => ({
+        Id: t.Id,
+        Code: t.Code,
+        IsArchived: t.IsArchived,
+        ShowCode: t.Show.Code,
+        ShowName: t.Show.Name,
+      })),
+    },
+  };
+};
+
+export default Index;
