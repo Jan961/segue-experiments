@@ -1,6 +1,4 @@
 import Layout from "../../../components/Layout";
-import Toolbar from "../../../components/marketing/venue/toolbar";
-import { Show } from "../../../interfaces";
 import { useState } from "react";
 import Entry from "../../../components/marketing/sales/entry";
 import { GetServerSideProps } from "next";
@@ -18,11 +16,6 @@ const Index = ({ activeTours }: Props) => {
   return (
     <Layout title={pagetitle + "| Seque"}>
       <div className="flex flex-col px-4 flex-auto">
-        {/* <Toolbar
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-          title={pagetitle}
-        ></Toolbar> */}
         <h1 className="text-3xl font-bold text-primary-green ">
           {pagetitle + " | Seque"}
         </h1>
