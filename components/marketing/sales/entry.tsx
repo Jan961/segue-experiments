@@ -7,6 +7,8 @@ import { tourJumpState } from "state/booking/tourJumpState";
 import { getSales } from "./Api";
 import schema from "./validation";
 import Typeahead from "components/Typeahead";
+import { LoadingTab } from "../tabs/LoadingTab";
+import { Spinner } from "components/global/Spinner";
 
 interface props {
   searchFilter: String;
@@ -120,7 +122,12 @@ export default function Entry({ tours = [], searchFilter }: props) {
         .catch((error) => console.log(error));
     }
   }, [inputs.Venue, previousSaleWeek]);
-  if (isLoading) return <LoadingPage />;
+  if (isLoading)
+    return (
+      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
+        <Spinner className="w-full" size="lg" />
+      </div>
+    );
 
   const handleOnChange = (e) => {
     e.persist?.();
