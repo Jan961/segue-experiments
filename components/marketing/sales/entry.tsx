@@ -10,8 +10,9 @@ import Typeahead from "components/Typeahead";
 
 interface props {
   searchFilter: String;
+  tours?: any[];
 }
-export default function Entry({ searchFilter }: props) {
+export default function Entry({ tours = [], searchFilter }: props) {
   const [isLoading, setLoading] = useState(false);
   const [salesWeeks, SetSalesWeeks] = useState([]);
   const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
@@ -23,23 +24,27 @@ export default function Entry({ searchFilter }: props) {
   const [sale, setSale] = useState<any>({});
   const [previousSale, setPreviousSale] = useState<any>({});
   const [notes, setNotes] = useState<any>({});
-  const { tours } = useRecoilValue(tourJumpState);
+  // const { tours } = useRecoilValue(tourJumpState);
   const [validationErrors, setValidationErrors] = useState<any>({});
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
+      setLoading(true);
       axios
         .get(`/api/reports/tourWeek/${tourId}`)
-        .then((data: any) => SetSalesWeeks(data.data || []));
+        .then((data: any) => SetSalesWeeks(data.data || []))
+        .finally(() => setLoading(false));
     }
   };
   const fetchVenues = (tourId) => {
     if (tourId) {
+      setLoading(true);
       axios
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
           SetSalesWeeksVenues(data.data);
-        });
+        })
+        .finally(() => setLoading(false));
     }
   };
 
@@ -66,7 +71,9 @@ export default function Entry({ searchFilter }: props) {
     };
   };
   const fetchSales = async (SetSalesFiguresDate, SetBookingId) => {
+    setLoading(true);
     const data = await getSales({ SetSalesFiguresDate, SetBookingId });
+    setLoading(false);
     return handleSalesResponse(data);
   };
   const fetchOptionTypes = () => {
@@ -370,11 +377,14 @@ export default function Entry({ searchFilter }: props) {
                         text: `${venue.Code} ${venue.Name}, ${
                           venue.VenueAddressTown
                         } ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: venue.BookingId,
+                        value: String(venue.BookingId),
                       }))}
                       onChange={(option) =>
                         handleOnChange({
-                          target: { id: "Venue", value: option.value },
+                          target: {
+                            id: "Venue",
+                            value: option.value,
+                          },
                         })
                       }
                     />
