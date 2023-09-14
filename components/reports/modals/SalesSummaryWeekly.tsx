@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import moment from 'moment'
-import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
-import { faLineChart } from '@fortawesome/free-solid-svg-icons'
-import axios from 'axios'
-import { getCurrentMondayDate, range } from 'services/reportsService'
-import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
+import React, { useState } from "react";
+import moment from "moment";
+import { getDateDaysAgo, toISO, toSql } from "services/dateService";
+import { faLineChart } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import { getCurrentMondayDate, range } from "services/reportsService";
+import { SwitchBoardItem } from "components/global/SwitchBoardItem";
+import { Spinner } from "components/global/Spinner";
 
 function formatDate(date) {
   return toSql(date);
@@ -16,6 +17,7 @@ type Props = {
 
 export default function SalesSummaryWeekly({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [tourWeeks, setTourWeeks] = useState([]); // Shory list of tours for the toolbar to switch
   const [inputs, setInputs] = useState({
     Tour: null,
@@ -41,6 +43,7 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
     const fromWeek = formatShortYearDate(
       getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7)
     );
+    setLoading(true);
     fetch("/api/reports/sales-summary-simple", {
       method: "POST",
       body: JSON.stringify({
@@ -49,42 +52,46 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
         toWeek,
         isWeeklyReport: true,
       }),
-    }).then(async (response) => {
-      if (response.status >= 200 && response.status < 300) {
-        const tourName: string = selectedTour?.name;
-        let suggestedName: string | any[] = response.headers.get(
-          "Content-Disposition"
-        );
-        if (suggestedName) {
-          suggestedName = suggestedName.match(/filename="(.+)"/);
-          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
-        }
-        if (!suggestedName) {
-          suggestedName = `${tourName}.xlsx`;
-        }
-        const content = await response.blob();
-        if (content) {
-          const anchor: any = document.createElement("a");
-          anchor.download = suggestedName;
-          anchor.href = (window.webkitURL || window.URL).createObjectURL(
-            content
+    })
+      .then(async (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          const tourName: string = selectedTour?.name;
+          let suggestedName: string | any[] = response.headers.get(
+            "Content-Disposition"
           );
-          anchor.dataset.downloadurl = [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            anchor.download,
-            anchor.href,
-          ].join(":");
-          anchor.click();
+          if (suggestedName) {
+            suggestedName = suggestedName.match(/filename="(.+)"/);
+            suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
+          }
+          if (!suggestedName) {
+            suggestedName = `${tourName}.xlsx`;
+          }
+          const content = await response.blob();
+          if (content) {
+            const anchor: any = document.createElement("a");
+            anchor.download = suggestedName;
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(
+              content
+            );
+            anchor.dataset.downloadurl = [
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              anchor.download,
+              anchor.href,
+            ].join(":");
+            anchor.click();
+          }
+          setShowModal(false);
+          setInputs({
+            Tour: null,
+            TourWeek: null,
+            numberOfWeeks: null,
+            order: null,
+          });
         }
-        setShowModal(false);
-        setInputs({
-          Tour: null,
-          TourWeek: null,
-          numberOfWeeks: null,
-          order: null,
-        });
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(true);
+      });
   }
 
   function handleOnChange(e) {
@@ -102,6 +109,7 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
           tourEndDate: EndDate,
         }));
       }
+      setLoading(true);
       axios
         .get(`/api/reports/tourWeek/${e.target.value}`)
         .then((res) => res.data)
@@ -112,6 +120,9 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
           setTourWeeks(data || []);
           const currentWeekMonday = getCurrentMondayDate();
           setInputs((prev) => ({ ...prev, TourWeek: currentWeekMonday }));
+        })
+        .finally(() => {
+          setLoading(true);
         });
     }
     setInputs((prev) => ({
@@ -125,9 +136,9 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
       <SwitchBoardItem
         link={{
           icon: faLineChart,
-          title: 'Sales Summary Weekly',
+          title: "Sales Summary Weekly",
           onClick: () => setShowModal(true),
-          color: 'bg-primary-green'
+          color: "bg-primary-green",
         }}
       />
       {showModal ? (
@@ -151,6 +162,11 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
                   </button>
                 </div>
                 {/* body */}
+                {loading && (
+                  <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+                    <Spinner className="w-full" size="lg" />
+                  </div>
+                )}
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">

@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
-import { faUsers } from '@fortawesome/free-solid-svg-icons'
-import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
+import React, { useState } from "react";
+import { faUsers } from "@fortawesome/free-solid-svg-icons";
+import { SwitchBoardItem } from "components/global/SwitchBoardItem";
+import { Spinner } from "components/global/Spinner";
 
 type Props = {
   activeTours: any[];
 };
 export default function HoldsComps({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [inputs, setInputs] = useState({
     dateFrom: null,
     dateTo: null,
@@ -39,7 +41,7 @@ export default function HoldsComps({ activeTours }: Props) {
     );
 
     if (!selectedTour) return;
-
+    setLoading(true);
     fetch("/api/reports/holds-comps", {
       method: "POST",
       body: JSON.stringify({
@@ -50,43 +52,47 @@ export default function HoldsComps({ activeTours }: Props) {
         venue: inputs.venue,
         bookingStatus: inputs.status,
       }),
-    }).then(async (response) => {
-      if (response.status >= 200 && response.status < 300) {
-        const tourName: string = selectedTour?.name;
-        let suggestedName: string | any[] = response.headers.get(
-          "Content-Disposition"
-        );
-        if (suggestedName) {
-          suggestedName = suggestedName.match(/filename="(.+)"/);
-          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
-        }
-        if (!suggestedName) {
-          suggestedName = `${tourName}.xlsx`;
-        }
-        const content = await response.blob();
-        if (content) {
-          const anchor: any = document.createElement("a");
-          anchor.download = suggestedName;
-          anchor.href = (window.webkitURL || window.URL).createObjectURL(
-            content
+    })
+      .then(async (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          const tourName: string = selectedTour?.name;
+          let suggestedName: string | any[] = response.headers.get(
+            "Content-Disposition"
           );
-          anchor.dataset.downloadurl = [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            anchor.download,
-            anchor.href,
-          ].join(":");
-          anchor.click();
+          if (suggestedName) {
+            suggestedName = suggestedName.match(/filename="(.+)"/);
+            suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
+          }
+          if (!suggestedName) {
+            suggestedName = `${tourName}.xlsx`;
+          }
+          const content = await response.blob();
+          if (content) {
+            const anchor: any = document.createElement("a");
+            anchor.download = suggestedName;
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(
+              content
+            );
+            anchor.dataset.downloadurl = [
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              anchor.download,
+              anchor.href,
+            ].join(":");
+            anchor.click();
+          }
+          setShowModal(false);
+          setInputs({
+            dateFrom: null,
+            dateTo: null,
+            tour: null,
+            venue: null,
+            status: null,
+          });
         }
-        setShowModal(false);
-        setInputs({
-          dateFrom: null,
-          dateTo: null,
-          tour: null,
-          venue: null,
-          status: null,
-        });
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   async function handleOnChange(e) {
@@ -99,12 +105,16 @@ export default function HoldsComps({ activeTours }: Props) {
     if (e.target.name === "tour") {
       // Load Venues for this tour
       setVenues([]);
+      setLoading(true);
       await fetch(`api/tours/read/venues/${e.target.value}`)
         .then((res) => res.json())
         .then((data) => data.data)
         .then((data) => {
           setInputs((prevState) => ({ ...prevState, Venue: null }));
           setVenues(data);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
   }
@@ -114,9 +124,9 @@ export default function HoldsComps({ activeTours }: Props) {
       <SwitchBoardItem
         link={{
           icon: faUsers,
-          title: 'Holds & Comps',
+          title: "Holds & Comps",
           onClick: () => setShowModal(true),
-          color: 'bg-primary-pink'
+          color: "bg-primary-pink",
         }}
       />
       {showModal ? (
@@ -138,6 +148,11 @@ export default function HoldsComps({ activeTours }: Props) {
                   </button>
                 </div>
                 {/* body */}
+                {loading && (
+                  <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+                    <Spinner className="w-full" size="lg" />
+                  </div>
+                )}
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">
