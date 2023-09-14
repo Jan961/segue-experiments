@@ -1,40 +1,34 @@
-import { useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { getActiveTours } from 'services/TourService'
 import Layout from '../../components/Layout'
 import Switchboard from '../../components/reports/switchboard'
-import Toolbar from '../../components/reports/toolbar'
 import { tourEditorMapper } from 'lib/mappers'
+import { getAccountIdFromReq } from 'services/userService'
+import { Tour } from '@prisma/client'
 
 type ReportsProps={
-    activeTours:any[];
+    activeTours: any & Tour[];
 }
 
 const Index = ({ activeTours = [] }:ReportsProps) => {
-  const [show, setShow] = useState('ST1')
-  const [tour, setTour] = useState('22')
-  const [activeTour, setActiveTour] = useState(null);
-
-  const onShowTourChange = (change:any) => {
-    // const selectedTour
-    console.log(change)
-  }
   return (
     <Layout title="ShowId | Segue">
       <div className="flex flex-col flex-auto">
-        <Toolbar activeTours={activeTours} show={show} tour={tour} onChange={onShowTourChange}></Toolbar>
-        <Switchboard activeTour={activeTour} activeTours={activeTours}></Switchboard>
+        <h1 className="text-2xl align-middle text-primary-blue font-bold">
+          Reports
+        </h1>
+        <Switchboard activeTours={activeTours}></Switchboard>
       </div>
     </Layout>
   )
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  // const { ShowCode, TourCode } = ctx.query as Params
-  const activeTours = await getActiveTours(1)
+  const AccountId = await getAccountIdFromReq(ctx.req)
+  const activeTours = await getActiveTours(AccountId)
   return {
     props: {
-      activeTours: activeTours.map(tour => tourEditorMapper(tour))
+      activeTours: activeTours.map((tour: any & Tour) => tourEditorMapper(tour))
     }
   }
 }

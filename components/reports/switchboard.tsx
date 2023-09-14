@@ -1,7 +1,4 @@
-// import React, {useCallback} from 'react'
-// import SideNavBar from '../sideMenu'
 import MasterPlan from './modals/masterPlan'
-// import SalesSummary from './modals/SalesSummary'
 import SalesVsCapacity from './modals/SalesVsCapacity'
 import TourGrossSales from './modals/TourGrossSales'
 import SalesSummaryWeekly from './modals/SalesSummaryWeekly'
@@ -11,17 +8,13 @@ import OutstandingActivities from './modals/OutstandingActivities'
 import MasterplanReport from './modals/MasterplanReport'
 import ActivityLog from './modals/ActivityLog'
 import SelectedVenues from './modals/SelectedVenues'
-// import SalesSummaryFix from './modals/SalesSummaryFix'
 import SalesSummarySimple from './modals/SalesSummarySimple'
 
-/* <SideNavBar></SideNavBar> */
-
 type SwitchboardProps={
-  activeTours:any[];
-  activeTour:any;
+  activeTours:any[]
 }
 
-export default function Switchboard ({ activeTours, activeTour }:SwitchboardProps) {
+export default function Switchboard ({ activeTours }:SwitchboardProps) {
   return (
     <div className=" justify-center flex align-center  flex-row">
       <div className={'md:w-3/4 sm:w-4/5 flex align-center py-4 flex-col content-center'}>
@@ -34,9 +27,7 @@ export default function Switchboard ({ activeTours, activeTour }:SwitchboardProp
               <h2>Sales and Marketing</h2>
             </div>
             <div className={'flex flex-row py-4 justify-between px-6'}>
-              <SalesSummarySimple activeTour={activeTour} activeTours={activeTours}></SalesSummarySimple>
-              {/* <SalesSummary activeTours={activeTours}></SalesSummary> */}
-              {/* <SalesSummaryFix activeTours={activeTours}></SalesSummaryFix> */}
+              <SalesSummarySimple activeTours={activeTours}></SalesSummarySimple>
               <SalesSummaryWeekly activeTours={activeTours}></SalesSummaryWeekly>
               <SalesVsCapacity activeTours={activeTours}></SalesVsCapacity>
               <TourGrossSales activeTours={activeTours}></TourGrossSales>
