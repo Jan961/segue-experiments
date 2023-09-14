@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { SegueLogo } from './global/SegueLogo'
 import { useRecoilValue } from 'recoil'
 import { tourJumpState } from 'state/booking/tourJumpState'
+import Link from 'next/link'
 
 export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
@@ -92,7 +93,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
         onClick={close}
       />
       <div
-        className={`fixed left-0 top-0 bottom-0 z-50 w-60 shadow-lg
+        className={`fixed left-0 top-0 bottom-0 z-40 w-60 shadow-lg
         min-h-full
        bg-primary-navy px-1 transform ease-in-out duration-300 ${
     menuIsOpen ? 'translate-x-0' : '-translate-x-full'
@@ -116,7 +117,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
             {menuItems.map((menuItem, index) => {
               return (
                 <li key={index} >
-                  <a className={`flex items-center text-sm py-2 px-4
+                  <Link className={`flex items-center text-sm py-2 px-4
                   size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
                   hover:bg-gray-100 transition duration-300
                   ease-in-out text-white`}
@@ -127,21 +128,21 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
                       </span>
                     )}
                     {menuItem.label}
-                  </a>
+                  </Link>
                   {menuItem.subItems && (
                     <ul className="pl-10 text-sm">
                       {menuItem.subItems.map((subMenuItem, subIndex) => {
                         const isSubItemActive = data?.menuLabel === subMenuItem.label
                         return (
                           <li key={subIndex} >
-                            <a className={`flex items-center text-sm py-1 px-2 
+                            <Link className={`flex items-center text-sm py-1 px-2 
                             text-ellipsis whitespace-nowrap rounded
                              hover:text-gray-900 hover:bg-gray-100 
                              transition duration-300 ease-in-out 
                              ${isSubItemActive ? menuItem.activeColor : 'text-white'}`}
                             href={subMenuItem.link}>
                               {subMenuItem.label}
-                            </a>
+                            </Link>
                           </li>
                         )
                       })}
