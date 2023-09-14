@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-import IconWithText from "../IconWithText";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
-import moment from "moment";
-import { getDateDaysAgo, toISO } from "services/dateService";
+import React, { useState } from 'react'
+import { faUser } from '@fortawesome/free-solid-svg-icons'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
-type Props = {
-  activeTours: any[];
-};
-export default function PromotorHolds({ activeTours }: Props) {
-  const [showModal, setShowModal] = React.useState(false);
+type Props={
+    activeTours:any[]
+}
+export default function PromotorHolds ({ activeTours }:Props) {
+  const [showModal, setShowModal] = React.useState(false)
   const [inputs, setInputs] = useState({
     dateFrom: null,
     dateTo: null,
@@ -108,12 +106,16 @@ export default function PromotorHolds({ activeTours }: Props) {
 
   return (
     <>
-      <IconWithText
-        icon={faUser}
-        text={"Promoter Holds"}
-        onClick={() => setShowModal(true)}
-      />
-      {showModal ? (
+      <SwitchBoardItem
+        link={{
+          icon: faUser,
+          title: 'Promoter Holds',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-pink'
+        }}
+      />      
+	{
+	  showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll">
             <div className="relative w-auto my-6 mx-auto max-w-6xl">

@@ -5,7 +5,7 @@ import prisma from 'lib/prisma'
 import { getAccountId, getEmailFromReq } from './userService'
 
 export const getShows = (AccountId: number) => {
-  return prisma.show.findMany({ where: { AccountId } })
+  return prisma.show.findMany({ where: { AccountId, IsDeleted: false } })
 }
 
 export interface ShowPageProps {

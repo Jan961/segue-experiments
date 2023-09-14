@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import moment from "moment";
-import { getDateDaysAgo, toISO, toSql } from "../../../services/dateService";
-import IconWithText from "../IconWithText";
-import { faChartLine } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
-import { getCurrentMondayDate, range } from "services/reportsService";
+import React, { useState } from 'react'
+import moment from 'moment'
+import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
+import { faLineChart } from '@fortawesome/free-solid-svg-icons'
+import axios from 'axios'
+import { getCurrentMondayDate, range } from 'services/reportsService'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 function formatDate(date) {
   return toSql(date);
@@ -122,19 +122,14 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
 
   return (
     <>
-      {/* TBC replace with design specific Icons */}
-      <IconWithText
-        icon={faChartLine}
-        text={"Sales Summary Weekly"}
-        onClick={() => setShowModal(true)}
+      <SwitchBoardItem
+        link={{
+          icon: faLineChart,
+          title: 'Sales Summary Weekly',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-green'
+        }}
       />
-      {/* <button
-                className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                type="button"
-                onClick={() => setShowModal(true)}
-            >
-                Sales Summary Weekly
-            </button> */}
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10">

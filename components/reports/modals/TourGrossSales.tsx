@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { faSignal5 } from '@fortawesome/free-solid-svg-icons'
-import IconWithText from '../IconWithText'
+import { faChartBar } from '@fortawesome/free-solid-svg-icons'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 
 type Props={
     activeTours:any[];
@@ -33,7 +33,14 @@ export default function SelectedVenues ({ activeTours }:Props) {
 
   return (
     <>
-      <IconWithText icon={faSignal5} text={'Gross Sales'} onClick={() => setShowModal(true)}/>
+      <SwitchBoardItem
+        link={{
+          icon: faChartBar,
+          title: 'Gross Sales',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-green'
+        }}
+      />
       {
         showModal
           ? (

@@ -1,6 +1,6 @@
 import {
   faAddressBook,
-  faCreditCard, faMapMarker, faUser
+  faCreditCard, faMapMarker, faSchool, faTheaterMasks, faUser
 } from '@fortawesome/free-solid-svg-icons'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
@@ -11,6 +11,12 @@ export const AccountSwitchBoard = () => {
       route: '/account/users',
       icon: faUser,
       color: 'bg-primary-blue'
+    },
+    {
+      title: 'Shows',
+      route: '/account/shows',
+      icon: faTheaterMasks,
+      color: 'bg-primary-pink'
     },
     {
       title: 'Account',
@@ -24,13 +30,6 @@ export const AccountSwitchBoard = () => {
       route: '/account/payment',
       icon: faCreditCard,
       color: 'bg-primary-yellow',
-      disabled: true
-    },
-    {
-      title: 'Custom Venues',
-      route: '/account/venues',
-      icon: faMapMarker,
-      color: 'bg-primary-pink',
       disabled: true
     }
   ]

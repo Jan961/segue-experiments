@@ -1,8 +1,9 @@
 import prisma from 'lib/prisma'
 import { Prisma } from '@prisma/client'
-import { tourMapper } from 'lib/mappers'
+import { showTourMapper, tourEditorMapper } from 'lib/mappers'
 import { getShowWithToursById } from './ShowService'
 import { getAccountId, getEmailFromReq } from './userService'
+import { TourDTO } from 'interfaces'
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -20,6 +21,32 @@ export const getActiveTours = async (accountId:number) => {
     },
     include: tourDateBlockInclude
   })
+}
+
+export interface AllTourPageProps {
+  tours: TourDTO[]
+}
+
+export const getAllTourPageProps = async (ctx: any) => {
+  const email = await getEmailFromReq(ctx.req)
+  const AccountId = await getAccountId(email)
+
+  const toursRaw = await prisma.tour.findMany({
+    where: {
+      Show: {
+        is: {
+          AccountId
+        }
+      }
+    },
+    include: {
+      Show: true
+    }
+  })
+
+  const tours = toursRaw.map(tourEditorMapper)
+
+  return { props: { tours } }
 }
 
 export const getTourPageProps = async (ctx: any) => {
@@ -41,7 +68,7 @@ export const getTourPageProps = async (ctx: any) => {
   if (!showRaw) return { notFound: true, props: {} }
 
   const show = await getShowWithToursById(showRaw.Id)
-  const tours = tourMapper(show)
+  const tours = showTourMapper(show)
 
   return { props: { tours, code: show.Code, name: show.Name } }
 }

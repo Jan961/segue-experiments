@@ -12,7 +12,6 @@ type Props = {
 
 export const ShowListItem = ({ show }: Props) => {
   const router = useRouter()
-  const path = router.pathname.split('/')[1]
 
   const deleteShow = (e) => {
     e.preventDefault()
@@ -33,7 +32,7 @@ export const ShowListItem = ({ show }: Props) => {
   }
 
   const navigateToShow = () => {
-    router.push(`/${path}/${show.Code}`)
+    router.push(`/account/shows/${show.Code}`)
   }
 
   return (
@@ -44,15 +43,15 @@ export const ShowListItem = ({ show }: Props) => {
       items-center justify-between border-b border-gray-200
       hover:bg-blue-400 hover:bg-opacity-25 h-16">
       <div className="min-w-0 flex-grow px-4">
-        <Link href={`/${path}/${show.Code}`}>
+        <Link href={`/account/shows/${show.Code}`}>
           <p className="text-lg  text-primary-blue text-center">
             {show.Name} - ({show.Code})
           </p>
         </Link>
       </div>
       <div className="whitespace-nowrap">
-        <MenuButton href={`/shows/edit/${show.Id}?path=${path}`} icon={faPencil} />
-        <MenuButton href={`/shows/delete/${show.Id}?path=${path}`} intent='DANGER' onClick={deleteShow} icon={faTrash} />
+        <MenuButton href={`/account/shows/${show.Code}/edit`} icon={faPencil} />
+        <MenuButton href={`/account/shows/${show.Code}/delete`} intent='DANGER' onClick={deleteShow} icon={faTrash} />
       </div>
     </li>
   )
