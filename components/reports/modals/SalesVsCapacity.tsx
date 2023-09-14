@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import { getDateDaysAgo, toISO, toSql } from "services/dateService";
-import IconWithText from "../IconWithText";
-import { faChartPie } from "@fortawesome/free-solid-svg-icons";
-import moment from "moment";
-import axios from "axios";
-import { getCurrentMondayDate, range } from "services/reportsService";
+import React, { useState } from 'react'
+import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
+import { faPercent } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
+import axios from 'axios'
+import { getCurrentMondayDate, range } from 'services/reportsService'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 function formatDate(date) {
   return toSql(date);
@@ -126,12 +126,13 @@ export default function SalesVsCapacity({ activeTours }: Props) {
 
   return (
     <>
-      {/* TBC replace with
-         design specific Icons */}
-      <IconWithText
-        icon={faChartPie}
-        text={"Sales VS Capacity"}
-        onClick={() => setShowModal(true)}
+      <SwitchBoardItem
+        link={{
+          icon: faPercent,
+          title: 'Sales Vs Capacity',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-green'
+        }}
       />
       {showModal ? (
         <>

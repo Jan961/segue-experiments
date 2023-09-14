@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { GetServerSideProps } from "next";
-import IconWithText from "../IconWithText";
-import { faChartPie } from "@fortawesome/free-solid-svg-icons";
-import moment from "moment";
-import { getDateDaysAgo, toISO } from "services/dateService";
-import formatDate from "utils/formatDate";
-import { getCurrentMondayDate, range } from "services/reportsService";
-import axios from "axios";
+import React, { useEffect, useState } from 'react'
+import { GetServerSideProps } from 'next'
+import { faPieChart } from '@fortawesome/free-solid-svg-icons'
+import moment from 'moment'
+import { getDateDaysAgo, toISO } from 'services/dateService'
+import formatDate from 'utils/formatDate'
+import { getCurrentMondayDate, range } from 'services/reportsService'
+import axios from 'axios'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
-type Props = {
-  activeTours: any[];
-  activeTour: any;
-};
+type Props={
+  activeTours:any[];
+}
 
 type TourWeek = {
   Id: number;
@@ -19,9 +18,9 @@ type TourWeek = {
   tourWeekNum: number;
 };
 
-export default function SalesSummarySimple({ activeTours, activeTour }: Props) {
-  const [showModal, setShowModal] = React.useState(false);
-  const [tourWeeks, setTourWeeks] = useState<TourWeek[]>([]);
+export default function SalesSummarySimple ({ activeTours }:Props) {
+  const [showModal, setShowModal] = React.useState(false)
+  const [tourWeeks, setTourWeeks] = useState<TourWeek[]>([])
   const [status, setStatus] = useState({
     submitted: false,
     submitting: false,
@@ -144,10 +143,13 @@ export default function SalesSummarySimple({ activeTours, activeTour }: Props) {
   }
   return (
     <>
-      <IconWithText
-        icon={faChartPie}
-        text={"Sales Summary"}
-        onClick={() => setShowModal(true)}
+      <SwitchBoardItem
+        link={{
+          icon: faPieChart,
+          title: 'Sales Summary',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-green'
+        }}
       />
       {showModal ? (
         <>

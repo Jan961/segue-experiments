@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import moment from 'moment'
-import IconWithText from '../IconWithText'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
-import { dateToSimple, getMonday } from 'services/dateService'
+import { faStar } from '@fortawesome/free-solid-svg-icons'
+import { getMonday } from 'services/dateService'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 export default function MasterPlan () {
   const [showModal, setShowModal] = React.useState(false)
@@ -68,10 +68,13 @@ export default function MasterPlan () {
 
   return (
     <>
-      <IconWithText
-        icon={faUser}
-        text={'Master Tour Plan'}
-        onClick={() => setShowModal(true)}
+      <SwitchBoardItem
+        link={{
+          icon: faStar,
+          title: 'All Shows Masterplan',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-blue'
+        }}
       />
       {
         showModal

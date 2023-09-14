@@ -8,8 +8,6 @@ import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import { ShowList } from 'components/shows/ShowList'
 import { BreadCrumb } from 'components/global/BreadCrumb'
-import { useRouter } from 'next/router'
-import { title } from 'radash'
 
 interface ShowsProps {
   shows: ShowDTO[]
@@ -17,8 +15,6 @@ interface ShowsProps {
 
 export const Shows = ({ shows }: ShowsProps) => {
   const [search, setSearch] = React.useState('')
-  const router = useRouter()
-  const path = router.pathname.split('/')[1]
 
   const query = search.toLowerCase()
 
@@ -36,14 +32,17 @@ export const Shows = ({ shows }: ShowsProps) => {
     <Layout title="Shows | Segue">
       <div className="float-right">
         <SearchBox onChange={(e) => setSearch(e.target.value)} value={search} />
-        <MenuButton iconRight={faPlus} href={`/shows/create?path=${path}`}>Add Show</MenuButton>
+        <MenuButton iconRight={faPlus} href={'account/shows/create'}>Add Show</MenuButton>
       </div>
       <BreadCrumb>
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
+        <BreadCrumb.Item href="/account">
+          Account
+        </BreadCrumb.Item>
         <BreadCrumb.Item>
-          { title(path) }
+          Shows
         </BreadCrumb.Item>
       </BreadCrumb>
       <Tab.Group className='max-w-screen-md mx-auto' as='div'>

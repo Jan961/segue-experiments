@@ -8,8 +8,6 @@ import TourList from 'components/tours/TourList'
 import { TourDTO } from 'interfaces'
 import { BreadCrumb } from 'components/global/BreadCrumb'
 import React from 'react'
-import { useRouter } from 'next/router'
-import { title } from 'radash'
 
 type Props = {
   tours: TourDTO[]
@@ -19,9 +17,6 @@ type Props = {
 
 export const Tours = ({ code, tours, name }: Props) => {
   const [query, setQuery] = React.useState('')
-  const router = useRouter()
-  const path = router.pathname.split('/')[1]
-
   const active = []
   const archived = []
 
@@ -36,14 +31,17 @@ export const Tours = ({ code, tours, name }: Props) => {
     <Layout title="Tours | Segue">
       <div className="float-right">
         <SearchBox onChange={(e) => setQuery(e.target.value)} value={query} />
-        <MenuButton href={`/tours/create/${code}?path=${path}`} iconRight={faPlus}>Add Tour</MenuButton>
+        <MenuButton href={`/account/shows/${code}/create`} iconRight={faPlus}>Add Tour</MenuButton>
       </div>
       <BreadCrumb>
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href={`/${path}`}>
-          { title(path) }
+        <BreadCrumb.Item href={'/account'}>
+          Account
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href={'/account/shows/'}>
+          Shows
         </BreadCrumb.Item>
         <BreadCrumb.Item>
           { name }
@@ -55,8 +53,8 @@ export const Tours = ({ code, tours, name }: Props) => {
           <StyledTab>Archived ({archived.length})</StyledTab>
         </Tab.List>
         <Tab.Panels>
-          <Tab.Panel><TourList items={active} /></Tab.Panel>
-          <Tab.Panel><TourList items={archived} /></Tab.Panel>
+          <Tab.Panel><TourList items={active} editable/></Tab.Panel>
+          <Tab.Panel><TourList items={archived} editable/></Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
     </Layout>

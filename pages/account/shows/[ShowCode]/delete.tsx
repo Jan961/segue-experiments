@@ -2,27 +2,24 @@ import { useState } from 'react'
 import axios from 'axios'
 import { loggingService } from 'services/loggingService'
 import Layout from 'components/Layout'
-import { getShowById } from 'services/ShowService'
+import { getShowById, lookupShowCode } from 'services/ShowService'
 import { GetServerSideProps } from 'next'
 import { FormInputText } from 'components/global/forms/FormInputText'
-import { FormInputSelect } from 'components/global/forms/FormInputSelect'
 import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
 import { FormContainer } from 'components/global/forms/FormContainer'
-import showTypes from 'data/showTypes.json'
 import { useRouter } from 'next/router'
 import { showMapper } from 'lib/mappers'
 import { ShowDTO } from 'interfaces'
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { FormInfo } from 'components/global/forms/FormInfo'
 import { BreadCrumb } from 'components/global/BreadCrumb'
-import { checkAccess, getEmailFromReq } from 'services/userService'
+import { getEmailFromReq, checkAccess, getAccountId } from 'services/userService'
 
 type Props = {
   show: ShowDTO
 }
 
-const EditShow = ({ show }: Props) => {
+const DeleteShow = ({ show }: Props) => {
   const router = useRouter()
-  const { path } = router.query
 
   const [status, setStatus] = useState({
     submitted: true,
@@ -30,20 +27,7 @@ const EditShow = ({ show }: Props) => {
     info: { error: false, msg: null }
   })
 
-  const [inputs, setInputs] = useState({ ...show })
-
-  const handleServerResponse = (ok, msg) => {
-    if (ok) {
-      setStatus({
-        submitted: true,
-        submitting: false,
-        info: { error: false, msg }
-      })
-    } else {
-      // @ts-ignore
-      setStatus(false)
-    }
-  }
+  const [inputs, setInputs] = useState({ Confirmation: '' })
 
   const handleOnChange = (e) => {
     setInputs((prev) => ({
@@ -59,47 +43,47 @@ const EditShow = ({ show }: Props) => {
 
   const handleOnSubmit = async (e) => {
     e.preventDefault()
-    setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
+    setStatus((prevStatus) => ({ ...prevStatus, submitting: true, submitted: false }))
     axios({
       method: 'POST',
-      url: '/api/shows/update/' + show.Id,
+      url: '/api/shows/delete/' + show.Id,
       data: inputs
     }).then((response) => {
       loggingService.logAction('Show', 'Show Updated')
-
-      handleServerResponse(
-        true,
-        'Thank you, your message has been submitted.'
-      )
-
-      router.push(`/${path}`)
+      setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: true }))
+      router.push('/account/shows')
     }).catch((error) => {
       loggingService.logError(error)
-
-      handleServerResponse(false, error.response.data.error)
+      setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: false }))
     })
   }
 
+  const matching = inputs.Confirmation.toLowerCase() === show.Code.toLowerCase()
+
   return (
-    <Layout title="Edit Show | Segue">
+    <Layout title="Delete Show | Segue">
       <BreadCrumb>
         <BreadCrumb.Item href="/">
-          Home
+            Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href="/shows">
-          Shows
+        <BreadCrumb.Item href="/account">
+            Account
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/account/shows">
+            Shows
         </BreadCrumb.Item>
         <BreadCrumb.Item>
-          Edit: {show.Name}
+            Delete: {show.Name}
         </BreadCrumb.Item>
       </BreadCrumb>
       <FormContainer>
         <form onSubmit={handleOnSubmit}>
-          <FormInputText label="Code" name="Code" value={inputs.Code} onChange={handleOnChange} placeholder="XYZABC" required />
-          <FormInputText label="Name" name="Name" value={inputs.Name} onChange={handleOnChange} required />
-          <FormInputSelect label="Show Type" name="Type" value={inputs.Type} onChange={handleOnChange} options={showTypes} required />
-          <FormInputCheckbox label="Archived" name="IsArchived" value={inputs.IsArchived} onChange={(handleOnChange)} />
-          <FormButtonSubmit disabled={status.submitted} loading={status.submitting} text="Save Changes" />
+          <FormInfo intent='DANGER'>
+            Warning. This will delete the show and all tours, documents, and information associated with it.
+          </FormInfo>
+          <p className="mb-2">Type <b>{show.Code}</b> in the text field to confirm deletion</p>
+          <FormInputText name="Confirmation" value={inputs.Confirmation} onChange={handleOnChange} required />
+          <FormButtonSubmit disabled={!matching} intent="DANGER" loading={status.submitting} text="Delete Show" />
         </form>
       </FormContainer>
     </Layout>
@@ -107,16 +91,18 @@ const EditShow = ({ show }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const ShowId = parseInt(ctx.params.ShowId as string)
+  const { ShowCode } = ctx.params
 
   const email = await getEmailFromReq(ctx.req)
+  const accountId = await getAccountId(email)
+  const ShowId = await lookupShowCode(ShowCode as string, accountId)
   const access = await checkAccess(email, { ShowId })
-
   if (!access) return { notFound: true }
+
 
   const show = await getShowById(ShowId)
 
   return { props: { show: showMapper(show) } }
 }
 
-export default EditShow
+export default DeleteShow

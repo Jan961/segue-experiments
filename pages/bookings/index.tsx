@@ -1,9 +1,9 @@
 import { GetServerSideProps } from 'next'
-import { ShowPageProps, getShowPageProps } from 'services/ShowService'
-import { Shows } from 'components/shows/Shows'
+import { AllTourPageProps, getAllTourPageProps } from 'services/TourService'
+import { TourSelector } from 'components/TourSelector'
 
-const ShowSelection = ({ shows }: ShowPageProps) => (<Shows shows={shows}/>)
+const ShowSelection = ({ tours }: AllTourPageProps) => (<TourSelector tours={tours}/>)
 
-export const getServerSideProps: GetServerSideProps = (ctx) => getShowPageProps(ctx)
+export const getServerSideProps: GetServerSideProps = (ctx) => getAllTourPageProps(ctx)
 
 export default ShowSelection

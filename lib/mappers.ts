@@ -1,4 +1,4 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes, TourTask, User } from '@prisma/client'
+import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes, TourTask, User, Tour } from '@prisma/client'
 import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, TourTaskDTO, UserDto, VenueContactDTO, VenueRoleDTO } from 'interfaces'
 import { ShowWithTours } from 'services/ShowService'
 import { TourWithDateblocks } from 'services/TourService'
@@ -34,7 +34,7 @@ export const showMapper = (show: Show): ShowDTO => ({
   IsArchived: show.IsArchived
 })
 
-export const tourMapper = (s: ShowWithTours): TourDTO[] => {
+export const showTourMapper = (s: ShowWithTours): TourDTO[] => {
   return s.Tour.map(tourEditorMapper)
 }
 
@@ -105,7 +105,7 @@ export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
   ShowName: t.Show.Name,
   Code: t.Code,
   ShowCode: t.Show.Code,
-  DateBlock: t.DateBlock.map(dateBlockMapper),
+  DateBlock: t.DateBlock ? t.DateBlock.map(dateBlockMapper) : [],
   IsArchived: t.IsArchived
 })
 

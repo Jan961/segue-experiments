@@ -72,7 +72,7 @@ const Create = () => {
           true,
           'Thank you, your message has been submitted.'
         )
-        router.push(`/${path}`)
+        router.push('/account/shows')
       })
       .catch((error) => {
         loggingService.logError(error)
@@ -86,7 +86,10 @@ const Create = () => {
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href="/shows">
+        <BreadCrumb.Item href="/account">
+          Account
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href="/account/shows">
           Shows
         </BreadCrumb.Item>
         <BreadCrumb.Item>

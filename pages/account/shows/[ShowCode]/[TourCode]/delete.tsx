@@ -13,9 +13,9 @@ import { useRouter } from 'next/router'
 import { tourEditorMapper } from 'lib/mappers'
 import { TourDTO } from 'interfaces'
 import { FormInfo } from 'components/global/forms/FormInfo'
-import { getTourById } from 'services/TourService'
+import { getTourById, lookupTourId } from 'services/TourService'
 import { BreadCrumb } from 'components/global/BreadCrumb'
-import { checkAccess, getEmailFromReq } from 'services/userService'
+import { checkAccess, getAccountIdFromReq, getEmailFromReq } from 'services/userService'
 
 type Props = {
   tour: TourDTO
@@ -24,8 +24,7 @@ type Props = {
 
 const Deletetour = ({ tour, showCode }: Props) => {
   const router = useRouter()
-  const { path } = router.query
-  const back = `/${path}/${showCode}`
+  const back = `/account/shows/${showCode}`
 
   const [status, setStatus] = useState({
     submitted: true,
@@ -72,14 +71,17 @@ const Deletetour = ({ tour, showCode }: Props) => {
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href={`/${path}`}>
+        <BreadCrumb.Item href={'/account'}>
+          Account
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href={'/account/shows'}>
           Shows
         </BreadCrumb.Item>
         <BreadCrumb.Item href={back}>
           { tour.ShowName }
         </BreadCrumb.Item>
         <BreadCrumb.Item>
-          Delete: { tour.ShowCode}
+          Delete: { tour.Code}
         </BreadCrumb.Item>
       </BreadCrumb>
       <FormContainer>
@@ -103,13 +105,18 @@ const Deletetour = ({ tour, showCode }: Props) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const TourId = parseInt(ctx.params.TourId as string)
-  const email = await getEmailFromReq(ctx.req)
+  const { TourCode, ShowCode } = ctx.params
 
-  const access = await checkAccess(email, { TourId })
+  console.log('hit')
+
+  const AccountId = await getAccountIdFromReq(ctx.req)
+  const email = await getEmailFromReq(ctx.req)
+  const { Id } = await lookupTourId(ShowCode as string, TourCode as string, AccountId)
+
+  const access = await checkAccess(email, { TourId: Id })
   if (!access) return { notFound: true }
 
-  const tour = await getTourById(TourId)
+  const tour = await getTourById(Id)
 
   return { props: { tour: tourEditorMapper(tour), showCode: tour.Show.Code } }
 }

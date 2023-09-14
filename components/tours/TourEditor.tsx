@@ -18,8 +18,7 @@ interface TourEditorProps {
 
 export const TourEditor = ({ showCode, tour } : TourEditorProps) => {
   const router = useRouter()
-  const { path } = router.query
-  const back = `/${path}/${showCode}`
+  const back = `/account/shows/${showCode}`
   const editMode = !!tour.Id
 
   const [status, setStatus] = useState({
@@ -103,7 +102,10 @@ export const TourEditor = ({ showCode, tour } : TourEditorProps) => {
         <BreadCrumb.Item href="/">
           Home
         </BreadCrumb.Item>
-        <BreadCrumb.Item href={`/${path}`}>
+        <BreadCrumb.Item href={'/account'}>
+          Account
+        </BreadCrumb.Item>
+        <BreadCrumb.Item href={'/account/shows'}>
           Shows
         </BreadCrumb.Item>
         <BreadCrumb.Item href={back}>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { faFileLines } from '@fortawesome/free-solid-svg-icons'
-import IconWithText from '../IconWithText'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 export default function ActivityLog () {
   const [showModal, setShowModal] = React.useState(false)
@@ -21,7 +21,14 @@ export default function ActivityLog () {
   }
   return (
     <>
-      <IconWithText icon={faFileLines} text={'Activity Log'} onClick={() => setShowModal(true)}/>
+      <SwitchBoardItem
+        link={{
+          icon: faFileLines,
+          title: 'Activity Log',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-orange'
+        }}
+      />
       {
         showModal
           ? (
@@ -35,7 +42,7 @@ export default function ActivityLog () {
                     {/* header */}
                     <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                       <h3 className="text-3xl font-semibold">
-                         Master Plan Report
+                         Activity Log
                       </h3>
                       <button
                         className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
