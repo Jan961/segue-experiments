@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
-import IconWithText from '../IconWithText'
-import { faChartPie, faPercent } from '@fortawesome/free-solid-svg-icons'
+import { faPercent } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
 import axios from 'axios'
 import { getCurrentMondayDate, range } from 'services/reportsService'

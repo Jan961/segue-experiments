@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { faUsers } from '@fortawesome/free-solid-svg-icons'
-import IconWithText from '../IconWithText'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 
 type Props={

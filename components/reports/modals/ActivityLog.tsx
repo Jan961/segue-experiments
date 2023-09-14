@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { faFileLines } from '@fortawesome/free-solid-svg-icons'
-import IconWithText from '../IconWithText'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 export default function ActivityLog () {
