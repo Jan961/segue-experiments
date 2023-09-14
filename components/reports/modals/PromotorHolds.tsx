@@ -1,9 +1,7 @@
 
 import React, { useState } from 'react'
-import IconWithText from '../IconWithText'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
-import moment from 'moment'
-import { getDateDaysAgo, toISO } from 'services/dateService'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 type Props={
     activeTours:any[]
@@ -88,7 +86,14 @@ export default function PromotorHolds ({ activeTours }:Props) {
 
   return (
     <>
-      <IconWithText icon={faUser} text={'Promoter Holds'} onClick={() => setShowModal(true)}/>
+      <SwitchBoardItem
+        link={{
+          icon: faUser,
+          title: 'Promoter Holds',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-pink'
+        }}
+      />
       {
         showModal
           ? (

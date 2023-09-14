@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { faFileLines } from '@fortawesome/free-solid-svg-icons'
 import IconWithText from '../IconWithText'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 export default function ActivityLog () {
   const [showModal, setShowModal] = React.useState(false)
@@ -21,7 +22,14 @@ export default function ActivityLog () {
   }
   return (
     <>
-      <IconWithText icon={faFileLines} text={'Activity Log'} onClick={() => setShowModal(true)}/>
+      <SwitchBoardItem
+        link={{
+          icon: faFileLines,
+          title: 'Activity Log',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-orange'
+        }}
+      />
       {
         showModal
           ? (

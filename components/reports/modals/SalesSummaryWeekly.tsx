@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import moment from 'moment'
 import { getDateDaysAgo, toISO, toSql } from '../../../services/dateService'
-import IconWithText from '../IconWithText'
-import { faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { faLineChart } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { getCurrentMondayDate, range } from 'services/reportsService'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 function formatDate (date) {
   return toSql(date)
@@ -93,15 +93,14 @@ export default function SalesSummaryWeekly ({ activeTours }:Props) {
 
   return (
     <>
-      {/* TBC replace with design specific Icons */}
-      <IconWithText icon={faChartLine} text={'Sales Summary Weekly'} onClick={() => setShowModal(true)}/>
-      {/* <button
-                className="inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                type="button"
-                onClick={() => setShowModal(true)}
-            >
-                Sales Summary Weekly
-            </button> */}
+      <SwitchBoardItem
+        link={{
+          icon: faLineChart,
+          title: 'Sales Summary Weekly',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-green'
+        }}
+      />
       {
         showModal
           ? (

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { faUsers } from '@fortawesome/free-solid-svg-icons'
 import IconWithText from '../IconWithText'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 
 type Props={
     activeTours:any[];
@@ -101,7 +102,14 @@ export default function HoldsComps ({ activeTours }:Props) {
 
   return (
     <>
-      <IconWithText icon={faUsers} text={'Holds & Comps'} onClick={() => setShowModal(true)}/>
+      <SwitchBoardItem
+        link={{
+          icon: faUsers,
+          title: 'Holds & Comps',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-pink'
+        }}
+      />
       {
         showModal
           ? (

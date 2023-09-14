@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { faListCheck } from '@fortawesome/free-solid-svg-icons'
-import IconWithText from '../IconWithText'
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 
 export default function MasterPlan () {
   const [showModal, setShowModal] = React.useState(false)
@@ -35,7 +35,14 @@ export default function MasterPlan () {
 
   return (
     <>
-      <IconWithText icon={faListCheck} text={'Masterplan Report'} onClick={() => setShowModal(true)}/>
+      <SwitchBoardItem
+        link={{
+          icon: faListCheck,
+          title: 'Masterplan Report',
+          onClick: () => setShowModal(true),
+          color: 'bg-primary-orange'
+        }}
+      />
       {
         showModal
           ? (
