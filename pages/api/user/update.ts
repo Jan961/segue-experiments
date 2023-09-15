@@ -13,8 +13,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const updatedUser = await prisma.user.update({
       data: {
-        Name: user.Name,
-        Email: user.Email
+        FirstName: user.FirstName,
+        LastName: user.LastName
       },
       where: {
         AccountId,

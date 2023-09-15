@@ -19,7 +19,7 @@ const UserListItem = ({ data }: Props) => {
         <StyledDialog title='Edit User' open={modalOpen} onClose={() => setModalOpen(false)}>
           <UserEditor user={data} triggerClose={() => setModalOpen(false)} />
         </StyledDialog>
-        {data.Name}
+        {data.FirstName} {data.LastName}
       </Table.Cell>
       <Table.Cell>
         {data.Email}

@@ -13,7 +13,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     const newUser = await prisma.user.create({
       data: {
-        Name: user.Name,
+        FirstName: user.FirstName,
+        LastName: user.LastName,
         Email: user.Email,
         AccountId
       }

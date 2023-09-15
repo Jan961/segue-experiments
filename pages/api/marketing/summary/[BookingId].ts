@@ -1,7 +1,7 @@
 import { loggingService } from 'services/loggingService'
 import prisma from 'lib/prisma'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { PerformanceDTO, BookingDTO } from 'interfaces'
+import { PerformanceDTO } from 'interfaces'
 import { calculateWeekNumber } from 'services/dateService'
 import { group } from 'radash'
 import { checkAccess, getEmailFromReq } from 'services/userService'
@@ -69,18 +69,24 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     })
     const NumberOfPerformances: number = performances.length
 
-    const SalesSetTotalsView: any = await prisma.$queryRaw`select
-    SetSalesFiguresDate as SaleFiguresDate,
-    SetIsFinalFigures,
-    Seats as TotalSeats,
-    Value as TotalSales
-    from SalesSetTotalsView
-    where
-        SaleTypeName in ('General Sales','School Sales')
-        and SetBookingId = ${BookingId}
-    order by SetSalesFiguresDate desc
-    limit 1;`
-    const salesSummary:any = SalesSetTotalsView?.[0]
+    const salesSummary = await prisma.salesSetTotalsView.findFirst({
+      where: {
+        SaleTypeName: {
+          in: ['General Sales', 'School Sales']
+        },
+        SetBookingId: BookingId
+      },
+      select: {
+        SetSalesFiguresDate: true,
+        SetIsFinalFigures: true,
+        Seats: true,
+        Value: true
+      },
+      orderBy: {
+        SetSalesFiguresDate: 'desc'
+      }
+    })
+
     const booking: any = await prisma.booking.findFirst({
       select: {
         FirstDate: true,
@@ -115,9 +121,6 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
               }
             }
           }
-          // where: {
-          //   Name: 'Tour'
-          // }
         }
       },
       where: {
@@ -139,28 +142,28 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const { Seats: Capacity, CurrencyCode } = booking?.Venue || {}
     const { CurrencySymbol } = booking?.Venue?.Currency || {}
     const { ConversionRate } = performance?.DateBlock?.Tour?.ConversionRate || {}
-    const AvgTicketPrice = salesSummary.TotalSales / salesSummary.TotalSeats
+    const AvgTicketPrice = salesSummary && salesSummary.Value / salesSummary.Seats
     const TotalSeats = Capacity * NumberOfPerformances
-    const GrossProfit = AvgTicketPrice * TotalSeats
-    const seatsSalePercentage = (salesSummary.TotalSeats / TotalSeats) * 100
+    const GrossProfit = AvgTicketPrice && AvgTicketPrice * TotalSeats
+    const seatsSalePercentage = salesSummary && (salesSummary.Seats / TotalSeats) * 100
     const currentTourWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate))
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        Seats: salesSummary.TotalSeats,
-        SalesValue: salesSummary.TotalSales,
-        AvgTicketPrice: parseFloat(AvgTicketPrice.toFixed(2)),
-        GrossPotential: parseFloat(GrossProfit.toFixed(2)),
+        Seats: salesSummary?.TotalSeats,
+        SalesValue: salesSummary?.TotalSales,
+        AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
+        GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
         VenueCurrencySymbol: CurrencySymbol,
-        seatsSalePercentage: parseFloat(seatsSalePercentage.toFixed(2)),
+        seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(2)),
         Capacity: TotalSeats,
         ConversionRate
       },
       TourInfo: {
         StartDate: booking?.DateBlock.StartDate,
         Date: performances?.[0]?.Date,
-        salesFigureDate: salesSummary.SaleFiguresDate,
+        salesFigureDate: salesSummary?.SaleFiguresDate,
         week: currentTourWeekNum,
         lastDate: performances?.[performances?.length - 1]?.Date,
         numberOfDays: Object.keys(group(performances, performance => performance.Date)).length
@@ -177,6 +180,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     res.status(200).json(result)
   } catch (err) {
     await loggingService.logError('Performance Issue' + err)
-    res.status(403).json({ err: 'Error occurred while generating search results.' + err })
+    console.log(err)
+    res.status(500).json({ err: 'Error occurred while generating search results.' + err })
   }
 }

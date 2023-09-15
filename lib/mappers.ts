@@ -144,12 +144,9 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   Notes: a.Notes
 })
 
-export const mapToTourTaskDTO = (tourTask: TourTask): TourTaskDTO => {
+export const mapToTourTaskDTO = (t: TourTask): TourTaskDTO => {
   return {
-    ...tourTask,
-    DueDate: convertDate(tourTask.DueDate),
-    FollowUp: convertDate(tourTask.FollowUp),
-    CreatedDate: convertDate(tourTask.CreatedDate)
+    ...t
   }
 }
 
@@ -160,6 +157,7 @@ export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
 
 export const userMapper = (user: User): UserDto => ({
   Id: user.Id,
-  Name: user.Name,
+  FirstName: user.FirstName,
+  LastName: user.LastName,
   Email: user.Email
 })

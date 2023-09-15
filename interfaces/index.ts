@@ -204,7 +204,8 @@ export type VenueRoleDTO = {
 export type UserDto = {
   Id?: number
   Email: string
-  Name: string
+  FirstName: string
+  LastName?: string
 }
 
 export type Venue = {

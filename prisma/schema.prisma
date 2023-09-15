@@ -18,38 +18,38 @@ model ActivityType {
 }
 
 model Booking {
-  Id                         Int                   @default(autoincrement()) @map("BookingId") @unique
-  DateBlockId                Int                   @map("BookingDateBlockId")
-  VenueId                    Int                   @map("BookingVenueId")
-  FirstDate                  DateTime              @map("BookingFirstDate") @db.Date
-  StatusCode                 String                @default("U") @map("BookingStatusCode") @db.Char(1)
-  PencilNum                  Int?                  @map("BookingPencilNum")
-  LandingPageURL             String?               @map("BookingLandingPageURL") @db.VarChar(255)
-  TicketsOnSaleFromDate      DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
-  TicketsOnSale              Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
-  IsOnSale                   Boolean               @default(dbgenerated("(b'0')")) @map("BookingIsOnSale") @db.Bit(1)
-  OnSaleDate                 DateTime?             @map("BookingOnSaleDate") @db.Date
-  MarketingPlanReceived      Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
-  ContactInfoReceived        Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
-  PrintReqsReceived          Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
-  Notes                      String?               @db.LongText @map("BookingNotes")
-  DealNotes                  String?               @db.LongText @map("BookingDealNotes")
-  TicketPriceNotes           String?               @db.LongText @map("BookingTicketPriceNotes")
-  MarketingDealNotes         String?               @db.LongText @map("BookingMarketingDealNotes")
-  CrewNotes                  String?               @db.LongText @map("BookingCrewNotes")
-  SalesNotes                 String?               @db.LongText @map("BookingSalesNotes")
-  HoldNotes                  String?               @db.LongText @map("BookingHoldNotes")
-  CompNotes                  String?               @db.LongText @map("BookingCompNotes")
-  MerchandiseNotes           String?               @db.LongText @map("BookingMerchandiseNotes")
-  CastRateTicketNotes        String?               @db.LongText @map("BookingCastRateTicketNotes")
-  BookedVenueHistory         BookedVenueHistory[]
-  DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
-  Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
-  BookingActivity            BookingActivity[]
-  BookingAttachedFile        BookingAttachedFile[]
-  Contract                   Contract?
-  Performance                Performance[]
-  SalesSet                   SalesSet[]
+  Id                    Int                   @unique @default(autoincrement()) @map("BookingId")
+  DateBlockId           Int                   @map("BookingDateBlockId")
+  VenueId               Int                   @map("BookingVenueId")
+  FirstDate             DateTime              @map("BookingFirstDate") @db.Date
+  StatusCode            String                @default("U") @map("BookingStatusCode") @db.Char(1)
+  PencilNum             Int?                  @map("BookingPencilNum")
+  LandingPageURL        String?               @map("BookingLandingPageURL") @db.VarChar(255)
+  TicketsOnSaleFromDate DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
+  TicketsOnSale         Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
+  IsOnSale              Boolean               @default(dbgenerated("(b'0')")) @map("BookingIsOnSale") @db.Bit(1)
+  OnSaleDate            DateTime?             @map("BookingOnSaleDate") @db.Date
+  MarketingPlanReceived Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
+  ContactInfoReceived   Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
+  PrintReqsReceived     Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
+  Notes                 String?               @map("BookingNotes") @db.LongText
+  DealNotes             String?               @map("BookingDealNotes") @db.LongText
+  TicketPriceNotes      String?               @map("BookingTicketPriceNotes") @db.LongText
+  MarketingDealNotes    String?               @map("BookingMarketingDealNotes") @db.LongText
+  CrewNotes             String?               @map("BookingCrewNotes") @db.LongText
+  SalesNotes            String?               @map("BookingSalesNotes") @db.LongText
+  HoldNotes             String?               @map("BookingHoldNotes") @db.LongText
+  CompNotes             String?               @map("BookingCompNotes") @db.LongText
+  MerchandiseNotes      String?               @map("BookingMerchandiseNotes") @db.LongText
+  CastRateTicketNotes   String?               @map("BookingCastRateTicketNotes") @db.LongText
+  BookedVenueHistory    BookedVenueHistory[]
+  DateBlock             DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
+  Venue                 Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
+  BookingActivity       BookingActivity[]
+  BookingAttachedFile   BookingAttachedFile[]
+  Contract              Contract?
+  Performance           Performance[]
+  SalesSet              SalesSet[]
 
   @@id([Id, DateBlockId])
   @@unique([DateBlockId, VenueId, FirstDate, StatusCode], map: "SECONDARY")
@@ -108,16 +108,18 @@ model Currency {
 }
 
 model DateType {
-  Id        Int         @id @default(autoincrement()) @map("DateTypeId")
-  Name      String      @unique(map: "OtherDayTypeName_UNIQUE") @map("DateTypeName") @db.VarChar(30)
-  Other     Other[]
-  Rehearsal Rehearsal[]
+  Id                          Int         @id @default(autoincrement()) @map("DateTypeId")
+  Name                        String      @unique(map: "OtherDayTypeName_UNIQUE") @map("DateTypeName") @db.VarChar(30)
+  DateTypeAffectsAvailability Boolean     @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DateTypeSeqNo               Int?        @db.UnsignedTinyInt
+  Other                       Other[]
+  Rehearsal                   Rehearsal[]
 }
 
 model Show {
   Id         Int     @id @default(autoincrement()) @map("ShowId")
   AccountId  Int     @map("ShowAccountId")
-  Code       String  @unique(map: "SECONDARY") @map("ShowCode") @db.VarChar(10)
+  Code       String  @map("ShowCode") @db.VarChar(10)
   Name       String  @map("ShowName") @db.VarChar(80)
   Logo       Bytes?  @map("ShowLogo")
   Type       String  @map("ShowType") @db.VarChar(1)
@@ -126,47 +128,48 @@ model Show {
   Account    Account @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
   Tour       Tour[]
 
+  @@unique([AccountId, Code], map: "SECONDARY")
   @@index([AccountId], map: "Account_Show_idx")
 }
 
 model Tour {
-  Id             Int              @id @default(autoincrement()) @map("TourId")
-  ShowId         Int              @map("TourShowId")
-  Code           String           @map("TourCode") @db.VarChar(10)
-  TourSalesEmail String?          @db.VarChar(80)
-  IsArchived     Boolean          @default(dbgenerated("(b'0')")) @map("TourIsArchived") @db.Bit(1)
-  IsDeleted      Boolean          @default(dbgenerated("(b'0')")) @map("TourIsDeleted") @db.Bit(1)
-  ConversionRate ConversionRate[]
-  DateBlock      DateBlock[]
-  Show           Show             @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveTour")
-  TourTask       TourTask[]
+  Id              Int               @id @default(autoincrement()) @map("TourId")
+  ShowId          Int               @map("TourShowId")
+  Code            String            @map("TourCode") @db.VarChar(10)
+  TourSalesEmail  String?           @db.VarChar(80)
+  IsArchived      Boolean           @default(dbgenerated("(b'0')")) @map("TourIsArchived") @db.Bit(1)
+  IsDeleted       Boolean           @default(dbgenerated("(b'0')")) @map("TourIsDeleted") @db.Bit(1)
+  AccountUserTour AccountUserTour[]
+  ConversionRate  ConversionRate[]
+  DateBlock       DateBlock[]
+  Show            Show              @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveTour")
+  TourTask        TourTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ShowId], map: "ShowMayHaveTour")
 }
 
 model TourTask {
-  Id                 Int       @id @default(autoincrement()) @map("TourTaskId")
-  TourId             Int
-  Code               Int       @map("TaskCode") @db.SmallInt
-  Name               String    @map("TaskName") @db.VarChar(80)
-  Priority           Int       @default(0) @db.TinyInt
-  Notes              String?   @db.VarChar(500)
-  Progress           Int       @default(0) @db.TinyInt
-  DueDate            DateTime? @db.Date
-  FollowUp           DateTime? @db.Date
-  CreatedDate        DateTime? @db.Date
-  Status             String?   @db.VarChar(20)
-  Interval           String    @default("once") @db.VarChar(20)
-  AssignedBy         String?   @map("TaskAssignedBy") @db.VarChar(30)
-  AssignedTo         String?   @map("TaskAssignedTo") @db.VarChar(30)
-  CompleteByWeekNum  Int?      @map("TaskCompleteByWeekNum") @db.SmallInt
-  StartByWeekNum     Int?      @map("TaskStartByWeekNum") @db.SmallInt
-  CompleteByPostTour Boolean   @default(dbgenerated("(b'0')")) @map("TaskCompleteByPostTour") @db.Bit(1)
-  StartByPostTour    Boolean   @default(dbgenerated("(b'0')")) @map("TaskStartByPostTour") @db.Bit(1)
-  Tour               Tour      @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
+  Id                   Int           @id @default(autoincrement()) @map("TourTaskId")
+  TourId               Int
+  Code                 Int           @map("TaskCode") @db.SmallInt
+  Name                 String        @map("TaskName") @db.VarChar(80)
+  Priority             Int           @default(0) @map("TaskPriority") @db.TinyInt
+  Notes                String?       @map("TaskNotes") @db.VarChar(500)
+  Progress             Int           @default(0) @map("TaskProgress") @db.TinyInt
+  AssignedToUserId     Int?          @map("TaskAssignedToUserId")
+  CompleteByPostTour   Boolean       @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostTour") @db.Bit(1)
+  Interval             String?       @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
+  RepeatCount          Bytes?        @map("TaskRepeatCount") @db.TinyBlob
+  StartByWeekNum       Int?          @map("TaskStartByWeekNum") @db.SmallInt
+  StartByPostTour      Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostTour") @db.Bit(1)
+  CompleteByWeekNum    Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
+  TaskWatcher          TaskWatcher[]
+  Tour                 Tour          @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
+  User                 User?         @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_TourTask_Assigned")
 
   @@index([TourId], map: "Tour_TourTask_fk")
+  @@index([AssignedToUserId], map: "User_TourTask_Assigned")
 }
 
 model Venue {
@@ -205,8 +208,8 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]   @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]   @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
-  VenueVenue1                                               VenueVenue[]         @relation("VenueVenue_VVVenue1IdToVenue") 
-  VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue")
+  VenueVenue1                                               VenueVenue[]         @relation("VenueVenue_VVVenue1IdToVenue") @ignore
+  VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue") @ignore
 
   @@index([CurrencyCode], map: "Currency_Venue")
 }
@@ -247,20 +250,20 @@ model VenueRole {
 }
 
 model VenueVenue {
-  Venue1Id                           Int   @map("VVVenue1Id")
-  Venue2Id                           Int   @map("VVVenue2Id")
-  Mileage                            Int?  @map("VVMileage")
-  TimeMins                           Int?  @map("VVTimeMins")
-  Venue1                             Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue2                             Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+  Venue1Id Int   @map("VVVenue1Id")
+  Venue2Id Int   @map("VVVenue2Id")
+  Mileage  Int?  @map("VVMileage")
+  TimeMins Int?  @map("VVTimeMins")
+  Venue1   Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
 
+  @@id([Venue1Id, Venue2Id])
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
   @@index([Venue2Id], map: "Venue_VenueVenue2_idx")
-  @@id([Venue1Id, Venue2Id])
 }
 
 model DateBlock {
-  Id                 Int          @default(autoincrement()) @map("DateBlockId") @unique
+  Id                 Int          @unique @default(autoincrement()) @map("DateBlockId")
   TourId             Int          @map("DateBlockTourId")
   Name               String       @map("DateBlockName") @db.VarChar(45)
   StartDate          DateTime     @map("DateBlockStartDate") @db.Date
@@ -332,24 +335,20 @@ model Rehearsal {
 }
 
 model Account {
-  AccountId       Int      @id @default(autoincrement())
-  AccountName     String   @db.VarChar(255)
-  CompanyWebsite  String   @db.VarChar(255)
-  TelephoneNumber String?  @db.VarChar(20)
-  EmailAddress    String?  @db.VarChar(255)
-  AddressLine1    String?  @db.VarChar(255)
-  AddressLine2    String?  @db.VarChar(255)
-  AddressLine3    String?  @db.VarChar(255)
-  County          String?  @db.VarChar(255)
-  Country         String?  @db.VarChar(255)
-  Postcode        String?  @db.VarChar(20)
-  VatRegistered   Int?     @db.TinyInt
-  Currency        String   @db.VarChar(3)
-  BusinessType    Int?
-  Updated_at      DateTime @default(now()) @db.DateTime(0)
-  Created_at      DateTime @default(now()) @db.DateTime(0)
-  Show            Show[]
-  User            User[]
+  AccountId              Int           @id @default(autoincrement())
+  AccountName            String        @db.VarChar(50)
+  AccountAddress1        String?       @db.VarChar(50)
+  AccountAddress2        String?       @db.VarChar(50)
+  AccountAddress3        String?       @db.VarChar(50)
+  AccountAddressTown     String?       @db.VarChar(50)
+  AccountAddressCounty   String?       @db.VarChar(50)
+  AccountAddressPostcode String?       @db.VarChar(20)
+  AccountAddressCountry  String?       @db.VarChar(30)
+  AccountVATNumber       String?       @db.VarChar(20)
+  AccountCurrencyCode    String        @db.VarChar(3)
+  AccountCompanyNumber   String?       @db.VarChar(20)
+  AccountUser            AccountUser[]
+  Show                   Show[]
 }
 
 model AvailableComp {
@@ -525,27 +524,465 @@ model ContractAttachedFile {
 }
 
 model VenueAddress {
-  VenueAddressId       Int     @id @default(autoincrement())
-  VenueAddressVenueId  Int
-  VenueAddressTypeName String  @db.VarChar(15)
-  VenueAddress1        String? @db.VarChar(50)
-  VenueAddress2        String? @db.VarChar(50)
-  VenueAddress3        String? @db.VarChar(50)
-  VenueAddressTown     String? @db.VarChar(50)
-  VenueAddressCounty   String? @db.VarChar(50)
-  VenueAddressPostcode String? @db.VarChar(12)
-  VenueAddressCountry  String? @db.VarChar(30)
-  Venue                Venue   @relation(fields: [VenueAddressVenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+  Id       Int     @id @default(autoincrement()) @map("VenueAddressId")
+  VenueId  Int     @map("VenueAddressVenueId")
+  TypeName String  @map("VenueAddressTypeName") @db.VarChar(15)
+  Line1    String? @map("VenueAddress1") @db.VarChar(50)
+  Line2    String? @map("VenueAddress2") @db.VarChar(50)
+  Line3    String? @map("VenueAddress3") @db.VarChar(50)
+  Town     String? @map("VenueAddressTown") @db.VarChar(50)
+  County   String? @map("VenueAddressCounty") @db.VarChar(50)
+  Postcode String? @map("VenueAddressPostcode") @db.VarChar(12)
+  Country  String? @map("VenueAddressCountry") @db.VarChar(30)
+  Venue    Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
-  @@index([VenueAddressVenueId], map: "Venue_VenueAddress")
+  @@index([VenueId], map: "Venue_VenueAddress")
 }
 
 model User {
-  Id            Int      @id @default(autoincrement()) @map("UserId")
-  Email         String   @unique(map: "UserEmail_uk") @db.VarChar(120) @map("UserEmail")
-  Name          String   @db.VarChar(50) @map("UserName")
-  AccountId     Int? @map("UserAccountId")
-  Account       Account? @relation(fields: [AccountId], references: [AccountId], onDelete: Restrict, onUpdate: Restrict, map: "Account_User")
+  Id          Int           @id @default(autoincrement()) @map("UserId")
+  Email       String        @unique(map: "UserEmail_uk") @map("UserEmail") @db.VarChar(120)
+  FirstName   String        @map("UserFirstName") @db.VarChar(50)
+  LastName    String?       @map("UserLastName") @db.VarChar(50)
+  AccountId   Int?          @map("UserAccountId")
+  AccountUser AccountUser[]
+  TaskWatcher TaskWatcher[]
+  TourTask    TourTask[]
+}
 
-  @@index([AccountId], map: "Account_User")
+model AccountUser {
+  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @map("AccUserUserId")
+  AccountId             Int                     @map("AccUserAccountId")
+  Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
+  User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
+  AccountUserPermission AccountUserPermission[]
+  AccountUserTour       AccountUserTour[]
+
+  @@index([AccountId], map: "Account_AccountUser")
+  @@index([UserId], map: "User_AccountUser")
+}
+
+model AccountUserPermission {
+  Id           Int         @id @default(autoincrement()) @map("UserAuthId")
+  AccUserId    Int         @map("UserAuthAccUserId")
+  PermissionId Int         @map("UserAuthPermissionId")
+  AccountUser  AccountUser @relation(fields: [AccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccountUserPermission")
+  Permission   Permission  @relation(fields: [PermissionId], references: [Id], onDelete: Cascade, map: "PermissionAccountUserPermission")
+
+  @@index([AccUserId], map: "AccountUser_AccountUserPermission")
+  @@index([PermissionId], map: "PermissionAccountUserPermission")
+}
+
+model AccountUserTour {
+  Id          Int         @id @default(autoincrement()) @map("AUTId")
+  UserId      Int         @map("AUTAccUserId")
+  TourId      Int         @map("AUTTourId")
+  AccountUser AccountUser @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccountUserTour")
+  Tour        Tour        @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_AccountUserTour")
+
+  @@index([UserId], map: "AccountUser_AccountUserTour")
+  @@index([TourId], map: "Tour_AccountUserTour")
+}
+
+model Permission {
+  Id                    Int                     @id @default(autoincrement()) @map("PermissionId")
+  Name                  String                  @map("PermissionName") @db.VarChar(50)
+  Description           String                  @map("PermissionDescription") @db.LongText
+  PermissionGroupId     Int                     @map("PermissionPermissionGroupId")
+  SeqNo                 Int?                    @map("PermissionSeqNo") @db.TinyInt
+  AccountUserPermission AccountUserPermission[]
+  PermissionGroup       PermissionGroup         @relation(fields: [PermissionGroupId], references: [Id], onUpdate: Restrict, map: "PermissionGroup_Permission")
+
+  @@index([PermissionGroupId], map: "PermissionGroup_Permission")
+}
+
+model PermissionGroup {
+  Id         Int          @id @default(autoincrement()) @map("PermissionGroupId")
+  Name       String       @map("PermissionGroupName") @db.VarChar(50)
+  SeqNo      Int          @map("PermissionGroupSeqNo") @db.TinyInt
+  Permission Permission[]
+}
+
+model TaskWatcher {
+  WatcherId         Int      @id @default(autoincrement())
+  WatcherTourTaskId Int
+  WatcherUserId     Int
+  TourTask          TourTask @relation(fields: [WatcherTourTaskId], references: [Id], onDelete: Cascade, map: "TourTask_TaskWatcher")
+  User              User     @relation(fields: [WatcherUserId], references: [Id], onDelete: Cascade, map: "User_TaskWatcher")
+
+  @@index([WatcherTourTaskId], map: "TourTask_TaskWatcher")
+  @@index([WatcherUserId], map: "User_TaskWatcher")
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view SalesFiguresView {
+  SetId               Int      @default(0)
+  BookingId           Int
+  PerformanceId       Int?
+  SetSalesFiguresDate DateTime @db.Date
+  SaleTypeId          Int      @default(0)
+  SaleTypeName        String   @db.VarChar(45)
+  SaleId              Int?     @default(0)
+  SaleSeats           Int?     @db.SmallInt
+  SaleValue           Decimal? @db.Decimal(8, 2)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BookingTravelView {
+  BookingDateBlockId Int
+  FromBookingId      Int  @default(0)
+  Mileage            Int?
+  TimeMins           Int?
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BookingHoldCompUnionView {
+  SetBookingId        Int      @default(0)
+  SetSalesFiguresDate DateTime @default(dbgenerated("('0000-00-00')")) @db.Date
+  HoldOrComp          String   @default("") @db.VarChar(4)
+  Code                String   @default("") @db.VarChar(5)
+  Name                String   @default("") @db.VarChar(30)
+  Seats               Int?
+  Value               Decimal? @db.Decimal(8, 2)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ScheduleView {
+  TourId              Int       @default(0)
+  FullTourCode        String?   @db.VarChar(20)
+  ShowName            String    @db.VarChar(80)
+  RehearsalStartDate  DateTime? @db.Date
+  TourStartDate       DateTime? @db.Date
+  TourEndDate         DateTime? @db.Date
+  EntryDate           DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
+  TourWeekNum         Int?      @db.SmallInt
+  EntryType           String?   @db.VarChar(30)
+  EntryId             Int       @default(0)
+  EntryName           String?   @db.VarChar(255)
+  EntryStatusCode     String    @default("") @db.Char(1)
+  Location            String?   @db.VarChar(50)
+  PencilNum           Int?
+  VenueId             Int?
+  VenueSeats          Float?
+  Mileage             Int?
+  TimeMins            Int?
+  DateTypeId          Int?
+  DateTypeName        String?   @db.VarChar(30)
+  AffectsAvailability Bytes?    @db.VarBinary(1)
+  SeqNo               Decimal?  @db.Decimal(4, 0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view VenueView {
+  VenueId                      Int     @default(0)
+  VenueCode                    String  @db.VarChar(6)
+  VenueName                    String  @db.VarChar(255)
+  VenueStatusCode              String  @default("O") @db.VarChar(1)
+  VenueWebsite                 String? @db.VarChar(255)
+  VenueFamily                  String? @db.VarChar(100)
+  VenueCurrencyCode            String  @db.VarChar(3)
+  VenueVATIndicator            Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueTechSpecsURL            String? @db.VarChar(255)
+  VenueSeats                   Float?
+  VenueBarringClause           String? @db.VarChar(255)
+  VenueTownPopulation          Float?
+  VenueLXDesk                  String? @db.VarChar(50)
+  VenueLXNotes                 String? @db.VarChar(2000)
+  VenueSoundDesk               String? @db.VarChar(50)
+  VenueSoundNotes              String? @db.VarChar(2000)
+  VenueStageSize               String? @db.VarChar(50)
+  VenueGridHeight              String? @db.VarChar(50)
+  VenueVenueFlags              String? @db.VarChar(2000)
+  VenueBarringWeeksPre         Int?    @db.TinyInt
+  VenueBarringWeeksPost        Int?    @db.TinyInt
+  VenueBarringMiles            Int?
+  VenueCulturallyExempt        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueAccountId               Int
+  VenueIsDeleted               Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueMainAddress1            String? @db.VarChar(50)
+  VenueMainAddress2            String? @db.VarChar(50)
+  VenueMainAddress3            String? @db.VarChar(50)
+  VenueMainAddressTown         String? @db.VarChar(50)
+  VenueMainAddressCounty       String? @db.VarChar(50)
+  VenueMainAddressPostcode     String? @db.VarChar(12)
+  VenueMainAddressCountry      String? @db.VarChar(30)
+  VenueDeliveryAddress1        String? @db.VarChar(50)
+  VenueDeliveryAddress2        String? @db.VarChar(50)
+  VenueDeliveryAddress3        String? @db.VarChar(50)
+  VenueDeliveryAddressTown     String? @db.VarChar(50)
+  VenueDeliveryAddressCounty   String? @db.VarChar(50)
+  VenueDeliveryAddressPostcode String? @db.VarChar(12)
+  VenueDeliveryAddressCountry  String? @db.VarChar(30)
+  VenueMainNoteText            String? @db.LongText
+  VenueWarningNoteText         String? @db.LongText
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view TourPerformanceSummaryView {
+  TourId     Int
+  StatusCode String @default("U") @db.Char(1)
+  Count      BigInt @default(0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view DateBlockDatesView {
+  DateBlockId         Int      @default(0)
+  EntryType           String?  @db.VarChar(30)
+  EntryId             Int      @default(0)
+  EntryDate           DateTime @default(dbgenerated("('0000-00-00')")) @db.Date
+  EntryName           String?  @db.VarChar(255)
+  TownName            String?  @db.VarChar(50)
+  StatusCode          String   @default("") @db.Char(1)
+  PencilNum           Int?
+  VenueId             Int?
+  VenueSeats          Float?
+  Mileage             Int?
+  TimeMins            Int?
+  DateTypeId          Int?
+  DateTypeName        String?  @db.VarChar(30)
+  AffectsAvailability Bytes?   @db.VarBinary(1)
+  SeqNo               Decimal? @db.Decimal(4, 0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BarringView {
+  VenueId       Int    @default(0)
+  BarredVenueId Int    @default(0)
+  BarType       String @default("") @db.VarChar(7)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view TourView {
+  TourId             Int       @default(0)
+  TourCode           String    @db.VarChar(10)
+  FullTourCode       String?   @db.VarChar(20)
+  TourSalesEmail     String?   @db.VarChar(80)
+  TourIsArchived     Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TourIsDeleted      Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ShowId             Int       @default(0)
+  ShowCode           String    @db.VarChar(10)
+  ShowName           String    @db.VarChar(80)
+  ShowType           String    @db.VarChar(1)
+  ShowLogo           Bytes?
+  RehearsalStartDate DateTime? @db.Date
+  RehearsalEndDate   DateTime? @db.Date
+  TourStartDate      DateTime? @db.Date
+  TourEndDate        DateTime? @db.Date
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BookingDateDiffView {
+  BookingDateBlockId Int
+  FromBookingId      Int  @default(0)
+  ToBookingId        Int  @default(0)
+  DaysDifference     Int?
+  FromVenueId        Int
+  ToVenueId          Int
+
+  @@ignore
+}
+
+/// The underlying view does not contain salesSetTotalsViewa valid unique identifier and can therefore currently not be handled by Prisma Client.
+view VenueVenueView {
+  FromVenueId Int  @default(0)
+  ToVenueId   Int  @default(0)
+  Mileage     Int?
+  TimeMins    Int?
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ShowView {
+  ShowId         Int     @default(0)
+  ShowCode       String  @db.VarChar(10)
+  ShowName       String  @db.VarChar(80)
+  ShowLogo       Bytes?
+  ShowType       String  @db.VarChar(1)
+  ShowIsArchived Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ShowIsDeleted  Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ShowAccountId  Int
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view SalesView {
+  ShowName                 String    @db.VarChar(80)
+  TourId                   Int       @default(0)
+  FullTourCode             String?   @db.VarChar(20)
+  TourStartDate            DateTime? @db.Date
+  TourEndDate              DateTime? @db.Date
+  BookingId                Int       @default(0)
+  BookingFirstDate         DateTime  @db.Date
+  BookingStatusCode        String    @default("U") @db.Char(1)
+  BookingTourWeekNum       Int?      @db.SmallInt
+  VenueTown                String?   @db.VarChar(50)
+  VenueCode                String    @db.VarChar(6)
+  VenueName                String    @db.VarChar(255)
+  VenueCurrencyCode        String    @db.VarChar(3)
+  VenueCurrencySymbol      String    @db.VarChar(1)
+  ConversionToCurrencyCode String?   @db.VarChar(3)
+  ConversionRate           Decimal?  @db.Decimal(8, 4)
+  SetSalesFiguresDate      DateTime? @db.Date
+  SetBookingWeekNum        Int?      @db.SmallInt
+  SetTourWeekDate          DateTime? @db.Date
+  SetNotOnSale             Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsFinalFigures        Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetSingleSeats           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetBrochureReleased      Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsCopy                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SaleTypeName             String?   @db.VarChar(45)
+  Seats                    Decimal?  @db.Decimal(27, 0)
+  Value                    Decimal?  @db.Decimal(30, 2)
+  TotalCapacity            Float?
+  FinalFiguresDate         DateTime? @db.Date
+  FinalFiguresSeats        Decimal?  @db.Decimal(27, 0)
+  FinalFiguresValue        Decimal?  @db.Decimal(30, 2)
+  NotOnSaleDate            DateTime? @db.Date
+  TotalHoldSeats           Decimal?  @db.Decimal(32, 0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BookingSelectionView {
+  BookingId            Int      @default(0)
+  BookingStatusCode    String   @default("U") @db.Char(1)
+  BookingFirstDate     DateTime @db.Date
+  VenueId              Int      @default(0)
+  VenueCode            String   @db.VarChar(6)
+  VenueMainAddressTown String?  @db.VarChar(50)
+  TourId               Int      @default(0)
+  FullTourCode         String?  @db.VarChar(20)
+  TourLengthWeeks      Int?     @db.SmallInt
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BookingHoldCompsView {
+  FullTourCode      String?  @db.VarChar(20)
+  VenueCode         String   @db.VarChar(6)
+  VenueName         String   @db.VarChar(255)
+  VenueSeats        Float?
+  BookingFirstDate  DateTime @db.Date
+  BookingStatusCode String   @default("U") @db.Char(1)
+  HoldOrComp        String   @default("") @db.VarChar(4)
+  Code              String   @default("") @db.VarChar(5)
+  Name              String   @default("") @db.VarChar(30)
+  Seats             Decimal? @db.Decimal(32, 0)
+  SoldSeats         Decimal? @db.Decimal(27, 0)
+  ReservedSeats     Decimal? @db.Decimal(27, 0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view TourSummaryView {
+  TourId                      Int      @default(0)
+  DateTypeAffectsAvailability Decimal? @db.Decimal(1, 0)
+  DateTypeId                  Int?
+  DateTypeSeqNo               Decimal? @db.Decimal(3, 0)
+  Item                        String   @default("") @db.VarChar(30)
+  StatusCode                  String   @default("") @db.Char(1)
+  Count                       BigInt   @default(0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view PromoterHoldsView {
+  TourId                               Int       @default(0)
+  FullTourCode                         String?   @db.VarChar(20)
+  VenueCode                            String    @db.VarChar(6)
+  VenueName                            String    @db.VarChar(255)
+  BookingId                            Int       @default(0)
+  PerformanceDate                      DateTime? @db.Date
+  PerformanceTime                      DateTime? @db.Time(0)
+  AvailableCompSeats                   Int?      @default(1) @db.TinyInt
+  AvailableCompNotes                   String?   @db.LongText
+  CompAllocationSeats                  Int?      @default(1) @db.TinyInt
+  CompAllocationTicketHolderName       String?   @db.VarChar(50)
+  CompAllocationSeatsAllocated         String?   @db.VarChar(50)
+  CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
+  CompAllocationComments               String?   @db.VarChar(100)
+  CompAllocationRequestedBy            String?   @db.VarChar(50)
+  CompAllocationArrangedBy             String?   @db.VarChar(50)
+  CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ScheduledDatesView {
+  DateBlockId Int      @default(0)
+  EntryId     Int      @default(0)
+  EntryDate   DateTime @default(dbgenerated("('0000-00-00')")) @db.Date
+  EntrySource String   @default("") @db.VarChar(13)
+  EntryName   String?  @db.VarChar(255)
+  TownName    String?  @db.VarChar(50)
+  StatusCode  String   @default("") @db.Char(1)
+  PencilNum   Int?
+  VenueSeats  Float?
+  Mileage     Int?
+  TimeMins    Int?
+
+  @@ignore
+}
+
+view SalesSetTotalsView {
+  SetBookingId        Int
+  SetSalesFiguresDate DateTime @db.Date
+  SetIsFinalFigures   Boolean  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SaleTypeName        String   @db.VarChar(45)
+  Seats               Decimal? @db.Decimal(27, 0)
+  Value               Decimal? @db.Decimal(30, 2)
+
+  @@unique([SetBookingId, SetSalesFiguresDate])
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view SalesSummaryView {
+  TourId                   Int       @default(0)
+  FullTourCode             String?   @db.VarChar(20)
+  ShowName                 String    @db.VarChar(80)
+  TourStartDate            DateTime? @db.Date
+  TourEndDate              DateTime? @db.Date
+  TourWeekNum              Int?      @db.SmallInt
+  EntryDate                DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
+  Location                 String?   @db.VarChar(50)
+  EntryId                  Int       @default(0)
+  EntryName                String?   @db.VarChar(255)
+  EntryType                String?   @db.VarChar(30)
+  EntryStatusCode          String    @default("") @db.Char(1)
+  Value                    Decimal?  @db.Decimal(30, 2)
+  VenueCurrencyCode        String?   @db.VarChar(3)
+  VenueCurrencySymbol      String?   @db.VarChar(1)
+  ConversionRate           Decimal?  @db.Decimal(8, 4)
+  ConversionToCurrencyCode String?   @db.VarChar(3)
+  SaleTypeName             String?   @db.VarChar(45)
+  SetSalesFiguresDate      DateTime? @db.Date
+  FinalSetSalesFiguresDate DateTime? @db.Date
+
+  @@ignore
 }

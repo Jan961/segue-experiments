@@ -13,7 +13,7 @@ interface UserEditorProps {
 }
 
 export const UserEditor = ({ user, triggerClose }: UserEditorProps) => {
-  const [inputs, setInputs] = React.useState(user || { Name: '', Email: '' })
+  const [inputs, setInputs] = React.useState<UserDto>(user || { FirstName: '', LastName: '', Email: '' })
   const [status, setStatus] = React.useState({ submitted: true, submitting: false })
   const [userDict, setUserDict] = useRecoilState(userState)
 
@@ -86,7 +86,8 @@ export const UserEditor = ({ user, triggerClose }: UserEditorProps) => {
 
   return (
     <form onSubmit={handleOnSubmit}>
-      <FormInputText name="Name" label="Name" onChange={handleOnChange} value={inputs.Name} />
+      <FormInputText name="FirstName" label="FirstName" onChange={handleOnChange} value={inputs.FirstName} />
+      <FormInputText name="LastName" label="LastName" onChange={handleOnChange} value={inputs.LastName} />
       <FormInputText name="Email" label="Email" onChange={handleOnChange} value={inputs.Email} />
 
       <StyledDialog.FooterContainer>
