@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
-import { faMuseum } from '@fortawesome/free-solid-svg-icons'
-import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
+import React, { useState } from "react";
+import { faMuseum } from "@fortawesome/free-solid-svg-icons";
+import { SwitchBoardItem } from "components/global/SwitchBoardItem";
+import { Spinner } from "components/global/Spinner";
 
 type Props = {
   activeTours: any[];
 };
 export default function SelectedVenues({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false);
-
+  const [loading, setLoading] = React.useState(false);
   const [inputs, setInputs] = useState({
     tour: "ALL",
     options: "ALL",
@@ -23,6 +24,7 @@ export default function SelectedVenues({ activeTours }: Props) {
     const selectedTour = activeTours.find(
       (tour) => tour.Id === parseInt(inputs.tour)
     );
+    setLoading(true);
     fetch("/api/reports/venues", {
       method: "POST",
       body: JSON.stringify({
@@ -33,40 +35,44 @@ export default function SelectedVenues({ activeTours }: Props) {
         showId: selectedTour?.ShowId,
         options: inputs.options,
       }),
-    }).then(async (response) => {
-      if (response.status >= 200 && response.status < 300) {
-        const tourName: string = selectedTour?.name;
-        let suggestedName: string | any[] = response.headers.get(
-          "Content-Disposition"
-        );
-        if (suggestedName) {
-          suggestedName = suggestedName.match(/filename="(.+)"/);
-          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
-        }
-        if (!suggestedName) {
-          suggestedName = `${tourName}.xlsx`;
-        }
-        const content = await response.blob();
-        if (content) {
-          const anchor: any = document.createElement("a");
-          anchor.download = suggestedName;
-          anchor.href = (window.webkitURL || window.URL).createObjectURL(
-            content
+    })
+      .then(async (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          const tourName: string = selectedTour?.name;
+          let suggestedName: string | any[] = response.headers.get(
+            "Content-Disposition"
           );
-          anchor.dataset.downloadurl = [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            anchor.download,
-            anchor.href,
-          ].join(":");
-          anchor.click();
+          if (suggestedName) {
+            suggestedName = suggestedName.match(/filename="(.+)"/);
+            suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
+          }
+          if (!suggestedName) {
+            suggestedName = `${tourName}.xlsx`;
+          }
+          const content = await response.blob();
+          if (content) {
+            const anchor: any = document.createElement("a");
+            anchor.download = suggestedName;
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(
+              content
+            );
+            anchor.dataset.downloadurl = [
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              anchor.download,
+              anchor.href,
+            ].join(":");
+            anchor.click();
+          }
+          setShowModal(false);
+          setInputs({
+            tour: "ALL",
+            options: "ALL",
+          });
         }
-        setShowModal(false);
-        setInputs({
-          tour: "ALL",
-          options: "ALL",
-        });
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   async function handleOnSubmit(e) {
@@ -87,9 +93,9 @@ export default function SelectedVenues({ activeTours }: Props) {
       <SwitchBoardItem
         link={{
           icon: faMuseum,
-          title: 'Selected Venues',
+          title: "Selected Venues",
           onClick: () => setShowModal(true),
-          color: 'bg-primary-purple'
+          color: "bg-primary-purple",
         }}
       />
       {showModal ? (
@@ -111,6 +117,11 @@ export default function SelectedVenues({ activeTours }: Props) {
                   </button>
                 </div>
                 {/* body */}
+                {loading && (
+                  <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+                    <Spinner className="w-full" size="lg" />
+                  </div>
+                )}
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">

@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
-import { faPercent } from '@fortawesome/free-solid-svg-icons'
-import moment from 'moment'
-import axios from 'axios'
-import { getCurrentMondayDate, range } from 'services/reportsService'
-import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
+import React, { useState } from "react";
+import { getDateDaysAgo, toISO, toSql } from "services/dateService";
+import { faPercent } from "@fortawesome/free-solid-svg-icons";
+import moment from "moment";
+import axios from "axios";
+import { getCurrentMondayDate, range } from "services/reportsService";
+import { SwitchBoardItem } from "components/global/SwitchBoardItem";
+import { Spinner } from "components/global/Spinner";
 
 function formatDate(date) {
   return toSql(date);
@@ -16,6 +17,7 @@ type Props = {
 
 export default function SalesVsCapacity({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [tourWeeks, setTourWeeks] = useState([]); // Shory list of tours for the toolbar to switch
   const [inputs, setInputs] = useState({
     Tour: null,
@@ -40,6 +42,7 @@ export default function SalesVsCapacity({ activeTours }: Props) {
     const fromWeek = formatShortYearDate(
       getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7)
     );
+    setLoading(true);
     fetch("/api/reports/sales-summary-simple", {
       method: "POST",
       body: JSON.stringify({
@@ -48,42 +51,46 @@ export default function SalesVsCapacity({ activeTours }: Props) {
         toWeek,
         isSeatsDataRequired: true,
       }),
-    }).then(async (response) => {
-      if (response.status >= 200 && response.status < 300) {
-        const tourName: string = selectedTour?.name;
-        let suggestedName: string | any[] = response.headers.get(
-          "Content-Disposition"
-        );
-        if (suggestedName) {
-          suggestedName = suggestedName.match(/filename="(.+)"/);
-          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
-        }
-        if (!suggestedName) {
-          suggestedName = `${tourName}.xlsx`;
-        }
-        const content = await response.blob();
-        if (content) {
-          const anchor: any = document.createElement("a");
-          anchor.download = suggestedName;
-          anchor.href = (window.webkitURL || window.URL).createObjectURL(
-            content
+    })
+      .then(async (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          const tourName: string = selectedTour?.name;
+          let suggestedName: string | any[] = response.headers.get(
+            "Content-Disposition"
           );
-          anchor.dataset.downloadurl = [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            anchor.download,
-            anchor.href,
-          ].join(":");
-          anchor.click();
+          if (suggestedName) {
+            suggestedName = suggestedName.match(/filename="(.+)"/);
+            suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
+          }
+          if (!suggestedName) {
+            suggestedName = `${tourName}.xlsx`;
+          }
+          const content = await response.blob();
+          if (content) {
+            const anchor: any = document.createElement("a");
+            anchor.download = suggestedName;
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(
+              content
+            );
+            anchor.dataset.downloadurl = [
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              anchor.download,
+              anchor.href,
+            ].join(":");
+            anchor.click();
+          }
+          setShowModal(false);
+          setInputs({
+            Tour: null,
+            TourWeek: null,
+            numberOfWeeks: null,
+            order: null,
+          });
         }
-        setShowModal(false);
-        setInputs({
-          Tour: null,
-          TourWeek: null,
-          numberOfWeeks: null,
-          order: null,
-        });
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   function handleOnSubmit(e) {
@@ -106,6 +113,7 @@ export default function SalesVsCapacity({ activeTours }: Props) {
           tourEndDate: EndDate,
         }));
       }
+      setLoading(true);
       axios
         .get(`/api/reports/tourWeek/${e.target.value}`)
         .then((res) => res.data)
@@ -116,6 +124,9 @@ export default function SalesVsCapacity({ activeTours }: Props) {
           setTourWeeks(data || []);
           const currentWeekMonday = getCurrentMondayDate();
           setInputs((prev) => ({ ...prev, TourWeek: currentWeekMonday }));
+        })
+        .finally(() => {
+          setLoading(false);
         });
     }
     setInputs((prev) => ({
@@ -129,9 +140,9 @@ export default function SalesVsCapacity({ activeTours }: Props) {
       <SwitchBoardItem
         link={{
           icon: faPercent,
-          title: 'Sales Vs Capacity',
+          title: "Sales Vs Capacity",
           onClick: () => setShowModal(true),
-          color: 'bg-primary-green'
+          color: "bg-primary-green",
         }}
       />
       {showModal ? (
@@ -139,7 +150,7 @@ export default function SalesVsCapacity({ activeTours }: Props) {
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10">
             <div className="relative w-auto my-6 mx-auto max-w-6xl">
               {/* content */}
-              <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+              <div className="px-4 border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none relative">
                 {/* header */}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">
@@ -155,6 +166,11 @@ export default function SalesVsCapacity({ activeTours }: Props) {
                   </button>
                 </div>
                 {/* body */}
+                {loading && (
+                  <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+                    <Spinner className="w-full" size="lg" />
+                  </div>
+                )}
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">

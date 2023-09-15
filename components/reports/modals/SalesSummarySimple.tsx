@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react'
-import { GetServerSideProps } from 'next'
-import { faPieChart } from '@fortawesome/free-solid-svg-icons'
-import moment from 'moment'
-import { getDateDaysAgo, toISO } from 'services/dateService'
-import formatDate from 'utils/formatDate'
-import { getCurrentMondayDate, range } from 'services/reportsService'
-import axios from 'axios'
-import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
+import React, { useEffect, useState } from "react";
+import { GetServerSideProps } from "next";
+import { faPieChart } from "@fortawesome/free-solid-svg-icons";
+import moment from "moment";
+import { getDateDaysAgo, toISO } from "services/dateService";
+import formatDate from "utils/formatDate";
+import { getCurrentMondayDate, range } from "services/reportsService";
+import axios from "axios";
+import { SwitchBoardItem } from "components/global/SwitchBoardItem";
+import { Spinner } from "components/global/Spinner";
 
-type Props={
-  activeTours:any[];
-}
+type Props = {
+  activeTours: any[];
+};
 
 type TourWeek = {
   Id: number;
@@ -18,9 +19,10 @@ type TourWeek = {
   tourWeekNum: number;
 };
 
-export default function SalesSummarySimple ({ activeTours }:Props) {
-  const [showModal, setShowModal] = React.useState(false)
-  const [tourWeeks, setTourWeeks] = useState<TourWeek[]>([])
+export default function SalesSummarySimple({ activeTours }: Props) {
+  const [showModal, setShowModal] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
+  const [tourWeeks, setTourWeeks] = useState<TourWeek[]>([]);
   const [status, setStatus] = useState({
     submitted: false,
     submitting: false,
@@ -36,9 +38,13 @@ export default function SalesSummarySimple ({ activeTours }:Props) {
   });
 
   const fetchTourWeek = async (tourId: number) => {
+    setLoading(true);
     const weeks: TourWeek[] = await axios
       .get(`/api/reports/tourWeek/${tourId}`)
-      .then((data) => data.data);
+      .then((data) => data.data)
+      .finally(() => {
+        setLoading(false);
+      });
     setTourWeeks(weeks);
     const currentWeekMonday = getCurrentMondayDate();
     setInputs((prev) => ({ ...prev, tourWeek: currentWeekMonday }));
@@ -62,6 +68,7 @@ export default function SalesSummarySimple ({ activeTours }:Props) {
     const fromWeek = formatShortYearDate(
       weeksBefore(toWeek, inputs.numberOfWeeks * 7)
     );
+    setLoading(true);
     fetch("/api/reports/sales-summary-simple", {
       method: "POST",
       body: JSON.stringify({
@@ -69,44 +76,48 @@ export default function SalesSummarySimple ({ activeTours }:Props) {
         fromWeek,
         toWeek,
       }),
-    }).then(async (response) => {
-      if (response.status >= 200 && response.status < 300) {
-        const tourName: string = selectedTour?.name;
-        let suggestedName: string | any[] = response.headers.get(
-          "Content-Disposition"
-        );
-        if (suggestedName) {
-          suggestedName = suggestedName.match(/filename="(.+)"/);
-          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
-        }
-        if (!suggestedName) {
-          suggestedName = `${tourName}.xlsx`;
-        }
-        const content = await response.blob();
-        if (content) {
-          const anchor: any = document.createElement("a");
-          anchor.download = suggestedName;
-          anchor.href = (window.webkitURL || window.URL).createObjectURL(
-            content
+    })
+      .then(async (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          const tourName: string = selectedTour?.name;
+          let suggestedName: string | any[] = response.headers.get(
+            "Content-Disposition"
           );
-          anchor.dataset.downloadurl = [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            anchor.download,
-            anchor.href,
-          ].join(":");
-          anchor.click();
+          if (suggestedName) {
+            suggestedName = suggestedName.match(/filename="(.+)"/);
+            suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
+          }
+          if (!suggestedName) {
+            suggestedName = `${tourName}.xlsx`;
+          }
+          const content = await response.blob();
+          if (content) {
+            const anchor: any = document.createElement("a");
+            anchor.download = suggestedName;
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(
+              content
+            );
+            anchor.dataset.downloadurl = [
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+              anchor.download,
+              anchor.href,
+            ].join(":");
+            anchor.click();
+          }
+          setShowModal(false);
+          setInputs({
+            tour: null,
+            tourWeek: null,
+            numberOfWeeks: null,
+            order: null,
+            tourStartDate: null,
+            tourEndDate: null,
+          });
         }
-        setShowModal(false);
-        setInputs({
-          tour: null,
-          tourWeek: null,
-          numberOfWeeks: null,
-          order: null,
-          tourStartDate: null,
-          tourEndDate: null,
-        });
-      }
-    });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
   useEffect(() => {
     if (inputs.tour) {
@@ -146,9 +157,9 @@ export default function SalesSummarySimple ({ activeTours }:Props) {
       <SwitchBoardItem
         link={{
           icon: faPieChart,
-          title: 'Sales Summary',
+          title: "Sales Summary",
           onClick: () => setShowModal(true),
-          color: 'bg-primary-green'
+          color: "bg-primary-green",
         }}
       />
       {showModal ? (
@@ -168,7 +179,7 @@ export default function SalesSummarySimple ({ activeTours }:Props) {
                 &#8203;
               </span>
               <div
-                className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6"
+                className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6 relative"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-headline"
@@ -202,6 +213,11 @@ export default function SalesSummarySimple ({ activeTours }:Props) {
                     </button>
                   </div>
                 </div>
+                {loading && (
+                  <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+                    <Spinner className="w-full" size="lg" />
+                  </div>
+                )}
                 <form onSubmit={handleOnSubmit}>
                   <div className="mt-6">
                     <label htmlFor="date" className="text-lg font-medium">

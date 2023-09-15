@@ -25,18 +25,20 @@ type UpsertSalesParams = {
   SetSalesFiguresDate: string
   Holds?: HoldInput[],
   Comps?: CompsInput[],
-  Sales?: SaleInput[]
+  Sales?: SaleInput[],
+  isFinalFigures?: boolean
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, Holds, Comps, Sales } = req.body as UpsertSalesParams
+    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, Holds, Comps, Sales, isFinalFigures } = req.body as UpsertSalesParams
 
     const salesSet = await prisma.salesSet.findFirst({
       where: {
         SetBookingId,
         SetPerformanceId,
-        SetSalesFiguresDate
+        SetSalesFiguresDate,
+        ...(isFinalFigures && {SetIsFinalFigures: isFinalFigures})
       }
     })
 
@@ -109,6 +111,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
           SetNotOnSale: 0,
           SetIsFinalFigures: 0,
           SetIsCopy: 0,
+          ...(isFinalFigures && {SetIsFinalFigures: isFinalFigures}),
           ...(Comps && Comps?.length && {
             setComp: {
               create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({

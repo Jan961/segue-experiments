@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { dateToSimple } from "services/dateService";
 import axios from "axios";
-import { LoadingPage } from "components/global/LoadingPage";
-import { useRecoilValue } from "recoil";
-import { tourJumpState } from "state/booking/tourJumpState";
 import { getSales } from "./Api";
 import schema from "./validation";
 import Typeahead from "components/Typeahead";
+import { Spinner } from "components/global/Spinner";
 
 interface props {
   searchFilter: String;
@@ -24,7 +22,6 @@ export default function Entry({ tours = [], searchFilter }: props) {
   const [sale, setSale] = useState<any>({});
   const [previousSale, setPreviousSale] = useState<any>({});
   const [notes, setNotes] = useState<any>({});
-  // const { tours } = useRecoilValue(tourJumpState);
   const [validationErrors, setValidationErrors] = useState<any>({});
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
@@ -120,7 +117,12 @@ export default function Entry({ tours = [], searchFilter }: props) {
         .catch((error) => console.log(error));
     }
   }, [inputs.Venue, previousSaleWeek]);
-  if (isLoading) return <LoadingPage />;
+  if (isLoading)
+    return (
+      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
+        <Spinner className="w-full" size="lg" />
+      </div>
+    );
 
   const handleOnChange = (e) => {
     e.persist?.();
@@ -162,7 +164,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
     }));
   };
   function validateSale(sale, previousSale) {
-    schema
+    return schema
       .validate(
         {
           ...sale,
@@ -175,9 +177,8 @@ export default function Entry({ tours = [], searchFilter }: props) {
         },
         { abortEarly: false }
       )
-      .then((validData) => {
-        // Form data is valid
-        console.log("Valid data", validData);
+      .then(() => {
+        return true;
       })
       .catch((validationErrors) => {
         const errors = {};
@@ -189,50 +190,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
             errors[error.path] = error.message;
           }
         });
-        console.log("errors", errors);
         setValidationErrors(errors);
+        return false;
       });
-
-    const messages = [];
-    if (
-      sale?.Seats < previousSale?.Seats ||
-      sale?.Value < previousSale?.Value ||
-      sale?.ReservedSeats < previousSale?.ReservedSeats ||
-      sale?.ReservedValue < previousSale?.ReservedValue
-    ) {
-      messages.push("Seat count or Value cannot be less than previous week");
-    }
-
-    if (sale.Seats < 100) {
-      if (
-        sale?.Seats > 0.5 * previousSale?.Seats ||
-        sale?.Value > 0.5 * previousSale?.Value
-      ) {
-        messages.push(
-          "Invalid Sales: Sold Seats or Value cannot be more than 50% of previous week sale"
-        );
-      }
-    }
-
-    if (sale.Seats >= 100) {
-      if (
-        sale.Seats > 0.15 * previousSale.Seats ||
-        sale.Value > 0.15 * previousSale.Value
-      ) {
-        messages.push(
-          "Invalid Sales: Sold Seats or Value cannot be more than 15% of previous week sale"
-        );
-      }
-    }
-    if (
-      sale.ReservedSeats > 0.15 * previousSale.ReservedSeats ||
-      sale.ReservedValue > 0.15 * previousSale.ReservedValue
-    ) {
-      messages.push(
-        "Invalid Sales: Reserved Seats or Value cannot be more than 15% of previous week's"
-      );
-    }
-    return messages;
   }
 
   async function onSubmit(e: any) {
@@ -246,8 +206,8 @@ export default function Entry({ tours = [], searchFilter }: props) {
       SetCompCompTypeId,
       SetCompSeats: comps[SetCompCompTypeId],
     }));
-    const errors = validateSale(sale, previousSale);
-    if (errors.length) {
+    const valid = await validateSale(sale, previousSale);
+    if (!valid) {
       return;
     }
     const Sales = [
@@ -388,30 +348,6 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         })
                       }
                     />
-                    {/* <label
-                      htmlFor="Venue"
-                      className="text-sm font-medium text-gray-700"
-                    >
-                      Venue
-                    </label>
-                    <select
-                      id="Venue"
-                      name="Venue"
-                      value={inputs.Venue}
-                      className="block bg-dark-primary-green w-full text-white max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
-                      onChange={handleOnChange}
-                    >
-                      <option value={0}>Select A Performance</option>
-                      {salesWeeksVenues
-                        ?.sort?.((a, b) => a.Name?.localCompare?.(b.Name))
-                        ?.map?.((venue) => (
-                          <option key={venue.BookingId} value={venue.BookingId}>
-                            {`${venue.Code} ${venue.Name}, ${
-                              venue.VenueAddressTown
-                            } ${dateToSimple(venue.booking.FirstDate)}`}
-                          </option>
-                        ))}
-                    </select> */}
                   </div>
                 </div>
 
@@ -668,11 +604,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
               Add Sales Data
             </button>
           </form>
-          <div>{/* <Email></Email> */}</div>
         </div>
       </div>
       <div className={"flex bg-transparent flex flex-col w-1/3 p-5"}>
-        {/* Buttons go here  */}
         <div className="grid grid-cols-2 gap-1 mb-4">
           <button
             disabled={!previousSaleWeek}
@@ -681,35 +615,10 @@ export default function Entry({ tours = [], searchFilter }: props) {
           >
             Copy Last Week Sales Data
           </button>
-          {/* <button className="bg-primary-green text-white drop-shadow-md px-4 rounded-md">Insert Data From Email</button> */}
         </div>
         <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border   ring-opacity-5 sm:-mx-6 md:mx-0 ">
           <div className={"mb-1"}></div>
-          {/* <div>
-            {loadedEmails.length > 0 && (
-              <>
-                <span>Click Email to load Data</span>
-                {loadedEmails.map((item) => (
-                  <div key={item.id}>
-                    <button onClick={() => importEmail(item.Id)}>
-                      <span>
-                        {JSON.stringify(item)}
-                        {item.SetTour} {dateToSimple(item.Date)}{' '}
-                        Import
-                      </span>
-                    </button>
-                  </div>
-                ))}
-              </>
-            )}
-            {loadedEmails.length == 0 && (
-              <>
-                <span></span>
-              </>
-            )}
-          </div> */}
         </div>
-        {/* <span>Our system found the following sales emails which matches the tour sale</span> */}
       </div>
     </div>
   );
