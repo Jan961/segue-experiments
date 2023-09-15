@@ -122,7 +122,7 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
           setInputs((prev) => ({ ...prev, TourWeek: currentWeekMonday }));
         })
         .finally(() => {
-          setLoading(true);
+          setLoading(false);
         });
     }
     setInputs((prev) => ({
