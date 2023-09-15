@@ -12,7 +12,7 @@ import schema from "./validation";
 import { getSales } from "./Api";
 
 type props = {
-  tours: any[];
+  tours?: any[];
 };
 
 type Sale = {
