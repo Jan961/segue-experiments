@@ -14,8 +14,8 @@ export const getAllVenuesMin = async () => {
         Seats: true,
         VenueAddress: {
           select: {
-            VenueAddressTown: true,
-            VenueAddressTypeName: true
+            Town: true,
+            TypeName: true
           }
         }
       }

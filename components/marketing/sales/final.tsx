@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react'
 import {
   dateToSimple,
   getMonday,
-  getPreviousMonday,
-} from "services/dateService";
-import axios from "axios";
-import { alertService } from "services/alert.service";
-import { Spinner } from "components/global/Spinner";
-import Typeahead from "components/Typeahead";
-import schema from "./validation";
-import { getSales } from "./Api";
+  getPreviousMonday
+} from 'services/dateService'
+import axios from 'axios'
+import { Spinner } from 'components/global/Spinner'
+import Typeahead from 'components/Typeahead'
+import schema from './validation'
+import { getSales } from './Api'
 
 type props = {
   tours?: any[];
@@ -25,158 +24,159 @@ type Sale = {
 };
 
 const defaultSale = {
-  Value: "",
-  Seats: "",
-  ReservedValue: "",
-  ReservedSeats: "",
-  SchoolSeats: "",
-  SchoolValue: "",
-};
-export default function FinalSales({ tours }: props) {
-  const [isLoading, setLoading] = useState(false);
-  const [activeSetTourDates, setActiveSetTourDates] = useState([]);
-  const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
-  const [finalSaleFigureDate, setFinalSaleFigureDate] = useState(null);
+  Value: '',
+  Seats: '',
+  ReservedValue: '',
+  ReservedSeats: '',
+  SchoolSeats: '',
+  SchoolValue: ''
+}
+export default function FinalSales ({ tours }: props) {
+  const [isLoading, setLoading] = useState(false)
+  const [activeSetTourDates, setActiveSetTourDates] = useState([])
+  const [previousSaleWeek, setPreviousSaleWeek] = useState(null)
+  const [finalSaleFigureDate, setFinalSaleFigureDate] = useState(null)
   const [status, setStatus] = useState({
     submitted: false,
     submitting: false,
-    info: { error: false, msg: null },
-  });
+    info: { error: false, msg: null }
+  })
   const [inputs, setInputs] = useState({
-    SetTour: "",
-    BookingId: "",
-    Confirmed: false,
-  });
+    SetTour: '',
+    BookingId: '',
+    Confirmed: false
+  })
   const isPantomime = useMemo(() => {
     const tour = tours?.find?.(
       (tour) => tour.Id === parseInt(inputs.SetTour, 10)
-    );
-    return tour?.ShowType === "P";
-  }, [inputs?.SetTour]);
-  const [sale, setSale] = useState<Sale>(defaultSale);
-  const [previousSale, setPreviousSale] = useState<Sale>(defaultSale);
-  const [validationErrors, setValidationErrors] = useState({});
+    )
+    return tour?.ShowType === 'P'
+  }, [inputs?.SetTour])
+  const [sale, setSale] = useState<Sale>(defaultSale)
+  const [previousSale, setPreviousSale] = useState<Sale>(defaultSale)
+  const [validationErrors, setValidationErrors] = useState<any>({})
 
   useEffect(() => {
     // setLoading(true);
-  }, []);
+  }, [])
   const handleSalesResponse = (data) => {
-    const { Sale, SetSalesFiguresDate } = data || {};
+    const { Sale, SetSalesFiguresDate } = data || {}
     return {
       sale: Sale,
-      SetSalesFiguresDate,
-    };
-  };
+      SetSalesFiguresDate
+    }
+  }
   const fetchSales = async (SetSalesFiguresDate = null, SetBookingId) => {
-    setLoading(true);
+    setLoading(true)
     const data = await getSales({
       SetBookingId,
       isFinalFigures: true,
-      SetSalesFiguresDate,
-    });
-    setLoading(false);
-    return handleSalesResponse(data);
-  };
+      SetSalesFiguresDate
+    })
+    setLoading(false)
+    return handleSalesResponse(data)
+  }
   useEffect(() => {
     if (inputs.SetTour && inputs.BookingId) {
-      setSale(defaultSale);
-      setLoading(false);
-      setSale(defaultSale);
-      setPreviousSale(defaultSale);
+      setSale(defaultSale)
+      setLoading(false)
+      setSale(defaultSale)
+      setPreviousSale(defaultSale)
       fetchSales(null, parseInt(inputs.BookingId, 10))
         .then(({ sale = {}, SetSalesFiguresDate }) => {
-          setSale(sale || {});
-          const nextMondayDate = getMonday(SetSalesFiguresDate);
-          const previousMondayDate = getPreviousMonday(SetSalesFiguresDate);
-          setFinalSaleFigureDate(nextMondayDate);
-          setPreviousSaleWeek(previousMondayDate);
+          setSale(sale || {})
+          const nextMondayDate = getMonday(SetSalesFiguresDate)
+          const previousMondayDate = getPreviousMonday(SetSalesFiguresDate)
+          setFinalSaleFigureDate(nextMondayDate)
+          setPreviousSaleWeek(previousMondayDate)
         })
         .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
+        .finally(() => setLoading(false))
     }
-  }, [inputs.SetTour, inputs.BookingId]);
+  }, [inputs.SetTour, inputs.BookingId])
   useEffect(() => {
     if (inputs.BookingId && previousSaleWeek) {
       fetchSales(previousSaleWeek, parseInt(inputs.BookingId, 10))
         .then(({ sale }) => {
-          setPreviousSale(sale || {});
+          setPreviousSale(sale || {})
         })
-        .catch((error) => console.log(error));
+        .catch((error) => console.log(error))
     }
-  }, [inputs.BookingId, previousSaleWeek]);
+  }, [inputs.BookingId, previousSaleWeek])
 
   const handleServerResponse = (ok, msg) => {
     if (ok) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg },
-      });
+        info: { error: false, msg }
+      })
       setInputs({
         SetTour: inputs.SetTour,
         BookingId: inputs.BookingId,
-        Confirmed: inputs.Confirmed,
-      });
+        Confirmed: inputs.Confirmed
+      })
     } else {
       // @ts-ignore
-      setStatus(false);
+      setStatus(false)
     }
-  };
+  }
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
         <Spinner className="w-full" size="lg" />
       </div>
-    );
+    )
+  }
 
   /**
    * Onn update of activeSetTours
    * Venues need updated
    */
-  function setTour(tourId) {
+  function setTour (tourId) {
     if (tourId) {
-      setLoading(true);
+      setLoading(true)
       axios
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          setActiveSetTourDates(data.data);
+          setActiveSetTourDates(data.data)
         })
-        .finally(() => setLoading(false));
+        .finally(() => setLoading(false))
     }
   }
 
   const handleOnChange = (e) => {
-    e.persist?.();
-    if (e.target.name === "SetTour") {
-      setTour(e.target.value);
+    e.persist?.()
+    if (e.target.name === 'SetTour') {
+      setTour(e.target.value)
       setInputs((prev) => ({
         ...prev,
         [e.target.id]: e.target.value,
-        BookingId: null,
-      }));
-      return;
+        BookingId: null
+      }))
+      return
     }
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
-    }));
+      [e.target.id]: e.target.value
+    }))
     setStatus({
       submitted: false,
       submitting: false,
-      info: { error: false, msg: null },
-    });
-  };
+      info: { error: false, msg: null }
+    })
+  }
 
   const handleOnSaleChange = (event: any) => {
     setSale((prevState) => ({
       ...prevState,
-      [event.target.id]: event.target.value,
-    }));
-  };
+      [event.target.id]: event.target.value
+    }))
+  }
 
-  async function validateSale(sale, previousSale) {
+  async function validateSale (sale, previousSale) {
     return schema
       .validate(
         {
@@ -185,82 +185,82 @@ export default function FinalSales({ tours }: props) {
             PreviousSeats: previousSale?.Seats,
             PreviousValue: previousSale?.Value,
             PreviousReservedSeats: previousSale?.ReservedSeats,
-            PreviousReservedValue: previousSale?.ReservedValue,
-          },
+            PreviousReservedValue: previousSale?.ReservedValue
+          }
         },
         { abortEarly: false }
       )
       .then(() => {
-        return true;
+        return true
       })
       .catch((validationErrors) => {
-        const errors = {};
-        const warnings = {};
+        const errors = {}
+        const warnings = {}
         validationErrors.inner.forEach((error) => {
-          if (error.path.startsWith("warning")) {
-            warnings[error.path] = error.message;
+          if (error.path.startsWith('warning')) {
+            warnings[error.path] = error.message
           } else {
-            errors[error.path] = error.message;
+            errors[error.path] = error.message
           }
-        });
-        setValidationErrors(errors);
-        return false;
-      });
+        })
+        setValidationErrors(errors)
+        return false
+      })
   }
 
-  async function handleOnSubmit(event: any) {
-    event.preventDefault?.();
+  async function handleOnSubmit (event: any) {
+    event.preventDefault?.()
     if (inputs.Confirmed === true) {
-      setLoading(true);
-      const valid = await validateSale(sale, previousSale);
+      setLoading(true)
+      const valid = await validateSale(sale, previousSale)
       if (!valid) {
-        setLoading(false);
-        return;
+        setLoading(false)
+        return
       }
       const Sales = [
         {
           SaleSaleTypeId: 1,
           SaleSeats: sale?.Seats,
-          SaleValue: sale?.Value,
+          SaleValue: sale?.Value
         },
         {
           SaleSaleTypeId: 2,
           SaleSeats: sale?.ReservedSeats,
-          SaleValue: sale?.ReservedValue,
+          SaleValue: sale?.ReservedValue
         },
         {
           SaleSaleTypeId: 3,
           SaleSeats: sale?.SchoolSeats,
-          SaleValue: sale?.SchoolValue,
-        },
-      ];
+          SaleValue: sale?.SchoolValue
+        }
+      ]
       await axios
-        .post("/api/marketing/sales/upsert", {
+        .post('/api/marketing/sales/upsert', {
           Sales,
           SetSalesFigureDate: finalSaleFigureDate,
-          SetBookkingId: inputs.BookingId,
+          SetBookkingId: inputs.BookingId
         })
         .then((res) => {
-          handleServerResponse(true, "Submitted");
-        });
+          handleServerResponse(true, 'Submitted')
+        })
     } else {
       // alertService.info("Sorry you need to confirm input", 1);
-      console.log("Sorry you need to confirm input");
+      console.log('Sorry you need to confirm input')
     }
-    setLoading(false);
+    setLoading(false)
   }
 
   const copyLastWeekSalesData = () => {
     if (previousSale) {
-      setSale(previousSale || defaultSale);
+      setSale(previousSale || defaultSale)
     }
-  };
+  }
 
   return (
     <div className="flex flex-row w-full">
-      <div className={"flex bg-pink-50 w-10/12 p-5"}>
+      <div className={'flex bg-pink-50 w-10/12 p-5'}>
         <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-          <div className={"mb-1"}></div>
+          <div className={'mb-1'}></div>
           <form onSubmit={handleOnSubmit}>
             <div>
               <div className=" p-4 rounded-md mb-4">
@@ -285,7 +285,7 @@ export default function FinalSales({ tours }: props) {
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
                             {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${
-                              tour.IsArchived ? " | (Archived)" : ""
+                              tour.IsArchived ? ' | (Archived)' : ''
                             }`}
                           </option>
                         ))}
@@ -301,16 +301,16 @@ export default function FinalSales({ tours }: props) {
                       value={inputs?.BookingId}
                       options={activeSetTourDates.map((venue) => ({
                         text: `${venue.Code} ${venue.Name}, ${
-                          venue.VenueAddressTown
+                          venue.Town
                         } ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: String(venue.BookingId),
+                        value: String(venue.BookingId)
                       }))}
                       onChange={(option) =>
                         handleOnChange({
                           target: {
-                            id: "BookingId",
-                            value: option.value,
-                          },
+                            id: 'BookingId',
+                            value: option.value
+                          }
                         })
                       }
                     />
@@ -318,7 +318,7 @@ export default function FinalSales({ tours }: props) {
                 </div>
 
                 <div className="columns-2">
-                  <div className={"columns-1"}>
+                  <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
                       <label
                         htmlFor="Value"
@@ -335,9 +335,9 @@ export default function FinalSales({ tours }: props) {
                           onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
-                        {validationErrors?.["Value"] && (
+                        {validationErrors?.Value && (
                           <p className="text-primary-orange">
-                            {validationErrors["Value"]}
+                            {validationErrors.Value}
                           </p>
                         )}
                       </div>
@@ -359,15 +359,15 @@ export default function FinalSales({ tours }: props) {
                           onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
-                        {validationErrors["Seats"] && (
+                        {validationErrors.Seats && (
                           <p className="text-primary-orange">
-                            {validationErrors["Seats"]}
+                            {validationErrors.Seats}
                           </p>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className={"columns-1"}>
+                  <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
                       <label
                         htmlFor="ReservedValue"
@@ -385,9 +385,9 @@ export default function FinalSales({ tours }: props) {
                           onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
-                        {validationErrors?.["ReservedValue"] && (
+                        {validationErrors?.ReservedValue && (
                           <p className="text-primary-orange">
-                            {validationErrors["ReservedValue"]}
+                            {validationErrors.ReservedValue}
                           </p>
                         )}
                       </div>
@@ -409,9 +409,9 @@ export default function FinalSales({ tours }: props) {
                           onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
-                        {validationErrors["ReservedSeats"] && (
+                        {validationErrors.ReservedSeats && (
                           <p className="text-primary-orange">
-                            {validationErrors["ReservedSeats"]}
+                            {validationErrors.ReservedSeats}
                           </p>
                         )}
                       </div>
@@ -435,9 +435,9 @@ export default function FinalSales({ tours }: props) {
                             onChange={handleOnSaleChange}
                             className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                           />
-                          {validationErrors?.["SchoolSeats"] && (
+                          {validationErrors?.SchoolSeats && (
                             <p className="text-primary-orange">
-                              {validationErrors["SchoolSeats"]}
+                              {validationErrors.SchoolSeats}
                             </p>
                           )}
                         </div>
@@ -459,9 +459,9 @@ export default function FinalSales({ tours }: props) {
                             onChange={handleOnSaleChange}
                             className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                           />
-                          {validationErrors?.["SchoolValue"] && (
+                          {validationErrors?.SchoolValue && (
                             <p className="text-primary-orange">
-                              {validationErrors["SchoolValue"]}
+                              {validationErrors.SchoolValue}
                             </p>
                           )}
                         </div>
@@ -477,7 +477,7 @@ export default function FinalSales({ tours }: props) {
                   <input
                     id="Confirmed"
                     name="Confirmed"
-                    type={"checkbox"}
+                    type={'checkbox'}
                     checked={inputs.Confirmed}
                     onChange={handleOnChange}
                   />
@@ -492,9 +492,9 @@ export default function FinalSales({ tours }: props) {
               </div>
             </div>
             <button
-              type={"submit"}
+              type={'submit'}
               className={
-                "inline-flex items-center mt-5 rounded border border-gray-300 bg-white w-100 h-16 text-grey-700 px-2.5 py-1 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2"
+                'inline-flex items-center mt-5 rounded border border-gray-300 bg-white w-100 h-16 text-grey-700 px-2.5 py-1 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
               }
             >
               Add Sales Data
@@ -502,22 +502,22 @@ export default function FinalSales({ tours }: props) {
           </form>
         </div>
       </div>
-      <div className={"flex-auto flex bg-blue-100 w-2/12 p-5"}>
+      <div className={'flex-auto flex bg-blue-100 w-2/12 p-5'}>
         <div className="flex-auto mx-4 mt-0overflow-hidden shadow  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-          <div className={"mb-1"}></div>
+          <div className={'mb-1'}></div>
           <div>
             <button
               className={
-                "inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                'inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
               }
               disabled={!previousSaleWeek}
               onClick={copyLastWeekSalesData}
             >
-              Copy Last weeks Sales Data{" "}
+              Copy Last weeks Sales Data{' '}
             </button>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

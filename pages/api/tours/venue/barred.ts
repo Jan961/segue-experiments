@@ -59,7 +59,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const filteredResults:BarredVenue[] = result.map(({ Mileage, TimeMins, Venue2 }) => {
       const { FirstDate, Id: BookingId } = Venue2.Booking.find((booking) => booking.DateBlock.TourId === tourId) || {}
       const { Name, Code, Id, StatusCode, VenueAddress } = Venue2
-      const town = VenueAddress?.[0]?.VenueAddressTown
+      const town = VenueAddress?.[0]?.Town
       if (!FirstDate) return null
       return {
         Id,

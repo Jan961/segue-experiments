@@ -127,7 +127,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         VenueId: venue.Id,
         VenueCode: venue.Code,
         VenueName: venue.Name,
-        VenueTown: venue.VenueAddress?.[0]?.VenueAddressTown || ''
+        VenueTown: venue.VenueAddress?.[0]?.Town || ''
       }
     })
 

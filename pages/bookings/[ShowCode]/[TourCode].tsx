@@ -233,7 +233,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
       // Remove extra info
       venue: objectify(venues, v => v.Id, (v: any) => {
-        const Town:string|null = v.VenueAddress.find((address:any) => address?.VenueAddressTypeName === 'Main')?.VenueAddressTown || null
+        const Town:string|null = v.VenueAddress.find((address:any) => address?.TypeName === 'Main')?.Town || null
         return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats }
       })
     }
