@@ -5,6 +5,7 @@ type UpsertSalesParams = {
   SetBookingId: string
   SetPerformanceId?: string
   SetSalesFiguresDate?: string
+  isFinalFigures?: string
 }
 
 type SaleResponse = {
@@ -12,6 +13,8 @@ type SaleResponse = {
   Value: string,
   ReservedSeats: number,
   ReservedValue: string,
+  SchoolSeats: number,
+  SchoolValue: string
 }
 
 type CompResponse = {
@@ -42,7 +45,7 @@ type BookingNotes = {
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate } = req.body as UpsertSalesParams
+    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, isFinalFigures } = req.body as UpsertSalesParams
     const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate)
 
     const salesSet = await prisma.salesSet.findFirst({
@@ -53,7 +56,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
           SetSalesFiguresDate: {
             equals: SetSalesFiguresDateInISO
           }
-        })
+        }),
+        ...(isFinalFigures && {SetIsFinalFigures:isFinalFigures})
       },
       select: {
         SetBookingId: true,
@@ -129,12 +133,16 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const Notes: BookingNotes = salesSet.Booking
     const generalSalesData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'General Sales')
     const generalReservationsData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'General Reservations')
+    const schoolSalesData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'School Sales')
+    // const schoolReservationsData: SalesData[] = saleData.filter(x=> x.SaleTypeName === 'School Reservations')
 
     const finalSalesData: SaleResponse = {
       Seats: generalSalesData?.[0]?.SaleSeats,
       Value: generalSalesData?.[0]?.SaleValue,
       ReservedSeats: generalReservationsData?.[0]?.SaleSeats,
-      ReservedValue: generalReservationsData?.[0]?.SaleValue
+      ReservedValue: generalReservationsData?.[0]?.SaleValue,
+      SchoolSeats: schoolSalesData?.[0]?.SaleSeats,
+      SchoolValue: schoolSalesData?.[0]?.SaleValue
     }
 
     res.status(200).json({ ...salesSet, SetComp: compData, SetHold: holdData, Sale: finalSalesData, Notes })

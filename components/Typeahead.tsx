@@ -18,6 +18,7 @@ type props = {
   searchKeys?: string[];
   className?: string;
   dropdownClassName?: string;
+  inputClassName?: string;
   onChange: (option: Option) => void;
 };
 
@@ -30,6 +31,7 @@ const Typeahead = ({
   name,
   label,
   className,
+  inputClassName,
   dropdownClassName,
   searchKeys = [],
 }: props) => {
@@ -79,9 +81,11 @@ const Typeahead = ({
         disabled={disabled}
         onFocus={handleInputFocus}
         onBlur={handleInputBlur}
-        className={`w-full py-2 px-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm ${
-          disabled ? "bg-gray-100 cursor-not-allowed" : ""
-        }`}
+        className={classNames(
+          "w-full py-2 px-3 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm",
+          inputClassName,
+          { "bg-gray-100 cursor-not-allowed": disabled }
+        )}
       />
       {isDropdownOpen && filteredOptions.length > 0 && !disabled && (
         <ul
