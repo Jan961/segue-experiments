@@ -49,25 +49,16 @@ export default function SalesSummarySimple({ activeTours }: Props) {
     const currentWeekMonday = getCurrentMondayDate();
     setInputs((prev) => ({ ...prev, tourWeek: currentWeekMonday }));
   };
-  function weeksBefore(date, weeks) {
-    return getDateDaysAgo(date, weeks);
-  }
 
-  function formatShortYearDate(dateString) {
-    const dateMomentObject =
-      moment(dateString) ||
-      moment(moment(dateString).format("DD/MM/YY"), "DD/MM/YY"); // 1st argument - string, 2nd argument - format
-    const day = toISO(dateMomentObject as any).substring(0, 10);
-    return day; // new Date( dateMomentObject.toDate());
-  }
   const downloadReport = async () => {
     const selectedTour = activeTours.find(
       (tour) => tour.Id === parseInt(inputs.tour)
     );
-    const toWeek = formatShortYearDate(inputs.tourWeek);
-    const fromWeek = formatShortYearDate(
-      weeksBefore(toWeek, inputs.numberOfWeeks * 7)
-    );
+    const toWeek = inputs.tourWeek?.split("T")?.[0];
+    const fromWeek = moment(inputs.tourWeek)
+      .subtract(inputs.numberOfWeeks, "weeks")
+      .toISOString()
+      ?.split("T")?.[0];
     setLoading(true);
     fetch("/api/reports/sales-summary-simple", {
       method: "POST",
@@ -255,9 +246,11 @@ export default function SalesSummarySimple({ activeTours }: Props) {
                           key={week.mondayDate}
                           value={`${week.mondayDate}`}
                         >
-                          {` Wk ${week.tourWeekNum} | ${formatDate(
-                            week.mondayDate
-                          )}`}
+                          {` Wk ${week.tourWeekNum} | ${
+                            week?.mondayDate?.split?.("T")?.[0]
+                          } | ${moment(
+                            week?.mondayDate?.split?.("T")?.[0]
+                          )?.format?.("dddd")}`}
                         </option>
                       ))}
                     </select>

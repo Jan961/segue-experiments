@@ -96,7 +96,9 @@ export const ArchivedSalesTab = () => {
             ))}
           </Table.HeaderRow>
           <Table.HeaderRow>
-            <Table.HeaderCell className="w-20">Week</Table.HeaderCell>
+            <Table.HeaderCell className="w-40 text-center">
+              Week
+            </Table.HeaderCell>
             <Table.HeaderCell className="w-20">Week of</Table.HeaderCell>
             {tours.map((_, i) => (
               <>
@@ -108,7 +110,9 @@ export const ArchivedSalesTab = () => {
           <Table.Body>
             {archivedSales.map((sale, i) => (
               <Table.Row key={i}>
-                <Table.Cell>{sale.SetTourWeekNum}</Table.Cell>
+                <Table.Cell className="text-center">
+                  Week {sale.SetBookingWeekNum}
+                </Table.Cell>
                 <Table.Cell>{dateToSimple(sale.SetTourWeekDate)}</Table.Cell>
                 {sale.data.map((tourSale) => (
                   <>

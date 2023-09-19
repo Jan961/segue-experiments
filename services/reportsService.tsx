@@ -74,6 +74,9 @@ export const range = (start: number, end: number) =>
   Array.from({ length: end - start + 1 }, (_, index) => start + index);
 
 export const getCurrentMondayDate = () => {
-  const currentSunday = moment(new Date().toDateString()).startOf("isoWeek");
-  return currentSunday.clone().add(1, "day").toISOString();
+  const currentMonday = moment(new Date().toDateString())
+    .startOf("isoWeek")
+    .set("hour", 0)
+    .add(1, "day");
+  return currentMonday.toISOString();
 };
