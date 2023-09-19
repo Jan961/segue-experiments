@@ -150,8 +150,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        Seats: salesSummary?.TotalSeats,
-        SalesValue: salesSummary?.TotalSales,
+        Seats: salesSummary?.Seats,
+        SalesValue: salesSummary?.Value,
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
