@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import { StyledDialog } from 'components/global/StyledDialog'
+import { Spinner } from 'components/global/Spinner'
 
 type props = {
     venueCode:string;
@@ -65,6 +66,11 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit 
   return (<>
     <div>
       <StyledDialog className='max-w-full relative max-h-full' open={true} onClose={() => onClose()} title="Select Archived Tours for Display" width='xl'>
+        {loading && (
+          <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+            <Spinner className="w-full" size="lg" />
+          </div>
+        )}
         <form onSubmit={handleOnSubmit}>
           <div className='h-[50vh] overflow-auto'>
             {
