@@ -75,12 +75,12 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit 
           <div className='h-[50vh] overflow-auto'>
             {
               bookings.map((booking, i) => (
-                <div className="mt-6" key={i}>
-                  <label htmlFor="date" className="text-lg font-medium">
+                <div className="flex items-center mt-6" key={i}>
+                  <label htmlFor="date" className="text-lg font-medium mr-4">
                     {booking.FullTourCode}(WEEKS: {booking.TourLengthWeeks})
                   </label>
                   <select
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     value={inputs?.[booking?.BookingId]}
                     id={booking.BookingId}
                     name={booking.BookingId}
