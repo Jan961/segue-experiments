@@ -34,7 +34,7 @@ export const OtherDisplay = ({ otherId, date }: OtherDisplayProps) => {
       border-lime-500 bg-lime-200
       ${active ? 'shadow bg-lime-400' : 'hover:bg-lime-300'}
       `}>
-      <div className="col-span-7 text-center">Other: { match?.Name }</div>
+      <div className="col-span-7 text-center">{ match?.Name }</div>
     </div>
   )
 }
