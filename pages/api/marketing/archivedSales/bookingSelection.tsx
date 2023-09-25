@@ -33,7 +33,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     if (!access) return res.status(401).end()
 
     const conditions: Prisma.Sql[] = []
-    conditions.push(Prisma.sql`FullTourCode Like ${showCode + '%'}`)
+    // conditions.push(Prisma.sql`FullTourCode Like ${showCode + '%'}`)
     if (salesByType === 'venue') {
       conditions.push(Prisma.sql`VenueCode = ${venueCode}`)
     }
@@ -47,9 +47,18 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     }
     const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
     const data: BookingSelectionView[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`
+    const results = []
+    const uniqueIds = {}
 
-    res.send(data)
+    data.forEach(selection => {
+      if (!uniqueIds[selection.TourId]) {
+        uniqueIds[selection.TourId] = true // Mark this id as seen
+        results.push(selection) // Push the unique item to the result array
+      }
+    })
+    res.send(results.sort((a, b) => a.BookingId - b.BookingId))
   } catch (error) {
+    console.log('Error:', error)
     res.status(500).send({ ok: false, message: error?.message })
   }
 }

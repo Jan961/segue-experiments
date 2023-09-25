@@ -35,7 +35,6 @@ const rearrangeArray = ({ arr, bookingIds }: {arr: TSalesView[], bookingIds: num
   for (let i = 0; i < totalBookings; i++) {
     for (let j = 0; j < arr.length; j++) {
       if (arr[j].BookingId === bookingIds[i]) {
-        console.log('===', arr[j])
         arrangedArray.push(getSeatsRelatedInfo(arr[j]))
         break
       }

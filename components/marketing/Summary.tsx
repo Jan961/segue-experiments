@@ -7,6 +7,7 @@ import numeral from 'numeral'
 import { LoadingTab } from './tabs/LoadingTab'
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]'
 import { DescriptionList as DL } from 'components/global/DescriptionList'
+import moment from 'moment'
 
 export const formatCurrency = (ammount, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
@@ -83,7 +84,7 @@ export const Summary = () => {
           Performance Time(s)
         </DL.Term>
         <DL.Desc>
-          {summary.Performances?.map?.(x => `${dateToSimple(x.Date)} ${dateTimeToTime(x.Time)}`).join(', ') || 'N/A' }
+          {summary.Performances?.map?.(x => `${moment(x.Date).format('dddd').substring(0, 3)} ${dateToSimple(x.Date)} ${dateTimeToTime(x.Time)}`).join(' ') || 'N/A' }
         </DL.Desc>
       </DL>
       <h3 className='mb-1 mt-4 text-base font-bold text-primary-blue'>Sales Summary</h3>
