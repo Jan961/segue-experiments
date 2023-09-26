@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import axios from 'axios'
 import { StyledDialog } from 'components/global/StyledDialog'
+import { Spinner } from 'components/global/Spinner'
 
 type props = {
     venueCode:string;
@@ -65,16 +66,21 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit 
   return (<>
     <div>
       <StyledDialog className='max-w-full relative max-h-full' open={true} onClose={() => onClose()} title="Select Archived Tours for Display" width='xl'>
+        {loading && (
+          <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+            <Spinner className="w-full" size="lg" />
+          </div>
+        )}
         <form onSubmit={handleOnSubmit}>
           <div className='h-[50vh] overflow-auto'>
             {
               bookings.map((booking, i) => (
-                <div className="mt-6" key={i}>
-                  <label htmlFor="date" className="text-lg font-medium">
+                <div className="flex items-center mt-6" key={i}>
+                  <label htmlFor="date" className="text-lg font-medium mr-4">
                     {booking.FullTourCode}(WEEKS: {booking.TourLengthWeeks})
                   </label>
                   <select
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     value={inputs?.[booking?.BookingId]}
                     id={booking.BookingId}
                     name={booking.BookingId}
