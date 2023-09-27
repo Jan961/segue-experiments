@@ -22,7 +22,7 @@ export const formatCurrency = (ammount, currency: string) => {
 export const Summary = () => {
   const { selected } = useRecoilValue(bookingJumpState)
   const [summary, setSummary] = React.useState<Partial<SummaryResponseDTO>>({})
-  const [loading, setLoading] = React.useState(true)
+  const [loading, setLoading] = React.useState(false)
 
   const search = async () => {
     try {

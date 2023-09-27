@@ -81,7 +81,7 @@ const ActionBar = () => {
           value={bookingJump.selected}
           name="Tour"
           onChange={changeBooking}
-          options={bookingOptions}
+          options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]}
         />
       </div>
       {/* SALES REPORT DOES NOT EXIST IN THE DESIGNS */}
