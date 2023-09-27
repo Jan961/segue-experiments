@@ -78,5 +78,5 @@ export const getCurrentMondayDate = () => {
     .startOf('isoWeek')
     .set('hour', 0)
     .add(1, 'day')
-  return currentMonday.toISOString()
+  return currentMonday.toISOString()?.split('T')?.[0]
 }
