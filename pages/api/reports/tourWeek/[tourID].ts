@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma'
-import moment from 'moment';
+import moment from 'moment'
 import { calculateWeekNumber, getWeeksBetweenDates } from 'services/dateService'
 
 type TourWeek = {
@@ -18,8 +18,8 @@ export default async function handle (req, res) {
       }
     })
     const { StartDate, EndDate } = tourDateBlock
-    const weekminus99 = moment(StartDate).subtract(99,'weeks').set('hour',0).toISOString()
-    const endWeek = moment(EndDate).add(1, 'week').set('hour',0).toISOString()
+    const weekminus99 = moment(StartDate).subtract(99, 'weeks').set('hour', 0).toISOString()
+    const endWeek = moment(EndDate).add(1, 'week').set('hour', 0).toISOString()
     const weeks:TourWeek[] = getWeeksBetweenDates(weekminus99, endWeek).map((week) => ({
       tourWeekNum: calculateWeekNumber(new Date(StartDate), new Date(week.mondayDate)),
       ...week
