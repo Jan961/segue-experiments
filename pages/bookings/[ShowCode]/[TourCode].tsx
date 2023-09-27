@@ -118,8 +118,11 @@ const BookingPage = ({ TourId }: bookingProps) => {
                 <div className="col-span-1 p-2 hidden xl:inline-block ">
                   Tour
                 </div>
-                <div className='col-span-4 lg:col-span-3 xl:col-span-2 p-2 whitespace-nowrap'>
-                  Week No. & Date
+                <div className='col-span-1 lg:col-span-1 xl:col-span-1 p-2 whitespace-nowrap'>
+                  Week No.
+                </div>
+                <div className='col-span-3 lg:col-span-2 xl:col-span-1 p-2 whitespace-nowrap'>
+                  Date
                 </div>
                 <div className="col-span-8 lg:col-span-9 grid grid-cols-10">
                   <div className='col-span-5 p-2'>
