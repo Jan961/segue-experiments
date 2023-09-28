@@ -25,10 +25,10 @@ const MarketingPanel = () => {
           <StyledTab>Promoter Holds</StyledTab>
         </Tab.List>
         <div className='grid grid-cols-12 gap-2 overflow-hidden'>
-          <div className='col-span-4 md:col-span-3 lg:col-span-2 h-full overflow-y-auto'>
+          <div className='col-span-4 md:col-span-3 lg:col-span-2 h-full overflow-y-auto' style={{ maxHeight: 'calc(100vh - 300px)' }}>
             <Summary />
           </div>
-          <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
+          <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4 overflow-y-auto">
             <Tab.Panels>
               <Tab.Panel><SalesTab/></Tab.Panel>
               <Tab.Panel><ArchivedSalesTab /></Tab.Panel>

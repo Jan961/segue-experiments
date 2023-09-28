@@ -3,6 +3,7 @@ import { PropsWithChildren } from 'react'
 
 interface ClassNameable {
   className?: string
+  style?: any
 }
 
 /*
@@ -10,9 +11,9 @@ interface ClassNameable {
   If additional classes are needed, consider adding additional props such as 'minimal' 'center' etc.
 */
 
-export const Table = ({ children, className }: PropsWithChildren<ClassNameable>) => {
+export const Table = ({ children, className, ...props }: PropsWithChildren<ClassNameable>) => {
   return (
-    <table className={ classNames('min-w-full', className) }>
+    <table className={ classNames('min-w-full', className) } {...props}>
       { children }
     </table>
   )
@@ -43,9 +44,9 @@ const HeaderCell = ({ children, className }: PropsWithChildren<ClassNameable>) =
   )
 }
 
-const Body = ({ children, className }: PropsWithChildren<ClassNameable>) => {
+const Body = ({ children, className, ...props }: PropsWithChildren<ClassNameable>) => {
   return (
-    <tbody className={classNames('bg-white divide-y divide-gray-200', className)}>
+    <tbody className={classNames('bg-white divide-y divide-gray-200', className)} {...props}>
       { children }
     </tbody>
   )
@@ -55,15 +56,16 @@ interface RowProps extends ClassNameable {
   hover?: boolean
   className?:string
   onClick?: () => void
+  ref?:any
 }
 
-const Row = ({ children, hover, onClick, className }: PropsWithChildren<RowProps>) => {
+const Row = ({ children, hover, onClick, className, ...props }: PropsWithChildren<RowProps>) => {
   let baseClass = 'bg-white even:bg-gray-50'
 
   if (hover) baseClass = classNames(baseClass, 'hover:bg-gray-100 cursor-pointer', className)
 
   return (
-    <tr className={baseClass} onClick={onClick}>
+    <tr className={baseClass} onClick={onClick} {...props}>
       { children }
     </tr>
   )

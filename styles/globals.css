@@ -13,4 +13,37 @@
 }
 
 
+.sticky-header-table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.sticky-header-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.sticky-header-table th {
+  position: sticky;
+  top: 0;
+  font-weight: bold;
+}
+
+.sticky-header-table tbody {
+  display: block;
+  max-height:500px;/* Change this to your desired max height */
+  overflow-y: auto;
+}
+
+.sticky-header-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+.sticky-header-table td {
+}
+
 

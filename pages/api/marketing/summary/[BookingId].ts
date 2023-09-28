@@ -150,15 +150,15 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        Seats: salesSummary?.Seats,
+        Seats: TotalSeats,
         SalesValue: salesSummary?.Value,
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
         VenueCurrencySymbol: CurrencySymbol,
         seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(2)),
-        Capacity: TotalSeats,
-        ConversionRate
+        ConversionRate,
+        Capacity
       },
       TourInfo: {
         StartDate: booking?.DateBlock.StartDate,
