@@ -64,11 +64,7 @@ export const VenueContactsTab = () => {
 
   return (
     <>
-      <div className='text-right pb-4'>
-        <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
-        {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
-      </div>
-      <div className="flex justify-between items-center mb-5 max-w-[820px]">
+      <div className="flex justify-between items-center mt-5 mb-5 max-w-[820px]">
         <h2 className={'text-xl font-bold text-primary-blue '}>
         Venue Contacts
         </h2>
@@ -130,6 +126,10 @@ export const VenueContactsTab = () => {
           ))}
         </Table.Body>
       </Table>
+      <div className='text-left pt-4 max-w-[820px]'>
+        <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
+        {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
+      </div>
     </>
   )
 }
