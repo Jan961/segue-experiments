@@ -1,7 +1,7 @@
 import { Table } from 'components/global/table/Table'
 
 import BookingSelection from './BookingSelection'
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
 import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
@@ -24,6 +24,7 @@ export const ArchivedSalesTab = () => {
     () => bookings.find((booking) => booking.Id === selected),
     [bookings, selected]
   )
+  const tableWidth = useMemo(() => 260 + (tours.length * 180), [tours])
   const openBookingSelection = (type) => {
     setSalesByType(type)
   }
@@ -84,13 +85,13 @@ export const ArchivedSalesTab = () => {
       </div>
       {archivedSales?.length
         ? (
-          <Table className="table-auto !min-w-0">
+          <Table className={'table-auto !min-w-0 sticky-header-table'} style={{ maxWidth: tableWidth }}>
             <Table.HeaderRow>
-              <Table.HeaderCell className="w-20"></Table.HeaderCell>
-              <Table.HeaderCell className="w-20"></Table.HeaderCell>
+              <Table.HeaderCell className=""></Table.HeaderCell>
+              <Table.HeaderCell className=""></Table.HeaderCell>
               {tours.map((tour, i) => (
                 <>
-                  <Table.HeaderCell className="text-right w-20" key={i}>
+                  <Table.HeaderCell className="text-right " key={i}>
                     {tour.FullTourCode}
                   </Table.HeaderCell>
                   <Table.HeaderCell></Table.HeaderCell>
@@ -98,18 +99,18 @@ export const ArchivedSalesTab = () => {
               ))}
             </Table.HeaderRow>
             <Table.HeaderRow>
-              <Table.HeaderCell className="w-40 text-center">
+              <Table.HeaderCell className="text-center">
               Week
               </Table.HeaderCell>
-              <Table.HeaderCell className="w-20">Week of</Table.HeaderCell>
+              <Table.HeaderCell className="">Week of</Table.HeaderCell>
               {tours.map((_, i) => (
                 <>
-                  <Table.HeaderCell className={classNames('w-20')}>Num</Table.HeaderCell>
-                  <Table.HeaderCell className={classNames('w-20')}>S Value</Table.HeaderCell>
+                  <Table.HeaderCell className={classNames('')}>Num</Table.HeaderCell>
+                  <Table.HeaderCell className={classNames('')}>S Value</Table.HeaderCell>
                 </>
               ))}
             </Table.HeaderRow>
-            <Table.Body>
+            <Table.Body className='max-h-[calc(100vh - 440px)]' style={{ maxHeight: 'calc(100vh - 440px)' }}>
               {archivedSales.map((sale, i) => (
                 <Table.Row key={i}>
                   <Table.Cell className="text-center">

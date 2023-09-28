@@ -1,4 +1,4 @@
-import { calculateWeekNumber, dateToSimple, dateTimeToTime } from 'services/dateService'
+import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
 import axios from 'axios'
@@ -84,7 +84,7 @@ export const Summary = () => {
           Performance Time(s)
         </DL.Term>
         <DL.Desc>
-          {summary.Performances?.map?.(x => `${moment(x.Date).format('dddd').substring(0, 3)} ${dateToSimple(x.Date)} ${dateTimeToTime(x.Time)}`).join(' ') || 'N/A' }
+          {summary.Performances?.map?.(x => `${moment(x.Date).format('dddd').substring(0, 3)} ${dateToSimple(x.Date)} ${getTimeFromDateAndTime(x.Time)}`).join(' ') || 'N/A' }
         </DL.Desc>
       </DL>
       <h3 className='mb-1 mt-4 text-base font-bold text-primary-blue'>Sales Summary</h3>

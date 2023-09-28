@@ -1,15 +1,18 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
+import Fuse from 'fuse.js'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Table } from 'components/global/table/Table'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
-import React from 'react'
+import React, { useMemo, useRef, useState } from 'react'
 import axios from 'axios'
 import { venueRoleState } from 'state/marketing/venueRoleState'
 import { objectify } from 'radash'
 import { VenueContactsEditor } from '../editors/VenueContactsEditor'
 import { VenueContactDTO } from 'interfaces'
 import { LoadingTab } from './LoadingTab'
+import { FormInputText } from 'components/global/forms/FormInputText'
 
 export const VenueContactsTab = () => {
   const { selected, bookings } = useRecoilValue(bookingJumpState)
@@ -23,13 +26,18 @@ export const VenueContactsTab = () => {
   const [loading, setLoading] = React.useState(true)
   const [modalOpen, setModalOpen] = React.useState(false)
   const [editing, setEditing] = React.useState(undefined)
-
+  const [searchFilter, setSearchFilter] = useState('')
+  const fuse = useRef(new Fuse(contacts, { keys: ['FirstName', 'LastName', 'Email', 'Phone'] }))
+  const filteredContacts = useMemo(() => searchFilter
+    ? fuse.current.search(searchFilter).map((result) => result.item)
+    : contacts, [contacts, searchFilter])
   const search = async () => {
     setLoading(true)
     setContacts([])
 
     const { data } = await axios.get(`/api/marketing/venueContacts/${venueId}`)
     setContacts(data)
+    fuse.current = new Fuse(data, { keys: ['FirstName', 'LastName', 'Email', 'Phone'] })
     setLoading(false)
   }
 
@@ -56,9 +64,27 @@ export const VenueContactsTab = () => {
 
   return (
     <>
-      <div className='text-right pb-4'>
-        <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
-        {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
+      <div className="flex justify-between items-center mt-5 mb-5 max-w-[820px]">
+        <h2 className={'text-xl font-bold text-primary-blue '}>
+        Venue Contacts
+        </h2>
+        <div className="ml-auto">
+          <label htmlFor="searchBookings" className="sr-only">
+            Search Contacts...
+          </label>
+          <div className="relative">
+            <FormInputText
+              name="Search"
+              onChange={(e) => setSearchFilter(e.currentTarget.value)}
+              value={searchFilter}
+              placeholder="Search Contacts..."
+              className="mb-0 w-[400px]"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
+            </div>
+          </div>
+        </div>
       </div>
       <Table className='table-auto !min-w-0'>
         <Table.HeaderRow>
@@ -79,7 +105,7 @@ export const VenueContactsTab = () => {
           </Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
-          {contacts.map((vc) => (
+          {filteredContacts.map((vc) => (
             <Table.Row key={vc.Id} onClick={() => edit(vc)} hover>
               <Table.Cell className='whitespace-nowrap'>
                 {venueRoleDict[vc.RoleId].Name}
@@ -100,6 +126,10 @@ export const VenueContactsTab = () => {
           ))}
         </Table.Body>
       </Table>
+      <div className='text-left pt-4 max-w-[820px]'>
+        <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
+        {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
+      </div>
     </>
   )
 }
