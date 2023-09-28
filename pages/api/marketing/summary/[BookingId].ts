@@ -156,7 +156,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
         VenueCurrencySymbol: CurrencySymbol,
-        seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(2)),
+        seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(1)),
         ConversionRate,
         Capacity
       },
