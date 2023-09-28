@@ -191,3 +191,7 @@ export const getPreviousMonday = (date) => {
   previousMonday.setDate(date.getDate() - difference)
   return previousMonday
 }
+
+export const getTimeFromDateAndTime = (time) => {
+  return moment.utc(time).format('HH:mm')
+}
