@@ -1,7 +1,7 @@
 import { Table } from 'components/global/table/Table'
 
 import BookingSelection from './BookingSelection'
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import axios from 'axios'
 import { useRecoilValue } from 'recoil'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
@@ -110,7 +110,7 @@ export const ArchivedSalesTab = () => {
                 </>
               ))}
             </Table.HeaderRow>
-            <Table.Body className='max-h-[calc(100vh - 440px)]' style={{ maxHeight: 'calc(100vh - 440px)' }}>
+            <Table.Body className='' style={{ maxHeight: 'calc(100vh - 440px)' }}>
               {archivedSales.map((sale, i) => (
                 <Table.Row key={i}>
                   <Table.Cell className="text-center">

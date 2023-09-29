@@ -39,6 +39,9 @@ export const SalesTab = () => {
         setBookingSales([])
         const { data } = await axios.get(`/api/marketing/sales/read/${selected}`)
         setBookingSales(data)
+        setTimeout(() => {
+          document.getElementById('final').scrollIntoView({ behavior: 'smooth' })
+        }, 0)
       } catch (error:any) {
         setLoading(false)
         console.error(error)
@@ -111,7 +114,7 @@ export const SalesTab = () => {
                 const { valueChange, seatsChange } = getChange(i)
                 const isLast = (bookingSales?.length - 1) === i
                 return (
-                  <Table.Row key={sale.week}>
+                  <Table.Row id={isLast ? 'final' : null} key={sale.week}>
                     <Table.Cell className="whitespace-nowrap max-w-fit">
                       {isLast ? 'Final' : sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>

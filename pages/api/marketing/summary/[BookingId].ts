@@ -10,6 +10,7 @@ export type SummaryResponseDTO = {
   Performances: PerformanceDTO[]
   Info: {
     Seats: number
+    SeatsSold: number
     GrossPotential: number
     SalesValue:number
     VenueCurrencyCode:string
@@ -150,6 +151,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
+        SeatsSold: salesSummary.Seats,
         Seats: TotalSeats,
         SalesValue: salesSummary?.Value,
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),

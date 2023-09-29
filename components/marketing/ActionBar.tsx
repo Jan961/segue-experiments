@@ -13,7 +13,7 @@ const ActionBar = () => {
       const date = new Date(b.Date)
       const weekday = getWeekDay(date)
       const ukDate = formatDateUK(date)
-      return { text: `${weekday} ${ukDate} | ${b.Venue.Name} (${b.StatusCode})`, value: b.Id, date: ukDate }
+      return { text: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`, value: b.Id, date: ukDate }
     })
     : []
 
@@ -47,6 +47,23 @@ const ActionBar = () => {
 
   return (
     <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">
+
+      <div className="col-span-4 flex grid-cols-5 gap-2 items-center">
+        <FormInputSelect
+          className="mb-0 pb-0"
+          value={bookingJump.selected}
+          name="Tour"
+          onChange={changeBooking}
+          options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]}
+        />
+        <ToolbarButton onClick={goToToday}>Go To Today</ToolbarButton>
+        <ToolbarButton disabled={selectedBookingIndex === 0} onClick={previousVenue}>Previous Venue</ToolbarButton>
+        <ToolbarButton disabled={selectedBookingIndex === bookingOptions?.length - 1} onClick={nextVenue}>Next Venue</ToolbarButton>
+      </div>
+      {/* SALES REPORT DOES NOT EXIST IN THE DESIGNS */}
+      {/* <div>
+            <Salesreport />
+          </div> */}
       {matching && (
 
         <div className="col-span-2 flex space-x-2">
@@ -66,28 +83,11 @@ const ActionBar = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-          Landing Page
+            Landing Page
             </a>
           )}
         </div>
       )}
-      <div className="col-span-4 flex grid-cols-5 gap-2 items-center">
-        <ToolbarButton onClick={goToToday}>Go To Today</ToolbarButton>
-        <ToolbarButton disabled={selectedBookingIndex === 0} onClick={previousVenue}>Previous Venue</ToolbarButton>
-        <ToolbarButton disabled={selectedBookingIndex === bookingOptions?.length - 1} onClick={nextVenue}>Next Venue</ToolbarButton>
-
-        <FormInputSelect
-          className="mb-0"
-          value={bookingJump.selected}
-          name="Tour"
-          onChange={changeBooking}
-          options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]}
-        />
-      </div>
-      {/* SALES REPORT DOES NOT EXIST IN THE DESIGNS */}
-      {/* <div>
-            <Salesreport />
-          </div> */}
     </div>
   )
 }
