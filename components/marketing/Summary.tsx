@@ -93,7 +93,7 @@ export const Summary = () => {
           Total Seats Sold
         </DL.Term>
         <DL.Desc>
-          {numeral(info.Seats).format('0,0') || '-'}
+          {numeral(info.SeatsSold).format('0,0') || '-'}
         </DL.Desc>
         <DL.Term>
           Total Sales ({currency})

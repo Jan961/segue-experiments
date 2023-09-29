@@ -78,7 +78,7 @@ const GlobalToolbar = ({
           <div> </div>
         )}
       { children }
-      { setSearchFilter && (
+      {/* { setSearchFilter && (
         <div className="ml-auto">
           <label htmlFor="searchBookings" className="sr-only">
             Search Venues
@@ -96,7 +96,7 @@ const GlobalToolbar = ({
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* @ts-ignore */}
       {filterComponent && filterComponent}

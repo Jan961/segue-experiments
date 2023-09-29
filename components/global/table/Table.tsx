@@ -57,6 +57,7 @@ interface RowProps extends ClassNameable {
   className?:string
   onClick?: () => void
   ref?:any
+  id?:string
 }
 
 const Row = ({ children, hover, onClick, className, ...props }: PropsWithChildren<RowProps>) => {
