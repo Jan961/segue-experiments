@@ -26,7 +26,7 @@ const Indicator = ({ icon, active = false, tooltip }: IndicatorProps) => {
     </li>
   )
 }
-
+// KILWAT
 export const SalesTab = () => {
   const [bookingSales, setBookingSales] = React.useState([])
   const [loading, setLoading] = React.useState(false)
@@ -125,7 +125,7 @@ export const SalesTab = () => {
                       {numeral(sale.seatsSold).format('0,0')}
                     </Table.Cell>
                     <Table.Cell className='text-right'>
-                      {sale.seatsSalePercentage ? sale.seatsSalePercentage.toFixed(2) : ''} %
+                      {((sale.seatsSold / sale.capacity) * 100).toFixed(2)} %
                     </Table.Cell>
                     <Table.Cell className='text-right'>
                       {sale.reservations}
