@@ -57,7 +57,7 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
     )
     const toWeek = inputs.tourWeek?.split('T')?.[0]
     const fromWeek = moment(inputs.tourWeek)
-      .subtract(inputs.numberOfWeeks, 'weeks')
+      .subtract(inputs.numberOfWeeks - 1, 'weeks')
       .toISOString()
       ?.split('T')?.[0]
     setLoading(true)

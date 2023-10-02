@@ -72,7 +72,7 @@ export const SalesTab = () => {
     <>
       <div className='grid grid-cols-12 gap-2 overflow-hidden'>
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
-          <Table className='mt-4 text-sm table-auto !min-w-0 h-full sticky-header-table' style={{ maxWidth: '' }}>
+          <Table className='mt-4 text-sm table-auto !min-w-0 h-full'>
             <Table.HeaderRow>
               <Table.HeaderCell className='w-20'>
               Week
@@ -108,7 +108,7 @@ export const SalesTab = () => {
               Activity
               </Table.HeaderCell>
             </Table.HeaderRow>
-            <Table.Body className='h-full overflow-y-auto' style={{ maxHeight: 'calc(100vh - 440px)' }}>
+            <Table.Body className='h-full overflow-y-auto'>
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i)
                 const isLast = (bookingSales?.length - 1) === i
