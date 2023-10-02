@@ -50,7 +50,7 @@ const ActionBar = () => {
 
       <div className="col-span-4 flex grid-cols-5 gap-2 items-center">
         <FormInputSelect
-          className="mb-0 pb-0"
+          className="mb-0 pb-0 [&>select]:!mb-0"
           value={bookingJump.selected}
           name="Tour"
           onChange={changeBooking}
