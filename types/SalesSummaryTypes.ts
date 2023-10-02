@@ -31,6 +31,7 @@ export type TSalesView = {
     ConversionRate: number
     SetSalesFiguresDate: string
     SetBookingWeekNum: number
+    SetTourWeekNum: number
     SetTourWeekDate: string
     SetNotOnSale: string
     SetIsFinalFigures: string
@@ -64,6 +65,7 @@ export type TRequiredFields = {
     TotalCapacity: TSalesView['TotalCapacity']
     Seats: TSalesView['Seats']
     NotOnSalesDate: TSalesView['NotOnSalesDate']
+    SetTourWeekNum: TSalesView['SetTourWeekNum']
   }
 
 export type TRequiredFieldsFinalFormat = TRequiredFields & {

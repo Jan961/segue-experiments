@@ -88,13 +88,11 @@ export const ArchivedSalesTab = () => {
           <Table className={'table-auto !min-w-0 sticky-header-table'} style={{ maxWidth: tableWidth }}>
             <Table.HeaderRow>
               <Table.HeaderCell className=""></Table.HeaderCell>
-              <Table.HeaderCell className=""></Table.HeaderCell>
               {tours.map((tour, i) => (
                 <>
-                  <Table.HeaderCell className="text-right !text-lg" key={i}>
+                  <Table.HeaderCell className="text-center !text-lg" key={i}>
                     {tour.FullTourCode}
                   </Table.HeaderCell>
-                  <Table.HeaderCell></Table.HeaderCell>
                 </>
               ))}
             </Table.HeaderRow>

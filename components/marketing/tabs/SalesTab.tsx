@@ -26,7 +26,6 @@ const Indicator = ({ icon, active = false, tooltip }: IndicatorProps) => {
     </li>
   )
 }
-// KILWAT
 export const SalesTab = () => {
   const [bookingSales, setBookingSales] = React.useState([])
   const [loading, setLoading] = React.useState(false)
@@ -40,7 +39,7 @@ export const SalesTab = () => {
         const { data } = await axios.get(`/api/marketing/sales/read/${selected}`)
         setBookingSales(data)
         setTimeout(() => {
-          document.getElementById('final').scrollIntoView({ behavior: 'smooth' })
+          document.getElementById?.('final')?.scrollIntoView?.({ behavior: 'smooth' })
         }, 0)
       } catch (error:any) {
         setLoading(false)
