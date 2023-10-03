@@ -29,7 +29,7 @@ export const dateToSimple = (dateToFormat: Date | string) => {
   if (!dateToFormat) return 'DD/MM/YYYY'
   const date = safeDate(dateToFormat)
   const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
+    year: '2-digit',
     day: '2-digit',
     month: '2-digit',
     timeZone: 'UTC'

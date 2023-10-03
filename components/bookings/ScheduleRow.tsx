@@ -38,7 +38,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
       <div className={rowClass} >
         <TourDisplay />
         <DateDisplay date={date.Date} />
-        <div className="col-span-8 lg:col-span-9 grid grid-rows-auto gap-y-2 flex-grow pr-1">
+        <div className="col-span-7 lg:col-span-8 grid grid-rows-auto gap-y-2 flex-grow pr-1">
           { uniqueBookingIds.map((id: number) => (
             <BookingDisplay key={id} bookingId={id} date={date.Date} performanceCount={date.PerformanceIds.length} />
           ))}
