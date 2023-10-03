@@ -310,7 +310,7 @@ model Other {
 model Performance {
   Id            Int             @id @default(autoincrement()) @map("PerformanceId")
   BookingId     Int             @map("PerformanceBookingId")
-  Time          DateTime        @map("PerformanceTime") @db.Time(0)
+  Time          DateTime?        @map("PerformanceTime") @db.Time(0)
   Date          DateTime        @map("PerformanceDate") @db.Date
   AvailableComp AvailableComp[]
   Booking       Booking         @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Performance")

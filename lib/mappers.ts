@@ -73,8 +73,8 @@ export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
   const day = p.Date.toISOString().split('T')[0]
-  const time = p.Time.toISOString().split('T')[1]
-  const Date = `${day}T${time}`
+  const time = p.Time?.toISOString?.()?.split?.('T')?.[1]
+  const Date = `${day}${time ? 'T' + time : ''}`
 
   return {
     Id: p.Id,
