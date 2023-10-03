@@ -57,6 +57,7 @@ export default async function handle (req, res) {
           isSingleSeats: sale.SetSingleSeats,
           isNotOnSale: sale.SetNotOnSale,
           capacity: sale.TotalCapacity,
+          isFinal: sale.SetIsFinalFigures,
           // saleType: sale.SaleTypeName,
           ...(sale.SaleTypeName === 'General Sales' && {
             seatsSold: parseInt(sale.Seats),

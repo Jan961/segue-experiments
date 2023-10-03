@@ -112,7 +112,7 @@ export const ArchivedSalesTab = () => {
               {archivedSales.map((sale, i) => (
                 <Table.Row key={i}>
                   <Table.Cell className="text-center">
-                  Week {sale.SetBookingWeekNum}
+                    {sale.SetIsFinalFigures ? 'Final' : `Week ${sale.SetBookingWeekNum}`}
                   </Table.Cell>
                   <Table.Cell>{dateToSimple(sale.SetTourWeekDate)}</Table.Cell>
                   {sale.data.map((tourSale, i) => (
