@@ -108,7 +108,7 @@ export const ArchivedSalesTab = () => {
                 </>
               ))}
             </Table.HeaderRow>
-            <Table.Body className='' style={{ maxHeight: 'calc(100vh - 440px)' }}>
+            <Table.Body className='' style={{ maxHeight: 'calc(100vh - 500px)' }}>
               {archivedSales.map((sale, i) => (
                 <Table.Row key={i}>
                   <Table.Cell className="text-center">

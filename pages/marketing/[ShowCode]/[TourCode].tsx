@@ -28,14 +28,24 @@ const Index = ({ initialState }: Props) => {
           setSearchFilter={setSearchFilter}
           title={'Marketing'}>
           <div className="flex items-center">
-            {matching?.Venue && <a
-              className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mr-5"
-              href={`https://${matching?.Venue?.Website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {matching?.Venue?.Website}
-            </a>}
+            <div className='flex flex-col'>
+              {matching?.Venue?.Website && <a
+                className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mr-5"
+                href={`https://${matching.Venue.Website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Landing Page
+              </a>}
+              {matching?.Venue?.TechSpecsURL && <a
+                className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mt-5"
+                href={`https://${matching.Venue.TechSpecsURL}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {matching.Venue.TechSpecsURL}
+              </a>}
+            </div>
             <div className="w-[200px] h-[100px] scale-50">
               {matching?.Venue && <iframe
                 id="Venue"
