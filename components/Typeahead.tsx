@@ -41,10 +41,10 @@ const Typeahead = ({
   const fuse = useRef(new Fuse(options, { keys: ['text', ...searchKeys] }))
   const filteredOptions: Option[] = useMemo(
     () =>
-      inputValue
+      inputValue && !value
         ? fuse.current.search(inputValue).map((result) => result.item)
         : options,
-    [inputValue, options]
+    [inputValue, options, value]
   )
   useEffect(() => {
     const selectedOption = options.find(
