@@ -168,8 +168,8 @@ export const formDate = (DateString: string) => {
 }
 
 export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
-  const currentSunday = moment(startDate).startOf('isoWeek').set('hour', 0)
-  const end = moment(endDate)
+  const currentSunday = moment.utc(startDate).startOf('isoWeek').subtract(1, 'day').set('hour', 0)
+  const end = moment.utc(endDate)
   const weeks = []
 
   while (currentSunday.isBefore(end)) {
