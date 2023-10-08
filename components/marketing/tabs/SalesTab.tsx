@@ -112,7 +112,7 @@ export const SalesTab = () => {
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i)
                 let colorCode = ''
-                if (sale.isSingleSeats)colorCode = 'bg-primary-orange text-yellow'
+                if (sale.isSingleSeats)colorCode = 'bg-primary-orange text-primary-yellow'
                 if (sale.isBrochureReleased)colorCode = 'bg-primary-yellow text-black'
                 if (sale.isNotOnSale)colorCode = 'bg-soft-primary-green text-black'
                 return (
