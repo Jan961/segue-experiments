@@ -18,6 +18,7 @@ export interface GapSuggestionUnbalancedProps {
   MaxFromMiles?: number
   MinToMiles?: number
   MaxToMiles?: number
+  ExcludeLondonVenues?: boolean
 }
 
 export type VenueWithDistance = {
@@ -38,7 +39,7 @@ export type GapSuggestionReponse = {
 }
 
 export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  let { StartVenue, EndVenue, MinFromMiles, MaxFromMiles, MinToMiles, MaxToMiles } = req.body as GapSuggestionUnbalancedProps
+  let { StartVenue, EndVenue, MinFromMiles, MaxFromMiles, MinToMiles, MaxToMiles, ExcludeLondonVenues } = req.body as GapSuggestionUnbalancedProps
   const SLIDER_MIN = 25
 
   try {
@@ -164,7 +165,22 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
     const capacities = await prisma.venue.findMany({
       select: {
         Id: true,
-        Seats: true
+        Seats: true,
+        VenueAddress: {
+          where: {
+            TypeName: 'main'
+          },
+          select: {
+            TypeName: true,
+            Line1: true,
+            Line2: true,
+            Line3: true,
+            Town: true,
+            County: true,
+            Postcode: true,
+            Country: true
+          }
+        }
       },
       where: {
         Id: {
@@ -172,15 +188,18 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         }
       }
     })
-
-    const capacityMap = new Map<number, number>(capacities.map((venue: Venue) => [venue.Id, venue.Seats]))
-
+    const capacityMap = new Map<number, any>(capacities.map((venue: Venue) => [venue.Id, { Seats: venue.Seats, Address: venue.VenueAddress?.[0] }]))
+    const VenueInfo = venuesWithDistanceData.map((x) => {
+      const { Seats, Address = {} } = capacityMap.get(x.VenueId) || {}
+      if (Address.Town === 'London' && ExcludeLondonVenues) return null
+      return { ...x, Capacity: Seats, ...Address }
+    }).filter((venue, i) => venue)
     const result: GapSuggestionReponse = {
       SliderMax: sliderMax,
       DefaultMin: safeMin,
       OriginalMiles: initial[0] ? initial[0].Mileage : undefined,
       OriginalMins: initial[0] ? initial[0].TimeMins : undefined,
-      VenueInfo: venuesWithDistanceData.map((x) => ({ ...x, Capacity: capacityMap.get(x.VenueId) }))
+      VenueInfo
     }
 
     res.status(200).json(result)
