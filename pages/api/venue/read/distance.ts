@@ -188,7 +188,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         }
       }
     })
-    const capacityMap = new Map<number, any>(capacities.map((venue: Venue) => [venue.Id, { Seats: venue.Seats, Address: venue.VenueAddress?.[0] }]))
+    const capacityMap = new Map<number, any>(capacities.map((venue: any) => [venue.Id, { Seats: venue.Seats, Address: venue.VenueAddress?.[0] }]))
     const VenueInfo = venuesWithDistanceData.map((x) => {
       const { Seats, Address = {} } = capacityMap.get(x.VenueId) || {}
       if (Address.Town === 'London' && ExcludeLondonVenues) return null
