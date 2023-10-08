@@ -87,7 +87,7 @@ export default function OutstandingActivities ({ activeTours }:Props) {
                           onChange={handleOnChange}>
                           <option>Select a Tour</option>
                           {activeTours.map((tour) => (
-                            <option key={tour.Id} value={`${tour.Id}`} >{tour.ShowCode}/{tour.Code} | {tour.ShowName}</option>
+                            <option key={tour.Id} value={`${tour.Id}`} >{tour.ShowCode}{tour.Code} | {tour.ShowName}</option>
                           ))
                           }
                         </select>

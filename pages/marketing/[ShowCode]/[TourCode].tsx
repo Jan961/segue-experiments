@@ -20,43 +20,49 @@ const Index = ({ initialState }: Props) => {
   const [searchFilter, setSearchFilter] = useState('')
   const bookingJump = useRecoilValue(bookingJumpState)
   const matching = useMemo(() => bookingJump.bookings?.filter?.(x => x.Id === bookingJump.selected)?.[0], [bookingJump])
+  const onIframeClick = () => {
+    window.open(`https://${matching?.Venue?.Website}`, '_blank')
+  }
   return (
     <Layout title="Marketing | Segue">
       <div className="flex flex-col px-4 flex-auto">
-        <GlobalToolbar
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-          title={'Marketing'}>
-          <div className="flex items-center">
-            <div className='flex flex-col'>
-              {matching?.Venue?.Website && <a
-                className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mr-5"
-                href={`https://${matching.Venue.Website}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Landing Page
-              </a>}
+        <div className='flex justify-between items-start'>
+          <GlobalToolbar
+            searchFilter={searchFilter}
+            setSearchFilter={setSearchFilter}
+            title={'Marketing'}>
+          </GlobalToolbar>
+          <div className="flex">
+            <div className='flex flex-col items-end justify-between'>
               {matching?.Venue?.TechSpecsURL && <a
-                className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mt-5"
+                className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mr-5 "
                 href={`https://${matching.Venue.TechSpecsURL}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 {matching.Venue.TechSpecsURL}
               </a>}
+              {matching?.Venue?.Website && <a
+                className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md  mr-5 "
+                href={`https://${matching.Venue.Website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Landing Page
+              </a>}
             </div>
-            <div className="w-[200px] h-[100px] scale-50">
-              {matching?.Venue && <iframe
+            <div className="w-[400px] cursor-pointer" onClick={onIframeClick}>
+              {matching?.Venue?.Website && <iframe
+                className="pointer-events-none"
                 id="Venue"
-                width="200"
-                height="100"
+                width="400"
+                height="auto"
                 src={`https://${matching?.Venue?.Website}`}
               >
               </iframe>}
             </div>
           </div>
-        </GlobalToolbar>
+        </div>
         <MarketingPanel />
       </div>
     </Layout>

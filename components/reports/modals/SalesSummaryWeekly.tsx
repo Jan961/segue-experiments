@@ -1,30 +1,32 @@
 import React, { useState } from 'react'
 import moment from 'moment'
-import { getDateDaysAgo, toISO, toSql } from 'services/dateService'
+import { dateToSimple, getDateDaysAgo, toISO } from 'services/dateService'
 import { faLineChart } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 import { getCurrentMondayDate, range } from 'services/reportsService'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 import { Spinner } from 'components/global/Spinner'
 
-function formatDate (date) {
-  return toSql(date)
-}
-
 type Props = {
   activeTours: any[];
 };
 
+const defaultInputs = {
+  Tour: null,
+  TourWeek: null,
+  numberOfWeeks: 2,
+  order: null
+}
 export default function SalesSummaryWeekly ({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [tourWeeks, setTourWeeks] = useState([]) // Shory list of tours for the toolbar to switch
-  const [inputs, setInputs] = useState({
-    Tour: null,
-    TourWeek: null,
-    numberOfWeeks: 2,
-    order: null
-  })
+  const [inputs, setInputs] = useState(defaultInputs)
+
+  const closeModal = () => {
+    setShowModal(false)
+    setInputs(defaultInputs)
+  }
 
   function formatShortYearDate (dateString) {
     const dateMomentObject =
@@ -80,13 +82,7 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
             ].join(':')
             anchor.click()
           }
-          setShowModal(false)
-          setInputs({
-            Tour: null,
-            TourWeek: null,
-            numberOfWeeks: null,
-            order: null
-          })
+          closeModal()
         }
       })
       .finally(() => {
@@ -156,7 +152,7 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
                       </h3>
                       <button
                         className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
-                        onClick={() => setShowModal(false)}
+                        onClick={closeModal}
                       >
                         <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
                       x
@@ -183,9 +179,9 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
                           onChange={handleOnChange}
                         >
                           <option key="default">Select a Tour</option>
-                          {activeTours.map((tour) => (
-                            <option key={tour.Id} value={`${tour.Id}`}>
-                              {tour.ShowCode}/{tour.Code} | {tour.ShowName}
+                          {activeTours.map((tour, i) => (
+                            <option key={i} value={`${tour.Id}`}>
+                              {tour.ShowCode}{tour.Code} | {tour.ShowName}
                             </option>
                           ))}
                         </select>
@@ -209,9 +205,7 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
                               value={`${week.mondayDate}`}
                             >
                               {/* {formatWeekNumber(week.WeekCode)}  */}
-                              {` Wk ${week.tourWeekNum} | ${formatDate(
-                                week.mondayDate
-                              )}`}
+                              {` Wk ${week.tourWeekNum} | ${dateToSimple(week?.mondayDate)}`}
                             </option>
                           ))}
                         </select>
@@ -240,7 +234,7 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
                         <button
                           className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                           type="button"
-                          onClick={() => setShowModal(false)}
+                          onClick={closeModal}
                         // THis will not save anything and discard the form
                         >
                       Close and Discard

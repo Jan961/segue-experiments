@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { GetServerSideProps } from 'next'
 import { faPieChart } from '@fortawesome/free-solid-svg-icons'
 import moment from 'moment'
-import { getDateDaysAgo, toISO } from 'services/dateService'
-import formatDate from 'utils/formatDate'
+import { dateToSimple } from 'services/dateService'
 import { getCurrentMondayDate, range } from 'services/reportsService'
 import axios from 'axios'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
@@ -18,7 +17,14 @@ type TourWeek = {
   mondayDate: string;
   tourWeekNum: number;
 };
-
+const defaultInputs = {
+  tour: null,
+  tourWeek: null,
+  numberOfWeeks: 2,
+  order: null,
+  tourStartDate: null,
+  tourEndDate: null
+}
 export default function SalesSummarySimple ({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
@@ -28,14 +34,11 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
     submitting: false,
     info: { error: false, msg: null }
   })
-  const [inputs, setInputs] = useState({
-    tour: null,
-    tourWeek: null,
-    numberOfWeeks: null,
-    order: null,
-    tourStartDate: null,
-    tourEndDate: null
-  })
+  const [inputs, setInputs] = useState(defaultInputs)
+  const closeModal = () => {
+    setShowModal(false)
+    setInputs(defaultInputs)
+  }
 
   const fetchTourWeek = async (tourId: number) => {
     setLoading(true)
@@ -96,15 +99,7 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
             ].join(':')
             anchor.click()
           }
-          setShowModal(false)
-          setInputs({
-            tour: null,
-            tourWeek: null,
-            numberOfWeeks: null,
-            order: null,
-            tourStartDate: null,
-            tourEndDate: null
-          })
+          closeModal()
         }
       })
       .finally(() => {
@@ -189,7 +184,7 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
                     <div className="absolute top-0 right-0 pt-4 pr-4">
                       <button
                         className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                        onClick={() => setShowModal(false)}
+                        onClick={closeModal}
                       >
                         <span className="sr-only">Close</span>
                         <svg
@@ -226,7 +221,7 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
                         <option>Select a Tour</option>
                         {activeTours?.map?.((tour) => (
                           <option key={tour.Id} value={`${tour.Id}`}>
-                            {tour.ShowCode}/{tour.Code} | {tour.ShowName}
+                            {tour.ShowCode}{tour.Code} | {tour.ShowName}
                           </option>
                         ))}
                       </select>
@@ -249,10 +244,8 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
                             value={`${week.mondayDate}`}
                           >
                             {` Wk ${week.tourWeekNum} | ${
-                              week?.mondayDate?.split?.('T')?.[0]
-                            } | ${moment(
-                              week?.mondayDate?.split?.('T')?.[0]
-                            )?.format?.('dddd')}`}
+                              dateToSimple(week?.mondayDate)
+                            }`}
                           </option>
                         ))}
                       </select>
@@ -302,7 +295,7 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
                       <button
                         className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        onClick={() => setShowModal(false)}
+                        onClick={closeModal}
                       >
                       Close and Discard
                       </button>

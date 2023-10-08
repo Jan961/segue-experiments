@@ -16,6 +16,7 @@ import { faCalculator, faSliders } from '@fortawesome/free-solid-svg-icons'
 import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import classNames from 'classnames'
 import { NumericSliderRange } from './components/NumericSliderRange'
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 
 interface ToggleButtonProps {
   icon: IconProp
@@ -67,7 +68,8 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     To: [25, 200] as [number, number],
     VenueId: 0,
     StartVenue: Number(startDropDown[0]?.value),
-    EndVenue: Number(endDropDown[0]?.value)
+    EndVenue: Number(endDropDown[0]?.value),
+    excludeLondonVenues: false
   })
 
   const [venueInputs, setVenueInputs] = React.useState({
@@ -87,10 +89,10 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
       MinFromMiles: inputs.From[0],
       MaxFromMiles: inputs.From[1],
       MinToMiles: inputs.To[0],
-      MaxToMiles: inputs.To[1]
+      MaxToMiles: inputs.To[1],
+      ExcludeLondonVenues: inputs.excludeLondonVenues
     }
     const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body)
-
     setResults(data)
     setRefreshing(false)
   }, [])
@@ -148,6 +150,14 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     setRefreshing(true)
   }
 
+  const handleExcludeLondonVenuesChange = (event) => {
+    setInputs((prev) => ({
+      ...prev,
+      excludeLondonVenues: event.target.value
+    }))
+    setRefreshing(true)
+  }
+
   const resultVenues = results?.VenueInfo?.length ? results?.VenueInfo?.length : 0
 
   return (
@@ -198,6 +208,12 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
             handleRangeChange={handleRangeChange}
             min={0}
             max={sliderMax}
+          />
+          <FormInputCheckbox
+            value={inputs.excludeLondonVenues}
+            label="EXCLUDE LONDON VENUES"
+            name="excludeLondonVenues"
+            onChange={handleExcludeLondonVenuesChange}
           />
           <br />
           { refreshing && (<div className="p-2 pt-0"><Spinner size='sm'/></div>)}
