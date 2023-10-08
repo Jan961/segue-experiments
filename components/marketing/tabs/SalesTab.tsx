@@ -111,12 +111,16 @@ export const SalesTab = () => {
             <Table.Body className='h-full overflow-y-auto'>
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i)
+                let colorCode = ''
+                if (sale.isSingleSeats)colorCode = 'bg-primary-orange text-yellow'
+                if (sale.isBrochureReleased)colorCode = 'bg-primary-yellow text-black'
+                if (sale.isNotOnSale)colorCode = 'bg-soft-primary-green text-black'
                 return (
                   <Table.Row id={sale.isFinal ? 'final' : null} key={sale.week}>
-                    <Table.Cell className="whitespace-nowrap max-w-fit">
+                    <Table.Cell className={classNames('whitespace-nowrap max-w-fit', colorCode)}>
                       {sale.isFinal ? 'Final' : sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell className={classNames(colorCode)}>
                       {sale.weekOf}
                     </Table.Cell>
                     <Table.Cell className='text-right'>
