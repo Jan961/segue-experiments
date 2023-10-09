@@ -51,12 +51,13 @@ const Index = ({ initialState }: Props) => {
                 Landing Page
               </a>}
             </div>
-            <div className="w-[400px] cursor-pointer" onClick={onIframeClick}>
+            <div className="w-[400px] h-[150px] cursor-pointer" onClick={onIframeClick}>
               {matching?.Venue?.Website && <iframe
                 className="pointer-events-none"
                 id="Venue"
                 width="400"
                 height="auto"
+                style={{ transform: 'scale(0.25)', transformOrigin: 'top left', width: '1600px', height: '600px' }}
                 src={`https://${matching?.Venue?.Website}`}
               >
               </iframe>}

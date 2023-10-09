@@ -12,7 +12,7 @@ type ReportsProps={
 
 const Index = ({ activeTours = [] }:ReportsProps) => {
   return (
-    <Layout title="ShowId | Segue">
+    <Layout title="Reports | Segue">
       <Switchboard activeTours={activeTours}></Switchboard>
     </Layout>
   )
