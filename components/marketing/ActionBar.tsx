@@ -19,7 +19,7 @@ const ActionBar = () => {
 
   const selectedBookingIndex = useMemo(() => bookingOptions.findIndex(booking => parseInt(booking.value, 10) === bookingJump.selected), [bookingJump.selected, bookingOptions])
   const changeBooking = (e) => {
-    const selected = Number(e.target.value)
+    const selected = Number(e.target.value) || null
     setBookingJump({ ...bookingJump, selected })
   }
 
@@ -53,7 +53,7 @@ const ActionBar = () => {
           className="mb-0 pb-0 max-w-[500px]"
           value={bookingJump.selected}
           name="Tour"
-          onChange={(selectedVenue) => changeBooking({ target: { value: selectedVenue.value, id: 'venue' } })}
+          onChange={(selectedVenue) => changeBooking({ target: { value: selectedVenue?.value, id: 'venue' } })}
           options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]} placeholder={'Please select a venue'}
         />
         <ToolbarButton onClick={goToToday} className='!text-primary-green'>Go To Today</ToolbarButton>

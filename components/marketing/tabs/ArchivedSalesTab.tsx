@@ -79,6 +79,7 @@ export const ArchivedSalesTab = () => {
             showCode={router.query.ShowCode}
             salesByType={salesByType}
             onSubmit={getBookingSales}
+            selectedBookingId={selectedBooking?.Id}
             onClose={() => setSalesByType(null)}
           />
         )}

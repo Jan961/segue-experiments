@@ -115,7 +115,7 @@ export default function Barring () {
               placeholder='-- Select Venue --'
               value={inputs.venue}
               options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
-              onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue.value, id: 'venue' } })}
+              onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue?.value, id: 'venue' } })}
             />
             <FormInputNumeric
               label="Bar Distance"
