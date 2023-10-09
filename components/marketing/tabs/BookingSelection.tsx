@@ -7,11 +7,12 @@ type props = {
     venueCode:string;
     salesByType:string;
     showCode:string | string[];
+    selectedBookingId:any;
     onClose:()=>void;
     onSubmit:(a:number[], b:any[])=>void
 }
 
-const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit }:props) => {
+const BookingSelection = ({ onClose, salesByType, venueCode, showCode, selectedBookingId, onSubmit }:props) => {
   const [bookings, setBookings] = React.useState([])
   const [loading, setLoading] = React.useState(false)
   const [inputs, setInputs] = React.useState<any>()
@@ -21,7 +22,7 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, onSubmit 
       try {
         const { data } = await axios.post('/api/marketing/archivedSales/bookingSelection', { salesByType, venueCode, showCode })
         setBookings(data)
-        setInputs(data.reduce((inputs, tour, i) => {
+        setInputs(data?.sort((a, b) => (a.BookingId === selectedBookingId) ? -1 : ((b.BookingId === selectedBookingId) ? 1 : 0)).reduce((inputs, tour, i) => {
           inputs[tour.BookingId] = i + 1
           return inputs
         }, {}))

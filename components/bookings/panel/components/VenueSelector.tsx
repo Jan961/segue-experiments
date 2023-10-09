@@ -18,8 +18,8 @@ export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps
     { text: 'Please Select a Venue', value: '' },
     ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: `${v.Code} - ${v.Name}, ${v.Town}`, value: v.Id, code: v.Code, town: v.Town })
     )]
-  const onSelect = (option:SelectOption) => {
-    onChange(option.value as number)
+  const onSelect = (option?:SelectOption) => {
+    onChange(option?.value as number || null)
   }
   return (
     <>

@@ -37,14 +37,13 @@ const Typeahead = ({
 }: props) => {
   const [inputValue, setInputValue] = useState('')
   const [isDropdownOpen, setDropdownOpen] = useState(false)
-  const inputRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const fuse = useRef(new Fuse(options, { keys: ['text', ...searchKeys] }))
   const filteredOptions: Option[] = useMemo(
-    () =>
-      inputValue && !value
-        ? fuse.current.search(inputValue).map((result) => result.item)
-        : options,
-    [inputValue, options, value]
+    () => {
+      return inputValue === '' ? options : fuse.current.search(inputValue).map((result) => result.item)
+    },
+    [inputValue, options]
   )
   useEffect(() => {
     const selectedOption = options.find(
@@ -53,7 +52,10 @@ const Typeahead = ({
     setInputValue(selectedOption?.text || '')
   }, [value])
   const handleInputChange = (e: { target: { value: any } }) => {
-    setInputValue(e.target.value)
+    if (!e?.target?.value) {
+      onChange?.({ text: '', value: '' })
+    }
+    setInputValue(e?.target?.value)
   }
   const handleSelectOption = (selectedOption: Option) => {
     setInputValue(selectedOption.text)

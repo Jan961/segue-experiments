@@ -1,170 +1,170 @@
-import { useEffect, useState } from "react";
-import { dateToSimple } from "services/dateService";
-import axios from "axios";
-import { getSales } from "./Api";
-import schema from "./validation";
-import Typeahead from "components/Typeahead";
-import { Spinner } from "components/global/Spinner";
+import { useEffect, useState } from 'react'
+import { dateToSimple } from 'services/dateService'
+import axios from 'axios'
+import { getSales } from './Api'
+import schema from './validation'
+import Typeahead from 'components/Typeahead'
+import { Spinner } from 'components/global/Spinner'
 
 interface props {
   searchFilter: String;
   tours?: any[];
 }
-export default function Entry({ tours = [], searchFilter }: props) {
-  const [isLoading, setLoading] = useState(false);
-  const [salesWeeks, SetSalesWeeks] = useState([]);
-  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
-  const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
-  const [options, setOptions] = useState<any>(null);
-  const [holds, setHolds] = useState<any>({});
-  const [comps, setComps] = useState<any>({});
-  const [inputs, setInputs] = useState<any>({});
-  const [sale, setSale] = useState<any>({});
-  const [previousSale, setPreviousSale] = useState<any>({});
-  const [notes, setNotes] = useState<any>({});
-  const [validationErrors, setValidationErrors] = useState<any>({});
+export default function Entry ({ tours = [], searchFilter }: props) {
+  const [isLoading, setLoading] = useState(false)
+  const [salesWeeks, SetSalesWeeks] = useState([])
+  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([])
+  const [previousSaleWeek, setPreviousSaleWeek] = useState(null)
+  const [options, setOptions] = useState<any>(null)
+  const [holds, setHolds] = useState<any>({})
+  const [comps, setComps] = useState<any>({})
+  const [inputs, setInputs] = useState<any>({})
+  const [sale, setSale] = useState<any>({})
+  const [previousSale, setPreviousSale] = useState<any>({})
+  const [notes, setNotes] = useState<any>({})
+  const [validationErrors, setValidationErrors] = useState<any>({})
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
-      setLoading(true);
+      setLoading(true)
       axios
         .get(`/api/reports/tourWeek/${tourId}`)
         .then((data: any) => SetSalesWeeks(data.data || []))
-        .finally(() => setLoading(false));
+        .finally(() => setLoading(false))
     }
-  };
+  }
   const fetchVenues = (tourId) => {
     if (tourId) {
-      setLoading(true);
+      setLoading(true)
       axios
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          SetSalesWeeksVenues(data.data);
+          SetSalesWeeksVenues(data.data)
         })
-        .finally(() => setLoading(false));
+        .finally(() => setLoading(false))
     }
-  };
+  }
 
   const handleSalesResponse = (data) => {
-    const { Notes, SetHold, SetComp, Sale } = data || {};
-    const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {};
+    const { Notes, SetHold, SetComp, Sale } = data || {}
+    const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
     const holdValues = SetHold?.reduce?.((holds, hold) => {
-      holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue };
-      return holds;
-    }, {});
+      holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
+      return holds
+    }, {})
     const compValues = SetComp?.reduce?.((comps, comp) => {
-      comps[comp.CompTypeId] = comp.CompSeats;
-      return comps;
-    }, {});
+      comps[comp.CompTypeId] = comp.CompSeats
+      return comps
+    }, {})
     return {
       holds: holdValues,
       comps: compValues,
       notes: {
         BookingSaleNotes,
         CompNotes,
-        HoldNotes,
+        HoldNotes
       },
-      sale: Sale,
-    };
-  };
+      sale: Sale
+    }
+  }
   const fetchSales = async (SetSalesFiguresDate, SetBookingId) => {
-    setLoading(true);
-    const data = await getSales({ SetSalesFiguresDate, SetBookingId });
-    setLoading(false);
-    return handleSalesResponse(data);
-  };
+    setLoading(true)
+    const data = await getSales({ SetSalesFiguresDate, SetBookingId })
+    setLoading(false)
+    return handleSalesResponse(data)
+  }
   const fetchOptionTypes = () => {
     axios
-      .get("/api/marketing/sales/options")
+      .get('/api/marketing/sales/options')
       .then((data) => {
-        setOptions(data.data);
+        setOptions(data.data)
       })
-      .catch((error) => console.log(error));
-  };
+      .catch((error) => console.log(error))
+  }
   useEffect(() => {
-    fetchTourWeeks(inputs.SetTour);
-    fetchVenues(inputs.SetTour);
-  }, [inputs.SetTour]);
+    fetchTourWeeks(inputs.SetTour)
+    fetchVenues(inputs.SetTour)
+  }, [inputs.SetTour])
   useEffect(() => {
     if (!options) {
-      fetchOptionTypes();
+      fetchOptionTypes()
     }
-  }, []);
+  }, [])
   useEffect(() => {
     if (inputs.SaleWeek && inputs.Venue) {
-      setHolds({});
-      setComps({});
-      setNotes({});
-      setSale({});
-      setLoading(false);
+      setHolds({})
+      setComps({})
+      setNotes({})
+      setSale({})
+      setLoading(false)
       fetchSales(inputs.SaleWeek, parseInt(inputs.Venue, 10))
         .then(({ holds = [], comps = [], notes, sale = {} }) => {
-          setHolds(holds);
-          setComps(comps);
-          setNotes(notes);
-          setSale(sale || {});
+          setHolds(holds)
+          setComps(comps)
+          setNotes(notes)
+          setSale(sale || {})
         })
         .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
+        .finally(() => setLoading(false))
     }
-  }, [inputs.SaleWeek, inputs.Venue]);
+  }, [inputs.SaleWeek, inputs.Venue])
   useEffect(() => {
     if (inputs.Venue && previousSaleWeek) {
       fetchSales(previousSaleWeek, parseInt(inputs.Venue, 10))
         .then(({ sale }) => {
-          setPreviousSale(sale || {});
+          setPreviousSale(sale || {})
         })
-        .catch((error) => console.log(error));
+        .catch((error) => console.log(error))
     }
-  }, [inputs.Venue, previousSaleWeek]);
+  }, [inputs.Venue, previousSaleWeek])
   if (isLoading) {
     return (
       <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
         <Spinner className="w-full" size="lg" />
       </div>
-    );
+    )
   }
 
   const handleOnChange = (e) => {
-    e.persist?.();
-    if (e.target.id === "SetTour") {
-      setInputs({ [e.target.id]: e.target.value });
-      return;
+    e.persist?.()
+    if (e.target.id === 'SetTour') {
+      setInputs({ [e.target.id]: e.target.value })
+      return
     }
-    if (e.target.id === "SaleWeek") {
+    if (e.target.id === 'SaleWeek') {
       const index = salesWeeks.findIndex(
         (week) => week.mondayDate === e.target.value
-      );
+      )
       if (index <= 0) {
-        setPreviousSaleWeek(null);
-        setPreviousSale(null);
+        setPreviousSaleWeek(null)
+        setPreviousSale(null)
       } else {
-        setPreviousSaleWeek(salesWeeks[index - 1]?.mondayDate);
+        setPreviousSaleWeek(salesWeeks[index - 1]?.mondayDate)
       }
     }
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
+      [e.target.id]: e.target.value
+    }))
+  }
 
   const handleOnSaleChange = (e) => {
-    e.persist?.();
-    setValidationErrors({});
+    e.persist?.()
+    setValidationErrors({})
     setSale((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
+      [e.target.id]: e.target.value
+    }))
+  }
 
   const handleOnNotesChange = (e) => {
-    e.persist?.();
+    e.persist?.()
     setNotes((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
-  function validateSale(sale, previousSale) {
+      [e.target.id]: e.target.value
+    }))
+  }
+  function validateSale (sale, previousSale) {
     return schema
       .validate(
         {
@@ -173,71 +173,71 @@ export default function Entry({ tours = [], searchFilter }: props) {
             PreviousSeats: previousSale?.Seats,
             PreviousValue: previousSale?.Value,
             PreviousReservedSeats: previousSale?.ReservedSeats,
-            PreviousReservedValue: previousSale?.ReservedValue,
-          },
+            PreviousReservedValue: previousSale?.ReservedValue
+          }
         },
         { abortEarly: false }
       )
       .then(() => {
-        return true;
+        return true
       })
       .catch((validationErrors) => {
-        const errors = {};
-        const warnings = {};
+        const errors = {}
+        const warnings = {}
         validationErrors.inner.forEach((error) => {
-          if (error.path.startsWith("warning")) {
-            warnings[error.path] = error.message;
+          if (error.path.startsWith('warning')) {
+            warnings[error.path] = error.message
           } else {
-            errors[error.path] = error.message;
+            errors[error.path] = error.message
           }
-        });
-        setValidationErrors(errors);
-        return false;
-      });
+        })
+        setValidationErrors(errors)
+        return false
+      })
   }
 
-  async function onSubmit(e: any) {
-    e.preventDefault();
+  async function onSubmit (e: any) {
+    e.preventDefault()
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
       SetHoldHoldTypeId,
       SetHoldSeats: holds[SetHoldHoldTypeId].seats,
-      SetHoldValue: holds[SetHoldHoldTypeId].value,
-    }));
+      SetHoldValue: holds[SetHoldHoldTypeId].value
+    }))
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
       SetCompCompTypeId,
-      SetCompSeats: comps[SetCompCompTypeId],
-    }));
-    const valid = await validateSale(sale, previousSale);
+      SetCompSeats: comps[SetCompCompTypeId]
+    }))
+    const valid = await validateSale(sale, previousSale)
     if (!valid) {
-      return;
+      return
     }
     const Sales = [
       {
         SaleSaleTypeId: 1,
         SaleSeats: sale?.Seats,
-        SaleValue: sale?.Value,
+        SaleValue: sale?.Value
       },
       {
         SaleSaleTypeId: 2,
         SaleSeats: sale?.ReservedSeats,
-        SaleValue: sale?.ReservedValue,
-      },
-    ];
+        SaleValue: sale?.ReservedValue
+      }
+    ]
     // const validateSales
     await axios
-      .post("/api/marketing/sales/upsert", {
+      .post('/api/marketing/sales/upsert', {
         Holds,
         Comps,
         Sales,
         SetBookingId: inputs.Venue,
-        SetSalesFiguresDate: inputs.SalesWeek,
+        SetSalesFiguresDate: inputs.SalesWeek
       })
       .then((res) => {
-        console.log("Updated Sales", res);
+        console.log('Updated Sales', res)
       })
       .catch((error) => {
-        console.log("Error updating Sales", error);
-      });
+        console.log('Error updating Sales', error)
+      })
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -252,26 +252,26 @@ export default function Entry({ tours = [], searchFilter }: props) {
     // BookingSaleId, HoldNotes, CompNotes, BookingSaleNotes
   }
   const handleOnHoldsChange = (e, key) => {
-    e.persist?.();
+    e.persist?.()
     setHolds((prev) => ({
       ...prev,
-      [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value },
-    }));
-  };
+      [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value }
+    }))
+  }
   const handleOnCompsChange = (e) => {
-    e.persist?.();
-    setComps((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-  };
+    e.persist?.()
+    setComps((prev) => ({ ...prev, [e.target.id]: e.target.value }))
+  }
   const copyLastWeekSalesData = () => {
     if (previousSale) {
-      setSale(previousSale || {});
+      setSale(previousSale || {})
     }
-  };
+  }
   return (
     <div className="flex flex-row w-full">
-      <div className={"flex bg-transparent w-5/8 p-5"}>
+      <div className={'flex bg-transparent w-5/8 p-5'}>
         <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-          <div className={"mb-1"}></div>
+          <div className={'mb-1'}></div>
           <form onSubmit={onSubmit}>
             <div>
               <div className="bg-soft-primary-green p-4 rounded-md mb-4">
@@ -296,7 +296,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
                             {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${
-                              tour.IsArchived ? " | (Archived)" : ""
+                              tour.IsArchived ? ' | (Archived)' : ''
                             }`}
                           </option>
                         ))}
@@ -344,14 +344,14 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         text: `${venue.Code} ${venue.Name}, ${
                           venue.Town
                         } ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: String(venue.BookingId),
+                        value: String(venue.BookingId)
                       }))}
                       onChange={(option) =>
                         handleOnChange({
                           target: {
-                            id: "Venue",
-                            value: option.value,
-                          },
+                            id: 'Venue',
+                            value: option?.value
+                          }
                         })
                       }
                     />
@@ -359,7 +359,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                 </div>
 
                 <div className="columns-2">
-                  <div className={"columns-1"}>
+                  <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
                       <label
                         htmlFor="Value"
@@ -408,7 +408,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       </div>
                     </div>
                   </div>
-                  <div className={"columns-1"}>
+                  <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
                       <label
                         htmlFor="Seats"
@@ -463,7 +463,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
 
               <div className="grid-cols-2 grid gap-4  md:gap-6 pt-10">
                 <div className="sm:col-span-1">
-                  <div className={"flex flex-col"}>
+                  <div className={'flex flex-col'}>
                     <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:pt-2">
                       <div className=" sm:col-span-1 sm:mt-0">Holds</div>
                       <div className=" sm:col-span-1 text-center sm:mt-0">
@@ -491,7 +491,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                             id={hold.HoldTypeId}
                             autoComplete="PressHoldsSeats"
                             value={holds?.[hold.HoldTypeId]?.seats}
-                            onChange={(e) => handleOnHoldsChange(e, "seats")}
+                            onChange={(e) => handleOnHoldsChange(e, 'seats')}
                             className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                           />
                         </div>
@@ -502,7 +502,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                             id={hold.HoldTypeId}
                             autoComplete="PressHoldsValue"
                             value={holds?.[hold.HoldTypeId]?.value}
-                            onChange={(e) => handleOnHoldsChange(e, "value")}
+                            onChange={(e) => handleOnHoldsChange(e, 'value')}
                             className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                           />
                         </div>
@@ -510,9 +510,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     ))}
                   </div>
                 </div>
-                <div className={"col-span-1"}>
+                <div className={'col-span-1'}>
                   <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 pt-2">
-                    <div className={" sm:col-span-1 "}>Comps</div>
+                    <div className={' sm:col-span-1 '}>Comps</div>
                     <div className=" text-right sm:col-span-2 ">Seats</div>
                   </div>
                   {options?.compTypes?.map((comp, j) => (
@@ -541,7 +541,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                   ))}
                 </div>
               </div>
-              <div className={"columns-1"}>
+              <div className={'columns-1'}>
                 <div className="sm:grid sm:grid-cols-2 px-2 sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                   <div className="flex flex-col w-full col-span-1 cursor-not-allowed">
                     <label
@@ -554,14 +554,14 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       <textarea
                         className="w-full cursor-not-allowed"
                         onChange={handleOnNotesChange}
-                        name={"HoldNotes"}
-                        id={"HoldNotes"}
+                        name={'HoldNotes'}
+                        id={'HoldNotes'}
                         value={notes.HoldNotes}
                         disabled
                       ></textarea>
                     </div>
                   </div>
-                  <div className={"col-span-1"}>
+                  <div className={'col-span-1'}>
                     <div className="flex flex-col px-2 sm:border-none sm:border-gray-200 w-full cursor-not-allowed">
                       <label
                         htmlFor="CompNotes"
@@ -572,8 +572,8 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       <div className="mt-1 sm:mt-0">
                         <textarea
                           onChange={handleOnNotesChange}
-                          name={"CompNotes"}
-                          id={"CompNotes"}
+                          name={'CompNotes'}
+                          id={'CompNotes'}
                           value={notes.CompNotes}
                           className="w-full cursor-not-allowed"
                           disabled
@@ -583,7 +583,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                   </div>
                 </div>
               </div>
-              <div className={"flex flex-col"}>
+              <div className={'flex flex-col'}>
                 <label
                   htmlFor="BookingSaleNotes"
                   className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
@@ -593,8 +593,8 @@ export default function Entry({ tours = [], searchFilter }: props) {
                 <div className="mt-1 sm:mt-0 w-full">
                   <textarea
                     onChange={handleOnNotesChange}
-                    name={"BookingSaleNotes"}
-                    id={"BookingSaleNotes"}
+                    name={'BookingSaleNotes'}
+                    id={'BookingSaleNotes'}
                     value={notes.BookingSaleNotes}
                     className="w-full cursor-not-allowed"
                     disabled
@@ -603,9 +603,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
               </div>
             </div>
             <button
-              type={"submit"}
+              type={'submit'}
               className={
-                "inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2"
+                'inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
               }
             >
               Add Sales Data
@@ -613,7 +613,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
           </form>
         </div>
       </div>
-      <div className={"flex bg-transparent flex flex-col w-1/3 p-5"}>
+      <div className={'flex bg-transparent flex flex-col w-1/3 p-5'}>
         <div className="grid grid-cols-2 gap-1 mb-4">
           <button
             disabled={!previousSaleWeek}
@@ -624,9 +624,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
           </button>
         </div>
         <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border   ring-opacity-5 sm:-mx-6 md:mx-0 ">
-          <div className={"mb-1"}></div>
+          <div className={'mb-1'}></div>
         </div>
       </div>
     </div>
-  );
+  )
 }

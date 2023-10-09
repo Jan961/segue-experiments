@@ -309,7 +309,7 @@ export default function FinalSales ({ tours }: props) {
                         handleOnChange({
                           target: {
                             id: 'BookingId',
-                            value: option.value
+                            value: option?.value
                           }
                         })
                       }
