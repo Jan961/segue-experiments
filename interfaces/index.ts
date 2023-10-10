@@ -118,6 +118,7 @@ export type BookingDTO = {
 
 export type BookingWithVenueDTO = BookingDTO & {
   Venue: {
+    Id: number
     Code: string
     Website: string
     Name: string
