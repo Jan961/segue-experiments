@@ -17,6 +17,7 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import classNames from 'classnames'
 import { NumericSliderRange } from './components/NumericSliderRange'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { FormInputNumeric } from 'components/global/forms/FormInputNumeric'
 
 interface ToggleButtonProps {
   icon: IconProp
@@ -69,7 +70,8 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     VenueId: 0,
     StartVenue: Number(startDropDown[0]?.value),
     EndVenue: Number(endDropDown[0]?.value),
-    excludeLondonVenues: false
+    ExcludeLondonVenues: false,
+    MinSeats: 0
   })
 
   const [venueInputs, setVenueInputs] = React.useState({
@@ -90,7 +92,8 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
       MaxFromMiles: inputs.From[1],
       MinToMiles: inputs.To[0],
       MaxToMiles: inputs.To[1],
-      ExcludeLondonVenues: inputs.excludeLondonVenues
+      ExcludeLondonVenues: inputs.ExcludeLondonVenues,
+      MinSeats: inputs.MinSeats
     }
     const { data } = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', body)
     setResults(data)
@@ -150,10 +153,10 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
     setRefreshing(true)
   }
 
-  const handleExcludeLondonVenuesChange = (event) => {
+  const handleInputsChange = (event:any) => {
     setInputs((prev) => ({
       ...prev,
-      excludeLondonVenues: event.target.value
+      [event.target.id]: event.target.value
     }))
     setRefreshing(true)
   }
@@ -209,11 +212,17 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
             min={0}
             max={sliderMax}
           />
+          <FormInputNumeric
+            value={inputs.MinSeats}
+            label="Min Num Seats"
+            name="MinSeats"
+            onChange={(value) => handleInputsChange({ target: { value, id: 'MinSeats' } })}
+          />
           <FormInputCheckbox
-            value={inputs.excludeLondonVenues}
+            value={inputs.ExcludeLondonVenues}
             label="EXCLUDE LONDON VENUES"
-            name="excludeLondonVenues"
-            onChange={handleExcludeLondonVenuesChange}
+            name="ExcludeLondonVenues"
+            onChange={handleInputsChange}
           />
           <br />
           { refreshing && (<div className="p-2 pt-0"><Spinner size='sm'/></div>)}

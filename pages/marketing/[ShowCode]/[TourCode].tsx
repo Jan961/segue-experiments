@@ -10,7 +10,12 @@ import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers'
 import { getRoles } from 'services/contactService'
 import { getTourJumpState } from 'utils/getTourJumpState'
 import { getAccountId, getEmailFromReq } from 'services/userService'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
+import { StyledDialog } from 'components/global/StyledDialog'
+import { FormInputText } from 'components/global/forms/FormInputText'
+import { FormButtonSubmit } from 'components/global/forms/FormButtonSubmit'
+import { Spinner } from 'components/global/Spinner'
+import axios from 'axios'
 
 type Props = {
   initialState: InitialState
@@ -18,10 +23,46 @@ type Props = {
 
 const Index = ({ initialState }: Props) => {
   const [searchFilter, setSearchFilter] = useState('')
-  const bookingJump = useRecoilValue(bookingJumpState)
-  const matching = useMemo(() => bookingJump.bookings?.filter?.(x => x.Id === bookingJump.selected)?.[0], [bookingJump])
+  const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
+  const matching = useMemo(() => bookingJump.bookings?.find?.(x => x.Id === bookingJump.selected), [bookingJump.bookings, bookingJump.selected])
+  const [showLandingPageModal, setShowLandingPageModal] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
+  const [landingPageUrl, setLandingPageUrl] = useState()
   const onIframeClick = () => {
     window.open(`https://${matching?.Venue?.Website}`, '_blank')
+  }
+  const handleSubmit = (e:any) => {
+    e?.preventDefault?.()
+    setLoading(true)
+    updateVenueWebsite(matching?.Venue?.Id)
+  }
+  const onClose = () => {
+    setShowLandingPageModal(false)
+    setLoading(false)
+  }
+
+  const onVenueWebsiteChange = (e:any) => {
+    setLandingPageUrl(e.target.value)
+  }
+
+  const updateVenueWebsite = (VenueId:number) => {
+    axios.put('/api/venue/update', { Website: landingPageUrl, VenueId })
+      .then(() => {
+        setShowLandingPageModal(false)
+        setBookingJump({
+          ...bookingJump,
+          bookings: bookingJump.bookings.map(booking => {
+            if (booking.Venue.Id === VenueId) {
+              return { ...booking, Venue: { ...booking.Venue, Website: landingPageUrl } }
+            }
+            return booking
+          })
+        })
+      })
+      .catch((error) => console.log('Error updating venue website', error))
+      .finally(() => {
+        setLoading(false)
+      })
   }
   return (
     <Layout title="Marketing | Segue">
@@ -42,14 +83,15 @@ const Index = ({ initialState }: Props) => {
               >
                 {matching.Venue.TechSpecsURL}
               </a>}
-              {matching?.Venue?.Website && <a
+              {matching && <div
                 className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md  mr-5 "
-                href={`https://${matching.Venue.Website}`}
-                target="_blank"
-                rel="noopener noreferrer"
+                onClick={() => {
+                  setShowLandingPageModal(true)
+                  setLandingPageUrl(matching?.Venue?.Website || '')
+                }}
               >
                 Landing Page
-              </a>}
+              </div>}
             </div>
             <div className="w-[400px] h-[150px] cursor-pointer" onClick={onIframeClick}>
               {matching?.Venue?.Website && <iframe
@@ -63,6 +105,13 @@ const Index = ({ initialState }: Props) => {
               </iframe>}
             </div>
           </div>
+          <StyledDialog className='w-1/4 max-w-full relative' open={showLandingPageModal} onClose={onClose} title="Venue Landing Page" width='xl'>
+            {loading && <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95"><Spinner className="w-full" size='lg'/></div>}
+            <form onSubmit={handleSubmit}>
+              <FormInputText value={landingPageUrl} onChange={onVenueWebsiteChange} name={'Venue Landing page'}/>
+              <FormButtonSubmit text={'Submit'}></FormButtonSubmit>
+            </form>
+          </StyledDialog>
         </div>
         <MarketingPanel />
       </div>
