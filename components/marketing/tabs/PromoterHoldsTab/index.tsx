@@ -24,7 +24,7 @@ export const PromoterHoldsTab = () => {
   useEffect(() => {
     const { CastRateTicketsArranged, CastRateTicketsNotes } = selectedBooking
     setInputs({ CastRateTicketsArranged, CastRateTicketsNotes })
-  }, [selectedBooking])
+  }, [bookingJump.selected])
   const search = async () => {
     setLoading(true)
     const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`)
