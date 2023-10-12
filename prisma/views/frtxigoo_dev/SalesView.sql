@@ -24,6 +24,10 @@ SELECT
     `frtxigoo_dev`.`Booking`.`BookingFirstDate`
   ) AS `SetBookingWeekNum`,
   `CalculateWeekDate`(`frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`) AS `SetTourWeekDate`,
+  `CalculateWeekNum`(
+    `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`,
+    `TourView`.`TourStartDate`
+  ) AS `SetTourWeekNum`,
   `frtxigoo_dev`.`SalesSet`.`SetNotOnSale` AS `SetNotOnSale`,
   `frtxigoo_dev`.`SalesSet`.`SetIsFinalFigures` AS `SetIsFinalFigures`,
   `frtxigoo_dev`.`SalesSet`.`SetSingleSeats` AS `SetSingleSeats`,

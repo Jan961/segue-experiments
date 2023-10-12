@@ -58,7 +58,9 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   VenueId: b.VenueId,
   StatusCode: b.StatusCode as any,
   PencilNum: b.PencilNum,
-  Notes: b.Notes
+  Notes: b.Notes,
+  CastRateTicketsArranged: b.CastRateTicketsArranged,
+  CastRateTicketsNotes: b.CastRateTicketsNotes
 })
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
