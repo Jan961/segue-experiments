@@ -46,6 +46,9 @@ const Typeahead = ({
     [inputValue, options]
   )
   useEffect(() => {
+    fuse.current = new Fuse(options, { keys: ['text', ...searchKeys] })
+  }, [options, searchKeys])
+  useEffect(() => {
     const selectedOption = options.find(
       (option) => option.value === String(value)
     )

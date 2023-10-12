@@ -29,7 +29,7 @@ const Index = ({ initialState }: Props) => {
   const [loading, setLoading] = useState<boolean>(false)
   const [landingPageUrl, setLandingPageUrl] = useState()
   const onIframeClick = () => {
-    window.open(`https://${matching?.Venue?.Website}`, '_blank')
+    window.open(getSanitisedUrl(matching?.Venue?.Website), '_blank')
   }
   const handleSubmit = (e:any) => {
     e?.preventDefault?.()
@@ -64,6 +64,12 @@ const Index = ({ initialState }: Props) => {
         setLoading(false)
       })
   }
+  const getSanitisedUrl = (url) => {
+    if (url.startsWith('https://')) {
+      return url
+    }
+    return `https://${url}`
+  }
   return (
     <Layout title="Marketing | Segue">
       <div className="flex flex-col px-4 flex-auto">
@@ -77,7 +83,7 @@ const Index = ({ initialState }: Props) => {
             <div className='flex flex-col items-end justify-between'>
               {matching?.Venue?.TechSpecsURL && <a
                 className="text-primary-green whitespace-pre transition-all duration-75 cursor-pointer py-3 bg-white rounded-md font-bold px-4 shadow-md mr-5 "
-                href={`https://${matching.Venue.TechSpecsURL}`}
+                href={getSanitisedUrl(matching.Venue.TechSpecsURL)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -100,7 +106,7 @@ const Index = ({ initialState }: Props) => {
                 width="400"
                 height="auto"
                 style={{ transform: 'scale(0.25)', transformOrigin: 'top left', width: '1600px', height: '600px' }}
-                src={`https://${matching?.Venue?.Website}`}
+                src={getSanitisedUrl(matching?.Venue?.Website)}
               >
               </iframe>}
             </div>
