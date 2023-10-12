@@ -113,7 +113,9 @@ export type BookingDTO = {
   Notes?: string,
   MarketingDealNotes?:string,
   HoldNotes?:string,
-  CompNotes?:string
+  CompNotes?:string,
+  CastRateTicketsArranged?: boolean,
+  CastRateTicketsNotes?: string
 }
 
 export type BookingWithVenueDTO = BookingDTO & {

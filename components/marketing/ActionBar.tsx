@@ -9,7 +9,7 @@ import Typeahead from 'components/Typeahead'
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState)
   const bookingOptions = useMemo(() => bookingJump.bookings
-    ? bookingJump.bookings.map((b) => {
+    ? bookingJump.bookings.filter(b => b.StatusCode !== 'U').map((b) => {
       const date = new Date(b.Date)
       const weekday = getWeekDay(date)
       const ukDate = formatDateUK(date)
