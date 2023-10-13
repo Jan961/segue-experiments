@@ -22,7 +22,7 @@ export const PromoterHoldsTab = () => {
   const [performances, setPerformances] = React.useState([])
   const selectedBooking = useMemo(() => bookingJump.bookings?.find?.(x => x.Id === selected), [bookingJump.bookings, selected])
   useEffect(() => {
-    const { CastRateTicketsArranged, CastRateTicketsNotes } = selectedBooking
+    const { CastRateTicketsArranged, CastRateTicketsNotes } = selectedBooking || {}
     setInputs({ CastRateTicketsArranged, CastRateTicketsNotes })
   }, [bookingJump.selected])
   const search = async () => {
@@ -64,10 +64,12 @@ export const PromoterHoldsTab = () => {
   return (
     <>
       <br />
-      {selectedBooking && <form>
-        <FormInputCheckbox className="max-w-[250px]" label="CAST RATE TICKETS ARRANGED" name="CastRateTicketsArranged" onChange={handleChange} value={inputs.CastRateTicketsArranged} />
-        <FormInputText className="h-[75px]" label="" name="CastRateTicketsNotes" onChange={handleChange} value={inputs.CastRateTicketsNotes} disabled={!inputs.CastRateTicketsArranged} />
-      </form>}
+      {
+        selectedBooking && <>
+          <FormInputCheckbox className="max-w-[250px]" label="CAST RATE TICKETS ARRANGED" name="CastRateTicketsArranged" onChange={handleChange} value={inputs.CastRateTicketsArranged} />
+          <FormInputText area className="h-[75px] mb-6" label="" name="CastRateTicketsNotes" onChange={handleChange} value={inputs.CastRateTicketsNotes} disabled={!inputs.CastRateTicketsArranged} />
+        </>
+      }
       { performances.map((perf) => (
         <PerformanceSection perf={perf} key={perf.Id} triggerSearch={search}/>
       ))}
