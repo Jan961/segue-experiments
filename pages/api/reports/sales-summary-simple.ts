@@ -2,9 +2,51 @@ import { Prisma } from '@prisma/client'
 import ExcelJS from 'exceljs'
 import prisma from 'lib/prisma'
 import moment from 'moment'
-import Decimal from 'decimal.js'
-import { COLOR_HEXCODE, alignCellTextRight, assignBackgroundColor, calculateCurrVSPrevWeekValue, colorCell, getChangeVsLastWeekValue, getCurrencyWiseTotal, getFileName, getMapKeyForValue, getValuesFromObject, getWeekWiseGrandTotalInPound, handleAddingWeeklyTotalRow, makeRowTextBold, makeRowTextBoldAndALignCenter, makeTextBoldOfNRows, groupBasedOnVenueWeeksKeepingVenueCommon, CONSTANTS, getUniqueAndSortedHeaderTourColumns, getMapKey, formatWeek, LEFT_PORTION_KEYS, getSeatsColumnForWeekTotal, getSeatsDataForTotal, makeColumnTextBold, makeCellTextBold, salesReportName, addCellBorder, formatCurrencyNumberWithNDecimal, convertDateFormat, makeRowTextNormal } from 'services/salesSummaryService'
-import { SALES_TYPE_NAME, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, TotalForSheet, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregates } from 'types/SalesSummaryTypes'
+import {
+  COLOR_HEXCODE,
+  alignCellTextRight,
+  assignBackgroundColor,
+  calculateCurrVSPrevWeekValue,
+  colorCell,
+  getChangeVsLastWeekValue,
+  getCurrencyWiseTotal,
+  getFileName,
+  getMapKeyForValue,
+  getValuesFromObject,
+  getWeekWiseGrandTotalInPound,
+  handleAddingWeeklyTotalRow,
+  makeRowTextBold,
+  makeRowTextBoldAndALignCenter,
+  makeTextBoldOfNRows,
+  groupBasedOnVenueWeeksKeepingVenueCommon,
+  CONSTANTS,
+  getUniqueAndSortedHeaderTourColumns,
+  getMapKey,
+  formatWeek,
+  LEFT_PORTION_KEYS,
+  getSeatsColumnForWeekTotal,
+  getSeatsDataForTotal,
+  makeColumnTextBold,
+  makeCellTextBold,
+  salesReportName,
+  addCellBorder,
+  convertDateFormat,
+  makeRowTextNormal,
+  applyFormattingToRange
+} from 'services/salesSummaryService'
+import {
+  SALES_TYPE_NAME,
+  TGroupBasedOnWeeksKeepingVenueCommon,
+  TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping,
+  TRequiredFields,
+  TRequiredFieldsFinalFormat,
+  TSalesView,
+  TotalForSheet,
+  UniqueHeadersObject,
+  VENUE_CURRENCY_SYMBOLS,
+  WeekAggregateSeatsDetail,
+  WeekAggregates
+} from 'types/SalesSummaryTypes'
 import { addWidthAsPerContent } from 'services/reportsService'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getEmailFromReq, checkAccess } from 'services/userService'
@@ -31,8 +73,46 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
   const data: TSalesView[] = await prisma.$queryRaw`select * FROM SalesView ${where} order by BookingFirstDate, SetSalesFiguresDate;`
 
-  const jsonArray: TRequiredFields[] = data.filter(x => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES).map(({ BookingTourWeekNum, BookingFirstDate, VenueTown, VenueName, Value, VenueCurrencySymbol, SetBookingWeekNum, SetTourWeekDate, ConversionRate, SetIsCopy, SetBrochureReleased, BookingStatusCode, FinalFiguresValue, TotalCapacity, Seats, NotOnSalesDate, SetTourWeekNum }) => ({ BookingTourWeekNum, BookingFirstDate, VenueTown, VenueName, Value, VenueCurrencySymbol, SetBookingWeekNum, SetTourWeekDate, ConversionRate, SetIsCopy, SetBrochureReleased, BookingStatusCode, FinalFiguresValue, TotalCapacity, Seats, NotOnSalesDate, SetTourWeekNum }))
-  const finalFormattedValues: TRequiredFieldsFinalFormat[] = jsonArray.map((x: TRequiredFields) => ({ ...x, Week: formatWeek(x.BookingTourWeekNum), FormattedValue: x.Value ? `${x.VenueCurrencySymbol}${x.Value}` : '', Value: x.Value || 0, FormattedSetTourWeekNum: formatWeek(x.SetTourWeekNum), FormattedFinalFiguresValue: `${x.VenueCurrencySymbol}${x.FinalFiguresValue || 0}`, Day: moment(x.BookingFirstDate).format('dddd'), Date: x.BookingFirstDate, Town: x.VenueTown, Venue: x.VenueName }))
+  const jsonArray: TRequiredFields[] = data
+    .filter(x => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES)
+    .map(({
+      BookingTourWeekNum,
+      BookingFirstDate,
+      VenueTown,
+      VenueName,
+      Value,
+      VenueCurrencySymbol,
+      SetBookingWeekNum,
+      SetTourWeekDate,
+      ConversionRate,
+      SetIsCopy,
+      SetBrochureReleased,
+      BookingStatusCode,
+      FinalFiguresValue,
+      TotalCapacity,
+      Seats,
+      NotOnSalesDate,
+      SetTourWeekNum
+    }) => ({
+      BookingTourWeekNum,
+      BookingFirstDate,
+      VenueTown,
+      VenueName,
+      Value: Value.toNumber?.(),
+      VenueCurrencySymbol,
+      SetBookingWeekNum,
+      SetTourWeekDate,
+      ConversionRate,
+      SetIsCopy,
+      SetBrochureReleased,
+      BookingStatusCode,
+      FinalFiguresValue: FinalFiguresValue.toNumber(),
+      TotalCapacity,
+      Seats: Seats.toNumber?.(),
+      NotOnSalesDate,
+      SetTourWeekNum
+    }))
+  const finalFormattedValues: TRequiredFieldsFinalFormat[] = jsonArray.map((x: TRequiredFields) => ({ ...x, Week: formatWeek(x.BookingTourWeekNum), FormattedValue: x.Value ? `${x.VenueCurrencySymbol}${x.Value}` : '', Value: x.Value || 0, FormattedSetTourWeekNum: formatWeek(x.SetTourWeekNum), FormattedFinalFiguresValue: x.FinalFiguresValue || 0, Day: moment(x.BookingFirstDate).format('dddd'), Date: x.BookingFirstDate, Town: x.VenueTown, Venue: x.VenueName }))
 
   // Write data to the worksheet
   const worksheet = workbook.addWorksheet('My Sales', {
@@ -76,7 +156,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   let row: number = 6
 
   let lastBookingWeek: string = finalFormattedValues?.[0]?.Week
-  let seatsData: { Seats?: number, TotalCapacity?: number, Percentage?: string, Currency?: TRequiredFieldsFinalFormat['VenueCurrencySymbol'] } = {}
+  let seatsData: { Seats?: number, TotalCapacity?: number, Percentage?: number, Currency?: TRequiredFieldsFinalFormat['VenueCurrencySymbol'] } = {}
   Object.values(groupBasedOnVenue).forEach((rowAsJSON: TGroupBasedOnWeeksKeepingVenueCommon) => {
     // Adding Weekly Totals
     if (isWeeklyReport) {
@@ -92,38 +172,42 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
 
     // Calculating Values
     const arr: any[] = getValuesFromObject(rowAsJSON, LEFT_PORTION_KEYS)
-    const values: string[] = []
+    const values: number[] = []
     for (let i = 0, col = 6; i < variableColsLength; i++, col++) {
       const key: string = getMapKeyForValue(rowAsJSON, { FormattedSetTourWeekNum: headerWeekNums[i], SetTourWeekDate: headerWeekDates[i] })
       const val: TRequiredFieldsFinalFormat = mapOfCreatedKeyAndModifiedFetchedValue[key]
       let totalObjToPush: Pick<TotalForSheet, 'Value' | 'ConversionRate' | 'VenueCurrencySymbol'> = { Value: 0, ConversionRate: 0, VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol }
       if (val) {
-        values.push(val.FormattedValue)
+        values.push(val.Value)
         totalObjToPush = { Value: val.Value, ConversionRate: val.ConversionRate, VenueCurrencySymbol: val.VenueCurrencySymbol }
         if (isSeatsDataRequired) {
-          seatsData = { Seats: parseInt(val.Seats as any as string), TotalCapacity: val.TotalCapacity, Percentage: (val.Seats === 0 || val.TotalCapacity === 0) ? '0.00%' : `${new Decimal(val.Seats).div(val.TotalCapacity).mul(100).toFixed(2)}%` }
+          seatsData = { Seats: val.Seats, TotalCapacity: val.TotalCapacity, Percentage: (val.Seats === 0 || val.TotalCapacity === 0) ? 0.00 : (val.Seats / val.TotalCapacity) }
           totalCurrencyAndWeekWiseSeatsTotal[val.VenueCurrencySymbol].push({ Seats: seatsData.Seats as number, TotalCapacity: seatsData.TotalCapacity as number, VenueCurrencySymbol: val.VenueCurrencySymbol })
           totalCurrencyWiseSeatsTotal[val.VenueCurrencySymbol].push({ Seats: seatsData.Seats as number, TotalCapacity: seatsData.TotalCapacity as number, VenueCurrencySymbol: val.VenueCurrencySymbol })
         }
       } else {
         if (moment(rowAsJSON.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
-          totalObjToPush = { Value: new Decimal(rowAsJSON.FormattedFinalFiguresValue.substring(1)) as any as number, ConversionRate: rowAsJSON.ConversionRate, VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol }
+          totalObjToPush = { Value: rowAsJSON.FormattedFinalFiguresValue, ConversionRate: rowAsJSON.ConversionRate, VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol }
           values.push(rowAsJSON.FormattedFinalFiguresValue)
         } else {
           totalObjToPush = { Value: 0, ConversionRate: 0, VenueCurrencySymbol: rowAsJSON.VenueCurrencySymbol }
-          values.push('')
+          values.push(0)
         }
       }
 
-      const finalValueToPushed: TotalForSheet = { ...totalObjToPush, ConvertedValue: new Decimal(totalObjToPush.Value).mul(totalObjToPush.ConversionRate) as any as number }
+      const finalValueToPushed: TotalForSheet = { ...totalObjToPush, ConvertedValue: totalObjToPush.Value * totalObjToPush.ConversionRate }
       totalForWeeks[headerWeekNums[i]].push(finalValueToPushed)
       totalRowWeekWise[headerWeekNums[i]].push(finalValueToPushed)
     }
 
     // Calculating Current Vs Prev Week Value
-    const currVSPrevWeekValue: string = calculateCurrVSPrevWeekValue({ valuesArrayOnly: values })
-    const rowData: string[] = [...arr, ...values.map(num => formatCurrencyNumberWithNDecimal(num, 2)), formatCurrencyNumberWithNDecimal(currVSPrevWeekValue), ...(seatsData?.Seats !== undefined ? [seatsData.Seats, seatsData.TotalCapacity, seatsData.Percentage] : [])]
+    const currVSPrevWeekValue: number = calculateCurrVSPrevWeekValue({ valuesArrayOnly: values })
+    const { VenueCurrencySymbol } = rowAsJSON
+    const rowData: string[] = [...arr, ...values.map(num => num), currVSPrevWeekValue, ...(seatsData?.Seats !== undefined ? [seatsData.Seats, seatsData.TotalCapacity, seatsData.Percentage] : [])]
     worksheet.addRow(rowData)
+    applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(arr.length).letter, endRow: row, endColumn: worksheet.getColumn(arr.length + values.length + 1).letter, formatOptions: { numFmt: VenueCurrencySymbol + '#,##0.00' } })
+    applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(arr.length + values.length + 2).letter, endRow: row, endColumn: worksheet.getColumn(arr.length + values.length + 3).letter, formatOptions: { numFmt: '#,##0' } })
+    applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(arr.length + values.length + 4).letter, endRow: row, endColumn: worksheet.getColumn(arr.length + values.length + 4).letter, formatOptions: { numFmt: '0.00%' } })
 
     // For Color Coding
     for (let i = 0, col = 6; i < variableColsLength; i++, col++) {
@@ -156,23 +240,27 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   row++
 
   // Add Euro Total Row
-  const seatsDataForEuro: string[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
+  const seatsDataForEuro: number[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
   const weekWiseDataInEuro = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO }))
   worksheet.addRow(['', '', '', '', 'Total Sales €', ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...seatsDataForEuro])
+  applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(6).letter, endRow: row, endColumn: worksheet.getColumn(6 + weekWiseDataInEuro.length).letter, formatOptions: { numFmt: '€#,##0.00' } })
   row++
   // Add Pound Total Row
-  const seatsDataForPound: string[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
+  const seatsDataForPound: number[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
   const weekWiseDataInPound = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND }))
   worksheet.addRow(['', '', '', '', 'Total Sales £', ...weekWiseDataInPound, getChangeVsLastWeekValue(weekWiseDataInPound), ...seatsDataForPound])
+  applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(6).letter, endRow: row, endColumn: worksheet.getColumn(6 + weekWiseDataInPound.length).letter, formatOptions: { numFmt: '£#,##0.00' } })
   row++
   // Add empty row
   worksheet.addRow([])
   row++
   // Add Grand Total Row
-  const seatsDataForTotal: string[] = isSeatsDataRequired ? getSeatsDataForTotal({ seatsDataForEuro, seatsDataForPound }) : []
+  const seatsDataForTotal: number[] = isSeatsDataRequired ? getSeatsDataForTotal({ seatsDataForEuro, seatsDataForPound }) : []
   const weekWiseGrandTotalInPound = headerWeekNums.map(weekNum => getWeekWiseGrandTotalInPound({ totalForWeeks, setTourWeekNum: weekNum }))
   worksheet.addRow(['', '', '', '', 'Grand Total £', ...weekWiseGrandTotalInPound, getChangeVsLastWeekValue(weekWiseGrandTotalInPound), ...seatsDataForTotal])
-
+  applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(6).letter, endRow: row, endColumn: worksheet.getColumn(6 + weekWiseGrandTotalInPound.length).letter, formatOptions: { numFmt: '£#,##0.00' } })
+  applyFormattingToRange({ worksheet, startRow: row - 3, startColumn: worksheet.getColumn(weekWiseGrandTotalInPound.length + 7).letter, endRow: row, endColumn: worksheet.getColumn(weekWiseGrandTotalInPound.length + 8).letter, formatOptions: { numFmt: '#,##0' } })
+  applyFormattingToRange({ worksheet, startRow: row - 3, startColumn: worksheet.getColumn(weekWiseGrandTotalInPound.length + 9).letter, endRow: row, endColumn: worksheet.getColumn(weekWiseGrandTotalInPound.length + 9).letter, formatOptions: { numFmt: '0.00%' } })
   // Coloring this row
   for (let i = 0; i <= (variableColsLength + (isSeatsDataRequired ? 3 : 0)) + 1; i++) {
     colorCell({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW })

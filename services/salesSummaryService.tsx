@@ -1,6 +1,7 @@
 
 import Decimal from 'decimal.js'
 import moment from 'moment'
+import * as ExcelJS from 'exceljs'
 import { BOOK_STATUS_CODES, TGroupBasedOnWeeksKeepingVenueCommon, TKeyAndGroupBasedOnWeeksKeepingVenueCommonMapping, TRequiredFields, TRequiredFieldsFinalFormat, TSalesView, UniqueHeadersObject, VENUE_CURRENCY_SYMBOLS, WeekAggregateSeatsDetail, WeekAggregateSeatsDetailCurrencyWise, WeekAggregates } from 'types/SalesSummaryTypes'
 
 export enum COLOR_HEXCODE {
@@ -215,10 +216,11 @@ export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({ worksheet, header
       numberOfRowsAdded: 0
     }
   }
-  const weekWiseDataInEuro: string[] = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks: totalRowWeekWise, setTourWeekNum: weekNum, currencySymbol }))
-  const rowData: string[] = ['', '', '', '', `Tour ${lastBookingWeek}`, ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...(isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol, totalCurrencyWiseSeatsMapping: totalCurrencyAndWeekWiseSeatsTotal }) : [])]
-  if (rowData.slice(5, rowData.length).filter(x => x !== `${currencySymbol}0`)?.length) {
+  const weekWiseDataInEuro: number[] = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks: totalRowWeekWise, setTourWeekNum: weekNum, currencySymbol }))
+  const rowData: (string|number)[] = ['', '', '', '', `Tour ${lastBookingWeek}`, ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...(isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol, totalCurrencyWiseSeatsMapping: totalCurrencyAndWeekWiseSeatsTotal }) : [])]
+  if (rowData.slice(5, rowData.length).filter(x => x !== 0)?.length) {
     worksheet.addRow(rowData)
+    applyFormattingToRange({ worksheet, startRow: worksheet.rowCount, startColumn: worksheet.getColumn(6).letter, endRow: worksheet.rowCount, endColumn: worksheet.getColumn(7 + weekWiseDataInEuro.length + 1).letter, formatOptions: { numFmt: currencySymbol + '#,##0.00' } })
     return {
       numberOfRowsAdded: 1
     }
@@ -233,25 +235,27 @@ export const handleAddingWeeklyTotalRow = ({ worksheet, headerWeekNums, totalRow
   return rowsAdded
 }
 
-export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayOnly: string[] }): string => {
+export const calculateCurrVSPrevWeekValue = ({ valuesArrayOnly }: { valuesArrayOnly: number[] }): number => {
   if (valuesArrayOnly?.length === 1) {
     return valuesArrayOnly[0]
   } else {
     const len = valuesArrayOnly.length
 
-    if (valuesArrayOnly[len - 2] || valuesArrayOnly[len - 1]) {
-      const prev = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2].substring(1) : 0
-      const curr = valuesArrayOnly[len - 1] ? valuesArrayOnly[len - 1].substring(1) : 0
+    // if (valuesArrayOnly[len - 2] || valuesArrayOnly[len - 1]) {
+    //   const prev = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2] : 0
+    //   const curr = valuesArrayOnly[len - 1] ? valuesArrayOnly[len - 1] : 0
 
-      const val = Number(new Decimal(curr).minus(prev).toFixed(2))
-      const symbol = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2].substring(0, 1) : valuesArrayOnly[len - 1].substring(0, 1)
-      const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
-      return `${prefix}${val > 0 ? val : -1 * (val)}`
-    } else {
-      // Nothing in this condition
-    }
+    const val = valuesArrayOnly[len - 1] - valuesArrayOnly[len - 2]
+    // Number(new Decimal(curr).minus(prev).toFixed(2))
+    // const symbol = valuesArrayOnly[len - 2] ? valuesArrayOnly[len - 2] : valuesArrayOnly[len - 1]
+    // const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
+    return val > 0 ? val : -1 * (val)
+    // `${prefix}${val > 0 ? val : -1 * (val)}`
+    // } else {
+    // Nothing in this condition
+    // }
   }
-  return ''
+  // return 0
 }
 
 export const makeTextBoldOfNRows = ({ worksheet, startingRow, numberOfRowsAdded }: {worksheet: any, startingRow: number, numberOfRowsAdded: number}) => {
@@ -262,37 +266,40 @@ export const makeTextBoldOfNRows = ({ worksheet, startingRow, numberOfRowsAdded 
 
 export const getFileName = (worksheet): string => `${worksheet.getCell(1, 1).value} ${moment().format('DD MM YYYY hh:mm:ss')}.xlsx`
 
-export const getCurrencyWiseTotal = ({ totalForWeeks, setTourWeekNum, currencySymbol }: {totalForWeeks: WeekAggregates, setTourWeekNum: string, currencySymbol: VENUE_CURRENCY_SYMBOLS}): string => {
+export const getCurrencyWiseTotal = ({ totalForWeeks, setTourWeekNum, currencySymbol }: {totalForWeeks: WeekAggregates, setTourWeekNum: string, currencySymbol: VENUE_CURRENCY_SYMBOLS}): number => {
   const arr = totalForWeeks[setTourWeekNum]
 
   if (!arr?.length) {
-    return `${currencySymbol}0`
+    return 0
+    // `${currencySymbol}0`
   }
 
   const finalValue = arr.filter(x => x.VenueCurrencySymbol === currencySymbol)
     .map(x => x.Value).reduce((acc, x) => new Decimal(acc).plus(x) as any, 0)
-  return `${currencySymbol}${formatNumberWithNDecimal(finalValue, 2)}`
+  return finalValue?.toNumber?.()
+  // `${currencySymbol}${formatNumberWithNDecimal(finalValue, 2)}`
 }
 
-export const getChangeVsLastWeekValue = (weeksDataArray: string[]): string => {
+export const getChangeVsLastWeekValue = (weeksDataArray: number[]): number => {
   if (weeksDataArray?.length === 1) {
     return weeksDataArray[0]
   } else {
     const len = weeksDataArray.length
 
-    if (weeksDataArray[len - 2] || weeksDataArray[len - 1]) {
-      const prev = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(1) : 0
-      const curr = weeksDataArray[len - 1] ? weeksDataArray[len - 1].substring(1) : 0
+    // if (weeksDataArray[len - 2] || weeksDataArray[len - 1]) {
+    // const prev = weeksDataArray[len - 2] ? weeksDataArray[len - 2] : 0
+    // const curr = weeksDataArray[len - 1] ? weeksDataArray[len - 1] : 0
 
-      const val = Number(new Decimal(curr).minus(prev).toFixed(2))
-      const symbol = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(0, 1) : weeksDataArray[len - 1].substring(0, 1)
-      const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
-      return `${prefix}${val > 0 ? val : -1 * (val)}`
-    } else {
-      // This case should not occur
-    }
+    const val = weeksDataArray[len - 1] - weeksDataArray[len - 2]
+    // Number(new Decimal(curr).minus(prev).toFixed(2))
+    // const symbol = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(0, 1) : weeksDataArray[len - 1].substring(0, 1)
+    // const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
+    return val > 0 ? val : -1 * (val)
+    // `${prefix}${val > 0 ? val : -1 * (val)}`
+    // } else {
+    // This case should not occur
+    // }
   }
-  return ''
 }
 
 export const formatNumberWithNDecimal = (num, numberOfDecimals) => {
@@ -308,28 +315,30 @@ export const formatCurrencyNumberWithNDecimal = (valAsString, numberOfDecimals =
   return `${valAsString[0]}${formatNumberWithNDecimal(Number(valAsString.substring(1)), numberOfDecimals)}`
 }
 
-export const getWeekWiseGrandTotalInPound = ({ totalForWeeks, setTourWeekNum }: {totalForWeeks: WeekAggregates, setTourWeekNum: string}): string => {
+export const getWeekWiseGrandTotalInPound = ({ totalForWeeks, setTourWeekNum }: {totalForWeeks: WeekAggregates, setTourWeekNum: string}): number => {
   const arr = totalForWeeks[setTourWeekNum]
 
   if (!arr?.length) {
-    return '£0'
+    return 0
+    // '£0'
   }
 
-  const finalValue = arr.map(x => x.ConvertedValue).reduce((acc, x) => new Decimal(acc).plus(x) as any, 0)
-  return `£${formatNumberWithNDecimal(finalValue, 2)}`
+  const finalValue = arr.map(x => x.ConvertedValue).reduce((acc, x) => acc.plus(x), new Decimal(0))
+  return finalValue?.toNumber?.()
+  // `£${formatNumberWithNDecimal(finalValue, 2)}`
 }
 
-export const getSeatsColumnForWeekTotal = ({ currencySymbol, totalCurrencyWiseSeatsMapping }: {currencySymbol: VENUE_CURRENCY_SYMBOLS, totalCurrencyWiseSeatsMapping: WeekAggregateSeatsDetail}): string[] => {
+export const getSeatsColumnForWeekTotal = ({ currencySymbol, totalCurrencyWiseSeatsMapping }: {currencySymbol: VENUE_CURRENCY_SYMBOLS, totalCurrencyWiseSeatsMapping: WeekAggregateSeatsDetail}): number[] => {
   const arr: WeekAggregateSeatsDetailCurrencyWise[] = totalCurrencyWiseSeatsMapping[currencySymbol]
   if (!arr || !arr?.length) {
     return []
   }
 
   const { Seats, TotalCapacity }: { Seats: number, TotalCapacity: number} = arr.reduce((acc, x) => ({ Seats: acc.Seats + x.Seats, TotalCapacity: acc.TotalCapacity + x.TotalCapacity }), { Seats: 0, TotalCapacity: 0 })
-  return [String(Seats), String(TotalCapacity), (Seats === 0 || TotalCapacity === 0) ? '0.00%' : `${new Decimal(Seats).div(TotalCapacity).mul(100).toFixed(2)}%`]
+  return [Seats, TotalCapacity, (Seats === 0 || TotalCapacity === 0) ? 0 : Seats / TotalCapacity]
 }
 
-export const getSeatsDataForTotal = ({ seatsDataForEuro, seatsDataForPound }: {seatsDataForEuro: string[], seatsDataForPound: string[]}): string[] => {
+export const getSeatsDataForTotal = ({ seatsDataForEuro, seatsDataForPound }: {seatsDataForEuro: number[], seatsDataForPound: number[]}): number[] => {
   if (!seatsDataForEuro || !seatsDataForEuro?.length) {
     return seatsDataForPound
   }
@@ -338,10 +347,11 @@ export const getSeatsDataForTotal = ({ seatsDataForEuro, seatsDataForPound }: {s
     return seatsDataForEuro
   }
 
-  const seats: number = parseInt(seatsDataForEuro[0]) + parseInt(seatsDataForPound[0])
-  const totalSeats: number = parseInt(seatsDataForEuro[1]) + parseInt(seatsDataForPound[1])
-  const percentage: string = (seats === 0 || totalSeats === 0) ? '0.00%' : `${new Decimal(seats).div(totalSeats).mul(100).toFixed(2)}%`
-  return [String(seats), String(totalSeats), percentage]
+  const seats: number = seatsDataForEuro[0] + seatsDataForPound[0]
+  const totalSeats: number = seatsDataForEuro[1] + seatsDataForPound[1]
+  const percentage: number = (seats === 0 || totalSeats === 0) ? 0 : (seats / totalSeats)
+  // `${new Decimal(seats).div(totalSeats).mul(100).toFixed(2)}%`
+  return [seats, totalSeats, percentage]
 }
 
 export const colorTextAndBGCell = ({ worksheet, row, col, textColor, cellColor }: {worksheet: any, row: number, col: number, textColor: COLOR_HEXCODE, cellColor: COLOR_HEXCODE}) => {
@@ -395,4 +405,28 @@ export const salesReportName = ({ tourId, isWeeklyReport, isSeatsDataRequired, d
     return tourId ? `Sales Vs Capacity - Tour ${tourId},` : 'Sales Vs Capacity'
   }
   return tourId ? `Sales Summary -Tour  ${tourId},` : 'Sales Summary'
+}
+
+export const applyFormattingToRange = ({ worksheet, startRow, startColumn, endRow, endColumn, formatOptions }:{worksheet:ExcelJS.Worksheet, startRow:number, startColumn:string, endRow:number, endColumn:string, formatOptions:any}) => {
+  for (let row = startRow; row <= endRow; row++) {
+    for (let col = startColumn; col <= endColumn; col = String.fromCharCode(col.charCodeAt(0) + 1)) {
+      const cell = worksheet.getCell(`${col}${row}`)
+
+      if (formatOptions.font) {
+        cell.font = formatOptions.font
+      }
+      if (formatOptions.fill) {
+        cell.fill = formatOptions.fill
+      }
+      if (formatOptions.border) {
+        cell.border = formatOptions.border
+      }
+      if (formatOptions.alignment) {
+        cell.alignment = formatOptions.alignment
+      }
+      if (formatOptions.numFmt) {
+        cell.numFmt = formatOptions.numFmt
+      }
+    }
+  }
 }

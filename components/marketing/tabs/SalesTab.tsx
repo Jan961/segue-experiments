@@ -14,13 +14,17 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { NoDataWarning } from '../NoDataWarning'
 import { LoadingTab } from './LoadingTab'
 import classNames from 'classnames'
+import { toSql } from 'services/dateService'
 
-interface IndicatorProps { icon: IconDefinition, active: boolean, tooltip: string }
-const Indicator = ({ icon, active = false, tooltip }: IndicatorProps) => {
+interface IndicatorProps { icon: IconDefinition, active: boolean, tooltip: string, onChange:(status:boolean)=>void }
+const Indicator = ({ icon, active = false, tooltip, onChange = () => null }: IndicatorProps) => {
   let baseClass = 'text-primary-blue p-1'
   baseClass = active ? baseClass : classNames(baseClass, 'opacity-10')
   return (
-    <li title={tooltip} className={baseClass}>
+    <li title={tooltip} onClick={(e:any) => {
+      e.stopPropagation?.()
+      onChange?.(!active)
+    }} className={classNames('cursor-pointer', baseClass)}>
       <FontAwesomeIcon icon={icon} />
       <span className="sr-only">{ tooltip }</span>
     </li>
@@ -67,6 +71,19 @@ export const SalesTab = () => {
       seatsChange = bookingSales?.[index].seatsSold - bookingSales?.[index - 1].seatsSold
     }
     return { valueChange, seatsChange }
+  }
+  const updateSaleSet = (BookingId:number, SalesFigureDate:string, update:any) => {
+    axios.put('/api/marketing/sales/salesSet/update', { BookingId, SalesFigureDate, ...update }).catch((error:any) => console.log('failed to update sale', error))
+  }
+  const onChange = (key:string, value:boolean, sale:any) => {
+    console.log('sale', sale, value, key, selected)
+    updateSaleSet(selected, toSql(sale.weekOf), { [key.replace('is', 'Set')]: value })
+    setBookingSales(prevSales => prevSales.map(s => {
+      if (sale.weekOf === s.weekOf && sale.week === s.week) {
+        return { ...s, [key]: value }
+      }
+      return s
+    }))
   }
   return (
     <>
@@ -153,16 +170,19 @@ export const SalesTab = () => {
                           tooltip='Single Seat'
                           active={sale.isSingleSeats}
                           icon={faUser}
+                          onChange={(value) => onChange('isSingleSeats', value, sale)}
                         />
                         <Indicator
                           tooltip='Brochure Released'
                           active={sale.isBrochureReleased}
                           icon={faBook}
+                          onChange={(value) => onChange('isBrochureReleased', value, sale)}
                         />
                         <Indicator
                           tooltip='Not on Sale'
                           active={sale.isNotOnSale}
                           icon={faSquareXmark}
+                          onChange={(value) => onChange('isNotOnSale', value, sale)}
                         />
                       </ul>
                     </Table.Cell>

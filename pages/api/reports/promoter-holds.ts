@@ -135,6 +135,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   }
   worksheet.getColumn('A').width = 8
   addWidthAsPerContent({ worksheet, fromColNumber: 2, toColNumber: numberOfColumns, startingColAsCharWIthCapsOn: 'B', minColWidth: 10, bufferWidth: 0, rowsToIgnore: 4, maxColWidth: 120, htmlFields: ['G', 'L'] })
+  worksheet.getColumn('G').width = 25
+  worksheet.getColumn('L').width = 25
   worksheet.getColumn('G').alignment = { wrapText: true }
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true }

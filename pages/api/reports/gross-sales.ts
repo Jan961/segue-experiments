@@ -34,209 +34,192 @@ export const colorCell = ({ worksheet, row, col, argbColor }: {worksheet: any, r
   }
 }
 
-const colorTextAndBGCell = ({worksheet, row, col, textColor, cellColor}: {worksheet: any, row: number, col: number, textColor?: COLOR_HEXCODE, cellColor?: COLOR_HEXCODE}) => {
-  if(!textColor && !cellColor) {
+const colorTextAndBGCell = ({ worksheet, row, col, textColor, cellColor }: {worksheet: any, row: number, col: number, textColor?: COLOR_HEXCODE, cellColor?: COLOR_HEXCODE}) => {
+  if (!textColor && !cellColor) {
     return
   }
-  const cell = worksheet.getCell(row, col);
-  if(textColor) {
-    cell.font = { color: {argb: 'ffffffff'}, bold: true };
+  const cell = worksheet.getCell(row, col)
+  if (textColor) {
+    cell.font = { color: { argb: 'ffffffff' }, bold: true }
   }
-  if(cellColor) {
+  if (cellColor) {
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
       fgColor: { argb: cellColor }
-    };
+    }
   }
-};
-
-const makeRowBold = ({worksheet, row}: {worksheet: any, row: number}) => {
-  worksheet.getRow(row).font = { bold: true };
-};
-
-const firstRowFormatting = ({worksheet}: {worksheet: any}) => {
-  worksheet.getRow(1).font = { bold: true, size: 16 };
-  worksheet.getRow(1).alignment = { horizontal: 'left' };
-};
-
-
-
-const getKey = ({FullTourCode, ShowName, EntryDate}) => `${FullTourCode} - ${ShowName} - ${EntryDate}`
-const formatDate = (date) => moment(date).format('DD/MM/YY')
-
-const getTotalInPound = ({totalOfCurrency, conversionRate}) => {
-  const euroVal = totalOfCurrency["€"]
-  const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toFixed(2) : 0
-  return totalOfCurrency["£"] ? new Decimal(totalOfCurrency["£"]).plus(finalValOfEuro).toFixed(2) : finalValOfEuro
 }
 
+const makeRowBold = ({ worksheet, row }: {worksheet: any, row: number}) => {
+  worksheet.getRow(row).font = { bold: true }
+}
 
+const firstRowFormatting = ({ worksheet }: {worksheet: any}) => {
+  worksheet.getRow(1).font = { bold: true, size: 16 }
+  worksheet.getRow(1).alignment = { horizontal: 'left' }
+}
+
+const getKey = ({ FullTourCode, ShowName, EntryDate }) => `${FullTourCode} - ${ShowName} - ${EntryDate}`
+const formatDate = (date) => moment(date).format('DD/MM/YY')
+
+const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
+  const euroVal = totalOfCurrency['€']
+  const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toFixed(2) : 0
+  return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toFixed(2) : finalValOfEuro
+}
 
 const handler = async (req, res) => {
-    const { tourId } = JSON.parse(req.body) || {}
-  
-    if (!tourId) {
-      throw new Error('Params are missing')
-    }
-    const conditions: Prisma.Sql[] = []
-    if (tourId) {
-      conditions.push(Prisma.sql` TourId=${tourId}`)
-    }
-    const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
+  const { tourId } = JSON.parse(req.body) || {}
 
+  if (!tourId) {
+    throw new Error('Params are missing')
+  }
+  const conditions: Prisma.Sql[] = []
+  if (tourId) {
+    conditions.push(Prisma.sql` TourId=${tourId}`)
+  }
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty
 
-    const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`
-
+  const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`
 
   const workbook = new ExcelJS.Workbook()
   const formattedData = data.map(x => ({
     ...x,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
     TourStartDate: moment(x.TourStartDate).format('YYYY-MM-DD'),
-    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD'),
+    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD')
   }))
-
 
   const worksheet = workbook.addWorksheet('My Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
   })
 
-  if(!formattedData?.length) {
+  if (!formattedData?.length) {
     const filename = 'Tour Gross Sales.xlsx'
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
-  
+
     await workbook.xlsx.write(res).then(() => {
       res.end()
     })
-    return;
+    return
   }
-
 
   const { ShowName, FullTourCode } = data[0]
   worksheet.addRow([`${ShowName} (${FullTourCode})`])
-  const date = new Date();
-  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]));
+  const date = new Date()
+  worksheet.addRow(([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]))
 
   worksheet.addRow([])
 
-
   const map: {[key: string]: SALES_SUMMARY} = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {})
 
-
-  const {TourStartDate: fromDate, TourEndDate: toDate } = data[0]
+  const { TourStartDate: fromDate, TourEndDate: toDate } = data[0]
 
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days')
 
-  let colNo = 1;
-  let weekPending = false;
-  let conversionRate = 0;
+  let colNo = 1
+  let weekPending = false
+  let conversionRate = 0
 
-  const r4: string[] = [];
-  const r5: string[] = [];
-  const r6: string[] = [];
-  const r7: string[] = [];
-  const r8: string[] = [];
-  const r9: string[] = [];
+  const r4: string[] = []
+  const r5: string[] = []
+  const r6: string[] = []
+  const r7: string[] = []
+  const r8: string[] = []
+  const r9: string[] = []
 
   const mergeRowCol: {row: number[], col: number[]}[] = []
   const cellColor: {cell: {rowNo: number, colNo: number}, cellColor?: COLOR_HEXCODE, textColor?: COLOR_HEXCODE}[] = []
-  const totalOfCurrency: {[key: string]: number} = {"£": 0, "€": 0}
+  const totalOfCurrency: {[key: string]: number} = { '£': 0, '€': 0 }
   for (let i = 1; (i <= daysDiff) || weekPending; i++) {
-    weekPending = true;
+    weekPending = true
 
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd')
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD')
     const date = formatDate(dateInIncomingFormat)
 
-    if(i%7 == 1) {
-      r4.push(`Week ${Math.floor(i/7) + 1}`)
+    if (i % 7 === 1) {
+      r4.push(`Week ${Math.floor(i / 7) + 1}`)
       r5.push('')
       r6.push('')
       r8.push('')
       r9.push('')
 
-      mergeRowCol.push({row: [7, 8], col: [colNo, colNo]})
-      mergeRowCol.push({row: [4, 4], col: [colNo, colNo+7]})
+      mergeRowCol.push({ row: [7, 8], col: [colNo, colNo] })
+      mergeRowCol.push({ row: [4, 4], col: [colNo, colNo + 7] })
 
-      r7.push("Weekly Costs")
+      r7.push('Weekly Costs')
       colNo++
     }
 
-    r4.push(`Week ${Math.floor(i/7) + 1}`)
+    r4.push(`Week ${Math.floor(i / 7) + 1}`)
     r5.push(date)
     r6.push(weekDay)
 
-    if(weekDay == 'Monday') {
-      cellColor.push({cell: {rowNo: 5, colNo }, cellColor: COLOR_HEXCODE.ORANGE })
-      cellColor.push({cell: {rowNo: 6, colNo }, cellColor: COLOR_HEXCODE.ORANGE })
+    if (weekDay === 'Monday') {
+      cellColor.push({ cell: { rowNo: 5, colNo }, cellColor: COLOR_HEXCODE.ORANGE })
+      cellColor.push({ cell: { rowNo: 6, colNo }, cellColor: COLOR_HEXCODE.ORANGE })
     }
-
 
     const key = getKey({ FullTourCode, ShowName, EntryDate: dateInIncomingFormat })
     const value: SALES_SUMMARY = map[key]
 
-    if(!value) {
+    if (!value) {
       r7.push('')
       r8.push('')
       r9.push('')
     } else {
-      if(!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
+      if (!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
         conversionRate = value.ConversionRate
       }
       r7.push(value.Location || '')
       r8.push(value.EntryName || '')
       r9.push(value.VenueCurrencySymbol && value.Value ? `${value.VenueCurrencySymbol}${value.Value}` : '')
-      if(value.VenueCurrencySymbol && value.Value) {
-        const val = totalOfCurrency[value.VenueCurrencySymbol];
-        if(val || val === 0) {
+      if (value.VenueCurrencySymbol && value.Value) {
+        const val = totalOfCurrency[value.VenueCurrencySymbol]
+        if (val || val === 0) {
           totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val).plus(new Decimal(value.Value).toFixed(2)).toFixed(2) as any as number
         }
       }
-      if(['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(value.EntryName) || value.EntryName.toLowerCase().includes('holiday')) {
-        cellColor.push({cell: {rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE })
-        cellColor.push({cell: {rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE })
+      if (['Get In/Fit Up Day', 'Tech/Dress Day', 'Day Off', 'Travel Day'].includes(value.EntryName) || value.EntryName.toLowerCase().includes('holiday')) {
+        cellColor.push({ cell: { rowNo: 7, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE })
+        cellColor.push({ cell: { rowNo: 8, colNo }, cellColor: COLOR_HEXCODE.RED, textColor: COLOR_HEXCODE.WHITE })
       }
     }
 
-
-    if(i%7 === 0) {
+    if (i % 7 === 0) {
       weekPending = false
     }
     colNo++
   }
 
-
-  for(let i =0; i<=2; i++) {
+  for (let i = 0; i <= 2; i++) {
     r4.push('Tour Totals')
     r5.push('')
-    if(i === 0) {
+    if (i === 0) {
       r6.push(`(£1 = ${conversionRate || '0.8650'})`)
     } else {
       r6.push('')
     }
 
-    if(i === 0) {
+    if (i === 0) {
       r7.push('Total EUR')
-      r9.push(totalOfCurrency["€"] ? `€${String(totalOfCurrency["€"])}` : '')
-    } else if( i === 1) {
+      r9.push(totalOfCurrency['€'] ? `€${String(totalOfCurrency['€'])}` : '')
+    } else if (i === 1) {
       r7.push('Total GBP')
-      r9.push(totalOfCurrency["£"] ? `£${String(totalOfCurrency["£"])}` : '')
+      r9.push(totalOfCurrency['£'] ? `£${String(totalOfCurrency['£'])}` : '')
     } else {
       r7.push('Grand Total')
-      r9.push(`£${getTotalInPound({totalOfCurrency, conversionRate})}`)
+      r9.push(`£${getTotalInPound({ totalOfCurrency, conversionRate })}`)
     }
     r8.push('')
 
-
-    mergeRowCol.push({row: [7, 8], col: [colNo+i, colNo+i]})
-
+    mergeRowCol.push({ row: [7, 8], col: [colNo + i, colNo + i] })
   }
 
-
-  mergeRowCol.push({row: [4, 4], col: [colNo, colNo+2]})
-
+  mergeRowCol.push({ row: [4, 4], col: [colNo, colNo + 2] })
 
   worksheet.addRow(r4)
   worksheet.addRow(r5)
@@ -246,7 +229,7 @@ const handler = async (req, res) => {
   worksheet.addRow(r9)
 
   mergeRowCol.forEach(ele => {
-    const {row, col} = ele
+    const { row, col } = ele
     worksheet.mergeCells(row[0], col[0], row[1], col[1])
   })
 
@@ -255,51 +238,51 @@ const handler = async (req, res) => {
     worksheet.getColumn(i).width = 20
   }
 
-  worksheet.getRow(4).alignment = { horizontal: 'center', vertical: 'middle' };
-  worksheet.getRow(5).alignment = { horizontal: 'center', vertical: 'middle' };
-  worksheet.getRow(6).alignment = { horizontal: 'center', vertical: 'middle' };
-  worksheet.getRow(7).alignment = { horizontal: 'center', vertical: 'middle' };
+  worksheet.getRow(4).alignment = { horizontal: 'center', vertical: 'middle' }
+  worksheet.getRow(5).alignment = { horizontal: 'center', vertical: 'middle' }
+  worksheet.getRow(6).alignment = { horizontal: 'center', vertical: 'middle' }
+  worksheet.getRow(7).alignment = { horizontal: 'center', vertical: 'middle' }
 
-  worksheet.getRow(8).alignment = { horizontal: 'center', wrapText: true, vertical: 'middle' };
-  worksheet.getRow(9).alignment = { horizontal: 'right', vertical: 'middle' };
-  
-  for(let rowNo = 4; rowNo <= 9 ; rowNo++) {
+  worksheet.getRow(8).alignment = { horizontal: 'center', wrapText: true, vertical: 'middle' }
+  worksheet.getRow(9).alignment = { horizontal: 'right', vertical: 'middle' }
+
+  for (let rowNo = 4; rowNo <= 9; rowNo++) {
     // makeRowBold({worksheet, row: rowNo})
-    worksheet.getRow(rowNo).font = { bold: true, 'size': 12, 'name': 'Times New Roman' }
+    worksheet.getRow(rowNo).font = { bold: true, size: 12, name: 'Times New Roman' }
   }
 
   worksheet.mergeCells(1, 1, 1, numberOfColumns)
   worksheet.mergeCells(2, 1, 2, numberOfColumns)
-  firstRowFormatting({worksheet})
-  makeRowBold({worksheet, row: 2})
+  firstRowFormatting({ worksheet })
+  makeRowBold({ worksheet, row: 2 })
 
-  for(let i=1; i<=numberOfColumns; i++) {
+  for (let i = 1; i <= numberOfColumns; i++) {
     worksheet.getCell(4, i).border = {
-      top: {style:'thick'},
-      left: {style:'thick'},
-      bottom: {style:'thick'},
-      right: {style:'thick'}
+      top: { style: 'thick' },
+      left: { style: 'thick' },
+      bottom: { style: 'thick' },
+      right: { style: 'thick' }
     }
   }
 
-  for(let i=1; i<=numberOfColumns; i++) {
-    if(i%8 == 1) {
-      for(let row = 5; row <=8; row++) {
+  for (let i = 1; i <= numberOfColumns; i++) {
+    if (i % 8 === 1) {
+      for (let row = 5; row <= 8; row++) {
         worksheet.getCell(row, i).border = {
-          left: {style:'thick'},
+          left: { style: 'thick' }
         }
       }
     }
   }
-  for(let row = 5; row <=8; row++) {
-    worksheet.getCell(row, colNo+3).border = {
-      left: {style:'thick'},
+  for (let row = 5; row <= 8; row++) {
+    worksheet.getCell(row, colNo + 3).border = {
+      left: { style: 'thick' }
     }
   }
 
   cellColor.forEach(ele => {
-    const {cell: {rowNo, colNo}, cellColor, textColor} = ele
-    colorTextAndBGCell({worksheet, row: rowNo, col: colNo, ...(textColor && {textColor}), ...(cellColor && {cellColor})})
+    const { cell: { rowNo, colNo }, cellColor, textColor } = ele
+    colorTextAndBGCell({ worksheet, row: rowNo, col: colNo, ...(textColor && { textColor }), ...(cellColor && { cellColor }) })
   })
 
   const filename = 'Tour Gross Sales.xlsx'
@@ -309,7 +292,6 @@ const handler = async (req, res) => {
   workbook.xlsx.write(res).then(() => {
     res.end()
   })
-  }
-  
-  export default handler
-  
+}
+
+export default handler

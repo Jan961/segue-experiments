@@ -1,3 +1,5 @@
+import Decimal from "decimal.js"
+
 export enum BOOK_STATUS_CODES {
     C = 'C',
     X = 'X'
@@ -39,12 +41,12 @@ export type TSalesView = {
     SetBrochureReleased: string
     SetIsCopy: string
     SaleTypeName: SALES_TYPE_NAME | null
-    Seats: number
-    Value: number
+    Seats: Decimal
+    Value: Decimal
     TotalCapacity: number
     FinalFiguresDate: string
     FinalFiguresSeats: number
-    FinalFiguresValue: number
+    FinalFiguresValue: Decimal
     NotOnSalesDate: string
   }
 
@@ -52,7 +54,7 @@ export type TRequiredFields = {
     BookingFirstDate: TSalesView['BookingFirstDate']
     VenueTown: TSalesView['VenueTown']
     VenueName: TSalesView['VenueName']
-    Value: TSalesView['Value']
+    Value: number
     BookingTourWeekNum: TSalesView['BookingTourWeekNum']
     VenueCurrencySymbol: TSalesView['VenueCurrencySymbol']
     SetBookingWeekNum: TSalesView['SetBookingWeekNum']
@@ -61,9 +63,9 @@ export type TRequiredFields = {
     SetIsCopy: TSalesView['SetIsCopy']
     SetBrochureReleased: TSalesView['SetBrochureReleased']
     BookingStatusCode: TSalesView['BookingStatusCode']
-    FinalFiguresValue: TSalesView['FinalFiguresValue']
+    FinalFiguresValue: number
     TotalCapacity: TSalesView['TotalCapacity']
-    Seats: TSalesView['Seats']
+    Seats: number
     NotOnSalesDate: TSalesView['NotOnSalesDate']
     SetTourWeekNum: TSalesView['SetTourWeekNum']
   }
@@ -75,8 +77,9 @@ export type TRequiredFieldsFinalFormat = TRequiredFields & {
     Town: TSalesView['VenueTown']
     Venue: TSalesView['VenueName']
     FormattedValue: string
-    FormattedFinalFiguresValue: string
+    FormattedFinalFiguresValue: number
     FormattedSetTourWeekNum: string
+    Value: number
   }
 
 export type UniqueHeadersObject = {
