@@ -52,10 +52,6 @@ export const toISO = (date: Date) => {
   return date.toISOString()
 }
 
-export const toSql = (date) => {
-  return date.slice(0, 10)
-}
-
 export const getDateDaysAgo = (date, daysToSubtract) => {
   date = new Date(date)
   return moment(date, 'dd/mm/yyyy').subtract(daysToSubtract, 'days')
@@ -194,4 +190,8 @@ export const getPreviousMonday = (date) => {
 
 export const getTimeFromDateAndTime = (time) => {
   return moment.utc(time).format('HH:mm')
+}
+
+export const toSql = (date:string) => {
+  return new Date(date).toISOString()?.split?.('T')?.[0]
 }
