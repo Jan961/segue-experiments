@@ -25,7 +25,7 @@ const defaultInputs = {
   tourStartDate: null,
   tourEndDate: null
 }
-const defaultStatus = {
+export const defaultStatus = {
   submitted: false,
   submitting: false,
   info: { error: false, msg: null }

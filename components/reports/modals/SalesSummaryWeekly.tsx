@@ -6,6 +6,7 @@ import axios from 'axios'
 import { getCurrentMondayDate, range } from 'services/reportsService'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 import { Spinner } from 'components/global/Spinner'
+import { defaultStatus } from './SalesSummarySimple'
 
 type Props = {
   activeTours: any[];
@@ -22,10 +23,12 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
   const [loading, setLoading] = React.useState(false)
   const [tourWeeks, setTourWeeks] = useState([]) // Shory list of tours for the toolbar to switch
   const [inputs, setInputs] = useState(defaultInputs)
+  const [status, setStatus] = useState(defaultStatus)
 
   const closeModal = () => {
     setShowModal(false)
     setInputs(defaultInputs)
+    setStatus(defaultStatus)
   }
 
   function formatShortYearDate (dateString) {
@@ -38,6 +41,7 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
 
   function handleOnSubmit (e) {
     e.preventDefault()
+    setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
     const selectedTour = activeTours.find(
       (tour) => tour.Id === parseInt(inputs.Tour)
     )
@@ -82,8 +86,13 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
             ].join(':')
             anchor.click()
           }
+          setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: true, info: { error: false, msg: 'Report downloaded successfully' } }))
           closeModal()
         }
+      })
+      .catch(error => {
+        console.log('Error downloading report', error)
+        setStatus((prevStatus) => ({ ...prevStatus, submitting: false, info: { error: true, msg: 'Error downloading report' } }))
       })
       .finally(() => {
         setLoading(true)
@@ -243,8 +252,11 @@ export default function SalesSummaryWeekly ({ activeTours }: Props) {
                           className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                           type="submit"
                         >
-                          {' '}
-                      Generate Excel Report
+                          {!status.submitting
+                            ? !status.submitted
+                              ? 'Generate Excel Report'
+                              : 'Downloaded'
+                            : 'Creating Report...'}
                         </button>
                       </div>
                     </form>
