@@ -98,7 +98,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       BookingFirstDate,
       VenueTown,
       VenueName,
-      Value: Value.toNumber?.(),
+      Value: Value?.toNumber?.(),
       VenueCurrencySymbol,
       SetBookingWeekNum,
       SetTourWeekDate,
@@ -106,9 +106,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       SetIsCopy,
       SetBrochureReleased,
       BookingStatusCode,
-      FinalFiguresValue: FinalFiguresValue.toNumber(),
+      FinalFiguresValue: FinalFiguresValue?.toNumber?.(),
       TotalCapacity,
-      Seats: Seats.toNumber?.(),
+      Seats: Seats?.toNumber?.(),
       NotOnSalesDate,
       SetTourWeekNum
     }))
@@ -242,9 +242,12 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
   // Add Euro Total Row
   const seatsDataForEuro: number[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
   const weekWiseDataInEuro = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO }))
-  worksheet.addRow(['', '', '', '', 'Total Sales €', ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...seatsDataForEuro])
-  applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(6).letter, endRow: row, endColumn: worksheet.getColumn(6 + weekWiseDataInEuro.length).letter, formatOptions: { numFmt: '€#,##0.00' } })
-  row++
+  console.log('weekWiseDataInEuro', weekWiseDataInEuro)
+  if (weekWiseDataInEuro.length) {
+    worksheet.addRow(['', '', '', '', 'Total Sales €', ...weekWiseDataInEuro, getChangeVsLastWeekValue(weekWiseDataInEuro), ...seatsDataForEuro])
+    applyFormattingToRange({ worksheet, startRow: row, startColumn: worksheet.getColumn(6).letter, endRow: row, endColumn: worksheet.getColumn(6 + weekWiseDataInEuro.length).letter, formatOptions: { numFmt: '€#,##0.00' } })
+    row++
+  }
   // Add Pound Total Row
   const seatsDataForPound: number[] = isSeatsDataRequired ? getSeatsColumnForWeekTotal({ currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND, totalCurrencyWiseSeatsMapping: totalCurrencyWiseSeatsTotal }) : []
   const weekWiseDataInPound = headerWeekNums.map(weekNum => getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND }))

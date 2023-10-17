@@ -25,19 +25,21 @@ const defaultInputs = {
   tourStartDate: null,
   tourEndDate: null
 }
+const defaultStatus = {
+  submitted: false,
+  submitting: false,
+  info: { error: false, msg: null }
+}
 export default function SalesSummarySimple ({ activeTours }: Props) {
   const [showModal, setShowModal] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [tourWeeks, setTourWeeks] = useState<TourWeek[]>([])
-  const [status, setStatus] = useState({
-    submitted: false,
-    submitting: false,
-    info: { error: false, msg: null }
-  })
+  const [status, setStatus] = useState(defaultStatus)
   const [inputs, setInputs] = useState(defaultInputs)
   const closeModal = () => {
     setShowModal(false)
     setInputs(defaultInputs)
+    setStatus(defaultStatus)
   }
 
   const fetchTourWeek = async (tourId: number) => {
@@ -99,8 +101,13 @@ export default function SalesSummarySimple ({ activeTours }: Props) {
             ].join(':')
             anchor.click()
           }
+          setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: true, info: { error: false, msg: 'Report downloaded successfully' } }))
           closeModal()
         }
+      })
+      .catch(error => {
+        console.log('Error downloading report', error)
+        setStatus((prevStatus) => ({ ...prevStatus, submitting: false, info: { error: true, msg: 'Error downloading report' } }))
       })
       .finally(() => {
         setLoading(false)
