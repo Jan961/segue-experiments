@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
 import { Spinner } from 'components/global/Spinner'
+import { defaultStatus } from './SalesSummarySimple';
 
 type Props = {
   activeTours: any[];
@@ -15,9 +16,11 @@ export default function PromotorHolds ({ activeTours }: Props) {
     tour: null,
     venue: null
   })
+  const [status, setStatus] = useState(defaultStatus)
   const [venues, setVenues] = useState([])
   function handleOnSubmit (e) {
     e.preventDefault()
+    setStatus((prevStatus) => ({ ...prevStatus, submitting: true }))
     downloadReport()
   }
 
@@ -29,7 +32,7 @@ export default function PromotorHolds ({ activeTours }: Props) {
       venue: null
     })
     setVenues([])
-
+    setStatus(defaultStatus)
     setShowModal(false)
   }
 
@@ -77,6 +80,7 @@ export default function PromotorHolds ({ activeTours }: Props) {
             ].join(':')
             anchor.click()
           }
+          setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: true, info: { error: false, msg: 'Report downloaded successfully' } }))
           setShowModal(false)
           setInputs({
             tour: null,
@@ -85,6 +89,10 @@ export default function PromotorHolds ({ activeTours }: Props) {
             venue: null
           })
         }
+      })
+      .catch(error => {
+        console.log('Error downloading report', error)
+        setStatus((prevStatus) => ({ ...prevStatus, submitting: false, info: { error: true, msg: 'Error downloading report' } }))
       })
       .finally(() => {
         setLoading(false)
@@ -232,8 +240,11 @@ export default function PromotorHolds ({ activeTours }: Props) {
                         className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="submit"
                       >
-                        {' '}
-                      Generate Excel Report
+                        {!status.submitting
+                          ? !status.submitted
+                            ? 'Generate Excel Report'
+                            : 'Downloaded'
+                          : 'Creating Report...'}
                       </button>
                     </div>
                   </form>
