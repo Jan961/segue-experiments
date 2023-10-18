@@ -67,7 +67,7 @@ export const PromoterHoldsTab = () => {
       {
         selectedBooking && <>
           <FormInputCheckbox className="max-w-[250px]" label="CAST RATE TICKETS ARRANGED" name="CastRateTicketsArranged" onChange={handleChange} value={inputs.CastRateTicketsArranged} />
-          <FormInputText area className="h-[75px] mb-6" label="" name="CastRateTicketsNotes" onChange={handleChange} value={inputs.CastRateTicketsNotes} disabled={!inputs.CastRateTicketsArranged} />
+          <FormInputText area className="min-h-[75px] h-auto mb-6" label="" name="CastRateTicketsNotes" onChange={handleChange} value={inputs.CastRateTicketsNotes} disabled={!inputs.CastRateTicketsArranged} />
         </>
       }
       { performances.map((perf) => (
