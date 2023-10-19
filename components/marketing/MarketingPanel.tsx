@@ -15,7 +15,7 @@ const MarketingPanel = () => {
     <div className={'flex md:flex-col'}>
       <ActionBar />
       <br />
-      <Tab.Group as='div'>
+      <Tab.Group as='div' className="mt-5">
         <Tab.List className="mb-2">
           <StyledTab>Sales</StyledTab>
           <StyledTab>Archived Sales</StyledTab>
@@ -24,11 +24,11 @@ const MarketingPanel = () => {
           <StyledTab>Venue Contacts</StyledTab>
           <StyledTab>Promoter Holds</StyledTab>
         </Tab.List>
-        <div className='grid grid-cols-12 gap-2 overflow-hidden'>
+        <div className='grid grid-cols-12 gap-2 overflow-hidden mt-5'>
           <div className='col-span-4 md:col-span-3 lg:col-span-2 h-full overflow-y-auto' style={{ maxHeight: 'calc(100vh - 300px)' }}>
             <Summary />
           </div>
-          <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4 overflow-y-auto">
+          <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4 overflow-y-auto mt-2">
             <Tab.Panels>
               <Tab.Panel><SalesTab/></Tab.Panel>
               <Tab.Panel><ArchivedSalesTab /></Tab.Panel>

@@ -5,6 +5,7 @@ import { getSales } from './Api'
 import schema from './validation'
 import Typeahead from 'components/Typeahead'
 import { Spinner } from 'components/global/Spinner'
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
 
 interface props {
   searchFilter: String;
@@ -23,6 +24,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
   const [previousSale, setPreviousSale] = useState<any>({})
   const [notes, setNotes] = useState<any>({})
   const [validationErrors, setValidationErrors] = useState<any>({})
+  const [ignoreValidation, setIgnoreValidation] = useState<boolean>(false)
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
       setLoading(true)
@@ -207,9 +209,11 @@ export default function Entry ({ tours = [], searchFilter }: props) {
       SetCompCompTypeId,
       SetCompSeats: comps[SetCompCompTypeId]
     }))
-    const valid = await validateSale(sale, previousSale)
-    if (!valid) {
-      return
+    if (!ignoreValidation) {
+      const valid = await validateSale(sale, previousSale)
+      if (!valid) {
+        return
+      }
     }
     const Sales = [
       {
@@ -601,6 +605,14 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                   ></textarea>
                 </div>
               </div>
+            </div>
+            <div>
+              <FormInputCheckbox
+                className='flex-row-reverse !justify-end'
+                onChange={(e) => setIgnoreValidation(e.target.value)}
+                label="Ignore errors and continue"
+                value={ignoreValidation}
+              />
             </div>
             <button
               type={'submit'}

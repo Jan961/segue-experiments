@@ -89,7 +89,7 @@ export const SalesTab = () => {
     <>
       <div className='grid grid-cols-12 gap-2 overflow-hidden'>
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
-          <Table className='mt-4 text-sm table-auto !min-w-0 h-full'>
+          <Table className='mt-4 text-sm table-auto !min-w-0'>
             <Table.HeaderRow>
               <Table.HeaderCell className='w-20'>
               Week
