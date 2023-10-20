@@ -1,5 +1,4 @@
 import prisma from 'lib/prisma'
-import { dateToSimple } from 'services/dateService'
 import { TSalesView } from 'types/MarketingTypes'
 import numeral from 'numeral'
 import { getEmailFromReq, checkAccess } from 'services/userService'
@@ -42,7 +41,7 @@ export default async function handle (req, res) {
         ...acc,
         [key]: {
           week: sale.SetBookingWeekNum ? `Week-${sale.SetBookingWeekNum}` : '',
-          weekOf: dateToSimple(sale.SetSalesFiguresDate),
+          weekOf: sale.SetSalesFiguresDate,
           seatsSold: parseInt(sale.Seats) || 0,
           seatsSalePercentage: (sale.Seats / sale.TotalCapacity) * 100,
           reservations: '',
