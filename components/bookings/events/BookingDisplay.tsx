@@ -29,6 +29,7 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
   const distance = options?.option?.filter((o) => o.VenueId === venue.Id)[0]
 
   const first = booking.Date.startsWith(date)
+  const isCancelled = booking?.StatusCode === 'X'
 
   const select = () => {
     setView({ ...view, selected: { type: 'booking', id: bookingId }, selectedDate: date })
@@ -40,6 +41,7 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
     text-center
     border-gray-300 bg-gray-50 bg-opacity-50
     ${active ? 'border-gray-400 bg-gray-300 shadow bg-opacity-100' : 'hover:bg-opacity-100 hover:bg-gray-200'}
+    ${isCancelled ? 'bg-black text-white border-black hover:bg-opacity-80 hover:bg-black' : ''}
     `}
     onClick={select}>
       <div className="col-span-5 text-center">

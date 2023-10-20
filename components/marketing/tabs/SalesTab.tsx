@@ -14,7 +14,8 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { NoDataWarning } from '../NoDataWarning'
 import { LoadingTab } from './LoadingTab'
 import classNames from 'classnames'
-import { toSql } from 'services/dateService'
+import { dateToSimple } from 'services/dateService'
+import moment from 'moment'
 
 interface IndicatorProps { icon: IconDefinition, active: boolean, tooltip: string, onChange:(status:boolean)=>void }
 const Indicator = ({ icon, active = false, tooltip, onChange = () => null }: IndicatorProps) => {
@@ -76,8 +77,7 @@ export const SalesTab = () => {
     axios.put('/api/marketing/sales/salesSet/update', { BookingId, SalesFigureDate, ...update }).catch((error:any) => console.log('failed to update sale', error))
   }
   const onChange = (key:string, value:boolean, sale:any) => {
-    console.log('sale', sale, value, key, selected)
-    updateSaleSet(selected, toSql(sale.weekOf), { [key.replace('is', 'Set')]: value })
+    updateSaleSet(selected, moment(sale.weekOf)?.toISOString()?.substring?.(0, 10), { [key.replace('is', 'Set')]: value })
     setBookingSales(prevSales => prevSales.map(s => {
       if (sale.weekOf === s.weekOf && sale.week === s.week) {
         return { ...s, [key]: value }
@@ -138,7 +138,7 @@ export const SalesTab = () => {
                       {sale.isFinal ? 'Final' : sale.week.replace('Week-', 'Wk ')}
                     </Table.Cell>
                     <Table.Cell className={classNames(colorCode)}>
-                      {sale.weekOf}
+                      {dateToSimple(sale.weekOf)}
                     </Table.Cell>
                     <Table.Cell className='text-right'>
                       {numeral(sale.seatsSold).format('0,0')}

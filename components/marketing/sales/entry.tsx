@@ -233,7 +233,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
         Holds,
         Comps,
         Sales,
-        SetBookingId: inputs.Venue,
+        SetBookingId: parseInt(inputs.Venue, 10),
         SetSalesFiguresDate: inputs.SalesWeek
       })
       .then((res) => {
@@ -299,7 +299,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                         ?.filter?.((tour) => !tour.IsArchived)
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${
+                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${
                               tour.IsArchived ? ' | (Archived)' : ''
                             }`}
                           </option>
@@ -320,7 +320,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                       className="block w-full  max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
-                      <option value={0}>Select A Tour</option>
+                      <option value={0}>Select Tour Week</option>
                       {salesWeeks
                         ?.sort?.(
                           (a, b) =>
@@ -610,7 +610,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
               <FormInputCheckbox
                 className='flex-row-reverse !justify-end'
                 onChange={(e) => setIgnoreValidation(e.target.value)}
-                label="Ignore errors and continue"
+                label="Ignore warnings and continue"
                 value={ignoreValidation}
               />
             </div>
