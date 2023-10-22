@@ -1,3 +1,9 @@
+import {
+  faBook,
+  faSquareXmark,
+  faUser
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
@@ -181,7 +187,20 @@ export const Summary = () => {
           </DL>
         </>
       )}
-
+      <div className='flex flex-col border-y-2 py-4 my-4'>
+        <div className='flex items-center text-gray-700'>
+          <FontAwesomeIcon icon={faUser} />
+          <div className='ml-4'>Down to single seat</div>
+        </div>
+        <div className='flex items-center text-gray-700'>
+          <FontAwesomeIcon icon={faBook} />
+          <div className='ml-4'>Brochure released</div>
+        </div>
+        <div className='flex items-center text-gray-700'>
+          <FontAwesomeIcon icon={faSquareXmark} />
+          <div className='ml-4'>Not for sale</div>
+        </div>
+      </div>
     </div>
   )
 }

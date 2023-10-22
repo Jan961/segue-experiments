@@ -91,23 +91,23 @@ export const SalesTab = () => {
         <div className="col-span-8 md:col-span-9 lg:col-span-10 mb-4">
           <Table className='mt-4 text-sm table-auto !min-w-0'>
             <Table.HeaderRow>
-              <Table.HeaderCell className='w-20'>
+              <Table.HeaderCell className='w-20 rounded-tl-lg'>
               Week
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
               Week of
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
-              Seats Sold
+              Seats Sold (n)
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
-              Seats Sold %
+              Seats Sold (%)
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
-              Reserved
+              Reserved (n)
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
-              Reserved %
+              Reserved (%)
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
               Total Value
@@ -116,12 +116,12 @@ export const SalesTab = () => {
               Value Change
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
-              Total Hold
+              Total Holds
               </Table.HeaderCell>
               <Table.HeaderCell className='w-20'>
               Seats Change
               </Table.HeaderCell>
-              <Table.HeaderCell className='w-20'>
+              <Table.HeaderCell className='w-20 rounded-tr-lg'>
               Activity
               </Table.HeaderCell>
             </Table.HeaderRow>

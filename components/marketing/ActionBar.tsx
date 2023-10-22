@@ -44,8 +44,7 @@ const ActionBar = () => {
 
   return (
     <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">
-
-      <div className="col-span-4 flex grid-cols-5 gap-2 items-center">
+      <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
         <Typeahead
           className="mb-0 pb-0 max-w-[500px]"
           value={bookingJump.selected}
@@ -53,9 +52,9 @@ const ActionBar = () => {
           onChange={(selectedVenue) => changeBooking({ target: { value: selectedVenue?.value, id: 'venue' } })}
           options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]} placeholder={'Please select a venue'}
         />
-        <ToolbarButton onClick={goToToday} className='!text-primary-green'>Go To Today</ToolbarButton>
-        <ToolbarButton disabled={selectedBookingIndex === 0} onClick={previousVenue} className='!text-primary-green'>Previous Venue</ToolbarButton>
-        <ToolbarButton disabled={selectedBookingIndex === bookingOptions?.length - 1} onClick={nextVenue} className='!text-primary-green'>Next Venue</ToolbarButton>
+        <ToolbarButton onClick={goToToday} className='!text-primary-green'>Today</ToolbarButton>
+        <ToolbarButton disabled={selectedBookingIndex === 0} onClick={previousVenue} className='!text-primary-green'>Previous</ToolbarButton>
+        <ToolbarButton disabled={selectedBookingIndex === bookingOptions?.length - 1} onClick={nextVenue} className='!text-primary-green'>Next</ToolbarButton>
       </div>
     </div>
   )

@@ -1,11 +1,9 @@
 import { SalesTab } from './tabs/SalesTab'
 import { ArchivedSalesTab } from './tabs/ArchivedSalesTab'
-// import { Summary } from './Summary'
 import { ActivitiesTab } from './tabs/ActivitiesTab'
 import { ContactNotesTab } from './tabs/ContactNotesTab'
 import { VenueContactsTab } from './tabs/VenueContactsTab'
 import { PromoterHoldsTab } from './tabs/PromoterHoldsTab'
-import ActionBar from './ActionBar'
 import { Tab } from '@headlessui/react'
 import { StyledTab } from 'components/global/StyledTabs'
 import { Summary } from './Summary'
@@ -13,7 +11,6 @@ import { Summary } from './Summary'
 const MarketingPanel = () => {
   return (
     <div className={'flex md:flex-col'}>
-      <ActionBar />
       <br />
       <Tab.Group as='div' className="mt-5">
         <Tab.List className="mb-2">
