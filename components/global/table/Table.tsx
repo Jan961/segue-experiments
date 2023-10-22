@@ -21,12 +21,13 @@ export const Table = ({ children, className, ...props }: PropsWithChildren<Class
 
 interface HeaderRowProps {
   bg?: string
+  className?: string
 }
 
-const HeaderRow = ({ children, bg }: PropsWithChildren<HeaderRowProps>) => {
+const HeaderRow = ({ children, bg, className }: PropsWithChildren<HeaderRowProps>) => {
   return (
     <thead>
-      <tr className={bg || 'bg-primary-green'}>
+      <tr className={classNames(bg || 'bg-primary-green', className)}>
         { children }
       </tr>
     </thead>

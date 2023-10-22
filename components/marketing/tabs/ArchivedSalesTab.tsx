@@ -60,7 +60,7 @@ export const ArchivedSalesTab = () => {
         <button
           onClick={() => openBookingSelection('venue')}
           className={
-            'inline-flex items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            'inline-flex items-center rounded-md  bg-white  px-6 py-3 text-xs font-bold drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
           }
         >
           For this Venue{' '}
@@ -68,7 +68,7 @@ export const ArchivedSalesTab = () => {
         <button
           onClick={() => openBookingSelection('town')}
           className={
-            'inline-flex items-center rounded-md  bg-white  px-6 py-3 text-xs font-medium drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+            'inline-flex items-center rounded-md  bg-white  px-6 py-3 text-xs font-bold drop-shadow-lg text-primary-green hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
           }
         >
           For this Town{' '}
@@ -87,11 +87,11 @@ export const ArchivedSalesTab = () => {
       {archivedSales?.length
         ? (
           <Table className={'table-auto !min-w-0 sticky-header-table'} style={{ maxWidth: tableWidth }}>
-            <Table.HeaderRow>
-              <Table.HeaderCell className=""></Table.HeaderCell>
+            <Table.HeaderRow className="rounded-t-lg">
+              <Table.HeaderCell className="rounded-tl-lg"></Table.HeaderCell>
               {tours.map((tour, i) => (
                 <>
-                  <Table.HeaderCell className="text-center !text-lg" key={i}>
+                  <Table.HeaderCell className={classNames('text-center !text-lg', { 'rounded-tr-lg': (i === tours.length - 1) })} key={i}>
                     {tour.FullTourCode}
                   </Table.HeaderCell>
                 </>

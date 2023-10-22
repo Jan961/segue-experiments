@@ -1,6 +1,4 @@
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
-import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { BookingContactNoteDTO } from 'interfaces'
 import React from 'react'
 import { useRecoilValue } from 'recoil'
@@ -10,6 +8,7 @@ import { LoadingTab } from './LoadingTab'
 import { NoDataWarning } from '../NoDataWarning'
 import { ContactNotesEditor } from '../editors/ContactNotesEditor'
 import { dateToSimple } from 'services/dateService'
+import { ToolbarButton } from 'components/bookings/ToolbarButton'
 
 export const ContactNotesTab = () => {
   const { selected, bookings } = useRecoilValue(bookingJumpState)
@@ -51,7 +50,6 @@ export const ContactNotesTab = () => {
   return (
     <>
       <div className='text-right pb-4'>
-        <FormInputButton text="Add New Note" onClick={create} icon={faPlus}/>
         {modalOpen && <ContactNotesEditor open={modalOpen} triggerClose={triggerClose} bookingId={selected} bookingContactNote={editing} />}
 
       </div>
@@ -59,8 +57,8 @@ export const ContactNotesTab = () => {
       { contactNotes.length > 0 && (
 
         <Table className='table-auto !min-w-0'>
-          <Table.HeaderRow>
-            <Table.HeaderCell>
+          <Table.HeaderRow className='rounded-t-lg'>
+            <Table.HeaderCell className='rounded-tl-lg'>
               Who
             </Table.HeaderCell>
             <Table.HeaderCell>
@@ -69,7 +67,7 @@ export const ContactNotesTab = () => {
             <Table.HeaderCell>
               Action By
             </Table.HeaderCell>
-            <Table.HeaderCell className='w-3/4'>
+            <Table.HeaderCell className='w-3/4 rounded-tr-lg'>
               Notes
             </Table.HeaderCell>
           </Table.HeaderRow>
@@ -93,6 +91,9 @@ export const ContactNotesTab = () => {
           </Table.Body>
         </Table>
       )}
+      <div className="mt-4">
+        <ToolbarButton onClick={create} className='!text-primary-green'>Add New Note</ToolbarButton>
+      </div>
     </>
   )
 }

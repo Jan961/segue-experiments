@@ -1,8 +1,7 @@
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import Fuse from 'fuse.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Table } from 'components/global/table/Table'
-import { FormInputButton } from 'components/global/forms/FormInputButton'
 import { bookingJumpState } from 'state/marketing/bookingJumpState'
 import { useRecoilValue } from 'recoil'
 import React, { useMemo, useRef, useState } from 'react'
@@ -13,6 +12,7 @@ import { VenueContactsEditor } from '../editors/VenueContactsEditor'
 import { VenueContactDTO } from 'interfaces'
 import { LoadingTab } from './LoadingTab'
 import { FormInputText } from 'components/global/forms/FormInputText'
+import { ToolbarButton } from 'components/bookings/ToolbarButton'
 
 export const VenueContactsTab = () => {
   const { selected, bookings } = useRecoilValue(bookingJumpState)
@@ -87,8 +87,8 @@ export const VenueContactsTab = () => {
         </div>
       </div>
       <Table className='table-auto !min-w-0'>
-        <Table.HeaderRow>
-          <Table.HeaderCell className='w-20'>
+        <Table.HeaderRow className='rounded-t-lg'>
+          <Table.HeaderCell className='w-20 rounded-tl-lg'>
           Role
           </Table.HeaderCell>
           <Table.HeaderCell className='w-20'>
@@ -100,7 +100,7 @@ export const VenueContactsTab = () => {
           <Table.HeaderCell className='w-20'>
           Phone
           </Table.HeaderCell>
-          <Table.HeaderCell className='w-20'>
+          <Table.HeaderCell className='w-20 rounded-tr-lg'>
           Email
           </Table.HeaderCell>
         </Table.HeaderRow>
@@ -127,7 +127,7 @@ export const VenueContactsTab = () => {
         </Table.Body>
       </Table>
       <div className='text-left pt-4 max-w-[820px]'>
-        <FormInputButton text="Add New Contact" onClick={create} icon={faPlus}/>
+        <ToolbarButton onClick={create} className='!text-primary-green'>Add another contact</ToolbarButton>
         {modalOpen && <VenueContactsEditor open={modalOpen} triggerClose={triggerClose} venueId={venueId} venueContact={editing} />}
       </div>
     </>

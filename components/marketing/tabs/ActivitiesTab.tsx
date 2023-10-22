@@ -14,6 +14,7 @@ import { objectify } from 'radash'
 import { dateToSimple } from 'services/dateService'
 import { NoDataWarning } from '../NoDataWarning'
 import numeral from 'numeral'
+import { ToolbarButton } from 'components/bookings/ToolbarButton'
 
 export const ActivitiesTab = () => {
   const { selected } = useRecoilValue(bookingJumpState)
@@ -85,10 +86,10 @@ export const ActivitiesTab = () => {
 
   return (
     <>
-      <h3 className="text-lg mb-2">Booking Info</h3>
-      <form className="bg-gray-200 mb-4 p-4 pb-2 rounded-lg">
+      <form className="mb-4 p-4 pb-2 rounded-lg">
         <div className="lg:flex lg:justify-between">
           <FormInputCheckbox
+            className='flex-row-reverse'
             name="IsOnSale"
             label="On Sale"
             value={inputs.IsOnSale}
@@ -96,20 +97,23 @@ export const ActivitiesTab = () => {
           <FormInputDate
             inline
             name="OnSaleDate"
-            label="On Sale Date"
+            label=""
             value={inputs.OnSaleDate}
             onChange={handleOnChange} />
           <FormInputCheckbox
+            className='flex-row-reverse'
             name="MarketingPlanReceived"
             label="Marketing Plans Received"
             value={inputs.MarketingPlanReceived}
             onChange={handleOnChange} />
           <FormInputCheckbox
+            className='flex-row-reverse'
             name="PrintReqsReceived"
             label="Print Reqs Received"
             value={inputs.PrintReqsReceived}
             onChange={handleOnChange} />
           <FormInputCheckbox
+            className='flex-row-reverse'
             name="ContactInfoReceived"
             label="Contact Info Received"
             value={inputs.ContactInfoReceived}
@@ -125,16 +129,14 @@ export const ActivitiesTab = () => {
         </div>
       </form>
       <div className='flex justify-between pb-4'>
-        <h3 className="text-lg">Activities</h3>
-        <FormInputButton text="Add New Activity" onClick={create} icon={faPlus}/>
         {modalOpen && <ActivitiesEditor types={data.activityTypes} open={modalOpen} triggerClose={triggerClose} activity={editing} />}
 
       </div>
       { data.activities.length === 0 && (<NoDataWarning message="No activities recorded" />) }
       { data.activities.length > 0 && (
         <Table className='table-auto !min-w-0'>
-          <Table.HeaderRow>
-            <Table.HeaderCell className='w-20'>
+          <Table.HeaderRow className='rounded-t-lg'>
+            <Table.HeaderCell className='w-20 rounded-tl-lg'>
             Activity Name
             </Table.HeaderCell>
             <Table.HeaderCell className='w-20'>
@@ -152,7 +154,7 @@ export const ActivitiesTab = () => {
             <Table.HeaderCell className="w-20">
             Venue Cost
             </Table.HeaderCell>
-            <Table.HeaderCell className='w-3/4'>
+            <Table.HeaderCell className='w-3/4 rounded-tr-lg'>
               Notes
             </Table.HeaderCell>
           </Table.HeaderRow>
@@ -185,6 +187,9 @@ export const ActivitiesTab = () => {
           </Table.Body>
         </Table>
       )}
+      <div className="mt-4">
+        <ToolbarButton onClick={create} className='!text-primary-green'>Add New Activity</ToolbarButton>
+      </div>
     </>
   )
 }

@@ -6,6 +6,7 @@ import schema from './validation'
 import Typeahead from 'components/Typeahead'
 import { Spinner } from 'components/global/Spinner'
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
+import { StyledDialog } from 'components/global/StyledDialog'
 
 interface props {
   searchFilter: String;
@@ -25,6 +26,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
   const [notes, setNotes] = useState<any>({})
   const [validationErrors, setValidationErrors] = useState<any>({})
   const [ignoreValidation, setIgnoreValidation] = useState<boolean>(false)
+  const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false)
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
       setLoading(true)
@@ -199,7 +201,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
   }
 
   async function onSubmit (e: any) {
-    e.preventDefault()
+    e?.preventDefault?.()
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
       SetHoldHoldTypeId,
       SetHoldSeats: holds[SetHoldHoldTypeId].seats,
@@ -212,6 +214,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
     if (!ignoreValidation) {
       const valid = await validateSale(sale, previousSale)
       if (!valid) {
+        setOpenWarningsDialog(true)
         return
       }
     }
@@ -238,10 +241,11 @@ export default function Entry ({ tours = [], searchFilter }: props) {
       })
       .then((res) => {
         console.log('Updated Sales', res)
+        setOpenWarningsDialog(false)
       })
       .catch((error) => {
         console.log('Error updating Sales', error)
-      })
+      }).finally(() => {})
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -606,14 +610,14 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                 </div>
               </div>
             </div>
-            <div>
+            {/* <div>
               <FormInputCheckbox
                 className='flex-row-reverse !justify-end'
                 onChange={(e) => setIgnoreValidation(e.target.value)}
                 label="Ignore warnings and continue"
                 value={ignoreValidation}
               />
-            </div>
+            </div> */}
             <button
               type={'submit'}
               className={
@@ -639,6 +643,32 @@ export default function Entry ({ tours = [], searchFilter }: props) {
           <div className={'mb-1'}></div>
         </div>
       </div>
+      <StyledDialog open={openWarningsDialog} onClose={() => setOpenWarningsDialog(false)} title={'Warnings'}>
+        <div>
+          {Object.values(validationErrors).map((errorMessage, i) => (
+            <p key={i} className="text-primary-orange">
+              {errorMessage}
+            </p>
+          ))}
+        </div>
+        <div>
+          <FormInputCheckbox
+            className='flex-row-reverse !justify-end'
+            onChange={(e) => setIgnoreValidation(e.target.value)}
+            label="Ignore warnings and continue"
+            value={ignoreValidation}
+          />
+        </div>
+        <button
+          type={'submit'}
+          onClick={onSubmit}
+          className={
+            'inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-12 text-white px-3 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
+          }
+        >
+              Add Sales Data
+        </button>
+      </StyledDialog>
     </div>
   )
 }
