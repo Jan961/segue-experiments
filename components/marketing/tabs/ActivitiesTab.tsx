@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { Table } from 'components/global/table/Table'
 import { FormInputButton } from 'components/global/forms/FormInputButton'
 import axios from 'axios'
