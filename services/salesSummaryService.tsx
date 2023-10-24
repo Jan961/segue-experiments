@@ -15,6 +15,7 @@ export enum COLOR_HEXCODE {
   ORANGE= 'ffff6347',
   CREAM = 'ffedb150',
   DARK_BLUE= 'ff2f75b5',
+  LIGHT_GREY= 'ffc8c8c8',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`
@@ -55,12 +56,6 @@ export const CONSTANTS: {[key:string]: string} = {
 }
 
 export const assignBackgroundColor = ({ worksheet, row, col, props: { SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetTourWeekDate, NotOnSalesDate }, meta: { weekCols } }: {worksheet: any, row: number, col: number, props: {SetIsCopy:TSalesView['SetIsCopy'], SetBrochureReleased: TSalesView['SetBrochureReleased'], BookingStatusCode: TSalesView['BookingStatusCode'], Date: TRequiredFieldsFinalFormat['Date'], SetTourWeekDate:TRequiredFields['SetTourWeekDate'], NotOnSalesDate: TRequiredFields['NotOnSalesDate']}, meta: {weekCols: number}}) => {
-  if (BookingStatusCode === BOOK_STATUS_CODES.X) {
-    const startPoint = 6
-    for (let i = 0; i < weekCols; i++) {
-      colorCell({ worksheet, row, col: i + startPoint, argbColor: COLOR_HEXCODE.GREY })
-    }
-  }
   if (Number(SetIsCopy)) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.PURPLE })
   }
@@ -74,6 +69,12 @@ export const assignBackgroundColor = ({ worksheet, row, col, props: { SetIsCopy,
 
   if (NotOnSalesDate && (moment(SetTourWeekDate).valueOf() < moment(NotOnSalesDate).valueOf())) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED })
+  }
+  if (BookingStatusCode === BOOK_STATUS_CODES.X) {
+    const startPoint = 6
+    for (let i = 0; i < weekCols; i++) {
+      colorTextAndBGCell({ worksheet, row, col: i + startPoint, cellColor: COLOR_HEXCODE.WHITE, textColor: COLOR_HEXCODE.LIGHT_GREY })
+    }
   }
 }
 
@@ -388,7 +389,7 @@ export const minutesInHHmmFormat = (min: number) => {
 }
 export const makeColumnTextBold = ({ worksheet, colAsChar }: {worksheet: any, colAsChar: string}) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
-    cell.font = { bold: true }
+    cell.font = { ...(cell.font || {}), bold: true }
   })
 }
 
