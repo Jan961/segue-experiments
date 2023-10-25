@@ -32,7 +32,8 @@ import {
   addCellBorder,
   convertDateFormat,
   makeRowTextNormal,
-  applyFormattingToRange
+  applyFormattingToRange,
+  colorTextAndBGCell
 } from 'services/salesSummaryService'
 import {
   SALES_TYPE_NAME,
@@ -215,7 +216,11 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       const val: TRequiredFieldsFinalFormat = mapOfCreatedKeyAndModifiedFetchedValue[key]
       if (val) {
         assignBackgroundColor({ worksheet, row, col, props: { SetIsCopy: val.SetIsCopy, SetBrochureReleased: val.SetBrochureReleased, BookingStatusCode: val.BookingStatusCode, Date: val.Date, SetTourWeekDate: headerWeekDates[i], NotOnSalesDate: rowAsJSON.NotOnSalesDate }, meta: { weekCols: variableColsLength + 1 } })
+        if (val.BookingStatusCode === 'X') {
+          colorTextAndBGCell({ worksheet, row, col: 5, textColor: COLOR_HEXCODE.WHITE, cellColor: COLOR_HEXCODE.BLACK })
+        }
       } else {
+        if (rowAsJSON?.BookingStatusCode === 'X') continue
         if (moment(rowAsJSON.Date).valueOf() < moment(headerWeekDates[i]).valueOf()) {
           colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE })
         }
