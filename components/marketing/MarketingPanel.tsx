@@ -11,8 +11,7 @@ import { Summary } from './Summary'
 const MarketingPanel = () => {
   return (
     <div className={'flex md:flex-col'}>
-      <br />
-      <Tab.Group as='div' className="mt-5">
+      <Tab.Group as='div' className={'mt-2'}>
         <Tab.List className="mb-2">
           <StyledTab>Sales</StyledTab>
           <StyledTab>Archived Sales</StyledTab>
