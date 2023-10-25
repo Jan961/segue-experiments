@@ -79,7 +79,9 @@ export const SalesTab = () => {
   const onChange = (key:string, value:boolean, sale:any) => {
     updateSaleSet(selected, moment(sale.weekOf)?.toISOString()?.substring?.(0, 10), { [key.replace('is', 'Set')]: value })
     setBookingSales(prevSales => prevSales.map(s => {
-      if (sale.weekOf === s.weekOf && sale.week === s.week) {
+      if (key === 'isNotOnSale') {
+        return { ...s, notOnSaleDate: sale.weekOf }
+      } if (sale.weekOf === s.weekOf && sale.week === s.week) {
         return { ...s, [key]: value }
       }
       return s
@@ -129,9 +131,10 @@ export const SalesTab = () => {
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i)
                 let colorCode = ''
-                if (sale.isSingleSeats)colorCode = 'bg-primary-orange text-primary-yellow'
-                if (sale.isBrochureReleased)colorCode = 'bg-primary-yellow text-black'
-                if (sale.isNotOnSale)colorCode = 'bg-soft-primary-green text-black'
+                const isNotOnSale = new Date(sale.weekOf) <= new Date(sale.notOnSaleDate)
+                if (isNotOnSale)colorCode = 'bg-lime-500 text-black'
+                if (sale.isSingleSeats)colorCode = 'bg-red-500 text-yellow-200'
+                if (sale.isBrochureReleased)colorCode = 'bg-yellow-200 text-black'
                 return (
                   <Table.Row id={sale.isFinal ? 'final' : null} key={sale.week}>
                     <Table.Cell className={classNames('whitespace-nowrap max-w-fit', colorCode)}>
@@ -180,7 +183,7 @@ export const SalesTab = () => {
                         />
                         <Indicator
                           tooltip='Not on Sale'
-                          active={sale.isNotOnSale}
+                          active={isNotOnSale}
                           icon={faSquareXmark}
                           onChange={(value) => onChange('isNotOnSale', value, sale)}
                         />
