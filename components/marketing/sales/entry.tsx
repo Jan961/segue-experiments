@@ -211,6 +211,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
       SetCompCompTypeId,
       SetCompSeats: comps[SetCompCompTypeId]
     }))
+    const ignoreValidation = Object.values(validationErrors).length > 0
     if (!ignoreValidation) {
       const valid = await validateSale(sale, previousSale)
       if (!valid) {
@@ -242,6 +243,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
       .then((res) => {
         console.log('Updated Sales', res)
         setOpenWarningsDialog(false)
+        setValidationErrors({})
       })
       .catch((error) => {
         console.log('Error updating Sales', error)
@@ -610,65 +612,32 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                 </div>
               </div>
             </div>
-            {/* <div>
-              <FormInputCheckbox
-                className='flex-row-reverse !justify-end'
-                onChange={(e) => setIgnoreValidation(e.target.value)}
-                label="Ignore warnings and continue"
-                value={ignoreValidation}
-              />
-            </div> */}
-            <button
-              type={'submit'}
-              className={
-                'inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
-              }
-            >
-              Add Sales Data
-            </button>
           </form>
         </div>
       </div>
       <div className={'flex bg-transparent flex flex-col w-1/3 p-5'}>
         <div className="grid grid-cols-2 gap-1 mb-4">
           <button
+            type={'submit'}
+            onClick={onSubmit}
+            className={
+              ' rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
+            }
+          >
+            {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
+          </button>
+          <button
             disabled={!previousSaleWeek}
             onClick={copyLastWeekSalesData}
-            className="bg-primary-green text-white drop-shadow-md px-4 rounded-md"
+            className=" rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2"
           >
             Copy Last Week Sales Data
           </button>
         </div>
-        <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border   ring-opacity-5 sm:-mx-6 md:mx-0 ">
+        <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border ring-opacity-5 sm:-mx-6 md:mx-0 ">
           <div className={'mb-1'}></div>
         </div>
       </div>
-      <StyledDialog open={openWarningsDialog} onClose={() => setOpenWarningsDialog(false)} title={'Warnings'}>
-        <div>
-          {Object.values(validationErrors).map((errorMessage, i) => (
-            <p key={i} className="text-primary-orange">
-              {errorMessage}
-            </p>
-          ))}
-        </div>
-        <div>
-          <FormInputCheckbox
-            className='flex-row-reverse !justify-end'
-            onChange={(e) => setIgnoreValidation(e.target.value)}
-            label="Ignore warnings and continue"
-            value={ignoreValidation}
-          />
-        </div>
-        <button
-          type={'submit'}
-          onClick={onSubmit}
-          className={
-            'inline-flex items-center mt-5 rounded border border-gray-300 bg-primary-green w-100 h-12 text-white px-3 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
-          }
-        >
-              Add Sales Data
-        </button>
-      </StyledDialog>
     </div>
   )
 }
