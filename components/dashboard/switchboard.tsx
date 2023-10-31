@@ -1,48 +1,62 @@
-import { faCalendarAlt, faChartLine, faCheckSquare, faFile, faUserCog, faVolumeHigh } from '@fortawesome/free-solid-svg-icons'
-import { SwitchBoardItem } from 'components/global/SwitchBoardItem'
+import {
+  faCalendarAlt,
+  faChartLine,
+  faCheckSquare,
+  faFile,
+  faLocationDot,
+  faUserCog,
+  faVolumeHigh,
+} from "@fortawesome/free-solid-svg-icons";
+import { SwitchBoardItem } from "components/global/SwitchBoardItem";
 
 export const Switchboard = () => {
   const links = [
     {
-      title: 'Bookings',
-      route: '/bookings',
+      title: "Bookings",
+      route: "/bookings",
       icon: faCalendarAlt,
-      color: 'bg-primary-orange'
+      color: "bg-primary-orange",
     },
     {
-      title: 'Tasks',
-      route: '/tasks',
+      title: "Tasks",
+      route: "/tasks",
       icon: faCheckSquare,
-      color: 'bg-primary-yellow'
+      color: "bg-primary-yellow",
     },
     {
-      title: 'Marketing',
-      route: '/marketing',
+      title: "Marketing",
+      route: "/marketing",
       icon: faVolumeHigh,
-      color: 'bg-primary-green'
+      color: "bg-primary-green",
     },
     {
-      title: 'Contracts',
-      route: '/contracts',
+      title: "Contracts",
+      route: "/contracts",
       icon: faFile,
-      color: 'bg-primary-blue'
+      color: "bg-primary-blue",
     },
     {
-      title: 'Reports',
-      route: '/reports',
+      title: "Reports",
+      route: "/reports",
       icon: faChartLine,
-      color: 'bg-primary-purple'
+      color: "bg-primary-purple",
     },
     {
-      title: 'Account',
-      route: '/account',
+      title: "Account",
+      route: "/account",
       icon: faUserCog,
-      color: 'bg-primary-pink'
-    }
-  ]
+      color: "bg-primary-pink",
+    },
+    {},
+    {
+      title: "Touring Management",
+      route: "/touring",
+      icon: faLocationDot,
+      color: "bg-primary-navy",
+    },
+  ];
 
   return (
-
     <ul
       role="list"
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4 max-w-2xl mx-auto"
@@ -51,5 +65,5 @@ export const Switchboard = () => {
         <SwitchBoardItem key={link.route} link={link} />
       ))}
     </ul>
-  )
-}
+  );
+};
