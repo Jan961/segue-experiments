@@ -201,7 +201,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const getInFitUp = {}
   const performance = {}
   const other = {}
-
+  const venue = objectify(venues, v => v.Id, (v: any) => {
+    const Town:string|null = v.VenueAddress.find((address:any) => address?.TypeName === 'Main')?.Town || null
+    return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 }
+  })
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const db of tour.DateBlock) {
     dateBlock.push(dateBlockMapper(db))
@@ -211,6 +214,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     db.Booking.forEach(b => {
       booking[b.Id] = bookingMapper(b as BookingsWithPerformances)
       b.Performance.forEach(p => { performance[p.Id] = performanceMapper(p) })
+      const venueId = booking[b.Id].VenueId
+      if (venue[venueId])venue[venueId].Count++
     })
   }
 
@@ -235,10 +240,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       performance,
       dateBlock: dateBlock.sort((a, b) => { return b.StartDate < a.StartDate ? 1 : -1 }),
       // Remove extra info
-      venue: objectify(venues, v => v.Id, (v: any) => {
-        const Town:string|null = v.VenueAddress.find((address:any) => address?.TypeName === 'Main')?.Town || null
-        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats }
-      })
+      venue
     }
   }
 
