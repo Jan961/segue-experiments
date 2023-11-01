@@ -1,11 +1,11 @@
-import { VenueRoleDTO } from 'interfaces'
-import { atom } from 'recoil'
+import { VenueRoleDTO } from 'interfaces';
+import { atom } from 'recoil';
 
-export type VenueRole = VenueRoleDTO[]
+export type VenueRole = VenueRoleDTO[];
 
-const intialState: VenueRole = []
+const intialState: VenueRole = [];
 
 export const venueRoleState = atom({
   key: 'venueRoleState',
-  default: intialState
-})
+  default: intialState,
+});

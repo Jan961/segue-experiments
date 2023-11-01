@@ -1,3 +1,3 @@
-import prisma from 'lib/prisma'
+import prisma from 'lib/prisma';
 
-export const getDayTypes = async () => (prisma.dateType.findMany({}))
+export const getDayTypes = async () => prisma.dateType.findMany({});

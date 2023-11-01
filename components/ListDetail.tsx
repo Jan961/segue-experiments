@@ -1,16 +1,16 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import {User} from '../interfaces'
+import { User } from '../interfaces';
 
 type ListDetailProps = {
-    item: User
-}
+  item: User;
+};
 
-const ListDetail = ({item: user}: ListDetailProps) => (
-    <div>
-        <h1>Detail for {user.UserName}</h1>
-        <p>ID: {user.UserId}</p>
-    </div>
-)
+const ListDetail = ({ item: user }: ListDetailProps) => (
+  <div>
+    <h1>Detail for {user.UserName}</h1>
+    <p>ID: {user.UserId}</p>
+  </div>
+);
 
-export default ListDetail
+export default ListDetail;

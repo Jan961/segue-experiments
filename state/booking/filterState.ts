@@ -1,14 +1,14 @@
-import { atom } from 'recoil'
+import { atom } from 'recoil';
 
 export type FilterState = {
-  venueText?: string
-}
+  venueText?: string;
+};
 
 const intialState: FilterState = {
-  venueText: ''
-}
+  venueText: '',
+};
 
 export const filterState = atom({
   key: 'filterState',
-  default: intialState
-})
+  default: intialState,
+});

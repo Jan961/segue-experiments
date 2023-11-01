@@ -1,6 +1,6 @@
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getEmailFromReq, checkAccess } from 'services/userService'
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getEmailFromReq, checkAccess } from 'services/userService';
 
 /**
  *
@@ -12,64 +12,59 @@ import { getEmailFromReq, checkAccess } from 'services/userService'
  * @param req TourID
  * @param res
  */
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const TourId = parseInt(req.query.TourId as string)
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+  const TourId = parseInt(req.query.TourId as string);
 
-  const email = await getEmailFromReq(req)
-  const access = await checkAccess(email, { TourId })
-  if (!access) return res.status(401).end()
+  const email = await getEmailFromReq(req);
+  const access = await checkAccess(email, { TourId });
+  if (!access) return res.status(401).end();
 
   // Simole qyerey to get the tour Start and End Date
-  const tourdates = await prisma.tour.findFirst(
-    {
-      where: {
-        TourId
-      }
-    }
-  )
+  const tourdates = await prisma.tour.findFirst({
+    where: {
+      TourId,
+    },
+  });
 
-  const result = await prisma.booking.findMany(
-    {
-      where: {
-        AND: [
-          { TourId },
-          /**
-                     * get indication of dates not currently booked
-                     */
-          {
-            VenueId: { not: null }
+  const result = await prisma.booking.findMany({
+    where: {
+      AND: [
+        { TourId },
+        /**
+         * get indication of dates not currently booked
+         */
+        {
+          VenueId: { not: null },
+        },
+        {
+          Performance1Time: {
+            not: null,
           },
-          {
-            Performance1Time: {
-              not: null
-            }
-          },
-          {
-            ShowDate: {
+        },
+        {
+          ShowDate: {
             /**
-                             * Use Dates from simple query to create constraint of Tour Start And End
-                             */
-              gte: tourdates.TourStartDate,
-              lte: tourdates.TourEndDate
-            }
+             * Use Dates from simple query to create constraint of Tour Start And End
+             */
+            gte: tourdates.TourStartDate,
+            lte: tourdates.TourEndDate,
           },
-          {
-            OR: [
+        },
+        {
+          OR: [
             /**
-                             * List of day types that can be used for new bookings to make sure
-                             * dates are not taken by Meta Days
-                             */
-              { DateTypeId: 1 }, // Null
-              { DateTypeId: 17 } // TBA
-            ]
-          }
-        ]
-      },
-      include: {
-        Venue: true
-      }
-
-    }
-  )
-  res.json(result)
+             * List of day types that can be used for new bookings to make sure
+             * dates are not taken by Meta Days
+             */
+            { DateTypeId: 1 }, // Null
+            { DateTypeId: 17 }, // TBA
+          ],
+        },
+      ],
+    },
+    include: {
+      Venue: true,
+    },
+  });
+  res.json(result);
 }

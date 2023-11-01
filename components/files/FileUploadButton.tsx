@@ -1,55 +1,45 @@
 import classNames from 'classnames';
-import { IFileData } from 'interfaces'
-import React from 'react'
+import { IFileData } from 'interfaces';
+import React from 'react';
 
 interface FileUploadProps {
   fileData: IFileData;
-  disabled: boolean
+  disabled: boolean;
   setFileData: (value: any) => void;
 }
 
-const FileUploadButton: React.FC<FileUploadProps> = ({
-  fileData,
-  disabled = false,
-  setFileData
-}) => {
+const FileUploadButton: React.FC<FileUploadProps> = ({ fileData, disabled = false, setFileData }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
 
     if (file) {
-      const reader = new FileReader()
-      reader.readAsArrayBuffer(file)
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(file);
       reader.onload = () => {
-        const fileDT = new Date()
-        const fileContent = new Uint8Array(reader.result as ArrayBuffer)
+        const fileDT = new Date();
+        const fileContent = new Uint8Array(reader.result as ArrayBuffer);
         setFileData({
           description: '',
           originalFilename: file.name,
           fileDT,
-          fileContent
-        })
-      }
+          fileContent,
+        });
+      };
     }
-  }
+  };
 
-  let baseClass = 'p-2 px-8  text-white rounded-md inline-block'
-  if (disabled) baseClass = classNames(baseClass, 'cursor-not-allowed bg-gray-300')
-  else baseClass = classNames(baseClass, 'cursor-pointer bg-primary-pink')
+  let baseClass = 'p-2 px-8  text-white rounded-md inline-block';
+  if (disabled) baseClass = classNames(baseClass, 'cursor-not-allowed bg-gray-300');
+  else baseClass = classNames(baseClass, 'cursor-pointer bg-primary-pink');
 
   return (
     <>
-      <input
-        type="file"
-        id="fileInput"
-        disabled={disabled}
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-      />
+      <input type="file" id="fileInput" disabled={disabled} onChange={handleFileChange} style={{ display: 'none' }} />
       <label htmlFor="fileInput" className={baseClass}>
         Add Artifact
       </label>
     </>
-  )
-}
+  );
+};
 
-export default FileUploadButton
+export default FileUploadButton;

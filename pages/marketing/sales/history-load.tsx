@@ -1,17 +1,17 @@
-import Layout from '../../../components/Layout'
-import Toolbar from '../../../components/marketing/venue/toolbar'
-import SideMenu from '../../../components/sideMenu'
-import { Show } from '../../../interfaces'
-import HistoryLoad from '../../../components/marketing/sales/historyload'
-import TemplateHelper from '../../../components/marketing/sales/templates-helper'
+import Layout from '../../../components/Layout';
+import Toolbar from '../../../components/marketing/venue/toolbar';
+import SideMenu from '../../../components/sideMenu';
+import { Show } from '../../../interfaces';
+import HistoryLoad from '../../../components/marketing/sales/historyload';
+import TemplateHelper from '../../../components/marketing/sales/templates-helper';
 
 type Props = {
-    items: Show[]
-}
-const pagetitle = 'Marketing - Sale Entry'
+  items: Show[];
+};
+const pagetitle = 'Marketing - Sale Entry';
 
 const Index = ({ items }: Props) => (
-  <Layout title={pagetitle + '| Seque'} >
+  <Layout title={pagetitle + '| Seque'}>
     <Toolbar title={pagetitle} searchFilter={''}></Toolbar>
     <div className="flex flex-auto">
       <SideMenu></SideMenu>
@@ -19,6 +19,6 @@ const Index = ({ items }: Props) => (
       <TemplateHelper></TemplateHelper>
     </div>
   </Layout>
-)
+);
 
-export default Index
+export default Index;

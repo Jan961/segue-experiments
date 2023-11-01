@@ -1,25 +1,25 @@
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { rehearsalState } from 'state/booking/rehearsalState'
-import { viewState } from 'state/booking/viewState'
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { rehearsalState } from 'state/booking/rehearsalState';
+import { viewState } from 'state/booking/viewState';
 
 interface RehearsalDisplayProps {
-  rehearsalId: number
-  date: string
+  rehearsalId: number;
+  date: string;
 }
 
 export const RehearsalDisplay = ({ rehearsalId, date }: RehearsalDisplayProps) => {
-  const rehearsalDict = useRecoilValue(rehearsalState)
-  const [view, setView] = useRecoilState(viewState)
+  const rehearsalDict = useRecoilValue(rehearsalState);
+  const [view, setView] = useRecoilState(viewState);
 
-  if (!rehearsalId) return null
+  if (!rehearsalId) return null;
 
-  const r = rehearsalDict[rehearsalId]
+  const r = rehearsalDict[rehearsalId];
 
   const select = () => {
-    setView({ ...view, selected: { type: 'rehearsal', id: rehearsalId }, selectedDate: date })
-  }
+    setView({ ...view, selected: { type: 'rehearsal', id: rehearsalId }, selectedDate: date });
+  };
 
-  const active = view.selected?.id === rehearsalId && view.selected?.type === 'rehearsal'
+  const active = view.selected?.id === rehearsalId && view.selected?.type === 'rehearsal';
 
   return (
     <div
@@ -31,7 +31,7 @@ export const RehearsalDisplay = ({ rehearsalId, date }: RehearsalDisplayProps) =
        `}
       onClick={select}
     >
-      <div className="col-span-7 text-center">Rehearsal: { r.Town ? r.Town : 'N/A' }</div>
+      <div className="col-span-7 text-center">Rehearsal: {r.Town ? r.Town : 'N/A'}</div>
     </div>
-  )
-}
+  );
+};
