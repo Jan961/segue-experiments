@@ -6,11 +6,11 @@ import {
   faClose,
   faFileSignature,
   faHome,
-<<<<<<< HEAD
+
   faLocationDot,
-=======
+
   faUserGear,
->>>>>>> 50a7d11 (Introducing prettier)
+
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegueLogo } from './global/SegueLogo';
@@ -77,6 +77,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       activeColor: 'text-primary-purple',
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     {
       label: 'Touring Management',
       link: '/touring',
@@ -85,6 +86,8 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
     },
 =======
 >>>>>>> 50a7d11 (Introducing prettier)
+=======
+>>>>>>> f84df22f53075d8522747372af1f74b77f3c8483
     /*
     {
       label: 'Admin',
