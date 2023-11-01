@@ -1,5 +1,4 @@
 import { SwitchBoardItem } from "components/global/SwitchBoardItem";
-import { Tile } from "components/global/Tile";
 import Layout from "../../components/Layout";
 import {
   faTriangleExclamation,
