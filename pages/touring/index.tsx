@@ -35,7 +35,7 @@ export default function TouringManagement() {
         <h1 className="mb-8 text-center">Touring Management</h1>
         <ul role="list" className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
           {links.map((link) => (
-            <SwitchBoardItem link={link} />
+            <SwitchBoardItem key={link.title} link={link} />
           ))}
         </ul>
       </div>
