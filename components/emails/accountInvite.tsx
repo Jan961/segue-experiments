@@ -1,11 +1,11 @@
-export default function AccountInvite (data) {
-  const body: string = data.data.text
-  const hashString: string = data.data.hash
+export default function AccountInvite(data) {
+  const body: string = data.data.text;
+  const hashString: string = data.data.hash;
 
-  console.log(data.data.text)
-  return <>{
-
-    `<html lang="en">
+  console.log(data.data.text);
+  return (
+    <>
+      {`<html lang="en">
 
         <head>
             <meta charSet="UTF-8">
@@ -38,7 +38,7 @@ export default function AccountInvite (data) {
             </div>
         </div>
         </body>
-        </html>`
-  }
-  </>
+        </html>`}
+    </>
+  );
 }

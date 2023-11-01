@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
-import TourJumpMenu from '../global/nav/TourJumpMenu'
-import { FormInputText } from 'components/global/forms/FormInputText'
-import { TourDTO } from 'interfaces'
+import * as React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import TourJumpMenu from '../global/nav/TourJumpMenu';
+import { FormInputText } from 'components/global/forms/FormInputText';
+import { TourDTO } from 'interfaces';
 
 // This needs to be passed from the template
 // let show = "ST1";
@@ -16,7 +16,7 @@ interface props {
   color?: string;
   tourJump?: boolean;
   filterComponent?: any;
-  page?:string;
+  page?: string;
 }
 
 const GlobalToolbar = ({
@@ -26,16 +26,14 @@ const GlobalToolbar = ({
   setSearchFilter,
   color = 'text-primary-blue',
   filterComponent,
-  children
+  children,
 }: React.PropsWithChildren<props>) => {
-  const [filtersOpen, setFiltersOpen] = React.useState(false)
+  const [filtersOpen, setFiltersOpen] = React.useState(false);
 
   return (
     <div className="py-2 flex flex-row items-center gap-4">
-      <h1 className={`text-xl font-bold ${color} `}>
-        {title}
-      </h1>
-      { filterComponent && (
+      <h1 className={`text-xl font-bold ${color} `}>{title}</h1>
+      {filterComponent && (
         <div className="flex flex-row">
           <button
             className="border-gray-400 rounded-md drop-shadow-md px-2 py-1"
@@ -50,34 +48,28 @@ const GlobalToolbar = ({
               width="20"
               height="20"
             >
-              {filtersOpen
-                ? (<path d="M5 6l5 5 5-5H5z" />)
-                : (<path
-                  fillRule="evenodd"
-                  d="M5 8h10l-5 5-5-5zm0 0h10l-5 5-5-5z"
-                  clipRule="evenodd"
-                />
-                )
-              }
+              {filtersOpen ? (
+                <path d="M5 6l5 5 5-5H5z" />
+              ) : (
+                <path fillRule="evenodd" d="M5 8h10l-5 5-5-5zm0 0h10l-5 5-5-5z" clipRule="evenodd" />
+              )}
             </svg>
           </button>
         </div>
       )}
-      {tourJump
-        ? (
-          <div className="bg-white drop-shadow-md inline-block rounded-md">
-            <div className="rounded-l-md">
-              <div className="flex items-center">
-                <p className="mx-2">Set Tour</p>
-                <TourJumpMenu />
-              </div>
+      {tourJump ? (
+        <div className="bg-white drop-shadow-md inline-block rounded-md">
+          <div className="rounded-l-md">
+            <div className="flex items-center">
+              <p className="mx-2">Set Tour</p>
+              <TourJumpMenu />
             </div>
           </div>
-        )
-        : (
-          <div> </div>
-        )}
-      { children }
+        </div>
+      ) : (
+        <div> </div>
+      )}
+      {children}
       {/* { setSearchFilter && (
         <div className="ml-auto">
           <label htmlFor="searchBookings" className="sr-only">
@@ -101,7 +93,7 @@ const GlobalToolbar = ({
       {/* @ts-ignore */}
       {filterComponent && filterComponent}
     </div>
-  )
-}
+  );
+};
 
-export default GlobalToolbar
+export default GlobalToolbar;

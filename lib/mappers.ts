@@ -1,9 +1,41 @@
-import { DateBlock, GetInFitUp, Rehearsal, Show, Performance as PerformanceType, DateType, Other, VenueContact, BookingActivity, BookingContactNotes, TourTask, User, Tour } from '@prisma/client'
-import { ActivityDTO, BookingContactNoteDTO, BookingDTO, BookingWithVenueDTO, DateBlockDTO, DateTypeDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, RehearsalDTO, ShowDTO, StatusCode, TourDTO, TourTaskDTO, UserDto, VenueContactDTO, VenueRoleDTO } from 'interfaces'
-import { ShowWithTours } from 'services/ShowService'
-import { TourWithDateblocks } from 'services/TourService'
-import { BookingsWithPerformances } from 'services/bookingService'
-import { toISO } from 'services/dateService'
+import {
+  DateBlock,
+  GetInFitUp,
+  Rehearsal,
+  Show,
+  Performance as PerformanceType,
+  DateType,
+  Other,
+  VenueContact,
+  BookingActivity,
+  BookingContactNotes,
+  TourTask,
+  User,
+  Tour,
+} from '@prisma/client';
+import {
+  ActivityDTO,
+  BookingContactNoteDTO,
+  BookingDTO,
+  BookingWithVenueDTO,
+  DateBlockDTO,
+  DateTypeDTO,
+  GetInFitUpDTO,
+  OtherDTO,
+  PerformanceDTO,
+  RehearsalDTO,
+  ShowDTO,
+  StatusCode,
+  TourDTO,
+  TourTaskDTO,
+  UserDto,
+  VenueContactDTO,
+  VenueRoleDTO,
+} from 'interfaces';
+import { ShowWithTours } from 'services/ShowService';
+import { TourWithDateblocks } from 'services/TourService';
+import { BookingsWithPerformances } from 'services/bookingService';
+import { toISO } from 'services/dateService';
 
 /*
 
@@ -22,35 +54,35 @@ We also have full control of types here so we can get type safety to child objec
 
 // This is so we can change the implimentation if needed. We had some issues with timezone.
 const convertDate = (date: Date) => {
-  if (date) return toISO(date)
-  return ''
-}
+  if (date) return toISO(date);
+  return '';
+};
 
 export const showMapper = (show: Show): ShowDTO => ({
   Id: show.Id,
   Name: show.Name,
   Type: show.Type,
   Code: show.Code,
-  IsArchived: show.IsArchived
-})
+  IsArchived: show.IsArchived,
+});
 
 export const showTourMapper = (s: ShowWithTours): TourDTO[] => {
-  return s.Tour.map(tourEditorMapper)
-}
+  return s.Tour.map(tourEditorMapper);
+};
 
 export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
   Id: db.Id,
   StartDate: convertDate(db.StartDate),
   EndDate: convertDate(db.EndDate),
-  Name: db.Name
-})
+  Name: db.Name,
+});
 
 export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
   Id: r.Id,
   Date: convertDate(r.Date),
   Town: r.Town,
-  StatusCode: r.StatusCode
-})
+  StatusCode: r.StatusCode,
+});
 
 export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   Date: convertDate(b.FirstDate),
@@ -60,8 +92,8 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   PencilNum: b.PencilNum,
   Notes: b.Notes,
   CastRateTicketsArranged: b.CastRateTicketsArranged,
-  CastRateTicketsNotes: b.CastRateTicketsNotes
-})
+  CastRateTicketsNotes: b.CastRateTicketsNotes,
+});
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
   ...bookingMapper(b),
@@ -69,38 +101,36 @@ export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
     Id: b.Venue.Id,
     Code: b.Venue.Code,
     Name: b.Venue.Name,
-    Website: b.Venue.Website
+    Website: b.Venue.Website,
   },
-  TourId: b.DateBlock?.TourId
-})
+  TourId: b.DateBlock?.TourId,
+});
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
-  const day = p.Date.toISOString().split('T')[0]
-  const time = p.Time?.toISOString?.()?.split?.('T')?.[1]
-  const Date = `${day}${time ? 'T' + time : ''}`
+  const day = p.Date.toISOString().split('T')[0];
+  const time = p.Time?.toISOString?.()?.split?.('T')?.[1];
+  const Date = `${day}${time ? 'T' + time : ''}`;
 
   return {
     Id: p.Id,
     Date,
-    BookingId: p.BookingId
-  }
-}
+    BookingId: p.BookingId,
+  };
+};
 
 export const otherMapper = (o: Other): OtherDTO => ({
   Id: o.Id,
   Date: convertDate(o.Date),
   DateTypeId: o.DateTypeId,
-  StatusCode: o.StatusCode as StatusCode
-})
+  StatusCode: o.StatusCode as StatusCode,
+});
 
-export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => (
-  {
-    Date: convertDate(gifu.Date),
-    Id: gifu.Id,
-    VenueId: gifu.VenueId,
-    StatusCode: gifu.StatusCode as StatusCode
-  }
-)
+export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => ({
+  Date: convertDate(gifu.Date),
+  Id: gifu.Id,
+  VenueId: gifu.VenueId,
+  StatusCode: gifu.StatusCode as StatusCode,
+});
 
 export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
   Id: t.Id,
@@ -109,13 +139,13 @@ export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
   Code: t.Code,
   ShowCode: t.Show.Code,
   DateBlock: t.DateBlock ? t.DateBlock.map(dateBlockMapper) : [],
-  IsArchived: t.IsArchived
-})
+  IsArchived: t.IsArchived,
+});
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({
   Id: dt.Id,
-  Name: dt.Name
-})
+  Name: dt.Name,
+});
 
 export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
   Id: vc.Id,
@@ -123,8 +153,8 @@ export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
   LastName: vc.LastName,
   Phone: vc.Phone,
   Email: vc.Email,
-  RoleId: vc.VenueRoleId
-})
+  RoleId: vc.VenueRoleId,
+});
 
 export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   Id: a.Id,
@@ -135,8 +165,8 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   CompanyCost: Number(a.CompanyCost),
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
-  Notes: a.ActivityNotes
-})
+  Notes: a.ActivityNotes,
+});
 
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({
   Id: a.Id,
@@ -144,23 +174,23 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   CoContactName: a.CoContactName,
   ContactDate: convertDate(a.ContactDate),
   ActionByDate: convertDate(a.ActionByDate),
-  Notes: a.Notes
-})
+  Notes: a.Notes,
+});
 
 export const mapToTourTaskDTO = (t: TourTask): TourTaskDTO => {
   return {
-    ...t
-  }
-}
+    ...t,
+  };
+};
 
 export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Id: vr.Id,
-  Name: vr.Name
-})
+  Name: vr.Name,
+});
 
 export const userMapper = (user: User): UserDto => ({
   Id: user.Id,
   FirstName: user.FirstName,
   LastName: user.LastName,
-  Email: user.Email
-})
+  Email: user.Email,
+});

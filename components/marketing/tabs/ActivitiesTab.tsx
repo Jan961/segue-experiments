@@ -1,194 +1,178 @@
-import * as React from 'react'
-import { Table } from 'components/global/table/Table'
-import { FormInputButton } from 'components/global/forms/FormInputButton'
-import axios from 'axios'
-import { bookingJumpState } from 'state/marketing/bookingJumpState'
-import { LoadingTab } from './LoadingTab'
-import { useRecoilValue } from 'recoil'
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
-import { ActivitiesResponse } from 'pages/api/marketing/activities/[BookingId]'
-import { FormInputDate } from 'components/global/forms/FormInputDate'
-import { ActivitiesEditor } from '../editors/ActivitiesEditor'
-import { objectify } from 'radash'
-import { dateToSimple } from 'services/dateService'
-import { NoDataWarning } from '../NoDataWarning'
-import numeral from 'numeral'
-import { ToolbarButton } from 'components/bookings/ToolbarButton'
+import * as React from 'react';
+import { Table } from 'components/global/table/Table';
+import { FormInputButton } from 'components/global/forms/FormInputButton';
+import axios from 'axios';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import { LoadingTab } from './LoadingTab';
+import { useRecoilValue } from 'recoil';
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
+import { ActivitiesResponse } from 'pages/api/marketing/activities/[BookingId]';
+import { FormInputDate } from 'components/global/forms/FormInputDate';
+import { ActivitiesEditor } from '../editors/ActivitiesEditor';
+import { objectify } from 'radash';
+import { dateToSimple } from 'services/dateService';
+import { NoDataWarning } from '../NoDataWarning';
+import numeral from 'numeral';
+import { ToolbarButton } from 'components/bookings/ToolbarButton';
 
 export const ActivitiesTab = () => {
-  const { selected } = useRecoilValue(bookingJumpState)
+  const { selected } = useRecoilValue(bookingJumpState);
 
-  const [data, setData] = React.useState<Partial<ActivitiesResponse>>({})
-  const [loading, setLoading] = React.useState(true)
-  const [inputs, setInputs] = React.useState(undefined)
-  const [modalOpen, setModalOpen] = React.useState(false)
-  const [editing, setEditing] = React.useState(undefined)
-  const [status, setStatus] = React.useState({ submitting: false, submitted: true })
+  const [data, setData] = React.useState<Partial<ActivitiesResponse>>({});
+  const [loading, setLoading] = React.useState(true);
+  const [inputs, setInputs] = React.useState(undefined);
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [editing, setEditing] = React.useState(undefined);
+  const [status, setStatus] = React.useState({ submitting: false, submitted: true });
 
   const search = async () => {
-    setLoading(true)
-    const { data } = await axios.get(`/api/marketing/activities/${selected}`)
-    setData(data)
-    setInputs(data.info)
-    setLoading(false)
-  }
+    setLoading(true);
+    const { data } = await axios.get(`/api/marketing/activities/${selected}`);
+    setData(data);
+    setInputs(data.info);
+    setLoading(false);
+  };
 
   const create = () => {
-    setEditing({ CompanyCost: 0, VenueCost: 0, BookingId: selected, Date: '' })
-    setModalOpen(true)
-  }
+    setEditing({ CompanyCost: 0, VenueCost: 0, BookingId: selected, Date: '' });
+    setModalOpen(true);
+  };
 
   const edit = (activity: any) => {
-    setEditing(activity)
-    setModalOpen(true)
-  }
+    setEditing(activity);
+    setModalOpen(true);
+  };
 
   React.useEffect(() => {
-    search()
-  }, [selected])
+    search();
+  }, [selected]);
 
   const triggerClose = async (refresh: boolean) => {
-    if (refresh) await search()
-    setModalOpen(false)
-  }
+    if (refresh) await search();
+    setModalOpen(false);
+  };
 
-  if (loading) return (<LoadingTab />)
+  if (loading) return <LoadingTab />;
 
   const handleOnSubmit = async (e: any) => {
     // Swap around the dates
-    e.preventDefault()
-    setStatus({ submitted: false, submitting: true })
+    e.preventDefault();
+    setStatus({ submitted: false, submitting: true });
 
     try {
-      await axios.post('/api/marketing/activities/booking/update', { ...inputs, Id: selected })
+      await axios.post('/api/marketing/activities/booking/update', { ...inputs, Id: selected });
     } catch {
-      setStatus({ submitted: false, submitting: false })
+      setStatus({ submitted: false, submitting: false });
     }
-    setStatus({ submitted: true, submitting: false })
-  }
+    setStatus({ submitted: true, submitting: false });
+  };
 
   const handleOnChange = async (e: any) => {
-    const { id, value } = e.target
+    const { id, value } = e.target;
 
     setInputs((prev) => ({
       ...prev,
-      [id]: value
-    }))
+      [id]: value,
+    }));
 
     setStatus({
       submitted: false,
-      submitting: false
-    })
-  }
+      submitting: false,
+    });
+  };
 
-  const activityDict = objectify(data.activityTypes, (x) => x.Id)
+  const activityDict = objectify(data.activityTypes, (x) => x.Id);
 
   return (
     <>
       <form className="mb-4 p-4 pb-2 rounded-lg">
         <div className="lg:flex lg:justify-between">
           <FormInputCheckbox
-            className='flex-row-reverse'
+            className="flex-row-reverse"
             name="IsOnSale"
             label="On Sale"
             value={inputs.IsOnSale}
-            onChange={handleOnChange}/>
-          <FormInputDate
-            inline
-            name="OnSaleDate"
-            label=""
-            value={inputs.OnSaleDate}
-            onChange={handleOnChange} />
+            onChange={handleOnChange}
+          />
+          <FormInputDate inline name="OnSaleDate" label="" value={inputs.OnSaleDate} onChange={handleOnChange} />
           <FormInputCheckbox
-            className='flex-row-reverse'
+            className="flex-row-reverse"
             name="MarketingPlanReceived"
             label="Marketing Plans Received"
             value={inputs.MarketingPlanReceived}
-            onChange={handleOnChange} />
+            onChange={handleOnChange}
+          />
           <FormInputCheckbox
-            className='flex-row-reverse'
+            className="flex-row-reverse"
             name="PrintReqsReceived"
             label="Print Reqs Received"
             value={inputs.PrintReqsReceived}
-            onChange={handleOnChange} />
+            onChange={handleOnChange}
+          />
           <FormInputCheckbox
-            className='flex-row-reverse'
+            className="flex-row-reverse"
             name="ContactInfoReceived"
             label="Contact Info Received"
             value={inputs.ContactInfoReceived}
-            onChange={handleOnChange} />
+            onChange={handleOnChange}
+          />
         </div>
         <div className="text-right mb-2">
           <FormInputButton
             submit
-            intent='PRIMARY'
+            intent="PRIMARY"
             onClick={handleOnSubmit}
             disabled={status.submitted || status.submitting}
-            text="Save Changes" />
+            text="Save Changes"
+          />
         </div>
       </form>
-      <div className='flex justify-between pb-4'>
-        {modalOpen && <ActivitiesEditor types={data.activityTypes} open={modalOpen} triggerClose={triggerClose} activity={editing} />}
-
+      <div className="flex justify-between pb-4">
+        {modalOpen && (
+          <ActivitiesEditor
+            types={data.activityTypes}
+            open={modalOpen}
+            triggerClose={triggerClose}
+            activity={editing}
+          />
+        )}
       </div>
-      { data.activities.length === 0 && (<NoDataWarning message="No activities recorded" />) }
-      { data.activities.length > 0 && (
-        <Table className='table-auto !min-w-0'>
-          <Table.HeaderRow className='rounded-t-lg'>
-            <Table.HeaderCell className='w-20 rounded-tl-lg'>
-            Activity Name
-            </Table.HeaderCell>
-            <Table.HeaderCell className='w-20'>
-            Type
-            </Table.HeaderCell>
-            <Table.HeaderCell className='w-20'>
-            Date
-            </Table.HeaderCell>
-            <Table.HeaderCell className='w-20'>
-            Follow Up Req.
-            </Table.HeaderCell>
-            <Table.HeaderCell className='w-20'>
-            Company Cost
-            </Table.HeaderCell>
-            <Table.HeaderCell className="w-20">
-            Venue Cost
-            </Table.HeaderCell>
-            <Table.HeaderCell className='w-3/4 rounded-tr-lg'>
-              Notes
-            </Table.HeaderCell>
+      {data.activities.length === 0 && <NoDataWarning message="No activities recorded" />}
+      {data.activities.length > 0 && (
+        <Table className="table-auto !min-w-0">
+          <Table.HeaderRow className="rounded-t-lg">
+            <Table.HeaderCell className="w-20 rounded-tl-lg">Activity Name</Table.HeaderCell>
+            <Table.HeaderCell className="w-20">Type</Table.HeaderCell>
+            <Table.HeaderCell className="w-20">Date</Table.HeaderCell>
+            <Table.HeaderCell className="w-20">Follow Up Req.</Table.HeaderCell>
+            <Table.HeaderCell className="w-20">Company Cost</Table.HeaderCell>
+            <Table.HeaderCell className="w-20">Venue Cost</Table.HeaderCell>
+            <Table.HeaderCell className="w-3/4 rounded-tr-lg">Notes</Table.HeaderCell>
           </Table.HeaderRow>
           <Table.Body>
             {data.activities.map((activity) => (
               <Table.Row hover key={activity.Id} onClick={() => edit(activity)}>
-                <Table.Cell>
-                  {activity.Name}
-                </Table.Cell>
-                <Table.Cell className="whitespace-nowrap">
-                  {activityDict[activity.ActivityTypeId].Name}
-                </Table.Cell>
-                <Table.Cell>
-                  {dateToSimple(activity.Date)}
-                </Table.Cell>
-                <Table.Cell className='text-center'>
-                  {activity.FollowUpRequired ? 'Yes' : 'No'}
-                </Table.Cell>
-                <Table.Cell className='text-right'>
+                <Table.Cell>{activity.Name}</Table.Cell>
+                <Table.Cell className="whitespace-nowrap">{activityDict[activity.ActivityTypeId].Name}</Table.Cell>
+                <Table.Cell>{dateToSimple(activity.Date)}</Table.Cell>
+                <Table.Cell className="text-center">{activity.FollowUpRequired ? 'Yes' : 'No'}</Table.Cell>
+                <Table.Cell className="text-right">
                   {activity.CompanyCost ? numeral(activity.CompanyCost).format('£0,0.00') : ''}
                 </Table.Cell>
-                <Table.Cell className='text-right'>
+                <Table.Cell className="text-right">
                   {activity.VenueCost ? numeral(activity.VenueCost).format('£0,0.00') : ''}
                 </Table.Cell>
-                <Table.Cell className=''>
-                  {activity.Notes}
-                </Table.Cell>
+                <Table.Cell className="">{activity.Notes}</Table.Cell>
               </Table.Row>
             ))}
           </Table.Body>
         </Table>
       )}
       <div className="mt-4">
-        <ToolbarButton onClick={create} className='!text-primary-green'>Add New Activity</ToolbarButton>
+        <ToolbarButton onClick={create} className="!text-primary-green">
+          Add New Activity
+        </ToolbarButton>
       </div>
     </>
-  )
-}
+  );
+};

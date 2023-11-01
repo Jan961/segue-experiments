@@ -1,9 +1,9 @@
-import * as React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import * as React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
-const show = 'ST1' // This needs to be passed from the template
-const tour = '22'
+const show = 'ST1'; // This needs to be passed from the template
+const tour = '22';
 
 interface props {
   title?: string;
@@ -29,11 +29,7 @@ const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
         </div>
 
         <div className="flex flex-row">
-          <select
-            className="border-gray-400 rounded-md drop-shadow-md"
-            name="filter"
-            id="filter"
-          >
+          <select className="border-gray-400 rounded-md drop-shadow-md" name="filter" id="filter">
             <option>Display Filters</option>
           </select>
         </div>
@@ -44,11 +40,11 @@ const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
           {show} / {tour} {title}
         </h1>
 
-        { setSearchFilter && (
+        {setSearchFilter && (
           <div className="flex flex-row">
             <form className="mt-4 relative">
               <label htmlFor="searchBookings" className="sr-only">
-              Search Venues
+                Search Venues
               </label>
               <div className="relative">
                 <input
@@ -81,6 +77,6 @@ const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
       </div>
     </div>
   </div>
-)
+);
 
-export default Toolbar
+export default Toolbar;

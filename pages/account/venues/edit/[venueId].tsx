@@ -1,13 +1,13 @@
-import Layout from 'components/Layout'
-import { GetServerSideProps } from 'next'
-import { Venue } from 'interfaces'
-import Panel from 'components/account/venues/edit/panel'
-import { userService } from 'services/user.service'
-import prisma from 'lib/prisma'
+import Layout from 'components/Layout';
+import { GetServerSideProps } from 'next';
+import { Venue } from 'interfaces';
+import Panel from 'components/account/venues/edit/panel';
+import { userService } from 'services/user.service';
+import prisma from 'lib/prisma';
 
 type Props = {
-    items: Venue
-}
+  items: Venue;
+};
 
 const venueId = ({ items }: Props) => (
   <Layout title="Account | Segue">
@@ -16,38 +16,35 @@ const venueId = ({ items }: Props) => (
     </h1>
 
     <Panel items={items}></Panel>
-
   </Layout>
-)
+);
 
-export const getServerSideProps: GetServerSideProps = async ctx => {
-  const venueID = parseInt(ctx.params.venueId as string) || {}
-  const AccountId = userService.userValue.accountId // todo: programmatically assign this
-  const venues = await prisma.venue.findFirstOrThrow(
-    {
-      where: {
-        OR: [
-          {
-            AccountId: 0
-          },
-          {
-            AccountId
-          }
-        ],
-        deleted: 0,
-        VenueId: venueID
-      }
-    }
-  )
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const venueID = parseInt(ctx.params.venueId as string) || {};
+  const AccountId = userService.userValue.accountId; // todo: programmatically assign this
+  const venues = await prisma.venue.findFirstOrThrow({
+    where: {
+      OR: [
+        {
+          AccountId: 0,
+        },
+        {
+          AccountId,
+        },
+      ],
+      deleted: 0,
+      VenueId: venueID,
+    },
+  });
 
   // @ts-ignore
-  const item: Venue = venues
+  const item: Venue = venues;
   // return { props: { items } }
   return {
     props: {
-      items: JSON.parse(JSON.stringify(item)) // <===
-    }
-  }
-}
+      items: JSON.parse(JSON.stringify(item)), // <===
+    },
+  };
+};
 
-export default venueId
+export default venueId;

@@ -13,26 +13,21 @@ const colorsConfig = {
   'soft-primary-grey': '#627293',
   'faded-primary-grey': '#f8f8fa',
   'soft-table-row-separation': '#e3ebf2',
-  'table-row-alternating': '#f8f8f8'
-}
+  'table-row-alternating': '#f8f8f8',
+};
 
 module.exports = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}'
-  ],
-  plugins: [
-    require('@tailwindcss/forms')
-  ],
+  content: ['./pages/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  plugins: [require('@tailwindcss/forms')],
   theme: {
     extend: {
-	    fontFamily: {
-        primary: ['Ubuntu']
+      fontFamily: {
+        primary: ['Ubuntu'],
       },
       colors: colorsConfig,
       fontSize: {
-        default: '0.85rem'
-      }
-    }
-  }
-}
+        default: '0.85rem',
+      },
+    },
+  },
+};

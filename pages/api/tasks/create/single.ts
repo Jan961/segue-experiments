@@ -1,16 +1,16 @@
-import { TourTaskDTO } from 'interfaces'
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getEmailFromReq, checkAccess } from 'services/userService'
+import { TourTaskDTO } from 'interfaces';
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getEmailFromReq, checkAccess } from 'services/userService';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const task = req.body as TourTaskDTO
-    const { TourId } = task
+    const task = req.body as TourTaskDTO;
+    const { TourId } = task;
 
-    const email = await getEmailFromReq(req)
-    const access = await checkAccess(email, { TourId })
-    if (!access) return res.status(401).end()
+    const email = await getEmailFromReq(req);
+    const access = await checkAccess(email, { TourId });
+    if (!access) return res.status(401).end();
 
     const createResult = await prisma.tourTask.create({
       data: {
@@ -26,17 +26,17 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         Status: task.Status,
         Interval: 'once',
         AssignedBy: task.AssignedBy,
-        AssignedTo: task.AssignedTo
+        AssignedTo: task.AssignedTo,
         // StartByWeekNum: undefined, // place your own logic here
         // CompleteByWeekNum: undefined, // place your own logic here
         // CompleteByPostTour: false, // place your own logic here
         // StartByPostTour: false // place your own logic here
-      }
-    })
+      },
+    });
 
-    res.json(createResult)
+    res.json(createResult);
   } catch (err) {
-    console.log(err)
-    res.status(500).json({ error: 'Error creating TourTask' })
+    console.log(err);
+    res.status(500).json({ error: 'Error creating TourTask' });
   }
 }

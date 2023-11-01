@@ -1,8 +1,6 @@
 export default function AccountRegistration() {
-    const text = "Its time to get the curtain up on your production login now and start adding users"
-    return (
-
-        `<html lang="en">
+  const text = 'Its time to get the curtain up on your production login now and start adding users';
+  return `<html lang="en">
 
         <head>
             <meta charSet="UTF-8">
@@ -35,7 +33,5 @@ export default function AccountRegistration() {
             </div>
         </div>
         </body>
-        </html>`
-
-)
+        </html>`;
 }

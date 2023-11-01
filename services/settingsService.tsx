@@ -1,6 +1,6 @@
 export const settingsService = {
-    getSetting
-}
+  getSetting,
+};
 
 /**
  *
@@ -8,15 +8,14 @@ export const settingsService = {
  *
  */
 const settings = [
-    {name:"EmailIngest", value:false,},
-    {name:"SingleLogin", value:false,},
-]
+  { name: 'EmailIngest', value: false },
+  { name: 'SingleLogin', value: false },
+];
 
 function getSetting(settingName) {
-
-    for (let i = 0; i < settings.length; i++) {
-        if (settings[i].name === settingName) {
-            return settings[i].value;
-        }
+  for (let i = 0; i < settings.length; i++) {
+    if (settings[i].name === settingName) {
+      return settings[i].value;
     }
+  }
 }

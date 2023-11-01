@@ -1,5 +1,5 @@
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 /**
  *
@@ -9,26 +9,27 @@ import { NextApiRequest, NextApiResponse } from 'next'
  * @param req
  * @param res
  */
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     if (req.body != null) {
       await prisma.log.create({
         data: {
           UserId: parseInt(req.body.UserID) !== undefined ? parseInt(req.body.UserID) : 0,
           Action: req.body.Action,
-          Detail: JSON.stringify(req.body.Detail)
-        }
-      })
+          Detail: JSON.stringify(req.body.Detail),
+        },
+      });
     }
   } catch (e) {
     await prisma.log.create({
       data: {
         UserId: 0,
         Action: 'System Error',
-        Detail: 'An error was reported that could not be logged correctly: ' + JSON.stringify(req.body) + '  error: ' + e
-      }
-    })
+        Detail:
+          'An error was reported that could not be logged correctly: ' + JSON.stringify(req.body) + '  error: ' + e,
+      },
+    });
   }
 
-  res.status(200).json({})
+  res.status(200).json({});
 }

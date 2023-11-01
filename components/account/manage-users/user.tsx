@@ -1,10 +1,9 @@
-
 const tabs = [
   { name: 'Show A', href: '#', current: false },
   { name: 'Show B', href: '#', current: false },
   { name: 'Show C', href: '#', current: true },
-  { name: 'Global', href: '#', current: false }
-]
+  { name: 'Global', href: '#', current: false },
+];
 
 const permissions = [
   { id: 1, name: 'Bookings', checked: true, subid: 0 },
@@ -28,12 +27,11 @@ const permissions = [
   { id: 19, name: 'Tour Data', checked: false, subid: 16 },
   { id: 20, name: 'Other', checked: false, subid: 0 },
   { id: 21, name: 'Manage Users', checked: false, subid: 20 },
-  { id: 22, name: 'Manage Tout Settings', checked: false, subid: 21 }
+  { id: 22, name: 'Manage Tout Settings', checked: false, subid: 21 },
+];
 
-]
-
-function classNames (...classes) {
-  return classes.filter(Boolean).join(' ')
+function classNames(...classes) {
+  return classes.filter(Boolean).join(' ');
 }
 
 const User = () => (
@@ -42,12 +40,12 @@ const User = () => (
       <div className="flex flex-row">
         <h1>Add another User</h1>
       </div>
-      <div >
+      <div>
         <div className="flex flex-row">
-          <input type="text" name="name" id="name" placeholder="Your name"/>
+          <input type="text" name="name" id="name" placeholder="Your name" />
         </div>
         <div className="flex flex-row">
-          <input type="email" name="email" id="email" placeholder="Your email"/>
+          <input type="email" name="email" id="email" placeholder="Your email" />
         </div>
 
         <div className="flex flex-row">
@@ -56,7 +54,7 @@ const User = () => (
         <div>
           <div className="sm:hidden">
             <label htmlFor="tabs" className="sr-only">
-                        Select a tab
+              Select a tab
             </label>
             {/* Use an "onChange" listener to redirect the user to the selected tab URL. */}
             <select
@@ -81,7 +79,7 @@ const User = () => (
                       tab.current
                         ? 'border-indigo-500 text-indigo-600'
                         : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300',
-                      'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm'
+                      'w-1/4 py-4 px-1 text-center border-b-2 font-medium text-sm',
                     )}
                     aria-current={tab.current ? 'page' : undefined}
                   >
@@ -94,23 +92,25 @@ const User = () => (
           <div className="">
             <ul>
               {permissions.map((permission) => (
-                <li>{permission.subid != 0 ? <>&emsp;</> : ''}
+                <li>
+                  {permission.subid != 0 ? <>&emsp;</> : ''}
                   <input type={'checkbox'} id={permission.subid + 'tourID'} />
-                  <label htmlFor={permission.subid + 'tourID'}> &nbsp;
-                    {permission.name}</label>
+                  <label htmlFor={permission.subid + 'tourID'}>
+                    {' '}
+                    &nbsp;
+                    {permission.name}
+                  </label>
                 </li>
               ))}
             </ul>
           </div>
           <div>
             <button>Save</button>
-
           </div>
         </div>
       </div>
     </div>
   </div>
+);
 
-)
-
-export default User
+export default User;
