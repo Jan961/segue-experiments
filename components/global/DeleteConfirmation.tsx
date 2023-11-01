@@ -1,32 +1,39 @@
-import React, { PropsWithChildren } from 'react'
-import { StyledDialog } from './StyledDialog'
+import React, { PropsWithChildren } from 'react';
+import { StyledDialog } from './StyledDialog';
 
 interface DeleteConfirmationProps {
-  onConfirm: () => void
-  onCancel: () => void
-  title: string
+  onConfirm: () => void;
+  onCancel: () => void;
+  title: string;
 }
 
-export const DeleteConfirmation = ({ onConfirm, onCancel, title, children }: PropsWithChildren<DeleteConfirmationProps>) => {
-  const [open, setOpen] = React.useState(true)
+export const DeleteConfirmation = ({
+  onConfirm,
+  onCancel,
+  title,
+  children,
+}: PropsWithChildren<DeleteConfirmationProps>) => {
+  const [open, setOpen] = React.useState(true);
 
   const cancel = () => {
-    setOpen(false)
-    onCancel()
-  }
+    setOpen(false);
+    onCancel();
+  };
 
   const confirm = () => {
-    setOpen(false)
-    onConfirm()
-  }
+    setOpen(false);
+    onConfirm();
+  };
 
   return (
     <StyledDialog open={open} onClose={cancel} title={title}>
-      { children }
+      {children}
       <StyledDialog.FooterContainer>
         <StyledDialog.FooterCancel onClick={onCancel}>Cancel</StyledDialog.FooterCancel>
-        <StyledDialog.FooterContinue intent="DANGER" onClick={confirm}>Delete</StyledDialog.FooterContinue>
+        <StyledDialog.FooterContinue intent="DANGER" onClick={confirm}>
+          Delete
+        </StyledDialog.FooterContinue>
       </StyledDialog.FooterContainer>
     </StyledDialog>
-  )
-}
+  );
+};

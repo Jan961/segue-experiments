@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import { JsConfigPathsPlugin } from "next/dist/build/webpack/plugins/jsconfig-paths-plugin";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { JsConfigPathsPlugin } from 'next/dist/build/webpack/plugins/jsconfig-paths-plugin';
 
-import axios from "axios";
+import axios from 'axios';
 
 export default function ViewForm() {
   const [showModal, setShowModal] = React.useState(false);
@@ -15,12 +15,12 @@ export default function ViewForm() {
   });
 
   const [inputs, setInputs] = useState({
-    code: "",
-    name: "",
-    town: "",
-    country: "",
+    code: '',
+    name: '',
+    town: '',
+    country: '',
     seats: 0,
-    website: "",
+    website: '',
     source: 0,
   });
 
@@ -32,12 +32,12 @@ export default function ViewForm() {
         info: { error: false, msg: msg },
       });
       setInputs({
-        code: "",
-        name: "",
-        town: "",
-        country: "",
+        code: '',
+        name: '',
+        town: '',
+        country: '',
         seats: 0,
-        website: "",
+        website: '',
         source: 0, //TOdo: change to account id
       });
     } else {
@@ -62,14 +62,14 @@ export default function ViewForm() {
     e.preventDefault();
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
     axios({
-      method: "POST",
-      url: "/api/venue/add",
+      method: 'POST',
+      url: '/api/venue/add',
       data: inputs,
     })
       .then((response) => {
         handleServerResponse(
           true,
-          "Thank you, your message has been submitted."
+          'Thank you, your message has been submitted.',
           //Todo: router setlocation to the new venue to allow user to add the rest fo the detils
         );
         console.log(JSON.stringify(handleServerResponse));
@@ -111,9 +111,8 @@ export default function ViewForm() {
                   <div className="relative p-6 flex-auto">
                     <div className="grid grid-cols-1 gap-2">
                       <div>
-                        <p className={"text-gray-700 small"}>
-                          Enter Basic Details for new Venue, Further information
-                          can be added on the next screen
+                        <p className={'text-gray-700 small'}>
+                          Enter Basic Details for new Venue, Further information can be added on the next screen
                         </p>
                       </div>
                       <div>
@@ -214,18 +213,14 @@ export default function ViewForm() {
                           <label htmlFor="source" className="">
                             Scope
                           </label>
-                          <p className={"text-gray-700 small"}>
-                            {" "}
-                            Creating a venue with as global will add this venue
-                            to the all accounts on Segue Platform
+                          <p className={'text-gray-700 small'}>
+                            {' '}
+                            Creating a venue with as global will add this venue to the all accounts on Segue Platform
                           </p>
 
                           <select name="source" id="source">
                             <option value={0}>Global - Update all lists</option>
-                            <option value={1}>
-                              Account - Update this lists
-                            </option>{" "}
-                            {/* TODO: Replace with account ID */}
+                            <option value={1}>Account - Update this lists</option> {/* TODO: Replace with account ID */}
                           </select>
                         </div>
                       ) : (
@@ -234,17 +229,11 @@ export default function ViewForm() {
                           <label htmlFor="source" className="">
                             Scope of Change
                           </label>
-                          <p className={"text-gray-700 small"}>
-                            You are adding a venue to your account only, To
-                            request a venue is added to the global database
-                            contact Segue Support
+                          <p className={'text-gray-700 small'}>
+                            You are adding a venue to your account only, To request a venue is added to the global
+                            database contact Segue Support
                           </p>
-                          <input
-                            type="hidden"
-                            name="source"
-                            id="source"
-                            value="1"
-                          />
+                          <input type="hidden" name="source" id="source" value="1" />
                         </div>
                       )}
                     </div>
@@ -265,11 +254,7 @@ export default function ViewForm() {
                       type="submit"
                       disabled={status.submitting}
                     >
-                      {!status.submitting
-                        ? !status.submitted
-                          ? "Submit"
-                          : "Submitted"
-                        : "Submitting..."}
+                      {!status.submitting ? (!status.submitted ? 'Submit' : 'Submitted') : 'Submitting...'}
                     </button>
                   </div>
                 </form>

@@ -1,7 +1,7 @@
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     // Input validation
     if (
@@ -12,7 +12,7 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       !req.body.website ||
       !req.body.accountId
     ) {
-      return res.status(400).json({ error: 'All fields are required.' })
+      return res.status(400).json({ error: 'All fields are required.' });
     }
 
     const venueData = {
@@ -22,33 +22,33 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       Seats: parseInt(req.body.seats),
       Website: req.body.website,
       deleted: 0,
-      AccountId: req.body.accountId
-    }
+      AccountId: req.body.accountId,
+    };
 
     // Find user by accountId
     const user = await prisma.user.findFirst({
-      where: { AccountId: req.body.accountId }
-    })
+      where: { AccountId: req.body.accountId },
+    });
 
     if (!user) {
-      return res.status(404).json({ error: 'User not found.' })
+      return res.status(404).json({ error: 'User not found.' });
     }
 
-    let result
+    let result;
 
     if (user.SegueAdmin === 1) {
       // Create a new master venue
       result = await prisma.masterVenue.create({
-        data: venueData
-      })
+        data: venueData,
+      });
     } else {
       // Create a new venue
       result = await prisma.venue.create({
-        data: venueData
-      })
+        data: venueData,
+      });
     }
 
-    let inserted
+    let inserted;
     if (user.SegueAdmin === 1) {
       inserted = await prisma.masterVenue.findFirst({
         where: {
@@ -57,9 +57,9 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
           Country: req.body.country,
           Seats: parseInt(req.body.seats),
           Website: req.body.website,
-          AccountId: req.body.accountId
-        }
-      })
+          AccountId: req.body.accountId,
+        },
+      });
     } else {
       inserted = await prisma.venue.findFirst({
         where: {
@@ -68,16 +68,14 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
           Country: req.body.country,
           Seats: parseInt(req.body.seats),
           Website: req.body.website,
-          AccountId: req.body.accountId
-        }
-      })
+          AccountId: req.body.accountId,
+        },
+      });
     }
 
-    res.json(inserted)
+    res.json(inserted);
   } catch (error) {
-    console.error('Error:', error)
-    res
-      .status(500)
-      .json({ error: 'An error occurred while processing your request.' })
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred while processing your request.' });
   }
 }

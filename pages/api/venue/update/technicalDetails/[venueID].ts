@@ -1,13 +1,13 @@
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const VenueId: number = parseInt(req.query.venueID as string)
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+  const VenueId: number = parseInt(req.query.venueID as string);
   try {
     //  console.log(JSON.stringify(req.body))
     await prisma.venue.update({
       where: {
-        VenueId
+        VenueId,
       },
       data: {
         TechSpecsURL: req.body.TechSpecsURL,
@@ -17,13 +17,12 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         LXNotes: req.body.LXNotes,
         VenueFlags: req.body.VenueFlags,
         SoundDesk: req.body.SoundDesk,
-        SoundNotes: req.body.SoundNotes
-      }
-
-    })
-    res.status(200).end()
+        SoundNotes: req.body.SoundNotes,
+      },
+    });
+    res.status(200).end();
   } catch (e) {
-    res.status(501).end()
+    res.status(501).end();
   }
-  return res
+  return res;
 }

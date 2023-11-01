@@ -1,30 +1,30 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import prisma from 'lib/prisma'
-import { getEmailFromReq, checkAccess } from 'services/userService'
+import { NextApiRequest, NextApiResponse } from 'next';
+import prisma from 'lib/prisma';
+import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export type BarredVenue = {
-  Id:number;
-  Name:string;
-  Code:string;
-  StatusCode:string;
-  Mileage:number;
-  TimeMins:number;
-  BookingId:number;
+  Id: number;
+  Name: string;
+  Code: string;
+  StatusCode: string;
+  Mileage: number;
+  TimeMins: number;
+  BookingId: number;
   Date: string;
-  town:string;
-}
+  town: string;
+};
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const { venueId, tourId, excludeLondon } = req.body
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+  const { venueId, tourId, excludeLondon } = req.body;
 
-  const email = await getEmailFromReq(req)
-  const access = await checkAccess(email, { TourId: tourId })
-  if (!access) return res.status(401).end()
+  const email = await getEmailFromReq(req);
+  const access = await checkAccess(email, { TourId: tourId });
+  if (!access) return res.status(401).end();
 
   try {
     const result = await prisma.VenueVenue.findMany({
       where: {
-        Venue1Id: venueId
+        Venue1Id: venueId,
       },
       select: {
         Mileage: true,
@@ -42,45 +42,49 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
                 DateBlock: {
                   select: {
                     TourId: true,
-                    Name: true
-                  }
-                }
-              }
+                    Name: true,
+                  },
+                },
+              },
             },
             VenueAddress: {
               select: {
-                VenueAddressTown: true
-              }
-            }
-          }
+                VenueAddressTown: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    const filteredResults: BarredVenue[] = result
+      .map(({ Mileage, TimeMins, Venue2 }) => {
+        const { FirstDate, Id: BookingId } =
+          Venue2.Booking.find((booking) => booking.DateBlock.TourId === tourId) || {};
+        const { Name, Code, Id, StatusCode, VenueAddress } = Venue2;
+        const town = VenueAddress?.[0]?.Town;
+        if (!FirstDate) return null;
+        return {
+          Id,
+          Name,
+          Code,
+          StatusCode,
+          Mileage,
+          TimeMins,
+          BookingId,
+          Date: FirstDate,
+          town,
+        };
+      })
+      .filter((x) => {
+        if (excludeLondon) {
+          return x && x.town !== 'London';
         }
-      }
-    })
-    const filteredResults:BarredVenue[] = result.map(({ Mileage, TimeMins, Venue2 }) => {
-      const { FirstDate, Id: BookingId } = Venue2.Booking.find((booking) => booking.DateBlock.TourId === tourId) || {}
-      const { Name, Code, Id, StatusCode, VenueAddress } = Venue2
-      const town = VenueAddress?.[0]?.Town
-      if (!FirstDate) return null
-      return {
-        Id,
-        Name,
-        Code,
-        StatusCode,
-        Mileage,
-        TimeMins,
-        BookingId,
-        Date: FirstDate,
-        town
-      }
-    }).filter(x => {
-      if (excludeLondon) {
-        return x && x.town !== 'London'
-      }
-      return x
-    }).sort((a:BarredVenue, b:BarredVenue) => a.Mileage - b.Mileage)
-    res.json(filteredResults)
+        return x;
+      })
+      .sort((a: BarredVenue, b: BarredVenue) => a.Mileage - b.Mileage);
+    res.json(filteredResults);
   } catch (e) {
-    console.log(e)
-    res.status(500).send({ message: e.message })
+    console.log(e);
+    res.status(500).send({ message: e.message });
   }
 }

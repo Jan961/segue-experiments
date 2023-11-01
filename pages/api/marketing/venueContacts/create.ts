@@ -1,12 +1,12 @@
-import { loggingService } from 'services/loggingService'
-import prisma from 'lib/prisma'
-import { VenueContactDTO } from 'interfaces'
-import { venueRoleMapper } from 'lib/mappers'
-import { NextApiRequest, NextApiResponse } from 'next'
+import { loggingService } from 'services/loggingService';
+import prisma from 'lib/prisma';
+import { VenueContactDTO } from 'interfaces';
+import { venueRoleMapper } from 'lib/mappers';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const vc = req.body as VenueContactDTO
+    const vc = req.body as VenueContactDTO;
 
     const result = await prisma.venueContact.create({
       data: {
@@ -16,20 +16,20 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         Phone: vc.Phone,
         Venue: {
           connect: {
-            Id: vc.VenueId
-          }
+            Id: vc.VenueId,
+          },
         },
         VenueRole: {
           connect: {
-            Id: vc.RoleId
-          }
-        }
-      }
-    })
-    res.status(200).json(venueRoleMapper(result))
+            Id: vc.RoleId,
+          },
+        },
+      },
+    });
+    res.status(200).json(venueRoleMapper(result));
   } catch (err) {
-    await loggingService.logError(err)
-    console.log(err)
-    res.status(500).json({ err: 'Error updating VenueContact' })
+    await loggingService.logError(err);
+    console.log(err);
+    res.status(500).json({ err: 'Error updating VenueContact' });
   }
 }

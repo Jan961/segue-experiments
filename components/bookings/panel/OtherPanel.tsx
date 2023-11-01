@@ -1,84 +1,81 @@
-import axios from 'axios'
-import { DeleteConfirmation } from 'components/global/DeleteConfirmation'
-import { FormInputButton } from 'components/global/forms/FormInputButton'
-import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect'
-import { OtherDTO } from 'interfaces'
-import { omit } from 'radash'
-import React from 'react'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { otherState } from 'state/booking/otherState'
-import { dateTypeState } from 'state/booking/dateTypeState'
-import { viewState } from 'state/booking/viewState'
+import axios from 'axios';
+import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
+import { FormInputButton } from 'components/global/forms/FormInputButton';
+import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
+import { OtherDTO } from 'interfaces';
+import { omit } from 'radash';
+import React from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { otherState } from 'state/booking/otherState';
+import { dateTypeState } from 'state/booking/dateTypeState';
+import { viewState } from 'state/booking/viewState';
 
 interface OtherPanelProps {
-  otherId: number
+  otherId: number;
 }
 
 export const OtherPanel = ({ otherId }: OtherPanelProps) => {
-  const [deleting, setDeleting] = React.useState(false)
-  const setView = useSetRecoilState(viewState)
-  const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false })
-  const [otherDict, setOtherDict] = useRecoilState(otherState)
-  const dateTypes = useRecoilValue(dateTypeState)
-  const other = otherDict[otherId]
-  const [inputs, setInputs] = React.useState<OtherDTO>(other)
+  const [deleting, setDeleting] = React.useState(false);
+  const setView = useSetRecoilState(viewState);
+  const [{ submitting, changed }, setStatus] = React.useState({ submitting: false, changed: false });
+  const [otherDict, setOtherDict] = useRecoilState(otherState);
+  const dateTypes = useRecoilValue(dateTypeState);
+  const other = otherDict[otherId];
+  const [inputs, setInputs] = React.useState<OtherDTO>(other);
 
   const handleOnChange = (e: any) => {
-    let { id, value } = e.target
+    let { id, value } = e.target;
     if (id === 'DateTypeId') {
-      value = parseInt(value)
-      if (value === 0) return performDelete()
+      value = parseInt(value);
+      if (value === 0) return performDelete();
     }
     setInputs((prev) => ({
       ...prev,
-      [id]: value
-    }))
-    setStatus({ changed: true, submitting: false })
-  }
+      [id]: value,
+    }));
+    setStatus({ changed: true, submitting: false });
+  };
 
   const save = async (e: any) => {
-    e.preventDefault()
-    setStatus({ changed: true, submitting: true })
+    e.preventDefault();
+    setStatus({ changed: true, submitting: true });
     try {
-      const { data } = await axios.post('/api/other/update', inputs)
-      const replacement = { ...otherDict, [data.Id]: data }
-      setOtherDict(replacement)
-      setStatus({ changed: false, submitting: false })
+      const { data } = await axios.post('/api/other/update', inputs);
+      const replacement = { ...otherDict, [data.Id]: data };
+      setOtherDict(replacement);
+      setStatus({ changed: false, submitting: false });
     } catch {
-      setStatus({ changed: true, submitting: false })
+      setStatus({ changed: true, submitting: false });
     }
-  }
+  };
 
   const dateTypeOptions: SelectOption[] = [
     { value: 0, text: '-- None (Remove) --' },
-    ...dateTypes.map(x => ({ value: x.Id.toString(), text: x.Name }))
-  ]
+    ...dateTypes.map((x) => ({ value: x.Id.toString(), text: x.Name })),
+  ];
 
   const statusOptions: SelectOption[] = [
     { text: 'Confirmed (C)', value: 'C' },
     { text: 'Unconfirmed (U)', value: 'U' },
-    { text: 'Canceled (X)', value: 'X' }
-  ]
+    { text: 'Canceled (X)', value: 'X' },
+  ];
 
   const initiateDelete = async () => {
-    setDeleting(true)
-  }
+    setDeleting(true);
+  };
 
   const performDelete = async () => {
-    setDeleting(false)
-    await axios.post('/api/other/delete', { ...other })
-    const newState = omit(otherDict, [otherId])
-    setView({ selectedDate: undefined, selected: undefined })
-    setOtherDict(newState)
-  }
+    setDeleting(false);
+    await axios.post('/api/other/delete', { ...other });
+    const newState = omit(otherDict, [otherId]);
+    setView({ selectedDate: undefined, selected: undefined });
+    setOtherDict(newState);
+  };
 
   return (
     <>
-      { deleting && (
-        <DeleteConfirmation
-          title="Delete Other"
-          onCancel={() => setDeleting(false)}
-          onConfirm={performDelete}>
+      {deleting && (
+        <DeleteConfirmation title="Delete Other" onCancel={() => setDeleting(false)} onConfirm={performDelete}>
           <p>This will delete the event permanently</p>
         </DeleteConfirmation>
       )}
@@ -89,7 +86,8 @@ export const OtherPanel = ({ otherId }: OtherPanelProps) => {
         name="DateTypeId"
         label="Day Type"
       />
-      <FormInputSelect inline
+      <FormInputSelect
+        inline
         value={inputs.StatusCode}
         onChange={handleOnChange}
         options={statusOptions}
@@ -110,12 +108,12 @@ export const OtherPanel = ({ otherId }: OtherPanelProps) => {
           <FormInputButton
             className="rounded-br-none rounded-tr-none w-full border-r border-soft-primary-blue"
             text="Save"
-            intent='PRIMARY'
+            intent="PRIMARY"
             disabled={submitting || !changed}
             onClick={save}
           />
         </div>
       </div>
     </>
-  )
-}
+  );
+};

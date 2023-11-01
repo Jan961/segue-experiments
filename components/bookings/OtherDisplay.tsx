@@ -1,29 +1,29 @@
-import { first } from 'radash'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { dateTypeState } from 'state/booking/dateTypeState'
-import { otherState } from 'state/booking/otherState'
-import { viewState } from 'state/booking/viewState'
+import { first } from 'radash';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { dateTypeState } from 'state/booking/dateTypeState';
+import { otherState } from 'state/booking/otherState';
+import { viewState } from 'state/booking/viewState';
 
 interface OtherDisplayProps {
-  otherId: number
-  date: string
+  otherId: number;
+  date: string;
 }
 
 export const OtherDisplay = ({ otherId, date }: OtherDisplayProps) => {
-  const otherDict = useRecoilValue(otherState)
-  const dayTypeArray = useRecoilValue(dateTypeState)
-  const [view, setView] = useRecoilState(viewState)
+  const otherDict = useRecoilValue(otherState);
+  const dayTypeArray = useRecoilValue(dateTypeState);
+  const [view, setView] = useRecoilState(viewState);
 
-  if (!otherDict) return null
+  if (!otherDict) return null;
 
-  const o = otherDict[otherId]
-  const match = first(dayTypeArray.filter(dt => o.DateTypeId === dt.Id))
+  const o = otherDict[otherId];
+  const match = first(dayTypeArray.filter((dt) => o.DateTypeId === dt.Id));
 
   const select = () => {
-    setView({ ...view, selected: { type: 'other', id: otherId }, selectedDate: date })
-  }
+    setView({ ...view, selected: { type: 'other', id: otherId }, selectedDate: date });
+  };
 
-  const active = view.selected?.id === otherId && view.selected?.type === 'other'
+  const active = view.selected?.id === otherId && view.selected?.type === 'other';
 
   return (
     <div
@@ -33,8 +33,9 @@ export const OtherDisplay = ({ otherId, date }: OtherDisplayProps) => {
       grid grid-cols-10
       border-lime-500 bg-lime-200
       ${active ? 'shadow bg-lime-400' : 'hover:bg-lime-300'}
-      `}>
-      <div className="col-span-7 text-center">{ match?.Name }</div>
+      `}
+    >
+      <div className="col-span-7 text-center">{match?.Name}</div>
     </div>
-  )
-}
+  );
+};

@@ -1,17 +1,16 @@
-import { atom } from 'recoil'
+import { atom } from 'recoil';
 
 interface View {
-  selectedDate?: string
+  selectedDate?: string;
   selected?: {
-    type: 'booking' | 'gifu' | 'rehearsal' | 'other'
-    id: number
-  }
+    type: 'booking' | 'gifu' | 'rehearsal' | 'other';
+    id: number;
+  };
 }
 
-const intialState: View = {
-}
+const intialState: View = {};
 
 export const viewState = atom({
   key: 'viewState',
-  default: intialState
-})
+  default: intialState,
+});

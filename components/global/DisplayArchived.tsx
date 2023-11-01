@@ -15,8 +15,8 @@ export const DisplayArchived = ({ onChange, checked }: DisplayArchivedProps) => 
           onChange={onChange}
           checked={checked}
         />
-      Display archived shows
+        Display archived shows
       </label>
     </div>
-  )
-}
+  );
+};

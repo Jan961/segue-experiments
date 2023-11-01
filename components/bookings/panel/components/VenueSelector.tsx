@@ -1,26 +1,31 @@
-import Typeahead from 'components/Typeahead'
-import { VenueInfo } from 'components/bookings/modal/VenueInfo'
-import ViewBookingHistory from 'components/bookings/modal/ViewBookingHistory'
-import { SelectOption } from 'components/global/forms/FormInputSelect'
-import { VenueMinimalDTO } from 'interfaces'
-import { useRecoilValue } from 'recoil'
-import { venueState } from 'state/booking/venueState'
+import Typeahead from 'components/Typeahead';
+import { VenueInfo } from 'components/bookings/modal/VenueInfo';
+import ViewBookingHistory from 'components/bookings/modal/ViewBookingHistory';
+import { SelectOption } from 'components/global/forms/FormInputSelect';
+import { VenueMinimalDTO } from 'interfaces';
+import { useRecoilValue } from 'recoil';
+import { venueState } from 'state/booking/venueState';
 
 export interface VenueSelectorProps {
-  venueId: number,
-  onChange: (e: number) => void,
-  options?: SelectOption[]
+  venueId: number;
+  onChange: (e: number) => void;
+  options?: SelectOption[];
 }
 
 export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps) => {
-  const venues = useRecoilValue(venueState)
+  const venues = useRecoilValue(venueState);
   const venueOptions: SelectOption[] = [
     { text: 'Please Select a Venue', value: '' },
-    ...Object.values(venues).map((v: VenueMinimalDTO) => ({ text: `${v.Code} - ${v.Name}, ${v.Town}`, value: v.Id, code: v.Code, town: v.Town })
-    )]
-  const onSelect = (option?:SelectOption) => {
-    onChange(option?.value as number || null)
-  }
+    ...Object.values(venues).map((v: VenueMinimalDTO) => ({
+      text: `${v.Code} - ${v.Name}, ${v.Town}`,
+      value: v.Id,
+      code: v.Code,
+      town: v.Town,
+    })),
+  ];
+  const onSelect = (option?: SelectOption) => {
+    onChange((option?.value as number) || null);
+  };
   return (
     <>
       <Typeahead
@@ -35,5 +40,5 @@ export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps
         <ViewBookingHistory venueId={venueId}></ViewBookingHistory>
       </div>
     </>
-  )
-}
+  );
+};

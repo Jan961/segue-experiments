@@ -3,32 +3,21 @@ module.exports = {
     react: {
       pragma: 'React',
       fragment: 'Fragment',
-      version: 'detect'
-    }
+      version: 'detect',
+    },
   },
   env: {
     browser: true,
-    es2021: true
+    es2021: true,
   },
-  extends: [
-    'next',
-    'plugin:react/recommended',
-    'standard',
-    'plugin:react/jsx-runtime'
-  ],
+  extends: ['next', 'plugin:react/recommended', 'standard', 'plugin:react/jsx-runtime', 'prettier'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
   },
-  plugins: [
-    'react',
-    '@typescript-eslint'
-  ],
-  rules: {
-    indent: ['error', 2]
-  }
-}
+  plugins: ['react', '@typescript-eslint'],
+};
