@@ -47,7 +47,12 @@ export const Switchboard = () => {
       icon: faUserCog,
       color: "bg-primary-pink",
     },
-    {},
+    //dummy item until we know what's taking its place
+    {
+      title: "dummy",
+      icon: faChartLine,
+      color: "bg-primary-purple",
+    },
     {
       title: "Touring Management",
       route: "/touring",
