@@ -6,7 +6,11 @@ import {
   faClose,
   faFileSignature,
   faHome,
+<<<<<<< HEAD
   faLocationDot,
+=======
+  faUserGear,
+>>>>>>> 50a7d11 (Introducing prettier)
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegueLogo } from './global/SegueLogo';
@@ -72,12 +76,15 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       icon: faClipboardList,
       activeColor: 'text-primary-purple',
     },
+<<<<<<< HEAD
     {
       label: 'Touring Management',
       link: '/touring',
       icon: faLocationDot,
       activeColor: 'text-primary-navy',
     },
+=======
+>>>>>>> 50a7d11 (Introducing prettier)
     /*
     {
       label: 'Admin',
