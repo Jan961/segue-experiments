@@ -1,16 +1,10 @@
-import axios from "axios";
-import moment from "moment";
+import axios from 'axios';
+import moment from 'moment';
 
-export const getSales = ({
-  SetSalesFiguresDate,
-  SetBookingId,
-  isFinalFigures = false,
-}) => {
+export const getSales = ({ SetSalesFiguresDate, SetBookingId, isFinalFigures = false }) => {
   return axios
-    .post("/api/marketing/sales/read", {
-      SetSalesFiguresDate: SetSalesFiguresDate
-        ? moment(SetSalesFiguresDate).toISOString().split("T")[0]
-        : null,
+    .post('/api/marketing/sales/read', {
+      SetSalesFiguresDate: SetSalesFiguresDate ? moment(SetSalesFiguresDate).toISOString().split('T')[0] : null,
       SetBookingId,
       isFinalFigures,
     })

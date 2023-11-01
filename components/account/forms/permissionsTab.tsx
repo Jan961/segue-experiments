@@ -1,10 +1,3 @@
-import * as React from 'react'
+import * as React from 'react';
 
-
-
-const PermissionsTab = () => (
-    <>
-        Permission List
-    </>
-
-)
+const PermissionsTab = () => <>Permission List</>;

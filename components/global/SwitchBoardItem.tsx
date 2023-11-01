@@ -1,6 +1,6 @@
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
 
 type ItemDefinition = {
   disabled?: boolean;
@@ -17,20 +17,14 @@ interface SwitchBoardItemProps {
 
 export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
   const content = (
-    <div className="flex flex-col items-center justify-center">
-      {link.icon && (
-        <FontAwesomeIcon icon={link.icon as IconProp} className="text-5xl" />
-      )}
+    <>
+      <FontAwesomeIcon icon={link.icon as IconProp} className="text-5xl" />
       <span className="text-center text-lg pt-2">{link.title}</span>
-    </div>
+    </>
   );
 
   const baseClass = `
-    ${
-      link.disabled
-        ? "bg-gray-400 hover:bg-gray-400 cursor-not-allowed"
-        : `${link.color} hover:opacity-75`
-    }
+    ${link.disabled ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : `${link.color} hover:opacity-75`}
     shadow-lg
     w-full
     h-full
@@ -41,7 +35,7 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
   return (
     <li key={link.title}>
       {link.route && (
-        <Link href={link.disabled ? "#" : link.route} className={baseClass}>
+        <Link href={link.disabled ? '#' : link.route} className={baseClass}>
           {content}
         </Link>
       )}

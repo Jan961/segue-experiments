@@ -1,21 +1,21 @@
-import React from 'react'
-import { BookingDTO, RehearsalDTO, GetInFitUpDTO, VenueMinimalDTO, PerformanceDTO } from 'interfaces'
-import { RecoilState, useRecoilCallback } from 'recoil'
-import { bookingState } from 'state/booking/bookingState'
-import { DateBlockState, dateBlockState } from 'state/booking/dateBlockState'
-import { DistanceState, distanceState } from 'state/booking/distanceState'
-import { getInFitUpState } from 'state/booking/getInFitUpState'
-import { rehearsalState } from 'state/booking/rehearsalState'
-import { venueState } from 'state/booking/venueState'
-import { performanceState } from 'state/booking/performanceState'
-import { DateTypeState, dateTypeState } from 'state/booking/dateTypeState'
-import { OtherState, otherState } from 'state/booking/otherState'
-import { TourJump, tourJumpState } from 'state/booking/tourJumpState'
-import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState'
-import { VenueRole, venueRoleState } from 'state/marketing/venueRoleState'
-import { TourState, tourState } from 'state/tasks/tourState'
-import { BulkSelectionState, bulkSelectionState } from 'state/tasks/bulkSelectionState'
-import { UserState, userState } from 'state/account/userState'
+import React from 'react';
+import { BookingDTO, RehearsalDTO, GetInFitUpDTO, VenueMinimalDTO, PerformanceDTO } from 'interfaces';
+import { RecoilState, useRecoilCallback } from 'recoil';
+import { bookingState } from 'state/booking/bookingState';
+import { DateBlockState, dateBlockState } from 'state/booking/dateBlockState';
+import { DistanceState, distanceState } from 'state/booking/distanceState';
+import { getInFitUpState } from 'state/booking/getInFitUpState';
+import { rehearsalState } from 'state/booking/rehearsalState';
+import { venueState } from 'state/booking/venueState';
+import { performanceState } from 'state/booking/performanceState';
+import { DateTypeState, dateTypeState } from 'state/booking/dateTypeState';
+import { OtherState, otherState } from 'state/booking/otherState';
+import { TourJump, tourJumpState } from 'state/booking/tourJumpState';
+import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
+import { VenueRole, venueRoleState } from 'state/marketing/venueRoleState';
+import { TourState, tourState } from 'state/tasks/tourState';
+import { BulkSelectionState, bulkSelectionState } from 'state/tasks/bulkSelectionState';
+import { UserState, userState } from 'state/account/userState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -25,45 +25,45 @@ import { UserState, userState } from 'state/account/userState'
 
 export type InitialState = Partial<{
   global?: {
-    tourJump?: TourJump
-  }
+    tourJump?: TourJump;
+  };
   tasks?: {
-    tours?: TourState
-    bulkSelection?: BulkSelectionState
-  }
+    tours?: TourState;
+    bulkSelection?: BulkSelectionState;
+  };
   booking?: {
-    booking?: Record<number, BookingDTO>,
-    rehearsal?: Record<number, RehearsalDTO>,
-    getInFitUp?: Record<number, GetInFitUpDTO>,
-    other?: OtherState
-    dateBlock?: DateBlockState,
-    dateType?: DateTypeState,
-    performance?: Record<number, PerformanceDTO>,
-    distance?: DistanceState,
-    venue?: Record<number, VenueMinimalDTO>,
-  }
+    booking?: Record<number, BookingDTO>;
+    rehearsal?: Record<number, RehearsalDTO>;
+    getInFitUp?: Record<number, GetInFitUpDTO>;
+    other?: OtherState;
+    dateBlock?: DateBlockState;
+    dateType?: DateTypeState;
+    performance?: Record<number, PerformanceDTO>;
+    distance?: DistanceState;
+    venue?: Record<number, VenueMinimalDTO>;
+  };
   marketing?: {
-    bookingJump?: BookingJump
-    venueRole?: VenueRole
-  }
+    bookingJump?: BookingJump;
+    venueRole?: VenueRole;
+  };
   account?: {
-    user: UserState
-  }
-}>
+    user: UserState;
+  };
+}>;
 
 const states: {
-  global: Record<keyof InitialState['global'], RecoilState<any>>,
-  tasks: Record<keyof InitialState['tasks'], RecoilState<any>>,
-  booking: Record<keyof InitialState['booking'], RecoilState<any>>,
-  marketing: Record<keyof InitialState['marketing'], RecoilState<any>>,
-  account: Record<keyof InitialState['account'], RecoilState<any>>
+  global: Record<keyof InitialState['global'], RecoilState<any>>;
+  tasks: Record<keyof InitialState['tasks'], RecoilState<any>>;
+  booking: Record<keyof InitialState['booking'], RecoilState<any>>;
+  marketing: Record<keyof InitialState['marketing'], RecoilState<any>>;
+  account: Record<keyof InitialState['account'], RecoilState<any>>;
 } = {
   global: {
-    tourJump: tourJumpState
+    tourJump: tourJumpState,
   },
   tasks: {
     tours: tourState,
-    bulkSelection: bulkSelectionState
+    bulkSelection: bulkSelectionState,
   },
   booking: {
     booking: bookingState,
@@ -74,46 +74,48 @@ const states: {
     venue: venueState,
     distance: distanceState,
     dateBlock: dateBlockState,
-    performance: performanceState
+    performance: performanceState,
   },
   marketing: {
     bookingJump: bookingJumpState,
-    venueRole: venueRoleState
+    venueRole: venueRoleState,
   },
   account: {
-    user: userState
-  }
-}
+    user: userState,
+  },
+};
 
 export const setInitialStateServer = (snapshot, initialState: InitialState) => {
   for (const pageKey in initialState) {
     for (const key in initialState[pageKey]) {
-      const state = states[pageKey][key]
-      if (state) snapshot.set(state, initialState[pageKey][key])
+      const state = states[pageKey][key];
+      if (state) snapshot.set(state, initialState[pageKey][key]);
     }
   }
-}
+};
 
 const useSetMultipleRecoilStates = () => {
-  return useRecoilCallback(({ set }) => (initialData: InitialState) => {
-    for (const pageKey in initialData) {
-      for (const key in initialData[pageKey]) {
-        const state = states[pageKey][key]
-        if (state) set(state, initialData[pageKey][key])
-      }
-    }
-  }, [])
-}
+  return useRecoilCallback(
+    ({ set }) =>
+      (initialData: InitialState) => {
+        for (const pageKey in initialData) {
+          for (const key in initialData[pageKey]) {
+            const state = states[pageKey][key];
+            if (state) set(state, initialData[pageKey][key]);
+          }
+        }
+      },
+    [],
+  );
+};
 // Included at the root of the app to automatically set any states it can
-export const ClientStateSetter = ({ intitialState }: {
-  intitialState: InitialState
-}) => {
-  const setMultipleRecoilStates = useSetMultipleRecoilStates()
+export const ClientStateSetter = ({ intitialState }: { intitialState: InitialState }) => {
+  const setMultipleRecoilStates = useSetMultipleRecoilStates();
   React.useEffect(() => {
     if (intitialState) {
-      setMultipleRecoilStates(intitialState)
+      setMultipleRecoilStates(intitialState);
     }
-  }, [intitialState, setMultipleRecoilStates])
+  }, [intitialState, setMultipleRecoilStates]);
 
-  return null
-}
+  return null;
+};

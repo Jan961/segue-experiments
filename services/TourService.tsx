@@ -1,94 +1,92 @@
-import prisma from 'lib/prisma'
-import { Prisma } from '@prisma/client'
-import { showTourMapper, tourEditorMapper } from 'lib/mappers'
-import { getShowWithToursById } from './ShowService'
-import { getAccountId, getEmailFromReq } from './userService'
-import { TourDTO } from 'interfaces'
+import prisma from 'lib/prisma';
+import { Prisma } from '@prisma/client';
+import { showTourMapper, tourEditorMapper } from 'lib/mappers';
+import { getShowWithToursById } from './ShowService';
+import { getAccountId, getEmailFromReq } from './userService';
+import { TourDTO } from 'interfaces';
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
   Show: true,
-  DateBlock: true
-})
+  DateBlock: true,
+});
 
-export const getActiveTours = async (accountId:number) => {
+export const getActiveTours = async (accountId: number) => {
   return prisma.tour.findMany({
     where: {
       IsArchived: false,
       Show: {
-        AccountId: accountId
-      }
+        AccountId: accountId,
+      },
     },
-    include: tourDateBlockInclude
-  })
-}
+    include: tourDateBlockInclude,
+  });
+};
 
 export interface AllTourPageProps {
-  tours: TourDTO[]
+  tours: TourDTO[];
 }
 
 export const getAllTourPageProps = async (ctx: any) => {
-  const email = await getEmailFromReq(ctx.req)
-  const AccountId = await getAccountId(email)
+  const email = await getEmailFromReq(ctx.req);
+  const AccountId = await getAccountId(email);
 
   const toursRaw = await prisma.tour.findMany({
     where: {
       Show: {
         is: {
-          AccountId
-        }
-      }
+          AccountId,
+        },
+      },
     },
     include: {
-      Show: true
-    }
-  })
+      Show: true,
+    },
+  });
 
-  const tours = toursRaw.map(tourEditorMapper)
+  const tours = toursRaw.map(tourEditorMapper);
 
-  return { props: { tours } }
-}
+  return { props: { tours } };
+};
 
 export const getTourPageProps = async (ctx: any) => {
-  const { ShowCode } = ctx.params
-  const email = await getEmailFromReq(ctx.req)
-  const AccountId = await getAccountId(email)
+  const { ShowCode } = ctx.params;
+  const email = await getEmailFromReq(ctx.req);
+  const AccountId = await getAccountId(email);
 
   const showRaw = await prisma.show.findFirst({
     where: {
       Code: ShowCode,
-      AccountId
+      AccountId,
     },
     select: {
       Id: true,
-      Code: true
-    }
-  })
+      Code: true,
+    },
+  });
 
-  if (!showRaw) return { notFound: true, props: {} }
+  if (!showRaw) return { notFound: true, props: {} };
 
-  const show = await getShowWithToursById(showRaw.Id)
-  const tours = showTourMapper(show)
+  const show = await getShowWithToursById(showRaw.Id);
+  const tours = showTourMapper(show);
 
-  return { props: { tours, code: show.Code, name: show.Name } }
-}
+  return { props: { tours, code: show.Code, name: show.Name } };
+};
 
 export const lookupTourId = async (ShowCode: string, TourCode: string, AccountId: number) => {
-  return prisma.tour.findFirst(
-    {
-      where: {
-        Code: TourCode as string,
-        Show: {
-          Code: ShowCode as string,
-          AccountId
-        }
+  return prisma.tour.findFirst({
+    where: {
+      Code: TourCode as string,
+      Show: {
+        Code: ShowCode as string,
+        AccountId,
       },
-      select: {
-        Id: true
-      }
-    }
-  )
-}
+    },
+    select: {
+      Id: true,
+    },
+  });
+};
 
 export const getAllTours = async (AccountId: number) => {
   return prisma.tour.findMany({
@@ -99,26 +97,26 @@ export const getAllTours = async (AccountId: number) => {
       Show: {
         select: {
           Code: true,
-          Name: true
-        }
-      }
+          Name: true,
+        },
+      },
     },
     where: {
       Show: {
         is: {
-          AccountId
-        }
-      }
-    }
-  })
-}
+          AccountId,
+        },
+      },
+    },
+  });
+};
 
 export const getToursByShowCode = (Code: string) => {
   return prisma.tour.findMany({
     where: {
       Show: {
-        Code
-      }
+        Code,
+      },
     },
     select: {
       Id: true,
@@ -126,12 +124,12 @@ export const getToursByShowCode = (Code: string) => {
       IsArchived: true,
       Show: {
         select: {
-          Code: true
-        }
-      }
-    }
-  })
-}
+          Code: true,
+        },
+      },
+    },
+  });
+};
 
 // Booking List
 const tourContentInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -140,41 +138,41 @@ const tourContentInclude = Prisma.validator<Prisma.TourSelect>()({
     include: {
       Booking: {
         include: {
-          Performance: true
-        }
+          Performance: true,
+        },
       },
       GetInFitUp: true,
       Rehearsal: true,
-      Other: true
-    }
-  }
-})
+      Other: true,
+    },
+  },
+});
 
 export type TourContent = Prisma.TourGetPayload<{
-  include: typeof tourContentInclude
-}>
+  include: typeof tourContentInclude;
+}>;
 
 export const getTourWithContent = async (Id: number) => {
   return await prisma.tour.findUnique({
     where: {
-      Id
+      Id,
     },
-    include: tourContentInclude
-  })
-}
+    include: tourContentInclude,
+  });
+};
 
 export type TourWithDateblocks = Prisma.TourGetPayload<{
-  include: typeof tourDateBlockInclude
-}>
+  include: typeof tourDateBlockInclude;
+}>;
 
 export const getTourById = async (Id: number) => {
   return await prisma.tour.findUnique({
     where: {
-      Id
+      Id,
     },
-    include: tourDateBlockInclude
-  })
-}
+    include: tourDateBlockInclude,
+  });
+};
 
 export const getToursAndTasks = async (AccountId: number) => {
   return await prisma.tour.findMany({
@@ -182,18 +180,18 @@ export const getToursAndTasks = async (AccountId: number) => {
       IsArchived: false,
       Show: {
         is: {
-          AccountId
-        }
-      }
+          AccountId,
+        },
+      },
     },
     include: {
       Show: true,
       TourTask: {
         orderBy: {
-          Id: 'desc'
+          Id: 'desc',
         },
-        take: 10
-      }
-    }
-  })
-}
+        take: 10,
+      },
+    },
+  });
+};

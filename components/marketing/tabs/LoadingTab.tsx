@@ -1,5 +1,5 @@
-import { Spinner } from 'components/global/Spinner'
+import { Spinner } from 'components/global/Spinner';
 
 export const LoadingTab = () => {
-  return (<Spinner size='lg' className="mt-8" />)
-}
+  return <Spinner size="lg" className="mt-8" />;
+};

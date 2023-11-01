@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { dateToSimple } from "../../../services/dateService";
-import IconWithText from "../IconWithText";
-import { faChartLine } from "@fortawesome/free-solid-svg-icons";
-import { Spinner } from "components/global/Spinner";
+import React, { useState } from 'react';
+import { dateToSimple } from '../../../services/dateService';
+import IconWithText from '../IconWithText';
+import { faChartLine } from '@fortawesome/free-solid-svg-icons';
+import { Spinner } from 'components/global/Spinner';
 
 type Props = {
   activeTours: any[];
@@ -49,14 +49,11 @@ export default function SalesSummaryFix({ activeTours }: Props) {
 
   async function handleOnChange(e) {
     e.persist();
-    if (e.target.name === "Tour") {
+    if (e.target.name === 'Tour') {
       setTourWeeks([]);
-      const currentTour = activeTours.find(
-        (tour) => tour.Id === parseInt(e.target.value)
-      );
+      const currentTour = activeTours.find((tour) => tour.Id === parseInt(e.target.value));
       if (currentTour) {
-        const { StartDate, EndDate } =
-          currentTour.DateBlock.find((date) => date.Name === "Tour") || {};
+        const { StartDate, EndDate } = currentTour.DateBlock.find((date) => date.Name === 'Tour') || {};
         setInputs((prev) => ({
           ...prev,
           tourStartDate: StartDate,
@@ -84,11 +81,7 @@ export default function SalesSummaryFix({ activeTours }: Props) {
 
   return (
     <>
-      <IconWithText
-        icon={faChartLine}
-        text={"Sales Summary Report"}
-        onClick={() => setShowModal(true)}
-      />
+      <IconWithText icon={faChartLine} text={'Sales Summary Report'} onClick={() => setShowModal(true)} />
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10">
@@ -135,8 +128,7 @@ export default function SalesSummaryFix({ activeTours }: Props) {
                   </div>
                   <div className="flex flex-col space-y-2 mt-4">
                     <span>
-                      Tour Dates {dateToSimple(inputs.tourStartDate)} to{" "}
-                      {dateToSimple(inputs.tourEndDate)}
+                      Tour Dates {dateToSimple(inputs.tourStartDate)} to {dateToSimple(inputs.tourEndDate)}
                     </span>
                   </div>
                   <div className="flex flex-col space-y-2 mt-4">
@@ -151,10 +143,7 @@ export default function SalesSummaryFix({ activeTours }: Props) {
                       onChange={handleOnChange}
                     >
                       {tourWeeks.map((week) => (
-                        <option
-                          key={week.MondayDate}
-                          value={`${week.MondayDate}`}
-                        >
+                        <option key={week.MondayDate} value={`${week.MondayDate}`}>
                           {week.Description || dateToSimple(week.MondayDate)}
                         </option>
                       ))}
@@ -196,13 +185,9 @@ export default function SalesSummaryFix({ activeTours }: Props) {
                       name="Order"
                       onChange={handleOnChange}
                     >
-                      <option value={"date"}>Show Date</option>
-                      <option value={"sales"}>
-                        Show Sales (Low to Highest)
-                      </option>
-                      <option value={"change"}>
-                        Change (Lowest to highest)
-                      </option>
+                      <option value={'date'}>Show Date</option>
+                      <option value={'sales'}>Show Sales (Low to Highest)</option>
+                      <option value={'change'}>Change (Lowest to highest)</option>
                     </select>
                   </div>
                   {/* footer */}
@@ -219,12 +204,12 @@ export default function SalesSummaryFix({ activeTours }: Props) {
                       className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="submit"
                     >
-                      {" "}
+                      {' '}
                       {!status.submitting
                         ? !status.submitted
-                          ? "Generate Excel Report"
-                          : "Downloaded"
-                        : "Creating Report..."}
+                          ? 'Generate Excel Report'
+                          : 'Downloaded'
+                        : 'Creating Report...'}
                     </button>
                   </div>
                 </form>

@@ -1,17 +1,17 @@
-import { TourTaskDTO } from 'interfaces'
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
-import { getEmailFromReq, checkAccess } from 'services/userService'
+import { TourTaskDTO } from 'interfaces';
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { getEmailFromReq, checkAccess } from 'services/userService';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
     try {
-      const task = req.body as TourTaskDTO
-      const { Id } = task
+      const task = req.body as TourTaskDTO;
+      const { Id } = task;
 
-      const email = await getEmailFromReq(req)
-      const access = await checkAccess(email, { TaskId: Id })
-      if (!access) return res.status(401).end()
+      const email = await getEmailFromReq(req);
+      const access = await checkAccess(email, { TaskId: Id });
+      if (!access) return res.status(401).end();
 
       await prisma.tourTask.update({
         where: { Id: task.Id },
@@ -28,16 +28,16 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
           Status: task.Status,
           Interval: 'once',
           AssignedBy: task.AssignedBy,
-          AssignedTo: task.AssignedTo
-        }
-      })
+          AssignedTo: task.AssignedTo,
+        },
+      });
 
-      return res.status(200).json({})
+      return res.status(200).json({});
     } catch (err) {
-      console.log(err)
-      return res.status(500).json({ error: 'Error updating TourTask' })
+      console.log(err);
+      return res.status(500).json({ error: 'Error updating TourTask' });
     }
   } else {
-    return res.status(405).json({ error: 'Method not allowed' })
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 }

@@ -1,9 +1,9 @@
-import Layout from 'components/Layout'
-import { UserList } from 'components/account/manage-users/userList'
-import { CreateUserModal } from 'components/account/modal/CreateUserModal'
-import { GetServerSideProps } from 'next'
-import { objectify } from 'radash'
-import { getAccountIdFromReq, getUsers } from 'services/userService'
+import Layout from 'components/Layout';
+import { UserList } from 'components/account/manage-users/userList';
+import { CreateUserModal } from 'components/account/modal/CreateUserModal';
+import { GetServerSideProps } from 'next';
+import { objectify } from 'radash';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 
 const Index = () => {
   return (
@@ -16,22 +16,22 @@ const Index = () => {
         <UserList />
       </div>
     </Layout>
-  )
-}
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const accountId = await getAccountIdFromReq(ctx.req)
-  const users = await getUsers(accountId)
+  const accountId = await getAccountIdFromReq(ctx.req);
+  const users = await getUsers(accountId);
 
   return {
     props: {
       initialState: {
         account: {
-          user: objectify(users, (u) => u.Id)
-        }
-      }
-    }
-  }
-}
+          user: objectify(users, (u) => u.Id),
+        },
+      },
+    },
+  };
+};
 
-export default Index
+export default Index;

@@ -1,6 +1,6 @@
-import Layout from '../../components/Layout'
-import Salesmarketsearch from '../../components/reports/sales/salesmarketsearch'
-import SalesMarketingSummary from '../../components/reports/modals/SalesMarketingSummary'
+import Layout from '../../components/Layout';
+import Salesmarketsearch from '../../components/reports/sales/salesmarketsearch';
+import SalesMarketingSummary from '../../components/reports/modals/SalesMarketingSummary';
 
 const ShowId = () => (
   <Layout title="ShowId | Segue">
@@ -9,6 +9,6 @@ const ShowId = () => (
       <Salesmarketsearch></Salesmarketsearch>
     </div>
   </Layout>
-)
+);
 
-export default ShowId
+export default ShowId;

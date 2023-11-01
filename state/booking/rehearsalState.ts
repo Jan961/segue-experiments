@@ -1,9 +1,9 @@
-import { RehearsalDTO } from 'interfaces'
-import { atom } from 'recoil'
+import { RehearsalDTO } from 'interfaces';
+import { atom } from 'recoil';
 
-const intialState: Record<number, RehearsalDTO> = {}
+const intialState: Record<number, RehearsalDTO> = {};
 
 export const rehearsalState = atom({
   key: 'rehearsalState',
-  default: intialState
-})
+  default: intialState,
+});

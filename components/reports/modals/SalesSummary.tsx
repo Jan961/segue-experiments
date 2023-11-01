@@ -1,9 +1,9 @@
-import React, { useState } from "react";
-import IconWithText from "../IconWithText";
-import { faChartPie } from "@fortawesome/free-solid-svg-icons";
-import { dateToSimple } from "services/dateService";
-import { getCurrentMondayDate } from "services/reportsService";
-import { Spinner } from "components/global/Spinner";
+import React, { useState } from 'react';
+import IconWithText from '../IconWithText';
+import { faChartPie } from '@fortawesome/free-solid-svg-icons';
+import { dateToSimple } from 'services/dateService';
+import { getCurrentMondayDate } from 'services/reportsService';
+import { Spinner } from 'components/global/Spinner';
 
 type Props = {
   activeTours: any[];
@@ -49,14 +49,11 @@ export default function SalesSummary({ activeTours }: Props) {
 
   async function handleOnChange(e) {
     e.persist();
-    if (e.target.name === "Tour") {
+    if (e.target.name === 'Tour') {
       setTourWeeks([]);
-      const currentTour = activeTours.find(
-        (tour) => tour.Id === parseInt(e.target.value)
-      );
+      const currentTour = activeTours.find((tour) => tour.Id === parseInt(e.target.value));
       if (currentTour) {
-        const { StartDate, EndDate } =
-          currentTour.DateBlock.find((date) => date.Name === "Tour") || {};
+        const { StartDate, EndDate } = currentTour.DateBlock.find((date) => date.Name === 'Tour') || {};
         setInputs((prev) => ({
           ...prev,
           tourStartDate: StartDate,
@@ -87,11 +84,7 @@ export default function SalesSummary({ activeTours }: Props) {
 
   return (
     <>
-      <IconWithText
-        icon={faChartPie}
-        text={"Sales Summary"}
-        onClick={() => setShowModal(true)}
-      />
+      <IconWithText icon={faChartPie} text={'Sales Summary'} onClick={() => setShowModal(true)} />
       {showModal ? (
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none overflow-scroll p-10">
@@ -137,27 +130,14 @@ export default function SalesSummary({ activeTours }: Props) {
                     </select>
                   </div>
                   <div className="flex flex-col space-y-2 mt-4">
-                    <input
-                      type={"hidden"}
-                      name={"tourStartDate"}
-                      id={"tourStartDate"}
-                      value={inputs.tourStartDate}
-                    />
-                    <input
-                      type={"hidden"}
-                      name={"tourEndDate"}
-                      id={"tourEndDate"}
-                      value={inputs.tourEndDate}
-                    />
+                    <input type={'hidden'} name={'tourStartDate'} id={'tourStartDate'} value={inputs.tourStartDate} />
+                    <input type={'hidden'} name={'tourEndDate'} id={'tourEndDate'} value={inputs.tourEndDate} />
                     {inputs.tourStartDate != null ? (
                       <p className="text-lg">
-                        Tour Dates {dateToSimple(inputs.tourStartDate)} to{" "}
-                        {dateToSimple(inputs.tourEndDate)}
+                        Tour Dates {dateToSimple(inputs.tourStartDate)} to {dateToSimple(inputs.tourEndDate)}
                       </p>
                     ) : (
-                      <p className="text-lg">
-                        Select a Tour to populate report filters
-                      </p>
+                      <p className="text-lg">Select a Tour to populate report filters</p>
                     )}
                   </div>
 
@@ -173,11 +153,8 @@ export default function SalesSummary({ activeTours }: Props) {
                       onChange={handleOnChange}
                     >
                       {tourWeeks.map((week) => (
-                        <option
-                          key={week.MondayDate}
-                          value={`${week.MondayDate}`}
-                        >
-                          {week?.Description || dateToSimple(week?.MondayDate)}{" "}
+                        <option key={week.MondayDate} value={`${week.MondayDate}`}>
+                          {week?.Description || dateToSimple(week?.MondayDate)}{' '}
                         </option>
                       ))}
                     </select>
@@ -218,13 +195,9 @@ export default function SalesSummary({ activeTours }: Props) {
                       name="Order"
                       onChange={handleOnChange}
                     >
-                      <option value={"date"}>Show Date</option>
-                      <option value={"sales"}>
-                        Show Sales (Low to Highest)
-                      </option>
-                      <option value={"change"}>
-                        Change (Lowest to highest)
-                      </option>
+                      <option value={'date'}>Show Date</option>
+                      <option value={'sales'}>Show Sales (Low to Highest)</option>
+                      <option value={'change'}>Change (Lowest to highest)</option>
                     </select>
                   </div>
 
@@ -242,12 +215,12 @@ export default function SalesSummary({ activeTours }: Props) {
                       className="bg-emerald-500 text-white active:bg-emerald-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="submit"
                     >
-                      {" "}
+                      {' '}
                       {!status.submitting
                         ? !status.submitted
-                          ? "Generate Excel Report"
-                          : "Downloaded"
-                        : "Creating Report..."}
+                          ? 'Generate Excel Report'
+                          : 'Downloaded'
+                        : 'Creating Report...'}
                     </button>
                   </div>
                 </form>

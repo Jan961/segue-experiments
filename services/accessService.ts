@@ -1,19 +1,19 @@
-import prisma from 'lib/prisma'
+import prisma from 'lib/prisma';
 
 // This may need to be expanded to include Tasks, Contracts, Files
 export interface AccessCheck {
-  ShowId?: number
-  TourId?: number
-  AccountId?: number
-  DateBlockId?: number
-  BookingId?: number
-  OtherId?: number
-  GifuId?: number
-  PerformanceId?: number
-  RehearsalId?: number
-  ActivityId?: number
-  AvailableCompId?: number
-  TaskId?: number
+  ShowId?: number;
+  TourId?: number;
+  AccountId?: number;
+  DateBlockId?: number;
+  BookingId?: number;
+  OtherId?: number;
+  GifuId?: number;
+  PerformanceId?: number;
+  RehearsalId?: number;
+  ActivityId?: number;
+  AvailableCompId?: number;
+  TaskId?: number;
 }
 
 // Check access based on the second paramater. Can pass multiple to it if wanted (but will increase workload)
@@ -22,30 +22,30 @@ export interface AccessCheck {
 export const checkAccess = async (email: string, items: AccessCheck): Promise<boolean> => {
   const user = await prisma.user.findUnique({
     where: {
-      Email: email
-    }
-  })
+      Email: email,
+    },
+  });
 
-  if (!user) return false
+  if (!user) return false;
 
   // We just need the minimal for checking existence
   const select = {
-    Id: true
-  }
+    Id: true,
+  };
 
   // We default to true for simple user checks
-  const successes = [true]
+  const successes = [true];
 
   // Show
   if (items.ShowId) {
     const show = await prisma.show.findFirst({
       where: {
         Id: items.ShowId,
-        AccountId: user.AccountId
+        AccountId: user.AccountId,
       },
-      select
-    })
-    successes.push(!!show)
+      select,
+    });
+    successes.push(!!show);
   }
 
   // Tour
@@ -55,14 +55,14 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
         Id: items.TourId,
         Show: {
           is: {
-            AccountId: user.AccountId
-          }
-        }
+            AccountId: user.AccountId,
+          },
+        },
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!tour)
+    successes.push(!!tour);
   }
 
   // DateBlock
@@ -74,15 +74,15 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
           is: {
             Show: {
               is: {
-                AccountId: user.AccountId
-              }
-            }
-          }
-        }
+                AccountId: user.AccountId,
+              },
+            },
+          },
+        },
       },
-      select
-    })
-    successes.push(!!dateblock)
+      select,
+    });
+    successes.push(!!dateblock);
   }
 
   // Shared for all event types, gifu, booking, rehearsal etc.
@@ -93,25 +93,25 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
           is: {
             Show: {
               is: {
-                AccountId: user.AccountId
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+                AccountId: user.AccountId,
+              },
+            },
+          },
+        },
+      },
+    },
+  };
 
   // Booking
   if (items.BookingId) {
     const booking = await prisma.booking.findFirst({
       where: {
         Id: items.BookingId,
-        ...EventWhere
+        ...EventWhere,
       },
-      select
-    })
-    successes.push(!!booking)
+      select,
+    });
+    successes.push(!!booking);
   }
 
   // Rehearsal
@@ -119,12 +119,12 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     const rehearsal = await prisma.rehearsal.findFirst({
       where: {
         Id: items.RehearsalId,
-        ...EventWhere
+        ...EventWhere,
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!rehearsal)
+    successes.push(!!rehearsal);
   }
 
   // Get In Fit Up (GIFU)
@@ -132,12 +132,12 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     const gifu = await prisma.getInFitUp.findFirst({
       where: {
         Id: items.GifuId,
-        ...EventWhere
+        ...EventWhere,
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!gifu)
+    successes.push(!!gifu);
   }
 
   // Other
@@ -145,11 +145,11 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     const other = await prisma.other.findFirst({
       where: {
         Id: items.OtherId,
-        ...EventWhere
+        ...EventWhere,
       },
-      select
-    })
-    successes.push(!!other)
+      select,
+    });
+    successes.push(!!other);
   }
 
   // Performance
@@ -159,13 +159,13 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
         Id: items.PerformanceId,
         // Slightly different. This is based on booking
         Booking: {
-          is: EventWhere
-        }
+          is: EventWhere,
+        },
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!perf)
+    successes.push(!!perf);
   }
 
   // Performance
@@ -175,13 +175,13 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
         Id: items.ActivityId,
         // Slightly different. This is based on booking
         Booking: {
-          is: EventWhere
-        }
+          is: EventWhere,
+        },
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!bookingActivity)
+    successes.push(!!bookingActivity);
   }
 
   if (items.AvailableCompId) {
@@ -192,15 +192,15 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
         Performance: {
           is: {
             Booking: {
-              is: EventWhere
-            }
-          }
-        }
+              is: EventWhere,
+            },
+          },
+        },
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!availableComp)
+    successes.push(!!availableComp);
   }
 
   if (items.TaskId) {
@@ -208,13 +208,13 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
       where: {
         Id: items.TaskId,
         // Slightly different. This is based on booking
-        Tour: EventWhere.DateBlock.is.Tour
+        Tour: EventWhere.DateBlock.is.Tour,
       },
-      select
-    })
+      select,
+    });
 
-    successes.push(!!task)
+    successes.push(!!task);
   }
 
-  return successes.filter(x => !x).length === 0
-}
+  return successes.filter((x) => !x).length === 0;
+};
