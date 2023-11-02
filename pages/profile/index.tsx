@@ -10,10 +10,10 @@ export default function Profile() {
 
   useEffect(() => {
     setLoading(true);
-    //TODO: Validate user session Agains frontend changed Page can only load if a session is active for this user
+    // TODO: Validate user session Agains frontend changed Page can only load if a session is active for this user
     // this account and this session id
-    let userid = sessionStorage.getItem('UserId');
-    let account = sessionStorage.getItem('accountId');
+    const userid = sessionStorage.getItem('UserId');
+    const account = sessionStorage.getItem('accountId');
 
     fetch('/api/account/read/users/accountUsers/' + account)
       .then((res) => res.json())

@@ -1,8 +1,8 @@
 import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
-  let AccountId: number = parseInt(req.query.AccountId);
-  let EntryType: number = parseInt(req.query.EntryType);
+  const AccountId: number = parseInt(req.query.AccountId);
+  const EntryType: number = parseInt(req.query.EntryType);
 
   const result = await prisma.emailImport.findMany({
     where: {

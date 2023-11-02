@@ -50,7 +50,7 @@ const UserListItem = ({ data, navigate }: Props) => (
       {data.Country}
     </td>
     <td onClick={() => navigate(data.VenueId)} className=" px-2 py-2 text-sm text-gray-500">
-      <a href={`${data.Website}`} target="_blank">
+      <a href={`${data.Website}`} target="_blank" rel="noreferrer">
         {data.Seats}
       </a>
     </td>
@@ -58,7 +58,7 @@ const UserListItem = ({ data, navigate }: Props) => (
       {formatDate(data.updated_at)}
     </td>
     <td onClick={() => navigate(data.VenueId)} className=" px-2 py-2 text-sm text-gray-500">
-      <a href={`${data.Website}`} target="_blank">
+      <a href={`${data.Website}`} target="_blank" rel="noreferrer">
         {trimWebsite(data.Website)}
       </a>
     </td>

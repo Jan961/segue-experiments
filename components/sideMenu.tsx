@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 
-let tourId = 1;
+const tourId = 1;
 
 const SideNavBar = (data?) => (
   <div className="1/12 w-60 h-full shadow-md bg-white px-1 ">

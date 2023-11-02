@@ -10,7 +10,7 @@ import accountId from '../../../pages/account/update-details/[account-id]';
 
 export default function NewUser() {
   const [showModal, setShowModal] = React.useState(false);
-  const userLevel = 1; //TODO: get this from User
+  const userLevel = 1; // TODO: get this from User
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -28,7 +28,7 @@ export default function NewUser() {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
         Name: inputs.Name,
@@ -100,9 +100,9 @@ export default function NewUser() {
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              {/*content*/}
+              {/* content */}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                {/*header*/}
+                {/* header */}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Add User</h3>
                   <button
@@ -114,7 +114,7 @@ export default function NewUser() {
                     </span>
                   </button>
                 </div>
-                {/*body*/}
+                {/* body */}
                 <form onSubmit={handleOnSubmit}>
                   <div className="relative p-6 flex-auto">
                     <div className="grid grid-cols-1 gap-2">
@@ -155,7 +155,7 @@ export default function NewUser() {
                     </div>
                   </div>
 
-                  {/*footer*/}
+                  {/* footer */}
                   <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                     <button
                       className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"

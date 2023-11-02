@@ -9,7 +9,7 @@ import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { StyledDialog } from 'components/global/StyledDialog';
 
 interface props {
-  searchFilter: String;
+  searchFilter: string;
   tours?: any[];
 }
 export default function Entry({ tours = [], searchFilter }: props) {

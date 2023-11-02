@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
-  let archived = req.query.archived;
+  const archived = req.query.archived;
 
   try {
     const searchResults =

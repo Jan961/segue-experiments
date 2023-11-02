@@ -1,5 +1,5 @@
 export async function Logging(action, user_id, account_id) {
-  //todo impliment this
+  // todo impliment this
   /**
     try {
         const logEntry = await prisma.action_log.create({

@@ -10,7 +10,7 @@ const BookingSchedule = ({ TourId }: props) => {
     fetch('/api/reports/bookingSchedule', { method: 'POST', body: JSON.stringify({ TourId }) })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
-          const tourName: string = `${TourId}`;
+          const tourName = `${TourId}`;
           let suggestedName: string | any[] = response.headers.get('Content-Disposition');
           if (suggestedName) {
             suggestedName = suggestedName?.match?.(/filename="(.+)"/);

@@ -23,7 +23,7 @@ export const InfoPanel = () => {
 
   let panel: any;
   let headerClass = 'm-0 p-2';
-  let headerText: string = '';
+  let headerText = '';
   const performanceIds = [];
 
   if (type === 'booking') {

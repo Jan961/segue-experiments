@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react';
 
 interface FormInfoProps {
   intent?: undefined | 'DANGER' | 'WARNING';
-  header?: String;
+  header?: string;
   className?: string;
 }
 

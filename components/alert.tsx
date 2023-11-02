@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 
-import { AlertType } from 'services/alert.service';
-import { alertService } from 'services/alert.service';
+import { AlertType , alertService } from 'services/alert.service';
 import { XCircleIcon } from '@heroicons/react/20/solid';
 
 export { Alert };

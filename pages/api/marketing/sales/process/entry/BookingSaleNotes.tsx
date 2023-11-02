@@ -1,9 +1,9 @@
 import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
-  //console.log(req.data)
+  // console.log(req.data)
   try {
-    let result = await prisma.bookingSaleNotes.create({
+    const result = await prisma.bookingSaleNotes.create({
       data: {
         BookingSaleId: req.data.BookingSaleId,
         HoldNotes: req.data.HoldNotes,

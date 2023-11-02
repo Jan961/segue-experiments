@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
-  let query =
+  const query =
     'SELECT * ' +
     'FROM TourWeekSummaryView  ' +
     `WHERE ShowId = ${req.query.ShowId} ` +
@@ -10,7 +10,7 @@ export default async function handle(req, res) {
     'ORDER BY WeekDate';
 
   try {
-    let result = await prisma.$queryRawUnsafe(`${query}`);
+    const result = await prisma.$queryRawUnsafe(`${query}`);
     res.json(result);
   } catch (e) {
     res.status(401);
