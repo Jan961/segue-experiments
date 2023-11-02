@@ -207,7 +207,7 @@ export default function ViewForm() {
                       </div>
                       {/* TODO: Replace with account ID */}
 
-                      {userLevel == 0 ? (
+                      {userLevel !== 1 ? (
                         <div>
                           {/* this will only show on ADMIN Accounts */}
                           <label htmlFor="source" className="">
