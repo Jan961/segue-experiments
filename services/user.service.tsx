@@ -26,8 +26,8 @@ function login(email, password) {
   return fetchWrapper.post(`${baseUrl}/authenticate`, { email, password }).then((user) => {
     // publish user to subscribers and store in local storage to stay logged in between page refreshes
     userSubject.next(user);
-    //NOTE: Can only create session if the Concurrent Session Count
-    //TODO: Create session in Session Table
+    // NOTE: Can only create session if the Concurrent Session Count
+    // TODO: Create session in Session Table
     localStorage.setItem('user', JSON.stringify(user));
     sessionStorage.setItem('userId', user.userId);
     sessionStorage.setItem('accountId', user.accountId);
@@ -38,7 +38,7 @@ function login(email, password) {
 function logout() {
   // remove user from local storage, publish null to user subscribers and redirect to login page
 
-  //TODO:  Delete Session in session Table
+  // TODO:  Delete Session in session Table
   localStorage.removeItem('user');
   sessionStorage.removeItem('userId');
   sessionStorage.removeItem('accountId');

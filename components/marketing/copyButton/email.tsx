@@ -11,7 +11,7 @@ import { settingsService } from '../../../services/settingsService';
  *
  */
 export default function () {
-  let email = '123@parser.seguesite.co.uk';
+  const email = '123@parser.seguesite.co.uk';
   const [emailAddress, setEmail] = useState(email);
   const [copied, setCopied] = useState(false);
 

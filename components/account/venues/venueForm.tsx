@@ -6,7 +6,7 @@ import axios from 'axios';
 
 export default function ViewForm() {
   const [showModal, setShowModal] = React.useState(false);
-  let userLevel = 1; //TODO: get this from User
+  const userLevel = 1; // TODO: get this from User
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -29,7 +29,7 @@ export default function ViewForm() {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
         code: '',
@@ -38,7 +38,7 @@ export default function ViewForm() {
         country: '',
         seats: 0,
         website: '',
-        source: 0, //TOdo: change to account id
+        source: 0, // TOdo: change to account id
       });
     } else {
       // @ts-ignore
@@ -70,7 +70,7 @@ export default function ViewForm() {
         handleServerResponse(
           true,
           'Thank you, your message has been submitted.',
-          //Todo: router setlocation to the new venue to allow user to add the rest fo the detils
+          // Todo: router setlocation to the new venue to allow user to add the rest fo the detils
         );
         console.log(JSON.stringify(handleServerResponse));
       })
@@ -92,9 +92,9 @@ export default function ViewForm() {
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              {/*content*/}
+              {/* content */}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                {/*header*/}
+                {/* header */}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Add Custom Venue</h3>
                   <button
@@ -106,7 +106,7 @@ export default function ViewForm() {
                     </span>
                   </button>
                 </div>
-                {/*body*/}
+                {/* body */}
                 <form onSubmit={handleOnSubmit}>
                   <div className="relative p-6 flex-auto">
                     <div className="grid grid-cols-1 gap-2">
@@ -239,7 +239,7 @@ export default function ViewForm() {
                     </div>
                   </div>
 
-                  {/*footer*/}
+                  {/* footer */}
                   <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                     <button
                       className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -258,7 +258,7 @@ export default function ViewForm() {
                     </button>
                   </div>
                 </form>
-                {/**}
+                {/** }
                             {status.info.error && (
                                 <div className="bg-red-800 text-black">Error: {status.info.msg}</div>
                             )}

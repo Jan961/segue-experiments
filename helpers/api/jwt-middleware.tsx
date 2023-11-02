@@ -1,6 +1,6 @@
+import getConfig from 'next/config';
 const expressJwt = require('express-jwt');
 const util = require('util');
-import getConfig from 'next/config';
 
 const { serverRuntimeConfig } = getConfig();
 

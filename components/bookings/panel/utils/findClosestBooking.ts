@@ -1,7 +1,7 @@
 import { BookingDTO } from 'interfaces';
 
 export const findClosestBooking = (bookings: Record<number, BookingDTO>, specifiedDate: string) => {
-  let closestDate: string = '1970-01-01'; // Allow initial comparisons
+  let closestDate = '1970-01-01'; // Allow initial comparisons
   let closestBookings: number[] = [];
 
   const keys = Object.keys(bookings);

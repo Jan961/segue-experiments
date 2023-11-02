@@ -57,7 +57,7 @@ export default function SalesDataValidation() {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
     } else {
       // @ts-ignore

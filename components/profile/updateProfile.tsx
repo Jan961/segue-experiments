@@ -27,7 +27,7 @@ export default function UpdateProfile(accountId) {
     submitting: false,
     info: { error: false, msg: null },
   });
-  let user = userService.userValue;
+  const user = userService.userValue;
 
   const searchEndpoint = (query) => `/api/users/read/${query}`;
 
@@ -67,7 +67,7 @@ export default function UpdateProfile(accountId) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
         password: inputs.password,
@@ -99,7 +99,7 @@ export default function UpdateProfile(accountId) {
     e.preventDefault();
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
 
-    //validate in
+    // validate in
     if (inputs.password === inputs.passwordConfirm) {
       if (inputs.password !== null || inputs.password !== undefined) {
       }

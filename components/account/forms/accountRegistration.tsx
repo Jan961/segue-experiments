@@ -5,10 +5,10 @@ import { router } from 'next/client';
 import { forceNavigate } from '../../../utils/forceNavigate';
 
 export default function AccountRegistration() {
-  //https://jasonwatmore.com/post/2021/08/19/next-js-11-user-registration-and-login-tutorial-with-example-app
+  // https://jasonwatmore.com/post/2021/08/19/next-js-11-user-registration-and-login-tutorial-with-example-app
 
   function handleOnSubmit() {
-    //Check Account can be created no conflicts with others
+    // Check Account can be created no conflicts with others
 
     // Register Account
 
@@ -16,7 +16,7 @@ export default function AccountRegistration() {
 
     // Log User in and Send to Platform Home
 
-    //forceNavigate("\/")
+    // forceNavigate("\/")
     return null;
   }
 

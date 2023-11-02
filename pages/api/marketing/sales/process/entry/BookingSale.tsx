@@ -2,7 +2,7 @@ import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
-    let result = await prisma.bookingSale.create({
+    const result = await prisma.bookingSale.create({
       data: {
         BookingId: parseInt(req.body.Venue),
         SalesFiguresDate: new Date(),
@@ -21,9 +21,9 @@ export default async function handle(req, res) {
         IsCopy: false,
       },
     });
-    //console.log(result)
+    // console.log(result)
 
-    let notes = await prisma.bookingSaleNotes.create({
+    const notes = await prisma.bookingSaleNotes.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldNotes: req.body.HoldNotes,
@@ -32,99 +32,99 @@ export default async function handle(req, res) {
       },
     });
 
-    //Venue
-    let VenueComp = await prisma.bookingSaleComp.create({
+    // Venue
+    const VenueComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 1,
         Seats: parseInt(req.body.VenueSeats),
       },
     });
-    let PromoterComp = await prisma.bookingSaleComp.create({
+    const PromoterComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 2,
         Seats: parseInt(req.body.PromoterSeats),
       },
     });
-    let CompanionComp = await prisma.bookingSaleComp.create({
+    const CompanionComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 3,
         Seats: parseInt(req.body.CompanionSpaceSeats),
       },
     });
-    let StaffComp = await prisma.bookingSaleComp.create({
+    const StaffComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 4,
         Seats: parseInt(req.body.StaffSeats),
       },
     });
-    let CastCrewComp = await prisma.bookingSaleComp.create({
+    const CastCrewComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 5,
         Seats: parseInt(req.body.CastCrewSeats),
       },
     });
-    let OtherComp = await prisma.bookingSaleComp.create({
+    const OtherComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 6,
         Seats: parseInt(req.body.OtherSeats),
       },
     });
-    let HouseManagementComp = await prisma.bookingSaleComp.create({
+    const HouseManagementComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 7,
         Seats: parseInt(req.body.HouseManagementSeats),
       },
     });
-    let PressComp = await prisma.bookingSaleComp.create({
+    const PressComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 8,
         Seats: parseInt(req.body.PressSeats),
       },
     });
-    let MixerComp = await prisma.bookingSaleComp.create({
+    const MixerComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 9,
         Seats: parseInt(req.body.MixerSeats),
       },
     });
-    let TechnicalComp = await prisma.bookingSaleComp.create({
+    const TechnicalComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 10,
         Seats: parseInt(req.body.TechnicalSeats),
       },
     });
-    let OffSaleComp = await prisma.bookingSaleComp.create({
+    const OffSaleComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 11,
         Seats: parseInt(req.body.OffSaleSeats),
       },
     });
-    let WheelchairComp = await prisma.bookingSaleComp.create({
+    const WheelchairComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 12,
         Seats: parseInt(req.body.WheelchairSeats),
       },
     });
-    let RestrictedViewComp = await prisma.bookingSaleComp.create({
+    const RestrictedViewComp = await prisma.bookingSaleComp.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         CompId: 13,
         Seats: parseInt(req.body.RestrictedViewSeats),
       },
     });
-    let PromoterHolds = await prisma.bookingSaleHold.create({
+    const PromoterHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 1,
@@ -132,7 +132,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.PromoterHoldsValue),
       },
     });
-    let PressHold = await prisma.bookingSaleHold.create({
+    const PressHold = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 2,
@@ -140,7 +140,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.PressHoldsValue),
       },
     });
-    let MixerHold = await prisma.bookingSaleHold.create({
+    const MixerHold = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 3,
@@ -148,7 +148,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.MixerHoldsValue),
       },
     });
-    let OffSaleHolds = await prisma.bookingSaleHold.create({
+    const OffSaleHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 4,
@@ -156,7 +156,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.OffSaleHoldsValue),
       },
     });
-    let WheelchairSpaceHolds = await prisma.bookingSaleHold.create({
+    const WheelchairSpaceHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 5,
@@ -164,7 +164,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.WheelchairSpaceHoldsValue),
       },
     });
-    let CompanionSpaceHolds = await prisma.bookingSaleHold.create({
+    const CompanionSpaceHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 6,
@@ -172,7 +172,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.CompanionSpaceHoldsValue),
       },
     });
-    let RestrictedViewSeatsHolds = await prisma.bookingSaleHold.create({
+    const RestrictedViewSeatsHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 7,
@@ -180,7 +180,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.RestrictedViewSeatsHoldsValue),
       },
     });
-    let StaffHolds = await prisma.bookingSaleHold.create({
+    const StaffHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 8,
@@ -188,7 +188,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.StaffHoldsValue),
       },
     });
-    let OtherHoldsSeats = await prisma.bookingSaleHold.create({
+    const OtherHoldsSeats = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 9,
@@ -196,7 +196,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.OtherHoldsValue),
       },
     });
-    let VenueHolds = await prisma.bookingSaleHold.create({
+    const VenueHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 10,
@@ -204,7 +204,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.VenueHoldsValue),
       },
     });
-    let TechnicalHolds = await prisma.bookingSaleHold.create({
+    const TechnicalHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 11,
@@ -212,7 +212,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.TechnicalHoldsValue),
       },
     });
-    let HouseManagementHolds = await prisma.bookingSaleHold.create({
+    const HouseManagementHolds = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 12,
@@ -220,7 +220,7 @@ export default async function handle(req, res) {
         Value: parseFloat(req.body.HouseManagementHoldsValue),
       },
     });
-    let CastCrewHoldsSeats = await prisma.bookingSaleHold.create({
+    const CastCrewHoldsSeats = await prisma.bookingSaleHold.create({
       data: {
         BookingSaleId: result.BookingSaleId,
         HoldId: 13,

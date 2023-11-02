@@ -112,7 +112,7 @@ const columns = [
   },
 ];
 
-let recordCount = 0;
+const recordCount = 0;
 
 export default function Historyload() {
   const [fileUpload, setFileUpload] = useState(null);
@@ -136,7 +136,7 @@ export default function Historyload() {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
         FileUpload: fileUpload,
@@ -152,7 +152,7 @@ export default function Historyload() {
   };
 
   const handleOnChange = (e) => {
-    //e.persist();
+    // e.persist();
     alert(e.target.value);
     if (e.target.files && e.target.files[0]) {
       const i = e.target.files[0];
@@ -176,16 +176,16 @@ export default function Historyload() {
     if (fileUpload) {
       const fd = new FormData();
       fd.append('file', fileUpload);
-      let res = await fetch(`/api/fileUpload/upload`, {
+      const res = await fetch(`/api/fileUpload/upload`, {
         method: 'POST',
         headers: {},
         body: fd,
       });
-      let response = await res.json();
+      const response = await res.json();
 
-      let fileName = response.data;
+      const fileName = response.data;
 
-      let records = csvFileService.parseCSV(fileName);
+      const records = csvFileService.parseCSV(fileName);
 
       const processCSV = (records, delim = ',') => {
         const headers = records.slice(0, records.indexOf('\n')).split(delim);

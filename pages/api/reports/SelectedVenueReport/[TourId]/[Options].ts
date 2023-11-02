@@ -77,7 +77,7 @@ export default async function handle(req, res) {
       }
 
       default: {
-        //statements;
+        // statements;
         break;
       }
     }
@@ -89,7 +89,7 @@ export default async function handle(req, res) {
   }
 
   try {
-    let result = await prisma.$queryRawUnsafe(`${query}`);
+    const result = await prisma.$queryRawUnsafe(`${query}`);
     res.json(result);
   } catch (e) {
     throw e;

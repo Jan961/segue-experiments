@@ -8,7 +8,7 @@ type Props = {
 };
 
 export default function Barring({ items }: Props) {
-  const userLevel = 1; //TODO: get this from User
+  const userLevel = 1; // TODO: get this from User
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -28,7 +28,7 @@ export default function Barring({ items }: Props) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
         BarringClause: items.BarringClause,
@@ -70,7 +70,7 @@ export default function Barring({ items }: Props) {
         handleServerResponse(
           true,
           'Thank you, your message has been submitted.',
-          //Todo: router setlocation to the new venue to allow user to add the rest fo the detils
+          // Todo: router setlocation to the new venue to allow user to add the rest fo the detils
         );
         console.log(JSON.stringify(handleServerResponse));
       })

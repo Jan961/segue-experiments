@@ -14,7 +14,7 @@ import { getAccountIdFromReq } from 'services/userService';
 
 const Index = () => {
   const [bulkIsOpen, setBulkIsOpen] = useState(false);
-  const [bulkActionField, setBulkActionField] = useState<String>('');
+  const [bulkActionField, setBulkActionField] = useState<string>('');
 
   const tours = useRecoilValue(tourState);
 

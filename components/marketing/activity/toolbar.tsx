@@ -9,8 +9,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-let show = 'ST1'; // This needs to be passed from the template
-let tour = '22';
+const show = 'ST1'; // This needs to be passed from the template
+const tour = '22';
 
 const Toolbar = ({ title = 'This is the default title' }) => (
   <div>

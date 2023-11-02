@@ -198,7 +198,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   );
 
   const variableColsLength: number = headerWeekNums.length;
-  let row: number = 6;
+  let row = 6;
 
   let lastBookingWeek: string = finalFormattedValues?.[0]?.Week;
   let seatsData: {

@@ -33,7 +33,7 @@ export default function AccountDetails(accountId) {
     businessType: '',
     county: '',
     postcode: '',
-    accountId: accountId,
+    accountId,
   });
 
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function AccountDetails(accountId) {
           telephone: data.searchResults.addressLine1,
           vatRegistered: data.searchResults.vatRegistered,
           emailAddress: data.searchResults.emailAddress,
-          accountId: accountId,
+          accountId,
         });
         setData(data);
         setLoading(false);
@@ -68,10 +68,10 @@ export default function AccountDetails(accountId) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
-        accountId: accountId,
+        accountId,
         emailAddress: inputs.emailAddress,
         telephone: inputs.telephone,
         businessName: inputs.businessName,

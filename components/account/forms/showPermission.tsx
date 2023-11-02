@@ -1,8 +1,8 @@
 import React from 'react';
 
-//Get Permissions list
+// Get Permissions list
 
-//GetUserPermissions
+// GetUserPermissions
 
 export default function ShowPermission(tab) {
   if (tab.data.Active === true) {

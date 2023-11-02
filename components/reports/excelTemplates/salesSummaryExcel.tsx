@@ -3,10 +3,10 @@ import { saveAs } from 'file-saver';
 
 // https://medium.com/@aalam-info-solutions-llp/excel-import-in-next-js-50359f3d7f66
 const SalesSummaryExcel = () => {
-  let excelExport = (DataGrid) => {
-    var ExcelJSWorkbook = new ExcelJS.Workbook();
-    var worksheet = ExcelJSWorkbook.addWorksheet('ExcelJS sheet');
-    var columns = DataGrid.getVisibleColumns();
+  const excelExport = (DataGrid) => {
+    const ExcelJSWorkbook = new ExcelJS.Workbook();
+    const worksheet = ExcelJSWorkbook.addWorksheet('ExcelJS sheet');
+    const columns = DataGrid.getVisibleColumns();
 
     worksheet.mergeCells('A2:I2');
 
@@ -22,13 +22,13 @@ const SalesSummaryExcel = () => {
 
     customCell.value = 'Custom header here';
 
-    var headerRow = worksheet.addRow();
+    const headerRow = worksheet.addRow();
     worksheet.getRow(4).font = { bold: true };
 
     for (let i = 0; i < columns.length; i++) {
-      let currentColumnWidth = DataGrid.option().columns[i].width;
+      const currentColumnWidth = DataGrid.option().columns[i].width;
       worksheet.getColumn(i + 1).width = currentColumnWidth !== undefined ? currentColumnWidth / 6 : 20;
-      let cell = headerRow.getCell(i + 1);
+      const cell = headerRow.getCell(i + 1);
       cell.value = columns[i].caption;
     }
 
@@ -59,12 +59,12 @@ const SalesSummaryExcel = () => {
       .loadAll()
       .then(function (allItems) {
         for (let i = 0; i < allItems.length; i++) {
-          var dataRow = worksheet.addRow();
+          const dataRow = worksheet.addRow();
           if (allItems[i].rowType === 'data') {
             dataRow.outlineLevel = 1;
           }
           for (let j = 0; j < allItems[i].values.length; j++) {
-            let cell = dataRow.getCell(j + 1);
+            const cell = dataRow.getCell(j + 1);
             cell.value = allItems[i].values[j];
           }
         }

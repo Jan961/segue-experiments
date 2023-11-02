@@ -8,7 +8,7 @@ export const loggingService = {
 };
 
 function logAction(action, details) {
-  let data = {
+  const data = {
     UserID: 0, // This is a "system user"
     Action: action,
     Detail: details,

@@ -2,10 +2,10 @@ import { BookingDTO } from 'interfaces';
 
 // Optimisation possible. We can search outwards, rather than going over the whole lot
 export const findPrevAndNextBookings = (bookings: Record<number, BookingDTO>, specifiedDate: string) => {
-  let prevDate: string = '1970-01-01'; // Allow initial comparisons
+  let prevDate = '1970-01-01'; // Allow initial comparisons
   let prevBookings: number[] = [];
 
-  let nextDate: string = '9999-12-31'; // Allow initial comparisons
+  let nextDate = '9999-12-31'; // Allow initial comparisons
   let nextBookings: number[] = [];
 
   const keys = Object.keys(bookings);

@@ -1,4 +1,4 @@
-//types of the main Modal
+// types of the main Modal
 export interface ModalProps {
   component?: React.FC<any>;
   props?: { [key: string]: unknown };
@@ -20,7 +20,7 @@ export interface ModalProps {
   closeable?: boolean;
   centered?: boolean;
 }
-//types for confirmation modals
+// types for confirmation modals
 export interface ConfirmationModalProps {
   title?: string;
   message?: string;
@@ -32,7 +32,7 @@ export interface ConfirmationModalProps {
   isBackdropCloseable?: boolean;
   closable?: boolean;
 }
-//types for async confirmation modals
+// types for async confirmation modals
 export interface AsyncConfirmationModalProps {
   title?: string;
   message?: string;

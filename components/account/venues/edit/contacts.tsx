@@ -60,7 +60,7 @@ const activities = [
 ];
 
 // @ts-ignore
-let today = new Date().toDateString();
+const today = new Date().toDateString();
 
 const Contacts = () => (
   <div className={'flex bg-blue-100 w-9/12 p-5'}>

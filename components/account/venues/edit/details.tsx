@@ -45,7 +45,7 @@ export default function Details({ items }: Props) {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
         Latitude: inputs.Latitude,
@@ -76,7 +76,7 @@ export default function Details({ items }: Props) {
   const handleOnChange = async (e) => {
     e.persist();
     if (e.target.name === 'Postcode') {
-      let postcode = e.target.value;
+      const postcode = e.target.value;
       await getLatLong(postcode);
     }
     setInputs((prev) => ({
@@ -105,7 +105,7 @@ export default function Details({ items }: Props) {
       .then((response) => {
         loggingService.logAction('Update Venue', 'Update Venue Details');
         handleServerResponse(true, 'Thank you, your message has been submitted.');
-        //console.log((JSON.stringify(handleServerResponse)))
+        // console.log((JSON.stringify(handleServerResponse)))
       })
       .catch((error) => {
         loggingService.logError(error);
