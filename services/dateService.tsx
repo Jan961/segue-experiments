@@ -195,3 +195,35 @@ export const getTimeFromDateAndTime = (time) => {
 export const toSql = (date:string) => {
   return new Date(date).toISOString()?.split?.('T')?.[0]
 }
+
+export function getDuration (upTime: string, downTime: string): number {
+  if (upTime === '' || downTime === '') {
+    return 0
+  }
+  const up = new Date(`2023-01-01 ${upTime}`)
+  const down = new Date(`2023-01-01 ${downTime}`)
+  const diff = down.getTime() - up.getTime()
+  return diff
+}
+
+export function formatDuration (duration: number, options?: {
+  h: string
+  m: string
+}): string {
+  const minutes = Math.floor(duration / 1000 / 60)
+  // format minutes to hours and minutes
+  const hours = Math.floor(minutes / 60)
+  const remainingMinutes = minutes % 60
+  if (hours > 0) {
+    return `${hours}${options?.h ?? 'h'} ${remainingMinutes}${options?.m ?? 'm'}`
+  } else if (remainingMinutes > 0) {
+    return `${remainingMinutes}${options?.m ?? 'm'}`
+  } else {
+    return ''
+  }
+}
+
+export const isValidDateString = (date: string): boolean => {
+  const d = new Date(date)
+  return d instanceof Date && !isNaN(d.getTime())
+}

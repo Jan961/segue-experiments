@@ -43,7 +43,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          SetSalesWeeksVenues(data.data)
+          SetSalesWeeksVenues(data)
         })
         .finally(() => setLoading(false))
     }

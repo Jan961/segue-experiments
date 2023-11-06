@@ -69,7 +69,7 @@ export default function Barring () {
       // Load Venues for this tour
       // setIsLoading(true)
       await axios.get(`/api/tours/read/venues/${e.target.value}`)
-        .then(data => data?.data?.data)
+        .then(data => data?.data)
         .then((data) => {
           // setIsLoading(false)
           setInputs(prevState => ({ ...prevState, Venue: null }))

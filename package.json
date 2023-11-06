@@ -61,6 +61,7 @@
     "react-export-table-to-excel": "^1.0.6",
     "react-hook-form": "^7.12.1",
     "react-range-slider-input": "^3.0.7",
+    "react-simple-timefield": "^3.3.1",
     "recoil": "^0.7.7",
     "rxjs": "^7.5.7",
     "serverless-mysql": "^1.5.4",

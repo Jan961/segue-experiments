@@ -141,7 +141,7 @@ export default function FinalSales ({ tours }: props) {
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          setActiveSetTourDates(data.data)
+          setActiveSetTourDates(data)
         })
         .finally(() => setLoading(false))
     }
