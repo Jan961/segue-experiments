@@ -106,7 +106,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
   const statusOptions: SelectOption[] = [
     { text: 'Confirmed (C)', value: 'C' },
     { text: 'Unconfirmed (U)', value: 'U' },
-    { text: 'Canceled (X)', value: 'X' },
+    { text: 'Cancelled (X)', value: 'X' },
   ];
   const pencilOptions: SelectOption[] = [1, 2, 3].map((i) => ({ text: i.toString(), value: i.toString() }));
 

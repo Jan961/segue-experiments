@@ -57,7 +57,7 @@ export const OtherPanel = ({ otherId }: OtherPanelProps) => {
   const statusOptions: SelectOption[] = [
     { text: 'Confirmed (C)', value: 'C' },
     { text: 'Unconfirmed (U)', value: 'U' },
-    { text: 'Canceled (X)', value: 'X' },
+    { text: 'Cancelled (X)', value: 'X' },
   ];
 
   const initiateDelete = async () => {
