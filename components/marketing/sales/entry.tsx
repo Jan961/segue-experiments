@@ -284,9 +284,10 @@ export default function Entry({ tours = [], searchFilter }: props) {
           <form onSubmit={onSubmit}>
             <div>
               <div className="bg-soft-primary-green p-4 rounded-md mb-4">
-                <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center justify-between">
-                    <label htmlFor="SetTour" className="text-sm font-medium text-gray-700">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                  {/* Set Tour */}
+                  <div className="row-start-1 flex flex-row items-center">
+                    <label htmlFor="SetTour" className="w-48 mr-6 text-sm font-medium text-gray-700">
                       Set Tour
                     </label>
                     <select
@@ -294,7 +295,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       name="SetTour"
                       value={inputs.SetTour}
                       onChange={handleOnChange}
-                      className="block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green  text-sm"
+                      className="ml-1 block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green text-sm"
                     >
                       <option value={0}>Select A Tour</option>
                       {tours
@@ -306,15 +307,16 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between">
-                    <label htmlFor="SaleWeek" className="text-sm font-medium text-gray-700">
+                  {/* Tour Sale Week */}
+                  <div className="row-start-2 flex flex-row items-center">
+                    <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
                       Tour Sale Week
                     </label>
                     <select
                       id="SaleWeek"
                       name="SaleWeek"
                       value={inputs.SaleWeek}
-                      className="block w-full  max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
+                      className="ml-1 block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
                       <option value={0}>Select Tour Week</option>
@@ -327,10 +329,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between relative">
+                  {/* Venue/Date */}
+                  <div className="row-start-3 flex flex-row items-center relative">
+                    <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
+                      Venue/Date
+                    </label>
                     <Typeahead
                       placeholder="Venue/Date"
-                      label="Venue/Date"
                       name="Venue"
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
@@ -349,88 +354,79 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       }
                     />
                   </div>
-                </div>
-
-                <div className="columns-2">
-                  <div className={'columns-1'}>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Sold Seat Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Value"
-                          id="Value"
-                          value={sale?.Value}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
-                      </div>
-                    </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
-                      <label
-                        htmlFor="ReservedValue"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedValue"
-                          id="ReservedValue"
-                          autoComplete="ReservedValue"
-                          value={sale.ReservedValue}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.ReservedValue && (
-                          <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
-                        )}
-                      </div>
+                  {/* Sold Seats Value */}
+                  <div className="row-start-4 flex flex-row items-center relative">
+                    <label htmlFor="Value" className="w-48 mr-6 text-sm font-medium text-gray-700">
+                      Sold Seats Value
+                    </label>
+                    <div className="block w-full max-w-lg">
+                      <input
+                        type="text"
+                        name="Value"
+                        id="Value"
+                        value={sale?.Value}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
                     </div>
                   </div>
-                  <div className={'columns-1'}>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Seats Sold
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Seats"
-                          id="Seats"
-                          autoComplete="Seats"
-                          value={sale.Seats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
-                      </div>
+                  {/* Seats Sold */}
+                  <div className="row-start-4 col-start-2 flex flex-row items-center relative">
+                    <label htmlFor="Seats" className="w-32 mr-6 text-sm font-medium text-gray-700">
+                      Seats Sold
+                    </label>
+                    <div className="block w-full max-w-lg">
+                      <input
+                        type="text"
+                        name="Seats"
+                        id="Seats"
+                        autoComplete="Seats"
+                        value={sale.Seats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label
-                        htmlFor="ReservedSeats"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedSeats"
-                          id="ReservedSeats"
-                          autoComplete="ReservedSeats"
-                          value={sale.ReservedSeats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.ReservedSeats && (
-                          <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
-                        )}
-                      </div>
+                  </div>
+                  {/* Reserved Seats Value */}
+                  <div className="row-start-5 flex flex-row items-center relative">
+                    <label htmlFor="ReservedValue" className="w-48 mr-6 text-sm font-medium text-gray-700">
+                      Reserved Seats Value
+                    </label>
+                    <div className="block w-full max-w-lg">
+                      <input
+                        type="text"
+                        name="ReservedValue"
+                        id="ReservedValue"
+                        autoComplete="ReservedValue"
+                        value={sale.ReservedValue}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.ReservedValue && (
+                        <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Reserved Seats */}
+                  <div className="row-start-5 col-start-2 flex flex-row items-center relative">
+                    <label htmlFor="ReservedSeats" className="w-32 mr-6 text-sm font-medium text-gray-700">
+                      Reserved Seats
+                    </label>
+                    <div className="block w-full max-w-lg">
+                      <input
+                        type="text"
+                        name="ReservedSeats"
+                        id="ReservedSeats"
+                        autoComplete="ReservedSeats"
+                        value={sale.ReservedSeats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.ReservedSeats && (
+                        <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
+                      )}
                     </div>
                   </div>
                 </div>
