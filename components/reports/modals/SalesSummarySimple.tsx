@@ -85,9 +85,12 @@ export default function SalesSummarySimple({ activeTours }: Props) {
           }
           const content = await response.blob();
           if (content) {
-            const anchor: any = document.createElement('a');
-            anchor.download = suggestedName;
-            anchor.href = (window.webkitURL || window.URL).createObjectURL(content);
+            const anchor: any = document.createElement('a')
+            anchor.download = suggestedName
+            const url = (window.webkitURL || window.URL).createObjectURL(
+              content
+            )
+            anchor.href = url
             anchor.dataset.downloadurl = [
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
               anchor.download,

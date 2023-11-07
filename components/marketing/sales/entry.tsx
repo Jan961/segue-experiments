@@ -230,6 +230,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
       },
     ];
     // const validateSales
+    setLoading(true)
     await axios
       .post('/api/marketing/sales/upsert', {
         Holds,
@@ -244,9 +245,10 @@ export default function Entry({ tours = [], searchFilter }: props) {
         setValidationErrors({});
       })
       .catch((error) => {
-        console.log('Error updating Sales', error);
+        console.log('Error updating Sales', error)
+      }).finally(() => {
+        setLoading(false)
       })
-      .finally(() => {});
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures

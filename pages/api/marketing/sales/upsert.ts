@@ -38,9 +38,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         SetBookingId,
         SetPerformanceId,
         SetSalesFiguresDate,
-        ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
-      },
-    });
+        ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures })
+      }
+    })
 
     if (salesSet) {
       // Update
@@ -118,37 +118,34 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           SetIsFinalFigures: 0,
           SetIsCopy: 0,
           ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
-          ...(Comps &&
-            Comps?.length && {
-              setComp: {
-                create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
-                  SetCompCompTypeId,
-                  SetCompSeats,
-                })),
-              },
-            }),
-          ...(Holds &&
-            Holds?.length && {
-              setHold: {
-                create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
-                  SetHoldHoldTypeId,
-                  SetHoldSeats,
-                  SetHoldValue,
-                })),
-              },
-            }),
-          ...(Sales &&
-            Sales?.length && {
-              sale: {
-                create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
-                  SaleSaleTypeId,
-                  SaleSeats,
-                  SaleValue,
-                })),
-              },
-            }),
-        },
-      });
+          ...(Comps && Comps?.length && {
+            setComp: {
+              create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
+                SetCompCompTypeId,
+                SetCompSeats
+              }))
+            }
+          }),
+          ...(Holds && Holds?.length && {
+            setHold: {
+              create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
+                SetHoldHoldTypeId,
+                SetHoldSeats,
+                SetHoldValue
+              }))
+            }
+          }),
+          ...(Sales && Sales?.length && {
+            sale: {
+              create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
+                SaleSaleTypeId,
+                SaleSeats,
+                SaleValue
+              }))
+            }
+          })
+        }
+      })
     }
 
     res.status(200).json({});

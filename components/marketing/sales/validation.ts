@@ -1,20 +1,59 @@
 import { object, mixed } from 'yup';
 
 const schema = object().shape({
-  Seats: mixed().test('Seats', 'Warning: Check sold seats', function () {
-    let { Seats: currentWeekSalesSeats, PreviousSeats: previousWeekSalesSeats } = this.parent;
-    currentWeekSalesSeats = parseInt(currentWeekSalesSeats, 10) || 0;
-    previousWeekSalesSeats = parseInt(previousWeekSalesSeats, 10) || 0;
-    const seatsPercentageIncrease = (currentWeekSalesSeats - previousWeekSalesSeats) / (previousWeekSalesSeats || 1);
+  Seats: mixed().test('Seats', 'Warning: Seats sold is greater than 100 and value increased is greater than 15%', function () {
+    let {
+      Seats: currentWeekSalesSeats,
+      PreviousSeats: previousWeekSalesSeats
+    } = this.parent
+    currentWeekSalesSeats = parseInt(currentWeekSalesSeats, 10) || 0
+    previousWeekSalesSeats = parseInt(previousWeekSalesSeats, 10) || 0
+    const seatsPercentageIncrease =
+        (currentWeekSalesSeats - previousWeekSalesSeats) /
+        (previousWeekSalesSeats || 1)
     if (
-      (currentWeekSalesSeats < 100 && seatsPercentageIncrease > 0.5) ||
+
       (currentWeekSalesSeats >= 100 && seatsPercentageIncrease > 0.15)
+    ) {
+      return false
+    }
+    return true
+  }).test('Seats', 'Warning: Seats sold is less than 100 and value increased is greater than 5%', function () {
+    let {
+      Seats: currentWeekSalesSeats,
+      PreviousSeats: previousWeekSalesSeats
+    } = this.parent
+    currentWeekSalesSeats = parseInt(currentWeekSalesSeats, 10) || 0
+    previousWeekSalesSeats = parseInt(previousWeekSalesSeats, 10) || 0
+    const seatsPercentageIncrease =
+        (currentWeekSalesSeats - previousWeekSalesSeats) /
+        (previousWeekSalesSeats || 1)
+    if (
+      (currentWeekSalesSeats < 100 && seatsPercentageIncrease > 0.5)
     ) {
       return false;
     }
     return true;
   }),
-  Value: mixed().test('Value', 'Warning: Check sold value', function () {
+  Value: mixed().test('Value', 'Warning: Seats sold is less than 100 and value increased is greater than 5%', function () {
+    let {
+      Seats: currentWeekSalesSeats,
+      Value: currentWeekSalesValue,
+      PreviousValue: previousWeekSalesValue
+    } = this.parent
+    currentWeekSalesSeats = parseInt(currentWeekSalesSeats, 10) || 0
+    currentWeekSalesValue = parseInt(currentWeekSalesValue, 10) || 0
+    previousWeekSalesValue = parseInt(previousWeekSalesValue, 10) || 0
+    const valuePercentageIncrease =
+        (currentWeekSalesValue - previousWeekSalesValue) /
+        (previousWeekSalesValue || 1)
+    if (
+      (currentWeekSalesSeats < 100 && valuePercentageIncrease > 0.5)
+    ) {
+      return false
+    }
+    return true
+  }).test('Value', 'Warning: Seats sold is greater than 100 and value increased is greater than 15%', function () {
     let {
       Seats: currentWeekSalesSeats,
       Value: currentWeekSalesValue,
@@ -25,7 +64,6 @@ const schema = object().shape({
     previousWeekSalesValue = parseInt(previousWeekSalesValue, 10) || 0;
     const valuePercentageIncrease = (currentWeekSalesValue - previousWeekSalesValue) / (previousWeekSalesValue || 1);
     if (
-      (currentWeekSalesSeats < 100 && valuePercentageIncrease > 0.5) ||
       (currentWeekSalesSeats >= 100 && valuePercentageIncrease > 0.15)
     ) {
       return false;
