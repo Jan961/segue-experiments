@@ -65,7 +65,7 @@ export const VenueContactsTab = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mt-5 mb-5 max-w-[820px]">
+      <div className="flex justify-between items-center mb-5 max-w-[1024px]">
         <h2 className={'text-xl font-bold text-primary-blue '}>Venue Contacts</h2>
         <div className="ml-auto">
           <label htmlFor="searchBookings" className="sr-only">
@@ -85,7 +85,7 @@ export const VenueContactsTab = () => {
           </div>
         </div>
       </div>
-      <Table className="table-auto !min-w-0">
+      <Table className="w-full max-w-[1024px] table-auto !min-w-0">
         <Table.HeaderRow className="rounded-t-lg">
           <Table.HeaderCell className="w-20 rounded-tl-lg">Role</Table.HeaderCell>
           <Table.HeaderCell className="w-20">First Name</Table.HeaderCell>

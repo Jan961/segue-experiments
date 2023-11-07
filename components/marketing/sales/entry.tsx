@@ -278,7 +278,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
   };
   return (
     <div className="flex flex-row w-full">
-      <div className={'flex bg-transparent w-5/8 p-5'}>
+      <div className={'flex bg-transparent w-5/8'}>
         <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
           <div className={'mb-1'}></div>
           <form onSubmit={onSubmit}>
@@ -436,13 +436,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
                 </div>
               </div>
 
-              <div className="grid-cols-2 grid gap-4  md:gap-6 pt-10">
+              <div className="grid-cols-2 grid gap-4  md:gap-6 pt-4">
                 <div className="sm:col-span-1">
                   <div className={'flex flex-col'}>
-                    <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:pt-2">
-                      <div className=" sm:col-span-1 sm:mt-0">Holds</div>
-                      <div className=" sm:col-span-1 text-center sm:mt-0">Seats</div>
-                      <div className=" sm:col-span-1 text-center sm:mt-0">Value</div>
+                    <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:py-2">
+                      <span className=" sm:col-span-1 sm:mt-0">Holds</span>
+                      <span className=" sm:col-span-1 text-center sm:mt-0">Seats</span>
+                      <span className=" sm:col-span-1 text-center sm:mt-0">Value</span>
                     </div>
                     {options?.holdTypes.map((hold, i) => (
                       <div
@@ -482,9 +482,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
                   </div>
                 </div>
                 <div className={'col-span-1'}>
-                  <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 pt-2">
-                    <div className={' sm:col-span-1 '}>Comps</div>
-                    <div className=" text-right sm:col-span-2 ">Seats</div>
+                  <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 py-2">
+                    <span className="sm:col-span-1">Comps</span>
+                    <span className="text-center sm:col-span-2 ">Seats</span>
                   </div>
                   {options?.compTypes?.map((comp, j) => (
                     <div
@@ -567,7 +567,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
           </form>
         </div>
       </div>
-      <div className={'flex bg-transparent flex flex-col w-1/3 p-5'}>
+      <div className={'ml-4 flex bg-transparent flex flex-col w-1/3'}>
         <div className="grid grid-cols-2 gap-1 mb-4">
           <button
             type={'submit'}
