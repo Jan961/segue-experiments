@@ -11,14 +11,11 @@ const schema = object().shape({
     const seatsPercentageIncrease =
         (currentWeekSalesSeats - previousWeekSalesSeats) /
         (previousWeekSalesSeats || 1)
-    if (
-
-      (currentWeekSalesSeats >= 100 && seatsPercentageIncrease > 0.15)
-    ) {
+    if (currentWeekSalesSeats >= 100 && seatsPercentageIncrease > 0.15) {
       return false
     }
     return true
-  }).test('Seats', 'Warning: Seats sold is less than 100 and value increased is greater than 5%', function () {
+  }).test('Seats', 'Warning: Seats sold is less than 100 and value increased is greater than 50%', function () {
     let {
       Seats: currentWeekSalesSeats,
       PreviousSeats: previousWeekSalesSeats
@@ -34,8 +31,19 @@ const schema = object().shape({
       return false;
     }
     return true;
+  }).test('Seats', 'Warning: Seats sold cannot be less than previous week', function () {
+    let {
+      Seats: currentWeekSalesSeats,
+      PreviousSeats: previousWeekSalesSeats
+    } = this.parent
+    currentWeekSalesSeats = parseInt(currentWeekSalesSeats, 10) || 0
+    previousWeekSalesSeats = parseInt(previousWeekSalesSeats, 10) || 0
+    if (currentWeekSalesSeats < previousWeekSalesSeats) {
+      return false;
+    }
+    return true;
   }),
-  Value: mixed().test('Value', 'Warning: Seats sold is less than 100 and value increased is greater than 5%', function () {
+  Value: mixed().test('Value', 'Warning: Seats sold is less than 100 and value increased is greater than 50%', function () {
     let {
       Seats: currentWeekSalesSeats,
       Value: currentWeekSalesValue,
@@ -69,6 +77,18 @@ const schema = object().shape({
       return false;
     }
     return true;
+  }).test('Value', 'Warning: Sold value cannot be less than previous week', function () {
+    let {
+      Seats: currentWeekSalesSeats,
+      Value: currentWeekSalesValue,
+      PreviousValue: previousWeekSalesValue,
+    } = this.parent;
+    currentWeekSalesValue = parseInt(currentWeekSalesValue, 10) || 0;
+    previousWeekSalesValue = parseInt(previousWeekSalesValue, 10) || 0;
+    if (currentWeekSalesValue<previousWeekSalesValue) {
+      return false;
+    }
+    return true;
   }),
 
   ReservedSeats: mixed().test(
@@ -86,6 +106,19 @@ const schema = object().shape({
       }
       return true;
     },
+  ).test(
+    'ReservedSeats',
+    'Reserved seats cannot be less than previous week.',
+    function () {
+      let { ReservedSeats: currentWeekReservationSeats, PreviousReservedSeats: previousWeekReservationSeats } =
+        this.parent;
+      currentWeekReservationSeats = parseInt(currentWeekReservationSeats, 10) || 0;
+      previousWeekReservationSeats = parseInt(previousWeekReservationSeats, 10) || 0;
+      if (currentWeekReservationSeats<previousWeekReservationSeats) {
+        return false;
+      }
+      return true;
+    },
   ),
   ReservedValue: mixed().test(
     'ReservedValue',
@@ -98,6 +131,19 @@ const schema = object().shape({
       const valuePercentageIncrease =
         (currentWeekReservationValue - previousWeekReservationValue) / (previousWeekReservationValue || 1);
       if (valuePercentageIncrease > 0.15) {
+        return false;
+      }
+      return true;
+    },
+  ).test(
+    'ReservedValue',
+    'Reservations value less than previous week.',
+    function () {
+      let { ReservedValue: currentWeekReservationValue, PreviousReservedValue: previousWeekReservationValue } =
+        this.parent;
+      currentWeekReservationValue = parseInt(currentWeekReservationValue, 10) || 0;
+      previousWeekReservationValue = parseInt(previousWeekReservationValue, 10) || 0;
+      if (currentWeekReservationValue<previousWeekReservationValue) {
         return false;
       }
       return true;
