@@ -2,7 +2,7 @@ import Layout from 'components/Layout';
 import { useMemo, useState } from 'react';
 import MarketingPanel from 'components/marketing/MarketingPanel';
 import GlobalToolbar from 'components/toolbar';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps } from 'next';
 import { InitialState } from 'lib/recoil';
 import { getSaleableBookings } from 'services/bookingService';
 import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
@@ -18,11 +18,37 @@ import { Spinner } from 'components/global/Spinner';
 import axios from 'axios';
 import ActionBar from 'components/marketing/ActionBar';
 
-type Props = {
-  initialState: InitialState;
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const email = await getEmailFromReq(ctx.req);
+  const AccountId = await getAccountId(email);
+  const tourJump = await getTourJumpState(ctx, 'marketing', AccountId);
+  const TourId = tourJump.selected;
+  // TourJumpState is checking if it's valid to access by accountId
+  if (!TourId) return { notFound: true };
+
+  const bookings: any[] = await getSaleableBookings(TourId);
+  // bookings.filter((booking:any) => booking?.DateBlock?.TourId === TourId)?.[0]?.Id ||
+  const selected = null;
+  const venueRoles = await getRoles();
+  const bookingJump: BookingJump = {
+    selected,
+    bookings: bookings.map(bookingMapperWithVenue),
+  };
+
+  const initialState: InitialState = {
+    global: {
+      tourJump,
+    },
+    marketing: {
+      bookingJump,
+      venueRole: venueRoles.map(venueRoleMapper),
+    },
+  };
+
+  return { props: { initialState } };
 };
 
-const Index = ({ initialState }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Index = () => {
   const [searchFilter, setSearchFilter] = useState('');
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const matching = useMemo(
@@ -81,21 +107,22 @@ const Index = ({ initialState }: InferGetServerSidePropsType<typeof getServerSid
         <div className="flex items-start">
           <div className="flex flex-col mr-4">
             <GlobalToolbar
+              color="primary-green"
               searchFilter={searchFilter}
               setSearchFilter={setSearchFilter}
               title={'Marketing'}
-            ></GlobalToolbar>
+            />
             <ActionBar />
           </div>
           <div className="flex py-2">
-            <div className="w-[400px] h-[150px] cursor-pointer mr-4" onClick={onIframeClick}>
+            <div className="w-[300px] h-[100px] cursor-pointer mr-4" onClick={onIframeClick}>
               {matching?.Venue?.Website && (
                 <iframe
                   className="pointer-events-none"
                   id="Venue"
-                  width="400"
+                  width="300"
                   height="auto"
-                  style={{ transform: 'scale(0.25)', transformOrigin: 'top left', width: '1600px', height: '600px' }}
+                  style={{ transform: 'scale(0.25)', transformOrigin: 'top left', width: '1200px', height: '400px' }}
                   src={getSanitisedUrl(matching?.Venue?.Website)}
                 ></iframe>
               )}
@@ -146,38 +173,6 @@ const Index = ({ initialState }: InferGetServerSidePropsType<typeof getServerSid
       </div>
     </Layout>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
-
-  const tourJump = await getTourJumpState(ctx, 'marketing', AccountId);
-
-  const TourId = tourJump.selected;
-  // TourJumpState is checking if it's valid to access by accountId
-  if (!TourId) return { notFound: true };
-
-  const bookings: any[] = await getSaleableBookings(TourId);
-  // bookings.filter((booking:any) => booking?.DateBlock?.TourId === TourId)?.[0]?.Id ||
-  const selected = null;
-  const venueRoles = await getRoles();
-  const bookingJump: BookingJump = {
-    selected,
-    bookings: bookings.map(bookingMapperWithVenue),
-  };
-
-  const initialState: InitialState = {
-    global: {
-      tourJump,
-    },
-    marketing: {
-      bookingJump,
-      venueRole: venueRoles.map(venueRoleMapper),
-    },
-  };
-
-  return { props: { initialState } };
 };
 
 export default Index;
