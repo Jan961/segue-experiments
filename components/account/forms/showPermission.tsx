@@ -1,20 +1,19 @@
-import React from "react";
+import React from 'react';
 
-//Get Permissions list
+// Get Permissions list
 
-//GetUserPermissions
-
+// GetUserPermissions
 
 export default function ShowPermission(tab) {
-    if (tab.data.Active === true) {
-        return (
-            <div>
-                {JSON.stringify(tab)}
+  if (tab.data.Active === true) {
+    return (
+      <div>
+        {JSON.stringify(tab)}
 
-                <h1>tab.data.</h1>
-            </div>)
-    } else {
-        return (<></>)
-    }
-
+        <h1>tab.data.</h1>
+      </div>
+    );
+  } else {
+    return <></>;
+  }
 }

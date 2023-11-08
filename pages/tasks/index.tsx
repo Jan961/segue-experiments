@@ -1,22 +1,22 @@
-import Layout from 'components/Layout'
-import { useState } from 'react'
-import Toolbar from 'components/tasks/toolbar'
-import Tasklist from 'components/tasks/TaskList'
-import TaskButtons from 'components/tasks/TaskButtons'
-import GlobalToolbar from 'components/toolbar'
-import { GetServerSideProps } from 'next'
-import { getToursAndTasks } from 'services/TourService'
-import { useRecoilValue } from 'recoil'
-import { ToursWithTasks, tourState } from 'state/tasks/tourState'
-import { InitialState } from 'lib/recoil'
-import { mapToTourTaskDTO } from 'lib/mappers'
-import { getAccountIdFromReq } from 'services/userService'
+import Layout from 'components/Layout';
+import { useState } from 'react';
+import Toolbar from 'components/tasks/toolbar';
+import Tasklist from 'components/tasks/TaskList';
+import TaskButtons from 'components/tasks/TaskButtons';
+import GlobalToolbar from 'components/toolbar';
+import { GetServerSideProps } from 'next';
+import { getToursAndTasks } from 'services/TourService';
+import { useRecoilValue } from 'recoil';
+import { ToursWithTasks, tourState } from 'state/tasks/tourState';
+import { InitialState } from 'lib/recoil';
+import { mapToTourTaskDTO } from 'lib/mappers';
+import { getAccountIdFromReq } from 'services/userService';
 
 const Index = () => {
-  const [bulkIsOpen, setBulkIsOpen] = useState(false)
-  const [bulkActionField, setBulkActionField] = useState<String>('')
+  const [bulkIsOpen, setBulkIsOpen] = useState(false);
+  const [bulkActionField, setBulkActionField] = useState<string>('');
 
-  const tours = useRecoilValue(tourState)
+  const tours = useRecoilValue(tourState);
 
   /*
   function applyFilters () {
@@ -55,70 +55,58 @@ const Index = () => {
   }
   */
 
-  function openBulkModal (key) {
+  function openBulkModal(key) {
     switch (key) {
-    case 'setstatus':
-      setBulkActionField('Status')
-      setBulkIsOpen(true)
-      break
-    case 'priority':
-      setBulkActionField('Priority')
-      setBulkIsOpen(true)
+      case 'setstatus':
+        setBulkActionField('Status');
+        setBulkIsOpen(true);
+        break;
+      case 'priority':
+        setBulkActionField('Priority');
+        setBulkIsOpen(true);
 
-      break
-    case 'progress':
-      setBulkActionField('Progress')
-      setBulkIsOpen(true)
+        break;
+      case 'progress':
+        setBulkActionField('Progress');
+        setBulkIsOpen(true);
 
-      break
-    case 'followup':
-      setBulkActionField('FollowUp')
-      setBulkIsOpen(true)
+        break;
+      case 'followup':
+        setBulkActionField('FollowUp');
+        setBulkIsOpen(true);
 
-      break
-    case 'reassign':
-      setBulkActionField('Assignee')
-      setBulkIsOpen(true)
+        break;
+      case 'reassign':
+        setBulkActionField('Assignee');
+        setBulkIsOpen(true);
 
-      break
-    default:
-      break
+        break;
+      default:
+        break;
     }
   }
 
   return (
     <Layout title="Tasks | Seque">
       <div className="flex flex-auto w-full h-screen">
-        <div
-          className="flex-col px-12 w-full flex justify-between"
-          style={{ minHeight: '60vh' }}
-        >
-          <GlobalToolbar
-            tourJump={false}
-            title={'Tasks'}
-            color={'text-primary-purple'}
-          >
+        <div className="flex-col px-12 w-full flex justify-between" style={{ minHeight: '60vh' }}>
+          <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}>
             <Toolbar />
           </GlobalToolbar>
-          {tours.length > 0
-            ? tours.map((tour) => {
+          {tours.length > 0 ? (
+            tours.map((tour) => {
               return (
                 <>
-                  <h3 className=" text-xl font-bold mt-8 mb-2">
-                    { tour.ShowName }
-                  </h3>
-                  <Tasklist
-                    tourId={tour.Id}
-                    key={tour.Id}
-                  />
+                  <h3 className=" text-xl font-bold mt-8 mb-2">{tour.ShowName}</h3>
+                  <Tasklist tourId={tour.Id} key={tour.Id} />
                 </>
-              )
+              );
             })
-            : (
-              <div className="text-center font-bold text-lg">
-                <p>No Tasks Found</p>
-              </div>
-            )}
+          ) : (
+            <div className="text-center font-bold text-lg">
+              <p>No Tasks Found</p>
+            </div>
+          )}
           <TaskButtons openBulkModal={openBulkModal} />
         </div>
       </div>
@@ -131,26 +119,25 @@ const Index = () => {
         />
         */}
     </Layout>
-  )
-}
+  );
+};
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const AccountId = await getAccountIdFromReq(ctx.req)
+  const AccountId = await getAccountIdFromReq(ctx.req);
 
-  const toursWithTasks = await getToursAndTasks(AccountId)
+  const toursWithTasks = await getToursAndTasks(AccountId);
 
-  const tours: ToursWithTasks[] = toursWithTasks.map((t: any) =>
-    ({
-      Id: t.Id,
-      ShowName: t.Show.Name,
-      ShowCode: t.Show.Code,
-      ShowId: t.Show.Id,
-      Code: t.Code,
-      Tasks: t.TourTask.map(mapToTourTaskDTO)
-    }))
+  const tours: ToursWithTasks[] = toursWithTasks.map((t: any) => ({
+    Id: t.Id,
+    ShowName: t.Show.Name,
+    ShowCode: t.Show.Code,
+    ShowId: t.Show.Id,
+    Code: t.Code,
+    Tasks: t.TourTask.map(mapToTourTaskDTO),
+  }));
 
-  const initialState: InitialState = { tasks: { tours, bulkSelection: {} } }
-  return { props: { initialState } }
-}
+  const initialState: InitialState = { tasks: { tours, bulkSelection: {} } };
+  return { props: { initialState } };
+};
 
-export default Index
+export default Index;

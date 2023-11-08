@@ -1,13 +1,13 @@
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
-  const VenueId: number = parseInt(req.query.venueID as string)
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+  const VenueId: number = parseInt(req.query.venueID as string);
   //    console.log(JSON.stringify(req.body))
   try {
     await prisma.venue.update({
       where: {
-        VenueId
+        VenueId,
       },
       data: {
         Code: req.body.Code,
@@ -30,14 +30,14 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         DeliveryPostcode: req.body.DeliveryPostcode,
         DeliveryCountry: req.body.DeliveryCountry,
         Latitude: req.body.Latitude,
-        Longitude: req.body.Longitude
-      }
-    })
-    res.status(200).end()
+        Longitude: req.body.Longitude,
+      },
+    });
+    res.status(200).end();
   } catch (e) {
-    console.log(e)
-    res.status(501).end()
+    console.log(e);
+    res.status(501).end();
   }
 
-  return res
+  return res;
 }

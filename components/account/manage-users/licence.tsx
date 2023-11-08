@@ -1,5 +1,5 @@
-const licences = 9 // This needs to be passed from the template
-const usedLicences = 8
+const licences = 9; // This needs to be passed from the template
+const usedLicences = 8;
 
 const Toolbar = () => (
   <div className="ml-10 mt-16">
@@ -13,12 +13,14 @@ const Toolbar = () => (
       </p>
     </div>
     <div className="mt-4">
-      <button className="inline-flex items-center rounded-md border border-transparent bg-primary-orange px-11 py-3 text-sm font-medium
-        leading-4 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset- 1">
+      <button
+        className="inline-flex items-center rounded-md border border-transparent bg-primary-orange px-11 py-3 text-sm font-medium
+        leading-4 text-white shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset- 1"
+      >
         Add Licences
       </button>
     </div>
   </div>
-)
+);
 
-export default Toolbar
+export default Toolbar;

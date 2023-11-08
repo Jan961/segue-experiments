@@ -1,28 +1,28 @@
-import { useRecoilState, useRecoilValue } from 'recoil'
-import { getInFitUpState } from 'state/booking/getInFitUpState'
-import { venueState } from 'state/booking/venueState'
-import { viewState } from 'state/booking/viewState'
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { getInFitUpState } from 'state/booking/getInFitUpState';
+import { venueState } from 'state/booking/venueState';
+import { viewState } from 'state/booking/viewState';
 
 interface GifuDisplayProps {
-  gifuId: number
-  date: string
+  gifuId: number;
+  date: string;
 }
 
 export const GifuDisplay = ({ gifuId, date }: GifuDisplayProps) => {
-  const gifuDict = useRecoilValue(getInFitUpState)
-  const venueDict = useRecoilValue(venueState)
-  const [view, setView] = useRecoilState(viewState)
+  const gifuDict = useRecoilValue(getInFitUpState);
+  const venueDict = useRecoilValue(venueState);
+  const [view, setView] = useRecoilState(viewState);
 
-  if (!gifuDict) return null
+  if (!gifuDict) return null;
 
-  const g = gifuDict[gifuId]
-  const { Name } = venueDict[g.VenueId]
+  const g = gifuDict[gifuId];
+  const { Name } = venueDict[g.VenueId];
 
   const select = () => {
-    setView({ ...view, selected: { type: 'gifu', id: gifuId }, selectedDate: date })
-  }
+    setView({ ...view, selected: { type: 'gifu', id: gifuId }, selectedDate: date });
+  };
 
-  const active = view.selected?.id === gifuId && view.selected?.type === 'gifu'
+  const active = view.selected?.id === gifuId && view.selected?.type === 'gifu';
 
   return (
     <div
@@ -33,7 +33,7 @@ export const GifuDisplay = ({ gifuId, date }: GifuDisplayProps) => {
       `}
       onClick={select}
     >
-      <div className="col-span-7 text-center">GIFU: { Name }</div>
+      <div className="col-span-7 text-center">GIFU: {Name}</div>
     </div>
-  )
-}
+  );
+};

@@ -1,9 +1,9 @@
-import ExcelJS from 'exceljs'
-import prisma from 'lib/prisma'
+import ExcelJS from 'exceljs';
+import prisma from 'lib/prisma';
 
-export default async function handle (req, res) {
-  const { type } = req.query
-  return HANDLERS_MAPPER[type](req, res)
+export default async function handle(req, res) {
+  const { type } = req.query;
+  return HANDLERS_MAPPER[type](req, res);
 }
 
 // Tour: "11"
@@ -51,7 +51,17 @@ export default async function handle (req, res) {
   }
  */
 const salesSummarySimple = async (req, res) => {
-  const { tour: TourId, TourWeek, numberOfWeeks, order, fromWeek, toWeek, tourEndDate: ToTourDate, tourStartDate: FromTourDate, ShowName } = JSON.parse(req.body)
+  const {
+    tour: TourId,
+    TourWeek,
+    numberOfWeeks,
+    order,
+    fromWeek,
+    toWeek,
+    tourEndDate: ToTourDate,
+    tourStartDate: FromTourDate,
+    ShowName,
+  } = JSON.parse(req.body);
   // const result = await prisma.$queryRaw`
   //   SELECT  VenueCurrencySymbol, ConversionRate, TourWeekNum, WeekDate, SUM(Value) AS Total, SUM(RunSeatsSold) AS TotalRunSeatsSold, SUM(TotalSeats) AS TotalTotalSeats
   //   FROM SalesView
@@ -62,42 +72,48 @@ const salesSummarySimple = async (req, res) => {
 
   const result = await prisma.$queryRaw`SELECT * FROM SalesView WHERE TourId = ${parseInt(TourId)}
   AND BookingFirstDate BETWEEN ${FromTourDate} AND ${ToTourDate}
-  AND SetSalesFiguresDate BETWEEN ${fromWeek} AND ${toWeek}`
+  AND SetSalesFiguresDate BETWEEN ${fromWeek} AND ${toWeek}`;
 
   // console.log(result)
-  const workbook = new ExcelJS.Workbook()
+  const workbook = new ExcelJS.Workbook();
   // const josnArray = data.map(({ WeekName, WeekDate, Town, VenueName }) => ({ Week: WeekName, Day: 1, Date: WeekDate, Town, Venue: VenueName }))
-  const josnArray = result.map(({ SetTourWeekNum, SetSalesFiguresDate, VenueTown, VenueName }) => ({ Week: SetTourWeekNum, Day: 1, Date: SetSalesFiguresDate, Town: VenueTown, Venue: VenueName }))
+  const josnArray = result.map(({ SetTourWeekNum, SetSalesFiguresDate, VenueTown, VenueName }) => ({
+    Week: SetTourWeekNum,
+    Day: 1,
+    Date: SetSalesFiguresDate,
+    Town: VenueTown,
+    Venue: VenueName,
+  }));
   // Write data to the worksheet
   const worksheet = workbook.addWorksheet('My Sales', {
-    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 }
-  })
+    pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
+  });
 
-  console.log('ShowName', ShowName)
-  worksheet.getCell(1, 1).value = ShowName || 'Reports'
-  worksheet.addRow([])
-  worksheet.addRow(['Tour'])
+  console.log('ShowName', ShowName);
+  worksheet.getCell(1, 1).value = ShowName || 'Reports';
+  worksheet.addRow([]);
+  worksheet.addRow(['Tour']);
 
-  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue'])
-  let count = 1
-  josnArray.forEach(json => {
-    worksheet.addRow([...Object.values(json)])
-    count += 1
-  })
+  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue']);
+  let count = 1;
+  josnArray.forEach((json) => {
+    worksheet.addRow([...Object.values(json)]);
+    count += 1;
+  });
   worksheet.getRow(1).eachCell((cell) => {
-    cell.font = { bold: true }
-  })
+    cell.font = { bold: true };
+  });
 
-  const filename = `report_${new Date().getTime()}.xlsx`
+  const filename = `report_${new Date().getTime()}.xlsx`;
 
-  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`)
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
   return workbook.xlsx.write(res).then(() => {
-    res.end()
-  })
-}
+    res.end();
+  });
+};
 
 const HANDLERS_MAPPER = {
-  1: salesSummarySimple
-}
+  1: salesSummarySimple,
+};

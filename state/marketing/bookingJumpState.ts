@@ -1,15 +1,15 @@
-import { atom } from 'recoil'
+import { atom } from 'recoil';
 
 export interface BookingJump {
-  selected?: number
-  bookings?: any[]
+  selected?: number;
+  bookings?: any[];
 }
 
 const intialState: BookingJump = {
-  bookings: []
-}
+  bookings: [],
+};
 
 export const bookingJumpState = atom({
   key: 'bookingJumpState',
-  default: intialState
-})
+  default: intialState,
+});

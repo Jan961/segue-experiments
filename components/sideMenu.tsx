@@ -1,7 +1,7 @@
-import * as React from "react";
-import Link from "next/link";
+import * as React from 'react';
+import Link from 'next/link';
 
-let tourId = 1;
+const tourId = 1;
 
 const SideNavBar = (data?) => (
   <div className="1/12 w-60 h-full shadow-md bg-white px-1 ">
@@ -119,15 +119,15 @@ const SideNavBar = (data?) => (
         </a>
       </li>
       <li className="relative">
-            <a
-              className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"
-              href="/tasks/20"
-              data-mdb-ripple="true"
-              data-mdb-ripple-color="dark"
-            >
-              Tasks
-            </a>
-          </li>
+        <a
+          className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"
+          href="/tasks/20"
+          data-mdb-ripple="true"
+          data-mdb-ripple-color="dark"
+        >
+          Tasks
+        </a>
+      </li>
       <li className="relative">
         <a
           className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"

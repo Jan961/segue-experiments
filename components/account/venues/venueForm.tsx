@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import { JsConfigPathsPlugin } from "next/dist/build/webpack/plugins/jsconfig-paths-plugin";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { JsConfigPathsPlugin } from 'next/dist/build/webpack/plugins/jsconfig-paths-plugin';
 
-import axios from "axios";
+import axios from 'axios';
 
 export default function ViewForm() {
   const [showModal, setShowModal] = React.useState(false);
-  let userLevel = 1; //TODO: get this from User
+  const userLevel = 1; // TODO: get this from User
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -15,12 +15,12 @@ export default function ViewForm() {
   });
 
   const [inputs, setInputs] = useState({
-    code: "",
-    name: "",
-    town: "",
-    country: "",
+    code: '',
+    name: '',
+    town: '',
+    country: '',
     seats: 0,
-    website: "",
+    website: '',
     source: 0,
   });
 
@@ -29,16 +29,16 @@ export default function ViewForm() {
       setStatus({
         submitted: true,
         submitting: false,
-        info: { error: false, msg: msg },
+        info: { error: false, msg },
       });
       setInputs({
-        code: "",
-        name: "",
-        town: "",
-        country: "",
+        code: '',
+        name: '',
+        town: '',
+        country: '',
         seats: 0,
-        website: "",
-        source: 0, //TOdo: change to account id
+        website: '',
+        source: 0, // TOdo: change to account id
       });
     } else {
       // @ts-ignore
@@ -62,15 +62,15 @@ export default function ViewForm() {
     e.preventDefault();
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
     axios({
-      method: "POST",
-      url: "/api/venue/add",
+      method: 'POST',
+      url: '/api/venue/add',
       data: inputs,
     })
       .then((response) => {
         handleServerResponse(
           true,
-          "Thank you, your message has been submitted."
-          //Todo: router setlocation to the new venue to allow user to add the rest fo the detils
+          'Thank you, your message has been submitted.',
+          // Todo: router setlocation to the new venue to allow user to add the rest fo the detils
         );
         console.log(JSON.stringify(handleServerResponse));
       })
@@ -92,9 +92,9 @@ export default function ViewForm() {
         <>
           <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
             <div className="relative w-auto my-6 mx-auto max-w-3xl">
-              {/*content*/}
+              {/* content */}
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
-                {/*header*/}
+                {/* header */}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">Add Custom Venue</h3>
                   <button
@@ -106,14 +106,13 @@ export default function ViewForm() {
                     </span>
                   </button>
                 </div>
-                {/*body*/}
+                {/* body */}
                 <form onSubmit={handleOnSubmit}>
                   <div className="relative p-6 flex-auto">
                     <div className="grid grid-cols-1 gap-2">
                       <div>
-                        <p className={"text-gray-700 small"}>
-                          Enter Basic Details for new Venue, Further information
-                          can be added on the next screen
+                        <p className={'text-gray-700 small'}>
+                          Enter Basic Details for new Venue, Further information can be added on the next screen
                         </p>
                       </div>
                       <div>
@@ -208,24 +207,20 @@ export default function ViewForm() {
                       </div>
                       {/* TODO: Replace with account ID */}
 
-                      {userLevel == 0 ? (
+                      {userLevel !== 1 ? (
                         <div>
                           {/* this will only show on ADMIN Accounts */}
                           <label htmlFor="source" className="">
                             Scope
                           </label>
-                          <p className={"text-gray-700 small"}>
-                            {" "}
-                            Creating a venue with as global will add this venue
-                            to the all accounts on Segue Platform
+                          <p className={'text-gray-700 small'}>
+                            {' '}
+                            Creating a venue with as global will add this venue to the all accounts on Segue Platform
                           </p>
 
                           <select name="source" id="source">
                             <option value={0}>Global - Update all lists</option>
-                            <option value={1}>
-                              Account - Update this lists
-                            </option>{" "}
-                            {/* TODO: Replace with account ID */}
+                            <option value={1}>Account - Update this lists</option> {/* TODO: Replace with account ID */}
                           </select>
                         </div>
                       ) : (
@@ -234,23 +229,17 @@ export default function ViewForm() {
                           <label htmlFor="source" className="">
                             Scope of Change
                           </label>
-                          <p className={"text-gray-700 small"}>
-                            You are adding a venue to your account only, To
-                            request a venue is added to the global database
-                            contact Segue Support
+                          <p className={'text-gray-700 small'}>
+                            You are adding a venue to your account only, To request a venue is added to the global
+                            database contact Segue Support
                           </p>
-                          <input
-                            type="hidden"
-                            name="source"
-                            id="source"
-                            value="1"
-                          />
+                          <input type="hidden" name="source" id="source" value="1" />
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/*footer*/}
+                  {/* footer */}
                   <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
                     <button
                       className="text-red-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -265,15 +254,11 @@ export default function ViewForm() {
                       type="submit"
                       disabled={status.submitting}
                     >
-                      {!status.submitting
-                        ? !status.submitted
-                          ? "Submit"
-                          : "Submitted"
-                        : "Submitting..."}
+                      {!status.submitting ? (!status.submitted ? 'Submit' : 'Submitted') : 'Submitting...'}
                     </button>
                   </div>
                 </form>
-                {/**}
+                {/** }
                             {status.info.error && (
                                 <div className="bg-red-800 text-black">Error: {status.info.msg}</div>
                             )}

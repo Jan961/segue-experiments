@@ -1,52 +1,52 @@
-import prisma from 'lib/prisma'
-import { NextApiRequest, NextApiResponse } from 'next'
+import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 type UpsertSalesParams = {
-  SetBookingId: string
-  SetPerformanceId?: string
-  SetSalesFiguresDate?: string
-  isFinalFigures?: string
-}
+  SetBookingId: string;
+  SetPerformanceId?: string;
+  SetSalesFiguresDate?: string;
+  isFinalFigures?: string;
+};
 
 type SaleResponse = {
-  Seats: number,
-  Value: string,
-  ReservedSeats: number,
-  ReservedValue: string,
-  SchoolSeats: number,
-  SchoolValue: string
-}
+  Seats: number;
+  Value: string;
+  ReservedSeats: number;
+  ReservedValue: string;
+  SchoolSeats: number;
+  SchoolValue: string;
+};
 
 type CompResponse = {
-  CompTypeId: number,
-  CompSeats: number,
-  CompTypeName: string
-}
+  CompTypeId: number;
+  CompSeats: number;
+  CompTypeName: string;
+};
 
 type HoldResponse = {
-  HoldTypeId: number,
-  HoldSeats: number,
-  HoldValue:string,
-  HoldTypeName: string
-}
+  HoldTypeId: number;
+  HoldSeats: number;
+  HoldValue: string;
+  HoldTypeName: string;
+};
 
 type SalesData = {
-  SaleTypeId: number,
-  SaleSeats: number,
-  SaleValue: string,
-  SaleTypeName: string
-}
+  SaleTypeId: number;
+  SaleSeats: number;
+  SaleValue: string;
+  SaleTypeName: string;
+};
 
 type BookingNotes = {
-  HoldNotes:string
-  CompNotes:string
-  SalesNotes:string
-}
+  HoldNotes: string;
+  CompNotes: string;
+  SalesNotes: string;
+};
 
-export default async function handle (req: NextApiRequest, res: NextApiResponse) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, isFinalFigures } = req.body as UpsertSalesParams
-    const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate)
+    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, isFinalFigures } = req.body as UpsertSalesParams;
+    const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate);
 
     const salesSet = await prisma.salesSet.findFirst({
       where: {
@@ -54,10 +54,10 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
         ...(SetPerformanceId && { SetPerformanceId }),
         ...(SetSalesFiguresDate && {
           SetSalesFiguresDate: {
-            equals: SetSalesFiguresDateInISO
-          }
+            equals: SetSalesFiguresDateInISO,
+          },
         }),
-        ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures })
+        ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
       },
       select: {
         SetBookingId: true,
@@ -67,8 +67,8 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
           select: {
             SalesNotes: true,
             HoldNotes: true,
-            CompNotes: true
-          }
+            CompNotes: true,
+          },
         },
         SetComp: {
           select: {
@@ -76,10 +76,10 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
             SetCompSeats: true,
             CompType: {
               select: {
-                CompTypeName: true
-              }
-            }
-          }
+                CompTypeName: true,
+              },
+            },
+          },
         },
         SetHold: {
           select: {
@@ -88,10 +88,10 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
             SetHoldValue: true,
             HoldType: {
               select: {
-                HoldTypeName: true
-              }
-            }
-          }
+                HoldTypeName: true,
+              },
+            },
+          },
         },
         Sale: {
           select: {
@@ -100,40 +100,42 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
             SaleValue: true,
             SaleType: {
               select: {
-                SaleTypeName: true
-              }
-            }
-          }
-        }
-      }
-    })
+                SaleTypeName: true,
+              },
+            },
+          },
+        },
+      },
+    });
     if (!salesSet) {
-      return res.status(200).json({ SetComp: [], SetHold: [], Sale: null })
+      return res.status(200).json({ SetComp: [], SetHold: [], Sale: null });
       // throw new Error('No such SalesSet exists')
     }
 
-    const holdData: HoldResponse[] = salesSet.SetHold.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue, HoldType }) => ({
-      HoldTypeId: SetHoldHoldTypeId,
-      HoldSeats: SetHoldSeats,
-      HoldValue: SetHoldValue,
-      HoldTypeName: HoldType.HoldTypeName
-    }))
+    const holdData: HoldResponse[] = salesSet.SetHold.map(
+      ({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue, HoldType }) => ({
+        HoldTypeId: SetHoldHoldTypeId,
+        HoldSeats: SetHoldSeats,
+        HoldValue: SetHoldValue,
+        HoldTypeName: HoldType.HoldTypeName,
+      }),
+    );
     const compData: CompResponse[] = salesSet.SetComp.map(({ SetCompCompTypeId, SetCompSeats, CompType }) => ({
       CompTypeId: SetCompCompTypeId,
       CompSeats: SetCompSeats,
-      CompTypeName: CompType.CompTypeName
-    }))
+      CompTypeName: CompType.CompTypeName,
+    }));
     const saleData: SalesData[] = salesSet.Sale.map(({ SaleSaleTypeId, SaleSeats, SaleValue, SaleType }) => ({
       SaleTypeId: SaleSaleTypeId,
       SaleSeats,
       SaleValue,
-      SaleTypeName: SaleType.SaleTypeName
-    }))
+      SaleTypeName: SaleType.SaleTypeName,
+    }));
 
-    const Notes: BookingNotes = salesSet.Booking
-    const generalSalesData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'General Sales')
-    const generalReservationsData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'General Reservations')
-    const schoolSalesData: SalesData[] = saleData.filter(x => x.SaleTypeName === 'School Sales')
+    const Notes: BookingNotes = salesSet.Booking;
+    const generalSalesData: SalesData[] = saleData.filter((x) => x.SaleTypeName === 'General Sales');
+    const generalReservationsData: SalesData[] = saleData.filter((x) => x.SaleTypeName === 'General Reservations');
+    const schoolSalesData: SalesData[] = saleData.filter((x) => x.SaleTypeName === 'School Sales');
     // const schoolReservationsData: SalesData[] = saleData.filter(x=> x.SaleTypeName === 'School Reservations')
 
     const finalSalesData: SaleResponse = {
@@ -142,12 +144,12 @@ export default async function handle (req: NextApiRequest, res: NextApiResponse)
       ReservedSeats: generalReservationsData?.[0]?.SaleSeats,
       ReservedValue: generalReservationsData?.[0]?.SaleValue,
       SchoolSeats: schoolSalesData?.[0]?.SaleSeats,
-      SchoolValue: schoolSalesData?.[0]?.SaleValue
-    }
+      SchoolValue: schoolSalesData?.[0]?.SaleValue,
+    };
 
-    res.status(200).json({ ...salesSet, SetComp: compData, SetHold: holdData, Sale: finalSalesData, Notes })
+    res.status(200).json({ ...salesSet, SetComp: compData, SetHold: holdData, Sale: finalSalesData, Notes });
   } catch (err) {
-    console.log('error', err)
-    res.status(500).json({ err: err?.message || 'Error updating AvailableComp' })
+    console.log('error', err);
+    res.status(500).json({ err: err?.message || 'Error updating AvailableComp' });
   }
 }

@@ -1,174 +1,172 @@
-import { useEffect, useState } from 'react'
-import { dateToSimple } from 'services/dateService'
-import axios from 'axios'
-import { getSales } from './Api'
-import schema from './validation'
-import Typeahead from 'components/Typeahead'
-import { Spinner } from 'components/global/Spinner'
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox'
-import { StyledDialog } from 'components/global/StyledDialog'
+import { useEffect, useState } from 'react';
+import { dateToSimple } from 'services/dateService';
+import axios from 'axios';
+import { getSales } from './Api';
+import schema from './validation';
+import Typeahead from 'components/Typeahead';
+import { Spinner } from 'components/global/Spinner';
+import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
+import { StyledDialog } from 'components/global/StyledDialog';
 
 interface props {
-  searchFilter: String;
+  searchFilter: string;
   tours?: any[];
 }
-export default function Entry ({ tours = [], searchFilter }: props) {
-  const [isLoading, setLoading] = useState(false)
-  const [salesWeeks, SetSalesWeeks] = useState([])
-  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([])
-  const [previousSaleWeek, setPreviousSaleWeek] = useState(null)
-  const [options, setOptions] = useState<any>(null)
-  const [holds, setHolds] = useState<any>({})
-  const [comps, setComps] = useState<any>({})
-  const [inputs, setInputs] = useState<any>({})
-  const [sale, setSale] = useState<any>({})
-  const [previousSale, setPreviousSale] = useState<any>({})
-  const [notes, setNotes] = useState<any>({})
-  const [validationErrors, setValidationErrors] = useState<any>({})
-  const [ignoreValidation, setIgnoreValidation] = useState<boolean>(false)
-  const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false)
+export default function Entry({ tours = [], searchFilter }: props) {
+  const [isLoading, setLoading] = useState(false);
+  const [salesWeeks, SetSalesWeeks] = useState([]);
+  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
+  const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
+  const [options, setOptions] = useState<any>(null);
+  const [holds, setHolds] = useState<any>({});
+  const [comps, setComps] = useState<any>({});
+  const [inputs, setInputs] = useState<any>({});
+  const [sale, setSale] = useState<any>({});
+  const [previousSale, setPreviousSale] = useState<any>({});
+  const [notes, setNotes] = useState<any>({});
+  const [validationErrors, setValidationErrors] = useState<any>({});
+  const [ignoreValidation, setIgnoreValidation] = useState<boolean>(false);
+  const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
-      setLoading(true)
+      setLoading(true);
       axios
         .get(`/api/reports/tourWeek/${tourId}`)
         .then((data: any) => SetSalesWeeks(data.data || []))
-        .finally(() => setLoading(false))
+        .finally(() => setLoading(false));
     }
-  }
+  };
   const fetchVenues = (tourId) => {
     if (tourId) {
-      setLoading(true)
+      setLoading(true);
       axios
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
           SetSalesWeeksVenues(data)
         })
-        .finally(() => setLoading(false))
+        .finally(() => setLoading(false));
     }
-  }
+  };
 
   const handleSalesResponse = (data) => {
-    const { Notes, SetHold, SetComp, Sale } = data || {}
-    const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {}
+    const { Notes, SetHold, SetComp, Sale } = data || {};
+    const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {};
     const holdValues = SetHold?.reduce?.((holds, hold) => {
-      holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue }
-      return holds
-    }, {})
+      holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue };
+      return holds;
+    }, {});
     const compValues = SetComp?.reduce?.((comps, comp) => {
-      comps[comp.CompTypeId] = comp.CompSeats
-      return comps
-    }, {})
+      comps[comp.CompTypeId] = comp.CompSeats;
+      return comps;
+    }, {});
     return {
       holds: holdValues,
       comps: compValues,
       notes: {
         BookingSaleNotes,
         CompNotes,
-        HoldNotes
+        HoldNotes,
       },
-      sale: Sale
-    }
-  }
+      sale: Sale,
+    };
+  };
   const fetchSales = async (SetSalesFiguresDate, SetBookingId) => {
-    setLoading(true)
-    const data = await getSales({ SetSalesFiguresDate, SetBookingId })
-    setLoading(false)
-    return handleSalesResponse(data)
-  }
+    setLoading(true);
+    const data = await getSales({ SetSalesFiguresDate, SetBookingId });
+    setLoading(false);
+    return handleSalesResponse(data);
+  };
   const fetchOptionTypes = () => {
     axios
       .get('/api/marketing/sales/options')
       .then((data) => {
-        setOptions(data.data)
+        setOptions(data.data);
       })
-      .catch((error) => console.log(error))
-  }
+      .catch((error) => console.log(error));
+  };
   useEffect(() => {
-    fetchTourWeeks(inputs.SetTour)
-    fetchVenues(inputs.SetTour)
-  }, [inputs.SetTour])
+    fetchTourWeeks(inputs.SetTour);
+    fetchVenues(inputs.SetTour);
+  }, [inputs.SetTour]);
   useEffect(() => {
     if (!options) {
-      fetchOptionTypes()
+      fetchOptionTypes();
     }
-  }, [])
+  }, []);
   useEffect(() => {
     if (inputs.SaleWeek && inputs.Venue) {
-      setHolds({})
-      setComps({})
-      setNotes({})
-      setSale({})
-      setLoading(false)
+      setHolds({});
+      setComps({});
+      setNotes({});
+      setSale({});
+      setLoading(false);
       fetchSales(inputs.SaleWeek, parseInt(inputs.Venue, 10))
         .then(({ holds = [], comps = [], notes, sale = {} }) => {
-          setHolds(holds)
-          setComps(comps)
-          setNotes(notes)
-          setSale(sale || {})
+          setHolds(holds);
+          setComps(comps);
+          setNotes(notes);
+          setSale(sale || {});
         })
         .catch((error) => console.log(error))
-        .finally(() => setLoading(false))
+        .finally(() => setLoading(false));
     }
-  }, [inputs.SaleWeek, inputs.Venue])
+  }, [inputs.SaleWeek, inputs.Venue]);
   useEffect(() => {
     if (inputs.Venue && previousSaleWeek) {
       fetchSales(previousSaleWeek, parseInt(inputs.Venue, 10))
         .then(({ sale }) => {
-          setPreviousSale(sale || {})
+          setPreviousSale(sale || {});
         })
-        .catch((error) => console.log(error))
+        .catch((error) => console.log(error));
     }
-  }, [inputs.Venue, previousSaleWeek])
+  }, [inputs.Venue, previousSaleWeek]);
   if (isLoading) {
     return (
       <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
         <Spinner className="w-full" size="lg" />
       </div>
-    )
+    );
   }
 
   const handleOnChange = (e) => {
-    e.persist?.()
+    e.persist?.();
     if (e.target.id === 'SetTour') {
-      setInputs({ [e.target.id]: e.target.value })
-      return
+      setInputs({ [e.target.id]: e.target.value });
+      return;
     }
     if (e.target.id === 'SaleWeek') {
-      const index = salesWeeks.findIndex(
-        (week) => week.mondayDate === e.target.value
-      )
+      const index = salesWeeks.findIndex((week) => week.mondayDate === e.target.value);
       if (index <= 0) {
-        setPreviousSaleWeek(null)
-        setPreviousSale(null)
+        setPreviousSaleWeek(null);
+        setPreviousSale(null);
       } else {
-        setPreviousSaleWeek(salesWeeks[index - 1]?.mondayDate)
+        setPreviousSaleWeek(salesWeeks[index - 1]?.mondayDate);
       }
     }
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value
-    }))
-  }
+      [e.target.id]: e.target.value,
+    }));
+  };
 
   const handleOnSaleChange = (e) => {
-    e.persist?.()
-    setValidationErrors({})
+    e.persist?.();
+    setValidationErrors({});
     setSale((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value
-    }))
-  }
+      [e.target.id]: e.target.value,
+    }));
+  };
 
   const handleOnNotesChange = (e) => {
-    e.persist?.()
+    e.persist?.();
     setNotes((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value
-    }))
-  }
-  function validateSale (sale, previousSale) {
+      [e.target.id]: e.target.value,
+    }));
+  };
+  function validateSale(sale, previousSale) {
     return schema
       .validate(
         {
@@ -177,60 +175,60 @@ export default function Entry ({ tours = [], searchFilter }: props) {
             PreviousSeats: previousSale?.Seats,
             PreviousValue: previousSale?.Value,
             PreviousReservedSeats: previousSale?.ReservedSeats,
-            PreviousReservedValue: previousSale?.ReservedValue
-          }
+            PreviousReservedValue: previousSale?.ReservedValue,
+          },
         },
-        { abortEarly: false }
+        { abortEarly: false },
       )
       .then(() => {
-        return true
+        return true;
       })
       .catch((validationErrors) => {
-        const errors = {}
-        const warnings = {}
+        const errors = {};
+        const warnings = {};
         validationErrors.inner.forEach((error) => {
           if (error.path.startsWith('warning')) {
-            warnings[error.path] = error.message
+            warnings[error.path] = error.message;
           } else {
-            errors[error.path] = error.message
+            errors[error.path] = error.message;
           }
-        })
-        setValidationErrors(errors)
-        return false
-      })
+        });
+        setValidationErrors(errors);
+        return false;
+      });
   }
 
-  async function onSubmit (e: any) {
-    e?.preventDefault?.()
+  async function onSubmit(e: any) {
+    e?.preventDefault?.();
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
       SetHoldHoldTypeId,
       SetHoldSeats: holds[SetHoldHoldTypeId].seats,
-      SetHoldValue: holds[SetHoldHoldTypeId].value
-    }))
+      SetHoldValue: holds[SetHoldHoldTypeId].value,
+    }));
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
       SetCompCompTypeId,
-      SetCompSeats: comps[SetCompCompTypeId]
-    }))
-    const ignoreValidation = Object.values(validationErrors).length > 0
+      SetCompSeats: comps[SetCompCompTypeId],
+    }));
+    const ignoreValidation = Object.values(validationErrors).length > 0;
     if (!ignoreValidation) {
-      const valid = await validateSale(sale, previousSale)
+      const valid = await validateSale(sale, previousSale);
       if (!valid) {
-        setOpenWarningsDialog(true)
-        return
+        setOpenWarningsDialog(true);
+        return;
       }
     }
     const Sales = [
       {
         SaleSaleTypeId: 1,
         SaleSeats: sale?.Seats,
-        SaleValue: sale?.Value
+        SaleValue: sale?.Value,
       },
       {
         SaleSaleTypeId: 2,
         SaleSeats: sale?.ReservedSeats,
-        SaleValue: sale?.ReservedValue
-      }
-    ]
+        SaleValue: sale?.ReservedValue,
+      },
+    ];
     // const validateSales
     await axios
       .post('/api/marketing/sales/upsert', {
@@ -238,16 +236,17 @@ export default function Entry ({ tours = [], searchFilter }: props) {
         Comps,
         Sales,
         SetBookingId: parseInt(inputs.Venue, 10),
-        SetSalesFiguresDate: inputs.SalesWeek
+        SetSalesFiguresDate: inputs.SalesWeek,
       })
       .then((res) => {
-        console.log('Updated Sales', res)
-        setOpenWarningsDialog(false)
-        setValidationErrors({})
+        console.log('Updated Sales', res);
+        setOpenWarningsDialog(false);
+        setValidationErrors({});
       })
       .catch((error) => {
-        console.log('Error updating Sales', error)
-      }).finally(() => {})
+        console.log('Error updating Sales', error);
+      })
+      .finally(() => {});
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -262,21 +261,21 @@ export default function Entry ({ tours = [], searchFilter }: props) {
     // BookingSaleId, HoldNotes, CompNotes, BookingSaleNotes
   }
   const handleOnHoldsChange = (e, key) => {
-    e.persist?.()
+    e.persist?.();
     setHolds((prev) => ({
       ...prev,
-      [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value }
-    }))
-  }
+      [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value },
+    }));
+  };
   const handleOnCompsChange = (e) => {
-    e.persist?.()
-    setComps((prev) => ({ ...prev, [e.target.id]: e.target.value }))
-  }
+    e.persist?.();
+    setComps((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+  };
   const copyLastWeekSalesData = () => {
     if (previousSale) {
-      setSale(previousSale || {})
+      setSale(previousSale || {});
     }
-  }
+  };
   return (
     <div className="flex flex-row w-full">
       <div className={'flex bg-transparent w-5/8 p-5'}>
@@ -287,10 +286,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
               <div className="bg-soft-primary-green p-4 rounded-md mb-4">
                 <div className="flex flex-col space-y-2">
                   <div className="flex flex-row items-center justify-between">
-                    <label
-                      htmlFor="SetTour"
-                      className="text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="SetTour" className="text-sm font-medium text-gray-700">
                       Set Tour
                     </label>
                     <select
@@ -305,18 +301,13 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                         ?.filter?.((tour) => !tour.IsArchived)
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${
-                              tour.IsArchived ? ' | (Archived)' : ''
-                            }`}
+                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
                           </option>
                         ))}
                     </select>
                   </div>
                   <div className="flex flex-row items-center justify-between">
-                    <label
-                      htmlFor="SaleWeek"
-                      className="text-sm font-medium text-gray-700"
-                    >
+                    <label htmlFor="SaleWeek" className="text-sm font-medium text-gray-700">
                       Tour Sale Week
                     </label>
                     <select
@@ -328,16 +319,10 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                     >
                       <option value={0}>Select Tour Week</option>
                       {salesWeeks
-                        ?.sort?.(
-                          (a, b) =>
-                            new Date(a.mondayDate).valueOf() -
-                            new Date(b.mondayDate).valueOf()
-                        )
+                        ?.sort?.((a, b) => new Date(a.mondayDate).valueOf() - new Date(b.mondayDate).valueOf())
                         ?.map?.((week) => (
                           <option key={week.mondayDate} value={week.mondayDate}>
-                            {`Wk ${week.tourWeekNum} | Monday ${dateToSimple(
-                              new Date(week.mondayDate)
-                            )}`}
+                            {`Wk ${week.tourWeekNum} | Monday ${dateToSimple(new Date(week.mondayDate))}`}
                           </option>
                         ))}
                     </select>
@@ -351,17 +336,15 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                       dropdownClassName="max-w-lg top-[40px] right-0"
                       value={inputs.Venue}
                       options={salesWeeksVenues.map((venue) => ({
-                        text: `${venue.Code} ${venue.Name}, ${
-                          venue.Town
-                        } ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: String(venue.BookingId)
+                        text: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+                        value: String(venue.BookingId),
                       }))}
                       onChange={(option) =>
                         handleOnChange({
                           target: {
                             id: 'Venue',
-                            value: option?.value
-                          }
+                            value: option?.value,
+                          },
                         })
                       }
                     />
@@ -371,10 +354,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                 <div className="columns-2">
                   <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label
-                        htmlFor="Value"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
+                      <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                         Sold Seat Value
                       </label>
                       <div className="mt-1 sm:col-span-2 sm:mt-0">
@@ -386,11 +366,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                           onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
-                        {validationErrors?.Value && (
-                          <p className="text-primary-orange">
-                            {validationErrors.Value}
-                          </p>
-                        )}
+                        {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
                       </div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
@@ -411,19 +387,14 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                         {validationErrors?.ReservedValue && (
-                          <p className="text-primary-orange">
-                            {validationErrors.ReservedValue}
-                          </p>
+                          <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
                         )}
                       </div>
                     </div>
                   </div>
                   <div className={'columns-1'}>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label
-                        htmlFor="Seats"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
+                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                         Seats Sold
                       </label>
                       <div className="mt-1 sm:col-span-2 sm:mt-0">
@@ -436,11 +407,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                           onChange={handleOnSaleChange}
                           className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
-                        {validationErrors.Seats && (
-                          <p className="text-primary-orange">
-                            {validationErrors.Seats}
-                          </p>
-                        )}
+                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
                       </div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
@@ -461,9 +428,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                         {validationErrors.ReservedSeats && (
-                          <p className="text-primary-orange">
-                            {validationErrors.ReservedSeats}
-                          </p>
+                          <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
                         )}
                       </div>
                     </div>
@@ -476,12 +441,8 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                   <div className={'flex flex-col'}>
                     <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:pt-2">
                       <div className=" sm:col-span-1 sm:mt-0">Holds</div>
-                      <div className=" sm:col-span-1 text-center sm:mt-0">
-                        Seats
-                      </div>
-                      <div className=" sm:col-span-1 text-center sm:mt-0">
-                        Value
-                      </div>
+                      <div className=" sm:col-span-1 text-center sm:mt-0">Seats</div>
+                      <div className=" sm:col-span-1 text-center sm:mt-0">Value</div>
                     </div>
                     {options?.holdTypes.map((hold, i) => (
                       <div
@@ -554,10 +515,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
               <div className={'columns-1'}>
                 <div className="sm:grid sm:grid-cols-2 px-2 sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
                   <div className="flex flex-col w-full col-span-1 cursor-not-allowed">
-                    <label
-                      htmlFor="HoldNotes"
-                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                    >
+                    <label htmlFor="HoldNotes" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                       Hold Notes
                     </label>
                     <div className="mt-1 sm:col-span-2 sm:mt-0 cursor-not-allowed">
@@ -573,10 +531,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                   </div>
                   <div className={'col-span-1'}>
                     <div className="flex flex-col px-2 sm:border-none sm:border-gray-200 w-full cursor-not-allowed">
-                      <label
-                        htmlFor="CompNotes"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
+                      <label htmlFor="CompNotes" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                         Comp Notes
                       </label>
                       <div className="mt-1 sm:mt-0">
@@ -594,10 +549,7 @@ export default function Entry ({ tours = [], searchFilter }: props) {
                 </div>
               </div>
               <div className={'flex flex-col'}>
-                <label
-                  htmlFor="BookingSaleNotes"
-                  className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                >
+                <label htmlFor="BookingSaleNotes" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                   Booking Sale Notes
                 </label>
                 <div className="mt-1 sm:mt-0 w-full">
@@ -639,5 +591,5 @@ export default function Entry ({ tours = [], searchFilter }: props) {
         </div>
       </div>
     </div>
-  )
+  );
 }

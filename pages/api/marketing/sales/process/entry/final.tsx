@@ -1,10 +1,10 @@
-import prisma from "lib/prisma";
+import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
   try {
-    let result = await prisma.bookingSale.create({
+    const result = await prisma.bookingSale.create({
       data: {
-        BookingId: parseInt(req.body.BookingId), //hold link to Venue/Date
+        BookingId: parseInt(req.body.BookingId), // hold link to Venue/Date
         SalesFiguresDate: new Date(),
         NumSeatsSold: parseInt(req.body.SeatsSold),
         SoldSeatsValue: parseFloat(req.body.SeatsSoldValue),

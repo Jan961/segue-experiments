@@ -1,14 +1,12 @@
-import prisma from 'lib/prisma'
+import prisma from 'lib/prisma';
 
 export default async function handle(req, res) {
+  const query = 'SELECT * FROM SalesSummaryView ORDER BY ShowDate, WeekDate';
 
-
-    let query =  "SELECT * FROM SalesSummaryView ORDER BY ShowDate, WeekDate"
-
-    try {
-        let result = await prisma.$queryRawUnsafe(`${query}`)
-        res.json(result)
-    } catch (e){
-        res.status(401)
-    }
+  try {
+    const result = await prisma.$queryRawUnsafe(`${query}`);
+    res.json(result);
+  } catch (e) {
+    res.status(401);
+  }
 }

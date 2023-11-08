@@ -1,14 +1,14 @@
-import React from 'react'
-import { GetServerSideProps } from 'next'
-import { FormInputButton } from 'components/global/forms/FormInputButton'
-import { StyledDialog } from 'components/global/StyledDialog'
+import React from 'react';
+import { GetServerSideProps } from 'next';
+import { FormInputButton } from 'components/global/forms/FormInputButton';
+import { StyledDialog } from 'components/global/StyledDialog';
 
 interface ViewBookingHistoryProps {
-    venueId: number
+  venueId: number;
 }
 
-export default function ViewBookingHistory ({ venueId }: ViewBookingHistoryProps) {
-  const [showModal, setShowModal] = React.useState(false)
+export default function ViewBookingHistory({ venueId }: ViewBookingHistoryProps) {
+  const [showModal, setShowModal] = React.useState(false);
 
   /*
 
@@ -28,25 +28,18 @@ export default function ViewBookingHistory ({ venueId }: ViewBookingHistoryProps
 
   return (
     <>
-      <FormInputButton
-        text="History"
-        disabled
-        className="w-full block"
-        onClick={() => setShowModal(true)}
-      />
-      { showModal && (
+      <FormInputButton text="History" disabled className="w-full block" onClick={() => setShowModal(true)} />
+      {showModal && (
         <StyledDialog title="Venue Information" width="lg" open={showModal} onClose={() => setShowModal(false)}>
           <p>Not Implimented</p>
         </StyledDialog>
       )}
     </>
-  )
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
-    props: {
-
-    }
-  }
-}
+    props: {},
+  };
+};

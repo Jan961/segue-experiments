@@ -1,4 +1,4 @@
-import Image from 'next/image'
+import Image from 'next/image';
 
 export const LoadingPage = () => {
   return (
@@ -9,5 +9,5 @@ export const LoadingPage = () => {
         <h2 className="text-gray-600">Loading...</h2>
       </div>
     </div>
-  )
-}
+  );
+};

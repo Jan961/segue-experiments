@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface props {
   openBulkModal: (key: string) => void;
 }
-function TaskButtons({openBulkModal}:props) {
+function TaskButtons({ openBulkModal }: props) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -46,7 +46,7 @@ function TaskButtons({openBulkModal}:props) {
           >
             <div className="py-1" role="none">
               <button
-                onClick={() => openBulkModal("reassign")}
+                onClick={() => openBulkModal('reassign')}
                 className="text-gray-700 group flex items-center px-4 py-2 text-sm"
                 role="menuitem"
                 id="menu-item-0"
@@ -55,7 +55,7 @@ function TaskButtons({openBulkModal}:props) {
                 Re-assign
               </button>
               <button
-                onClick={() => openBulkModal("setstatus")}
+                onClick={() => openBulkModal('setstatus')}
                 className="text-gray-700 group flex items-center px-4 py-2 text-sm"
                 role="menuitem"
                 id="menu-item-1"
@@ -66,7 +66,7 @@ function TaskButtons({openBulkModal}:props) {
             </div>
             <div className="py-1" role="none">
               <button
-                onClick={() => openBulkModal("priority")}
+                onClick={() => openBulkModal('priority')}
                 className="text-gray-700 group flex items-center px-4 py-2 text-sm"
                 role="menuitem"
                 id="menu-item-2"
@@ -75,7 +75,7 @@ function TaskButtons({openBulkModal}:props) {
                 Priority
               </button>
               <button
-                onClick={() => openBulkModal("progress")}
+                onClick={() => openBulkModal('progress')}
                 className="text-gray-700 group flex items-center px-4 py-2 text-sm"
                 role="menuitem"
                 id="menu-item-3"
@@ -86,7 +86,7 @@ function TaskButtons({openBulkModal}:props) {
             </div>
             <div className="py-1" role="none">
               <button
-                onClick={() => openBulkModal("followup")}
+                onClick={() => openBulkModal('followup')}
                 className="text-gray-700 group flex items-center px-4 py-2 text-sm"
                 role="menuitem"
                 id="menu-item-4"
