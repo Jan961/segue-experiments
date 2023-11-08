@@ -6,7 +6,7 @@ import { tourJumpState } from 'state/booking/tourJumpState';
 export default function TourJumpMenu() {
   const router = useRouter();
   const [tourJump, setTourJump] = useRecoilState(tourJumpState);
-  const [includeArchived, setIncludeArchived] = useState<any>(false);
+  const [includeArchived, setIncludeArchived] = useState<boolean>(false);
   const tours = useMemo(() => {
     if (includeArchived) return tourJump?.tours;
     return tourJump?.tours?.filter?.((tour) => !tour.IsArchived);
@@ -37,16 +37,16 @@ export default function TourJumpMenu() {
       </select>
       <div className="flex  items-center ml-1 mr-4">
         <input
-          id="vatRegistered"
+          id="includeArchived"
           type="checkbox"
-          name="vatRegistered"
+          name="includeArchived"
           onChange={(e) => setIncludeArchived(e.target.checked)}
           className=" w-[15px] flex-1 rounded border-gray-300focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           placeholder="0141 000 0000"
-          value={includeArchived}
+          value={includeArchived.toString()}
           contentEditable={true}
         />
-        <label htmlFor="vatRegistered" className="ml-2">
+        <label htmlFor="includeArchived" className="ml-2">
           Include archived
         </label>
       </div>

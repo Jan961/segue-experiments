@@ -68,7 +68,7 @@ const Typeahead = ({
     }, 200);
   };
   return (
-    <div className={classNames('mb-2 w-full', className)}>
+    <div className={classNames('w-full', className)}>
       <label htmlFor={name}>{label && <span className="text-sm mb-2 pr-2">{label}</span>}</label>
       <input
         ref={inputRef}

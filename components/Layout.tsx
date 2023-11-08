@@ -61,7 +61,7 @@ const Layout = ({ children, title = 'Your tour assistant', flush = false }: Prop
       <main className="h-full w-full flex flex-rows  ">
         <PopoutMenu menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
         {isLoading && <LoadingOverlay />}
-        <div className={flush ? 'flex-1' : 'flex-1 px-4'}>{children}</div>
+        <div className={`md:ml-64 ${flush ? 'flex-1' : 'flex-1 px-4'}`}>{children}</div>
       </main>
     </div>
   );
