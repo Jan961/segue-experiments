@@ -111,7 +111,7 @@ const ReportForm = ({
   return (
     <form onSubmit={(event) => {
       event.preventDefault()
-      void handleSubmit(onSubmit)(event)
+      handleSubmit(onSubmit)(event)
     }}
     >
       <div className='lg:flex lg:gap-8'>

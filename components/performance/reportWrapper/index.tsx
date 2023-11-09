@@ -70,7 +70,7 @@ function ReportWrapper ({ children }: ReportWrapperProps) {
       data={...data, performanceDate: performance?.Date||'', performanceTime: performance?.Date||'' }
     }
     return data
-  },[])
+  },[bookings, bookingId, performanceId, performances])
  
   /**
    * There is no 'image' field in the JSON files you provided.
