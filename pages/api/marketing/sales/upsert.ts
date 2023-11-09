@@ -33,11 +33,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, Holds, Comps, Sales, isFinalFigures } =
       req.body as UpsertSalesParams;
+    const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate);
     const salesSet = await prisma.salesSet.findFirst({
       where: {
         SetBookingId,
-        SetPerformanceId,
-        SetSalesFiguresDate,
+        ...(SetPerformanceId && { SetPerformanceId }),
+        ...(SetSalesFiguresDate && {
+          SetSalesFiguresDate: {
+            equals: SetSalesFiguresDateInISO,
+          },
+        }),
         ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures })
       }
     })
@@ -88,8 +93,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) =>
             tx.sale.upsert({
               where: {
-                SaleSetId: salesSet.SetId,
-                SaleSaleTypeId,
+                Sale_unique: {
+                  SaleSetId: salesSet.SetId,
+                  SaleSaleTypeId
+                }
               },
               update: {
                 SaleSeats,
