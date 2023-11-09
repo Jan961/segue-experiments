@@ -55,7 +55,10 @@ SELECT
       `frtxigoo_dev`.`SetHold`
     WHERE
       `frtxigoo_dev`.`SetHold`.`SetHoldSetId` = `frtxigoo_dev`.`SalesSet`.`SetId`
-  ) AS `TotalHoldSeats`
+  ) AS `TotalHoldSeats`,
+  `LatestTotals`.`SetSalesFiguresDate` AS `LastFiguresDate`,
+  `LatestTotals`.`Seats` AS `LastFiguresSeats`,
+  `LatestTotals`.`Value` AS `LastFiguresValue`
 FROM
   (
     (
@@ -67,50 +70,64 @@ FROM
                 (
                   (
                     (
-                      `frtxigoo_dev`.`TourView`
-                      JOIN `frtxigoo_dev`.`DateBlock` ON(
-                        `TourView`.`TourId` = `frtxigoo_dev`.`DateBlock`.`DateBlockTourId`
+                      (
+                        `frtxigoo_dev`.`TourView`
+                        JOIN `frtxigoo_dev`.`DateBlock` ON(
+                          `TourView`.`TourId` = `frtxigoo_dev`.`DateBlock`.`DateBlockTourId`
+                        )
+                      )
+                      JOIN `frtxigoo_dev`.`Booking` ON(
+                        `frtxigoo_dev`.`DateBlock`.`DateBlockId` = `frtxigoo_dev`.`Booking`.`BookingDateBlockId`
                       )
                     )
-                    JOIN `frtxigoo_dev`.`Booking` ON(
-                      `frtxigoo_dev`.`DateBlock`.`DateBlockId` = `frtxigoo_dev`.`Booking`.`BookingDateBlockId`
+                    JOIN `frtxigoo_dev`.`VenueView` ON(
+                      `frtxigoo_dev`.`Booking`.`BookingVenueId` = `VenueView`.`VenueId`
                     )
                   )
-                  JOIN `frtxigoo_dev`.`VenueView` ON(
-                    `frtxigoo_dev`.`Booking`.`BookingVenueId` = `VenueView`.`VenueId`
+                  JOIN `frtxigoo_dev`.`Currency` ON(
+                    `VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`Currency`.`CurrencyCode`
                   )
                 )
-                JOIN `frtxigoo_dev`.`Currency` ON(
-                  `VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`Currency`.`CurrencyCode`
+                LEFT JOIN `frtxigoo_dev`.`ConversionRate` ON(
+                  `VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`ConversionRate`.`ConversionFromCurrencyCode`
+                  AND `TourView`.`TourId` = `frtxigoo_dev`.`ConversionRate`.`ConversionTourId`
                 )
               )
-              LEFT JOIN `frtxigoo_dev`.`ConversionRate` ON(
-                `VenueView`.`VenueCurrencyCode` = `frtxigoo_dev`.`ConversionRate`.`ConversionFromCurrencyCode`
-                AND `TourView`.`TourId` = `frtxigoo_dev`.`ConversionRate`.`ConversionTourId`
+              LEFT JOIN `frtxigoo_dev`.`SalesSet` ON(
+                `frtxigoo_dev`.`Booking`.`BookingId` = `frtxigoo_dev`.`SalesSet`.`SetBookingId`
               )
             )
-            LEFT JOIN `frtxigoo_dev`.`SalesSet` ON(
-              `frtxigoo_dev`.`Booking`.`BookingId` = `frtxigoo_dev`.`SalesSet`.`SetBookingId`
+            LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` ON(
+              `frtxigoo_dev`.`SalesSet`.`SetBookingId` = `SalesSetTotalsView`.`SetBookingId`
+              AND `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate` = `SalesSetTotalsView`.`SetSalesFiguresDate`
             )
           )
-          LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` ON(
-            `frtxigoo_dev`.`SalesSet`.`SetBookingId` = `SalesSetTotalsView`.`SetBookingId`
-            AND `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate` = `SalesSetTotalsView`.`SetSalesFiguresDate`
+          LEFT JOIN `frtxigoo_dev`.`SalesSet` `FinalFiguresSet` ON(
+            `frtxigoo_dev`.`Booking`.`BookingId` = `FinalFiguresSet`.`SetBookingId`
+            AND `FinalFiguresSet`.`SetIsFinalFigures` = 1
           )
         )
-        LEFT JOIN `frtxigoo_dev`.`SalesSet` `FinalFiguresSet` ON(
-          `frtxigoo_dev`.`Booking`.`BookingId` = `FinalFiguresSet`.`SetBookingId`
-          AND `FinalFiguresSet`.`SetIsFinalFigures` = 1
+        LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` `FinalFiguresTotals` ON(
+          `FinalFiguresSet`.`SetBookingId` = `FinalFiguresTotals`.`SetBookingId`
+          AND `FinalFiguresSet`.`SetSalesFiguresDate` = `FinalFiguresTotals`.`SetSalesFiguresDate`
         )
       )
-      LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` `FinalFiguresTotals` ON(
-        `FinalFiguresSet`.`SetBookingId` = `FinalFiguresTotals`.`SetBookingId`
-        AND `FinalFiguresSet`.`SetSalesFiguresDate` = `FinalFiguresTotals`.`SetSalesFiguresDate`
+      LEFT JOIN `frtxigoo_dev`.`SalesSet` `NotOnSaleSet` ON(
+        `frtxigoo_dev`.`Booking`.`BookingId` = `NotOnSaleSet`.`SetBookingId`
+        AND `NotOnSaleSet`.`SetNotOnSale` = 1
       )
     )
-    LEFT JOIN `frtxigoo_dev`.`SalesSet` `NotOnSaleSet` ON(
-      `frtxigoo_dev`.`Booking`.`BookingId` = `NotOnSaleSet`.`SetBookingId`
-      AND `NotOnSaleSet`.`SetNotOnSale` = 1
+    LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` `LatestTotals` ON(
+      `frtxigoo_dev`.`Booking`.`BookingId` = `LatestTotals`.`SetBookingId`
+      AND `FinalFiguresSet`.`SetSalesFiguresDate` = (
+        SELECT
+          max(`LatestTotal`.`SetSalesFiguresDate`)
+        FROM
+          `frtxigoo_dev`.`SalesSetTotalsView` `LatestTotal`
+        WHERE
+          `LatestTotal`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
+          AND `LatestTotal`.`Seats` > 0
+      )
     )
   )
 WHERE

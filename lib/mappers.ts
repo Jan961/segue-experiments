@@ -115,6 +115,7 @@ export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
     Id: p.Id,
     Date,
     BookingId: p.BookingId,
+    Time: time
   };
 };
 

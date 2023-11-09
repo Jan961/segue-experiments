@@ -97,7 +97,7 @@ export default function Reports ({ reports }:{reports:Report[]}) {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const response = await axios('/performance/reports/table-data')
+    const response = await axios('/performance/reports/list')
     return {
       props: {
         reports: response.data

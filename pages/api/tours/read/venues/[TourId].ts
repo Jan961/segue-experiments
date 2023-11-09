@@ -27,22 +27,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             },
           },
         },
-        include: {
-          Booking: {
-            include: {
-              Venue: {
-                include: {
-                  VenueAddress: true
-                }
-              }
-            }
-          }
-        },
+      },
         orderBy: {
           StartDate: 'desc'
         }
-      }
-    )
+  })
     const bookings = result.Booking.map(booking => ({ booking: omit(booking, ['Venue']), ...(booking.Venue || {}), ...(booking.Venue?.VenueAddress?.[0] || {}), BookingId: booking.Id }))
     res.json(bookings)
   } catch (error) {

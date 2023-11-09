@@ -4,7 +4,7 @@ import { getEmailFromReq, checkAccess } from 'services/userService'
 
 export default async function handle (req, res) {
   try {
-    const { BookingId } = req.query
+    const BookingId = parseInt(req.query.BookingId,10)
 
     const email = await getEmailFromReq(req)
     const access = await checkAccess(email, { BookingId })
@@ -16,13 +16,14 @@ export default async function handle (req, res) {
       select: {
         Id: true,
         Date: true,
-        Time: true
+        Time: true,
+        BookingId: true
       },
       orderBy: {
         Date: 'asc'
       }
     })
-    res.status(200).json(performanceMapper(performances))
+    res.status(200).json(performances.map((performance)=>performanceMapper(performance)))
   } catch (err) {
     console.log(err)
     res.status(500).json({ err: 'Error occurred creating performance.' })

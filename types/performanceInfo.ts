@@ -1,1 +1,1 @@
-export interface PerformanceInfo { performanceId: string, performanceKey: string }
+export interface PerformanceInfo { Id: number, Date: string, Time?: string}

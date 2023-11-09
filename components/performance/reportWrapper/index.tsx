@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import swr from 'swr'
 import axios from 'axios'
 import ReportForm from '../reportForm'
@@ -9,6 +9,7 @@ import { PerformanceInfo } from 'types/performanceInfo'
 import { ReportInfo } from 'types/reportInfo'
 import { CustomSelect } from './CustomSelect'
 import { dateToSimple } from 'services/dateService'
+import { format } from 'date-fns'
 
 const fetcher = async (url: string): Promise<any> => await axios(url).then((res) => res.data)
 
@@ -41,21 +42,36 @@ function ReportWrapper ({ children }: ReportWrapperProps) {
   * the performance options to populate the 'Set Performance' dropdown.
 */
   const { data: performances, isLoading: isLoadingPerformances } = swr<PerformanceInfo[]>(
-    bookingId !== '' ? `/api/performanceInfo/${bookingId}` : null,
+    bookingId !== '' ? `/api/performances/read/${bookingId}` : null,
     fetcher,
     swrOptions
   )
   /**
   * Whenever the user selects a performance, we fetch ther rport data
 */
-  const { data: reportInfoData } = swr<ReportInfo>(
-    bookingId !== '' && performanceId !== ''
-      ? `/api/reportInfo/${bookingId}/${performanceId}`
-      : null,
-    fetcher,
-    swrOptions
-  )
-
+  // const { data: reportInfoData } = swr<ReportInfo>(
+  //   bookingId !== '' && performanceId !== ''
+  //     ? `/api/reportInfo/${bookingId}/${performanceId}`
+  //     : null,
+  //   fetcher,
+  //   swrOptions
+  // )
+  const reportInfoData = useMemo(()=>{
+    let data={
+      venue:'', town:'', performanceDate:'', performanceTime:'', cms:'', lighting:'', asm:''
+    };
+    if(bookingId){
+      const booking = bookings.find(booking=>booking.BookingId===parseInt(bookingId))
+      const venue = booking.VenueAddress.find(address=>address.TypeName==='Main')
+      data={...data, venue:booking?.Name||'', town:venue?.Town||'' }
+    }
+    if(performanceId){
+      const performance=performances.find(performance=>performance.Id===parseInt(performanceId))
+      data={...data, performanceDate: performance?.Date||'', performanceTime: performance?.Date||'' }
+    }
+    return data
+  },[])
+ 
   /**
    * There is no 'image' field in the JSON files you provided.
    * If it should be present in 'show.json,' then the 'tourInfo' should include it to make it available here.
@@ -96,7 +112,7 @@ function ReportWrapper ({ children }: ReportWrapperProps) {
               }}
               disabled={tourId === ''}
               options={bookings?.map((venue) => (
-                <option key={venue.bookingId} value={venue.bookingId}>
+                <option key={venue.BookingId} value={venue.BookingId}>
                   {`${venue?.Code} ${venue?.Name}, ${
                     venue?.Town
                   } ${dateToSimple(venue?.booking?.FirstDate)}`}
@@ -110,9 +126,9 @@ function ReportWrapper ({ children }: ReportWrapperProps) {
               value={performanceId}
               onChange={(e) => setPerformanceId(e.target.value)}
               disabled={bookingId === ''}
-              options={performances?.map(({ performanceId, performanceKey }) => (
-                <option key={performanceId} value={performanceId}>
-                  {performanceKey}
+              options={performances?.map(({ Id, Date:performanceDate }) => (
+                <option key={Id} value={Id}>
+                  {format(new Date(performanceDate),'PPPppp')}
                 </option>
               ))}
               isLoading={isLoadingPerformances}

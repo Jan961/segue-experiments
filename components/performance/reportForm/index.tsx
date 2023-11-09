@@ -100,7 +100,7 @@ const ReportForm = ({
       reportImageUrl
     }
     try {
-      const res = await axios.post('/api/reportPdf', payload)
+      const res = await axios.post('/api/performance/reports/report-pdf', payload)
       console.log(res)
       window.alert('Report created succesfully')
     } catch (err) {
