@@ -13,7 +13,6 @@ const Tasklist = ({ tourId }: TaskListProps) => {
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const tours: TourState = useRecoilValue(tourState);
   const match = tours.filter((x) => x.Id === tourId)[0];
-  console.log(tours);
 
   if (!match) return null;
 
@@ -35,10 +34,12 @@ const Tasklist = ({ tourId }: TaskListProps) => {
     setBulkSelection(newState);
   };
 
-  if (match.Tasks.length === 0) return <p>No tasks for this tour</p>;
+  if (match.Tasks.length === 0) {
+    return <p>No tasks for this tour</p>;
+  }
 
   return (
-    <>
+    <div className="h-96 overflow-auto">
       <Table>
         <Table.HeaderRow>
           <Table.HeaderCell>
@@ -63,12 +64,7 @@ const Tasklist = ({ tourId }: TaskListProps) => {
           ))}
         </Table.Body>
       </Table>
-      {match.Tasks.length < 1 && (
-        <div className="w-full-screen text-center font-bold my-4">
-          <p className="">No Tasks Available</p>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 
