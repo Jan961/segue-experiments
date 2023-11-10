@@ -2,7 +2,6 @@
   "private": true,
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--max-http-header-size=24576' node server.js next dev",
-    "dev_old": "next",
     "build": "next build",
     "start": "next start",
     "cp-start": "NODE_ENV=production node server.js",

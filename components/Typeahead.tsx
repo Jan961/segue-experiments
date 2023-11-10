@@ -59,8 +59,10 @@ const Typeahead = ({
     setInputValue(selectedOption.text);
     onChange?.(selectedOption);
   };
-  const handleInputFocus = () => {
+  const handleInputFocus = (e) => {
+    e.preventDefault();
     setDropdownOpen(true);
+    inputRef.current.select();
   };
   const handleInputBlur = () => {
     setTimeout(() => {
