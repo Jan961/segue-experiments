@@ -46,8 +46,6 @@ export const ArchivedSalesTab = () => {
   }, [selected]);
   if (loading) return <LoadingTab />;
 
-  console.log('Archived Sales ', archivedSales);
-
   return (
     <>
       <div className={'mb-1 space-x-3 pl-1 pb-4 mt-4'}>
