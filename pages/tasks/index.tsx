@@ -96,10 +96,10 @@ const Index = () => {
           {tours.length > 0 ? (
             tours.map((tour) => {
               return (
-                <>
-                  <h3 className=" text-xl font-bold mt-8 mb-2">{tour.ShowName}</h3>
+                <div key={tour.Id} className="mb-10">
+                  <h3 className=" text-xl font-bold py-4">{tour.ShowName}</h3>
                   <Tasklist tourId={tour.Id} key={tour.Id} />
-                </>
+                </div>
               );
             })
           ) : (

@@ -48,8 +48,7 @@ export const ArchivedSalesTab = () => {
 
   return (
     <>
-      {/* <HardCodedWarning message="This is hard-coded server-side"/> */}
-      <div className={'mb-1 space-x-3 pb-4 mt-4'}>
+      <div className={'mb-1 space-x-3 pl-1 pb-4 mt-4'}>
         <button
           onClick={() => openBookingSelection('venue')}
           className={

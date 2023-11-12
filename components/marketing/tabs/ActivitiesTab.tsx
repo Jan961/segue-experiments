@@ -85,39 +85,47 @@ export const ActivitiesTab = () => {
 
   return (
     <>
-      <form className="mb-4 p-4 pb-2 rounded-lg">
+      <form className="rounded-lg">
         <div className="lg:flex lg:justify-between">
-          <FormInputCheckbox
-            className="flex-row-reverse"
-            name="IsOnSale"
-            label="On Sale"
-            value={inputs.IsOnSale}
-            onChange={handleOnChange}
-          />
-          <FormInputDate inline name="OnSaleDate" label="" value={inputs.OnSaleDate} onChange={handleOnChange} />
-          <FormInputCheckbox
-            className="flex-row-reverse"
-            name="MarketingPlanReceived"
-            label="Marketing Plans Received"
-            value={inputs.MarketingPlanReceived}
-            onChange={handleOnChange}
-          />
-          <FormInputCheckbox
-            className="flex-row-reverse"
-            name="PrintReqsReceived"
-            label="Print Reqs Received"
-            value={inputs.PrintReqsReceived}
-            onChange={handleOnChange}
-          />
-          <FormInputCheckbox
-            className="flex-row-reverse"
-            name="ContactInfoReceived"
-            label="Contact Info Received"
-            value={inputs.ContactInfoReceived}
-            onChange={handleOnChange}
-          />
-        </div>
-        <div className="text-right mb-2">
+          <div className="flex items-center">
+            <FormInputCheckbox
+              className="mr-8 flex-row-reverse"
+              name="IsOnSale"
+              label="On Sale"
+              value={inputs.IsOnSale}
+              onChange={handleOnChange}
+            />
+            <FormInputDate
+              className="mr-8 flex-row-reverse"
+              inline
+              name="OnSaleDate"
+              label=""
+              value={inputs.OnSaleDate}
+              onChange={handleOnChange}
+            />
+            <FormInputCheckbox
+              className="mr-8 flex-row-reverse"
+              name="MarketingPlanReceived"
+              label="Marketing Plans Received"
+              value={inputs.MarketingPlanReceived}
+              onChange={handleOnChange}
+            />
+            <FormInputCheckbox
+              className="mr-8 flex-row-reverse"
+              name="PrintReqsReceived"
+              label="Print Reqs Received"
+              value={inputs.PrintReqsReceived}
+              onChange={handleOnChange}
+            />
+            <FormInputCheckbox
+              className="mr-8 flex-row-reverse"
+              name="ContactInfoReceived"
+              label="Contact Info Received"
+              value={inputs.ContactInfoReceived}
+              onChange={handleOnChange}
+            />
+          </div>
+
           <FormInputButton
             submit
             intent="PRIMARY"
