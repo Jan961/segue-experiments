@@ -3,7 +3,7 @@ import { dateToSimple, getMonday, getPreviousMonday } from 'services/dateService
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 import Typeahead from 'components/Typeahead';
-import schema from './validation';
+import schema from './FinalSalesValidation';
 import { getSales } from './Api';
 
 type props = {
@@ -13,8 +13,6 @@ type props = {
 type Sale = {
   Value: string;
   Seats: string;
-  ReservedValue: string;
-  ReservedSeats: string;
   SchoolSeats: string;
   SchoolValue: string;
 };
@@ -22,8 +20,6 @@ type Sale = {
 const defaultSale = {
   Value: '',
   Seats: '',
-  ReservedValue: '',
-  ReservedSeats: '',
   SchoolSeats: '',
   SchoolValue: '',
 };
@@ -72,7 +68,6 @@ export default function FinalSales({ tours }: props) {
   };
   useEffect(() => {
     if (inputs.SetTour && inputs.BookingId) {
-      setSale(defaultSale);
       setLoading(false);
       setSale(defaultSale);
       setPreviousSale(defaultSale);
@@ -111,8 +106,7 @@ export default function FinalSales({ tours }: props) {
         Confirmed: inputs.Confirmed,
       });
     } else {
-      // @ts-ignore
-      setStatus(false);
+      // setStatus(false);
     }
   };
 
@@ -178,8 +172,9 @@ export default function FinalSales({ tours }: props) {
           ...{
             PreviousSeats: previousSale?.Seats,
             PreviousValue: previousSale?.Value,
-            PreviousReservedSeats: previousSale?.ReservedSeats,
-            PreviousReservedValue: previousSale?.ReservedValue,
+            PreviousSchoolSeats: previousSale?.SchoolSeats,
+            PreviousSchoolValue: previousSale?.SchoolValue,
+            isPantomime
           },
         },
         { abortEarly: false },
@@ -214,18 +209,13 @@ export default function FinalSales({ tours }: props) {
       const Sales = [
         {
           SaleSaleTypeId: 1,
-          SaleSeats: sale?.Seats,
-          SaleValue: sale?.Value,
-        },
-        {
-          SaleSaleTypeId: 2,
-          SaleSeats: sale?.ReservedSeats,
-          SaleValue: sale?.ReservedValue,
+          SaleSeats: parseInt(sale?.Seats, 10),
+          SaleValue: parseFloat(sale?.Value),
         },
         {
           SaleSaleTypeId: 3,
-          SaleSeats: sale?.SchoolSeats,
-          SaleValue: sale?.SchoolValue,
+          SaleSeats: parseInt(sale?.SchoolSeats, 10),
+          SaleValue: parseFloat(sale?.SchoolValue),
         },
       ];
       await axios
@@ -234,7 +224,7 @@ export default function FinalSales({ tours }: props) {
           SetSalesFigureDate: finalSaleFigureDate,
           SetBookkingId: inputs.BookingId,
         })
-        .then((res) => {
+        .then(() => {
           handleServerResponse(true, 'Submitted');
         });
     } else {
@@ -340,52 +330,6 @@ export default function FinalSales({ tours }: props) {
                       </div>
                     </div>
                   </div>
-                  <div className={'columns-1'}>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
-                      <label
-                        htmlFor="ReservedValue"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedValue"
-                          id="ReservedValue"
-                          autoComplete="ReservedValue"
-                          value={sale.ReservedValue}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.ReservedValue && (
-                          <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label
-                        htmlFor="ReservedSeats"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedSeats"
-                          id="ReservedSeats"
-                          autoComplete="ReservedSeats"
-                          value={sale.ReservedSeats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.ReservedSeats && (
-                          <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                   {isPantomime && (
                     <div className="columns-1">
                       <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
@@ -444,7 +388,9 @@ export default function FinalSales({ tours }: props) {
                     name="Confirmed"
                     type={'checkbox'}
                     checked={inputs.Confirmed}
-                    onChange={handleOnChange}
+                    onChange={(e)=>{
+                      handleOnChange({ target: { id: 'Confirmed', value: e.target.checked } });
+                    }}
                   />
                 </div>
                 <label htmlFor="Confirmed" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 ml-4">
