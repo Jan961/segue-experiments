@@ -126,7 +126,7 @@ export const Summary = () => {
       <div className="flex flex-col border-y-2 py-4 my-4">
         <div className="flex items-center text-gray-700">
           <FontAwesomeIcon icon={faUser} />
-          <div className="ml-4 bg-red-500 text-yellow-200 px-1">Down to single seat</div>
+          <div className="ml-4 bg-lime-500 text-black px-1">Down to single seat</div>
         </div>
         <div className="flex items-center text-gray-700 mt-2">
           <FontAwesomeIcon icon={faBook} />
@@ -134,7 +134,7 @@ export const Summary = () => {
         </div>
         <div className="flex items-center text-gray-700 mt-2">
           <FontAwesomeIcon icon={faSquareXmark} />
-          <div className="ml-4 bg-lime-500 text-black px-1">Not for sale</div>
+          <div className="ml-4 bg-red-500 text-yellow-200 px-1">Not on sale</div>
         </div>
       </div>
     </div>
