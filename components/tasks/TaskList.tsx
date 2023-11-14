@@ -39,7 +39,7 @@ const Tasklist = ({ tourId }: TaskListProps) => {
   }
 
   return (
-    <div className="h-96 overflow-auto">
+    <div className="h-96">
       <Table>
         <Table.HeaderRow>
           <Table.HeaderCell>
@@ -57,7 +57,7 @@ const Tasklist = ({ tourId }: TaskListProps) => {
           <Table.HeaderCell>Priority</Table.HeaderCell>
           <Table.HeaderCell>Follow Up</Table.HeaderCell>
         </Table.HeaderRow>
-        <Table.Body>
+        <Table.Body className="overflow-auto">
           {' '}
           {match.Tasks.map((task) => (
             <TaskListItem task={task} key={task.Id}></TaskListItem>
