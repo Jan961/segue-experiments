@@ -201,10 +201,13 @@ export default function FinalSales({ tours }: props) {
     event.preventDefault?.();
     if (inputs.Confirmed === true) {
       setLoading(true);
-      const valid = await validateSale(sale, previousSale);
-      if (!valid) {
-        setLoading(false);
-        return;
+      const ignoreValidation = Object.values(validationErrors).length > 0;
+      if (!ignoreValidation) {
+        const valid = await validateSale(sale, previousSale);
+        if (!valid) {
+          setLoading(false);
+          return;
+        }
       }
       const Sales = [
         {
@@ -404,7 +407,7 @@ export default function FinalSales({ tours }: props) {
                 'inline-flex items-center mt-5 rounded border border-gray-300 bg-white w-100 h-16 text-grey-700 px-2.5 py-1 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
               }
             >
-              Add Sales Data
+               {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
             </button>
           </form>
         </div>
