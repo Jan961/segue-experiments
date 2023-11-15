@@ -31,7 +31,7 @@ type UpsertSalesParams = {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, Holds, Comps, Sales, isFinalFigures } =
+    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, Holds=[], Comps=[], Sales=[], isFinalFigures=false } =
       req.body as UpsertSalesParams;
     const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate);
     const salesSet = await prisma.salesSet.findFirst({

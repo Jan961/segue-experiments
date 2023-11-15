@@ -56,11 +56,11 @@ export default function FinalSales({ tours }: props) {
       SetSalesFiguresDate,
     };
   };
-  const fetchSales = async (SetSalesFiguresDate = null, SetBookingId) => {
+  const fetchSales = async (SetSalesFiguresDate = null, SetBookingId, isFinalFigures=true) => {
     setLoading(true);
     const data = await getSales({
       SetBookingId,
-      isFinalFigures: true,
+      isFinalFigures,
       SetSalesFiguresDate,
     });
     setLoading(false);
@@ -75,7 +75,7 @@ export default function FinalSales({ tours }: props) {
         .then(({ sale = {}, SetSalesFiguresDate }) => {
           setSale(sale || {});
           const nextMondayDate = getMonday(SetSalesFiguresDate);
-          const previousMondayDate = getPreviousMonday(SetSalesFiguresDate);
+          const previousMondayDate = getPreviousMonday(new Date(SetSalesFiguresDate));
           setFinalSaleFigureDate(nextMondayDate);
           setPreviousSaleWeek(previousMondayDate);
         })
@@ -85,13 +85,13 @@ export default function FinalSales({ tours }: props) {
   }, [inputs.SetTour, inputs.BookingId]);
   useEffect(() => {
     if (inputs.BookingId && previousSaleWeek) {
-      fetchSales(previousSaleWeek, parseInt(inputs.BookingId, 10))
+      fetchSales(previousSaleWeek, parseInt(inputs.BookingId, 10), false)
         .then(({ sale }) => {
           setPreviousSale(sale || {});
         })
         .catch((error) => console.log(error));
     }
-  }, [inputs.BookingId, previousSaleWeek]);
+  }, [previousSaleWeek]);
 
   const handleServerResponse = (ok, msg) => {
     if (ok) {
@@ -215,17 +215,18 @@ export default function FinalSales({ tours }: props) {
           SaleSeats: parseInt(sale?.Seats, 10),
           SaleValue: parseFloat(sale?.Value),
         },
-        {
+        ...(isPantomime && [{
           SaleSaleTypeId: 3,
           SaleSeats: parseInt(sale?.SchoolSeats, 10),
           SaleValue: parseFloat(sale?.SchoolValue),
-        },
+        }]||[]),
       ];
       await axios
         .post('/api/marketing/sales/upsert', {
           Sales,
-          SetSalesFigureDate: finalSaleFigureDate,
-          SetBookkingId: inputs.BookingId,
+          SetSalesFiguresDate: finalSaleFigureDate,
+          SetBookingId: parseInt(inputs.BookingId),
+          isFinalFigures: true
         })
         .then(() => {
           handleServerResponse(true, 'Submitted');
