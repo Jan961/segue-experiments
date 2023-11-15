@@ -167,7 +167,7 @@ export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
 
 export const getPreviousMonday = (date) => {
   const dayOfWeek = date.getDay();
-  const difference = (dayOfWeek + 6) % 7; // Calculate the difference to Monday
+  const difference = ((dayOfWeek + 6) % 7)+7; // Calculate the difference to Monday
   const previousMonday = new Date(date);
   previousMonday.setDate(date.getDate() - difference);
   return previousMonday;
