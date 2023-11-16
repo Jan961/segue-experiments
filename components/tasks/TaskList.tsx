@@ -39,8 +39,8 @@ const Tasklist = ({ tourId }: TaskListProps) => {
   }
 
   return (
-    <div className="h-96 overflow-auto">
-      <Table>
+    <div className="h-128 w-full overflow-auto">
+      <Table className="border-collapse">
         <Table.HeaderRow>
           <Table.HeaderCell>
             <FormInputCheckbox value={allSelected} onChange={toggleAll} minimal />

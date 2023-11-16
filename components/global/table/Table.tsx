@@ -26,7 +26,7 @@ interface HeaderRowProps {
 
 const HeaderRow = ({ children, bg, className }: PropsWithChildren<HeaderRowProps>) => {
   return (
-    <thead>
+    <thead className="sticky top-0">
       <tr className={classNames(bg || 'bg-primary-green', className)}>{children}</tr>
     </thead>
   );
@@ -36,7 +36,10 @@ const HeaderCell = ({ children, className }: PropsWithChildren<ClassNameable>) =
   return (
     <th
       scope="col"
-      className={classNames('py-2 px-2 text-left font-bold text-xs whitespace-nowrap text-white', className)}
+      className={classNames(
+        'sticky top-0 py-2 px-2 text-left font-bold text-xs whitespace-nowrap text-white',
+        className,
+      )}
     >
       {children}
     </th>
