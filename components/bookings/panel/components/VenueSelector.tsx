@@ -10,7 +10,7 @@ export interface VenueSelectorProps {
   venueId: number;
   onChange: (e: number) => void;
   options?: SelectOption[];
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 export const VenueSelector = ({ venueId, onChange, options, disabled = false }: VenueSelectorProps) => {
