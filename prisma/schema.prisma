@@ -42,7 +42,7 @@ model Booking {
   CompNotes               String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes        String?               @map("BookingMerchandiseNotes") @db.LongText
   CastRateTicketNotes     String?               @map("BookingCastRateTicketNotes") @db.LongText
-  CastRateTicketsArranged Boolean               @map("BookingCastRateTicketsArranged") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  CastRateTicketsArranged Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
   CastRateTicketsNotes    String?               @map("BookingCastRateTicketsNotes") @db.Text
   BookedVenueHistory      BookedVenueHistory[]
   DateBlock               DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
@@ -311,13 +311,14 @@ model Other {
 }
 
 model Performance {
-  Id            Int             @id @default(autoincrement()) @map("PerformanceId")
-  BookingId     Int             @map("PerformanceBookingId")
-  Time          DateTime?        @map("PerformanceTime") @db.Time(0)
-  Date          DateTime        @map("PerformanceDate") @db.Date
-  AvailableComp AvailableComp[]
-  Booking       Booking         @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Performance")
-  SalesSet      SalesSet[]
+  Id                Int                 @id @default(autoincrement()) @map("PerformanceId")
+  BookingId         Int                 @map("PerformanceBookingId")
+  Time              DateTime?           @map("PerformanceTime") @db.Time(0)
+  Date              DateTime            @map("PerformanceDate") @db.Date
+  AvailableComp     AvailableComp[]
+  Booking           Booking             @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Performance")
+  PerformanceReport PerformanceReport[]
+  SalesSet          SalesSet[]
 
   @@index([BookingId], map: "Booking_Performance_fk")
   @@index([BookingId, Time, Date], map: "SECONDARY")
@@ -619,52 +620,40 @@ model TaskWatcher {
 }
 
 model PerformanceReport {
-  PRPerformanceId           Int                         @id
-  PRGetOutTime              DateTime?                   @db.Time(0)
-  PRGetOutUpTime            DateTime?                   @db.Time(0)
-  PRGetOutDownTime          DateTime?                   @db.Time(0)
-  PRAbsences                String?                     @db.Text
-  PRIllness                 String?                     @db.Text
-  PRTechnicalNotes          String?                     @db.Text
-  PRPerformanceNotes        String?                     @db.Text
-  PRSetPropCostumeNotes     String?                     @db.Text
-  PRAudienceNotes           String?                     @db.Text
-  PRMerchandiseNotes        String?                     @db.Text
-  PerformanceReportAct      PerformanceReportAct[]
-  PerformanceReportInterval PerformanceReportInterval[]
-  PerformanceReportRoles    PerformanceReportRoles[]
+  Id                    Int         @id @default(autoincrement()) @map("PRId")
+  PerformanceId         Int         @map("PRPerformanceId")
+  Act1UpTime            DateTime?   @db.Time(0) @map("PRAct1UpTime")
+  Act1DownTime          DateTime?   @db.Time(0) @map("PRAct1DownTime")
+  Interval1UpTime       DateTime?   @db.Time(0) @map("PRInterval1UpTime")
+  Interval1DownTime     DateTime?   @db.Time(0) @map("PRInterval1DownTime")
+  Act2UpTime            DateTime?   @db.Time(0) @map("PRAct2UpTime")
+  Act2DownTime          DateTime?   @db.Time(0) @map("PRAct2DownTime")
+  GetOutTime            DateTime?   @db.Time(0) @map("PRGetOutTime")
+  GetOutUpTime          DateTime?   @db.Time(0) @map("PRGetOutUpTime")
+  GetOutDownTime        DateTime?   @db.Time(0) @map("PRGetOutDownTime")
+  Absences              String?     @db.Text @map("PRAbsences")
+  Illness               String?     @db.Text @map("PRIllness")
+  TechnicalNotes        String?     @db.Text @map("PRTechnicalNotes")
+  PerformanceNotes      String?     @db.Text @map("PRPerformanceNotes")
+  SetPropCostumeNotes   String?     @db.Text @map("PRSetPropCostumeNotes")
+  AudienceNotes         String?     @db.Text @map("PRAudienceNotes")
+  MerchandiseNotes      String?     @db.Text @map("PRMerchandiseNotes")
+  GeneralRemarks        String?     @db.Text @map("PRGeneralRemarks")
+  CSM                   String?     @db.VarChar(255) @map("PRCSM")
+  Lighting              String?     @db.VarChar(255) @map("PRLighting")
+  ASM                   String?     @db.VarChar(255) @map("PRASM")
+  CreatedAt             DateTime    @default(now()) @db.Timestamp(0) @map("PRCreatedAt")
+  UpdatedAt             DateTime    @default(now()) @db.Timestamp(0) @map("PRUpdatedAt")
+  Performance           Performance @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "Performance_PerformanceReport")
+
+  @@index([PerformanceId], map: "Performance_PerformanceReport")
 }
 
-model PerformanceReportAct {
-  PRActId              Int               @id @default(autoincrement())
-  PRActPRPerformanceId Int
-  PRActNumber          Int               @db.TinyInt
-  PRActUpTime          DateTime?         @db.Time(0)
-  PRActDownTime        DateTime?         @db.Time(0)
-  PerformanceReport    PerformanceReport @relation(fields: [PRActPRPerformanceId], references: [PRPerformanceId], onDelete: Cascade, map: "PerformanceReportAct_ibfk_1")
 
-  @@index([PRActPRPerformanceId], map: "PRActPRPerformanceId")
-}
-
-model PerformanceReportInterval {
-  PRIntervalId              Int               @id @default(autoincrement())
-  PRIntervalPRPerformanceId Int
-  PRIntervalNumber          Int               @db.TinyInt
-  PRIntervalUpTime          DateTime?         @db.Time(0)
-  PRIntervalDownTime        DateTime?         @db.Time(0)
-  PerformanceReport         PerformanceReport @relation(fields: [PRIntervalPRPerformanceId], references: [PRPerformanceId], onDelete: Cascade, map: "PerformanceReportInterval_ibfk_1")
-
-  @@index([PRIntervalPRPerformanceId], map: "PRIntervalPRPerformanceId")
-}
-
-model PerformanceReportRoles {
-  PRRoleId              Int               @id @default(autoincrement())
-  PRRolePRPerformanceId Int
-  PRRoleName            String            @db.VarChar(50)
-  PRRoleHolder          String            @db.VarChar(50)
-  PerformanceReport     PerformanceReport @relation(fields: [PRRolePRPerformanceId], references: [PRPerformanceId], onDelete: Cascade, map: "PerformanceReportRoles_ibfk_1")
-
-  @@index([PRRolePRPerformanceId], map: "PRRolePRPerformanceId")
+model DBSetting {
+  DBSettingId    Int    @id @default(autoincrement())
+  DBSettingName  String @unique(map: "SettingName") @db.VarChar(50)
+  DBSettingValue String @db.VarChar(255)
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -956,7 +945,7 @@ view BookingHoldCompsView {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view TourSummaryView {
   TourId                      Int      @default(0)
-  DateTypeAffectsAvailability Decimal? @db.Decimal(1, 0)
+  DateTypeAffectsAvailability Boolean? @db.Bit(1)
   DateTypeId                  Int?
   DateTypeSeqNo               Decimal? @db.Decimal(3, 0)
   Item                        String   @default("") @db.VarChar(30)

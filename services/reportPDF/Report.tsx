@@ -1,11 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
 import { Page, Text, View, Document, Image } from '@react-pdf/renderer'
 
 
-const TableViewHorizantal = ({ data, headerStyle = {}, rowStyle = {} }) => {
+const TableViewHorizantal = ({ data, headerStyle = {}, rowStyle = {} }:{data:any, headerStyle?:any, rowStyle?:any}) => {
   const count = Object.keys(data).length
-  return Object.entries(data).map(([key, value], i) => (
+  return <>{Object.entries(data).map(([key, value], i) => (
     <View
       key={key}
       style={{
@@ -38,14 +37,13 @@ const TableViewHorizantal = ({ data, headerStyle = {}, rowStyle = {} }) => {
           ...rowStyle
         }}
       >
-        <Text>{value}</Text>
+        <Text>{value as string}</Text>
       </View>
     </View>
-  ))
+  ))}</>
 }
 
-// eslint-disable-next-line react/prop-types
-const TableView = ({ data, headerStyle, rowStyle }) => {
+const TableView = ({ data, headerStyle, rowStyle }:{data:any, headerStyle?:any, rowStyle?:any}) => {
   return (
     <View style={{ marginTop: 20 }}>
       <View style={{ display: 'flex', flexDirection: 'row' }}>
@@ -81,7 +79,7 @@ const TableView = ({ data, headerStyle, rowStyle }) => {
               ...rowStyle
             }}
           >
-            <Text>{value || 'N/A'}</Text>
+            <Text>{value as string || 'N/A'}</Text>
           </View>
         ))}
       </View>
@@ -89,8 +87,10 @@ const TableView = ({ data, headerStyle, rowStyle }) => {
   )
 }
 
-// eslint-disable-next-line react/prop-types
-const ReportPdf = ({ reportData = {} }) => {
+interface ReportDocumentProps {
+  reportData: any;
+}
+const ReportPdf: React.FC<ReportDocumentProps> = ({ reportData = {} }) => {
   const {
     venue,
     town,

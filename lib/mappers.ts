@@ -12,6 +12,7 @@ import {
   TourTask,
   User,
   Tour,
+  PerformanceReport,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -112,9 +113,9 @@ export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
   const Date = `${day}${time ? 'T' + time : ''}`;
 
   return {
-    Id: p.Id,
+    Id: p?.Id,
     Date,
-    BookingId: p.BookingId,
+    BookingId: p?.BookingId,
     Time: time
   };
 };

@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import ReactPDF from '@react-pdf/renderer';
-import ReportDocument from './reportPDF/Report';
+import Report from './reportPDF/Report';
 
 function formatDuration (duration, options = {}) {
     const { h = 'h', m = 'm' } = options
@@ -32,5 +32,5 @@ export async function generateReport (report) {
       performanceDate: format(new Date(report.performanceDate), 'eee dd/MM/yyyy'),
       performanceTime: format(new Date(report.performanceTime), 'HH:mm')
     }
-    return await ReactPDF.renderToStream(<ReportDocument reportData={reportData} />)
+    return await ReactPDF.renderToStream(<Report reportData={reportData} />)
   }

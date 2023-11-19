@@ -1,11 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { generateReport } from 'services/performanceReport';
-import { Report } from 'types/report';
+import { getPerformanceReportById, transformPerformanceReport } from 'services/performanceReports';
 
 export default async function handler (req: NextApiRequest, res: NextApiResponse) {
   try {
-    const report = req.body as Report;
-    const pdfStream = await generateReport(report)
+    const reportId = req.query.reportId as string
+    if(!reportId) return res.status(401).end();
+    const report = await getPerformanceReportById(parseInt(reportId,10));
+    const pdfStream = await generateReport(transformPerformanceReport(report))
     res.setHeader('Content-Type', 'application/pdf')
     pdfStream.pipe(res)
     pdfStream.on('end', () => console.log('Done streaming, response sent.'))
