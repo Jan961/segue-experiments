@@ -13,7 +13,7 @@ export interface VenueSelectorProps {
   disabled: boolean;
 }
 
-export const VenueSelector = ({ venueId, onChange, options, disabled }: VenueSelectorProps) => {
+export const VenueSelector = ({ venueId, onChange, options, disabled = false }: VenueSelectorProps) => {
   const venues = useRecoilValue(venueState);
   const venueOptions: SelectOption[] = [
     { text: 'Please Select a Venue', value: '' },
