@@ -19,7 +19,7 @@ const ActionBar = () => {
               const ukDate = formatDateUK(date);
               return {
                 text: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`,
-                value: `${b.Id}`,
+                value: b.Id,
                 date: ukDate,
               };
             })

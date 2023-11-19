@@ -10,9 +10,10 @@ export interface VenueSelectorProps {
   venueId: number;
   onChange: (e: number) => void;
   options?: SelectOption[];
+  disabled: boolean;
 }
 
-export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps) => {
+export const VenueSelector = ({ venueId, onChange, options, disabled }: VenueSelectorProps) => {
   const venues = useRecoilValue(venueState);
   const venueOptions: SelectOption[] = [
     { text: 'Please Select a Venue', value: '' },
@@ -34,6 +35,7 @@ export const VenueSelector = ({ venueId, onChange, options }: VenueSelectorProps
         placeholder={'Please Select a Venue'}
         value={venueId}
         searchKeys={['code', 'Town']}
+        disabled={disabled}
       />
       <div className="columns-2 mb-4">
         <VenueInfo venueId={venueId} />
