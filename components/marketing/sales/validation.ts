@@ -93,7 +93,7 @@ const schema = object().shape({
 
   ReservedSeats: mixed().test(
     'ReservedSeats',
-    'Reserved seats count cannot be greater than 15% from previous week.',
+    'Warning: Reserved seats count cannot be greater than 15% from previous week.',
     function () {
       let { ReservedSeats: currentWeekReservationSeats, PreviousReservedSeats: previousWeekReservationSeats } =
         this.parent;
@@ -108,7 +108,7 @@ const schema = object().shape({
     },
   ).test(
     'ReservedSeats',
-    'Reserved seats cannot be less than previous week.',
+    'Warning: Reserved seats cannot be less than previous week.',
     function () {
       let { ReservedSeats: currentWeekReservationSeats, PreviousReservedSeats: previousWeekReservationSeats } =
         this.parent;
@@ -122,7 +122,7 @@ const schema = object().shape({
   ),
   ReservedValue: mixed().test(
     'ReservedValue',
-    'Reservations value cannot be greater than 15% from previous week.',
+    'Warning: Reservations value cannot be greater than 15% from previous week.',
     function () {
       let { ReservedValue: currentWeekReservationValue, PreviousReservedValue: previousWeekReservationValue } =
         this.parent;
@@ -137,7 +137,7 @@ const schema = object().shape({
     },
   ).test(
     'ReservedValue',
-    'Reservations value less than previous week.',
+    'Warning: Reservations value less than previous week.',
     function () {
       let { ReservedValue: currentWeekReservationValue, PreviousReservedValue: previousWeekReservationValue } =
         this.parent;

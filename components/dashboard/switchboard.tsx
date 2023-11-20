@@ -42,7 +42,7 @@ export const Switchboard = () => {
       color: 'bg-primary-purple',
     },
     {
-      title: 'Account',
+      title: 'User Account',
       route: '/account',
       icon: faUserCog,
       color: 'bg-primary-pink',

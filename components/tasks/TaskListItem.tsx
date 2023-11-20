@@ -39,7 +39,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   return (
     <>
       {modalOpen && <TaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}
-      <Table.Row className={taskDateStatusColor} hover onClick={() => setModalOpen(true)}>
+      <Table.Row className={`${taskDateStatusColor}`} hover onClick={() => setModalOpen(true)}>
         <Table.Cell>
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
         </Table.Cell>
