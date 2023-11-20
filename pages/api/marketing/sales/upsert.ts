@@ -55,15 +55,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Comps.map(({ SetCompCompTypeId, SetCompSeats }) =>
             tx.setComp.upsert({
               where: {
-                SetCompSetId: salesSet.SetId,
-                SetCompCompTypeId,
+                Comp_unique:{
+                  SetCompSetId: salesSet.SetId,
+                  SetCompCompTypeId,
+                }
               },
               update: {
                 SetCompSeats,
               },
               create: {
-                SetCompCompTypeId,
                 SetCompSeats,
+                CompType:{
+                  connect:{CompTypeId: SetCompCompTypeId}
+                },
+                SalesSet:{
+                  connect:{SetId: salesSet.SetId}
+                }
               },
             }),
           ),
@@ -73,17 +80,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) =>
             tx.setHold.upsert({
               where: {
-                SetHoldSetId: salesSet.SetId,
-                SetHoldHoldTypeId,
+                Hold_unique:{
+                  SetHoldSetId: salesSet.SetId,
+                  SetHoldHoldTypeId,
+                }
               },
               update: {
                 SetHoldSeats,
                 SetHoldValue,
               },
               create: {
-                SetHoldHoldTypeId,
                 SetHoldSeats,
                 SetHoldValue,
+                HoldType:{
+                  connect:{HoldTypeId: SetHoldHoldTypeId}
+                },
+                SalesSet:{
+                  connect:{SetId: salesSet.SetId}
+                }
               },
             }),
           ),

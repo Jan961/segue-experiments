@@ -131,8 +131,10 @@ export default function Entry({ tours = [], searchFilter }: props) {
 
   const handleOnChange = (e) => {
     e.persist?.();
+    setValidationErrors({});
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value });
+      setSale({})
       return;
     }
     if (e.target.id === 'SaleWeek') {
@@ -201,12 +203,12 @@ export default function Entry({ tours = [], searchFilter }: props) {
   async function onSubmit(e: any) {
     e?.preventDefault?.();
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
-      SetHoldHoldTypeId,
+      SetHoldHoldTypeId: parseInt(SetHoldHoldTypeId),
       SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats,10),
       SetHoldValue: parseFloat(holds[SetHoldHoldTypeId].value),
     }));
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
-      SetCompCompTypeId,
+      SetCompCompTypeId: parseInt(SetCompCompTypeId, 10),
       SetCompSeats: parseInt(comps[SetCompCompTypeId],10),
     }));
     const ignoreValidation = Object.values(validationErrors).length > 0;
