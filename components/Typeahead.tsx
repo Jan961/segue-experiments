@@ -45,10 +45,12 @@ const Typeahead = ({
   useEffect(() => {
     fuse.current = new Fuse(options, { keys: ['text', ...searchKeys] });
   }, [options, searchKeys]);
+
   useEffect(() => {
-    const selectedOption = options.find((option) => option.value === String(value));
+    const selectedOption = options.find((option) => option.value === value);
     setInputValue(selectedOption?.text || '');
-  }, [value]);
+  }, [value, options]);
+
   const handleInputChange = (e: { target: { value: any } }) => {
     if (!e?.target?.value) {
       onChange?.({ text: '', value: '' });
