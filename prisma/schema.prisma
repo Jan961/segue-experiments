@@ -483,6 +483,7 @@ model SetComp {
   CompType          CompType @relation(fields: [SetCompCompTypeId], references: [CompTypeId], map: "CompType_SetComp")
   SalesSet          SalesSet @relation(fields: [SetCompSetId], references: [SetId], onDelete: Cascade, map: "SalesSet_SetComp")
 
+  @@unique([SetCompSetId, SetCompCompTypeId], name: "Comp_unique")
   @@index([SetCompCompTypeId], map: "CompType_SetComp")
   @@index([SetCompSetId], map: "SalesSet_SetComp_idx")
 }
@@ -496,6 +497,7 @@ model SetHold {
   HoldType          HoldType @relation(fields: [SetHoldHoldTypeId], references: [HoldTypeId], map: "HoldType_SetHold")
   SalesSet          SalesSet @relation(fields: [SetHoldSetId], references: [SetId], onDelete: Cascade, map: "SalesSet_SetHold")
 
+  @@unique([SetHoldSetId, SetHoldHoldTypeId], name: "Hold_unique")
   @@index([SetHoldHoldTypeId], map: "HoldType_SetHold")
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
 }
