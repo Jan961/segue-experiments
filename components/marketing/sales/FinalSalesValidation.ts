@@ -91,59 +91,63 @@ const schema = object().shape({
     return true;
   }),
 
-  ReservedSeats: mixed().test(
-    'ReservedSeats',
-    'Reserved seats count cannot be greater than 15% from previous week.',
+  SchoolSeats: mixed().test(
+    'SchoolSeats',
+    'School seats count cannot be greater than 15% from previous week.',
     function () {
-      let { ReservedSeats: currentWeekReservationSeats, PreviousReservedSeats: previousWeekReservationSeats } =
+      let { SchoolSeats: currentWeekSchoolSeats, PreviousSchoolSeats: previousWeekSchoolSeats, isPantomime } =
         this.parent;
-      currentWeekReservationSeats = parseInt(currentWeekReservationSeats, 10) || 0;
-      previousWeekReservationSeats = parseInt(previousWeekReservationSeats, 10) || 0;
+    if(!isPantomime)return true
+      currentWeekSchoolSeats = parseInt(currentWeekSchoolSeats, 10) || 0;
+      previousWeekSchoolSeats = parseInt(previousWeekSchoolSeats, 10) || 0;
       const seatsPercentageIncrease =
-        (currentWeekReservationSeats - previousWeekReservationSeats) / (previousWeekReservationSeats || 1);
+        (currentWeekSchoolSeats - previousWeekSchoolSeats) / (previousWeekSchoolSeats || 1);
       if (seatsPercentageIncrease > 0.15) {
         return false;
       }
       return true;
     },
   ).test(
-    'ReservedSeats',
-    'Reserved seats cannot be less than previous week.',
+    'SchoolSeats',
+    'School seats cannot be less than previous week.',
     function () {
-      let { ReservedSeats: currentWeekReservationSeats, PreviousReservedSeats: previousWeekReservationSeats } =
+      let { SchoolSeats: currentWeekSchoolSeats, PreviousSchoolSeats: previousWeekSchoolSeats, isPantomime } =
         this.parent;
-      currentWeekReservationSeats = parseInt(currentWeekReservationSeats, 10) || 0;
-      previousWeekReservationSeats = parseInt(previousWeekReservationSeats, 10) || 0;
-      if (currentWeekReservationSeats<previousWeekReservationSeats) {
+      if(!isPantomime) return true
+      currentWeekSchoolSeats = parseInt(currentWeekSchoolSeats, 10) || 0;
+      previousWeekSchoolSeats = parseInt(previousWeekSchoolSeats, 10) || 0;
+      if (currentWeekSchoolSeats<previousWeekSchoolSeats) {
         return false;
       }
       return true;
     },
   ),
-  ReservedValue: mixed().test(
-    'ReservedValue',
-    'Reservations value cannot be greater than 15% from previous week.',
+  SchoolValue: mixed().test(
+    'SchoolValue',
+    'Schools value cannot be greater than 15% from previous week.',
     function () {
-      let { ReservedValue: currentWeekReservationValue, PreviousReservedValue: previousWeekReservationValue } =
+      let { SchoolValue: currentWeekSchoolValue, PreviousSchoolValue: previousWeekSchoolValue, isPantomime } =
         this.parent;
-      currentWeekReservationValue = parseInt(currentWeekReservationValue, 10) || 0;
-      previousWeekReservationValue = parseInt(previousWeekReservationValue, 10) || 0;
+        if(!isPantomime) return true
+      currentWeekSchoolValue = parseInt(currentWeekSchoolValue, 10) || 0;
+      previousWeekSchoolValue = parseInt(previousWeekSchoolValue, 10) || 0;
       const valuePercentageIncrease =
-        (currentWeekReservationValue - previousWeekReservationValue) / (previousWeekReservationValue || 1);
+        (currentWeekSchoolValue - previousWeekSchoolValue) / (previousWeekSchoolValue || 1);
       if (valuePercentageIncrease > 0.15) {
         return false;
       }
       return true;
     },
   ).test(
-    'ReservedValue',
-    'Reservations value less than previous week.',
+    'SchoolValue',
+    'Schools value less than previous week.',
     function () {
-      let { ReservedValue: currentWeekReservationValue, PreviousReservedValue: previousWeekReservationValue } =
+      let { SchoolValue: currentWeekSchoolValue, PreviousSchoolValue: previousWeekSchoolValue, isPantomime } =
         this.parent;
-      currentWeekReservationValue = parseInt(currentWeekReservationValue, 10) || 0;
-      previousWeekReservationValue = parseInt(previousWeekReservationValue, 10) || 0;
-      if (currentWeekReservationValue<previousWeekReservationValue) {
+        if(!isPantomime) return true
+      currentWeekSchoolValue = parseInt(currentWeekSchoolValue, 10) || 0;
+      previousWeekSchoolValue = parseInt(previousWeekSchoolValue, 10) || 0;
+      if (currentWeekSchoolValue<previousWeekSchoolValue) {
         return false;
       }
       return true;

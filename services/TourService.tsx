@@ -190,7 +190,6 @@ export const getToursAndTasks = async (AccountId: number) => {
         orderBy: {
           Id: 'desc',
         },
-        take: 10,
       },
     },
   });

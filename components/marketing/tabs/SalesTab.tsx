@@ -77,24 +77,52 @@ export const SalesTab = () => {
     }
     return { valueChange, seatsChange };
   };
-  const updateSaleSet = (BookingId: number, SalesFigureDate: string, update: any) => {
+
+  const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update: any) => {
     axios
-      .put('/api/marketing/sales/salesSet/update', { BookingId, SalesFigureDate, ...update })
+      .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
       .catch((error: any) => console.log('failed to update sale', error));
   };
+
   const onChange = (key: string, value: boolean, sale: any) => {
-    updateSaleSet(selected, moment(sale.weekOf)?.toISOString()?.substring?.(0, 10), {
+    updateSaleSet('update', selected, moment(sale.weekOf)?.toISOString()?.substring?.(0, 10), {
       [key.replace('is', 'Set')]: value,
     });
     setBookingSales((prevSales) =>
       prevSales.map((s) => {
-        if (key === 'isNotOnSale') {
-          return { ...s, notOnSaleDate: sale.weekOf };
-        }
         if (sale.weekOf === s.weekOf && sale.week === s.week) {
           return { ...s, [key]: value };
         }
         return s;
+      }),
+    );
+  };
+
+  const onIsNotOnSaleChange = (key: string, value: boolean, sale: any) => {
+    updateSaleSet('updateNotOnSale', selected, moment(sale.weekOf)?.toISOString()?.substring?.(0, 10), {
+      [key.replace('is', 'Set')]: value,
+    });
+    setBookingSales((prevSales) =>
+      prevSales.map((s) => {
+        if (!value) {
+          const isOnSale = new Date(s.weekOf) < new Date(sale.weekOf);
+          return { ...s, [key]: isOnSale };
+        } else {
+          const isNotOnSale = new Date(s.weekOf) <= new Date(sale.weekOf);
+          return isNotOnSale ? { ...s, [key]: value } : s;
+        }
+      }),
+    );
+  };
+
+  const onSingleSeatChange = (key: string, value: boolean, sale: any) => {
+    updateSaleSet('updateSingleSeats', selected, moment(sale.weekOf)?.toISOString()?.substring?.(0, 10), {
+      [key.replace('is', 'Set')]: value,
+    });
+    setBookingSales((prevSales) =>
+      prevSales.map((s) => {
+        const isSingleSeat = new Date(s.weekOf) >= new Date(sale.weekOf);
+        return isSingleSeat ? { ...s, [key]: value } : s;
       }),
     );
   };
@@ -120,9 +148,9 @@ export const SalesTab = () => {
               {bookingSales.map((sale, i) => {
                 const { valueChange, seatsChange } = getChange(i);
                 let colorCode = '';
-                const isNotOnSale = new Date(sale.weekOf) <= new Date(sale.notOnSaleDate);
-                if (isNotOnSale) colorCode = 'bg-lime-500 text-black';
-                if (sale.isSingleSeats) colorCode = 'bg-red-500 text-yellow-200';
+                const isNotOnSale = sale.isNotOnSale;
+                if (isNotOnSale) colorCode = 'bg-red-500 text-yellow-200';
+                if (sale.isSingleSeats) colorCode = 'bg-lime-500 text-black';
                 if (sale.isBrochureReleased) colorCode = 'bg-yellow-200 text-black';
                 return (
                   <Table.Row id={sale.isFinal ? 'final' : null} key={sale.week}>
@@ -150,7 +178,7 @@ export const SalesTab = () => {
                           tooltip="Single Seat"
                           active={sale.isSingleSeats}
                           icon={faUser}
-                          onChange={(value) => onChange('isSingleSeats', value, sale)}
+                          onChange={(value) => onSingleSeatChange('isSingleSeats', value, sale)}
                         />
                         <Indicator
                           tooltip="Brochure Released"
@@ -162,7 +190,7 @@ export const SalesTab = () => {
                           tooltip="Not on Sale"
                           active={isNotOnSale}
                           icon={faSquareXmark}
-                          onChange={(value) => onChange('isNotOnSale', value, sale)}
+                          onChange={(value) => onIsNotOnSaleChange('isNotOnSale', value, sale)}
                         />
                       </ul>
                     </Table.Cell>

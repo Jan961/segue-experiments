@@ -125,6 +125,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
           <VenueSelector
             onChange={(value: any) => handleOnChange({ target: { id: 'VenueId', value } })}
             venueId={inputs.VenueId}
+            disabled={inputs.StatusCode === 'C'}
           />
         </div>
 

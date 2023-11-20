@@ -45,10 +45,12 @@ const Typeahead = ({
   useEffect(() => {
     fuse.current = new Fuse(options, { keys: ['text', ...searchKeys] });
   }, [options, searchKeys]);
+
   useEffect(() => {
-    const selectedOption = options.find((option) => option.value === String(value));
+    const selectedOption = options.find((option) => option.value === value);
     setInputValue(selectedOption?.text || '');
-  }, [value]);
+  }, [value, options]);
+
   const handleInputChange = (e: { target: { value: any } }) => {
     if (!e?.target?.value) {
       onChange?.({ text: '', value: '' });
@@ -59,8 +61,10 @@ const Typeahead = ({
     setInputValue(selectedOption.text);
     onChange?.(selectedOption);
   };
-  const handleInputFocus = () => {
+  const handleInputFocus = (e) => {
+    e.preventDefault();
     setDropdownOpen(true);
+    inputRef.current.select();
   };
   const handleInputBlur = () => {
     setTimeout(() => {
@@ -68,7 +72,7 @@ const Typeahead = ({
     }, 200);
   };
   return (
-    <div className={classNames('mb-2 w-full', className)}>
+    <div className={classNames('w-full', className)}>
       <label htmlFor={name}>{label && <span className="text-sm mb-2 pr-2">{label}</span>}</label>
       <input
         ref={inputRef}

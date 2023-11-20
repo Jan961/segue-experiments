@@ -131,8 +131,10 @@ export default function Entry({ tours = [], searchFilter }: props) {
 
   const handleOnChange = (e) => {
     e.persist?.();
+    setValidationErrors({});
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value });
+      setSale({})
       return;
     }
     if (e.target.id === 'SaleWeek') {
@@ -201,13 +203,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
   async function onSubmit(e: any) {
     e?.preventDefault?.();
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
-      SetHoldHoldTypeId,
-      SetHoldSeats: holds[SetHoldHoldTypeId].seats,
-      SetHoldValue: holds[SetHoldHoldTypeId].value,
+      SetHoldHoldTypeId: parseInt(SetHoldHoldTypeId),
+      SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats,10),
+      SetHoldValue: parseFloat(holds[SetHoldHoldTypeId].value),
     }));
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
-      SetCompCompTypeId,
-      SetCompSeats: comps[SetCompCompTypeId],
+      SetCompCompTypeId: parseInt(SetCompCompTypeId, 10),
+      SetCompSeats: parseInt(comps[SetCompCompTypeId],10),
     }));
     const ignoreValidation = Object.values(validationErrors).length > 0;
     if (!ignoreValidation) {
@@ -220,23 +222,24 @@ export default function Entry({ tours = [], searchFilter }: props) {
     const Sales = [
       {
         SaleSaleTypeId: 1,
-        SaleSeats: sale?.Seats,
-        SaleValue: sale?.Value,
+        SaleSeats: parseInt(sale?.Seats,10),
+        SaleValue: parseFloat(sale?.Value),
       },
       {
         SaleSaleTypeId: 2,
-        SaleSeats: sale?.ReservedSeats,
-        SaleValue: sale?.ReservedValue,
+        SaleSeats: parseInt(sale?.ReservedSeats,10),
+        SaleValue: parseFloat(sale?.ReservedValue),
       },
     ];
     // const validateSales
+    setLoading(true)
     await axios
       .post('/api/marketing/sales/upsert', {
         Holds,
         Comps,
         Sales,
         SetBookingId: parseInt(inputs.Venue, 10),
-        SetSalesFiguresDate: inputs.SalesWeek,
+        SetSalesFiguresDate: inputs.SaleWeek,
       })
       .then((res) => {
         console.log('Updated Sales', res);
@@ -244,9 +247,10 @@ export default function Entry({ tours = [], searchFilter }: props) {
         setValidationErrors({});
       })
       .catch((error) => {
-        console.log('Error updating Sales', error);
+        console.log('Error updating Sales', error)
+      }).finally(() => {
+        setLoading(false)
       })
-      .finally(() => {});
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -278,15 +282,16 @@ export default function Entry({ tours = [], searchFilter }: props) {
   };
   return (
     <div className="flex flex-row w-full">
-      <div className={'flex bg-transparent w-5/8 p-5'}>
+      <div className={'flex bg-transparent w-5/8'}>
         <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
           <div className={'mb-1'}></div>
           <form onSubmit={onSubmit}>
             <div>
               <div className="bg-soft-primary-green p-4 rounded-md mb-4">
-                <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center justify-between">
-                    <label htmlFor="SetTour" className="text-sm font-medium text-gray-700">
+                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                  {/* Set Tour */}
+                  <div className="row-start-1 flex flex-row items-center">
+                    <label htmlFor="SetTour" className="w-48 mr-6 text-sm font-medium text-gray-700">
                       Set Tour
                     </label>
                     <select
@@ -294,7 +299,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       name="SetTour"
                       value={inputs.SetTour}
                       onChange={handleOnChange}
-                      className="block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green  text-sm"
+                      className="ml-1 block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green text-sm"
                     >
                       <option value={0}>Select A Tour</option>
                       {tours
@@ -306,15 +311,16 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between">
-                    <label htmlFor="SaleWeek" className="text-sm font-medium text-gray-700">
+                  {/* Tour Sale Week */}
+                  <div className="row-start-2 flex flex-row items-center">
+                    <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
                       Tour Sale Week
                     </label>
                     <select
                       id="SaleWeek"
                       name="SaleWeek"
                       value={inputs.SaleWeek}
-                      className="block w-full  max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
+                      className="ml-1 block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
                       <option value={0}>Select Tour Week</option>
@@ -327,10 +333,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between relative">
+                  {/* Venue/Date */}
+                  <div className="row-start-3 flex flex-row items-center relative">
+                    <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
+                      Venue/Date
+                    </label>
                     <Typeahead
                       placeholder="Venue/Date"
-                      label="Venue/Date"
                       name="Venue"
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
@@ -351,8 +360,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                   </div>
                 </div>
 
-                <div className="columns-2">
-                  <div className={'columns-1'}>
+                <div className="grid lg:grid-cols-2 gap-4 sm:grid-cols-1">
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
                       <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                         Sold Seat Value
@@ -367,6 +375,23 @@ export default function Entry({ tours = [], searchFilter }: props) {
                           className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
                         />
                         {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
+                      </div>
+                    </div>
+                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
+                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                        Seats Sold
+                      </label>
+                      <div className="mt-1 sm:col-span-2 sm:mt-0">
+                        <input
+                          type="text"
+                          name="Seats"
+                          id="Seats"
+                          autoComplete="Seats"
+                          value={sale.Seats}
+                          onChange={handleOnSaleChange}
+                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                        />
+                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
                       </div>
                     </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
@@ -391,25 +416,6 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         )}
                       </div>
                     </div>
-                  </div>
-                  <div className={'columns-1'}>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Seats Sold
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Seats"
-                          id="Seats"
-                          autoComplete="Seats"
-                          value={sale.Seats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
-                      </div>
-                    </div>
                     <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
                       <label
                         htmlFor="ReservedSeats"
@@ -432,17 +438,16 @@ export default function Entry({ tours = [], searchFilter }: props) {
                         )}
                       </div>
                     </div>
-                  </div>
                 </div>
               </div>
 
-              <div className="grid-cols-2 grid gap-4  md:gap-6 pt-10">
+              <div className="grid-cols-2 grid gap-4  md:gap-6 pt-4">
                 <div className="sm:col-span-1">
                   <div className={'flex flex-col'}>
-                    <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:pt-2">
-                      <div className=" sm:col-span-1 sm:mt-0">Holds</div>
-                      <div className=" sm:col-span-1 text-center sm:mt-0">Seats</div>
-                      <div className=" sm:col-span-1 text-center sm:mt-0">Value</div>
+                    <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:py-2">
+                      <span className=" sm:col-span-1 sm:mt-0">Holds</span>
+                      <span className=" sm:col-span-1 text-center sm:mt-0">Seats</span>
+                      <span className=" sm:col-span-1 text-center sm:mt-0">Value</span>
                     </div>
                     {options?.holdTypes.map((hold, i) => (
                       <div
@@ -482,9 +487,9 @@ export default function Entry({ tours = [], searchFilter }: props) {
                   </div>
                 </div>
                 <div className={'col-span-1'}>
-                  <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 pt-2">
-                    <div className={' sm:col-span-1 '}>Comps</div>
-                    <div className=" text-right sm:col-span-2 ">Seats</div>
+                  <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 py-2">
+                    <span className="sm:col-span-1">Comps</span>
+                    <span className="text-center sm:col-span-2 ">Seats</span>
                   </div>
                   {options?.compTypes?.map((comp, j) => (
                     <div
@@ -567,7 +572,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
           </form>
         </div>
       </div>
-      <div className={'flex bg-transparent flex flex-col w-1/3 p-5'}>
+      <div className={'ml-4 flex bg-transparent flex flex-col w-1/3'}>
         <div className="grid grid-cols-2 gap-1 mb-4">
           <button
             type={'submit'}

@@ -19,7 +19,7 @@ const ActionBar = () => {
               const ukDate = formatDateUK(date);
               return {
                 text: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`,
-                value: `${b.Id}`,
+                value: b.Id,
                 date: ukDate,
               };
             })
@@ -56,7 +56,7 @@ const ActionBar = () => {
   };
 
   return (
-    <div className="grid grid-cols-6 gap-3 mt-5 max-w-full items-center">
+    <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
         <Typeahead
           className="mb-0 pb-0 max-w-[500px]"

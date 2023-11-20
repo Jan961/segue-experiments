@@ -444,6 +444,7 @@ model Sale {
   SalesSet       SalesSet? @relation(fields: [SaleSetId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
   SalesType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
 
+  @@unique([SaleSetId, SaleSaleTypeId], name: "Sale_unique")
   @@index([SaleSaleTypeId], map: "BookingSale_Sale_idx")
   @@index([SaleSetId], map: "SaleType_Sale_idx")
 }
@@ -483,6 +484,7 @@ model SetComp {
   CompType          CompType @relation(fields: [SetCompCompTypeId], references: [CompTypeId], map: "CompType_SetComp")
   SalesSet          SalesSet @relation(fields: [SetCompSetId], references: [SetId], onDelete: Cascade, map: "SalesSet_SetComp")
 
+  @@unique([SetCompSetId, SetCompCompTypeId], name: "Comp_unique")
   @@index([SetCompCompTypeId], map: "CompType_SetComp")
   @@index([SetCompSetId], map: "SalesSet_SetComp_idx")
 }
@@ -496,6 +498,7 @@ model SetHold {
   HoldType          HoldType @relation(fields: [SetHoldHoldTypeId], references: [HoldTypeId], map: "HoldType_SetHold")
   SalesSet          SalesSet @relation(fields: [SetHoldSetId], references: [SetId], onDelete: Cascade, map: "SalesSet_SetHold")
 
+  @@unique([SetHoldSetId, SetHoldHoldTypeId], name: "Hold_unique")
   @@index([SetHoldHoldTypeId], map: "HoldType_SetHold")
   @@index([SetHoldSetId], map: "SalesSet_SetHold_idx")
 }

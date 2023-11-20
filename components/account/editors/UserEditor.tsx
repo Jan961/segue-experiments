@@ -38,8 +38,6 @@ export const UserEditor = ({ user, triggerClose }: UserEditorProps) => {
     e.preventDefault();
     setStatus({ submitted: false, submitting: true });
 
-    console.log(editMode);
-
     if (editMode) {
       axios({
         method: 'POST',
