@@ -20,7 +20,7 @@ const ActionBar = () => {
   );
   const changeBooking = (booking: TypeaheadOption) => {
     setSelectedBooking(booking);
-    setBookingJump({ ...bookingJump, selected: booking.value });
+    setBookingJump({ ...bookingJump, selected: Number(booking.value) });
   };
 
   const goToToday = () => {
