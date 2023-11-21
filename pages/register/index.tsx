@@ -163,7 +163,7 @@ function Register() {
                         placeholder="Your email"
                         {...register('email')}
                       />
-                      <div className="invalid-feedback">{errors.email?.message}</div>
+                      <div className="invalid-feedback">{errors.email?.message as string ||''}</div>
                     </div>
                     <div>
                       <input
@@ -174,7 +174,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('name')}
                       />
-                      <div className="invalid-feedback">{errors.name?.message}</div>
+                      <div className="invalid-feedback">{errors.name?.message as string ||''}</div>
                     </div>
                     <div>
                       <input
@@ -185,7 +185,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('password')}
                       />
-                      <div className="invalid-feedback">{errors.password?.message}</div>
+                      <div className="invalid-feedback">{errors.password?.message as string ||''}</div>
                     </div>
                     <div>
                       <input
@@ -194,7 +194,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('password_confirm')}
                       />
-                      <div className="invalid-feedback">{errors.password_confirm?.message}</div>
+                      <div className="invalid-feedback">{errors.password_confirm?.message as string ||''}</div>
                     </div>
                     <div>
                       <input
@@ -203,7 +203,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('telephone')}
                       />
-                      <div className="invalid-feedback">{errors.telephone?.message}</div>
+                      <div className="invalid-feedback">{errors.telephone?.message as string ||''}</div>
                     </div>
                     <div>
                       <input
@@ -212,7 +212,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1 rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('business_name')}
                       />
-                      <div className="invalid-feedback">{errors.business_name?.message}</div>
+                      <div className="invalid-feedback">{errors.business_name?.message as string ||''}</div>
                     </div>
                     <div>
                       <input
@@ -221,7 +221,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('address_line_1')}
                       />
-                      <div className="invalid-feedback">{errors.address_line_1?.message}</div>
+                      <div className="invalid-feedback">{errors.address_line_1?.message as string ||''}</div>
                     </div>
                     <div>
                       <div className="mt-1 ">
@@ -231,7 +231,7 @@ function Register() {
                           placeholder="Website URL"
                           {...register('company_website')}
                         />
-                        <div className="invalid-feedback">{errors.company_website?.message}</div>
+                        <div className="invalid-feedback">{errors.company_website?.message as string ||''}</div>
                       </div>
                     </div>
                     <div>
@@ -241,7 +241,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('address_line_2')}
                       />
-                      <div className="invalid-feedback">{errors.address_line_2?.message}</div>
+                      <div className="invalid-feedback">{errors.address_line_2?.message as string ||''}</div>
                     </div>
                     <div className="flex flex-row items-center">
                       <input type="checkbox" {...register('var_reg')} />
@@ -255,7 +255,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('address_line_3')}
                       />
-                      <div className="invalid-feedback">{errors.address_line_3?.message}</div>
+                      <div className="invalid-feedback">{errors.address_line_3?.message as string ||''}</div>
                     </div>
                     <div>
                       <select
@@ -281,7 +281,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('county')}
                       />
-                      <div className="invalid-feedback">{errors.county?.message}</div>
+                      <div className="invalid-feedback">{errors.county?.message as string ||''}</div>
                     </div>
                     <div></div>
 
@@ -292,7 +292,7 @@ function Register() {
                         className="block w-full min-w-0 flex-1  rounded-md drop-shadow-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         {...register('postcode')}
                       />
-                      <div className="invalid-feedback">{errors.postcode?.message}</div>
+                      <div className="invalid-feedback">{errors.postcode?.message as string ||''}</div>
                     </div>
 
                     <div></div>
@@ -334,7 +334,7 @@ function Register() {
                         placeholder="Long Card #"
                         {...register('card_number')}
                       />
-                      <div className="invalid-feedback">{errors.card_number?.message}</div>
+                      <div className="invalid-feedback">{errors.card_number?.message as string ||''}</div>
                     </div>
                     <div className="flex flex-row justify-between mt-4">
                       <div className="pr-2 flex-1">
@@ -344,7 +344,7 @@ function Register() {
                           placeholder="Valid MM / YY"
                           {...register('card_expiration_date')}
                         />
-                        <div className="invalid-feedback">{errors.card_expiration_date?.message}</div>
+                        <div className="invalid-feedback">{errors.card_expiration_date?.message as string ||''}</div>
                       </div>
                       <div className="min-w-0 px-2 flex-1">
                         <input
@@ -353,7 +353,7 @@ function Register() {
                           placeholder="CVC"
                           {...register('card_cvc')}
                         />
-                        <div className="invalid-feedback">{errors.card_cvc?.message}</div>
+                        <div className="invalid-feedback">{errors.card_cvc?.message as string ||''}</div>
                       </div>
                       <div className="min-w-0 pl-2 flex-1">
                         <label htmlFor="card_postcode" className="sr-only">
@@ -365,7 +365,7 @@ function Register() {
                           placeholder="Postcode"
                           {...register('card_postcode')}
                         />
-                        <div className="invalid-feedback">{errors.card_postcode?.message}</div>
+                        <div className="invalid-feedback">{errors.card_postcode?.message as string ||''}</div>
                       </div>
                     </div>
                   </div>
@@ -380,7 +380,7 @@ function Register() {
                         Agree with Segue terms and conditions
                       </label>
                       <input type="checkbox" className="mr-2" {...register('terms_agree')} />
-                      <div className="invalid-feedback">{errors.terms_agree?.message}</div>
+                      <div className="invalid-feedback">{errors.terms_agree?.message as string ||''}</div>
                       <span className="inline text-sm text-gray-500">
                         I agree to the
                         <Link href={'terms'} className="text-blue-500 font-bold">

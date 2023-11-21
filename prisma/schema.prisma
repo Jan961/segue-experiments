@@ -42,7 +42,7 @@ model Booking {
   CompNotes               String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes        String?               @map("BookingMerchandiseNotes") @db.LongText
   CastRateTicketNotes     String?               @map("BookingCastRateTicketNotes") @db.LongText
-  CastRateTicketsArranged Boolean               @map("BookingCastRateTicketsArranged") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  CastRateTicketsArranged Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
   CastRateTicketsNotes    String?               @map("BookingCastRateTicketsNotes") @db.Text
   BookedVenueHistory      BookedVenueHistory[]
   DateBlock               DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
@@ -152,23 +152,23 @@ model Tour {
 }
 
 model TourTask {
-  Id                   Int           @id @default(autoincrement()) @map("TourTaskId")
-  TourId               Int
-  Code                 Int           @map("TaskCode") @db.SmallInt
-  Name                 String        @map("TaskName") @db.VarChar(80)
-  Priority             Int           @default(0) @map("TaskPriority") @db.TinyInt
-  Notes                String?       @map("TaskNotes") @db.VarChar(500)
-  Progress             Int           @default(0) @map("TaskProgress") @db.TinyInt
-  AssignedToUserId     Int?          @map("TaskAssignedToUserId")
-  CompleteByPostTour   Boolean       @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostTour") @db.Bit(1)
-  Interval             String?       @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
-  RepeatCount          Bytes?        @map("TaskRepeatCount") @db.TinyBlob
-  StartByWeekNum       Int?          @map("TaskStartByWeekNum") @db.SmallInt
-  StartByPostTour      Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostTour") @db.Bit(1)
-  CompleteByWeekNum    Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskWatcher          TaskWatcher[]
-  Tour                 Tour          @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
-  User                 User?         @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_TourTask_Assigned")
+  Id                 Int           @id @default(autoincrement()) @map("TourTaskId")
+  TourId             Int
+  Code               Int           @map("TaskCode") @db.SmallInt
+  Name               String        @map("TaskName") @db.VarChar(80)
+  Priority           Int           @default(0) @map("TaskPriority") @db.TinyInt
+  Notes              String?       @map("TaskNotes") @db.VarChar(500)
+  Progress           Int           @default(0) @map("TaskProgress") @db.TinyInt
+  AssignedToUserId   Int?          @map("TaskAssignedToUserId")
+  CompleteByPostTour Boolean       @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostTour") @db.Bit(1)
+  Interval           String?       @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
+  RepeatCount        Bytes?        @map("TaskRepeatCount") @db.TinyBlob
+  StartByWeekNum     Int?          @map("TaskStartByWeekNum") @db.SmallInt
+  StartByPostTour    Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostTour") @db.Bit(1)
+  CompleteByWeekNum  Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
+  TaskWatcher        TaskWatcher[]
+  Tour               Tour          @relation(fields: [TourId], references: [Id], onDelete: Cascade, map: "Tour_TourTask_fk")
+  User               User?         @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_TourTask_Assigned")
 
   @@index([TourId], map: "Tour_TourTask_fk")
   @@index([AssignedToUserId], map: "User_TourTask_Assigned")
@@ -310,13 +310,14 @@ model Other {
 }
 
 model Performance {
-  Id            Int             @id @default(autoincrement()) @map("PerformanceId")
-  BookingId     Int             @map("PerformanceBookingId")
-  Time          DateTime?        @map("PerformanceTime") @db.Time(0)
-  Date          DateTime        @map("PerformanceDate") @db.Date
-  AvailableComp AvailableComp[]
-  Booking       Booking         @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Performance")
-  SalesSet      SalesSet[]
+  Id                Int                 @id @default(autoincrement()) @map("PerformanceId")
+  BookingId         Int                 @map("PerformanceBookingId")
+  Time              DateTime?           @map("PerformanceTime") @db.Time(0)
+  Date              DateTime            @map("PerformanceDate") @db.Date
+  AvailableComp     AvailableComp[]
+  Booking           Booking             @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Performance")
+  PerformanceReport PerformanceReport[]
+  SalesSet          SalesSet[]
 
   @@index([BookingId], map: "Booking_Performance_fk")
   @@index([BookingId, Time, Date], map: "SECONDARY")
@@ -440,8 +441,8 @@ model Sale {
   SaleSetId      Int?
   SaleSeats      Int?      @db.SmallInt
   SaleValue      Decimal?  @db.Decimal(8, 2)
-  SaleType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
   SalesSet       SalesSet? @relation(fields: [SaleSetId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
+  SalesType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
 
   @@unique([SaleSetId, SaleSaleTypeId], name: "Sale_unique")
   @@index([SaleSaleTypeId], map: "BookingSale_Sale_idx")
@@ -618,6 +619,43 @@ model TaskWatcher {
 
   @@index([WatcherTourTaskId], map: "TourTask_TaskWatcher")
   @@index([WatcherUserId], map: "User_TaskWatcher")
+}
+
+model PerformanceReport {
+  Id                    Int         @id @default(autoincrement()) @map("PRId")
+  PerformanceId         Int         @map("PRPerformanceId")
+  Act1UpTime            DateTime?   @db.Time(0) @map("PRAct1UpTime")
+  Act1DownTime          DateTime?   @db.Time(0) @map("PRAct1DownTime")
+  Interval1UpTime       DateTime?   @db.Time(0) @map("PRInterval1UpTime")
+  Interval1DownTime     DateTime?   @db.Time(0) @map("PRInterval1DownTime")
+  Act2UpTime            DateTime?   @db.Time(0) @map("PRAct2UpTime")
+  Act2DownTime          DateTime?   @db.Time(0) @map("PRAct2DownTime")
+  GetOutTime            DateTime?   @db.Time(0) @map("PRGetOutTime")
+  GetOutUpTime          DateTime?   @db.Time(0) @map("PRGetOutUpTime")
+  GetOutDownTime        DateTime?   @db.Time(0) @map("PRGetOutDownTime")
+  Absences              String?     @db.Text @map("PRAbsences")
+  Illness               String?     @db.Text @map("PRIllness")
+  TechnicalNotes        String?     @db.Text @map("PRTechnicalNotes")
+  PerformanceNotes      String?     @db.Text @map("PRPerformanceNotes")
+  SetPropCostumeNotes   String?     @db.Text @map("PRSetPropCostumeNotes")
+  AudienceNotes         String?     @db.Text @map("PRAudienceNotes")
+  MerchandiseNotes      String?     @db.Text @map("PRMerchandiseNotes")
+  GeneralRemarks        String?     @db.Text @map("PRGeneralRemarks")
+  CSM                   String?     @db.VarChar(255) @map("PRCSM")
+  Lighting              String?     @db.VarChar(255) @map("PRLighting")
+  ASM                   String?     @db.VarChar(255) @map("PRASM")
+  CreatedAt             DateTime    @default(now()) @db.Timestamp(0) @map("PRCreatedAt")
+  UpdatedAt             DateTime    @default(now()) @db.Timestamp(0) @map("PRUpdatedAt")
+  Performance           Performance @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "Performance_PerformanceReport")
+
+  @@index([PerformanceId], map: "Performance_PerformanceReport")
+}
+
+
+model DBSetting {
+  DBSettingId    Int    @id @default(autoincrement())
+  DBSettingName  String @unique(map: "SettingName") @db.VarChar(50)
+  DBSettingValue String @db.VarChar(255)
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -851,6 +889,7 @@ view SalesView {
   SetSalesFiguresDate      DateTime? @db.Date
   SetBookingWeekNum        Int?      @db.SmallInt
   SetTourWeekDate          DateTime? @db.Date
+  SetTourWeekNum           Int?      @db.SmallInt
   SetNotOnSale             Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsFinalFigures        Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetSingleSeats           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
@@ -865,6 +904,9 @@ view SalesView {
   FinalFiguresValue        Decimal?  @db.Decimal(30, 2)
   NotOnSaleDate            DateTime? @db.Date
   TotalHoldSeats           Decimal?  @db.Decimal(32, 0)
+  LastFiguresDate          DateTime? @db.Date
+  LastFiguresSeats         Decimal?  @db.Decimal(27, 0)
+  LastFiguresValue         Decimal?  @db.Decimal(30, 2)
 
   @@ignore
 }
@@ -905,7 +947,7 @@ view BookingHoldCompsView {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view TourSummaryView {
   TourId                      Int      @default(0)
-  DateTypeAffectsAvailability Decimal? @db.Decimal(1, 0)
+  DateTypeAffectsAvailability Boolean? @db.Bit(1)
   DateTypeId                  Int?
   DateTypeSeqNo               Decimal? @db.Decimal(3, 0)
   Item                        String   @default("") @db.VarChar(30)

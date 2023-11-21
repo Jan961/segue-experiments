@@ -28,19 +28,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       },
-      orderBy: {
-        StartDate: 'desc',
-      },
-    });
-    res.json({
-      data: result.Booking.map((booking) => ({
-        booking: omit(booking, ['Venue']),
-        ...(booking.Venue || {}),
-        ...(booking.Venue?.VenueAddress?.[0] || {}),
-        BookingId: booking.Id,
-      })),
-    });
-    // res.json(result)
+        orderBy: {
+          StartDate: 'desc'
+        }
+  })
+    const bookings = result.Booking.map(booking => ({ booking: omit(booking, ['Venue']), ...(booking.Venue || {}), ...(booking.Venue?.VenueAddress?.[0] || {}), BookingId: booking.Id }))
+    res.json(bookings)
   } catch (error) {
     console.log('==Error fetching Venue bookings==', error);
     res.status(500).end();
