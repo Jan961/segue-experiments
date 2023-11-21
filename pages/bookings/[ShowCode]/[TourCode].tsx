@@ -118,8 +118,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
                 text-sm xl:text-md
                 sticky inset-x-0 top-0 bg-gray-50 z-10
                 shadow-lg
-                text-gray-400
-                "
+                text-gray-400"
               >
                 <div className="col-span-1 p-2 hidden xl:inline-block ">Tour</div>
                 <div className="col-span-1 lg:col-span-1 xl:col-span-1 p-2 whitespace-nowrap">Week No.</div>
