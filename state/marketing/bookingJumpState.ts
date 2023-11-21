@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
 
 export interface BookingJump {
-  selected?: number;
+  selected?: number | string;
   bookings?: any[];
 }
 
