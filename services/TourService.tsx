@@ -100,6 +100,7 @@ export const getAllTours = async (AccountId: number) => {
           Name: true,
         },
       },
+      DateBlock: true,
     },
     where: {
       Show: {
