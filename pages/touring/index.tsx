@@ -6,7 +6,7 @@ export default function TouringManagement() {
   const links = [
     {
       title: 'Performance Reports',
-      route: '/tbd',
+      route: '/performance/reports',
       icon: null,
       color: 'bg-primary-navy',
     },
