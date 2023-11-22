@@ -58,8 +58,8 @@ const getHTMLFieldMaxWidth = (text: string) => {
   let maxWidth = 0;
   // eslint-disable-next-line array-callback-return
   text.split('\n').map((htmlString) => {
-    const $ = cheerio.load(htmlString);
-    const line = $.text();
+    const $:any = cheerio.load(htmlString);
+    const line = $.text?.();
     maxWidth = Math.max(maxWidth, line.length);
   });
   return maxWidth;

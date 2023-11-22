@@ -102,7 +102,7 @@ const Index = () => {
     return `https://${url}`;
   };
   return (
-    <Layout title="Marketing | Segue">
+    <Layout title="Performance Reports | Report | Segue">
       <div className="flex flex-col px-4 flex-auto">
         <div className="flex items-start">
           <div className="flex flex-col mr-4">
