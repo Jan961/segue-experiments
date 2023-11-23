@@ -11,6 +11,7 @@ import { ToursWithTasks, tourState } from 'state/tasks/tourState';
 import { InitialState } from 'lib/recoil';
 import { mapToTourTaskDTO } from 'lib/mappers';
 import { getAccountIdFromReq } from 'services/userService';
+import { getToursByStartDate } from 'utils/getToursByStartDate';
 
 const Index = () => {
   const [bulkIsOpen, setBulkIsOpen] = useState(false);
@@ -127,7 +128,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const toursWithTasks = await getToursAndTasks(AccountId);
 
-  const tours: ToursWithTasks[] = toursWithTasks.map((t: any) => ({
+  const tours: ToursWithTasks[] = getToursByStartDate(toursWithTasks).map((t: any) => ({
     Id: t.Id,
     ShowName: t.Show.Name,
     ShowCode: t.Show.Code,

@@ -1,6 +1,7 @@
 import { ParsedUrlQuery } from 'querystring';
 import { getAllTours } from 'services/TourService';
 import { TourJump } from 'state/booking/tourJumpState';
+import { getToursByStartDate } from './getToursByStartDate';
 
 interface Params extends ParsedUrlQuery {
   ShowCode: string;
@@ -12,17 +13,13 @@ export const getTourJumpState = async (ctx, path: string, AccountId: number): Pr
   const toursRaw = await getAllTours(AccountId);
   const selectedTour = toursRaw.find((tour: any) => tour.Code === TourCode && tour.Show.Code === ShowCode)?.Id;
   return {
-    tours: [...toursRaw]
-      .sort((a, b) => {
-        return b.DateBlock[0].StartDate < a.DateBlock[0].StartDate ? 1 : -1;
-      })
-      .map((t: any) => ({
-        Id: t.Id,
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code,
-        ShowName: t.Show.Name,
-      })),
+    tours: getToursByStartDate(toursRaw).map((t: any) => ({
+      Id: t.Id,
+      Code: t.Code,
+      IsArchived: t.IsArchived,
+      ShowCode: t.Show.Code,
+      ShowName: t.Show.Name,
+    })),
     selected: selectedTour,
     path,
   };

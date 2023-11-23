@@ -56,7 +56,7 @@ export default function FinalSales({ tours }: props) {
       SetSalesFiguresDate,
     };
   };
-  const fetchSales = async (SetSalesFiguresDate = null, SetBookingId, isFinalFigures=true) => {
+  const fetchSales = async (SetSalesFiguresDate = null, SetBookingId, isFinalFigures = true) => {
     setLoading(true);
     const data = await getSales({
       SetBookingId,
@@ -129,7 +129,7 @@ export default function FinalSales({ tours }: props) {
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          setActiveSetTourDates(data)
+          setActiveSetTourDates(data);
         })
         .finally(() => setLoading(false));
     }
@@ -174,7 +174,7 @@ export default function FinalSales({ tours }: props) {
             PreviousValue: previousSale?.Value,
             PreviousSchoolSeats: previousSale?.SchoolSeats,
             PreviousSchoolValue: previousSale?.SchoolValue,
-            isPantomime
+            isPantomime,
           },
         },
         { abortEarly: false },
@@ -215,18 +215,21 @@ export default function FinalSales({ tours }: props) {
           SaleSeats: parseInt(sale?.Seats, 10),
           SaleValue: parseFloat(sale?.Value),
         },
-        ...(isPantomime && [{
-          SaleSaleTypeId: 3,
-          SaleSeats: parseInt(sale?.SchoolSeats, 10),
-          SaleValue: parseFloat(sale?.SchoolValue),
-        }]||[]),
+        ...((isPantomime && [
+          {
+            SaleSaleTypeId: 3,
+            SaleSeats: parseInt(sale?.SchoolSeats, 10),
+            SaleValue: parseFloat(sale?.SchoolValue),
+          },
+        ]) ||
+          []),
       ];
       await axios
         .post('/api/marketing/sales/upsert', {
           Sales,
           SetSalesFiguresDate: finalSaleFigureDate,
           SetBookingId: parseInt(inputs.BookingId),
-          isFinalFigures: true
+          isFinalFigures: true,
         })
         .then(() => {
           handleServerResponse(true, 'Submitted');
@@ -269,7 +272,7 @@ export default function FinalSales({ tours }: props) {
                         ?.filter?.((tour) => !tour.IsArchived)
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
+                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
                           </option>
                         ))}
                     </select>
@@ -392,7 +395,7 @@ export default function FinalSales({ tours }: props) {
                     name="Confirmed"
                     type={'checkbox'}
                     checked={inputs.Confirmed}
-                    onChange={(e)=>{
+                    onChange={(e) => {
                       handleOnChange({ target: { id: 'Confirmed', value: e.target.checked } });
                     }}
                   />
@@ -408,7 +411,7 @@ export default function FinalSales({ tours }: props) {
                 'inline-flex items-center mt-5 rounded border border-gray-300 bg-white w-100 h-16 text-grey-700 px-2.5 py-1 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
               }
             >
-               {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
+              {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
             </button>
           </form>
         </div>

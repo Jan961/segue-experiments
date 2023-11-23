@@ -5,6 +5,7 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
+import { getToursByStartDate } from 'utils/getToursByStartDate';
 
 interface ToolbarProps {}
 
@@ -22,7 +23,7 @@ const Toolbar: React.FC<ToolbarProps> = () => {
     }));
   };
 
-  const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}/${x.Code}`, value: x.Id }));
+  const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }));
 
   return (
     <div>

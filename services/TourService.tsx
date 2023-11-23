@@ -4,6 +4,7 @@ import { showTourMapper, tourEditorMapper } from 'lib/mappers';
 import { getShowWithToursById } from './ShowService';
 import { getAccountId, getEmailFromReq } from './userService';
 import { TourDTO } from 'interfaces';
+import { getToursByStartDate } from 'utils/getToursByStartDate';
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -41,10 +42,11 @@ export const getAllTourPageProps = async (ctx: any) => {
     },
     include: {
       Show: true,
+      DateBlock: true,
     },
   });
 
-  const tours = toursRaw.map(tourEditorMapper);
+  const tours = getToursByStartDate(toursRaw).map(tourEditorMapper);
 
   return { props: { tours } };
 };
@@ -187,6 +189,7 @@ export const getToursAndTasks = async (AccountId: number) => {
     },
     include: {
       Show: true,
+      DateBlock: true,
       TourTask: {
         orderBy: {
           Id: 'desc',
