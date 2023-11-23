@@ -39,7 +39,7 @@ const alignCellTextCenter = ({ worksheet, colAsChar }: { worksheet: any; colAsCh
   });
 };
 
-const makeRowTextBoldAndAllignLeft = ({
+export const makeRowTextBoldAndAllignLeft = ({
   worksheet,
   row,
   numberOfColumns,
