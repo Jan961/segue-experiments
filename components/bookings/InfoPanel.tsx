@@ -61,9 +61,6 @@ export const InfoPanel = () => {
         <div className={baseClass}>
           <div className={classNames(headerClass, 'flex justify-between items-center')}>
             <h2>{headerText}</h2>
-            <button onClick={() => setView({selected: undefined})}>
-            <FontAwesomeIcon icon={faClose} height={25} width={25} size="xl" />
-            </button>
           </div>
           <div className="p-2">{panel}</div> 
         </div>
