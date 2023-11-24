@@ -13,14 +13,14 @@ export default function BookingsButtons() {
     <>
       <FormInputDate
         className="mb-2 flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
-        label="From"
+        label="From:"
         value={filter?.startDate}
         name="startDate"
         onChange={onChange}
       />
       <FormInputDate
         className="flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
-        label="To"
+        label="To:"
         value={filter?.endDate}
         name="endDate"
         onChange={onChange}

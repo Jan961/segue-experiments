@@ -105,7 +105,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
 
   return (
     <Layout title="Booking | Segue" flush>
-      <div className="px-4">
+      <div className="">
         <GlobalToolbar
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
@@ -116,7 +116,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
               <div className="flex items-center">
                 <p className="mx-2">Status: </p>
                 <FormInputSelect
-                  className="[&>select]:border-0 [&>select]:mb-0 [&>select]:text-primary-blue !mb-0"
+                  className="[&>select]:border-0 [&>select]:mb-0 [&>select]:text-primary-blue [&>select]:font-bold !mb-0"
                   label=""
                   onChange={onChange}
                   value={filter.status}
@@ -128,7 +128,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
           </div>
         </GlobalToolbar>
       </div>
-      <div className="flex items-center flex-wrap justify-around my-4">
+      <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
         <MileageCalculator />
         <BookingFilter />
         <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
