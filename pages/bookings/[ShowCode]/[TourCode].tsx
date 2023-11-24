@@ -32,6 +32,8 @@ import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import { viewState } from 'state/booking/viewState';
 import { getAccountIdFromReq } from 'services/userService';
+import BookingFilter from 'components/bookings/BookingFilter';
+import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
 
 interface bookingProps {
   TourId: number;
@@ -44,6 +46,13 @@ interface ScrollablePanelProps {
   className: string;
   reduceHeight: number;
 }
+
+const statusOptions: SelectOption[] = [
+  { text: 'ALL', value: null },
+  { text: 'Confirmed (C)', value: 'C' },
+  { text: 'Unconfirmed (U)', value: 'U' },
+  { text: 'Cancelled (X)', value: 'X' },
+];
 
 // Based on toolbar height. Adds a tasteful shadow when scrolled to prevent strange cut off
 const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildren<ScrollablePanelProps>) => {
@@ -89,23 +98,43 @@ const BookingPage = ({ TourId }: bookingProps) => {
       setView({ ...view, selectedDate: todayKey });
     }
   };
+  const onChange = (e: any) => {
+    console.log(filter, 'onFilterChange', e.target.id, e.target.value);
+    setFilter({ ...filter, [e.target.id]: e.target.value });
+  };
 
   return (
     <Layout title="Booking | Segue" flush>
-      {/* <TourJumpMenu></TourJumpMenu> */}
       <div className="px-4">
         <GlobalToolbar
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
           title={'Bookings'}
         >
-          {/* <ToolbarInfo label='Week' value={"??"} /> */}
-          <MileageCalculator />
-          <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
-            Go To Today
-          </ToolbarButton>
-          <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
+          <div className="bg-white drop-shadow-md inline-block rounded-md">
+            <div className="rounded-l-md">
+              <div className="flex items-center">
+                <p className="mx-2">Status: </p>
+                <FormInputSelect
+                  className="[&>select]:border-0 [&>select]:mb-0 [&>select]:text-primary-blue !mb-0"
+                  label=""
+                  onChange={onChange}
+                  value={filter.status}
+                  name={'status'}
+                  options={statusOptions}
+                />
+              </div>
+            </div>
+          </div>
         </GlobalToolbar>
+      </div>
+      <div className="flex items-center flex-wrap justify-around my-4">
+        <MileageCalculator />
+        <BookingFilter />
+        <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
+          Go To Today
+        </ToolbarButton>
+        <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
