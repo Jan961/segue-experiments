@@ -9,8 +9,7 @@ pipelines:
               - node
             script:
               - npm install
-              - npm run test
-              - npm run build
+              - npm run test:ci
   branches:
     release/*:
       - step:
