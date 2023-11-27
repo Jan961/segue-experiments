@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import axios from 'axios';
 import { getSales } from './Api';
@@ -280,6 +280,16 @@ export default function Entry({ tours = [], searchFilter }: props) {
       setSale(previousSale || {});
     }
   };
+
+  const mapVenuesToTypeaheadOptions = (venues) => {
+    return venues.map((venue) => ({
+      name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+      value: String(venue.BookingId),
+    }));
+  };
+
+  const typeaheadOptions = useMemo(() => mapVenuesToTypeaheadOptions(salesWeeksVenues), [salesWeeksVenues]);
+
   return (
     <div className="flex flex-row w-full">
       <div className={'flex bg-transparent w-5/8'}>
@@ -345,10 +355,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
                       value={inputs.Venue} 
-                      options={salesWeeksVenues.map((venue) => ({
-                        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: String(venue.BookingId),
-                      }))}
+                      options={typeaheadOptions}
                       onChange={(selectedOption) =>
                         handleOnChange({
                           target: {

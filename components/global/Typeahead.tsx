@@ -8,9 +8,9 @@ export interface TypeaheadProps {
   onChange: (value: string | number) => void;
   options: TypeaheadOption[];
   className?: string;
-  placeholder: string;
-  label: string;
-  dropdownClassName: string;
+  placeholder?: string;
+  label?: string;
+  dropdownClassName?: string;
 }
 
 export default function Typeahead({ value, onChange, options, className }: TypeaheadProps) {
