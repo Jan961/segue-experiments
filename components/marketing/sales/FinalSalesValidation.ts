@@ -93,7 +93,7 @@ const schema = object().shape({
 
   SchoolSeats: mixed().test(
     'SchoolSeats',
-    'School seats count cannot be greater than 15% from previous week.',
+    'Warning: School seats count cannot be greater than 15% from previous week.',
     function () {
       let { SchoolSeats: currentWeekSchoolSeats, PreviousSchoolSeats: previousWeekSchoolSeats, isPantomime } =
         this.parent;
@@ -109,7 +109,7 @@ const schema = object().shape({
     },
   ).test(
     'SchoolSeats',
-    'School seats cannot be less than previous week.',
+    'Warning: School seats cannot be less than previous week.',
     function () {
       let { SchoolSeats: currentWeekSchoolSeats, PreviousSchoolSeats: previousWeekSchoolSeats, isPantomime } =
         this.parent;
@@ -124,7 +124,7 @@ const schema = object().shape({
   ),
   SchoolValue: mixed().test(
     'SchoolValue',
-    'Schools value cannot be greater than 15% from previous week.',
+    'Warning: Schools value cannot be greater than 15% from previous week.',
     function () {
       let { SchoolValue: currentWeekSchoolValue, PreviousSchoolValue: previousWeekSchoolValue, isPantomime } =
         this.parent;
@@ -140,7 +140,7 @@ const schema = object().shape({
     },
   ).test(
     'SchoolValue',
-    'Schools value less than previous week.',
+    'Warning: Schools value less than previous week.',
     function () {
       let { SchoolValue: currentWeekSchoolValue, PreviousSchoolValue: previousWeekSchoolValue, isPantomime } =
         this.parent;
