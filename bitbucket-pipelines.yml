@@ -1,17 +1,28 @@
 image: atlassian/default-image:2
 pipelines:
+  default:
+    - parallel:
+        - step:
+            name: Build and Test
+            image: node:19.8.1
+            caches:
+              - node
+            script:
+              - npm install
+              - npm run test
+              - npm run build
   branches:
     release/*:
-          - step:
-              name: Deploy to Staging
-              deployment: staging
-              script:
-                - pipe: atlassian/rsync-deploy:0.6.1
-                  variables:
-                    USER: $SFTP_USERNAME
-                    SERVER: $SFTP_HOST
-                    SSH_PORT: $SSH_PORT
-                    LOCAL_PATH: "${BITBUCKET_CLONE_DIR}/"
-                    REMOTE_PATH: /home/$SFTP_USERNAME/public_html/
-                    DELETE_FLAG: 'false' # Don't delete existing files
-                    EXTRA_ARGS: "--exclude=.bitbucket/ --exclude=.git/ --exclude=bitbucket-pipelines.yml --exclude=.gitignore" # Ignorethese
+      - step:
+          name: Deploy to Staging
+          deployment: staging
+          script:
+            - pipe: atlassian/rsync-deploy:0.6.1
+              variables:
+                USER: $SFTP_USERNAME
+                SERVER: $SFTP_HOST
+                SSH_PORT: $SSH_PORT
+                LOCAL_PATH: '${BITBUCKET_CLONE_DIR}/'
+                REMOTE_PATH: /home/$SFTP_USERNAME/public_html/
+                DELETE_FLAG: 'false' # Don't delete existing files
+                EXTRA_ARGS: '--exclude=.bitbucket/ --exclude=.git/ --exclude=bitbucket-pipelines.yml --exclude=.gitignore' # Ignorethese
