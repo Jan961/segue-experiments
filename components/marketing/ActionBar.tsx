@@ -46,7 +46,16 @@ const ActionBar = () => {
   return (
     <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
-        <Typeahead className="w-128" value={selectedBooking} options={bookingOptions} onChange={changeBooking} />
+        {/* JAS TO DO: what are missing attributes*/}
+        <Typeahead 
+        className="w-128" 
+        value={selectedBooking.toString()} 
+        options={bookingOptions} 
+        onChange={changeBooking} 
+        name="Booking" 
+        placeholder={''} 
+        label="Booking" 
+        dropdownClassName="" />
         <ToolbarButton onClick={goToToday} className="!text-primary-green">
           Today
         </ToolbarButton>
@@ -68,5 +77,5 @@ export default ActionBar;
 
 // Add default props
 ActionBar.defaultProps = {
-  onActionBookingIdChange: () => {},
+  onActionBookingIdChange: () => { },
 };

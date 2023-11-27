@@ -10,7 +10,8 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { ToolbarButton } from '../ToolbarButton';
-import Typeahead from 'components/Typeahead';
+// JAS TO DO: check
+import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
 
@@ -66,11 +67,11 @@ export default function Barring() {
 
   const handleOnChange = async (e: any) => {
     console.log(e);
+    const { id, value } = e.target;
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
+      [id]: value,
     }));
-
     if (e.target.name === 'tour') {
       // Load Venues for this tour
       // setIsLoading(true)
@@ -97,7 +98,7 @@ export default function Barring() {
     value: tour.Id,
   }));
   const venueOptions = venues.map((venue) => ({
-    text: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name})`,
+    name: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name}`,
     value: String(venue.Id),
   }));
 
@@ -132,9 +133,11 @@ export default function Barring() {
               name="venue"
               placeholder="-- Select Venue --"
               value={inputs.venue}
-              options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
+              options={[{ value: 0, name: '-- Select Venue --' }, ...venueOptions]}
               onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue?.value, id: 'venue' } })}
+              dropdownClassName="your-dropdown-class"
             />
+
             <FormInputNumeric
               label="Bar Distance"
               name="barDistance"

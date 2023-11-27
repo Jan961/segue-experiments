@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { dateToSimple, getMonday, getPreviousMonday } from 'services/dateService';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
-import Typeahead from 'components/Typeahead';
+import Typeahead from 'components/global/Typeahead';
 import schema from './FinalSalesValidation';
 import { getSales } from './Api';
 
@@ -56,7 +56,7 @@ export default function FinalSales({ tours }: props) {
       SetSalesFiguresDate,
     };
   };
-  const fetchSales = async (SetSalesFiguresDate = null, SetBookingId, isFinalFigures=true) => {
+  const fetchSales = async (SetSalesFiguresDate = null, SetBookingId, isFinalFigures = true) => {
     setLoading(true);
     const data = await getSales({
       SetBookingId,
@@ -219,7 +219,7 @@ export default function FinalSales({ tours }: props) {
           SaleSaleTypeId: 3,
           SaleSeats: parseInt(sale?.SchoolSeats, 10),
           SaleValue: parseFloat(sale?.SchoolValue),
-        }]||[]),
+        }] || []),
       ];
       await axios
         .post('/api/marketing/sales/upsert', {
@@ -283,7 +283,7 @@ export default function FinalSales({ tours }: props) {
                       dropdownClassName="max-w-lg top-[40px] right-0"
                       value={inputs?.BookingId}
                       options={activeSetTourDates.map((venue) => ({
-                        text: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+                        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`, // Changed 'text' to 'name'
                         value: String(venue.BookingId),
                       }))}
                       onChange={(option) =>
@@ -295,6 +295,7 @@ export default function FinalSales({ tours }: props) {
                         })
                       }
                     />
+
                   </div>
                 </div>
 
@@ -392,7 +393,7 @@ export default function FinalSales({ tours }: props) {
                     name="Confirmed"
                     type={'checkbox'}
                     checked={inputs.Confirmed}
-                    onChange={(e)=>{
+                    onChange={(e) => {
                       handleOnChange({ target: { id: 'Confirmed', value: e.target.checked } });
                     }}
                   />
@@ -408,7 +409,7 @@ export default function FinalSales({ tours }: props) {
                 'inline-flex items-center mt-5 rounded border border-gray-300 bg-white w-100 h-16 text-grey-700 px-2.5 py-1 text-xs font-medium drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
               }
             >
-               {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
+              {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
             </button>
           </form>
         </div>

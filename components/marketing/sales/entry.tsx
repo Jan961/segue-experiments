@@ -3,7 +3,7 @@ import { dateToSimple } from 'services/dateService';
 import axios from 'axios';
 import { getSales } from './Api';
 import schema from './validation';
-import Typeahead from 'components/Typeahead';
+import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { StyledDialog } from 'components/global/StyledDialog';
@@ -340,12 +340,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     </label>
                     <Typeahead
                       placeholder="Venue/Date"
+                      label="Venue/Date"
                       name="Venue"
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
                       value={inputs.Venue}
                       options={salesWeeksVenues.map((venue) => ({
-                        text: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+                        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
                         value: String(venue.BookingId),
                       }))}
                       onChange={(option) =>
