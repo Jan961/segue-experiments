@@ -198,8 +198,8 @@ const handler = async (req, res) => {
         worksheet,
         row: rowNo + 1,
         col: 5,
-        textColor: COLOR_HEXCODE.WHITE,
-        cellColor: COLOR_HEXCODE.BLACK,
+        textColor: COLOR_HEXCODE.BLACK,
+        cellColor: COLOR_HEXCODE.WHITE,
       });
     } else {
       const { TourWeekNum, Location, EntryName, TimeMins, Mileage, VenueSeats, EntryId, PencilNum } = value;
