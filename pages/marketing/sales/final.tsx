@@ -7,7 +7,7 @@ import { getActiveTours } from 'services/TourService';
 type Props = {
   activeTours: any[];
 };
-const pagetitle = 'Marketing - Sale Entry';
+const pagetitle = 'Marketing - Final Sales Entry';
 
 const Index = ({ activeTours }: Props) => (
   <Layout title={pagetitle + '| Seque'}>
