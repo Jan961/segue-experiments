@@ -1,7 +1,6 @@
 import { ParsedUrlQuery } from 'querystring';
 import { getAllTours } from 'services/TourService';
 import { TourJump } from 'state/booking/tourJumpState';
-import { getToursByStartDate } from './getToursByStartDate';
 
 interface Params extends ParsedUrlQuery {
   ShowCode: string;
@@ -13,7 +12,7 @@ export const getTourJumpState = async (ctx, path: string, AccountId: number): Pr
   const toursRaw = await getAllTours(AccountId);
   const selectedTour = toursRaw.find((tour: any) => tour.Code === TourCode && tour.Show.Code === ShowCode)?.Id;
   return {
-    tours: getToursByStartDate(toursRaw).map((t: any) => ({
+    tours: toursRaw.map((t: any) => ({
       Id: t.Id,
       Code: t.Code,
       IsArchived: t.IsArchived,

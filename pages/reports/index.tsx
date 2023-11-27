@@ -5,7 +5,6 @@ import Switchboard from '../../components/reports/switchboard';
 import { tourEditorMapper } from 'lib/mappers';
 import { getAccountIdFromReq } from 'services/userService';
 import { Tour } from '@prisma/client';
-import { getToursByStartDate } from 'utils/getToursByStartDate';
 
 type ReportsProps = {
   activeTours: any & Tour[];
@@ -24,7 +23,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const activeTours = await getActiveTours(AccountId);
   return {
     props: {
-      activeTours: getToursByStartDate(activeTours).map((tour: any & Tour) => tourEditorMapper(tour)),
+      activeTours: activeTours.map((tour: any & Tour) => tourEditorMapper(tour)),
     },
   };
 };

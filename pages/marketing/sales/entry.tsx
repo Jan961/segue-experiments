@@ -4,7 +4,6 @@ import Entry from '../../../components/marketing/sales/entry';
 import { GetServerSideProps } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import { getActiveTours } from 'services/TourService';
-import { getToursByStartDate } from 'utils/getToursByStartDate';
 
 type Props = {
   activeTours: any[];
@@ -30,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const toursRaw = await getActiveTours(AccountId);
   return {
     props: {
-      activeTours: getToursByStartDate(toursRaw).map((t: any) => ({
+      activeTours: toursRaw.map((t: any) => ({
         Id: t.Id,
         Code: t.Code,
         IsArchived: t.IsArchived,

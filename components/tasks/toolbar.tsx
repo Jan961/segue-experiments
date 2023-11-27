@@ -5,11 +5,8 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
-import { getToursByStartDate } from 'utils/getToursByStartDate';
 
-interface ToolbarProps {}
-
-const Toolbar: React.FC<ToolbarProps> = () => {
+const Toolbar: React.FC = () => {
   const [addTaskOpen, setAddTaskOpen] = React.useState(false);
   const [filters, setFilters] = React.useState({ Search: '', Tour: undefined });
   const tours = useRecoilValue(tourState);

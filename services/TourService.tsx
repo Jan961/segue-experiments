@@ -13,7 +13,7 @@ const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
 });
 
 export const getActiveTours = async (accountId: number) => {
-  return prisma.tour.findMany({
+  const tours = await prisma.tour.findMany({
     where: {
       IsArchived: false,
       Show: {
@@ -22,6 +22,7 @@ export const getActiveTours = async (accountId: number) => {
     },
     include: tourDateBlockInclude,
   });
+  return getToursByStartDate(tours);
 };
 
 export interface AllTourPageProps {
@@ -91,7 +92,7 @@ export const lookupTourId = async (ShowCode: string, TourCode: string, AccountId
 };
 
 export const getAllTours = async (AccountId: number) => {
-  return prisma.tour.findMany({
+  const tours = await prisma.tour.findMany({
     select: {
       Id: true,
       Code: true,
@@ -112,6 +113,7 @@ export const getAllTours = async (AccountId: number) => {
       },
     },
   });
+  return getToursByStartDate(tours);
 };
 
 export const getToursByShowCode = (Code: string) => {
@@ -178,7 +180,7 @@ export const getTourById = async (Id: number) => {
 };
 
 export const getToursAndTasks = async (AccountId: number) => {
-  return await prisma.tour.findMany({
+  const toursWithTasks = await prisma.tour.findMany({
     where: {
       IsArchived: false,
       Show: {
@@ -197,4 +199,5 @@ export const getToursAndTasks = async (AccountId: number) => {
       },
     },
   });
+  return getToursByStartDate(toursWithTasks);
 };
