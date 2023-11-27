@@ -9,7 +9,7 @@ describe('Tests for FormInputCheckbox', () => {
     mockOnChange.mockClear();
   });
   it('Renders checkbox currectly', async () => {
-    render(<FormInputCheckbox label="Test checkbo" value={false} onChange={mockOnChange} />);
+    render(<FormInputCheckbox label="Test checkbox" value={false} onChange={mockOnChange} />);
     expect(screen.getByText('Test checkbox')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('checkbox'));
     expect(mockOnChange).toHaveBeenCalled();
