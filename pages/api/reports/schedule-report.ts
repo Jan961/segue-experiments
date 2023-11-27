@@ -45,6 +45,7 @@ type SCHEDULE_VIEW = {
 interface PerformanceInfo {
   performanceId: number;
   performanceTime: string | null;
+  performanceDate: string | null;
 }
 
 const makeRowBold = ({ worksheet, row }: { worksheet: any; row: number }) => {
@@ -102,7 +103,6 @@ const handler = async (req, res) => {
   const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
   const bookingIdList: number[] =
     data.map((entry) => (entry.EntryType === 'Booking' ? entry.EntryId : null)).filter((id) => id) || [];
-  console.log('==bookingIdList==', bookingIdList);
   const performances: Performance[] = await prisma.performance.findMany({
     where: {
       BookingId: {
@@ -111,7 +111,7 @@ const handler = async (req, res) => {
     },
   });
   performances.forEach((performance) => {
-    const { Id, BookingId, Time } = performance;
+    const { Id, BookingId, Time, Date } = performance;
 
     if (!bookingIdPerformanceMap[BookingId]) {
       bookingIdPerformanceMap[BookingId] = [];
@@ -119,7 +119,8 @@ const handler = async (req, res) => {
 
     bookingIdPerformanceMap[BookingId].push({
       performanceId: Id,
-      performanceTime: Time ? Time.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : null,
+      performanceTime: Time ? moment.utc(Time).format('HH:mm'): null,
+      performanceDate: Date ? Date.toISOString() : null,
     });
   });
   const { RehearsalStartDate: fromDate, TourEndDate: toDate } = data?.[0] || {};
@@ -205,6 +206,7 @@ const handler = async (req, res) => {
       const { TourWeekNum, Location, EntryName, TimeMins, Mileage, VenueSeats, EntryId, PencilNum } = value;
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       const performances = bookingIdPerformanceMap[EntryId];
+      const performancesOnThisDay = performances?.filter?.(performance=>moment(performance.performanceDate).isSame(moment(dateInIncomingFormat,'YYYY-MM-DD'),'day'))
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);
       seats.push(Number(VenueSeats) || 0);
@@ -220,7 +222,7 @@ const handler = async (req, res) => {
           Location || '',
           PencilNum,
           VenueSeats,
-          performances?.length,
+          performancesOnThisDay?.length,
           performances?.[0]?.performanceTime || '',
           performances?.[1]?.performanceTime || '',
           Mileage || '',
