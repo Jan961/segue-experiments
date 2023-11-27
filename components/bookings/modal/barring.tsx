@@ -10,7 +10,6 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { ToolbarButton } from '../ToolbarButton';
-// JAS TO DO: check
 import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';

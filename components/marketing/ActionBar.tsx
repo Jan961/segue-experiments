@@ -46,7 +46,6 @@ const ActionBar = () => {
   return (
     <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
-        {/* JAS TO DO: what are missing attributes*/}
         <Typeahead 
         className="w-128" 
         value={selectedBooking.toString()} 
