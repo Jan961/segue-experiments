@@ -46,7 +46,7 @@ const ScheduleReport = ({ TourId }: props) => {
   };
   return <ToolbarButton onClick={onScheduleReport} className='flex items-center gap-1'>
     <ExcelIcon height={18} width={18} />
-    {isLoading ? <Spinner className='mr-2' size="sm" />: "STD"}
+    {isLoading ? <Spinner className='mr-2' size="sm" />: "Schedule"}
   </ToolbarButton>;
 };
 

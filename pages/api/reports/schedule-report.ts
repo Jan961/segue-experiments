@@ -223,8 +223,8 @@ const handler = async (req, res) => {
           PencilNum,
           VenueSeats,
           performancesOnThisDay?.length,
-          performances?.[0]?.performanceTime || '',
-          performances?.[1]?.performanceTime || '',
+          performancesOnThisDay?.[0]?.performanceTime || '',
+          performancesOnThisDay?.[1]?.performanceTime || '',
           Mileage || '',
           formattedTime,
         ]) ||
