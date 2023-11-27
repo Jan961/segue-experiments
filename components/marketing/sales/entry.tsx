@@ -344,7 +344,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                       name="Venue"
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
-                      value={inputs.Venue.toString()} // Ensure value is a string
+                      value={inputs.Venue} 
                       options={salesWeeksVenues.map((venue) => ({
                         name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
                         value: String(venue.BookingId),
