@@ -27,13 +27,17 @@ import { tourJumpState } from 'state/booking/tourJumpState';
 import { Spinner } from 'components/global/Spinner';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import { viewState } from 'state/booking/viewState';
 import { getAccountIdFromReq } from 'services/userService';
 import BookingFilter from 'components/bookings/BookingFilter';
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
+import { bookingState } from 'state/booking/bookingState';
+import { rehearsalState } from 'state/booking/rehearsalState';
+import { getInFitUpState } from 'state/booking/getInFitUpState';
+import { otherState } from 'state/booking/otherState';
 
 interface bookingProps {
   TourId: number;
@@ -48,7 +52,7 @@ interface ScrollablePanelProps {
 }
 
 const statusOptions: SelectOption[] = [
-  { text: 'ALL', value: null },
+  { text: 'ALL', value: '' },
   { text: 'Confirmed (C)', value: 'C' },
   { text: 'Unconfirmed (U)', value: 'U' },
   { text: 'Cancelled (X)', value: 'X' },
@@ -81,6 +85,10 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
 
 const BookingPage = ({ TourId }: bookingProps) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
+  const bookingDict = useRecoilValue(bookingState);
+  const rehearsalDict = useRecoilValue(rehearsalState);
+  const gifuDict = useRecoilValue(getInFitUpState);
+  const otherDict = useRecoilValue(otherState);
   const { Sections } = schedule;
   const [filter, setFilter] = useRecoilState(filterState);
   const [view, setView] = useRecoilState(viewState);
@@ -90,7 +98,53 @@ const BookingPage = ({ TourId }: bookingProps) => {
     Sections.map((x) => x.Dates)
       .flat()
       .filter((x) => x.Date === todayKey).length > 0;
-
+  const filterDateByStatus = useCallback(
+    (Date:any, status:string):any => {
+      if(!Date || !status) return Date;
+      const { RehearsalIds, GetInFitUpIds, OtherIds, BookingIds } = Date;
+      const filteredRehearsalIds = RehearsalIds.filter((id) => rehearsalDict?.[id]?.StatusCode === status);
+      const filteredGetInFitUpIds = GetInFitUpIds.filter((id) => gifuDict?.[id]?.StatusCode === status);
+      const filteredOtherIds = OtherIds.filter((id) => otherDict?.[id]?.StatusCode === status);
+      const filteredBookingIds = BookingIds.filter((id) => bookingDict?.[id]?.StatusCode === status);
+      if(!(filteredBookingIds.length || filteredGetInFitUpIds.length || filteredOtherIds.length || filteredRehearsalIds.length)) return null
+      return {
+        ...Date,
+        RehearsalIds: filteredRehearsalIds,
+        GetInFitUpIds: filteredGetInFitUpIds,
+        OtherIds: filteredOtherIds,
+        BookingIds: filteredBookingIds,
+      };
+    },
+    [bookingDict, rehearsalDict, gifuDict, otherDict],
+  );
+  const filteredSections = useMemo(() => {
+    let result = [...Sections];
+    if (filter.startDate) {
+      result = result
+        .map((section) => ({
+          ...section,
+          Dates: section.Dates.filter((date) => new Date(date.Date) >= new Date(filter.startDate)),
+        }))
+        .filter((section) => section.Dates.length);
+    }
+    if (filter.endDate) {
+      result = result
+        .map((section) => ({
+          ...section,
+          Dates: section.Dates.filter((date) => new Date(date.Date) <= new Date(filter.endDate)),
+        }))
+        .filter((section) => section.Dates.length);
+    }
+    if (filter.status) {
+      result = result
+        .map((section) => ({
+          ...section,
+          Dates: section.Dates.map((date) => filterDateByStatus(date, filter.status)).filter(x=>x),
+        }))
+        .filter((section) => section.Dates.length);
+    }
+    return result;
+  }, [filter, Sections, filterDateByStatus]);
   const gotoToday = () => {
     const idToScrollTo = `booking-${todayKey}`;
     if (todayOnSchedule) {
@@ -162,7 +216,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
                 </div>
               </div>
               <ul className="grid w-full shadow">
-                {Sections.map((section: ScheduleSectionViewModel) => (
+                {filteredSections.map((section: ScheduleSectionViewModel) => (
                   <li key={section.Name}>
                     <h3 className="font-bold p-3 bg-gray-300">{section.Name}</h3>{' '}
                     {section.Dates.map((date: DateViewModel) => (
