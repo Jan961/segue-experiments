@@ -48,8 +48,8 @@ export const BookingDisplay = ({ bookingId, performanceCount, date }: PropsWithC
     `}
       onClick={select}
     >
-      <div className="col-span-5 text-center">{venue ? venue.Name : 'No Venue'}</div>
-      <div className="col-span-1 text-center">{venue ? venue.Town : ''}</div>
+      <div className="col-span-4 text-center truncate">{venue ? venue.Name : 'No Venue'}</div>
+      <div className="col-span-2 text-center truncate">{venue ? venue.Town : ''}</div>
       <div className="col-span-1 text-center">{venue ? venue.Seats : ''}</div>
       <div className="col-span-1">{performanceCount}</div>
       <div className="col-span-1 mx-2 whitespace-nowrap">

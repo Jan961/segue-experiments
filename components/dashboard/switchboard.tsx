@@ -30,7 +30,7 @@ export const Switchboard = () => {
       color: 'bg-primary-green',
     },
     {
-      title: 'Contracts',
+      title: 'Venue Contracts',
       route: '/contracts',
       icon: faFile,
       color: 'bg-primary-blue',
