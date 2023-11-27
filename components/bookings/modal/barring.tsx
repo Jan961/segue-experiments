@@ -10,6 +10,7 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { ToolbarButton } from '../ToolbarButton';
+// JAS TO DO: check
 import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
@@ -128,15 +129,14 @@ export default function Barring() {
               required
             />
             <Typeahead
+              dropdownClassName=""
               label="Venue"
               name="venue"
+              onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue, id: 'venue' } })}
+              options={[{ value: 0, name: '-- Select Venue --' }, ...venueOptions]}
               placeholder="-- Select Venue --"
               value={inputs.venue}
-              options={[{ value: 0, name: '-- Select Venue --' }, ...venueOptions]}
-              onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue?.value, id: 'venue' } })}
-              dropdownClassName="your-dropdown-class"
             />
-
             <FormInputNumeric
               label="Bar Distance"
               name="barDistance"

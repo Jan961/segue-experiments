@@ -13,16 +13,17 @@ const ActionBar = () => {
     () => (bookingJump.bookings ? mapBookingsToTourOptions(bookingJump.bookings) : []),
     [bookingJump],
   );
-  const [selectedBooking, setSelectedBooking] = useState<TypeaheadOption>();
+  const [selectedBooking, setSelectedBooking] = useState<string | number>('');
   const selectedBookingIndex = useMemo(
     () => bookingOptions.findIndex((booking) => parseInt(booking.value, 10) === bookingJump.selected),
     [bookingJump.selected, bookingOptions],
   );
-  const changeBooking = (booking: TypeaheadOption) => {
-    setSelectedBooking(booking);
-    setBookingJump({ ...bookingJump, selected: Number(booking.value) });
+  const changeBooking = (value: string | number) => {
+    const booking = bookingOptions.find(booking => booking.value === value);
+    setSelectedBooking(value);
+    setBookingJump({ ...bookingJump, selected: Number(booking?.value) });
   };
-
+  
   const goToToday = () => {
     const currentDate = moment();
     const sortedBookings = bookingOptions.sort((a, b) => {
@@ -46,15 +47,16 @@ const ActionBar = () => {
   return (
     <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
-        <Typeahead 
-        className="w-128" 
-        value={selectedBooking.toString()} 
-        options={bookingOptions} 
-        onChange={changeBooking} 
-        name="Booking" 
-        placeholder={''} 
-        label="Booking" 
-        dropdownClassName="" />
+      <Typeahead 
+          className="w-128" 
+          value={selectedBooking} // Use state value directly
+          options={bookingOptions} 
+          onChange={changeBooking} 
+          name="Booking" 
+          placeholder={''} 
+          label="Booking" 
+          dropdownClassName="" 
+        />
         <ToolbarButton onClick={goToToday} className="!text-primary-green">
           Today
         </ToolbarButton>

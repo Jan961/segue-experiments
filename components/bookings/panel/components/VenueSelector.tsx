@@ -30,13 +30,13 @@ export const VenueSelector = ({ venueId, onChange, options, disabled = false }: 
   return (
     <>
       <Typeahead
-        name="Venue Selector"
         dropdownClassName=""
-        options={venueOptions}
-        onChange={onSelect}
-        placeholder="Please Select a Venue"
-        value={venueId.toString()}  // Assuming `value` prop in `Typeahead` expects a string
         label="Venue"
+        name="Venue"
+        onChange={onSelect}
+        options={venueOptions}
+        placeholder="Please Select a Venue"
+        value={venueId.toString()}
       />
       <div className="columns-2 mb-4">
         <VenueInfo venueId={venueId} />

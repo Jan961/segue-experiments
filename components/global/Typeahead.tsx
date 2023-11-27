@@ -5,7 +5,7 @@ import { Fragment, useMemo, useRef, useState, useEffect } from 'react';
 export type TypeaheadOption = { value: string | number; name: string };
 export interface TypeaheadProps {
   value: string | number; name: string ;
-  onChange: (value: TypeaheadOption) => void;
+  onChange: (value: string | number) => void;
   options: TypeaheadOption[];
   className?: string;
   placeholder: string;
@@ -48,15 +48,19 @@ export default function Typeahead({ value, onChange, options, className }: Typea
     };
   }, []);
 
+  const handleComboboxChange = (value: string | number) => {
+    onChange(value);
+  };
+
   return (
     <div ref={containerRef} className={className}>
-      <Combobox value={value} onChange={onChange}>
+      <Combobox value={value} onChange={handleComboboxChange}>
         <div className="relative mt-1">
           <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 focus-visible:ring-offset-2 focus-visible:ring-offset-teal-300 sm:text-sm">
             <Combobox.Input
               ref={inputRef}
               className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-              displayValue={(value: TypeaheadOption) => value.name}
+              displayValue={(value: TypeaheadOption) => value ? value.name : ''}
               onChange={(event) => setQuery(event.target.value)}
               onFocus={onInputClick}
               onClick={onInputClick}

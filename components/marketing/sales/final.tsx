@@ -281,16 +281,16 @@ export default function FinalSales({ tours }: props) {
                       name="BookingId"
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
-                      value={inputs?.BookingId}
+                      value={inputs?.BookingId.toString()}
                       options={activeSetTourDates.map((venue) => ({
-                        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`, // Changed 'text' to 'name'
+                        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
                         value: String(venue.BookingId),
                       }))}
                       onChange={(option) =>
                         handleOnChange({
                           target: {
                             id: 'BookingId',
-                            value: option?.value,
+                            value: option,
                           },
                         })
                       }
