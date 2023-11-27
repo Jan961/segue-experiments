@@ -49,7 +49,7 @@ export const TourSelector = ({ tours }: TourSelectorProps) => {
         </Tab.List>
         <Tab.Panels>
           <Tab.Panel>
-            <TourList items={active} />
+            <TourList items={active} showDateBlock={false} />
           </Tab.Panel>
           <Tab.Panel>
             <TourList items={archived} />
