@@ -129,7 +129,7 @@ export default function FinalSales({ tours }: props) {
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          setActiveSetTourDates(data)
+          setActiveSetTourDates(data);
         })
         .finally(() => setLoading(false));
     }
@@ -174,7 +174,7 @@ export default function FinalSales({ tours }: props) {
             PreviousValue: previousSale?.Value,
             PreviousSchoolSeats: previousSale?.SchoolSeats,
             PreviousSchoolValue: previousSale?.SchoolValue,
-            isPantomime
+            isPantomime,
           },
         },
         { abortEarly: false },
@@ -215,18 +215,21 @@ export default function FinalSales({ tours }: props) {
           SaleSeats: parseInt(sale?.Seats, 10),
           SaleValue: parseFloat(sale?.Value),
         },
-        ...(isPantomime && [{
-          SaleSaleTypeId: 3,
-          SaleSeats: parseInt(sale?.SchoolSeats, 10),
-          SaleValue: parseFloat(sale?.SchoolValue),
-        }] || []),
+        ...((isPantomime && [
+          {
+            SaleSaleTypeId: 3,
+            SaleSeats: parseInt(sale?.SchoolSeats, 10),
+            SaleValue: parseFloat(sale?.SchoolValue),
+          },
+        ]) ||
+          []),
       ];
       await axios
         .post('/api/marketing/sales/upsert', {
           Sales,
           SetSalesFiguresDate: finalSaleFigureDate,
           SetBookingId: parseInt(inputs.BookingId),
-          isFinalFigures: true
+          isFinalFigures: true,
         })
         .then(() => {
           handleServerResponse(true, 'Submitted');
@@ -269,7 +272,7 @@ export default function FinalSales({ tours }: props) {
                         ?.filter?.((tour) => !tour.IsArchived)
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
+                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
                           </option>
                         ))}
                     </select>
