@@ -5,6 +5,7 @@ import { Spinner } from 'components/global/Spinner';
 import Typeahead from 'components/global/Typeahead';
 import schema from './FinalSalesValidation';
 import { getSales } from './Api';
+import moment from 'moment';
 
 type props = {
   tours?: any[];
@@ -241,23 +242,23 @@ export default function FinalSales({ tours }: props) {
     setLoading(false);
   }
 
-  const copyLastWeekSalesData = () => {
-    if (previousSale) {
-      setSale(previousSale || defaultSale);
-    }
-  };
+  // const copyLastWeekSalesData = () => {
+  //   if (previousSale) {
+  //     setSale(previousSale || defaultSale);
+  //   }
+  // };
 
   return (
     <div className="flex flex-row w-full">
-      <div className={'flex bg-pink-50 w-10/12 p-5'}>
-        <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
+      <div className={'flex bg-soft-primary-green w-10/12 p-5 rounded-md mt-4'}>
+        <div className="flex-auto mx-4 mt-0 overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
           <div className={'mb-1'}></div>
           <form onSubmit={handleOnSubmit}>
             <div>
               <div className=" p-4 rounded-md mb-4">
                 <div className="flex flex-col space-y-2">
-                  <div className="flex flex-row items-center justify-between">
-                    <label htmlFor="SetTour" className="text-sm font-medium text-gray-700">
+                  <div className="flex flex-row items-center">
+                    <label htmlFor="SetTour" className="text-sm font-medium text-gray-700 w-[200px]">
                       Set Tour
                     </label>
                     <select
@@ -277,13 +278,13 @@ export default function FinalSales({ tours }: props) {
                         ))}
                     </select>
                   </div>
-                  <div className="flex flex-row items-center justify-between relative">
+                  <div className="flex flex-row items-center relative">
                     <Typeahead
                       placeholder="Venue/Date"
-                      label="Venue/Date"
+                      label="Venue"
                       name="BookingId"
-                      className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
-                      dropdownClassName="max-w-lg top-[40px] right-0"
+                      className="flex flex-row items-center relative [&>input]:max-w-lg [&>label]:w-[200px]"
+                      dropdownClassName="max-w-lg top-[40px] left-[200px]"
                       value={inputs?.BookingId.toString()}
                       options={activeSetTourDates.map((venue) => ({
                         name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
@@ -300,50 +301,45 @@ export default function FinalSales({ tours }: props) {
                     />
 
                   </div>
-                </div>
-
-                <div className="columns-2">
-                  <div className={'columns-1'}>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Sold Seat Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Value"
-                          id="Value"
-                          value={sale?.Value}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
-                      </div>
+                  <div className="flex flex-row items-center">
+                    <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]">
+                      Sold Seats Value
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="Value"
+                        id="Value"
+                        value={sale?.Value}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Seats Sold
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Seats"
-                          id="Seats"
-                          autoComplete="Seats"
-                          value={sale.Seats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
-                      </div>
+                  </div>
+                  <div className="flex flex-row items-center">
+                    <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]">
+                      Seats Sold
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="Seats"
+                        id="Seats"
+                        autoComplete="Seats"
+                        value={sale.Seats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
                     </div>
                   </div>
                   {isPantomime && (
-                    <div className="columns-1">
-                      <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
+                    <>
+                      <div className="flex flex-row items-center">
                         <label
                           htmlFor="SchoolSeats"
-                          className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                          className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]"
                         >
                           School Seats Sold
                         </label>
@@ -361,10 +357,10 @@ export default function FinalSales({ tours }: props) {
                           )}
                         </div>
                       </div>
-                      <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
+                      <div className="flex flex-row items-center">
                         <label
                           htmlFor="SchoolSeatsValue"
-                          className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                          className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]"
                         >
                           School Seats Sold Value
                         </label>
@@ -383,13 +379,13 @@ export default function FinalSales({ tours }: props) {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
             </div>
             <div>
-              <div className="flex flex-row items-center sm:border-t sm:border-gray-200 sm:pt-5">
+              <div className="flex flex-row items-center sm:border-t sm:border-gray-200 mt-2">
                 <div className="">
                   <input
                     id="Confirmed"
@@ -401,7 +397,7 @@ export default function FinalSales({ tours }: props) {
                     }}
                   />
                 </div>
-                <label htmlFor="Confirmed" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 ml-4">
+                <label htmlFor="Confirmed" className="block text-sm font-medium text-gray-700 ml-4 mt-1">
                   I confirm these are the final figures for the above tour venue/date, as agreed by all parties
                 </label>
               </div>
@@ -415,22 +411,6 @@ export default function FinalSales({ tours }: props) {
               {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
             </button>
           </form>
-        </div>
-      </div>
-      <div className={'flex-auto flex bg-blue-100 w-2/12 p-5'}>
-        <div className="flex-auto mx-4 mt-0overflow-hidden shadow  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-          <div className={'mb-1'}></div>
-          <div>
-            <button
-              className={
-                'inline-flex items-center rounded border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
-              }
-              disabled={!previousSaleWeek}
-              onClick={copyLastWeekSalesData}
-            >
-              Copy Last weeks Sales Data{' '}
-            </button>
-          </div>
         </div>
       </div>
     </div>

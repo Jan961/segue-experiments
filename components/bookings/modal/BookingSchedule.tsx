@@ -44,8 +44,8 @@ const BookingSchedule = ({ TourId }: props) => {
         setIsLoading(false)
       });
   };
-  return <ToolbarButton onClick={onBookingSchedule}  className='flex'>
-    <ExcelIcon />
+  return <ToolbarButton onClick={onBookingSchedule}  className='flex items-center gap-1'>
+    <ExcelIcon height={18} width={18}  />
     {isLoading ? <Spinner className='mr-2' size="sm" />: "Travel Summary"}
     </ToolbarButton>;
 };
