@@ -28,10 +28,19 @@ module.exports = {
     ecmaVersion: 'latest',
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint'],
+  plugins: ['react', '@typescript-eslint', 'testing-library'],
+  overrides: [
+    // Only uses Testing library lint rules in test files
+    {
+      files: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+      extends: ['plugin:testing-library/react'],
+    },
+  ],
   root: true,
   rules: {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    'import/no-unresolved': 'off',
+    'import/extensions': 'off',
   },
 };
