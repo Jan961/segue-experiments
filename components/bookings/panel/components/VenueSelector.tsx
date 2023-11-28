@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Typeahead from 'components/global/Typeahead';
 import { VenueInfo } from 'components/bookings/modal/VenueInfo';
 import ViewBookingHistory from 'components/bookings/modal/ViewBookingHistory';
@@ -15,14 +16,16 @@ export interface VenueSelectorProps {
 export const VenueSelector = ({ venueId, onChange, options, disabled = false }: VenueSelectorProps) => {
   const venues = useRecoilValue(venueState);
 
-  const venueOptions = [
-    { name: 'Please Select a Venue', value: '' },
-    ...Object.values(venues).map((v: VenueMinimalDTO) => ({
-      value: v.Id,
-      name: `${v.Code} - ${v.Name}, ${v.Town}`,
-    })),
-  ];
-
+  const venueOptions = useMemo(
+    () => [
+      { name: 'Please Select a Venue', value: '' },
+      ...Object.values(venues).map((v: VenueMinimalDTO) => ({
+        value: v.Id,
+        name: `${v.Code} - ${v.Name}, ${v.Town}`,
+      })),
+    ],
+    [venues]
+  );
 
   const onSelect = (selectedOption) => {
     onChange(selectedOption ? selectedOption.value : null);

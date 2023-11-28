@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { useRecoilValue } from 'recoil';
@@ -10,7 +10,6 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { ToolbarButton } from '../ToolbarButton';
-// JAS TO DO: check
 import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
@@ -97,11 +96,14 @@ export default function Barring() {
     text: `${tour.ShowCode}/${tour.Code} | ${tour.ShowName}`,
     value: tour.Id,
   }));
-  const venueOptions = venues.map((venue) => ({
-    name: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name}`,
-    value: String(venue.Id),
-  }));
-
+  const venueOptions = useMemo(
+    () =>
+      venues.map((venue) => ({
+        name: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name}`,
+        value: String(venue.Id),
+      })),
+    [venues]
+  );
   // @ts-ignore
   return (
     <>
@@ -129,7 +131,6 @@ export default function Barring() {
               required
             />
             <Typeahead
-              dropdownClassName=""
               label="Venue"
               name="venue"
               onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue, id: 'venue' } })}

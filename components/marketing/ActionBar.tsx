@@ -55,7 +55,6 @@ const ActionBar = () => {
           name="Booking" 
           placeholder={''} 
           label="Booking" 
-          dropdownClassName="" 
         />
         <ToolbarButton onClick={goToToday} className="!text-primary-green">
           Today
