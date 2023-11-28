@@ -33,7 +33,6 @@ export const VenueSelector = ({ venueId, onChange, options, disabled = false }: 
   return (
     <>
       <Typeahead
-        dropdownClassName=""
         label="Venue"
         name="Venue"
         onChange={onSelect}
