@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { dateToSimple, getMonday, getPreviousMonday } from 'services/dateService';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
-import Typeahead from 'components/Typeahead';
+import Typeahead from 'components/global/Typeahead';
 import schema from './FinalSalesValidation';
 import { getSales } from './Api';
 import moment from 'moment';
@@ -285,20 +285,21 @@ export default function FinalSales({ tours }: props) {
                       name="BookingId"
                       className="flex flex-row items-center relative [&>input]:max-w-lg [&>label]:w-[200px]"
                       dropdownClassName="max-w-lg top-[40px] left-[200px]"
-                      value={inputs?.BookingId}
+                      value={inputs?.BookingId.toString()}
                       options={activeSetTourDates.map((venue) => ({
-                        text: ` ${moment(venue.booking.FirstDate).format("ddd DD/MM")} ${venue.Name}(${venue.Town}) | ${venue.Code}`,
+                        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
                         value: String(venue.BookingId),
                       }))}
                       onChange={(option) =>
                         handleOnChange({
                           target: {
                             id: 'BookingId',
-                            value: option?.value,
+                            value: option,
                           },
                         })
                       }
                     />
+
                   </div>
                   <div className="flex flex-row items-center">
                     <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]">

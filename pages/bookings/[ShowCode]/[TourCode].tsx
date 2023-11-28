@@ -226,7 +226,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     venues,
     (v) => v.Id,
     (v: any) => {
-      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town || null;
+      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
@@ -245,7 +245,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     db.Booking.forEach((b) => {
       booking[b.Id] = bookingMapper(b as BookingsWithPerformances);
       b.Performance.forEach((p) => {
-        performance[p.Id] = performanceMapper(p);
+        performance[p.Id] = {
+          ...performanceMapper(p),
+          Time: performanceMapper(p).Time ?? null, // Example of setting a default value
+        };
       });
       const venueId = booking[b.Id].VenueId;
       if (venue[venueId]) venue[venueId].Count++;

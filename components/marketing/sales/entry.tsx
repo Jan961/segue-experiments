@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import axios from 'axios';
 import { getSales } from './Api';
 import schema from './validation';
-import Typeahead from 'components/Typeahead';
+import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { StyledDialog } from 'components/global/StyledDialog';
@@ -204,12 +204,12 @@ export default function Entry({ tours = [], searchFilter }: props) {
     e?.preventDefault?.();
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
       SetHoldHoldTypeId: parseInt(SetHoldHoldTypeId),
-      SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats,10),
+      SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats, 10),
       SetHoldValue: parseFloat(holds[SetHoldHoldTypeId].value),
     }));
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
       SetCompCompTypeId: parseInt(SetCompCompTypeId, 10),
-      SetCompSeats: parseInt(comps[SetCompCompTypeId],10),
+      SetCompSeats: parseInt(comps[SetCompCompTypeId], 10),
     }));
     const ignoreValidation = Object.values(validationErrors).length > 0;
     if (!ignoreValidation) {
@@ -222,12 +222,12 @@ export default function Entry({ tours = [], searchFilter }: props) {
     const Sales = [
       {
         SaleSaleTypeId: 1,
-        SaleSeats: parseInt(sale?.Seats,10),
+        SaleSeats: parseInt(sale?.Seats, 10),
         SaleValue: parseFloat(sale?.Value),
       },
       {
         SaleSaleTypeId: 2,
-        SaleSeats: parseInt(sale?.ReservedSeats,10),
+        SaleSeats: parseInt(sale?.ReservedSeats, 10),
         SaleValue: parseFloat(sale?.ReservedValue),
       },
     ];
@@ -280,6 +280,16 @@ export default function Entry({ tours = [], searchFilter }: props) {
       setSale(previousSale || {});
     }
   };
+
+  const mapVenuesToTypeaheadOptions = (venues) => {
+    return venues.map((venue) => ({
+      name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+      value: String(venue.BookingId),
+    }));
+  };
+
+  const typeaheadOptions = useMemo(() => mapVenuesToTypeaheadOptions(salesWeeksVenues), [salesWeeksVenues]);
+
   return (
     <div className="flex flex-row w-full">
       <div className={'flex bg-transparent w-5/8'}>
@@ -340,19 +350,17 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     </label>
                     <Typeahead
                       placeholder="Venue/Date"
+                      label="Venue/Date"
                       name="Venue"
                       className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
                       dropdownClassName="max-w-lg top-[40px] right-0"
-                      value={inputs.Venue}
-                      options={salesWeeksVenues.map((venue) => ({
-                        text: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: String(venue.BookingId),
-                      }))}
-                      onChange={(option) =>
+                      value={inputs.Venue} 
+                      options={typeaheadOptions}
+                      onChange={(selectedOption) =>
                         handleOnChange({
                           target: {
                             id: 'Venue',
-                            value: option?.value,
+                            value: selectedOption, // Ensure this is a string or number
                           },
                         })
                       }
@@ -361,83 +369,83 @@ export default function Entry({ tours = [], searchFilter }: props) {
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-4 sm:grid-cols-1">
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Sold Seat Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Value"
-                          id="Value"
-                          value={sale?.Value}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
-                      </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
+                    <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                      Sold Seat Value
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="Value"
+                        id="Value"
+                        value={sale?.Value}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Seats Sold
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Seats"
-                          id="Seats"
-                          autoComplete="Seats"
-                          value={sale.Seats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
-                      </div>
+                  </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
+                    <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                      Seats Sold
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="Seats"
+                        id="Seats"
+                        autoComplete="Seats"
+                        value={sale.Seats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
-                      <label
-                        htmlFor="ReservedValue"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedValue"
-                          id="ReservedValue"
-                          autoComplete="ReservedValue"
-                          value={sale.ReservedValue}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.ReservedValue && (
-                          <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
-                        )}
-                      </div>
+                  </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
+                    <label
+                      htmlFor="ReservedValue"
+                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                    >
+                      Reserved Seats Value
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="ReservedValue"
+                        id="ReservedValue"
+                        autoComplete="ReservedValue"
+                        value={sale.ReservedValue}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.ReservedValue && (
+                        <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
+                      )}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label
-                        htmlFor="ReservedSeats"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedSeats"
-                          id="ReservedSeats"
-                          autoComplete="ReservedSeats"
-                          value={sale.ReservedSeats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.ReservedSeats && (
-                          <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
-                        )}
-                      </div>
+                  </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
+                    <label
+                      htmlFor="ReservedSeats"
+                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                    >
+                      Reserved Seats
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="ReservedSeats"
+                        id="ReservedSeats"
+                        autoComplete="ReservedSeats"
+                        value={sale.ReservedSeats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.ReservedSeats && (
+                        <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
+                      )}
                     </div>
+                  </div>
                 </div>
               </div>
 
