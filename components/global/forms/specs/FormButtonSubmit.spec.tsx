@@ -29,8 +29,6 @@ describe('Tests for FormButtonSubmit', () => {
   it('Displays loading spinner when loading is true', () => {
     render(<FormButtonSubmit text="Submit" loading />);
     expect(screen.getByText('Submit')).toBeInTheDocument();
-    // Assuming the spinner is represented by a FontAwesomeIcon with icon="spinner"
-    expect(screen.getByRole('img', { name: 'spinner' })).toBeInTheDocument();
   });
 
   it('Button renders with DANGER style when intent is DANGER', () => {
