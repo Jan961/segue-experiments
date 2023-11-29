@@ -64,10 +64,10 @@ export default function SalesSummarySimple({ activeTours }: Props) {
       .toISOString()
       ?.split('T')?.[0];
     setLoading(true);
-    fetch('/api/reports/sales-summary-simple', {
+    fetch('/api/reports/task-list', {
       method: 'POST',
       body: JSON.stringify({
-        tourId: parseInt(inputs.tour, 10),
+        TourId: parseInt(inputs.tour, 10),
         fromWeek,
         toWeek,
       }),
