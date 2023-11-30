@@ -115,7 +115,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           onChange={handleOnChange}
           options={tourOptions}
         />
-        <FormInputNumeric name="Code" label="Code" value={inputs.Code} onChange={handleCodeChange} />
         <FormInputText name="Name" label="Description" onChange={handleOnChange} value={inputs.Name} />
         <FormInputText name="AssigneeTo" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
         <FormInputText name="AssignedBy" label="Assigned By" onChange={handleOnChange} value={inputs.AssignedBy} />
