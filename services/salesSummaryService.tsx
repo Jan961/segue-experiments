@@ -688,3 +688,9 @@ export const applyFormattingToRange = ({
     }
   }
 };
+
+export const alignColumnTextHorizontally = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align:string }) => {
+  worksheet.getColumn(colAsChar).eachCell((cell) => {
+    cell.alignment = { horizontal: align };
+  });
+};
