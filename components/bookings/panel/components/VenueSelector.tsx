@@ -1,4 +1,5 @@
-import Typeahead from 'components/Typeahead';
+import { useMemo } from 'react';
+import Typeahead from 'components/global/Typeahead';
 import { VenueInfo } from 'components/bookings/modal/VenueInfo';
 import ViewBookingHistory from 'components/bookings/modal/ViewBookingHistory';
 import { SelectOption } from 'components/global/forms/FormInputSelect';
@@ -12,30 +13,32 @@ export interface VenueSelectorProps {
   options?: SelectOption[];
   disabled?: boolean;
 }
-
 export const VenueSelector = ({ venueId, onChange, options, disabled = false }: VenueSelectorProps) => {
   const venues = useRecoilValue(venueState);
-  const venueOptions: SelectOption[] = [
-    { text: 'Please Select a Venue', value: '' },
-    ...Object.values(venues).map((v: VenueMinimalDTO) => ({
-      text: `${v.Code} - ${v.Name}, ${v.Town}`,
-      value: v.Id,
-      code: v.Code,
-      town: v.Town,
-    })),
-  ];
-  const onSelect = (option?: SelectOption) => {
-    onChange((option?.value as number) || null);
+
+  const venueOptions = useMemo(
+    () => [
+      { name: 'Please Select a Venue', value: '' },
+      ...Object.values(venues).map((v: VenueMinimalDTO) => ({
+        value: v.Id,
+        name: `${v.Code} - ${v.Name}, ${v.Town}`,
+      })),
+    ],
+    [venues]
+  );
+
+  const onSelect = (selectedOption) => {
+    onChange(selectedOption ? selectedOption.value : null);
   };
   return (
     <>
       <Typeahead
-        options={options || venueOptions}
+        label="Venue"
+        name="Venue"
         onChange={onSelect}
-        placeholder={'Please Select a Venue'}
-        value={venueId}
-        searchKeys={['code', 'Town']}
-        disabled={disabled}
+        options={venueOptions}
+        placeholder="Please Select a Venue"
+        value={venueId.toString()}
       />
       <div className="columns-2 mb-4">
         <VenueInfo venueId={venueId} />

@@ -1,40 +1,29 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import moment from 'moment';
 import { useRecoilState } from 'recoil';
-import { formatDateUK, getWeekDay } from 'services/dateService';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import Typeahead from 'components/Typeahead';
+
+import Typeahead, { TypeaheadOption } from 'components/global/Typeahead';
+import { mapBookingsToTourOptions } from 'mappers/tourCodeMapper';
 
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const bookingOptions = useMemo(
-    () =>
-      bookingJump.bookings
-        ? bookingJump.bookings
-            .filter((b) => b.StatusCode !== 'U')
-            .map((b) => {
-              const date = new Date(b.Date);
-              const weekday = getWeekDay(date);
-              const ukDate = formatDateUK(date);
-              return {
-                text: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`,
-                value: b.Id,
-                date: ukDate,
-              };
-            })
-        : [],
+    () => (bookingJump.bookings ? mapBookingsToTourOptions(bookingJump.bookings) : []),
     [bookingJump],
   );
+  const [selectedBooking, setSelectedBooking] = useState<string | number>('');
   const selectedBookingIndex = useMemo(
     () => bookingOptions.findIndex((booking) => parseInt(booking.value, 10) === bookingJump.selected),
     [bookingJump.selected, bookingOptions],
   );
-  const changeBooking = (e) => {
-    const selected = Number(e.target.value) || null;
-    setBookingJump({ ...bookingJump, selected });
+  const changeBooking = (value: string | number) => {
+    const booking = bookingOptions.find(booking => booking.value === value);
+    setSelectedBooking(value);
+    setBookingJump({ ...bookingJump, selected: Number(booking?.value) });
   };
-
+  
   const goToToday = () => {
     const currentDate = moment();
     const sortedBookings = bookingOptions.sort((a, b) => {
@@ -58,13 +47,14 @@ const ActionBar = () => {
   return (
     <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
-        <Typeahead
-          className="mb-0 pb-0 max-w-[500px]"
-          value={bookingJump.selected}
-          name="Tour"
-          onChange={(selectedVenue) => changeBooking({ target: { value: selectedVenue?.value, id: 'venue' } })}
-          options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]}
-          placeholder={'Please select a venue'}
+      <Typeahead 
+          className="w-128" 
+          value={selectedBooking} // Use state value directly
+          options={bookingOptions} 
+          onChange={changeBooking} 
+          name="Booking" 
+          placeholder={''} 
+          label="Booking" 
         />
         <ToolbarButton onClick={goToToday} className="!text-primary-green">
           Today
@@ -87,5 +77,5 @@ export default ActionBar;
 
 // Add default props
 ActionBar.defaultProps = {
-  onActionBookingIdChange: () => {},
+  onActionBookingIdChange: () => { },
 };

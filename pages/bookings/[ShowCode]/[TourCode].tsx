@@ -27,11 +27,18 @@ import { tourJumpState } from 'state/booking/tourJumpState';
 import { Spinner } from 'components/global/Spinner';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useCallback, useMemo } from 'react';
 import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import { viewState } from 'state/booking/viewState';
 import { getAccountIdFromReq } from 'services/userService';
+import BookingFilter from 'components/bookings/BookingFilter';
+import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
+import { bookingState } from 'state/booking/bookingState';
+import { rehearsalState } from 'state/booking/rehearsalState';
+import { getInFitUpState } from 'state/booking/getInFitUpState';
+import { otherState } from 'state/booking/otherState';
+import useBookingFilter from 'hooks/useBookingsFilter';
 
 interface bookingProps {
   TourId: number;
@@ -44,6 +51,13 @@ interface ScrollablePanelProps {
   className: string;
   reduceHeight: number;
 }
+
+const statusOptions: SelectOption[] = [
+  { text: 'ALL', value: '' },
+  { text: 'Confirmed (C)', value: 'C' },
+  { text: 'Unconfirmed (U)', value: 'U' },
+  { text: 'Cancelled (X)', value: 'X' },
+];
 
 // Based on toolbar height. Adds a tasteful shadow when scrolled to prevent strange cut off
 const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildren<ScrollablePanelProps>) => {
@@ -72,6 +86,10 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
 
 const BookingPage = ({ TourId }: bookingProps) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
+  const bookingDict = useRecoilValue(bookingState);
+  const rehearsalDict = useRecoilValue(rehearsalState);
+  const gifuDict = useRecoilValue(getInFitUpState);
+  const otherDict = useRecoilValue(otherState);
   const { Sections } = schedule;
   const [filter, setFilter] = useRecoilState(filterState);
   const [view, setView] = useRecoilState(viewState);
@@ -81,7 +99,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
     Sections.map((x) => x.Dates)
       .flat()
       .filter((x) => x.Date === todayKey).length > 0;
-
+  const filteredSections = useBookingFilter({Sections, bookingDict, rehearsalDict, gifuDict, otherDict})
   const gotoToday = () => {
     const idToScrollTo = `booking-${todayKey}`;
     if (todayOnSchedule) {
@@ -89,23 +107,42 @@ const BookingPage = ({ TourId }: bookingProps) => {
       setView({ ...view, selectedDate: todayKey });
     }
   };
+  const onChange = (e: any) => {
+    setFilter({ ...filter, [e.target.id]: e.target.value });
+  };
 
   return (
     <Layout title="Booking | Segue" flush>
-      {/* <TourJumpMenu></TourJumpMenu> */}
-      <div className="px-4">
+      <div className="">
         <GlobalToolbar
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
           title={'Bookings'}
         >
-          {/* <ToolbarInfo label='Week' value={"??"} /> */}
-          <MileageCalculator />
-          <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
-            Go To Today
-          </ToolbarButton>
-          <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
+          <div className="bg-white drop-shadow-md inline-block rounded-md">
+            <div className="rounded-l-md">
+              <div className="flex items-center">
+                <p className="mx-2">Status: </p>
+                <FormInputSelect
+                  className="[&>select]:border-0 [&>select]:mb-0 [&>select]:text-primary-blue [&>select]:font-bold !mb-0"
+                  label=""
+                  onChange={onChange}
+                  value={filter.status}
+                  name={'status'}
+                  options={statusOptions}
+                />
+              </div>
+            </div>
+          </div>
         </GlobalToolbar>
+      </div>
+      <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
+        <MileageCalculator />
+        <BookingFilter />
+        <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
+          Go To Today
+        </ToolbarButton>
+        <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
@@ -133,7 +170,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
                 </div>
               </div>
               <ul className="grid w-full shadow">
-                {Sections.map((section: ScheduleSectionViewModel) => (
+                {filteredSections.map((section: ScheduleSectionViewModel) => (
                   <li key={section.Name}>
                     <h3 className="font-bold p-3 bg-gray-300">{section.Name}</h3>{' '}
                     {section.Dates.map((date: DateViewModel) => (
@@ -189,7 +226,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     venues,
     (v) => v.Id,
     (v: any) => {
-      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town || null;
+      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
@@ -208,7 +245,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     db.Booking.forEach((b) => {
       booking[b.Id] = bookingMapper(b as BookingsWithPerformances);
       b.Performance.forEach((p) => {
-        performance[p.Id] = performanceMapper(p);
+        performance[p.Id] = {
+          ...performanceMapper(p),
+          Time: performanceMapper(p).Time ?? null, // Example of setting a default value
+        };
       });
       const venueId = booking[b.Id].VenueId;
       if (venue[venueId]) venue[venueId].Count++;

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { useRecoilValue } from 'recoil';
@@ -10,7 +10,7 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { ToolbarButton } from '../ToolbarButton';
-import Typeahead from 'components/Typeahead';
+import Typeahead from 'components/global/Typeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
 
@@ -66,11 +66,11 @@ export default function Barring() {
 
   const handleOnChange = async (e: any) => {
     console.log(e);
+    const { id, value } = e.target;
     setInputs((prev) => ({
       ...prev,
-      [e.target.id]: e.target.value,
+      [id]: value,
     }));
-
     if (e.target.name === 'tour') {
       // Load Venues for this tour
       // setIsLoading(true)
@@ -96,11 +96,14 @@ export default function Barring() {
     text: `${tour.ShowCode}/${tour.Code} | ${tour.ShowName}`,
     value: tour.Id,
   }));
-  const venueOptions = venues.map((venue) => ({
-    text: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name})`,
-    value: String(venue.Id),
-  }));
-
+  const venueOptions = useMemo(
+    () =>
+      venues.map((venue) => ({
+        name: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name}`,
+        value: String(venue.Id),
+      })),
+    [venues]
+  );
   // @ts-ignore
   return (
     <>
@@ -130,10 +133,10 @@ export default function Barring() {
             <Typeahead
               label="Venue"
               name="venue"
+              onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue, id: 'venue' } })}
+              options={[{ value: 0, name: '-- Select Venue --' }, ...venueOptions]}
               placeholder="-- Select Venue --"
               value={inputs.venue}
-              options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
-              onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue?.value, id: 'venue' } })}
             />
             <FormInputNumeric
               label="Bar Distance"
