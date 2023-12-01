@@ -17,7 +17,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         where: { Id: task.Id },
         data: {
           TourId: task.TourId,
-          Code: 0,
           Name: task.Name,
           Priority: task.Priority,
           Notes: task.Notes,
