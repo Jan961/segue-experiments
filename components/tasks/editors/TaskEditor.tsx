@@ -8,7 +8,6 @@ import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
-import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
