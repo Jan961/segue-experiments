@@ -13,6 +13,7 @@ import { mapToTourTaskDTO } from 'lib/mappers';
 import { getAccountIdFromReq } from 'services/userService';
 
 const Index = () => {
+  const [selectedTour, setSelectedTour] = useState<number | undefined>(undefined);
   const [bulkIsOpen, setBulkIsOpen] = useState(false);
   const [bulkActionField, setBulkActionField] = useState<string>('');
 
@@ -91,7 +92,7 @@ const Index = () => {
       <div className="flex flex-auto w-full h-screen">
         <div className="flex-col px-12 w-full flex justify-between" style={{ minHeight: '60vh' }}>
           <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}>
-            <Toolbar />
+            <Toolbar setSelectedTour={setSelectedTour}/>
           </GlobalToolbar>
           {tours.length > 0 ? (
             tours.map((tour) => {

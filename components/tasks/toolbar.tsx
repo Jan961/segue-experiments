@@ -11,7 +11,8 @@ import { dateToPicker, dateToSimple, getKey } from 'services/dateService';
 const Toolbar: React.FC = () => {
   const [addTaskOpen, setAddTaskOpen] = React.useState(false);
   const [addRecurringTaskOpen, setAddRecurringTaskOpen] = React.useState(false);
-  const [filters, setFilters] = React.useState({ Search: '', Tour: undefined });
+  const [selectedTour, setSelectedTour] = React.useState<number | undefined>(undefined);
+  const [filters, setFilters] = React.useState({ Search: '', Tour: undefined, Status: undefined, Assignee: undefined });
   const tours = useRecoilValue(tourState);
 
   const handleOnChange = (e) => {
@@ -21,6 +22,10 @@ const Toolbar: React.FC = () => {
       ...prev,
       [e.target.id]: e.target.value,
     }));
+
+    if (e.target.id === 'Tour') {
+      setSelectedTour(parseInt(e.target.value, 10));
+    }
   };
 
   const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }));
@@ -65,7 +70,7 @@ const Toolbar: React.FC = () => {
             className="w-80"
             onChange={handleOnChange}
             name="Tour"
-            value={filters.Tour}
+            value={filters.Assignee}
             options={tourOptions}
           />
         </div>
@@ -75,7 +80,7 @@ const Toolbar: React.FC = () => {
             className="w-80"
             onChange={handleOnChange}
             name="Tour"
-            value={filters.Tour}
+            value={filters.Status}
             options={tourOptions}
           />
         </div>

@@ -9,12 +9,14 @@ interface TaskListProps {
   tourId: number;
 }
 
-const Tasklist = ({ tourId }: TaskListProps) => {
+const Tasklist = ({ tourId, selectedTour }: TaskListProps) => {
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const tours: TourState = useRecoilValue(tourState);
   const match = tours.filter((x) => x.Id === tourId)[0];
 
-  if (!match) return null;
+  if (!match || (selectedTour !== undefined && selectedTour !== tourId)) {
+    return null;
+  }
 
   const countSelected = match.Tasks.filter((x) => bulkSelection[x.Id]).length;
   const allSelected = countSelected === match.Tasks.length;
