@@ -48,10 +48,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     setStatus({ ...status, submitted: false });
   };
 
-  const handleCodeChange = (code: number) => {
-    setInputs({ ...inputs, Code: code });
-  };
-
   const handleOnSubmit = async (event) => {
     event.preventDefault();
     if (inputs.TourId === 0) {
@@ -83,6 +79,16 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     { text: '-- Select Tour --', value: '' },
     ...tours.map((x) => ({ text: `${x.ShowName}/${x.Code}`, value: x.Id })),
   ];
+
+  const startByOptions: SelectOption[] = Array.from(Array(104).keys()).map((x) => {
+    const week = x - 52;
+    const formattedWeek = week < 0 ? `week - ${Math.abs(week)}` : `week + ${week}`;
+    return {
+      text: formattedWeek,
+      value: x,
+    };
+  });
+
   const progressOptions: SelectOption[] = [
     { text: 'Not Started', value: 0 },
     { text: '10%', value: 10 },
@@ -116,6 +122,13 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           options={tourOptions}
         />
         <FormInputText name="Name" label="Description" onChange={handleOnChange} value={inputs.Name} />
+        <FormInputSelect
+          name="StartByWeekNum"
+          label="Start By (wk)"
+          onChange={handleOnChange}
+          value={inputs.StartByWeekNum}
+          options={startByOptions}
+        />
         <FormInputText name="AssigneeTo" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
         <FormInputText name="AssignedBy" label="Assigned By" onChange={handleOnChange} value={inputs.AssignedBy} />
         <FormInputDate name="DueDate" label="Due" onChange={handleOnChange} value={inputs.DueDate} />
