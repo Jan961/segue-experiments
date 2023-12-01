@@ -47,7 +47,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         <Table.Cell>{task.StartByWeekNum}</Table.Cell>
         <Table.Cell>{getAdjustedDateByWeeks(task.StartByWeekNum)}</Table.Cell>
         <Table.Cell>{task.CompleteByWeekNum}</Table.Cell>
-        <Table.Cell>{formatDateDoubleDigits(task.DueDate) ?? 'N/A'}</Table.Cell>
+        <Table.Cell>{getAdjustedDateByWeeks(task.CompleteByWeekNum)}</Table.Cell>
         <Table.Cell>{task.Progress + '%'}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
         <Table.Cell>{task.AssignedTo ?? '-'}</Table.Cell>
