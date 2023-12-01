@@ -165,7 +165,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           label="Follow Up"
           onChange={handleOnChange}
           value={inputs.FollowUp}
-          options={weekOptions.map((option) => ({ ...option, value: getAdjustedDateByWeeks(option.value as number) }))}
+          options={weekOptions.map((option) => ({ ...option, value: getAdjustedDateByWeeks(Number(option.value)) }))}
         />
         <FormInputText area name="Notes" label="Notes" onChange={handleOnChange} value={inputs.Notes} />
         <StyledDialog.FooterContainer>
