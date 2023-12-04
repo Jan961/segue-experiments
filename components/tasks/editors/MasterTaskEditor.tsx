@@ -1,14 +1,14 @@
 import { MasterTask } from '@prisma/client';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StyledDialog } from 'components/global/StyledDialog';
-import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
-import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
+import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { loggingService } from 'services/loggingService';
 import axios from 'axios';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { weekOptions } from 'utils/getTaskDateStatus';
 
 interface NewTaskFormProps {
     task?: MasterTask;
@@ -45,6 +45,8 @@ const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
   const handleOnChange = (e: any) => {
     let { id, value } = e.target;
     if(id==='AssignedToUserId')value = parseInt(value,10)
+    if(id==='StartByWeekNum')value = parseInt(value,10)
+    if(id==='CompleteByWeekNum')value = parseInt(value,10)
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
     setStatus({ ...status, submitted: false });
@@ -78,8 +80,8 @@ const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
         <FormInputNumeric name="Code" label="Code" value={inputs.Code} onChange={handleCodeChange} />
         <FormInputText name="Name" label="Name" onChange={handleOnChange} value={inputs.Name} />
         <FormInputSelect name="AssignedToUserId" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedToUserId} options={userOptions} />
-        <FormInputNumeric name="StartByWeekNum" label="Start by" onChange={(change)=>handleOnChange({target:{id:'StartByWeekNum', value:change}})} value={inputs.StartByWeekNum} />
-        <FormInputNumeric name="CompleteByWeekNum" label="Complete by" onChange={(change)=>handleOnChange({target:{id:'CompleteByWeekNum', value:change}})} value={inputs.CompleteByWeekNum} />
+        <FormInputSelect name="StartByWeekNum" label="Start by" onChange={handleOnChange} value={inputs.StartByWeekNum} options={weekOptions} />
+        <FormInputSelect name="CompleteByWeekNum" label="Complete by" onChange={handleOnChange} value={inputs.CompleteByWeekNum} options={weekOptions} />
         <FormInputText area name="Notes" label="Notes" onChange={handleOnChange} value={inputs.Notes} />
         <StyledDialog.FooterContainer>
           <StyledDialog.FooterCancel onClick={triggerClose} />

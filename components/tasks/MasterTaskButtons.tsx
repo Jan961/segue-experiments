@@ -1,11 +1,18 @@
 import { ToolbarButton } from "components/bookings/ToolbarButton";
 import { FormInputText } from "components/global/forms/FormInputText";
 import MasterTaskEditor from "./editors/MasterTaskEditor";
-import React from "react";
+import React, { useCallback } from "react";
+import { useRecoilState } from "recoil";
+import { filterState } from "state/booking/filterState";
 
 function TaskButtons() {
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('')
+  const [search, setSearch] = React.useState('');
+  const [filter, setFilter] = useRecoilState(filterState);
+  const onSearch = useCallback((e)=>{
+    setSearch(e?.target?.value)
+    setFilter({...filter, masterTaskText:e?.target?.value})
+  },[filter, setFilter])
 
   return (
     <>
@@ -15,7 +22,7 @@ function TaskButtons() {
           <ToolbarButton className="text-purple-900">Export</ToolbarButton>
         </div>
         <div>
-          <FormInputText value={search} name={"Search"} placeholder="Search Master Tasks by Name" onChange={(e)=>setSearch(e?.target?.value)} />
+          <FormInputText value={search} name={"Search"} placeholder="Search Master Tasks.." onChange={onSearch} />
         </div>
       </div>
       {modalOpen && <MasterTaskEditor open={modalOpen} triggerClose={() => setModalOpen(false)} />}

@@ -1,3 +1,5 @@
+import { SelectOption } from "components/global/forms/FormInputSelect";
+
 export default function getTaskDateStatusColor(date: string, status: string) {
   if (status && status.toLowerCase() === 'done') {
     return 'bg-none';
@@ -19,3 +21,13 @@ export default function getTaskDateStatusColor(date: string, status: string) {
 
   return ' bg-none ';
 }
+
+
+export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x) => {
+  const week = x - 52;
+  const formattedWeek = week < 0 ? `week - ${Math.abs(week)}` : `week + ${week}`;
+  return {
+    text: formattedWeek,
+    value: x,
+  };
+});
