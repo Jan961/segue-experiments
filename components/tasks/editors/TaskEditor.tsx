@@ -3,12 +3,10 @@ import { loggingService } from '../../../services/loggingService';
 import { TourTaskDTO } from 'interfaces';
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
-import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
-import { get } from 'http';
 import { getAdjustedDateByWeeks } from 'utils/getAdjustedDateByWeeks';
 
 interface NewTaskFormProps {
@@ -43,6 +41,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
 
     if (id === 'TourId') value = Number(value);
     if (id === 'Progress') value = Number(value);
+    if (id === 'Priority') value = Number(value);
 
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
