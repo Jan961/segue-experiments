@@ -23,16 +23,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Progress: task.Progress,
           Interval: 'once',
           AssignedToUserId: task.AssignedTo,
+          StartByWeekNum: task.StartByWeekNum,
+          CompleteByWeekNum: task.CompleteByWeekNum,
+          StartByPostTour: task.StartByPostTour,
+          CompleteByPostTour: task.CompleteByPostTour,
           Tour: {
             connect: {
               Id: task.TourId,
             },
           },
-          // DueDate: task.DueDate ? new Date(task.DueDate) : undefined,
-          // FollowUp: task.FollowUp ? new Date(task.FollowUp) : undefined,
-          // CreatedDate: new Date(),
-          // Status: task.Status,
-          // AssignedBy: task.AssignedBy,
         },
       });
 
