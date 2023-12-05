@@ -7,7 +7,6 @@ import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
-import { getAdjustedDateByWeeks } from 'utils/getAdjustedDateByWeeks';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -42,6 +41,8 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     if (id === 'TourId') value = Number(value);
     if (id === 'Progress') value = Number(value);
     if (id === 'Priority') value = Number(value);
+    if (id === 'StartByWeekNum') value = Number(value);
+    if (id === 'CompleteByWeekNum') value = Number(value);
 
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
@@ -85,7 +86,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     const formattedWeek = week < 0 ? `week - ${Math.abs(week)}` : `week + ${week}`;
     return {
       text: formattedWeek,
-      value: x,
+      value: week,
     };
   });
 
@@ -137,7 +138,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           options={weekOptions}
         />
         <FormInputText name="AssigneeTo" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
-        <FormInputText name="AssignedBy" label="Assigned By" onChange={handleOnChange} value={inputs.AssignedBy} />
         <FormInputSelect
           name="Progress"
           label="Progress"
@@ -158,13 +158,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           onChange={handleOnChange}
           value={inputs.Priority}
           options={priorityOptions}
-        />
-        <FormInputSelect
-          name="FollowUp"
-          label="Follow Up"
-          onChange={handleOnChange}
-          value={inputs.FollowUp}
-          options={weekOptions.map((option) => ({ ...option, value: getAdjustedDateByWeeks(Number(option.value)) }))}
         />
         <FormInputText area name="Notes" label="Notes" onChange={handleOnChange} value={inputs.Notes} />
         <StyledDialog.FooterContainer>
