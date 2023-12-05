@@ -13,21 +13,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const access = await checkAccess(email, { TaskId: Id });
       if (!access) return res.status(401).end();
 
-      await prisma.tourTask.update({
+      await prisma.TourTask.update({
         where: { Id: task.Id },
         data: {
-          TourId: task.TourId,
           Name: task.Name,
+          Code: task.Code,
           Priority: task.Priority,
           Notes: task.Notes,
           Progress: task.Progress,
-          DueDate: task.DueDate ? new Date(task.DueDate) : undefined,
-          FollowUp: task.FollowUp ? new Date(task.FollowUp) : undefined,
-          CreatedDate: new Date(),
-          Status: task.Status,
           Interval: 'once',
-          AssignedBy: task.AssignedBy,
-          AssignedTo: task.AssignedTo,
+          AssignedToUserId: task.AssignedTo,
+          Tour: {
+            connect: {
+              Id: task.TourId,
+            },
+          },
+          // DueDate: task.DueDate ? new Date(task.DueDate) : undefined,
+          // FollowUp: task.FollowUp ? new Date(task.FollowUp) : undefined,
+          // CreatedDate: new Date(),
+          // Status: task.Status,
+          // AssignedBy: task.AssignedBy,
         },
       });
 

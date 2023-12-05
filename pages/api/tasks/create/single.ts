@@ -21,8 +21,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Notes: task.Notes,
         Progress: task.Progress,
         Interval: 'once',
-        AssignedBy: task.AssignedBy,
-        AssignedTo: task.AssignedTo,
+        AssignedToUserId: task.AssignedTo,
+        // AssignedBy: task.AssignedBy,
         // StartByWeekNum: undefined, // place your own logic here
         // CompleteByWeekNum: undefined, // place your own logic here
         // CompleteByPostTour: false, // place your own logic here
