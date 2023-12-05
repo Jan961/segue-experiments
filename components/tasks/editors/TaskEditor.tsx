@@ -6,7 +6,7 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -31,7 +31,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
   const [alert, setAlert] = React.useState<string>('');
   const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
-  const tours = useRecoilValue(tourState);
+  const [tours, setTours] = useRecoilState(tourState);
 
   const creating = !inputs.Id;
 
@@ -59,6 +59,17 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     if (inputs.Id) {
       try {
         await axios.post('/api/tasks/update', inputs);
+
+        const updatedTours = tours.map((tour) => {
+          if (tour.Id === inputs.TourId) {
+            const updatedTasks = tour.Tasks.map((t) => (t.Id === inputs.Id ? inputs : t));
+            return { ...tour, Tasks: updatedTasks };
+          }
+          return tour;
+        });
+
+        setTours(updatedTours);
+
         triggerClose();
       } catch (error) {
         loggingService.logError(error);
@@ -68,6 +79,16 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       try {
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/';
         await axios.post(endpoint, inputs);
+
+        const updatedTours = tours.map((tour) => {
+          if (tour.Id === inputs.TourId) {
+            return { ...tour, Tasks: [inputs, ...tour.Tasks] };
+          }
+          return tour;
+        });
+
+        setTours(updatedTours);
+
         triggerClose();
       } catch (error) {
         loggingService.logError(error);
