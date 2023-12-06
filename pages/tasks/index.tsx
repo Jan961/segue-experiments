@@ -82,22 +82,38 @@ const Index = () => {
   return (
     <Layout title="Tasks | Seque">
       <div className="flex flex-auto w-full h-screen">
-        <div className="flex-col px-12 w-full flex justify-between" style={{ minHeight: '60vh' }}>
+        <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
           <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}>
-            <Toolbar setSelectedTour={setSelectedTour} onFilterChange={applyFilters} onSearch={handleSearch}/>
+            <Toolbar setSelectedTour={setSelectedTour} onFilterChange={applyFilters} onSearch={handleSearch} selectedStatus={filters.Status} />
           </GlobalToolbar>
           {filteredTasks.length > 0 ? (
             filteredTasks.map((tour) => (
-              <div key={tour.Id} className="mb-10">
-                <h3 className="text-xl font-bold py-4">{tour.ShowName}</h3>
-                <Tasklist
-                  tourId={tour.Id}
-                  key={tour.Id}
-                  selectedTour={selectedTour}
-                  searchFilter={searchFilter}
-                  statusFilter={filters.Status} 
-                  tasks={tour.Tasks || []}
-                />
+              <div key={tour.Id} className={selectedTour === undefined || selectedTour == tour.Id ? 'mb-10' : 'hidden'}>
+                {(
+                  (tour.Tasks &&
+                    tour.Tasks.some(
+                      (task) =>
+                        task.TaskName &&
+                        task.TaskName.toLowerCase().includes(searchFilter.toLowerCase()) &&
+                        (filters.Status === undefined || filters.Status === task.Status)
+                    )) ||
+                  tour.ShowName.toLowerCase().includes(searchFilter.toLowerCase())
+                ) && (
+                    <>
+                      {/* Conditionally render h3 title */}
+                      {selectedTour === undefined || selectedTour == tour.Id ? (
+                        <h3 className="text-xl font-bold py-4">{tour.ShowName}</h3>
+                      ) : null}
+                      <Tasklist
+                        tourId={tour.Id}
+                        key={tour.Id}
+                        selectedTour={selectedTour}
+                        searchFilter={searchFilter}
+                        statusFilter={filters.Status}
+                        tasks={tour.Tasks || []}
+                      />
+                    </>
+                  )}
               </div>
             ))
           ) : (

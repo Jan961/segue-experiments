@@ -3,6 +3,7 @@ import TaskEditor from './editors/TaskEditor';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
+import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { tourState, ToursWithTasks } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
 
@@ -10,6 +11,7 @@ interface ToolbarProps {
   setSelectedTour: React.Dispatch<React.SetStateAction<number | undefined>>;
   onFilterChange: (filters: any) => void;
   onSearch: (searchFilter: string) => void;
+  selectedStatus: string | undefined;
 }
 
 const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSearch }) => {
@@ -27,7 +29,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
     const filteredTours = tours.filter((tour) => {
       const matchesTour = !filters.Tour || filters.Tour === tour.Id;
       const matchesStatus =
-        !filters.Status ||
+        !selectedStatus ||
         tour.Tasks.some((task) =>
           (filters.Status === 'todo' && task.Progress === 0) ||
           (filters.Status === 'inProgress' && task.Progress > 0 && task.Progress < 100) ||
@@ -40,7 +42,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
     });
   
     setFilteredTasks(filteredTours);
-    onFilterChange({ ...filters, Search: searchFilter });
+    onFilterChange({ ...filters, Search: searchFilter, Status: selectedStatus });
   };
   
 
@@ -77,8 +79,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
     }
   };
 
-  const handleStatusChange = (status: string) => {
-    setSelectedStatus(status);
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    console.log("handleStatus", e.target.value);
+    setSelectedStatus(e.target.value);
+
+    onFilterChange({ ...filters, Status: e.target.value });
   };
 
   const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }));
@@ -126,11 +131,30 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
         </div>
       </div>
       <div className="flex flex-row gap-2">
+      <div className="flex">
+          <p>Due date</p>
+          <FormInputDate name="DueDate" label="" onChange={handleOnChange} value={''} />
+        </div>
+        <div className="flex">
+          <p>to</p>
+          <FormInputDate name="ToDate" label="" onChange={handleOnChange} value={''} />
+        </div>
+        <div className="flex">
+          <p>Asignee</p>
           <FormInputSelect
             className="w-80"
             onChange={handleOnChange}
+            name="Assignee"
+            value={filters.Assignee}
+            options={tourOptions}
+          />
+        </div>
+        <p>Status</p>
+          <FormInputSelect
+            className="w-80"
+            onChange={handleStatusChange}
             name="Status"
-            value={filters.Status}
+            value={selectedStatus}
             options={statusOptions}
           />
         <ToolbarButton className="mb-2" onClick={applyFilters}>
