@@ -13,50 +13,40 @@ import { mapToTourTaskDTO } from 'lib/mappers';
 import { getAccountIdFromReq } from 'services/userService';
 
 const Index = () => {
-  const [selectedTour, setSelectedTour] = useState<number | undefined>(undefined);
   const [bulkIsOpen, setBulkIsOpen] = useState(false);
   const [bulkActionField, setBulkActionField] = useState<string>('');
+  const [selectedTour, setSelectedTour] = useState<number | undefined>(undefined);
+  const [filteredTasks, setFilteredTasks] = useState<ToursWithTasks[]>([]);
 
+  const [searchFilter, setSearchFilter] = useState('');
+
+  const handleSearch = (newSearchFilter: string) => {
+    setSearchFilter(newSearchFilter);
+    console.log('Current state', newSearchFilter);
+    console.log('Current searchFilter:', searchFilter);
+    console.log('Current filteredTasks:', filteredTasks);
+  };
+
+  const [filters, setFilters] = useState({ Search: '', Tour: undefined, Status: undefined, Assignee: undefined });
   const tours = useRecoilValue(tourState);
 
-  /*
-  function applyFilters () {
-    console.log('the master data:', masterTourData)
-    console.log('the tour data:', tourData)
-    setTourData([])
-    setIsLoading(true)
+  const applyFilters = (filters) => {
+    const filteredTours = tours.filter((tour) => {
+      const matchesTour = filters.Tour === undefined || filters.Tour === tour.Id;
+      const matchesStatus = filters.Status === undefined || filters.Status === tour.Status;
+      const matchesAssignee = filters.Assignee === undefined || filters.Assignee === tour.Assignee;
+      const matchesSearch =
+        filters.Search === '' ||
+        (tour.Tasks &&
+          tour.Tasks.some((task) => task.TaskName && task.TaskName.toLowerCase().includes(filters.Search.toLowerCase())));
 
-    let filteredTourData = deepCopy(masterTourData)
+      return matchesTour && matchesStatus && matchesAssignee && matchesSearch;
+    });
 
-    if (selectedTour !== 0) {
-      filteredTourData = filteredTourData.filter(
-        (tour) => selectedTour === 0 || selectedTour === tour.TourId
-      )
-    }
+    setFilteredTasks(filteredTours.length > 0 ? filteredTours : tours);
+  };
 
-    if (assignee !== 0 || assignedBy !== 0 || searchFilter.length > 0) {
-      filteredTourData = filteredTourData.map((tour) => {
-        const tasks = tour.TourTask.filter((task) => {
-          return (
-            task.Assignee === assignee ||
-            task.AssignedBy === assignedBy ||
-            (searchFilter.length > 0 && task.TaskName.toLowerCase().includes(searchFilter.toLowerCase()))
-          )
-        })
-
-        const updatedTour = deepCopy(tour)
-        updatedTour.TourTask = tasks
-
-        return updatedTour
-      })
-    }
-
-    setTourData(filteredTourData)
-    setIsLoading(true)
-  }
-  */
-
-  function openBulkModal(key) {
+  const openBulkModal = (key) => {
     switch (key) {
       case 'setstatus':
         setBulkActionField('Status');
@@ -85,24 +75,31 @@ const Index = () => {
       default:
         break;
     }
-  }
+  };
+
+
 
   return (
     <Layout title="Tasks | Seque">
       <div className="flex flex-auto w-full h-screen">
         <div className="flex-col px-12 w-full flex justify-between" style={{ minHeight: '60vh' }}>
           <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}>
-            <Toolbar setSelectedTour={setSelectedTour}/>
+            <Toolbar setSelectedTour={setSelectedTour} onFilterChange={applyFilters} onSearch={handleSearch}/>
           </GlobalToolbar>
-          {tours.length > 0 ? (
-            tours.map((tour) => {
-              return (
-                <div key={tour.Id} className="mb-10">
-                  <h3 className=" text-xl font-bold py-4">{tour.ShowName}</h3>
-                  <Tasklist tourId={tour.Id} key={tour.Id} />
-                </div>
-              );
-            })
+          {filteredTasks.length > 0 ? (
+            filteredTasks.map((tour) => (
+              <div key={tour.Id} className="mb-10">
+                <h3 className="text-xl font-bold py-4">{tour.ShowName}</h3>
+                <Tasklist
+                  tourId={tour.Id}
+                  key={tour.Id}
+                  selectedTour={selectedTour}
+                  searchFilter={searchFilter}
+                  statusFilter={filters.Status} 
+                  tasks={tour.Tasks || []}
+                />
+              </div>
+            ))
           ) : (
             <div className="text-center font-bold text-lg">
               <p>No Tasks Found</p>
@@ -111,14 +108,6 @@ const Index = () => {
           <TaskButtons openBulkModal={openBulkModal} />
         </div>
       </div>
-      {/*
-        <BulkActionForm
-          userAccountId={0}
-          closeModal={console.log}
-          taskIdArray={isSelectedArray}
-          bulkActionField={bulkActionField}
-        />
-        */}
     </Layout>
   );
 };
