@@ -22,7 +22,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Notes: task.Notes,
           Progress: task.Progress,
           Interval: 'once',
-          AssignedToUserId: task.AssignedTo,
           StartByWeekNum: task.StartByWeekNum,
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByPostTour: task.StartByPostTour,
@@ -30,6 +29,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Tour: {
             connect: {
               Id: task.TourId,
+            },
+          },
+          User: {
+            connect: {
+              Id: task.AssignedToUserId,
             },
           },
         },

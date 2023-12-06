@@ -140,6 +140,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
                   Id: parseInt(tourId),
                 },
               },
+              User: {
+                connect: {
+                  id: parseInt(assignedBy),
+                },
+              },
             },
           }),
       ),

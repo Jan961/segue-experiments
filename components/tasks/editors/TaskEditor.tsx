@@ -6,7 +6,8 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { userState } from 'state/account/userState';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -23,6 +24,9 @@ const DEFAULT_TASK: TourTaskDTO = {
   Interval: 'once',
   CompleteByPostTour: false,
   StartByPostTour: false,
+  StartByWeekNum: -52,
+  CompleteByWeekNum: -52,
+  AssignedToUserId: 2,
   Progress: 0,
   Priority: 0,
 };
@@ -32,6 +36,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
   const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
   const [tours, setTours] = useRecoilState(tourState);
+  const users = useRecoilValue(userState).users;
 
   const creating = !inputs.Id;
 
@@ -43,6 +48,9 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     if (id === 'Priority') value = Number(value);
     if (id === 'StartByWeekNum') value = Number(value);
     if (id === 'CompleteByWeekNum') value = Number(value);
+    if (id === 'AssignedToUserId') value = Number(value);
+
+    console.log(id, value);
 
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
@@ -158,7 +166,16 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           value={inputs.CompleteByWeekNum}
           options={weekOptions}
         />
-        <FormInputText name="AssigneeTo" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
+        <FormInputSelect
+          name="AssignedToUserId"
+          label="Assigned To"
+          onChange={handleOnChange}
+          value={inputs.AssignedToUserId}
+          options={Object.values(users).map((user) => ({
+            text: `${user.FirstName} ${user?.LastName ?? ''}`,
+            value: user.Id,
+          }))}
+        />
         <FormInputSelect
           name="Progress"
           label="Progress"
