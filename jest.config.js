@@ -1,4 +1,6 @@
 module.exports = {
+  clearMocks: true,
+  rootDir: './',
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/node_modules/**'],
   moduleNameMapper: {
     // Handle CSS imports (with CSS modules)
