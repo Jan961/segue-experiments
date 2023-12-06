@@ -10,7 +10,7 @@ import { useRecoilValue } from 'recoil';
 import { ToursWithTasks, tourState } from 'state/tasks/tourState';
 import { InitialState } from 'lib/recoil';
 import { mapToTourTaskDTO } from 'lib/mappers';
-import { getAccountIdFromReq } from 'services/userService';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 
 const Index = () => {
   // const [bulkIsOpen, setBulkIsOpen] = useState(false);
@@ -126,6 +126,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
 
   const toursWithTasks = await getToursAndTasks(AccountId);
+  const users = await getUsers(AccountId);
 
   const tours: ToursWithTasks[] = toursWithTasks.map((t: any) => ({
     Id: t.Id,
@@ -136,7 +137,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     Tasks: t.TourTask.map(mapToTourTaskDTO),
   }));
 
-  const initialState: InitialState = { tasks: { tours, bulkSelection: {} } };
+  const initialState: InitialState = {
+    tasks: { tours, bulkSelection: {} },
+    account: { user: { users } },
+  };
   return { props: { initialState } };
 };
 
