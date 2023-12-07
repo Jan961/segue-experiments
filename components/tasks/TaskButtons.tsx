@@ -11,12 +11,12 @@ function TaskButtons({ openBulkModal }: props) {
   };
   return (
     <div className="options">
-      <div className="relative inline-block text-left">
+      <div className="flex relative inline-block text-left">
         <div>
           <button
             onClick={toggleDropdown}
             type="button"
-            className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            className="inline-flex items-center rounded-md border bg-white mr-3 px-3 py-2 text-sm leading-4 shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 hover:font-bold"
             id="menu-button"
             aria-expanded="true"
             aria-haspopup="true"
@@ -98,12 +98,12 @@ function TaskButtons({ openBulkModal }: props) {
           </div>
         )}
 
-        {/* <button
+        <button
           type="button"
           className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
           Apply
-        </button> */}
+        </button>
       </div>
     </div>
   );

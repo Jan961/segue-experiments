@@ -12,45 +12,23 @@ interface ToolbarProps {
   onFilterChange: (filters: any) => void;
   onSearch: (searchFilter: string) => void;
   selectedStatus: string | undefined;
+  onStatusChange: (status: string) => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSearch }) => {
+const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSearch, selectedStatus, onStatusChange }) => {
   const [addTaskOpen, setAddTaskOpen] = useState(false);
   const [addRecurringTaskOpen, setAddRecurringTaskOpen] = useState(false);
   const [filters, setFilters] = useState({ Tour: undefined, Status: undefined, Assignee: undefined });
   const [searchFilter, setSearchFilter] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState<string | undefined>(undefined);
+  const [localStatus, setLocalStatus] = useState<string | undefined>(selectedStatus);
 
   const tours = useRecoilValue(tourState);
-  const [filteredTasks, setFilteredTasks] = useState<ToursWithTasks[]>([]);
-
-  const applyFilters = () => {
-    const searchTerm = searchFilter.toLowerCase();
-    const filteredTours = tours.filter((tour) => {
-      const matchesTour = !filters.Tour || filters.Tour === tour.Id;
-      const matchesStatus =
-        !selectedStatus ||
-        tour.Tasks.some((task) =>
-          (filters.Status === 'todo' && task.Progress === 0) ||
-          (filters.Status === 'inProgress' && task.Progress > 0 && task.Progress < 100) ||
-          (filters.Status === 'complete' && task.Progress === 100)
-        );
-      const matchesAssignee = !filters.Assignee || filters.Assignee === tour.Assignee;
-      const matchesSearch = !searchFilter || tour.Tasks.some((task) => task.TaskName.toLowerCase().includes(searchTerm));
-  
-      return matchesTour && matchesStatus && matchesAssignee && matchesSearch;
-    });
-  
-    setFilteredTasks(filteredTours);
-    onFilterChange({ ...filters, Search: searchFilter, Status: selectedStatus });
-  };
-  
 
   const clearFilters = () => {
-    setFilters({ Tour: undefined, Status: undefined, Assignee: undefined });
-    setSearchFilter('');
+    setFilters({ Tour: undefined, Status: '', Assignee: undefined });
     setSelectedTour(undefined);
-    setFilteredTasks([]);
+    setLocalStatus(undefined); // Clear local status
+    onStatusChange(undefined); // Update parent component's status
     onFilterChange({});
   };
 
@@ -65,33 +43,33 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
     }
   };
 
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setLocalStatus(e.target.value);
+  };
+  
   const handleSearchOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      const searchTerm = searchFilter.toLowerCase();
-      const filteredTours = tours.filter((tour) =>
-        tour.Tasks && tour.Tasks.some((task) => task.TaskName && task.TaskName.toLowerCase().includes(searchTerm))
-      );
-      setFilteredTasks(filteredTours);
-      onFilterChange({ ...filters, Search: searchFilter });
       onSearch(searchFilter);
-      console.log('search term:' + searchTerm + searchFilter);
-      console.log(filteredTours);
     }
   };
 
-  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log("handleStatus", e.target.value);
-    setSelectedStatus(e.target.value);
-
-    onFilterChange({ ...filters, Status: e.target.value });
+  // JAS TO DO: query functionality of submit button
+  const applyFilters = () => {
+    onFilterChange({ ...filters, Search: searchFilter, Status: selectedStatus });
+    onStatusChange(localStatus); // This will update the parent component's status
   };
 
   const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }));
 
   const statusOptions = [
+    { text: 'All', value: 'all'},
     { text: 'To do', value: 'todo' },
     { text: 'In progress', value: 'inProgress' },
     { text: 'Complete', value: 'complete' },
+  ];
+
+  const asigneeOptions = [
+    { text: 'Temp', value: 'Temp'},
   ];
 
   useEffect(() => {
@@ -100,15 +78,17 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
 
   return (
     <div>
-      <div className="flex flex-row gap-2 justify-end items-center">
-        <FormInputSelect
-          className="w-80"
-          onChange={handleOnChange}
-          name="Tour"
-          value={filters.Tour}
-          options={tourOptions}
-        />
-        <div className="flex gap-2">
+      <div className="flex flex-row gap-2 items-center">
+        <div className='grow'>
+          <FormInputSelect
+            className="w-80"
+            onChange={handleOnChange}
+            name="Tour"
+            value={filters.Tour}
+            options={tourOptions}
+          />
+        </div>
+        <div className="flex gap-4">
           <ToolbarButton className="mb-2" onClick={() => setAddRecurringTaskOpen(true)} disabled>
             Add Recurring Task
           </ToolbarButton>
@@ -121,35 +101,39 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
           <ToolbarButton className="mb-2" onClick={() => setAddTaskOpen(true)}>
             Report
           </ToolbarButton>
-          <FormInputText
-            placeholder="Search Tasks"
-            onChange={handleOnChange}
-            onKeyDown={handleSearchOnEnter}
-            name="searchTasks"
-            value={searchFilter}
-          />
         </div>
+        <div className="flex gap-2 grow">
+            <FormInputText
+              placeholder="Search Tasks"
+              onChange={handleOnChange}
+              onKeyDown={handleSearchOnEnter}
+              name="searchTasks"
+              value={searchFilter}
+              className="flex-grow"
+            />
+          </div>
       </div>
       <div className="flex flex-row gap-2">
-      <div className="flex">
-          <p>Due date</p>
+        <div className="flex items-center	">
+          <p className='mr-3 font-light text-sm'>Due date</p>
           <FormInputDate name="DueDate" label="" onChange={handleOnChange} value={''} />
         </div>
-        <div className="flex">
-          <p>to</p>
-          <FormInputDate name="ToDate" label="" onChange={handleOnChange} value={''} />
+        <div className="flex items-center">
+          <p className='mr-3 font-light	text-sm'>to</p>
+          <FormInputDate name="ToDate" label="" onChange={handleOnChange} value={''} className={'unstyled'}/>
         </div>
-        <div className="flex">
-          <p>Asignee</p>
+        <div className="flex items-center">
+          <p className='mr-3 font-light text-sm'>Asignee</p>
           <FormInputSelect
             className="w-80"
             onChange={handleOnChange}
             name="Assignee"
             value={filters.Assignee}
-            options={tourOptions}
+            options={asigneeOptions}
           />
         </div>
-        <p>Status</p>
+        <div className="flex items-center">
+          <p className='mr-3 font-light	text-sm'>Status</p>
           <FormInputSelect
             className="w-80"
             onChange={handleStatusChange}
@@ -157,6 +141,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
             value={selectedStatus}
             options={statusOptions}
           />
+        </div>
         <ToolbarButton className="mb-2" onClick={applyFilters}>
           Submit
         </ToolbarButton>

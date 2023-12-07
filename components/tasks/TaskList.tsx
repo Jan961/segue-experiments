@@ -14,10 +14,10 @@ interface TaskListProps {
   searchFilter: string;
   statusFilter: string;
   tasks: TourTaskDTO[];
-
 }
 
 const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: TaskListProps) => {
+  // console.log('Received searchFilter:', searchFilter);
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const tours: TourState = useRecoilValue(tourState);
   const match = tours.find((x) => x.Id === tourId);
@@ -51,34 +51,42 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
   }
 
   return (
-    <div className="h-128 w-full overflow-auto">
+    <div className="max-h-[32rem] w-full overflow-auto">
       <Table className="border-collapse">
         <Table.HeaderRow>
-          <Table.HeaderCell>
-            <FormInputCheckbox value={allSelected} onChange={toggleAll} minimal />
-          </Table.HeaderCell>
+          <Table.HeaderCell>Code</Table.HeaderCell>
+          <Table.HeaderCell>Task Name</Table.HeaderCell>
           <Table.HeaderCell>Start by (wk)</Table.HeaderCell>
           <Table.HeaderCell>Start by</Table.HeaderCell>
           <Table.HeaderCell>Due (wk)</Table.HeaderCell>
           <Table.HeaderCell>Due</Table.HeaderCell>
           <Table.HeaderCell>Progress</Table.HeaderCell>
-          <Table.HeaderCell>Title</Table.HeaderCell>
-          <Table.HeaderCell>Assignee</Table.HeaderCell>
-          <Table.HeaderCell>Assigned By</Table.HeaderCell>
           <Table.HeaderCell>Status</Table.HeaderCell>
+          <Table.HeaderCell>Assignee</Table.HeaderCell>
           <Table.HeaderCell>Priority</Table.HeaderCell>
-          <Table.HeaderCell>Follow Up</Table.HeaderCell>
+          <Table.HeaderCell>Notes</Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
         {tasks
-            .filter(
-              (task) =>
-                (searchFilter === '' || task.Name.toLowerCase().includes(searchFilter.toLowerCase())) &&
-                (!statusFilter ||
-                  (statusFilter === 'todo' && task.Progress === 0) ||
-                  (statusFilter === 'inProgress' && task.Progress > 0 && task.Progress < 100) ||
-                  (statusFilter === 'complete' && task.Progress === 100))
-            )
+            .filter((task) => {
+              const matchesSearch = searchFilter === '' || task.Name.toLowerCase().includes(searchFilter.toLowerCase());
+              console.log('Tasklist here', statusFilter);
+              let matchesStatus = true;
+              switch (statusFilter) {
+                case 'todo':
+                  matchesStatus = task.Progress === 0;
+                  break;
+                case 'inProgress':
+                  matchesStatus = task.Progress > 0 && task.Progress < 100;
+                  break;
+                case 'complete':
+                  matchesStatus = task.Progress === 100;
+                  break;
+                default:
+                  break;
+              }
+              return matchesSearch && matchesStatus;
+            })
             .map((task) => (
               <TaskListItem task={task} key={task.Id}></TaskListItem>
             ))}
