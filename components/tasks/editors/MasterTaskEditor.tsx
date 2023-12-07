@@ -103,14 +103,14 @@ const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
         <p className="text-center text-red-500">{alert ?? ''}</p>
         <FormInputNumeric name="Code" label="Code" value={inputs.Code} onChange={handleCodeChange} />
         <FormInputText name="Name" label="Name" onChange={handleOnChange} value={inputs.Name} />
-        <FormInputSelect name="AssignedToUserId" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedToUserId} options={[userOptions]} />
+        <FormInputSelect name="AssignedToUserId" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedToUserId} options={userOptions} />
         <FormInputSelect name="StartByWeekNum" label="Start by" onChange={handleOnChange} value={inputs.StartByWeekNum} options={weekOptions} />
         <FormInputSelect name="CompleteByWeekNum" label="Complete by" onChange={handleOnChange} value={inputs.CompleteByWeekNum} options={weekOptions} />
         <FormInputText area name="Notes" label="Notes" onChange={handleOnChange} value={inputs.Notes} />
         <StyledDialog.FooterContainer>
           <StyledDialog.FooterCancel onClick={triggerClose} />
           {/* <StyledDialog.FooterDelete onClick={handleDelete} disabled={creating || status.submitting}>Delete</StyledDialog.FooterDelete> */}
-          <StyledDialog.FooterContinue disabled={status.submitted || status.submitting} submit>
+          <StyledDialog.FooterContinue className="bg-purple-900" disabled={status.submitted || status.submitting} submit>
             {creating ? 'Create' : 'Update'}
           </StyledDialog.FooterContinue>
         </StyledDialog.FooterContainer>

@@ -13,6 +13,8 @@ import { masterTaskState } from 'state/tasks/masterTaskState';
 import { omit } from 'radash';
 import { loggingService } from 'services/loggingService';
 import { Spinner } from 'components/global/Spinner';
+import { getWeekOptions } from 'utils/getTaskDateStatus';
+import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 
 interface TaskListItemProps {
   task: MasterTask;
@@ -21,82 +23,154 @@ interface TaskListItemProps {
 const TaskListItem = ({ task }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
-  const [loading, setLoading] = React.useState<boolean>(false)
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
-  const {users={}} = useRecoilValue(userState)
-  const assignedToUser = useMemo(()=>users[task.AssignedToUserId],[task,users])
+  const { users = {} } = useRecoilValue(userState);
+  const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
+  const weekOptions = useMemo(()=>getWeekOptions(''),[])
   const toggleSelected = () => {
     setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   };
-  const onActionItemClick = (e:any,key:string)=>{
-    e?.stopPropagation?.()
-    switch(key){
+  const onActionItemClick = (e: any, key: string) => {
+    e?.stopPropagation?.();
+    switch (key) {
       case 'clone':
-        onCloneTask()
+        onCloneTask();
         return;
       case 'edit':
-        setModalOpen(true)
-        return
+        setModalOpen(true);
+        return;
       case 'delete':
-        setShowDeleteConfirmation(true)
+        setShowDeleteConfirmation(true);
     }
-  }
-  const onCloneTask = async ()=>{
-    setLoading(true)
+  };
+  const onCloneTask = async () => {
+    setLoading(true);
     try {
       const endpoint = '/api/tasks/master/create';
-      await axios.post(endpoint, omit(task, ['Id'])).then((response)=>{
-        const taskIndex = masterTasks.findIndex(masterTask=>masterTask.Id===task.Id)
-        setMasterTasks([...masterTasks.slice(0, taskIndex),{ ...omit(task, ['Id']), Id:response.data.Id}, ...masterTasks.slice(taskIndex)])
-      }).finally(()=>{
-        setLoading(false)
-      });
+      await axios
+        .post(endpoint, omit(task, ['Id']))
+        .then((response) => {
+          const taskIndex = masterTasks.findIndex((masterTask) => masterTask.Id === task.Id);
+          setMasterTasks([
+            ...masterTasks.slice(0, taskIndex),
+            { ...omit(task, ['Id']), Id: response.data.Id },
+            ...masterTasks.slice(taskIndex),
+          ]);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } catch (error) {
       loggingService.logError(error);
       console.error(error);
     }
-  }
-  const onDeleteTask = ()=>{
+  };
+  const onDeleteTask = () => {
     axios
-        .delete(`/api/tasks/master/delete/${task.Id}`)
-        .then(()=>{
-          setShowDeleteConfirmation(false)
-          const updatedTasks = masterTasks.filter(masterTask=>masterTask.Id!==task.Id)
-          setMasterTasks(updatedTasks)
-        })
-        .catch(error=>{
-          console.error(error)
-        })
-  }
+      .delete(`/api/tasks/master/delete/${task.Id}`)
+      .then(() => {
+        setShowDeleteConfirmation(false);
+        const updatedTasks = masterTasks.filter((masterTask) => masterTask.Id !== task.Id);
+        setMasterTasks(updatedTasks);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+  const handleOnChange = (e:any) => {
+    e?.stopPropagation?.();
+    let { id, value } = e.target;
+    const oldTask = {...task}
+    value = parseInt(value, 10);
+    const updatedTask =  {...task, [id]:value}
+    const updatedTasks = masterTasks.map((masterTask) => {
+      if (masterTask.Id === task.Id) {
+        return updatedTask;
+      }
+      return masterTask;
+    });
+    setMasterTasks(updatedTasks);
+    setLoading(true)
+    axios
+      .post('/api/tasks/master/update',updatedTask)
+      .catch((error) => {
+        setMasterTasks(masterTasks.map((masterTask)=>{
+          if(masterTask.Id===task.Id){
+            return oldTask
+          }
+          return masterTask
+        }))
+        loggingService.logError(error);
+        console.error(error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
   return (
     <>
       {modalOpen && <MasterTaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}
       {loading && (
-          <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
-            <Spinner className="w-full" size="lg" />
-          </div>
-        )}
-      <Table.Row className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`} hover onClick={() => setModalOpen(true)}>
+        <div className="w-full h-full absolute z-5 left-0 top-0 bg-white flex items-center opacity-95">
+          <Spinner className="w-full" size="lg" />
+        </div>
+      )}
+      <Table.Row
+        className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`}
+        hover
+      >
         <Table.Cell>
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
         </Table.Cell>
         <Table.Cell>{task.Code}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
-        <Table.Cell>{task.StartByWeekNum}</Table.Cell>
-        <Table.Cell>{task.CompleteByWeekNum}</Table.Cell>
+        <Table.Cell>
+          <FormInputSelect
+            className='z-3 relative w-20 block'
+            name="StartByWeekNum"
+            label=""
+            onChange={handleOnChange}
+            value={task.StartByWeekNum}
+            options={weekOptions}
+            inline={false}
+          />
+        </Table.Cell>
+        <Table.Cell>
+          <FormInputSelect
+            className='z-3 relative w-20 block'
+            name="CompleteByWeekNum"
+            label=""
+            onChange={handleOnChange}
+            value={task.CompleteByWeekNum}
+            options={weekOptions}
+          />
+        </Table.Cell>
         <Table.Cell>{task.Priority}</Table.Cell>
-        <Table.Cell>{assignedToUser?`${assignedToUser?.FirstName} ${assignedToUser?.LastName}`:'-'}</Table.Cell>
+        <Table.Cell>{assignedToUser ? `${assignedToUser?.FirstName} ${assignedToUser?.LastName}` : '-'}</Table.Cell>
         <Table.Cell>{task.Notes}</Table.Cell>
         <Table.Cell>
-            <MenuButton className='!bg-gray-600 hover:!bg-gray-400' onClick={(e)=>onActionItemClick(e,'clone')}>CLONE</MenuButton>
-            <MenuButton className='!bg-gray-600 hover:!bg-gray-400' onClick={(e)=>onActionItemClick(e,'edit')}>EDIT</MenuButton>
-            <MenuButton className='!bg-gray-600 hover:!bg-gray-400' onClick={(e)=>onActionItemClick(e,'delete')}>DEL</MenuButton>
+          <MenuButton className="!bg-gray-600 hover:!bg-gray-400" onClick={(e) => onActionItemClick(e, 'clone')}>
+            CLONE
+          </MenuButton>
+          <MenuButton className="!bg-gray-600 hover:!bg-gray-400" onClick={(e) => onActionItemClick(e, 'edit')}>
+            EDIT
+          </MenuButton>
+          <MenuButton className="!bg-gray-600 hover:!bg-gray-400" onClick={(e) => onActionItemClick(e, 'delete')}>
+            DEL
+          </MenuButton>
         </Table.Cell>
       </Table.Row>
-      {showDeleteConfirmation && <DeleteConfirmation title={"Delete Master task"} onConfirm={onDeleteTask} onCancel={()=>setShowDeleteConfirmation(false)}>
+      {showDeleteConfirmation && (
+        <DeleteConfirmation
+          title={'Delete Master task'}
+          onConfirm={onDeleteTask}
+          onCancel={() => setShowDeleteConfirmation(false)}
+        >
           <p>Are you sure, you want to delete this task?</p>
-        </DeleteConfirmation>}
+        </DeleteConfirmation>
+      )}
     </>
   );
 };
