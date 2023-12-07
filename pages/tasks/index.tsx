@@ -8,14 +8,14 @@ const ShowSelection = ({ tours }: AllTourPageProps) => (
   <div>
     <TourSelector
       ToolbarButtons={
-        <div className='flex gap-2 my-4'>
+        <div className='flex gap-6 my-6 justify-center'>
           <Link href={`/tasks/all`}>
-            <ToolbarButton>All Productions</ToolbarButton>
+            <ToolbarButton className="text-purple-900">All Productions</ToolbarButton>
           </Link>
           <Link href={`/tasks/master`}>
-            <ToolbarButton>View / Edit Master Task List</ToolbarButton>
+            <ToolbarButton className="text-purple-900">View / Edit Master Task List</ToolbarButton>
           </Link>
-          <ToolbarButton>Start Production Task List</ToolbarButton>
+          <ToolbarButton className="text-purple-900">Start Production Task List</ToolbarButton>
         </div>
       }
       tours={tours}
