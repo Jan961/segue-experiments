@@ -24,7 +24,7 @@ const Toolbar: React.FC = () => {
 
   return (
     <div>
-      <div className="flex flex-row gap-2 justify-end items-center">
+      <div className="flex flex-row gap-2 justify-end items-end">
         <FormInputText placeholder="Search" onChange={handleOnChange} name="Search" value={filters.Search} />
         <FormInputSelect
           className="w-80"

@@ -29,7 +29,7 @@ export const FormInputSelect = ({
   inline,
 }: Input) => {
   const inputClass =
-    'w-full pr-8 block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 mb-2 focus:ring-indigo-500 sm:text-sm';
+    'w-full pr-8 block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
   let baseClass = classNames('whitespace-nowrap mb-2', className);
   if (inline) {
     baseClass = classNames(baseClass, 'flex items-baseline gap-x-2');
