@@ -1,17 +1,17 @@
+import { useState } from 'react';
 import { ToolbarButton } from '../ToolbarButton';
 import { Spinner } from 'components/global/Spinner';
 import ExcelIcon from 'components/global/icons/excelIcon';
-import { useState } from 'react';
 
 type props = {
   TourId: number;
 };
 
-const BookingSchedule = ({ TourId }: props) => {
+const ScheduleReport = ({ TourId }: props) => {
   const [isLoading, setIsLoading] = useState(false)
-  const onBookingSchedule = () => {
+  const onScheduleReport = () => {
     setIsLoading(true)
-    fetch('/api/reports/bookingSchedule', { method: 'POST', body: JSON.stringify({ TourId }) })
+    fetch('/api/reports/schedule-report', { method: 'POST', body: JSON.stringify({ TourId }) })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
           const tourName = `${TourId}`;
@@ -44,10 +44,10 @@ const BookingSchedule = ({ TourId }: props) => {
         setIsLoading(false)
       });
   };
-  return <ToolbarButton onClick={onBookingSchedule}  className='flex items-center gap-1'>
-    <ExcelIcon height={18} width={18}  />
-    {isLoading ? <Spinner className='mr-2' size="sm" />: "Travel Summary"}
-    </ToolbarButton>;
+  return <ToolbarButton onClick={onScheduleReport} className='flex items-center gap-1'>
+    <ExcelIcon height={18} width={18} />
+    {isLoading ? <Spinner className='mr-2' size="sm" />: "Schedule"}
+  </ToolbarButton>;
 };
 
-export default BookingSchedule;
+export default ScheduleReport;

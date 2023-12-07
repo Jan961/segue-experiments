@@ -113,7 +113,7 @@ export default function PromotorHolds({ activeTours }: Props) {
       setLoading(true);
       await fetch(`api/tours/read/venues/${e.target.value}`)
         .then((res) => res.json())
-        .then((data) => data.data)
+        .then((data) => data)
         .then((data) => {
           setInputs((prevState) => ({ ...prevState, Venue: null }));
           setVenues(data);
