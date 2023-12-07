@@ -51,8 +51,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     if (id === 'CompleteByWeekNum') value = Number(value);
     if (id === 'AssignedToUserId') value = Number(value);
 
-    console.log(id, value);
-
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
     setStatus({ ...status, submitted: false });
@@ -88,17 +86,8 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       try {
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/';
         await axios.post(endpoint, inputs);
-
-        const updatedTours = tours.map((tour) => {
-          if (tour.Id === inputs.TourId) {
-            return { ...tour, Tasks: [inputs, ...tour.Tasks] };
-          }
-          return tour;
-        });
-
-        setTours(updatedTours);
-
         triggerClose();
+        window.location.reload();
       } catch (error) {
         loggingService.logError(error);
         console.error(error);
