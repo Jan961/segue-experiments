@@ -8,6 +8,7 @@ import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { weekOptions } from 'utils/weekOptions';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -109,15 +110,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     { text: '-- Select Tour --', value: '' },
     ...tours.map((x) => ({ text: `${x.ShowName}/${x.Code}`, value: x.Id })),
   ];
-
-  const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x) => {
-    const week = x - 52;
-    const formattedWeek = week < 0 ? `week - ${Math.abs(week)}` : `week + ${week}`;
-    return {
-      text: formattedWeek,
-      value: week,
-    };
-  });
 
   const progressOptions: SelectOption[] = [
     { text: 'Not Started', value: 0 },
