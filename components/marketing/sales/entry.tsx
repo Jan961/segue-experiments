@@ -3,16 +3,14 @@ import { dateToSimple } from 'services/dateService';
 import axios from 'axios';
 import { getSales } from './Api';
 import schema from './validation';
-import Typeahead from 'components/global/Typeahead';
+import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { Spinner } from 'components/global/Spinner';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
-import { StyledDialog } from 'components/global/StyledDialog';
 
 interface props {
   searchFilter: string;
   tours?: any[];
 }
-export default function Entry({ tours = [], searchFilter }: props) {
+export default function Entry({ tours = [] }: props) {
   const [isLoading, setLoading] = useState(false);
   const [salesWeeks, SetSalesWeeks] = useState([]);
   const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
@@ -25,8 +23,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
   const [previousSale, setPreviousSale] = useState<any>({});
   const [notes, setNotes] = useState<any>({});
   const [validationErrors, setValidationErrors] = useState<any>({});
-  const [ignoreValidation, setIgnoreValidation] = useState<boolean>(false);
-  const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
+  // const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
       setLoading(true);
@@ -43,7 +40,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          SetSalesWeeksVenues(data)
+          SetSalesWeeksVenues(data);
         })
         .finally(() => setLoading(false));
     }
@@ -121,20 +118,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
         .catch((error) => console.log(error));
     }
   }, [inputs.Venue, previousSaleWeek]);
-  if (isLoading) {
-    return (
-      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
-        <Spinner className="w-full" size="lg" />
-      </div>
-    );
-  }
 
   const handleOnChange = (e) => {
     e.persist?.();
     setValidationErrors({});
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value });
-      setSale({})
+      setSale({});
       return;
     }
     if (e.target.id === 'SaleWeek') {
@@ -215,7 +205,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
     if (!ignoreValidation) {
       const valid = await validateSale(sale, previousSale);
       if (!valid) {
-        setOpenWarningsDialog(true);
+        // setOpenWarningsDialog(true);
         return;
       }
     }
@@ -232,7 +222,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
       },
     ];
     // const validateSales
-    setLoading(true)
+    setLoading(true);
     await axios
       .post('/api/marketing/sales/upsert', {
         Holds,
@@ -243,14 +233,15 @@ export default function Entry({ tours = [], searchFilter }: props) {
       })
       .then((res) => {
         console.log('Updated Sales', res);
-        setOpenWarningsDialog(false);
+        // setOpenWarningsDialog(false);
         setValidationErrors({});
       })
       .catch((error) => {
-        console.log('Error updating Sales', error)
-      }).finally(() => {
-        setLoading(false)
+        console.log('Error updating Sales', error);
       })
+      .finally(() => {
+        setLoading(false);
+      });
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -281,14 +272,20 @@ export default function Entry({ tours = [], searchFilter }: props) {
     }
   };
 
-  const mapVenuesToTypeaheadOptions = (venues) => {
-    return venues.map((venue) => ({
+  const typeaheadOptions = useMemo(() => {
+    return salesWeeksVenues.map((venue) => ({
       name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
       value: String(venue.BookingId),
     }));
-  };
+  }, [salesWeeksVenues]);
 
-  const typeaheadOptions = useMemo(() => mapVenuesToTypeaheadOptions(salesWeeksVenues), [salesWeeksVenues]);
+  if (isLoading) {
+    return (
+      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
+        <Spinner className="w-full" size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-row w-full">
@@ -344,17 +341,15 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     </select>
                   </div>
                   {/* Venue/Date */}
-                  <div className="row-start-3 flex flex-row items-center relative">
+                  <div className="row-start-3 row-span-2 flex flex-row items-center relative">
                     <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
                       Venue/Date
                     </label>
-                    <Typeahead
+                    <FormTypeahead
                       placeholder="Venue/Date"
-                      label="Venue/Date"
                       name="Venue"
-                      className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
-                      dropdownClassName="max-w-lg top-[40px] right-0"
-                      value={inputs.Venue} 
+                      className="ml-1 block w-full max-w-lg rounded-md"
+                      value={inputs.Venue}
                       options={typeaheadOptions}
                       onChange={(selectedOption) =>
                         handleOnChange({
@@ -403,10 +398,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     </div>
                   </div>
                   <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
-                    <label
-                      htmlFor="ReservedValue"
-                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                    >
+                    <label htmlFor="ReservedValue" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                       Reserved Seats Value
                     </label>
                     <div className="mt-1 sm:col-span-2 sm:mt-0">
@@ -425,10 +417,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     </div>
                   </div>
                   <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                    <label
-                      htmlFor="ReservedSeats"
-                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                    >
+                    <label htmlFor="ReservedSeats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
                       Reserved Seats
                     </label>
                     <div className="mt-1 sm:col-span-2 sm:mt-0">

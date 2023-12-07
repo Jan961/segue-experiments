@@ -10,7 +10,7 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { ToolbarButton } from '../ToolbarButton';
-import Typeahead from 'components/global/Typeahead';
+import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
 
@@ -51,7 +51,7 @@ export default function Barring() {
     fetchBarredVenues();
   };
 
-  const closeForm = () => {
+  /* const closeForm = () => {
     setInputs({
       tour: null,
       venue: null,
@@ -62,10 +62,9 @@ export default function Barring() {
     });
 
     setShowModal(false);
-  };
+  }; */
 
-  const handleOnChange = async (e: any) => {
-    console.log(e);
+  const handleOnChange = async (e) => {
     const { id, value } = e.target;
     setInputs((prev) => ({
       ...prev,
@@ -74,8 +73,9 @@ export default function Barring() {
     if (e.target.name === 'tour') {
       // Load Venues for this tour
       // setIsLoading(true)
-      await axios.get(`/api/tours/read/venues/${e.target.value}`)
-        .then(data => data?.data)
+      await axios
+        .get(`/api/tours/read/venues/${e.target.value}`)
+        .then((data) => data?.data)
         .then((data) => {
           // setIsLoading(false)
           setInputs((prevState) => ({ ...prevState, Venue: null }));
@@ -102,9 +102,9 @@ export default function Barring() {
         name: `${dateToSimple(new Date(venue.booking.FirstDate))} - ${venue.Name}`,
         value: String(venue.Id),
       })),
-    [venues]
+    [venues],
   );
-  // @ts-ignore
+
   return (
     <>
       <ToolbarButton onClick={() => setShowModal(true)}>Barring</ToolbarButton>
@@ -130,8 +130,7 @@ export default function Barring() {
               onChange={handleOnChange}
               required
             />
-            <Typeahead
-              label="Venue"
+            <FormTypeahead
               name="venue"
               onChange={(selectedVenue) => handleOnChange({ target: { value: selectedVenue, id: 'venue' } })}
               options={[{ value: 0, name: '-- Select Venue --' }, ...venueOptions]}

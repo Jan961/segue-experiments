@@ -1,10 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import moment from 'moment';
 import { useRecoilState } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
-import Typeahead, { TypeaheadOption } from 'components/global/Typeahead';
+import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { mapBookingsToTourOptions } from 'mappers/tourCodeMapper';
 
 const ActionBar = () => {
@@ -13,17 +13,15 @@ const ActionBar = () => {
     () => (bookingJump.bookings ? mapBookingsToTourOptions(bookingJump.bookings) : []),
     [bookingJump],
   );
-  const [selectedBooking, setSelectedBooking] = useState<string | number>('');
+
   const selectedBookingIndex = useMemo(
     () => bookingOptions.findIndex((booking) => parseInt(booking.value, 10) === bookingJump.selected),
     [bookingJump.selected, bookingOptions],
   );
   const changeBooking = (value: string | number) => {
-    const booking = bookingOptions.find(booking => booking.value === value);
-    setSelectedBooking(value);
-    setBookingJump({ ...bookingJump, selected: Number(booking?.value) });
+    setBookingJump({ ...bookingJump, selected: Number(value) });
   };
-  
+
   const goToToday = () => {
     const currentDate = moment();
     const sortedBookings = bookingOptions.sort((a, b) => {
@@ -47,14 +45,11 @@ const ActionBar = () => {
   return (
     <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
-      <Typeahead 
-          className="w-128" 
-          value={selectedBooking} // Use state value directly
-          options={bookingOptions} 
-          onChange={changeBooking} 
-          name="Booking" 
-          placeholder={''} 
-          label="Booking" 
+        <FormTypeahead
+          className="w-128"
+          options={bookingOptions}
+          onChange={changeBooking}
+          placeholder={'Please select a venue'}
         />
         <ToolbarButton onClick={goToToday} className="!text-primary-green">
           Today
@@ -74,8 +69,3 @@ const ActionBar = () => {
   );
 };
 export default ActionBar;
-
-// Add default props
-ActionBar.defaultProps = {
-  onActionBookingIdChange: () => { },
-};
