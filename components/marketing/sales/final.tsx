@@ -234,6 +234,8 @@ export default function FinalSales({ tours }: props) {
         })
         .then(() => {
           handleServerResponse(true, 'Submitted');
+        }).finally(()=>{
+          setLoading(false)
         });
     } else {
       // alertService.info("Sorry you need to confirm input", 1);

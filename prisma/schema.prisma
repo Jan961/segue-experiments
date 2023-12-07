@@ -445,8 +445,8 @@ model Sale {
   SaleType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Restrict, onUpdate: Restrict, map: "SaleType_Sale")
 
   @@unique([SaleSetId, SaleSaleTypeId], name: "Sale_unique")
-  @@index([SaleSaleTypeId], map: "BookingSale_Sale_idx")
-  @@index([SaleSetId], map: "SaleType_Sale_idx")
+  @@index([SaleSaleTypeId], map: "SaleType_Sale_idx")
+  @@index([SaleSetId], map: "SaleSet_Sale")
 }
 
 model SaleType {
