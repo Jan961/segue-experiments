@@ -12,7 +12,7 @@ const Tasklist = () => {
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const masterTasks = useRecoilValue(masterTaskState);
   const filter = useRecoilValue(filterState)
-  const filteredTasks = useMemo(()=>masterTasks?.filter?.(task=>task?.Name?.toLowerCase?.()?.includes?.(filter?.masterTaskText?.toLowerCase?.())),[filter?.masterTaskText])
+  const filteredTasks = useMemo(()=>masterTasks?.filter?.(task=>task?.Name?.toLowerCase?.()?.includes?.(filter?.masterTaskText?.toLowerCase?.())),[filter?.masterTaskText, masterTasks])
   if (!filteredTasks.length) return null;
 
   const countSelected = filteredTasks.filter((x) => bulkSelection[x.Id]).length;

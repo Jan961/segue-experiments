@@ -6,9 +6,11 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { loggingService } from 'services/loggingService';
 import axios from 'axios';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/getTaskDateStatus';
+import { masterTaskState } from 'state/tasks/masterTaskState';
+import { Spinner } from 'components/global/Spinner';
 
 interface NewTaskFormProps {
     task?: MasterTask;
@@ -34,7 +36,9 @@ const DEFAULT_MASTER_TASK: MasterTask = {
 
 const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
   const {users={}} = useRecoilValue(userState);
+  const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState)
   const [alert, setAlert] = React.useState<string>('');
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [inputs, setInputs] = React.useState<MasterTask>(task || DEFAULT_MASTER_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
   const userOptions = useMemo(()=>Object.values(users).map(user=>({text:`${user.FirstName} ${user.LastName} (${user.Email})`, value:user?.Id})),[users])
@@ -53,10 +57,20 @@ const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
   };
   const handleOnSubmit = async (event) => {
     event.preventDefault();
-
-    if (inputs.Id) {
+    setLoading(true)
+    if (inputs.Id){
       try {
-        await axios.post('/api/tasks/master/update', inputs);
+        await axios.post('/api/tasks/master/update', inputs).then(()=>{
+          const updatedTasks = masterTasks.map(masterTask=>{
+            if(masterTask.Id===task.Id){
+              return {...task, ...inputs}
+            }
+            return masterTask
+          })
+          setMasterTasks(updatedTasks)
+        }).finally(()=>{
+          setLoading(false)
+        });
         triggerClose();
       } catch (error) {
         loggingService.logError(error);
@@ -65,7 +79,12 @@ const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
     } else {
       try {
         const endpoint = '/api/tasks/master/create';
-        await axios.post(endpoint, inputs);
+        await axios.post(endpoint, inputs).then((response)=>{
+          const updatedTasks = [{...inputs, Id:response.data.Id}, ...masterTasks]
+          setMasterTasks(updatedTasks)
+        }).finally(()=>{
+          setLoading(false)
+        });
         triggerClose();
       } catch (error) {
         loggingService.logError(error);
@@ -75,11 +94,16 @@ const MasterTaskEditor = ({ task, triggerClose, open }:NewTaskFormProps) => {
   };
   return (
     <StyledDialog title={creating ? 'Create Master Task' : 'Edit Master Task'} open={open} onClose={triggerClose}>
+      {loading && (
+          <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+            <Spinner className="w-full" size="lg" />
+          </div>
+        )}
       <form onSubmit={handleOnSubmit}>
         <p className="text-center text-red-500">{alert ?? ''}</p>
         <FormInputNumeric name="Code" label="Code" value={inputs.Code} onChange={handleCodeChange} />
         <FormInputText name="Name" label="Name" onChange={handleOnChange} value={inputs.Name} />
-        <FormInputSelect name="AssignedToUserId" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedToUserId} options={userOptions} />
+        <FormInputSelect name="AssignedToUserId" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedToUserId} options={[userOptions]} />
         <FormInputSelect name="StartByWeekNum" label="Start by" onChange={handleOnChange} value={inputs.StartByWeekNum} options={weekOptions} />
         <FormInputSelect name="CompleteByWeekNum" label="Complete by" onChange={handleOnChange} value={inputs.CompleteByWeekNum} options={weekOptions} />
         <FormInputText area name="Notes" label="Notes" onChange={handleOnChange} value={inputs.Notes} />

@@ -9,6 +9,10 @@ import { userState } from 'state/account/userState';
 import { MenuButton } from 'components/global/MenuButton';
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
 import axios from 'axios';
+import { masterTaskState } from 'state/tasks/masterTaskState';
+import { omit } from 'radash';
+import { loggingService } from 'services/loggingService';
+import { Spinner } from 'components/global/Spinner';
 
 interface TaskListItemProps {
   task: MasterTask;
@@ -17,6 +21,8 @@ interface TaskListItemProps {
 const TaskListItem = ({ task }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
+  const [loading, setLoading] = React.useState<boolean>(false)
+  const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
   const {users={}} = useRecoilValue(userState)
   const assignedToUser = useMemo(()=>users[task.AssignedToUserId],[task,users])
@@ -27,6 +33,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
     e?.stopPropagation?.()
     switch(key){
       case 'clone':
+        onCloneTask()
         return;
       case 'edit':
         setModalOpen(true)
@@ -35,11 +42,28 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         setShowDeleteConfirmation(true)
     }
   }
+  const onCloneTask = async ()=>{
+    setLoading(true)
+    try {
+      const endpoint = '/api/tasks/master/create';
+      await axios.post(endpoint, omit(task, ['Id'])).then((response)=>{
+        const taskIndex = masterTasks.findIndex(masterTask=>masterTask.Id===task.Id)
+        setMasterTasks([...masterTasks.slice(0, taskIndex),{ ...omit(task, ['Id']), Id:response.data.Id}, ...masterTasks.slice(taskIndex)])
+      }).finally(()=>{
+        setLoading(false)
+      });
+    } catch (error) {
+      loggingService.logError(error);
+      console.error(error);
+    }
+  }
   const onDeleteTask = ()=>{
     axios
         .delete(`/api/tasks/master/delete/${task.Id}`)
         .then(()=>{
           setShowDeleteConfirmation(false)
+          const updatedTasks = masterTasks.filter(masterTask=>masterTask.Id!==task.Id)
+          setMasterTasks(updatedTasks)
         })
         .catch(error=>{
           console.error(error)
@@ -48,6 +72,11 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   return (
     <>
       {modalOpen && <MasterTaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}
+      {loading && (
+          <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
+            <Spinner className="w-full" size="lg" />
+          </div>
+        )}
       <Table.Row className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`} hover onClick={() => setModalOpen(true)}>
         <Table.Cell>
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
