@@ -14,9 +14,10 @@ import React from 'react';
 
 interface TourSelectorProps {
   tours: TourDTO[];
+  ToolbarButtons?:any;
 }
 
-export const TourSelector = ({ tours }: TourSelectorProps) => {
+export const TourSelector = ({ tours, ToolbarButtons=<div></div> }: TourSelectorProps) => {
   const [search, setSearch] = React.useState('');
   const router = useRouter();
   const path = router.pathname.split('/')[1];
@@ -42,6 +43,7 @@ export const TourSelector = ({ tours }: TourSelectorProps) => {
         <BreadCrumb.Item href="/">Home</BreadCrumb.Item>
         <BreadCrumb.Item>{title(path)}</BreadCrumb.Item>
       </BreadCrumb>
+      {ToolbarButtons}
       <Tab.Group className="max-w-screen-md mx-auto" as="div">
         <Tab.List className="mb-2">
           <StyledTab>Active ({active.length})</StyledTab>

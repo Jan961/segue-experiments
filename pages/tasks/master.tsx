@@ -25,7 +25,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   
     const masterTasks: MasterTask[] = await getMasterTasksList(AccountId);
     const users = await getUsers(AccountId);
-  
     const initialState: InitialState = { tasks: {
         masterTask: masterTasks
     },
