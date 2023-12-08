@@ -1,5 +1,15 @@
 image: atlassian/default-image:2
 pipelines:
+  custom:
+    - step:
+      name: Build and run e2e tests
+      image: node:19.8.1
+      caches:
+        - node
+      script:
+        - npm install
+        - npm run build
+        - npm run cy:dev:run
   default:
     - parallel:
         - step:
@@ -10,6 +20,7 @@ pipelines:
             script:
               - npm install
               - npm run test:ci
+              - npm run build
   branches:
     release/*:
       - step:
