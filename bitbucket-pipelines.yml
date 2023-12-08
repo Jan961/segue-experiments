@@ -1,15 +1,21 @@
 image: atlassian/default-image:2
+image: cypress/browsers:latest
 pipelines:
   custom:
-    - step:
-      name: Build and run e2e tests
-      image: node:19.8.1
-      caches:
-        - node
-      script:
-        - npm install
-        - npm run build
-        - npm run cy:dev:run
+    run-browser-based-on-name: #name of this pipeline
+      - variables:          #list variable names under here
+          - name: browser_name
+            default: "chrome"
+            allowed-values:           # optionally restrict variable values
+              - "chrome"
+              - "firefox"
+              - "electron"
+      - step: 
+          script:
+            - npm ci
+            - npx cypress run --browser $browser_name --config video=false,screenshotOnRunFailure=false
+          artifacts: # defining the artifacts to be passed to each future step.
+            - cypress/reports/**
   default:
     - parallel:
         - step:
