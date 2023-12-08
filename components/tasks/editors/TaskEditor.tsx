@@ -27,6 +27,7 @@ const DEFAULT_TASK: TourTaskDTO = {
   StartByPostTour: false,
   Progress: 0,
   Priority: 0,
+  TaskName: undefined
 };
 
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
