@@ -6,8 +6,8 @@ import { useRecoilState } from "recoil";
 import { filterState } from "state/booking/filterState";
 
 function TaskButtons() {
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [search, setSearch] = React.useState<string>('');
   const [filter, setFilter] = useRecoilState(filterState);
   const onSearch = useCallback((e)=>{
     setSearch(e?.target?.value)

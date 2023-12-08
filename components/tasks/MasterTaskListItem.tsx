@@ -28,7 +28,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
   const { users = {} } = useRecoilValue(userState);
   const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
-  const weekOptions = useMemo(()=>getWeekOptions(''),[])
+  const weekOptions = useMemo(() => getWeekOptions(''), []);
   const toggleSelected = () => {
     setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   };
@@ -49,25 +49,21 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
     setLoading(true);
     try {
       const endpoint = '/api/tasks/master/create';
-      await axios
-        .post(endpoint, omit(task, ['Id']))
-        .then((response) => {
-          const taskIndex = masterTasks.findIndex((masterTask) => masterTask.Id === task.Id);
-          setMasterTasks([
-            ...masterTasks.slice(0, taskIndex),
-            { ...omit(task, ['Id']), Id: response.data.Id },
-            ...masterTasks.slice(taskIndex),
-          ]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      const { data:{ Code, Id }} = await axios.post(endpoint, omit(task, ['Id','Code'])) || { data:{} };
+      const taskIndex = masterTasks.findIndex((masterTask) => masterTask.Id === task.Id);
+      setMasterTasks([
+        ...masterTasks.slice(0, taskIndex),
+        { ...omit(task, ['Id']), Id, Code },
+        ...masterTasks.slice(taskIndex),
+      ]);
     } catch (error) {
       loggingService.logError(error);
       console.error(error);
     }
+    setLoading(false);
   };
   const onDeleteTask = () => {
+    setLoading(true);
     axios
       .delete(`/api/tasks/master/delete/${task.Id}`)
       .then(() => {
@@ -77,14 +73,17 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
       })
       .catch((error) => {
         console.error(error);
+      })
+      .finally(()=>{
+        setLoading(false);
       });
   };
-  const handleOnChange = (e:any) => {
+  const handleOnChange = (e: any) => {
     e?.stopPropagation?.();
     let { id, value } = e.target;
-    const oldTask = {...task}
+    const oldTask = { ...task };
     value = parseInt(value, 10);
-    const updatedTask =  {...task, [id]:value}
+    const updatedTask = { ...task, [id]: value };
     const updatedTasks = masterTasks.map((masterTask) => {
       if (masterTask.Id === task.Id) {
         return updatedTask;
@@ -92,16 +91,18 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
       return masterTask;
     });
     setMasterTasks(updatedTasks);
-    setLoading(true)
+    setLoading(true);
     axios
-      .post('/api/tasks/master/update',updatedTask)
+      .post('/api/tasks/master/update', updatedTask)
       .catch((error) => {
-        setMasterTasks(masterTasks.map((masterTask)=>{
-          if(masterTask.Id===task.Id){
-            return oldTask
-          }
-          return masterTask
-        }))
+        setMasterTasks(
+          masterTasks.map((masterTask) => {
+            if (masterTask.Id === task.Id) {
+              return oldTask;
+            }
+            return masterTask;
+          }),
+        );
         loggingService.logError(error);
         console.error(error);
       })
@@ -113,14 +114,11 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
     <>
       {modalOpen && <MasterTaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}
       {loading && (
-        <div className="w-full h-full absolute z-5 left-0 top-0 bg-white flex items-center opacity-95">
+        <div className="w-full h-full absolute z-[5] left-0 top-0 bg-white flex items-center opacity-95">
           <Spinner className="w-full" size="lg" />
         </div>
       )}
-      <Table.Row
-        className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`}
-        hover
-      >
+      <Table.Row className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`} hover>
         <Table.Cell>
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
         </Table.Cell>
@@ -128,7 +126,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         <Table.Cell>{task.Name}</Table.Cell>
         <Table.Cell>
           <FormInputSelect
-            className='z-3 relative w-20 block'
+            className="z-3 relative w-20 block"
             name="StartByWeekNum"
             label=""
             onChange={handleOnChange}
@@ -139,7 +137,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         </Table.Cell>
         <Table.Cell>
           <FormInputSelect
-            className='z-3 relative w-20 block'
+            className="z-3 relative w-20 block"
             name="CompleteByWeekNum"
             label=""
             onChange={handleOnChange}

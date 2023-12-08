@@ -1,12 +1,9 @@
 import { TourDTO } from 'interfaces';
 import TourList from './tours/TourList';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { Tab } from '@headlessui/react';
-import archived from 'pages/api/marketing/sales/read/archived';
 import { title } from 'radash';
 import Layout from './Layout';
 import { BreadCrumb } from './global/BreadCrumb';
-import { MenuButton } from './global/MenuButton';
 import { SearchBox } from './global/SearchBox';
 import { StyledTab } from './global/StyledTabs';
 import { useRouter } from 'next/router';
@@ -17,7 +14,7 @@ interface TourSelectorProps {
   ToolbarButtons?:any;
 }
 
-export const TourSelector = ({ tours, ToolbarButtons=<div></div> }: TourSelectorProps) => {
+export const TourSelector = ({ tours, ToolbarButtons=<div /> }: TourSelectorProps) => {
   const [search, setSearch] = React.useState('');
   const router = useRouter();
   const path = router.pathname.split('/')[1];
