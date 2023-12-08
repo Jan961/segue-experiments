@@ -25,7 +25,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
   const tours = useRecoilValue(tourState);
 
   const clearFilters = () => {
-    setFilters({ Tour: undefined, Status: '', Assignee: undefined });
+    setFilters({ Tour: 'All tours', Status: '', Assignee: undefined });
     setSelectedTour(undefined);
     setLocalStatus(undefined); // Clear local status
     onStatusChange(undefined); // Update parent component's status
@@ -34,6 +34,11 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
+    if (id === 'Tour' && value === 'all') {
+      clearFilters();
+      return;
+    }
+
     setFilters((prev) => ({ ...prev, [id]: value }));
 
     if (id === 'Tour') {
@@ -53,13 +58,12 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
     }
   };
 
-  // JAS TO DO: query functionality of submit button
   const applyFilters = () => {
     onFilterChange({ ...filters, Search: searchFilter, Status: selectedStatus });
-    onStatusChange(localStatus); // This will update the parent component's status
+    onStatusChange(localStatus);
   };
 
-  const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }));
+  const tourOptions = [{ text: 'All tours', value: 'all' }, ...tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }))];
 
   const statusOptions = [
     { text: 'All', value: 'all'},

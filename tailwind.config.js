@@ -14,6 +14,8 @@ const colorsConfig = {
   'faded-primary-grey': '#f8f8fa',
   'soft-table-row-separation': '#e3ebf2',
   'table-row-alternating': '#f8f8f8',
+  'progress-teal': '#84ecd7',
+  'progress-grey': '#dadce5'
 };
 
 module.exports = {

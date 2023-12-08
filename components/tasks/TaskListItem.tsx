@@ -50,8 +50,8 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         <Table.Cell>{formatDateDoubleDigits(task.DueDate) ?? 'N/A'}</Table.Cell>
         <Table.Cell>
           {/* JAS TO DO, add to config */}
-          <div className='rounded flex justify-center bg-[#dadce5] py-2 relative  w-full'>
-          <div className='rounded bg-red absolute block' style={{ width: progressBarWidth, zIndex: 1 }}></div>
+          <div className='rounded flex justify-center bg-progress-grey h-8 relative w-full items-center'>
+          <span className='rounded bg-progress-teal absolute block h-full top-0 left-0' style={{ width: progressBarWidth, zIndex: 1 }}></span>
             <span className='z-10 relative'>{task.Progress}</span>
           </div>
         </Table.Cell>
