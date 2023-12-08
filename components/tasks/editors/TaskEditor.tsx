@@ -9,6 +9,7 @@ import { tourState } from 'state/tasks/tourState';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/weekOptions';
+import { useRouter } from 'next/router';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -33,6 +34,7 @@ const DEFAULT_TASK: TourTaskDTO = {
 };
 
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
+  const router = useRouter();
   const [alert, setAlert] = React.useState<string>('');
   const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
@@ -50,8 +52,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     if (id === 'StartByWeekNum') value = Number(value);
     if (id === 'CompleteByWeekNum') value = Number(value);
     if (id === 'AssignedToUserId') value = Number(value);
-
-    console.log(id, value);
 
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
@@ -88,17 +88,8 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       try {
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/';
         await axios.post(endpoint, inputs);
-
-        const updatedTours = tours.map((tour) => {
-          if (tour.Id === inputs.TourId) {
-            return { ...tour, Tasks: [inputs, ...tour.Tasks] };
-          }
-          return tour;
-        });
-
-        setTours(updatedTours);
-
         triggerClose();
+        router.reload();
       } catch (error) {
         loggingService.logError(error);
         console.error(error);
