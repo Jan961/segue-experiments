@@ -102,7 +102,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
           <ToolbarButton className="mb-2" onClick={clearFilters}>
             Show All
           </ToolbarButton>
-          <ToolbarButton className="mb-2" onClick={() => setAddTaskOpen(true)}>
+          <ToolbarButton className="mb-2">
             Report
           </ToolbarButton>
         </div>
