@@ -9,6 +9,7 @@ import { tourState } from 'state/tasks/tourState';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/weekOptions';
+import { useRouter } from 'next/router';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -33,6 +34,7 @@ const DEFAULT_TASK: TourTaskDTO = {
 };
 
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
+  const router = useRouter();
   const [alert, setAlert] = React.useState<string>('');
   const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
@@ -87,7 +89,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/';
         await axios.post(endpoint, inputs);
         triggerClose();
-        window.location.reload();
+        router.reload();
       } catch (error) {
         loggingService.logError(error);
         console.error(error);
