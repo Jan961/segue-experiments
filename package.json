@@ -14,7 +14,7 @@
     "lint:fix": "eslint --config .eslintrc.js . --fix",
     "prepare": "husky install",
     "cy:local": "cypress open --env WEB_APP_URI=http://localhost:3000",
-    "cy:dev": "cypress run --env WEB_APP_URI=https://segue-staging.vercel.app/"
+    "cy:dev": "cypress run --env CYPRESS_BASE_URL=https://segue-staging.vercel.app WEB_APP_URI=https://segue-staging.vercel.app"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
