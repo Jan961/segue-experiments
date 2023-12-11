@@ -1,5 +1,7 @@
 import classNames from 'classnames';
 import React from 'react';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface Input {
   placeholder?: string;
@@ -40,6 +42,10 @@ export const FormInputText = (props: Input) => {
     readOnly: disabled,
   };
 
+  const containerClass = classNames('relative', className);
+
+  const iconClass = 'absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 mt-2';
+
   if (area) {
     return (
       <div className={className}>
@@ -66,5 +72,17 @@ export const FormInputText = (props: Input) => {
     );
   }
 
-  return <input type="text" {...inputProps} />;
+  return (
+    <div className={containerClass}>
+      {label && (
+        <label htmlFor={name}>
+          <div className="text-sm pb-2">
+            {label} {required ? '*' : null}
+          </div>
+        </label>
+      )}
+      <input type="text" {...inputProps} />
+      <FontAwesomeIcon icon={faSearch} className={iconClass} />
+    </div>
+  );
 };

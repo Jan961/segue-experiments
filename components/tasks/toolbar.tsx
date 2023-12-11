@@ -25,7 +25,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
   const tours = useRecoilValue(tourState);
 
   const clearFilters = () => {
-    setFilters({ Tour: 'All tours', Status: '', Assignee: undefined });
+    setFilters({ Tour: 'Show / Tour', Status: '', Assignee: undefined });
     setSelectedTour(undefined);
     setLocalStatus(undefined); // Clear local status
     onStatusChange(undefined); // Update parent component's status
@@ -34,7 +34,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
-    if (id === 'Tour' && value === 'all') {
+    if (id === 'Tour' && value === 'Show / Tour') {
       clearFilters();
       return;
     }
@@ -63,7 +63,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
     onStatusChange(localStatus);
   };
 
-  const tourOptions = [{ text: 'All tours', value: 'all' }, ...tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }))];
+  const tourOptions = [{ text: 'Show / Tour', value: 'Show / Tour' }, ...tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }))];
 
   const statusOptions = [
     { text: 'All', value: 'all'},
@@ -142,7 +142,7 @@ const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSe
             className="w-80"
             onChange={handleStatusChange}
             name="Status"
-            value={selectedStatus}
+            value={localStatus}
             options={statusOptions}
           />
         </div>
