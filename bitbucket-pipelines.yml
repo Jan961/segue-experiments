@@ -2,7 +2,7 @@ image: atlassian/default-image:2
 image: cypress/browsers:latest
 pipelines:
   custom:
-    run-browser-based-on-name: #name of this pipeline
+    cypress: #name of this pipeline
       - variables:          #list variable names under here
           - name: browser_name
             default: "chrome"
@@ -10,10 +10,16 @@ pipelines:
               - "chrome"
               - "firefox"
               - "electron"
+          - name: WEB_APP_URI
+            default: "https://segue-mr7kil5wr-segue-app.vercel.app"
       - step: 
+          name: "E2E (Cypress) test"
+          caches:
+            - node
+            - cypress
           script:
             - npm ci
-            - npm run cy:dev --browser $browser_name
+            - npm run cy:ci --browser $browser_name
           artifacts: # defining the artifacts to be passed to each future step.
             - cypress/reports/**
   default:
@@ -24,6 +30,7 @@ pipelines:
             variables:
               NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
               CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+              WEB_APP_URI: $CYPRESS_BASE_URL
             caches:
               - node
             script:
