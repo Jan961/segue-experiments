@@ -27,7 +27,7 @@ import { tourJumpState } from 'state/booking/tourJumpState';
 import { Spinner } from 'components/global/Spinner';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren, useCallback, useMemo } from 'react';
+import React, { PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import { viewState } from 'state/booking/viewState';

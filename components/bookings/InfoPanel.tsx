@@ -10,10 +10,6 @@ import classNames from 'classnames';
 import { performanceState } from 'state/booking/performanceState';
 import { NewPerformanceButton } from './panel/components/NewPerformanceButton';
 import { CreateModal } from './modal/CreateModal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
-import { any } from 'prop-types';
 
 export const InfoPanel = () => {
   const [view, setView] = useRecoilState(viewState);

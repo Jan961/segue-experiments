@@ -660,24 +660,24 @@ model DBSetting {
 }
 
 model MasterTask {
-  MasterTaskId             Int     @id @default(autoincrement())
-  TaskAccountId            Int
-  TaskCode                 Int     @db.SmallInt
-  TaskName                 String  @db.VarChar(80)
-  TaskPriority             Int     @default(0) @db.TinyInt
-  TaskNotes                String? @db.VarChar(500)
-  TaskAssignedToUserId     Int?
-  TaskRepeatInterval       String? @default("once") @db.VarChar(20)
-  TaskRepeatCount          Bytes?  @db.TinyBlob
-  TaskStartByWeekNum       Int?    @db.SmallInt
-  TaskStartByIsPostTour    Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  TaskCompleteByWeekNum    Int?    @db.SmallInt
-  TaskCompleteByIsPostTour Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  Account                  Account @relation(fields: [TaskAccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
-  User                     User?   @relation(fields: [TaskAssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
+  Id                       Int     @map("MasterTaskId") @id @default(autoincrement())
+  AccountId                Int     @map("TaskAccountId")
+  Code                     Int     @map("TaskCode") @db.SmallInt
+  Name                     String  @map("TaskName") @db.VarChar(80)
+  Priority                 Int     @map("TaskPriority") @default(0) @db.TinyInt
+  Notes                    String? @map("TaskNotes") @db.VarChar(500)
+  AssignedToUserId         Int?    @map("TaskAssignedToUserId") 
+  RepeatInterval           String? @map("TaskRepeatInterval") @default("once") @db.VarChar(20)
+  RepeatCount              Bytes?  @map("TaskRepeatCount") @db.TinyBlob
+  StartByWeekNum           Int?    @map("TaskStartByWeekNum") @db.SmallInt
+  StartByIsPostTour        Boolean @map("TaskStartByIsPostTour") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  CompleteByWeekNum        Int?    @map("TaskCompleteByWeekNum") @db.SmallInt
+  CompleteByIsPostTour     Boolean @map("TaskCompleteByIsPostTour") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  Account                  Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
+  User                     User?   @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
 
-  @@index([TaskAccountId], map: "Account_MasterTask")
-  @@index([TaskAssignedToUserId], map: "User_MasterTask_Assigned")
+  @@index([AccountId], map: "Account_MasterTask")
+  @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
