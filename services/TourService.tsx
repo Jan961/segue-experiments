@@ -5,6 +5,7 @@ import { getShowWithToursById } from './ShowService';
 import { getAccountId, getEmailFromReq } from './userService';
 import { TourDTO } from 'interfaces';
 import { getToursByStartDate } from 'utils/getToursByStartDate';
+import { getWeekNumsToDateMap } from './dateService';
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -180,7 +181,7 @@ export const getTourById = async (Id: number) => {
 };
 
 export const getToursAndTasks = async (AccountId: number) => {
-  const toursWithTasks = await prisma.tour.findMany({
+  let toursWithTasks = await prisma.tour.findMany({
     where: {
       IsArchived: false,
       Show: {
@@ -199,5 +200,11 @@ export const getToursAndTasks = async (AccountId: number) => {
       },
     },
   });
+  toursWithTasks = toursWithTasks.map(tour=>{
+    const {StartDate,EndDate} = tour.DateBlock.find(DateBlock=>DateBlock.Name==='Tour')||{};
+    const weekNumsList = tour.TourTask.map(TourTask=>([TourTask.CompleteByWeekNum, TourTask.StartByWeekNum])).flat();
+    const WeekNumToDateMap = getWeekNumsToDateMap(StartDate,EndDate, Array.from(new Set(weekNumsList)))
+    return {...tour, WeekNumToDateMap}
+  })
   return getToursByStartDate(toursWithTasks);
 };

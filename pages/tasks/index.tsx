@@ -144,6 +144,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     ShowCode: t.Show.Code,
     ShowId: t.Show.Id,
     Code: t.Code,
+    WeekNumToDateMap: t.WeekNumToDateMap,
     Tasks: t.TourTask.map(mapToTourTaskDTO),
   }));
 
