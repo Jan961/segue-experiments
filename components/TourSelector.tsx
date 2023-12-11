@@ -48,7 +48,7 @@ export const TourSelector = ({ tours, ToolbarButtons=<div /> }: TourSelectorProp
         </Tab.List>
         <Tab.Panels>
           <Tab.Panel>
-            <TourList items={active} />
+            <TourList items={active} showDateBlock={false} />
           </Tab.Panel>
           <Tab.Panel>
             <TourList items={archived} />

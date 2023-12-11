@@ -28,6 +28,9 @@ module.exports = {
       fontSize: {
         default: '0.85rem',
       },
+      width: {
+        128: '32rem',
+      },
       height: {
         128: '32rem',
       },

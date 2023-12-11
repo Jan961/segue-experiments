@@ -1,5 +1,5 @@
 import Layout from 'components/Layout';
-import { useState } from 'react';
+// import { useState } from 'react';
 import Toolbar from 'components/tasks/toolbar';
 import Tasklist from 'components/tasks/TaskList';
 import TaskButtons from 'components/tasks/TaskButtons';
@@ -10,12 +10,11 @@ import { useRecoilValue } from 'recoil';
 import { ToursWithTasks, tourState } from 'state/tasks/tourState';
 import { InitialState } from 'lib/recoil';
 import { mapToTourTaskDTO } from 'lib/mappers';
-import { getAccountIdFromReq } from 'services/userService';
-import { getTourJumpState } from 'utils/getTourJumpState';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 
 const Index = () => {
-  const [bulkIsOpen, setBulkIsOpen] = useState(false);
-  const [bulkActionField, setBulkActionField] = useState<string>('');
+  // const [bulkIsOpen, setBulkIsOpen] = useState(false);
+  // const [bulkActionField, setBulkActionField] = useState<string>('');
 
   const tours = useRecoilValue(tourState);
 
@@ -59,27 +58,27 @@ const Index = () => {
   function openBulkModal(key) {
     switch (key) {
       case 'setstatus':
-        setBulkActionField('Status');
-        setBulkIsOpen(true);
+        // setBulkActionField('Status');
+        // setBulkIsOpen(true);
         break;
       case 'priority':
-        setBulkActionField('Priority');
-        setBulkIsOpen(true);
+        // setBulkActionField('Priority');
+        // setBulkIsOpen(true);
 
         break;
       case 'progress':
-        setBulkActionField('Progress');
-        setBulkIsOpen(true);
+        // setBulkActionField('Progress');
+        // setBulkIsOpen(true);
 
         break;
       case 'followup':
-        setBulkActionField('FollowUp');
-        setBulkIsOpen(true);
+        // setBulkActionField('FollowUp');
+        // setBulkIsOpen(true);
 
         break;
       case 'reassign':
-        setBulkActionField('Assignee');
-        setBulkIsOpen(true);
+        // setBulkActionField('Assignee');
+        // setBulkIsOpen(true);
 
         break;
       default:
@@ -125,13 +124,9 @@ const Index = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const tourJump = await getTourJumpState(ctx, 'bookings', AccountId);
-
-  const TourId = tourJump.selected;
-  // TourJumpState is checking if it's valid to access by accountId
-  if (!TourId) return { notFound: true };
 
   const toursWithTasks = await getToursAndTasks(AccountId);
+  const users = await getUsers(AccountId);
 
   const tours: ToursWithTasks[] = toursWithTasks.map((t: any) => ({
     Id: t.Id,
@@ -143,10 +138,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }));
 
   const initialState: InitialState = {
-    global: {
-      tourJump,
-    },
     tasks: { tours, bulkSelection: {} },
+    account: { user: { users } },
   };
   return { props: { initialState } };
 };
