@@ -13,7 +13,7 @@ pipelines:
       - step: 
           script:
             - npm ci
-            - npx cypress run --browser $browser_name --config video=false,screenshotOnRunFailure=false
+            - npm cy:dev:run --browser $browser_name
           artifacts: # defining the artifacts to be passed to each future step.
             - cypress/reports/**
   default:
