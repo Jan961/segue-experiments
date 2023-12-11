@@ -133,7 +133,7 @@ const BookingPage = () => {
           <SearchBox onChange={(e) => console.log(e)} value="" placeholder="Search bookings..." />
         </GlobalToolbar>
       </div>
-      <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
+      <div className="px-4 flex items-center gap-4 flex-wrap  my-4 max-w-7xl">
         <BookingFilter />
         <ToolbarButton>Full Tour</ToolbarButton>
         <ToolbarButton>All Dates All Shows</ToolbarButton>
