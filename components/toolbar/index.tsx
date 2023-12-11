@@ -28,7 +28,7 @@ const GlobalToolbar = ({
 
   return (
     <div className="py-2 flex flex-row items-center gap-4">
-      <h1 className={`text-3xl font-bold text-${color} `}>{title}</h1>
+      <h1 className={`text-3xl font-bold text-${color} text-primary-blue`}>{title}</h1>
       {filterComponent && (
         <div className="flex flex-row">
           <button
