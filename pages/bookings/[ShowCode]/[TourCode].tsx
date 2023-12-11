@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import GlobalToolbar from 'components/toolbar';
-import BookingsButtons from 'components/bookings/bookingsButtons';
+
 import Layout from 'components/Layout';
 import { getTourWithContent } from 'services/TourService';
 import { InfoPanel } from 'components/bookings/InfoPanel';
@@ -26,8 +26,8 @@ import { filteredScheduleSelector } from 'state/booking/selectors/filteredSchedu
 import { tourJumpState } from 'state/booking/tourJumpState';
 import { Spinner } from 'components/global/Spinner';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
-import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren, useCallback, useMemo } from 'react';
+
+import React, { PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import { viewState } from 'state/booking/viewState';
@@ -39,11 +39,7 @@ import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
-
-interface bookingProps {
-  TourId: number;
-  intitialState: InitialState;
-}
+import { SearchBox } from 'components/global/SearchBox';
 
 const toolbarHeight = 136;
 
@@ -84,7 +80,7 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   );
 };
 
-const BookingPage = ({ TourId }: bookingProps) => {
+const BookingPage = () => {
   const schedule = useRecoilValue(filteredScheduleSelector);
   const bookingDict = useRecoilValue(bookingState);
   const rehearsalDict = useRecoilValue(rehearsalState);
@@ -99,7 +95,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
     Sections.map((x) => x.Dates)
       .flat()
       .filter((x) => x.Date === todayKey).length > 0;
-  const filteredSections = useBookingFilter({Sections, bookingDict, rehearsalDict, gifuDict, otherDict})
+  const filteredSections = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
   const gotoToday = () => {
     const idToScrollTo = `booking-${todayKey}`;
     if (todayOnSchedule) {
@@ -134,15 +130,20 @@ const BookingPage = ({ TourId }: bookingProps) => {
               </div>
             </div>
           </div>
+          <SearchBox onChange={(e) => console.log(e)} value="" placeholder="Search bookings..." />
         </GlobalToolbar>
       </div>
       <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
-        <MileageCalculator />
         <BookingFilter />
+        <ToolbarButton>Full Tour</ToolbarButton>
+        <ToolbarButton>All Dates All Shows</ToolbarButton>
+        <ToolbarButton>Venue History</ToolbarButton>
+        <ToolbarButton>Tour summary</ToolbarButton>
+        <ToolbarButton>Barring</ToolbarButton>
         <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
           Go To Today
         </ToolbarButton>
-        <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
+        <ToolbarButton>Add booking</ToolbarButton>
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
