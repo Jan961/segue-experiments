@@ -29,13 +29,16 @@ export const PromoterHoldsTab = () => {
     setInputs({ CastRateTicketsArranged, CastRateTicketsNotes });
   }, [bookingJump.selected]);
   const search = async () => {
-    setLoading(true);
-    const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`);
-    console.log(data);
-    setPerformances(data);
-    setLoading(false);
+    if (selected) {
+      setLoading(true);
+      const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`);
+      setPerformances(data);
+      setLoading(false);
+    } else {
+      console.log('Selected booking ID is null');
+    }
   };
-
+  
   React.useEffect(() => {
     search();
   }, [selected]);
