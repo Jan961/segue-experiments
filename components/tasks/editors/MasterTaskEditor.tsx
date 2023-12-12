@@ -1,7 +1,6 @@
 import { MasterTask } from '@prisma/client';
 import React, { useMemo } from 'react';
 import { StyledDialog } from 'components/global/StyledDialog';
-import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { loggingService } from 'services/loggingService';
@@ -11,6 +10,7 @@ import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/getTaskDateStatus';
 import { masterTaskState } from 'state/tasks/masterTaskState';
 import { Spinner } from 'components/global/Spinner';
+import { priorityOptions } from 'utils/tasks';
 
 interface NewTaskFormProps {
   task?: MasterTask;
@@ -55,7 +55,8 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
   // };
   const handleOnChange = (e: any) => {
     let { id, value } = e.target;
-    if (['AssignedToUserId', 'StartByWeekNum', 'CompleteByWeekNum'].includes(id)) value = parseInt(value, 10);
+    if (['AssignedToUserId', 'StartByWeekNum', 'CompleteByWeekNum', 'Priority'].includes(id))
+      value = parseInt(value, 10);
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
     setStatus({ ...status, submitted: false });
@@ -75,13 +76,16 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
         setMasterTasks(updatedTasks);
       } else {
         const endpoint = '/api/tasks/master/create';
-        const { data:{ Code, Id} } = await axios.post(endpoint, inputs)||{data:{}};
-        const updatedTasks = [{ ...inputs, Id, Code}, ...masterTasks];
+        const {
+          data: { Code, Id },
+        } = (await axios.post(endpoint, inputs)) || { data: {} };
+        const updatedTasks = [{ ...inputs, Id, Code }, ...masterTasks];
         setMasterTasks(updatedTasks);
       }
     } catch (error) {
       loggingService.logError(error);
       console.error(error);
+      setAlert(inputs.Id ? 'Error updating the task' : 'Error creating the task');
     }
     setLoading(false);
     triggerClose();
@@ -103,6 +107,13 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
           onChange={handleOnChange}
           value={inputs.AssignedToUserId}
           options={userOptions}
+        />
+        <FormInputSelect
+          name="Priority"
+          label="Priority"
+          onChange={handleOnChange}
+          value={inputs.Priority}
+          options={priorityOptions}
         />
         <FormInputSelect
           name="StartByWeekNum"
