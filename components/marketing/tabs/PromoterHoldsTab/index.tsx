@@ -39,6 +39,7 @@ export const PromoterHoldsTab = () => {
     }
   };
   
+  // JAS TO DO: NO CALL MADE IF NO BOOKING ID 
   React.useEffect(() => {
     search();
   }, [selected]);
