@@ -14,9 +14,10 @@ pipelines:
             default: "https://segue-mr7kil5wr-segue-app.vercel.app"
       - step: 
           name: "E2E (Cypress) test"
-          - node
-          - npm
-          - cypress
+          caches:
+            - node
+            - npm
+            - cypress
           script:
             - npm ci
             - npm run cy:ci --browser $browser_name
