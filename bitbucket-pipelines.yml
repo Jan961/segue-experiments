@@ -16,6 +16,7 @@ pipelines:
           name: "E2E (Cypress) test"
           caches:
             - node
+            - nextcache
             - npm
             - cypress
           script:
@@ -59,3 +60,4 @@ definitions:
   caches:
     npm: ~/.npm
     cypress: ~/.cache
+    nextcache: ~/.next/cache
