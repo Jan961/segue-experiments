@@ -7,11 +7,11 @@ Cypress.Commands.add(`signOut`, () => {
 });
 
 Cypress.Commands.add(`signIn`, () => {
-  const WEBA_APP_URI = Cypress.env('WEB_APP_URI');
-  cy.log(`Signing in.`);
-  const { cyUser, cyPassword } = Cypress.env();
+  const { WEB_APP_URI = '', cyUser, cyPassword } = Cypress.env();
+  cy.log(`Signing in.`, Cypress.env());
+
   cy.visit({
-    url: WEBA_APP_URI,
+    url: WEB_APP_URI,
     auth: {
       username: cyUser,
       password: cyPassword,
