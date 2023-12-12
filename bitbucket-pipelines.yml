@@ -20,6 +20,7 @@ pipelines:
             - cypress
           script:
             - npm ci
+            - npm run build
             - npm run start &
             - npm run cy:ci --browser $browser_name
           artifacts: # defining the artifacts to be passed to each future step.
