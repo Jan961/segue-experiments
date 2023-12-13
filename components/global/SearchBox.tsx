@@ -10,7 +10,7 @@ interface SearchBoxProps {
 
 export const SearchBox = ({ onChange, value, placeholder }: SearchBoxProps) => {
   return (
-    <label htmlFor="search" className="inline-block">
+    <label htmlFor="search" className="inline-block flex-1">
       <span className="sr-only">Quick search</span>
       <div className="relative">
         <input
