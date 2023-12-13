@@ -6,9 +6,7 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { tourState } from 'state/tasks/tourState';
 import { useRecoilValue } from 'recoil';
 
-interface ToolbarProps {}
-
-const Toolbar: React.FC<ToolbarProps> = () => {
+const Toolbar: React.FC = () => {
   const [addTaskOpen, setAddTaskOpen] = React.useState(false);
   const [filters, setFilters] = React.useState({ Search: '', Tour: undefined });
   const tours = useRecoilValue(tourState);
@@ -22,11 +20,11 @@ const Toolbar: React.FC<ToolbarProps> = () => {
     }));
   };
 
-  const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}/${x.Code}`, value: x.Id }));
+  const tourOptions = tours.map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }));
 
   return (
     <div>
-      <div className="flex flex-row gap-2 justify-end items-center">
+      <div className="flex flex-row gap-2 justify-end items-end">
         <FormInputText placeholder="Search" onChange={handleOnChange} name="Search" value={filters.Search} />
         <FormInputSelect
           className="w-80"

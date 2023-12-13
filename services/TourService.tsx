@@ -4,6 +4,7 @@ import { showTourMapper, tourEditorMapper } from 'lib/mappers';
 import { getShowWithToursById } from './ShowService';
 import { getAccountId, getEmailFromReq } from './userService';
 import { TourDTO } from 'interfaces';
+import { getToursByStartDate } from 'utils/getToursByStartDate';
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
@@ -12,7 +13,7 @@ const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({
 });
 
 export const getActiveTours = async (accountId: number) => {
-  return prisma.tour.findMany({
+  const tours = await prisma.tour.findMany({
     where: {
       IsArchived: false,
       Show: {
@@ -21,6 +22,7 @@ export const getActiveTours = async (accountId: number) => {
     },
     include: tourDateBlockInclude,
   });
+  return getToursByStartDate(tours);
 };
 
 export interface AllTourPageProps {
@@ -41,10 +43,11 @@ export const getAllTourPageProps = async (ctx: any) => {
     },
     include: {
       Show: true,
+      DateBlock: true,
     },
   });
 
-  const tours = toursRaw.map(tourEditorMapper);
+  const tours = getToursByStartDate(toursRaw).map(tourEditorMapper);
 
   return { props: { tours } };
 };
@@ -89,7 +92,7 @@ export const lookupTourId = async (ShowCode: string, TourCode: string, AccountId
 };
 
 export const getAllTours = async (AccountId: number) => {
-  return prisma.tour.findMany({
+  const tours = await prisma.tour.findMany({
     select: {
       Id: true,
       Code: true,
@@ -110,6 +113,7 @@ export const getAllTours = async (AccountId: number) => {
       },
     },
   });
+  return getToursByStartDate(tours);
 };
 
 export const getToursByShowCode = (Code: string) => {
@@ -176,7 +180,7 @@ export const getTourById = async (Id: number) => {
 };
 
 export const getToursAndTasks = async (AccountId: number) => {
-  return await prisma.tour.findMany({
+  const toursWithTasks = await prisma.tour.findMany({
     where: {
       IsArchived: false,
       Show: {
@@ -187,6 +191,7 @@ export const getToursAndTasks = async (AccountId: number) => {
     },
     include: {
       Show: true,
+      DateBlock: true,
       TourTask: {
         orderBy: {
           Id: 'desc',
@@ -194,4 +199,5 @@ export const getToursAndTasks = async (AccountId: number) => {
       },
     },
   });
+  return getToursByStartDate(toursWithTasks);
 };

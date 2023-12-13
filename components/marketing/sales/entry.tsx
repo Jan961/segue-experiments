@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import axios from 'axios';
 import { getSales } from './Api';
 import schema from './validation';
-import Typeahead from 'components/Typeahead';
+import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { Spinner } from 'components/global/Spinner';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
-import { StyledDialog } from 'components/global/StyledDialog';
 
 interface props {
   searchFilter: string;
   tours?: any[];
 }
-export default function Entry({ tours = [], searchFilter }: props) {
+export default function Entry({ tours = [] }: props) {
   const [isLoading, setLoading] = useState(false);
   const [salesWeeks, SetSalesWeeks] = useState([]);
   const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
@@ -25,8 +23,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
   const [previousSale, setPreviousSale] = useState<any>({});
   const [notes, setNotes] = useState<any>({});
   const [validationErrors, setValidationErrors] = useState<any>({});
-  const [ignoreValidation, setIgnoreValidation] = useState<boolean>(false);
-  const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
+  // const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
   const fetchTourWeeks = (tourId) => {
     if (tourId) {
       setLoading(true);
@@ -43,7 +40,7 @@ export default function Entry({ tours = [], searchFilter }: props) {
         .get(`/api/tours/read/venues/${tourId}`)
         .then((data) => data.data)
         .then((data) => {
-          SetSalesWeeksVenues(data)
+          SetSalesWeeksVenues(data);
         })
         .finally(() => setLoading(false));
     }
@@ -121,20 +118,13 @@ export default function Entry({ tours = [], searchFilter }: props) {
         .catch((error) => console.log(error));
     }
   }, [inputs.Venue, previousSaleWeek]);
-  if (isLoading) {
-    return (
-      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
-        <Spinner className="w-full" size="lg" />
-      </div>
-    );
-  }
 
   const handleOnChange = (e) => {
     e.persist?.();
     setValidationErrors({});
     if (e.target.id === 'SetTour') {
       setInputs({ [e.target.id]: e.target.value });
-      setSale({})
+      setSale({});
       return;
     }
     if (e.target.id === 'SaleWeek') {
@@ -204,35 +194,35 @@ export default function Entry({ tours = [], searchFilter }: props) {
     e?.preventDefault?.();
     const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
       SetHoldHoldTypeId: parseInt(SetHoldHoldTypeId),
-      SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats,10),
+      SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats, 10),
       SetHoldValue: parseFloat(holds[SetHoldHoldTypeId].value),
     }));
     const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
       SetCompCompTypeId: parseInt(SetCompCompTypeId, 10),
-      SetCompSeats: parseInt(comps[SetCompCompTypeId],10),
+      SetCompSeats: parseInt(comps[SetCompCompTypeId], 10),
     }));
     const ignoreValidation = Object.values(validationErrors).length > 0;
     if (!ignoreValidation) {
       const valid = await validateSale(sale, previousSale);
       if (!valid) {
-        setOpenWarningsDialog(true);
+        // setOpenWarningsDialog(true);
         return;
       }
     }
     const Sales = [
       {
         SaleSaleTypeId: 1,
-        SaleSeats: parseInt(sale?.Seats,10),
+        SaleSeats: parseInt(sale?.Seats, 10),
         SaleValue: parseFloat(sale?.Value),
       },
       {
         SaleSaleTypeId: 2,
-        SaleSeats: parseInt(sale?.ReservedSeats,10),
+        SaleSeats: parseInt(sale?.ReservedSeats, 10),
         SaleValue: parseFloat(sale?.ReservedValue),
       },
     ];
     // const validateSales
-    setLoading(true)
+    setLoading(true);
     await axios
       .post('/api/marketing/sales/upsert', {
         Holds,
@@ -243,14 +233,15 @@ export default function Entry({ tours = [], searchFilter }: props) {
       })
       .then((res) => {
         console.log('Updated Sales', res);
-        setOpenWarningsDialog(false);
+        // setOpenWarningsDialog(false);
         setValidationErrors({});
       })
       .catch((error) => {
-        console.log('Error updating Sales', error)
-      }).finally(() => {
-        setLoading(false)
+        console.log('Error updating Sales', error);
       })
+      .finally(() => {
+        setLoading(false);
+      });
 
     // Reserved SeatsValue
     // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
@@ -280,6 +271,22 @@ export default function Entry({ tours = [], searchFilter }: props) {
       setSale(previousSale || {});
     }
   };
+
+  const typeaheadOptions = useMemo(() => {
+    return salesWeeksVenues.map((venue) => ({
+      name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+      value: String(venue.BookingId),
+    }));
+  }, [salesWeeksVenues]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
+        <Spinner className="w-full" size="lg" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-row w-full">
       <div className={'flex bg-transparent w-5/8'}>
@@ -334,25 +341,21 @@ export default function Entry({ tours = [], searchFilter }: props) {
                     </select>
                   </div>
                   {/* Venue/Date */}
-                  <div className="row-start-3 flex flex-row items-center relative">
+                  <div className="row-start-3 row-span-2 flex flex-row items-center relative">
                     <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
                       Venue/Date
                     </label>
-                    <Typeahead
+                    <FormTypeahead
                       placeholder="Venue/Date"
                       name="Venue"
-                      className="flex flex-row items-center justify-between relative [&>input]:max-w-lg"
-                      dropdownClassName="max-w-lg top-[40px] right-0"
+                      className="ml-1 block w-full max-w-lg rounded-md"
                       value={inputs.Venue}
-                      options={salesWeeksVenues.map((venue) => ({
-                        text: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
-                        value: String(venue.BookingId),
-                      }))}
-                      onChange={(option) =>
+                      options={typeaheadOptions}
+                      onChange={(selectedOption) =>
                         handleOnChange({
                           target: {
                             id: 'Venue',
-                            value: option?.value,
+                            value: selectedOption, // Ensure this is a string or number
                           },
                         })
                       }
@@ -361,83 +364,77 @@ export default function Entry({ tours = [], searchFilter }: props) {
                 </div>
 
                 <div className="grid lg:grid-cols-2 gap-4 sm:grid-cols-1">
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Sold Seat Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Value"
-                          id="Value"
-                          value={sale?.Value}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
-                      </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
+                    <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                      Sold Seat Value
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="Value"
+                        id="Value"
+                        value={sale?.Value}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                      <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Seats Sold
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="Seats"
-                          id="Seats"
-                          autoComplete="Seats"
-                          value={sale.Seats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
-                      </div>
+                  </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
+                    <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                      Seats Sold
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="Seats"
+                        id="Seats"
+                        autoComplete="Seats"
+                        value={sale.Seats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
-                      <label
-                        htmlFor="ReservedValue"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats Value
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedValue"
-                          id="ReservedValue"
-                          autoComplete="ReservedValue"
-                          value={sale.ReservedValue}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors?.ReservedValue && (
-                          <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
-                        )}
-                      </div>
+                  </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
+                    <label htmlFor="ReservedValue" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                      Reserved Seats Value
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="ReservedValue"
+                        id="ReservedValue"
+                        autoComplete="ReservedValue"
+                        value={sale.ReservedValue}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors?.ReservedValue && (
+                        <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
+                      )}
                     </div>
-                    <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                      <label
-                        htmlFor="ReservedSeats"
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        Reserved Seats
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name="ReservedSeats"
-                          id="ReservedSeats"
-                          autoComplete="ReservedSeats"
-                          value={sale.ReservedSeats}
-                          onChange={handleOnSaleChange}
-                          className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                        />
-                        {validationErrors.ReservedSeats && (
-                          <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
-                        )}
-                      </div>
+                  </div>
+                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
+                    <label htmlFor="ReservedSeats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
+                      Reserved Seats
+                    </label>
+                    <div className="mt-1 sm:col-span-2 sm:mt-0">
+                      <input
+                        type="text"
+                        name="ReservedSeats"
+                        id="ReservedSeats"
+                        autoComplete="ReservedSeats"
+                        value={sale.ReservedSeats}
+                        onChange={handleOnSaleChange}
+                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+                      />
+                      {validationErrors.ReservedSeats && (
+                        <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
+                      )}
                     </div>
+                  </div>
                 </div>
               </div>
 

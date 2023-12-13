@@ -2,10 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { dateToSimple, getMonday, getPreviousMonday } from 'services/dateService';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
-import Typeahead from 'components/Typeahead';
+import FormTypeahead from 'components/global/forms/FormTypeahead';
 import schema from './FinalSalesValidation';
 import { getSales } from './Api';
-import moment from 'moment';
 
 type props = {
   tours?: any[];
@@ -29,11 +28,11 @@ export default function FinalSales({ tours }: props) {
   const [activeSetTourDates, setActiveSetTourDates] = useState([]);
   const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
   const [finalSaleFigureDate, setFinalSaleFigureDate] = useState(null);
-  const [status, setStatus] = useState({
+  /* const [status, setStatus] = useState({
     submitted: false,
     submitting: false,
     info: { error: false, msg: null },
-  });
+  }); */
   const [inputs, setInputs] = useState({
     SetTour: '',
     BookingId: '',
@@ -47,9 +46,15 @@ export default function FinalSales({ tours }: props) {
   const [previousSale, setPreviousSale] = useState<Sale>(defaultSale);
   const [validationErrors, setValidationErrors] = useState<any>({});
 
-  useEffect(() => {
-    // setLoading(true);
-  }, []);
+  const venueOptions = useMemo(
+    () =>
+      activeSetTourDates.map((venue) => ({
+        name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
+        value: String(venue.BookingId),
+      })),
+    [activeSetTourDates],
+  );
+
   const handleSalesResponse = (data) => {
     const { Sale, SetSalesFiguresDate } = data || {};
     return {
@@ -94,13 +99,13 @@ export default function FinalSales({ tours }: props) {
     }
   }, [previousSaleWeek]);
 
-  const handleServerResponse = (ok, msg) => {
+  const handleServerResponse = (ok) => {
     if (ok) {
-      setStatus({
+      /* setStatus({
         submitted: true,
         submitting: false,
         info: { error: false, msg },
-      });
+      }); */
       setInputs({
         SetTour: inputs.SetTour,
         BookingId: inputs.BookingId,
@@ -151,11 +156,11 @@ export default function FinalSales({ tours }: props) {
       ...prev,
       [e.target.id]: e.target.value,
     }));
-    setStatus({
+    /* setStatus({
       submitted: false,
       submitting: false,
       info: { error: false, msg: null },
-    });
+    }); */
   };
 
   const handleOnSaleChange = (event: any) => {
@@ -233,7 +238,7 @@ export default function FinalSales({ tours }: props) {
           isFinalFigures: true,
         })
         .then(() => {
-          handleServerResponse(true, 'Submitted');
+          handleServerResponse(true);
         }).finally(()=>{
           setLoading(false)
         });
@@ -275,35 +280,36 @@ export default function FinalSales({ tours }: props) {
                         ?.filter?.((tour) => !tour.IsArchived)
                         ?.map?.((tour) => (
                           <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}/${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
+                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
                           </option>
                         ))}
                     </select>
                   </div>
                   <div className="flex flex-row items-center relative">
-                    <Typeahead
+                    <label htmlFor="venue" className="text-sm font-medium text-gray-700 w-[200px]">
+                      Venue
+                    </label>
+                    <FormTypeahead
                       placeholder="Venue/Date"
-                      label="Venue"
-                      name="BookingId"
+                      name="venue"
                       className="flex flex-row items-center relative [&>input]:max-w-lg [&>label]:w-[200px]"
-                      dropdownClassName="max-w-lg top-[40px] left-[200px]"
                       value={inputs?.BookingId}
-                      options={activeSetTourDates.map((venue) => ({
-                        text: ` ${moment(venue.booking.FirstDate).format("ddd DD/MM")} ${venue.Name}(${venue.Town}) | ${venue.Code}`,
-                        value: String(venue.BookingId),
-                      }))}
+                      options={venueOptions}
                       onChange={(option) =>
                         handleOnChange({
                           target: {
                             id: 'BookingId',
-                            value: option?.value,
+                            value: option,
                           },
                         })
                       }
                     />
                   </div>
                   <div className="flex flex-row items-center">
-                    <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]">
+                    <label
+                      htmlFor="Value"
+                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]"
+                    >
                       Sold Seats Value
                     </label>
                     <div className="mt-1 sm:col-span-2 sm:mt-0">
@@ -319,7 +325,10 @@ export default function FinalSales({ tours }: props) {
                     </div>
                   </div>
                   <div className="flex flex-row items-center">
-                    <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]">
+                    <label
+                      htmlFor="Seats"
+                      className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2 w-[200px]"
+                    >
                       Seats Sold
                     </label>
                     <div className="mt-1 sm:col-span-2 sm:mt-0">

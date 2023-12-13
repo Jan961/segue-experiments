@@ -2,37 +2,24 @@ import { useMemo } from 'react';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import moment from 'moment';
 import { useRecoilState } from 'recoil';
-import { formatDateUK, getWeekDay } from 'services/dateService';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import Typeahead from 'components/Typeahead';
+
+import FormTypeahead from 'components/global/forms/FormTypeahead';
+import { mapBookingsToTourOptions } from 'mappers/tourCodeMapper';
 
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const bookingOptions = useMemo(
-    () =>
-      bookingJump.bookings
-        ? bookingJump.bookings
-            .filter((b) => b.StatusCode !== 'U')
-            .map((b) => {
-              const date = new Date(b.Date);
-              const weekday = getWeekDay(date);
-              const ukDate = formatDateUK(date);
-              return {
-                text: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`,
-                value: b.Id,
-                date: ukDate,
-              };
-            })
-        : [],
+    () => (bookingJump.bookings ? mapBookingsToTourOptions(bookingJump.bookings) : []),
     [bookingJump],
   );
+
   const selectedBookingIndex = useMemo(
     () => bookingOptions.findIndex((booking) => parseInt(booking.value, 10) === bookingJump.selected),
     [bookingJump.selected, bookingOptions],
   );
-  const changeBooking = (e) => {
-    const selected = Number(e.target.value) || null;
-    setBookingJump({ ...bookingJump, selected });
+  const changeBooking = (value: string | number) => {
+    setBookingJump({ ...bookingJump, selected: Number(value) });
   };
 
   const goToToday = () => {
@@ -58,12 +45,10 @@ const ActionBar = () => {
   return (
     <div className="grid grid-cols-6 gap-3 mt-3 max-w-full items-center">
       <div className="col-span-6 flex grid-cols-5 gap-2 items-center">
-        <Typeahead
-          className="mb-0 pb-0 max-w-[500px]"
-          value={bookingJump.selected}
-          name="Tour"
-          onChange={(selectedVenue) => changeBooking({ target: { value: selectedVenue?.value, id: 'venue' } })}
-          options={[{ text: 'Please select a venue', value: '', date: '' }, ...bookingOptions]}
+        <FormTypeahead
+          className="w-128"
+          options={bookingOptions}
+          onChange={changeBooking}
           placeholder={'Please select a venue'}
         />
         <ToolbarButton onClick={goToToday} className="!text-primary-green">
@@ -84,8 +69,3 @@ const ActionBar = () => {
   );
 };
 export default ActionBar;
-
-// Add default props
-ActionBar.defaultProps = {
-  onActionBookingIdChange: () => {},
-};
