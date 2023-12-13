@@ -12,17 +12,13 @@ export const getTourJumpState = async (ctx, path: string, AccountId: number): Pr
   const toursRaw = await getAllTours(AccountId);
   const selectedTour = toursRaw.find((tour: any) => tour.Code === TourCode && tour.Show.Code === ShowCode)?.Id;
   return {
-    tours: [...toursRaw]
-      .sort((a, b) => {
-        return b.DateBlock[0].StartDate < a.DateBlock[0].StartDate ? 1 : -1;
-      })
-      .map((t: any) => ({
-        Id: t.Id,
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code,
-        ShowName: t.Show.Name,
-      })),
+    tours: toursRaw.map((t: any) => ({
+      Id: t.Id,
+      Code: t.Code,
+      IsArchived: t.IsArchived,
+      ShowCode: t.Show.Code,
+      ShowName: t.Show.Name,
+    })),
     selected: selectedTour,
     path,
   };
