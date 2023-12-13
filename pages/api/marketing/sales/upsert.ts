@@ -128,137 +128,44 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     } else {
       // Create
 
-      // await prisma.salesSet.create({
-      //   data: {
-      //     SetPerformanceId,
-      //     SetSalesFiguresDate,
-      //     ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
-      //     ...(Comps && Comps?.length && {
-      //       setComp: {
-      //         create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
-      //           SetCompCompTypeId,
-      //           SetCompSeats
-      //         }))
-      //       }
-      //     }),
-      //     ...(Holds && Holds?.length && {
-      //       setHold: {
-      //         create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
-      //           SetHoldHoldTypeId,
-      //           SetHoldSeats,
-      //           SetHoldValue
-      //         }))
-      //       }
-      //     }),
-      //     ...(Sales && Sales?.length && {
-      //       Sale: {
-      //         create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
-      //           SaleSaleTypeId,
-      //           SaleSeats,
-      //           SaleValue
-      //         }))
-      //       }
-      //     }),
-      //     ...(SetBookingId && {Booking:{
-      //       connect:{
-      //         Id:SetBookingId
-      //       }
-      //     }})
-      //   }
-      // })
-      await prisma.$transaction(async (tx) => {
-        const createdSalesSet = await tx.salesSet.create({
-          data: {
-            SetPerformanceId,
-            SetSalesFiguresDate,
-            ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
-            // ...(Comps && Comps?.length && {
-            //   setComp: {
-            //     create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
-            //       SetCompCompTypeId,
-            //       SetCompSeats,
-            //     })),
-            //   },
-            // }),
-            // ...(Holds && Holds?.length && {
-            //   setHold: {
-            //     create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
-            //       SetHoldHoldTypeId,
-            //       SetHoldSeats,
-            //       SetHoldValue,
-            //     })),
-            //   },
-            // }),
-            ...(SetBookingId && {
-              Booking: {
-                connect: {
-                  Id: SetBookingId,
-                },
-              },
-            }),
-            // Note: Do not include Sale creation here
-          },
-        });
-        console.log("==createdSalesSet===",createdSalesSet)
-        // Now create associated Sale instances
-        if (Sales && Sales?.length) {
-          await Promise.all(
-            Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) =>
-              tx.sale.create({
-                data: {
-                  // SaleSaleTypeId,
-                  SaleSeats,
-                  SaleValue,
-                  // SaleSetId: createdSalesSet.SetId, 
-                  SalesSet:{
-                    connect:{
-                      SetId: createdSalesSet.SetId,
-                    }
-                  },
-                  SaleType:{
-                    connect:{
-                      SaleTypeId: SaleSaleTypeId
-                    }
-                  }
-                },
-              })
-            )
-          );
+      await prisma.salesSet.create({
+        data: {
+          SetPerformanceId,
+          SetSalesFiguresDate,
+          ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
+          ...(Comps && Comps?.length && {
+            setComp: {
+              create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
+                SetCompCompTypeId,
+                SetCompSeats
+              }))
+            }
+          }),
+          ...(Holds && Holds?.length && {
+            setHold: {
+              create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
+                SetHoldHoldTypeId,
+                SetHoldSeats,
+                SetHoldValue
+              }))
+            }
+          }),
+          ...(Sales && Sales?.length && {
+            Sale: {
+              create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
+                SaleSaleTypeId,
+                SaleSeats,
+                SaleValue
+              }))
+            }
+          }),
+          ...(SetBookingId && {Booking:{
+            connect:{
+              Id:SetBookingId
+            }
+          }})
         }
-
-        // Now create associated Hold instances
-        if (Holds && Holds?.length) {
-          await Promise.all(
-            Holds.map(({  SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) =>
-              tx.SetHold.create({
-                data: {
-                  SetHoldHoldTypeId,
-                  SetHoldSeats,
-                  SetHoldValue,
-                  SetHoldSetId: createdSalesSet.SetId, // Link Sale to the created SalesSet
-                },
-              })
-            )
-          );
-        }
-
-         // Now create associated Comp instances
-         if (Comps && Comps?.length) {
-          await Promise.all(
-            Comps.map(({  SetCompCompTypeId, SetCompSeats }) =>
-              prisma.SetComp.create({
-                data: {
-                  SetCompCompTypeId, 
-                  SetCompSeats,
-                  SetCompSetId: createdSalesSet.SetId, // Link Sale to the created SalesSet
-                },
-              })
-            )
-          );
-        }
-
-      });
-      
+      })
     }
 
     res.status(200).json({});
