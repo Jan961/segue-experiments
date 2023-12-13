@@ -88,7 +88,7 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
               return matchesSearch && matchesStatus;
             })
             .map((task) => (
-              <TaskListItem task={task} weekNumToDateMap={match.WeekNumToDateMap} key={task.Id}></TaskListItem>
+              <TaskListItem task={task} weekNumToDateMap={match.weekNumToDateMap} key={task.Id}></TaskListItem>
             ))}
         </Table.Body>
       </Table>

@@ -3,12 +3,13 @@ import { loggingService } from '../../../services/loggingService';
 import { TourTaskDTO } from 'interfaces';
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
-import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
 import { tourState } from 'state/tasks/tourState';
-import { useRecoilValue } from 'recoil';
-import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { userState } from 'state/account/userState';
+import { weekOptions } from 'utils/weekOptions';
+import { useRouter } from 'next/router';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -25,16 +26,21 @@ const DEFAULT_TASK: TourTaskDTO = {
   Interval: 'once',
   CompleteByPostTour: false,
   StartByPostTour: false,
+  StartByWeekNum: -52,
+  CompleteByWeekNum: -52,
+  AssignedToUserId: 2,
   Progress: 0,
   Priority: 0,
   TaskName: undefined
 };
 
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
+  const router = useRouter();
   const [alert, setAlert] = React.useState<string>('');
   const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
-  const tours = useRecoilValue(tourState);
+  const [tours, setTours] = useRecoilState(tourState);
+  const users = useRecoilValue(userState).users;
 
   const creating = !inputs.Id;
 
@@ -43,14 +49,14 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
 
     if (id === 'TourId') value = Number(value);
     if (id === 'Progress') value = Number(value);
+    if (id === 'Priority') value = Number(value);
+    if (id === 'StartByWeekNum') value = Number(value);
+    if (id === 'CompleteByWeekNum') value = Number(value);
+    if (id === 'AssignedToUserId') value = Number(value);
 
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
     setStatus({ ...status, submitted: false });
-  };
-
-  const handleCodeChange = (code: number) => {
-    setInputs({ ...inputs, Code: code });
   };
 
   const handleOnSubmit = async (event) => {
@@ -63,6 +69,17 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     if (inputs.Id) {
       try {
         await axios.post('/api/tasks/update', inputs);
+
+        const updatedTours = tours.map((tour) => {
+          if (tour.Id === inputs.TourId) {
+            const updatedTasks = tour.Tasks.map((t) => (t.Id === inputs.Id ? inputs : t));
+            return { ...tour, Tasks: updatedTasks };
+          }
+          return tour;
+        });
+
+        setTours(updatedTours);
+
         triggerClose();
       } catch (error) {
         loggingService.logError(error);
@@ -73,6 +90,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/';
         await axios.post(endpoint, inputs);
         triggerClose();
+        router.reload();
       } catch (error) {
         loggingService.logError(error);
         console.error(error);
@@ -84,6 +102,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     { text: '-- Select Tour --', value: '' },
     ...tours.map((x) => ({ text: `${x.ShowName}/${x.Code}`, value: x.Id })),
   ];
+
   const progressOptions: SelectOption[] = [
     { text: 'Not Started', value: 0 },
     { text: '10%', value: 10 },
@@ -116,11 +135,31 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           onChange={handleOnChange}
           options={tourOptions}
         />
-        <FormInputNumeric name="Code" label="Code" value={inputs.Code} onChange={handleCodeChange} />
         <FormInputText name="Name" label="Description" onChange={handleOnChange} value={inputs.Name} />
-        <FormInputText name="AssigneeTo" label="Assigned To" onChange={handleOnChange} value={inputs.AssignedTo} />
-        <FormInputText name="AssignedBy" label="Assigned By" onChange={handleOnChange} value={inputs.AssignedBy} />
-        <FormInputDate name="DueDate" label="Due" onChange={handleOnChange} value={inputs.DueDate} />
+        <FormInputSelect
+          name="StartByWeekNum"
+          label="Start By (wk)"
+          onChange={handleOnChange}
+          value={inputs.StartByWeekNum}
+          options={weekOptions}
+        />
+        <FormInputSelect
+          name="CompleteByWeekNum"
+          label="Due By (wk)"
+          onChange={handleOnChange}
+          value={inputs.CompleteByWeekNum}
+          options={weekOptions}
+        />
+        <FormInputSelect
+          name="AssignedToUserId"
+          label="Assigned To"
+          onChange={handleOnChange}
+          value={inputs.AssignedToUserId}
+          options={Object.values(users).map((user) => ({
+            text: `${user.FirstName} ${user?.LastName ?? ''}`,
+            value: user.Id,
+          }))}
+        />
         <FormInputSelect
           name="Progress"
           label="Progress"
@@ -142,7 +181,6 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
           value={inputs.Priority}
           options={priorityOptions}
         />
-        <FormInputDate name="FollowUp" label="Follow Up" onChange={handleOnChange} value={inputs.FollowUp} />
         <FormInputText area name="Notes" label="Notes" onChange={handleOnChange} value={inputs.Notes} />
         <StyledDialog.FooterContainer>
           <StyledDialog.FooterCancel onClick={triggerClose} />

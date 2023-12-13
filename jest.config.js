@@ -1,4 +1,6 @@
 module.exports = {
+  clearMocks: true,
+  rootDir: './',
   collectCoverageFrom: ['**/*.{ts,tsx}', '!**/*.d.ts', '!**/node_modules/**'],
   moduleNameMapper: {
     // Handle CSS imports (with CSS modules)
@@ -11,6 +13,15 @@ module.exports = {
     // Handle image imports
     // https://jestjs.io/docs/webpack#handling-static-assets
     '^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$': `<rootDir>/__mocks__/fileMock.js`,
+
+    // Handle state imports
+    '^state/(.*)$': '<rootDir>/state/$1',
+
+    //  Handle utils imports
+    '^utils/(.*)$': '<rootDir>/utils/$1',
+
+    // Handle components imports
+    '^components/(.*)$': '<rootDir>/components/$1',
 
     // Handle module aliases
     '^@/components/(.*)$': '<rootDir>/components/$1',

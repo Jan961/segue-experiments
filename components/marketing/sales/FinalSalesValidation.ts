@@ -79,7 +79,7 @@ const schema = object().shape({
     return true;
   }).test('Value', 'Warning: Sold value cannot be less than previous week', function () {
     let {
-      Seats: currentWeekSalesSeats,
+      // Seats: currentWeekSalesSeats,
       Value: currentWeekSalesValue,
       PreviousValue: previousWeekSalesValue,
     } = this.parent;

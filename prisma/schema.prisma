@@ -6,7 +6,8 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 model ActivityType {
@@ -351,6 +352,7 @@ model Account {
   AccountCurrencyCode    String        @db.VarChar(3)
   AccountCompanyNumber   String?       @db.VarChar(20)
   AccountUser            AccountUser[]
+  MasterTask             MasterTask[]
   Show                   Show[]
 }
 
@@ -552,6 +554,7 @@ model User {
   LastName    String?       @map("UserLastName") @db.VarChar(50)
   AccountId   Int?          @map("UserAccountId")
   AccountUser AccountUser[]
+  MasterTask  MasterTask[]
   TaskWatcher TaskWatcher[]
   TourTask    TourTask[]
 }
@@ -622,40 +625,60 @@ model TaskWatcher {
 }
 
 model PerformanceReport {
-  Id                    Int         @id @default(autoincrement()) @map("PRId")
-  PerformanceId         Int         @map("PRPerformanceId")
-  Act1UpTime            DateTime?   @db.Time(0) @map("PRAct1UpTime")
-  Act1DownTime          DateTime?   @db.Time(0) @map("PRAct1DownTime")
-  Interval1UpTime       DateTime?   @db.Time(0) @map("PRInterval1UpTime")
-  Interval1DownTime     DateTime?   @db.Time(0) @map("PRInterval1DownTime")
-  Act2UpTime            DateTime?   @db.Time(0) @map("PRAct2UpTime")
-  Act2DownTime          DateTime?   @db.Time(0) @map("PRAct2DownTime")
-  GetOutTime            DateTime?   @db.Time(0) @map("PRGetOutTime")
-  GetOutUpTime          DateTime?   @db.Time(0) @map("PRGetOutUpTime")
-  GetOutDownTime        DateTime?   @db.Time(0) @map("PRGetOutDownTime")
-  Absences              String?     @db.Text @map("PRAbsences")
-  Illness               String?     @db.Text @map("PRIllness")
-  TechnicalNotes        String?     @db.Text @map("PRTechnicalNotes")
-  PerformanceNotes      String?     @db.Text @map("PRPerformanceNotes")
-  SetPropCostumeNotes   String?     @db.Text @map("PRSetPropCostumeNotes")
-  AudienceNotes         String?     @db.Text @map("PRAudienceNotes")
-  MerchandiseNotes      String?     @db.Text @map("PRMerchandiseNotes")
-  GeneralRemarks        String?     @db.Text @map("PRGeneralRemarks")
-  CSM                   String?     @db.VarChar(255) @map("PRCSM")
-  Lighting              String?     @db.VarChar(255) @map("PRLighting")
-  ASM                   String?     @db.VarChar(255) @map("PRASM")
-  CreatedAt             DateTime    @default(now()) @db.Timestamp(0) @map("PRCreatedAt")
-  UpdatedAt             DateTime    @default(now()) @db.Timestamp(0) @map("PRUpdatedAt")
-  Performance           Performance @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "Performance_PerformanceReport")
+  Id                  Int         @id @default(autoincrement()) @map("PRId")
+  PerformanceId       Int         @map("PRPerformanceId")
+  Act1UpTime          DateTime?   @map("PRAct1UpTime") @db.Time(0)
+  Act1DownTime        DateTime?   @map("PRAct1DownTime") @db.Time(0)
+  Interval1UpTime     DateTime?   @map("PRInterval1UpTime") @db.Time(0)
+  Interval1DownTime   DateTime?   @map("PRInterval1DownTime") @db.Time(0)
+  Act2UpTime          DateTime?   @map("PRAct2UpTime") @db.Time(0)
+  Act2DownTime        DateTime?   @map("PRAct2DownTime") @db.Time(0)
+  GetOutTime          DateTime?   @map("PRGetOutTime") @db.Time(0)
+  GetOutUpTime        DateTime?   @map("PRGetOutUpTime") @db.Time(0)
+  GetOutDownTime      DateTime?   @map("PRGetOutDownTime") @db.Time(0)
+  Absences            String?     @map("PRAbsences") @db.Text
+  Illness             String?     @map("PRIllness") @db.Text
+  TechnicalNotes      String?     @map("PRTechnicalNotes") @db.Text
+  PerformanceNotes    String?     @map("PRPerformanceNotes") @db.Text
+  SetPropCostumeNotes String?     @map("PRSetPropCostumeNotes") @db.Text
+  AudienceNotes       String?     @map("PRAudienceNotes") @db.Text
+  MerchandiseNotes    String?     @map("PRMerchandiseNotes") @db.Text
+  GeneralRemarks      String?     @map("PRGeneralRemarks") @db.Text
+  CSM                 String?     @map("PRCSM") @db.VarChar(255)
+  Lighting            String?     @map("PRLighting") @db.VarChar(255)
+  ASM                 String?     @map("PRASM") @db.VarChar(255)
+  CreatedAt           DateTime    @default(now()) @map("PRCreatedAt") @db.Timestamp(0)
+  UpdatedAt           DateTime    @default(now()) @map("PRUpdatedAt") @db.Timestamp(0)
+  Performance         Performance @relation(fields: [PerformanceId], references: [Id], onDelete: Cascade, map: "Performance_PerformanceReport")
 
   @@index([PerformanceId], map: "Performance_PerformanceReport")
 }
-
 
 model DBSetting {
   DBSettingId    Int    @id @default(autoincrement())
   DBSettingName  String @unique(map: "SettingName") @db.VarChar(50)
   DBSettingValue String @db.VarChar(255)
+}
+
+model MasterTask {
+  Id                       Int     @map("MasterTaskId") @id @default(autoincrement())
+  AccountId                Int     @map("TaskAccountId")
+  Code                     Int     @map("TaskCode") @db.SmallInt
+  Name                     String  @map("TaskName") @db.VarChar(80)
+  Priority                 Int     @map("TaskPriority") @default(0) @db.TinyInt
+  Notes                    String? @map("TaskNotes") @db.VarChar(500)
+  AssignedToUserId         Int?    @map("TaskAssignedToUserId") 
+  RepeatInterval           String? @map("TaskRepeatInterval") @default("once") @db.VarChar(20)
+  RepeatCount              Bytes?  @map("TaskRepeatCount") @db.TinyBlob
+  StartByWeekNum           Int?    @map("TaskStartByWeekNum") @db.SmallInt
+  StartByIsPostTour        Boolean @map("TaskStartByIsPostTour") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  CompleteByWeekNum        Int?    @map("TaskCompleteByWeekNum") @db.SmallInt
+  CompleteByIsPostTour     Boolean @map("TaskCompleteByIsPostTour") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  Account                  Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
+  User                     User?   @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
+
+  @@index([AccountId], map: "Account_MasterTask")
+  @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

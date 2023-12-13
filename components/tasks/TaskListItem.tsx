@@ -9,6 +9,7 @@ import TaskEditor from './editors/TaskEditor';
 import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { useRecoilState } from 'recoil';
 
+
 function getPriority(priority) {
   switch (priority) {
     case 0:

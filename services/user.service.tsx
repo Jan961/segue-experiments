@@ -79,7 +79,8 @@ function update(id, params) {
 function _delete(id) {
   return fetchWrapper.delete(`${baseUrl}/${id}`);
 }
-function safeParseJson(arg0: string): any {
+
+export function safeParseJson(): any {
   throw new Error('Function not implemented.');
 }
 
