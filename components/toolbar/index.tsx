@@ -17,9 +17,7 @@ interface props {
 
 const GlobalToolbar = ({
   title,
-
   tourJump = true,
-
   color = 'text-primary-blue',
   filterComponent,
   children,
@@ -27,7 +25,7 @@ const GlobalToolbar = ({
   const [filtersOpen, setFiltersOpen] = React.useState(false);
 
   return (
-    <div className="py-2 flex flex-row items-center gap-4">
+    <div className="py-2 flex flex-row items-center gap-4 w-[1200px] ml-4">
       <h1 className={`text-3xl font-bold text-${color} text-primary-blue`}>{title}</h1>
       {filterComponent && (
         <div className="flex flex-row">
