@@ -184,10 +184,7 @@ const BookingPage = () => {
             </>
           )}
         </ScrollablePanel>
-        <ScrollablePanel
-          reduceHeight={toolbarHeight}
-          className="col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue"
-        >
+        <ScrollablePanel reduceHeight={toolbarHeight} className="col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-white">
           <InfoPanel />
         </ScrollablePanel>
       </div>
