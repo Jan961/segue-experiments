@@ -24,20 +24,27 @@ function getPriority(priority) {
 
 interface TaskListItemProps {
   task: TourTaskDTO;
+  weekNumToDateMap: { [key: number]: Date };
 }
 
-const TaskListItem = ({ task }: TaskListItemProps) => {
+const TaskListItem = ({ task, weekNumToDateMap }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
 
   const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status);
 
-  const progressBarWidth = task.Progress + '%'; // Convert progress to a percentage string
-
+  const progressBarWidth = task.Progress + '%';
   const toggleSelected = () => {
     setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   };
 
+
+  function getDateFromWeekNum(weekNum, weekNumToDateMap) {
+    if (weekNumToDateMap && weekNumToDateMap[weekNum]) {
+      return formatDateDoubleDigits(weekNumToDateMap[weekNum]);
+    }
+    return 'N/A';
+  }
   return (
     <>
       {modalOpen && <TaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}
@@ -45,11 +52,10 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         <Table.Cell>{task.Code}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
         <Table.Cell>{task.StartByWeekNum}</Table.Cell>
-        <Table.Cell>{formatDateDoubleDigits(task.DueDate) ?? 'N/A'}</Table.Cell>
+        <Table.Cell>{getDateFromWeekNum(task.StartByWeekNum, weekNumToDateMap)}</Table.Cell>
         <Table.Cell>{task.CompleteByWeekNum}</Table.Cell>
-        <Table.Cell>{formatDateDoubleDigits(task.DueDate) ?? 'N/A'}</Table.Cell>
+        <Table.Cell>{getDateFromWeekNum(task.CompleteByWeekNum, weekNumToDateMap)}</Table.Cell>
         <Table.Cell>
-          {/* JAS TO DO, add to config */}
           <div className='rounded flex justify-center bg-progress-grey h-8 relative w-full items-center'>
           <span className='rounded bg-progress-teal absolute block h-full top-0 left-0' style={{ width: progressBarWidth, zIndex: 1 }}></span>
             <span className='z-10 relative'>{task.Progress}</span>

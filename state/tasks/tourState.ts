@@ -2,7 +2,8 @@ import { TourDTO, TourTaskDTO } from 'interfaces'
 import { atom } from 'recoil'
 
 export type ToursWithTasks = TourDTO & {
-  Tasks: TourTaskDTO[]
+  Tasks: TourTaskDTO[];
+  weekNumToDateMap: { [key: number]: Date };
 }
 
 export type TourState = ToursWithTasks[]

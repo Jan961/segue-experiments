@@ -21,7 +21,7 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const tours: TourState = useRecoilValue(tourState);
   const match = tours.find((x) => x.Id === tourId);
-
+  console.log('match', match);
   const [searchQuery, setSearchQuery] = useState('');
 
   if (!match || (selectedTour !== undefined && selectedTour !== tourId)) {
@@ -67,7 +67,7 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
           <Table.HeaderCell>Notes</Table.HeaderCell>
         </Table.HeaderRow>
         <Table.Body>
-        {tasks
+          {tasks
             .filter((task) => {
               const matchesSearch = searchFilter === '' || task.Name.toLowerCase().includes(searchFilter.toLowerCase());
               console.log('Tasklist here', statusFilter);
@@ -88,7 +88,7 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
               return matchesSearch && matchesStatus;
             })
             .map((task) => (
-              <TaskListItem task={task} key={task.Id}></TaskListItem>
+              <TaskListItem task={task} weekNumToDateMap={match.WeekNumToDateMap} key={task.Id}></TaskListItem>
             ))}
         </Table.Body>
       </Table>
