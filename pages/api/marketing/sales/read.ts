@@ -119,7 +119,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             Date:'desc'
           }
         })
-        console.log("====", performance, SetBookingId)
         salesFigureDate = getNextMondayDateString(performance.Date?.toISOString())
       }
       return res.status(200).json({ SetComp: [], SetHold: [], Sale: null, SetSalesFiguresDate: salesFigureDate });
