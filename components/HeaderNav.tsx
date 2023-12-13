@@ -5,7 +5,6 @@ import { userService } from 'services/user.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { faHome, faUser, faSignOutAlt, IconDefinition, faBars } from '@fortawesome/free-solid-svg-icons';
-import { SegueLogo } from './global/SegueLogo';
 
 interface HeaderNavButtonProps {
   icon: IconDefinition;
@@ -74,7 +73,6 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             <div className="p-2 px-4 pr-2 text-primary-blue">
               <FontAwesomeIcon size="xl" icon={faBars} />
             </div>
-            <SegueLogo />
           </div>
           <div className="flex flex-row items-center pr-2">
             <HeaderNavButton icon={faHome} href="/" className="bg-primary-green">
