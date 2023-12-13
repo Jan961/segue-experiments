@@ -19,12 +19,11 @@ export const RehearsalDisplay = ({ rehearsalId, date }: RehearsalDisplayProps) =
     setView({ ...view, selected: { type: 'rehearsal', id: rehearsalId }, selectedDate: date });
   };
 
+  const active = view.selected?.id === rehearsalId && view.selected?.type === 'rehearsal';
+
   return (
     <div
-      className={`p-1 px-2 rounded
-        border border-l-8 
-        grid grid-cols-10
-       `}
+      className={`${active ? 'bg-primary-blue text-white' : ''} cursor-pointer p-1 px-2 rounded grid grid-cols-10`}
       onClick={select}
     >
       <div className="col-span-7 text-center">Rehearsal: {r.Town ? r.Town : 'N/A'}</div>
