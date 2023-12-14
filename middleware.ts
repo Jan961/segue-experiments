@@ -1,7 +1,7 @@
 import { Clerk } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { authMiddleware } from '@clerk/nextjs';
-import prismaAccelerate from 'lib/prismaAccelerate';
+import prismaEdge from 'lib/prismaEdge';
 
 const publicPaths = ['/sign-in*', '/sign-up*', '/access-denied'];
 
@@ -33,7 +33,7 @@ export default authMiddleware({
         This is as standard database calls don't work on Vercel Edge. This middleware flagged an error if you tried a lookup
         https://www.prisma.io/docs/data-platform/classic-projects/data-proxy/use-data-proxy#enable-the-data-proxy-for-a-project
       */
-      const access = await prismaAccelerate.user.findUnique({ where: { Email: userEmail }, select: { Id: true } });
+      const access = await prismaEdge.user.findUnique({ where: { Email: userEmail }, select: { Id: true } });
 
       if (access) return NextResponse.next();
       const denied = new URL('/access-denied', request.url);
