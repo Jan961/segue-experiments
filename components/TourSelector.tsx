@@ -14,6 +14,7 @@ import React from 'react';
 
 interface TourSelectorProps {
   tours: TourDTO[];
+  ToolbarButtons?: JSX.Element;
 }
 
 export const TourSelector = ({ tours }: TourSelectorProps) => {
