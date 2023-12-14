@@ -281,7 +281,6 @@ export type BarringVenue = {
 };
 
 
-// 1
 export type TourTaskDTO = {
   TaskName?: any;
   Id: number;
