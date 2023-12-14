@@ -51,13 +51,13 @@ const Index = () => {
           return false;
         }));
 
-      const matchesAssignee = filters.Assignee === undefined || filters.Assignee === tour.Assignee;
+      // const matchesAssignee = filters.Assignee === undefined || filters.Assignee === tour.Assignee;
       const matchesSearch =
         filters.Search === '' ||
         (tour.Tasks &&
           tour.Tasks.some((task) => task.TaskName && task.TaskName.toLowerCase().includes(filters.Search.toLowerCase())));
 
-      return matchesTour && matchesStatus && matchesAssignee && matchesSearch;
+      return matchesTour && matchesStatus && matchesSearch;
     });
 
     setFilteredTasks(filteredTours.length > 0 ? filteredTours : tours);
