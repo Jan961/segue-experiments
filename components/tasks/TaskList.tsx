@@ -17,11 +17,9 @@ interface TaskListProps {
 }
 
 const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: TaskListProps) => {
-  // console.log('Received searchFilter:', searchFilter);
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const tours: TourState = useRecoilValue(tourState);
   const match = tours.find((x) => x.Id === tourId);
-  console.log('match', match);
   const [searchQuery, setSearchQuery] = useState('');
 
   if (!match || (selectedTour !== undefined && selectedTour !== tourId)) {
@@ -70,7 +68,6 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
           {tasks
             .filter((task) => {
               const matchesSearch = searchFilter === '' || task.Name.toLowerCase().includes(searchFilter.toLowerCase());
-              console.log('Tasklist here', statusFilter);
               let matchesStatus = true;
               switch (statusFilter) {
                 case 'todo':
