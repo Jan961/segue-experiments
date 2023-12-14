@@ -302,6 +302,7 @@ export type TourTaskDTO = {
   CompleteByWeekNum?: number;
   CompleteByPostTour: boolean;
   StartByPostTour: boolean;
+  AssignedToUserId?: number;
 };
 
 enum intervalEnum {
