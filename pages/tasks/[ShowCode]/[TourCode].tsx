@@ -10,7 +10,7 @@ import { useRecoilValue } from 'recoil';
 import { ToursWithTasks, tourState } from 'state/tasks/tourState';
 import { InitialState } from 'lib/recoil';
 import { mapToTourTaskDTO } from 'lib/mappers';
-import { getAccountIdFromReq } from 'services/userService';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 
 const Index = () => {
   const [bulkIsOpen, setBulkIsOpen] = useState(false);
@@ -37,9 +37,7 @@ const Index = () => {
 
   const applyFilters = (filters) => {
     const filteredTours = tours.filter((tour) => {
-      // tour filter
       const matchesTour = filters.Tour === undefined || filters.Tour === tour.Id;
-      // status filter
       const matchesStatus =
         filters.Status === undefined ||
         (tour.Tasks && tour.Tasks.some((task) => {
