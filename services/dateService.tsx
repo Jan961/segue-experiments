@@ -173,6 +173,14 @@ export const getPreviousMonday = (date) => {
   return previousMonday;
 };
 
+export const getNextMondayDateString = (date:string)=>{
+    const inputDate = moment(date);
+    const daysUntilNextMonday = (7 - inputDate.day() + 1) % 7;
+    const nextMondayDate = inputDate.add(daysUntilNextMonday, 'days');
+    const nextMondayDateStr = nextMondayDate.toISOString();
+    return nextMondayDateStr;
+}
+
 export const getTimeFromDateAndTime = (time) => {
   return moment.utc(time).format('HH:mm');
 };

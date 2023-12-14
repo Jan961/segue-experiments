@@ -28,11 +28,6 @@ export default function FinalSales({ tours }: props) {
   const [activeSetTourDates, setActiveSetTourDates] = useState([]);
   const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
   const [finalSaleFigureDate, setFinalSaleFigureDate] = useState(null);
-  /* const [status, setStatus] = useState({
-    submitted: false,
-    submitting: false,
-    info: { error: false, msg: null },
-  }); */
   const [inputs, setInputs] = useState({
     SetTour: '',
     BookingId: '',
@@ -101,18 +96,11 @@ export default function FinalSales({ tours }: props) {
 
   const handleServerResponse = (ok) => {
     if (ok) {
-      /* setStatus({
-        submitted: true,
-        submitting: false,
-        info: { error: false, msg },
-      }); */
       setInputs({
         SetTour: inputs.SetTour,
         BookingId: inputs.BookingId,
         Confirmed: inputs.Confirmed,
       });
-    } else {
-      // setStatus(false);
     }
   };
 
@@ -156,11 +144,6 @@ export default function FinalSales({ tours }: props) {
       ...prev,
       [e.target.id]: e.target.value,
     }));
-    /* setStatus({
-      submitted: false,
-      submitting: false,
-      info: { error: false, msg: null },
-    }); */
   };
 
   const handleOnSaleChange = (event: any) => {
@@ -238,20 +221,16 @@ export default function FinalSales({ tours }: props) {
           isFinalFigures: true,
         })
         .then(() => {
-          handleServerResponse('Submitted');
+          handleServerResponse(true);
+        })
+        .finally(() => {
+          setLoading(false);
         });
     } else {
-      // alertService.info("Sorry you need to confirm input", 1);
       console.log('Sorry you need to confirm input');
     }
     setLoading(false);
   }
-
-  // const copyLastWeekSalesData = () => {
-  //   if (previousSale) {
-  //     setSale(previousSale || defaultSale);
-  //   }
-  // };
 
   return (
     <div className="flex flex-row w-full">
