@@ -2,7 +2,6 @@ import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 
-
 export default function BookingsButtons() {
   const [filter, setFilter] = useRecoilState(filterState);
   const onChange = (e: any) => {
@@ -12,7 +11,7 @@ export default function BookingsButtons() {
   return (
     <>
       <FormInputDate
-        className="mb-2 flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
+        className="flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
         label="From:"
         value={filter?.startDate}
         name="startDate"

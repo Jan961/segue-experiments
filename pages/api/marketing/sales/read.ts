@@ -1,6 +1,5 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getNextMondayDateString } from 'services/dateService';
 
 type UpsertSalesParams = {
   SetBookingId: string;
@@ -109,19 +108,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
     if (!salesSet) {
-      let salesFigureDate = SetSalesFiguresDate;
-      if(!SetSalesFiguresDate && isFinalFigures){
-        const performance = await prisma.performance.findFirst({
-          where:{
-            BookingId:SetBookingId
-          },
-          orderBy:{
-            Date:'desc'
-          }
-        })
-        salesFigureDate = getNextMondayDateString(performance.Date?.toISOString())
-      }
-      return res.status(200).json({ SetComp: [], SetHold: [], Sale: null, SetSalesFiguresDate: salesFigureDate });
+      return res.status(200).json({ SetComp: [], SetHold: [], Sale: null });
       // throw new Error('No such SalesSet exists')
     }
 

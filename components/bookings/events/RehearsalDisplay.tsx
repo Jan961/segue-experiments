@@ -23,12 +23,7 @@ export const RehearsalDisplay = ({ rehearsalId, date }: RehearsalDisplayProps) =
 
   return (
     <div
-      className={`p-1 px-2 rounded
-        border border-l-8 
-        border-red-500 bg-red-200
-        grid grid-cols-10
-        ${active ? 'bg-red-400 shadow' : 'hover:bg-red-300'}
-       `}
+      className={`${active ? 'bg-primary-blue text-white' : ''} cursor-pointer p-1 px-2 rounded grid grid-cols-10`}
       onClick={select}
     >
       <div className="col-span-7 text-center">Rehearsal: {r.Town ? r.Town : 'N/A'}</div>

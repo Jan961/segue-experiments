@@ -130,8 +130,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
       await prisma.salesSet.create({
         data: {
+          SetBookingId,
           SetPerformanceId,
           SetSalesFiguresDate,
+          SetBrochureReleased: 0,
+          SetSingleSeats: 0,
+          SetNotOnSale: 0,
+          SetIsFinalFigures: 0,
+          SetIsCopy: 0,
           ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
           ...(Comps && Comps?.length && {
             setComp: {
@@ -151,19 +157,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             }
           }),
           ...(Sales && Sales?.length && {
-            Sale: {
+            sale: {
               create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
                 SaleSaleTypeId,
                 SaleSeats,
                 SaleValue
               }))
             }
-          }),
-          ...(SetBookingId && {Booking:{
-            connect:{
-              Id:SetBookingId
-            }
-          }})
+          })
         }
       })
     }
