@@ -5,7 +5,7 @@ import { FormInputSelect, SelectOption } from 'components/global/forms/FormInput
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
-import { tourState } from 'state/tasks/tourState';
+import { TourState, tourState } from 'state/tasks/tourState';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/weekOptions';
@@ -16,6 +16,7 @@ interface NewTaskFormProps {
   triggerClose: () => void;
   open: boolean;
   recurring?: boolean;
+  tours?: TourState;
 }
 
 const DEFAULT_TASK: TourTaskDTO = {
