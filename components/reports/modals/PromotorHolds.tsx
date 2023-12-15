@@ -39,7 +39,6 @@ export default function PromotorHolds({ activeTours }: Props) {
   const downloadReport = async () => {
     const selectedTour = activeTours.find((tour) => tour.Id === parseInt(inputs.tour));
     setLoading(true);
-    console.log('hi');
     fetch('/api/reports/promoter-holds', {
       method: 'POST',
       body: JSON.stringify({
