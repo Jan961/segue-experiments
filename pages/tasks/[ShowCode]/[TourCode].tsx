@@ -63,7 +63,7 @@ const Index = () => {
     setFilteredTasks(filteredTours.length > 0 ? filteredTours : tours);
   };
 
-  const openBulkModal = (key) => {
+  const openBulkModal = (key: any) => {
     switch (key) {
       case 'setstatus':
         setBulkActionField('Status');

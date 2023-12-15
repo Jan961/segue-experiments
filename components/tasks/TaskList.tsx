@@ -3,7 +3,6 @@ import { TourState, tourState } from 'state/tasks/tourState';
 import TaskListItem from './TaskListItem';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Table } from 'components/global/table/Table';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { TourTaskDTO } from 'interfaces';
 import { useState } from 'react';
