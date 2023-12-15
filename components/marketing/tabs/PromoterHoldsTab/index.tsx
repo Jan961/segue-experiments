@@ -10,9 +10,7 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 import { debounce } from 'radash';
 import { Table } from 'components/global/table/Table';
 import { AllocatedSeatsEditor } from 'components/marketing/editors/AllocatedSeatsEditor';
-import { AvailableSeatsEditor } from 'components/marketing/editors/AvailableSeatsEditor';
 import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
-
 
 const defaultInputs = {
   CastRateTicketsArranged: false,
@@ -28,16 +26,15 @@ export const PromoterHoldsTab = () => {
   const [allocatedSeatsModalOpen, setAllocatedSeatsModalOpen] = React.useState(false);
   const [allocatedSeatsEditing, setAllocatedSeatsEditing] = React.useState(undefined);
 
-  
   const selectedBooking = useMemo(
     () => bookingJump.bookings?.find?.((x) => x.Id === selected),
     [bookingJump.bookings, selected],
   );
 
   const sortByDateAndTime = (a, b) => {
-    const dateA = new Date(a.info.Date);
-    const dateB = new Date(b.info.Date);
-  
+    const dateA = new Date(a.info.Date).getTime();
+    const dateB = new Date(b.info.Date).getTime();
+    
     return dateA - dateB; 
   };
 
@@ -88,7 +85,6 @@ export const PromoterHoldsTab = () => {
     if (refresh) search();
   };
 
-  // Allocated Seats
   const createAllocatedSeat = (acId) => {
     setAllocatedSeatsEditing({ AvailableCompId: acId, Seats: 0 });
     setAllocatedSeatsModalOpen(true);
@@ -99,15 +95,9 @@ export const PromoterHoldsTab = () => {
     setAllocatedSeatsModalOpen(true);
   };
 
-  // const max = perf.totalAvailable - perf.totalAllocated;
-
   if (loading) return <LoadingTab />;
 
   if (performances.length === 0) return <NoDataWarning message="No performances for this booking." />;
-
-  function search(): void {
-    throw new Error('Function not implemented.');
-  }
 
   return (
     <>
@@ -135,60 +125,66 @@ export const PromoterHoldsTab = () => {
       )}
 
       {/* Render Performance Section Notes and other components as needed */}
-      {performances.map(perf => (
-        <PerformanceSectionNotes perf={perf} key={perf.Id} triggerSearch={search} />
-      ))}
+      {performances.map(perf => {
+        const max = perf.totalAvailable - perf.totalAllocated;
 
-      <div>
-        <h3 className="text-xl mt-2">Allocated Seats</h3>
-        <Table className="mb-8">
-          <Table.HeaderRow>
-            <Table.HeaderCell>Date</Table.HeaderCell>
-            <Table.HeaderCell>Time</Table.HeaderCell>
-            <Table.HeaderCell>Name</Table.HeaderCell>
-            <Table.HeaderCell>Requested</Table.HeaderCell>
-            <Table.HeaderCell>Comments</Table.HeaderCell>
-            <Table.HeaderCell>Seats</Table.HeaderCell>
-            <Table.HeaderCell>Allocated</Table.HeaderCell>
-            <Table.HeaderCell>Name / Email</Table.HeaderCell>
-            <Table.HeaderCell>Venue Confirmation Notes</Table.HeaderCell>
-          </Table.HeaderRow>
-          <Table.Body>
-            {performances.sort(sortByDateAndTime).map(perf =>
-              perf.allocated.map(as => (
-                <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
-                  <Table.Cell>{dateToSimple(perf.info.Date)}</Table.Cell>
-                  <Table.Cell>{getTimeFromDateAndTime(perf.info.Date)}</Table.Cell>
-                  <Table.Cell>{as.ArrangedBy}</Table.Cell>
-                  <Table.Cell>{as.RequestedBy}</Table.Cell>
-                  <Table.Cell>{as.Comments}</Table.Cell>
-                  <Table.Cell>
-                    <b>{as.Seats}</b>
-                  </Table.Cell>
-                  <Table.Cell>{as.SeatsAllocated}</Table.Cell>
-                  <Table.Cell>
-                    {as.TicketHolderName}
-                    <br />
-                    {as.TicketHolderEmail}
-                  </Table.Cell>
-                  <Table.Cell>{as.VenueConfirmationNotes}</Table.Cell>
-                </Table.Row>
-              ))
+        function search(): void {
+          throw new Error('Function not implemented.');
+        }
+
+        return (
+          <div key={perf.Id}>
+            <PerformanceSectionNotes perf={perf} triggerSearch={search} />
+
+            <div>
+              <h3 className="text-xl mt-2">Allocated Seats</h3>
+              <Table className="mb-8">
+                <Table.HeaderRow>
+                  <Table.HeaderCell>Date</Table.HeaderCell>
+                  <Table.HeaderCell>Time</Table.HeaderCell>
+                  <Table.HeaderCell>Name</Table.HeaderCell>
+                  <Table.HeaderCell>Requested</Table.HeaderCell>
+                  <Table.HeaderCell>Comments</Table.HeaderCell>
+                  <Table.HeaderCell>Seats</Table.HeaderCell>
+                  <Table.HeaderCell>Allocated</Table.HeaderCell>
+                  <Table.HeaderCell>Name / Email</Table.HeaderCell>
+                  <Table.HeaderCell>Venue Confirmation Notes</Table.HeaderCell>
+                </Table.HeaderRow>
+                <Table.Body>
+                  {perf.allocated.map(as => (
+                    <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
+                      <Table.Cell>{dateToSimple(perf.info.Date)}</Table.Cell>
+                      <Table.Cell>{getTimeFromDateAndTime(perf.info.Date)}</Table.Cell>
+                      <Table.Cell>{as.ArrangedBy}</Table.Cell>
+                      <Table.Cell>{as.RequestedBy}</Table.Cell>
+                      <Table.Cell>{as.Comments}</Table.Cell>
+                      <Table.Cell>
+                        <b>{as.Seats}</b>
+                      </Table.Cell>
+                      <Table.Cell>{as.SeatsAllocated}</Table.Cell>
+                      <Table.Cell>
+                        {as.TicketHolderName}
+                        <br />
+                        {as.TicketHolderEmail}
+                      </Table.Cell>
+                      <Table.Cell>{as.VenueConfirmationNotes}</Table.Cell>
+                    </Table.Row>
+                  ))}
+                </Table.Body>
+              </Table>
+            </div>
+
+            {allocatedSeatsModalOpen && (
+              <AllocatedSeatsEditor
+                open={allocatedSeatsModalOpen}
+                max={max}
+                triggerClose={triggerClose}
+                allocatedSeat={allocatedSeatsEditing}
+              />
             )}
-          </Table.Body>
-        </Table>
-      </div>
-
-
-      {/* Modals and other components */}
-      {allocatedSeatsModalOpen && (
-        <AllocatedSeatsEditor
-          open={allocatedSeatsModalOpen}
-          max={max}
-          triggerClose={triggerClose}
-          allocatedSeat={allocatedSeatsEditing}
-        />
-      )}
+          </div>
+        );
+      })}
     </>
   );
 };
