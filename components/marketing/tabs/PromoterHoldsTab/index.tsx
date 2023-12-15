@@ -28,10 +28,18 @@ export const PromoterHoldsTab = () => {
   const [allocatedSeatsModalOpen, setAllocatedSeatsModalOpen] = React.useState(false);
   const [allocatedSeatsEditing, setAllocatedSeatsEditing] = React.useState(undefined);
 
+  
   const selectedBooking = useMemo(
     () => bookingJump.bookings?.find?.((x) => x.Id === selected),
     [bookingJump.bookings, selected],
   );
+
+  const sortByDateAndTime = (a, b) => {
+    const dateA = new Date(a.info.Date);
+    const dateB = new Date(b.info.Date);
+  
+    return dateA - dateB; 
+  };
 
   useEffect(() => {
     const { CastRateTicketsArranged, CastRateTicketsNotes } = selectedBooking || {};
@@ -91,6 +99,8 @@ export const PromoterHoldsTab = () => {
     setAllocatedSeatsModalOpen(true);
   };
 
+  // const max = perf.totalAvailable - perf.totalAllocated;
+
   if (loading) return <LoadingTab />;
 
   if (performances.length === 0) return <NoDataWarning message="No performances for this booking." />;
@@ -135,7 +145,7 @@ export const PromoterHoldsTab = () => {
           <Table.HeaderRow>
             <Table.HeaderCell>Date</Table.HeaderCell>
             <Table.HeaderCell>Time</Table.HeaderCell>
-            <Table.HeaderCell>Arranged</Table.HeaderCell>
+            <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell>Requested</Table.HeaderCell>
             <Table.HeaderCell>Comments</Table.HeaderCell>
             <Table.HeaderCell>Seats</Table.HeaderCell>
@@ -144,7 +154,7 @@ export const PromoterHoldsTab = () => {
             <Table.HeaderCell>Venue Confirmation Notes</Table.HeaderCell>
           </Table.HeaderRow>
           <Table.Body>
-            {performances.map(perf =>
+            {performances.sort(sortByDateAndTime).map(perf =>
               perf.allocated.map(as => (
                 <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
                   <Table.Cell>{dateToSimple(perf.info.Date)}</Table.Cell>
