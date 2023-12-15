@@ -1,4 +1,4 @@
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { viewState } from 'state/booking/viewState';
 import { BookingPanel } from './panel/BookingPanel';
 import { RehearsalPanel } from './panel/RehearsalPanel';
@@ -12,7 +12,7 @@ import { NewPerformanceButton } from './panel/components/NewPerformanceButton';
 import { CreateModal } from './modal/CreateModal';
 
 export const InfoPanel = () => {
-  const view = useRecoilValue(viewState);
+  const [view] = useRecoilState(viewState);
   const scheduleDict = useRecoilValue(scheduleDictSelector);
   const perfState = useRecoilValue(performanceState);
 
@@ -22,7 +22,7 @@ export const InfoPanel = () => {
   const baseClass = 'bg-white shadow-xl';
 
   let panel: any;
-  let headerClass = 'm-0 p-2';
+  let headerClass = 'm-0 p-2 bg-primary-blue text-white rounded-md';
   let headerText = '';
   const performanceIds = [];
 
@@ -38,24 +38,23 @@ export const InfoPanel = () => {
   if (type === 'rehearsal') {
     panel = <RehearsalPanel key={id} rehearsalId={id} />;
     headerText = 'Rehearsal';
-    headerClass = classNames(headerClass, 'bg-red-500 text-white');
   }
   if (type === 'gifu') {
     panel = <GifuPanel key={id} gifuId={id} />;
     headerText = 'Get-In Fit-Up';
-    headerClass = classNames(headerClass, 'bg-yellow-400');
   }
   if (type === 'other') {
     panel = <OtherPanel key={id} otherId={id} />;
     headerText = 'Other';
-    headerClass = classNames(headerClass, 'bg-lime-400');
   }
 
   if (panel) {
     return (
       <>
         <div className={baseClass}>
-          <h2 className={headerClass}>{headerText}</h2>
+          <div className={classNames(headerClass, 'flex justify-between items-center')}>
+            <h2>{headerText}</h2>
+          </div>
           <div className="p-2">{panel}</div>
         </div>
         {type === 'booking' && (

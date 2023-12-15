@@ -1,12 +1,13 @@
 import { BehaviorSubject } from 'rxjs';
 import getConfig from 'next/config';
 import Router from 'next/router';
-
+import { safeJsonParse } from 'utils';
 import { fetchWrapper } from '../helpers/fetch-wrapper';
 
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/users`;
-const userSubject = new BehaviorSubject(process.browser && JSON.parse(localStorage.getItem('user')));
+const userSubject = new BehaviorSubject(process.browser && safeJsonParse(localStorage.getItem('user')));
+;
 
 export const userService = {
   user: userSubject.asObservable(),
@@ -78,3 +79,7 @@ function update(id, params) {
 function _delete(id) {
   return fetchWrapper.delete(`${baseUrl}/${id}`);
 }
+function safeParseJson(arg0: string): any {
+  throw new Error('Function not implemented.');
+}
+

@@ -1,13 +1,13 @@
 import { TourTaskDTO } from 'interfaces';
 import formatDate from 'utils/formatDate';
 import getTaskDateStatusColor from 'utils/getTaskDateStatus';
-import formatDateDoubleDigits from 'utils/formatDateDoubleDigits';
 import { Table } from 'components/global/table/Table';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import React from 'react';
 import TaskEditor from './editors/TaskEditor';
 import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { useRecoilState } from 'recoil';
+import { getAdjustedDateByWeeks } from 'utils/getAdjustedDateByWeeks';
 
 function getPriority(priority) {
   switch (priority) {
@@ -44,12 +44,12 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
         </Table.Cell>
         <Table.Cell>{task.StartByWeekNum}</Table.Cell>
-        <Table.Cell>{formatDateDoubleDigits(task.DueDate) ?? 'N/A'}</Table.Cell>
+        <Table.Cell>{getAdjustedDateByWeeks(task.StartByWeekNum)}</Table.Cell>
         <Table.Cell>{task.CompleteByWeekNum}</Table.Cell>
-        <Table.Cell>{formatDateDoubleDigits(task.DueDate) ?? 'N/A'}</Table.Cell>
+        <Table.Cell>{getAdjustedDateByWeeks(task.CompleteByWeekNum)}</Table.Cell>
         <Table.Cell>{task.Progress + '%'}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
-        <Table.Cell>{task.AssignedTo ?? '-'}</Table.Cell>
+        <Table.Cell>{task.AssignedToUserId ?? '-'}</Table.Cell>
         <Table.Cell>{task.AssignedBy ?? '-'}</Table.Cell>
         <Table.Cell>{task.Status}</Table.Cell>
         <Table.Cell>{getPriority(task.Priority)}</Table.Cell>
