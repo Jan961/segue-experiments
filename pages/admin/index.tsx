@@ -1,82 +1,96 @@
-import { PermissionGroup } from '@prisma/client';
-import { getPermissionsList } from 'services/permissionService';
-import { Fragment, useState } from 'react';
-import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
-import { XMarkIcon } from '@heroicons/react/24/outline';
-import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/20/solid';
+import { getAccountUsersList, getPermissionsList } from 'services/permissionService';
+
+import TreeSelect from 'components/global/TreeSelect';
+import { TreeItemOption, TreeItemSelectedOption } from 'components/global/TreeSelect/types';
+import Layout from 'components/Layout';
+import Typeahead, { TypeaheadOption } from 'components/global/forms/FormTypeahead';
+import axios from 'axios';
+import { useState } from 'react';
+import { FormInputButton } from 'components/global/forms/FormInputButton';
 
 export async function getServerSideProps() {
   const permissions = await getPermissionsList();
-  console.log('Pem ', permissions);
-  return { props: { permissions } };
+  const accountUsers = await getAccountUsersList();
+
+  return { props: { permissions, accountUsers } };
 }
 
 interface AdminProps {
-  permissions: PermissionGroup[];
+  permissions: TreeItemOption[];
+  accountUsers: TypeaheadOption[];
 }
 
-const filters = [
-  {
-    id: 'color',
-    name: 'Color',
-    options: [
-      { value: 'white', label: 'White', checked: false },
-      { value: 'beige', label: 'Beige', checked: false },
-      { value: 'blue', label: 'Blue', checked: true },
-      { value: 'brown', label: 'Brown', checked: false },
-      { value: 'green', label: 'Green', checked: false },
-      { value: 'purple', label: 'Purple', checked: false },
-    ],
-  },
-];
+const formatUserPermissions = (permArr = [], userPermArr = []) => {
+  const formatted = permArr.map((perm) => {
+    if (perm?.options && perm.options.length > 0) {
+      perm.options.forEach((option) => {
+        option.checked = !!userPermArr.find(({ PermissionId }) => PermissionId === option.id);
+      });
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(' ');
-}
+      return perm;
+    }
+    return perm;
+  });
+  return formatted;
+};
 
-export default function Admin({ permissions = [] }: AdminProps) {
+export default function Admin({ permissions = [], accountUsers = [] }: AdminProps) {
+  const [userPermissions, setUserPermissions] = useState(permissions);
+  const [user, setUser] = useState<string>();
+
+  const fetchPermissionsForUser = async (Id) => {
+    const results = await axios({
+      method: 'GET',
+      url: `/api/admin/userPermissions/${Id}`,
+    });
+
+    const formattedPermissions = formatUserPermissions(permissions, results.data);
+    setUserPermissions([...formattedPermissions]);
+  };
+
+  const handleUserSelect = (Id) => {
+    setUser(Id);
+    fetchPermissionsForUser(Id);
+  };
+
+  const togglePermission = (perm: TreeItemSelectedOption) => {
+    const updatePermissions = userPermissions.map((p) => {
+      if (p.id === perm.parentId) {
+        const updatedOptions = p.options.map((o) => {
+          if (o.id === perm.id) {
+            return { ...o, checked: perm.checked };
+          }
+          return o;
+        });
+        return { ...p, options: updatedOptions };
+      }
+      return p;
+    });
+
+    setUserPermissions(updatePermissions);
+  };
+
+  const handlePermissionsSave = async () => {
+    await axios({
+      method: 'POST',
+      url: `/api/admin/userPermissions`,
+      data: { user, userPermissions },
+    });
+  };
+
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-10">
-      <form className="hidden lg:block">
-        {filters.map((section) => (
-          <Disclosure as="div" key={section.id} className="border border-gray-200 p-6">
-            {({ open }) => (
-              <>
-                <Disclosure.Button className="flex w-full items-center bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                  <span className="flex items-center">
-                    {open ? (
-                      <MinusIcon className="h-5 w-5" aria-hidden="true" />
-                    ) : (
-                      <PlusIcon className="h-5 w-5" aria-hidden="true" />
-                    )}
-                  </span>
-                  <span className="ml-4 font-medium text-gray-900">{section.name}</span>
-                </Disclosure.Button>
-
-                <Disclosure.Panel className="ml-3">
-                  <div className="space-y-4">
-                    {section.options.map((option, optionIdx) => (
-                      <div key={option.value} className="flex items-center">
-                        <input
-                          id={`filter-${section.id}-${optionIdx}`}
-                          name={`${section.id}[]`}
-                          defaultValue={option.value}
-                          type="checkbox"
-                          defaultChecked={option.checked}
-                          className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <label htmlFor={`filter-${section.id}-${optionIdx}`} className="ml-3 text-sm text-gray-600">
-                          {option.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </Disclosure.Panel>
-              </>
-            )}
-          </Disclosure>
-        ))}
-      </form>
-    </div>
+    <Layout title="Admin | Segue">
+      <div className="mt-4 max-w-5xl mx-auto text-2xl text-primary-navy">
+        <h1 className="mb-8 text-center">Admin</h1>
+        <Typeahead options={accountUsers} onChange={handleUserSelect} />
+        <div className={`mt-8 grid grid-cols-1 gap-x-8 gap-y-10 ${!user ? 'pointer-events-none opacity-80' : ''}`}>
+          <TreeSelect options={userPermissions} onChange={togglePermission} />
+          <div className="flex justify-end">
+            <FormInputButton className="mr-4" onClick={() => fetchPermissionsForUser(user)} text="Reset" />
+            <FormInputButton intent="PRIMARY" className="mr-4" onClick={handlePermissionsSave} text="Save" />
+          </div>
+        </div>
+      </div>
+    </Layout>
   );
 }

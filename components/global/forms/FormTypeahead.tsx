@@ -31,7 +31,7 @@ export default function Typeahead({
   const filteredOptions = useMemo(() => {
     return query === ''
       ? options
-      : options.filter(({ name }) => {
+      : options.filter(({ name = '' }) => {
           return name.toLowerCase().includes(query.toLowerCase());
         });
   }, [query, options]);
