@@ -1,9 +1,8 @@
 import { TourTaskDTO } from 'interfaces';
-import formatDate from 'utils/formatDate';
+import getDateFromWeekNum from 'utils/getDateFromWeekNum';
 import getTaskDateStatusColor from 'utils/getTaskDateStatus';
 import formatDateDoubleDigits from 'utils/formatDateDoubleDigits';
 import { Table } from 'components/global/table/Table';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import React from 'react';
 import TaskEditor from './editors/TaskEditor';
 import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
@@ -39,13 +38,12 @@ const TaskListItem = ({ task, weekNumToDateMap }: TaskListItemProps) => {
     setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   };
 
-
-  function getDateFromWeekNum(weekNum, weekNumToDateMap) {
-    if (weekNumToDateMap && weekNumToDateMap[weekNum]) {
-      return formatDateDoubleDigits(weekNumToDateMap[weekNum]);
-    }
-    return 'N/A';
+  function formatWeekNumDate(weekNum) {
+    const date = getDateFromWeekNum(weekNum, weekNumToDateMap);
+    console.log('the date', weekNumToDateMap, formatDateDoubleDigits(date))
+    return formatDateDoubleDigits(date); 
   }
+
   return (
     <>
       {modalOpen && <TaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}
@@ -53,9 +51,9 @@ const TaskListItem = ({ task, weekNumToDateMap }: TaskListItemProps) => {
         <Table.Cell>{task.Code}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
         <Table.Cell>{task.StartByWeekNum}</Table.Cell>
-        <Table.Cell>{getDateFromWeekNum(task.StartByWeekNum, weekNumToDateMap)}</Table.Cell>
+        <Table.Cell>{formatWeekNumDate(task.StartByWeekNum)}</Table.Cell>
         <Table.Cell>{task.CompleteByWeekNum}</Table.Cell>
-        <Table.Cell>{getDateFromWeekNum(task.CompleteByWeekNum, weekNumToDateMap)}</Table.Cell>
+        <Table.Cell>{formatWeekNumDate(task.CompleteByWeekNum)}</Table.Cell>
         <Table.Cell>
           <div className='rounded flex justify-center bg-progress-grey h-8 relative w-full items-center'>
           <span className='rounded bg-progress-teal absolute block h-full top-0 left-0' style={{ width: progressBarWidth, zIndex: 1 }}></span>

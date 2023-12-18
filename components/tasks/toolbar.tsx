@@ -15,9 +15,9 @@ interface ToolbarProps {
   onStatusChange: (status: string) => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({ setSelectedTour, onFilterChange, onSearch, selectedStatus, onStatusChange }) => {
-  const [addTaskOpen, setAddTaskOpen] = useState(false);
-  const [addRecurringTaskOpen, setAddRecurringTaskOpen] = useState(false);
+const Toolbar = ({ setSelectedTour, onFilterChange, onSearch, selectedStatus, onStatusChange }: ToolbarProps) => {
+  const [addTaskOpen, setAddTaskOpen] = useState<boolean>(false);
+  const [addRecurringTaskOpen, setAddRecurringTaskOpen] = useState<boolean>(false);
   const [filters, setFilters] = useState({ Tour: undefined, Status: undefined, Assignee: undefined });
   const [searchFilter, setSearchFilter] = useState('');
   const [localStatus, setLocalStatus] = useState<string | undefined>(selectedStatus);
