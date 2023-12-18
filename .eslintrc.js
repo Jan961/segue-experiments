@@ -27,6 +27,7 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    tsconfigRootDir: __dirname,
   },
   plugins: ['react', '@typescript-eslint', 'testing-library'],
   overrides: [

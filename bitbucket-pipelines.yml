@@ -1,27 +1,46 @@
 image: atlassian/default-image:2
+image: cypress/browsers:latest
 pipelines:
+  custom:
+    cypress:
+      - variables:
+          - name: browser_name
+            default: "chrome"
+            allowed-values:
+              - "chrome"
+              - "firefox"
+              - "electron"
+      - step:
+          name: "E2E (Cypress) test"
+          caches:
+            - node
+            - nextcache
+            - npm
+            - cypress
+          script:
+            - npm ci
+            - npm run build
+            - npm run start &
+            - npm run cy:ci --browser $browser_name
+          artifacts: # defining the artifacts to be passed to each future step.
+            - cypress/reports/**
   default:
     - parallel:
         - step:
             name: Build and Test
             image: node:19.8.1
+            variables:
+              NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: $NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+              CLERK_SECRET_KEY: $CLERK_SECRET_KEY
+              WEB_APP_URI: $CYPRESS_BASE_URL
             caches:
               - node
             script:
               - npm install
               - npm run test:ci
-  branches:
-    release/*:
-      - step:
-          name: Deploy to Staging
-          deployment: staging
-          script:
-            - pipe: atlassian/rsync-deploy:0.6.1
-              variables:
-                USER: $SFTP_USERNAME
-                SERVER: $SFTP_HOST
-                SSH_PORT: $SSH_PORT
-                LOCAL_PATH: '${BITBUCKET_CLONE_DIR}/'
-                REMOTE_PATH: /home/$SFTP_USERNAME/public_html/
-                DELETE_FLAG: 'false' # Don't delete existing files
-                EXTRA_ARGS: '--exclude=.bitbucket/ --exclude=.git/ --exclude=bitbucket-pipelines.yml --exclude=.gitignore' # Ignorethese
+              - npm run build
+definitions:
+  caches:
+    npm: ~/.npm
+    cypress: ~/.cache
+    nextcache: ~/.next/cache
