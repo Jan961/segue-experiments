@@ -160,13 +160,13 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
 
       <div className="grid grid-cols-3 gap-2">
         <div className="col-span-3 grid grid-cols-3 gap-2">
-          <FormInputButton
+        <FormInputButton
             className="rounded-br-none rounded-tr-none w-full border-r border-soft-primary-blue"
             text="Undo"
             disabled={!changed}
             onClick={() => {
               setInputs(booking);
-              setStatus({ submitting: false, changed: false });
+              setStatus({submitting: false, changed: false})
             }}
           />
           <FormInputButton
