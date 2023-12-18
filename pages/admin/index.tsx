@@ -86,8 +86,8 @@ export default function Admin({ permissions = [], accountUsers = [] }: AdminProp
         <div className={`mt-8 grid grid-cols-1 gap-x-8 gap-y-10 ${!user ? 'pointer-events-none opacity-80' : ''}`}>
           <TreeSelect options={userPermissions} onChange={togglePermission} />
           <div className="flex justify-end">
-            <FormInputButton className="mr-4" onClick={() => fetchPermissionsForUser(user)} text="Reset" />
-            <FormInputButton intent="PRIMARY" className="mr-4" onClick={handlePermissionsSave} text="Save" />
+            <FormInputButton className="mr-4 w-24" onClick={() => fetchPermissionsForUser(user)} text="Reset" />
+            <FormInputButton intent="PRIMARY" className="mr-4 w-24" onClick={handlePermissionsSave} text="Save" />
           </div>
         </div>
       </div>
