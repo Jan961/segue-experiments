@@ -2,17 +2,15 @@ image: atlassian/default-image:2
 image: cypress/browsers:latest
 pipelines:
   custom:
-    cypress: #name of this pipeline
-      - variables:          #list variable names under here
+    cypress:
+      - variables:
           - name: browser_name
             default: "chrome"
-            allowed-values:           # optionally restrict variable values
+            allowed-values:
               - "chrome"
               - "firefox"
               - "electron"
-          - name: WEB_APP_URI
-            default: "https://segue-mr7kil5wr-segue-app.vercel.app"
-      - step: 
+      - step:
           name: "E2E (Cypress) test"
           caches:
             - node
@@ -41,21 +39,6 @@ pipelines:
               - npm install
               - npm run test:ci
               - npm run build
-  branches:
-    release/*:
-      - step:
-          name: Deploy to Staging
-          deployment: staging
-          script:
-            - pipe: atlassian/rsync-deploy:0.6.1
-              variables:
-                USER: $SFTP_USERNAME
-                SERVER: $SFTP_HOST
-                SSH_PORT: $SSH_PORT
-                LOCAL_PATH: '${BITBUCKET_CLONE_DIR}/'
-                REMOTE_PATH: /home/$SFTP_USERNAME/public_html/
-                DELETE_FLAG: 'false' # Don't delete existing files
-                EXTRA_ARGS: '--exclude=.bitbucket/ --exclude=.git/ --exclude=bitbucket-pipelines.yml --exclude=.gitignore' # Ignorethese
 definitions:
   caches:
     npm: ~/.npm
