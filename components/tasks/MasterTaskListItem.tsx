@@ -1,7 +1,7 @@
 import { Table } from 'components/global/table/Table';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
+// import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import React, { useMemo } from 'react';
-import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
+// import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { MasterTask } from '@prisma/client';
 import MasterTaskEditor from './editors/MasterTaskEditor';
@@ -15,6 +15,7 @@ import { loggingService } from 'services/loggingService';
 import { Spinner } from 'components/global/Spinner';
 import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
+import { priorityOptions } from 'utils/tasks';
 
 interface TaskListItemProps {
   task: MasterTask;
@@ -22,16 +23,20 @@ interface TaskListItemProps {
 
 const TaskListItem = ({ task }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
-  const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
+  // const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
   const { users = {} } = useRecoilValue(userState);
   const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
   const weekOptions = useMemo(() => getWeekOptions(''), []);
-  const toggleSelected = () => {
-    setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
-  };
+  const priorityName = useMemo(
+    () => priorityOptions.find((option) => option.value === task.Priority)?.text,
+    [task.Priority],
+  );
+  // const toggleSelected = () => {
+  //   setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
+  // };
   const onActionItemClick = (e: any, key: string) => {
     e?.stopPropagation?.();
     switch (key) {
@@ -49,7 +54,9 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
     setLoading(true);
     try {
       const endpoint = '/api/tasks/master/create';
-      const { data:{ Code, Id }} = await axios.post(endpoint, omit(task, ['Id','Code'])) || { data:{} };
+      const {
+        data: { Code, Id },
+      } = (await axios.post(endpoint, omit(task, ['Id', 'Code']))) || { data: {} };
       const taskIndex = masterTasks.findIndex((masterTask) => masterTask.Id === task.Id);
       setMasterTasks([
         ...masterTasks.slice(0, taskIndex),
@@ -74,7 +81,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
       .catch((error) => {
         console.error(error);
       })
-      .finally(()=>{
+      .finally(() => {
         setLoading(false);
       });
   };
@@ -119,9 +126,9 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
         </div>
       )}
       <Table.Row className={`!bg-transparent !bg-opacity-[unset] [&>td]:!border-x-0`} hover>
-        <Table.Cell>
+        {/* <Table.Cell>
           <FormInputCheckbox value={bulkSelection[task.Id]} onChange={toggleSelected} minimal />
-        </Table.Cell>
+        </Table.Cell> */}
         <Table.Cell>{task.Code}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
         <Table.Cell>
@@ -145,7 +152,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
             options={weekOptions}
           />
         </Table.Cell>
-        <Table.Cell>{task.Priority}</Table.Cell>
+        <Table.Cell>{priorityName}</Table.Cell>
         <Table.Cell>{assignedToUser ? `${assignedToUser?.FirstName} ${assignedToUser?.LastName}` : '-'}</Table.Cell>
         <Table.Cell>{task.Notes}</Table.Cell>
         <Table.Cell>
