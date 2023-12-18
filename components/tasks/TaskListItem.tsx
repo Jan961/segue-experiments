@@ -1,12 +1,12 @@
 import { TourTaskDTO } from 'interfaces';
 import getDateFromWeekNum from 'utils/getDateFromWeekNum';
 import getTaskDateStatusColor from 'utils/getTaskDateStatus';
-import formatDateDoubleDigits from 'utils/formatDateDoubleDigits';
 import { Table } from 'components/global/table/Table';
 import React from 'react';
 import TaskEditor from './editors/TaskEditor';
 import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { useRecoilState } from 'recoil';
+import { getAdjustedDateByWeeks } from 'utils/getAdjustedDateByWeeks';
 
 
 function getPriority(priority) {
@@ -24,25 +24,15 @@ function getPriority(priority) {
 
 interface TaskListItemProps {
   task: TourTaskDTO;
-  weekNumToDateMap: { [key: number]: Date };
 }
 
-const TaskListItem = ({ task, weekNumToDateMap }: TaskListItemProps) => {
+const TaskListItem = ({ task }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
 
   const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status);
 
   const progressBarWidth = task.Progress + '%';
-  const toggleSelected = () => {
-    setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
-  };
-
-  function formatWeekNumDate(weekNum) {
-    const date = getDateFromWeekNum(weekNum, weekNumToDateMap);
-    console.log('the date', weekNumToDateMap, formatDateDoubleDigits(date))
-    return formatDateDoubleDigits(date); 
-  }
 
   return (
     <>
@@ -51,9 +41,9 @@ const TaskListItem = ({ task, weekNumToDateMap }: TaskListItemProps) => {
         <Table.Cell>{task.Code}</Table.Cell>
         <Table.Cell>{task.Name}</Table.Cell>
         <Table.Cell>{task.StartByWeekNum}</Table.Cell>
-        <Table.Cell>{formatWeekNumDate(task.StartByWeekNum)}</Table.Cell>
+        <Table.Cell>{getAdjustedDateByWeeks(task.StartByWeekNum)}</Table.Cell>
         <Table.Cell>{task.CompleteByWeekNum}</Table.Cell>
-        <Table.Cell>{formatWeekNumDate(task.CompleteByWeekNum)}</Table.Cell>
+        <Table.Cell>{getAdjustedDateByWeeks(task.CompleteByWeekNum)}</Table.Cell>
         <Table.Cell>
           <div className='rounded flex justify-center bg-progress-grey h-8 relative w-full items-center'>
           <span className='rounded bg-progress-teal absolute block h-full top-0 left-0' style={{ width: progressBarWidth, zIndex: 1 }}></span>
