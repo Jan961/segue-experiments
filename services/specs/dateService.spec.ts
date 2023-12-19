@@ -22,6 +22,6 @@ describe('getNextMondayDateString Utility Function', () => {
   // Additional Test Case: Testing with an invalid date
   test('getNextMondayDateString - Invalid Date', () => {
     const result = getNextMondayDateString('invalid-date');
-    expect(result).toBeNull();
+    expect(result).toEqual('');
   });
 });
