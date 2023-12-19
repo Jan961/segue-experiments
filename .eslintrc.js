@@ -41,6 +41,7 @@ module.exports = {
   rules: {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-var-requires': 'off',
     'import/no-unresolved': 'off',
     'import/extensions': 'off',
   },

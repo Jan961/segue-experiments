@@ -81,13 +81,28 @@ export default function Admin({ permissions = [], accountUsers = [] }: AdminProp
   return (
     <Layout title="Admin | Segue">
       <div className="mt-4 max-w-5xl mx-auto text-2xl text-primary-navy">
-        <h1 className="mb-8 text-center">Admin</h1>
-        <Typeahead options={accountUsers} onChange={handleUserSelect} />
-        <div className={`mt-8 grid grid-cols-1 gap-x-8 gap-y-10 ${!user ? 'pointer-events-none opacity-80' : ''}`}>
-          <TreeSelect options={userPermissions} onChange={togglePermission} />
-          <div className="flex justify-end">
-            <FormInputButton className="mr-4 w-24" onClick={() => fetchPermissionsForUser(user)} text="Reset" />
-            <FormInputButton intent="PRIMARY" className="mr-4 w-24" onClick={handlePermissionsSave} text="Save" />
+        <h1 className="mb-4 text-center text-3xl font-bold text-primary-orange">{'User Permissions'}</h1>
+
+        <div className={'mt-20 px-4 py-8 grid grid-cols-1 gap-x-8 gap-y-10'}>
+          <div className="flex items-center w-4xl">
+            <span className="mr-4 text-lg text-primary-navy">User</span>
+            <Typeahead
+              className="w-3/5"
+              placeholder="Please select a user"
+              options={accountUsers}
+              onChange={handleUserSelect}
+            />
+          </div>
+          <div className={`w-full ${!user ? 'pointer-events-none opacity-80' : ''}`}>
+            <TreeSelect options={userPermissions} onChange={togglePermission} />
+            <div className="mt-4 flex justify-end">
+              <FormInputButton
+                className="mr-4 btn btn-primary-navy w-24"
+                onClick={() => fetchPermissionsForUser(user)}
+                text="Reset"
+              />
+              <FormInputButton className="btn btn-primary-navy w-24" onClick={handlePermissionsSave} text="Save" />
+            </div>
           </div>
         </div>
       </div>
