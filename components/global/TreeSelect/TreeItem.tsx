@@ -27,9 +27,9 @@ export default function TreeItem({ value, onChange }: TreeItemProps) {
               >
                 <span className="flex items-center">
                   {open ? (
-                    <MinusIcon className="h-5 w-5" aria-hidden="true" />
+                    <MinusIcon data-testid="tree-item-open" className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <PlusIcon className="h-5 w-5" aria-hidden="true" />
+                    <PlusIcon data-testid="tree-item-close" className="h-5 w-5" aria-hidden="true" />
                   )}
                 </span>
                 <span className={`ml-4 ${isDisabled ? 'text-gray-400' : 'text-gray-700'} font-semibold`}>{name}</span>
@@ -41,6 +41,7 @@ export default function TreeItem({ value, onChange }: TreeItemProps) {
                     <div key={option.value} className="flex items-center">
                       <input
                         id={`filter-${id}-${optionIdx}`}
+                        data-testid={`tree-item-checkbox-${option.value}`}
                         name={`${id}[]`}
                         defaultValue={option.value}
                         type="checkbox"
