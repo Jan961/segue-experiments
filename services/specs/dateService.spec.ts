@@ -1,4 +1,4 @@
-import { getNextMondayDateString } from './dateService';
+import { getNextMondayDateString } from '../dateService';
 
 describe('getNextMondayDateString Utility Function', () => {
   // Test Case 1: Testing with a date that is before Monday
