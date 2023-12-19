@@ -1,6 +1,6 @@
 import { GetServerSideProps } from 'next';
 import GlobalToolbar from 'components/toolbar';
-
+import BookingsButtons from 'components/bookings/bookingsButtons';
 import Layout from 'components/Layout';
 import { getTourWithContent } from 'services/TourService';
 import { InfoPanel } from 'components/bookings/InfoPanel';
@@ -26,7 +26,7 @@ import { filteredScheduleSelector } from 'state/booking/selectors/filteredSchedu
 import { tourJumpState } from 'state/booking/tourJumpState';
 import { Spinner } from 'components/global/Spinner';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
-
+import { MileageCalculator } from 'components/bookings/MileageCalculator';
 import React, { PropsWithChildren } from 'react';
 import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
@@ -39,7 +39,11 @@ import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
-import { SearchBox } from 'components/global/SearchBox';
+
+interface bookingProps {
+  TourId: number;
+  intitialState: InitialState;
+}
 
 const toolbarHeight = 136;
 
@@ -80,7 +84,7 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   );
 };
 
-const BookingPage = () => {
+const BookingPage = ({ TourId }: bookingProps) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
   const bookingDict = useRecoilValue(bookingState);
   const rehearsalDict = useRecoilValue(rehearsalState);
@@ -95,7 +99,7 @@ const BookingPage = () => {
     Sections.map((x) => x.Dates)
       .flat()
       .filter((x) => x.Date === todayKey).length > 0;
-  const filteredSections = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
+  const filteredSections = useBookingFilter({Sections, bookingDict, rehearsalDict, gifuDict, otherDict})
   const gotoToday = () => {
     const idToScrollTo = `booking-${todayKey}`;
     if (todayOnSchedule) {
@@ -130,21 +134,15 @@ const BookingPage = () => {
               </div>
             </div>
           </div>
-          <SearchBox onChange={(e) => console.log(e)} value="" placeholder="Search bookings..." />
         </GlobalToolbar>
       </div>
-      <div className="flex items-center gap-4 flex-wrap my-4 w-[1200px] ml-4 justify-end">
+      <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
+        <MileageCalculator />
         <BookingFilter />
-        <div className="m-auto" />
-        <ToolbarButton>Full Tour</ToolbarButton>
-        <ToolbarButton>All Dates All Shows</ToolbarButton>
-        <ToolbarButton>Venue History</ToolbarButton>
-        <ToolbarButton>Tour summary</ToolbarButton>
-        <ToolbarButton>Barring</ToolbarButton>
         <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
           Go To Today
         </ToolbarButton>
-        <ToolbarButton>Add booking</ToolbarButton>
+        <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
@@ -157,9 +155,9 @@ const BookingPage = () => {
                 text-sm xl:text-md
                 sticky inset-x-0 top-0 bg-gray-50 z-10
                 shadow-lg
-                text-primary-blue"
+                text-gray-400"
               >
-                <div className="col-span-1 p-2 hidden xl:inline-block">Tour</div>
+                <div className="col-span-1 p-2 hidden xl:inline-block ">Tour</div>
                 <div className="col-span-1 lg:col-span-1 xl:col-span-1 p-2 whitespace-nowrap">Week No.</div>
                 <div className="col-span-4 lg:col-span-3 xl:col-span-2 p-2 whitespace-nowrap">Date</div>
                 <div className="col-span-7 lg:col-span-8 grid grid-cols-10">
@@ -184,7 +182,10 @@ const BookingPage = () => {
             </>
           )}
         </ScrollablePanel>
-        <ScrollablePanel reduceHeight={toolbarHeight} className="col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-white">
+        <ScrollablePanel
+          reduceHeight={toolbarHeight}
+          className="col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue"
+        >
           <InfoPanel />
         </ScrollablePanel>
       </div>

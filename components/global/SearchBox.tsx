@@ -5,17 +5,16 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 interface SearchBoxProps {
   onChange: (e: any) => void;
   value: string;
-  placeholder?: string;
 }
 
-export const SearchBox = ({ onChange, value, placeholder }: SearchBoxProps) => {
+export const SearchBox = ({ onChange, value }: SearchBoxProps) => {
   return (
-    <label htmlFor="search" className="inline-block flex-1">
+    <label htmlFor="search" className="inline-block">
       <span className="sr-only">Quick search</span>
       <div className="relative">
         <input
           className="block w-full rounded-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          placeholder={placeholder ?? 'Search'}
+          placeholder="Search"
           onChange={onChange}
           type="text"
           name="search"
