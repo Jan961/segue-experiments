@@ -11,6 +11,7 @@ interface FormInputButtonProps {
   className?: string;
   icon?: IconProp;
   intent?: undefined | 'DANGER' | 'PRIMARY';
+  testId?: string;
 }
 
 const LoadingSpinner = () => {
@@ -25,6 +26,7 @@ const LoadingSpinner = () => {
 
 // Larger button for submitting forms. Green in color
 export const FormInputButton = ({
+  testId,
   loading,
   disabled,
   text,
@@ -54,6 +56,7 @@ export const FormInputButton = ({
       type={submit ? 'submit' : 'button'}
       onClick={onClick}
       disabled={disabled}
+      data-testid={testId ? `form-input-button-${testId}` : 'form-input-button'}
     >
       <span>{text}</span>
       {icon && <FontAwesomeIcon icon={icon} className={text ? 'ml-2' : ''} />}
