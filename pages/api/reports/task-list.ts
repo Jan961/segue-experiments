@@ -1,9 +1,20 @@
-import { TourTask } from '@prisma/client';
 import prisma from 'lib/prisma';
 import ExcelJS from 'exceljs';
 import moment from 'moment';
-import { addWidthAsPerContent } from 'services/reportsService';
+import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
+import { dateToSimple, getWeekNumsToDateMap } from 'services/dateService';
+
+const getTaskStatusFromProgress = (progress: number) => {
+  if (progress === 0) {
+    return 'ToDo';
+  } else if (progress > 0 && progress < 100) {
+    return 'InProgress';
+  } else if (progress === 100) {
+    return 'Complete';
+  }
+  return '';
+};
 
 const handler = async (req, res) => {
   const { TourId } = JSON.parse(req.body) || {};
@@ -17,9 +28,18 @@ const handler = async (req, res) => {
       StartByWeekNum: true,
       CompleteByWeekNum: true,
       Priority: true,
+      AssignedToUserId: true,
+      Notes: true,
+      User: {
+        select: {
+          FirstName: true,
+          LastName: true,
+        },
+      },
       Tour: {
         select: {
           Code: true,
+          DateBlock: true,
           Show: {
             select: {
               Name: true,
@@ -30,10 +50,9 @@ const handler = async (req, res) => {
       },
     },
   });
-  console.table(taskList);
   const task = taskList?.[0];
   const FullTourCode = `${task?.Tour?.Show?.Code}${task?.Tour?.Code}`;
-  const ShowName = `${task?.Tour?.Show?.Name}`;
+  // const ShowName = `${task?.Tour?.Show?.Name}`;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Tasks', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
@@ -49,39 +68,43 @@ const handler = async (req, res) => {
     });
     return;
   }
+  const { StartDate, EndDate } = task.Tour.DateBlock.find((DateBlock) => DateBlock.Name === 'Tour') || {};
+  const weekNumsList = taskList.map((TourTask) => [TourTask.CompleteByWeekNum, TourTask.StartByWeekNum]).flat();
+  const weekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
 
   worksheet.addRow([`TOUR TASK LIST`]);
   worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
-  worksheet.addRow(['', '', '', '', '', '', '', 'DEPARTMENTS', '', '', '', '%']);
+  worksheet.addRow(['', '', '', '', '', '', '', '', '', '', '']);
   worksheet.addRow([
     'CODE',
     'TASK NAME',
+    'START BY (wk)',
     'START BY',
-    '',
-    'COMPLETE BY',
-    '',
-    'P!',
-    'RCK',
-    'MKT',
-    'PRD',
-    'ACC',
+    'DUE (wk)',
+    'DUE',
     'PROGRESS',
+    'STATUS',
+    'ASSIGNEE',
+    'PRIORITY',
+    'NOTES',
   ]);
   worksheet.addRow([]);
-  taskList.map(({ Name, Progress, StartByWeekNum, CompleteByWeekNum, Priority }) => {
+  const progressData = [];
+  taskList.map(({ Name, Progress, StartByWeekNum, CompleteByWeekNum, Priority, Notes, User }) => {
+    const { FirstName, LastName } = User || {};
+    progressData.push(Progress);
     return worksheet.addRow([
       FullTourCode,
       Name,
       StartByWeekNum,
-      '',
+      dateToSimple(weekNumToDateMap[StartByWeekNum]),
       CompleteByWeekNum,
-      '',
-      Priority,
-      '',
-      '',
-      '',
-      '',
+      dateToSimple(weekNumToDateMap[CompleteByWeekNum]),
       Progress,
+      getTaskStatusFromProgress(Progress),
+      `${FirstName || ''} ${LastName || ''}`,
+      Priority,
+      Notes,
     ]);
   });
   const numberOfColumns = worksheet.columnCount;
@@ -103,6 +126,7 @@ const handler = async (req, res) => {
     rowsToIgnore: 4,
     maxColWidth: Infinity,
   });
+  applyGradientFillToColumn({ worksheet, columnIndex: 6, progressData, startingRow: 6 });
   const filename = `${FullTourCode} Tasks.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
