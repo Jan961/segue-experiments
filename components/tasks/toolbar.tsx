@@ -79,7 +79,7 @@ const Toolbar: React.FC = () => {
         <ToolbarButton className="mb-2" onClick={() => setAddTaskOpen(true)}>
           Add Task
         </ToolbarButton>
-        <ToolbarButton className="mb-2" onClick={() => exportTasks()}>
+        <ToolbarButton className="flex items-center gap-1 mb-2 px-2" onClick={() => exportTasks()}>
           <ExcelIcon height={18} width={18} />
           Export
           {isLoading ? <Spinner className="mr-2" size="sm" /> : 'Export'}
