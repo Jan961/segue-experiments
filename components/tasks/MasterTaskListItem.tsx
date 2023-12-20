@@ -15,7 +15,6 @@ import { loggingService } from 'services/loggingService';
 import { Spinner } from 'components/global/Spinner';
 import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
-import { priorityOptions } from 'utils/tasks';
 
 interface TaskListItemProps {
   task: MasterTask;
@@ -30,10 +29,6 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const { users = {} } = useRecoilValue(userState);
   const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
   const weekOptions = useMemo(() => getWeekOptions(''), []);
-  const priorityName = useMemo(
-    () => priorityOptions.find((option) => option.value === task.Priority)?.text,
-    [task.Priority],
-  );
   // const toggleSelected = () => {
   //   setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   // };
@@ -152,7 +147,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
             options={weekOptions}
           />
         </Table.Cell>
-        <Table.Cell>{priorityName}</Table.Cell>
+        <Table.Cell>{task.Priority}</Table.Cell>
         <Table.Cell>{assignedToUser ? `${assignedToUser?.FirstName} ${assignedToUser?.LastName}` : '-'}</Table.Cell>
         <Table.Cell>{task.Notes}</Table.Cell>
         <Table.Cell>
