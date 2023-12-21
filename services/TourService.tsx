@@ -5,7 +5,7 @@ import { getShowWithToursById } from './ShowService';
 import { getAccountId, getEmailFromReq } from './userService';
 import { TourDTO } from 'interfaces';
 import { getToursByStartDate } from 'utils/getToursByStartDate';
-import getWeekNumsToDateMap from 'utils/weekOptions';
+import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 
 // Edit Tour Page
 const tourDateBlockInclude = Prisma.validator<Prisma.TourSelect>()({

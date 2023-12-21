@@ -1,3 +1,4 @@
+import { getDateFromWeekNumber, getWeekNumsToDateMap } from './getDateFromWeekNum';
 import { weekOptions } from './weekOptions';
 
 describe('weekOptions Utility Function', () => {
@@ -20,5 +21,27 @@ describe('weekOptions Utility Function', () => {
     const values = weekOptions.map((option) => option.value);
     const uniqueValues = new Set(values);
     expect(uniqueValues.size).toBe(values.length);
+  });
+
+  describe('getDateFromWeekNum', () => {
+    test('should return the correct date for a positive week number', () => {
+      const result = getDateFromWeekNumber('2023-01-01', 2);
+      expect(result).toBe('2023-01-15T00:00:00.000Z');
+    });
+    test('should return the correct date for a negative week number', () => {
+      const result = getDateFromWeekNumber('2023-01-01', -2);
+      expect(result).toBe('2022-12-18T00:00:00.000Z');
+    });
+  });
+
+  describe('getWeekNumsToDateMap', () => {
+    test('should return an object mapping week numbers to dates', () => {
+      const result = getWeekNumsToDateMap('2023-01-01', '2023-01-31', [1, 2, 3]);
+      expect(result).toEqual({
+        1: '2023-01-08T00:00:00.000Z',
+        2: '2023-01-15T00:00:00.000Z',
+        3: '2023-01-22T00:00:00.000Z',
+      });
+    });
   });
 });
