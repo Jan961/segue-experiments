@@ -31,8 +31,15 @@ type UpsertSalesParams = {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { SetBookingId, SetPerformanceId, SetSalesFiguresDate, Holds=[], Comps=[], Sales=[], isFinalFigures=false } =
-      req.body as UpsertSalesParams;
+    const {
+      SetBookingId,
+      SetPerformanceId,
+      SetSalesFiguresDate,
+      Holds = [],
+      Comps = [],
+      Sales = [],
+      isFinalFigures = false,
+    } = req.body as UpsertSalesParams;
     const SetSalesFiguresDateInISO = new Date(SetSalesFiguresDate);
     const salesSet = await prisma.salesSet.findFirst({
       where: {
@@ -43,9 +50,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             equals: SetSalesFiguresDateInISO,
           },
         }),
-        ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures })
-      }
-    })
+        ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
+      },
+    });
 
     if (salesSet) {
       // Update
@@ -55,22 +62,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Comps.map(({ SetCompCompTypeId, SetCompSeats }) =>
             tx.setComp.upsert({
               where: {
-                Comp_unique:{
+                Comp_unique: {
                   SetCompSetId: salesSet.SetId,
                   SetCompCompTypeId,
-                }
+                },
               },
               update: {
                 SetCompSeats,
               },
               create: {
                 SetCompSeats,
-                CompType:{
-                  connect:{CompTypeId: SetCompCompTypeId}
+                CompType: {
+                  connect: { CompTypeId: SetCompCompTypeId },
                 },
-                SalesSet:{
-                  connect:{SetId: salesSet.SetId}
-                }
+                SalesSet: {
+                  connect: { SetId: salesSet.SetId },
+                },
               },
             }),
           ),
@@ -80,10 +87,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) =>
             tx.setHold.upsert({
               where: {
-                Hold_unique:{
+                Hold_unique: {
                   SetHoldSetId: salesSet.SetId,
                   SetHoldHoldTypeId,
-                }
+                },
               },
               update: {
                 SetHoldSeats,
@@ -92,12 +99,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               create: {
                 SetHoldSeats,
                 SetHoldValue,
-                HoldType:{
-                  connect:{HoldTypeId: SetHoldHoldTypeId}
+                HoldType: {
+                  connect: { HoldTypeId: SetHoldHoldTypeId },
                 },
-                SalesSet:{
-                  connect:{SetId: salesSet.SetId}
-                }
+                SalesSet: {
+                  connect: { SetId: salesSet.SetId },
+                },
               },
             }),
           ),
@@ -109,8 +116,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               where: {
                 Sale_unique: {
                   SaleSetId: salesSet.SetId,
-                  SaleSaleTypeId
-                }
+                  SaleSaleTypeId,
+                },
               },
               update: {
                 SaleSeats,
@@ -130,43 +137,47 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
       await prisma.salesSet.create({
         data: {
-          SetBookingId,
           SetPerformanceId,
           SetSalesFiguresDate,
-          SetBrochureReleased: 0,
-          SetSingleSeats: 0,
-          SetNotOnSale: 0,
-          SetIsFinalFigures: 0,
-          SetIsCopy: 0,
           ...(isFinalFigures && { SetIsFinalFigures: isFinalFigures }),
-          ...(Comps && Comps?.length && {
-            setComp: {
-              create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
-                SetCompCompTypeId,
-                SetCompSeats
-              }))
-            }
+          ...(Comps &&
+            Comps?.length && {
+              setComp: {
+                create: Comps.map(({ SetCompCompTypeId, SetCompSeats }) => ({
+                  SetCompCompTypeId,
+                  SetCompSeats,
+                })),
+              },
+            }),
+          ...(Holds &&
+            Holds?.length && {
+              setHold: {
+                create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
+                  SetHoldHoldTypeId,
+                  SetHoldSeats,
+                  SetHoldValue,
+                })),
+              },
+            }),
+          ...(Sales &&
+            Sales?.length && {
+              Sale: {
+                create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
+                  SaleSaleTypeId,
+                  SaleSeats,
+                  SaleValue,
+                })),
+              },
+            }),
+          ...(SetBookingId && {
+            Booking: {
+              connect: {
+                Id: SetBookingId,
+              },
+            },
           }),
-          ...(Holds && Holds?.length && {
-            setHold: {
-              create: Holds.map(({ SetHoldHoldTypeId, SetHoldSeats, SetHoldValue }) => ({
-                SetHoldHoldTypeId,
-                SetHoldSeats,
-                SetHoldValue
-              }))
-            }
-          }),
-          ...(Sales && Sales?.length && {
-            sale: {
-              create: Sales.map(({ SaleSaleTypeId, SaleSeats, SaleValue }) => ({
-                SaleSaleTypeId,
-                SaleSeats,
-                SaleValue
-              }))
-            }
-          })
-        }
-      })
+        },
+      });
     }
 
     res.status(200).json({});

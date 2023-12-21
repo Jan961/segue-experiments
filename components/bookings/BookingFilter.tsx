@@ -11,7 +11,7 @@ export default function BookingsButtons() {
   return (
     <>
       <FormInputDate
-        className="flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
+        className="mb-2 flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
         label="From:"
         value={filter?.startDate}
         name="startDate"

@@ -167,48 +167,63 @@ export const getWeeksBetweenDates = (startDate: string, endDate: string) => {
 
 export const getPreviousMonday = (date) => {
   const dayOfWeek = date.getDay();
-  const difference = ((dayOfWeek + 6) % 7)+7; // Calculate the difference to Monday
+  const difference = ((dayOfWeek + 6) % 7) + 7; // Calculate the difference to Monday
   const previousMonday = new Date(date);
   previousMonday.setDate(date.getDate() - difference);
   return previousMonday;
+};
+
+export const getNextMondayDateString = (date: string) => {
+  const inputDate = moment(date);
+  if (!inputDate.isValid()) {
+    return '';
+  }
+
+  const daysUntilNextMonday = (7 - inputDate.day() + 1) % 7;
+  const nextMondayDate = inputDate.add(daysUntilNextMonday, 'days');
+  const nextMondayDateStr = nextMondayDate.toISOString();
+  return nextMondayDateStr;
 };
 
 export const getTimeFromDateAndTime = (time) => {
   return moment.utc(time).format('HH:mm');
 };
 
-export const toSql = (date:string) => {
-  return new Date(date).toISOString()?.split?.('T')?.[0]
-}
+export const toSql = (date: string) => {
+  return new Date(date).toISOString()?.split?.('T')?.[0];
+};
 
-export function getDuration (upTime: string, downTime: string): number {
+export function getDuration(upTime: string, downTime: string): number {
   if (upTime === '' || downTime === '') {
-    return 0
+    return 0;
   }
-  const up = new Date(`2023-01-01 ${upTime}`)
-  const down = new Date(`2023-01-01 ${downTime}`)
-  const diff = down.getTime() - up.getTime()
-  return diff
+  const up = new Date(`2023-01-01 ${upTime}`);
+  const down = new Date(`2023-01-01 ${downTime}`);
+  const diff = down.getTime() - up.getTime();
+  return diff;
 }
 
-export function formatDuration (duration: number, options?: {
-  h: string
-  m: string
-}): string {
-  const minutes = Math.floor(duration / 1000 / 60)
+export function formatDuration(
+  duration: number,
+  options?: {
+    h: string;
+    m: string;
+  },
+): string {
+  const minutes = Math.floor(duration / 1000 / 60);
   // format minutes to hours and minutes
-  const hours = Math.floor(minutes / 60)
-  const remainingMinutes = minutes % 60
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
   if (hours > 0) {
-    return `${hours}${options?.h ?? 'h'} ${remainingMinutes}${options?.m ?? 'm'}`
+    return `${hours}${options?.h ?? 'h'} ${remainingMinutes}${options?.m ?? 'm'}`;
   } else if (remainingMinutes > 0) {
-    return `${remainingMinutes}${options?.m ?? 'm'}`
+    return `${remainingMinutes}${options?.m ?? 'm'}`;
   } else {
-    return ''
+    return '';
   }
 }
 
 export const isValidDateString = (date: string): boolean => {
-  const d = new Date(date)
-  return d instanceof Date && !isNaN(d.getTime())
-}
+  const d = new Date(date);
+  return d instanceof Date && !isNaN(d.getTime());
+};

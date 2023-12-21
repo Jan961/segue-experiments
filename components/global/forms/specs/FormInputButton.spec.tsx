@@ -23,7 +23,7 @@ describe('Tests for FormInputButton', () => {
 
   it('Renders button as disabled', () => {
     render(<FormInputButton text="Click Me" disabled />);
-    const button = screen.getByText('Click Me');
+    const button = screen.getByTestId('form-input-button');
     expect(button).toBeDisabled();
   });
 
@@ -38,16 +38,19 @@ describe('Tests for FormInputButton', () => {
 
   it('Applies custom class name when provided', () => {
     const { container } = render(<FormInputButton className="custom-class" />);
-    expect(container.firstChild).toHaveClass('custom-class');
+    const { firstChild } = container;
+    expect(firstChild).toHaveClass('custom-class');
   });
 
   it('Applies DANGER styling when intent is DANGER', () => {
     const { container } = render(<FormInputButton intent="DANGER" />);
-    expect(container.firstChild).toHaveClass('bg-red-500');
+    const { firstChild } = container;
+    expect(firstChild).toHaveClass('bg-red-500');
   });
 
   it('Applies PRIMARY styling when intent is PRIMARY', () => {
     const { container } = render(<FormInputButton intent="PRIMARY" />);
-    expect(container.firstChild).toHaveClass('bg-primary-blue');
+    const { firstChild } = container;
+    expect(firstChild).toHaveClass('bg-primary-blue');
   });
 });

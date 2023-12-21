@@ -12,7 +12,8 @@ import { NewPerformanceButton } from './panel/components/NewPerformanceButton';
 import { CreateModal } from './modal/CreateModal';
 
 export const InfoPanel = () => {
-  const [view] = useRecoilState(viewState);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [view, setView] = useRecoilState(viewState);
   const scheduleDict = useRecoilValue(scheduleDictSelector);
   const perfState = useRecoilValue(performanceState);
 
@@ -22,7 +23,7 @@ export const InfoPanel = () => {
   const baseClass = 'bg-white shadow-xl';
 
   let panel: any;
-  let headerClass = 'm-0 p-2 bg-primary-blue text-white rounded-md';
+  let headerClass = 'm-0 p-2';
   let headerText = '';
   const performanceIds = [];
 
@@ -38,14 +39,17 @@ export const InfoPanel = () => {
   if (type === 'rehearsal') {
     panel = <RehearsalPanel key={id} rehearsalId={id} />;
     headerText = 'Rehearsal';
+    headerClass = classNames(headerClass, 'bg-red-500 text-white');
   }
   if (type === 'gifu') {
     panel = <GifuPanel key={id} gifuId={id} />;
     headerText = 'Get-In Fit-Up';
+    headerClass = classNames(headerClass, 'bg-yellow-400');
   }
   if (type === 'other') {
     panel = <OtherPanel key={id} otherId={id} />;
     headerText = 'Other';
+    headerClass = classNames(headerClass, 'bg-lime-400');
   }
 
   if (panel) {

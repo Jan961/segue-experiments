@@ -27,6 +27,7 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    tsconfigRootDir: __dirname,
   },
   plugins: ['react', '@typescript-eslint', 'testing-library'],
   overrides: [
@@ -40,6 +41,7 @@ module.exports = {
   rules: {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+    '@typescript-eslint/no-var-requires': 'off',
     'import/no-unresolved': 'off',
     'import/extensions': 'off',
   },
