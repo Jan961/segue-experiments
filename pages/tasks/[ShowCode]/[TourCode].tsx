@@ -11,11 +11,14 @@ import { ToursWithTasks, tourState } from 'state/tasks/tourState';
 import { InitialState } from 'lib/recoil';
 import { mapToTourTaskDTO } from 'lib/mappers';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
+import { tourJumpState } from 'state/booking/tourJumpState';
+import { getTourJumpState } from 'utils/getTourJumpState';
 
 const Index = () => {
-  const [bulkIsOpen, setBulkIsOpen] = useState(false);
-  const [bulkActionField, setBulkActionField] = useState<string>('');
-  const [selectedTour, setSelectedTour] = useState<number | undefined>(undefined);
+  const { selected } = useRecoilValue(tourJumpState);
+  // const [bulkIsOpen, setBulkIsOpen] = useState(false);
+  // const [bulkActionField, setBulkActionField] = useState<string>('');
+  const [selectedTour, setSelectedTour] = useState<number | undefined>(selected);
   const [filteredTasks, setFilteredTasks] = useState<ToursWithTasks[]>([]);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
@@ -28,34 +31,37 @@ const Index = () => {
     setStatusFilter(newStatusFilter);
   };
 
-  const [filters, setFilters] = useState({
-    Search: '',
-    Tour: undefined,
-    Status: statusFilter,
-    Assignee: undefined,
-  });
+  // const [filters, setFilters] = useState({
+  //   Search: '',
+  //   Tour: undefined,
+  //   Status: statusFilter,
+  //   Assignee: undefined,
+  // });
 
   const applyFilters = (filters) => {
     const filteredTours = tours.filter((tour) => {
       const matchesTour = filters.Tour === undefined || filters.Tour === tour.Id;
       const matchesStatus =
         filters.Status === undefined ||
-        (tour.Tasks && tour.Tasks.some((task) => {
-          if (filters.Status === 'todo') {
-            return task.Progress === 0;
-          } else if (filters.Status === 'inProgress') {
-            return task.Progress > 0 && task.Progress < 100;
-          } else if (filters.Status === 'complete') {
-            return task.Progress === 100;
-          }
-          return false;
-        }));
+        (tour.Tasks &&
+          tour.Tasks.some((task) => {
+            if (filters.Status === 'todo') {
+              return task.Progress === 0;
+            } else if (filters.Status === 'inProgress') {
+              return task.Progress > 0 && task.Progress < 100;
+            } else if (filters.Status === 'complete') {
+              return task.Progress === 100;
+            }
+            return false;
+          }));
 
       // const matchesAssignee = filters.Assignee === undefined || filters.Assignee === tour.Assignee;
       const matchesSearch =
         filters.Search === '' ||
         (tour.Tasks &&
-          tour.Tasks.some((task) => task.TaskName && task.TaskName.toLowerCase().includes(filters.Search.toLowerCase())));
+          tour.Tasks.some(
+            (task) => task.TaskName && task.TaskName.toLowerCase().includes(filters.Search.toLowerCase()),
+          ));
 
       return matchesTour && matchesStatus && matchesSearch;
     });
@@ -66,28 +72,24 @@ const Index = () => {
   const openBulkModal = (key: any) => {
     switch (key) {
       case 'setstatus':
-        setBulkActionField('Status');
-        setBulkIsOpen(true);
+        // setBulkActionField('Status');
+        // setBulkIsOpen(true);
         break;
       case 'priority':
-        setBulkActionField('Priority');
-        setBulkIsOpen(true);
-
+        // setBulkActionField('Priority');
+        // setBulkIsOpen(true);
         break;
       case 'progress':
-        setBulkActionField('Progress');
-        setBulkIsOpen(true);
-
+        // setBulkActionField('Progress');
+        // setBulkIsOpen(true);
         break;
       case 'followup':
-        setBulkActionField('FollowUp');
-        setBulkIsOpen(true);
-
+        // setBulkActionField('FollowUp');
+        // setBulkIsOpen(true);
         break;
       case 'reassign':
-        setBulkActionField('Assignee');
-        setBulkIsOpen(true);
-
+        // setBulkActionField('Assignee');
+        // setBulkIsOpen(true);
         break;
       default:
         break;
@@ -100,12 +102,20 @@ const Index = () => {
     <Layout title="Tasks | Seque">
       <div className="flex flex-auto w-full">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
-          <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}>
-          </GlobalToolbar>
-          <Toolbar setSelectedTour={setSelectedTour} onFilterChange={applyFilters} onSearch={handleSearch} selectedStatus={statusFilter} onStatusChange={handleStatusChange} />
+          <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}></GlobalToolbar>
+          <Toolbar
+            setSelectedTour={setSelectedTour}
+            onFilterChange={applyFilters}
+            onSearch={handleSearch}
+            selectedStatus={statusFilter}
+            onStatusChange={handleStatusChange}
+          />
           {filteredTasks.length > 0 ? (
             filteredTasks.map((tour) => (
-              <div key={tour.Id} className={selectedTour === undefined || selectedTour == tour.Id ? 'mb-10' : 'hidden'}>
+              <div
+                key={tour.Id}
+                className={selectedTour === undefined || selectedTour === tour.Id ? 'mb-10' : 'hidden'}
+              >
                 <h3 className="text-xl font-bold py-4 text-primary-purple">{tour.ShowName}</h3>
                 <Tasklist
                   tourId={tour.Id}
@@ -125,7 +135,7 @@ const Index = () => {
         </div>
       </div>
       <div className="flex w-full justify-end px-12 pb-12">
-      <TaskButtons openBulkModal={openBulkModal} />
+        <TaskButtons openBulkModal={openBulkModal} />
       </div>
     </Layout>
   );
@@ -133,10 +143,12 @@ const Index = () => {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-
+  const tourJump = await getTourJumpState(ctx, 'bookings', AccountId);
+  const TourId = tourJump.selected;
+  // TourJumpState is checking if it's valid to access by accountId
+  if (!TourId) return { notFound: true };
   const toursWithTasks = await getToursAndTasks(AccountId);
   const users = await getUsers(AccountId);
-
   const tours: ToursWithTasks[] = toursWithTasks.map((t: any) => ({
     Id: t.Id,
     ShowName: t.Show.Name,
@@ -147,6 +159,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }));
 
   const initialState: InitialState = {
+    global: {
+      tourJump,
+    },
     tasks: { tours, bulkSelection: {} },
     account: { user: { users } },
   };

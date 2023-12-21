@@ -204,7 +204,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const tourJump = await getTourJumpState(ctx, 'bookings', AccountId);
+  const tourJump = await getTourJumpState(ctx, 'tasks', AccountId);
 
   const TourId = tourJump.selected;
   // TourJumpState is checking if it's valid to access by accountId
