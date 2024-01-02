@@ -175,6 +175,10 @@ export const getPreviousMonday = (date) => {
 
 export const getNextMondayDateString = (date: string) => {
   const inputDate = moment(date);
+  if (!inputDate.isValid()) {
+    return '';
+  }
+
   const daysUntilNextMonday = (7 - inputDate.day() + 1) % 7;
   const nextMondayDate = inputDate.add(daysUntilNextMonday, 'days');
   const nextMondayDateStr = nextMondayDate.toISOString();

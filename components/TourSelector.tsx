@@ -11,10 +11,10 @@ import React from 'react';
 
 interface TourSelectorProps {
   tours: TourDTO[];
-  ToolbarButtons?:any;
+  ToolbarButtons?: any;
 }
 
-export const TourSelector = ({ tours, ToolbarButtons=<div /> }: TourSelectorProps) => {
+export const TourSelector = ({ tours, ToolbarButtons = <div /> }: TourSelectorProps) => {
   const [search, setSearch] = React.useState('');
   const router = useRouter();
   const path = router.pathname.split('/')[1];
@@ -25,7 +25,7 @@ export const TourSelector = ({ tours, ToolbarButtons=<div /> }: TourSelectorProp
   const query = search.toLowerCase();
 
   for (const t of tours) {
-    if (t.Code?.toLowerCase().includes(query) || t.ShowName?.toLowerCase().includes(query)) {
+    if (!query || t.Code?.toLowerCase().includes(query) || t.ShowName?.toLowerCase().includes(query)) {
       if (t.IsArchived) archived.push(t);
       else active.push(t);
     }

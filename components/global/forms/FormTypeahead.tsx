@@ -31,7 +31,7 @@ export default function Typeahead({
   const filteredOptions = useMemo(() => {
     return query === ''
       ? options
-      : options.filter(({ name }) => {
+      : options.filter(({ name = '' }) => {
           return name.toLowerCase().includes(query.toLowerCase());
         });
   }, [query, options]);
@@ -58,7 +58,7 @@ export default function Typeahead({
               <Combobox.Input
                 data-testid={`${testId ? `form-typeahead-input-${testId}` : 'form-typeahead-input'}`}
                 ref={inputRef}
-                className="w-full border-none py-2 px-3 text-sm leading-5 text-gray-900 focus:ring-0"
+                className="w-full border-none py-2 px-3 text-sm leading-5 text-gray-900 focus:ring-0 h-10"
                 displayValue={(o: TypeaheadOption) => o?.name || ''}
                 onChange={(event) => setQuery(event.target.value)}
                 onFocus={onInputFocus}

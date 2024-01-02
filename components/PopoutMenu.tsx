@@ -7,6 +7,7 @@ import {
   faFileSignature,
   faHome,
   faLocationDot,
+  faUserGear,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegueLogo } from './global/SegueLogo';
@@ -80,20 +81,12 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       activeColor: 'text-primary-navy',
     },
 
-    /*
     {
       label: 'Admin',
-      link: '#',
+      link: '/admin',
       icon: faUserGear,
       activeColor: 'text-primary-orange',
-      subItems: [
-        {
-          label: 'Venues',
-          link: '/venues/20'
-        }
-      ]
-    }
-    */
+    },
   ];
 
   const close = () => setMenuIsOpen(!menuIsOpen);

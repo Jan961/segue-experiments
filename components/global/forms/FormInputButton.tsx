@@ -11,6 +11,7 @@ interface FormInputButtonProps {
   className?: string;
   icon?: IconProp;
   intent?: undefined | 'DANGER' | 'PRIMARY';
+  testId?: string;
 }
 
 const LoadingSpinner = () => {
@@ -25,6 +26,7 @@ const LoadingSpinner = () => {
 
 // Larger button for submitting forms. Green in color
 export const FormInputButton = ({
+  testId,
   loading,
   disabled,
   text,
@@ -34,14 +36,14 @@ export const FormInputButton = ({
   intent,
   icon,
 }: FormInputButtonProps) => {
-  const baseClass = 'rounded shadow text-sm px-3 py-2 cursor-pointer ';
+  const baseClass = 'flex justify-center items-center rounded shadow text-responsive-sm px-3 py-2 cursor-pointer ';
 
   const intentClass =
     intent === 'DANGER'
       ? 'bg-red-500 hover:bg-red-400 text-white'
       : intent === 'PRIMARY'
       ? 'bg-primary-blue text-white hover:bg-soft-primary-blue hover:text-black'
-      : 'bg-gray-200 hover:bg-gray-100 active:bg-gray-300';
+      : '';
 
   const availableClasses = classNames(baseClass, intentClass);
   const disabledClasses = classNames(baseClass + 'bg-gray-300 text-gray-400 cursor-not-allowed');
@@ -54,8 +56,9 @@ export const FormInputButton = ({
       type={submit ? 'submit' : 'button'}
       onClick={onClick}
       disabled={disabled}
+      data-testid={testId ? `form-input-button-${testId}` : 'form-input-button'}
     >
-      {text}
+      <span>{text}</span>
       {icon && <FontAwesomeIcon icon={icon} className={text ? 'ml-2' : ''} />}
       {loading && <LoadingSpinner />}
     </button>
