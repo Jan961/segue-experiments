@@ -32,7 +32,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status);
 
   const progressBarWidth = task.Progress + '%';
-
+  console.log('task completed', getAdjustedDateByWeeks(task.CompleteByWeekNum));
   return (
     <>
       {modalOpen && <TaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}

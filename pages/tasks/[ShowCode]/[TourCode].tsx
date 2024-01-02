@@ -22,6 +22,8 @@ const Index = () => {
   const [filteredTasks, setFilteredTasks] = useState<ToursWithTasks[]>([]);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [startDateFilter] = useState<string>('');
+  const [endDateFilter] = useState<string>('');
 
   const handleSearch = (newSearchFilter: string) => {
     setSearchFilter(newSearchFilter);
@@ -123,6 +125,8 @@ const Index = () => {
                   selectedTour={selectedTour}
                   searchFilter={searchFilter}
                   statusFilter={statusFilter}
+                  startDateFilter={startDateFilter}
+                  endDateFilter={endDateFilter}
                   tasks={tour.Tasks || []}
                 />
               </div>

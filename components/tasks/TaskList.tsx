@@ -1,35 +1,40 @@
-// Import necessary types and components
 import { TourState, tourState } from 'state/tasks/tourState';
 import TaskListItem from './TaskListItem';
 import { useRecoilValue } from 'recoil';
 import { Table } from 'components/global/table/Table';
 // import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { TourTaskDTO } from 'interfaces';
-// import { useState } from 'react';
 
 interface TaskListProps {
   tourId: number;
   selectedTour?: number;
   searchFilter: string;
   statusFilter: string;
+  startDateFilter: string;
+  endDateFilter: string;
   tasks: TourTaskDTO[];
 }
 
-const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: TaskListProps) => {
-  // const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
+const Tasklist = ({
+  tourId,
+  selectedTour,
+  searchFilter,
+  statusFilter,
+  startDateFilter,
+  endDateFilter,
+  tasks,
+}: TaskListProps) => {
   const tours: TourState = useRecoilValue(tourState);
   const match = tours.find((x) => x.Id === tourId);
-  // const [searchQuery, setSearchQuery] = useState('');
 
   if (!match || (selectedTour !== undefined && selectedTour !== tourId)) {
     return null;
   }
 
-  // const countSelected = match.Tasks.filter((x) => bulkSelection[x.Id]).length;
   // const allSelected = countSelected === match.Tasks.length;
 
   // const toggleAll = () => {
-  //   const ids = match.Tasks.map((x) => x.Id);
+  //   const ids = match.Tasks.map(x => x.Id);
   //   const newState = { ...bulkSelection };
   //   if (allSelected) {
   //     for (const id of ids) {
@@ -42,6 +47,31 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
   //   }
   //   setBulkSelection(newState);
   // };
+
+  const isDateInRange = (taskDueDate: string, startDate: string, endDate: string) => {
+    const convertDate = (dateStr) => {
+      if (typeof dateStr !== 'string' || !dateStr.includes('/')) {
+        console.error('Invalid date format:', dateStr);
+        return null;
+      }
+      const parts = dateStr.split('/');
+      if (parts.length !== 3) {
+        console.error('Invalid date format:', dateStr);
+        return null;
+      }
+      const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+      return `${year}-${parts[1]}-${parts[0]}`;
+    };
+
+    const convertedTaskDueDate = convertDate(taskDueDate);
+    if (!convertedTaskDueDate) return false;
+
+    const taskDate = new Date(convertedTaskDueDate).getTime();
+    const start = new Date(startDate).getTime();
+    const end = new Date(endDate).getTime();
+
+    return taskDate >= start && taskDate <= end;
+  };
 
   if ((match.Tasks || []).length === 0) {
     return <p>No tasks for this tour</p>;
@@ -81,7 +111,10 @@ const Tasklist = ({ tourId, selectedTour, searchFilter, statusFilter, tasks }: T
                 default:
                   break;
               }
-              return matchesSearch && matchesStatus;
+              const matchesDate =
+                startDateFilter && endDateFilter ? isDateInRange(task.DueDate, startDateFilter, endDateFilter) : true;
+              console.log('start date filter', startDateFilter);
+              return matchesSearch && matchesStatus && matchesDate;
             })
             .map((task) => (
               <TaskListItem task={task} key={task.Id}></TaskListItem>
