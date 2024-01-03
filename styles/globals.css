@@ -46,4 +46,6 @@
 .sticky-header-table td {
 }
 
-
+.unstyled::-webkit-calendar-picker-indicator {
+    display: none;
+}

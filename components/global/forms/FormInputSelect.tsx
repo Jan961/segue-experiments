@@ -15,6 +15,7 @@ interface Input {
   disabled?: boolean;
   inline?: boolean; // Side by Side
   className?: string;
+  searchIcon?: boolean
 }
 
 export const FormInputSelect = ({

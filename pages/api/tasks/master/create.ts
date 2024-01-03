@@ -9,9 +9,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const task = req.body as MasterTask;
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
-    const {Code} = await getMaxTaskCode();
+    const { Code } = await getMaxTaskCode();
     const createResult = await prisma.MasterTask.create({
-      data: {...task, AccountId, Code: Code+1},
+      data: { ...task, AccountId, Code: Code + 1 },
     });
     res.json(createResult);
   } catch (err) {

@@ -13,8 +13,8 @@ export const getMaxTaskCode = async () => {
     orderBy: {
       Code: 'desc',
     },
-    select:{
-        Code: true,
-    }
+    select: {
+      Code: true,
+    },
   });
 };

@@ -39,7 +39,18 @@ export const dateToSimple = (dateToFormat: Date | string) => {
 
 export const dateToPicker = (dateToFormat: Date | string) => {
   if (!dateToFormat) return '';
-  return typeof dateToFormat === 'object' ? dateToFormat.toISOString().slice(0, 10) : dateToFormat.slice(0, 10);
+
+  if (typeof dateToFormat === 'object') {
+    return dateToFormat.toISOString().slice(0, 10);
+  }
+
+  // Handle string values that represent incomplete dates
+  if (typeof dateToFormat === 'string') {
+    // Basic validation or manipulation if needed
+    return dateToFormat;
+  }
+
+  return dateToFormat;
 };
 
 export const dateTimeToTime = (dateToFormat: string) => {

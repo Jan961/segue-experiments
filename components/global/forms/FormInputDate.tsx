@@ -12,6 +12,7 @@ interface Input {
   inputClass?: string;
   disabled?: boolean;
   inline?: boolean;
+  icon?: boolean
 }
 
 export const FormInputDate = ({
@@ -53,7 +54,7 @@ export const FormInputDate = ({
           {label} {required ? '*' : null}
         </div>
       )}
-      <input {...inputProps} />
+      <input {...inputProps}/>
     </label>
   );
 };

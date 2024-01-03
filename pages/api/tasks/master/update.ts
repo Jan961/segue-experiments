@@ -10,8 +10,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
     const result = await prisma.MasterTask.update({
-      where:{Id:task.Id},
-      data: {...task, AccountId},
+      where: { Id: task.Id },
+      data: { ...task, AccountId },
     });
     res.status(200).json(result);
   } catch (err) {

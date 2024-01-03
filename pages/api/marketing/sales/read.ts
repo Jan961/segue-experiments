@@ -110,16 +110,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
     if (!salesSet) {
       let salesFigureDate = SetSalesFiguresDate;
-      if(!SetSalesFiguresDate && isFinalFigures){
+      if (!SetSalesFiguresDate && isFinalFigures) {
         const performance = await prisma.performance.findFirst({
-          where:{
-            BookingId:SetBookingId
+          where: {
+            BookingId: SetBookingId,
           },
-          orderBy:{
-            Date:'desc'
-          }
-        })
-        salesFigureDate = getNextMondayDateString(performance.Date?.toISOString())
+          orderBy: {
+            Date: 'desc',
+          },
+        });
+        salesFigureDate = getNextMondayDateString(performance.Date?.toISOString());
       }
       return res.status(200).json({ SetComp: [], SetHold: [], Sale: null, SetSalesFiguresDate: salesFigureDate });
       // throw new Error('No such SalesSet exists')
