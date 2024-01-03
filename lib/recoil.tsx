@@ -17,6 +17,7 @@ import { TourState, tourState } from 'state/tasks/tourState';
 import { BulkSelectionState, bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { UserState, userState } from 'state/account/userState';
 import { MasterTaskStateType, masterTaskState } from 'state/tasks/masterTaskState';
+import { tasksfilterState, TasksFilterType } from 'state/tasks/tasksFilterState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -32,6 +33,7 @@ export type InitialState = Partial<{
     tours?: TourState;
     bulkSelection?: BulkSelectionState;
     masterTask?: MasterTaskStateType;
+    tasksFilter?: TasksFilterType;
   };
   booking?: {
     booking?: Record<number, BookingDTO>;
@@ -67,6 +69,7 @@ const states: {
     tours: tourState,
     bulkSelection: bulkSelectionState,
     masterTask: masterTaskState,
+    tasksFilter: tasksfilterState
   },
   booking: {
     booking: bookingState,

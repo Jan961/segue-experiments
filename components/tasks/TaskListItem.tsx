@@ -27,12 +27,8 @@ interface TaskListItemProps {
 
 const TaskListItem = ({ task }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
-  // const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
-
   const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status);
-
   const progressBarWidth = task.Progress + '%';
-  console.log('task completed', getAdjustedDateByWeeks(task.CompleteByWeekNum));
   return (
     <>
       {modalOpen && <TaskEditor open={modalOpen} task={task} triggerClose={() => setModalOpen(false)} />}

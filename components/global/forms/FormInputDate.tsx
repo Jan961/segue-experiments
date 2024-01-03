@@ -29,7 +29,7 @@ export const FormInputDate = ({
 }: Input) => {
   const stringValue = dateToPicker(value);
   let inputBaseClass =
-    'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm unstyled';
+    'w-full block rounded border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
   if (disabled) inputBaseClass = classNames(inputBaseClass, 'bg-gray-100 text-gray-400');
 
   const flexClass = inline ? 'flex whitespace-nowrap items-center' : '';

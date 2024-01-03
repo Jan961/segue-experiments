@@ -180,15 +180,17 @@ export const getTourById = async (Id: number) => {
   });
 };
 
-export const getToursAndTasks = async (AccountId: number) => {
+export const getToursAndTasks = async (AccountId: number, TourId?: number) => {
   let toursWithTasks = await prisma.tour.findMany({
     where: {
       IsArchived: false,
+      ...(TourId && {Id: TourId}),
       Show: {
         is: {
           AccountId,
         },
       },
+
     },
     include: {
       Show: true,
