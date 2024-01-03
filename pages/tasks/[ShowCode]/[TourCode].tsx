@@ -18,7 +18,7 @@ import useTasksFilter from 'hooks/useTasksFilter';
 
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { selected } = useRecoilValue(tourJumpState);
-  const {filteredTours, onApplyFilters} = useTasksFilter(selected);
+  const {filteredTours, onApplyFilters} = useTasksFilter();
 
   return (
     <Layout title="Tasks | Seque">

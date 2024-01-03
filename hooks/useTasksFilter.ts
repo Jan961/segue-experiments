@@ -1,10 +1,10 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { tasksfilterState } from 'state/tasks/tasksFilterState';
 import { tourState } from 'state/tasks/tourState';
 import { applyTaskFilters, filterTourTasksBySearchText } from 'utils/tasks';
 
-const useTasksFilter = (tourId:number) => {
+const useTasksFilter = () => {
     const tours = useRecoilValue(tourState);
     const filters = useRecoilValue(tasksfilterState);
     const [filteredTours, setFilteredTours] = useState(tours)
@@ -16,9 +16,6 @@ const useTasksFilter = (tourId:number) => {
       const updatedTours = applyTaskFilters(tours,  filters)
       setFilteredTours(updatedTours)
     }
-    useEffect(()=>{
-      onApplyFilters()
-    }, [tourId])
     
   return {filteredTours, handleSearch, onApplyFilters};
 };
