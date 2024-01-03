@@ -7,8 +7,6 @@ import { fetchWrapper } from '../helpers/fetch-wrapper';
 const { publicRuntimeConfig } = getConfig();
 const baseUrl = `${publicRuntimeConfig.apiUrl}/users`;
 const userSubject = new BehaviorSubject(process.browser && safeJsonParse(localStorage.getItem('user')));
-;
-
 export const userService = {
   user: userSubject.asObservable(),
   get userValue() {
@@ -83,4 +81,3 @@ function _delete(id) {
 export function safeParseJson(): any {
   throw new Error('Function not implemented.');
 }
-

@@ -7,10 +7,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
     const UserList = await prisma.User.findMany({
-        where:{
-            AccountId
-        }
-    })
+      where: {
+        AccountId,
+      },
+    });
     return res.status(200).json(UserList);
   } catch (err) {
     console.log(err);

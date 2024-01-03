@@ -54,7 +54,7 @@ interface FooterButton {
   submit?: boolean;
   intent?: undefined | 'DANGER';
   disabled?: boolean;
-  className?:string;
+  className?: string;
 }
 
 const FooterCancel = ({ onClick, submit, children = 'Cancel' }: PropsWithChildren<FooterButton>) => {
@@ -73,7 +73,14 @@ const FooterDelete = ({ onClick, children, disabled }: PropsWithChildren<FooterB
   );
 };
 
-const FooterContinue = ({ onClick, submit, children, intent, disabled, className='' }: PropsWithChildren<FooterButton>) => {
+const FooterContinue = ({
+  onClick,
+  submit,
+  children,
+  intent,
+  disabled,
+  className = '',
+}: PropsWithChildren<FooterButton>) => {
   return (
     <MenuButton className={className} onClick={onClick} submit={submit} intent={intent} disabled={disabled}>
       {children}

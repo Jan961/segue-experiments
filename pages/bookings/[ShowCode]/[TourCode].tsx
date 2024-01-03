@@ -99,7 +99,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
     Sections.map((x) => x.Dates)
       .flat()
       .filter((x) => x.Date === todayKey).length > 0;
-  const filteredSections = useBookingFilter({Sections, bookingDict, rehearsalDict, gifuDict, otherDict})
+  const filteredSections = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
   const gotoToday = () => {
     const idToScrollTo = `booking-${todayKey}`;
     if (todayOnSchedule) {
@@ -205,7 +205,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const tourJump = await getTourJumpState(ctx, 'bookings', AccountId);
+  const tourJump = await getTourJumpState(ctx, 'tasks', AccountId);
 
   const TourId = tourJump.selected;
   // TourJumpState is checking if it's valid to access by accountId

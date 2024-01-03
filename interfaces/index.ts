@@ -41,6 +41,7 @@ export type ShowDTO = {
 };
 
 export type TourTaskDTO = {
+  TaskName?: any;
   Id: number;
   TourId: number;
   Code: number;
@@ -54,11 +55,12 @@ export type TourTaskDTO = {
   Status?: string;
   Interval: string;
   AssignedBy?: string;
-  AssignedToUserId?: number;
+  AssignedTo?: string;
   StartByWeekNum?: number;
   CompleteByWeekNum?: number;
   CompleteByPostTour: boolean;
   StartByPostTour: boolean;
+  AssignedToUserId?: number;
 };
 
 // Existing tour interface for old schema. Remove eventually
@@ -300,6 +302,14 @@ export type BarringVenue = {
   showVenue: Venue;
   barredVenue: Venue;
 };
+
+
+export enum intervalEnum {
+  'once',
+  'daily',
+  'monthly',
+  'yearly',
+}
 
 export interface IContractDetails {
   Artifacts: Blob;

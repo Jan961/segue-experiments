@@ -10,7 +10,7 @@ export type FilterState = {
 
 const intialState: FilterState = {
   venueText: '',
-  masterTaskText:'',
+  masterTaskText: '',
   status: null,
   startDate: '',
   endDate: '',

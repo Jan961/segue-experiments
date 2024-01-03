@@ -12,6 +12,7 @@ import { NewPerformanceButton } from './panel/components/NewPerformanceButton';
 import { CreateModal } from './modal/CreateModal';
 
 export const InfoPanel = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [view, setView] = useRecoilState(viewState);
   const scheduleDict = useRecoilValue(scheduleDictSelector);
   const perfState = useRecoilValue(performanceState);
@@ -58,7 +59,7 @@ export const InfoPanel = () => {
           <div className={classNames(headerClass, 'flex justify-between items-center')}>
             <h2>{headerText}</h2>
           </div>
-          <div className="p-2">{panel}</div> 
+          <div className="p-2">{panel}</div>
         </div>
         {type === 'booking' && (
           <div className="border-t border-gray-200 p-2 bg-white">

@@ -2,7 +2,6 @@ import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 
-
 export default function BookingsButtons() {
   const [filter, setFilter] = useRecoilState(filterState);
   const onChange = (e: any) => {
