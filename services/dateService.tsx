@@ -238,3 +238,16 @@ export const isValidDateString = (date: string): boolean => {
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
 };
+
+export const getDateFromWeekNum = (date: string, weeknum: number) => {
+  const startDate = new Date(date);
+  const numberOfDays = Math.abs(weeknum) * 7;
+  startDate.setDate(weeknum < 0 ? startDate.getDate() - numberOfDays : startDate.getDate() + numberOfDays);
+  return getMonday(startDate.toISOString()).toISOString();
+};
+export const getWeekNumsToDateMap = (StartDate: string, EndDate: string, list: number[]) => {
+  return list.reduce((weeknumToDateMap, weeknum) => {
+    weeknumToDateMap[weeknum] = getDateFromWeekNum(StartDate, weeknum);
+    return weeknumToDateMap;
+  }, {});
+};

@@ -40,6 +40,29 @@ export type ShowDTO = {
   IsArchived: boolean;
 };
 
+export type TourTaskDTO = {
+  TaskName?: any;
+  Id: number;
+  TourId: number;
+  Code: number;
+  Name: string;
+  Priority: number;
+  Notes?: string;
+  Progress: number;
+  DueDate?: string;
+  FollowUp?: string;
+  CreatedDate?: string;
+  Status?: string;
+  Interval: string;
+  AssignedBy?: string;
+  AssignedTo?: string;
+  StartByWeekNum?: number;
+  CompleteByWeekNum?: number;
+  CompleteByPostTour: boolean;
+  StartByPostTour: boolean;
+  AssignedToUserId?: number;
+};
+
 // Existing tour interface for old schema. Remove eventually
 export type Tour = {
   TourId: number;
@@ -281,30 +304,7 @@ export type BarringVenue = {
 };
 
 
-export type TourTaskDTO = {
-  TaskName?: any;
-  Id: number;
-  TourId: number;
-  Code: number;
-  Name: string;
-  Priority: number;
-  Notes?: string;
-  Progress: number;
-  DueDate?: string;
-  FollowUp?: string;
-  CreatedDate?: string;
-  Status?: string;
-  Interval: string;
-  AssignedBy?: string;
-  AssignedTo?: string;
-  StartByWeekNum?: number;
-  CompleteByWeekNum?: number;
-  CompleteByPostTour: boolean;
-  StartByPostTour: boolean;
-  AssignedToUserId?: number;
-};
-
-enum intervalEnum {
+export enum intervalEnum {
   'once',
   'daily',
   'monthly',

@@ -1,5 +1,6 @@
 import moment from 'moment';
 import cheerio from 'cheerio';
+import { COLOR_HEXCODE } from './salesSummaryService';
 
 export const addWidthAsPerContent = ({
   worksheet,
@@ -58,7 +59,7 @@ const getHTMLFieldMaxWidth = (text: string) => {
   let maxWidth = 0;
   // eslint-disable-next-line array-callback-return
   text.split('\n').map((htmlString) => {
-    const $:any = cheerio.load(htmlString);
+    const $: any = cheerio.load(htmlString);
     const line = $.text?.();
     maxWidth = Math.max(maxWidth, line.length);
   });
@@ -71,4 +72,32 @@ export const range = (start: number, end: number) =>
 export const getCurrentMondayDate = () => {
   const currentMonday = moment(new Date()).startOf('isoWeek').set('hour', 0).add(1, 'day');
   return currentMonday.toISOString()?.split('T')?.[0];
+};
+
+export const applyGradientFillToColumn = ({
+  worksheet,
+  columnIndex,
+  progressData,
+  startingRow,
+}: {
+  worksheet: any;
+  columnIndex: number;
+  progressData: number[];
+  startingRow: number;
+}) => {
+  for (let i = startingRow; i <= startingRow + progressData.length - 1; i++) {
+    const cell = worksheet.getCell(`${String.fromCharCode(65 + columnIndex)}${i}`);
+    const progress = progressData[i - startingRow] / 100;
+    cell.fill = {
+      type: 'gradient',
+      gradient: 'angle',
+      degree: 0,
+      stops: [
+        ...((progress === 0 && [{ position: 0, color: { argb: COLOR_HEXCODE.WHITE } }]) || []),
+        { position: 0, color: { argb: 'ff84ecd7' } },
+        { position: progress, color: { argb: 'ff84ecd7' } },
+        ...(((progress < 1 || progress === 0) && [{ position: 1, color: { argb: COLOR_HEXCODE.WHITE } }]) || []),
+      ],
+    };
+  }
 };
