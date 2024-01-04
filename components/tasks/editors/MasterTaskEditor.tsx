@@ -41,6 +41,10 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [inputs, setInputs] = React.useState<MasterTask>(task || DEFAULT_MASTER_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
+  const priorityOptionList = React.useMemo(
+    () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
+    [],
+  );
   const userOptions = useMemo(
     () =>
       Object.values(users).map((user) => ({
@@ -113,7 +117,7 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
           label="Priority"
           onChange={handleOnChange}
           value={inputs.Priority}
-          options={priorityOptions}
+          options={priorityOptionList}
         />
         <FormInputSelect
           name="StartByWeekNum"
