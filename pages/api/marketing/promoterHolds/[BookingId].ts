@@ -15,6 +15,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         BookingId,
       },
+      orderBy: [
+        {
+          Date: 'asc',
+        },
+        {
+          Time: 'asc',
+        },
+      ],
       include: {
         AvailableComp: {
           include: {

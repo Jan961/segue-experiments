@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LoadingTab } from '../LoadingTab';
 import axios from 'axios';
 import { useRecoilState } from 'recoil';
@@ -11,6 +11,8 @@ import { debounce } from 'radash';
 import { Table } from 'components/global/table/Table';
 import { AllocatedSeatsEditor } from 'components/marketing/editors/AllocatedSeatsEditor';
 import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
+import { FormInputButton } from 'components/global/forms/FormInputButton';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const defaultInputs = {
   CastRateTicketsArranged: false,
@@ -20,22 +22,24 @@ const defaultInputs = {
 export const PromoterHoldsTab = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const { selected } = bookingJump;
-  const [inputs, setInputs] = React.useState(defaultInputs);
-  const [loading, setLoading] = React.useState(true);
-  const [performances, setPerformances] = React.useState([]);
-  const [allocatedSeatsModalOpen, setAllocatedSeatsModalOpen] = React.useState(false);
-  const [allocatedSeatsEditing, setAllocatedSeatsEditing] = React.useState(undefined);
+  const [inputs, setInputs] = useState(defaultInputs);
+  const [loading, setLoading] = useState(true);
+  const [performances, setPerformances] = useState([]);
+  const [allocatedSeatsModalOpen, setAllocatedSeatsModalOpen] = useState(false);
+  const [allocatedSeatsEditing, setAllocatedSeatsEditing] = useState(undefined);
 
   const selectedBooking = useMemo(
     () => bookingJump.bookings?.find?.((x) => x.Id === selected),
     [bookingJump.bookings, selected],
   );
 
-  const sortByDateAndTime = (a, b) => {
-    const dateA = new Date(a.info.Date).getTime();
-    const dateB = new Date(b.info.Date).getTime();
-    
-    return dateA - dateB; 
+  const search = async () => {
+    if (selected) {
+      setLoading(true);
+      const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`);
+      setPerformances(data);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -44,16 +48,6 @@ export const PromoterHoldsTab = () => {
   }, [bookingJump.selected]);
 
   useEffect(() => {
-    const search = async () => {
-      if (selected) {
-        setLoading(true);
-        const { data } = await axios.get(`/api/marketing/promoterHolds/${selected}`);
-        setPerformances(data);
-        setLoading(false);
-      } else {
-        console.log('Selected booking ID is null');
-      }
-    };
     search();
   }, [selected]);
 
@@ -85,8 +79,8 @@ export const PromoterHoldsTab = () => {
     if (refresh) search();
   };
 
-  const createAllocatedSeat = (acId) => {
-    setAllocatedSeatsEditing({ AvailableCompId: acId, Seats: 0 });
+  const createAllocatedSeat = (acId, maxAllocation = 0) => {
+    setAllocatedSeatsEditing({ AvailableCompId: acId, Seats: 0, maxAllocation });
     setAllocatedSeatsModalOpen(true);
   };
 
@@ -125,66 +119,65 @@ export const PromoterHoldsTab = () => {
       )}
 
       {/* Render Performance Section Notes and other components as needed */}
-      {performances.map(perf => {
+      {performances.map((perf) => {
         const max = perf.totalAvailable - perf.totalAllocated;
 
-        function search(): void {
-          throw new Error('Function not implemented.');
-        }
-
         return (
-          <div key={perf.Id}>
+          <div key={perf.id} className="bg-gray-200 rounded p-4 pt-2 mb-4">
             <PerformanceSectionNotes perf={perf} triggerSearch={search} />
 
-            <div>
-              <h3 className="text-xl mt-2">Allocated Seats</h3>
+            <div className="flex justify-end mt-2 pb-4">
+              <FormInputButton
+                text="Add Allocations"
+                onClick={() => createAllocatedSeat(perf.availableCompId, max)}
+                icon={faPlus}
+                disabled={max === 0}
+              />
+            </div>
+            {perf.allocated?.length > 0 && (
               <Table className="mb-8">
                 <Table.HeaderRow>
                   <Table.HeaderCell>Date</Table.HeaderCell>
                   <Table.HeaderCell>Time</Table.HeaderCell>
-                  <Table.HeaderCell>Name</Table.HeaderCell>
+                  <Table.HeaderCell>Name / Email</Table.HeaderCell>
                   <Table.HeaderCell>Requested</Table.HeaderCell>
                   <Table.HeaderCell>Comments</Table.HeaderCell>
                   <Table.HeaderCell>Seats</Table.HeaderCell>
                   <Table.HeaderCell>Allocated</Table.HeaderCell>
-                  <Table.HeaderCell>Name / Email</Table.HeaderCell>
                   <Table.HeaderCell>Venue Confirmation Notes</Table.HeaderCell>
                 </Table.HeaderRow>
                 <Table.Body>
-                  {perf.allocated.map(as => (
+                  {perf.allocated.map((as) => (
                     <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
                       <Table.Cell>{dateToSimple(perf.info.Date)}</Table.Cell>
                       <Table.Cell>{getTimeFromDateAndTime(perf.info.Date)}</Table.Cell>
-                      <Table.Cell>{as.ArrangedBy}</Table.Cell>
+                      <Table.Cell>
+                        {as.TicketHolderName}
+                        <br />
+                        {as.TicketHolderEmail}
+                      </Table.Cell>
                       <Table.Cell>{as.RequestedBy}</Table.Cell>
                       <Table.Cell>{as.Comments}</Table.Cell>
                       <Table.Cell>
                         <b>{as.Seats}</b>
                       </Table.Cell>
                       <Table.Cell>{as.SeatsAllocated}</Table.Cell>
-                      <Table.Cell>
-                        {as.TicketHolderName}
-                        <br />
-                        {as.TicketHolderEmail}
-                      </Table.Cell>
                       <Table.Cell>{as.VenueConfirmationNotes}</Table.Cell>
                     </Table.Row>
                   ))}
                 </Table.Body>
               </Table>
-            </div>
-
-            {allocatedSeatsModalOpen && (
-              <AllocatedSeatsEditor
-                open={allocatedSeatsModalOpen}
-                max={max}
-                triggerClose={triggerClose}
-                allocatedSeat={allocatedSeatsEditing}
-              />
             )}
           </div>
         );
       })}
+      {allocatedSeatsModalOpen && (
+        <AllocatedSeatsEditor
+          open={allocatedSeatsModalOpen}
+          triggerClose={triggerClose}
+          allocatedSeat={allocatedSeatsEditing}
+        />
+      )}
     </>
   );
 };

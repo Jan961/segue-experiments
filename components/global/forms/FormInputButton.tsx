@@ -28,7 +28,7 @@ const LoadingSpinner = () => {
 export const FormInputButton = ({
   testId,
   loading,
-  disabled,
+  disabled = false,
   text,
   onClick,
   submit,
@@ -36,7 +36,9 @@ export const FormInputButton = ({
   intent,
   icon,
 }: FormInputButtonProps) => {
-  const baseClass = 'flex justify-center items-center rounded shadow text-responsive-sm px-3 py-2 cursor-pointer ';
+  const baseClass = `flex justify-center items-center rounded shadow text-responsive-sm px-3 py-2 ${
+    disabled ? 'auto' : 'cursor-pointer'
+  } `;
 
   const intentClass =
     intent === 'DANGER'
