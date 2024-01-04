@@ -42,6 +42,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   const gotoTour = (tourId?: number) => {
     const selectedTour = tours.find((tour) => tour.Id === tourId);
     if (!selectedTour) {
+      setTourJump({ ...tourJump, loading: true, selected: null });
       router.push(`/tasks/all`);
       return;
     }
@@ -52,7 +53,8 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
 
   const clearFilters = () => {
     setFilters({});
-    setTimeout(() => onApplyFilters(), 0);
+    setTourJump({ ...tourJump, loading: true, selected: null });
+    router.push(`/tasks/all`);
   };
 
   const exportTasks = () => {

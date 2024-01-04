@@ -303,7 +303,6 @@ export type BarringVenue = {
   barredVenue: Venue;
 };
 
-
 export enum intervalEnum {
   'once',
   'daily',

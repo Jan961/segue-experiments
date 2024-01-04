@@ -85,12 +85,10 @@ export default function SalesSummarySimple({ activeTours }: Props) {
           }
           const content = await response.blob();
           if (content) {
-            const anchor: any = document.createElement('a')
-            anchor.download = suggestedName
-            const url = (window.webkitURL || window.URL).createObjectURL(
-              content
-            )
-            anchor.href = url
+            const anchor: any = document.createElement('a');
+            anchor.download = suggestedName;
+            const url = (window.webkitURL || window.URL).createObjectURL(content);
+            anchor.href = url;
             anchor.dataset.downloadurl = [
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
               anchor.download,
@@ -310,7 +308,7 @@ export default function SalesSummarySimple({ activeTours }: Props) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {},
   };

@@ -14,12 +14,13 @@ import { objectify } from 'radash';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import useTasksFilter from 'hooks/useTasksFilter';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const {filteredTours, onApplyFilters} = useTasksFilter();
+  const { filteredTours, onApplyFilters } = useTasksFilter();
   return (
     <Layout title="Tasks | Seque">
       <div className="flex flex-auto w-full h-screen">
-        <div className="flex-col px-12 w-full flex justify-between" style={{ minHeight: '60vh' }}>
+        <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
           <GlobalToolbar tourJump={false} title={'Tasks'} color={'text-primary-purple'}></GlobalToolbar>
           <Toolbar onApplyFilters={onApplyFilters} />
           {filteredTours.length > 0 ? (
