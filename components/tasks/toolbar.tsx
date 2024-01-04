@@ -10,6 +10,8 @@ import { userState } from 'state/account/userState';
 import { tasksfilterState } from 'state/tasks/tasksFilterState';
 import { tourJumpState } from 'state/booking/tourJumpState';
 import { useRouter } from 'next/router';
+import ExcelIcon from 'components/global/icons/excelIcon';
+import { Spinner } from 'components/global/Spinner';
 
 type ToolbarProps = {
   onApplyFilters: () => void;
@@ -18,6 +20,7 @@ type ToolbarProps = {
 const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   const router = useRouter();
   const [addTaskOpen, setAddTaskOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [addRecurringTaskOpen, setAddRecurringTaskOpen] = useState<boolean>(false);
   const { users } = useRecoilValue(userState);
   const [filters, setFilters] = useRecoilState(tasksfilterState);
@@ -54,6 +57,46 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
     router.push(`/tasks/all`);
   };
 
+  const exportTasks = () => {
+    setIsLoading(true);
+    fetch('/api/reports/task-list', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...filters,
+      }),
+    })
+      .then(async (response) => {
+        if (response.status >= 200 && response.status < 300) {
+          const tourName = 'Tour Name';
+          let suggestedName: string | any[] = response.headers.get('Content-Disposition');
+          if (suggestedName) {
+            suggestedName = suggestedName.match(/filename="(.+)"/);
+            suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
+          }
+          if (!suggestedName) {
+            suggestedName = `${tourName}.xlsx`;
+          }
+          const content = await response.blob();
+          if (content) {
+            const anchor: any = document.createElement('a');
+            anchor.download = suggestedName;
+            anchor.href = (window.webkitURL || window.URL).createObjectURL(content);
+            anchor.dataset.downloadurl = [
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              anchor.download,
+              anchor.href,
+            ].join(':');
+            anchor.click();
+          }
+        }
+      })
+      .catch((error) => {
+        console.log('Error downloading report', error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let { name, value }: { name: string; value: any } = e.target;
     if (name === 'tour') {
@@ -95,7 +138,14 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
           <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold" onClick={clearFilters}>
             Show All
           </ToolbarButton>
-          <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold">Report</ToolbarButton>
+          {/* <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold">Report</ToolbarButton> */}
+          <ToolbarButton
+            className="flex items-center gap-1 mb-2 px-2 bg-white !text-primary-purple !font-bold"
+            onClick={() => exportTasks()}
+          >
+            <ExcelIcon height={18} width={18} />
+            {isLoading ? <Spinner className="mr-2" size="sm" /> : 'Export'}
+          </ToolbarButton>
         </div>
         <div className="flex gap-2 grow">
           <FormInputText
