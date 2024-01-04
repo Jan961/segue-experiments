@@ -11,53 +11,61 @@ import { tasksfilterState } from 'state/tasks/tasksFilterState';
 import { tourJumpState } from 'state/booking/tourJumpState';
 import { useRouter } from 'next/router';
 
-
 type ToolbarProps = {
-  onApplyFilters: () => void
-}
+  onApplyFilters: () => void;
+};
 
-
-const Toolbar = ({onApplyFilters}:ToolbarProps) => {
+const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   const router = useRouter();
   const [addTaskOpen, setAddTaskOpen] = useState<boolean>(false);
   const [addRecurringTaskOpen, setAddRecurringTaskOpen] = useState<boolean>(false);
-  const {users} = useRecoilValue(userState);
-  const [filters, setFilters] = useRecoilState(tasksfilterState)
-  const userList = useMemo(()=>Object.values(users).map(({Id, FirstName='', LastName=''})=>({value:Id, text:`${FirstName||''} ${LastName||''}`})), [users]);
+  const { users } = useRecoilValue(userState);
+  const [filters, setFilters] = useRecoilState(tasksfilterState);
+  const userList = useMemo(
+    () =>
+      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
+      })),
+    [users],
+  );
   const [tourJump, setTourJump] = useRecoilState(tourJumpState);
-  const {tours} = tourJump;
+  const { tours } = tourJump;
   const tourOptions = [
     { text: 'All', value: null },
-    ...(tours?.filter?.(tour=>!tour.IsArchived).map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id }))||[]),
+    ...(tours?.filter?.((tour) => !tour.IsArchived).map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id })) ||
+      []),
   ];
-  const gotoTour = (tourId?:number)=>{
+  const gotoTour = (tourId?: number) => {
     const selectedTour = tours.find((tour) => tour.Id === tourId);
     if (!selectedTour) {
+      setTourJump({ ...tourJump, loading: true, selected: null });
       router.push(`/tasks/all`);
       return;
     }
     const { ShowCode, Code: TourCode, Id } = selectedTour;
     setTourJump({ ...tourJump, loading: true, selected: Id });
     router.push(`/tasks/${ShowCode}/${TourCode}`);
-  }
+  };
 
   const clearFilters = () => {
-    setFilters({})
-    setTimeout(() => onApplyFilters(),0);
+    setFilters({});
+    setTourJump({ ...tourJump, loading: true, selected: null });
+    router.push(`/tasks/all`);
   };
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    let { name, value }:{name:string, value: any} = e.target;
-    if(name==='tour'){
-       value = parseInt(value, 10);
+    let { name, value }: { name: string; value: any } = e.target;
+    if (name === 'tour') {
+      value = parseInt(value, 10);
     }
-    setFilters({...filters, [name]:value})
-    if(name==='tour')gotoTour(value)
+    setFilters({ ...filters, [name]: value });
+    if (name === 'tour') gotoTour(value);
   };
 
   const handleSearchOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      onApplyFilters()
+      onApplyFilters();
     }
   };
 
@@ -74,7 +82,11 @@ const Toolbar = ({onApplyFilters}:ToolbarProps) => {
           />
         </div>
         <div className="flex gap-4">
-          <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold" onClick={() => setAddRecurringTaskOpen(true)} disabled>
+          <ToolbarButton
+            className="mb-2 bg-white !text-primary-purple !font-bold"
+            onClick={() => setAddRecurringTaskOpen(true)}
+            disabled
+          >
             Add Recurring Task
           </ToolbarButton>
           <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold" onClick={() => setAddTaskOpen(true)}>
@@ -113,7 +125,7 @@ const Toolbar = ({onApplyFilters}:ToolbarProps) => {
             onChange={handleOnChange}
             name="assignee"
             value={filters?.assignee}
-            options={[{text:'', value:null},...userList]}
+            options={[{ text: '', value: null }, ...userList]}
           />
         </div>
         <div className="flex items-center">
@@ -133,11 +145,7 @@ const Toolbar = ({onApplyFilters}:ToolbarProps) => {
       <div>
         {addTaskOpen && <TaskEditor open={addTaskOpen} triggerClose={() => setAddTaskOpen(false)} />}
         {addRecurringTaskOpen && (
-          <TaskEditor
-            recurring
-            open={addRecurringTaskOpen}
-            triggerClose={() => setAddRecurringTaskOpen(false)}
-          />
+          <TaskEditor recurring open={addRecurringTaskOpen} triggerClose={() => setAddRecurringTaskOpen(false)} />
         )}
       </div>
     </div>
