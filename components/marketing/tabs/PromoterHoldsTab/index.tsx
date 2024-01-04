@@ -10,9 +10,6 @@ import { FormInputText } from 'components/global/forms/FormInputText';
 import { debounce } from 'radash';
 import { Table } from 'components/global/table/Table';
 import { AllocatedSeatsEditor } from 'components/marketing/editors/AllocatedSeatsEditor';
-import { dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
-import { FormInputButton } from 'components/global/forms/FormInputButton';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
 
 const defaultInputs = {
   CastRateTicketsArranged: false,
@@ -24,7 +21,7 @@ export const PromoterHoldsTab = () => {
   const { selected } = bookingJump;
   const [inputs, setInputs] = useState(defaultInputs);
   const [loading, setLoading] = useState(true);
-  const [performances, setPerformances] = useState([]);
+  const [performances, setPerformances] = useState({ holds: [], allocations: [] });
   const [allocatedSeatsModalOpen, setAllocatedSeatsModalOpen] = useState(false);
   const [allocatedSeatsEditing, setAllocatedSeatsEditing] = useState(undefined);
 
@@ -91,7 +88,7 @@ export const PromoterHoldsTab = () => {
 
   if (loading) return <LoadingTab />;
 
-  if (performances.length === 0) return <NoDataWarning message="No performances for this booking." />;
+  if (performances?.holds.length === 0) return <NoDataWarning message="No performances for this booking." />;
 
   return (
     <>
@@ -119,58 +116,45 @@ export const PromoterHoldsTab = () => {
       )}
 
       {/* Render Performance Section Notes and other components as needed */}
-      {performances.map((perf) => {
-        const max = perf.totalAvailable - perf.totalAllocated;
-
+      {performances.holds.map((perf) => {
         return (
-          <div key={perf.id} className="bg-gray-200 rounded p-4 pt-2 mb-4">
-            <PerformanceSectionNotes perf={perf} triggerSearch={search} />
-
-            <div className="flex justify-end mt-2 pb-4">
-              <FormInputButton
-                text="Add Allocations"
-                onClick={() => createAllocatedSeat(perf.availableCompId, max)}
-                icon={faPlus}
-                disabled={max === 0}
-              />
-            </div>
-            {perf.allocated?.length > 0 && (
-              <Table className="mb-8">
-                <Table.HeaderRow>
-                  <Table.HeaderCell>Date</Table.HeaderCell>
-                  <Table.HeaderCell>Time</Table.HeaderCell>
-                  <Table.HeaderCell>Name / Email</Table.HeaderCell>
-                  <Table.HeaderCell>Requested</Table.HeaderCell>
-                  <Table.HeaderCell>Comments</Table.HeaderCell>
-                  <Table.HeaderCell>Seats</Table.HeaderCell>
-                  <Table.HeaderCell>Allocated</Table.HeaderCell>
-                  <Table.HeaderCell>Venue Confirmation Notes</Table.HeaderCell>
-                </Table.HeaderRow>
-                <Table.Body>
-                  {perf.allocated.map((as) => (
-                    <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
-                      <Table.Cell>{dateToSimple(perf.info.Date)}</Table.Cell>
-                      <Table.Cell>{getTimeFromDateAndTime(perf.info.Date)}</Table.Cell>
-                      <Table.Cell>
-                        {as.TicketHolderName}
-                        <br />
-                        {as.TicketHolderEmail}
-                      </Table.Cell>
-                      <Table.Cell>{as.RequestedBy}</Table.Cell>
-                      <Table.Cell>{as.Comments}</Table.Cell>
-                      <Table.Cell>
-                        <b>{as.Seats}</b>
-                      </Table.Cell>
-                      <Table.Cell>{as.SeatsAllocated}</Table.Cell>
-                      <Table.Cell>{as.VenueConfirmationNotes}</Table.Cell>
-                    </Table.Row>
-                  ))}
-                </Table.Body>
-              </Table>
-            )}
-          </div>
+          <PerformanceSectionNotes key={perf.Id} perf={perf} triggerSearch={search} onCreate={createAllocatedSeat} />
         );
       })}
+      {performances.allocations?.length > 0 && (
+        <Table className="mt-4 mb-8">
+          <Table.HeaderRow>
+            <Table.HeaderCell>Date</Table.HeaderCell>
+            <Table.HeaderCell>Time</Table.HeaderCell>
+            <Table.HeaderCell>Name / Email</Table.HeaderCell>
+            <Table.HeaderCell>Requested</Table.HeaderCell>
+            <Table.HeaderCell>Comments</Table.HeaderCell>
+            <Table.HeaderCell>Seats</Table.HeaderCell>
+            <Table.HeaderCell>Allocated</Table.HeaderCell>
+            <Table.HeaderCell>Venue Confirmation Notes</Table.HeaderCell>
+          </Table.HeaderRow>
+          <Table.Body>
+            {performances.allocations.map((as) => (
+              <Table.Row key={as.Id} hover onClick={() => editAllocatedSeat(as)}>
+                <Table.Cell>{as.date}</Table.Cell>
+                <Table.Cell>{as.time}</Table.Cell>
+                <Table.Cell>
+                  {as.TicketHolderName}
+                  <br />
+                  {as.TicketHolderEmail}
+                </Table.Cell>
+                <Table.Cell>{as.RequestedBy}</Table.Cell>
+                <Table.Cell>{as.Comments}</Table.Cell>
+                <Table.Cell>
+                  <b>{as.Seats}</b>
+                </Table.Cell>
+                <Table.Cell>{as.SeatsAllocated}</Table.Cell>
+                <Table.Cell>{as.VenueConfirmationNotes}</Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      )}
       {allocatedSeatsModalOpen && (
         <AllocatedSeatsEditor
           open={allocatedSeatsModalOpen}
