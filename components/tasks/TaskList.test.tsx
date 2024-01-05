@@ -6,7 +6,7 @@ describe('TaskList Component', () => {
   it('renders', () => {
     render(
       <RecoilRoot>
-        <TaskList tourId={1} searchFilter={''} statusFilter={''} tasks={[]} />
+        <TaskList tasks={[]} />
       </RecoilRoot>,
     );
   });
