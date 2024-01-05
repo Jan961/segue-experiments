@@ -12,6 +12,7 @@ interface FormInputButtonProps {
   icon?: IconProp;
   intent?: undefined | 'DANGER' | 'PRIMARY';
   testId?: string;
+  tooltip?: string;
 }
 
 const LoadingSpinner = () => {
@@ -35,10 +36,11 @@ export const FormInputButton = ({
   className,
   intent,
   icon,
+  tooltip = '',
 }: FormInputButtonProps) => {
   const baseClass = `flex justify-center items-center rounded shadow text-responsive-sm px-3 py-2 ${
     disabled ? 'auto' : 'cursor-pointer'
-  } `;
+  }`;
 
   const intentClass =
     intent === 'DANGER'
@@ -53,16 +55,19 @@ export const FormInputButton = ({
   const endClass = disabled ? disabledClasses : !loading ? availableClasses : disabledClasses;
 
   return (
-    <button
-      className={classNames(endClass, className)}
-      type={submit ? 'submit' : 'button'}
-      onClick={onClick}
-      disabled={disabled}
-      data-testid={testId ? `form-input-button-${testId}` : 'form-input-button'}
-    >
-      <span>{text}</span>
-      {icon && <FontAwesomeIcon icon={icon} className={text ? 'ml-2' : ''} />}
-      {loading && <LoadingSpinner />}
-    </button>
+    <div className="has-tooltip group">
+      {tooltip && <span className="tooltip rounded shadow-lg p-1 bg-gray-100 relative right-16">{tooltip}</span>}
+      <button
+        className={classNames(endClass, className)}
+        type={submit ? 'submit' : 'button'}
+        onClick={onClick}
+        disabled={disabled}
+        data-testid={testId ? `form-input-button-${testId}` : 'form-input-button'}
+      >
+        <span>{text}</span>
+        {icon && <FontAwesomeIcon icon={icon} className={text ? 'ml-2' : ''} />}
+        {loading && <LoadingSpinner />}
+      </button>
+    </div>
   );
 };

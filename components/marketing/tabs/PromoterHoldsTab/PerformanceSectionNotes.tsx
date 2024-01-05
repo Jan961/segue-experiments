@@ -22,8 +22,8 @@ export const PerformanceSectionNotes = ({ perf, triggerSearch, onCreate }: Perfo
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4 mb-4 py-2">
-        <div className="col-span-11 bg-white text-sm text-gray-500 rounded p-3 border-2 ">
+      <div className="flex w-full mb-4  ">
+        <div className="w-full bg-white text-sm text-gray-500 rounded p-3 border-2 ">
           <div className="text-md mb-2">
             <h2 className="font-bold mr-4">
               <span className="mr-1">{dateToSimple(perf.info.Date)}</span>
@@ -37,9 +37,19 @@ export const PerformanceSectionNotes = ({ perf, triggerSearch, onCreate }: Perfo
           {perf.note || 'N/A'}
         </div>
 
-        <div className="flex flex-col items-end">
-          <FormInputButton className="mb-2" onClick={() => onCreate(perf.availableCompId, max)} icon={faPlus} />
-          <FormInputButton intent="PRIMARY" icon={faPencil} onClick={() => setAvailableSeatsModalOpen(true)} />
+        <div className="w-8 ml-4 flex flex-col justify-center items-center">
+          <FormInputButton
+            className="mb-2"
+            onClick={() => onCreate(perf.availableCompId, max)}
+            icon={faPlus}
+            tooltip="Add seats"
+          />
+          <FormInputButton
+            intent="PRIMARY"
+            icon={faPencil}
+            onClick={() => setAvailableSeatsModalOpen(true)}
+            tooltip="Edit notes/seats"
+          />
         </div>
       </div>
 
