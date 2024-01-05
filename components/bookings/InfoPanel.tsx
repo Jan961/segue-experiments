@@ -1,4 +1,4 @@
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { viewState } from 'state/booking/viewState';
 import { BookingPanel } from './panel/BookingPanel';
 import { RehearsalPanel } from './panel/RehearsalPanel';
@@ -12,7 +12,8 @@ import { NewPerformanceButton } from './panel/components/NewPerformanceButton';
 import { CreateModal } from './modal/CreateModal';
 
 export const InfoPanel = () => {
-  const view = useRecoilValue(viewState);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [view, setView] = useRecoilState(viewState);
   const scheduleDict = useRecoilValue(scheduleDictSelector);
   const perfState = useRecoilValue(performanceState);
 
@@ -55,7 +56,9 @@ export const InfoPanel = () => {
     return (
       <>
         <div className={baseClass}>
-          <h2 className={headerClass}>{headerText}</h2>
+          <div className={classNames(headerClass, 'flex justify-between items-center')}>
+            <h2>{headerText}</h2>
+          </div>
           <div className="p-2">{panel}</div>
         </div>
         {type === 'booking' && (

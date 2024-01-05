@@ -82,7 +82,11 @@ export const GifuPanel = ({ gifuId }: GifuPanelProps) => {
           <p>This will delete the event permanently</p>
         </DeleteConfirmation>
       )}
-      <VenueSelector venueId={inputs.VenueId} onChange={(value: any) => handleOnChange('VenueId', value)} />
+      <VenueSelector
+        venueId={inputs.VenueId}
+        onChange={(value: any) => handleOnChange('VenueId', value)}
+        disabled={inputs.StatusCode === 'C'}
+      />
       <FormInputSelect
         inline
         value={inputs.StatusCode}

@@ -15,22 +15,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const createResult = await prisma.tourTask.create({
       data: {
         TourId: task.TourId,
-        Code: 0,
+        Code: task.Code,
         Name: task.Name,
         Priority: task.Priority,
         Notes: task.Notes,
         Progress: task.Progress,
-        DueDate: task.DueDate ? new Date(task.DueDate) : undefined,
-        FollowUp: task.FollowUp ? new Date(task.FollowUp) : undefined,
-        CreatedDate: new Date(),
-        Status: task.Status,
         Interval: 'once',
-        AssignedBy: task.AssignedBy,
-        AssignedTo: task.AssignedTo,
-        // StartByWeekNum: undefined, // place your own logic here
-        // CompleteByWeekNum: undefined, // place your own logic here
-        // CompleteByPostTour: false, // place your own logic here
-        // StartByPostTour: false // place your own logic here
+        AssignedToUserId: task.AssignedToUserId,
+        StartByWeekNum: task.StartByWeekNum,
+        CompleteByWeekNum: task.CompleteByWeekNum,
+        StartByPostTour: task.StartByPostTour,
+        CompleteByPostTour: task.CompleteByPostTour,
       },
     });
 

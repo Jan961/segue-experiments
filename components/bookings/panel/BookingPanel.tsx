@@ -159,18 +159,18 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <div>
-          <FormInputButton
-            className="w-full"
-            text="Delete"
-            intent="DANGER"
-            onClick={initiateDelete}
-            disabled={submitting || notFirst}
-          />
-        </div>
-        <div className="col-span-2 grid grid-cols-2">
+        <div className="col-span-3 grid grid-cols-3 gap-2">
           <FormInputButton
             className="rounded-br-none rounded-tr-none w-full border-r border-soft-primary-blue"
+            text="Undo"
+            disabled={!changed}
+            onClick={() => {
+              setInputs(booking);
+              setStatus({ submitting: false, changed: false });
+            }}
+          />
+          <FormInputButton
+            className="rounded w-full border border-soft-primary-blue"
             text="Save"
             intent="PRIMARY"
             disabled={submitting || !changed}
@@ -182,6 +182,15 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
             intent="PRIMARY"
             onClick={saveAndNext}
             disabled={submitting || !nextBookingId}
+          />
+        </div>
+        <div>
+          <FormInputButton
+            className="w-full"
+            text="Delete"
+            intent="DANGER"
+            onClick={initiateDelete}
+            disabled={submitting || notFirst}
           />
         </div>
       </div>

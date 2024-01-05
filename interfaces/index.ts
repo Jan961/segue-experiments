@@ -1,10 +1,3 @@
-// You can include shared interfaces/types in a separate file
-// and then use them in any component by importing them. For
-// example, to import the interface below do:
-//
-// import { User } from 'path/to/interfaces';
-import { number } from 'prop-types';
-
 export type StatusCode = 'C' | 'U' | 'X';
 
 export type Currency = {
@@ -47,6 +40,29 @@ export type ShowDTO = {
   IsArchived: boolean;
 };
 
+export type TourTaskDTO = {
+  TaskName?: any;
+  Id: number;
+  TourId: number;
+  Code: number;
+  Name: string;
+  Priority: number;
+  Notes?: string;
+  Progress: number;
+  DueDate?: string;
+  FollowUp?: string;
+  CreatedDate?: string;
+  Status?: string;
+  Interval: string;
+  AssignedBy?: string;
+  AssignedTo?: string;
+  StartByWeekNum?: number;
+  CompleteByWeekNum?: number;
+  CompleteByPostTour: boolean;
+  StartByPostTour: boolean;
+  AssignedToUserId?: number;
+};
+
 // Existing tour interface for old schema. Remove eventually
 export type Tour = {
   TourId: number;
@@ -60,46 +76,6 @@ export type Tour = {
   RehearsalEndDate: Date;
   Show: Show;
   TourTask: TourTaskDTO[];
-};
-
-export type TourDTO = {
-  Id?: number;
-  ShowId: number;
-  Code: string;
-  ShowName: string;
-  ShowCode: string;
-  IsArchived: boolean;
-  DateBlock: DateBlockDTO[];
-};
-
-export type RehearsalDTO = {
-  Id?: number;
-  Date: string;
-  Town: string;
-  StatusCode?: string;
-};
-
-export type VenueMinimalDTO = {
-  Id: number;
-  Name: string;
-  Code: string;
-  Town?: string;
-  Seats?: string;
-  Count?: number;
-};
-
-export type GetInFitUpDTO = {
-  Id: number;
-  VenueId: number;
-  Date: string;
-  StatusCode: StatusCode;
-};
-
-export type OtherDTO = {
-  Id: number;
-  Date: string;
-  DateTypeId: number;
-  StatusCode: StatusCode;
 };
 
 export type BookingDTO = {
@@ -116,6 +92,61 @@ export type BookingDTO = {
   CompNotes?: string;
   CastRateTicketsArranged?: boolean;
   CastRateTicketsNotes?: string;
+};
+
+export type GetInFitUpDTO = {
+  Id: number;
+  VenueId: number;
+  Date: string;
+  StatusCode: StatusCode;
+};
+
+export type RehearsalDTO = {
+  Id?: number;
+  Date: string;
+  Town: string;
+  StatusCode?: string;
+};
+
+export type DateDTO = {
+  Id: string;
+  Booking?: BookingDTO[];
+  Tech?: GetInFitUpDTO[];
+  Rehearsal?: RehearsalDTO[];
+};
+
+export type DateBlockDTO = {
+  Id?: number;
+  Name: string;
+  StartDate: string;
+  EndDate: string;
+  Dates?: DateDTO[];
+};
+
+export type TourDTO = {
+  Id?: number;
+  ShowId: number;
+  Code: string;
+  ShowName: string;
+  ShowCode: string;
+  IsArchived: boolean;
+  DateBlock: DateBlockDTO[];
+};
+
+export type VenueMinimalDTO = {
+  Id: number;
+  Name: string;
+  Code: string;
+  Town?: string;
+  Seats?: string;
+  Count?: number;
+};
+
+export type OtherDTO = {
+  Id: number;
+  Date: string;
+  DateTypeId: number;
+  StatusCode: StatusCode;
 };
 
 export type BookingWithVenueDTO = BookingDTO & {
@@ -138,21 +169,6 @@ export type PerformanceDTO = {
   BookingId: number;
   Date: string;
   Time?: string;
-};
-
-export type DateDTO = {
-  Id: string;
-  Booking?: BookingDTO[];
-  Tech?: GetInFitUpDTO[];
-  Rehearsal?: RehearsalDTO[];
-};
-
-export type DateBlockDTO = {
-  Id?: number;
-  Name: string;
-  StartDate: string;
-  EndDate: string;
-  Dates?: DateDTO[];
 };
 
 export type VenueContactDTO = {
@@ -287,28 +303,7 @@ export type BarringVenue = {
   barredVenue: Venue;
 };
 
-export type TourTaskDTO = {
-  Id: number;
-  TourId: number;
-  Code: number;
-  Name: string;
-  Priority: number;
-  Notes?: string;
-  Progress: number;
-  DueDate?: string;
-  FollowUp?: string;
-  CreatedDate?: string;
-  Status?: string;
-  Interval: string;
-  AssignedBy?: string;
-  AssignedTo?: string;
-  StartByWeekNum?: number;
-  CompleteByWeekNum?: number;
-  CompleteByPostTour: boolean;
-  StartByPostTour: boolean;
-};
-
-enum intervalEnum {
+export enum intervalEnum {
   'once',
   'daily',
   'monthly',
