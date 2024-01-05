@@ -1,4 +1,4 @@
-import prisma from 'lib/prismaEdge';
+import prisma from 'lib/prismaAccelerate';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 

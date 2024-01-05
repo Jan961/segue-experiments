@@ -99,7 +99,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let { name, value }: { name: string; value: any } = e.target;
-    if (name === 'tour') {
+    if (name === 'tour' || name === 'assignee') {
       value = parseInt(value, 10);
     }
     setFilters({ ...filters, [name]: value });
