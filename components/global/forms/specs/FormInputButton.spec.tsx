@@ -37,20 +37,17 @@ describe('Tests for FormInputButton', () => {
   });
 
   it('Applies custom class name when provided', () => {
-    const { container } = render(<FormInputButton className="custom-class" />);
-    const { firstChild } = container;
-    expect(firstChild).toHaveClass('custom-class');
+    render(<FormInputButton className="custom-class" />);
+    expect(screen.getByRole('button')).toHaveClass('custom-class');
   });
 
   it('Applies DANGER styling when intent is DANGER', () => {
-    const { container } = render(<FormInputButton intent="DANGER" />);
-    const { firstChild } = container;
-    expect(firstChild).toHaveClass('bg-red-500');
+    render(<FormInputButton intent="DANGER" />);
+    expect(screen.getByRole('button')).toHaveClass('bg-red-500');
   });
 
   it('Applies PRIMARY styling when intent is PRIMARY', () => {
-    const { container } = render(<FormInputButton intent="PRIMARY" />);
-    const { firstChild } = container;
-    expect(firstChild).toHaveClass('bg-primary-blue');
+    render(<FormInputButton intent="PRIMARY" />);
+    expect(screen.getByRole('button')).toHaveClass('bg-primary-blue');
   });
 });

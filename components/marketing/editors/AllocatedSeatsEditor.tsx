@@ -9,13 +9,12 @@ interface AllocatedSeatsEditorProps {
   allocatedSeat?: any;
   open: boolean;
   triggerClose: (refresh: boolean) => void;
-  max: number;
 }
 
-export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose, max }: AllocatedSeatsEditorProps) => {
+export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose }: AllocatedSeatsEditorProps) => {
   const [inputs, setInputs] = React.useState<Partial<any>>({
     ...allocatedSeat,
-    Seats: Math.max(1, allocatedSeat.Seats),
+    Seats: Math.max(1, allocatedSeat?.Seats || 0),
   });
   const [status, setStatus] = React.useState({ submitting: false, submitted: true });
 
@@ -76,7 +75,7 @@ export const AllocatedSeatsEditor = ({ allocatedSeat, open, triggerClose, max }:
     });
   };
 
-  const maxSeats = max + allocatedSeat.Seats;
+  const maxSeats = allocatedSeat.maxAllocation + allocatedSeat?.Seats || 0;
 
   return (
     <StyledDialog
