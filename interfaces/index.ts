@@ -61,6 +61,8 @@ export type TourTaskDTO = {
   CompleteByPostTour: boolean;
   StartByPostTour: boolean;
   AssignedToUserId?: number;
+  StartDate?: string;
+  CompleteDate?: string;
 };
 
 // Existing tour interface for old schema. Remove eventually

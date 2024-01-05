@@ -36,16 +36,17 @@ export const calculateTaskStatus = (progress: number): string => {
 
 export const applyTaskFilters = (toursWithTasks: ToursWithTasks[], filters: TasksFilterType): ToursWithTasks[] => {
   const results = [];
+  console.log('====', filters);
   for (const tourWithTasks of toursWithTasks) {
     const filteredTasks = tourWithTasks.Tasks.filter((task) => {
       let matches = true;
       if (filters.taskText && !task.Name.includes(filters.taskText)) {
         matches = false;
       }
-      if (filters.status && filters.status!=='all' && calculateTaskStatus(task.Progress) !== filters.status) {
+      if (filters.status && filters.status !== 'all' && calculateTaskStatus(task.Progress) !== filters.status) {
         matches = false;
       }
-      const taskDueDate = tourWithTasks.weekNumToDateMap?.[task.CompleteByWeekNum]
+      const taskDueDate = tourWithTasks.weekNumToDateMap?.[task.CompleteByWeekNum];
       if (filters.startDueDate && new Date(taskDueDate) < new Date(filters.startDueDate)) {
         matches = false;
       }
@@ -62,4 +63,17 @@ export const applyTaskFilters = (toursWithTasks: ToursWithTasks[], filters: Task
     }
   }
   return results;
+};
+
+export const getPriority = (priority) => {
+  switch (priority) {
+    case 0:
+      return 'low';
+    case 1:
+      return 'Medium';
+    case 2:
+      return 'High';
+    default:
+      break;
+  }
 };
