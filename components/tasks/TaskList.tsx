@@ -1,66 +1,44 @@
-import { TourState, tourState } from 'state/tasks/tourState';
 import TaskListItem from './TaskListItem';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { Table } from 'components/global/table/Table';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
-import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
+import { TourTaskDTO } from 'interfaces';
 
 interface TaskListProps {
-  tourId: number;
+  tasks: TourTaskDTO[];
+  onTasksChange?: (tasks: TourTaskDTO[]) => void;
 }
 
-const Tasklist = ({ tourId }: TaskListProps) => {
-  const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
-  const tours: TourState = useRecoilValue(tourState);
-  const match = tours.filter((x) => x.Id === tourId)[0];
-
-  if (!match) return null;
-
-  const countSelected = match.Tasks.filter((x) => bulkSelection[x.Id]).length;
-  const allSelected = countSelected === match.Tasks.length;
-
-  const toggleAll = () => {
-    const ids = match.Tasks.map((x) => x.Id);
-    const newState = { ...bulkSelection };
-    if (allSelected) {
-      for (const id of ids) {
-        delete newState[id];
+const Tasklist = ({ tasks = [], onTasksChange }: TaskListProps) => {
+  const onTaskChange = (updatedTask: TourTaskDTO) => {
+    const updatedTasks = tasks.map((task) => {
+      if (task.Id === updatedTask.Id) {
+        return updatedTask;
       }
-    } else {
-      for (const id of ids) {
-        newState[id] = true;
-      }
-    }
-    setBulkSelection(newState);
+      return task;
+    });
+    onTasksChange?.(updatedTasks);
   };
-
-  if (match.Tasks.length === 0) {
+  if (tasks.length === 0) {
     return <p>No tasks for this tour</p>;
   }
-
   return (
-    <div className="h-128 w-full overflow-auto">
+    <div className="max-h-[15rem] w-full overflow-auto">
       <Table className="border-collapse">
-        <Table.HeaderRow>
-          <Table.HeaderCell>
-            <FormInputCheckbox value={allSelected} onChange={toggleAll} minimal />
-          </Table.HeaderCell>
-          <Table.HeaderCell>Start by (wk)</Table.HeaderCell>
-          <Table.HeaderCell>Start by</Table.HeaderCell>
-          <Table.HeaderCell>Due (wk)</Table.HeaderCell>
-          <Table.HeaderCell>Due</Table.HeaderCell>
-          <Table.HeaderCell>Progress</Table.HeaderCell>
-          <Table.HeaderCell>Title</Table.HeaderCell>
-          <Table.HeaderCell>Assignee</Table.HeaderCell>
-          <Table.HeaderCell>Assigned By</Table.HeaderCell>
-          <Table.HeaderCell>Status</Table.HeaderCell>
-          <Table.HeaderCell>Priority</Table.HeaderCell>
-          <Table.HeaderCell>Follow Up</Table.HeaderCell>
+        <Table.HeaderRow className="!bg-gray-50 !text-purple-700">
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[80px]">Code</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[300px]">Task Name</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[100px]">Start by (wk)</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[100px]">Start by</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[100px]">Due (wk)</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[100px]">Due</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[150px]">Progress</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[100px]">Status</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[180px]">Assignee</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg w-[100px]">Priority</Table.HeaderCell>
+          <Table.HeaderCell className="!text-purple-900 !text-lg">Notes</Table.HeaderCell>
         </Table.HeaderRow>
-        <Table.Body>
-          {' '}
-          {match.Tasks.map((task) => (
-            <TaskListItem task={task} key={task.Id}></TaskListItem>
+        <Table.Body className="!bg-transparent">
+          {tasks.map((task) => (
+            <TaskListItem onTaskChange={onTaskChange} task={task} key={task.Id}></TaskListItem>
           ))}
         </Table.Body>
       </Table>

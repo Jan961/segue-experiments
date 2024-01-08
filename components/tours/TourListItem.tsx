@@ -25,9 +25,10 @@ const TourListDateDisplay = ({ startDate, endDate, label }: TourListDateDisplayP
 type TourListItemProps = {
   tour: TourDTO;
   editable: boolean;
+  showDateBlock?: boolean;
 };
 
-const TourListItem = ({ tour, editable }: TourListItemProps) => {
+const TourListItem = ({ tour, editable, showDateBlock = true }: TourListItemProps) => {
   const router = useRouter();
   const path = router.pathname.split('/')[1];
 
@@ -56,9 +57,11 @@ const TourListItem = ({ tour, editable }: TourListItemProps) => {
           </>
         )}
         <div className="mt-2 flex justify-between text-sm text-gray-500">
-          {tour.DateBlock.map((x) => (
-            <TourListDateDisplay key={x.Id} label={x.Name} startDate={x.StartDate} endDate={x.EndDate} />
-          ))}
+          {showDateBlock
+            ? tour.DateBlock.map((x) => (
+                <TourListDateDisplay key={x.Id} label={x.Name} startDate={x.StartDate} endDate={x.EndDate} />
+              ))
+            : null}
         </div>
       </div>
       {editable && (
