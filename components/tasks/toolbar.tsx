@@ -138,7 +138,6 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
           <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold" onClick={clearFilters}>
             Show All
           </ToolbarButton>
-          {/* <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold">Report</ToolbarButton> */}
           <ToolbarButton
             className="flex items-center gap-1 mb-2 px-2 bg-white !text-primary-purple !font-bold"
             onClick={() => exportTasks()}
@@ -158,37 +157,40 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
           />
         </div>
       </div>
-      <div className="flex flex-row items-center gap-2">
-        <div className="flex items-center	">
-          <p className="mr-3 font-light text-sm mb-2">Due date</p>
-          {/* JAS NOTES: HARD CODED FOR TESTING PURPOSES  */}
-          <FormInputDate name="startDueDate" label="" onChange={handleOnChange} value={filters?.startDueDate} />
-        </div>
-        <div className="flex items-center mb-2">
-          <p className="mr-3 font-light	text-sm">to</p>
-          <FormInputDate name="endDueDate" label="" onChange={handleOnChange} value={filters?.endDueDate} />
-        </div>
-        <div className="flex items-center">
-          <p className="mr-3 font-light text-sm mb-2">Asignee</p>
-          <FormInputSelect
-            className="w-80"
-            onChange={handleOnChange}
-            name="assignee"
-            value={filters?.assignee}
-            options={[{ text: '', value: null }, ...userList]}
-          />
-        </div>
-        <div className="flex items-center">
-          <p className="mr-3 font-light	text-sm mb-2">Status</p>
-          <FormInputSelect
-            className="w-80"
-            onChange={handleOnChange}
-            name="status"
-            value={filters?.status}
-            options={statusOptions}
-          />
-        </div>
-        <ToolbarButton className="mb-2 bg-white !text-primary-purple !font-bold" onClick={onApplyFilters}>
+      <div className="flex flex-row items-center gap-4 my-4">
+        <FormInputDate
+          className="flex items-center [&>div]:!pb-0 [&>input]:!w-auto"
+          name="startDueDate"
+          label="Due date"
+          onChange={handleOnChange}
+          value={filters?.startDueDate}
+        />
+        <FormInputDate
+          className="flex items-center [&>div]:!pb-0"
+          name="endDueDate"
+          label="to"
+          onChange={handleOnChange}
+          value={filters?.endDueDate}
+        />
+        <FormInputSelect
+          className="w-80 !mb-0"
+          onChange={handleOnChange}
+          name="assignee"
+          label="Assignee"
+          value={filters?.assignee}
+          options={[{ text: '', value: null }, ...userList]}
+          inline
+        />
+        <FormInputSelect
+          className="w-80 !mb-0"
+          onChange={handleOnChange}
+          name="status"
+          label="Status"
+          value={filters?.status}
+          options={statusOptions}
+          inline
+        />
+        <ToolbarButton className="bg-white !text-primary-purple !font-bold" onClick={onApplyFilters}>
           Submit
         </ToolbarButton>
       </div>

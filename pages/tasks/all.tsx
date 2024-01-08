@@ -40,7 +40,7 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
               return (
                 <div key={tour.Id} className="mb-10">
                   <h3 className=" text-xl font-bold py-4 !text-purple-900">{tour.ShowName}</h3>
-                  <Tasklist onTasksChange={(change) => onTasksChange(change, tour.Id)} tasks={tour.Tasks} />
+                  <Tasklist onTasksChange={(change) => onTasksChange(change, tour.Id)} tasks={tour?.Tasks} />
                 </div>
               );
             })
@@ -76,11 +76,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     ShowCode: t.Show.Code,
     ShowId: t.Show.Id,
     Code: t.Code,
-    Tasks: t.TourTask.map(mapToTourTaskDTO).map((task) => ({
-      ...task,
-      StartDate: t.WeekNumToDateMap[task.StartByWeekNum],
-      CompleteDate: t.WeekNumToDateMap[task.CompleteByWeekNum],
-    })),
+    Tasks: t.TourTask.map(mapToTourTaskDTO)
+      .map((task) => ({
+        ...task,
+        StartDate: t.WeekNumToDateMap[task.StartByWeekNum],
+        CompleteDate: t.WeekNumToDateMap[task.CompleteByWeekNum],
+      }))
+      .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum),
     weekNumToDateMap: t.WeekNumToDateMap,
   }));
   const initialState: InitialState = {
