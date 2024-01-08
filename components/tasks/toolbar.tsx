@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import DatePicker from 'react-datepicker';
 import TaskEditor from './editors/TaskEditor';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
-import { FormInputDate } from 'components/global/forms/FormInputDate';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { statusOptions } from 'config/tasks';
 import { userState } from 'state/account/userState';
@@ -99,6 +99,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let { name, value }: { name: string; value: any } = e.target;
+    if(name === 'startDueDate' || name === 'endDueDate') value = value?.toLocaleDateString?.()||'';
     if (name === 'tour' || name === 'assignee') {
       value = parseInt(value, 10);
     }
@@ -115,15 +116,13 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   return (
     <div>
       <div className="flex flex-row gap-2 items-center">
-        <div className="grow">
           <FormInputSelect
-            className="w-80"
+            className="[&>select]:w-auto"
             onChange={handleOnChange}
             name="tour"
             value={tourJump.selected}
             options={tourOptions}
           />
-        </div>
         <div className="flex gap-4">
           <ToolbarButton
             className="mb-2 bg-white !text-primary-purple !font-bold"
@@ -143,10 +142,10 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
             onClick={() => exportTasks()}
           >
             <ExcelIcon height={18} width={18} />
-            {isLoading ? <Spinner className="mr-2" size="sm" /> : 'Export'}
+            {isLoading ? <Spinner className="mr-2" size="sm" /> : 'Report'}
           </ToolbarButton>
         </div>
-        <div className="flex gap-2 grow">
+        <div className="flex gap-2">
           <FormInputText
             placeholder="Search Tasks"
             onChange={handleOnChange}
@@ -158,27 +157,44 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
         </div>
       </div>
       <div className="flex flex-row items-center gap-4 my-4">
-        <FormInputDate
-          className="flex items-center [&>div]:!pb-0 [&>input]:!w-auto"
-          name="startDueDate"
-          label="Due date"
-          onChange={handleOnChange}
-          value={filters?.startDueDate}
-        />
-        <FormInputDate
-          className="flex items-center [&>div]:!pb-0"
-          name="endDueDate"
-          label="to"
-          onChange={handleOnChange}
-          value={filters?.endDueDate}
-        />
+        <div className="flex items-center gap-2">
+          <span className="">Due date</span>
+          <DatePicker
+            placeholderText="DD/MM/YY"
+            dateFormat="dd/MM/yy"
+            popperClassName="!z-50"
+            className="rounded border-gray-300 px-3 py-2 z-90"
+            selected={filters?.startDueDate?new Date(filters?.startDueDate): null}
+            onChange={(date) =>
+              handleOnChange({ target: { name: 'startDueDate', value: date } } as React.ChangeEvent<
+                HTMLInputElement | HTMLSelectElement
+              >)
+            }
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="">To</span>
+          <DatePicker
+            placeholderText="DD/MM/YY"
+            dateFormat="dd/MM/yy"
+            popperClassName="!z-50"
+            className="rounded border-gray-300 px-3 py-2 z-90"
+            selected={filters?.endDueDate?new Date(filters?.endDueDate):null}
+            minDate={filters?.startDueDate?new Date(filters?.startDueDate): new Date()}
+            onChange={(date) =>
+              handleOnChange({ target: { name: 'endDueDate', value: date } } as React.ChangeEvent<
+                HTMLInputElement | HTMLSelectElement
+              >)
+            }
+          />
+        </div>
         <FormInputSelect
           className="w-80 !mb-0"
           onChange={handleOnChange}
           name="assignee"
           label="Assignee"
           value={filters?.assignee}
-          options={[{ text: '', value: null }, ...userList]}
+          options={[{ text: 'Select Assignee', value: null }, ...userList]}
           inline
         />
         <FormInputSelect
