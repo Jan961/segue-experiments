@@ -1,5 +1,6 @@
 import '../styles/globals.css';
 import 'react-range-slider-input/dist/style.css';
+import "react-datepicker/dist/react-datepicker.css";
 
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
@@ -18,7 +19,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 // Login disabled due to lack of support. DO NOT PUT PUBLIC
-export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+export default function MyApp({ Component, pageProps }) {
   const { initialState } = pageProps;
   const router = useRouter();
 

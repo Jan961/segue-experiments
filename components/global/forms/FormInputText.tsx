@@ -44,7 +44,7 @@ export const FormInputText = (props: Input) => {
 
   const containerClass = classNames('relative', className);
 
-  const iconClass = 'absolute inset-y-0 right-0 pr-3 flex items-center text-gray-600 mt-2';
+  const iconClass = 'absolute inset-y-0 right-2 pr-3 flex items-center text-gray-600 mt-3';
 
   if (area) {
     return (
@@ -82,7 +82,7 @@ export const FormInputText = (props: Input) => {
         </label>
       )}
       <input type="text" {...inputProps} />
-      <FontAwesomeIcon icon={faSearch} className={iconClass} />
+      <FontAwesomeIcon flip={"horizontal"} icon={faSearch} className={iconClass} />
     </div>
   );
 };
