@@ -50,7 +50,7 @@ export default function Admin({ permissions = [], accountUsers = [] }: AdminProp
 
   const handleUserSelect = (Id) => {
     setUser(Id);
-    fetchPermissionsForUser(Id);
+    // fetchPermissionsForUser(Id);
   };
 
   const togglePermission = (perm: TreeItemSelectedOption) => {

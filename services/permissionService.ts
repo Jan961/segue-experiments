@@ -18,8 +18,14 @@ const formatPermissions = (data) => {
   return data.reduce((acc, value) => {
     const item = {
       id: value.Id,
-      name: value.Name,
-      options: value.Permission?.map((p) => ({ id: p.Id, value: p.Id, label: p.Name })) || [],
+      label: value.Name,
+      options:
+        value.Permission?.map((p) => ({
+          id: p.Id,
+          value: p.Id,
+          label: p.Name,
+          options: value.Permission?.map((p) => ({ id: `${p.Id}-${p.value}`, value: p.Id, label: p.Name })),
+        })) || [],
     };
 
     return [...acc, item];
