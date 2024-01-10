@@ -95,6 +95,7 @@ const handler = async (req, res) => {
         },
       },
     },
+    orderBy: [{ StartByWeekNum: 'asc' }],
   });
   const TourTaskMap = group(taskList, (task) => task.TourId);
   const workbook = new ExcelJS.Workbook();

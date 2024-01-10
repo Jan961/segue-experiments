@@ -63,6 +63,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
       method: 'POST',
       body: JSON.stringify({
         ...filters,
+        tour: tourJump.selected,
       }),
     })
       .then(async (response) => {
@@ -99,7 +100,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   };
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     let { name, value }: { name: string; value: any } = e.target;
-    if(name === 'startDueDate' || name === 'endDueDate') value = value?.toLocaleDateString?.()||'';
+    if (name === 'startDueDate' || name === 'endDueDate') value = value?.toLocaleDateString?.() || '';
     if (name === 'tour' || name === 'assignee') {
       value = parseInt(value, 10);
     }
@@ -116,13 +117,13 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   return (
     <div>
       <div className="flex flex-row gap-2 items-center">
-          <FormInputSelect
-            className="[&>select]:w-auto"
-            onChange={handleOnChange}
-            name="tour"
-            value={tourJump.selected}
-            options={tourOptions}
-          />
+        <FormInputSelect
+          className="[&>select]:w-auto"
+          onChange={handleOnChange}
+          name="tour"
+          value={tourJump.selected}
+          options={tourOptions}
+        />
         <div className="flex gap-4">
           <ToolbarButton
             className="mb-2 bg-white !text-primary-purple !font-bold"
@@ -164,7 +165,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
             dateFormat="dd/MM/yy"
             popperClassName="!z-50"
             className="rounded border-gray-300 px-3 py-2 z-90"
-            selected={filters?.startDueDate?new Date(filters?.startDueDate): null}
+            selected={filters?.startDueDate ? new Date(filters?.startDueDate) : null}
             onChange={(date) =>
               handleOnChange({ target: { name: 'startDueDate', value: date } } as React.ChangeEvent<
                 HTMLInputElement | HTMLSelectElement
@@ -179,8 +180,8 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
             dateFormat="dd/MM/yy"
             popperClassName="!z-50"
             className="rounded border-gray-300 px-3 py-2 z-90"
-            selected={filters?.endDueDate?new Date(filters?.endDueDate):null}
-            minDate={filters?.startDueDate?new Date(filters?.startDueDate): new Date()}
+            selected={filters?.endDueDate ? new Date(filters?.endDueDate) : null}
+            minDate={filters?.startDueDate ? new Date(filters?.startDueDate) : new Date()}
             onChange={(date) =>
               handleOnChange({ target: { name: 'endDueDate', value: date } } as React.ChangeEvent<
                 HTMLInputElement | HTMLSelectElement
