@@ -3,28 +3,11 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
 import { TreeItemOption } from './types';
 import React, { useEffect, useState, memo } from 'react';
 import { FormInputCheckbox } from '../forms/FormInputCheckbox';
+import { mapRecursive } from 'utils';
 
 export interface TreeItemProps {
   value: TreeItemOption;
   onChange: (v: TreeItemOption) => void;
-}
-
-function mapRecursive<T>(oldArray: Array<T & { options?: T[] }>, callback: (item: T) => T, newArray: T[] = []): T[] {
-  if (oldArray.length <= 0) {
-    // if all items have been processed return the new array
-    return newArray;
-  } else {
-    // destructure the first item from old array and put remaining in a separate array
-    let [item, ...theRest] = oldArray;
-    if (item.options) {
-      // item with options is cloned to avoid mutating the original object
-      item = { ...item, options: mapRecursive<T>(item.options, callback) };
-    }
-    // create an array of the current new array and the result of the current item and the callback function
-    const interimArray = [...newArray, callback(item)];
-    // return a recursive call to to map to process the next item.
-    return mapRecursive<T>(theRest, callback, interimArray);
-  }
 }
 
 export default memo(function TreeItem({ value, onChange }: TreeItemProps) {
