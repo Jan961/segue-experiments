@@ -269,6 +269,7 @@ module.exports = {
       });
     }),
   ],
+  darkMode: ['class', '[data-mode="dark"]'],
   theme: {
     screens: {
       xs: '425px',
