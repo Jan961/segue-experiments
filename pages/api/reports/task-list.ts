@@ -69,6 +69,7 @@ const handler = async (req, res) => {
     },
     select: {
       Name: true,
+      Code: true,
       Progress: true,
       StartByWeekNum: true,
       CompleteByWeekNum: true,
@@ -95,6 +96,7 @@ const handler = async (req, res) => {
         },
       },
     },
+    orderBy: [{ StartByWeekNum: 'asc' }],
   });
   const TourTaskMap = group(taskList, (task) => task.TourId);
   const workbook = new ExcelJS.Workbook();
@@ -133,7 +135,7 @@ const handler = async (req, res) => {
     const progressData = [];
     const task = taskList?.[0];
     const ShowName = `${task?.Tour?.Show?.Name}`;
-    const FullTourCode = `${task?.Tour?.Show?.Code}${task?.Tour?.Code}`;
+    // const FullTourCode = `${task?.Tour?.Show?.Code}${task?.Tour?.Code}`;
     const { StartDate, EndDate } = task.Tour.DateBlock.find((DateBlock) => DateBlock.Name === 'Tour') || {};
     const weekNumsList = taskList.map((TourTask) => [TourTask.CompleteByWeekNum, TourTask.StartByWeekNum]).flat();
     const weekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
@@ -151,23 +153,25 @@ const handler = async (req, res) => {
       }
       return matches;
     });
-    taskList.map(({ Name, Progress, StartByWeekNum, CompleteByWeekNum, Priority, Notes, User }) => {
-      const { FirstName, LastName } = User || {};
-      progressData.push(Progress);
-      return worksheet.addRow([
-        FullTourCode,
-        Name,
-        StartByWeekNum,
-        dateToSimple(weekNumToDateMap[StartByWeekNum]),
-        CompleteByWeekNum,
-        dateToSimple(weekNumToDateMap[CompleteByWeekNum]),
-        Progress,
-        getTaskStatusFromProgress(Progress),
-        `${FirstName || ''} ${LastName || ''}`,
-        Priority,
-        Notes,
-      ]);
-    });
+    taskList
+      .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum)
+      .map(({ Name, Code, Progress, StartByWeekNum, CompleteByWeekNum, Priority, Notes, User }) => {
+        const { FirstName, LastName } = User || {};
+        progressData.push(Progress);
+        return worksheet.addRow([
+          Code,
+          Name,
+          StartByWeekNum,
+          dateToSimple(weekNumToDateMap[StartByWeekNum]),
+          CompleteByWeekNum,
+          dateToSimple(weekNumToDateMap[CompleteByWeekNum]),
+          Progress,
+          getTaskStatusFromProgress(Progress),
+          `${FirstName || ''} ${LastName || ''}`,
+          Priority,
+          Notes,
+        ]);
+      });
     worksheet.mergeCells(`A${startingRow - 2}:C${startingRow - 2}`);
     worksheet.getRow(startingRow - 2).font = { bold: true, size: 14 };
     worksheet.getRow(startingRow - 2).alignment = { horizontal: 'left' };
@@ -195,6 +199,7 @@ const handler = async (req, res) => {
   });
   worksheet.getColumn('A').width = 8;
   worksheet.getColumn('C').width = 5;
+  worksheet.getColumn('E').width = 5;
   worksheet.getColumn('G').alignment = { horizontal: 'center' };
   const filename = `Tasks.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

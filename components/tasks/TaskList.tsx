@@ -1,13 +1,15 @@
+import classNames from 'classnames';
 import TaskListItem from './TaskListItem';
 import { Table } from 'components/global/table/Table';
 import { TourTaskDTO } from 'interfaces';
 
 interface TaskListProps {
   tasks: TourTaskDTO[];
+  className?: string;
   onTasksChange?: (tasks: TourTaskDTO[]) => void;
 }
 
-const Tasklist = ({ tasks = [], onTasksChange }: TaskListProps) => {
+const Tasklist = ({ tasks = [], onTasksChange, className }: TaskListProps) => {
   const onTaskChange = (updatedTask: TourTaskDTO) => {
     const updatedTasks = tasks.map((task) => {
       if (task.Id === updatedTask.Id) {
@@ -21,7 +23,7 @@ const Tasklist = ({ tasks = [], onTasksChange }: TaskListProps) => {
     return <p>No tasks for this tour</p>;
   }
   return (
-    <div className="max-h-[15rem] w-full overflow-auto">
+    <div className={classNames('max-h-[15rem] w-full overflow-auto', className)}>
       <Table className="border-collapse">
         <Table.HeaderRow className="!bg-gray-50 !text-purple-700">
           <Table.HeaderCell className="!text-purple-900 !text-lg w-[80px]">Code</Table.HeaderCell>
