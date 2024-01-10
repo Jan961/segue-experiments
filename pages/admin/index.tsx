@@ -1,7 +1,7 @@
 import { getAccountUsersList, getPermissionsList } from 'services/permissionService';
 
 import TreeSelect from 'components/global/TreeSelect';
-import { TreeItemOption, TreeItemSelectedOption } from 'components/global/TreeSelect/types';
+import { TreeItemOption } from 'components/global/TreeSelect/types';
 import Layout from 'components/Layout';
 import Typeahead, { TypeaheadOption } from 'components/global/forms/FormTypeahead';
 import axios from 'axios';
@@ -53,21 +53,9 @@ export default function Admin({ permissions = [], accountUsers = [] }: AdminProp
     // fetchPermissionsForUser(Id);
   };
 
-  const togglePermission = (perm: TreeItemSelectedOption) => {
-    const updatePermissions = userPermissions.map((p) => {
-      if (p.id === perm.parentId) {
-        const updatedOptions = p.options.map((o) => {
-          if (o.id === perm.id) {
-            return { ...o, checked: perm.checked };
-          }
-          return o;
-        });
-        return { ...p, options: updatedOptions };
-      }
-      return p;
-    });
-
-    setUserPermissions(updatePermissions);
+  const togglePermission = (perm: TreeItemOption[]) => {
+    console.log(perm);
+    // TODO: Implement function after DB is ready
   };
 
   const handlePermissionsSave = async () => {
