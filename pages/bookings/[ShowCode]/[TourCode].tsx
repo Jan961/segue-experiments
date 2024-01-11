@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import GlobalToolbar from 'components/toolbar';
 import BookingsButtons from 'components/bookings/bookingsButtons';
 import Layout from 'components/Layout';
@@ -40,11 +40,6 @@ import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
 
-interface bookingProps {
-  TourId: number;
-  intitialState: InitialState;
-}
-
 const toolbarHeight = 136;
 
 interface ScrollablePanelProps {
@@ -84,7 +79,7 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   );
 };
 
-const BookingPage = ({ TourId }: bookingProps) => {
+const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
   const bookingDict = useRecoilValue(bookingState);
   const rehearsalDict = useRecoilValue(rehearsalState);
@@ -205,7 +200,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const tourJump = await getTourJumpState(ctx, 'tasks', AccountId);
+  const tourJump = await getTourJumpState(ctx, 'bookings', AccountId);
 
   const TourId = tourJump.selected;
   // TourJumpState is checking if it's valid to access by accountId
