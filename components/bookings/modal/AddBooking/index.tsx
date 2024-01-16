@@ -38,6 +38,7 @@ const AddBooking = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState(initialState);
+  const [error, setError] = useState<string>('');
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
   const availableDates = useMemo(() => {
     const dates = [];
@@ -86,11 +87,13 @@ const AddBooking = () => {
     e.preventDefault();
   };
   const onModalClose = () => {
+    setError('');
     setStage(0);
     setFormData(initialState);
     setShowModal(false);
   };
   const addBookings = async () => {
+    setError('');
     const payload = [];
     for (const booking of Object.values(performancesData)) {
       const { hasPerformance, performanceTimes, date } = booking;
@@ -116,10 +119,11 @@ const AddBooking = () => {
       onModalClose();
     } catch (e) {
       setIsLoading(false);
-      console.log('Error', e);
+      setError('Something went wrong. Please try again later.');
     }
   };
   const onPerformanceDataChange = (date: string, key: string, value: any) => {
+    setError('');
     setPerformancesData((prev) => ({ ...prev, [date]: { ...(prev?.[date] || {}), [key]: value, date } }));
   };
   return (
@@ -204,11 +208,15 @@ const AddBooking = () => {
               </div>
             </div>
           )}
+          {error && <div className="text-red-500 font-medium">{error}</div>}
         </form>
         <div className="flex justify-end my-4 gap-2">
           {stage === 1 && (
             <ToolbarButton
-              onClick={() => setStage((stage) => stage - 1)}
+              onClick={() => {
+                setStage((stage) => stage - 1);
+                setError('');
+              }}
               disabled={!formData.venue || !formData.fromDate || !formData.toDate}
               className=""
             >
