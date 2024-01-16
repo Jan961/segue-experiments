@@ -9,11 +9,11 @@ describe('weekOptions Utility Function', () => {
     expect(weekOptions[0].text).toBe('week - 52');
     expect(weekOptions[0].value).toBe(-52);
 
-    expect(weekOptions[52].text).toBe('week + 0');
-    expect(weekOptions[52].value).toBe(0);
+    expect(weekOptions[52].text).toBe('week + 1');
+    expect(weekOptions[52].value).toBe(1);
 
-    expect(weekOptions[103].text).toBe('week + 51');
-    expect(weekOptions[103].value).toBe(51);
+    expect(weekOptions[103].text).toBe('week + 52');
+    expect(weekOptions[103].value).toBe(52);
   });
 
   it('should have unique values for each option', () => {
