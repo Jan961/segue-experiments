@@ -1,77 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import axios from 'axios';
+import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
-import moment from 'moment';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { Spinner } from 'components/global/Spinner';
 import { StyledDialog } from 'components/global/StyledDialog';
 import FormTypeahead from 'components/global/forms/FormTypeahead';
-import { bookingState } from 'state/booking/bookingState';
 import { venueState } from 'state/booking/venueState';
-import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
-import { ToolbarButton } from '../ToolbarButton';
-import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
-import { FormInputTime } from 'components/global/forms/FormInputTime';
-import classNames from 'classnames';
 import { scheduleSelector } from 'state/booking/selectors/scheduleSelector';
-import { getDateBlockId } from '../panel/utils/getDateBlockId';
-import axios from 'axios';
 import { performanceState } from 'state/booking/performanceState';
-
-const PerformanceRowEditor = ({
-  date,
-  onPerformanceDataChange,
-}: {
-  date: string;
-  onPerformanceDataChange: (date: string, key: string, value: any) => void;
-}) => {
-  const [hasPerformance, setHasPerformance] = useState(false);
-  const [performanceCount, setPerformanceCount] = useState(0);
-  const [performanceTimes, setPerformanceTimes] = useState({});
-  const onPerformanceAvailabilityChange = (e: any) => {
-    setHasPerformance(e?.target?.value);
-    onPerformanceDataChange(date, 'hasPerformance', e?.target?.value);
-  };
-  const onPerformanceCountChange = (value: number) => {
-    console.log('onPerformanceCountChange', value);
-    setPerformanceCount(value);
-    onPerformanceDataChange(date, 'performanceTimes', Object.values(performanceTimes).slice(0, value));
-  };
-  const onPerformanceTimesChange = (e: any, index: number) => {
-    const updatedTimes = { ...performanceTimes, [index]: e.target.value };
-    setPerformanceTimes(updatedTimes);
-    onPerformanceDataChange(date, 'performanceTimes', Object.values(updatedTimes));
-  };
-  return (
-    <div className="grid grid-cols-12 text-primary-navy border-b border-primary-navy">
-      <div className="col-span-6 border-r border-primary-navy p-2 text-sm font-normal">
-        {moment(date).format('dddd D MMMM YYYY')}
-      </div>
-      <div className="col-span-2 border-r border-primary-navy p-2">
-        <FormInputCheckbox
-          name="PerformanceAvailability"
-          onChange={onPerformanceAvailabilityChange}
-          value={hasPerformance}
-        />
-      </div>
-      <div className="col-span-2 border-r border-primary-navy p-2">
-        <FormInputNumeric
-          disabled={!hasPerformance}
-          name={'NumberOfPerformances'}
-          value={performanceCount}
-          onChange={onPerformanceCountChange}
-        />
-      </div>
-      <div className="col-span-2 flex flex-wrap p-2 gap-2">
-        {performanceCount > 0 &&
-          new Array(performanceCount)
-            .fill(0)
-            .map((_, i) => (
-              <FormInputTime key={i} onChange={(e) => onPerformanceTimesChange(e, i)} value={performanceTimes[i]} />
-            ))}
-      </div>
-    </div>
-  );
-};
+import { bookingState } from 'state/booking/bookingState';
+import { ToolbarButton } from '../../ToolbarButton';
+import { getDateBlockId } from '../../panel/utils/getDateBlockId';
+import PerformanceRowEditor from './PerformanceRowEditor';
 
 const initialState = {
   fromDate: null,
