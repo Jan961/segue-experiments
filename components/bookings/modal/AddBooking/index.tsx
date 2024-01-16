@@ -208,8 +208,8 @@ const AddBooking = () => {
               </div>
             </div>
           )}
-          {error && <div className="text-red-500 font-medium">{error}</div>}
         </form>
+        {error && <div className="text-red-500 font-medium my-1">{error}</div>}
         <div className="flex justify-end my-4 gap-2">
           {stage === 1 && (
             <ToolbarButton
