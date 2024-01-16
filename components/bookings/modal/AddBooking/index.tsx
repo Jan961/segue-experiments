@@ -194,11 +194,11 @@ const AddBooking = () => {
           )}
           {stage === 1 && (
             <div className="flex flex-col">
-              <div className="grid grid-cols-12 text-white p-2">
-                <div className="col-span-6 text-white p-2">Date</div>
-                <div className="col-span-2 text-white p-2">Perf Y/N</div>
-                <div className="col-span-2 text-white p-2">No: Perf</div>
-                <div className="col-span-2 text-white p-2">Time</div>
+              <div className="grid grid-cols-12 text-white p-2 text-sm font-bold">
+                <div className="col-span-6 text-white px-2 ">Date</div>
+                <div className="col-span-2 text-white px-2">Perf Y/N</div>
+                <div className="col-span-2 text-white px-2">No: Perf</div>
+                <div className="col-span-2 text-white px-2">Time</div>
               </div>
               <div className="p-2 bg-white rounded-lg max-h-[400px] overflow-y-scroll">
                 {dateRange.length === 0 && <div className="text-red-500">All dates booked!!</div>}

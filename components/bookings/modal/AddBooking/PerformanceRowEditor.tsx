@@ -29,18 +29,19 @@ const PerformanceRowEditor = ({
   };
   return (
     <div className="grid grid-cols-12 text-primary-navy border-b border-primary-navy">
-      <div className="col-span-6 border-r border-primary-navy p-2 text-sm font-normal">
+      <div className="col-span-6 border-r border-primary-navy px-2 text-sm font-normal flex items-center my-2">
         {moment(date).format('dddd D MMMM YYYY')}
       </div>
-      <div className="col-span-2 border-r border-primary-navy p-2">
+      <div className="col-span-2 border-r border-primary-navy flex items-center justify-center my-2">
         <FormInputCheckbox
           name="PerformanceAvailability"
           onChange={onPerformanceAvailabilityChange}
           value={hasPerformance}
         />
       </div>
-      <div className="col-span-2 border-r border-primary-navy p-2">
+      <div className="col-span-2 border-r border-primary-navy px-3 flex items-center justify-center my-2">
         <FormInputNumeric
+          className="w-16"
           disabled={!hasPerformance}
           name={'NumberOfPerformances'}
           value={performanceCount}
