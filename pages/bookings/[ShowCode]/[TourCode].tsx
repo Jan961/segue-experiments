@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import GlobalToolbar from 'components/toolbar';
 import BookingsButtons from 'components/bookings/bookingsButtons';
 import Layout from 'components/Layout';
@@ -39,6 +39,7 @@ import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
+import AddBooking from 'components/bookings/modal/AddBooking';
 
 interface bookingProps {
   TourId: number;
@@ -84,7 +85,7 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   );
 };
 
-const BookingPage = ({ TourId }: bookingProps) => {
+const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
   const bookingDict = useRecoilValue(bookingState);
   const rehearsalDict = useRecoilValue(rehearsalState);
@@ -143,6 +144,7 @@ const BookingPage = ({ TourId }: bookingProps) => {
           Go To Today
         </ToolbarButton>
         <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
+        <AddBooking />
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
