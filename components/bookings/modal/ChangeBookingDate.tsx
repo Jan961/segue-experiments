@@ -160,7 +160,7 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
               <ul>
                 {unique(conflicts).map((bId) => (
                   <li key={bId}>
-                    Conflict: <b>{venueDict[bookingDict[bId].VenueId].Name}</b>
+                    Conflict: <b>{venueDict[bookingDict[bId]?.VenueId]?.Name}</b>
                   </li>
                 ))}
                 {unique(errors).map((text) => (

@@ -37,14 +37,15 @@ const PerformanceRowEditor = ({
     onPerformanceDataChange(date, 'performanceTimes', Object.values(performanceTimes).slice(0, value));
   };
   const onPerformanceTimesChange = (e: any, index: number) => {
-    console.log('onPerformanceTimesChange', index, e?.target?.value, e);
     const updatedTimes = { ...performanceTimes, [index]: e.target.value };
     setPerformanceTimes(updatedTimes);
     onPerformanceDataChange(date, 'performanceTimes', Object.values(updatedTimes));
   };
   return (
     <div className="grid grid-cols-12 text-primary-navy border-b border-primary-navy">
-      <div className="col-span-6 border-r border-primary-navy p-2">{moment(date).format('dddd D MMMM YYYY')}</div>
+      <div className="col-span-6 border-r border-primary-navy p-2 text-sm font-normal">
+        {moment(date).format('dddd D MMMM YYYY')}
+      </div>
       <div className="col-span-2 border-r border-primary-navy p-2">
         <FormInputCheckbox
           name="PerformanceAvailability"
@@ -100,10 +101,15 @@ const AddBooking = () => {
   const availableDates = useMemo(() => {
     const dates = [];
     const tourSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Tour');
-    for (const Date of tourSchedule.Dates) {
-      const { GetInFitUpIds = [], OtherIds = [], PerformanceIds = [], RehearsalIds = [] } = Date || {};
-      if ([...GetInFitUpIds, ...OtherIds, ...PerformanceIds, ...RehearsalIds].length === 0) {
+    for (const Date of tourSchedule?.Dates || []) {
+      const { GetInFitUpIds = [], OtherIds = [], PerformanceIds = [], RehearsalIds = [], BookingIds = [] } = Date || {};
+      if ([...GetInFitUpIds, ...OtherIds, ...PerformanceIds, ...RehearsalIds, ...BookingIds].length === 0) {
         dates.push(Date.Date);
+      } else if (BookingIds.length) {
+        const hasUnConfirmedBookings = BookingIds.some((id) => bookingDict?.[id]?.StatusCode === 'U');
+        if (hasUnConfirmedBookings) {
+          dates.push(Date.Date);
+        }
       }
     }
     return dates;
@@ -204,36 +210,42 @@ const AddBooking = () => {
             placeholder={'Please select a venue'}
           />
           {stage === 0 && (
-            <DatePicker
-              placeholderText="DD/MM/YY"
-              dateFormat="dd/MM/yy"
-              popperClassName="!z-[51] w-80"
-              className="rounded border-gray-300 px-3 py-2 z-90 w-full my-2"
-              minDate={minDate ? new Date(minDate) : null}
-              maxDate={maxDate ? new Date(maxDate) : null}
-              selected={formData.fromDate ? new Date(formData.fromDate) : null}
-              onChange={(date) =>
-                handleOnChange({ target: { name: 'fromDate', value: date } } as React.ChangeEvent<
-                  HTMLInputElement | HTMLSelectElement
-                >)
-              }
-            />
+            <div className="flex flex-col my-2">
+              <div className="text-white text-sm font-bold pl-2">Start Date</div>
+              <DatePicker
+                placeholderText="DD/MM/YY"
+                dateFormat="dd/MM/yy"
+                popperClassName="!z-[51] w-80"
+                className="rounded border-gray-300 px-3 z-90 w-full my-1"
+                minDate={minDate ? new Date(minDate) : null}
+                maxDate={maxDate ? new Date(maxDate) : null}
+                selected={formData.fromDate ? new Date(formData.fromDate) : null}
+                onChange={(date) =>
+                  handleOnChange({ target: { name: 'fromDate', value: date } } as React.ChangeEvent<
+                    HTMLInputElement | HTMLSelectElement
+                  >)
+                }
+              />
+            </div>
           )}
           {stage === 0 && (
-            <DatePicker
-              placeholderText="DD/MM/YY"
-              dateFormat="dd/MM/yy"
-              popperClassName="!z-[51]"
-              className="rounded border-gray-300 px-3 py-2 z-90 w-full my-2"
-              selected={formData?.toDate ? new Date(formData?.toDate) : null}
-              minDate={formData?.fromDate ? new Date(formData?.fromDate) : new Date()}
-              maxDate={maxDate ? new Date(maxDate) : null}
-              onChange={(date) =>
-                handleOnChange({ target: { name: 'toDate', value: date } } as React.ChangeEvent<
-                  HTMLInputElement | HTMLSelectElement
-                >)
-              }
-            />
+            <div className="flex flex-col my-2">
+              <div className="text-white text-sm font-bold pl-2">End Date</div>
+              <DatePicker
+                placeholderText="DD/MM/YY"
+                dateFormat="dd/MM/yy"
+                popperClassName="!z-[51]"
+                className="rounded border-gray-300 px-3 z-90 w-full my-1"
+                selected={formData?.toDate ? new Date(formData?.toDate) : null}
+                minDate={formData?.fromDate ? new Date(formData?.fromDate) : new Date()}
+                maxDate={maxDate ? new Date(maxDate) : null}
+                onChange={(date) =>
+                  handleOnChange({ target: { name: 'toDate', value: date } } as React.ChangeEvent<
+                    HTMLInputElement | HTMLSelectElement
+                  >)
+                }
+              />
+            </div>
           )}
           {stage === 1 && (
             <div className="flex flex-col">
@@ -244,10 +256,10 @@ const AddBooking = () => {
                 <div className="col-span-2 text-white p-2">Time</div>
               </div>
               <div className="p-2 bg-white rounded-lg max-h-[400px] overflow-y-scroll">
+                {dateRange.length === 0 && <div className="text-red-500">All dates booked!!</div>}
                 {dateRange.map((date, i) => (
                   <PerformanceRowEditor onPerformanceDataChange={onPerformanceDataChange} key={i} date={date} />
                 ))}
-                {availableDates.length === 0 && <div>No availableDates</div>}
               </div>
             </div>
           )}
