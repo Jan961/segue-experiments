@@ -1,4 +1,5 @@
 import type { StorybookConfig } from '@storybook/nextjs';
+var path = require('path');
 
 const config: StorybookConfig = {
   stories: ['../**/*.mdx', '../**/*.stories.@(js|jsx|mjs|ts|tsx)'],
@@ -8,11 +9,17 @@ const config: StorybookConfig = {
     '@storybook/addon-onboarding',
     '@storybook/addon-interactions',
     '@storybook/addon-themes',
+    {
+      name: '@storybook/addon-styling',
+      options: {
+        postCss: true,
+      },
+    },
   ],
-  staticDirs: ['../public'],
+  staticDirs: ['../public', { from: '../public/fonts', to: '/fonts' }],
   framework: {
     name: '@storybook/nextjs',
-    options: {},
+    options: { nextConfigPath: path.resolve(__dirname, '../next.config.js') },
   },
   docs: {
     autodocs: 'tag',

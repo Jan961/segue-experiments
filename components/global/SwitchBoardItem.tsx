@@ -19,7 +19,7 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
   const content = (
     <>
       <FontAwesomeIcon icon={link.icon as IconProp} className="text-5xl" />
-      <span className="text-center text-lg pt-2">{link.title}</span>
+      <span className="text-center text-base pt-2">{link.title}</span>
     </>
   );
 
