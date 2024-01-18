@@ -39,6 +39,7 @@ import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
+import AddBooking from 'components/bookings/modal/AddBooking';
 
 const toolbarHeight = 136;
 
@@ -138,6 +139,7 @@ const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSid
           Go To Today
         </ToolbarButton>
         <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
+        <AddBooking />
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
