@@ -184,20 +184,19 @@ export const getToursAndTasks = async (AccountId: number, TourId?: number) => {
   let toursWithTasks = await prisma.tour.findMany({
     where: {
       IsArchived: false,
-      ...(TourId && {Id: TourId}),
+      ...(TourId && { Id: TourId }),
       Show: {
         is: {
           AccountId,
         },
       },
-
     },
     include: {
       Show: true,
       DateBlock: true,
       TourTask: {
         orderBy: {
-          Id: 'desc',
+          StartByWeekNum: 'asc',
         },
       },
     },

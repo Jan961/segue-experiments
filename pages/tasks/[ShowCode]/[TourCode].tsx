@@ -41,7 +41,11 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
             filteredTours.map((tour) => (
               <div key={tour.Id} className={selected === undefined || selected === tour.Id ? 'mb-10' : 'hidden'}>
                 <h3 className="text-xl font-bold py-4 !text-purple-900">{tour.ShowName}</h3>
-                <Tasklist tasks={tour?.Tasks} onTasksChange={(change) => onTasksChange(change, tour.Id)} />
+                <Tasklist
+                  className="max-h-[70vh]"
+                  tasks={tour?.Tasks}
+                  onTasksChange={(change) => onTasksChange(change, tour.Id)}
+                />
               </div>
             ))
           ) : (
