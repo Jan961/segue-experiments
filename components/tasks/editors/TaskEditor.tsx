@@ -10,6 +10,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/weekOptions';
 import { useRouter } from 'next/router';
+import { Spinner } from 'components/global/Spinner';
 
 interface NewTaskFormProps {
   task?: TourTaskDTO;
@@ -39,6 +40,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
   const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
   const [tours, setTours] = useRecoilState(tourState);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const users = useRecoilValue(userState).users;
 
   const creating = !inputs.Id;
@@ -65,6 +67,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       return;
     }
 
+    setIsLoading(true);
     if (inputs.Id) {
       try {
         await axios.post('/api/tasks/update', inputs);
@@ -78,9 +81,10 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
         });
 
         setTours(updatedTours);
-
+        setIsLoading(false);
         triggerClose();
       } catch (error) {
+        setIsLoading(false);
         loggingService.logError(error);
         console.error(error);
       }
@@ -88,9 +92,11 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       try {
         const endpoint = recurring ? '/api/tasks/create/recurring' : '/api/tasks/create/single/';
         await axios.post(endpoint, inputs);
+        setIsLoading(false);
         triggerClose();
         router.reload();
       } catch (error) {
+        setIsLoading(false);
         loggingService.logError(error);
         console.error(error);
       }
@@ -184,8 +190,11 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
         <StyledDialog.FooterContainer>
           <StyledDialog.FooterCancel onClick={triggerClose} />
           {/* <StyledDialog.FooterDelete onClick={handleDelete} disabled={creating || status.submitting}>Delete</StyledDialog.FooterDelete> */}
-          <StyledDialog.FooterContinue disabled={status.submitted || status.submitting} submit>
-            {creating ? 'Create' : 'Update'}
+          <StyledDialog.FooterContinue disabled={status.submitted || status.submitting || isLoading} submit>
+            <div className="flex items-center gap-2">
+              {isLoading && <Spinner size={'sm'} />}
+              {creating ? 'Create' : 'Update'}
+            </div>
           </StyledDialog.FooterContinue>
         </StyledDialog.FooterContainer>
       </form>
