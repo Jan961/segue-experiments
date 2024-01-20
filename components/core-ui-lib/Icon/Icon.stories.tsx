@@ -23,6 +23,7 @@ export const Icons: Story = {
         <Icon iconName="edit" {...args} />
         <Icon iconName="delete" {...args} />
         <Icon iconName="calendar" {...args} />
+        <Icon iconName="spin" {...args} />
       </div>
     );
   },

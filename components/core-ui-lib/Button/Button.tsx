@@ -7,6 +7,7 @@ export interface ButtonProps {
   disabled?: boolean;
   className?: string;
   onClick?: () => void;
+  loading?: boolean;
 }
 
 const baseClass =

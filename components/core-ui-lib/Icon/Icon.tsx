@@ -2,7 +2,7 @@ import * as iconDir from '../assets/svg';
 
 type ModuleType = typeof iconDir;
 
-export type IconName = 'search' | 'chevron-down' | 'check' | 'minus' | 'edit' | 'delete' | 'calendar';
+export type IconName = 'search' | 'chevron-down' | 'check' | 'minus' | 'edit' | 'delete' | 'calendar' | 'spin';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -12,6 +12,7 @@ const IconNameMap = new Map([
   ['edit', 'PencilIcon'],
   ['delete', 'BinIcon'],
   ['calendar', 'CalendarIcon'],
+  ['spin', 'SpinIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg';
@@ -24,9 +25,18 @@ interface IconProps {
   strokeWidth?: string;
   stroke?: string;
   color?: string;
+  className?: string;
 }
 
-export default function Icon({ iconName, testId = '', variant = 'sm', stroke, strokeWidth, color }: IconProps) {
+export default function Icon({
+  iconName,
+  testId = '',
+  variant = 'sm',
+  stroke,
+  strokeWidth,
+  color,
+  className,
+}: IconProps) {
   if (!IconNameMap.get(iconName)) return null;
 
   const getIcon = <T extends keyof ModuleType>(icon: T): ModuleType[T] => iconDir[icon as T];
@@ -44,6 +54,7 @@ export default function Icon({ iconName, testId = '', variant = 'sm', stroke, st
       color={color}
       width={getSizeForVariant(variant)}
       height={getSizeForVariant(variant)}
+      className={className}
     />
   );
 }

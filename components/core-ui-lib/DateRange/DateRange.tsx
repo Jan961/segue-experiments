@@ -2,25 +2,33 @@ import { useState } from 'react';
 import DateInput from '../DateInput';
 import Label from '../Label';
 
+export type DateRangeValue = {
+  from: string;
+  to: string;
+};
 interface DateRangePorps {
   className?: string;
   disabled?: boolean;
   testId?: string;
   label?: string;
+  onChange: (v: DateRangeValue) => void;
 }
 
-export default function DateRange({ className, disabled, testId, label }: DateRangePorps) {
+export default function DateRange({ className, disabled, testId, label, onChange }: DateRangePorps) {
   const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
-  const [dateFrom, setDateFrom] = useState();
-  const [dateTo, setDateTo] = useState();
-  console.log(dateFrom, dateTo);
+  const [dateFrom, setDateFrom] = useState<string>();
+  const [dateTo, setDateTo] = useState<string>();
+
   const handleDateFromChange = (v) => {
     setDateFrom(v);
+    setDateTo(v);
+    onChange({ from: v, to: v });
   };
 
   const handleDateToChange = (v) => {
     setDateTo(v);
+    onChange({ from: dateFrom, to: v });
   };
 
   return (
@@ -35,7 +43,12 @@ export default function DateRange({ className, disabled, testId, label }: DateRa
       )}
       <DateInput inputClass="border-none !shadow-none" value={dateFrom} onChange={handleDateFromChange} />
       <span className="mx-2 text-primary-label">to</span>
-      <DateInput inputClass="border-none !shadow-none" value={dateTo} onChange={handleDateToChange} />
+      <DateInput
+        inputClass="border-none !shadow-none"
+        value={dateTo}
+        onChange={handleDateToChange}
+        minDate={dateFrom ? new Date(dateFrom) : null}
+      />
     </div>
   );
 }

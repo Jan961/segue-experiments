@@ -1,6 +1,6 @@
 import '../styles/globals.css';
 import 'react-range-slider-input/dist/style.css';
-import "react-datepicker/dist/react-datepicker.css";
+import 'react-datepicker/dist/react-datepicker.css';
 
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
@@ -10,7 +10,7 @@ import { ClientStateSetter, setInitialStateServer } from 'lib/recoil';
 import { ClerkProvider } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
 
@@ -19,7 +19,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 // Login disabled due to lack of support. DO NOT PUT PUBLIC
-export default function MyApp({ Component, pageProps }) {
+export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const { initialState } = pageProps;
   const router = useRouter();
 

@@ -210,6 +210,8 @@ module.exports = {
       },
       height: {
         128: '32rem',
+        'comp-height': '1.9375rem',
+        'table-header-height': '3.1875rem',
       },
     },
   },
