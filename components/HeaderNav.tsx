@@ -6,6 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 import { faHome, faUser, faSignOutAlt, IconDefinition, faBars } from '@fortawesome/free-solid-svg-icons';
 import { SegueLogo } from './global/SegueLogo';
+import { FormInputSelect } from './global/forms/FormInputSelect';
+import { availableLocales } from 'config/global';
+import { useRecoilState } from 'recoil';
+import { globalState } from 'state/global/globalState';
+import useStrings from 'hooks/useStrings';
 
 interface HeaderNavButtonProps {
   icon: IconDefinition;
@@ -48,6 +53,8 @@ const HeaderNavDivider = () => <span className="mx-2">{' | '}</span>;
 
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
   const [username, setUsername] = React.useState('My Account');
+  const [userPrefs, setUserPrefs] = useRecoilState(globalState);
+  const getString = useStrings();
   const router = useRouter();
   const { signOut } = useClerk();
 
@@ -62,6 +69,9 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
       setUsername(user.name);
     }
   }, [user]);
+  const onLocaleChange = (e:any)=>{
+    setUserPrefs({...userPrefs, locale: e.target.value})
+  }
 
   return (
     <nav>
@@ -78,15 +88,24 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
           </div>
           <div className="flex flex-row items-center pr-2">
             <HeaderNavButton icon={faHome} href="/" className="bg-primary-green">
-              Home
+              {getString('global.home')}
             </HeaderNavButton>
             <HeaderNavDivider />
             <HeaderNavButton icon={faUser} href="/accounts" className="bg-primary-orange">
               {username}
             </HeaderNavButton>
             <HeaderNavDivider />
+            <div className="">
+              <FormInputSelect 
+                onChange={onLocaleChange} 
+                value={userPrefs.locale} 
+                name={'locale'} 
+                options={availableLocales}                
+              />
+            </div>
+            <HeaderNavDivider />
             <HeaderNavButton icon={faSignOutAlt} onClick={logout} className="bg-purple-500">
-              Log Out
+              {getString('global.logOut')}
             </HeaderNavButton>
           </div>
         </div>

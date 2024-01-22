@@ -8,41 +8,43 @@ import {
   faVolumeHigh,
 } from '@fortawesome/free-solid-svg-icons';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
+import useStrings from 'hooks/useStrings';
 
 export const Switchboard = () => {
+  const getStrings = useStrings();
   const links = [
     {
-      title: 'Bookings',
+      title: getStrings('global.bookings'),
       route: '/bookings',
       icon: faCalendarAlt,
       color: 'bg-primary-orange',
     },
     {
-      title: 'Tasks',
+      title: getStrings('global.tasks'),
       route: '/tasks',
       icon: faCheckSquare,
       color: 'bg-primary-yellow',
     },
     {
-      title: 'Marketing',
+      title: getStrings('global.marketing'),
       route: '/marketing',
       icon: faVolumeHigh,
       color: 'bg-primary-green',
     },
     {
-      title: 'Venue Contracts',
+      title: getStrings('global.venueContracts'),
       route: '/contracts',
       icon: faFile,
       color: 'bg-primary-blue',
     },
     {
-      title: 'Reports',
+      title: getStrings('global.reports'),
       route: '/reports',
       icon: faChartLine,
       color: 'bg-primary-purple',
     },
     {
-      title: 'User Account',
+      title: getStrings('global.userAccount'),
       route: '/account',
       icon: faUserCog,
       color: 'bg-primary-pink',
@@ -54,7 +56,7 @@ export const Switchboard = () => {
       color: 'bg-primary-purple',
     },
     {
-      title: 'Touring Management',
+      title: getStrings('global.touringManagement'),
       route: '/touring',
       icon: faLocationDot,
       color: 'bg-primary-navy',

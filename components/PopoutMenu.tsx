@@ -14,10 +14,12 @@ import { SegueLogo } from './global/SegueLogo';
 import { useRecoilValue } from 'recoil';
 import { tourJumpState } from 'state/booking/tourJumpState';
 import Link from 'next/link';
+import useStrings from 'hooks/useStrings';
 
 export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
   const tourJump = useRecoilValue(tourJumpState);
+  const getStrings = useStrings();
 
   const { selected, tours } = tourJump;
   const tour = tours.filter((x) => x.Id === selected)[0];
@@ -27,19 +29,19 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
 
   const menuItems = [
     {
-      label: 'Home',
+      label: getStrings('global.home'),
       link: '/',
       icon: faHome,
       activeColor: 'text-primary-blue',
     },
     {
-      label: 'Bookings',
+      label: getStrings('global.bookings'),
       link: noTourSelected ? '/bookings' : `/bookings/${path}`,
       icon: faCalendarCheck,
       activeColor: 'text-primary-blue',
     },
     {
-      label: 'Marketing',
+      label: getStrings('global.marketing'),
       link: noTourSelected ? '/marketing' : `/marketing/${path}`,
       icon: faBullhorn,
       activeColor: 'text-primary-green',
@@ -56,33 +58,33 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       ],
     },
     {
-      label: 'Contracts',
+      label: getStrings('global.contracts'),
       link: noTourSelected ? '/contracts' : `/contracts/${path}`,
       icon: faFileSignature,
       activeColor: 'text-primary-pink',
     },
     {
-      label: 'Reports',
+      label: getStrings('global.reports'),
       link: '/reports',
       icon: faChartLine,
       activeColor: 'text-primary-blue',
     },
     {
-      label: 'Tasks',
+      label: getStrings('global.tasks'),
       link: '/tasks',
       icon: faClipboardList,
       activeColor: 'text-primary-purple',
     },
 
     {
-      label: 'Touring Management',
+      label: getStrings('global.touringManagement'),
       link: '/touring',
       icon: faLocationDot,
       activeColor: 'text-primary-navy',
     },
 
     {
-      label: 'Admin',
+      label: getStrings('global.admin'),
       link: '/admin',
       icon: faUserGear,
       activeColor: 'text-primary-orange',
