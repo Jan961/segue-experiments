@@ -24,6 +24,10 @@ export const Icons: Story = {
         <Icon iconName="delete" {...args} />
         <Icon iconName="calendar" {...args} />
         <Icon iconName="spin" {...args} />
+        <Icon iconName="pin-open" {...args} />
+        <Icon iconName="pin-close" {...args} />
+        <Icon iconName="note" {...args} />
+        <Icon iconName="note-filled" {...args} />
       </div>
     );
   },

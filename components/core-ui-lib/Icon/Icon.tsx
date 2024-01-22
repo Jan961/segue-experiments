@@ -2,7 +2,19 @@ import * as iconDir from '../assets/svg';
 
 type ModuleType = typeof iconDir;
 
-export type IconName = 'search' | 'chevron-down' | 'check' | 'minus' | 'edit' | 'delete' | 'calendar' | 'spin';
+export type IconName =
+  | 'search'
+  | 'chevron-down'
+  | 'check'
+  | 'minus'
+  | 'edit'
+  | 'delete'
+  | 'calendar'
+  | 'spin'
+  | 'pin-open'
+  | 'pin-close'
+  | 'note'
+  | 'note-filled';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -13,6 +25,10 @@ const IconNameMap = new Map([
   ['delete', 'BinIcon'],
   ['calendar', 'CalendarIcon'],
   ['spin', 'SpinIcon'],
+  ['pin-open', 'PinOpenIcon'],
+  ['pin-close', 'PinCloseIcon'],
+  ['note', 'NoteIcon'],
+  ['note-filled', 'NoteFilledIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg';

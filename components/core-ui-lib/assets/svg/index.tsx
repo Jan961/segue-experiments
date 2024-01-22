@@ -6,3 +6,7 @@ export { default as PencilIcon } from './Pencil';
 export { default as BinIcon } from './Bin';
 export { default as CalendarIcon } from './Calendar';
 export { default as SpinIcon } from './Spin';
+export { default as PinOpenIcon } from './PinOpen';
+export { default as PinCloseIcon } from './PinClose';
+export { default as NoteIcon } from './Note';
+export { default as NoteFilledIcon } from './NoteFilled';
