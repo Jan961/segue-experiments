@@ -98,9 +98,9 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
         setIsLoading(false);
       });
   };
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleOnChange = (e) => {
     let { name, value }: { name: string; value: any } = e.target;
-    if (name === 'startDueDate' || name === 'endDueDate') value = value?.toLocaleDateString?.() || '';
+    if (name === 'startDueDate' || name === 'endDueDate') value = value || '';
     if (name === 'tour' || name === 'assignee') {
       value = parseInt(value, 10);
     }
@@ -166,11 +166,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
             popperClassName="!z-50"
             className="rounded border-gray-300 px-3 py-2 z-90"
             selected={filters?.startDueDate ? new Date(filters?.startDueDate) : null}
-            onChange={(date) =>
-              handleOnChange({ target: { name: 'startDueDate', value: date } } as React.ChangeEvent<
-                HTMLInputElement | HTMLSelectElement
-              >)
-            }
+            onChange={(date) => handleOnChange({ target: { name: 'startDueDate', value: date.toLocaleDateString() } })}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -182,11 +178,7 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
             className="rounded border-gray-300 px-3 py-2 z-90"
             selected={filters?.endDueDate ? new Date(filters?.endDueDate) : null}
             minDate={filters?.startDueDate ? new Date(filters?.startDueDate) : new Date()}
-            onChange={(date) =>
-              handleOnChange({ target: { name: 'endDueDate', value: date } } as React.ChangeEvent<
-                HTMLInputElement | HTMLSelectElement
-              >)
-            }
+            onChange={(date) => handleOnChange({ target: { name: 'endDueDate', value: date.toLocaleDateString() } })}
           />
         </div>
         <FormInputSelect
