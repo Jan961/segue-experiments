@@ -6,6 +6,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 module.exports = withBundleAnalyzer({
   reactStrictMode: true,
+  i18n: {
+    locales: ['en-US', 'fr', 'es'],
+    defaultLocale: 'en-US',
+  },
   serverRuntimeConfig: {
     secret: 'THIS IS USED TO SIGN AND VERIFY JWT TOKENS, REPLACE IT WITH YOUR OWN SECRET, IT CAN BE ANY STRING',
   },
