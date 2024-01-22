@@ -13,7 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const access = await checkAccess(email, { TaskId: Id });
       if (!access) return res.status(401).end();
 
-      await prisma.TourTask.update({
+      const updatedTask = await prisma.TourTask.update({
         where: { Id: task.Id },
         data: {
           Name: task.Name,
@@ -26,20 +26,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByPostTour: task.StartByPostTour,
           CompleteByPostTour: task.CompleteByPostTour,
-          Tour: {
-            connect: {
-              Id: task.TourId,
+          ...(task.TourId && {
+            Tour: {
+              connect: {
+                Id: task.TourId,
+              },
             },
-          },
-          User: {
-            connect: {
-              Id: task.AssignedToUserId,
+          }),
+          ...(task.AssignedToUserId && {
+            User: {
+              connect: {
+                Id: task.AssignedToUserId,
+              },
             },
-          },
+          }),
         },
       });
 
-      return res.status(200).json({});
+      return res.status(200).json(updatedTask);
     } catch (err) {
       console.log(err);
       return res.status(500).json({ error: 'Error updating TourTask' });
