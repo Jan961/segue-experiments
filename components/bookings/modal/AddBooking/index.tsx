@@ -74,9 +74,9 @@ const AddBooking = () => {
     () => Object.values(venueDict).map((venue) => ({ name: `${venue?.Name} ${venue?.Town}`, value: venue?.Id })),
     [venueDict],
   );
-  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleOnChange = (e) => {
     let { name, value }: { name: string; value: any } = e.target;
-    if (name === 'fromDate' || name === 'toDate') value = value?.toLocaleDateString?.() || '';
+    if (name === 'fromDate' || name === 'toDate') value = value || '';
     if (name === 'venue') value = parseInt(value, 10);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -165,11 +165,7 @@ const AddBooking = () => {
                 minDate={minDate ? new Date(minDate) : null}
                 maxDate={maxDate ? new Date(maxDate) : null}
                 selected={formData.fromDate ? new Date(formData.fromDate) : null}
-                onChange={(date) =>
-                  handleOnChange({ target: { name: 'fromDate', value: date } } as React.ChangeEvent<
-                    HTMLInputElement | HTMLSelectElement
-                  >)
-                }
+                onChange={(date) => handleOnChange({ target: { name: 'fromDate', value: date.toLocaleDateString() } })}
               />
             </div>
           )}
@@ -184,11 +180,7 @@ const AddBooking = () => {
                 selected={formData?.toDate ? new Date(formData?.toDate) : null}
                 minDate={formData?.fromDate ? new Date(formData?.fromDate) : new Date()}
                 maxDate={maxDate ? new Date(maxDate) : null}
-                onChange={(date) =>
-                  handleOnChange({ target: { name: 'toDate', value: date } } as React.ChangeEvent<
-                    HTMLInputElement | HTMLSelectElement
-                  >)
-                }
+                onChange={(date) => handleOnChange({ target: { name: 'toDate', value: date.toLocaleDateString() } })}
               />
             </div>
           )}

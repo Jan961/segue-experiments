@@ -2,22 +2,28 @@
 const plugin = require('tailwindcss/plugin');
 
 const colorsConfig = {
-  'primary-orange': '#ec6255',
-  'primary-yellow': '#fdce74',
-  'primary-green': '#41a29a',
-  'primary-blue': '#0093c0',
+  'primary-orange': '#EC6255',
+  'primary-yellow': '#FDCE74',
+  'primary-green': '#41A29A',
+  'primary-blue': '#0093C0',
   'soft-primary-blue': '#80c5e1',
-  'primary-purple': '#7b568d',
-  'primary-pink': '#e94580',
-  'primary-navy': '#21345b',
-  'dark-primary-green': '#42A29A',
-  'soft-primary-green': '#BFE0DE',
-  'soft-primary-grey': '#627293',
-  'faded-primary-grey': '#f8f8fa',
-  'soft-table-row-separation': '#e3ebf2',
-  'table-row-alternating': '#f8f8f8',
-  'progress-teal': '#84ecd7',
-  'progress-grey': '#dadce5',
+  'primary-purple': '#7B568D',
+  'primary-pink': '#E94580',
+  'primary-navy': '#082B4B',
+  'primary-red': '#D41818',
+  'primary-white': '#FFF',
+  'primary-button-hover': 'rgba(8, 43, 75, 0.6)',
+  'primary-button-active': 'rgba(8, 43, 75, 0.8)',
+  'secondary-button-hover': '#E3EBF2',
+  'secondary-button-active': '#617293',
+  'tertiary-button-hover': '#F86C6C',
+  'tertiary-button-active': '#891E1E',
+  disabled: 'rgba(218, 220, 229, 0.65)',
+  'primary-input-text': '#617293',
+  'primary-border': '#E9EBF0',
+  'primary-list-row-hover': '#21345b99',
+  'primary-list-row-active': '#21345bcc',
+  'primary-label': '#21345bcc',
 };
 
 module.exports = {
@@ -62,94 +68,6 @@ module.exports = {
             paddingLeft: theme('spacing.20'),
             paddingRight: theme('spacing.20'),
           },
-        },
-        '.btn': {
-          with: 'fit-content',
-          height: 'fit-content',
-          fontFamily: theme('fontFamily.gilroy'),
-          fontWeight: theme('fontWeight.semibold'),
-          textAlign: 'center',
-          fontSize: theme('fontSize.sm'),
-
-          paddingLeft: theme('spacing.3'),
-          paddingRight: theme('spacing.3'),
-          paddingTop: theme('spacing.2'),
-          paddingBottom: theme('spacing.2'),
-          gap: theme('spacing.3'),
-          display: 'inline-flex',
-          alignItems: 'center',
-          borderRadius: theme('borderRadius.md'),
-          transitionProperty: 'all',
-          transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          transitionDuration: '150ms',
-
-          '&:hover': {
-            transform: 'scale(1.05)',
-          },
-        },
-
-        '.btn-primary': {
-          backgroundColor: colorsConfig['primary-pink'],
-          color: theme('colors.white'),
-        },
-        '.btn-primary-org': {
-          backgroundColor: colorsConfig['primary-orange'],
-          color: theme('colors.white'),
-        },
-        '.btn-primary-blue': {
-          backgroundColor: colorsConfig['primary-blue'],
-          color: theme('colors.white'),
-        },
-        '.btn-primary-green': {
-          backgroundColor: colorsConfig['primary-green'],
-          color: theme('colors.white'),
-        },
-        '.btn-primary-navy': {
-          backgroundColor: colorsConfig['primary-navy'],
-          color: theme('colors.white'),
-        },
-        '.btn-primary-purple': {
-          backgroundColor: colorsConfig['primary-purple'],
-          color: theme('colors.white'),
-        },
-        '.btn-primary-yellow': {
-          backgroundColor: colorsConfig['primary-yellow'],
-          color: theme('colors.white'),
-        },
-
-        '.btn.btn-lg': {
-          fontSize: theme('fontSize.xl'),
-          paddingLeft: theme('spacing.8'),
-          paddingRight: theme('spacing.8'),
-          paddingTop: theme('spacing.3'),
-          paddingBottom: theme('spacing.3'),
-          gap: theme('spacing.4'),
-        },
-        '.btn.btn-md': {
-          fontSize: theme('fontSize.base'),
-          paddingLeft: theme('spacing.6'),
-          paddingRight: theme('spacing.6'),
-          paddingTop: theme('spacing.2'),
-          paddingBottom: theme('spacing.2'),
-          gap: theme('spacing.4'),
-        },
-        '.btn.btn-sm': {
-          fontSize: theme('fontSize.sm'),
-          paddingLeft: theme('spacing.4'),
-          paddingRight: theme('spacing.4'),
-          paddingTop: theme('spacing.2'),
-          paddingBottom: theme('spacing.2'),
-          gap: theme('spacing.2'),
-          fontWeight: theme('fontWeight.medium'),
-        },
-        '.btn.btn-xs': {
-          fontSize: theme('fontSize.sm'),
-          paddingLeft: theme('spacing.3'),
-          paddingRight: theme('spacing.3'),
-          paddingTop: theme('spacing.1'),
-          paddingBottom: theme('spacing.1'),
-          gap: theme('spacing.2'),
-          fontWeight: theme('fontWeight.medium'),
         },
       });
       addUtilities({
@@ -269,6 +187,7 @@ module.exports = {
       });
     }),
   ],
+  darkMode: ['class', '[data-mode="dark"]'],
   theme: {
     screens: {
       xs: '425px',
@@ -280,17 +199,19 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        primary: ['Ubuntu'],
+        calibri: ['var(--font-calibri)'],
+      },
+      boxShadow: {
+        'sm-shadow': '0px 5px 5px 0px rgba(112, 144, 176, 0.30)',
       },
       colors: colorsConfig,
-      fontSize: {
-        default: '0.85rem',
-      },
       width: {
         128: '32rem',
       },
       height: {
         128: '32rem',
+        'comp-height': '1.9375rem',
+        'table-header-height': '3.1875rem',
       },
     },
   },

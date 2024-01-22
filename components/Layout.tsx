@@ -4,6 +4,7 @@ import { HeaderNav } from 'components/HeaderNav';
 import { PopoutMenu } from 'components/PopoutMenu';
 import Router from 'next/router';
 import { Spinner } from './global/Spinner';
+import { calibri } from 'lib/fonts';
 
 type Props = {
   children?: ReactNode;
@@ -49,7 +50,7 @@ const Layout = ({ children, title = 'Your tour assistant', flush = false }: Prop
   }, []);
 
   return (
-    <div className="background-gradient font-primary">
+    <div className={`${calibri.variable} font-calibri background-gradient`}>
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />

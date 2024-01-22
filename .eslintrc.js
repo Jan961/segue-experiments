@@ -19,6 +19,7 @@ module.exports = {
     'standard',
     'plugin:react/jsx-runtime',
     'prettier',
+    'plugin:storybook/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
