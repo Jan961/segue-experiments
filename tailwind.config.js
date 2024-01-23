@@ -10,6 +10,7 @@ const colorsConfig = {
   'primary-purple': '#7B568D',
   'primary-pink': '#E94580',
   'primary-navy': '#082B4B',
+  'primary-dark-blue': '#21345B',
   'primary-red': '#D41818',
   'primary-white': '#FFF',
   'primary-button-hover': 'rgba(8, 43, 75, 0.6)',

@@ -12,7 +12,7 @@ const meta: Meta<typeof Icon> = {
 export default meta;
 type Story = StoryObj<typeof Icon>;
 
-export const Icons: Story = {
+export const Primary: Story = {
   render: (args) => {
     return (
       <div className="flex w-full items-center gap-4 p-4">
@@ -28,7 +28,35 @@ export const Icons: Story = {
         <Icon iconName="pin-close" {...args} />
         <Icon iconName="note" {...args} />
         <Icon iconName="note-filled" {...args} />
+        <Icon iconName="home" {...args} />
       </div>
+    );
+  },
+};
+
+export const MenuIcons: Story = {
+  render: (args) => {
+    return (
+      <>
+        <div className="flex w-128 items-center gap-4 p-4 bg-primary-dark-blue">
+          <Icon iconName="home" {...args} />
+          <Icon iconName="bookings" {...args} />
+          <Icon iconName="marketing" fill="#21345B" {...args} />
+          <Icon iconName="tasks" fill="#FFF" {...args} />
+          <Icon iconName="contracts" fill="#FFF" {...args} />
+          <Icon iconName="touring-management" {...args} />
+          <Icon iconName="system-admin" stroke="#FFF" fill="#FFF" {...args} />
+        </div>
+        <div className="flex w-128 items-center gap-4 p-4 bg-primary-dark-blue">
+          <Icon iconName="home" {...args} />
+          <Icon iconName="bookings" fill="#EC6255" {...args} />
+          <Icon iconName="marketing" stroke="#41A29A" fill="#21345B" {...args} />
+          <Icon iconName="tasks" fill="#FDCE74" {...args} />
+          <Icon iconName="contracts" fill="#0093C0" {...args} />
+          <Icon iconName="touring-management" fill="#7B568D" {...args} />
+          <Icon iconName="system-admin" stroke="#E94580" fill="#E94580" {...args} />
+        </div>
+      </>
     );
   },
 };

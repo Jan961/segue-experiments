@@ -14,7 +14,14 @@ export type IconName =
   | 'pin-open'
   | 'pin-close'
   | 'note'
-  | 'note-filled';
+  | 'note-filled'
+  | 'home'
+  | 'bookings'
+  | 'marketing'
+  | 'tasks'
+  | 'contracts'
+  | 'touring-management'
+  | 'system-admin';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -29,6 +36,13 @@ const IconNameMap = new Map([
   ['pin-close', 'PinCloseIcon'],
   ['note', 'NoteIcon'],
   ['note-filled', 'NoteFilledIcon'],
+  ['home', 'HomeIcon'],
+  ['bookings', 'BookingsIcon'],
+  ['marketing', 'HornIcon'],
+  ['tasks', 'SquareTickIcon'],
+  ['contracts', 'PaperIcon'],
+  ['touring-management', 'LocationIcon'],
+  ['system-admin', 'UserSettingIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg';
@@ -41,6 +55,7 @@ interface IconProps {
   strokeWidth?: string;
   stroke?: string;
   color?: string;
+  fill?: string;
   className?: string;
 }
 
@@ -51,6 +66,7 @@ export default function Icon({
   stroke,
   strokeWidth,
   color,
+  fill,
   className,
 }: IconProps) {
   if (!IconNameMap.get(iconName)) return null;
@@ -66,6 +82,7 @@ export default function Icon({
       role="img"
       strokeWidth={strokeWidth}
       stroke={stroke}
+      fill={fill}
       data-testid={testId}
       color={color}
       width={getSizeForVariant(variant)}
