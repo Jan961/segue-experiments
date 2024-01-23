@@ -3,10 +3,11 @@ import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { addWidthAsPerContent, applyGradientFillToColumn } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
-import { dateToSimple, getWeekNumsToDateMap } from 'services/dateService';
+import { dateToSimple } from 'services/dateService';
 import { TasksFilterType } from 'state/tasks/tasksFilterState';
 import { group } from 'radash';
 import { TourTask } from '@prisma/client';
+import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 
 const getTaskStatusFromProgress = (progress: number) => {
   if (progress === 0) {
