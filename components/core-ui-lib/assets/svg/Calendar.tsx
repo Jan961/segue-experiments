@@ -1,17 +1,18 @@
-import React from 'react';
+import { SVGProps } from '../types';
 
-export default function CalendarIcon(props: React.SVGProps<SVGSVGElement>) {
+export default function CalendarIcon(props: SVGProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="21" height="22" viewBox="0 0 21 22" fill="none" {...props}>
       <path
         d="M1.16553 6.13732H20.0008M16.2337 4.34456V0.759033M4.93257 4.34456V0.759033M1.16553 2.55179H20.0008V20.4794H1.16553V2.55179Z"
-        stroke="#21345B"
+        stroke={props.stroke || '#21345B'}
+        fill={props.fill || '#FFF'}
         strokeOpacity="0.8"
         strokeWidth="2"
       />
       <path
         d="M15.2919 8.82642H17.1754V10.6192H15.2919V8.82642ZM15.2919 12.4119H17.1754V14.2047H15.2919V12.4119ZM11.5248 8.82642H13.4083V10.6192H11.5248V8.82642ZM10.5831 11.5156H14.3501V15.1011H10.5831V11.5156ZM7.75777 8.82642H9.64129V10.6192H7.75777V8.82642ZM7.75777 12.4119H9.64129V14.2047H7.75777V12.4119ZM3.99072 12.4119H5.87424V14.2047H3.99072V12.4119ZM11.5248 15.9975H13.4083V17.7902H11.5248V15.9975ZM7.75777 15.9975H9.64129V17.7902H7.75777V15.9975ZM3.99072 15.9975H5.87424V17.7902H3.99072V15.9975Z"
-        fill="#21345B"
+        fill={props.fill || '#21345B'}
         fillOpacity="0.8"
       />
     </svg>
