@@ -4,9 +4,10 @@ import MenuItem from './MenuItem';
 
 interface HierarchicalMenuProps {
   options: MenuOption[];
+  onClick?: (o: MenuOption) => void;
 }
 
-export default function HierarchicalMenu({ options = [] }: HierarchicalMenuProps) {
+export default function HierarchicalMenu({ options = [], onClick }: HierarchicalMenuProps) {
   const [itemOptions, setItemOptions] = useState(options || []);
 
   useEffect(() => {
@@ -19,7 +20,7 @@ export default function HierarchicalMenu({ options = [] }: HierarchicalMenuProps
   return (
     <div className="px-3 py-2">
       {itemOptions.map((o) => (
-        <MenuItem key={o.value} option={o} />
+        <MenuItem key={o.value} option={o} onClick={onClick} />
       ))}
     </div>
   );

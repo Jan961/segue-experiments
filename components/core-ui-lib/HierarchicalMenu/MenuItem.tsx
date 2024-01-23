@@ -6,12 +6,13 @@ import classNames from 'classnames';
 
 export interface MenuItemProps {
   option: MenuOption;
+  onClick?: (o: MenuOption) => void;
 }
 
-export default memo(function MenuItem({ option }: MenuItemProps) {
-  const { label, value, options, groupHeader } = option;
+export default memo(function MenuItem({ option, onClick }: MenuItemProps) {
+  const { label, value, options, groupHeader, icon } = option;
   const isLeafNode = !options || options.length === 0;
-  const baseClass = 'text-[0.9375rem]';
+  const baseClass = 'text-[0.9375rem] cursor-pointer';
   const labelClass = groupHeader ? 'text-[1.0625rem] font-bold' : isLeafNode ? '' : 'font-bold';
   const [itemOptions, setItemOptions] = useState(options || []);
 
@@ -20,8 +21,13 @@ export default memo(function MenuItem({ option }: MenuItemProps) {
   }, [options]);
 
   return isLeafNode ? (
-    <div className="flex items-center gap-3">
-      <span className={classNames(baseClass, labelClass)}>{label}</span>
+    <div className="py-1 flex items-center gap-3">
+      {icon && (
+        <Icon iconName={icon.default.iconName} stroke={icon.default.stroke} fill={icon.default.fill} variant="lg" />
+      )}
+      <span onClick={() => onClick(option)} className={classNames(baseClass, labelClass)}>
+        {label}
+      </span>
     </div>
   ) : (
     <div>
@@ -29,8 +35,18 @@ export default memo(function MenuItem({ option }: MenuItemProps) {
         {({ open }) => (
           <>
             <div className="flex items-center gap-3">
+              {icon && (
+                <Icon
+                  iconName={open ? icon.active.iconName : icon.default.iconName}
+                  stroke={open ? icon.active.stroke : icon.default.stroke}
+                  fill={open ? icon.active.fill : icon.default.fill}
+                  variant="lg"
+                />
+              )}
               <Disclosure.Button className="flex w-full items-center">
-                <span className={classNames(baseClass, labelClass)}>{label}</span>
+                <span onClick={() => onClick(option)} className={classNames(baseClass, labelClass)}>
+                  {label}
+                </span>
                 <span className="flex items-center ml-2">
                   <Icon
                     iconName="chevron-down"

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
 import HierarchicalMenu from './HierarchicalMenu';
+import { MenuOption } from './types';
 
 const meta: Meta<typeof HierarchicalMenu> = {
   component: HierarchicalMenu,
@@ -10,16 +11,31 @@ const meta: Meta<typeof HierarchicalMenu> = {
 export default meta;
 type Story = StoryObj<typeof HierarchicalMenu>;
 
-const values = [
-  { label: 'Home', value: '/home' },
+const homeIcon = {
+  default: { iconName: 'home', stroke: '', fill: '' },
+  active: { iconName: 'home', stroke: '', fill: '' },
+};
+const bookingsIcon = {
+  default: { iconName: 'bookings', stroke: '', fill: '' },
+  active: { iconName: 'bookings', stroke: '', fill: '#EC6255' },
+};
+const marketingIcon = {
+  default: { iconName: 'marketing', stroke: '', fill: '#21345B' },
+  active: { iconName: 'marketing', stroke: '#41A29A', fill: '#21345B' },
+};
+
+const values: MenuOption[] = [
+  { label: 'Home', value: '/home', icon: homeIcon },
   {
     label: 'Bookings',
     value: '/bookings',
+    icon: bookingsIcon,
     options: [{ label: 'Manage Shows/Productions', value: '/bookings/shows-productions' }],
   },
   {
     label: 'Marketing',
     value: '/marketing',
+    icon: marketingIcon,
     options: [
       {
         label: 'Marketing Home',
