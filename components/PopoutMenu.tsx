@@ -1,7 +1,6 @@
 import {
   faBullhorn,
   faCalendarCheck,
-  faChartLine,
   faClipboardList,
   faClose,
   faFileSignature,
@@ -15,6 +14,9 @@ import { useRecoilValue } from 'recoil';
 import { tourJumpState } from 'state/booking/tourJumpState';
 import Link from 'next/link';
 import useStrings from 'hooks/useStrings';
+import Icon from './core-ui-lib/Icon';
+import classNames from 'classnames';
+import { IconName } from './core-ui-lib/Icon/Icon';
 
 export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
@@ -32,19 +34,25 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       label: getStrings('global.home'),
       link: '/',
       icon: faHome,
+      iconName: 'home',
       activeColor: 'text-primary-blue',
+      classNames: '',
     },
     {
       label: getStrings('global.bookings'),
       link: noTourSelected ? '/bookings' : `/bookings/${path}`,
       icon: faCalendarCheck,
+      iconName: 'bookings',
       activeColor: 'text-primary-blue',
+      classNames: '',
     },
     {
       label: getStrings('global.marketing'),
       link: noTourSelected ? '/marketing' : `/marketing/${path}`,
       icon: faBullhorn,
+      iconName: 'marketing',
       activeColor: 'text-primary-green',
+      classNames: '',
       subItems: [
         { label: 'Venue Data Status', link: '/marketing/venue/status/' },
         {
@@ -61,33 +69,35 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
       label: getStrings('global.contracts'),
       link: noTourSelected ? '/contracts' : `/contracts/${path}`,
       icon: faFileSignature,
+      iconName: 'contracts',
       activeColor: 'text-primary-pink',
-    },
-    {
-      label: getStrings('global.reports'),
-      link: '/reports',
-      icon: faChartLine,
-      activeColor: 'text-primary-blue',
+      classNames: '',
     },
     {
       label: getStrings('global.tasks'),
       link: '/tasks',
       icon: faClipboardList,
+      iconName: 'tasks',
       activeColor: 'text-primary-purple',
+      classNames: '',
     },
 
     {
       label: getStrings('global.touringManagement'),
       link: '/touring',
       icon: faLocationDot,
+      iconName: 'touring-management',
       activeColor: 'text-primary-navy',
+      classNames: '',
     },
 
     {
       label: getStrings('global.admin'),
       link: '/admin',
       icon: faUserGear,
+      iconName: 'system-admin',
       activeColor: 'text-primary-orange',
+      classNames: 'h-3 w-2',
     },
   ];
 
@@ -113,6 +123,7 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
           <SegueLogo />
         </div>
         <div className="overflow-y-auto overflow-x-hidden max-h-screen" style={{ height: 'calc(100vh - 88px)' }}>
+          {/* <HierarchicalMenu options={menuItems} /> */}
           <ul>
             {menuItems.map((menuItem, index) => {
               return (
@@ -126,7 +137,12 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
                   >
                     {menuItem.icon && (
                       <span className="mr-2">
-                        <FontAwesomeIcon icon={menuItem.icon} className="h-5 w-5" />
+                        <Icon
+                          iconName={menuItem.iconName as IconName}
+                          fill={'#ffffff'}
+                          variant="md"
+                          className={classNames('')}
+                        />
                       </span>
                     )}
                     {menuItem.label}

@@ -45,7 +45,7 @@ const IconNameMap = new Map([
   ['system-admin', 'UserSettingIcon'],
 ]);
 
-type variant = 'xs' | 'sm' | 'md' | 'lg';
+type variant = 'xs' | 'sm' | 'md' | 'lg' | '2xl';
 
 interface IconProps {
   iconName: IconName;

@@ -1,11 +1,13 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Icon from 'components/core-ui-lib/Icon';
+import { IconName } from 'components/core-ui-lib/Icon/Icon';
 import Link from 'next/link';
 
 type ItemDefinition = {
   disabled?: boolean;
   title: string;
   icon: IconProp;
+  iconName?: IconName;
   route?: string;
   color: string;
   onClick?: () => void;
@@ -18,7 +20,7 @@ interface SwitchBoardItemProps {
 export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
   const content = (
     <>
-      <FontAwesomeIcon icon={link.icon as IconProp} className="text-5xl" />
+      <Icon iconName={link.iconName} variant="2xl" fill={'#ffffff'} className="text-5xl h-11 w-11" />
       <span className="text-center text-base pt-2">{link.title}</span>
     </>
   );
