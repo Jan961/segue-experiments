@@ -47,8 +47,8 @@ const IconNameMap = new Map([
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | '2xl';
 
-interface IconProps {
-  iconName: IconName;
+export interface IconProps {
+  iconName: IconName | string;
   onClick?: () => void;
   testId?: string;
   variant?: variant;
