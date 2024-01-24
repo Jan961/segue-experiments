@@ -1,13 +1,12 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import Icon from 'components/core-ui-lib/Icon';
-import { IconName } from 'components/core-ui-lib/Icon/Icon';
 import Link from 'next/link';
 
 type ItemDefinition = {
   disabled?: boolean;
   title: string;
   icon: IconProp;
-  iconName?: IconName;
+  iconName?: string;
   route?: string;
   color: string;
   onClick?: () => void;

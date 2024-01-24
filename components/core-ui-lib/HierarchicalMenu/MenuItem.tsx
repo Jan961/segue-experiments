@@ -62,7 +62,7 @@ export default memo(function MenuItem({ option, onClick }: MenuItemProps) {
 
             <Disclosure.Panel className="ml-7 mt-1">
               {itemOptions.map((option) => (
-                <MenuItem key={option.value} option={option} />
+                <MenuItem key={option.value} option={option} onClick={onClick} />
               ))}
             </Disclosure.Panel>
           </>
