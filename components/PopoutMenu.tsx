@@ -1,25 +1,27 @@
-import {
-  faBullhorn,
-  faCalendarCheck,
-  faChartLine,
-  faClipboardList,
-  faClose,
-  faFileSignature,
-  faHome,
-  faLocationDot,
-  faUserGear,
-} from '@fortawesome/free-solid-svg-icons';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { SegueLogo } from './global/SegueLogo';
 import { useRecoilValue } from 'recoil';
 import { tourJumpState } from 'state/booking/tourJumpState';
-import Link from 'next/link';
 import useStrings from 'hooks/useStrings';
+import HierarchicalMenu from './core-ui-lib/HierarchicalMenu';
+import { MenuOption } from './core-ui-lib/HierarchicalMenu/types';
+import { useRouter } from 'next/router';
+import {
+  bookingsIcon,
+  contractsIcon,
+  homeIcon,
+  marketingIcon,
+  systemAdminIcon,
+  tasksIcon,
+  tourManagementIcon,
+} from 'config/global';
 
 export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   // If no path, you need to add a tourJump to the page. This is a global state
   const tourJump = useRecoilValue(tourJumpState);
   const getStrings = useStrings();
+  const router = useRouter();
 
   const { selected, tours } = tourJump;
   const tour = tours.filter((x) => x.Id === selected)[0];
@@ -30,68 +32,78 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
   const menuItems = [
     {
       label: getStrings('global.home'),
-      link: '/',
-      icon: faHome,
+      value: '/',
+      icon: homeIcon,
       activeColor: 'text-primary-blue',
+      classNames: '',
     },
     {
       label: getStrings('global.bookings'),
-      link: noTourSelected ? '/bookings' : `/bookings/${path}`,
-      icon: faCalendarCheck,
+      value: noTourSelected ? '/bookings' : `/bookings/${path}`,
+      icon: bookingsIcon,
       activeColor: 'text-primary-blue',
+      classNames: '',
     },
     {
       label: getStrings('global.marketing'),
-      link: noTourSelected ? '/marketing' : `/marketing/${path}`,
-      icon: faBullhorn,
+      value: noTourSelected ? '/marketing' : `/marketing/${path}`,
+      icon: marketingIcon,
       activeColor: 'text-primary-green',
-      subItems: [
-        { label: 'Venue Data Status', link: '/marketing/venue/status/' },
+      classNames: '',
+      options: [
+        { label: 'Venue Data Status', value: '/marketing/venue/status/' },
         {
           label: 'Venue History Entry',
-          link: `/${data.Tour}/marketing/venue/status`,
+          value: `/${data.Tour}/marketing/venue/status`,
         },
-        { label: 'Sales Entry', link: '/marketing/sales/entry' },
-        { label: 'Final Figures Entry', link: '/marketing/sales/final' },
-        { label: 'Load Sales History', link: '/marketing/sales/history-load' },
-        { label: 'Global Activities', link: '/marketing/activity/global' },
+        { label: 'Sales Entry', value: '/marketing/sales/entry' },
+        { label: 'Final Figures Entry', value: '/marketing/sales/final' },
+        { label: 'Load Sales History', value: '/marketing/sales/history-load' },
+        { label: 'Global Activities', value: '/marketing/activity/global' },
       ],
     },
     {
       label: getStrings('global.contracts'),
-      link: noTourSelected ? '/contracts' : `/contracts/${path}`,
-      icon: faFileSignature,
+      value: noTourSelected ? '/contracts' : `/contracts/${path}`,
+      icon: contractsIcon,
       activeColor: 'text-primary-pink',
-    },
-    {
-      label: getStrings('global.reports'),
-      link: '/reports',
-      icon: faChartLine,
-      activeColor: 'text-primary-blue',
+      classNames: '',
     },
     {
       label: getStrings('global.tasks'),
-      link: '/tasks',
-      icon: faClipboardList,
+      value: '/tasks',
+      icon: tasksIcon,
       activeColor: 'text-primary-purple',
+      classNames: '',
+      options: [
+        { label: 'Production Task Lists', value: '/tasks/all' },
+        { label: 'Master Task List', value: '/tasks/master' },
+      ],
     },
 
     {
       label: getStrings('global.touringManagement'),
-      link: '/touring',
-      icon: faLocationDot,
+      value: '/touring',
+      icon: tourManagementIcon,
       activeColor: 'text-primary-navy',
+      classNames: '',
     },
 
     {
       label: getStrings('global.admin'),
-      link: '/admin',
-      icon: faUserGear,
+      value: '/admin',
+      icon: systemAdminIcon,
       activeColor: 'text-primary-orange',
+      classNames: 'h-3 w-2',
     },
   ];
 
   const close = () => setMenuIsOpen(!menuIsOpen);
+  const onMenuItemClick = (option: MenuOption) => {
+    if (!option?.options?.length) {
+      router.push(option.value);
+    }
+  };
 
   return (
     <>
@@ -112,50 +124,11 @@ export const PopoutMenu = ({ menuIsOpen, setMenuIsOpen }: any, data?: any) => {
           </button>
           <SegueLogo />
         </div>
-        <div className="overflow-y-auto overflow-x-hidden max-h-screen" style={{ height: 'calc(100vh - 88px)' }}>
-          <ul>
-            {menuItems.map((menuItem, index) => {
-              return (
-                <li key={index}>
-                  <Link
-                    className={`flex items-center text-sm py-2 px-4
-                  size-md text-ellipsis whitespace-nowrap rounded hover:text-gray-900
-                  hover:bg-gray-100 transition duration-300
-                  ease-in-out text-white`}
-                    href={menuItem.link}
-                  >
-                    {menuItem.icon && (
-                      <span className="mr-2">
-                        <FontAwesomeIcon icon={menuItem.icon} className="h-5 w-5" />
-                      </span>
-                    )}
-                    {menuItem.label}
-                  </Link>
-                  {menuItem.subItems && (
-                    <ul className="pl-10 text-sm">
-                      {menuItem.subItems.map((subMenuItem, subIndex) => {
-                        const isSubItemActive = data?.menuLabel === subMenuItem.label;
-                        return (
-                          <li key={subIndex}>
-                            <Link
-                              className={`flex items-center text-sm py-1 px-2 
-                            text-ellipsis whitespace-nowrap rounded
-                             hover:text-gray-900 hover:bg-gray-100 
-                             transition duration-300 ease-in-out 
-                             ${isSubItemActive ? menuItem.activeColor : 'text-white'}`}
-                              href={subMenuItem.link}
-                            >
-                              {subMenuItem.label}
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+        <div
+          className="overflow-y-auto overflow-x-hidden max-h-screen text-primary-white"
+          style={{ height: 'calc(100vh - 88px)' }}
+        >
+          <HierarchicalMenu options={menuItems} onClick={onMenuItemClick} />
         </div>
       </div>
     </>
