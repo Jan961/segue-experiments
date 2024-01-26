@@ -1,16 +1,16 @@
 import * as React from 'react';
-import TourJumpMenu from '../global/nav/TourJumpMenu';
+import ProductionJumpMenu from '../global/nav/ProductionJumpMenu';
 
 // This needs to be passed from the template
 // let show = "ST1";
-// let tour = "22";
+// let production = "22";
 
 interface props {
   title: string;
   searchFilter?: string;
   setSearchFilter?: (filter: string) => void;
   color?: string;
-  tourJump?: boolean;
+  productionJump?: boolean;
   filterComponent?: any;
   page?: string;
   titleClassName?: string;
@@ -18,11 +18,11 @@ interface props {
 
 const GlobalToolbar = ({
   title,
-  titleClassName,
-  tourJump = true,
+  productionJump = true,
   color = 'text-primary-blue',
   filterComponent,
   children,
+  titleClassName,
 }: React.PropsWithChildren<props>) => {
   const [filtersOpen, setFiltersOpen] = React.useState(false);
 
@@ -53,11 +53,12 @@ const GlobalToolbar = ({
           </button>
         </div>
       )}
-      {tourJump ? (
-        <div className="bg-white border-primary-border rounded-md border">
+      {productionJump ? (
+        <div className="bg-white drop-shadow-md inline-block rounded-md">
           <div className="rounded-l-md">
             <div className="flex items-center">
-              <TourJumpMenu />
+              <p className="mx-2">Set Production</p>
+              <ProductionJumpMenu />
             </div>
           </div>
         </div>

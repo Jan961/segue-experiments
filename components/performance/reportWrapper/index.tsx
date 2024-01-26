@@ -4,9 +4,7 @@ import swr from 'swr';
 import axios from 'axios';
 import ReportForm from '../reportForm';
 import Image from 'next/image';
-import { BookingInfo } from 'types/bookingInfo';
 import { PerformanceInfo } from 'types/performanceInfo';
-import { ReportInfo } from 'types/reportInfo';
 import { CustomSelect } from './CustomSelect';
 import { dateToSimple } from 'services/dateService';
 import { format } from 'date-fns';
@@ -25,16 +23,16 @@ interface ReportWrapperProps {
 }
 
 function ReportWrapper({ children }: ReportWrapperProps) {
-  const [tourId, setTourId] = useState('');
+  const [productionId, setProductionId] = useState('');
   const [bookingId, setBookingId] = useState('');
   const [performanceId, setPerformanceId] = useState('');
 
   /**
-   * Whenever the user selects a tour from the tour dropdown, we fetch
+   * Whenever the user selects a production from the production dropdown, we fetch
    * the booking options to populate the 'Set Booking' dropdown.
    */
   const { data: bookings, isLoading: isLoadingBookings } = swr<any[]>(
-    tourId !== '' ? `/api/tours/read/venues/${tourId}` : null,
+    productionId !== '' ? `/api/productions/read/venues/${productionId}` : null,
     fetcher,
     swrOptions,
   );
@@ -81,7 +79,7 @@ function ReportWrapper({ children }: ReportWrapperProps) {
 
   /**
    * There is no 'image' field in the JSON files you provided.
-   * If it should be present in 'show.json,' then the 'tourInfo' should include it to make it available here.
+   * If it should be present in 'show.json,' then the 'productionInfo' should include it to make it available here.
    */
   const reportImageUrl = '/show-img.jpg';
 
@@ -108,10 +106,10 @@ function ReportWrapper({ children }: ReportWrapperProps) {
 
           <div className="flex-1 mt-8 md:mt-0">
             <CustomSelect
-              label="Set Tour:"
-              value={tourId}
+              label="Set Production:"
+              value={productionId}
               onChange={(e) => {
-                setTourId(e.target.value);
+                setProductionId(e.target.value);
                 setBookingId('');
                 setPerformanceId('');
               }}
@@ -126,7 +124,7 @@ function ReportWrapper({ children }: ReportWrapperProps) {
                 setBookingId(e.target.value);
                 setPerformanceId('');
               }}
-              disabled={tourId === ''}
+              disabled={productionId === ''}
               options={bookings?.map((venue) => (
                 <option key={venue.BookingId} value={venue.BookingId}>
                   {`${venue?.Code} ${venue?.Name}, ${venue?.Town} ${dateToSimple(venue?.booking?.FirstDate)}`}

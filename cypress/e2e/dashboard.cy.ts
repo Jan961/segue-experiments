@@ -14,7 +14,7 @@ describe('Signed in', () => {
       'Reports',
       'User Account',
       '',
-      'Touring Management',
+      'Production Management',
     ];
     // open dashboard page
     cy.navigateToDashboard();

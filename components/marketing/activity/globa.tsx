@@ -1,10 +1,7 @@
-import * as React from 'react';
-import { faBook, faEdit, faPlus, faSquareXmark, faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const activitiy = [
   {
-    tour: 'C12233',
+    production: 'C12233',
     title: 'Grand Hall',
     type: 'townsville',
     start: 'England',
@@ -24,7 +21,7 @@ const GlobalActivites = () => (
               scope="col"
               className="py-3.5 pl-4 pr-3 rounded-tl-md text-left text-sm font-semibold text-white sm:pl-6"
             >
-              Tour
+              Production
             </th>
             <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">
               Activity Title
@@ -48,9 +45,9 @@ const GlobalActivites = () => (
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {activitiy.map((venue) => (
-            <tr key={venue.tour}>
+            <tr key={venue.production}>
               <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-white sm:w-auto sm:max-w-none sm:pl-6">
-                {venue.tour}
+                {venue.production}
               </td>
               <td className="hidden px-3 py-4 text-sm text-gray-500 lg:table-cell">{venue.title}</td>
               <td className="hidden px-3 py-4 text-sm text-gray-500 sm:table-cell">{venue.type}</td>

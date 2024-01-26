@@ -1,10 +1,10 @@
 import { Booking, Prisma } from '@prisma/client';
-import { addDays, differenceInDays, parseISO } from 'date-fns';
+import { addDays, differenceInDays } from 'date-fns';
 import prisma from 'lib/prisma';
 import { omit } from 'radash';
 
-export const updateBookingVenue = (date, venueID, tourID) => {
-  fetch(`/api/tours/booking/update/${tourID}/${venueID}/${date}`).then((res) => res.json());
+export const updateBookingVenue = (date, venueID, productionID) => {
+  fetch(`/api/productions/booking/update/${productionID}/${venueID}/${date}`).then((res) => res.json());
   return true;
 };
 
@@ -63,13 +63,13 @@ export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: num
   });
 };
 
-export const getSaleableBookings = async (TourId: number) => {
+export const getSaleableBookings = async (ProductionId: number) => {
   return await prisma.booking.findMany({
     where: {
       DateBlock: {
         is: {
-          TourId,
-          Name: 'Tour',
+          ProductionId,
+          Name: 'Production',
         },
       },
       VenueId: {
@@ -80,7 +80,7 @@ export const getSaleableBookings = async (TourId: number) => {
       Venue: true,
       DateBlock: {
         include: {
-          Tour: {
+          Production: {
             include: {
               Show: true,
             },

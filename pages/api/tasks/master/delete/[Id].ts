@@ -14,7 +14,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       res.status(200).json({ ok: true, message: 'Master task delete successful' });
     } catch (error) {
       console.log(error);
-      return res.status(500).json({ error: 'Error updating TourTask' });
+      return res.status(500).json({ error: 'Error updating ProductionTask' });
     }
   } else {
     res.status(405).json({ error: 'Method not allowed' });

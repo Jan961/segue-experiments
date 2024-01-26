@@ -1,10 +1,7 @@
-import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-const show = 'ST1'; // This needs to be passed from the template
-const tour = '22';
 
 const Toolbar = () => (
   <div>

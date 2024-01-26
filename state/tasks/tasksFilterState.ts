@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
 
 export type TasksFilterType = {
-  tour?: number;
+  production?: number;
   taskText?: string;
   status?: string;
   startDueDate?: string;
@@ -10,7 +10,7 @@ export type TasksFilterType = {
 };
 
 const intialState: TasksFilterType = {
-  tour:null,
+  production:null,
   taskText: '',
   status: null,
   startDueDate: '',

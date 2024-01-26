@@ -64,9 +64,9 @@ export default async function handle(req, res) {
     );
     const commonData = formattedData
       .filter((x: TSalesView) => x.BookingId === bookingIds[0])
-      .map(({ SetBookingWeekNum, SetTourWeekDate, SetIsFinalFigures }) => ({
+      .map(({ SetBookingWeekNum, SetProductionWeekDate, SetIsFinalFigures }) => ({
         SetBookingWeekNum,
-        SetTourWeekDate,
+        SetProductionWeekDate,
         SetIsFinalFigures,
       }));
     commonData.sort((a, b) => {
@@ -75,7 +75,7 @@ export default async function handle(req, res) {
       return t1 - t2;
     });
 
-    const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum, SetTourWeekDate, SetIsFinalFigures }) =>
+    const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
       formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
     );
 
@@ -86,7 +86,7 @@ export default async function handle(req, res) {
           ...acc,
           {
             SetBookingWeekNum: x.SetBookingWeekNum,
-            SetTourWeekDate: x.SetTourWeekDate,
+            SetProductionWeekDate: x.SetProductionWeekDate,
             SetIsFinalFigures: x.SetIsFinalFigures,
             data: rearrangeArray({ arr: result[idx], bookingIds }),
           },

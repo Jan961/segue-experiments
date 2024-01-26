@@ -20,7 +20,7 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const Layout = ({ children, title = 'Your tour assistant', flush = false }: Props) => {
+const Layout = ({ children, title = 'Your production assistant', flush = false }: Props) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const state = useRecoilValue(globalState);

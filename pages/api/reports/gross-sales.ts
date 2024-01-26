@@ -6,12 +6,12 @@ import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 type SALES_SUMMARY = {
-  TourId: number;
-  FullTourCode: string;
+  ProductionId: number;
+  FullProductionCode: string;
   ShowName: string;
-  TourStartDate: string;
-  TourEndDate: string;
-  TourWeekNum: number;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
+  ProductionWeekNum: number;
   EntryDate: string;
   Location: string | null;
   EntryId: number;
@@ -82,7 +82,7 @@ const firstRowFormatting = ({ worksheet }: { worksheet: any }) => {
   worksheet.getRow(1).alignment = { horizontal: 'left' };
 };
 
-const getKey = ({ FullTourCode, ShowName, EntryDate }) => `${FullTourCode} - ${ShowName} - ${EntryDate}`;
+const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 const formatDate = (date) => moment(date).format('DD/MM/YY');
 
 const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
@@ -92,14 +92,14 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
 };
 
 const handler = async (req, res) => {
-  const { tourId } = JSON.parse(req.body) || {};
+  const { productionId } = JSON.parse(req.body) || {};
 
-  if (!tourId) {
+  if (!productionId) {
     throw new Error('Params are missing');
   }
   const conditions: Prisma.Sql[] = [];
-  if (tourId) {
-    conditions.push(Prisma.sql` TourId=${tourId}`);
+  if (productionId) {
+    conditions.push(Prisma.sql` ProductionId=${productionId}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
 
@@ -109,8 +109,8 @@ const handler = async (req, res) => {
   const formattedData = data.map((x) => ({
     ...x,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-    TourStartDate: moment(x.TourStartDate).format('YYYY-MM-DD'),
-    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD'),
+    ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
+    ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
 
   const worksheet = workbook.addWorksheet('My Sales', {
@@ -118,7 +118,7 @@ const handler = async (req, res) => {
   });
 
   if (!formattedData?.length) {
-    const filename = 'Tour Gross Sales.xlsx';
+    const filename = 'Production Gross Sales.xlsx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
@@ -128,8 +128,8 @@ const handler = async (req, res) => {
     return;
   }
 
-  const { ShowName, FullTourCode } = data[0];
-  worksheet.addRow([`${ShowName} (${FullTourCode})`]);
+  const { ShowName, FullProductionCode } = data[0];
+  worksheet.addRow([`${ShowName} (${FullProductionCode})`]);
   const date = new Date();
   worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]);
 
@@ -137,7 +137,7 @@ const handler = async (req, res) => {
 
   const map: { [key: string]: SALES_SUMMARY } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
 
-  const { TourStartDate: fromDate, TourEndDate: toDate } = data[0];
+  const { ProductionStartDate: fromDate, ProductionEndDate: toDate } = data[0];
 
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
 
@@ -186,7 +186,7 @@ const handler = async (req, res) => {
       cellColor.push({ cell: { rowNo: 6, colNo }, cellColor: COLOR_HEXCODE.ORANGE });
     }
 
-    const key = getKey({ FullTourCode, ShowName, EntryDate: dateInIncomingFormat });
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
     const value: SALES_SUMMARY = map[key];
 
     if (!value) {
@@ -224,7 +224,7 @@ const handler = async (req, res) => {
   }
 
   for (let i = 0; i <= 2; i++) {
-    r4.push('Tour Totals');
+    r4.push('Production Totals');
     r5.push('');
     if (i === 0) {
       r6.push(`(£1 = ${conversionRate || '0.8650'})`);
@@ -323,7 +323,7 @@ const handler = async (req, res) => {
     });
   });
 
-  const filename = 'Tour Gross Sales.xlsx';
+  const filename = 'Production Gross Sales.xlsx';
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 

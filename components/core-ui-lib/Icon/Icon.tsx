@@ -23,7 +23,9 @@ export type IconName =
   | 'touring-management'
   | 'system-admin'
   | 'menu'
-  | 'exit';
+  | 'exit'
+  | 'production-management'
+  | 'system-admin';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -44,6 +46,7 @@ const IconNameMap = new Map([
   ['tasks', 'SquareTickIcon'],
   ['contracts', 'PaperIcon'],
   ['touring-management', 'LocationIcon'],
+  ['production-management', 'LocationIcon'],
   ['system-admin', 'UserSettingIcon'],
   ['menu', 'MenuIcon'],
   ['exit', 'ExitIcon'],

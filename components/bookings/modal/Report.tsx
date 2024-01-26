@@ -1,19 +1,21 @@
+import { ToolbarButton } from '../ToolbarButton';
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { Spinner } from 'components/global/Spinner';
 
-export default function Report({ visible, onClose, TourId }: { TourId: number, visible: boolean, onClose:()=>void}) {
-  const [tourSummary, setTourSummary] = useState<any[]>([]);
+export default function Report({ ProductionId }: { ProductionId: number }) {
+  const [productionSummary, setProductionSummary] = useState<any[]>([]);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [loading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>('Oops! Something went wrong. Please try again after some time');
-  const fetchTourSummary = useCallback((tourCode) => {
+  const [error] = useState<string>('Oops! Something went wrong. Please try again after some time');
+  const fetchProductionSummary = useCallback((productionCode) => {
     setIsLoading(true);
     axios
-      .get(`/api/tours/summary/${tourCode}`)
+      .get(`/api/productions/summary/${productionCode}`)
       .then((response: any) => {
         if (response?.data?.ok) {
-          setTourSummary(response.data.data);
+          setProductionSummary(response.data.data);
         }
       })
       .catch((error) => {
@@ -22,15 +24,18 @@ export default function Report({ visible, onClose, TourId }: { TourId: number, v
       .finally(() => setIsLoading(false));
   }, []);
   useEffect(() => {
-    if (TourId) fetchTourSummary(TourId);
-  }, [TourId]);
+    if (ProductionId) fetchProductionSummary(ProductionId);
+  }, [ProductionId]);
   return (
     <>
+      <ToolbarButton onClick={() => setShowModal(true)} submit>
+        Production Summary
+      </ToolbarButton>
       <StyledDialog
         className="w-1/4 max-w-full max-h-[95vh] relative"
-        open={visible}
-        onClose={onClose}
-        title="Tour Summary"
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        title="Production Summary"
         width="xl"
       >
         {loading && (
@@ -39,9 +44,9 @@ export default function Report({ visible, onClose, TourId }: { TourId: number, v
           </div>
         )}
         <div className="py-4 overflow-y-auto max-h-[80vh]">
-          {tourSummary.length ? (
+          {productionSummary.length ? (
             <div className="grid grid-cols-1">
-              {tourSummary.map((summaryGroup, i) => (
+              {productionSummary.map((summaryGroup, i) => (
                 <div key={i}>
                   {summaryGroup.map((summaryItem, j) => (
                     <div

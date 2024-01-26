@@ -27,7 +27,7 @@ type BOOKING = {
   VenueTown: string;
 };
 
-type TOUR = {
+type PRODUCTION = {
   Id: number;
   Code: string;
   ShowId: number;
@@ -35,8 +35,8 @@ type TOUR = {
   ShowName: string;
 };
 
-type TOUR_DATA = {
-  tour: TOUR;
+type PRODUCTION_DATA = {
+  production: PRODUCTION;
   bookings: BOOKING[];
 };
 
@@ -86,18 +86,18 @@ const getBooleanAsString = (val: boolean | null): string => {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { tourId, showId, tourCode, options } = JSON.parse(req.body);
+    const { productionId, showId, productionCode, options } = JSON.parse(req.body);
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { TourId: tourId });
+    const access = await checkAccess(email, { ProductionId: productionId });
     if (!access) return res.status(401).end();
 
     const data = await prisma.DateBlock.findFirst({
       where: {
-        ...(tourId && { TourId: tourId }),
-        Name: 'Tour',
+        ...(productionId && { ProductionId: productionId }),
+        Name: 'Production',
         ...(showId && {
-          Tour: {
+          Production: {
             is: {
               ShowId: showId,
             },
@@ -117,18 +117,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             FirstDate: 'asc',
           },
         },
-        Tour: {
+        Production: {
           include: {
             Show: true,
           },
         },
       },
     });
-    const tour = {
-      ...pick(data.Tour, ['Id', 'Code']),
-      ShowId: data.Tour.Show.Id,
-      ShowCode: data.Tour.Show.Code,
-      ShowName: data.Tour.Show.Name,
+    const production = {
+      ...pick(data.Production, ['Id', 'Code']),
+      ShowId: data.Production.Show.Id,
+      ShowCode: data.Production.Show.Code,
+      ShowName: data.Production.Show.Name,
     };
     const bookings = data.Booking.map((booking) => {
       const venue = booking.Venue;
@@ -142,18 +142,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     const workbook = new ExcelJS.Workbook();
-    const response: TOUR_DATA = { tour, bookings };
+    const response: PRODUCTION_DATA = { production, bookings };
     const worksheet = workbook.addWorksheet('SELECTED VENUES', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', ySplit: 5 }],
     });
 
-    const { Code: TourCode, ShowCode, ShowName } = response?.tour || {};
+    const { Code: ProductionCode, ShowCode, ShowName } = response?.production || {};
 
-    worksheet.addRow([`${ShowCode + TourCode || ''} (${ShowName || ''}) VENUES : ALL`]);
+    worksheet.addRow([`${ShowCode + ProductionCode || ''} (${ShowName || ''}) VENUES : ALL`]);
     const date = new Date();
     worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
-    worksheet.addRow(['TOUR', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']);
+    worksheet.addRow(['PRODUCTION', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']);
     worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']);
     worksheet.addRow([]);
 
@@ -169,7 +169,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
 
       worksheet.addRow([
-        ShowCode + TourCode,
+        ShowCode + ProductionCode,
         ShowDate,
         VenueCode,
         VenueName,
@@ -221,7 +221,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-    const filename = `Venues_${tourCode || options}.xlsx`;
+    const filename = `Venues_${productionCode || options}.xlsx`;
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 

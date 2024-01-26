@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ExcelIcon from '../../global/icons/excelIcon';
 import PdfIcon from '../../global/icons/pdfIcon';
 import CsvIcon from '../../global/icons/csvIcon';
@@ -9,7 +9,7 @@ export default function Salesreport() {
   const [inputs, setInputs] = useState({
     fromDate: null,
     toDate: null,
-    showTour: null,
+    showProduction: null,
     salesWeekNo: null,
     noWeeks: null,
     options: null,
@@ -23,15 +23,9 @@ export default function Salesreport() {
     //
   }
 
-  function resetForm() {
-    alert('reset');
-  }
-
   function setMonday() {
     inputs.toDate = '20-10-2022';
   }
-
-  function clearField() {}
 
   return (
     <>
@@ -63,18 +57,18 @@ export default function Salesreport() {
                 {/* body */}
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-row m-10">
-                    <label htmlFor="showTour" className="">
-                      Show/Tour
+                    <label htmlFor="showProduction" className="">
+                      Show/Production
                     </label>
                     <select
-                      id="showTour"
-                      name="showTour"
+                      id="showProduction"
+                      name="showProduction"
                       onChange={handleOnChange}
                       required
-                      value={inputs.showTour}
+                      value={inputs.showProduction}
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                     >
-                      <option>Active Tours</option>
+                      <option>Active Productions</option>
                     </select>
                   </div>
                   <div className="flex flex-row m-10">
@@ -112,7 +106,7 @@ export default function Salesreport() {
 
                   <div className="flex flex-row m-10">
                     <label htmlFor="fromDate" className="">
-                      From Tour Date
+                      From Production Date
                     </label>
 
                     <input
@@ -144,7 +138,7 @@ export default function Salesreport() {
                   </div>
                   <div className="flex flex-row m-10">
                     <label htmlFor="Name" className="">
-                      To Tour Date
+                      To Production Date
                     </label>
 
                     <input

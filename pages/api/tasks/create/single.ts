@@ -1,20 +1,20 @@
-import { TourTaskDTO } from 'interfaces';
+import { ProductionTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const task = req.body as TourTaskDTO;
-    const { TourId } = task;
+    const task = req.body as ProductionTaskDTO;
+    const { ProductionId } = task;
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { TourId });
+    const access = await checkAccess(email, { ProductionId });
     if (!access) return res.status(401).end();
 
-    const createResult = await prisma.tourTask.create({
+    const createResult = await prisma.productionTask.create({
       data: {
-        TourId: task.TourId,
+        ProductionId: task.ProductionId,
         Code: task.Code,
         Name: task.Name,
         Priority: task.Priority,
@@ -24,14 +24,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AssignedToUserId: task.AssignedToUserId,
         StartByWeekNum: task.StartByWeekNum,
         CompleteByWeekNum: task.CompleteByWeekNum,
-        StartByPostTour: task.StartByPostTour,
-        CompleteByPostTour: task.CompleteByPostTour,
+        StartByPostProduction: task.StartByPostProduction,
+        CompleteByPostProduction: task.CompleteByPostProduction,
       },
     });
 
     res.json(createResult);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error creating TourTask' });
+    res.status(500).json({ error: 'Error creating ProductionTask' });
   }
 }

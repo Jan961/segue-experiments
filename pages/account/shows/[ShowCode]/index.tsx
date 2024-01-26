@@ -1,9 +1,9 @@
 import { GetServerSideProps } from 'next';
-import { Tours } from 'components/shows/Tours';
-import { getTourPageProps } from 'services/TourService';
+import { Productions } from 'components/shows/Productions';
+import { getProductionPageProps } from 'services/ProductionService';
 
-const TourSelection = (props: any) => <Tours {...props} />;
+const ProductionSelection = (props: any) => <Productions {...props} />;
 
-export default TourSelection;
+export default ProductionSelection;
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => getTourPageProps(ctx);
+export const getServerSideProps: GetServerSideProps = async (ctx) => getProductionPageProps(ctx);

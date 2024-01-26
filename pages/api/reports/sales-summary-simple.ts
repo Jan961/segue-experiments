@@ -20,7 +20,7 @@ import {
   makeTextBoldOfNRows,
   groupBasedOnVenueWeeksKeepingVenueCommon,
   CONSTANTS,
-  getUniqueAndSortedHeaderTourColumns,
+  getUniqueAndSortedHeaderProductionColumns,
   getMapKey,
   formatWeek,
   LEFT_PORTION_KEYS,
@@ -54,22 +54,22 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 
 // TODO
 // Decimal upto 2 places fix
-// Tour row height fix
+// Production row height fix
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { tourId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {};
+  const { productionId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {};
 
   const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { TourId: tourId });
+  const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
 
   const workbook = new ExcelJS.Workbook();
   const conditions: Prisma.Sql[] = [];
-  if (tourId) {
-    conditions.push(Prisma.sql`TourId = ${parseInt(tourId)}`);
+  if (productionId) {
+    conditions.push(Prisma.sql`ProductionId = ${parseInt(productionId)}`);
   }
   if (fromWeek && toWeek) {
-    conditions.push(Prisma.sql`setTourWeekDate BETWEEN ${fromWeek} AND ${toWeek}`);
+    conditions.push(Prisma.sql`setProductionWeekDate BETWEEN ${fromWeek} AND ${toWeek}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: TSalesView[] =
@@ -79,14 +79,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     .filter((x) => x.SaleTypeName === SALES_TYPE_NAME.GENERAL_SALES)
     .map(
       ({
-        BookingTourWeekNum,
+        BookingProductionWeekNum,
         BookingFirstDate,
         VenueTown,
         VenueName,
         Value,
         VenueCurrencySymbol,
         SetBookingWeekNum,
-        SetTourWeekDate,
+        SetProductionWeekDate,
         ConversionRate,
         SetIsCopy,
         SetBrochureReleased,
@@ -95,16 +95,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         TotalCapacity,
         Seats,
         NotOnSalesDate,
-        SetTourWeekNum,
+        SetProductionWeekNum,
       }) => ({
-        BookingTourWeekNum,
+        BookingProductionWeekNum,
         BookingFirstDate,
         VenueTown,
         VenueName,
         Value: Value?.toNumber?.(),
         VenueCurrencySymbol,
         SetBookingWeekNum,
-        SetTourWeekDate,
+        SetProductionWeekDate,
         ConversionRate,
         SetIsCopy,
         SetBrochureReleased,
@@ -113,15 +113,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         TotalCapacity,
         Seats: Seats?.toNumber?.(),
         NotOnSalesDate,
-        SetTourWeekNum,
+        SetProductionWeekNum,
       }),
     );
   const finalFormattedValues: TRequiredFieldsFinalFormat[] = jsonArray.map((x: TRequiredFields) => ({
     ...x,
-    Week: formatWeek(x.BookingTourWeekNum),
+    Week: formatWeek(x.BookingProductionWeekNum),
     FormattedValue: x.Value ? `${x.VenueCurrencySymbol}${x.Value}` : '',
     Value: x.Value || 0,
-    FormattedSetTourWeekNum: formatWeek(x.SetTourWeekNum),
+    FormattedSetProductionWeekNum: formatWeek(x.SetProductionWeekNum),
     FormattedFinalFiguresValue: x.FinalFiguresValue || 0,
     Day: moment(x.BookingFirstDate).format('dddd'),
     Date: x.BookingFirstDate,
@@ -145,23 +145,23 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     );
 
   // Logic for headers
-  const uniqueTourColumns: UniqueHeadersObject[] = getUniqueAndSortedHeaderTourColumns(finalFormattedValues);
-  const headerWeekNums: string[] = uniqueTourColumns.map((x) => x.FormattedSetTourWeekNum);
-  const headerWeekDates: string[] = uniqueTourColumns.map((x) => x.SetTourWeekDate);
+  const uniqueProductionColumns: UniqueHeadersObject[] = getUniqueAndSortedHeaderProductionColumns(finalFormattedValues);
+  const headerWeekNums: string[] = uniqueProductionColumns.map((x) => x.FormattedSetProductionWeekNum);
+  const headerWeekDates: string[] = uniqueProductionColumns.map((x) => x.SetProductionWeekDate);
 
   // Adding Heading
-  worksheet.addRow([salesReportName({ tourId, isWeeklyReport, isSeatsDataRequired, data })]);
-  // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullTourCode + ')' : 'Dummy Report'
+  worksheet.addRow([salesReportName({ productionId, isWeeklyReport, isSeatsDataRequired, data })]);
+  // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullProductionCode + ')' : 'Dummy Report'
   worksheet.addRow([]);
 
   // Adding Table Columns
   const columns: string[] = [
-    'Tour',
+    'Production',
     '',
     '',
     '',
     '',
-    ...uniqueTourColumns.map((x) => x.FormattedSetTourWeekNum),
+    ...uniqueProductionColumns.map((x) => x.FormattedSetProductionWeekNum),
     CONSTANTS.CHANGE_VS,
     ...(isSeatsDataRequired ? [CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SEATS, CONSTANTS.RUN_SALES] : []),
   ];
@@ -172,7 +172,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     'Date',
     'Town',
     'Venue',
-    ...uniqueTourColumns.map((x) => convertDateFormat(x.SetTourWeekDate)),
+    ...uniqueProductionColumns.map((x) => convertDateFormat(x.SetProductionWeekDate)),
     'Last Week',
     ...(isSeatsDataRequired ? ['Sold', 'Capacity', 'vs Capacity'] : []),
   ]);
@@ -235,8 +235,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const values: number[] = [];
     for (let i = 0, col = 6; i < variableColsLength; i++, col++) {
       const key: string = getMapKeyForValue(rowAsJSON, {
-        FormattedSetTourWeekNum: headerWeekNums[i],
-        SetTourWeekDate: headerWeekDates[i],
+        FormattedSetProductionWeekNum: headerWeekNums[i],
+        SetProductionWeekDate: headerWeekDates[i],
       });
       const val: TRequiredFieldsFinalFormat = mapOfCreatedKeyAndModifiedFetchedValue[key];
       let totalObjToPush: Pick<TotalForSheet, 'Value' | 'ConversionRate' | 'VenueCurrencySymbol'> = {
@@ -328,8 +328,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // For Color Coding
     for (let i = 0, col = 6; i < variableColsLength; i++, col++) {
       const key: string = getMapKeyForValue(rowAsJSON, {
-        FormattedSetTourWeekNum: headerWeekNums[i],
-        SetTourWeekDate: headerWeekDates[i],
+        FormattedSetProductionWeekNum: headerWeekNums[i],
+        SetProductionWeekDate: headerWeekDates[i],
       });
       const val: TRequiredFieldsFinalFormat = mapOfCreatedKeyAndModifiedFetchedValue[key];
       if (val) {
@@ -342,7 +342,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             SetBrochureReleased: val.SetBrochureReleased,
             BookingStatusCode: val.BookingStatusCode,
             Date: val.Date,
-            SetTourWeekDate: headerWeekDates[i],
+            SetProductionWeekDate: headerWeekDates[i],
             NotOnSalesDate: rowAsJSON.NotOnSalesDate,
           },
           meta: { weekCols: variableColsLength + 1 },
@@ -399,7 +399,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       })
     : [];
   const weekWiseDataInEuro = headerWeekNums.map((weekNum) =>
-    getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO }),
+    getCurrencyWiseTotal({ totalForWeeks, setProductionWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO }),
   );
   console.log('weekWiseDataInEuro', weekWiseDataInEuro);
   if (weekWiseDataInEuro.length) {
@@ -431,7 +431,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       })
     : [];
   const weekWiseDataInPound = headerWeekNums.map((weekNum) =>
-    getCurrencyWiseTotal({ totalForWeeks, setTourWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND }),
+    getCurrencyWiseTotal({ totalForWeeks, setProductionWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND }),
   );
   worksheet.addRow([
     '',
@@ -460,7 +460,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     ? getSeatsDataForTotal({ seatsDataForEuro, seatsDataForPound })
     : [];
   const weekWiseGrandTotalInPound = headerWeekNums.map((weekNum) =>
-    getWeekWiseGrandTotalInPound({ totalForWeeks, setTourWeekNum: weekNum }),
+    getWeekWiseGrandTotalInPound({ totalForWeeks, setProductionWeekNum: weekNum }),
   );
   worksheet.addRow([
     '',

@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { JsConfigPathsPlugin } from 'next/dist/build/webpack/plugins/jsconfig-paths-plugin';
 
 import axios from 'axios';
 
@@ -225,7 +223,7 @@ export default function ViewForm() {
                         </div>
                       ) : (
                         <div>
-                          {/* This is a Standard User / Tour User Account */}
+                          {/* This is a Standard User / Production User Account */}
                           <label htmlFor="source" className="">
                             Scope of Change
                           </label>

@@ -29,8 +29,8 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, selectedB
         setInputs(
           data
             ?.sort((a, b) => (a.BookingId === selectedBookingId ? -1 : b.BookingId === selectedBookingId ? 1 : 0))
-            .reduce((inputs, tour, i) => {
-              inputs[tour.BookingId] = i + 1;
+            .reduce((inputs, production, i) => {
+              inputs[production.BookingId] = i + 1;
               return inputs;
             }, {}),
         );
@@ -51,10 +51,10 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, selectedB
       .filter((id) => inputs[id])
       .map((id) => parseInt(id, 10))
       .filter((id) => id);
-    const tours: any[] = bookingIds.map((bookingId: any) =>
+    const productions: any[] = bookingIds.map((bookingId: any) =>
       bookings.find((booking) => booking.BookingId === bookingId),
     );
-    onSubmit(bookingIds, tours);
+    onSubmit(bookingIds, productions);
     onClose();
   };
   const handleOnChange = (e) => {
@@ -81,7 +81,7 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, selectedB
           className="max-w-full relative max-h-full"
           open={true}
           onClose={() => onClose()}
-          title="Select Archived Tours for Display"
+          title="Select Archived Productions for Display"
           width="xl"
         >
           {loading && (
@@ -94,7 +94,7 @@ const BookingSelection = ({ onClose, salesByType, venueCode, showCode, selectedB
               {bookings.map((booking, i) => (
                 <div className="flex items-center mt-6" key={i}>
                   <label htmlFor="date" className="text-lg font-medium mr-4">
-                    {booking.FullTourCode}(WEEKS: {booking.TourLengthWeeks})
+                    {booking.FullProductionCode}(WEEKS: {booking.ProductionLengthWeeks})
                   </label>
                   <select
                     className="block rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

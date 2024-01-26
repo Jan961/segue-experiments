@@ -107,7 +107,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
             performanceId: report?.Performance?.Id,
             performanceDate: report?.Performance?.Date?.toISOString?.(),
             performanceTime: report?.Performance?.Time?.toISOString?.(),
-            showName: report?.Performance?.Booking?.DateBlock?.Tour?.Show?.Name,
+            showName: report?.Performance?.Booking?.DateBlock?.Production?.Show?.Name,
             venue: report?.Performance?.Booking?.Venue?.Name,
           })) || [],
       },

@@ -144,7 +144,7 @@
   },
   {
     "DateTypeId": 14,
-    "Name": "Start of Tour",
+    "Name": "Start of Production",
     "IsAWorkday": false,
     "IsATravelDay": false,
     "IsARehearsalDay": false,
@@ -155,7 +155,7 @@
   },
   {
     "DateTypeId": 15,
-    "Name": "End of Tour",
+    "Name": "End of Production",
     "IsAWorkday": false,
     "IsATravelDay": false,
     "IsARehearsalDay": false,
@@ -166,7 +166,7 @@
   },
   {
     "DateTypeId": 16,
-    "Name": "Potential Tour Extension",
+    "Name": "Potential Production Extension",
     "IsAWorkday": false,
     "IsATravelDay": false,
     "IsARehearsalDay": false,

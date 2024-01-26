@@ -10,10 +10,10 @@ import { venueState } from 'state/booking/venueState';
 import { performanceState } from 'state/booking/performanceState';
 import { DateTypeState, dateTypeState } from 'state/booking/dateTypeState';
 import { OtherState, otherState } from 'state/booking/otherState';
-import { TourJump, tourJumpState } from 'state/booking/tourJumpState';
+import { ProductionJump, productionJumpState } from 'state/booking/productionJumpState';
 import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
 import { VenueRole, venueRoleState } from 'state/marketing/venueRoleState';
-import { TourState, tourState } from 'state/tasks/tourState';
+import { ProductionState, productionState } from 'state/tasks/productionState';
 import { BulkSelectionState, bulkSelectionState } from 'state/tasks/bulkSelectionState';
 import { UserState, userState } from 'state/account/userState';
 import { MasterTaskStateType, masterTaskState } from 'state/tasks/masterTaskState';
@@ -28,11 +28,11 @@ import { GlobalStateType, globalState, } from 'state/global/globalState';
 
 export type InitialState = Partial<{
   global?: {
-    tourJump?: TourJump;
+    productionJump?: ProductionJump;
     userPrefs?: GlobalStateType;
   };
   tasks?: {
-    tours?: TourState;
+    productions?: ProductionState;
     bulkSelection?: BulkSelectionState;
     masterTask?: MasterTaskStateType;
     tasksFilter?: TasksFilterType;
@@ -65,11 +65,11 @@ const states: {
   account: Record<keyof InitialState['account'], RecoilState<any>>;
 } = {
   global: {
-    tourJump: tourJumpState,
+    productionJump: productionJumpState,
     userPrefs: globalState,
   },
   tasks: {
-    tours: tourState,
+    productions: productionState,
     bulkSelection: bulkSelectionState,
     masterTask: masterTaskState,
     tasksFilter: tasksfilterState

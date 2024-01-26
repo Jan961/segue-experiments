@@ -1,124 +1,9 @@
-import {
-  faBook,
-  faCopy,
-  faEdit,
-  faEnvelopeOpen,
-  faPlus,
-  faSquareXmark,
-  faUser,
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import upload from '../../../pages/api/fileUpload/upload';
-import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { forceReload } from '../../../utils/forceReload';
+
+import { useState } from 'react';
 import { csvFileService } from '../../../services/csvFileService';
-const fs = require('fs');
-const { parse } = require('csv-parse');
-
-type cvsItem = {
-  TourCode: string;
-  VenueCode: string;
-  VenueName: string;
-  ShowDate: string;
-  SalesFiguresDate: string;
-  FinalFigures: string;
-  NumSchoolSeatsSold: string;
-  SoldSchoolSeatsValue: string;
-  NumSchoolSeatsReserved: string;
-  ReservedSchoolSeatsValue: string;
-  NumSeatsSold: string;
-  SoldSeatsValue: string;
-  NumSeatsReserved: string;
-  ReservedSeatsValue: string;
-  PromoterHoldsSeats: string;
-  PromoterHoldsValue: string;
-  VenueHoldsSeats: string;
-  VenueHoldsValue: string;
-};
-
-const columns = [
-  {
-    field: 'TourCode',
-    headerName: 'TourCode',
-  },
-  {
-    field: 'VenueCode',
-    headerName: 'VenueCode',
-  },
-  {
-    field: 'VenueName',
-    headerName: 'VenueName',
-  },
-  {
-    field: 'ShowDate',
-    headerName: 'ShowDate',
-  },
-  {
-    field: 'SalesFiguresDate',
-    headerName: 'SalesFiguresDate',
-  },
-  {
-    field: 'FinalFigures',
-    headerName: 'FinalFigures',
-  },
-  {
-    field: 'NumSchoolSeatsSold',
-    headerName: 'NumSchoolSeatsSold',
-  },
-  {
-    field: 'SoldSchoolSeatsValue',
-    headerName: 'SoldSchoolSeatsValue',
-  },
-  {
-    field: 'NumSchoolSeatsReserved',
-    headerName: 'NumSchoolSeatsReserved',
-  },
-  {
-    field: 'ReservedSchoolSeatsValue',
-    headerName: 'ReservedSchoolSeatsValue',
-  },
-  {
-    field: 'NumSeatsSold',
-    headerName: 'NumSeatsSold',
-  },
-  {
-    field: 'SoldSeatsValue',
-    headerName: 'SoldSeatsValue',
-  },
-  {
-    field: 'NumSeatsReserved',
-    headerName: 'NumSeatsReserved',
-  },
-  {
-    field: 'ReservedSeatsValue',
-    headerName: 'ReservedSeatsValue',
-  },
-  {
-    field: 'PromoterHoldsSeats',
-    headerName: 'PromoterHoldsSeats',
-  },
-  {
-    field: 'PromoterHoldsValue',
-    headerName: 'PromoterHoldsValue',
-  },
-  {
-    field: 'VenueHoldsSeats',
-    headerName: 'VenueHoldsSeats',
-  },
-  {
-    field: 'VenueHoldsValue',
-    headerName: 'VenueHoldsValue',
-  },
-];
-
-const recordCount = 0;
 
 export default function Historyload() {
   const [fileUpload, setFileUpload] = useState(null);
-  const [createObjectURL, setCreateObjectURL] = useState(null);
-  const [csvData, setCsvData] = useState<cvsItem[]>([]);
-  const [filename, setFilename] = useState('');
   const [csvArray, setCsvArray] = useState([]);
 
   const [status, setStatus] = useState({
@@ -142,14 +27,10 @@ export default function Historyload() {
         FileUpload: fileUpload,
       });
     } else {
-      // @ts-ignore
-      setStatus(false);
+      setStatus({submitted:false, submitting:false, info:{error:true, msg:"Error"}});
     }
   };
 
-  const handleClose = () => {
-    forceReload();
-  };
 
   const handleOnChange = (e) => {
     // e.persist();
@@ -157,7 +38,6 @@ export default function Historyload() {
     if (e.target.files && e.target.files[0]) {
       const i = e.target.files[0];
       setFileUpload(i);
-      setCreateObjectURL(URL.createObjectURL(i));
     }
     setInputs((prev) => ({
       ...prev,
@@ -202,6 +82,7 @@ export default function Historyload() {
 
         setCsvArray(newArray);
       };
+      processCSV(records)
       alert(csvArray.length);
     }
 
@@ -221,15 +102,15 @@ export default function Historyload() {
         <div className={'mb-1'}>
           <h1 className={''}>Overwrite sales data</h1>
           <p>
-            Select a CSV file to upload. This will overwrite existing sales data for the specified ‘Show/Tour, Venue,
-            Date’. If data does not currently exist for that ‘Show/Tour, Venue, Date’ then the information in the CSV
+            Select a CSV file to upload. This will overwrite existing sales data for the specified ‘Show/Production, Venue,
+            Date’. If data does not currently exist for that ‘Show/Production, Venue, Date’ then the information in the CSV
             file will be uploaded to the system without affecting current data.
           </p>
         </div>
         <form onSubmit={handleOnSubmit}>
           <div className="columns-1">
             <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5">
-              <label htmlFor="settour" className=" sr-only">
+              <label htmlFor="setproduction" className=" sr-only">
                 Select File
               </label>
               <div className="mt-1 sm:col-span-2 sm:mt-0">

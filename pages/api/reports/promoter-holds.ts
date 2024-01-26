@@ -8,8 +8,8 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 type TPromoter = {
-  TourId: number;
-  FullTourCode: string;
+  ProductionId: number;
+  FullProductionCode: string;
   VenueCode: string;
   VenueName: string;
   BookingId: number;
@@ -68,17 +68,17 @@ export const makeRowTextBoldAndAllignLeft = ({
 
 // TODO - Issue with Performance Time
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { tourCode, fromDate, toDate, venue, tourId } = JSON.parse(req.body) || {};
+  const { productionCode, fromDate, toDate, venue, productionId } = JSON.parse(req.body) || {};
 
   const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { TourId: tourId });
+  const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
 
   const workbook = new ExcelJS.Workbook();
 
   const conditions: Prisma.Sql[] = [];
-  if (tourId) {
-    conditions.push(Prisma.sql`TourId = ${tourId}`);
+  if (productionId) {
+    conditions.push(Prisma.sql`ProductionId = ${productionId}`);
   }
   if (venue) {
     conditions.push(Prisma.sql`VenueCode = ${venue}`);
@@ -97,7 +97,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   worksheet.addRow(['PROMOTER HOLDS']);
   const date = new Date();
   worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
-  worksheet.addRow(['TOUR', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']);
+  worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']);
   worksheet.addRow([
     'CODE',
     'CODE',
@@ -117,7 +117,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   ]);
 
   data.forEach((x) => {
-    const tourCode = x.FullTourCode || '';
+    const productionCode = x.FullProductionCode || '';
     const venueCode = x.VenueCode || '';
     const venueName = x.VenueName || '';
     const showDate = x.PerformanceDate ? moment(x.PerformanceDate).format('DD/MM/YY') : '';
@@ -134,7 +134,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const venueConfirmation = x.CompAllocationVenueConfirmationNotes || '';
 
     worksheet.addRow([
-      tourCode,
+      productionCode,
       venueCode,
       venueName,
       showDate,
@@ -190,7 +190,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-  const filename = `Promoter_Holds_${tourCode || tourId ? '_' + (tourCode || tourId) : ''}${
+  const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${
     fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
   }.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

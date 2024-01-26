@@ -9,7 +9,7 @@ interface FormInputUploadProps {
 export const FormInputUpload = ({ name, onChange, children, label }: PropsWithChildren<FormInputUploadProps>) => {
   return (
     <div className="mb-2">
-      <label htmlFor="Tour Logo" className="">
+      <label htmlFor="Production Logo" className="">
         {label}
       </label>
       <div className="flex gap-x-4">

@@ -4,13 +4,13 @@ import { DateDistancesDTO } from 'services/venueService';
 export type DistanceState = {
   stops: DateDistancesDTO[];
   outdated: boolean;
-  tourCode?: string;
+  productionCode?: string;
 };
 
 const intialState: DistanceState = {
   stops: [],
   outdated: true,
-  tourCode: undefined,
+  productionCode: undefined,
 };
 
 export const distanceState = atom({

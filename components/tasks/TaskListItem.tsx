@@ -1,4 +1,4 @@
-import { TourTaskDTO } from 'interfaces';
+import { ProductionTaskDTO } from 'interfaces';
 import getTaskDateStatusColor from 'utils/getTaskDateStatus';
 import { Table } from 'components/global/table/Table';
 import React, { useMemo } from 'react';
@@ -12,8 +12,8 @@ import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 import { dateToSimple } from 'services/dateService';
 
 interface TaskListItemProps {
-  task: TourTaskDTO;
-  onTaskChange?: (task: TourTaskDTO) => void;
+  task: ProductionTaskDTO;
+  onTaskChange?: (task: ProductionTaskDTO) => void;
 }
 
 const TaskListItem = ({ task }: TaskListItemProps) => {

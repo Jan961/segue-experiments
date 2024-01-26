@@ -38,7 +38,7 @@ interface IBooking {
   SalesNotes: null | unknown;
   ShowDate: string;
   TicketPriceNotes: null | unknown;
-  TourId: number;
+  ProductionId: number;
   TravelTime: null | unknown;
   TravelTimeMins: null | unknown;
   Venue: null | unknown;

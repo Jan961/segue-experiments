@@ -4,13 +4,13 @@ import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 import { Spinner } from 'components/global/Spinner';
 
 type Props = {
-  activeTours: any[];
+  activeProductions: any[];
 };
-export default function SelectedVenues({ activeTours }: Props) {
+export default function SelectedVenues({ activeProductions }: Props) {
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [inputs, setInputs] = useState({
-    tour: 'ALL',
+    production: 'ALL',
     options: 'ALL',
   });
 
@@ -21,27 +21,27 @@ export default function SelectedVenues({ activeTours }: Props) {
   });
 
   const downloadReport = async () => {
-    const selectedTour = activeTours.find((tour) => tour.Id === parseInt(inputs.tour));
+    const selectedProduction = activeProductions.find((production) => production.Id === parseInt(inputs.production));
     setLoading(true);
     fetch('/api/reports/venues', {
       method: 'POST',
       body: JSON.stringify({
-        tourCode: selectedTour ? `${selectedTour?.ShowCode}${selectedTour?.Code}` : null,
-        tourId: parseInt(selectedTour?.Id, 10),
-        showId: selectedTour?.ShowId,
+        productionCode: selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null,
+        productionId: parseInt(selectedProduction?.Id, 10),
+        showId: selectedProduction?.ShowId,
         options: inputs.options,
       }),
     })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
-          const tourName: string = selectedTour?.name;
+          const productionName: string = selectedProduction?.name;
           let suggestedName: string | any[] = response.headers.get('Content-Disposition');
           if (suggestedName) {
             suggestedName = suggestedName.match(/filename="(.+)"/);
             suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
           }
           if (!suggestedName) {
-            suggestedName = `${tourName}.xlsx`;
+            suggestedName = `${productionName}.xlsx`;
           }
           const content = await response.blob();
           if (content) {
@@ -57,7 +57,7 @@ export default function SelectedVenues({ activeTours }: Props) {
           }
           setShowModal(false);
           setInputs({
-            tour: 'ALL',
+            production: 'ALL',
             options: 'ALL',
           });
         }
@@ -117,30 +117,30 @@ export default function SelectedVenues({ activeTours }: Props) {
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">
-                      Tour
+                      Production
                     </label>
 
                     <select
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={inputs.tour}
-                      id="tour"
-                      name="tour"
+                      value={inputs.production}
+                      id="production"
+                      name="production"
                       onChange={handleOnChange}
                     >
                       <option key="ALL" value="ALL">
                         All
                       </option>
-                      {activeTours.map((tour) => (
-                        <option key={tour.Id} value={tour.Id}>
-                          {tour.ShowCode}
-                          {tour.Code} | {tour.ShowName}
+                      {activeProductions.map((production) => (
+                        <option key={production.Id} value={production.Id}>
+                          {production.ShowCode}
+                          {production.Code} | {production.ShowName}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div className="flex flex-col space-y-2 mt-4">
                     <label htmlFor="date" className="">
-                      Tour
+                      Production
                     </label>
                     <select
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"

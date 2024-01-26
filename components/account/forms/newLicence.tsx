@@ -1,16 +1,12 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { JsConfigPathsPlugin } from 'next/dist/build/webpack/plugins/jsconfig-paths-plugin';
 
 import axios from 'axios';
-import { Show, Tour } from '../../../interfaces';
 import { forceReload } from '../../../utils/forceReload';
 import { loggingService } from '../../../services/loggingService';
 import accountId from '../../../pages/account/update-details/[account-id]';
 
 export default function NewUser() {
   const [showModal, setShowModal] = React.useState(false);
-  const userLevel = 1; // TODO: get this from User
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -35,8 +31,11 @@ export default function NewUser() {
         emailAddress: inputs.emailAddress,
       });
     } else {
-      // @ts-ignore
-      setStatus(false);
+      setStatus({
+        submitted: true,
+        submitting: false,
+        info: { error: true, msg: 'Error' },
+      });
     }
   };
   const handleOnChange = (e) => {
@@ -61,7 +60,7 @@ export default function NewUser() {
       url: '/api/user/create',
       data: inputs,
     })
-      .then((response) => {
+      .then(() => {
         loggingService.logAction('Create User', 'Create User on  account: ' + accountId);
         handleServerResponse(true, 'Thank you, your message has been submitted.');
         handleClose();
@@ -74,17 +73,6 @@ export default function NewUser() {
   const handleClose = () => {
     setShowModal(false);
     forceReload();
-  };
-  const [image, setImage] = useState(null);
-  const [createObjectURL, setCreateObjectURL] = useState(null);
-
-  const uploadToClient = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      const i = event.target.files[0];
-
-      setImage(i);
-      setCreateObjectURL(URL.createObjectURL(i));
-    }
   };
 
   return (

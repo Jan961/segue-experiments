@@ -5,15 +5,15 @@ import { Spinner } from 'components/global/Spinner';
 import { defaultStatus } from './SalesSummarySimple';
 
 type Props = {
-  activeTours: any[];
+  activeProductions: any[];
 };
-export default function PromotorHolds({ activeTours }: Props) {
+export default function PromotorHolds({ activeProductions }: Props) {
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [inputs, setInputs] = useState({
     dateFrom: null,
     dateTo: null,
-    tour: null,
+    production: null,
     venue: null,
   });
   const [status, setStatus] = useState(defaultStatus);
@@ -28,7 +28,7 @@ export default function PromotorHolds({ activeTours }: Props) {
     setInputs({
       dateFrom: null,
       dateTo: null,
-      tour: null,
+      production: null,
       venue: null,
     });
     setVenues([]);
@@ -37,13 +37,13 @@ export default function PromotorHolds({ activeTours }: Props) {
   }
 
   const downloadReport = async () => {
-    const selectedTour = activeTours.find((tour) => tour.Id === parseInt(inputs.tour));
+    const selectedProduction = activeProductions.find((production) => production.Id === parseInt(inputs.production));
     setLoading(true);
     fetch('/api/reports/promoter-holds', {
       method: 'POST',
       body: JSON.stringify({
-        tourId: parseInt(inputs?.tour, 10),
-        tourCode: selectedTour ? `${selectedTour?.ShowCode}${selectedTour?.Code}` : null,
+        productionId: parseInt(inputs?.production, 10),
+        productionCode: selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null,
         fromDate: inputs.dateFrom,
         toDate: inputs.dateTo,
         venue: inputs.venue,
@@ -51,14 +51,14 @@ export default function PromotorHolds({ activeTours }: Props) {
     })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
-          const tourName: string = selectedTour?.name;
+          const productionName: string = selectedProduction?.name;
           let suggestedName: string | any[] = response.headers.get('Content-Disposition');
           if (suggestedName) {
             suggestedName = suggestedName.match(/filename="(.+)"/);
             suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
           }
           if (!suggestedName) {
-            suggestedName = `${tourName}.xlsx`;
+            suggestedName = `${productionName}.xlsx`;
           }
           const content = await response.blob();
           if (content) {
@@ -80,7 +80,7 @@ export default function PromotorHolds({ activeTours }: Props) {
           }));
           setShowModal(false);
           setInputs({
-            tour: null,
+            production: null,
             dateFrom: null,
             dateTo: null,
             venue: null,
@@ -107,11 +107,11 @@ export default function PromotorHolds({ activeTours }: Props) {
       [e.target.id]: e.target.value,
     }));
 
-    if (e.target.name === 'tour') {
-      // Load Venues for this tour
+    if (e.target.name === 'production') {
+      // Load Venues for this production
       setVenues([]);
       setLoading(true);
-      await fetch(`api/tours/read/venues/${e.target.value}`)
+      await fetch(`api/productions/read/venues/${e.target.value}`)
         .then((res) => res.json())
         .then((data) => data)
         .then((data) => {
@@ -161,21 +161,21 @@ export default function PromotorHolds({ activeTours }: Props) {
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">
-                      Tour
+                      Production
                     </label>
                     <select
                       required
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={inputs.tour}
-                      id="tour"
-                      name="tour"
+                      value={inputs.production}
+                      id="production"
+                      name="production"
                       onChange={handleOnChange}
                     >
-                      <option>Select a Tour</option>
-                      {activeTours.map((tour) => (
-                        <option key={tour.Id} value={tour.Id}>
-                          {tour.ShowCode}
-                          {tour.Code} | {tour.ShowName}
+                      <option>Select a Production</option>
+                      {activeProductions.map((production) => (
+                        <option key={production.Id} value={production.Id}>
+                          {production.ShowCode}
+                          {production.Code} | {production.ShowName}
                         </option>
                       ))}
                     </select>
