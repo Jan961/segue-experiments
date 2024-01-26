@@ -4,8 +4,14 @@ import { useClerk } from '@clerk/nextjs';
 import { userService } from 'services/user.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import { faHome, faUser, faSignOutAlt, IconDefinition, faBars } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faSignOutAlt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { SegueLogo } from './global/SegueLogo';
+// import { FormInputSelect } from './global/forms/FormInputSelect';
+// import { availableLocales } from 'config/global';
+// import { useRecoilState } from 'recoil';
+// import { globalState } from 'state/global/globalState';
+import useStrings from 'hooks/useStrings';
+import Icon from './core-ui-lib/Icon';
 
 interface HeaderNavButtonProps {
   icon: IconDefinition;
@@ -47,7 +53,9 @@ const HeaderNavButton = ({
 const HeaderNavDivider = () => <span className="mx-2">{' | '}</span>;
 
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
-  const [username, setUsername] = React.useState('My Account');
+  // const [username, setUsername] = React.useState('My Account');
+  // const [userPrefs, setUserPrefs] = useRecoilState(globalState);
+  const getString = useStrings();
   const router = useRouter();
   const { signOut } = useClerk();
 
@@ -56,12 +64,15 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
     await signOut();
     router.push('/');
   };
-  const user = userService.userValue;
-  React.useEffect(() => {
+  /* const user = userService.userValue;
+   React.useEffect(() => {
     if (user && user.name) {
       setUsername(user.name);
     }
-  }, [user]);
+  }, [user]); 
+   const onLocaleChange = (e: any) => {
+    setUserPrefs({ ...userPrefs, locale: e.target.value });
+  }; */
 
   return (
     <nav>
@@ -71,22 +82,27 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             onClick={() => setMenuIsOpen(!menuIsOpen)}
             className="flex items-center h-20 cursor-pointer hover:opacity-70"
           >
-            <div className="p-2 px-4 pr-2 text-primary-blue">
-              <FontAwesomeIcon size="xl" icon={faBars} />
+            <div id="menu-icon" className="p-2 px-4 pr-2 text-primary-blue">
+              <Icon iconName="menu" className="pointer-events-none" variant="xl" />
             </div>
-            <SegueLogo />
+            <SegueLogo className="w-36" />
           </div>
-          <div className="flex flex-row items-center pr-2">
+          <div className="flex flex-row items-center pr-10">
             <HeaderNavButton icon={faHome} href="/" className="bg-primary-green">
-              Home
+              {getString('global.home')}
             </HeaderNavButton>
+
+            {/* <div className="">
+              <FormInputSelect
+                onChange={onLocaleChange}
+                value={userPrefs.locale}
+                name={'locale'}
+                options={availableLocales}
+              />
+            </div> */}
             <HeaderNavDivider />
-            <HeaderNavButton icon={faUser} href="/accounts" className="bg-primary-orange">
-              {username}
-            </HeaderNavButton>
-            <HeaderNavDivider />
-            <HeaderNavButton icon={faSignOutAlt} onClick={logout} className="bg-purple-500">
-              Log Out
+            <HeaderNavButton icon={faSignOutAlt} onClick={logout} className="bg-primary-purple">
+              {getString('global.logOut')}
             </HeaderNavButton>
           </div>
         </div>

@@ -1,9 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 import Head from 'next/head';
 import { HeaderNav } from 'components/HeaderNav';
-import { PopoutMenu } from 'components/PopoutMenu';
+import PopoutMenu from 'components/PopoutMenu';
 import Router from 'next/router';
 import { Spinner } from './global/Spinner';
+import { calibri } from 'lib/fonts';
+import { useRecoilValue } from 'recoil';
+import { globalState } from 'state/global/globalState';
 
 type Props = {
   children?: ReactNode;
@@ -20,6 +23,7 @@ const LoadingOverlay = () => (
 const Layout = ({ children, title = 'Your tour assistant', flush = false }: Props) => {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const state = useRecoilValue(globalState);
 
   React.useEffect(() => {
     let loadingTimeout;
@@ -49,7 +53,7 @@ const Layout = ({ children, title = 'Your tour assistant', flush = false }: Prop
   }, []);
 
   return (
-    <div className="background-gradient font-primary">
+    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col`}>
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />
@@ -58,10 +62,10 @@ const Layout = ({ children, title = 'Your tour assistant', flush = false }: Prop
       <header className="flex flex-col">
         <HeaderNav menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen}></HeaderNav>
       </header>
-      <main className="h-full w-full flex flex-rows  ">
-        <PopoutMenu menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
+      <main className="h-full w-full flex flex-rows flex-1">
+        <PopoutMenu menuIsOpen={state.menuPinned || menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
         {isLoading && <LoadingOverlay />}
-        <div className={`${flush ? 'flex-1' : 'flex-1 px-4'}`}>{children}</div>
+        <div className={`${flush ? 'flex-1' : 'mt-24 flex-1 px-4'}`}>{children}</div>
       </main>
     </div>
   );

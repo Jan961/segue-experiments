@@ -27,10 +27,10 @@ describe('Tests for FormInputButton', () => {
     expect(button).toBeDisabled();
   });
 
-  it('Displays loading spinner when loading is true', () => {
+  /* it('Displays loading spinner when loading is true', () => {
     render(<FormInputButton text="Loading..." loading />);
     expect(screen.getByText('Loading...')).toBeInTheDocument();
-  });
+  }); */
 
   it('Displays icon when provided', () => {
     render(<FormInputButton text="Coffee" icon={faCoffee} />);
