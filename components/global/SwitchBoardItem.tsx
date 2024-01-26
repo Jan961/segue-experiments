@@ -10,6 +10,8 @@ type ItemDefinition = {
   route?: string;
   color: string;
   onClick?: () => void;
+  stroke?: string;
+  fill?: string;
 };
 
 interface SwitchBoardItemProps {
@@ -19,19 +21,25 @@ interface SwitchBoardItemProps {
 export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
   const content = (
     <>
-      <Icon iconName={link.iconName} variant="2xl" fill={'#ffffff'} className="text-5xl h-11 w-11" />
-      <span className="text-center text-base pt-2">{link.title}</span>
+      <Icon
+        iconName={link.iconName}
+        variant="2xl"
+        className="text-5xl h-10 w-10"
+        stroke={link.stroke}
+        fill={link.fill}
+      />
+      <span className="text-center text-base mt-2">{link.title}</span>
     </>
   );
 
   const baseClass = `
     ${link.disabled ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : `${link.color} hover:opacity-75`}
     shadow-lg
-    w-full
-    h-full
+    w-46
+    h-24
     flex flex-col items-center justify-center
     whitespace-nowrap
-    text-white text-center rounded-lg p-6`;
+    text-white text-center rounded-lg`;
 
   return (
     <li key={link.title}>
@@ -40,11 +48,7 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
           {content}
         </Link>
       )}
-      {link.onClick && (
-        <button onClick={link.onClick} className={baseClass}>
-          {content}
-        </button>
-      )}
+      {link.onClick && <button onClick={link.onClick}>{content}</button>}
     </li>
   );
 };

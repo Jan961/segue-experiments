@@ -28,7 +28,7 @@ export const marketingIcon = {
 
 export const contractsIcon = {
   default: { iconName: 'contracts', stroke: '', fill: '' },
-  active: { iconName: 'contracts', stroke: '#41A29A', fill: '#21345B' },
+  active: { iconName: 'contracts', stroke: '#0093C0', fill: '#21345B' },
 };
 
 export const tasksIcon = {
@@ -38,10 +38,10 @@ export const tasksIcon = {
 
 export const tourManagementIcon = {
   default: { iconName: 'touring-management', stroke: '', fill: '' },
-  active: { iconName: 'touring-management', stroke: '#41A29A', fill: '#21345B' },
+  active: { iconName: 'touring-management', stroke: '#7B568D;', fill: '#7B568D' },
 };
 
 export const systemAdminIcon = {
   default: { iconName: 'system-admin', stroke: '', fill: '#21345B' },
-  active: { iconName: 'system-admin', stroke: '#41A29A', fill: '#21345B' },
+  active: { iconName: 'system-admin', stroke: '#E94580', fill: '#21345B' },
 };
