@@ -41,7 +41,7 @@ export default function TourJumpMenu() {
   return (
     <>
       <Typeahead
-        className="border-0 !shadow-none"
+        className="border-0 !shadow-none w-80"
         onChange={goToTour}
         value={selected ? selected + '' : null}
         label="Production"
