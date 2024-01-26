@@ -208,6 +208,7 @@ module.exports = {
       colors: colorsConfig,
       width: {
         128: '32rem',
+        132: '38rem',
       },
       height: {
         128: '32rem',

@@ -2,7 +2,7 @@ import { SVGProps } from '../types';
 
 export default function UserSettingIcon(props: SVGProps) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="35" viewBox="0 0 34 35" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="35" viewBox="0 0 34 35" fill="none" {...props}>
       <path
         d="M13.3038 17.0717C9.14124 17.0717 5.76793 13.6984 5.76793 9.53586C5.76793 5.37331 9.14124 2 13.3038 2C17.4663 2 20.8396 5.37331 20.8396 9.53586C20.8396 13.6984 17.4663 17.0717 13.3038 17.0717ZM13.3038 17.0717C7.06209 17.0717 2 22.1338 2 28.3755"
         stroke={props.stroke || '#FFF'}

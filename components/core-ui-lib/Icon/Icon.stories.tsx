@@ -29,6 +29,7 @@ export const Primary: Story = {
         <Icon iconName="note" {...args} />
         <Icon iconName="note-filled" {...args} />
         <Icon iconName="home" {...args} />
+        <Icon iconName="menu" {...args} />
       </div>
     );
   },
