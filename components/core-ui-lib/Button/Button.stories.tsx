@@ -34,3 +34,27 @@ export const Tertiary: Story = {
     className: 'w-36',
   },
 };
+
+export const PrefixIcon: Story = {
+  args: {
+    text: 'Primary Button',
+    disabled: false,
+    className: 'w-36',
+    prefixIconName: 'edit',
+    iconProps:{
+      stroke:"#ffffff"
+    }
+  },
+};
+
+export const SuffixIcon: Story = {
+  args: {
+    text: 'Primary Button',
+    disabled: false,
+    className: 'w-36',
+    sufixIconName: 'edit',
+    iconProps:{
+      stroke:"#ffffff"
+    }
+  },
+};
