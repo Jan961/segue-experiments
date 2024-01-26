@@ -118,7 +118,7 @@ const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSid
     <Layout title="Booking | Segue" flush>
       <div className="grid grid-cols-12 mb-8">
         <div className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9">
-          <div className="">
+          <div className="px-4">
             <GlobalToolbar
               searchFilter={filter.venueText}
               setSearchFilter={(venueText) => setFilter({ venueText })}
