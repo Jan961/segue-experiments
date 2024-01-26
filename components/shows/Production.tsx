@@ -10,12 +10,12 @@ import { BreadCrumb } from 'components/global/BreadCrumb';
 import React from 'react';
 
 type Props = {
-  productions: ProductionDTO[];
-  code: string;
-  name: string;
+  productions?: ProductionDTO[];
+  code?: string;
+  name?: string;
 };
 
-export const Productions = ({ code, productions, name }: Props) => {
+export const Productions = ({ code, productions=[], name }: Props) => {
   const [query, setQuery] = React.useState('');
   const active = [];
   const archived = [];

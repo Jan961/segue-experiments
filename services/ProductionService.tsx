@@ -69,7 +69,7 @@ export const getProductionPageProps = async (ctx: any) => {
     },
   });
 
-  if (!showRaw) return { notFound: true, props: {} };
+  if (!showRaw) return { notFound: true, props: { productions: [], code:'', name:''} };
 
   const show = await getShowWithProductionsById(showRaw.Id);
   const productions = showProductionMapper(show);

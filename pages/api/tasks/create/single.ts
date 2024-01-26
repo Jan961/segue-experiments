@@ -24,8 +24,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AssignedToUserId: task.AssignedToUserId,
         StartByWeekNum: task.StartByWeekNum,
         CompleteByWeekNum: task.CompleteByWeekNum,
-        StartByPostProduction: task.StartByPostProduction,
-        CompleteByPostProduction: task.CompleteByPostProduction,
+        StartByIsPostProduction: task.StartByIsPostProduction,
+        CompleteByIsPostProduction: task.CompleteByIsPostProduction,
       },
     });
 

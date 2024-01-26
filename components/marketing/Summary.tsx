@@ -11,14 +11,14 @@ import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
 import { DescriptionList as DL } from 'components/global/DescriptionList';
 import moment from 'moment';
 
-export const formatCurrency = (ammount) => {
+export const formatCurrency = (amount:number, currency:string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
-    currency: 'GBP',
+    currency: currency || 'GBP',
     minimumFractionDigits: 0,
   });
 
-  return formatter.format(ammount);
+  return formatter.format(amount);
 };
 
 export const Summary = () => {

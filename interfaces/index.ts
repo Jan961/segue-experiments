@@ -53,7 +53,7 @@ export type ProductionTaskDTO = {
   FollowUp?: string;
   CreatedDate?: string;
   Status?: string;
-  Interval: string;
+  Interval?: string;
   AssignedBy?: string;
   AssignedTo?: string;
   StartByWeekNum?: number;

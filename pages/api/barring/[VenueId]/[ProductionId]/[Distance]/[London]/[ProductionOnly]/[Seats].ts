@@ -27,7 +27,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const result: any[] = await prisma.$queryRawUnsafe(`${query}`);
 
     let uniqueArray: any[] = [];
-    uniqueArray = [...new Set(result.map(JSON.stringify))].map(JSON.parse);
+    uniqueArray = result.reduce((acc, current) => {
+      const stringified = JSON.stringify(current);
+      if (!acc.some(item => JSON.stringify(item) === stringified)) {
+        acc.push(current);
+      }
+      return acc;
+    }, []);
+    
     res.json(uniqueArray);
   } catch (e) {
     console.log(e);
