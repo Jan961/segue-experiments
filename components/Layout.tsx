@@ -53,7 +53,7 @@ const Layout = ({ children, title = 'Your tour assistant', flush = false }: Prop
   }, []);
 
   return (
-    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col`}>
+    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col  px-6 pt-6`}>
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />

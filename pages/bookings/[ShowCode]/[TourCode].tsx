@@ -110,32 +110,42 @@ const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSid
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
 
-  const onClearFilters = ()=>{
-    setFilter(intialBookingFilterState)
-  }
+  const onClearFilters = () => {
+    setFilter(intialBookingFilterState);
+  };
 
   return (
     <Layout title="Booking | Segue" flush>
-      <div className="grid grid-cols-12">
+      <div className="grid grid-cols-12 mb-8">
         <div className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9">
           <div className="">
             <GlobalToolbar
               searchFilter={filter.venueText}
               setSearchFilter={(venueText) => setFilter({ venueText })}
+              titleClassName="text-primary-orange"
               title={'Bookings'}
             >
               <div className="flex items-center gap-2">
-                <Button disabled={!todayOnSchedule} text="Go To Today"  onClick={() => gotoToday()}></Button>
-                <Button  text="Tour Summary"  onClick={() => setShowTourSummary(true)}></Button>
-                {showTourSummary && <Report visible={showTourSummary} onClose={()=>setShowTourSummary(false)} TourId={TourId} />}
+                <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
+                <Button text="Tour Summary" onClick={() => setShowTourSummary(true)}></Button>
+                {showTourSummary && (
+                  <Report visible={showTourSummary} onClose={() => setShowTourSummary(false)} TourId={TourId} />
+                )}
               </div>
             </GlobalToolbar>
           </div>
-          <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
+          <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
             <MileageCalculator />
-            <Select onChange={(value)=>onChange({target:{id:'status', value}})} className="bg-white" label="Status" options={statusOptions} />
+            <Select
+              onChange={(value) => onChange({ target: { id: 'status', value } })}
+              value={filter.status}
+              className="bg-white"
+              label="Status"
+              options={statusOptions}
+            />
             <BookingFilter />
             <TextInput
+              id={'venueText'}
               placeHolder="search bookings..."
               className="!w-fit"
               iconName="search"

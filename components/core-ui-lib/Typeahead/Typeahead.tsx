@@ -55,7 +55,7 @@ export default function Typeahead({
 
   return (
     <div
-      className={`${className} !shadow-sm-shadow border border-primary-border rounded-md flex items-center text-sm`}
+      className={`shadow-sm-shadow border border-primary-border rounded-md flex items-center text-sm ${className} `}
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
     >
       {label && (
