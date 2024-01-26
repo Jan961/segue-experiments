@@ -7,7 +7,7 @@ export const Switchboard = () => {
     {
       title: getStrings('global.bookings'),
       route: '/bookings',
-
+      icon: null,
       iconName: 'bookings',
       stroke: '',
       fill: '',
@@ -16,6 +16,7 @@ export const Switchboard = () => {
     {
       title: getStrings('global.marketing'),
       route: '/marketing',
+      icon: null,
       stroke: '',
       fill: '#41A29A',
       iconName: 'marketing',
@@ -24,6 +25,7 @@ export const Switchboard = () => {
     {
       title: getStrings('global.tasks'),
       route: '/tasks',
+      icon: null,
       stroke: '',
       fill: '#FFF',
       iconName: 'tasks',
@@ -32,6 +34,7 @@ export const Switchboard = () => {
     {
       title: getStrings('global.venueContracts'),
       route: '/contracts',
+      icon: null,
       stroke: '',
       fill: '',
       iconName: 'contracts',
@@ -40,6 +43,7 @@ export const Switchboard = () => {
     {
       title: getStrings('global.touringManagement'),
       route: '/touring',
+      icon: null,
       stroke: '',
       fill: '#FFF',
       iconName: 'touring-management',
@@ -48,6 +52,7 @@ export const Switchboard = () => {
     {
       title: getStrings('global.userAccount'),
       route: '/account',
+      icon: null,
       stroke: '#FFF',
       fill: '#E94580',
       iconName: 'system-admin',

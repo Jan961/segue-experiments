@@ -1,9 +1,11 @@
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import Icon from 'components/core-ui-lib/Icon';
 import Link from 'next/link';
 
 type ItemDefinition = {
   disabled?: boolean;
   title: string;
+  icon: IconProp;
   iconName?: string;
   route?: string;
   color: string;
