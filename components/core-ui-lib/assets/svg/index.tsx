@@ -17,3 +17,4 @@ export { default as SquareTickIcon } from './SquareTick';
 export { default as PaperIcon } from './Paper';
 export { default as LocationIcon } from './Location';
 export { default as UserSettingIcon } from './UserSetting';
+export { default as MenuIcon } from './Menu';

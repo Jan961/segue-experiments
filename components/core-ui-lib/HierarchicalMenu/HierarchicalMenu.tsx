@@ -1,26 +1,38 @@
 import { useEffect, useState } from 'react';
 import { MenuOption } from './types';
 import MenuItem from './MenuItem';
+import { v4 as uuidv4 } from 'uuid';
+import { mapRecursive } from 'utils';
 
 interface HierarchicalMenuProps {
   options: MenuOption[];
-  onClick?: (o: MenuOption) => void;
+  onClick?: (selected: MenuOption) => void;
+  onToggle?: (state: MenuOption[]) => void;
+  className?: string;
 }
 
-export default function HierarchicalMenu({ options = [], onClick }: HierarchicalMenuProps) {
+export default function HierarchicalMenu({ options = [], onClick, onToggle, className = '' }: HierarchicalMenuProps) {
   const [itemOptions, setItemOptions] = useState(options || []);
 
   useEffect(() => {
     if (!options || options.length === 0) setItemOptions([]);
 
-    const updatedOptions = options.map((o) => ({ ...o, groupHeader: true }));
+    let updatedOptions: MenuOption[] = options.map((o) => ({ ...o, groupHeader: true }));
+    updatedOptions = mapRecursive(updatedOptions, (o) => ({ ...o, id: uuidv4() }));
+
     setItemOptions(updatedOptions);
   }, [options]);
 
+  const handleMenuToggle = (selectedOption) => {
+    const updated = mapRecursive(itemOptions, (o) => (o.id === selectedOption.id ? selectedOption : o));
+    setItemOptions(updated);
+    onToggle(updated);
+  };
+
   return (
-    <div className="px-3 py-2">
+    <div className={className}>
       {itemOptions.map((o) => (
-        <MenuItem key={o.value} option={o} onClick={onClick} />
+        <MenuItem key={o.value} option={o} onClick={onClick} onToggle={handleMenuToggle} />
       ))}
     </div>
   );

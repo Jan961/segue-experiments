@@ -6,9 +6,12 @@ type MenuItemIcon = {
 };
 
 export type MenuOption = {
+  id?: string;
   value: string;
   label: string;
   options?: MenuOption[];
   groupHeader?: boolean;
   icon?: MenuItemIcon;
+  expanded?: boolean;
+  labelClass?: string;
 };
