@@ -1,3 +1,6 @@
+import classNames from "classnames";
+import Icon, { IconName, IconProps } from "../Icon/Icon";
+
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
 export interface ButtonProps {
@@ -8,6 +11,9 @@ export interface ButtonProps {
   className?: string;
   onClick?: () => void;
   loading?: boolean;
+  prefixIconName?: IconName|string;
+  sufixIconName?: IconName|string;
+  iconProps?: Partial<IconProps>;
 }
 
 const baseClass =
@@ -31,14 +37,23 @@ export default function Button({
   className = '',
   disabled = false,
   onClick,
+  prefixIconName,
+  sufixIconName,
+  iconProps,
 }: ButtonProps) {
   const variantClass = ClassMap.get(variant);
   const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
   const endClass = `${baseClass} ${variantClass} ${disabledClass} ${className}`;
 
   return (
-    <button id={id} type="button" className={endClass} disabled={disabled} onClick={onClick}>
+    <button id={id} type="button" className={classNames(endClass,{'flex items-center gap-1': prefixIconName || sufixIconName})} disabled={disabled} onClick={onClick}>
+      {
+        prefixIconName && <span><Icon aria-hidden="true" iconName={prefixIconName} {...iconProps} /></span>
+      }
       {text || ''}
+      {
+        sufixIconName && <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />
+      }
     </button>
   );
 }

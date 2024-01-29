@@ -32,7 +32,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
   };
 
   return isLeafNode ? (
-    <div className={`flex items-center gap-3 ${groupHeader ? 'mt-4' : 'mt-3'}`}>
+    <div className={`flex items-center gap-3 ${groupHeader ? 'mt-4' : 'mt-1'}`}>
       {icon && (
         <div className="w-6">
           <Icon iconName={icon.default.iconName} stroke={icon.default.stroke} fill={icon.default.fill} variant="lg" />
@@ -43,7 +43,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
       </span>
     </div>
   ) : (
-    <div className={groupHeader ? 'mt-4' : `mt-3 ${icon ? '' : ''}`}>
+    <div className={groupHeader ? 'mt-4' : `mt-1 ${icon ? '' : ''}`}>
       <Disclosure as="div" key={value} className="" defaultOpen={isExpanded}>
         {({ open }) => (
           <>

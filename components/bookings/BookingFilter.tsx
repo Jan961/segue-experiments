@@ -1,29 +1,18 @@
-import { FormInputDate } from 'components/global/forms/FormInputDate';
+import DateRange from 'components/core-ui-lib/DateRange/DateRange';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 
 export default function BookingsButtons() {
   const [filter, setFilter] = useRecoilState(filterState);
-  const onChange = (e: any) => {
-    console.log(filter, 'onFilterChange', e.target.id, e.target.value);
-    setFilter({ ...filter, [e.target.id]: e.target.value });
+  const {startDate, endDate} = filter||{};
+  const onChange = (change:{from:string,to:string}) => {
+    const {from:startDate, to:endDate} = change;
+    console.log(filter, 'onFilterChange', change);
+    setFilter({ ...filter, startDate, endDate });
   };
   return (
-    <>
-      <FormInputDate
-        className="mb-2 flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
-        label="From:"
-        value={filter?.startDate}
-        name="startDate"
-        onChange={onChange}
-      />
-      <FormInputDate
-        className="flex items-center [&>div]:text-primary-blue [&>div]:text-lg [&>div]:font-bold"
-        label="To:"
-        value={filter?.endDate}
-        name="endDate"
-        onChange={onChange}
-      />
-    </>
+    <div className='bg-white'>
+      <DateRange label="Date" onChange={onChange} value={{from:startDate, to:endDate}} />
+    </div>
   );
 }
