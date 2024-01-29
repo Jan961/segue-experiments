@@ -99,7 +99,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             <HeaderNavButton
               iconName="home"
               href="/"
-              className="bg-primary-green"
+              className="bg-primary-green shadow-sm-shadow"
               containerClass={`${!isCurrentPathHome ? 'cursor-pointer hover:scale-105' : 'pointer-events-none'}`}
             >
               {getString('global.home')}
@@ -117,7 +117,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             <HeaderNavButton
               iconName="exit"
               onClick={logout}
-              className="bg-primary-purple"
+              className="bg-primary-purple shadow-sm-shadow"
               containerClass="cursor-pointer hover:scale-105"
             >
               {getString('global.logOut')}
