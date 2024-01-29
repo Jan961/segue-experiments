@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DateInput from '../DateInput';
 import Label from '../Label';
 
@@ -6,19 +6,29 @@ export type DateRangeValue = {
   from: string;
   to: string;
 };
+
 interface DateRangePorps {
   className?: string;
   disabled?: boolean;
   testId?: string;
   label?: string;
   onChange: (v: DateRangeValue) => void;
+  value?: DateRangeValue
 }
 
-export default function DateRange({ className, disabled, testId, label, onChange }: DateRangePorps) {
+export default function DateRange({ className, disabled, testId, label, onChange, value }: DateRangePorps) {
   const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
   const [dateFrom, setDateFrom] = useState<string>();
   const [dateTo, setDateTo] = useState<string>();
+
+  useEffect(()=>{
+    setDateFrom(value.from)
+  }, [value.from])
+
+  useEffect(()=>{
+    setDateTo(value.to)
+  }, [value.to])
 
   const handleDateFromChange = (v) => {
     setDateFrom(v);

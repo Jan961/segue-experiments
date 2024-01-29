@@ -13,10 +13,12 @@ interface props {
   tourJump?: boolean;
   filterComponent?: any;
   page?: string;
+  titleClassName?: string;
 }
 
 const GlobalToolbar = ({
   title,
+  titleClassName,
   tourJump = true,
   color = 'text-primary-blue',
   filterComponent,
@@ -26,7 +28,7 @@ const GlobalToolbar = ({
 
   return (
     <div className="py-2 flex flex-row items-center gap-4">
-      <h1 className={`text-3xl font-bold ${color} `}>{title}</h1>
+      <h1 className={`text-4xl font-bold ${color} ${titleClassName}`}>{title}</h1>
       {filterComponent && (
         <div className="flex flex-row">
           <button
@@ -52,10 +54,9 @@ const GlobalToolbar = ({
         </div>
       )}
       {tourJump ? (
-        <div className="bg-white drop-shadow-md inline-block rounded-md">
+        <div className="bg-white border-primary-border rounded-md border">
           <div className="rounded-l-md">
             <div className="flex items-center">
-              <p className="mx-2">Set Tour</p>
               <TourJumpMenu />
             </div>
           </div>

@@ -21,25 +21,27 @@ import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
-import { filterState } from 'state/booking/filterState';
+import { filterState, intialBookingFilterState } from 'state/booking/filterState';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { tourJumpState } from 'state/booking/tourJumpState';
 import { Spinner } from 'components/global/Spinner';
-import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import classNames from 'classnames';
 import { getTourJumpState } from 'utils/getTourJumpState';
 import { viewState } from 'state/booking/viewState';
 import { getAccountIdFromReq } from 'services/userService';
 import BookingFilter from 'components/bookings/BookingFilter';
-import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
 import { bookingState } from 'state/booking/bookingState';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
-import AddBooking from 'components/bookings/modal/AddBooking';
+import Select from 'components/core-ui-lib/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import TextInput from 'components/core-ui-lib/TextInput/TextInput';
+import Report from 'components/bookings/modal/Report';
+import Button from 'components/core-ui-lib/Button';
 
 const toolbarHeight = 136;
 
@@ -90,6 +92,7 @@ const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSid
   const [filter, setFilter] = useRecoilState(filterState);
   const [view, setView] = useRecoilState(viewState);
   const { loading } = useRecoilValue(tourJumpState);
+  const [showTourSummary, setShowTourSummary] = useState(false);
   const todayKey = new Date().toISOString().substring(0, 10);
   const todayOnSchedule =
     Sections.map((x) => x.Dates)
@@ -107,39 +110,54 @@ const BookingPage = ({ TourId }: InferGetServerSidePropsType<typeof getServerSid
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
 
+  const onClearFilters = () => {
+    setFilter(intialBookingFilterState);
+  };
+
   return (
     <Layout title="Booking | Segue" flush>
-      <div className="">
-        <GlobalToolbar
-          searchFilter={filter.venueText}
-          setSearchFilter={(venueText) => setFilter({ venueText })}
-          title={'Bookings'}
-        >
-          <div className="bg-white drop-shadow-md inline-block rounded-md">
-            <div className="rounded-l-md">
-              <div className="flex items-center">
-                <p className="mx-2">Status: </p>
-                <FormInputSelect
-                  className="[&>select]:border-0 [&>select]:mb-0 [&>select]:text-primary-blue [&>select]:font-bold !mb-0"
-                  label=""
-                  onChange={onChange}
-                  value={filter.status}
-                  name={'status'}
-                  options={statusOptions}
-                />
+      <div className="grid grid-cols-12 mb-8">
+        <div className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9">
+          <div className="px-4">
+            <GlobalToolbar
+              searchFilter={filter.venueText}
+              setSearchFilter={(venueText) => setFilter({ venueText })}
+              titleClassName="text-primary-orange"
+              title={'Bookings'}
+            >
+              <div className="flex items-center gap-2">
+                <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
+                <Button text="Tour Summary" onClick={() => setShowTourSummary(true)}></Button>
+                {showTourSummary && (
+                  <Report visible={showTourSummary} onClose={() => setShowTourSummary(false)} TourId={TourId} />
+                )}
               </div>
-            </div>
+            </GlobalToolbar>
           </div>
-        </GlobalToolbar>
-      </div>
-      <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
-        <MileageCalculator />
-        <BookingFilter />
-        <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
-          Go To Today
-        </ToolbarButton>
-        <BookingsButtons key={'toolbar'} currentTourId={TourId}></BookingsButtons>
-        <AddBooking />
+          <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
+            <MileageCalculator />
+            <Select
+              onChange={(value) => onChange({ target: { id: 'status', value } })}
+              value={filter.status}
+              className="bg-white"
+              label="Status"
+              options={statusOptions}
+            />
+            <BookingFilter />
+            <TextInput
+              id={'venueText'}
+              placeHolder="search bookings..."
+              className="!w-fit"
+              iconName="search"
+              value={filter.venueText}
+              onChange={onChange}
+            />
+            <Button text="Clear Filters" onClick={onClearFilters}></Button>
+          </div>
+        </div>
+        <div className="col-span-5 lg:col-span-4 xl:col-span-3 p-2">
+          <BookingsButtons></BookingsButtons>
+        </div>
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>

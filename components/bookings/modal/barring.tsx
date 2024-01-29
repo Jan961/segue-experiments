@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { useRecoilValue } from 'recoil';
@@ -9,14 +9,17 @@ import { BarredVenue } from 'pages/api/tours/venue/barred';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
-import { ToolbarButton } from '../ToolbarButton';
 import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
 
-export default function Barring() {
+type BarringProps={
+  visible: boolean;
+  onClose:()=>void;
+}
+
+export default function Barring({visible,onClose}:BarringProps) {
   const { tours } = useRecoilValue(tourJumpState);
-  const [showModal, setShowModal] = React.useState(false);
   const [venues, setVenues] = useState([]);
   const [inputs, setInputs] = useState({
     tour: null,
@@ -107,11 +110,10 @@ export default function Barring() {
 
   return (
     <>
-      <ToolbarButton onClick={() => setShowModal(true)}>Barring</ToolbarButton>
       <StyledDialog
         className="w-4/5 max-w-full h-[90vh] relative"
-        open={showModal}
-        onClose={() => setShowModal(false)}
+        open={visible}
+        onClose={onClose}
         title="Barring"
         width="xl"
       >

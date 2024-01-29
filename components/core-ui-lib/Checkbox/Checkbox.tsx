@@ -10,6 +10,7 @@ interface CheckboxProps {
   checked?: boolean;
   showIntermediate?: boolean;
   testId?: string;
+  className?: string;
 }
 
 const Checkbox = ({
@@ -21,6 +22,8 @@ const Checkbox = ({
   disabled,
   showIntermediate = false,
   testId,
+  className,
+  label,
 }: CheckboxProps) => {
   const modifyOnChange = (e: any) => {
     e.stopPropagation();
@@ -34,7 +37,7 @@ const Checkbox = ({
   }, [showIntermediate]);
 
   return (
-    <div className={`w-full ${checked || showIntermediate ? 'flex' : ''} gap-2`}>
+    <div className={`w-full ${checked || showIntermediate ? 'flex' : ''} flex items-center gap-2 ${className}`}>
       <input
         id={`form-input-checkbox-${id}`}
         data-testid={`core-ui-lib-checkbox-${testId}`}
@@ -46,7 +49,7 @@ const Checkbox = ({
         disabled={disabled}
         className="peer relative appearance-none shrink-0 w-4 h-4 rounded-sm focus:ring-primary-input-text text-base"
       />
-
+      {label && <label className="text-primary-label text-sm leading-8 font-normal ">{label}</label>}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="19"

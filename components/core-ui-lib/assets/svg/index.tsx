@@ -18,3 +18,4 @@ export { default as PaperIcon } from './Paper';
 export { default as LocationIcon } from './Location';
 export { default as UserSettingIcon } from './UserSetting';
 export { default as MenuIcon } from './Menu';
+export { default as ExitIcon } from './Exit';
