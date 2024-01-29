@@ -9,6 +9,7 @@ import { RecoilRoot } from 'recoil';
 import { ClientStateSetter, setInitialStateServer } from 'lib/recoil';
 import { ClerkProvider } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
+import TanstackProvider from 'components/providers/TanstackProvider';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -24,11 +25,13 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
 
   return (
-    <ClerkProvider {...pageProps} navigate={(to) => router.push(to)}>
-      <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
-        <ClientStateSetter intitialState={initialState} />
-        <Component {...pageProps} />
-      </RecoilRoot>
-    </ClerkProvider>
+    <TanstackProvider>
+      <ClerkProvider {...pageProps} navigate={(to) => router.push(to)}>
+        <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
+          <ClientStateSetter intitialState={initialState} />
+          <Component {...pageProps} />
+        </RecoilRoot>
+      </ClerkProvider>
+    </TanstackProvider>
   );
 }
