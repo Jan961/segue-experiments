@@ -30,6 +30,7 @@ export const Primary: Story = {
         <Icon iconName="note-filled" {...args} />
         <Icon iconName="home" {...args} />
         <Icon iconName="menu" {...args} />
+        <Icon iconName="exit" {...args} />
       </div>
     );
   },

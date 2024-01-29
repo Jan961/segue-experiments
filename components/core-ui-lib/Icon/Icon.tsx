@@ -22,7 +22,8 @@ export type IconName =
   | 'contracts'
   | 'touring-management'
   | 'system-admin'
-  | 'menu';
+  | 'menu'
+  | 'exit';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -45,6 +46,7 @@ const IconNameMap = new Map([
   ['touring-management', 'LocationIcon'],
   ['system-admin', 'UserSettingIcon'],
   ['menu', 'MenuIcon'],
+  ['exit', 'ExitIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';

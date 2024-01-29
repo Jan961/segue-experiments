@@ -24,25 +24,21 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
       <Icon
         iconName={link.iconName}
         variant="2xl"
-        className="text-5xl h-10 w-10"
+        className="lg:h-12 lg:w-12 md:h-10 md:w-10"
         stroke={link.stroke}
         fill={link.fill}
       />
-      <span className="text-center text-base mt-2">{link.title}</span>
+      <span className="text-center lg:text-responsive-lg md:text-base lg:mt-4 md:mt-2">{link.title}</span>
     </>
   );
 
   const baseClass = `
-    ${link.disabled ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : `${link.color} hover:opacity-75`}
-    shadow-lg
-    w-46
-    h-24
-    flex flex-col items-center justify-center
-    whitespace-nowrap
-    text-white text-center rounded-lg`;
+    ${
+      link.disabled ? 'bg-gray-400 hover:bg-gray-400 cursor-not-allowed' : `${link.color} hover:opacity-75`
+    } h-full flex flex-col items-center justify-center whitespace-nowrap text-white text-center rounded-lg`;
 
   return (
-    <li key={link.title}>
+    <li key={link.title} className="shadow-lg md:w-44 md:h-24 lg:w-56 lg:h-32">
       {link.route && (
         <Link href={link.disabled ? '#' : link.route} className={baseClass}>
           {content}
