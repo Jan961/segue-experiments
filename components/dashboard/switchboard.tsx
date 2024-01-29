@@ -32,7 +32,7 @@ export const Switchboard = () => {
       color: 'bg-primary-yellow',
     },
     {
-      title: getStrings('global.venueContracts'),
+      title: getStrings('global.contracts'),
       route: '/contracts',
       icon: null,
       stroke: '',
@@ -50,8 +50,8 @@ export const Switchboard = () => {
       color: 'bg-primary-purple',
     },
     {
-      title: getStrings('global.userAccount'),
-      route: '/account',
+      title: getStrings('global.admin'),
+      route: '/admin',
       icon: null,
       stroke: '#FFF',
       fill: '#E94580',
@@ -64,7 +64,7 @@ export const Switchboard = () => {
     <ul
       data-testid="dashboard-tiles"
       role="list"
-      className="w-132 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 mt-4 max-w-2xl mx-auto"
+      className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-3 mt-4 mx-auto"
     >
       {links.map((link) => (
         <SwitchBoardItem key={link.route} link={link} />
