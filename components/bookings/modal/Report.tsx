@@ -1,18 +1,12 @@
-import { useRouter } from 'next/router';
-import { ToolbarButton } from '../ToolbarButton';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-// import { DescriptionList as DL } from 'components/global/DescriptionList'
 import { StyledDialog } from 'components/global/StyledDialog';
 import { Spinner } from 'components/global/Spinner';
 
-export default function Report({ TourId }: { TourId: number }) {
+export default function Report({ visible, onClose, TourId }: { TourId: number, visible: boolean, onClose:()=>void}) {
   const [tourSummary, setTourSummary] = useState<any[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('Oops! Something went wrong. Please try again after some time');
-  const router = useRouter();
-  const fullTourCode = useMemo(() => `${router.query.ShowCode}${router.query.TourCode}`, [router.query]);
   const fetchTourSummary = useCallback((tourCode) => {
     setIsLoading(true);
     axios
@@ -32,13 +26,10 @@ export default function Report({ TourId }: { TourId: number }) {
   }, [TourId]);
   return (
     <>
-      <ToolbarButton onClick={() => setShowModal(true)} submit>
-        Tour Summary
-      </ToolbarButton>
       <StyledDialog
         className="w-1/4 max-w-full max-h-[95vh] relative"
-        open={showModal}
-        onClose={() => setShowModal(false)}
+        open={visible}
+        onClose={onClose}
         title="Tour Summary"
         width="xl"
       >

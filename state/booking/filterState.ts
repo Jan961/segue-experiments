@@ -8,7 +8,7 @@ export type FilterState = {
   endDate?: string;
 };
 
-const intialState: FilterState = {
+export const intialBookingFilterState: FilterState = {
   venueText: '',
   masterTaskText: '',
   status: null,
@@ -18,5 +18,5 @@ const intialState: FilterState = {
 
 export const filterState = atom({
   key: 'filterState',
-  default: intialState,
+  default: intialBookingFilterState,
 });

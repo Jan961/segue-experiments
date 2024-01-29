@@ -19,7 +19,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
     return (
-      <div className="relative w-full" onClick={onClick}>
+      <div className="relative" onClick={onClick}>
         <input
           ref={ref}
           id={id}

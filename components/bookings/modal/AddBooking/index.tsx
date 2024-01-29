@@ -29,13 +29,18 @@ type PerformanceItem = {
 type PerformanceData = {
   [key: string]: PerformanceItem;
 };
-const AddBooking = () => {
+
+type AddBookingProps={
+  visible: boolean;
+  onClose:()=>void;
+}
+
+const AddBooking = ({visible, onClose}:AddBookingProps) => {
   const venueDict = useRecoilValue(venueState);
   const schedule = useRecoilValue(scheduleSelector);
   const [perfDict, setPerfDict] = useRecoilState(performanceState);
   const [bookingDict, setBookingDict] = useRecoilState(bookingState);
   const [stage, setStage] = useState<number>(0);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState(initialState);
   const [error, setError] = useState<string>('');
@@ -90,7 +95,7 @@ const AddBooking = () => {
     setError('');
     setStage(0);
     setFormData(initialState);
-    setShowModal(false);
+    onClose()
   };
   const addBookings = async () => {
     setError('');
@@ -128,10 +133,9 @@ const AddBooking = () => {
   };
   return (
     <>
-      <ToolbarButton onClick={() => setShowModal(true)}>Add Booking</ToolbarButton>
       <StyledDialog
         className="relative overflow-visible"
-        open={showModal}
+        open={visible}
         onClose={onModalClose}
         title="Add Booking"
         width="xl"
