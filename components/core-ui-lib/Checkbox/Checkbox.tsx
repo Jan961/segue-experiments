@@ -4,7 +4,7 @@ interface CheckboxProps {
   id: string;
   onChange: (e: any) => void;
   label?: string;
-  value?: boolean;
+  value?: string | number;
   name?: string; // Also ID
   disabled?: boolean;
   checked?: boolean;
@@ -16,7 +16,7 @@ interface CheckboxProps {
 const Checkbox = ({
   id,
   onChange,
-  value = false,
+  value = '',
   checked = false,
   name,
   disabled,
@@ -27,7 +27,7 @@ const Checkbox = ({
 }: CheckboxProps) => {
   const modifyOnChange = (e: any) => {
     e.stopPropagation();
-    const newValue = !value;
+    const newValue = !checked;
     const newEvent = { ...e, target: { ...e.target, value: newValue, id: name } };
     onChange(newEvent);
   };

@@ -35,7 +35,6 @@ export default function ProductionJumpMenu() {
   if (!productionJump?.selected || !productionJump?.productions?.length) return null;
 
   const { selected, path } = productionJump;
-  console.log('===selected===', selected, path, typeof selected);
   function goToProduction(value: any) {
     const selectedProduction = productions.find((production) => production.Id === parseInt(value));
     if (!selectedProduction) return;
@@ -57,7 +56,6 @@ export default function ProductionJumpMenu() {
           id="IncludeArchived"
           label="Include Archived"
           checked={includeArchived}
-          value={includeArchived}
           onChange={(e) => setIncludeArchived(e.target.value)}
           className=""
         />
