@@ -13,7 +13,12 @@ import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
 
-export default function Barring() {
+type BarringProps = {
+  visible: boolean;
+  onClose: () => void;
+};
+
+export default function Barring({ visible, onClose }: BarringProps) {
   const { productions } = useRecoilValue(productionJumpState);
   const [venues, setVenues] = useState([]);
   const [inputs, setInputs] = useState({
@@ -48,19 +53,6 @@ export default function Barring() {
     e.preventDefault();
     fetchBarredVenues();
   };
-
-  /* const closeForm = () => {
-    setInputs({
-      production: null,
-      venue: null,
-      barDistance: 0,
-      London: false,
-      ProductionOnly: false,
-      Seats: 0,
-    });
-
-    setShowModal(false);
-  }; */
 
   const handleOnChange = async (e) => {
     const { id, value } = e.target;
@@ -107,8 +99,8 @@ export default function Barring() {
     <>
       <StyledDialog
         className="w-4/5 max-w-full h-[90vh] relative"
-        open={false}
-        onClose={() => null}
+        open={visible}
+        onClose={onClose}
         title="Barring"
         width="xl"
       >
