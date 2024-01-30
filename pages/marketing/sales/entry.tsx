@@ -3,21 +3,21 @@ import { useState } from 'react';
 import Entry from '../../../components/marketing/sales/entry';
 import { GetServerSideProps } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import { getActiveTours } from 'services/TourService';
+import { getActiveProductions } from 'services/ProductionService';
 
 type Props = {
-  activeTours: any[];
+  activeProductions: any[];
 };
 const pagetitle = 'Marketing - Sale Entry';
 
-const Index = ({ activeTours }: Props) => {
+const Index = ({ activeProductions }: Props) => {
   const [searchFilter, setSearchFilter] = useState('');
 
   return (
     <Layout title={pagetitle + '| Seque'}>
       <div className="flex flex-col flex-auto">
         <h1 className="mb-4 text-3xl font-bold text-primary-green ">{pagetitle + ' | Segue'}</h1>
-        <Entry tours={activeTours} searchFilter={searchFilter}></Entry>
+        <Entry productions={activeProductions} searchFilter={searchFilter}></Entry>
       </div>
     </Layout>
   );
@@ -26,10 +26,10 @@ const Index = ({ activeTours }: Props) => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
   const AccountId = await getAccountId(email);
-  const toursRaw = await getActiveTours(AccountId);
+  const productionsRaw = await getActiveProductions(AccountId);
   return {
     props: {
-      activeTours: toursRaw.map((t: any) => ({
+      activeProductions: productionsRaw.map((t: any) => ({
         Id: t.Id,
         Code: t.Code,
         IsArchived: t.IsArchived,

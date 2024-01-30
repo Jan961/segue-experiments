@@ -14,14 +14,14 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 
 type SCHEDULE_VIEW = {
-  TourId: number;
-  FullTourCode: string;
+  ProductionId: number;
+  FullProductionCode: string;
   ShowName: string;
   RehearsalStartDate: string;
-  TourStartDate: string;
-  TourEndDate: string;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
   EntryDate: string;
-  TourWeekNum: number;
+  ProductionWeekNum: number;
   EntryType: string;
   EntryId: number;
   EntryName: string;
@@ -38,7 +38,7 @@ type SCHEDULE_VIEW = {
   SeqNo: number;
 };
 // type UniqueHeadersObject = {
-//   FullTourCode: string,
+//   FullProductionCode: string,
 //   ShowName: string
 // }
 
@@ -80,15 +80,15 @@ const addTime = (timeArr: string[] = []) => {
   const [h, m] = minsTime.split(':');
   return `${hour + Number(h)}:${Number(m)}`;
 };
-const getKey = ({ FullTourCode, ShowName, EntryDate }) => `${FullTourCode} - ${ShowName} - ${EntryDate}`;
+const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 // const formatDate = (date) => moment(date).format('DD/MM/YY')
 
 const handler = async (req, res) => {
-  const { TourId, from, to } = JSON.parse(req.body) || {};
+  const { ProductionId, from, to } = JSON.parse(req.body) || {};
 
   //   const formatedFromDate = formatDate(from)
   //   const formatedToDate = formatDate(to)
-  if (!TourId) {
+  if (!ProductionId) {
     throw new Error('Params are missing');
   }
   const conditions: Prisma.Sql[] = [];
@@ -96,8 +96,8 @@ const handler = async (req, res) => {
   if (from && to) {
     conditions.push(Prisma.sql`EntryDate BETWEEN ${from} AND ${to}`);
   }
-  if (TourId) {
-    conditions.push(Prisma.sql` TourId=${TourId}`);
+  if (ProductionId) {
+    conditions.push(Prisma.sql` ProductionId=${ProductionId}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
@@ -123,13 +123,13 @@ const handler = async (req, res) => {
       performanceDate: Date ? Date.toISOString() : null,
     });
   });
-  const { RehearsalStartDate: fromDate, TourEndDate: toDate } = data?.[0] || {};
+  const { RehearsalStartDate: fromDate, ProductionEndDate: toDate } = data?.[0] || {};
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-    TourStartDate: moment(x.TourStartDate).format('YYYY-MM-DD'),
-    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD'),
+    ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
+    ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
   const worksheet = workbook.addWorksheet('Travel Summary', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
@@ -144,12 +144,12 @@ const handler = async (req, res) => {
     });
     return;
   }
-  const { ShowName, FullTourCode } = data[0];
-  worksheet.addRow([`SCHEDULE FOR ${FullTourCode} ${ShowName}`]);
+  const { ShowName, FullProductionCode } = data[0];
+  worksheet.addRow([`SCHEDULE FOR ${FullProductionCode} ${ShowName}`]);
   worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
-  worksheet.addRow(['', '', 'SHOW ', '', '', '', '', 'TOUR', 'PERFS', 'PERF1', 'PERF2', 'TRAVEL']);
+  worksheet.addRow(['', '', 'SHOW ', '', '', '', '', 'PRODUCTION', 'PERFS', 'PERF1', 'PERF2', 'TRAVEL']);
   worksheet.addRow([
-    'Tour',
+    'Production',
     'DAY',
     'DATE',
     'WEEK',
@@ -167,10 +167,10 @@ const handler = async (req, res) => {
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
   let rowNo = 5;
-  let prevTourWeekNum = '';
+  let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
-    prevTourWeekNum: '',
+    prevProductionWeekNum: '',
   };
   const time: string[] = [];
   const mileage: number[] = [];
@@ -182,7 +182,7 @@ const handler = async (req, res) => {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-    const key = getKey({ FullTourCode, ShowName, EntryDate: dateInIncomingFormat });
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
     const value: SCHEDULE_VIEW = map[key];
     const isOtherDay = [
       'Day Off',
@@ -194,7 +194,7 @@ const handler = async (req, res) => {
     ].includes(value?.EntryName);
     const isCancelled = value?.EntryStatusCode === 'X'
     if (!value) {
-      worksheet.addRow([FullTourCode, weekDay.substring(0, 3), dateInIncomingFormat, prevTourWeekNum]);
+      worksheet.addRow([FullProductionCode, weekDay.substring(0, 3), dateInIncomingFormat, prevProductionWeekNum]);
       colorTextAndBGCell({
         worksheet,
         row: rowNo + 1,
@@ -203,7 +203,7 @@ const handler = async (req, res) => {
         cellColor: COLOR_HEXCODE.WHITE,
       });
     } else {
-      const { TourWeekNum, Location, EntryName, TimeMins, Mileage, VenueSeats, EntryId, PencilNum } = value;
+      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage, VenueSeats, EntryId, PencilNum } = value;
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       const performances = bookingIdPerformanceMap[EntryId];
       const performancesOnThisDay = performances?.filter?.(performance=>moment(performance.performanceDate).isSame(moment(dateInIncomingFormat,'YYYY-MM-DD'),'day'))
@@ -211,12 +211,12 @@ const handler = async (req, res) => {
       mileage.push(Number(Mileage) || 0);
       seats.push(Number(VenueSeats) || 0);
       performancesPerDay.push(performances?.length || 0);
-      prevTourWeekNum = TourWeekNum ? String(TourWeekNum) : prevTourWeekNum;
+      prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
       worksheet.addRow([
-        FullTourCode,
+        FullProductionCode,
         weekDay.substring(0, 3),
         dateInIncomingFormat,
-        TourWeekNum,
+        ProductionWeekNum,
         EntryName || '',
         ...((!isOtherDay && !isCancelled && [
           Location || '',
@@ -256,7 +256,7 @@ const handler = async (req, res) => {
       colorCell({ worksheet, row: rowNo, col: 2, argbColor: COLOR_HEXCODE.CREAM });
       colorCell({ worksheet, row: rowNo, col: 3, argbColor: COLOR_HEXCODE.CREAM });
     }
-    lastWeekMetaInfo = { ...lastWeekMetaInfo, prevTourWeekNum };
+    lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
   }
   if (time.length) {
     totalTime = [...totalTime, ...time];
@@ -269,7 +269,7 @@ const handler = async (req, res) => {
     '',
     '',
     '',
-    'TOUR TOTALS',
+    'PRODUCTION TOTALS',
     '',
     '',
     seats.reduce((acc, m) => acc + Number(m || 0), 0),

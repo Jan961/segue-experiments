@@ -14,16 +14,16 @@ function formatNewValue(val, field) {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { tourTaskIds, fieldToUpdate, newValue } = req.body;
+    const { productionTaskIds, fieldToUpdate, newValue } = req.body;
 
     const email = await getEmailFromReq(req);
     // Check all Task Ids
-    const check = tourTaskIds.map((TaskId) => checkAccess(email, { TaskId }));
+    const check = productionTaskIds.map((TaskId) => checkAccess(email, { TaskId }));
     const result = await Promise.all(check);
     if (result.filter((x) => !x).length > 0) return res.status(401).end();
 
-    if (!Array.isArray(tourTaskIds) || tourTaskIds.length === 0) {
-      res.status(400).json({ error: 'tourTaskIds must be a non-empty array' });
+    if (!Array.isArray(productionTaskIds) || productionTaskIds.length === 0) {
+      res.status(400).json({ error: 'productionTaskIds must be a non-empty array' });
       return;
     }
 
@@ -33,9 +33,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     }
 
     const preparedValue = formatNewValue(newValue, fieldToUpdate);
-    const updateTasksPromises = tourTaskIds.map((tourTaskId) =>
-      prisma.tourTask.update({
-        where: { TourTaskId: parseInt(tourTaskId) },
+    const updateTasksPromises = productionTaskIds.map((productionTaskId) =>
+      prisma.productionTask.update({
+        where: { ProductionTaskId: parseInt(productionTaskId) },
         data: { [fieldToUpdate]: preparedValue },
       }),
     );
@@ -45,6 +45,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.json(updateResults);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error updating TourTasks' });
+    res.status(500).json({ error: 'Error updating ProductionTasks' });
   }
 }

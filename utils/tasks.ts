@@ -1,6 +1,6 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { TasksFilterType } from 'state/tasks/tasksFilterState';
-import { ToursWithTasks } from 'state/tasks/tourState';
+import { ProductionsWithTasks } from 'state/tasks/productionState';
 
 export const priorityOptions: SelectOption[] = [
   { text: 'Immediate', value: 1 },
@@ -10,14 +10,14 @@ export const priorityOptions: SelectOption[] = [
   { text: 'Low Priority', value: 5 },
 ];
 
-export const filterTourTasksBySearchText = (toursWithTasks: ToursWithTasks[], searchText: string): ToursWithTasks[] => {
+export const filterProductionTasksBySearchText = (productionsWithTasks: ProductionsWithTasks[], searchText: string): ProductionsWithTasks[] => {
   const results = [];
-  for (const tourWithTasks of toursWithTasks) {
-    const filteredTasks = tourWithTasks.Tasks.filter(
+  for (const productionWithTasks of productionsWithTasks) {
+    const filteredTasks = productionWithTasks.Tasks.filter(
       (Task) => Task?.Name?.toLocaleLowerCase?.().includes(searchText?.toLocaleLowerCase?.()),
     );
     if (filteredTasks.length > 0) {
-      results.push({ ...tourWithTasks, Tasks: filteredTasks });
+      results.push({ ...productionWithTasks, Tasks: filteredTasks });
     }
   }
   return results;
@@ -34,11 +34,11 @@ export const calculateTaskStatus = (progress: number): string => {
   return '';
 };
 
-export const applyTaskFilters = (toursWithTasks: ToursWithTasks[], filters: TasksFilterType): ToursWithTasks[] => {
+export const applyTaskFilters = (productionsWithTasks: ProductionsWithTasks[], filters: TasksFilterType): ProductionsWithTasks[] => {
   const results = [];
   console.log('====', filters);
-  for (const tourWithTasks of toursWithTasks) {
-    const filteredTasks = tourWithTasks.Tasks.filter((task) => {
+  for (const productionWithTasks of productionsWithTasks) {
+    const filteredTasks = productionWithTasks.Tasks.filter((task) => {
       let matches = true;
       if (filters.taskText && !task.Name.includes(filters.taskText)) {
         matches = false;
@@ -46,7 +46,7 @@ export const applyTaskFilters = (toursWithTasks: ToursWithTasks[], filters: Task
       if (filters.status && filters.status !== 'all' && calculateTaskStatus(task.Progress) !== filters.status) {
         matches = false;
       }
-      const taskDueDate = tourWithTasks.weekNumToDateMap?.[task.CompleteByWeekNum];
+      const taskDueDate = productionWithTasks.weekNumToDateMap?.[task.CompleteByWeekNum];
       if (filters.startDueDate && new Date(taskDueDate) < new Date(filters.startDueDate)) {
         matches = false;
       }
@@ -59,7 +59,7 @@ export const applyTaskFilters = (toursWithTasks: ToursWithTasks[], filters: Task
       return matches;
     });
     if (filteredTasks.length > 0) {
-      results.push({ ...tourWithTasks, Tasks: filteredTasks });
+      results.push({ ...productionWithTasks, Tasks: filteredTasks });
     }
   }
   return results;

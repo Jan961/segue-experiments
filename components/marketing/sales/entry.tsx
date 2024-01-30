@@ -8,9 +8,9 @@ import { Spinner } from 'components/global/Spinner';
 
 interface props {
   searchFilter: string;
-  tours?: any[];
+  productions?: any[];
 }
-export default function Entry({ tours = [] }: props) {
+export default function Entry({ productions = [] }: props) {
   const [isLoading, setLoading] = useState(false);
   const [salesWeeks, SetSalesWeeks] = useState([]);
   const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
@@ -24,20 +24,20 @@ export default function Entry({ tours = [] }: props) {
   const [notes, setNotes] = useState<any>({});
   const [validationErrors, setValidationErrors] = useState<any>({});
   // const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
-  const fetchTourWeeks = (tourId) => {
-    if (tourId) {
+  const fetchProductionWeeks = (productionId) => {
+    if (productionId) {
       setLoading(true);
       axios
-        .get(`/api/reports/tourWeek/${tourId}`)
+        .get(`/api/reports/productionWeek/${productionId}`)
         .then((data: any) => SetSalesWeeks(data.data || []))
         .finally(() => setLoading(false));
     }
   };
-  const fetchVenues = (tourId) => {
-    if (tourId) {
+  const fetchVenues = (productionId) => {
+    if (productionId) {
       setLoading(true);
       axios
-        .get(`/api/tours/read/venues/${tourId}`)
+        .get(`/api/productions/read/venues/${productionId}`)
         .then((data) => data.data)
         .then((data) => {
           SetSalesWeeksVenues(data);
@@ -83,9 +83,9 @@ export default function Entry({ tours = [] }: props) {
       .catch((error) => console.log(error));
   };
   useEffect(() => {
-    fetchTourWeeks(inputs.SetTour);
-    fetchVenues(inputs.SetTour);
-  }, [inputs.SetTour]);
+    fetchProductionWeeks(inputs.SetProduction);
+    fetchVenues(inputs.SetProduction);
+  }, [inputs.SetProduction]);
   useEffect(() => {
     if (!options) {
       fetchOptionTypes();
@@ -122,7 +122,7 @@ export default function Entry({ tours = [] }: props) {
   const handleOnChange = (e) => {
     e.persist?.();
     setValidationErrors({});
-    if (e.target.id === 'SetTour') {
+    if (e.target.id === 'SetProduction') {
       setInputs({ [e.target.id]: e.target.value });
       setSale({});
       return;
@@ -296,32 +296,32 @@ export default function Entry({ tours = [] }: props) {
             <div>
               <div className="bg-soft-primary-green p-4 rounded-md mb-4">
                 <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                  {/* Set Tour */}
+                  {/* Set Production */}
                   <div className="row-start-1 flex flex-row items-center">
-                    <label htmlFor="SetTour" className="w-48 mr-6 text-sm font-medium text-gray-700">
-                      Set Tour
+                    <label htmlFor="SetProduction" className="w-48 mr-6 text-sm font-medium text-gray-700">
+                      Set Production
                     </label>
                     <select
-                      id="SetTour"
-                      name="SetTour"
-                      value={inputs.SetTour}
+                      id="SetProduction"
+                      name="SetProduction"
+                      value={inputs.SetProduction}
                       onChange={handleOnChange}
                       className="ml-1 block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green text-sm"
                     >
-                      <option value={0}>Select A Tour</option>
-                      {tours
-                        ?.filter?.((tour) => !tour.IsArchived)
-                        ?.map?.((tour) => (
-                          <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
+                      <option value={0}>Select A Production</option>
+                      {productions
+                        ?.filter?.((production) => !production.IsArchived)
+                        ?.map?.((production) => (
+                          <option key={production.Id} value={production.Id}>
+                            {`${production.ShowName} ${production.ShowCode}${production.Code} ${production.IsArchived ? ' | (Archived)' : ''}`}
                           </option>
                         ))}
                     </select>
                   </div>
-                  {/* Tour Sale Week */}
+                  {/* Production Sale Week */}
                   <div className="row-start-2 flex flex-row items-center">
                     <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
-                      Tour Sale Week
+                      Production Sale Week
                     </label>
                     <select
                       id="SaleWeek"
@@ -330,12 +330,12 @@ export default function Entry({ tours = [] }: props) {
                       className="ml-1 block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
                       onChange={handleOnChange}
                     >
-                      <option value={0}>Select Tour Week</option>
+                      <option value={0}>Select Production Week</option>
                       {salesWeeks
                         ?.sort?.((a, b) => new Date(a.mondayDate).valueOf() - new Date(b.mondayDate).valueOf())
                         ?.map?.((week) => (
                           <option key={week.mondayDate} value={week.mondayDate}>
-                            {`Wk ${week.tourWeekNum} | Monday ${dateToSimple(new Date(week.mondayDate))}`}
+                            {`Wk ${week.productionWeekNum} | Monday ${dateToSimple(new Date(week.mondayDate))}`}
                           </option>
                         ))}
                     </select>

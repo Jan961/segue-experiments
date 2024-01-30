@@ -49,7 +49,7 @@ const DeleteShow = ({ show }: Props) => {
       url: '/api/shows/delete/' + show.Id,
       data: inputs,
     })
-      .then((response) => {
+      .then(() => {
         loggingService.logAction('Show', 'Show Updated');
         setStatus((prevStatus) => ({ ...prevStatus, submitting: false, submitted: true }));
         router.push('/account/shows');
@@ -73,7 +73,7 @@ const DeleteShow = ({ show }: Props) => {
       <FormContainer>
         <form onSubmit={handleOnSubmit}>
           <FormInfo intent="DANGER">
-            Warning. This will delete the show and all tours, documents, and information associated with it.
+            Warning. This will delete the show and all productions, documents, and information associated with it.
           </FormInfo>
           <p className="mb-2">
             Type <b>{show.Code}</b> in the text field to confirm deletion

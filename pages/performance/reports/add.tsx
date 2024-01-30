@@ -1,20 +1,20 @@
 import ReportWrapper from 'components/performance/reportWrapper';
-import { tourEditorMapper } from 'lib/mappers';
+import { productionEditorMapper } from 'lib/mappers';
 import { GetServerSideProps } from 'next';
-import { getActiveTours } from 'services/TourService';
+import { getActiveProductions } from 'services/ProductionService';
 import { getAccountIdFromReq } from 'services/userService';
-import { Tour } from '@prisma/client';
+import { Production } from '@prisma/client';
 import Layout from 'components/Layout';
 
 type Props = {
-  tours: any & Tour[];
+  productions: any & Production[];
 };
 
-export default function Reports({ tours = [] }: Props) {
+export default function Reports({ productions = [] }: Props) {
   return (
     <Layout title="Performance Reports | Add Report | Segue">
       <ReportWrapper>
-        {tours.map(({ Id, ShowName }) => (
+        {productions.map(({ Id, ShowName }) => (
           <option key={Id} value={Id}>
             {ShowName}
           </option>
@@ -26,10 +26,10 @@ export default function Reports({ tours = [] }: Props) {
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const activeTours = await getActiveTours(AccountId);
+  const activeProductions = await getActiveProductions(AccountId);
   return {
     props: {
-      tours: activeTours.map((tour: any & Tour) => tourEditorMapper(tour)),
+      productions: activeProductions.map((production: any & Production) => productionEditorMapper(production)),
     },
   };
 };

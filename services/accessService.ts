@@ -3,7 +3,7 @@ import prisma from 'lib/prisma';
 // This may need to be expanded to include Tasks, Contracts, Files
 export interface AccessCheck {
   ShowId?: number;
-  TourId?: number;
+  ProductionId?: number;
   AccountId?: number;
   DateBlockId?: number;
   BookingId?: number;
@@ -48,11 +48,11 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     successes.push(!!show);
   }
 
-  // Tour
-  if (items.TourId) {
-    const tour = await prisma.tour.findFirst({
+  // Production
+  if (items.ProductionId) {
+    const production = await prisma.production.findFirst({
       where: {
-        Id: items.TourId,
+        Id: items.ProductionId,
         Show: {
           is: {
             AccountId: user.AccountId,
@@ -62,7 +62,7 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
       select,
     });
 
-    successes.push(!!tour);
+    successes.push(!!production);
   }
 
   // DateBlock
@@ -70,7 +70,7 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
     const dateblock = await prisma.dateBlock.findFirst({
       where: {
         Id: items.DateBlockId,
-        Tour: {
+        Production: {
           is: {
             Show: {
               is: {
@@ -89,7 +89,7 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
   const EventWhere = {
     DateBlock: {
       is: {
-        Tour: {
+        Production: {
           is: {
             Show: {
               is: {
@@ -204,11 +204,11 @@ export const checkAccess = async (email: string, items: AccessCheck): Promise<bo
   }
 
   if (items.TaskId) {
-    const task = await prisma.tourTask.findFirst({
+    const task = await prisma.productionTask.findFirst({
       where: {
         Id: items.TaskId,
         // Slightly different. This is based on booking
-        Tour: EventWhere.DateBlock.is.Tour,
+        Production: EventWhere.DateBlock.is.Production,
       },
       select,
     });

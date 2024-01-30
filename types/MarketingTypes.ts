@@ -15,14 +15,14 @@ export enum SALES_TYPE_NAME {
 
 export type TSalesView = {
   ShowName: string;
-  TourId: number;
-  FullTourCode: string;
-  TourStartDate: string;
-  TourEndDate: string;
+  ProductionId: number;
+  FullProductionCode: string;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
   BookingId: number;
   BookingFirstDate: string;
   BookingStatusCode: BOOK_STATUS_CODES;
-  BookingTourWeekNum: number;
+  BookingProductionWeekNum: number;
   VenueTown: string;
   VenueCode: string;
   VenueName: string;
@@ -32,7 +32,7 @@ export type TSalesView = {
   ConversionRate: number;
   SetSalesFiguresDate: string;
   SetBookingWeekNum: number;
-  SetTourWeekDate: string;
+  SetProductionWeekDate: string;
   SetNotOnSale: string;
   SetIsFinalFigures: string;
   SetSingleSeats: string;

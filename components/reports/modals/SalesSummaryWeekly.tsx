@@ -9,19 +9,19 @@ import { Spinner } from 'components/global/Spinner';
 import { defaultStatus } from './SalesSummarySimple';
 
 type Props = {
-  activeTours: any[];
+  activeProductions: any[];
 };
 
 const defaultInputs = {
-  Tour: null,
-  TourWeek: null,
+  Production: null,
+  ProductionWeek: null,
   numberOfWeeks: 2,
   order: null,
 };
-export default function SalesSummaryWeekly({ activeTours }: Props) {
+export default function SalesSummaryWeekly({ activeProductions }: Props) {
   const [showModal, setShowModal] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const [tourWeeks, setTourWeeks] = useState([]); // Shory list of tours for the toolbar to switch
+  const [productionWeeks, setProductionWeeks] = useState([]); // Shory list of productions for the toolbar to switch
   const [inputs, setInputs] = useState(defaultInputs);
   const [status, setStatus] = useState(defaultStatus);
 
@@ -40,14 +40,14 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
   function handleOnSubmit(e) {
     e.preventDefault();
     setStatus((prevStatus) => ({ ...prevStatus, submitting: true }));
-    const selectedTour = activeTours.find((tour) => tour.Id === parseInt(inputs.Tour));
-    const toWeek = formatShortYearDate(inputs.TourWeek);
+    const selectedProduction = activeProductions.find((production) => production.Id === parseInt(inputs.Production));
+    const toWeek = formatShortYearDate(inputs.ProductionWeek);
     const fromWeek = formatShortYearDate(getDateDaysAgo(toWeek, inputs.numberOfWeeks * 7));
     setLoading(true);
     fetch('/api/reports/sales-summary-simple', {
       method: 'POST',
       body: JSON.stringify({
-        tourId: parseInt(inputs.Tour, 10),
+        productionId: parseInt(inputs.Production, 10),
         fromWeek,
         toWeek,
         isWeeklyReport: true,
@@ -55,14 +55,14 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
     })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
-          const tourName: string = selectedTour?.name;
+          const productionName: string = selectedProduction?.name;
           let suggestedName: string | any[] = response.headers.get('Content-Disposition');
           if (suggestedName) {
             suggestedName = suggestedName.match(/filename="(.+)"/);
             suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
           }
           if (!suggestedName) {
-            suggestedName = `${tourName}.xlsx`;
+            suggestedName = `${productionName}.xlsx`;
           }
           const content = await response.blob();
           if (content) {
@@ -99,28 +99,28 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
   }
 
   function handleOnChange(e) {
-    if (e.target.name === 'Tour') {
-      setTourWeeks([]);
-      const currentTour = activeTours.find((tour) => tour.Id === parseInt(e.target.value));
-      if (currentTour) {
-        const { StartDate, EndDate } = currentTour.DateBlock.find((date) => date.Name === 'Tour') || {};
+    if (e.target.name === 'Production') {
+      setProductionWeeks([]);
+      const currentProduction = activeProductions.find((production) => production.Id === parseInt(e.target.value));
+      if (currentProduction) {
+        const { StartDate, EndDate } = currentProduction.DateBlock.find((date) => date.Name === 'Production') || {};
         setInputs((prev) => ({
           ...prev,
-          tourStartDate: StartDate,
-          tourEndDate: EndDate,
+          productionStartDate: StartDate,
+          productionEndDate: EndDate,
         }));
       }
       setLoading(true);
       axios
-        .get(`/api/reports/tourWeek/${e.target.value}`)
+        .get(`/api/reports/productionWeek/${e.target.value}`)
         .then((res) => res.data)
         .then((data) => {
-          // Make sure tour weeks are empty
-          setTourWeeks([]);
-          // Set tour weeks with data
-          setTourWeeks(data || []);
+          // Make sure production weeks are empty
+          setProductionWeeks([]);
+          // Set production weeks with data
+          setProductionWeeks(data || []);
           const currentWeekMonday = getCurrentMondayDate();
-          setInputs((prev) => ({ ...prev, TourWeek: currentWeekMonday }));
+          setInputs((prev) => ({ ...prev, ProductionWeek: currentWeekMonday }));
         })
         .finally(() => {
           setLoading(false);
@@ -169,42 +169,42 @@ export default function SalesSummaryWeekly({ activeTours }: Props) {
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
                     <label htmlFor="date" className="">
-                      Tour
+                      Production
                     </label>
 
                     <select
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={inputs.Tour}
-                      id="Tour"
-                      name="Tour"
+                      value={inputs.Production}
+                      id="Production"
+                      name="Production"
                       onChange={handleOnChange}
                     >
-                      <option key="default">Select a Tour</option>
-                      {activeTours.map((tour, i) => (
-                        <option key={i} value={`${tour.Id}`}>
-                          {tour.ShowCode}
-                          {tour.Code} | {tour.ShowName}
+                      <option key="default">Select a Production</option>
+                      {activeProductions.map((production, i) => (
+                        <option key={i} value={`${production.Id}`}>
+                          {production.ShowCode}
+                          {production.Code} | {production.ShowName}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div className="flex flex-col space-y-2 mt-4">
                     <label htmlFor="date" className="">
-                      Tour Week
+                      Production Week
                     </label>
 
                     <select
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={inputs.TourWeek}
-                      id="TourWeek"
-                      name="TourWeek"
+                      value={inputs.ProductionWeek}
+                      id="ProductionWeek"
+                      name="ProductionWeek"
                       onChange={handleOnChange}
                     >
-                      <option key="default">Select a Tour Week</option>
-                      {tourWeeks.map((week) => (
-                        <option key={week.TourWeekId} value={`${week.mondayDate}`}>
+                      <option key="default">Select a Production Week</option>
+                      {productionWeeks.map((week) => (
+                        <option key={week.ProductionWeekId} value={`${week.mondayDate}`}>
                           {/* {formatWeekNumber(week.WeekCode)}  */}
-                          {` Wk ${week.tourWeekNum} | ${dateToSimple(week?.mondayDate)}`}
+                          {` Wk ${week.productionWeekNum} | ${dateToSimple(week?.mondayDate)}`}
                         </option>
                       ))}
                     </select>

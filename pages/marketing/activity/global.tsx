@@ -3,13 +3,9 @@ import Toolbar from 'components/marketing/activity/toolbar';
 import { useState } from 'react';
 import GlobalActivites from 'components/marketing/activity/globa';
 import GlobalToolbar from 'components/toolbar';
-import { Show } from 'interfaces';
 
-type Props = {
-  items: Show[];
-};
 
-const Index = ({ items }: Props) => {
+const Index = (props) => {
   const [searchFilter, setSearchFilter] = useState('');
 
   return (
@@ -20,7 +16,7 @@ const Index = ({ items }: Props) => {
           setSearchFilter={setSearchFilter}
           title={'Global Activities'}
         ></GlobalToolbar>
-        <Toolbar title={'Global Activities'}></Toolbar>
+        <Toolbar></Toolbar>
         {/* <SideMenu></SideMenu> */}
         <GlobalActivites></GlobalActivites>
       </div>

@@ -1,7 +1,5 @@
-import * as React from 'react';
 import Link from 'next/link';
 
-const tourId = 1;
 
 const SideNavBar = (data?) => (
   <div className="1/12 w-60 h-full shadow-md bg-white px-1 ">
@@ -49,7 +47,7 @@ const SideNavBar = (data?) => (
           <li className="relative">
             <Link
               className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"
-              href={`/${data.Tour}/marketing/venue/status`}
+              href={`/${data.Production}/marketing/venue/status`}
               data-mdb-ripple="true"
               data-mdb-ripple-color="dark"
             >
@@ -161,11 +159,11 @@ const SideNavBar = (data?) => (
           <li className="relative">
             <a
               className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"
-              href="/tours/1"
+              href="/productions/1"
               data-mdb-ripple="true"
               data-mdb-ripple-color="dark"
             >
-              Tours
+              Productions
             </a>
           </li>
         </ul>

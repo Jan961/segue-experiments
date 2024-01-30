@@ -40,10 +40,10 @@ export type ShowDTO = {
   IsArchived: boolean;
 };
 
-export type TourTaskDTO = {
+export type ProductionTaskDTO = {
   TaskName?: any;
   Id: number;
-  TourId: number;
+  ProductionId: number;
   Code: number;
   Name: string;
   Priority: number;
@@ -53,31 +53,31 @@ export type TourTaskDTO = {
   FollowUp?: string;
   CreatedDate?: string;
   Status?: string;
-  Interval: string;
+  Interval?: string;
   AssignedBy?: string;
   AssignedTo?: string;
   StartByWeekNum?: number;
   CompleteByWeekNum?: number;
-  CompleteByPostTour: boolean;
-  StartByPostTour: boolean;
+  CompleteByIsPostProduction: boolean;
+  StartByIsPostProduction: boolean;
   AssignedToUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
 };
 
-// Existing tour interface for old schema. Remove eventually
-export type Tour = {
-  TourId: number;
+// Existing Production interface for old schema. Remove eventually
+export type Production = {
+  ProductionId: number;
   Code: string;
   Logo: string;
   ShowId: Show;
-  TourStartDate: Date;
-  TourEndDate: Date;
+  ProductionStartDate: Date;
+  ProductionEndDate: Date;
   Archived: boolean;
   RehearsalStartDate: Date;
   RehearsalEndDate: Date;
   Show: Show;
-  TourTask: TourTaskDTO[];
+  ProductionTask: ProductionTaskDTO[];
 };
 
 export type BookingDTO = {
@@ -125,7 +125,7 @@ export type DateBlockDTO = {
   Dates?: DateDTO[];
 };
 
-export type TourDTO = {
+export type ProductionDTO = {
   Id?: number;
   ShowId: number;
   Code: string;
@@ -158,7 +158,7 @@ export type BookingWithVenueDTO = BookingDTO & {
     Website: string;
     Name: string;
   };
-  TourId?: number;
+  ProductionId?: number;
 };
 
 export type DateTypeDTO = {

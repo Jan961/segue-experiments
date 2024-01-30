@@ -89,8 +89,8 @@ export const getWeekDayLong = (dateToFormat: Date | string) => {
 // Broken week number calculation
 export const weeks = (showDate: string, firstShowDate: string): number => {
   const date = moment(showDate, 'YYYY-MM-DD');
-  const TourStartDate = moment(firstShowDate, 'YYYY-MM-DD');
-  const diff = moment.duration(TourStartDate.diff(date));
+  const ProductionStartDate = moment(firstShowDate, 'YYYY-MM-DD');
+  const diff = moment.duration(ProductionStartDate.diff(date));
 
   let week = Math.floor(diff.asWeeks());
   if (week >= 0) {
@@ -101,8 +101,8 @@ export const weeks = (showDate: string, firstShowDate: string): number => {
 };
 
 // Working one. AFAIK
-export const calculateWeekNumber = (tourStart: Date, dateToNumber: Date): number => {
-  const weekOneStart = startOfWeek(tourStart, { weekStartsOn: 1 });
+export const calculateWeekNumber = (productionStart: Date, dateToNumber: Date): number => {
+  const weekOneStart = startOfWeek(productionStart, { weekStartsOn: 1 });
   let weekNumber = differenceInWeeks(dateToNumber, weekOneStart);
 
   // Handle the week boundary condition

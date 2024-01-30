@@ -5,12 +5,12 @@ import { useRecoilState } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
 import FormTypeahead from 'components/global/forms/FormTypeahead';
-import { mapBookingsToTourOptions } from 'mappers/tourCodeMapper';
+import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 
 const ActionBar = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const bookingOptions = useMemo(
-    () => (bookingJump.bookings ? mapBookingsToTourOptions(bookingJump.bookings) : []),
+    () => (bookingJump.bookings ? mapBookingsToProductionOptions(bookingJump.bookings) : []),
     [bookingJump],
   );
 

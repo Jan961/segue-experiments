@@ -8,7 +8,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { statusOptions } from 'config/tasks';
 import { userState } from 'state/account/userState';
 import { tasksfilterState } from 'state/tasks/tasksFilterState';
-import { tourJumpState } from 'state/booking/tourJumpState';
+import { productionJumpState } from 'state/booking/productionJumpState';
 import { useRouter } from 'next/router';
 import ExcelIcon from 'components/global/icons/excelIcon';
 import { Spinner } from 'components/global/Spinner';
@@ -32,28 +32,28 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
       })),
     [users],
   );
-  const [tourJump, setTourJump] = useRecoilState(tourJumpState);
-  const { tours } = tourJump;
-  const tourOptions = [
+  const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
+  const { productions } = productionJump;
+  const productionOptions = [
     { text: 'All', value: null },
-    ...(tours?.filter?.((tour) => !tour.IsArchived).map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id })) ||
+    ...(productions?.filter?.((production) => !production.IsArchived).map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id })) ||
       []),
   ];
-  const gotoTour = (tourId?: number) => {
-    const selectedTour = tours.find((tour) => tour.Id === tourId);
-    if (!selectedTour) {
-      setTourJump({ ...tourJump, loading: true, selected: null });
+  const gotoProduction = (productionId?: number) => {
+    const selectedProduction = productions.find((production) => production.Id === productionId);
+    if (!selectedProduction) {
+      setProductionJump({ ...productionJump, loading: true, selected: null });
       router.push(`/tasks/all`);
       return;
     }
-    const { ShowCode, Code: TourCode, Id } = selectedTour;
-    setTourJump({ ...tourJump, loading: true, selected: Id });
-    router.push(`/tasks/${ShowCode}/${TourCode}`);
+    const { ShowCode, Code: ProductionCode, Id } = selectedProduction;
+    setProductionJump({ ...productionJump, loading: true, selected: Id });
+    router.push(`/tasks/${ShowCode}/${ProductionCode}`);
   };
 
   const clearFilters = () => {
     setFilters({});
-    setTourJump({ ...tourJump, loading: true, selected: null });
+    setProductionJump({ ...productionJump, loading: true, selected: null });
     router.push(`/tasks/all`);
   };
 
@@ -63,19 +63,19 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
       method: 'POST',
       body: JSON.stringify({
         ...filters,
-        tour: tourJump.selected,
+        production: productionJump.selected,
       }),
     })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
-          const tourName = 'Tour Name';
+          const productionName = 'Production Name';
           let suggestedName: string | any[] = response.headers.get('Content-Disposition');
           if (suggestedName) {
             suggestedName = suggestedName.match(/filename="(.+)"/);
             suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
           }
           if (!suggestedName) {
-            suggestedName = `${tourName}.xlsx`;
+            suggestedName = `${productionName}.xlsx`;
           }
           const content = await response.blob();
           if (content) {
@@ -101,11 +101,11 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   const handleOnChange = (e) => {
     let { name, value }: { name: string; value: any } = e.target;
     if (name === 'startDueDate' || name === 'endDueDate') value = value || '';
-    if (name === 'tour' || name === 'assignee') {
+    if (name === 'production' || name === 'assignee') {
       value = parseInt(value, 10);
     }
     setFilters({ ...filters, [name]: value });
-    if (name === 'tour') gotoTour(value);
+    if (name === 'production') gotoProduction(value);
   };
 
   const handleSearchOnEnter = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -120,9 +120,9 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
         <FormInputSelect
           className="[&>select]:w-auto"
           onChange={handleOnChange}
-          name="tour"
-          value={tourJump.selected}
-          options={tourOptions}
+          name="production"
+          value={productionJump.selected}
+          options={productionOptions}
         />
         <div className="flex gap-4">
           <ToolbarButton

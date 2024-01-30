@@ -24,7 +24,7 @@ const permissions = [
   { id: 16, name: 'All Admin', checked: false, subid: 0 },
   { id: 17, name: 'Venues', checked: false, subid: 16 },
   { id: 18, name: 'Show Data', checked: false, subid: 16 },
-  { id: 19, name: 'Tour Data', checked: false, subid: 16 },
+  { id: 19, name: 'Production Data', checked: false, subid: 16 },
   { id: 20, name: 'Other', checked: false, subid: 0 },
   { id: 21, name: 'Manage Users', checked: false, subid: 20 },
   { id: 22, name: 'Manage Tout Settings', checked: false, subid: 21 },
@@ -91,11 +91,11 @@ const User = () => (
           </div>
           <div className="">
             <ul>
-              {permissions.map((permission) => (
-                <li>
-                  {permission.subid != 0 ? <>&emsp;</> : ''}
-                  <input type={'checkbox'} id={permission.subid + 'tourID'} />
-                  <label htmlFor={permission.subid + 'tourID'}>
+              {permissions.map((permission,i) => (
+                <li key={i}>
+                  {permission.subid !== 0 ? <>&emsp;</> : ''}
+                  <input type={'checkbox'} id={permission.subid + 'productionID'} />
+                  <label htmlFor={permission.subid + 'productionID'}>
                     {' '}
                     &nbsp;
                     {permission.name}

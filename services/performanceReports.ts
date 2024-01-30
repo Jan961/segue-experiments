@@ -1,4 +1,3 @@
-import { PerformanceReport } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { getDuration } from './dateService';
 
@@ -24,7 +23,7 @@ export const getReportsList = async () => {
               },
               DateBlock: {
                 select: {
-                  Tour: {
+                  Production: {
                     select: {
                       Show: {
                         select: {
@@ -92,7 +91,7 @@ export const getPerformanceReportById = async (Id: number) => {
               },
               DateBlock: {
                 select: {
-                  Tour: {
+                  Production: {
                     select: {
                       Show: {
                         select: {

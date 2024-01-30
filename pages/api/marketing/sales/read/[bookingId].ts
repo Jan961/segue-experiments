@@ -4,28 +4,28 @@ import numeral from 'numeral';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 const getMapKey = ({
-  FullTourCode,
-  TourStartDate,
+  FullProductionCode,
+  ProductionStartDate,
   BookingFirstDate,
   BookingStatusCode,
   VenueTown,
   VenueCode,
   SetSalesFiguresDate,
   SetBookingWeekNum,
-  SetTourWeekDate,
+  SetProductionWeekDate,
 }: Pick<
   TSalesView,
-  | 'FullTourCode'
-  | 'TourStartDate'
+  | 'FullProductionCode'
+  | 'ProductionStartDate'
   | 'BookingFirstDate'
   | 'BookingStatusCode'
   | 'VenueTown'
   | 'VenueCode'
   | 'SetSalesFiguresDate'
   | 'SetBookingWeekNum'
-  | 'SetTourWeekDate'
+  | 'SetProductionWeekDate'
 >): string =>
-  `${FullTourCode} | ${TourStartDate} | ${BookingFirstDate} | ${BookingStatusCode} | ${VenueTown} | ${VenueCode} | ${SetSalesFiguresDate} | ${SetBookingWeekNum} | ${SetTourWeekDate}`;
+  `${FullProductionCode} | ${ProductionStartDate} | ${BookingFirstDate} | ${BookingStatusCode} | ${VenueTown} | ${VenueCode} | ${SetSalesFiguresDate} | ${SetBookingWeekNum} | ${SetProductionWeekDate}`;
 
 export default async function handle(req, res) {
   try {

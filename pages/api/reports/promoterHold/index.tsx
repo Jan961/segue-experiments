@@ -1,19 +1,19 @@
 import prisma from 'lib/prisma';
 
 /**
-Parameters = TourId & ", "
+Parameters = ProductionId & ", "
 Parameters = Parameters & IIf(Nz(VenueId, INVALID_ID) > 0, VenueId, "Null") & ", "
 Parameters = Parameters & IIf(IsDate(FromDate), "'" & Format(FromDate, "yyyymmdd") & "', ", "Null, ")
 Parameters = Parameters & IIf(IsDate(ToDate), "'" & Format(ToDate, "yyyymmdd") & "'", "Null")
 */
 export default async function handle(req, res) {
   // console.log(JSON.stringify(req.body))
-  const TourId = req.body.Tour;
+  const ProductionId = req.body.Production;
   const VenueID = req.body.Venue; // Can be null
   const fromDate = req.body.DateFrom; // Can be null
   const toDate = req.body.DateFrom; // Can be null
 
-  const query = `call GetPromoterHolds(${TourId}, ${VenueID},${fromDate},${toDate})`;
+  const query = `call GetPromoterHolds(${ProductionId}, ${VenueID},${fromDate},${toDate})`;
 
   try {
     const result = await prisma.$queryRawUnsafe(`${query}`);
