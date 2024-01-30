@@ -208,11 +208,13 @@ module.exports = {
       colors: colorsConfig,
       width: {
         5.5: '1.375rem',
+        13: '3.125rem',
         128: '32rem',
         132: '38rem',
       },
       height: {
         5.5: '1.375rem',
+        13: '3.125rem',
         128: '32rem',
         'comp-height': '1.9375rem',
         'table-header-height': '3.1875rem',
