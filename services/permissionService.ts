@@ -1,5 +1,8 @@
 import prisma from 'lib/prisma';
-import { AccountUser, PermissionGroup } from '@prisma/client';
+import { 
+  // AccountUser, 
+  // Permission 
+} from '@prisma/client';
 
 /* const prisma = new PrismaClient().$extends({
   model: {
@@ -11,26 +14,26 @@ import { AccountUser, PermissionGroup } from '@prisma/client';
   },
 }); */
 
-const formatPermissions = (data) => {
-  if (!data || data.length === 0) {
-    return [];
-  }
-  return data.reduce((acc, value) => {
-    const item = {
-      id: value.Id,
-      label: value.Name,
-      options:
-        value.Permission?.map((p) => ({
-          id: p.Id,
-          value: p.Id,
-          label: p.Name,
-          options: value.Permission?.map((p) => ({ id: `${p.Id}-${p.value}`, value: p.Id, label: p.Name })),
-        })) || [],
-    };
+// const formatPermissions = (data) => {
+//   if (!data || data.length === 0) {
+//     return [];
+//   }
+//   return data.reduce((acc, value) => {
+//     const item = {
+//       id: value.Id,
+//       label: value.Name,
+//       options:
+//         value.Permission?.map((p) => ({
+//           id: p.Id,
+//           value: p.Id,
+//           label: p.Name,
+//           options: value.Permission?.map((p) => ({ id: `${p.Id}-${p.value}`, value: p.Id, label: p.Name })),
+//         })) || [],
+//     };
 
-    return [...acc, item];
-  }, []);
-};
+//     return [...acc, item];
+//   }, []);
+// };
 
 const formatAccountUsers = (data) => {
   if (!data || data.length === 0) {
@@ -47,20 +50,20 @@ const formatAccountUsers = (data) => {
   }, []);
 };
 
-export const getPermissionsList = async (): Promise<PermissionGroup[]> => {
-  try {
-    const results = await prisma.permissionGroup.findMany({
-      include: {
-        Permission: true,
-      },
-    });
-    return formatPermissions(results);
-  } catch (err) {
-    console.log('Error fetching permissions ', err);
-  }
-};
+// export const getPermissionsList = async (): Promise<PermissionGroup[]> => {
+//   try {
+//     const results = await prisma.permissionGroup.findMany({
+//       include: {
+//         Permission: true,
+//       },
+//     });
+//     return formatPermissions(results);
+//   } catch (err) {
+//     console.log('Error fetching permissions ', err);
+//   }
+// };
 
-export const getAccountUsersList = async (): Promise<AccountUser[]> => {
+export const getAccountUsersList = async (): Promise<any[]> => {
   try {
     const results = await prisma.AccountUser.findMany({
       include: {

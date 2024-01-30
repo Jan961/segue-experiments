@@ -7,7 +7,7 @@ import schema from './FinalSalesValidation';
 import { getSales } from './Api';
 
 type props = {
-  tours?: any[];
+  productions?: any[];
 };
 
 type Sale = {
@@ -23,31 +23,31 @@ const defaultSale = {
   SchoolSeats: '',
   SchoolValue: '',
 };
-export default function FinalSales({ tours }: props) {
+export default function FinalSales({ productions }: props) {
   const [isLoading, setLoading] = useState(false);
-  const [activeSetTourDates, setActiveSetTourDates] = useState([]);
+  const [activeSetProductionDates, setActiveSetProductionDates] = useState([]);
   const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
   const [finalSaleFigureDate, setFinalSaleFigureDate] = useState(null);
   const [inputs, setInputs] = useState({
-    SetTour: '',
+    SetProduction: '',
     BookingId: '',
     Confirmed: false,
   });
   const isPantomime = useMemo(() => {
-    const tour = tours?.find?.((tour) => tour.Id === parseInt(inputs.SetTour, 10));
-    return tour?.ShowType === 'P';
-  }, [inputs?.SetTour]);
+    const production = productions?.find?.((production) => production.Id === parseInt(inputs.SetProduction, 10));
+    return production?.ShowType === 'P';
+  }, [inputs?.SetProduction]);
   const [sale, setSale] = useState<Sale>(defaultSale);
   const [previousSale, setPreviousSale] = useState<Sale>(defaultSale);
   const [validationErrors, setValidationErrors] = useState<any>({});
 
   const venueOptions = useMemo(
     () =>
-      activeSetTourDates.map((venue) => ({
+      activeSetProductionDates.map((venue) => ({
         name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
         value: String(venue.BookingId),
       })),
-    [activeSetTourDates],
+    [activeSetProductionDates],
   );
 
   const handleSalesResponse = (data) => {
@@ -68,7 +68,7 @@ export default function FinalSales({ tours }: props) {
     return handleSalesResponse(data);
   };
   useEffect(() => {
-    if (inputs.SetTour && inputs.BookingId) {
+    if (inputs.SetProduction && inputs.BookingId) {
       setLoading(false);
       setSale(defaultSale);
       setPreviousSale(defaultSale);
@@ -83,7 +83,7 @@ export default function FinalSales({ tours }: props) {
         .catch((error) => console.log(error))
         .finally(() => setLoading(false));
     }
-  }, [inputs.SetTour, inputs.BookingId]);
+  }, [inputs.SetProduction, inputs.BookingId]);
   useEffect(() => {
     if (inputs.BookingId && previousSaleWeek) {
       fetchSales(previousSaleWeek, parseInt(inputs.BookingId, 10), false)
@@ -97,7 +97,7 @@ export default function FinalSales({ tours }: props) {
   const handleServerResponse = (ok) => {
     if (ok) {
       setInputs({
-        SetTour: inputs.SetTour,
+        SetProduction: inputs.SetProduction,
         BookingId: inputs.BookingId,
         Confirmed: inputs.Confirmed,
       });
@@ -113,17 +113,17 @@ export default function FinalSales({ tours }: props) {
   }
 
   /**
-   * Onn update of activeSetTours
+   * Onn update of activeSetProductions
    * Venues need updated
    */
-  function setTour(tourId) {
-    if (tourId) {
+  function setProduction(productionId) {
+    if (productionId) {
       setLoading(true);
       axios
-        .get(`/api/tours/read/venues/${tourId}`)
+        .get(`/api/productions/read/venues/${productionId}`)
         .then((data) => data.data)
         .then((data) => {
-          setActiveSetTourDates(data);
+          setActiveSetProductionDates(data);
         })
         .finally(() => setLoading(false));
     }
@@ -131,8 +131,8 @@ export default function FinalSales({ tours }: props) {
 
   const handleOnChange = (e) => {
     e.persist?.();
-    if (e.target.name === 'SetTour') {
-      setTour(e.target.value);
+    if (e.target.name === 'SetProduction') {
+      setProduction(e.target.value);
       setInputs((prev) => ({
         ...prev,
         [e.target.id]: e.target.value,
@@ -242,22 +242,22 @@ export default function FinalSales({ tours }: props) {
               <div className=" p-4 rounded-md mb-4">
                 <div className="flex flex-col space-y-2">
                   <div className="flex flex-row items-center">
-                    <label htmlFor="SetTour" className="text-sm font-medium text-gray-700 w-[200px]">
-                      Set Tour
+                    <label htmlFor="SetProduction" className="text-sm font-medium text-gray-700 w-[200px]">
+                      Set Production
                     </label>
                     <select
-                      id="SetTour"
-                      name="SetTour"
-                      value={inputs.SetTour}
+                      id="SetProduction"
+                      name="SetProduction"
+                      value={inputs.SetProduction}
                       onChange={handleOnChange}
                       className="block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green  text-sm"
                     >
-                      <option value={0}>Select A Tour</option>
-                      {tours
-                        ?.filter?.((tour) => !tour.IsArchived)
-                        ?.map?.((tour) => (
-                          <option key={tour.Id} value={tour.Id}>
-                            {`${tour.ShowName} ${tour.ShowCode}${tour.Code} ${tour.IsArchived ? ' | (Archived)' : ''}`}
+                      <option value={0}>Select A Production</option>
+                      {productions
+                        ?.filter?.((production) => !production.IsArchived)
+                        ?.map?.((production) => (
+                          <option key={production.Id} value={production.Id}>
+                            {`${production.ShowName} ${production.ShowCode}${production.Code} ${production.IsArchived ? ' | (Archived)' : ''}`}
                           </option>
                         ))}
                     </select>
@@ -385,7 +385,7 @@ export default function FinalSales({ tours }: props) {
                   />
                 </div>
                 <label htmlFor="Confirmed" className="block text-sm font-medium text-gray-700 ml-4 mt-1">
-                  I confirm these are the final figures for the above tour venue/date, as agreed by all parties
+                  I confirm these are the final figures for the above production venue/date, as agreed by all parties
                 </label>
               </div>
             </div>

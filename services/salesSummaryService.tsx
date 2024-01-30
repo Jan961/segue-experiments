@@ -34,20 +34,20 @@ export const getMapKey = ({
   Week,
   Town,
   Venue,
-  FormattedSetTourWeekNum,
-  SetTourWeekDate,
+  FormattedSetProductionWeekNum,
+  SetProductionWeekDate,
 }: Pick<
   TRequiredFieldsFinalFormat,
-  'Week' | 'Town' | 'Venue' | 'FormattedSetTourWeekNum' | 'SetTourWeekDate'
->): string => `${Week} | ${Town} | ${Venue} | ${FormattedSetTourWeekNum} | ${SetTourWeekDate}`;
+  'Week' | 'Town' | 'Venue' | 'FormattedSetProductionWeekNum' | 'SetProductionWeekDate'
+>): string => `${Week} | ${Town} | ${Venue} | ${FormattedSetProductionWeekNum} | ${SetProductionWeekDate}`;
 
 export const getMapKeyForValue = (
   { Week, Town, Venue }: Pick<TRequiredFieldsFinalFormat, 'Week' | 'Town' | 'Venue'>,
   {
-    FormattedSetTourWeekNum: setTourWeekNumVar,
-    SetTourWeekDate: setTourWeekDateVar,
-  }: Pick<TRequiredFieldsFinalFormat, 'FormattedSetTourWeekNum' | 'SetTourWeekDate'>,
-): string => `${Week} | ${Town} | ${Venue} | ${setTourWeekNumVar} | ${setTourWeekDateVar}`;
+    FormattedSetProductionWeekNum: setProductionWeekNumVar,
+    SetProductionWeekDate: setProductionWeekDateVar,
+  }: Pick<TRequiredFieldsFinalFormat, 'FormattedSetProductionWeekNum' | 'SetProductionWeekDate'>,
+): string => `${Week} | ${Town} | ${Venue} | ${setProductionWeekNumVar} | ${setProductionWeekDateVar}`;
 
 export const convertDateFormat = (date) => {
   const parsedDate = moment(date, 'DD-MM-YYYY');
@@ -86,7 +86,7 @@ export const assignBackgroundColor = ({
   worksheet,
   row,
   col,
-  props: { SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetTourWeekDate, NotOnSalesDate },
+  props: { SetIsCopy, SetBrochureReleased, BookingStatusCode, Date, SetProductionWeekDate, NotOnSalesDate },
   meta: { weekCols },
 }: {
   worksheet: any;
@@ -97,7 +97,7 @@ export const assignBackgroundColor = ({
     SetBrochureReleased: TSalesView['SetBrochureReleased'];
     BookingStatusCode: TSalesView['BookingStatusCode'];
     Date: TRequiredFieldsFinalFormat['Date'];
-    SetTourWeekDate: TRequiredFields['SetTourWeekDate'];
+    SetProductionWeekDate: TRequiredFields['SetProductionWeekDate'];
     NotOnSalesDate: TRequiredFields['NotOnSalesDate'];
   };
   meta: { weekCols: number };
@@ -109,11 +109,11 @@ export const assignBackgroundColor = ({
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.YELLOW });
   }
 
-  if (moment(Date).valueOf() < moment(SetTourWeekDate).valueOf()) {
+  if (moment(Date).valueOf() < moment(SetProductionWeekDate).valueOf()) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.BLUE });
   }
 
-  if (NotOnSalesDate && moment(SetTourWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
+  if (NotOnSalesDate && moment(SetProductionWeekDate).valueOf() < moment(NotOnSalesDate).valueOf()) {
     colorCell({ worksheet, row, col, argbColor: COLOR_HEXCODE.RED });
   }
   if (BookingStatusCode === BOOK_STATUS_CODES.X) {
@@ -203,6 +203,7 @@ export const addCellBorder = ({
   worksheet,
   row,
   col,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   argbColor,
 }: {
   worksheet: any;
@@ -218,35 +219,35 @@ export const addCellBorder = ({
   };
 };
 
-export const getUniqueAndSortedHeaderTourColumns = (
+export const getUniqueAndSortedHeaderProductionColumns = (
   finalFormattedValues: TRequiredFieldsFinalFormat[],
 ): UniqueHeadersObject[] => {
-  const tourColumns: UniqueHeadersObject[] = Array.from(
+  const productionColumns: UniqueHeadersObject[] = Array.from(
     new Set(
-      finalFormattedValues.map(({ FormattedSetTourWeekNum, SetTourWeekDate }) => ({
-        FormattedSetTourWeekNum,
-        SetTourWeekDate,
+      finalFormattedValues.map(({ FormattedSetProductionWeekNum, SetProductionWeekDate }) => ({
+        FormattedSetProductionWeekNum,
+        SetProductionWeekDate,
       })),
     ),
   );
-  const uniqueTourColumns = tourColumns.reduce(
+  const uniqueProductionColumns = productionColumns.reduce(
     ({ keys, values }: { keys: string[]; values: UniqueHeadersObject[] }, x: UniqueHeadersObject) => {
-      const doesKeyExists: boolean = keys.includes(x.FormattedSetTourWeekNum);
+      const doesKeyExists: boolean = keys.includes(x.FormattedSetProductionWeekNum);
       if (doesKeyExists) return { keys, values };
       return {
-        keys: [...keys, x.FormattedSetTourWeekNum],
+        keys: [...keys, x.FormattedSetProductionWeekNum],
         values: [...values, x],
       };
     },
     { keys: [], values: [] },
   ).values;
 
-  uniqueTourColumns.sort((a, b) => {
-    const t1 = Number(a.FormattedSetTourWeekNum.split(' ')[1]);
-    const t2 = Number(b.FormattedSetTourWeekNum.split(' ')[1]);
+  uniqueProductionColumns.sort((a, b) => {
+    const t1 = Number(a.FormattedSetProductionWeekNum.split(' ')[1]);
+    const t2 = Number(b.FormattedSetProductionWeekNum.split(' ')[1]);
     return t1 - t2;
   });
-  return uniqueTourColumns;
+  return uniqueProductionColumns;
 };
 
 export const groupBasedOnVenueWeeksKeepingVenueCommon = ({
@@ -269,8 +270,8 @@ export const groupBasedOnVenueWeeksKeepingVenueCommon = ({
               FormattedValue: obj.FormattedValue,
               ConversionRate: obj.ConversionRate,
               VenueCurrencySymbol: obj.VenueCurrencySymbol,
-              FormattedSetTourWeekNum: obj.FormattedSetTourWeekNum,
-              SetTourWeekDate: obj.SetTourWeekDate,
+              FormattedSetProductionWeekNum: obj.FormattedSetProductionWeekNum,
+              SetProductionWeekDate: obj.SetProductionWeekDate,
               SetIsCopy: obj.SetIsCopy,
               SetBrochureReleased: obj.SetBrochureReleased,
               Seats: obj.Seats,
@@ -300,8 +301,8 @@ export const groupBasedOnVenueWeeksKeepingVenueCommon = ({
             FormattedValue: obj.FormattedValue,
             ConversionRate: obj.ConversionRate,
             VenueCurrencySymbol: obj.VenueCurrencySymbol,
-            FormattedSetTourWeekNum: obj.FormattedSetTourWeekNum,
-            SetTourWeekDate: obj.SetTourWeekDate,
+            FormattedSetProductionWeekNum: obj.FormattedSetProductionWeekNum,
+            SetProductionWeekDate: obj.SetProductionWeekDate,
             SetIsCopy: obj.SetIsCopy,
             SetBrochureReleased: obj.SetBrochureReleased,
           },
@@ -335,14 +336,14 @@ export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({
     };
   }
   const weekWiseDataInEuro: number[] = headerWeekNums.map((weekNum) =>
-    getCurrencyWiseTotal({ totalForWeeks: totalRowWeekWise, setTourWeekNum: weekNum, currencySymbol }),
+    getCurrencyWiseTotal({ totalForWeeks: totalRowWeekWise, setProductionWeekNum: weekNum, currencySymbol }),
   );
   const rowData: (string | number)[] = [
     '',
     '',
     '',
     '',
-    `Tour ${lastBookingWeek}`,
+    `Production ${lastBookingWeek}`,
     ...weekWiseDataInEuro,
     getChangeVsLastWeekValue(weekWiseDataInEuro),
     ...(isSeatsDataRequired
@@ -445,14 +446,14 @@ export const getFileName = (worksheet): string =>
 
 export const getCurrencyWiseTotal = ({
   totalForWeeks,
-  setTourWeekNum,
+  setProductionWeekNum,
   currencySymbol,
 }: {
   totalForWeeks: WeekAggregates;
-  setTourWeekNum: string;
+  setProductionWeekNum: string;
   currencySymbol: VENUE_CURRENCY_SYMBOLS;
 }): number => {
-  const arr = totalForWeeks[setTourWeekNum];
+  const arr = totalForWeeks[setProductionWeekNum];
 
   if (!arr?.length) {
     return 0;
@@ -504,12 +505,12 @@ export const formatCurrencyNumberWithNDecimal = (valAsString, numberOfDecimals =
 
 export const getWeekWiseGrandTotalInPound = ({
   totalForWeeks,
-  setTourWeekNum,
+  setProductionWeekNum,
 }: {
   totalForWeeks: WeekAggregates;
-  setTourWeekNum: string;
+  setProductionWeekNum: string;
 }): number => {
-  const arr = totalForWeeks[setTourWeekNum];
+  const arr = totalForWeeks[setProductionWeekNum];
 
   if (!arr?.length) {
     return 0;
@@ -636,19 +637,19 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
   });
 };
 
-export const salesReportName = ({ tourId, isWeeklyReport, isSeatsDataRequired, data }): string => {
+export const salesReportName = ({ productionId, isWeeklyReport, isSeatsDataRequired, data }): string => {
   if (data.length) {
-    return data[0].ShowName + ' (' + data[0].FullTourCode + ')';
+    return data[0].ShowName + ' (' + data[0].FullProductionCode + ')';
   }
 
   if (isWeeklyReport) {
-    return tourId ? `Sales Summary Weekly - Tour ${tourId},` : 'Sales Summary Weekly';
+    return productionId ? `Sales Summary Weekly - Production ${productionId},` : 'Sales Summary Weekly';
   }
 
   if (isSeatsDataRequired) {
-    return tourId ? `Sales Vs Capacity - Tour ${tourId},` : 'Sales Vs Capacity';
+    return productionId ? `Sales Vs Capacity - Production ${productionId},` : 'Sales Vs Capacity';
   }
-  return tourId ? `Sales Summary -Tour  ${tourId},` : 'Sales Summary';
+  return productionId ? `Sales Summary -Production  ${productionId},` : 'Sales Summary';
 };
 
 export const applyFormattingToRange = ({

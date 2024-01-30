@@ -17,13 +17,13 @@ export enum SALES_TYPE_NAME {
 
 export type TSalesView = {
   ShowName: string;
-  TourId: number;
-  FullTourCode: string;
-  TourStartDate: string;
-  TourEndDate: string;
+  ProductionId: number;
+  FullProductionCode: string;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
   BookingFirstDate: string;
   BookingStatusCode: BOOK_STATUS_CODES;
-  BookingTourWeekNum: number;
+  BookingProductionWeekNum: number;
   VenueTown: string;
   VenueCode: string;
   VenueName: string;
@@ -33,8 +33,8 @@ export type TSalesView = {
   ConversionRate: number;
   SetSalesFiguresDate: string;
   SetBookingWeekNum: number;
-  SetTourWeekNum: number;
-  SetTourWeekDate: string;
+  SetProductionWeekNum: number;
+  SetProductionWeekDate: string;
   SetNotOnSale: string;
   SetIsFinalFigures: string;
   SetSingleSeats: string;
@@ -55,10 +55,10 @@ export type TRequiredFields = {
   VenueTown: TSalesView['VenueTown'];
   VenueName: TSalesView['VenueName'];
   Value: number;
-  BookingTourWeekNum: TSalesView['BookingTourWeekNum'];
+  BookingProductionWeekNum: TSalesView['BookingProductionWeekNum'];
   VenueCurrencySymbol: TSalesView['VenueCurrencySymbol'];
   SetBookingWeekNum: TSalesView['SetBookingWeekNum'];
-  SetTourWeekDate: TSalesView['SetTourWeekDate'];
+  SetProductionWeekDate: TSalesView['SetProductionWeekDate'];
   ConversionRate: TSalesView['ConversionRate'];
   SetIsCopy: TSalesView['SetIsCopy'];
   SetBrochureReleased: TSalesView['SetBrochureReleased'];
@@ -67,7 +67,7 @@ export type TRequiredFields = {
   TotalCapacity: TSalesView['TotalCapacity'];
   Seats: number;
   NotOnSalesDate: TSalesView['NotOnSalesDate'];
-  SetTourWeekNum: TSalesView['SetTourWeekNum'];
+  SetProductionWeekNum: TSalesView['SetProductionWeekNum'];
 };
 
 export type TRequiredFieldsFinalFormat = TRequiredFields & {
@@ -78,13 +78,13 @@ export type TRequiredFieldsFinalFormat = TRequiredFields & {
   Venue: TSalesView['VenueName'];
   FormattedValue: string;
   FormattedFinalFiguresValue: number;
-  FormattedSetTourWeekNum: string;
+  FormattedSetProductionWeekNum: string;
   Value: number;
 };
 
 export type UniqueHeadersObject = {
-  FormattedSetTourWeekNum: string;
-  SetTourWeekDate: string;
+  FormattedSetProductionWeekNum: string;
+  SetProductionWeekDate: string;
 };
 
 export type TGroupBasedOnWeeksKeepingVenueCommon = {
@@ -103,8 +103,8 @@ export type TGroupBasedOnWeeksKeepingVenueCommon = {
     FormattedValue: TRequiredFieldsFinalFormat['FormattedValue'];
     ConversionRate: TRequiredFieldsFinalFormat['ConversionRate'];
     VenueCurrencySymbol: TRequiredFieldsFinalFormat['VenueCurrencySymbol'];
-    FormattedSetTourWeekNum: TRequiredFieldsFinalFormat['FormattedSetTourWeekNum'];
-    SetTourWeekDate: TRequiredFieldsFinalFormat['SetTourWeekDate'];
+    FormattedSetProductionWeekNum: TRequiredFieldsFinalFormat['FormattedSetProductionWeekNum'];
+    SetProductionWeekDate: TRequiredFieldsFinalFormat['SetProductionWeekDate'];
     SetIsCopy: TRequiredFieldsFinalFormat['SetIsCopy'];
     SetBrochureReleased: TRequiredFieldsFinalFormat['SetBrochureReleased'];
   }[];

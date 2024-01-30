@@ -5,42 +5,42 @@ import Tasklist from 'components/tasks/TaskList';
 // import TaskButtons from 'components/tasks/TaskButtons';
 import GlobalToolbar from 'components/toolbar';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { getToursAndTasks } from 'services/TourService';
-import { ToursWithTasks, tourState } from 'state/tasks/tourState';
+import { getProductionsAndTasks } from 'services/ProductionService';
+import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
 import { InitialState } from 'lib/recoil';
-import { mapToTourTaskDTO } from 'lib/mappers';
+import { mapToProductionTaskDTO } from 'lib/mappers';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
 import { objectify } from 'radash';
-import { getTourJumpState } from 'utils/getTourJumpState';
+import { getProductionJumpState } from 'utils/getProductionJumpState';
 import useTasksFilter from 'hooks/useTasksFilter';
 import { useRecoilState } from 'recoil';
-import { TourTaskDTO } from 'interfaces';
+import { ProductionTaskDTO } from 'interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { filteredTours, onApplyFilters } = useTasksFilter();
-  const [tourTasks, setTourTasks] = useRecoilState(tourState);
-  const onTasksChange = (updatedTasks: TourTaskDTO[], tourId: number) => {
-    const updatedTourTasks = tourTasks.map((tourTask) => {
-      if (tourTask.Id === tourId) {
-        return { ...tourTask, Tasks: updatedTasks };
+  const { filteredProductions, onApplyFilters } = useTasksFilter();
+  const [productionTasks, setProductionTasks] = useRecoilState(productionState);
+  const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
+    const updatedProductionTasks = productionTasks.map((productionTask) => {
+      if (productionTask.Id === productionId) {
+        return { ...productionTask, Tasks: updatedTasks };
       }
-      return tourTask;
+      return productionTask;
     });
-    setTourTasks(updatedTourTasks);
+    setProductionTasks(updatedProductionTasks);
   };
   return (
     <Layout title="Tasks | Seque">
       <div className="flex flex-auto w-full h-screen">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
-          <GlobalToolbar tourJump={false} title={'Tasks'} color={'!text-purple-900'}></GlobalToolbar>
+          <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'}></GlobalToolbar>
           <Toolbar onApplyFilters={onApplyFilters} />
-          {filteredTours.length > 0 ? (
-            filteredTours.map((tour) => {
+          {filteredProductions.length > 0 ? (
+            filteredProductions.map((production) => {
               return (
-                <div key={tour.Id} className="mb-10">
-                  <h3 className=" text-xl font-bold py-4 !text-purple-900">{tour.ShowName}</h3>
-                  <Tasklist onTasksChange={(change) => onTasksChange(change, tour.Id)} tasks={tour?.Tasks} />
+                <div key={production.Id} className="mb-10">
+                  <h3 className=" text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
+                  <Tasklist onTasksChange={(change) => onTasksChange(change, production.Id)} tasks={production?.Tasks} />
                 </div>
               );
             })
@@ -66,17 +66,17 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const tourJump = await getTourJumpState(ctx, 'tasks', AccountId);
-  const toursWithTasks = await getToursAndTasks(AccountId);
+  const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
+  const productionsWithTasks = await getProductionsAndTasks(AccountId);
   const users = await getUsers(AccountId);
 
-  const tours: ToursWithTasks[] = toursWithTasks.map((t: any) => ({
+  const productions: ProductionsWithTasks[] = productionsWithTasks.map((t: any) => ({
     Id: t.Id,
     ShowName: t.Show.Name,
     ShowCode: t.Show.Code,
     ShowId: t.Show.Id,
     Code: t.Code,
-    Tasks: t.TourTask.map(mapToTourTaskDTO)
+    Tasks: t.ProductionTask.map(mapToProductionTaskDTO)
       .map((task) => ({
         ...task,
         StartDate: t.WeekNumToDateMap[task.StartByWeekNum],
@@ -87,9 +87,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }));
   const initialState: InitialState = {
     global: {
-      tourJump,
+      productionJump,
     },
-    tasks: { tours, bulkSelection: {} },
+    tasks: { productions, bulkSelection: {} },
     account: {
       user: { users: objectify(users, (user) => user.Id) },
     },

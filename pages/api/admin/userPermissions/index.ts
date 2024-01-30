@@ -1,4 +1,4 @@
-import prisma from 'lib/prismaAccelerate';
+import prisma from 'lib/prisma';
 
 import { NextApiRequest, NextApiResponse } from 'next';
 

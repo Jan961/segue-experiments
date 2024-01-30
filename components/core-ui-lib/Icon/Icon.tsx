@@ -23,7 +23,9 @@ export type IconName =
   | 'touring-management'
   | 'system-admin'
   | 'menu'
-  | 'exit';
+  | 'exit'
+  | 'production-management'
+  | 'system-admin';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -44,12 +46,14 @@ const IconNameMap = new Map([
   ['tasks', 'SquareTickIcon'],
   ['contracts', 'PaperIcon'],
   ['touring-management', 'LocationIcon'],
+  ['production-management', 'LocationIcon'],
   ['system-admin', 'UserSettingIcon'],
   ['menu', 'MenuIcon'],
   ['exit', 'ExitIcon'],
+  ['excel', 'ExcelIcon'],
 ]);
 
-type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '5xl';
 
 export interface IconProps {
   iconName: IconName | string;
@@ -80,7 +84,8 @@ export default function Icon({
 
   const IconComp = getIcon(IconNameMap.get(iconName) as any);
 
-  const getSizeForVariant = (v) => ({ xs: '15px', sm: '18px', md: '20px', lg: '22px', xl: '24px', '2xl': '26px' })[v];
+  const getSizeForVariant = (v) =>
+    ({ xs: '15px', sm: '18px', md: '20px', lg: '22px', xl: '24px', '2xl': '26px', '5xl': '50px' })[v];
 
   return (
     <IconComp

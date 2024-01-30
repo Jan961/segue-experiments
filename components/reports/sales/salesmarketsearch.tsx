@@ -1,4 +1,3 @@
-import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCode, faEnvelopesBulk, faFilePdf, faTable } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
@@ -15,7 +14,7 @@ export default function Salesmarketsearch() {
           <div className="grid grid-cols-4 gap-4">
             <div>
               <select>
-                <option>Show / Tour</option>
+                <option>Show / Production</option>
               </select>
             </div>
             <div>

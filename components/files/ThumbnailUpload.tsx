@@ -34,7 +34,7 @@ export const ThumbnailUpload = ({ path, setPath }: ThumbnailUploadProps) => {
   };
 
   return (
-    <FormInputUpload label="Tour Logo" name="Logo" onChange={uploadToClient}>
+    <FormInputUpload label="Production Logo" name="Logo" onChange={uploadToClient}>
       {loading && <p>Uploading...</p>}
       {path && <img src={path} alt="Preview" />}
     </FormInputUpload>

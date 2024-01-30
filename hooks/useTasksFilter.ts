@@ -1,25 +1,25 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { tasksfilterState } from 'state/tasks/tasksFilterState';
-import { tourState } from 'state/tasks/tourState';
-import { applyTaskFilters, filterTourTasksBySearchText } from 'utils/tasks';
+import { productionState } from 'state/tasks/productionState';
+import { applyTaskFilters, filterProductionTasksBySearchText } from 'utils/tasks';
 
 const useTasksFilter = () => {
-  const tours = useRecoilValue(tourState);
+  const productions = useRecoilValue(productionState);
   const filters = useRecoilValue(tasksfilterState);
-  const [filteredTours, setFilteredTours] = useState(tours);
+  const [filteredProductions, setFilteredProductions] = useState(productions);
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    const updatedTours = filterTourTasksBySearchText(tours, e.target.value);
-    setFilteredTours(updatedTours);
+    const updatedProductions = filterProductionTasksBySearchText(productions, e.target.value);
+    setFilteredProductions(updatedProductions);
   };
   const onApplyFilters = () => {
-    const updatedTours = applyTaskFilters(tours, filters);
-    setFilteredTours(updatedTours);
+    const updatedProductions = applyTaskFilters(productions, filters);
+    setFilteredProductions(updatedProductions);
   };
   useEffect(() => {
     onApplyFilters();
-  }, [tours]);
-  return { filteredTours, handleSearch, onApplyFilters };
+  }, [productions]);
+  return { filteredProductions, handleSearch, onApplyFilters };
 };
 
 export default useTasksFilter;

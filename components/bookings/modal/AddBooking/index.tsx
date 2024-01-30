@@ -47,8 +47,8 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
   const availableDates = useMemo(() => {
     const dates = [];
-    const tourSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Tour');
-    for (const Date of tourSchedule?.Dates || []) {
+    const productionSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Production');
+    for (const Date of productionSchedule?.Dates || []) {
       const { GetInFitUpIds = [], OtherIds = [], PerformanceIds = [], RehearsalIds = [], BookingIds = [] } = Date || {};
       if ([...GetInFitUpIds, ...OtherIds, ...PerformanceIds, ...RehearsalIds, ...BookingIds].length === 0) {
         dates.push(Date.Date);

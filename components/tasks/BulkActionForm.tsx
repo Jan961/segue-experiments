@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { loggingService } from '../../services/loggingService';
 
-function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
+type Props={
+  taskIdArray:any[];
+  bulkActionField:string;
+  closeModal:()=>void;
+}
+
+function BulkActionForm({ taskIdArray, bulkActionField, closeModal }:Props) {
   const [updateValue, setUpdateValue] = useState({});
 
   const handleChange = (event) => {
@@ -18,7 +24,7 @@ function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
         error.message = 'no tasks to update';
         throw error;
       }
-      const tourTaskIds = taskIdArray; // Replace with actual task IDs to update
+      const productionTaskIds = taskIdArray; // Replace with actual task IDs to update
       const fieldToUpdate = bulkActionField; // Assuming bulkActionField has a 'value' property
       const newValue = updateValue; // Replace with the new value for the specified field
 
@@ -28,7 +34,7 @@ function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tourTaskIds,
+          productionTaskIds,
           fieldToUpdate,
           newValue,
         }),
@@ -58,8 +64,8 @@ function BulkActionForm({ taskIdArray, bulkActionField, closeModal }) {
         return (
           <select name="assignee" onChange={(e) => handleChange(e)}>
             <option value={0}>Assign a User</option>
-            {[].map((usr) => {
-              return <option value={usr.UserId}>{usr.UserName}</option>;
+            {[].map((usr,i) => {
+              return <option key={i} value={usr.UserId}>{usr.UserName}</option>;
             })}
           </select>
         );

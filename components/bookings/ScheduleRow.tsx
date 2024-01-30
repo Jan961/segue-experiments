@@ -9,7 +9,7 @@ import { bookingState } from 'state/booking/bookingState';
 import { GifuDisplay } from './events/GifuDisplay';
 import { OtherDisplay } from './OtherDisplay';
 import { CreateModal } from './modal/CreateModal';
-import { TourDisplay } from './TourDisplay';
+import { ProductionDisplay } from './ProductionDisplay';
 
 interface ScheduleRowProps {
   date: DateViewModel;
@@ -38,7 +38,7 @@ export const ScheduleRow = ({ date }: ScheduleRowProps) => {
       id={`booking-${date.Date.replace('/', '-')}`}
     >
       <div className={rowClass}>
-        <TourDisplay />
+        <ProductionDisplay />
         <DateDisplay date={date.Date} />
         <div className="col-span-7 lg:col-span-8 grid grid-rows-auto gap-y-2 flex-grow pr-1">
           {uniqueBookingIds.map((id: number) => (

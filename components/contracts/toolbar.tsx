@@ -1,16 +1,10 @@
-import * as React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
   faSearch,
 } from '@fortawesome/free-solid-svg-icons';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const show = 'ST1'; // This needs to be passed from the template
-const tour = '22';
+const production = '22';
 
 const Toolbar = () => (
   <div className="px-4">
@@ -18,11 +12,11 @@ const Toolbar = () => (
       <div className="flex flex-row align-center justify-between">
         <div className="bg-white rounded-md flex flex-row">
           <div className="rounded-l-md">
-            <p>Set Tour</p>
+            <p>Set Production</p>
           </div>
           <select className="text-primary-pink font-medium rounded-r-md">
             <option>
-              {show}/{tour}
+              {show}/{production}
             </option>
           </select>
         </div>
@@ -36,7 +30,7 @@ const Toolbar = () => (
       <div className="flex flex-row justify-between mt-4">
         <h1 className="text-2xl font-bold text-primary-pink ">
           {' '}
-          {show} / {tour} Contracts
+          {show} / {production} Contracts
         </h1>
 
         <div className="flex flex-row">

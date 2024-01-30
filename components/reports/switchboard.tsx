@@ -1,6 +1,6 @@
 import MasterPlan from './modals/masterPlan';
 import SalesVsCapacity from './modals/SalesVsCapacity';
-import TourGrossSales from './modals/TourGrossSales';
+import ProductionGrossSales from './modals/ProductionGrossSales';
 import SalesSummaryWeekly from './modals/SalesSummaryWeekly';
 import PromotorHolds from './modals/PromotorHolds';
 import HoldsComps from './modals/HoldsComps';
@@ -12,12 +12,12 @@ import SalesSummarySimple from './modals/SalesSummarySimple';
 import { PropsWithChildren } from 'react';
 
 type SwitchboardProps = {
-  activeTours: any[];
+  activeProductions: any[];
 };
 
 const Header = ({ children }: PropsWithChildren<unknown>) => <h2 className="text-lg mb-2 text-center">{children}</h2>;
 
-export default function Switchboard({ activeTours }: SwitchboardProps) {
+export default function Switchboard({ activeProductions }: SwitchboardProps) {
   return (
     <div className="mx-auto max-w-6xl">
       <h1 className="font-bold text-primary-blue text-4xl my-4">Reports</h1>
@@ -29,32 +29,32 @@ export default function Switchboard({ activeTours }: SwitchboardProps) {
         <div className="col-span-1 bg-primary-green to-transparent bg-opacity-25 p-4 rounded-xl">
           <Header>Sales and Marketing</Header>
           <ul className="grid grid-cols-1 gap-4">
-            <SalesSummarySimple activeTours={activeTours}></SalesSummarySimple>
-            <SalesSummaryWeekly activeTours={activeTours}></SalesSummaryWeekly>
-            <SalesVsCapacity activeTours={activeTours}></SalesVsCapacity>
-            <TourGrossSales activeTours={activeTours}></TourGrossSales>
+            <SalesSummarySimple activeProductions={activeProductions}></SalesSummarySimple>
+            <SalesSummaryWeekly activeProductions={activeProductions}></SalesSummaryWeekly>
+            <SalesVsCapacity activeProductions={activeProductions}></SalesVsCapacity>
+            <ProductionGrossSales activeProductions={activeProductions}></ProductionGrossSales>
           </ul>
         </div>
 
         <div className="col-span-1 bg-primary-pink bg-opacity-25 p-4 rounded-xl">
           <Header>Holds And Comps</Header>
           <ul className="grid grid-cols-1 gap-4">
-            <PromotorHolds activeTours={activeTours}></PromotorHolds>
-            <HoldsComps activeTours={activeTours}></HoldsComps>
+            <PromotorHolds activeProductions={activeProductions}></PromotorHolds>
+            <HoldsComps activeProductions={activeProductions}></HoldsComps>
           </ul>
         </div>
 
         <div className="col-span-1 bg-primary-purple bg-opacity-25 p-4 rounded-xl">
-          <Header>Tours and Venues</Header>
+          <Header>Productions and Venues</Header>
           <ul className="grid grid-cols-1 gap-4">
-            <SelectedVenues activeTours={activeTours}></SelectedVenues>
+            <SelectedVenues activeProductions={activeProductions}></SelectedVenues>
           </ul>
         </div>
 
         <div className="col-span-1 bg-primary-orange bg-opacity-25 p-4 rounded-xl">
           <Header>Activities</Header>
           <ul className="grid grid-cols-1 gap-4">
-            <OutstandingActivities activeTours={activeTours}></OutstandingActivities>
+            <OutstandingActivities activeProductions={activeProductions}></OutstandingActivities>
             <MasterplanReport></MasterplanReport>
             <ActivityLog></ActivityLog>
           </ul>

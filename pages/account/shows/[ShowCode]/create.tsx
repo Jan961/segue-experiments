@@ -1,21 +1,21 @@
 import Layout from 'components/Layout';
 import { GetServerSideProps } from 'next';
-import { TourEditor } from 'components/tours/TourEditor';
-import { TourDTO } from 'interfaces';
+import { ProductionEditor } from 'components/productions/ProductionEditor';
+import { ProductionDTO } from 'interfaces';
 import { getShowById, lookupShowCode } from 'services/ShowService';
 import { getEmailFromReq, getAccountId } from 'services/userService';
 
 type CreateProps = {
-  tour: TourDTO;
+  production: ProductionDTO;
   showCode: string;
 };
 
-const DEFAULT_TOUR: Pick<TourDTO, 'DateBlock' | 'IsArchived' | 'Code'> = {
+const DEFAULT_PRODUCTION: Pick<ProductionDTO, 'DateBlock' | 'IsArchived' | 'Code'> = {
   Code: '',
   IsArchived: false,
   DateBlock: [
     {
-      Name: 'Tour',
+      Name: 'Production',
       StartDate: '',
       EndDate: '',
     },
@@ -27,10 +27,10 @@ const DEFAULT_TOUR: Pick<TourDTO, 'DateBlock' | 'IsArchived' | 'Code'> = {
   ],
 };
 
-const Create = ({ tour, showCode }: CreateProps) => {
+const Create = ({ production, showCode }: CreateProps) => {
   return (
-    <Layout title="Add Tour | Segue">
-      <TourEditor showCode={showCode} tour={tour} />
+    <Layout title="Add Production | Segue">
+      <ProductionEditor showCode={showCode} production={production} />
     </Layout>
   );
 };
@@ -49,8 +49,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const show = await getShowById(ShowId);
 
-  const tour = { ...DEFAULT_TOUR, ShowId, ShowName: show.Name };
-  return { props: { tour, showCode: ShowCode } };
+  const production = { ...DEFAULT_PRODUCTION, ShowId, ShowName: show.Name };
+  return { props: { production, showCode: ShowCode } };
 };
 
 export default Create;

@@ -6,13 +6,13 @@ import Decimal from 'decimal.js';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
 
 type SCHEDULE_VIEW = {
-  TourId: number;
-  FullTourCode: string;
+  ProductionId: number;
+  FullProductionCode: string;
   ShowName: string;
-  TourStartDate: string;
-  TourEndDate: string;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
   EntryDate: string;
-  TourWeekNum: number;
+  ProductionWeekNum: number;
   EntryName: string;
   Location: string;
   PencilNum: number | null;
@@ -23,7 +23,7 @@ type SCHEDULE_VIEW = {
 };
 
 type UniqueHeadersObject = {
-  FullTourCode: string;
+  FullProductionCode: string;
   ShowName: string;
 };
 
@@ -66,9 +66,9 @@ const alignCellText = ({
   worksheet.getCell(row, col).alignment = { horizontal: align };
 };
 
-const getKey = ({ FullTourCode, ShowName, EntryDate }) => `${FullTourCode} - ${ShowName} - ${EntryDate}`;
+const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 const formatDate = (date) => moment(date).format('DD/MM/YY');
-const getShowAndTourKey = ({ FullTourCode, ShowName }) => `${FullTourCode} - ${ShowName}`;
+const getShowAndProductionKey = ({ FullProductionCode, ShowName }) => `${FullProductionCode} - ${ShowName}`;
 
 const handler = async (req, res) => {
   const { fromDate, toDate } = JSON.parse(req.body) || {};
@@ -86,30 +86,30 @@ const handler = async (req, res) => {
   const formattedData = data.map((x) => ({
     ...x,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-    TourStartDate: moment(x.TourStartDate).format('YYYY-MM-DD'),
-    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD'),
+    ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
+    ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
 
-  const showNameAndTourCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
+  const showNameAndProductionCode: { [key: string]: string[] } = formattedData.reduce((acc, x) => {
     const value = acc[x.ShowName];
     if (value && value?.length) {
-      if (!value.includes(x.FullTourCode)) {
+      if (!value.includes(x.FullProductionCode)) {
         return {
           ...acc,
-          [x.ShowName]: [...value, x.FullTourCode],
+          [x.ShowName]: [...value, x.FullProductionCode],
         };
       }
       return acc;
     }
     return {
       ...acc,
-      [x.ShowName]: [x.FullTourCode],
+      [x.ShowName]: [x.FullProductionCode],
     };
   }, {});
 
-  const destinctShowNames: UniqueHeadersObject[] = Object.keys(showNameAndTourCode)
+  const destinctShowNames: UniqueHeadersObject[] = Object.keys(showNameAndProductionCode)
     .map((key) => {
-      return showNameAndTourCode[key].map((code) => ({ ShowName: key, FullTourCode: code }));
+      return showNameAndProductionCode[key].map((code) => ({ ShowName: key, FullProductionCode: code }));
     })
     .reduce((acc, arr) => [...acc, ...arr], []);
 
@@ -123,24 +123,24 @@ const handler = async (req, res) => {
   worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
   worksheet.addRow([]);
   worksheet.addRow(['', '', ...destinctShowNames.map((x) => x.ShowName)]);
-  worksheet.addRow(['DAY', 'DATE', ...destinctShowNames.map((x) => x.FullTourCode)]);
+  worksheet.addRow(['DAY', 'DATE', ...destinctShowNames.map((x) => x.FullProductionCode)]);
   worksheet.addRow([]);
 
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
-  const showNameAndTourMap: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce(
-    (acc, x) => ({ ...acc, [getShowAndTourKey(x)]: x }),
+  const showNameAndProductionMap: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce(
+    (acc, x) => ({ ...acc, [getShowAndProductionKey(x)]: x }),
     {},
   );
 
   const headerWeeks =
-    destinctShowNames.reduce((acc, { ShowName, FullTourCode }) => {
-      const key = getShowAndTourKey({ FullTourCode, ShowName });
-      const value = showNameAndTourMap[key];
+    destinctShowNames.reduce((acc, { ShowName, FullProductionCode }) => {
+      const key = getShowAndProductionKey({ FullProductionCode, ShowName });
+      const value = showNameAndProductionMap[key];
       if (!value) {
         throw new Error('Missing Data');
       }
 
-      const daysDiff = moment(fromDate).diff(moment(value.TourStartDate), 'days');
+      const daysDiff = moment(fromDate).diff(moment(value.ProductionStartDate), 'days');
       let week;
       if (daysDiff >= 0 && daysDiff <= 6) {
         week = 1;
@@ -151,12 +151,12 @@ const handler = async (req, res) => {
       }
       return {
         ...acc,
-        [getShowAndTourKey({ FullTourCode, ShowName })]: week,
+        [getShowAndProductionKey({ FullProductionCode, ShowName })]: week,
       };
     }, {}) || {};
 
-  const weeks = destinctShowNames.reduce((acc, { FullTourCode, ShowName }) => {
-    const key = getShowAndTourKey({ FullTourCode, ShowName });
+  const weeks = destinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
+    const key = getShowAndProductionKey({ FullProductionCode, ShowName });
     const value = headerWeeks[key];
 
     if (!value) {
@@ -194,8 +194,8 @@ const handler = async (req, res) => {
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
     const date = formatDate(dateInIncomingFormat);
 
-    const values: string[] = destinctShowNames.map(({ FullTourCode, ShowName }) => {
-      const key = getKey({ FullTourCode, ShowName, EntryDate: dateInIncomingFormat });
+    const values: string[] = destinctShowNames.map(({ FullProductionCode, ShowName }) => {
+      const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
       const value = map[key];
       if (value) {
         return value.EntryName;
@@ -216,6 +216,7 @@ const handler = async (req, res) => {
         if (['Rehearsal Day', 'Day Off', 'Travel Day'].includes(value)) {
           return idx + 1 + 2;
         }
+        return null;
       })
       .filter((x) => !!x) as number[];
     targetCellIdx.forEach((col) =>
@@ -231,8 +232,8 @@ const handler = async (req, res) => {
     if (i % 7 === 0) {
       // worksheet.addRow([])
       // rowNo++
-      const weeks = destinctShowNames.reduce((acc, { FullTourCode, ShowName }) => {
-        const key = getShowAndTourKey({ FullTourCode, ShowName });
+      const weeks = destinctShowNames.reduce((acc, { FullProductionCode, ShowName }) => {
+        const key = getShowAndProductionKey({ FullProductionCode, ShowName });
         const value = headerWeeks[key];
 
         if (!value) {
