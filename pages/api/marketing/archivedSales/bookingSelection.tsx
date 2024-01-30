@@ -11,9 +11,9 @@ type BookingSelectionView = {
   VenueId: number;
   VenueCode: string;
   VenueMainAddressTown: string;
-  TourId: number;
-  FullTourCode: string;
-  TourLengthWeeks: number;
+  ProductionId: number;
+  FullProductionCode: string;
+  ProductionLengthWeeks: number;
 };
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -33,7 +33,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
 
     const conditions: Prisma.Sql[] = [];
-    // conditions.push(Prisma.sql`FullTourCode Like ${showCode + '%'}`)
+    // conditions.push(Prisma.sql`FullProductionCode Like ${showCode + '%'}`)
     if (salesByType === 'venue') {
       conditions.push(Prisma.sql`VenueCode = ${venueCode}`);
     }
@@ -51,8 +51,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const uniqueIds = {};
 
     data.forEach((selection) => {
-      if (!uniqueIds[selection.TourId]) {
-        uniqueIds[selection.TourId] = true; // Mark this id as seen
+      if (!uniqueIds[selection.ProductionId]) {
+        uniqueIds[selection.ProductionId] = true; // Mark this id as seen
         results.push(selection); // Push the unique item to the result array
       }
     });

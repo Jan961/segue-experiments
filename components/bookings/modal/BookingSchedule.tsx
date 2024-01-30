@@ -4,24 +4,24 @@ import ExcelIcon from 'components/global/icons/excelIcon';
 import { useState } from 'react';
 
 type props = {
-  TourId: number;
+  ProductionId: number;
 };
 
-const BookingSchedule = ({ TourId }: props) => {
+const BookingSchedule = ({ ProductionId }: props) => {
   const [isLoading, setIsLoading] = useState(false)
   const onBookingSchedule = () => {
     setIsLoading(true)
-    fetch('/api/reports/bookingSchedule', { method: 'POST', body: JSON.stringify({ TourId }) })
+    fetch('/api/reports/bookingSchedule', { method: 'POST', body: JSON.stringify({ ProductionId }) })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
-          const tourName = `${TourId}`;
+          const productionName = `${ProductionId}`;
           let suggestedName: string | any[] = response.headers.get('Content-Disposition');
           if (suggestedName) {
             suggestedName = suggestedName?.match?.(/filename="(.+)"/);
             suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
           }
           if (!suggestedName) {
-            suggestedName = `${tourName}.xlsx`;
+            suggestedName = `${productionName}.xlsx`;
           }
           const content = await response.blob();
           if (content) {

@@ -1,11 +1,11 @@
 import React from 'react';
 import { loggingService } from '../../../services/loggingService';
-import { TourTaskDTO } from 'interfaces';
+import { ProductionTaskDTO } from 'interfaces';
 import { FormInputSelect, SelectOption } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { StyledDialog } from 'components/global/StyledDialog';
 import axios from 'axios';
-import { tourState } from 'state/tasks/tourState';
+import { productionState } from 'state/tasks/productionState';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/weekOptions';
@@ -13,20 +13,20 @@ import { useRouter } from 'next/router';
 import { Spinner } from 'components/global/Spinner';
 
 interface NewTaskFormProps {
-  task?: TourTaskDTO;
+  task?: ProductionTaskDTO;
   triggerClose: () => void;
   open: boolean;
   recurring?: boolean;
 }
 
-const DEFAULT_TASK: TourTaskDTO = {
+const DEFAULT_TASK: ProductionTaskDTO = {
   Id: undefined,
-  TourId: 0,
+  ProductionId: 0,
   Code: 0,
   Name: '',
   Interval: 'once',
-  CompleteByPostTour: false,
-  StartByPostTour: false,
+  CompleteByIsPostProduction: false,
+  StartByIsPostProduction: false,
   StartByWeekNum: -52,
   CompleteByWeekNum: -52,
   AssignedToUserId: 2,
@@ -37,9 +37,9 @@ const DEFAULT_TASK: TourTaskDTO = {
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
   const router = useRouter();
   const [alert, setAlert] = React.useState<string>('');
-  const [inputs, setInputs] = React.useState<TourTaskDTO>(task || DEFAULT_TASK);
+  const [inputs, setInputs] = React.useState<ProductionTaskDTO>(task || DEFAULT_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
-  const [tours, setTours] = useRecoilState(tourState);
+  const [productions, setProductions] = useRecoilState(productionState);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const users = useRecoilValue(userState).users;
 
@@ -48,7 +48,7 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
   const handleOnChange = (e: any) => {
     let { id, value } = e.target;
 
-    if (id === 'TourId') value = Number(value);
+    if (id === 'ProductionId') value = Number(value);
     if (id === 'Progress') value = Number(value);
     if (id === 'Priority') value = Number(value);
     if (id === 'StartByWeekNum') value = Number(value);
@@ -62,8 +62,8 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
 
   const handleOnSubmit = async (event) => {
     event.preventDefault();
-    if (inputs.TourId === 0) {
-      setAlert('Select a Tour to add a task');
+    if (inputs.ProductionId === 0) {
+      setAlert('Select a Production to add a task');
       return;
     }
 
@@ -72,15 +72,15 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       try {
         await axios.post('/api/tasks/update', inputs);
 
-        const updatedTours = tours.map((tour) => {
-          if (tour.Id === inputs.TourId) {
-            const updatedTasks = tour.Tasks.map((t) => (t.Id === inputs.Id ? inputs : t));
-            return { ...tour, Tasks: updatedTasks };
+        const updatedProductions = productions.map((production) => {
+          if (production.Id === inputs.ProductionId) {
+            const updatedTasks = production.Tasks.map((t) => (t.Id === inputs.Id ? inputs : t));
+            return { ...production, Tasks: updatedTasks };
           }
-          return tour;
+          return production;
         });
 
-        setTours(updatedTours);
+        setProductions(updatedProductions);
         setIsLoading(false);
         triggerClose();
       } catch (error) {
@@ -103,9 +103,9 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
     }
   };
 
-  const tourOptions: SelectOption[] = [
-    { text: '-- Select Tour --', value: '' },
-    ...tours.map((x) => ({ text: `${x.ShowName}/${x.Code}`, value: x.Id })),
+  const productionOptions: SelectOption[] = [
+    { text: '-- Select Production --', value: '' },
+    ...productions.map((x) => ({ text: `${x.ShowName}/${x.Code}`, value: x.Id })),
   ];
 
   const progressOptions: SelectOption[] = [
@@ -134,11 +134,11 @@ const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskForm
       <form onSubmit={handleOnSubmit}>
         <p className="text-center text-red-500">{alert ?? ''}</p>
         <FormInputSelect
-          name="TourId"
-          label="Tour"
-          value={inputs.TourId}
+          name="ProductionId"
+          label="Production"
+          value={inputs.ProductionId}
           onChange={handleOnChange}
-          options={tourOptions}
+          options={productionOptions}
         />
         <FormInputText name="Name" label="Description" onChange={handleOnChange} value={inputs.Name} />
         <FormInputSelect

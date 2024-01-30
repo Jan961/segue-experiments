@@ -13,14 +13,14 @@ import {
 import { addWidthAsPerContent } from 'services/reportsService';
 
 type SCHEDULE_VIEW = {
-  TourId: number;
-  FullTourCode: string;
+  ProductionId: number;
+  FullProductionCode: string;
   ShowName: string;
   RehearsalStartDate: string;
-  TourStartDate: string;
-  TourEndDate: string;
+  ProductionStartDate: string;
+  ProductionEndDate: string;
   EntryDate: string;
-  TourWeekNum: number;
+  ProductionWeekNum: number;
   EntryType: string;
   EntryId: number;
   EntryName: string;
@@ -37,7 +37,7 @@ type SCHEDULE_VIEW = {
   SeqNo: number;
 };
 // type UniqueHeadersObject = {
-//   FullTourCode: string,
+//   FullProductionCode: string,
 //   ShowName: string
 // }
 
@@ -73,33 +73,33 @@ const addTime = (timeArr: string[] = []) => {
   const [h, m] = minsTime.split(':');
   return `${hour + Number(h)}:${Number(m)}`;
 };
-const getKey = ({ FullTourCode, ShowName, EntryDate }) => `${FullTourCode} - ${ShowName} - ${EntryDate}`;
+const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
 // const formatDate = (date) => moment(date).format('DD/MM/YY')
 
 const handler = async (req, res) => {
-  const { TourId } = JSON.parse(req.body) || {};
+  const { ProductionId } = JSON.parse(req.body) || {};
 
   // const formatedFromDate = formatDate(fromDate)
   // const formatedToDate = formatDate(toDate)
-  // if (!fromDate || !toDate || !TourId) {
+  // if (!fromDate || !toDate || !ProductionId) {
   //   throw new Error('Params are missing')
   // }
   const conditions: Prisma.Sql[] = [];
   // if (fromDate && toDate) {
   //   conditions.push(Prisma.sql`EntryDate BETWEEN ${fromDate} AND ${toDate}`)
   // }
-  if (TourId) {
-    conditions.push(Prisma.sql` TourId=${TourId}`);
+  if (ProductionId) {
+    conditions.push(Prisma.sql` ProductionId=${ProductionId}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: SCHEDULE_VIEW[] = await prisma.$queryRaw`select * FROM ScheduleView ${where} order by EntryDate;`;
-  const { RehearsalStartDate: fromDate, TourEndDate: toDate } = data?.[0] || {};
+  const { RehearsalStartDate: fromDate, ProductionEndDate: toDate } = data?.[0] || {};
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
     EntryDate: moment(x.EntryDate).format('YYYY-MM-DD'),
-    TourStartDate: moment(x.TourStartDate).format('YYYY-MM-DD'),
-    TourEndDate: moment(x.TourEndDate).format('YYYY-MM-DD'),
+    ProductionStartDate: moment(x.ProductionStartDate).format('YYYY-MM-DD'),
+    ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
   const worksheet = workbook.addWorksheet('Travel Summary', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
@@ -113,19 +113,19 @@ const handler = async (req, res) => {
     });
     return;
   }
-  const { ShowName, FullTourCode } = data[0];
-  worksheet.addRow([`${ShowName} (${FullTourCode}) Travel Summary`]);
+  const { ShowName, FullProductionCode } = data[0];
+  worksheet.addRow([`${ShowName} (${FullProductionCode}) Travel Summary`]);
   worksheet.addRow([]);
-  worksheet.addRow(['Tour', '', '', '', '', 'Onward Travel']);
+  worksheet.addRow(['Production', '', '', '', '', 'Onward Travel']);
   worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue', 'Time', 'Miles']);
   worksheet.addRow([]);
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
   let rowNo = 5;
-  let prevTourWeekNum = '';
+  let prevProductionWeekNum = '';
   let lastWeekMetaInfo = {
     weekTotalPrinted: false,
-    prevTourWeekNum: '',
+    prevProductionWeekNum: '',
   };
   let time: string[] = [];
   let mileage: number[] = [];
@@ -135,10 +135,10 @@ const handler = async (req, res) => {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-    const key = getKey({ FullTourCode, ShowName, EntryDate: dateInIncomingFormat });
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
     const value: SCHEDULE_VIEW = map[key];
     if (!value) {
-      worksheet.addRow([`Week ${prevTourWeekNum}`, weekDay, dateInIncomingFormat]);
+      worksheet.addRow([`Week ${prevProductionWeekNum}`, weekDay, dateInIncomingFormat]);
       colorTextAndBGCell({
         worksheet,
         row: rowNo + 1,
@@ -147,14 +147,14 @@ const handler = async (req, res) => {
         cellColor: COLOR_HEXCODE.BLACK,
       });
     } else {
-      const { TourWeekNum, Location, EntryName, TimeMins, Mileage } = value;
+      const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value;
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);
-      prevTourWeekNum = TourWeekNum ? String(TourWeekNum) : prevTourWeekNum;
+      prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
       // localhost:8002/api/v1/dummy
       worksheet.addRow([
-        `Week ${TourWeekNum}`,
+        `Week ${ProductionWeekNum}`,
         weekDay.substring(0, 3),
         dateInIncomingFormat,
         Location || '',
@@ -189,7 +189,7 @@ const handler = async (req, res) => {
         '',
         '',
         '',
-        `Tour Week ${value?.TourWeekNum || prevTourWeekNum || ''}`,
+        `Production Week ${value?.ProductionWeekNum || prevProductionWeekNum || ''}`,
         addTime(time),
         mileage.reduce((acc, m) => acc + Number(m || 0), 0),
       ]);
@@ -207,7 +207,7 @@ const handler = async (req, res) => {
       colorCell({ worksheet, row: rowNo, col: 2, argbColor: COLOR_HEXCODE.CREAM });
       colorCell({ worksheet, row: rowNo, col: 3, argbColor: COLOR_HEXCODE.CREAM });
     }
-    lastWeekMetaInfo = { ...lastWeekMetaInfo, prevTourWeekNum };
+    lastWeekMetaInfo = { ...lastWeekMetaInfo, prevProductionWeekNum };
   }
   if (time.length) {
     totalTime = [...totalTime, ...time];
@@ -222,7 +222,7 @@ const handler = async (req, res) => {
       '',
       '',
       '',
-      `Tour Week ${lastWeekMetaInfo?.prevTourWeekNum || ''}`,
+      `Production Week ${lastWeekMetaInfo?.prevProductionWeekNum || ''}`,
       addTime(time),
       mileage.reduce((acc, m) => acc + Number(m || 0), 0),
     ]);
@@ -235,7 +235,7 @@ const handler = async (req, res) => {
     '',
     '',
     '',
-    'TOUR TOTALS',
+    'PRODUCTION TOTALS',
     addTime(totalTime),
     totalMileage.reduce((acc, m) => acc + Number(m || 0), 0),
   ]);

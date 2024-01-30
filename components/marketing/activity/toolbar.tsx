@@ -1,18 +1,5 @@
-import * as React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faAnglesDown,
-  faArrowsLeftRightToLine,
-  faCalendarXmark,
-  faFileExcel,
-  faSearch,
-} from '@fortawesome/free-solid-svg-icons';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-const show = 'ST1'; // This needs to be passed from the template
-const tour = '22';
-
-const Toolbar = ({ title = 'This is the default title' }) => (
+const Toolbar = () => (
   <div>
     <div className="flex flex-row items-center text-primary-green justify-evenly mt-5 h-50 max-w-full bg-transparent">
       <div className=" w-1/12">
@@ -30,7 +17,7 @@ const Toolbar = ({ title = 'This is the default title' }) => (
       <input type={'text'} />
       <input type={'checkbox'} />
       <label className="text-center font-bold" htmlFor={'venue Code'}>
-        Display current tour activities only
+        Display current production activities only
       </label>
     </div>
   </div>

@@ -1,24 +1,24 @@
-import { getAccountUsersList, getPermissionsList } from 'services/permissionService';
-
+import { getAccountUsersList } from 'services/permissionService';
 import TreeSelect from 'components/global/TreeSelect';
 import { TreeItemOption } from 'components/global/TreeSelect/types';
 import Layout from 'components/Layout';
-import Typeahead, { TypeaheadOption } from 'components/global/forms/FormTypeahead';
+import Typeahead from 'components/global/forms/FormTypeahead';
 import axios from 'axios';
 import { useState } from 'react';
 import { FormInputButton } from 'components/global/forms/FormInputButton';
+import { InferGetServerSidePropsType } from "next";
 
 export async function getServerSideProps() {
-  const permissions = await getPermissionsList();
+  const permissions = [];
   const accountUsers = await getAccountUsersList();
 
-  return { props: { permissions, accountUsers } };
+  return { props: { permissions, accountUsers  } };
 }
 
-interface AdminProps {
-  permissions: TreeItemOption[];
-  accountUsers: TypeaheadOption[];
-}
+// interface AdminProps {
+//   permissions: TreeItemOption[];
+//   accountUsers: TypeaheadOption[];
+// }
 
 const formatUserPermissions = (permArr = [], userPermArr = []) => {
   const formatted = permArr.map((perm) => {
@@ -34,7 +34,7 @@ const formatUserPermissions = (permArr = [], userPermArr = []) => {
   return formatted;
 };
 
-export default function Admin({ permissions = [], accountUsers = [] }: AdminProps) {
+export default function Admin({ permissions = [], accountUsers = [] }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [userPermissions, setUserPermissions] = useState(permissions);
   const [user, setUser] = useState<string>();
 

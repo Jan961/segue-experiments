@@ -1,29 +1,29 @@
 import { GetServerSideProps } from 'next';
-import { getActiveTours } from 'services/TourService';
+import { getActiveProductions } from 'services/ProductionService';
 import Layout from '../../components/Layout';
 import Switchboard from '../../components/reports/switchboard';
-import { tourEditorMapper } from 'lib/mappers';
+import { productionEditorMapper } from 'lib/mappers';
 import { getAccountIdFromReq } from 'services/userService';
-import { Tour } from '@prisma/client';
+import { Production } from '@prisma/client';
 
 type ReportsProps = {
-  activeTours: any & Tour[];
+  activeProductions: any & Production[];
 };
 
-const Index = ({ activeTours = [] }: ReportsProps) => {
+const Index = ({ activeProductions = [] }: ReportsProps) => {
   return (
     <Layout title="Reports | Segue">
-      <Switchboard activeTours={activeTours}></Switchboard>
+      <Switchboard activeProductions={activeProductions}></Switchboard>
     </Layout>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const activeTours = await getActiveTours(AccountId);
+  const activeProductions = await getActiveProductions(AccountId);
   return {
     props: {
-      activeTours: activeTours.map((tour: any & Tour) => tourEditorMapper(tour)),
+      activeProductions: activeProductions.map((production: any & Production) => productionEditorMapper(production)),
     },
   };
 };

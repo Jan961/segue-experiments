@@ -2,7 +2,6 @@ import { Prisma } from '@prisma/client';
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
-import { lookupTourId } from 'services/TourService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
@@ -13,7 +12,7 @@ enum HOLD_OR_COMP {
 }
 
 type TBookingHolds = {
-  FullTourCode: string;
+  FullProductionCode: string;
   VenueCode: string;
   VenueName: string;
   VenueSeats: number;
@@ -34,7 +33,7 @@ type TBookingCodeAndName = {
 };
 
 type TBookingHoldsGrouped = {
-  FullTourCode: string;
+  FullProductionCode: string;
   VenueCode: string;
   VenueName: string;
   VenueSeats: number;
@@ -78,16 +77,16 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
 };
 
 const getAggregateKey = ({
-  FullTourCode,
+  FullProductionCode,
   VenueCode,
   VenueName,
   BookingFirstDate,
 }: {
-  FullTourCode: TBookingHolds['FullTourCode'];
+  FullProductionCode: TBookingHolds['FullProductionCode'];
   VenueCode: TBookingHolds['VenueCode'];
   VenueName: TBookingHolds['VenueName'];
   BookingFirstDate: TBookingHolds['BookingFirstDate'];
-}) => `${FullTourCode} | ${VenueCode} | ${VenueName} | ${BookingFirstDate}`;
+}) => `${FullProductionCode} | ${VenueCode} | ${VenueName} | ${BookingFirstDate}`;
 
 const getTypeAndCodeKey = ({
   HoldOrComp,
@@ -155,7 +154,7 @@ const groupBasedOnVenueAndSameDate = ({
     return {
       ...acc,
       [key]: {
-        FullTourCode: obj.FullTourCode,
+        FullProductionCode: obj.FullProductionCode,
         VenueCode: obj.VenueCode,
         VenueName: obj.VenueName,
         VenueSeats: obj.VenueSeats,
@@ -181,17 +180,17 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
 };
 
 const handler = async (req, res) => {
-  const { TourId, tourCode, fromDate, toDate, venue } = JSON.parse(req.body) || {};
+  const { ProductionId, productionCode, fromDate, toDate, venue } = JSON.parse(req.body) || {};
 
-  // This doesn't check tourCode
+  // This doesn't check productionCode
   const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { TourId });
+  const access = await checkAccess(email, { ProductionId });
   if (!access) return res.status(401).end();
 
   const workbook = new ExcelJS.Workbook();
   const conditions: Prisma.Sql[] = [];
-  if (tourCode) {
-    conditions.push(Prisma.sql`FullTourCode = ${tourCode}`);
+  if (productionCode) {
+    conditions.push(Prisma.sql`FullProductionCode = ${productionCode}`);
   }
   if (venue) {
     conditions.push(Prisma.sql`VenueCode = ${venue}`);
@@ -210,7 +209,7 @@ const handler = async (req, res) => {
   worksheet.addRow(['BOOKING HOLDS/COMPS REPORT']);
   const date = new Date();
   worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
-  worksheet.addRow(['TOUR', 'VENUE', '', 'SHOW']);
+  worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW']);
   worksheet.addRow(['CODE', 'CODE', 'NAME', 'DATE', 'TYPE', 'CODE', 'NAME', 'SEATS', 'TOTAL', 'REMAINING']);
 
   const numberOfColumns = worksheet.columnCount;
@@ -235,7 +234,7 @@ const handler = async (req, res) => {
       worksheet.mergeCells(`A${row - 1}:J${row - 1}`);
     }
     worksheet.addRow([
-      x.FullTourCode,
+      x.FullProductionCode,
       x.VenueCode,
       x.VenueName,
       x.BookingFirstDate ? moment(x.BookingFirstDate).format('DD/MM/YY') : '',
@@ -380,7 +379,7 @@ const handler = async (req, res) => {
     maxColWidth: Infinity,
   });
 
-  const filename = `Holds_Comps${tourCode ? '_' + tourCode : ''}${
+  const filename = `Holds_Comps${productionCode ? '_' + productionCode : ''}${
     fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
   }.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

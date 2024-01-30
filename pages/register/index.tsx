@@ -110,12 +110,7 @@ function Register() {
 
   async function onSubmit(user) {
     // Create Account get Account ID
-    let paymentSuccess: boolean;
-
-    paymentSuccess = true;
-
     user.accountId = await createAccount(user);
-
     // Send User to UserService to Register
     return userService
       .register(user)
@@ -146,7 +141,7 @@ function Register() {
               />
               <h1 className=" text-center text-3xl font-bold tracking-tight text-gray-900">Register</h1>
               <p className="mt-2 text-center text-sm text-gray-600">
-                If you have been invited to Join use the link in the email to create an account linked to your tour
+                If you have been invited to Join use the link in the email to create an account linked to your production
                 company
               </p>
             </div>

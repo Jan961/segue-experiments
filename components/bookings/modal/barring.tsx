@@ -2,10 +2,10 @@ import { useRef, useState, useMemo } from 'react';
 import { dateToSimple } from 'services/dateService';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { useRecoilValue } from 'recoil';
-import { tourJumpState } from 'state/booking/tourJumpState';
+import { productionJumpState } from 'state/booking/productionJumpState';
 import axios from 'axios';
 import { Table } from 'components/global/table/Table';
-import { BarredVenue } from 'pages/api/tours/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputNumeric } from 'components/global/forms/FormInputNumeric';
 import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
@@ -13,20 +13,15 @@ import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { Spinner } from 'components/global/Spinner';
 import { MenuButton } from 'components/global/MenuButton';
 
-type BarringProps={
-  visible: boolean;
-  onClose:()=>void;
-}
-
-export default function Barring({visible,onClose}:BarringProps) {
-  const { tours } = useRecoilValue(tourJumpState);
+export default function Barring() {
+  const { productions } = useRecoilValue(productionJumpState);
   const [venues, setVenues] = useState([]);
   const [inputs, setInputs] = useState({
-    tour: null,
+    production: null,
     venue: null,
     barDistance: 0,
     London: false,
-    TourOnly: false,
+    ProductionOnly: false,
     Seats: 0,
   });
   const [barringVenues, setBarringVenues] = useState<BarredVenue[]>([]);
@@ -35,8 +30,8 @@ export default function Barring({visible,onClose}:BarringProps) {
   const fetchBarredVenues = async () => {
     setIsLoading(true);
     axios
-      .post('/api/tours/venue/barred', {
-        tourId: parseInt(inputs.tour),
+      .post('/api/productions/venue/barred', {
+        productionId: parseInt(inputs.production),
         venueId: parseInt(inputs.venue),
         excludeLondon: inputs.London,
       })
@@ -56,11 +51,11 @@ export default function Barring({visible,onClose}:BarringProps) {
 
   /* const closeForm = () => {
     setInputs({
-      tour: null,
+      production: null,
       venue: null,
       barDistance: 0,
       London: false,
-      TourOnly: false,
+      ProductionOnly: false,
       Seats: 0,
     });
 
@@ -73,11 +68,11 @@ export default function Barring({visible,onClose}:BarringProps) {
       ...prev,
       [id]: value,
     }));
-    if (e.target.name === 'tour') {
-      // Load Venues for this tour
+    if (e.target.name === 'production') {
+      // Load Venues for this production
       // setIsLoading(true)
       await axios
-        .get(`/api/tours/read/venues/${e.target.value}`)
+        .get(`/api/productions/read/venues/${e.target.value}`)
         .then((data) => data?.data)
         .then((data) => {
           // setIsLoading(false)
@@ -95,9 +90,9 @@ export default function Barring({visible,onClose}:BarringProps) {
     }
   };
 
-  const tourOptions = tours.map((tour) => ({
-    text: `${tour.ShowCode}/${tour.Code} | ${tour.ShowName}`,
-    value: tour.Id,
+  const productionOptions = productions.map((production) => ({
+    text: `${production.ShowCode}/${production.Code} | ${production.ShowName}`,
+    value: production.Id,
   }));
   const venueOptions = useMemo(
     () =>
@@ -112,8 +107,8 @@ export default function Barring({visible,onClose}:BarringProps) {
     <>
       <StyledDialog
         className="w-4/5 max-w-full h-[90vh] relative"
-        open={visible}
-        onClose={onClose}
+        open={false}
+        onClose={() => null}
         title="Barring"
         width="xl"
       >
@@ -125,10 +120,10 @@ export default function Barring({visible,onClose}:BarringProps) {
         <form ref={formRef} onSubmit={handleOnSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-x-2 items-center">
             <FormInputSelect
-              label="Tour"
-              name="tour"
-              value={inputs.tour}
-              options={[{ value: 0, text: '-- Select Tour --' }, ...tourOptions]}
+              label="Production"
+              name="production"
+              value={inputs.production}
+              options={[{ value: 0, text: '-- Select Production --' }, ...productionOptions]}
               onChange={handleOnChange}
               required
             />

@@ -6,7 +6,7 @@ import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 import { dateToSimple } from 'services/dateService';
 import { TasksFilterType } from 'state/tasks/tasksFilterState';
 import { group } from 'radash';
-import { TourTask } from '@prisma/client';
+import { ProductionTask } from '@prisma/client';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 
 const getTaskStatusFromProgress = (progress: number) => {
@@ -21,7 +21,7 @@ const getTaskStatusFromProgress = (progress: number) => {
 };
 
 const handler = async (req, res) => {
-  const { tour, assignee, taskText, status, startDueDate, endDueDate } = (JSON.parse(req.body) ||
+  const { production, assignee, taskText, status, startDueDate, endDueDate } = (JSON.parse(req.body) ||
     {}) as TasksFilterType;
   let where = {};
   if (status) {
@@ -53,17 +53,17 @@ const handler = async (req, res) => {
       };
     }
   }
-  const taskList: any[] = await prisma.TourTask.findMany({
+  const taskList: any[] = await prisma.ProductionTask.findMany({
     where: {
       ...where,
-      ...(tour && { TourId: tour }),
+      ...(production && { ProductionId: production }),
       ...(assignee && { AssignedToUserId: assignee }),
       ...(taskText && {
         Name: {
           contains: taskText,
         },
       }),
-      Tour: {
+      Production: {
         is: {
           IsArchived: false,
         },
@@ -78,14 +78,14 @@ const handler = async (req, res) => {
       Priority: true,
       AssignedToUserId: true,
       Notes: true,
-      TourId: true,
+      ProductionId: true,
       User: {
         select: {
           FirstName: true,
           LastName: true,
         },
       },
-      Tour: {
+      Production: {
         select: {
           Code: true,
           DateBlock: true,
@@ -100,7 +100,7 @@ const handler = async (req, res) => {
     },
     orderBy: [{ StartByWeekNum: 'asc' }],
   });
-  const TourTaskMap = group(taskList, (task) => task.TourId);
+  const ProductionTaskMap = group(taskList, (task) => task.ProductionId);
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Tasks', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
@@ -116,7 +116,7 @@ const handler = async (req, res) => {
     });
     return;
   }
-  worksheet.addRow([`TOUR TASK LIST`]);
+  worksheet.addRow([`PRODUCTION TASK LIST`]);
   worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
   worksheet.addRow(['', '', '', '', '', '', '', '', '', '', '']);
   worksheet.addRow([
@@ -133,18 +133,18 @@ const handler = async (req, res) => {
     'NOTES',
   ]);
   let startingRow = 8;
-  const compareTours = (a: TourTask[], b: TourTask[]): number => {
-    const getStartDate = (tour) =>
-      tour?.[0]?.Tour?.DateBlock?.find?.((DateBlock) => DateBlock?.Name === 'Tour')?.StartDate || '';
+  const compareProductions = (a: ProductionTask[], b: ProductionTask[]): number => {
+    const getStartDate = (production) =>
+      production?.[0]?.Production?.DateBlock?.find?.((DateBlock) => DateBlock?.Name === 'Production')?.StartDate || '';
     return getStartDate(b) < getStartDate(a) ? 1 : -1;
   };
-  const TourTasks = Object.values(TourTaskMap).sort(compareTours);
-  for (let taskList of TourTasks) {
+  const ProductionTasks = Object.values(ProductionTaskMap).sort(compareProductions);
+  for (let taskList of ProductionTasks) {
     const progressData = [];
     const task = taskList?.[0];
-    const ShowName = `${task?.Tour?.Show?.Name}`;
-    const { StartDate, EndDate } = task.Tour.DateBlock.find((DateBlock) => DateBlock.Name === 'Tour') || {};
-    const weekNumsList = taskList.flatMap((TourTask) => [TourTask.CompleteByWeekNum, TourTask.StartByWeekNum]);
+    const ShowName = `${task?.Production?.Show?.Name}`;
+    const { StartDate, EndDate } = task.Production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
+    const weekNumsList = taskList.flatMap((ProductionTask) => [ProductionTask.CompleteByWeekNum, ProductionTask.StartByWeekNum]);
     const weekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
     taskList = taskList.filter((task) => {
       const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum];

@@ -3,10 +3,10 @@ import { faListDots } from '@fortawesome/free-solid-svg-icons';
 import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 
 type Props = {
-  activeTours: any[];
+  activeProductions: any[];
 };
 
-export default function OutstandingActivities({ activeTours }: Props) {
+export default function OutstandingActivities({ activeProductions }: Props) {
   const [showModal, setShowModal] = React.useState(false);
 
   const [status, setStatus] = useState({
@@ -16,12 +16,12 @@ export default function OutstandingActivities({ activeTours }: Props) {
   });
 
   const [inputs, setInputs] = useState({
-    Tour: null,
+    Production: null,
   });
 
   function closeForm() {
     setInputs({
-      Tour: null,
+      Production: null,
     });
 
     setShowModal(false);
@@ -71,21 +71,21 @@ export default function OutstandingActivities({ activeTours }: Props) {
                 {/* body */}
                 <form onSubmit={handleOnSubmit}>
                   <div className="flex flex-col space-y-2">
-                    <label htmlFor="Tour" className="">
-                      Tour
+                    <label htmlFor="Production" className="">
+                      Production
                     </label>
                     <select
                       className="block w-full min-w-0 flex-1 rounded-none rounded-l-md border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={inputs.Tour}
-                      id="Tour"
-                      name="Tour"
+                      value={inputs.Production}
+                      id="Production"
+                      name="Production"
                       onChange={handleOnChange}
                     >
-                      <option>Select a Tour</option>
-                      {activeTours.map((tour) => (
-                        <option key={tour.Id} value={`${tour.Id}`}>
-                          {tour.ShowCode}
-                          {tour.Code} | {tour.ShowName}
+                      <option>Select a Production</option>
+                      {activeProductions.map((production) => (
+                        <option key={production.Id} value={`${production.Id}`}>
+                          {production.ShowCode}
+                          {production.Code} | {production.ShowName}
                         </option>
                       ))}
                     </select>

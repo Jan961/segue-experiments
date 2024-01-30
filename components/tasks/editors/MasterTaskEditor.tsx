@@ -29,9 +29,9 @@ const DEFAULT_MASTER_TASK: MasterTask = {
   RepeatInterval: '',
   RepeatCount: null,
   StartByWeekNum: 0,
-  StartByIsPostTour: false,
+  TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,
-  CompleteByIsPostTour: false,
+  TaskCompleteByIsPostProduction: false,
 };
 
 const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {

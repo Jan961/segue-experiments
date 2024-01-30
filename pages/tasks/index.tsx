@@ -1,12 +1,12 @@
 import { GetServerSideProps } from 'next';
-import { AllTourPageProps, getAllTourPageProps } from 'services/TourService';
-import { TourSelector } from 'components/TourSelector';
+import { AllProductionPageProps, getAllProductionPageProps } from 'services/ProductionService';
+import { ProductionSelector } from 'components/ProductionSelector';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import Link from 'next/link';
 
-const ShowSelection = ({ tours }: AllTourPageProps) => (
+const ShowSelection = ({ productions }: AllProductionPageProps) => (
   <div>
-    <TourSelector
+    <ProductionSelector
       ToolbarButtons={
         <div className='flex gap-6 my-6 justify-center'>
           <Link href={`/tasks/all`}>
@@ -18,11 +18,11 @@ const ShowSelection = ({ tours }: AllTourPageProps) => (
           <ToolbarButton className="text-purple-900">Start Production Task List</ToolbarButton>
         </div>
       }
-      tours={tours}
+      productions={productions}
     />
   </div>
 );
 
-export const getServerSideProps: GetServerSideProps = (ctx) => getAllTourPageProps(ctx);
+export const getServerSideProps: GetServerSideProps = (ctx) => getAllProductionPageProps(ctx);
 
 export default ShowSelection;

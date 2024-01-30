@@ -2,18 +2,18 @@ import Layout from '../../../components/Layout';
 import FinalSales from '../../../components/marketing/sales/final';
 import { GetServerSideProps } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import { getActiveTours } from 'services/TourService';
+import { getActiveProductions } from 'services/ProductionService';
 
 type Props = {
-  activeTours: any[];
+  activeProductions: any[];
 };
 const pagetitle = 'Marketing - Final Sales Entry';
 
-const Index = ({ activeTours }: Props) => (
+const Index = ({ activeProductions }: Props) => (
   <Layout title={pagetitle + '| Seque'}>
     <div className="flex flex-col px-4 flex-auto">
       <h1 className="text-3xl font-bold text-primary-green ">{pagetitle + ' | Seque'}</h1>
-      <FinalSales tours={activeTours}></FinalSales>
+      <FinalSales productions={activeProductions}></FinalSales>
     </div>
   </Layout>
 );
@@ -21,10 +21,10 @@ const Index = ({ activeTours }: Props) => (
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
   const AccountId = await getAccountId(email);
-  const toursRaw = await getActiveTours(AccountId);
+  const productionsRaw = await getActiveProductions(AccountId);
   return {
     props: {
-      activeTours: toursRaw.map((t: any) => ({
+      activeProductions: productionsRaw.map((t: any) => ({
         Id: t.Id,
         Code: t.Code,
         IsArchived: t.IsArchived,

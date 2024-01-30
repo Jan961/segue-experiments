@@ -14,21 +14,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       // status,
       priority,
       // followUp,
-      tourId,
+      productionId,
       notes,
       intervalWeekDay,
       intervalMonthDate,
     } = req.body;
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { TourId: tourId });
+    const access = await checkAccess(email, { ProductionId: productionId });
     if (!access) return res.status(401).end();
 
     console.log('The req.body', req.body);
-    // Fetch tour weeks
-    const tourWeeks = await prisma.tourWeek.findMany({
+    // Fetch production weeks
+    const productionWeeks = await prisma.productionWeek.findMany({
       where: {
-        TourId: parseInt(tourId),
+        ProductionId: parseInt(productionId),
       },
     });
 
@@ -47,18 +47,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const dueDateObj = dueDate ? new Date(dueDate) : undefined;
 
       if (dueDateObj) {
-        const matchedTourWeek = tourWeeks.find((tourWeek) => {
-          const mondayDate = new Date(tourWeek.MondayDate);
-          const sundayDate = new Date(tourWeek.SundayDate);
+        const matchedProductionWeek = productionWeeks.find((productionWeek) => {
+          const mondayDate = new Date(productionWeek.MondayDate);
+          const sundayDate = new Date(productionWeek.SundayDate);
 
           return dueDateObj >= mondayDate && dueDateObj <= sundayDate;
         });
 
-        if (matchedTourWeek) {
+        if (matchedProductionWeek) {
           tasksToCreate.push({
             dueDate: dueDateObj,
-            startByWeekCode: matchedTourWeek.WeekCode,
-            completeByWeekCode: matchedTourWeek.WeekCode,
+            startByWeekCode: matchedProductionWeek.WeekCode,
+            completeByWeekCode: matchedProductionWeek.WeekCode,
           });
         } else {
           console.error('No due date found');
@@ -72,15 +72,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     } else if (interval === 'month') {
       const months = {};
       // sort the weeks into
-      tourWeeks.forEach((tourWeek, index) => {
-        const date = new Date(tourWeek.MondayDate);
+      productionWeeks.forEach((productionWeek, index) => {
+        const date = new Date(productionWeek.MondayDate);
         const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
 
         if (!months[monthKey]) {
           months[monthKey] = {
             date,
-            startByWeekCode: tourWeek.WeekCode,
-            completeByWeekCode: tourWeeks[index + 1]?.WeekCode || '',
+            startByWeekCode: productionWeek.WeekCode,
+            completeByWeekCode: productionWeeks[index + 1]?.WeekCode || '',
           };
         }
       });
@@ -98,13 +98,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const dayOffset = weekDays.indexOf(intervalWeekDay);
       const weekOffset = interval === 'biWeek' ? 2 : 1;
 
-      for (let i = 0; i < tourWeeks.length; i += weekOffset) {
-        const tourWeek = tourWeeks[i];
-        const date = addDays(tourWeek.MondayDate, dayOffset);
+      for (let i = 0; i < productionWeeks.length; i += weekOffset) {
+        const productionWeek = productionWeeks[i];
+        const date = addDays(productionWeek.MondayDate, dayOffset);
         tasksToCreate.push({
           dueDate: date,
-          startByWeekCode: tourWeek.WeekCode,
-          completeByWeekCode: tourWeeks[i + 1]?.WeekCode || '',
+          startByWeekCode: productionWeek.WeekCode,
+          completeByWeekCode: productionWeeks[i + 1]?.WeekCode || '',
         });
       }
     }
@@ -115,7 +115,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const createdTasks = await Promise.all(
       tasksToCreate.map(
         async (task) =>
-          await prisma.tourTask.create({
+          await prisma.productionTask.create({
             data: {
               Code: parseInt('0'),
               Name: taskTitle,
@@ -123,21 +123,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               CompleteByWeekNum: task.completeByWeekCode,
               Priority: parseInt(priority),
               Notes: notes,
-              // DeptRCK: req.body.DeptRCK === 'true',
-              // DeptMarketing: req.body.DeptMarketing === 'true',
-              // DeptProduction: req.body.DeptProduction === 'true',
-              // DeptAccounts: req.body.DeptAccounts === 'true',
               Progress: parseInt(progress),
-              // DueDate: task.dueDate,
-              // FollowUp: followUp ? new Date(followUp) : undefined,
               Assignee: assignee ? parseInt(req.body.assignee) : undefined,
               AssignedBy: assignedBy ? parseInt(assignedBy) : undefined,
-              // CreatedDate: new Date(),
               Interval: interval,
-              // Status: status,
-              Tour: {
+              Production: {
                 connect: {
-                  Id: parseInt(tourId),
+                  Id: parseInt(productionId),
                 },
               },
               User: {
@@ -153,6 +145,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.json(createdTasks);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error creating Recurring TourTask' });
+    res.status(500).json({ error: 'Error creating Recurring ProductionTask' });
   }
 }

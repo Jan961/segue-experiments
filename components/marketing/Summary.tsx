@@ -11,14 +11,14 @@ import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
 import { DescriptionList as DL } from 'components/global/DescriptionList';
 import moment from 'moment';
 
-export const formatCurrency = (ammount, currency: string) => {
+export const formatCurrency = (amount:number, currency:string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
-    currency: 'GBP',
+    currency: currency || 'GBP',
     minimumFractionDigits: 0,
   });
 
-  return formatter.format(ammount);
+  return formatter.format(amount);
 };
 
 export const Summary = () => {
@@ -46,7 +46,7 @@ export const Summary = () => {
   if (loading) return <LoadingTab />;
 
   if (!summary) return null;
-  const weekNo = calculateWeekNumber(new Date(summary?.TourInfo?.StartDate), new Date(summary?.TourInfo?.Date));
+  const weekNo = calculateWeekNumber(new Date(summary?.ProductionInfo?.StartDate), new Date(summary?.ProductionInfo?.Date));
 
   if (!summary?.Info) return null;
 
@@ -59,12 +59,12 @@ export const Summary = () => {
       <h3 className="mb-1 text-base font-bold text-primary-blue">General Info</h3>
       <DL>
         <DL.Term>First Date</DL.Term>
-        <DL.Desc>{dateToSimple(summary?.TourInfo?.Date)}</DL.Desc>
+        <DL.Desc>{dateToSimple(summary?.ProductionInfo?.Date)}</DL.Desc>
         <DL.Term>Last Date</DL.Term>
-        <DL.Desc>{dateToSimple(summary?.TourInfo?.lastDate)}</DL.Desc>
+        <DL.Desc>{dateToSimple(summary?.ProductionInfo?.lastDate)}</DL.Desc>
         <DL.Term>Number of Day(s)</DL.Term>
-        <DL.Desc>{summary?.TourInfo?.numberOfDays}</DL.Desc>
-        <DL.Term>Tour Week No</DL.Term>
+        <DL.Desc>{summary?.ProductionInfo?.numberOfDays}</DL.Desc>
+        <DL.Term>Production Week No</DL.Term>
         <DL.Desc>{weekNo}</DL.Desc>
         <DL.Term>Performance Time(s)</DL.Term>
         <DL.Desc>

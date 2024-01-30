@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const show = 'ST1'; // This needs to be passed from the template
-const tour = '22';
+const production = '22';
 
 interface props {
   title?: string;
@@ -18,10 +18,10 @@ const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
         <div className="bg-white drop-shadow-md rounded-md flex flex-row">
           <div className="rounded-l-md">
             <div className="flex items-center">
-              <p className="mx-2">Set Tour</p>
+              <p className="mx-2">Set Production</p>
               <select className="text-primary-green border-y-0 border-r-0 border-l-1 border-gray-200 font-medium rounded-r-md">
                 <option>
-                  {show}/{tour}
+                  {show}/{production}
                 </option>
               </select>
             </div>
@@ -37,7 +37,7 @@ const Toolbar = ({ title, searchFilter, setSearchFilter }: props) => (
       <div className="flex flex-row justify-between mt-4">
         <h1 className="text-3xl font-bold text-primary-green ">
           {' '}
-          {show} / {tour} {title}
+          {show} / {production} {title}
         </h1>
 
         {setSearchFilter && (

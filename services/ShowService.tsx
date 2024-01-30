@@ -25,17 +25,17 @@ export const getShowPageProps = async (ctx: any) => {
 };
 
 const showInclude = Prisma.validator<Prisma.ShowInclude>()({
-  Tour: {
+  Production: {
     where: { IsDeleted: false },
     include: { Show: true, DateBlock: true },
   },
 });
 
-export type ShowWithTours = Prisma.ShowGetPayload<{
+export type ShowWithProductions = Prisma.ShowGetPayload<{
   include: typeof showInclude;
 }>;
 
-export const getShowWithToursById = async (Id: number) => {
+export const getShowWithProductionsById = async (Id: number) => {
   return await prisma.show.findFirst({
     where: {
       Id,

@@ -46,7 +46,7 @@ export const MenuIcons: Story = {
           <Icon iconName="marketing" fill="#21345B" {...args} />
           <Icon iconName="tasks" fill="#FFF" {...args} />
           <Icon iconName="contracts" fill="#FFF" {...args} />
-          <Icon iconName="touring-management" {...args} />
+          <Icon iconName="production-management" {...args} />
           <Icon iconName="system-admin" stroke="#FFF" fill="#FFF" {...args} />
         </div>
         <div className="flex w-128 items-center gap-4 p-4 bg-primary-dark-blue">
@@ -55,7 +55,7 @@ export const MenuIcons: Story = {
           <Icon iconName="marketing" stroke="#41A29A" fill="#21345B" {...args} />
           <Icon iconName="tasks" fill="#FDCE74" {...args} />
           <Icon iconName="contracts" fill="#0093C0" {...args} />
-          <Icon iconName="touring-management" fill="#7B568D" {...args} />
+          <Icon iconName="production-management" fill="#7B568D" {...args} />
           <Icon iconName="system-admin" stroke="#E94580" fill="#E94580" {...args} />
         </div>
       </>

@@ -9,10 +9,8 @@ import {
   VenueContact,
   BookingActivity,
   BookingContactNotes,
-  TourTask,
+  ProductionTask,
   User,
-  Tour,
-  PerformanceReport,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -27,14 +25,14 @@ import {
   RehearsalDTO,
   ShowDTO,
   StatusCode,
-  TourDTO,
-  TourTaskDTO,
+  ProductionDTO,
+  ProductionTaskDTO,
   UserDto,
   VenueContactDTO,
   VenueRoleDTO,
 } from 'interfaces';
-import { ShowWithTours } from 'services/ShowService';
-import { TourWithDateblocks } from 'services/TourService';
+import { ShowWithProductions } from 'services/ShowService';
+import { ProductionWithDateblocks } from 'services/ProductionService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { toISO } from 'services/dateService';
 
@@ -67,8 +65,8 @@ export const showMapper = (show: Show): ShowDTO => ({
   IsArchived: show.IsArchived,
 });
 
-export const showTourMapper = (s: ShowWithTours): TourDTO[] => {
-  return s.Tour.map(tourEditorMapper);
+export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
+  return s.Production.map(productionEditorMapper);
 };
 
 export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
@@ -104,7 +102,7 @@ export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
     Name: b.Venue.Name,
     Website: b.Venue.Website,
   },
-  TourId: b.DateBlock?.TourId,
+  ProductionId: b.DateBlock?.ProductionId,
 });
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
@@ -134,7 +132,7 @@ export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => ({
   StatusCode: gifu.StatusCode as StatusCode,
 });
 
-export const tourEditorMapper = (t: TourWithDateblocks): TourDTO => ({
+export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
   Id: t.Id,
   ShowId: t.Show.Id,
   ShowName: t.Show.Name,
@@ -179,7 +177,7 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   Notes: a.Notes,
 });
 
-export const mapToTourTaskDTO = (t: TourTask): TourTaskDTO => {
+export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => {
   return {
     ...t,
   };

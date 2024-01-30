@@ -1,6 +1,6 @@
 import { SegueLogo } from '../global/SegueLogo';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { tourJumpState } from 'state/booking/tourJumpState';
+import { productionJumpState } from 'state/booking/productionJumpState';
 import useStrings from 'hooks/useStrings';
 import HierarchicalMenu from '../core-ui-lib/HierarchicalMenu';
 import { useRouter } from 'next/router';
@@ -25,12 +25,12 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   const [state, setGlobalState] = useRecoilState(globalState);
   const isMenuPinned = useRef(false);
   // If no path, you need to add a tourJump to the page. This is a global state
-  const tourJump = useRecoilValue(tourJumpState);
+  const jump = useRecoilValue(productionJumpState);
   const getStrings = useStrings();
   const router = useRouter();
   const ref = useRef();
-  const { selected, tours } = tourJump;
-  const tour = tours.filter((x) => x.Id === selected)[0];
+  const { selected, productions } = jump;
+  const tour = productions.filter((x) => x.Id === selected)[0];
 
   const path = tour ? `${tour.ShowCode}/${tour.Code}` : '';
   const noTourSelected = !path;

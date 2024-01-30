@@ -5,7 +5,7 @@ export default async function handle(req, res) {
 
   try {
     const searchResults =
-      await prisma.$queryRaw`SELECT * FROM TourView WHERE Archived = ${archived} AND TourEndDate <= ${req.query.date}  ORDER BY TourStartDate`;
+      await prisma.$queryRaw`SELECT * FROM ProductionView WHERE Archived = ${archived} AND ProductionEndDate <= ${req.query.date}  ORDER BY ProductionStartDate`;
 
     res.json(searchResults);
   } catch (err) {
