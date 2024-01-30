@@ -91,7 +91,7 @@ const BookingPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getSer
   const { Sections } = schedule;
   const [filter, setFilter] = useRecoilState(filterState);
   const [view, setView] = useRecoilState(viewState);
-  const [showTourSummary, setShowTourSummary] = useState(false);
+  const [showProductionSummary, setShowProductionSummary] = useState(false);
   const { loading } = useRecoilValue(productionJumpState);
   const todayKey = new Date().toISOString().substring(0, 10);
   const todayOnSchedule =
@@ -127,23 +127,35 @@ const BookingPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getSer
             >
               <div className="flex items-center gap-2">
                 <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
-                <Button text="Tour Summary" onClick={() => setShowTourSummary(true)}></Button>
-                {showTourSummary && (
-                  <Report visible={showTourSummary} onClose={() => setShowTourSummary(false)} TourId={TourId} />
-                )}
+                <Button text="Production Summary" onClick={() => setShowProductionSummary(true)}></Button>
+                {showProductionSummary && <Report ProductionId={ProductionId} />}
               </div>
             </GlobalToolbar>
           </div>
-        
-      </div>
-      <div className="px-4 flex items-center gap-4 flex-wrap  my-4">
-        <MileageCalculator />
-        <BookingFilter />
-        <ToolbarButton disabled={!todayOnSchedule} onClick={() => gotoToday()}>
-          Go To Today
-        </ToolbarButton>
-        <BookingsButtons key={'toolbar'} currentProductionId={ProductionId}></BookingsButtons>
-        <AddBooking />
+          <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
+            <MileageCalculator />
+            <Select
+              onChange={(value) => onChange({ target: { id: 'status', value } })}
+              value={filter.status}
+              className="bg-white"
+              label="Status"
+              options={statusOptions}
+            />
+            <BookingFilter />
+            <TextInput
+              id={'venueText'}
+              placeHolder="search bookings..."
+              className="!w-fit"
+              iconName="search"
+              value={filter.venueText}
+              onChange={onChange}
+            />
+            <Button text="Clear Filters" onClick={onClearFilters}></Button>
+          </div>
+        </div>
+        <div className="col-span-5 lg:col-span-4 xl:col-span-3 p-2">
+          <BookingsButtons currentProductionId={ProductionId} />
+        </div>
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
@@ -213,7 +225,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
-  const [venues, production, dateTypeRaw] = await all([getAllVenuesMin(), getProductionWithContent(ProductionId), getDayTypes()]);
+  const [venues, production, dateTypeRaw] = await all([
+    getAllVenuesMin(),
+    getProductionWithContent(ProductionId),
+    getDayTypes(),
+  ]);
 
   console.log(`Retrieved main content. Production: ${production.Id}`);
 

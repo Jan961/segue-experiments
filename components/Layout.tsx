@@ -1,7 +1,7 @@
 import React, { ReactNode, useState } from 'react';
 import Head from 'next/head';
 import { HeaderNav } from 'components/HeaderNav';
-import PopoutMenu from 'components/PopoutMenu';
+import PopoutMenu from 'components/PopoutMenu/index';
 import Router from 'next/router';
 import { Spinner } from './global/Spinner';
 import { calibri } from 'lib/fonts';
