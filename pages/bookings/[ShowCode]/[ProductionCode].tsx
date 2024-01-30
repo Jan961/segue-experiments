@@ -128,7 +128,13 @@ const BookingPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getSer
               <div className="flex items-center gap-2">
                 <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
                 <Button text="Production Summary" onClick={() => setShowProductionSummary(true)}></Button>
-                {showProductionSummary && <Report ProductionId={ProductionId} />}
+                {showProductionSummary && (
+                  <Report
+                    visible={showProductionSummary}
+                    onClose={() => setShowProductionSummary(false)}
+                    ProductionId={ProductionId}
+                  />
+                )}
               </div>
             </GlobalToolbar>
           </div>
@@ -154,7 +160,7 @@ const BookingPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getSer
           </div>
         </div>
         <div className="col-span-5 lg:col-span-4 xl:col-span-3 p-2">
-          <BookingsButtons currentProductionId={ProductionId} />
+          <BookingsButtons />
         </div>
       </div>
       <div className="grid grid-cols-12">

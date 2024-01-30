@@ -50,6 +50,7 @@ const IconNameMap = new Map([
   ['system-admin', 'UserSettingIcon'],
   ['menu', 'MenuIcon'],
   ['exit', 'ExitIcon'],
+  ['excel', 'ExcelIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';

@@ -1,12 +1,18 @@
-import { ToolbarButton } from '../ToolbarButton';
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { Spinner } from 'components/global/Spinner';
 
-export default function Report({ ProductionId }: { ProductionId: number }) {
+export default function Report({
+  visible,
+  onClose,
+  ProductionId,
+}: {
+  ProductionId: number;
+  visible: boolean;
+  onClose: () => void;
+}) {
   const [productionSummary, setProductionSummary] = useState<any[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [error] = useState<string>('Oops! Something went wrong. Please try again after some time');
   const fetchProductionSummary = useCallback((productionCode) => {
@@ -28,13 +34,10 @@ export default function Report({ ProductionId }: { ProductionId: number }) {
   }, [ProductionId]);
   return (
     <>
-      <ToolbarButton onClick={() => setShowModal(true)} submit>
-        Production Summary
-      </ToolbarButton>
       <StyledDialog
         className="w-1/4 max-w-full max-h-[95vh] relative"
-        open={showModal}
-        onClose={() => setShowModal(false)}
+        open={visible}
+        onClose={onClose}
         title="Production Summary"
         width="xl"
       >

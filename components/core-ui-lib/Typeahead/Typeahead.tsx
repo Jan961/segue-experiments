@@ -86,7 +86,7 @@ export default function Typeahead({
             leaveTo="opacity-0"
             afterLeave={() => setQuery('')}
           >
-            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 font-bold text-base shadow-lg focus:outline-none">
+            <Combobox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 font-bold text-base shadow-lg focus:outline-none">
               {filteredOptions.length === 0 && query !== '' ? (
                 <div className="relative cursor-default select-none px-4 py-2">Nothing found.</div>
               ) : (
