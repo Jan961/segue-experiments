@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Entry from '../../../components/marketing/sales/entry';
 import { GetServerSideProps } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import { getActiveProductions } from 'services/ProductionService';
+import { getActiveProductions } from 'services/productionService';
 
 type Props = {
   activeProductions: any[];
@@ -11,7 +11,7 @@ type Props = {
 const pagetitle = 'Marketing - Sale Entry';
 
 const Index = ({ activeProductions }: Props) => {
-  const [searchFilter, setSearchFilter] = useState('');
+  const [searchFilter] = useState('');
 
   return (
     <Layout title={pagetitle + '| Seque'}>
