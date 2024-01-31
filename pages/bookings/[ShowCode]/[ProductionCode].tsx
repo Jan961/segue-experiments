@@ -1,17 +1,33 @@
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import GlobalToolbar from 'components/toolbar';
 import BookingsButtons from 'components/bookings/bookingsButtons';
 import Layout from 'components/Layout';
-
+import { getProductionWithContent } from 'services/productionService';
 import { useRecoilState, useRecoilValue } from 'recoil';
-
+import {
+  DateTypeMapper,
+  bookingMapper,
+  dateBlockMapper,
+  getInFitUpMapper,
+  otherMapper,
+  performanceMapper,
+  rehearsalMapper,
+} from 'lib/mappers';
+import { getAllVenuesMin } from 'services/venueService';
+import { InitialState } from 'lib/recoil';
+import { BookingsWithPerformances } from 'services/bookingService';
+import { objectify, all } from 'radash';
+import { getDayTypes } from 'services/dayTypeService';
 import { filterState, intialBookingFilterState } from 'state/booking/filterState';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
-
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { Spinner } from 'components/global/Spinner';
 import { MileageCalculator } from 'components/bookings/MileageCalculator';
 import { useState } from 'react';
 
+import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { viewState } from 'state/booking/viewState';
-
+import { getAccountIdFromReq } from 'services/userService';
 import BookingFilter from 'components/bookings/BookingFilter';
 import { bookingState } from 'state/booking/bookingState';
 import { rehearsalState } from 'state/booking/rehearsalState';
@@ -25,6 +41,103 @@ import Report from 'components/bookings/modal/Report';
 import Button from 'components/core-ui-lib/Button';
 import BookingsTable from 'components/bookings/BookingsTable';
 
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  /*
+      We get the data for the whole booking page here. We pass it to the constructor, then store it in state management.
+      This means we can update a single booking, and the schedule will update without having to redownload all the data.
+      We have effectively cloned the database for this production, and populate it using the results of a single query which includes 'everything we want
+      to display'.
+  
+      The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
+    */
+  const AccountId = await getAccountIdFromReq(ctx.req);
+  const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
+
+  const ProductionId = productionJump.selected;
+  // ProductionJumpState is checking if it's valid to access by accountId
+  if (!ProductionId) return { notFound: true };
+
+  // Get in parallel
+  const [venues, production, dateTypeRaw] = await all([
+    getAllVenuesMin(),
+    getProductionWithContent(ProductionId),
+    getDayTypes(),
+  ]);
+
+  const dateBlock = [];
+  const rehearsal = {};
+  const booking = {};
+  const getInFitUp = {};
+  const performance = {};
+  const other = {};
+  const venue = objectify(
+    venues,
+    (v) => v.Id,
+    (v: any) => {
+      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+    },
+  );
+  // Map to DTO. The database can change and we want to control. More info in mappers.ts
+  for (const db of production.DateBlock) {
+    dateBlock.push(dateBlockMapper(db));
+    db.Other.forEach((o) => {
+      other[o.Id] = otherMapper(o);
+    });
+    db.Rehearsal.forEach((r) => {
+      rehearsal[r.Id] = rehearsalMapper(r);
+    });
+    db.GetInFitUp.forEach((gifu) => {
+      getInFitUp[gifu.Id] = getInFitUpMapper(gifu);
+    });
+    db.Booking.forEach((b) => {
+      booking[b.Id] = bookingMapper(b as BookingsWithPerformances);
+      b.Performance.forEach((p) => {
+        performance[p.Id] = {
+          ...performanceMapper(p),
+          Time: performanceMapper(p).Time ?? null, // Example of setting a default value
+        };
+      });
+      const venueId = booking[b.Id].VenueId;
+      if (venue[venueId]) venue[venueId].Count++;
+    });
+  }
+
+  const distance = {
+    stops: [],
+    outdated: true,
+    productionCode: production.Code,
+  };
+
+  // See _app.tsx for how this is picked up
+  const initialState: InitialState = {
+    global: {
+      productionJump,
+    },
+    booking: {
+      distance,
+      rehearsal,
+      booking,
+      getInFitUp,
+      other,
+      dateType: dateTypeRaw.map(DateTypeMapper),
+      performance,
+      dateBlock: dateBlock.sort((a, b) => {
+        return b.StartDate < a.StartDate ? 1 : -1;
+      }),
+      // Remove extra info
+      venue,
+    },
+  };
+
+  return {
+    props: {
+      ProductionId,
+      initialState,
+    },
+  };
+};
+
 const statusOptions: SelectOption[] = [
   { text: 'ALL', value: '' },
   { text: 'Confirmed (C)', value: 'C' },
@@ -32,7 +145,7 @@ const statusOptions: SelectOption[] = [
   { text: 'Cancelled (X)', value: 'X' },
 ];
 
-const BookingPage = () => {
+const BookingForProductionPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
   const bookingDict = useRecoilValue(bookingState);
   const rehearsalDict = useRecoilValue(rehearsalState);
@@ -42,14 +155,14 @@ const BookingPage = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const [view, setView] = useRecoilState(viewState);
   const [showProductionSummary, setShowProductionSummary] = useState(false);
-
+  const { loading } = useRecoilValue(productionJumpState);
   const todayKey = new Date().toISOString().substring(0, 10);
   const todayOnSchedule =
     Sections.map((x) => x.Dates)
       .flat()
       .filter((x) => x.Date === todayKey).length > 0;
   const filteredSections = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
-  console.log(filteredSections);
+  console.log(!!filteredSections);
   const gotoToday = () => {
     const idToScrollTo = `booking-${todayKey}`;
     if (todayOnSchedule) {
@@ -57,6 +170,7 @@ const BookingPage = () => {
       setView({ ...view, selectedDate: todayKey });
     }
   };
+
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
@@ -83,7 +197,7 @@ const BookingPage = () => {
                   <Report
                     visible={showProductionSummary}
                     onClose={() => setShowProductionSummary(false)}
-                    ProductionId={0}
+                    ProductionId={ProductionId}
                   />
                 )}
               </div>
@@ -114,10 +228,11 @@ const BookingPage = () => {
           <BookingsButtons />
         </div>
       </div>
-      {/* Bookings Grid */}
-      <BookingsTable />
+
+      {loading && <Spinner size="lg" className="mt-32 mb-8" />}
+      {!loading && <BookingsTable />}
     </Layout>
   );
 };
 
-export default BookingPage;
+export default BookingForProductionPage;
