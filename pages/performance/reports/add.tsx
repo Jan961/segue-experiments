@@ -1,7 +1,7 @@
 import ReportWrapper from 'components/performance/reportWrapper';
 import { productionEditorMapper } from 'lib/mappers';
 import { GetServerSideProps } from 'next';
-import { getActiveProductions } from 'services/ProductionService';
+import { getActiveProductions } from 'services/productionService';
 import { getAccountIdFromReq } from 'services/userService';
 import { Production } from '@prisma/client';
 import Layout from 'components/Layout';

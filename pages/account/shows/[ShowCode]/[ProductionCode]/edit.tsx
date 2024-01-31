@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
 import { GetServerSideProps } from 'next';
-import { getProductionById, lookupProductionId } from 'services/ProductionService';
+import { getProductionById, lookupProductionId } from 'services/productionService';
 import { productionEditorMapper } from 'lib/mappers';
 import { ProductionDTO } from 'interfaces';
 import { ProductionEditor } from 'components/productions/ProductionEditor';

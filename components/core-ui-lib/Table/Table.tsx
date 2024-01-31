@@ -9,14 +9,23 @@ interface TableProps {
   rowData?: any[];
   columnDefs?: any[];
   styleProps?: StyleProps;
+  onCellClicked?: (e) => void;
+  onRowClicked?: (e) => void;
 }
 
-export default function Table({ rowData, columnDefs, styleProps }: TableProps) {
+export default function Table({ rowData, columnDefs, styleProps, onCellClicked, onRowClicked }: TableProps) {
   return (
     <>
       <GridStyles {...styleProps} />
       <div className="ag-theme-quartz h-full">
-        <AgGridReact rowData={rowData} columnDefs={columnDefs} headerHeight={51} rowHeight={43} />
+        <AgGridReact
+          rowData={rowData}
+          columnDefs={columnDefs}
+          headerHeight={51}
+          rowHeight={43}
+          onCellClicked={onCellClicked}
+          onRowClicked={onRowClicked}
+        />
       </div>
     </>
   );

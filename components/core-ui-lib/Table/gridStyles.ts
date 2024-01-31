@@ -3,6 +3,8 @@ import { StyleProps } from './Table';
 
 const GridStyles = createGlobalStyle<StyleProps>`
 .ag-theme-quartz {
+    --ag-border-radius: 0px;
+    --ag-wrapper-border-radius: 0px;
     --ag-foreground-color: #617293;
     --ag-font-size: 14px;
     --ag-font-family: 'Calibri', sans-serif;
