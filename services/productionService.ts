@@ -69,7 +69,7 @@ export const getProductionPageProps = async (ctx: any) => {
     },
   });
 
-  if (!showRaw) return { notFound: true, props: { productions: [], code:'', name:''} };
+  if (!showRaw) return { notFound: true, props: { productions: [], code: '', name: '' } };
 
   const show = await getShowWithProductionsById(showRaw.Id);
   const productions = showProductionMapper(show);
@@ -203,7 +203,10 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
   });
   productionsWithTasks = productionsWithTasks.map((production) => {
     const { StartDate, EndDate } = production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
-    const weekNumsList = production.ProductionTask.map((ProductionTask) => [ProductionTask.CompleteByWeekNum, ProductionTask.StartByWeekNum]).flat();
+    const weekNumsList = production.ProductionTask.map((ProductionTask) => [
+      ProductionTask.CompleteByWeekNum,
+      ProductionTask.StartByWeekNum,
+    ]).flat();
     const WeekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
     return { ...production, WeekNumToDateMap };
   });
