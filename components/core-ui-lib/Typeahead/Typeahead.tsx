@@ -4,7 +4,7 @@ import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 
-export type TypeaheadOption = { text: string; value: string };
+export type TypeaheadOption = { text: string; value: string | number };
 
 export interface TypeaheadProps extends WithTestId {
   value?: string | number | undefined;
