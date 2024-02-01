@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { getActiveProductions } from 'services/ProductionService';
+import { getActiveProductions } from 'services/productionService';
 import Layout from '../../components/Layout';
 import Switchboard from '../../components/reports/switchboard';
 import { productionEditorMapper } from 'lib/mappers';

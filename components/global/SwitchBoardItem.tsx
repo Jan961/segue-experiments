@@ -23,8 +23,8 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
     <>
       <Icon
         iconName={link.iconName}
-        variant="2xl"
-        className="lg:h-12 lg:w-12 md:h-10 md:w-10"
+        variant="5xl"
+        className="lg:h-13 lg:w-13 md:h-10 md:w-10"
         stroke={link.stroke}
         fill={link.fill}
       />

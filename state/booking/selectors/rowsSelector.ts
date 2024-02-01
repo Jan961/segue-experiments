@@ -6,6 +6,7 @@ import { otherState } from '../otherState';
 import { venueState } from '../venueState';
 import { productionJumpState } from '../productionJumpState';
 import { objectify } from 'radash';
+import moment from 'moment';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ Id, ShowCode }: any) => `${ShowCode}${Id}`;
@@ -24,10 +25,10 @@ export const rowsSelector = selector({
     const rows: any = [];
     const getBookingDetails = (booking) => {
       const { VenueId, performanceIds, Notes: notes, Seats: capacity } = booking || {};
-      const { Name: venueName, Town: venueTown } = venueDict[VenueId] || {};
+      const { Name: venue, Town: town } = venueDict[VenueId] || {};
       return {
-        venueName,
-        venueTown,
+        venue,
+        town,
         capacity,
         noOfPerfs: performanceIds?.length || 0,
         notes,
@@ -56,11 +57,13 @@ export const rowsSelector = selector({
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
       const row = {
-        date,
+        dateTime: date,
+        date: moment(date).format('ddd MM/DD/YY'),
         production: getProductionName(production),
         productionCode: getProductionCode(production),
         productionId: ProductionId,
         dayType: type,
+        bookingStatus: data?.StatusCode,
         status: data?.StatusCode,
         ...rowData,
       };

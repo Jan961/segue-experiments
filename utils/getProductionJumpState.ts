@@ -1,5 +1,5 @@
 import { ParsedUrlQuery } from 'querystring';
-import { getAllProductions } from 'services/ProductionService';
+import { getAllProductions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
 
 interface Params extends ParsedUrlQuery {

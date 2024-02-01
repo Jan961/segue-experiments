@@ -1,9 +1,5 @@
-import React, { PropsWithChildren } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
-import { getProductionsWithContent } from 'services/ProductionService';
-import { InfoPanel } from 'components/bookings/InfoPanel';
-import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector';
 import {
   DateTypeMapper,
   bookingMapper,
@@ -13,16 +9,12 @@ import {
   performanceMapper,
   rehearsalMapper,
 } from 'lib/mappers';
-import { ScheduleRow } from 'components/bookings/ScheduleRow';
 import { getAllVenuesMin } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
-import { productionJumpState } from 'state/booking/productionJumpState';
-import { Spinner } from 'components/global/Spinner';
-import classNames from 'classnames';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import { bookingState } from 'state/booking/bookingState';
@@ -32,38 +24,8 @@ import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
 import { useRecoilValue } from 'recoil';
-
-const toolbarHeight = 136;
-
-interface ScrollablePanelProps {
-  className: string;
-  reduceHeight: number;
-}
-
-// Based on toolbar height. Adds a tasteful shadow when scrolled to prevent strange cut off
-const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildren<ScrollablePanelProps>) => {
-  const [scrolled, setScrolled] = React.useState(false);
-
-  const handleScroll = (e) => {
-    setScrolled(e.target.scrollTop > 0);
-  };
-
-  const panelClasses = classNames('overflow-y-auto relative', {
-    'shadow-inner': scrolled,
-  });
-
-  return (
-    <div
-      onScroll={handleScroll}
-      className={classNames(className, panelClasses)}
-      style={{
-        height: `calc(100vh - ${reduceHeight}px)`,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
+import { getProductionsWithContent } from 'services/productionService';
+import BookingsTable from 'components/bookings/BookingsTable';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -73,58 +35,15 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
   const gifuDict = useRecoilValue(getInFitUpState);
   const otherDict = useRecoilValue(otherState);
   const { Sections } = schedule;
-  const { loading } = useRecoilValue(productionJumpState);
-  const { filteredSections, rows } = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
+  const { rows } = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
   console.table(rows);
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
         <Filters />
       </div>
-      <div className="grid grid-cols-12">
-        <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
-          {loading && <Spinner size="lg" className="mt-32 mb-8" />}
-          {!loading && (
-            <>
-              <div
-                className="grid grid-cols-12 font-bold
-                text-center
-                text-sm xl:text-md
-                sticky inset-x-0 top-0 bg-gray-50 z-10
-                shadow-lg
-                text-gray-400"
-              >
-                <div className="col-span-1 p-2 hidden xl:inline-block ">Production</div>
-                <div className="col-span-1 lg:col-span-1 xl:col-span-1 p-2 whitespace-nowrap">Week No.</div>
-                <div className="col-span-4 lg:col-span-3 xl:col-span-2 p-2 whitespace-nowrap">Date</div>
-                <div className="col-span-7 lg:col-span-8 grid grid-cols-10">
-                  <div className="col-span-4 p-2">Venue</div>
-                  <div className="col-span-2 p-2">Town</div>
-                  <div className="col-span-1 p-2">Seats</div>
-                  <div className="col-span-1 p-2">Perf(s)</div>
-                  <div className="col-span-1 p-2">Miles</div>
-                  <div className="col-span-1 p-2">Time</div>
-                </div>
-              </div>
-              <ul className="grid w-full shadow">
-                {filteredSections.map((section: ScheduleSectionViewModel) => (
-                  <li key={section.Name}>
-                    <h3 className="font-bold p-3 bg-gray-300">{section.Name}</h3>{' '}
-                    {section.Dates.map((date: DateViewModel) => (
-                      <ScheduleRow key={date.Date} date={date} />
-                    ))}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </ScrollablePanel>
-        <ScrollablePanel
-          reduceHeight={toolbarHeight}
-          className="col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue"
-        >
-          <InfoPanel />
-        </ScrollablePanel>
+      <div className="w-full h-full">
+        <BookingsTable rowData={rows} />
       </div>
     </Layout>
   );

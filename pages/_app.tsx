@@ -1,14 +1,18 @@
 import '../styles/globals.css';
 import 'react-range-slider-input/dist/style.css';
 import 'react-datepicker/dist/react-datepicker.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { RecoilRoot } from 'recoil';
 import { ClientStateSetter, setInitialStateServer } from 'lib/recoil';
-import { ClerkProvider } from '@clerk/nextjs';
+import { ClerkProvider, SignedIn } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
+import TanstackProvider from 'components/providers/TanstackProvider';
+import ReferenceDataLoader from 'components/ReferenceDataLoader';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -24,11 +28,16 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
 
   return (
-    <ClerkProvider {...pageProps} navigate={(to) => router.push(to)}>
-      <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
-        <ClientStateSetter intitialState={initialState} />
-        <Component {...pageProps} />
-      </RecoilRoot>
-    </ClerkProvider>
+    <TanstackProvider>
+      <ClerkProvider {...pageProps} navigate={(to) => router.push(to)}>
+        <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
+          <ClientStateSetter intitialState={initialState} />
+          <SignedIn>
+            <ReferenceDataLoader />
+          </SignedIn>
+          <Component {...pageProps} />
+        </RecoilRoot>
+      </ClerkProvider>
+    </TanstackProvider>
   );
 }

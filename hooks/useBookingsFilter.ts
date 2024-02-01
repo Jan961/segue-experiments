@@ -12,16 +12,16 @@ const useBookingFilter = ({ Sections, rehearsalDict, gifuDict, otherDict, bookin
   const filteredRows = useMemo(() => {
     const filteredRowList = [];
     for (const row of rows) {
-      const { date, status, productionId } = row;
+      const { dateTime, status, productionId } = row;
       let filtered = false;
       if (selected !== -1) {
         filtered = productionId !== selected;
       }
       if (filter.endDate) {
-        filtered = new Date(date) >= new Date(filter.endDate);
+        filtered = new Date(dateTime) >= new Date(filter.endDate);
       }
       if (filter.startDate) {
-        filtered = new Date(date) <= new Date(filter.startDate);
+        filtered = new Date(dateTime) <= new Date(filter.startDate);
       }
       if (filter.status) {
         filtered = status !== filter.status;
