@@ -1,10 +1,8 @@
+import React, { PropsWithChildren } from 'react';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import GlobalToolbar from 'components/toolbar';
-import BookingsButtons from 'components/bookings/bookingsButtons';
 import Layout from 'components/Layout';
 import { getProductionWithContent } from 'services/ProductionService';
 import { InfoPanel } from 'components/bookings/InfoPanel';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector';
 import {
   DateTypeMapper,
@@ -21,27 +19,19 @@ import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
-import { filterState, intialBookingFilterState } from 'state/booking/filterState';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Spinner } from 'components/global/Spinner';
-import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren, useState } from 'react';
 import classNames from 'classnames';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { viewState } from 'state/booking/viewState';
 import { getAccountIdFromReq } from 'services/userService';
-import BookingFilter from 'components/bookings/BookingFilter';
 import { bookingState } from 'state/booking/bookingState';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
-import Select from 'components/core-ui-lib/Select';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import TextInput from 'components/core-ui-lib/TextInput/TextInput';
-import Report from 'components/bookings/modal/Report';
-import Button from 'components/core-ui-lib/Button';
+import Filters from 'components/bookings/Filters';
+import { useRecoilValue } from 'recoil';
 
 const toolbarHeight = 136;
 
@@ -49,13 +39,6 @@ interface ScrollablePanelProps {
   className: string;
   reduceHeight: number;
 }
-
-const statusOptions: SelectOption[] = [
-  { text: 'ALL', value: '' },
-  { text: 'Confirmed (C)', value: 'C' },
-  { text: 'Unconfirmed (U)', value: 'U' },
-  { text: 'Cancelled (X)', value: 'X' },
-];
 
 // Based on toolbar height. Adds a tasteful shadow when scrolled to prevent strange cut off
 const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildren<ScrollablePanelProps>) => {
@@ -82,86 +65,22 @@ const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildre
   );
 };
 
-const BookingPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const schedule = useRecoilValue(filteredScheduleSelector);
   const bookingDict = useRecoilValue(bookingState);
   const rehearsalDict = useRecoilValue(rehearsalState);
   const gifuDict = useRecoilValue(getInFitUpState);
   const otherDict = useRecoilValue(otherState);
   const { Sections } = schedule;
-  const [filter, setFilter] = useRecoilState(filterState);
-  const [view, setView] = useRecoilState(viewState);
-  const [showProductionSummary, setShowProductionSummary] = useState(false);
   const { loading } = useRecoilValue(productionJumpState);
-  const todayKey = new Date().toISOString().substring(0, 10);
-  const todayOnSchedule =
-    Sections.map((x) => x.Dates)
-      .flat()
-      .filter((x) => x.Date === todayKey).length > 0;
-  const filteredSections = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
-  const gotoToday = () => {
-    const idToScrollTo = `booking-${todayKey}`;
-    if (todayOnSchedule) {
-      document.getElementById(`${idToScrollTo}`).scrollIntoView({ behavior: 'smooth' });
-      setView({ ...view, selectedDate: todayKey });
-    }
-  };
-  const onChange = (e: any) => {
-    setFilter({ ...filter, [e.target.id]: e.target.value });
-  };
-
-  const onClearFilters = () => {
-    setFilter(intialBookingFilterState);
-  };
+  const { filteredSections, rows } = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
+  console.table(rows);
 
   return (
     <Layout title="Booking | Segue" flush>
-      <div className="grid grid-cols-12 mb-8">
-        <div className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9">
-          <div className="px-4">
-            <GlobalToolbar
-              searchFilter={filter.venueText}
-              setSearchFilter={(venueText) => setFilter({ venueText })}
-              titleClassName="text-primary-orange"
-              title={'Bookings'}
-            >
-              <div className="flex items-center gap-2">
-                <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
-                <Button text="Production Summary" onClick={() => setShowProductionSummary(true)}></Button>
-                {showProductionSummary && (
-                  <Report
-                    visible={showProductionSummary}
-                    onClose={() => setShowProductionSummary(false)}
-                    ProductionId={ProductionId}
-                  />
-                )}
-              </div>
-            </GlobalToolbar>
-          </div>
-          <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
-            <MileageCalculator />
-            <Select
-              onChange={(value) => onChange({ target: { id: 'status', value } })}
-              value={filter.status}
-              className="bg-white"
-              label="Status"
-              options={statusOptions}
-            />
-            <BookingFilter />
-            <TextInput
-              id={'venueText'}
-              placeHolder="search bookings..."
-              className="!w-fit"
-              iconName="search"
-              value={filter.venueText}
-              onChange={onChange}
-            />
-            <Button text="Clear Filters" onClick={onClearFilters}></Button>
-          </div>
-        </div>
-        <div className="col-span-5 lg:col-span-4 xl:col-span-3 p-2">
-          <BookingsButtons />
-        </div>
+      <div className="mb-8">
+        <Filters />
       </div>
       <div className="grid grid-cols-12">
         <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>

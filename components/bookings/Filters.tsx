@@ -1,0 +1,95 @@
+import Button from 'components/core-ui-lib/Button';
+import GlobalToolbar from 'components/toolbar';
+import Report from 'components/bookings/modal/Report';
+import { MileageCalculator } from 'components/bookings/MileageCalculator';
+import Select from 'components/core-ui-lib/Select';
+import BookingFilter from './BookingFilter';
+import TextInput from 'components/core-ui-lib/TextInput';
+import BookingsButtons from './bookingsButtons';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { filterState, intialBookingFilterState } from 'state/booking/filterState';
+import { viewState } from 'state/booking/viewState';
+import { useMemo, useState } from 'react';
+import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
+import { statusOptions } from 'config/bookings';
+import { productionJumpState } from 'state/booking/productionJumpState';
+
+const Filters = () => {
+  const [filter, setFilter] = useRecoilState(filterState);
+  const [view, setView] = useRecoilState(viewState);
+  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const schedule = useRecoilValue(filteredScheduleSelector);
+  const [showProductionSummary, setShowProductionSummary] = useState(false);
+  const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
+  const todayOnSchedule = useMemo(
+    () =>
+      schedule.Sections.map((x) => x.Dates)
+        .flat()
+        .filter((x) => x.Date === todayKey).length > 0,
+    [schedule.Sections],
+  );
+
+  const onChange = (e: any) => {
+    setFilter({ ...filter, [e.target.id]: e.target.value });
+  };
+  const gotoToday = () => {
+    const idToScrollTo = `booking-${todayKey}`;
+    if (todayOnSchedule) {
+      document.getElementById(`${idToScrollTo}`).scrollIntoView({ behavior: 'smooth' });
+      setView({ ...view, selectedDate: todayKey });
+    }
+  };
+
+  const onClearFilters = () => {
+    setFilter(intialBookingFilterState);
+  };
+  return (
+    <div className="w-full flex items-center gap-10">
+      <div className="mx-0">
+        <div className="px-4">
+          <GlobalToolbar
+            searchFilter={filter.venueText}
+            setSearchFilter={(venueText) => setFilter({ venueText })}
+            titleClassName="text-primary-orange"
+            title={'Bookings'}
+          >
+            <div className="flex items-center gap-2">
+              <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
+              <Button text="Production Summary" onClick={() => setShowProductionSummary(true)}></Button>
+              {showProductionSummary && (
+                <Report
+                  visible={showProductionSummary}
+                  onClose={() => setShowProductionSummary(false)}
+                  ProductionId={ProductionId}
+                />
+              )}
+            </div>
+          </GlobalToolbar>
+        </div>
+        <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
+          <MileageCalculator />
+          <Select
+            onChange={(value) => onChange({ target: { id: 'status', value } })}
+            value={filter.status}
+            className="bg-white"
+            label="Status"
+            options={statusOptions}
+          />
+          <BookingFilter />
+          <TextInput
+            id={'venueText'}
+            placeHolder="search bookings..."
+            className="!w-fit"
+            iconName="search"
+            value={filter.venueText}
+            onChange={onChange}
+          />
+          <Button text="Clear Filters" onClick={onClearFilters}></Button>
+        </div>
+      </div>
+      <BookingsButtons />
+    </div>
+  );
+};
+
+export default Filters;
