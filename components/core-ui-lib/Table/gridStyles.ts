@@ -22,7 +22,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
 
 .ag-ltr .ag-cell {
     padding: 0;
-    &:after {
+    &:not(:last-child):after {
         content: '';
         position: absolute;
         right: 0px;

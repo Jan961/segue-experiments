@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps } from 'next';
 import Layout from 'components/Layout';
 import {
   DateTypeMapper,
@@ -23,16 +23,15 @@ import BookingsTable from 'components/bookings/BookingsTable';
 import { DateType } from '@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const BookingPage = () => {
   const rows = useBookingFilter();
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
         <Filters />
       </div>
-      <div className="w-full">
-        <BookingsTable rowData={rows} />
-      </div>
+
+      <BookingsTable rowData={rows} />
     </Layout>
   );
 };

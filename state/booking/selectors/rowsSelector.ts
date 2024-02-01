@@ -70,7 +70,7 @@ export const rowsSelector = selector({
       const row = {
         week,
         dateTime: date,
-        date: moment(date).format('ddd DD/MM/YY'),
+        date: date ? moment(date).format('ddd DD/MM/YY') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,

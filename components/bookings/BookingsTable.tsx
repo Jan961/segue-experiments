@@ -19,13 +19,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     defaultColDef,
     autoSizeStrategy: {
       type: 'fitGridWidth',
-      defaultMinWidth: 100,
-      columnLimits: [
-        {
-          colId: 'production',
-          minWidth: 300,
-        },
-      ],
+      defaultMinWidth: 50,
     },
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';

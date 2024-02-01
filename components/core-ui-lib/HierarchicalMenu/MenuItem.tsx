@@ -17,7 +17,7 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
   const baseClass = 'cursor-pointer';
 
   const [itemOptions, setItemOptions] = useState(options || []);
-  console.log('Menu item ', value, isExpanded);
+
   useEffect(() => {
     setItemOptions(options);
   }, [options]);
