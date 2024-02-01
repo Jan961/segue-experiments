@@ -31,6 +31,8 @@ export const Primary: Story = {
         <Icon iconName="home" {...args} />
         <Icon iconName="menu" {...args} />
         <Icon iconName="exit" {...args} />
+        <Icon iconName="excel" fill="#7B568D" {...args} />
+        <Icon iconName="cross" {...args} />
       </div>
     );
   },

@@ -11,9 +11,17 @@ interface TableProps {
   styleProps?: StyleProps;
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
+  gridOptions?: any;
 }
 
-export default function Table({ rowData, columnDefs, styleProps, onCellClicked, onRowClicked }: TableProps) {
+export default function Table({
+  rowData,
+  columnDefs,
+  styleProps,
+  onCellClicked,
+  onRowClicked,
+  gridOptions,
+}: TableProps) {
   return (
     <>
       <GridStyles {...styleProps} />
@@ -25,6 +33,7 @@ export default function Table({ rowData, columnDefs, styleProps, onCellClicked, 
           rowHeight={43}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
+          gridOptions={gridOptions}
         />
       </div>
     </>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { MenuOption } from './types';
 import MenuItem from './MenuItem';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,29 +11,60 @@ interface HierarchicalMenuProps {
   className?: string;
 }
 
-export default function HierarchicalMenu({ options = [], onClick, onToggle, className = '' }: HierarchicalMenuProps) {
-  const [itemOptions, setItemOptions] = useState(options || []);
+const HierarchicalMenu = forwardRef(
+  ({ options = [], onClick, onToggle, className = '' }: HierarchicalMenuProps, ref) => {
+    const [itemOptions, setItemOptions] = useState(options || []);
 
-  useEffect(() => {
-    if (!options || options.length === 0) setItemOptions([]);
+    useImperativeHandle(ref, () => ({
+      expandParentAndChildren: (parentNodeValue: string) => {
+        // Expands the parent node and all of its chicldren if found. All other nodes are collapsed
+        // Step1. Close all nodes
+        let updatedOptions = itemOptions; // = mapRecursive(itemOptions, (o) => ({ ...o, expanded: false }));
+        const parentNode = itemOptions.find(({ value }) => value === parentNodeValue);
 
-    let updatedOptions: MenuOption[] = options.map((o) => ({ ...o, groupHeader: true }));
-    updatedOptions = mapRecursive(updatedOptions, (o) => ({ ...o, id: uuidv4() }));
+        if (parentNode?.options?.length > 0) {
+          // Step2. Find node to expand and recursively expand all of its children
+          updatedOptions = updatedOptions.map((o) => {
+            if (o.groupHeader && o.value === parentNodeValue) {
+              return {
+                ...o,
+                expanded: true,
+                options: mapRecursive(o.options, (o) => ({ ...o, expanded: true })),
+              };
+            }
+            return o;
+          });
+        }
 
-    setItemOptions(updatedOptions);
-  }, [options]);
+        setItemOptions(updatedOptions);
+      },
+    }));
 
-  const handleMenuToggle = (selectedOption) => {
-    const updated = mapRecursive(itemOptions, (o) => (o.id === selectedOption.id ? selectedOption : o));
-    setItemOptions(updated);
-    onToggle(updated);
-  };
+    useEffect(() => {
+      if (!options || options.length === 0) setItemOptions([]);
 
-  return (
-    <div className={className}>
-      {itemOptions.map((o) => (
-        <MenuItem key={o.value} option={o} onClick={onClick} onToggle={handleMenuToggle} />
-      ))}
-    </div>
-  );
-}
+      let updatedOptions: MenuOption[] = options.map((o) => ({ ...o, groupHeader: true }));
+      updatedOptions = mapRecursive(updatedOptions, (o) => ({ ...o, id: uuidv4() }));
+
+      setItemOptions(updatedOptions);
+    }, [options]);
+
+    const handleMenuToggle = (selectedOption) => {
+      const updated = mapRecursive(itemOptions, (o) => (o.id === selectedOption.id ? selectedOption : o));
+      setItemOptions(updated);
+      onToggle(updated);
+    };
+
+    return (
+      <div className={className}>
+        {itemOptions.map((o) => (
+          <MenuItem key={o.value} option={o} onClick={onClick} onToggle={handleMenuToggle} />
+        ))}
+      </div>
+    );
+  },
+);
+
+HierarchicalMenu.displayName = 'HierarchicalMenu';
+
+export default HierarchicalMenu;

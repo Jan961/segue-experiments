@@ -28,7 +28,7 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
         stroke={link.stroke}
         fill={link.fill}
       />
-      <span className="text-center lg:text-responsive-lg md:text-base lg:mt-4 md:mt-2">{link.title}</span>
+      <span className="text-center lg:text-responsive-lg md:text-base lg:mt-3 md:mt-2">{link.title}</span>
     </>
   );
 
