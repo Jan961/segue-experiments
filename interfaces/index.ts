@@ -123,6 +123,7 @@ export type DateBlockDTO = {
   StartDate: string;
   EndDate: string;
   Dates?: DateDTO[];
+  IsPrimary?: boolean;
 };
 
 export type ProductionDTO = {
@@ -148,6 +149,7 @@ export type OtherDTO = {
   Id: number;
   Date: string;
   DateTypeId: number;
+  DateTypeName?: string;
   StatusCode: StatusCode;
 };
 

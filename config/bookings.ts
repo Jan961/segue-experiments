@@ -5,4 +5,12 @@ export const statusOptions: SelectOption[] = [
   { text: 'Confirmed (C)', value: 'C' },
   { text: 'Unconfirmed (U)', value: 'U' },
   { text: 'Cancelled (X)', value: 'X' },
+  { text: 'Suspended (S)', value: 'S' },
 ];
+
+export const bookingStatusMap = {
+  C: 'Confirmed',
+  U: 'Pencilled',
+  X: 'Cancelled',
+  S: 'Suspended',
+};

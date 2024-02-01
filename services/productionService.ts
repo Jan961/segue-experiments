@@ -149,7 +149,11 @@ const productionContentInclude = Prisma.validator<Prisma.ProductionSelect>()({
       },
       GetInFitUp: true,
       Rehearsal: true,
-      Other: true,
+      Other: {
+        include: {
+          DateType: true,
+        },
+      },
     },
   },
 });

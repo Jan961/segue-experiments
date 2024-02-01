@@ -14,29 +14,17 @@ import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
-import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
-import { bookingState } from 'state/booking/bookingState';
-import { rehearsalState } from 'state/booking/rehearsalState';
-import { getInFitUpState } from 'state/booking/getInFitUpState';
-import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
-import { useRecoilValue } from 'recoil';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
+import { DateType } from '@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const schedule = useRecoilValue(filteredScheduleSelector);
-  const bookingDict = useRecoilValue(bookingState);
-  const rehearsalDict = useRecoilValue(rehearsalState);
-  const gifuDict = useRecoilValue(getInFitUpState);
-  const otherDict = useRecoilValue(otherState);
-  const { Sections } = schedule;
-  const { rows } = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
-  console.table(rows);
+  const rows = useBookingFilter();
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
@@ -89,24 +77,41 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
+  const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const production of productions) {
+    const PrimaryDateBlock = production.DateBlock.find((dateBlock) => dateBlock.IsPrimary);
     for (const db of production.DateBlock) {
-      dateBlock.push(dateBlockMapper(db));
+      const mappedBlock = dateBlockMapper(db);
+      dateBlock.push(mappedBlock);
       db.Other.forEach((o) => {
-        other[o.Id] = { ...otherMapper(o), ProductionId: production?.Id };
+        other[o.Id] = {
+          ...otherMapper(o),
+          ProductionId: production?.Id,
+          DayTypeName: dayTypeMap[o.DayTypeId] || 'Other',
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
       });
       db.Rehearsal.forEach((r) => {
-        rehearsal[r.Id] = { ...rehearsalMapper(r), ProductionId: production?.Id };
+        rehearsal[r.Id] = {
+          ...rehearsalMapper(r),
+          ProductionId: production?.Id,
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
       });
       db.GetInFitUp.forEach((gifu) => {
-        getInFitUp[gifu.Id] = { ...getInFitUpMapper(gifu), ProductionId: production?.Id };
+        getInFitUp[gifu.Id] = {
+          ...getInFitUpMapper(gifu),
+          ProductionId: production?.Id,
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
       });
       db.Booking.forEach((b) => {
         booking[b.Id] = {
           ...bookingMapper(b as BookingsWithPerformances),
           ProductionId: production?.Id,
           performanceIds: b.Performance.map((perf) => perf.Id),
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
         };
         b.Performance.forEach((p) => {
           performance[p.Id] = {
