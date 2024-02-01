@@ -87,7 +87,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
       <div>
         <div className="flex justify-between items-center">
           <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center h-20">
-            <div id="menu-icon" className="cursor-pointer hover:scale-105 p-2 px-4 pr-2 text-primary-blue">
+            <div id="menu-icon" className="cursor-pointer hover:scale-105 pr-2 text-primary-blue">
               <Icon iconName="menu" className="pointer-events-none" variant="xl" />
             </div>
             <SegueLogo
@@ -95,7 +95,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
               onClick={navigateToHome}
             />
           </div>
-          <div className="flex flex-row items-center pr-10">
+          <div className="flex flex-row items-center">
             <HeaderNavButton
               iconName="home"
               href="/"

@@ -3,48 +3,30 @@ import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useState } from 'react';
 import NotesPopup from './NotesPopup';
 
-const rows = [
-  {
-    production: 'MTM23 - Name',
-    date: '2024-01-29T11:30:30',
-    week: 3,
-    venue: 'Alhambra',
-    town: 'Dunfermline',
-    dayType: 'xxx',
-    bookingStatus: 'uncomfirmed',
-    capacity: 1000,
-    performanceCount: 6,
-    performanceTimes: '3pm to 5pm',
-    miles: 400,
-    travelTime: '6hrs',
-    note: 'Hey you!',
-  },
-  {
-    production: 'MTM23 - Name',
-    date: '2024-01-23T11:30:30',
-    week: 3,
-    venue: 'Alhambra',
-    town: 'Dunfermline',
-    dayType: 'xxx',
-    bookingStatus: 'Pencilled',
-    capacity: 1000,
-    performanceCount: 6,
-    performanceTimes: '3pm to 5pm',
-    miles: 400,
-    travelTime: '6hrs',
-    note: '',
-  },
-];
-
 interface BookingsTableProps {
-  rowData?: (typeof rows)[0][];
+  rowData?: any;
 }
 
-export default function BookingsTable({ rowData = rows }: BookingsTableProps) {
+const defaultColDef = {
+  wrapHeaderText: true,
+};
+
+export default function BookingsTable({ rowData }: BookingsTableProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
 
   const gridOptions = {
+    defaultColDef,
+    autoSizeStrategy: {
+      type: 'fitGridWidth',
+      defaultMinWidth: 100,
+      columnLimits: [
+        {
+          colId: 'production',
+          minWidth: 300,
+        },
+      ],
+    },
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
@@ -69,7 +51,7 @@ export default function BookingsTable({ rowData = rows }: BookingsTableProps) {
 
   return (
     <>
-      <div className="w-full h-full">
+      <div className="w-full h-[calc(100%-140px)]">
         <Table
           columnDefs={columnDefs}
           rowData={rowData}
