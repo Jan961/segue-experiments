@@ -12,7 +12,7 @@ import { calculateWeekNumber } from 'services/dateService';
 import { performanceState } from '../performanceState';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
-const getProductionCode = ({ Id, ShowCode }: any) => `${ShowCode}${Id}`;
+const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
 
 export const rowsSelector = selector({
   key: 'rowsSelector',
@@ -31,6 +31,7 @@ export const rowsSelector = selector({
       const { Name: venue, Town: town, Seats: capacity } = venueDict[VenueId] || {};
       const performanceTimes = performanceIds
         .map((performanceId) => performanceDict[performanceId]?.Time?.substring(0, 5))
+        .filter((time) => time)
         .join('; ');
       return {
         venue,
@@ -70,8 +71,8 @@ export const rowsSelector = selector({
         week,
         dateTime: date,
         date: moment(date).format('ddd DD/MM/YY'),
-        production: getProductionName(production),
-        productionCode: getProductionCode(production),
+        productionName: getProductionName(production),
+        production: getProductionCode(production),
         productionId: ProductionId,
         dayType: type,
         bookingStatus: bookingStatusMap[data?.StatusCode] || '',
