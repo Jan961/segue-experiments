@@ -1,9 +1,39 @@
 import { useCallback, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 
 const useBookingFilter = ({ Sections, rehearsalDict, gifuDict, otherDict, bookingDict }) => {
   const filter = useRecoilValue(filterState);
+  const { selected } = useRecoilValue(productionJumpState);
+  const rows = useRecoilValue(rowsSelector);
+  console.table(rows);
+  const filteredRows = useMemo(() => {
+    const filteredRowList = [];
+    for (const row of rows) {
+      const { dateTime, status, productionId } = row;
+      let filtered = false;
+      if (selected !== -1) {
+        filtered = productionId !== selected;
+      }
+      if (filter.endDate) {
+        filtered = new Date(dateTime) >= new Date(filter.endDate);
+      }
+      if (filter.startDate) {
+        filtered = new Date(dateTime) <= new Date(filter.startDate);
+      }
+      if (filter.status) {
+        filtered = status !== filter.status;
+      }
+      if (!filtered) {
+        filteredRowList.push(row);
+      }
+    }
+    return filteredRowList.sort((a, b) => {
+      return new Date(a.date).valueOf() - new Date(b.date).valueOf();
+    });
+  }, [rows, filter]);
   const filterDateByStatus = useCallback(
     (Date: any, status: string): any => {
       if (!Date || !status) return Date;
@@ -59,7 +89,7 @@ const useBookingFilter = ({ Sections, rehearsalDict, gifuDict, otherDict, bookin
     }
     return result;
   }, [filter, Sections, filterDateByStatus]);
-  return filteredSections;
+  return { filteredSections, rows: filteredRows };
 };
 
 export default useBookingFilter;

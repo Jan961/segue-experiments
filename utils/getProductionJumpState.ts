@@ -21,7 +21,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
       ShowCode: t.Show.Code,
       ShowName: t.Show.Name,
     })),
-    selected: selectedProduction || null,
+    selected: selectedProduction || -1,
     path,
   };
 };

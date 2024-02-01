@@ -167,6 +167,16 @@ export const getProductionWithContent = async (Id: number) => {
   });
 };
 
+export const getProductionsWithContent = async (Id?: number) => {
+  return await prisma.production.findMany({
+    where: {
+      ...(Id && { Id }),
+      IsArchived: false,
+    },
+    include: productionContentInclude,
+  });
+};
+
 export type ProductionWithDateblocks = Prisma.ProductionGetPayload<{
   include: typeof productionDateBlockInclude;
 }>;
