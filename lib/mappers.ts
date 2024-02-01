@@ -74,6 +74,7 @@ export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
   StartDate: convertDate(db.StartDate),
   EndDate: convertDate(db.EndDate),
   Name: db.Name,
+  IsPrimary: db.IsPrimary,
 });
 
 export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({

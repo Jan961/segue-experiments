@@ -12,7 +12,7 @@ export const columnDefs = [
   { headerName: 'Day Type', field: 'dayType' },
   { headerName: 'Booking Status', field: 'bookingStatus' },
   { headerName: 'Capacity', field: 'capacity' },
-  { headerName: 'No. of Prefs', field: 'noOfPrefs' },
+  { headerName: 'No. of Perfs', field: 'performanceCount' },
   { headerName: 'Performance Times', field: 'performanceTimes' },
   { headerName: 'Miles', field: 'miles' },
   { headerName: 'Travel Time', field: 'travelTime' },

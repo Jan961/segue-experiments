@@ -7,9 +7,12 @@ import { venueState } from '../venueState';
 import { productionJumpState } from '../productionJumpState';
 import { objectify } from 'radash';
 import moment from 'moment';
+import { bookingStatusMap } from 'config/bookings';
+import { calculateWeekNumber } from 'services/dateService';
+import { performanceState } from '../performanceState';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
-const getProductionCode = ({ Id, ShowCode }: any) => `${ShowCode}${Id}`;
+const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
 
 export const rowsSelector = selector({
   key: 'rowsSelector',
@@ -17,21 +20,26 @@ export const rowsSelector = selector({
     const rehearsals = get(rehearsalState);
     const bookings = get(bookingState);
     const getInFitUp = get(getInFitUpState);
-    // const performances = get(performanceState);
+    const performanceDict = get(performanceState);
     const other = get(otherState);
     const venueDict = get(venueState);
     const { productions } = get(productionJumpState);
     const productionDict = objectify(productions, (production) => production.Id);
     const rows: any = [];
     const getBookingDetails = (booking) => {
-      const { VenueId, performanceIds, Notes: notes, Seats: capacity } = booking || {};
-      const { Name: venue, Town: town } = venueDict[VenueId] || {};
+      const { VenueId, performanceIds, Notes: note } = booking || {};
+      const { Name: venue, Town: town, Seats: capacity } = venueDict[VenueId] || {};
+      const performanceTimes = performanceIds
+        .map((performanceId) => performanceDict[performanceId]?.Time?.substring(0, 5))
+        .filter((time) => time)
+        .join('; ');
       return {
         venue,
         town,
         capacity,
-        noOfPerfs: performanceIds?.length || 0,
-        notes,
+        note,
+        performanceTimes,
+        performanceCount: performanceIds?.length || 0,
       };
     };
     const getRehearsalDetails = (rehearsal) => {
@@ -40,8 +48,10 @@ export const rowsSelector = selector({
       };
     };
     const getOthersDetails = (others) => {
+      const { DayTypeName: dayType } = others || {};
       return {
         status: others.StatusCode,
+        dayType,
       };
     };
     const getInFitUpDetails = (gifu) => {
@@ -53,33 +63,35 @@ export const rowsSelector = selector({
       };
     };
     const addRow = (date: string, type: string, data: any, transformer) => {
-      const { ProductionId } = data;
+      const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
+      const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
       const row = {
+        week,
         dateTime: date,
-        date: moment(date).format('ddd MM/DD/YY'),
-        production: getProductionName(production),
-        productionCode: getProductionCode(production),
+        date: moment(date).format('ddd DD/MM/YY'),
+        productionName: getProductionName(production),
+        production: getProductionCode(production),
         productionId: ProductionId,
         dayType: type,
-        bookingStatus: data?.StatusCode,
+        bookingStatus: bookingStatusMap[data?.StatusCode] || '',
         status: data?.StatusCode,
         ...rowData,
       };
       rows.push(row);
     };
     Object.values(rehearsals).forEach((r) => {
-      addRow(r.Date, 'rehearsal', r, getRehearsalDetails);
+      addRow(r.Date, 'Rehearsal', r, getRehearsalDetails);
     });
     Object.values(getInFitUp).forEach((g) => {
-      addRow(g.Date, 'gifu', g, getInFitUpDetails);
+      addRow(g.Date, 'Get-in, Fit-Up', g, getInFitUpDetails);
     });
     Object.values(bookings).forEach((b) => {
-      addRow(b.Date, 'booking', b, getBookingDetails);
+      addRow(b.Date, 'Performance', b, getBookingDetails);
     });
     Object.values(other).forEach((o) => {
-      addRow(o.Date, 'other', o, getOthersDetails);
+      addRow(o.Date, o?.DateTypeName || 'Other', o, getOthersDetails);
     });
     return rows;
   },
