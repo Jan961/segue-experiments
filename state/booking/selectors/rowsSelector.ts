@@ -44,7 +44,7 @@ export const rowsSelector = selector({
     };
     const getRehearsalDetails = (rehearsal) => {
       return {
-        venueTown: rehearsal.Town,
+        town: rehearsal.Town,
       };
     };
     const getOthersDetails = (others) => {
@@ -58,8 +58,8 @@ export const rowsSelector = selector({
       const { VenueId } = gifu;
       const venue = venueDict[VenueId];
       return {
-        venueName: venue.Name,
-        venueTown: venue.Town,
+        venue: venue.Name,
+        town: venue.Town,
       };
     };
     const addRow = (date: string, type: string, data: any, transformer) => {

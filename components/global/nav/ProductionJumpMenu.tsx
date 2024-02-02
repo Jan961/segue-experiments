@@ -18,8 +18,8 @@ export default function ProductionJumpMenu() {
           ShowCode: null,
           Code: null,
           ...production,
-          text: `${production.ShowName} ${production.ShowCode}${production.Code} ${
-            production.IsArchived ? ' | (Archived)' : ''
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
           }`,
           value: production.Id,
         });
@@ -29,8 +29,8 @@ export default function ProductionJumpMenu() {
           ShowCode: null,
           Code: null,
           ...production,
-          text: `${production.ShowName} ${production.ShowCode}${production.Code} ${
-            production.IsArchived ? ' | (Archived)' : ''
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
           }`,
           value: production.Id,
         });
@@ -55,7 +55,7 @@ export default function ProductionJumpMenu() {
   return (
     <>
       <Typeahead
-        className="border-0 !shadow-none w-[400px]"
+        className="border-0 !shadow-none w-[510px]"
         value={selected}
         label="Production"
         options={productions}
@@ -64,7 +64,7 @@ export default function ProductionJumpMenu() {
       <div className="flex  items-center ml-1 mr-4">
         <Checkbox
           id="IncludeArchived"
-          label="Include Archived"
+          label="Include archived"
           checked={includeArchived}
           onChange={(e) => setIncludeArchived(e.target.value)}
           className=""

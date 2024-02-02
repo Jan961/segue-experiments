@@ -11,7 +11,7 @@ export type FilterState = {
 export const intialBookingFilterState: FilterState = {
   venueText: '',
   masterTaskText: '',
-  status: null,
+  status: 'all',
   startDate: '',
   endDate: '',
 };
