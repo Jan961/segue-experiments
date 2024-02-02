@@ -44,7 +44,7 @@ const Filters = () => {
     setFilter(intialBookingFilterState);
   };
   return (
-    <div className="w-full flex items-center gap-10">
+    <div className="w-full flex items-center justify-between">
       <div className="mx-0">
         <div className="px-4">
           <GlobalToolbar
@@ -53,9 +53,18 @@ const Filters = () => {
             titleClassName="text-primary-orange"
             title={'Bookings'}
           >
-            <div className="flex items-center gap-2">
-              <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
-              <Button text="Production Summary" onClick={() => setShowProductionSummary(true)}></Button>
+            <div className="flex items-center gap-4">
+              <Button
+                disabled={!todayOnSchedule}
+                text="Go To Today"
+                className="text-sm leading-8 w-[120px]"
+                onClick={() => gotoToday()}
+              ></Button>
+              <Button
+                text="Tour Summary"
+                className="text-sm leading-8 w-[120px]"
+                onClick={() => setShowProductionSummary(true)}
+              ></Button>
               {showProductionSummary && (
                 <Report
                   visible={showProductionSummary}
@@ -71,20 +80,20 @@ const Filters = () => {
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             value={filter.status}
-            className="bg-white"
+            className="bg-white w-52"
             label="Status"
             options={statusOptions}
           />
           <BookingFilter />
           <TextInput
             id={'venueText'}
-            placeHolder="search bookings..."
-            className="!w-fit"
+            placeHolder="Search bookings..."
+            className="w-[230px]"
             iconName="search"
             value={filter.venueText}
             onChange={onChange}
           />
-          <Button text="Clear Filters" onClick={onClearFilters}></Button>
+          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters}></Button>
         </div>
       </div>
       <BookingsButtons />

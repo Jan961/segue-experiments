@@ -1,11 +1,11 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const statusOptions: SelectOption[] = [
-  { text: 'ALL', value: '' },
-  { text: 'Confirmed (C)', value: 'C' },
-  { text: 'Unconfirmed (U)', value: 'U' },
-  { text: 'Cancelled (X)', value: 'X' },
-  { text: 'Suspended (S)', value: 'S' },
+  { text: 'ALL', value: 'all' },
+  { text: 'Confirmed', value: 'C' },
+  { text: 'Pencilled', value: 'U' },
+  { text: 'Cancelled', value: 'X' },
+  { text: 'Suspended', value: 'S' },
 ];
 
 export const bookingStatusMap = {

@@ -11,7 +11,7 @@ const useBookingFilter = () => {
   const filteredRows = useMemo(() => {
     const filteredRowList = [];
     for (const row of rows) {
-      const { dateTime, status, productionId } = row;
+      const { dateTime, status, productionId, venue } = row;
       let filtered = false;
       if (selected !== -1) {
         filtered = productionId !== selected;
@@ -22,8 +22,11 @@ const useBookingFilter = () => {
       if (filter.startDate) {
         filtered = new Date(dateTime) <= new Date(filter.startDate);
       }
-      if (filter.status) {
+      if (filter.status !== 'all') {
         filtered = status !== filter.status;
+      }
+      if (filter.venueText) {
+        filtered = !venue?.includes?.(filter.venueText);
       }
       if (!filtered) {
         filteredRowList.push(row);
@@ -32,7 +35,7 @@ const useBookingFilter = () => {
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
     });
-  }, [rows, selected, filter.endDate, filter.startDate, filter.status]);
+  }, [rows, selected, filter.endDate, filter.startDate, filter.status, filter.venueText]);
 
   return filteredRows;
 };

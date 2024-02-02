@@ -13,22 +13,33 @@ interface DateRangePorps {
   testId?: string;
   label?: string;
   onChange: (v: DateRangeValue) => void;
-  value?: DateRangeValue
+  value?: DateRangeValue;
+  minDate?: string;
+  maxDate?: string;
 }
 
-export default function DateRange({ className, disabled, testId, label, onChange, value }: DateRangePorps) {
+export default function DateRange({
+  className,
+  disabled,
+  testId,
+  label,
+  onChange,
+  value,
+  minDate,
+  maxDate,
+}: DateRangePorps) {
   const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
   const [dateFrom, setDateFrom] = useState<string>();
   const [dateTo, setDateTo] = useState<string>();
 
-  useEffect(()=>{
-    setDateFrom(value.from)
-  }, [value.from])
+  useEffect(() => {
+    setDateFrom(value.from);
+  }, [value.from]);
 
-  useEffect(()=>{
-    setDateTo(value.to)
-  }, [value.to])
+  useEffect(() => {
+    setDateTo(value.to);
+  }, [value.to]);
 
   const handleDateFromChange = (v) => {
     setDateFrom(v);
@@ -51,13 +62,19 @@ export default function DateRange({ className, disabled, testId, label, onChange
           <Label text={label} />
         </div>
       )}
-      <DateInput inputClass="border-none !shadow-none" value={dateFrom} onChange={handleDateFromChange} />
+      <DateInput
+        inputClass="border-none !shadow-none"
+        value={dateFrom}
+        onChange={handleDateFromChange}
+        minDate={minDate ? new Date(minDate) : null}
+      />
       <span className="mx-2 text-primary-label">to</span>
       <DateInput
         inputClass="border-none !shadow-none"
         value={dateTo}
         onChange={handleDateToChange}
         minDate={dateFrom ? new Date(dateFrom) : null}
+        maxDate={maxDate ? new Date(maxDate) : null}
       />
     </div>
   );
