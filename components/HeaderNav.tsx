@@ -85,8 +85,8 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
   return (
     <nav>
       <div>
-        <div className="flex justify-between items-center">
-          <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center h-20">
+        <div className="flex justify-between">
+          <div onClick={() => setMenuIsOpen(!menuIsOpen)} className="flex items-center">
             <div id="menu-icon" className="cursor-pointer hover:scale-105 pr-2 text-primary-blue">
               <Icon iconName="menu" className="pointer-events-none" variant="xl" />
             </div>

@@ -1,7 +1,7 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
 const AUTO_HEIGHT_LIMIT = 2;
 
@@ -18,15 +18,15 @@ interface TableProps {
   gridOptions?: any;
 }
 
-export default function Table({
-  rowData,
-  columnDefs,
-  styleProps,
-  onCellClicked,
-  onRowClicked,
-  gridOptions,
-}: TableProps) {
+export default forwardRef(function Table(
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
+  ref,
+) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
+
+  useImperativeHandle(ref, () => ({
+    getApi: () => gridApi,
+  }));
 
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
@@ -62,4 +62,4 @@ export default function Table({
       </div>
     </>
   );
-}
+});

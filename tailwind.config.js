@@ -2,12 +2,14 @@
 const plugin = require('tailwindcss/plugin');
 
 const colorsConfig = {
+  'primary-black': '#000',
   'primary-orange': '#EC6255',
   'primary-yellow': '#FDCE74',
   'primary-green': '#41A29A',
   'primary-blue': '#0093C0',
   'soft-primary-blue': '#80c5e1',
   'primary-purple': '#7B568D',
+
   'primary-pink': '#E94580',
   'primary-navy': '#082B4B',
   'primary-dark-blue': '#21345B',
@@ -15,6 +17,7 @@ const colorsConfig = {
   'primary-white': '#FFF',
   'primary-button-hover': 'rgba(8, 43, 75, 0.6)',
   'primary-button-active': 'rgba(8, 43, 75, 0.8)',
+  'secondary-purple': '#7B568D',
   'secondary-button-hover': '#E3EBF2',
   'secondary-button-active': '#617293',
   'tertiary-button-hover': '#F86C6C',

@@ -17,10 +17,10 @@ const useBookingFilter = () => {
         filtered = productionId !== selected;
       }
       if (filter.endDate) {
-        filtered = new Date(dateTime) >= new Date(filter.endDate);
+        filtered = new Date(dateTime) >= filter.endDate;
       }
       if (filter.startDate) {
-        filtered = new Date(dateTime) <= new Date(filter.startDate);
+        filtered = new Date(dateTime) <= filter.startDate;
       }
       if (filter.status !== 'all') {
         filtered = status !== filter.status;
