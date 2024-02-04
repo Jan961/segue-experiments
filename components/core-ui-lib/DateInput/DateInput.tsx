@@ -26,15 +26,20 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
       } else if (value instanceof Date) {
         setSelectedDate(value);
       }
+    } else {
+      setSelectedDate(null);
     }
   }, [value]);
 
   const handleInputChange = (value: string) => {
     if (value) {
-      if (regex.test(value) && moment(value).isValid()) {
+      if (regex.test(value) && moment(value, 'DD/MM/YY').isValid()) {
         const date = moment(value, 'DD/MM/YY').toDate();
         onChange(date);
       }
+    } else {
+      setSelectedDate(null);
+      onChange(null);
     }
   };
 

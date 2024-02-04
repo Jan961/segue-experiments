@@ -77,7 +77,7 @@ export default function DateRange({
         </div>
       )}
       <DateInput
-        inputClass="border-primary-white !shadow-none"
+        inputClass={`!shadow-none ${!errors?.fromError ? '!border-primary-white' : ''}`}
         value={dateRange.from}
         onChange={handleDateFromChange}
         error={errors.fromError}
@@ -85,7 +85,7 @@ export default function DateRange({
       />
       <span className="mx-2 text-primary-label">to</span>
       <DateInput
-        inputClass="border-primary-white !shadow-none"
+        inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}
         onChange={handleDateToChange}
         minDate={dateRange.from || null}
