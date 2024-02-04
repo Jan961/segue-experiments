@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import { productionEditorMapper } from 'lib/mappers';
 import { ProductionDTO } from 'interfaces';
 import { FormInfo } from 'components/global/forms/FormInfo';
-import { getProductionById, lookupProductionId } from 'services/ProductionService';
+import { getProductionById, lookupProductionId } from 'services/productionService';
 import { BreadCrumb } from 'components/global/BreadCrumb';
 import { checkAccess, getAccountIdFromReq, getEmailFromReq } from 'services/userService';
 

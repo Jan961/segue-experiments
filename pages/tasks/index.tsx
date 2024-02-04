@@ -1,5 +1,5 @@
 import { GetServerSideProps } from 'next';
-import { AllProductionPageProps, getAllProductionPageProps } from 'services/ProductionService';
+import { AllProductionPageProps, getAllProductionPageProps } from 'services/productionService';
 import { ProductionSelector } from 'components/ProductionSelector';
 import { ToolbarButton } from 'components/bookings/ToolbarButton';
 import Link from 'next/link';
@@ -8,7 +8,7 @@ const ShowSelection = ({ productions }: AllProductionPageProps) => (
   <div>
     <ProductionSelector
       ToolbarButtons={
-        <div className='flex gap-6 my-6 justify-center'>
+        <div className="flex gap-6 my-6 justify-center">
           <Link href={`/tasks/all`}>
             <ToolbarButton className="text-purple-900">All Productions</ToolbarButton>
           </Link>

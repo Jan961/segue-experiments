@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next';
 import { useState } from 'react';
 import ContractDetailsForm from 'components/contracts/contractDetailsForm';
 import ContractListingPanel from 'components/contracts/contractListingPanel';
-import { ProductionContent, getProductionWithContent } from 'services/ProductionService';
+import { ProductionContent, getProductionWithContent } from 'services/productionService';
 import GlobalToolbar from 'components/toolbar';
 import { bookingMapper } from 'lib/mappers';
 import { BookingDTO } from 'interfaces';

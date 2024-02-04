@@ -3,6 +3,8 @@ import { StyleProps } from './Table';
 
 const GridStyles = createGlobalStyle<StyleProps>`
 .ag-theme-quartz {
+    --ag-border-radius: 0px;
+    --ag-wrapper-border-radius: 0px;
     --ag-foreground-color: #617293;
     --ag-font-size: 14px;
     --ag-font-family: 'Calibri', sans-serif;
@@ -14,8 +16,13 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-odd-row-background-color: #F8F8F8;
 }
 
+.ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
+    border: none;
+}
+
 .ag-ltr .ag-cell {
-    &:after {
+    padding: 0;
+    &:not(:last-child):after {
         content: '';
         position: absolute;
         right: 0px;
@@ -34,7 +41,6 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .ag-header-cell-resize::after {
     background-color: #FFF
 }
-
 `;
 
 export default GridStyles;

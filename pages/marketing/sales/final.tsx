@@ -2,7 +2,7 @@ import Layout from '../../../components/Layout';
 import FinalSales from '../../../components/marketing/sales/final';
 import { GetServerSideProps } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import { getActiveProductions } from 'services/ProductionService';
+import { getActiveProductions } from 'services/productionService';
 
 type Props = {
   activeProductions: any[];
