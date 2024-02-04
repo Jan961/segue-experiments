@@ -5,6 +5,7 @@ import { filterState } from 'state/booking/filterState';
 export default function BookingsButtons() {
   const [filter, setFilter] = useRecoilState(filterState);
   const { startDate, endDate } = filter || {};
+
   const onChange = (change: { from: Date; to: Date }) => {
     const { from: startDate, to: endDate } = change;
     setFilter({ ...filter, startDate, endDate });

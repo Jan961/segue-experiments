@@ -20,6 +20,8 @@ interface DateRangePorps {
   label?: string;
   onChange: (v: DateRangeValue) => void;
   value?: DateRangeValue;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 export default function DateRange({
@@ -38,29 +40,31 @@ export default function DateRange({
   const [errors, setErrors] = useState<DateRangeError>({ fromError: '', toError: '' });
 
   useEffect(() => {
+    checkDateRangeValid(value.from, value.to);
     setDateRange(value);
   }, [value]);
 
-  const checkDateRangeValid = () => {
-    const error = isBefore(dateRange.to, dateRange.from) ? 'Invalid date' : '';
+  const checkDateRangeValid = (from: Date, to: Date) => {
+    const error = isBefore(to, from) ? 'Invalid date' : '';
     setErrors({ fromError: error, toError: error });
+    return error === '';
   };
 
   const handleDateFromChange = (v: Date) => {
     const updatedDate = { ...dateRange, from: v };
     setDateRange(updatedDate);
-    onChange(updatedDate);
+    if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
+      onChange(updatedDate);
+    }
   };
 
   const handleDateToChange = (v: Date) => {
     const updatedDate = { ...dateRange, to: v };
     setDateRange(updatedDate);
-    onChange(updatedDate);
+    if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
+      onChange(updatedDate);
+    }
   };
-
-  useEffect(() => {
-    checkDateRangeValid();
-  }, [dateRange]);
 
   return (
     <div

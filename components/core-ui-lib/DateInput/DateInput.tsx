@@ -29,19 +29,12 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
     }
   }, [value]);
 
-  const handleInputChange = (value) => {
+  const handleInputChange = (value: string) => {
     if (value) {
-      if (regex.test(value) && moment(value).isValid) {
-        console.log(new Date(value));
-        onChange(new Date(value));
+      if (regex.test(value) && moment(value).isValid()) {
+        const date = moment(value, 'DD/MM/YY').toDate();
+        onChange(date);
       }
-    }
-  };
-
-  const testInputValueIsDate = (event) => {
-    console.log(event);
-    if (event.data != null && !regex.test(event.data)) {
-      event.preventDefault();
     }
   };
 
@@ -53,15 +46,7 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
         popperClassName="!z-50"
         onSelect={onChange}
         onChange={() => null}
-        customInput={
-          <TextInput
-            ref={inputRef}
-            iconName="calendar"
-            className={inputClass}
-            onKeyDown={testInputValueIsDate}
-            error={error}
-          />
-        }
+        customInput={<TextInput ref={inputRef} iconName="calendar" className={inputClass} error={error} />}
         selected={selectedDate}
         onChangeRaw={(event) => handleInputChange(event.target.value)}
         strictParsing
