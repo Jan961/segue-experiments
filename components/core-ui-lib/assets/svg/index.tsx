@@ -20,3 +20,4 @@ export { default as UserSettingIcon } from './UserSetting';
 export { default as MenuIcon } from './Menu';
 export { default as ExitIcon } from './Exit';
 export { default as ExcelIcon } from './Excel';
+export { default as CrossIcon } from './Cross';

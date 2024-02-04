@@ -4,16 +4,18 @@ export type FilterState = {
   venueText?: string;
   masterTaskText?: string;
   status?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: Date;
+  endDate?: Date;
+  scrollToDate?: string;
 };
 
 export const intialBookingFilterState: FilterState = {
   venueText: '',
   masterTaskText: '',
   status: 'all',
-  startDate: '',
-  endDate: '',
+  startDate: null,
+  endDate: null,
+  scrollToDate: '',
 };
 
 export const filterState = atom({

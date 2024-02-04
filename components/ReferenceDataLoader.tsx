@@ -8,7 +8,6 @@ export default function ReferenceDataLoader() {
   const setProductionsList = useSetRecoilState(productionsList);
 
   const getProductions = async () => {
-    console.log('Getting productions');
     const values = await axios.get(`/api/productions/read/productionsList`);
     return values;
   };

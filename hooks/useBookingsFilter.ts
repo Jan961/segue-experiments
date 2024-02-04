@@ -8,30 +8,17 @@ const useBookingFilter = () => {
   const filter = useRecoilValue(filterState);
   const { selected } = useRecoilValue(productionJumpState);
   const rows = useRecoilValue(rowsSelector);
+
   const filteredRows = useMemo(() => {
-    const filteredRowList = [];
-    for (const row of rows) {
-      const { dateTime, status, productionId, venue } = row;
-      let filtered = false;
-      if (selected !== -1) {
-        filtered = productionId !== selected;
-      }
-      if (filter.endDate) {
-        filtered = new Date(dateTime) >= new Date(filter.endDate);
-      }
-      if (filter.startDate) {
-        filtered = new Date(dateTime) <= new Date(filter.startDate);
-      }
-      if (filter.status !== 'all') {
-        filtered = status !== filter.status;
-      }
-      if (filter.venueText) {
-        filtered = !venue?.includes?.(filter.venueText);
-      }
-      if (!filtered) {
-        filteredRowList.push(row);
-      }
-    }
+    const filteredRowList = rows.filter(({ dateTime, status, productionId, venue }) => {
+      return (
+        (selected === -1 || productionId === selected) &&
+        (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
+        (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
+        (filter.status === 'all' || status === filter.status) &&
+        (!filter.venueText || venue?.includes?.(filter.venueText))
+      );
+    });
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
     });
