@@ -5,7 +5,7 @@ import Tasklist from 'components/tasks/TaskList';
 // import TaskButtons from 'components/tasks/TaskButtons';
 import GlobalToolbar from 'components/toolbar';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { getProductionsAndTasks } from 'services/ProductionService';
+import { getProductionsAndTasks } from 'services/productionService';
 import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
 import { InitialState } from 'lib/recoil';
 import { mapToProductionTaskDTO } from 'lib/mappers';
@@ -40,7 +40,10 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
               return (
                 <div key={production.Id} className="mb-10">
                   <h3 className=" text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
-                  <Tasklist onTasksChange={(change) => onTasksChange(change, production.Id)} tasks={production?.Tasks} />
+                  <Tasklist
+                    onTasksChange={(change) => onTasksChange(change, production.Id)}
+                    tasks={production?.Tasks}
+                  />
                 </div>
               );
             })

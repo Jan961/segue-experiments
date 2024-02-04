@@ -32,7 +32,7 @@ import {
   VenueRoleDTO,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
-import { ProductionWithDateblocks } from 'services/ProductionService';
+import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { toISO } from 'services/dateService';
 
@@ -74,6 +74,7 @@ export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
   StartDate: convertDate(db.StartDate),
   EndDate: convertDate(db.EndDate),
   Name: db.Name,
+  IsPrimary: db.IsPrimary,
 });
 
 export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
@@ -107,14 +108,14 @@ export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {
   const day = p.Date.toISOString().split('T')[0];
-  const time = p.Time?.toISOString?.()?.split?.('T')?.[1]||null;
+  const time = p.Time?.toISOString?.()?.split?.('T')?.[1] || null;
   const Date = `${day}${time ? 'T' + time : ''}`;
 
   return {
     Id: p?.Id,
     Date,
     BookingId: p?.BookingId,
-    Time: time
+    Time: time,
   };
 };
 

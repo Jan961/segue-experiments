@@ -12,7 +12,7 @@ export interface MenuItemProps {
 
 export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemProps) {
   const { label, value, options, groupHeader, icon, expanded, labelClass } = option;
-  const [isExpanded, setIsExpanded] = useState(expanded);
+  const [isExpanded, setIsExpanded] = useState<boolean>(expanded);
   const isLeafNode = !options || options.length === 0;
   const baseClass = 'cursor-pointer';
 
@@ -21,6 +21,10 @@ export default memo(function MenuItem({ option, onClick, onToggle }: MenuItemPro
   useEffect(() => {
     setItemOptions(options);
   }, [options]);
+
+  useEffect(() => {
+    setIsExpanded(expanded);
+  }, [expanded]);
 
   const handleBtnClick = () => {
     onClick(option);

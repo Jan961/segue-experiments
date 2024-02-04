@@ -1,8 +1,10 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { Productions } from 'components/shows/Production';
-import { getProductionPageProps } from 'services/ProductionService';
+import { getProductionPageProps } from 'services/productionService';
 
-const ProductionSelection = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => <Productions {...props} />;
+const ProductionSelection = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => (
+  <Productions {...props} />
+);
 
 export default ProductionSelection;
 

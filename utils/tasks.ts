@@ -10,7 +10,10 @@ export const priorityOptions: SelectOption[] = [
   { text: 'Low Priority', value: 5 },
 ];
 
-export const filterProductionTasksBySearchText = (productionsWithTasks: ProductionsWithTasks[], searchText: string): ProductionsWithTasks[] => {
+export const filterProductionTasksBySearchText = (
+  productionsWithTasks: ProductionsWithTasks[],
+  searchText: string,
+): ProductionsWithTasks[] => {
   const results = [];
   for (const productionWithTasks of productionsWithTasks) {
     const filteredTasks = productionWithTasks.Tasks.filter(
@@ -34,9 +37,11 @@ export const calculateTaskStatus = (progress: number): string => {
   return '';
 };
 
-export const applyTaskFilters = (productionsWithTasks: ProductionsWithTasks[], filters: TasksFilterType): ProductionsWithTasks[] => {
+export const applyTaskFilters = (
+  productionsWithTasks: ProductionsWithTasks[],
+  filters: TasksFilterType,
+): ProductionsWithTasks[] => {
   const results = [];
-  console.log('====', filters);
   for (const productionWithTasks of productionsWithTasks) {
     const filteredTasks = productionWithTasks.Tasks.filter((task) => {
       let matches = true;

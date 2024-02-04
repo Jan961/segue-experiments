@@ -1,11 +1,5 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import GlobalToolbar from 'components/toolbar';
-import BookingsButtons from 'components/bookings/bookingsButtons';
+import { GetServerSideProps } from 'next';
 import Layout from 'components/Layout';
-import { getProductionWithContent } from 'services/ProductionService';
-import { InfoPanel } from 'components/bookings/InfoPanel';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { DateViewModel, ScheduleSectionViewModel } from 'state/booking/selectors/scheduleSelector';
 import {
   DateTypeMapper,
   bookingMapper,
@@ -15,199 +9,29 @@ import {
   performanceMapper,
   rehearsalMapper,
 } from 'lib/mappers';
-import { ScheduleRow } from 'components/bookings/ScheduleRow';
 import { getAllVenuesMin } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
-import { filterState, intialBookingFilterState } from 'state/booking/filterState';
-import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
-import { productionJumpState } from 'state/booking/productionJumpState';
-import { Spinner } from 'components/global/Spinner';
-import { MileageCalculator } from 'components/bookings/MileageCalculator';
-import React, { PropsWithChildren, useState } from 'react';
-import classNames from 'classnames';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { viewState } from 'state/booking/viewState';
 import { getAccountIdFromReq } from 'services/userService';
-import BookingFilter from 'components/bookings/BookingFilter';
-import { bookingState } from 'state/booking/bookingState';
-import { rehearsalState } from 'state/booking/rehearsalState';
-import { getInFitUpState } from 'state/booking/getInFitUpState';
-import { otherState } from 'state/booking/otherState';
 import useBookingFilter from 'hooks/useBookingsFilter';
-import Select from 'components/core-ui-lib/Select';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import TextInput from 'components/core-ui-lib/TextInput/TextInput';
-import Report from 'components/bookings/modal/Report';
-import Button from 'components/core-ui-lib/Button';
+import Filters from 'components/bookings/Filters';
+import { getProductionsWithContent } from 'services/productionService';
+import BookingsTable from 'components/bookings/BookingsTable';
+import { DateType } from '@prisma/client';
 
-const toolbarHeight = 136;
-
-interface ScrollablePanelProps {
-  className: string;
-  reduceHeight: number;
-}
-
-const statusOptions: SelectOption[] = [
-  { text: 'ALL', value: '' },
-  { text: 'Confirmed (C)', value: 'C' },
-  { text: 'Unconfirmed (U)', value: 'U' },
-  { text: 'Cancelled (X)', value: 'X' },
-];
-
-// Based on toolbar height. Adds a tasteful shadow when scrolled to prevent strange cut off
-const ScrollablePanel = ({ children, className, reduceHeight }: PropsWithChildren<ScrollablePanelProps>) => {
-  const [scrolled, setScrolled] = React.useState(false);
-
-  const handleScroll = (e) => {
-    setScrolled(e.target.scrollTop > 0);
-  };
-
-  const panelClasses = classNames('overflow-y-auto relative', {
-    'shadow-inner': scrolled,
-  });
-
-  return (
-    <div
-      onScroll={handleScroll}
-      className={classNames(className, panelClasses)}
-      style={{
-        height: `calc(100vh - ${reduceHeight}px)`,
-      }}
-    >
-      {children}
-    </div>
-  );
-};
-
-const BookingPage = ({ ProductionId }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const schedule = useRecoilValue(filteredScheduleSelector);
-  const bookingDict = useRecoilValue(bookingState);
-  const rehearsalDict = useRecoilValue(rehearsalState);
-  const gifuDict = useRecoilValue(getInFitUpState);
-  const otherDict = useRecoilValue(otherState);
-  const { Sections } = schedule;
-  const [filter, setFilter] = useRecoilState(filterState);
-  const [view, setView] = useRecoilState(viewState);
-  const [showProductionSummary, setShowProductionSummary] = useState(false);
-  const { loading } = useRecoilValue(productionJumpState);
-  const todayKey = new Date().toISOString().substring(0, 10);
-  const todayOnSchedule =
-    Sections.map((x) => x.Dates)
-      .flat()
-      .filter((x) => x.Date === todayKey).length > 0;
-  const filteredSections = useBookingFilter({ Sections, bookingDict, rehearsalDict, gifuDict, otherDict });
-  const gotoToday = () => {
-    const idToScrollTo = `booking-${todayKey}`;
-    if (todayOnSchedule) {
-      document.getElementById(`${idToScrollTo}`).scrollIntoView({ behavior: 'smooth' });
-      setView({ ...view, selectedDate: todayKey });
-    }
-  };
-  const onChange = (e: any) => {
-    setFilter({ ...filter, [e.target.id]: e.target.value });
-  };
-
-  const onClearFilters = () => {
-    setFilter(intialBookingFilterState);
-  };
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const BookingPage = () => {
+  const rows = useBookingFilter();
   return (
     <Layout title="Booking | Segue" flush>
-      <div className="grid grid-cols-12 mb-8">
-        <div className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9">
-          <div className="px-4">
-            <GlobalToolbar
-              searchFilter={filter.venueText}
-              setSearchFilter={(venueText) => setFilter({ venueText })}
-              titleClassName="text-primary-orange"
-              title={'Bookings'}
-            >
-              <div className="flex items-center gap-2">
-                <Button disabled={!todayOnSchedule} text="Go To Today" onClick={() => gotoToday()}></Button>
-                <Button text="Production Summary" onClick={() => setShowProductionSummary(true)}></Button>
-                {showProductionSummary && (
-                  <Report
-                    visible={showProductionSummary}
-                    onClose={() => setShowProductionSummary(false)}
-                    ProductionId={ProductionId}
-                  />
-                )}
-              </div>
-            </GlobalToolbar>
-          </div>
-          <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
-            <MileageCalculator />
-            <Select
-              onChange={(value) => onChange({ target: { id: 'status', value } })}
-              value={filter.status}
-              className="bg-white"
-              label="Status"
-              options={statusOptions}
-            />
-            <BookingFilter />
-            <TextInput
-              id={'venueText'}
-              placeHolder="search bookings..."
-              className="!w-fit"
-              iconName="search"
-              value={filter.venueText}
-              onChange={onChange}
-            />
-            <Button text="Clear Filters" onClick={onClearFilters}></Button>
-          </div>
-        </div>
-        <div className="col-span-5 lg:col-span-4 xl:col-span-3 p-2">
-          <BookingsButtons />
-        </div>
+      <div className="mb-8">
+        <Filters />
       </div>
-      <div className="grid grid-cols-12">
-        <ScrollablePanel className="mx-0 col-span-7 lg:col-span-8 xl:col-span-9" reduceHeight={toolbarHeight}>
-          {loading && <Spinner size="lg" className="mt-32 mb-8" />}
-          {!loading && (
-            <>
-              <div
-                className="grid grid-cols-12 font-bold
-                text-center
-                text-sm xl:text-md
-                sticky inset-x-0 top-0 bg-gray-50 z-10
-                shadow-lg
-                text-gray-400"
-              >
-                <div className="col-span-1 p-2 hidden xl:inline-block ">Production</div>
-                <div className="col-span-1 lg:col-span-1 xl:col-span-1 p-2 whitespace-nowrap">Week No.</div>
-                <div className="col-span-4 lg:col-span-3 xl:col-span-2 p-2 whitespace-nowrap">Date</div>
-                <div className="col-span-7 lg:col-span-8 grid grid-cols-10">
-                  <div className="col-span-4 p-2">Venue</div>
-                  <div className="col-span-2 p-2">Town</div>
-                  <div className="col-span-1 p-2">Seats</div>
-                  <div className="col-span-1 p-2">Perf(s)</div>
-                  <div className="col-span-1 p-2">Miles</div>
-                  <div className="col-span-1 p-2">Time</div>
-                </div>
-              </div>
-              <ul className="grid w-full shadow">
-                {filteredSections.map((section: ScheduleSectionViewModel) => (
-                  <li key={section.Name}>
-                    <h3 className="font-bold p-3 bg-gray-300">{section.Name}</h3>{' '}
-                    {section.Dates.map((date: DateViewModel) => (
-                      <ScheduleRow key={date.Date} date={date} />
-                    ))}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </ScrollablePanel>
-        <ScrollablePanel
-          reduceHeight={toolbarHeight}
-          className="col-span-5 lg:col-span-4 xl:col-span-3 p-2 bg-primary-blue"
-        >
-          <InfoPanel />
-        </ScrollablePanel>
-      </div>
+
+      <BookingsTable rowData={rows} />
     </Layout>
   );
 };
@@ -225,19 +49,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
-
   const ProductionId = productionJump.selected;
   // ProductionJumpState is checking if it's valid to access by accountId
-  if (!ProductionId) return { notFound: true };
+  //   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
-  const [venues, production, dateTypeRaw] = await all([
+  const [venues, productions, dateTypeRaw] = await all([
     getAllVenuesMin(),
-    getProductionWithContent(ProductionId),
+    getProductionsWithContent(ProductionId === -1 ? null : ProductionId),
     getDayTypes(),
   ]);
 
-  console.log(`Retrieved main content. Production: ${production.Id}`);
+  console.log(`Retrieved main content. Production: ${productions}`);
 
   const dateBlock = [];
   const rehearsal = {};
@@ -253,35 +76,57 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
+  const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
-  for (const db of production.DateBlock) {
-    dateBlock.push(dateBlockMapper(db));
-    db.Other.forEach((o) => {
-      other[o.Id] = otherMapper(o);
-    });
-    db.Rehearsal.forEach((r) => {
-      rehearsal[r.Id] = rehearsalMapper(r);
-    });
-    db.GetInFitUp.forEach((gifu) => {
-      getInFitUp[gifu.Id] = getInFitUpMapper(gifu);
-    });
-    db.Booking.forEach((b) => {
-      booking[b.Id] = bookingMapper(b as BookingsWithPerformances);
-      b.Performance.forEach((p) => {
-        performance[p.Id] = {
-          ...performanceMapper(p),
-          Time: performanceMapper(p).Time ?? null, // Example of setting a default value
+  for (const production of productions) {
+    const PrimaryDateBlock = production.DateBlock.find((dateBlock) => dateBlock.IsPrimary);
+    for (const db of production.DateBlock) {
+      const mappedBlock = dateBlockMapper(db);
+      dateBlock.push(mappedBlock);
+      db.Other.forEach((o) => {
+        other[o.Id] = {
+          ...otherMapper(o),
+          ProductionId: production?.Id,
+          DayTypeName: dayTypeMap[o.DayTypeId] || 'Other',
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
         };
       });
-      const venueId = booking[b.Id].VenueId;
-      if (venue[venueId]) venue[venueId].Count++;
-    });
+      db.Rehearsal.forEach((r) => {
+        rehearsal[r.Id] = {
+          ...rehearsalMapper(r),
+          ProductionId: production?.Id,
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
+      });
+      db.GetInFitUp.forEach((gifu) => {
+        getInFitUp[gifu.Id] = {
+          ...getInFitUpMapper(gifu),
+          ProductionId: production?.Id,
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
+      });
+      db.Booking.forEach((b) => {
+        booking[b.Id] = {
+          ...bookingMapper(b as BookingsWithPerformances),
+          ProductionId: production?.Id,
+          performanceIds: b.Performance.map((perf) => perf.Id),
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
+        b.Performance.forEach((p) => {
+          performance[p.Id] = {
+            ...performanceMapper(p),
+            Time: performanceMapper(p).Time ?? null, // Example of setting a default value
+          };
+        });
+        const venueId = booking[b.Id].VenueId;
+        if (venue[venueId]) venue[venueId].Count++;
+      });
+    }
   }
-
   const distance = {
     stops: [],
     outdated: true,
-    productionCode: production.Code,
+    productionCode: ProductionId ? productions?.[0]?.Code || null : null,
   };
 
   // See _app.tsx for how this is picked up

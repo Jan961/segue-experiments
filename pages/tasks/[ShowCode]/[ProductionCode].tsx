@@ -5,7 +5,7 @@ import Tasklist from 'components/tasks/TaskList';
 // import TaskButtons from 'components/tasks/TaskButtons';
 import GlobalToolbar from 'components/toolbar';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { getProductionsAndTasks } from 'services/ProductionService';
+import { getProductionsAndTasks } from 'services/productionService';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
 import { InitialState } from 'lib/recoil';
@@ -39,7 +39,10 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
           <Toolbar onApplyFilters={onApplyFilters} />
           {filteredProductions.length > 0 ? (
             filteredProductions.map((production) => (
-              <div key={production.Id} className={selected === undefined || selected === production.Id ? 'mb-10' : 'hidden'}>
+              <div
+                key={production.Id}
+                className={selected === undefined || selected === production.Id ? 'mb-10' : 'hidden'}
+              >
                 <h3 className="text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
                 <Tasklist
                   className="max-h-[70vh]"

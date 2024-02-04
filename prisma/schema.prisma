@@ -230,7 +230,7 @@ model DateBlock {
   Name                  String       @map("DateBlockName") @db.VarChar(45)
   StartDate             DateTime     @map("DateBlockStartDate") @db.Date
   EndDate               DateTime     @map("DateBlockEndDate") @db.Date
-  DateBlockIsPrimary    Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsPrimary             Boolean      @map("DateBlockIsPrimary")@default(dbgenerated("(b'0')")) @db.Bit(1)
   Booking               Booking[]
   Production            Production   @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_DateBlock")
   GetInFitUp            GetInFitUp[]

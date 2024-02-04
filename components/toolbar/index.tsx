@@ -54,7 +54,7 @@ const GlobalToolbar = ({
         </div>
       )}
       {productionJump ? (
-        <div className="bg-white border-primary-border rounded-md border">
+        <div className="bg-white border-primary-border rounded-md border shadow-md">
           <div className="rounded-l-md">
             <div className="flex items-center">
               <ProductionJumpMenu />

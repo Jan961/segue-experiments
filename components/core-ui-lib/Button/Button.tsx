@@ -1,5 +1,5 @@
-import classNames from "classnames";
-import Icon, { IconName, IconProps } from "../Icon/Icon";
+import classNames from 'classnames';
+import Icon, { IconName, IconProps } from '../Icon/Icon';
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
@@ -11,13 +11,13 @@ export interface ButtonProps {
   className?: string;
   onClick?: () => void;
   loading?: boolean;
-  prefixIconName?: IconName|string;
-  sufixIconName?: IconName|string;
+  prefixIconName?: IconName | string;
+  sufixIconName?: IconName | string;
   iconProps?: Partial<IconProps>;
 }
 
 const baseClass =
-  'h-[1.9375rem] min-w-fit px-2 py-1 rounded-md text-center flex justify-center items-center !shadow-sm-shadow font-bold text-sm tracking-[-0.00263re] transition-all hover:scale-110';
+  'h-[1.9375rem] min-w-fit px-2 py-1 rounded-md text-center flex justify-center items-center !shadow-sm-shadow font-bold text-sm tracking-[-0.00263re] transition-all hover:scale-105';
 const primaryClass = 'bg-primary-navy text-primary-white hover:bg-primary-button-hover active:bg-primary-button-active';
 const secondaryClass =
   'bg-primary-white border border-primary-button-active text-primary-button-active hover:bg-secondary-button-hover active:bg-secondary-button-active';
@@ -46,14 +46,20 @@ export default function Button({
   const endClass = `${baseClass} ${variantClass} ${disabledClass} ${className}`;
 
   return (
-    <button id={id} type="button" className={classNames(endClass,{'flex items-center gap-1': prefixIconName || sufixIconName})} disabled={disabled} onClick={onClick}>
-      {
-        prefixIconName && <span><Icon aria-hidden="true" iconName={prefixIconName} {...iconProps} /></span>
-      }
+    <button
+      id={id}
+      type="button"
+      className={classNames(endClass, { 'flex items-center gap-1': prefixIconName || sufixIconName })}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {prefixIconName && (
+        <span>
+          <Icon aria-hidden="true" iconName={prefixIconName} {...iconProps} />
+        </span>
+      )}
       {text || ''}
-      {
-        sufixIconName && <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />
-      }
+      {sufixIconName && <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />}
     </button>
   );
 }

@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
 import DateInput from '../DateInput';
 import Label from '../Label';
+import { isBefore } from 'date-fns';
 
 export type DateRangeValue = {
-  from: string;
-  to: string;
+  from: Date;
+  to: Date;
+};
+
+export type DateRangeError = {
+  fromError: string;
+  toError: string;
 };
 
 interface DateRangePorps {
@@ -13,32 +19,51 @@ interface DateRangePorps {
   testId?: string;
   label?: string;
   onChange: (v: DateRangeValue) => void;
-  value?: DateRangeValue
+  value?: DateRangeValue;
+  minDate?: Date;
+  maxDate?: Date;
 }
 
-export default function DateRange({ className, disabled, testId, label, onChange, value }: DateRangePorps) {
+export default function DateRange({
+  className,
+  disabled,
+  testId,
+  label,
+  onChange,
+  value,
+  minDate,
+  maxDate,
+}: DateRangePorps) {
   const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
-  const [dateFrom, setDateFrom] = useState<string>();
-  const [dateTo, setDateTo] = useState<string>();
+  const [dateRange, setDateRange] = useState<DateRangeValue>({ from: null, to: null });
+  const [errors, setErrors] = useState<DateRangeError>({ fromError: '', toError: '' });
 
-  useEffect(()=>{
-    setDateFrom(value.from)
-  }, [value.from])
+  useEffect(() => {
+    checkDateRangeValid(value.from, value.to);
+    setDateRange(value);
+  }, [value]);
 
-  useEffect(()=>{
-    setDateTo(value.to)
-  }, [value.to])
-
-  const handleDateFromChange = (v) => {
-    setDateFrom(v);
-    setDateTo(v);
-    onChange({ from: v, to: v });
+  const checkDateRangeValid = (from: Date, to: Date) => {
+    const error = isBefore(to, from) ? 'Invalid date' : '';
+    setErrors({ fromError: error, toError: error });
+    return error === '';
   };
 
-  const handleDateToChange = (v) => {
-    setDateTo(v);
-    onChange({ from: dateFrom, to: v });
+  const handleDateFromChange = (v: Date) => {
+    const updatedDate = { ...dateRange, from: v };
+    setDateRange(updatedDate);
+    if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
+      onChange(updatedDate);
+    }
+  };
+
+  const handleDateToChange = (v: Date) => {
+    const updatedDate = { ...dateRange, to: v };
+    setDateRange(updatedDate);
+    if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
+      onChange(updatedDate);
+    }
   };
 
   return (
@@ -51,13 +76,21 @@ export default function DateRange({ className, disabled, testId, label, onChange
           <Label text={label} />
         </div>
       )}
-      <DateInput inputClass="border-none !shadow-none" value={dateFrom} onChange={handleDateFromChange} />
+      <DateInput
+        inputClass="border-primary-white !shadow-none"
+        value={dateRange.from}
+        onChange={handleDateFromChange}
+        error={errors.fromError}
+        minDate={minDate}
+      />
       <span className="mx-2 text-primary-label">to</span>
       <DateInput
-        inputClass="border-none !shadow-none"
-        value={dateTo}
+        inputClass="border-primary-white !shadow-none"
+        value={dateRange.to}
         onChange={handleDateToChange}
-        minDate={dateFrom ? new Date(dateFrom) : null}
+        minDate={dateRange.from || null}
+        error={errors.toError}
+        maxDate={maxDate || null}
       />
     </div>
   );

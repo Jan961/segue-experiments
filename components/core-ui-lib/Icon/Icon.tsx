@@ -25,7 +25,9 @@ export type IconName =
   | 'menu'
   | 'exit'
   | 'production-management'
-  | 'system-admin';
+  | 'system-admin'
+  | 'excel'
+  | 'cross';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -51,6 +53,7 @@ const IconNameMap = new Map([
   ['menu', 'MenuIcon'],
   ['exit', 'ExitIcon'],
   ['excel', 'ExcelIcon'],
+  ['cross', 'CrossIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '5xl';

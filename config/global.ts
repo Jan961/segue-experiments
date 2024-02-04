@@ -13,13 +13,17 @@ export const availableLocales = [
   },
 ];
 
+export const tileColors = {
+  bookings: '#EC6255',
+};
+
 export const homeIcon = {
   default: { iconName: 'home', stroke: '', fill: '' },
   active: { iconName: 'home', stroke: '', fill: '' },
 };
 export const bookingsIcon = {
   default: { iconName: 'bookings', stroke: '', fill: '' },
-  active: { iconName: 'bookings', stroke: '', fill: '#EC6255' },
+  active: { iconName: 'bookings', stroke: '', fill: tileColors.bookings },
 };
 export const marketingIcon = {
   default: { iconName: 'marketing', stroke: '', fill: '#21345B' },

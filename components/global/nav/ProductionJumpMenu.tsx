@@ -10,21 +10,27 @@ export default function ProductionJumpMenu() {
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(false);
   const productions = useMemo(() => {
-    const productionOptions = [];
+    const productionOptions = [{ text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null }];
     for (const production of productionJump.productions) {
       if (includeArchived) {
         productionOptions.push({
+          Id: -1,
+          ShowCode: null,
+          Code: null,
           ...production,
-          text: `${production.ShowName} ${production.ShowCode}/${production.Code} ${
-            production.IsArchived ? ' | (Archived)' : ''
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
           }`,
           value: production.Id,
         });
       } else if (!production.IsArchived) {
         productionOptions.push({
+          Id: -1,
+          ShowCode: null,
+          Code: null,
           ...production,
-          text: `${production.ShowName} ${production.ShowCode}/${production.Code} ${
-            production.IsArchived ? ' | (Archived)' : ''
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
           }`,
           value: production.Id,
         });
@@ -36,16 +42,20 @@ export default function ProductionJumpMenu() {
 
   const { selected, path } = productionJump;
   function goToProduction(value: any) {
-    const selectedProduction = productions.find((production) => production.Id === parseInt(value));
+    const selectedProduction = productions.find((production) => production.value === parseInt(value));
     if (!selectedProduction) return;
-    const { ShowCode, Code: ProductionCode, Id } = selectedProduction;
+    if (selectedProduction.Id === -1) {
+      router.push(`/${path}`);
+      return;
+    }
+    const { ShowCode, Code: ProductionCode, Id } = selectedProduction || {};
     setProductionJump({ ...productionJump, loading: true, selected: Id });
     router.push(`/${path}/${ShowCode}/${ProductionCode}`);
   }
   return (
     <>
       <Typeahead
-        className="border-0 !shadow-none w-80"
+        className="border-0 !shadow-none w-[510px]"
         value={selected}
         label="Production"
         options={productions}
@@ -54,7 +64,7 @@ export default function ProductionJumpMenu() {
       <div className="flex  items-center ml-1 mr-4">
         <Checkbox
           id="IncludeArchived"
-          label="Include Archived"
+          label="Include archived"
           checked={includeArchived}
           onChange={(e) => setIncludeArchived(e.target.value)}
           className=""

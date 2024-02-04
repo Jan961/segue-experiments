@@ -53,7 +53,7 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
   }, []);
 
   return (
-    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col  px-6 pt-6`}>
+    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col  px-6`}>
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />
@@ -65,7 +65,9 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
       <main className="h-full w-full flex flex-rows flex-1">
         <PopoutMenu menuIsOpen={state.menuPinned || menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
         {isLoading && <LoadingOverlay />}
-        <div className={`${flush ? 'flex-1' : 'mt-24 flex-1 px-4'}`}>{children}</div>
+        <div className={`${flush ? 'flex-1' : 'mt-24 flex-1 px-4'} ${state.menuPinned ? 'ml-64 pl-1' : ''}`}>
+          {children}
+        </div>
       </main>
     </div>
   );

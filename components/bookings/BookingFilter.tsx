@@ -4,15 +4,13 @@ import { filterState } from 'state/booking/filterState';
 
 export default function BookingsButtons() {
   const [filter, setFilter] = useRecoilState(filterState);
-  const {startDate, endDate} = filter||{};
-  const onChange = (change:{from:string,to:string}) => {
-    const {from:startDate, to:endDate} = change;
-    console.log(filter, 'onFilterChange', change);
+  const { startDate, endDate } = filter || {};
+
+  const onChange = (change: { from: Date; to: Date }) => {
+    const { from: startDate, to: endDate } = change;
     setFilter({ ...filter, startDate, endDate });
   };
   return (
-    <div className='bg-white'>
-      <DateRange label="Date" onChange={onChange} value={{from:startDate, to:endDate}} />
-    </div>
+    <DateRange className="bg-primary-white" label="Date" onChange={onChange} value={{ from: startDate, to: endDate }} />
   );
 }

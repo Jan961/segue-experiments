@@ -26,7 +26,7 @@ export const dateStringToPerformancePair = (dateString: string) => {
 };
 
 export const dateToSimple = (dateToFormat: Date | string) => {
-  if (!dateToFormat) return 'DD/MM/YYYY';
+  if (!dateToFormat) return 'DD/MM/YY';
   const date = safeDate(dateToFormat);
   const options: Intl.DateTimeFormatOptions = {
     year: '2-digit',
