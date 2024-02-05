@@ -1,14 +1,19 @@
+import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Combobox, Transition } from '@headlessui/react';
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 
-export type TypeaheadOption = { text: string; value: string | number };
+export type TypeaheadOption = { text: string; value: string | number; [key: string]: any };
 
 export interface TypeaheadProps extends WithTestId {
   value?: string | number | undefined;
   onChange: (value: string | number) => void;
+  renderOption?: (
+    option: TypeaheadOption,
+    selectedOption: TypeaheadOption,
+    handleOptionSelect: (option: TypeaheadOption) => void,
+  ) => React.ReactNode;
   options: TypeaheadOption[];
   className?: string;
   placeholder?: string;
@@ -22,6 +27,7 @@ export default function Typeahead({
   onChange,
   options,
   className,
+  renderOption,
   placeholder = '',
   name = '',
   disabled = false,
@@ -90,21 +96,25 @@ export default function Typeahead({
               {filteredOptions.length === 0 && query !== '' ? (
                 <div className="relative cursor-default select-none px-4 py-2">Nothing found.</div>
               ) : (
-                filteredOptions.map((o) => (
-                  <Combobox.Option
-                    key={o.value}
-                    className={({ active }) =>
-                      `relative cursor-default select-none py-2 px-4 ${
-                        active ? 'bg-primary-list-row-active text-white' : 'text-primary-input-text'
-                      } hover:'bg-primary-list-row-hover hover:text-white active:'bg-primary-list-row-active active:text-white`
-                    }
-                    value={o}
-                  >
-                    {({ selected }) => (
-                      <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{o.text}</span>
-                    )}
-                  </Combobox.Option>
-                ))
+                filteredOptions.map((o) =>
+                  renderOption ? (
+                    renderOption?.(o, selectedOption, handleOptionSelect)
+                  ) : (
+                    <Combobox.Option
+                      key={o.value}
+                      className={({ active }) =>
+                        `relative cursor-default select-none py-2 px-4 ${
+                          active ? 'bg-primary-list-row-active text-white' : 'text-primary-input-text'
+                        } hover:'bg-primary-list-row-hover hover:text-white active:'bg-primary-list-row-active active:text-white`
+                      }
+                      value={o}
+                    >
+                      {({ selected }) => (
+                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{o.text}</span>
+                      )}
+                    </Combobox.Option>
+                  ),
+                )
               )}
             </Combobox.Options>
           </Transition>

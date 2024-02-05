@@ -89,7 +89,7 @@
     "radash": "^10.8.1",
     "react": "^18.2.0",
     "react-copy-to-clipboard": "^5.1.0",
-    "react-datepicker": "^4.25.0",
+    "react-datepicker": "^6.1.0",
     "react-dom": "^18.2.0",
     "react-export-table-to-excel": "^1.0.6",
     "react-hook-form": "^7.12.1",
