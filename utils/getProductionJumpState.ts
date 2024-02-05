@@ -8,8 +8,9 @@ interface Params extends ParsedUrlQuery {
 }
 
 export const getProductionJumpState = async (ctx, path: string, AccountId: number): Promise<ProductionJump> => {
-  const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
+  const { ProductionCode, ShowCode, resolvedUrl } = (ctx.params || {}) as Params;
   const productionsRaw = await getAllProductions(AccountId);
+  console.log('==resolvedUrl==', resolvedUrl);
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
   )?.Id;
@@ -21,7 +22,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
       ShowCode: t.Show.Code,
       ShowName: t.Show.Name,
     })),
-    selected: selectedProduction || -1,
+    selected: selectedProduction || null,
     path,
   };
 };
