@@ -28,12 +28,13 @@ export const rowsSelector = selector({
     const rows: any = [];
     const getBookingDetails = (booking) => {
       const { VenueId, performanceIds, Notes: note } = booking || {};
-      const { Name: venue, Town: town, Seats: capacity } = venueDict[VenueId] || {};
+      const { Name: venue, Town: town, Seats: capacity, Count: count } = venueDict[VenueId] || {};
       const performanceTimes = performanceIds
         .map((performanceId) => performanceDict[performanceId]?.Time?.substring(0, 5))
         .filter((time) => time)
         .join('; ');
       return {
+        count,
         venue,
         town,
         capacity,
@@ -70,7 +71,7 @@ export const rowsSelector = selector({
       const row = {
         week,
         dateTime: date,
-        date: moment(date).format('ddd DD/MM/YY'),
+        date: date ? moment(date).format('ddd DD/MM/YY') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,

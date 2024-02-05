@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -8,16 +8,15 @@ import Filters from 'components/bookings/Filters';
 import BookingsTable from 'components/bookings/BookingsTable';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const BookingPage = () => {
   const rows = useBookingFilter();
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
         <Filters />
       </div>
-      <div className="w-full h-full">
-        <BookingsTable rowData={rows} />
-      </div>
+
+      <BookingsTable rowData={rows} />
     </Layout>
   );
 };

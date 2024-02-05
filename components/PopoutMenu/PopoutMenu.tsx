@@ -24,6 +24,7 @@ const level3 = 'text-[0.9375rem]';
 export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: any) {
   const [state, setGlobalState] = useRecoilState(globalState);
   const isMenuPinned = useRef(false);
+  const menuRef = useRef(null);
   // If no path, you need to add a tourJump to the page. This is a global state
   const jump = useRecoilValue(productionJumpState);
   const getStrings = useStrings();
@@ -74,7 +75,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
           },
           {
             label: 'Venue Data Status',
-            value: `/${data.Tour}/marketing/venue/status`,
+            value: `/marketing/venue/status`,
             labelClass: leve2,
           },
           { label: 'Sales Entry', value: '/marketing/sales/entry', labelClass: leve2 },
@@ -187,6 +188,8 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
   useEffect(() => {
     if (menuIsOpen) {
       document.addEventListener('click', handleOutsideClick, false);
+      const path = router.pathname.split('/')[1];
+      menuRef.current.expandParentAndChildren(`/${path}`);
     }
 
     return () => document.removeEventListener('click', handleOutsideClick);
@@ -209,6 +212,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         style={{ height: 'calc(100vh - 150px)' }}
       >
         <HierarchicalMenu
+          ref={menuRef}
           options={state?.menuItems || []}
           onClick={handleMenuClick}
           onToggle={handleMenuToggle}

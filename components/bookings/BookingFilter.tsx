@@ -9,12 +9,17 @@ export default function BookingsButtons() {
   const { startDate, endDate } = filter || {};
   const onChange = (change: { from: string; to: string }) => {
     const { from: startDate, to: endDate } = change;
-    console.log(filter, 'onFilterChange', change);
     setFilter({ ...filter, startDate, endDate });
   };
   return (
     <div className="bg-white">
-      <DateRange disabled={!ProductionId} label="Date" onChange={onChange} value={{ from: startDate, to: endDate }} />
+      <DateRange
+        disabled={!ProductionId}
+        className="bg-primary-white"
+        label="Date"
+        onChange={onChange}
+        value={{ from: startDate, to: endDate }}
+      />
     </div>
   );
 }

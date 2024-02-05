@@ -8,15 +8,16 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import BookingsButtons from './bookingsButtons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState, intialBookingFilterState } from 'state/booking/filterState';
-import { viewState } from 'state/booking/viewState';
+
 import { useMemo, useState } from 'react';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { statusOptions } from 'config/bookings';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import moment from 'moment';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
-  const [view, setView] = useRecoilState(viewState);
+
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
   const [showProductionSummary, setShowProductionSummary] = useState(false);
@@ -33,10 +34,9 @@ const Filters = () => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
   const gotoToday = () => {
-    const idToScrollTo = `booking-${todayKey}`;
+    const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');
     if (todayOnSchedule) {
-      document.getElementById(`${idToScrollTo}`).scrollIntoView({ behavior: 'smooth' });
-      setView({ ...view, selectedDate: todayKey });
+      setFilter({ ...filter, scrollToDate: dateToScrollTo });
     }
   };
 

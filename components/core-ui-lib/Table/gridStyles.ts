@@ -16,8 +16,13 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-odd-row-background-color: #F8F8F8;
 }
 
+.ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
+    border: none;
+}
+
 .ag-ltr .ag-cell {
-    &:after {
+    padding: 0;
+    &:not(:last-child):after {
         content: '';
         position: absolute;
         right: 0px;
@@ -36,7 +41,6 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .ag-header-cell-resize::after {
     background-color: #FFF
 }
-
 `;
 
 export default GridStyles;
