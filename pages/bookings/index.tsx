@@ -1,26 +1,11 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
-import {
-  DateTypeMapper,
-  bookingMapper,
-  dateBlockMapper,
-  getInFitUpMapper,
-  otherMapper,
-  performanceMapper,
-  rehearsalMapper,
-} from 'lib/mappers';
-import { getAllVenuesMin } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
-import { BookingsWithPerformances } from 'services/bookingService';
-import { objectify, all } from 'radash';
-import { getDayTypes } from 'services/dayTypeService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import useBookingFilter from 'hooks/useBookingsFilter';
 import Filters from 'components/bookings/Filters';
-import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
-import { DateType } from '@prisma/client';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -51,104 +36,104 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
   const ProductionId = productionJump.selected;
-  // ProductionJumpState is checking if it's valid to access by accountId
-  //   if (!ProductionId) return { notFound: true };
+  // // ProductionJumpState is checking if it's valid to access by accountId
+  // //   if (!ProductionId) return { notFound: true };
 
-  // Get in parallel
-  const [venues, productions, dateTypeRaw] = await all([
-    getAllVenuesMin(),
-    getProductionsWithContent(ProductionId === -1 ? null : ProductionId),
-    getDayTypes(),
-  ]);
+  // // Get in parallel
+  // const [venues, productions, dateTypeRaw] = await all([
+  //   getAllVenuesMin(),
+  //   getProductionsWithContent(ProductionId === -1 ? null : ProductionId),
+  //   getDayTypes(),
+  // ]);
 
-  console.log(`Retrieved main content. Production: ${productions}`);
+  // console.log(`Retrieved main content. Production: ${productions}`);
 
-  const dateBlock = [];
-  const rehearsal = {};
-  const booking = {};
-  const getInFitUp = {};
-  const performance = {};
-  const other = {};
-  const venue = objectify(
-    venues,
-    (v) => v.Id,
-    (v: any) => {
-      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
-    },
-  );
-  const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
-  // Map to DTO. The database can change and we want to control. More info in mappers.ts
-  for (const production of productions) {
-    const PrimaryDateBlock = production.DateBlock.find((dateBlock) => dateBlock.IsPrimary);
-    for (const db of production.DateBlock) {
-      const mappedBlock = dateBlockMapper(db);
-      dateBlock.push(mappedBlock);
-      db.Other.forEach((o) => {
-        other[o.Id] = {
-          ...otherMapper(o),
-          ProductionId: production?.Id,
-          DayTypeName: dayTypeMap[o.DayTypeId] || 'Other',
-          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
-        };
-      });
-      db.Rehearsal.forEach((r) => {
-        rehearsal[r.Id] = {
-          ...rehearsalMapper(r),
-          ProductionId: production?.Id,
-          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
-        };
-      });
-      db.GetInFitUp.forEach((gifu) => {
-        getInFitUp[gifu.Id] = {
-          ...getInFitUpMapper(gifu),
-          ProductionId: production?.Id,
-          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
-        };
-      });
-      db.Booking.forEach((b) => {
-        booking[b.Id] = {
-          ...bookingMapper(b as BookingsWithPerformances),
-          ProductionId: production?.Id,
-          performanceIds: b.Performance.map((perf) => perf.Id),
-          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
-        };
-        b.Performance.forEach((p) => {
-          performance[p.Id] = {
-            ...performanceMapper(p),
-            Time: performanceMapper(p).Time ?? null, // Example of setting a default value
-          };
-        });
-        const venueId = booking[b.Id].VenueId;
-        if (venue[venueId]) venue[venueId].Count++;
-      });
-    }
-  }
-  const distance = {
-    stops: [],
-    outdated: true,
-    productionCode: ProductionId ? productions?.[0]?.Code || null : null,
-  };
+  // const dateBlock = [];
+  // const rehearsal = {};
+  // const booking = {};
+  // const getInFitUp = {};
+  // const performance = {};
+  // const other = {};
+  // const venue = objectify(
+  //   venues,
+  //   (v) => v.Id,
+  //   (v: any) => {
+  //     const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+  //     return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+  //   },
+  // );
+  // const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
+  // // Map to DTO. The database can change and we want to control. More info in mappers.ts
+  // for (const production of productions) {
+  //   const PrimaryDateBlock = production.DateBlock.find((dateBlock) => dateBlock.IsPrimary);
+  //   for (const db of production.DateBlock) {
+  //     const mappedBlock = dateBlockMapper(db);
+  //     dateBlock.push(mappedBlock);
+  //     db.Other.forEach((o) => {
+  //       other[o.Id] = {
+  //         ...otherMapper(o),
+  //         ProductionId: production?.Id,
+  //         DayTypeName: dayTypeMap[o.DayTypeId] || 'Other',
+  //         PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+  //       };
+  //     });
+  //     db.Rehearsal.forEach((r) => {
+  //       rehearsal[r.Id] = {
+  //         ...rehearsalMapper(r),
+  //         ProductionId: production?.Id,
+  //         PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+  //       };
+  //     });
+  //     db.GetInFitUp.forEach((gifu) => {
+  //       getInFitUp[gifu.Id] = {
+  //         ...getInFitUpMapper(gifu),
+  //         ProductionId: production?.Id,
+  //         PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+  //       };
+  //     });
+  //     db.Booking.forEach((b) => {
+  //       booking[b.Id] = {
+  //         ...bookingMapper(b as BookingsWithPerformances),
+  //         ProductionId: production?.Id,
+  //         performanceIds: b.Performance.map((perf) => perf.Id),
+  //         PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+  //       };
+  //       b.Performance.forEach((p) => {
+  //         performance[p.Id] = {
+  //           ...performanceMapper(p),
+  //           Time: performanceMapper(p).Time ?? null, // Example of setting a default value
+  //         };
+  //       });
+  //       const venueId = booking[b.Id].VenueId;
+  //       if (venue[venueId]) venue[venueId].Count++;
+  //     });
+  //   }
+  // }
+  // const distance = {
+  //   stops: [],
+  //   outdated: true,
+  //   productionCode: ProductionId ? productions?.[0]?.Code || null : null,
+  // };
 
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
       productionJump,
     },
-    booking: {
-      distance,
-      rehearsal,
-      booking,
-      getInFitUp,
-      other,
-      dateType: dateTypeRaw.map(DateTypeMapper),
-      performance,
-      dateBlock: dateBlock.sort((a, b) => {
-        return b.StartDate < a.StartDate ? 1 : -1;
-      }),
-      // Remove extra info
-      venue,
-    },
+    // booking: {
+    //   distance,
+    //   rehearsal,
+    //   booking,
+    //   getInFitUp,
+    //   other,
+    //   dateType: dateTypeRaw.map(DateTypeMapper),
+    //   performance,
+    //   dateBlock: dateBlock.sort((a, b) => {
+    //     return b.StartDate < a.StartDate ? 1 : -1;
+    //   }),
+    //   // Remove extra info
+    //   venue,
+    // },
   };
 
   return {

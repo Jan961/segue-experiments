@@ -26,7 +26,7 @@ const Filters = () => {
       schedule.Sections.map((x) => x.Dates)
         .flat()
         .filter((x) => x.Date === todayKey).length > 0,
-    [schedule.Sections],
+    [schedule.Sections, todayKey],
   );
 
   const onChange = (e: any) => {
@@ -55,13 +55,14 @@ const Filters = () => {
           >
             <div className="flex items-center gap-4">
               <Button
-                disabled={!todayOnSchedule}
+                disabled={!todayOnSchedule || !ProductionId}
                 text="Go To Today"
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => gotoToday()}
               ></Button>
               <Button
                 text="Tour Summary"
+                disabled={ProductionId === -1 || !ProductionId}
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => setShowProductionSummary(true)}
               ></Button>
@@ -79,6 +80,7 @@ const Filters = () => {
           <MileageCalculator />
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
+            disabled={!ProductionId}
             value={filter.status}
             className="bg-white w-52"
             label="Status"
@@ -87,6 +89,7 @@ const Filters = () => {
           <BookingFilter />
           <TextInput
             id={'venueText'}
+            disabled={!ProductionId}
             placeHolder="Search bookings..."
             className="w-[230px]"
             iconName="search"

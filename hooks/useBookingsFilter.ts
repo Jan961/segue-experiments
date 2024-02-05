@@ -11,7 +11,7 @@ const useBookingFilter = () => {
   const filteredRows = useMemo(() => {
     const filteredRowList = [];
     for (const row of rows) {
-      const { dateTime, status, productionId, venue } = row;
+      const { dateTime, status, productionId, venue, town } = row;
       let filtered = false;
       if (selected !== -1) {
         filtered = productionId !== selected;
@@ -26,7 +26,10 @@ const useBookingFilter = () => {
         filtered = status !== filter.status;
       }
       if (filter.venueText) {
-        filtered = !venue?.includes?.(filter.venueText);
+        filtered = !(
+          venue?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase()) ||
+          town?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase())
+        );
       }
       if (!filtered) {
         filteredRowList.push(row);
