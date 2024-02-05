@@ -13,8 +13,8 @@ export interface TextInputProps {
   onClick?: (e: any) => void;
   iconName?: IconName;
   error?: string;
-  onFocus: (e: any) => void;
-  onBlur: (e: any) => void;
+  onFocus?: (e: any) => void;
+  onBlur?: (e: any) => void;
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
