@@ -52,17 +52,23 @@ export default function DateRange({
 
   const handleDateFromChange = (v: Date) => {
     const updatedDate = { ...dateRange, from: v };
-    setDateRange(updatedDate);
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
+      setDateRange(updatedDate);
       onChange(updatedDate);
+    } else {
+      // The way date is set like this is to force state update
+      setDateRange({ from: new Date(dateRange.from.getTime()), to: new Date(dateRange.to.getTime()) });
     }
   };
 
   const handleDateToChange = (v: Date) => {
     const updatedDate = { ...dateRange, to: v };
-    setDateRange(updatedDate);
     if (checkDateRangeValid(updatedDate.from, updatedDate.to)) {
+      setDateRange(updatedDate);
       onChange(updatedDate);
+    } else {
+      // The way date is set like this is to force state update
+      setDateRange({ from: new Date(dateRange.from.getTime()), to: new Date(dateRange.to.getTime()) });
     }
   };
 

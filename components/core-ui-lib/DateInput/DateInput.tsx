@@ -21,14 +21,16 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
   const [inputValue, setInputValue] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const dpRef = useRef(null);
+
   useEffect(() => {
+    console.log('In useffect value is ', value);
     if (value) {
       if (typeof value === 'string' && regex.test(value)) {
         setInputValue(value);
         setSelectedDate(new Date(value));
-      } else if (value instanceof Date) {
+      } else {
         setInputValue(moment(value).format('DD/MM/YY'));
-        setSelectedDate(value);
+        setSelectedDate(value as Date);
       }
     } else {
       setInputValue('');
@@ -92,7 +94,7 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
           onSelect={onChange}
           onChange={() => null}
           selected={selectedDate}
-          customInput={<div className="w-4 h-4 " ref={inputRef} />}
+          customInput={<div className="cursor-pointer w-4 h-4 " ref={inputRef} />}
           {...props}
         />
       </div>
