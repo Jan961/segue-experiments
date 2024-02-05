@@ -32,6 +32,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
     }
 }
 
+.ag-header-cell {
+    padding-left: 8px;
+}
+
 .ag-header-cell-label {
     color: #FFF;
     font-family: 'Calibri', sans-serif;
