@@ -7,7 +7,7 @@ export default function BookingsButtons() {
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const [filter, setFilter] = useRecoilState(filterState);
   const { startDate, endDate } = filter || {};
-  const onChange = (change: { from: string; to: string }) => {
+  const onChange = (change: { from: Date; to: Date }) => {
     const { from: startDate, to: endDate } = change;
     setFilter({ ...filter, startDate, endDate });
   };
