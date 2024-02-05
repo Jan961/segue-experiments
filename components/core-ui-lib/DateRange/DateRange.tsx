@@ -83,7 +83,7 @@ export default function DateRange({
         error={errors.fromError}
         minDate={minDate}
       />
-      <span className="mx-2 text-primary-label">to</span>
+      <span className="mx-1 text-primary-label">to</span>
       <DateInput
         inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}

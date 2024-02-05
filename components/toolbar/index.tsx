@@ -62,7 +62,7 @@ const GlobalToolbar = ({
           </div>
         </div>
       ) : (
-        <div> </div>
+        <div className="nonJump"> </div>
       )}
       {children}
       {filterComponent && filterComponent}

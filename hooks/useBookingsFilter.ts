@@ -10,13 +10,15 @@ const useBookingFilter = () => {
   const rows = useRecoilValue(rowsSelector);
 
   const filteredRows = useMemo(() => {
-    const filteredRowList = rows.filter(({ dateTime, status, productionId, venue }) => {
+    const filteredRowList = rows.filter(({ dateTime, status, productionId, venue, town }) => {
       return (
         (selected === -1 || productionId === selected) &&
         (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
         (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
         (filter.status === 'all' || status === filter.status) &&
-        (!filter.venueText || venue?.includes?.(filter.venueText))
+        (!filter.venueText ||
+          venue?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase()) ||
+          town?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase()))
       );
     });
     return filteredRowList.sort((a, b) => {
