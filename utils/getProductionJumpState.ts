@@ -12,7 +12,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
   const productionsRaw = await getAllProductions(AccountId);
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
-  )?.Id;
+  );
   return {
     productions: productionsRaw.map((t: any) => ({
       Id: t.Id,
@@ -21,7 +21,8 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
       ShowCode: t.Show.Code,
       ShowName: t.Show.Name,
     })),
-    selected: selectedProduction || null,
+    selected: selectedProduction?.Id || null,
+    includeArchived: selectedProduction?.IsArchived || false,
     path,
   };
 };

@@ -9,7 +9,7 @@ import ProductionOption from './ProductionOption';
 export default function ProductionJumpMenu() {
   const router = useRouter();
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
-  const [includeArchived, setIncludeArchived] = useState<boolean>(false);
+  const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
   const productions = useMemo(() => {
     const productionOptions = [
       { text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false },
@@ -56,6 +56,10 @@ export default function ProductionJumpMenu() {
     setProductionJump({ ...productionJump, loading: true, selected: Id });
     router.push(`/${path}/${ShowCode}/${ProductionCode}`);
   }
+  const onIncludeArchiveChange = (e) => {
+    setProductionJump({ ...productionJump, includeArchived: e.target.value });
+    setIncludeArchived(e.target.value);
+  };
   if (!productionJump?.productions?.length) return null;
   return (
     <>
@@ -75,7 +79,7 @@ export default function ProductionJumpMenu() {
           id="IncludeArchived"
           label="Include archived"
           checked={includeArchived}
-          onChange={(e) => setIncludeArchived(e.target.value)}
+          onChange={onIncludeArchiveChange}
           className=""
         />
       </div>
