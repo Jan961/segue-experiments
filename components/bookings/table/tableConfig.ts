@@ -3,6 +3,8 @@ import NoteColumnRenderer from './NoteColumnRenderer';
 import DateColumnRenderer from './DateColumnRenderer';
 import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
+import MilesRenderer from './MilesRenderer';
+import TravelTimeRenderer from './TravelTimeRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -26,9 +28,13 @@ export const columnDefs = [
     width: 120,
   },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'No. of Perfs', field: 'noOfPerfs', cellRenderer: DefaultCellRenderer, width: 120 },
+  { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 120 },
   { headerName: 'Performance Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 200 },
-  { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer },
-  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: DefaultCellRenderer, width: 110 },
+  {
+    headerName: 'Miles',
+    field: 'miles',
+    cellRenderer: MilesRenderer,
+  },
+  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 110 },
   { headerName: '', field: 'note', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
 ];

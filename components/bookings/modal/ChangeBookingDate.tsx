@@ -87,7 +87,7 @@ export const ChangeBookingDate = ({ bookingId, disabled }: ChangeBookingDateProp
       const newPerfState = { ...perfDict, ...objectify(performances, (x: PerformanceDTO) => x.Id) };
       setBookingDict(newBookingState);
       setPerfDict(newPerfState);
-      setDistance({ ...distance, outdated: true });
+      setDistance({ ...distance });
       setShowModal(false);
     } finally {
       setLoading(false);

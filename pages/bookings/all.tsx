@@ -52,8 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
   const ProductionId = -1;
   productionJump.selected = -1;
-  // ProductionJumpState is checking if it's valid to access by accountId
-  //   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
   const [venues, productions, dateTypeRaw] = await all([
@@ -79,12 +77,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
   );
   const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
+  let distance = {};
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const production of productions) {
+    distance = { ...distance, [production.Id]: { stops: [], outdated: true, productionCode: production?.Code } };
     const PrimaryDateBlock = production.DateBlock.find((dateBlock) => dateBlock.IsPrimary);
     for (const db of production.DateBlock) {
       const mappedBlock = dateBlockMapper(db);
-      dateBlock.push(mappedBlock);
+      dateBlock.push({
+        ...mappedBlock,
+        ProductionId: production?.Id,
+      });
       db.Other.forEach((o) => {
         other[o.Id] = {
           ...otherMapper(o),
@@ -125,11 +128,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       });
     }
   }
-  const distance = {
-    stops: [],
-    outdated: true,
-    productionCode: ProductionId ? productions?.[0]?.Code || null : null,
-  };
 
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
