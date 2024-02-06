@@ -17,8 +17,8 @@ export const columnDefs = [
     width: 130,
   },
   { headerName: 'Week', field: 'week', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, width: 300 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, width: 300 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, flex: 2 },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 120 },
   {
     headerName: 'Booking Status',
@@ -27,7 +27,7 @@ export const columnDefs = [
     resizable: false,
     width: 120,
   },
-  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer },
+  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
   { headerName: 'No. of Prefs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 120 },
   { headerName: 'Performance Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 200 },
   {
@@ -36,5 +36,5 @@ export const columnDefs = [
     cellRenderer: MilesRenderer,
   },
   { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 110 },
-  { headerName: '', field: 'note', cellRenderer: NoteColumnRenderer, resizable: false, width: 30 },
+  { headerName: '', field: 'note', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
 ];
