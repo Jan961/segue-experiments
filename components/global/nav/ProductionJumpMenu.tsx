@@ -60,7 +60,7 @@ export default function ProductionJumpMenu() {
   return (
     <>
       <Typeahead
-        className="border-0 !shadow-none w-[430px]"
+        className="border-0 !shadow-none w-[525px]"
         value={selected}
         label="Production"
         placeholder="Please select a Production"

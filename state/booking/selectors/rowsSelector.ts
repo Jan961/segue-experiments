@@ -7,9 +7,12 @@ import { venueState } from '../venueState';
 import { productionJumpState } from '../productionJumpState';
 import { objectify } from 'radash';
 import moment from 'moment';
-import { bookingStatusMap } from 'config/bookings';
-import { calculateWeekNumber } from 'services/dateService';
+import { bookingRow, bookingStatusMap } from 'config/bookings';
+import { calculateWeekNumber, getKey } from 'services/dateService';
 import { performanceState } from '../performanceState';
+import BookingHelper from 'utils/booking';
+import { dateBlockState } from '../dateBlockState';
+import { getArrayOfDatesBetween } from 'utils/getDatesBetween';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
@@ -25,44 +28,11 @@ export const rowsSelector = selector({
     const venueDict = get(venueState);
     const { productions } = get(productionJumpState);
     const productionDict = objectify(productions, (production) => production.Id);
+    const dateBlocks = get(dateBlockState);
+    const helper = new BookingHelper({ performanceDict, venueDict, productionDict });
+    const { start, end } = helper.getRangeFromDateBlocks(dateBlocks);
     const rows: any = [];
-    const getBookingDetails = (booking) => {
-      const { VenueId, performanceIds, Notes: note } = booking || {};
-      const { Name: venue, Town: town, Seats: capacity, Count: count } = venueDict[VenueId] || {};
-      const performanceTimes = performanceIds
-        .map((performanceId) => performanceDict[performanceId]?.Time?.substring(0, 5))
-        .filter((time) => time)
-        .join('; ');
-      return {
-        count,
-        venue,
-        town,
-        capacity,
-        note,
-        performanceTimes,
-        performanceCount: performanceIds?.length || 0,
-      };
-    };
-    const getRehearsalDetails = (rehearsal) => {
-      return {
-        town: rehearsal.Town,
-      };
-    };
-    const getOthersDetails = (others) => {
-      const { DayTypeName: dayType } = others || {};
-      return {
-        status: others.StatusCode,
-        dayType,
-      };
-    };
-    const getInFitUpDetails = (gifu) => {
-      const { VenueId } = gifu;
-      const venue = venueDict[VenueId];
-      return {
-        venue: venue.Name,
-        town: venue.Town,
-      };
-    };
+    const bookedDates: string[] = [];
     const addRow = (date: string, type: string, data: any, transformer) => {
       const { ProductionId, PrimaryDateBlock } = data;
       const production = productionDict[ProductionId] || {};
@@ -83,17 +53,36 @@ export const rowsSelector = selector({
       rows.push(row);
     };
     Object.values(rehearsals).forEach((r) => {
-      addRow(r.Date, 'Rehearsal', r, getRehearsalDetails);
+      bookedDates.push(getKey(r.Date));
+      addRow(r.Date, 'Rehearsal', r, helper.getRehearsalDetails);
     });
     Object.values(getInFitUp).forEach((g) => {
-      addRow(g.Date, 'Get-in, Fit-Up', g, getInFitUpDetails);
+      bookedDates.push(getKey(g.Date));
+      addRow(g.Date, 'Get-in, Fit-Up', g, helper.getInFitUpDetails);
     });
     Object.values(bookings).forEach((b) => {
-      addRow(b.Date, 'Performance', b, getBookingDetails);
+      bookedDates.push(getKey(b.Date));
+      addRow(b.Date, 'Performance', b, helper.getBookingDetails);
     });
     Object.values(other).forEach((o) => {
-      addRow(o.Date, o?.DateTypeName || 'Other', o, getOthersDetails);
+      bookedDates.push(getKey(o.Date));
+      addRow(o.Date, o?.DateTypeName || 'Other', o, helper.getOthersDetails);
     });
+    const allDates = getArrayOfDatesBetween(start, end);
+    console.log(start, end, bookedDates, allDates);
+    for (const date of allDates) {
+      if (!bookedDates.includes(date)) {
+        const production = helper.getProductionByDate(dateBlocks, date);
+        rows.push({
+          ...bookingRow,
+          date: moment(date).format('ddd DD/MM/YY'),
+          dateTime: new Date(date).toISOString(),
+          production: production ? getProductionCode(production) : '',
+          productionId: production?.Id,
+          productionCode: production?.Code,
+        });
+      }
+    }
     return rows;
   },
 });

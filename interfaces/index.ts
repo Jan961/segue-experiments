@@ -81,6 +81,7 @@ export type Production = {
 };
 
 export type BookingDTO = {
+  ProductionId: number;
   Id: number;
   Date: string;
   VenueId: number;
