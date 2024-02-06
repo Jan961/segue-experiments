@@ -4,6 +4,10 @@ export default function VenueColumnRenderer(props: CustomCellRendererProps) {
   const { dayType, bookingStatus, multipleVenuesOnSameDate, venueHasMultipleBookings } = props.data;
 
   const getEndClass = () => {
+    if (!dayType) {
+      return '';
+    }
+
     if (dayType !== 'Performance') {
       return 'bg-[#E94580]/75 text-[#21345B]';
     } else if (bookingStatus === 'Cancelled') {
