@@ -69,7 +69,6 @@ export const rowsSelector = selector({
       addRow(o.Date, o?.DateTypeName || 'Other', o, helper.getOthersDetails);
     });
     const allDates = getArrayOfDatesBetween(start, end);
-    console.log(start, end, bookedDates, allDates);
     for (const date of allDates) {
       if (!bookedDates.includes(date)) {
         const production = helper.getProductionByDate(dateBlocks, date);

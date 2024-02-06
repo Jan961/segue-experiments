@@ -79,7 +79,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const production of productions) {
-    distance = { ...distance, [production.Id]: { stops: [], outdated: true, productionCode: production?.Code } };
+    distance = {
+      ...distance,
+      [production.Id]: {
+        ...(distance[production.Id] || {}),
+        stops: [],
+        outdated: true,
+        productionCode: production?.Code,
+      },
+    };
     const PrimaryDateBlock = production.DateBlock.find((dateBlock) => dateBlock.IsPrimary);
     for (const db of production.DateBlock) {
       const mappedBlock = dateBlockMapper(db);

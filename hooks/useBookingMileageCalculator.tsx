@@ -3,12 +3,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { distanceState } from 'state/booking/distanceState';
-import { productionJumpState } from 'state/booking/productionJumpState';
 import { getStops } from 'utils/getStops';
 
 const useMileageCalculator = () => {
   const [distance, setDistance] = useRecoilState(distanceState);
-  const { selected } = useRecoilValue(productionJumpState);
   const bookingDict = useRecoilValue(bookingState);
   const [loading, setLoading] = useState(false);
   const shouldRefresh = useMemo(() => !loading && Object.values(distance).some((x) => x.outdated), [distance]);
@@ -17,6 +15,7 @@ const useMileageCalculator = () => {
     setLoading(true);
     const promises = Object.keys(stops).map(async (prodId) => {
       if (distance[prodId].outdated) {
+        console.log(`Calculating mileage for ${prodId}`);
         const { data } = await axios.post('/api/distance', stops[prodId]);
         setDistance({ ...distance, [prodId]: { stops: data, outdated: false } });
       }
@@ -27,7 +26,7 @@ const useMileageCalculator = () => {
   useEffect(() => {
     if (!shouldRefresh) return;
     refresh();
-  }, [selected]);
+  }, [refresh]);
   return { loading, distance };
 };
 
