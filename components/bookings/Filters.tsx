@@ -92,7 +92,7 @@ const Filters = () => {
             id={'venueText'}
             disabled={!ProductionId}
             placeHolder="Search bookings..."
-            className="w-[317px]"
+            className="w-[310px]"
             iconName="search"
             value={filter.venueText}
             onChange={onChange}
