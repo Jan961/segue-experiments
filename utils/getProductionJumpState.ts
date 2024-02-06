@@ -1,3 +1,4 @@
+import { dateBlockMapper } from 'lib/mappers';
 import { ParsedUrlQuery } from 'querystring';
 import { getAllProductions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
@@ -14,13 +15,28 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
   );
   return {
-    productions: productionsRaw.map((t: any) => ({
-      Id: t.Id,
-      Code: t.Code,
-      IsArchived: t.IsArchived,
-      ShowCode: t.Show.Code,
-      ShowName: t.Show.Name,
-    })),
+    productions: productionsRaw
+      .map((t: any) => {
+        let db = t.DateBlock.find((block) => block.IsPrimary);
+        if (db) {
+          db = dateBlockMapper(db);
+        }
+        return {
+          Id: t.Id,
+          Code: t.Code,
+          IsArchived: t.IsArchived,
+          ShowCode: t.Show.Code,
+          ShowName: t.Show.Name,
+          StartDate: db?.StartDate,
+          EndDate: db?.EndDate,
+        };
+      })
+      .sort((a, b) => {
+        if (a.IsArchived !== b.IsArchived) {
+          return a.IsArchived ? 1 : -1;
+        }
+        return new Date(a.StartDate).valueOf() > new Date(b.StartDate).valueOf();
+      }),
     selected: selectedProduction?.Id || null,
     includeArchived: selectedProduction?.IsArchived || false,
     path,
