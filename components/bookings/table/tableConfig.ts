@@ -28,7 +28,7 @@ export const columnDefs = [
     width: 120,
   },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'No. of Prefs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 120 },
+  { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 120 },
   { headerName: 'Performance Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 200 },
   {
     headerName: 'Miles',
