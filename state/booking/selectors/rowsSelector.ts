@@ -85,6 +85,6 @@ export const rowsSelector = selector({
         rows.push(emptyRow);
       }
     }
-    return rows;
+    return { rows, scheduleStart: start, scheduleEnd: end };
   },
 });

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -7,12 +7,12 @@ import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 const useBookingFilter = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected } = useRecoilValue(productionJumpState);
-  const rows = useRecoilValue(rowsSelector);
-  const [rowsForProduction, setRowsForProduction] = useState([]);
+  const { rows, scheduleStart, scheduleEnd } = useRecoilValue(rowsSelector);
 
   const filteredRows = useMemo(() => {
-    const filteredRowList = rowsForProduction.filter(({ dateTime, status, venue, town }) => {
+    const filteredRowList = rows.filter(({ dateTime, status, productionId, venue, town }) => {
       return (
+        (selected === -1 || productionId === selected) &&
         (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
         (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
         (filter.status === 'all' || status === filter.status) &&
@@ -21,29 +21,18 @@ const useBookingFilter = () => {
           town?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase()))
       );
     });
-    return filteredRowList;
-  }, [rowsForProduction, filter.endDate, filter.startDate, filter.status, filter.venueText]);
+    return filteredRowList.sort((a, b) => {
+      return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
+    });
+  }, [rows, selected, filter.endDate, filter.startDate, filter.status, filter.venueText]);
 
   useEffect(() => {
-    if (rows && rows.length > 0) {
-      const filteredRowList = rows
-        .filter(({ productionId }) => {
-          return selected === -1 || productionId === selected;
-        })
-        .sort((a, b) => {
-          return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
-        });
-      setRowsForProduction(filteredRowList);
-
-      if (filteredRowList.length > 0) {
-        const minDate = new Date(filteredRowList[0].dateTime);
-        const maxDate = new Date(filteredRowList[filteredRowList.length - 1].dateTime);
-        setFilter({ ...filter, productionStartDate: minDate, productionEndDate: maxDate });
-      }
-    } else {
-      setRowsForProduction([]);
+    if (scheduleStart && scheduleEnd) {
+      const start = new Date(scheduleStart);
+      const end = new Date(scheduleEnd);
+      setFilter({ ...filter, productionStartDate: start, productionEndDate: end, startDate: start, endDate: end });
     }
-  }, [rows, selected]);
+  }, [selected, scheduleStart, scheduleEnd]);
 
   return filteredRows;
 };

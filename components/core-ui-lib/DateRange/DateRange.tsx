@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import DateInput from '../DateInput';
 import Label from '../Label';
-import { isBefore } from 'date-fns';
+import { set, isBefore } from 'date-fns';
 
 export type DateRangeValue = {
   from: Date;
@@ -24,6 +24,10 @@ interface DateRangePorps {
   maxDate?: Date;
 }
 
+const setDateWithoutTime = (date) => {
+  return set(date, { hours: 0, minutes: 0, seconds: 0, milliseconds: 0 });
+};
+
 export default function DateRange({
   className,
   disabled,
@@ -40,10 +44,18 @@ export default function DateRange({
   const toInputRef = useRef(null);
   const [dateRange, setDateRange] = useState<DateRangeValue>({ from: null, to: null });
   const [errors, setErrors] = useState<DateRangeError>({ fromError: '', toError: '' });
-
+  const formattedMinDate = setDateWithoutTime(minDate);
+  const formattedMaxDate = setDateWithoutTime(maxDate);
   const checkDateRangeValid = (from: Date, to: Date) => {
+    // console.log('In DateRange', minDate, from, isBefore(from, minDate));
+
+    const formattedFromDate = setDateWithoutTime(from);
+    const formattedToDate = setDateWithoutTime(to);
+
     const error =
-      (minDate && isBefore(from, minDate)) || (maxDate && isBefore(maxDate, to)) || isBefore(to, from)
+      (minDate && isBefore(formattedFromDate, formattedMinDate)) ||
+      (formattedMaxDate && isBefore(formattedMaxDate, formattedToDate)) ||
+      isBefore(formattedToDate, formattedFromDate)
         ? 'Invalid date'
         : '';
     setErrors({ fromError: error, toError: error });

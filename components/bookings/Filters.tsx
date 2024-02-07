@@ -43,7 +43,13 @@ const Filters = () => {
   };
 
   const onClearFilters = () => {
-    setFilter(intialBookingFilterState);
+    setFilter({
+      ...intialBookingFilterState,
+      startDate: filter.productionStartDate,
+      endDate: filter.productionEndDate,
+      productionStartDate: filter.productionStartDate,
+      productionEndDate: filter.productionEndDate,
+    });
   };
   return (
     <div className="w-full flex items-center justify-between">
