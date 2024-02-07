@@ -76,7 +76,8 @@ class BookingHelper {
   }
 
   getProductionByDate(dateBlocks = [], date) {
-    const db = dateBlocks?.find((block) => block.StartDate <= date && block.EndDate <= date);
+    date = new Date(date);
+    const db = dateBlocks?.find((block) => new Date(block.StartDate) <= date && new Date(block.EndDate) >= date);
     return this.productionDict?.[db?.ProductionId];
   }
 }
