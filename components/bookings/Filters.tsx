@@ -13,7 +13,7 @@ import { filteredScheduleSelector } from 'state/booking/selectors/filteredSchedu
 import { statusOptions } from 'config/bookings';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import moment from 'moment';
-import useMileageCalculator from 'hooks/useBookingMileageCalculator';
+// import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
@@ -21,7 +21,7 @@ const Filters = () => {
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { loading: isMileageLoading } = useMileageCalculator();
+  // const { loading: isMileageLoading } = {}; // useMileageCalculator();
   const [showProductionSummary, setShowProductionSummary] = useState(false);
   const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
   const todayOnSchedule = useMemo(
@@ -43,7 +43,13 @@ const Filters = () => {
   };
 
   const onClearFilters = () => {
-    setFilter(intialBookingFilterState);
+    setFilter({
+      ...intialBookingFilterState,
+      startDate: filter.scheduleStartDate,
+      endDate: filter.scheduleEndDate,
+      scheduleStartDate: filter.scheduleStartDate,
+      scheduleEndDate: filter.scheduleEndDate,
+    });
   };
   return (
     <div className="w-full flex items-center justify-between">

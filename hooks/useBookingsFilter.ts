@@ -7,7 +7,7 @@ import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 const useBookingFilter = () => {
   const filter = useRecoilValue(filterState);
   const { selected } = useRecoilValue(productionJumpState);
-  const rows = useRecoilValue(rowsSelector);
+  const { rows } = useRecoilValue(rowsSelector);
 
   const filteredRows = useMemo(() => {
     const filteredRowList = rows.filter(({ dateTime, status, productionId, venue, town }) => {
