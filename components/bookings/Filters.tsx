@@ -45,10 +45,10 @@ const Filters = () => {
   const onClearFilters = () => {
     setFilter({
       ...intialBookingFilterState,
-      startDate: filter.productionStartDate,
-      endDate: filter.productionEndDate,
-      productionStartDate: filter.productionStartDate,
-      productionEndDate: filter.productionEndDate,
+      startDate: filter.scheduleStartDate,
+      endDate: filter.scheduleEndDate,
+      scheduleStartDate: filter.scheduleStartDate,
+      scheduleEndDate: filter.scheduleEndDate,
     });
   };
   return (

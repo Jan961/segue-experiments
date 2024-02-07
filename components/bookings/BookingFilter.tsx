@@ -1,16 +1,28 @@
 import DateRange from 'components/core-ui-lib/DateRange/DateRange';
+import { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 
 export default function BookingsButtons() {
+  const { scheduleStart, scheduleEnd } = useRecoilValue(rowsSelector);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const [filter, setFilter] = useRecoilState(filterState);
-  const { startDate, endDate, productionStartDate, productionEndDate } = filter || {};
+  const { startDate, endDate, scheduleStartDate, scheduleEndDate } = filter || {};
   const onChange = (change: { from: Date; to: Date }) => {
     const { from: startDate, to: endDate } = change;
     setFilter({ ...filter, startDate, endDate });
   };
+
+  useEffect(() => {
+    if (scheduleStart && scheduleEnd) {
+      const start = new Date(scheduleStart);
+      const end = new Date(scheduleEnd);
+      setFilter({ ...filter, scheduleStartDate: start, scheduleEndDate: end, startDate: start, endDate: end });
+    }
+  }, [ProductionId, scheduleStart, scheduleEnd]);
+
   return (
     <div className="bg-white">
       <DateRange
@@ -19,8 +31,8 @@ export default function BookingsButtons() {
         label="Date"
         onChange={onChange}
         value={{ from: startDate, to: endDate }}
-        minDate={productionStartDate}
-        maxDate={productionEndDate}
+        minDate={scheduleStartDate}
+        maxDate={scheduleEndDate}
       />
     </div>
   );
