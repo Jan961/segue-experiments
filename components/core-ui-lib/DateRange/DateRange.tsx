@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DateInput from '../DateInput';
 import Label from '../Label';
 import { isBefore } from 'date-fns';
@@ -31,24 +31,36 @@ export default function DateRange({
   label,
   onChange,
   value,
-  minDate,
-  maxDate,
+  minDate = null,
+  maxDate = null,
 }: DateRangePorps) {
   const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
+  const fromInputRef = useRef(null);
+  const toInputRef = useRef(null);
   const [dateRange, setDateRange] = useState<DateRangeValue>({ from: null, to: null });
   const [errors, setErrors] = useState<DateRangeError>({ fromError: '', toError: '' });
 
-  useEffect(() => {
-    checkDateRangeValid(value.from, value.to);
-    setDateRange(value);
-  }, [value]);
-
   const checkDateRangeValid = (from: Date, to: Date) => {
-    const error = isBefore(to, from) ? 'Invalid date' : '';
+    const error =
+      (minDate && isBefore(from, minDate)) || (maxDate && isBefore(maxDate, to)) || isBefore(to, from)
+        ? 'Invalid date'
+        : '';
     setErrors({ fromError: error, toError: error });
+
     return error === '';
   };
+
+  useEffect(() => {
+    checkDateRangeValid(value.from, value.to);
+    if (!value) {
+      setDateRange({ from: minDate, to: maxDate });
+    } else {
+      const from = value.from || minDate;
+      const to = value?.to || maxDate;
+      setDateRange({ from, to });
+    }
+  }, [value, minDate, maxDate]);
 
   const handleDateFromChange = (v: Date) => {
     const updatedDate = { ...dateRange, from: v };
@@ -57,7 +69,7 @@ export default function DateRange({
       onChange(updatedDate);
     } else {
       // The way date is set like this is to force state update
-      setDateRange({ from: new Date(dateRange.from.getTime()), to: new Date(dateRange.to.getTime()) });
+      fromInputRef?.current.setValue(dateRange.from || null);
     }
   };
 
@@ -68,7 +80,8 @@ export default function DateRange({
       onChange(updatedDate);
     } else {
       // The way date is set like this is to force state update
-      setDateRange({ from: new Date(dateRange.from.getTime()), to: new Date(dateRange.to.getTime()) });
+      setErrors(null);
+      toInputRef?.current.setValue(dateRange.to || null, dateRange.from || null);
     }
   };
 
@@ -83,20 +96,23 @@ export default function DateRange({
         </div>
       )}
       <DateInput
+        ref={fromInputRef}
         inputClass={`!shadow-none ${!errors?.fromError ? '!border-primary-white' : ''}`}
         value={dateRange.from}
         onChange={handleDateFromChange}
-        error={errors.fromError}
+        error={errors?.fromError}
         minDate={minDate}
+        maxDate={maxDate}
       />
       <span className="mx-1 text-primary-label">to</span>
       <DateInput
+        ref={toInputRef}
         inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}
         onChange={handleDateToChange}
-        minDate={dateRange.from || null}
-        error={errors.toError}
-        maxDate={maxDate || null}
+        minDate={dateRange.from || minDate}
+        error={errors?.toError}
+        maxDate={maxDate}
       />
     </div>
   );
