@@ -72,14 +72,17 @@ export const rowsSelector = selector({
     for (const date of allDates) {
       if (!bookedDates.includes(date)) {
         const production = helper.getProductionByDate(dateBlocks, date);
-        rows.push({
+        const week = calculateWeekNumber(new Date(production?.StartDate), new Date(date)) || '';
+        const emptyRow = {
           ...bookingRow,
+          week,
           date: moment(date).format('ddd DD/MM/YY'),
           dateTime: new Date(date).toISOString(),
           production: production ? getProductionCode(production) : '',
           productionId: production?.Id,
           productionCode: production?.Code,
-        });
+        };
+        rows.push(emptyRow);
       }
     }
     return rows;

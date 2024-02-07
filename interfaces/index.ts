@@ -135,6 +135,8 @@ export type ProductionDTO = {
   ShowCode: string;
   IsArchived: boolean;
   DateBlock: DateBlockDTO[];
+  StartDate?: string;
+  EndDate?: string;
 };
 
 export type VenueMinimalDTO = {
