@@ -5,19 +5,22 @@ import DatePicker from 'react-datepicker';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Spinner } from 'components/global/Spinner';
 import { StyledDialog } from 'components/global/StyledDialog';
-import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { venueState } from 'state/booking/venueState';
 import { scheduleSelector } from 'state/booking/selectors/scheduleSelector';
 import { performanceState } from 'state/booking/performanceState';
 import { bookingState } from 'state/booking/bookingState';
-import { ToolbarButton } from '../../ToolbarButton';
 import { getDateBlockId } from '../../panel/utils/getDateBlockId';
 import PerformanceRowEditor from './PerformanceRowEditor';
+import Typeahead from 'components/core-ui-lib/Typeahead';
+import Button from 'components/core-ui-lib/Button';
+import Checkbox from 'components/core-ui-lib/Checkbox';
+import { dateTypeState } from 'state/booking/dateTypeState';
 
 const initialState = {
   fromDate: null,
   toDate: null,
   venue: null,
+  dayType: null,
 };
 
 type PerformanceItem = {
@@ -30,14 +33,16 @@ type PerformanceData = {
   [key: string]: PerformanceItem;
 };
 
-type AddBookingProps={
+type AddBookingProps = {
   visible: boolean;
-  onClose:()=>void;
-}
+  onClose: () => void;
+};
 
-const AddBooking = ({visible, onClose}:AddBookingProps) => {
+const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   const venueDict = useRecoilValue(venueState);
   const schedule = useRecoilValue(scheduleSelector);
+  const dayTypes = useRecoilValue(dateTypeState);
+  const DayTypeOptions = useMemo(() => dayTypes.map(({ Id: value, Name: text }) => ({ text, value })), [dayTypes]);
   const [perfDict, setPerfDict] = useRecoilState(performanceState);
   const [bookingDict, setBookingDict] = useRecoilState(bookingState);
   const [stage, setStage] = useState<number>(0);
@@ -45,6 +50,7 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
   const [formData, setFormData] = useState(initialState);
   const [error, setError] = useState<string>('');
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
+  const [isDayTypeOnly, setIsDayTypeOnly] = useState(false);
   const availableDates = useMemo(() => {
     const dates = [];
     const productionSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Production');
@@ -76,7 +82,11 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
   }, [formData.fromDate, formData.toDate, availableDates]);
 
   const VenueOptions = useMemo(
-    () => Object.values(venueDict).map((venue) => ({ name: `${venue?.Name} ${venue?.Town}`, value: venue?.Id })),
+    () =>
+      Object.values(venueDict).map((venue) => ({
+        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
+        value: venue?.Id,
+      })),
     [venueDict],
   );
   const handleOnChange = (e) => {
@@ -95,7 +105,7 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
     setError('');
     setStage(0);
     setFormData(initialState);
-    onClose()
+    onClose();
   };
   const addBookings = async () => {
     setError('');
@@ -139,6 +149,7 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
         onClose={onModalClose}
         title="Add Booking"
         width="xl"
+        bodyClassName="overflow-visible"
       >
         {loading && (
           <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
@@ -146,26 +157,14 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
           </div>
         )}
         <form className="flex flex-col bg-primary-navy py-2 px-4 rounded-lg" onSubmit={handleOnSubmit}>
-          <FormTypeahead
-            className={classNames('my-2', { 'max-w-full': stage === 1, 'w-80': stage === 0 })}
-            options={VenueOptions}
-            disabled={stage !== 0}
-            onChange={(value) =>
-              handleOnChange({ target: { name: 'venue', value } } as React.ChangeEvent<
-                HTMLInputElement | HTMLSelectElement
-              >)
-            }
-            value={formData.venue}
-            placeholder={'Please select a venue'}
-          />
           {stage === 0 && (
             <div className="flex flex-col my-2">
-              <div className="text-white text-sm font-bold pl-2">Start Date</div>
+              <div className="text-white text-sm font-bold pl-2">Date</div>
               <DatePicker
                 placeholderText="DD/MM/YY"
                 dateFormat="dd/MM/yy"
                 popperClassName="!z-[51] w-80"
-                className="rounded border-gray-300 px-3 z-90 w-full my-1"
+                className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
                 minDate={minDate ? new Date(minDate) : null}
                 maxDate={maxDate ? new Date(maxDate) : null}
                 selected={formData.fromDate ? new Date(formData.fromDate) : null}
@@ -175,18 +174,59 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
           )}
           {stage === 0 && (
             <div className="flex flex-col my-2">
-              <div className="text-white text-sm font-bold pl-2">End Date</div>
+              <div className="text-white text-sm font-bold pl-2">Last Date</div>
               <DatePicker
                 placeholderText="DD/MM/YY"
                 dateFormat="dd/MM/yy"
                 popperClassName="!z-[51]"
-                className="rounded border-gray-300 px-3 z-90 w-full my-1"
+                className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
                 selected={formData?.toDate ? new Date(formData?.toDate) : null}
                 minDate={formData?.fromDate ? new Date(formData?.fromDate) : new Date()}
                 maxDate={maxDate ? new Date(maxDate) : null}
                 onChange={(date) => handleOnChange({ target: { name: 'toDate', value: date.toLocaleDateString() } })}
               />
             </div>
+          )}
+          {isDayTypeOnly && (
+            <Typeahead
+              className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
+              options={DayTypeOptions}
+              disabled={stage !== 0}
+              onChange={(value) =>
+                handleOnChange({ target: { name: 'dayType', value } } as React.ChangeEvent<
+                  HTMLInputElement | HTMLSelectElement
+                >)
+              }
+              value={formData.dayType}
+              placeholder={'Please select a DayType'}
+            />
+          )}
+          {!isDayTypeOnly && (
+            <>
+              <Typeahead
+                className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
+                options={VenueOptions}
+                disabled={stage !== 0}
+                onChange={(value) =>
+                  handleOnChange({ target: { name: 'venue', value } } as React.ChangeEvent<
+                    HTMLInputElement | HTMLSelectElement
+                  >)
+                }
+                value={formData.venue}
+                placeholder={'Please select a venue'}
+              />
+              <Checkbox
+                id="shouldFilterVenues"
+                labelClassName="text-white"
+                onChange={console.log}
+                checked={false}
+                label="Hide venues with existing bookings for this production?"
+              />
+              <div className="grid grid-cols-2 w-full gap-2">
+                <Button variant="secondary" text="Gap Suggest" onClick={console.log} />
+                <Button variant="secondary" text="Continue with DayType only" onClick={() => setIsDayTypeOnly(true)} />
+              </div>
+            </>
           )}
           {stage === 1 && (
             <div className="flex flex-col">
@@ -206,26 +246,37 @@ const AddBooking = ({visible, onClose}:AddBookingProps) => {
           )}
         </form>
         {error && <div className="text-red-500 font-medium my-1">{error}</div>}
-        <div className="flex justify-end my-4 gap-2">
+        <div className="grid grid-cols-3 my-4 gap-2">
+          <Button
+            onClick={stage === 0 ? goToNext : addBookings}
+            disabled={!formData.venue || !formData.fromDate || !formData.toDate}
+            className="h-8 px-6"
+            text={'Check Mileage'}
+          ></Button>
+          <Button
+            onClick={stage === 0 ? goToNext : addBookings}
+            disabled={!formData.venue || !formData.fromDate || !formData.toDate}
+            className="h-8"
+            variant="secondary"
+            text={'Cancel'}
+          ></Button>
           {stage === 1 && (
-            <ToolbarButton
+            <Button
               onClick={() => {
                 setStage((stage) => stage - 1);
                 setError('');
               }}
               disabled={!formData.venue || !formData.fromDate || !formData.toDate}
-              className=""
-            >
-              Reject
-            </ToolbarButton>
+              className="h-8"
+              text="Reject"
+            ></Button>
           )}
-          <ToolbarButton
+          <Button
             onClick={stage === 0 ? goToNext : addBookings}
             disabled={!formData.venue || !formData.fromDate || !formData.toDate}
-            className=""
-          >
-            {stage === 0 ? 'Next' : 'Accept'}
-          </ToolbarButton>
+            className="h-8"
+            text={stage === 0 ? 'Next' : 'Accept'}
+          ></Button>
         </div>
       </StyledDialog>
     </>
