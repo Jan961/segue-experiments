@@ -1,7 +1,7 @@
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import TextInput from '../TextInput';
-import React, { createRef, useEffect, useRef, useState } from 'react';
+import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import moment from 'moment';
 
 interface DateInputProps {
@@ -11,31 +11,60 @@ interface DateInputProps {
   error?: string;
   minDate?: Date;
   maxDate?: Date;
+  placeholder?: string;
+  popperClassName?: string;
+  className?: string;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
 
-export default function DateInput({ value, onChange, error = '', inputClass = '', ...props }: DateInputProps) {
+type Ref = {
+  setValue: (value: Date | null, useIfValueNull: Date | null) => void;
+} | null;
+
+export default forwardRef<Ref, DateInputProps>(function DateInput(
+  {
+    value,
+    onChange,
+    error = '',
+    inputClass = '',
+    minDate,
+    maxDate,
+    placeholder = 'DD/MM/YY',
+    ...props
+  }: DateInputProps,
+  ref,
+) {
   const inputRef = createRef<HTMLInputElement>();
   const [selectedDate, setSelectedDate] = useState<Date>(null);
   const [inputValue, setInputValue] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
   const dpRef = useRef(null);
 
-  useEffect(() => {
-    console.log('In useffect value is ', value);
-    if (value) {
-      if (typeof value === 'string' && regex.test(value)) {
-        setInputValue(value);
-        setSelectedDate(new Date(value));
+  const setDateValue = (dateValue, useIfValueNull = null) => {
+    if (dateValue) {
+      if (typeof dateValue === 'string' && regex.test(dateValue)) {
+        setInputValue(dateValue);
+        setSelectedDate(new Date(dateValue));
       } else {
-        setInputValue(moment(value).format('DD/MM/YY'));
-        setSelectedDate(value as Date);
+        setInputValue(moment(dateValue).format('DD/MM/YY'));
+        setSelectedDate(dateValue as Date);
       }
     } else {
       setInputValue('');
-      setSelectedDate(null);
+
+      setSelectedDate(useIfValueNull);
     }
+  };
+
+  useImperativeHandle(ref, () => ({
+    setValue: (value: Date | null, useIfValueNull: Date | null) => {
+      setDateValue(value, useIfValueNull);
+    },
+  }));
+
+  useEffect(() => {
+    setDateValue(value);
   }, [value]);
 
   useEffect(() => {
@@ -61,7 +90,7 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
   };
 
   const handleInputFocus = () => {
-    inputRef.current.select();
+    inputRef?.current?.select();
   };
 
   const handleInputBlur = () => {
@@ -70,6 +99,7 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
       if (regex.test(inputValue) && moment(inputValue, 'DD/MM/YY').isValid()) {
         const date = moment(inputValue, 'DD/MM/YY').toDate();
         onChange(date);
+        setSelectedDate(date);
       } else {
         if (value) {
           setInputValue(moment(value).format('DD/MM/YY'));
@@ -84,23 +114,26 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
   };
 
   return (
-    <div className={`relative h-[1.9375rem]`}>
+    <div className={`relative h-[1.9375rem]`} onFocus={handleInputFocus}>
       <div className="absolute right-3 top-3 z-10">
         <DatePicker
           ref={dpRef}
-          placeholderText="DD/MM/YY"
+          minDate={minDate}
+          maxDate={maxDate}
+          placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName="!z-50"
           onSelect={onChange}
           onChange={() => null}
           selected={selectedDate}
-          customInput={<div className="cursor-pointer w-4 h-4 " ref={inputRef} />}
+          openToDate={selectedDate}
+          customInput={<div className="cursor-pointer w-4 h-4 " />}
           {...props}
         />
       </div>
       <div className={errorMsg ? 'animate-shake' : ''}>
         <TextInput
-          placeHolder="DD/MM/YY"
+          placeHolder={placeholder}
           ref={inputRef}
           value={inputValue}
           iconName="calendar"
@@ -112,4 +145,4 @@ export default function DateInput({ value, onChange, error = '', inputClass = ''
       </div>
     </div>
   );
-}
+});

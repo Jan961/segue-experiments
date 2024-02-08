@@ -14,3 +14,22 @@ export const bookingStatusMap = {
   X: 'Cancelled',
   S: 'Suspended',
 };
+
+export const bookingRow = {
+  Id: null,
+  date: '',
+  dateTime: '',
+  week: '',
+  venue: '',
+  town: '',
+  performanceCount: '',
+  performanceTimes: '',
+  productionName: '',
+  productionId: null,
+  production: null,
+  bookingStatus: '',
+  status: '',
+  dayType: '',
+  capacity: null,
+  note: '',
+};

@@ -14,12 +14,16 @@ export const MileageCalculator = () => {
 
   // Monitor distances and refresh if some are missing
   React.useEffect(() => {
-    if (!distance.outdated) return;
+    const shouldRefresh = Object.values(distance).some((x) => x.outdated);
+    if (!shouldRefresh) return;
 
     const refresh = async () => {
       const stops = getStops(bookingDict);
-      const { data } = await axios.post('/api/distance', stops);
-      setDistance({ ...distance, stops: data, outdated: false });
+      const promises = Object.keys(stops).map(async (prodId) => {
+        const { data } = await axios.post('/api/distance', stops[prodId]);
+        setDistance({ ...distance, [prodId]: { stops: data, outdated: false } });
+      });
+      await Promise.allSettled(promises);
     };
 
     refresh();

@@ -7,6 +7,8 @@ export type FilterState = {
   startDate?: Date;
   endDate?: Date;
   scrollToDate?: string;
+  scheduleStartDate?: Date;
+  scheduleEndDate?: Date;
 };
 
 export const intialBookingFilterState: FilterState = {
@@ -16,6 +18,8 @@ export const intialBookingFilterState: FilterState = {
   startDate: null,
   endDate: null,
   scrollToDate: '',
+  scheduleStartDate: null,
+  scheduleEndDate: null,
 };
 
 export const filterState = atom({

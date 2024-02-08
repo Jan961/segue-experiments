@@ -81,6 +81,7 @@ export type Production = {
 };
 
 export type BookingDTO = {
+  ProductionId?: number;
   Id: number;
   Date: string;
   VenueId: number;
@@ -134,6 +135,8 @@ export type ProductionDTO = {
   ShowCode: string;
   IsArchived: boolean;
   DateBlock: DateBlockDTO[];
+  StartDate?: string;
+  EndDate?: string;
 };
 
 export type VenueMinimalDTO = {

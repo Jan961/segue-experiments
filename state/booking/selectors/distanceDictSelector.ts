@@ -5,7 +5,10 @@ import { objectify } from 'radash';
 export const distanceDictSelector = selector({
   key: 'distanceDictSelector',
   get: ({ get }) => {
-    const source = get(distanceState);
-    return objectify(source.stops, (d) => d.Date);
+    const productionDistanceDict = get(distanceState);
+    return Object.keys(productionDistanceDict).reduce((mapper, sourceKey) => {
+      mapper[sourceKey] = objectify(productionDistanceDict[sourceKey].stops, (d) => d.Date);
+      return mapper;
+    }, {});
   },
 });

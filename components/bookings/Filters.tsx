@@ -1,7 +1,6 @@
 import Button from 'components/core-ui-lib/Button';
 import GlobalToolbar from 'components/toolbar';
 import Report from 'components/bookings/modal/Report';
-import { MileageCalculator } from 'components/bookings/MileageCalculator';
 import Select from 'components/core-ui-lib/Select';
 import BookingFilter from './BookingFilter';
 import TextInput from 'components/core-ui-lib/TextInput';
@@ -14,12 +13,15 @@ import { filteredScheduleSelector } from 'state/booking/selectors/filteredSchedu
 import { statusOptions } from 'config/bookings';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import moment from 'moment';
+import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
 
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { loading: isMileageLoading } = useMileageCalculator();
   const [showProductionSummary, setShowProductionSummary] = useState(false);
   const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
   const todayOnSchedule = useMemo(
@@ -41,10 +43,16 @@ const Filters = () => {
   };
 
   const onClearFilters = () => {
-    setFilter(intialBookingFilterState);
+    setFilter({
+      ...intialBookingFilterState,
+      startDate: filter.scheduleStartDate,
+      endDate: filter.scheduleEndDate,
+      scheduleStartDate: filter.scheduleStartDate,
+      scheduleEndDate: filter.scheduleEndDate,
+    });
   };
   return (
-    <div className="w-full flex items-center justify-between">
+    <div className="w-full flex items-center justify-between flex-wrap">
       <div className="mx-0">
         <div className="px-4">
           <GlobalToolbar
@@ -77,7 +85,6 @@ const Filters = () => {
           </GlobalToolbar>
         </div>
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
-          <MileageCalculator />
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             disabled={!ProductionId}
@@ -91,7 +98,7 @@ const Filters = () => {
             id={'venueText'}
             disabled={!ProductionId}
             placeHolder="Search bookings..."
-            className="w-[317px]"
+            className="w-[310px]"
             iconName="search"
             value={filter.venueText}
             onChange={onChange}

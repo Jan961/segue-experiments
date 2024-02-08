@@ -24,7 +24,7 @@ const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== unde
 
 export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInputProps) {
   const [time, setTime] = useState<Time>(DEFAULT_TIME);
-  const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
+  const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
