@@ -12,21 +12,24 @@ const useMileageCalculator = () => {
   const shouldRefresh = useMemo(() => !loading && Object.values(distance).some((x) => x.outdated), [distance]);
   const refresh = useCallback(async () => {
     const stops = getStops(bookingDict);
+    let updatedDistance = { ...distance };
     setLoading(true);
     const promises = Object.keys(stops).map(async (prodId) => {
-      if (distance[prodId].outdated) {
+      if (distance[prodId]?.outdated) {
         console.log(`Calculating mileage for ${prodId}`);
         const { data } = await axios.post('/api/distance', stops[prodId]);
-        setDistance({ ...distance, [prodId]: { stops: data, outdated: false } });
+        updatedDistance = { ...updatedDistance, [prodId]: { stops: data, outdated: false } };
       }
     });
     await Promise.allSettled(promises);
+    setDistance((prev) => ({ ...prev, ...updatedDistance }));
     setLoading(false);
-  }, [bookingDict, distance]);
+  }, [bookingDict, distance, setDistance]);
   useEffect(() => {
+    console.log('shouldRefresh', shouldRefresh);
     if (!shouldRefresh) return;
     refresh();
-  }, [refresh]);
+  }, [shouldRefresh]);
   return { loading, distance };
 };
 

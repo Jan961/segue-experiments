@@ -3,6 +3,7 @@ import { Dialog } from '@headlessui/react';
 import { MenuButton } from './MenuButton';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import classNames from 'classnames';
 
 interface StyledDialogProps {
   open: boolean;
@@ -10,6 +11,7 @@ interface StyledDialogProps {
   title: string;
   width?: undefined | 'lg' | 'xl' | 'md';
   className?: string;
+  bodyClassName?: string;
 }
 
 // Only use non-default classes on desktop only pages.
@@ -29,6 +31,7 @@ export const StyledDialog = ({
   children,
   width,
   className,
+  bodyClassName,
 }: PropsWithChildren<StyledDialogProps>) => {
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
@@ -41,7 +44,9 @@ export const StyledDialog = ({
           >
             <FontAwesomeIcon size="xl" icon={faClose} className="float-right p-4 cursor-pointer" onClick={onClose} />
             <Dialog.Title className="text-xl mb-2 p-4 border-gray-200 border-b">{title}</Dialog.Title>
-            <div className="dialog-content p-4 overflow-y-auto max-h-[calc(100vh-200px)]">{children}</div>
+            <div className={classNames('dialog-content p-4 overflow-y-auto max-h-[calc(100vh-200px)]', bodyClassName)}>
+              {children}
+            </div>
           </Dialog.Panel>
         </div>
       </div>

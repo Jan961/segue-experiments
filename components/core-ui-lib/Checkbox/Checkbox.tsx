@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { useEffect } from 'react';
 
 interface CheckboxProps {
@@ -11,6 +12,7 @@ interface CheckboxProps {
   showIntermediate?: boolean;
   testId?: string;
   className?: string;
+  labelClassName?: string;
 }
 
 const Checkbox = ({
@@ -24,6 +26,7 @@ const Checkbox = ({
   testId,
   className,
   label,
+  labelClassName,
 }: CheckboxProps) => {
   const modifyOnChange = (e: any) => {
     e.stopPropagation();
@@ -49,7 +52,11 @@ const Checkbox = ({
         disabled={disabled}
         className="peer relative appearance-none shrink-0 w-4 h-4 rounded-sm focus:ring-primary-input-text text-base"
       />
-      {label && <label className="text-primary-label text-sm leading-8 font-normal ">{label}</label>}
+      {label && (
+        <label className={classNames('text-primary-label text-sm leading-8 font-normal ', labelClassName)}>
+          {label}
+        </label>
+      )}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="19"
