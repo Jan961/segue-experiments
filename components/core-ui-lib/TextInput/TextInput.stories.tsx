@@ -22,3 +22,7 @@ export const SearchInput = () => {
   const [{ value }, updateArgs] = useArgs();
   return <TextInput iconName="search" value={value} onChange={(e) => updateArgs(e.target.value)} />;
 };
+
+export const Disabled = () => {
+  return <TextInput disabled value="I am disabled" />;
+};

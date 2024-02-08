@@ -22,18 +22,16 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     { id, value = '', className = '', disabled = false, onChange, placeHolder = '', onClick, iconName, error, ...rest },
     ref,
   ) => {
-    const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-inner text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
+    const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
     const inputClass = error ? '!border-primary-red' : '!border-primary-border';
-    const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
 
     return (
-      <div className="relative" onClick={onClick}>
+      <div className={`relative ${disabled ? 'disabled-input' : ''}`} onClick={onClick}>
         <input
           ref={ref}
           id={id}
           type="text"
-          className={classNames(baseClass, inputClass, disabledClass, `${iconName ? 'pr-6' : ''}`, className)}
-          disabled={disabled}
+          className={classNames(baseClass, inputClass, `${iconName ? 'pr-6' : ''}`, className)}
           onChange={onChange}
           placeholder={placeHolder}
           value={value || ''}

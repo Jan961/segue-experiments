@@ -22,7 +22,8 @@ const colorsConfig = {
   'secondary-button-active': '#617293',
   'tertiary-button-hover': '#F86C6C',
   'tertiary-button-active': '#891E1E',
-  disabled: 'rgba(218, 220, 229, 0.65)',
+  'disabled-button': '#DADCE5',
+  'disabled-input': '#E9EBF0CC',
   'primary-input-text': '#617293',
   'primary-border': '#E9EBF0',
   'primary-list-row-hover': '#21345b99',
@@ -72,6 +73,13 @@ module.exports = {
             paddingLeft: theme('spacing.20'),
             paddingRight: theme('spacing.20'),
           },
+        },
+        '.disabled-input': {
+          '&:hover': {
+            cursor: 'not-allowed !important',
+          },
+          opacity: 0.6,
+          pointerEvents: 'none',
         },
       });
       addUtilities({
@@ -226,8 +234,12 @@ module.exports = {
       },
       boxShadow: {
         'sm-shadow': '0px 5px 5px 0px rgba(112, 144, 176, 0.30)',
+        'input-shadow': 'inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
       },
       colors: colorsConfig,
+      backgroundOpacity: {
+        65: '0.65',
+      },
       width: {
         5.5: '1.375rem',
         13: '3.125rem',
