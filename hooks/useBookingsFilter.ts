@@ -21,7 +21,6 @@ const useBookingFilter = () => {
 
   const filteredRows = useMemo(() => {
     const filteredRowList = rows.filter(({ dateTime, status, productionId, venue, town }) => {
-      console.log(dateTime, !filter.endDate || new Date(dateTime) <= filter.endDate);
       return (
         (selected === -1 || productionId === selected) &&
         (!filter.endDate || compareUTCAndLocalDates(new Date(dateTime), filter.endDate, tz, 'lte')) &&
