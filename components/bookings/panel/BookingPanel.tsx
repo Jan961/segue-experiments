@@ -100,7 +100,7 @@ export const BookingPanel = ({ bookingId }: BookingPanelProps) => {
     const newState = omit(bookingDict, [bookingId]);
     setView({ selectedDate: undefined, selected: undefined });
     setBookingDict(newState);
-    setDistance({ ...distance, outdated: true });
+    setDistance({ ...distance });
   };
 
   const statusOptions: SelectOption[] = [

@@ -27,7 +27,7 @@ export const CreateBookingPanel = ({ finish }: CreateBookingPanelProps) => {
     const { data } = await axios.post('/api/bookings/create', newDate);
     const newState = { ...bookingDict, [data.Id]: data };
     setBookingDict(newState);
-    setDistance({ ...distance, outdated: true });
+    setDistance({ ...distance });
     finish();
   };
 
