@@ -38,7 +38,7 @@ export default function DateRange({
   minDate = null,
   maxDate = null,
 }: DateRangePorps) {
-  const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
+  const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
   const fromInputRef = useRef(null);
   const toInputRef = useRef(null);
