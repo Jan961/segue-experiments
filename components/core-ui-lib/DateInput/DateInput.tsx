@@ -11,6 +11,9 @@ interface DateInputProps {
   error?: string;
   minDate?: Date;
   maxDate?: Date;
+  placeholder?: string;
+  popperClassName?: string;
+  className?: string;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -20,7 +23,16 @@ type Ref = {
 } | null;
 
 export default forwardRef<Ref, DateInputProps>(function DateInput(
-  { value, onChange, error = '', inputClass = '', minDate, maxDate, ...props }: DateInputProps,
+  {
+    value,
+    onChange,
+    error = '',
+    inputClass = '',
+    minDate,
+    maxDate,
+    placeholder = 'DD/MM/YY',
+    ...props
+  }: DateInputProps,
   ref,
 ) {
   const inputRef = createRef<HTMLInputElement>();
@@ -108,7 +120,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           ref={dpRef}
           minDate={minDate}
           maxDate={maxDate}
-          placeholderText="DD/MM/YY"
+          placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName="!z-50"
           onSelect={onChange}
@@ -121,7 +133,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       </div>
       <div className={errorMsg ? 'animate-shake' : ''}>
         <TextInput
-          placeHolder="DD/MM/YY"
+          placeHolder={placeholder}
           ref={inputRef}
           value={inputValue}
           iconName="calendar"

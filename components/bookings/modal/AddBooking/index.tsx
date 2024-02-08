@@ -1,10 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import axios from 'axios';
 import classNames from 'classnames';
-import DatePicker from 'react-datepicker';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Spinner } from 'components/global/Spinner';
-import { StyledDialog } from 'components/global/StyledDialog';
 import { venueState } from 'state/booking/venueState';
 import { scheduleSelector } from 'state/booking/selectors/scheduleSelector';
 import { performanceState } from 'state/booking/performanceState';
@@ -15,6 +13,8 @@ import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { dateTypeState } from 'state/booking/dateTypeState';
+import PopupModal from 'components/core-ui-lib/PopupModal';
+import DateInput from 'components/core-ui-lib/DateInput';
 
 const initialState = {
   fromDate: null,
@@ -143,14 +143,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   };
   return (
     <>
-      <StyledDialog
-        className="relative overflow-visible"
-        open={visible}
-        onClose={onModalClose}
-        title="Add Booking"
-        width="xl"
-        bodyClassName="overflow-visible"
-      >
+      <PopupModal show={visible} onClose={onModalClose} title="Add Booking">
         {loading && (
           <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
             <Spinner className="w-full" size="lg" />
@@ -160,30 +153,30 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
           {stage === 0 && (
             <div className="flex flex-col my-2">
               <div className="text-white text-sm font-bold pl-2">Date</div>
-              <DatePicker
-                placeholderText="DD/MM/YY"
-                dateFormat="dd/MM/yy"
-                popperClassName="!z-[51] w-80"
+              <DateInput
+                placeholder="DD/MM/YY"
+                popperClassName="!z-[51]"
+                inputClass="w-full"
                 className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
                 minDate={minDate ? new Date(minDate) : null}
                 maxDate={maxDate ? new Date(maxDate) : null}
-                selected={formData.fromDate ? new Date(formData.fromDate) : null}
-                onChange={(date) => handleOnChange({ target: { name: 'fromDate', value: date.toLocaleDateString() } })}
+                value={formData.fromDate ? new Date(formData.fromDate) : null}
+                onChange={(date) => handleOnChange({ target: { name: 'fromDate', value: date?.toLocaleDateString() } })}
               />
             </div>
           )}
           {stage === 0 && (
             <div className="flex flex-col my-2">
               <div className="text-white text-sm font-bold pl-2">Last Date</div>
-              <DatePicker
-                placeholderText="DD/MM/YY"
-                dateFormat="dd/MM/yy"
+              <DateInput
+                placeholder="DD/MM/YY"
                 popperClassName="!z-[51]"
+                inputClass="w-full"
                 className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
-                selected={formData?.toDate ? new Date(formData?.toDate) : null}
+                value={formData?.toDate ? new Date(formData?.toDate) : null}
                 minDate={formData?.fromDate ? new Date(formData?.fromDate) : new Date()}
                 maxDate={maxDate ? new Date(maxDate) : null}
-                onChange={(date) => handleOnChange({ target: { name: 'toDate', value: date.toLocaleDateString() } })}
+                onChange={(date) => handleOnChange({ target: { name: 'toDate', value: date?.toLocaleDateString() } })}
               />
             </div>
           )}
@@ -222,9 +215,14 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
                 checked={false}
                 label="Hide venues with existing bookings for this production?"
               />
-              <div className="grid grid-cols-2 w-full gap-2">
-                <Button variant="secondary" text="Gap Suggest" onClick={console.log} />
-                <Button variant="secondary" text="Continue with DayType only" onClick={() => setIsDayTypeOnly(true)} />
+              <div className="flex flex-wrap item-center w-full gap-2">
+                <Button className="px-4" variant="secondary" text="Gap Suggest" onClick={console.log} />
+                <Button
+                  className="px-4"
+                  variant="secondary"
+                  text="Continue with DayType only"
+                  onClick={() => setIsDayTypeOnly(true)}
+                />
               </div>
             </>
           )}
@@ -249,14 +247,13 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
         <div className="grid grid-cols-3 my-4 gap-2">
           <Button
             onClick={stage === 0 ? goToNext : addBookings}
-            disabled={!formData.venue || !formData.fromDate || !formData.toDate}
-            className="h-8 px-6"
+            disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
+            className="px-6"
             text={'Check Mileage'}
           ></Button>
           <Button
             onClick={stage === 0 ? goToNext : addBookings}
-            disabled={!formData.venue || !formData.fromDate || !formData.toDate}
-            className="h-8"
+            disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
             variant="secondary"
             text={'Cancel'}
           ></Button>
@@ -266,19 +263,17 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
                 setStage((stage) => stage - 1);
                 setError('');
               }}
-              disabled={!formData.venue || !formData.fromDate || !formData.toDate}
-              className="h-8"
+              disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
               text="Reject"
             ></Button>
           )}
           <Button
             onClick={stage === 0 ? goToNext : addBookings}
-            disabled={!formData.venue || !formData.fromDate || !formData.toDate}
-            className="h-8"
+            disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
             text={stage === 0 ? 'Next' : 'Accept'}
           ></Button>
         </div>
-      </StyledDialog>
+      </PopupModal>
     </>
   );
 };
