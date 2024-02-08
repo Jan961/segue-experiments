@@ -47,8 +47,6 @@ export default function DateRange({
   const formattedMinDate = setDateWithoutTime(minDate);
   const formattedMaxDate = setDateWithoutTime(maxDate);
   const checkDateRangeValid = (from: Date, to: Date) => {
-    // console.log('In DateRange', minDate, from, isBefore(from, minDate));
-
     const formattedFromDate = setDateWithoutTime(from);
     const formattedToDate = setDateWithoutTime(to);
 
