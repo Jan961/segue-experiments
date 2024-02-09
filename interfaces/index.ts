@@ -95,6 +95,7 @@ export type BookingDTO = {
   CompNotes?: string;
   CastRateTicketsArranged?: boolean;
   CastRateTicketsNotes?: string;
+  PerformanceIds?: number[];
 };
 
 export type GetInFitUpDTO = {

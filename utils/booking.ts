@@ -29,11 +29,12 @@ class BookingHelper {
     this.getRehearsalDetails = this.getRehearsalDetails.bind(this);
   }
 
-  getBookingDetails(booking: BookingDTO & { performanceIds?: number[] }) {
-    const { VenueId, performanceIds, Notes: note } = booking || {};
+  getBookingDetails(booking: BookingDTO) {
+    const { VenueId, PerformanceIds, Notes: note } = booking || {};
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
-    const performanceTimes = performanceIds
-      .map((performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5))
+    const performanceTimes = PerformanceIds.map(
+      (performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5),
+    )
       .filter((time) => time)
       .join('; ');
     return {
@@ -45,7 +46,7 @@ class BookingHelper {
       capacity,
       note,
       performanceTimes,
-      performanceCount: performanceIds?.length || 0,
+      performanceCount: PerformanceIds?.length || 0,
     };
   }
 
@@ -103,6 +104,15 @@ export const getArchivedProductionIds = (productions: Partial<ProductionDTO>[]) 
     }
     return archivedList;
   }, []);
+};
+
+export const formatMinutes = (minutes: number) => {
+  if (!minutes) {
+    return '';
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return hours + ' hr ' + remainingMinutes + ' min';
 };
 
 export default BookingHelper;

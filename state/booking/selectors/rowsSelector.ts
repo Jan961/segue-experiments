@@ -61,8 +61,20 @@ export const rowsSelector = selector({
       addRow(g.Date, 'Get-in, Fit-Up', g, helper.getInFitUpDetails);
     });
     Object.values(bookings).forEach((b) => {
-      bookedDates.push(getKey(b.Date));
-      addRow(b.Date, 'Performance', b, helper.getBookingDetails);
+      const performancesGroup = b.PerformanceIds.reduce((performancesByDate, performanceId) => {
+        const performance = performanceDict[performanceId];
+        const performanceDate = new Date(getKey(performance.Date)).toISOString();
+        if (performancesByDate[performanceDate]) {
+          performancesByDate[performanceDate].push(performanceId);
+        } else {
+          performancesByDate[performanceDate] = [performanceId];
+        }
+        return performancesByDate;
+      }, {});
+      Object.keys(performancesGroup).forEach((date) => {
+        bookedDates.push(getKey(date));
+        addRow(date, 'Performance', { ...b, PerformanceIds: performancesGroup[date] }, helper.getBookingDetails);
+      });
     });
     Object.values(other).forEach((o) => {
       bookedDates.push(getKey(o.Date));
@@ -72,9 +84,9 @@ export const rowsSelector = selector({
     for (const date of allDates) {
       if (!bookedDates.includes(date)) {
         const production = helper.getProductionByDate(dateBlocks, date);
-        if(!production){
+        if (!production) {
           continue;
-        } 
+        }
         const week = calculateWeekNumber(new Date(production?.StartDate), new Date(date)) || '';
         const emptyRow = {
           ...bookingRow,
