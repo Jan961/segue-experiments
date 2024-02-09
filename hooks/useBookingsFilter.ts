@@ -3,7 +3,9 @@ import { useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-
+/*
+ * Hook responsible for returning filtered and sorted Bookings
+ */
 const useBookingFilter = () => {
   const filter = useRecoilValue(filterState);
   const { selected, includeArchived, productions } = useRecoilValue(productionJumpState);

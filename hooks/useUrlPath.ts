@@ -12,13 +12,21 @@ const useUrlPath = () => {
     return router.pathname === urlPaths.home;
   };
 
+  const isBookingsHome = () => {
+    return router.pathname === urlPaths.bookings;
+  };
+
+  const isBookingsUrl = () => {
+    return router.pathname.includes(urlPaths.bookings);
+  };
+
   const navigateToHome = () => {
     if (!isHome()) {
       router.push(urlPaths.home);
     }
   };
 
-  return { isHome, navigateToHome };
+  return { isHome, isBookingsHome, isBookingsUrl, navigateToHome };
 };
 
 export default useUrlPath;
