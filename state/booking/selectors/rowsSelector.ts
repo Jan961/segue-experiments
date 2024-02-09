@@ -72,6 +72,9 @@ export const rowsSelector = selector({
     for (const date of allDates) {
       if (!bookedDates.includes(date)) {
         const production = helper.getProductionByDate(dateBlocks, date);
+        if(!production){
+          continue;
+        } 
         const week = calculateWeekNumber(new Date(production?.StartDate), new Date(date)) || '';
         const emptyRow = {
           ...bookingRow,

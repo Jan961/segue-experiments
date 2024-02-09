@@ -10,7 +10,6 @@ interface VenueInfoProps {
 }
 
 export const VenueInfoItem = ({ label, value }: { label: string; value: string }) => {
-  console.log(label);
   if (label === 'Website') {
     return (
       <div className="flex">
@@ -68,7 +67,7 @@ export const VenueInfo = ({ venueId }: VenueInfoProps) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
+export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {},
   };

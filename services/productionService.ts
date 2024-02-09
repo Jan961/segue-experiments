@@ -171,11 +171,11 @@ export const getProductionWithContent = async (Id: number) => {
   });
 };
 
-export const getProductionsWithContent = async (Id?: number) => {
+export const getProductionsWithContent = async (Id?: number, excludeArchived=true) => {
   return await prisma.production.findMany({
     where: {
       ...(Id && { Id }),
-      IsArchived: false,
+      ...(excludeArchived && {IsArchived:false}),
     },
     include: productionContentInclude,
   });

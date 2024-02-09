@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // Get in parallel
   const [venues, productions, dateTypeRaw] = await all([
     getAllVenuesMin(),
-    getProductionsWithContent(null),
+    getProductionsWithContent(null, false),
     getDayTypes(),
   ]);
 
