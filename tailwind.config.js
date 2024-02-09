@@ -234,7 +234,7 @@ module.exports = {
       },
       boxShadow: {
         'sm-shadow': '0px 5px 5px 0px rgba(112, 144, 176, 0.30)',
-        'input-shadow': 'inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
+        'input-shadow': 'inset 0px 1px 2px 0px rgba(0, 0, 0, 0.30)',
       },
       colors: colorsConfig,
       backgroundOpacity: {

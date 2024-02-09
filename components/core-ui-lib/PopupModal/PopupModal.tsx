@@ -8,6 +8,7 @@ interface PopupModalProps {
   show: boolean;
   onClose?: () => void;
   titleClass?: string;
+  showCloseIcon?: boolean;
 }
 
 export default function PopupModal({
@@ -16,6 +17,7 @@ export default function PopupModal({
   show = false,
   onClose = () => null,
   titleClass,
+  showCloseIcon = true,
 }: PopupModalProps) {
   return (
     <Transition appear show={show} as={Fragment}>
@@ -44,7 +46,14 @@ export default function PopupModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="px-7 py-8 transform overflow-hidden bg-primary-white text-left align-middle shadow-xl transition-all">
-                <Icon iconName="cross" variant="lg" className="hover:scale-105 fixed right-4 top-4" onClick={onClose} />
+                {showCloseIcon && (
+                  <Icon
+                    iconName="cross"
+                    variant="lg"
+                    className="hover:scale-105 fixed right-4 top-4"
+                    onClick={onClose}
+                  />
+                )}
                 <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>
                   {title}
                 </Dialog.Title>
