@@ -17,8 +17,8 @@ export const columnDefs = [
     width: 130,
   },
   { headerName: 'Week', field: 'week', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, flex: 2 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 300, flex: 2 },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 200, flex: 1 },
   { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 120 },
   {
     headerName: 'Booking Status',

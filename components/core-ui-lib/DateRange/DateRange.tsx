@@ -38,7 +38,7 @@ export default function DateRange({
   minDate = null,
   maxDate = null,
 }: DateRangePorps) {
-  const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
+  const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
   const fromInputRef = useRef(null);
   const toInputRef = useRef(null);
@@ -47,8 +47,6 @@ export default function DateRange({
   const formattedMinDate = setDateWithoutTime(minDate);
   const formattedMaxDate = setDateWithoutTime(maxDate);
   const checkDateRangeValid = (from: Date, to: Date) => {
-    // console.log('In DateRange', minDate, from, isBefore(from, minDate));
-
     const formattedFromDate = setDateWithoutTime(from);
     const formattedToDate = setDateWithoutTime(to);
 
