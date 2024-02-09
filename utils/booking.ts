@@ -1,18 +1,25 @@
-import { BookingDTO, DateBlockDTO, GetInFitUpDTO, OtherDTO, PerformanceDTO, ProductionDTO, RehearsalDTO } from 'interfaces';
+import {
+  BookingDTO,
+  DateBlockDTO,
+  GetInFitUpDTO,
+  OtherDTO,
+  PerformanceDTO,
+  ProductionDTO,
+  RehearsalDTO,
+} from 'interfaces';
 import { VenueState } from 'state/booking/venueState';
 
-
-type BookingHelperArgType ={
-  venueDict?: VenueState, 
-  performanceDict?: Record<number, PerformanceDTO>, 
-  productionDict?:  Record<number, ProductionDTO>
-}
+type BookingHelperArgType = {
+  venueDict?: VenueState;
+  performanceDict?: Record<number, PerformanceDTO>;
+  productionDict?: Record<number, Partial<ProductionDTO>>;
+};
 
 class BookingHelper {
   private venueDict?: VenueState;
   private performanceDict?: Record<number, PerformanceDTO>;
-  private productionDict?: Record<number, ProductionDTO>;
-  constructor({ venueDict, performanceDict, productionDict }:BookingHelperArgType) {
+  private productionDict?: Record<number, Partial<ProductionDTO>>;
+  constructor({ venueDict, performanceDict, productionDict }: BookingHelperArgType) {
     this.venueDict = venueDict;
     this.performanceDict = performanceDict;
     this.productionDict = productionDict;
@@ -22,7 +29,7 @@ class BookingHelper {
     this.getRehearsalDetails = this.getRehearsalDetails.bind(this);
   }
 
-  getBookingDetails(booking:BookingDTO & {performanceIds?:number[]}) {
+  getBookingDetails(booking: BookingDTO & { performanceIds?: number[] }) {
     const { VenueId, performanceIds, Notes: note } = booking || {};
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     const performanceTimes = performanceIds
@@ -58,7 +65,7 @@ class BookingHelper {
     };
   }
 
-  getInFitUpDetails(gifu:GetInFitUpDTO) {
+  getInFitUpDetails(gifu: GetInFitUpDTO) {
     const { VenueId } = gifu;
     const venue = this.venueDict[VenueId];
     return {
@@ -68,7 +75,7 @@ class BookingHelper {
     };
   }
 
-  getRangeFromDateBlocks(dateBlocks:DateBlockDTO[]):{start:string, end:string} {
+  getRangeFromDateBlocks(dateBlocks: DateBlockDTO[]): { start: string; end: string } {
     let minStartDate = dateBlocks?.[0]?.StartDate;
     let maxEndDate = dateBlocks?.[0]?.EndDate;
     for (const dateBlock of dateBlocks) {
@@ -82,20 +89,20 @@ class BookingHelper {
     return { start: minStartDate, end: maxEndDate };
   }
 
-  getProductionByDate(dateBlocks:DateBlockDTO[] = [], date:string|Date='') {
+  getProductionByDate(dateBlocks: DateBlockDTO[] = [], date: string | Date = '') {
     date = new Date(date);
     const db = dateBlocks?.find((block) => new Date(block.StartDate) <= date && new Date(block.EndDate) >= date);
     return this.productionDict?.[db?.ProductionId];
   }
 }
 
-export const getArchivedProductionIds=(productions:Partial<ProductionDTO>[])=>{
-  return productions.reduce((archivedList, production)=>{
-    if(production.IsArchived){
-      archivedList.push(production.Id)
+export const getArchivedProductionIds = (productions: Partial<ProductionDTO>[]) => {
+  return productions.reduce((archivedList, production) => {
+    if (production.IsArchived) {
+      archivedList.push(production.Id);
     }
     return archivedList;
-  }, [])
-}
+  }, []);
+};
 
 export default BookingHelper;
