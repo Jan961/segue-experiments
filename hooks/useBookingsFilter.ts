@@ -6,7 +6,7 @@ import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 
 const useBookingFilter = () => {
   const filter = useRecoilValue(filterState);
-  const { selected } = useRecoilValue(productionJumpState);
+  const { selected, includeArchived, productions } = useRecoilValue(productionJumpState);
   const { rows } = useRecoilValue(rowsSelector);
 
   const tz = useMemo(() => filter?.endDate?.getTimezoneOffset() * 60000 || 0, [filter]);
@@ -20,7 +20,13 @@ const useBookingFilter = () => {
   };
 
   const filteredRows = useMemo(() => {
+    const archivedProductionIds = productions
+      .filter((production) => production.IsArchived)
+      .map((production) => production.Id);
     const filteredRowList = rows.filter(({ dateTime, status, productionId, venue, town }) => {
+      if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
+        return false;
+      }
       return (
         (selected === -1 || productionId === selected) &&
         (!filter.endDate || compareUTCAndLocalDates(new Date(dateTime), filter.endDate, tz, 'lte')) &&
@@ -34,7 +40,7 @@ const useBookingFilter = () => {
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
     });
-  }, [rows, selected, filter.endDate, filter.startDate, filter.status, filter.venueText]);
+  }, [productions, rows, filter.endDate, filter.startDate, filter.status, filter.venueText, includeArchived, selected]);
 
   return filteredRows;
 };

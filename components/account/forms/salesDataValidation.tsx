@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import { userService } from '../../../services/user.service';
 import { alertService } from '../../../services/alert.service';
 import axios from 'axios';
@@ -10,10 +9,6 @@ import { loggingService } from '../../../services/loggingService';
 export default function SalesDataValidation() {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
-
-  let errors: {};
-
-  const router = useRouter();
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -35,7 +30,6 @@ export default function SalesDataValidation() {
     fetch(searchEndpoint)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         if (data !== null) {
           setInputs({
             lowSeatCount: data.lowSeatCount,

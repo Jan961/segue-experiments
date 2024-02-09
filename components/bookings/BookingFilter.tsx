@@ -3,10 +3,10 @@ import { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { rowsSelector } from 'state/booking/selectors/rowsSelector';
+import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 
 export default function BookingsButtons() {
-  const { scheduleStart, scheduleEnd } = useRecoilValue(rowsSelector);
+  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const [filter, setFilter] = useRecoilState(filterState);
   const { startDate, endDate, scheduleStartDate, scheduleEndDate } = filter || {};

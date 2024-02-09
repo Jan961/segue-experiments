@@ -125,6 +125,7 @@ export type DateBlockDTO = {
   EndDate: string;
   Dates?: DateDTO[];
   IsPrimary?: boolean;
+  ProductionId?: number;
 };
 
 export type ProductionDTO = {
