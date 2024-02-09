@@ -121,7 +121,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         booking[b.Id] = {
           ...bookingMapper(b as BookingsWithPerformances),
           ProductionId: production?.Id,
-          performanceIds: b.Performance.map((perf) => perf.Id),
+          PerformanceIds: b.Performance.map((perf) => perf.Id),
           PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
         };
         b.Performance.forEach((p) => {
