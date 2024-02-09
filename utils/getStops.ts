@@ -2,7 +2,7 @@ import { group } from 'radash';
 import { getKey } from 'services/dateService';
 import { DistanceStop } from 'services/venueService';
 import { BookingState } from 'state/booking/bookingState';
-import { PerformanceState } from 'state/booking/performanceState';
+import { type PerformanceState } from 'state/booking/performanceState';
 
 export const getStops = (bookingDict: BookingState, performanceDict: PerformanceState) => {
   // Get distances
