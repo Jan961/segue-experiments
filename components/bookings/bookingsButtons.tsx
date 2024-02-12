@@ -1,6 +1,6 @@
 import Barring from './modal/barring';
 import Button from 'components/core-ui-lib/Button';
-import AddBooking from './modal/AddBooking';
+import AddBooking from './modal/NewBooking';
 import { useState } from 'react';
 
 export default function BookingsButtons() {
