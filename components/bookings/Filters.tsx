@@ -7,7 +7,6 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import BookingsButtons from './bookingsButtons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState, intialBookingFilterState } from 'state/booking/filterState';
-
 import { useMemo, useState } from 'react';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { statusOptions } from 'config/bookings';
@@ -17,7 +16,6 @@ import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
-
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,6 +49,7 @@ const Filters = () => {
       scheduleEndDate: filter.scheduleEndDate,
     });
   };
+
   return (
     <div className="w-full flex items-center justify-between flex-wrap">
       <div className="mx-0">

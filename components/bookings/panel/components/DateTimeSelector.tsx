@@ -9,9 +9,6 @@ export const DateTimeSelector = ({ date, setDate }: DateTimeSelectorProps) => {
   const datePart = date ? date.split('T')[0] : '';
   const timePart = date && date.split('T')[1] ? date.split('T')[1] : '18:30:00';
 
-  console.log(date);
-  console.log(timePart);
-
   const handleOnChange = (e: any) => {
     const { id, value } = e.target;
 

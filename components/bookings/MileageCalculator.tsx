@@ -3,6 +3,7 @@ import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { distanceState } from 'state/booking/distanceState';
+import { performanceState } from 'state/booking/performanceState';
 import { getStops } from 'utils/getStops';
 
 /*
@@ -11,6 +12,7 @@ import { getStops } from 'utils/getStops';
 export const MileageCalculator = () => {
   const [distance, setDistance] = useRecoilState(distanceState);
   const bookingDict = useRecoilValue(bookingState);
+  const PerformanceDict = useRecoilValue(performanceState);
 
   // Monitor distances and refresh if some are missing
   React.useEffect(() => {
@@ -18,7 +20,7 @@ export const MileageCalculator = () => {
     if (!shouldRefresh) return;
 
     const refresh = async () => {
-      const stops = getStops(bookingDict);
+      const stops = getStops(bookingDict, PerformanceDict);
       const promises = Object.keys(stops).map(async (prodId) => {
         const { data } = await axios.post('/api/distance', stops[prodId]);
         setDistance({ ...distance, [prodId]: { stops: data, outdated: false } });

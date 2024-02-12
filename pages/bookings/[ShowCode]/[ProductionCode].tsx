@@ -55,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   // Get in parallel
   const [venues, productions, dateTypeRaw] = await all([
     getAllVenuesMin(),
-    getProductionsWithContent(ProductionId === -1 ? null : ProductionId),
+    getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
     getDayTypes(),
   ]);
 
@@ -121,7 +121,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         booking[b.Id] = {
           ...bookingMapper(b as BookingsWithPerformances),
           ProductionId: production?.Id,
-          performanceIds: b.Performance.map((perf) => perf.Id),
+          PerformanceIds: b.Performance.map((perf) => perf.Id),
           PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
         };
         b.Performance.forEach((p) => {

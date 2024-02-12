@@ -95,6 +95,7 @@ export type BookingDTO = {
   CompNotes?: string;
   CastRateTicketsArranged?: boolean;
   CastRateTicketsNotes?: string;
+  PerformanceIds?: number[];
 };
 
 export type GetInFitUpDTO = {
@@ -125,6 +126,7 @@ export type DateBlockDTO = {
   EndDate: string;
   Dates?: DateDTO[];
   IsPrimary?: boolean;
+  ProductionId?: number;
 };
 
 export type ProductionDTO = {

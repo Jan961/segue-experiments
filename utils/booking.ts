@@ -1,11 +1,25 @@
-import { PerformanceDTO, ProductionDTO } from 'interfaces';
+import {
+  BookingDTO,
+  DateBlockDTO,
+  GetInFitUpDTO,
+  OtherDTO,
+  PerformanceDTO,
+  ProductionDTO,
+  RehearsalDTO,
+} from 'interfaces';
 import { VenueState } from 'state/booking/venueState';
 
+type BookingHelperArgType = {
+  venueDict?: VenueState;
+  performanceDict?: Record<number, PerformanceDTO>;
+  productionDict?: Record<number, Partial<ProductionDTO>>;
+};
+
 class BookingHelper {
-  private venueDict: VenueState;
-  private performanceDict: Record<number, PerformanceDTO>;
-  private productionDict: Record<number, ProductionDTO>;
-  constructor({ venueDict, performanceDict, productionDict }) {
+  private venueDict?: VenueState;
+  private performanceDict?: Record<number, PerformanceDTO>;
+  private productionDict?: Record<number, Partial<ProductionDTO>>;
+  constructor({ venueDict, performanceDict, productionDict }: BookingHelperArgType) {
     this.venueDict = venueDict;
     this.performanceDict = performanceDict;
     this.productionDict = productionDict;
@@ -15,11 +29,12 @@ class BookingHelper {
     this.getRehearsalDetails = this.getRehearsalDetails.bind(this);
   }
 
-  getBookingDetails(booking) {
-    const { VenueId, performanceIds, Notes: note } = booking || {};
+  getBookingDetails(booking: BookingDTO) {
+    const { VenueId, PerformanceIds, Notes: note } = booking || {};
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
-    const performanceTimes = performanceIds
-      .map((performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5))
+    const performanceTimes = PerformanceIds.map(
+      (performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5),
+    )
       .filter((time) => time)
       .join('; ');
     return {
@@ -31,19 +46,19 @@ class BookingHelper {
       capacity,
       note,
       performanceTimes,
-      performanceCount: performanceIds?.length || 0,
+      performanceCount: PerformanceIds?.length || 0,
     };
   }
 
-  getRehearsalDetails(rehearsal) {
+  getRehearsalDetails(rehearsal: RehearsalDTO) {
     return {
       Id: rehearsal?.Id,
       town: rehearsal.Town,
     };
   }
 
-  getOthersDetails(others) {
-    const { DayTypeName: dayType } = others || {};
+  getOthersDetails(others: OtherDTO) {
+    const { DateTypeName: dayType } = others || {};
     return {
       Id: others?.Id,
       status: others.StatusCode,
@@ -51,7 +66,7 @@ class BookingHelper {
     };
   }
 
-  getInFitUpDetails(gifu) {
+  getInFitUpDetails(gifu: GetInFitUpDTO) {
     const { VenueId } = gifu;
     const venue = this.venueDict[VenueId];
     return {
@@ -61,7 +76,7 @@ class BookingHelper {
     };
   }
 
-  getRangeFromDateBlocks(dateBlocks) {
+  getRangeFromDateBlocks(dateBlocks: DateBlockDTO[]): { start: string; end: string } {
     let minStartDate = dateBlocks?.[0]?.StartDate;
     let maxEndDate = dateBlocks?.[0]?.EndDate;
     for (const dateBlock of dateBlocks) {
@@ -75,11 +90,29 @@ class BookingHelper {
     return { start: minStartDate, end: maxEndDate };
   }
 
-  getProductionByDate(dateBlocks = [], date) {
+  getProductionByDate(dateBlocks: DateBlockDTO[] = [], date: string | Date = '') {
     date = new Date(date);
     const db = dateBlocks?.find((block) => new Date(block.StartDate) <= date && new Date(block.EndDate) >= date);
     return this.productionDict?.[db?.ProductionId];
   }
 }
+
+export const getArchivedProductionIds = (productions: Partial<ProductionDTO>[]) => {
+  return productions.reduce((archivedList, production) => {
+    if (production.IsArchived) {
+      archivedList.push(production.Id);
+    }
+    return archivedList;
+  }, []);
+};
+
+export const formatMinutes = (minutes: number) => {
+  if (!minutes) {
+    return '';
+  }
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return hours + ' hr ' + remainingMinutes + ' min';
+};
 
 export default BookingHelper;
