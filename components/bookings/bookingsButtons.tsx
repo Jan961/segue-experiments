@@ -12,11 +12,11 @@ export default function BookingsButtons() {
       <Button
         text="Booking Reports"
         className="w-[155px]"
-        iconProps={{ className: 'h-4 w-3' }}
+        iconProps={{ className: 'h-4 w-3 ml-2' }}
         sufixIconName={'excel'}
       ></Button>
       <Button text="Venue History" className="w-[155px]"></Button>
-      <Button text="Check Barring" className="w-[155px]" onClick={() => setShowBarringModal(true)}></Button>
+      <Button text="Barring Check" className="w-[155px]" onClick={() => setShowBarringModal(true)}></Button>
       {showBarringModal && <Barring visible={showBarringModal} onClose={() => setShowBarringModal(false)} />}
       {showAddNewBookingModal && (
         <AddBooking visible={showAddNewBookingModal} onClose={() => setShowAddNewBookingModal(false)} />
