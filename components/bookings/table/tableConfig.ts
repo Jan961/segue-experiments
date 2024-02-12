@@ -38,3 +38,15 @@ export const columnDefs = [
   { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 110 },
   { headerName: '', field: 'note', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
 ];
+
+export const bookingConflictsColumnDefs = [
+  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Booking Status', field: 'bookingStatus', cellRenderer: DefaultCellRenderer, width: 145 },
+];
+
+export const barringIssueColumnDefs = [
+  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
+];
