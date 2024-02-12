@@ -112,7 +112,7 @@ export const formatMinutes = (minutes: number) => {
   }
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
-  return hours + ' hr ' + remainingMinutes + ' min';
+  return `${hours ? hours + ' hr ' : ''} ${remainingMinutes ? remainingMinutes + ' min' : ''}`;
 };
 
 export default BookingHelper;
