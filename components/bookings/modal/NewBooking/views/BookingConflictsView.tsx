@@ -1,26 +1,34 @@
 import { bookingConflictsColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { useSetRecoilState } from 'recoil';
 import { newBookingState } from 'state/booking/newBookingState';
-
-const rows = [
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-];
+import { bookingStatusMap } from 'config/bookings';
+import { dateToSimple } from 'services/dateService';
+import { BookingWithVenueDTO } from 'interfaces';
+import { steps } from 'config/AddBooking';
 
 interface BarringIssueViewProps {
-  steps: string[];
+  data?: BookingWithVenueDTO[];
 }
 
-export default function BookingConflictsView({ steps }: BarringIssueViewProps) {
+export default function BookingConflictsView({ data }: BarringIssueViewProps) {
   const { nextStep, previousStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
-  const confirmedBookings = rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed');
+
+  const rows = useMemo(
+    () =>
+      data?.map?.((b) => ({
+        ...b,
+        venue: b.Venue.Name,
+        date: dateToSimple(b.Date),
+        bookingStatus: bookingStatusMap[b.StatusCode],
+      })),
+    [data],
+  );
+  const confirmedBookings = useMemo(() => rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed'), [rows]);
 
   useEffect(() => {
     setViewHeader({ stepIndex: activeStep });

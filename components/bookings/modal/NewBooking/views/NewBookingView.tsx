@@ -17,6 +17,10 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import { useWizard } from 'react-use-wizard';
 import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
+import useAxios from 'hooks/useAxios';
+import { steps } from 'config/AddBooking';
+import Loader from 'components/core-ui-lib/Loader';
+import { BookingWithVenueDTO } from 'interfaces';
 
 type PerformanceItem = {
   hasPerformance?: boolean;
@@ -30,12 +34,13 @@ type PerformanceData = {
 
 type AddBookingProps = {
   formData: TForm;
+  updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
 
-const NewBookingView = ({ onClose, onChange, formData }: AddBookingProps) => {
-  const { nextStep, activeStep } = useWizard();
+const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }: AddBookingProps) => {
+  const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
   const schedule = useRecoilValue(scheduleSelector);
@@ -47,6 +52,7 @@ const NewBookingView = ({ onClose, onChange, formData }: AddBookingProps) => {
   const [loading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
+  const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId } = formData;
   const availableDates = useMemo(() => {
     const dates = [];
@@ -92,7 +98,22 @@ const NewBookingView = ({ onClose, onChange, formData }: AddBookingProps) => {
     [venueDict],
   );
   const goToNext = () => {
-    nextStep();
+    fetchData({
+      url: '/api/bookings/conflict',
+      method: 'POST',
+      data: formData,
+    }).then((data: any) => {
+      updateBookingConflicts(data);
+      if (data.error) {
+        console.log(data.error);
+        return;
+      }
+      if (!data?.length) {
+        goToStep(steps.indexOf('Barring Issue'));
+      } else {
+        nextStep();
+      }
+    });
     // setStage((prev) => prev + 1);
   };
   const handleOnSubmit = async (e) => {
@@ -254,11 +275,14 @@ const NewBookingView = ({ onClose, onChange, formData }: AddBookingProps) => {
             text="Reject"
           ></Button>
         )}
-        <Button
-          onClick={stage === 0 ? goToNext : addBookings}
-          // disabled={!(venue || dayType) || !fromDate || !toDate}
-          text={stage === 0 ? 'Next' : 'Accept'}
-        ></Button>
+        {!fetchingBookingConflicts && (
+          <Button
+            onClick={stage === 0 ? goToNext : addBookings}
+            disabled={!(venueId || dateType) || !fromDate || !toDate}
+            text={stage === 0 ? 'Next' : 'Accept'}
+          ></Button>
+        )}
+        {fetchingBookingConflicts && <Loader variant={'sm'} />}
       </div>
     </>
   );
