@@ -11,40 +11,28 @@ type Story = StoryObj<typeof ConfirmationDialoig>;
 
 export const GlobalModal1a: Story = {
   args: {
-    yesBtnClass: 'primary-blue',
-    noBtnClass: 'primary-red',
-    question: 'Are you sure you want to close?',
-    warning: 'Any unsaved changes may be lost.',
+    variant: 'close',
     show: true
   },
 };
 
 export const GlobalModal2a: Story = {
     args: {
-      yesBtnClass: 'bg-primary-navy',
-      noBtnClass: '',
-      question: 'Are you sure you want to cancel?',
-      warning: 'Any unsaved changes may be lost.',
+      variant: 'cancel',
       show: true
     },
   };
 
   export const GlobalModal3: Story = {
     args: {
-      yesBtnClass: 'bg-primary-navy',
-      noBtnClass: 'bg-primary-red',
-      question: 'Are you sure you want to delete?',
-      warning: 'This action cannot be undone.',
+      variant: 'delete',
       show: true
     },
   };
   
   export const GlobalModal4: Story = {
     args: {
-      yesBtnClass: 'bg-primary-navy',
-      noBtnClass: '',
-      question: 'Are you sure you want to log out?',
-      warning: '',
+      variant: 'logout',
       show: true
     },
   };
@@ -52,10 +40,7 @@ export const GlobalModal2a: Story = {
 
   export const GlobalModal5: Story = {
     args: {
-      yesBtnClass: 'bg-primary-navy',
-      noBtnClass: '',
-      question: 'Are you sure you want to leave this page?',
-      warning: 'Any unsaved changes may be lost.',
+      variant: 'leave',
       show: true
     },
   };

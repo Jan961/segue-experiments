@@ -2,25 +2,42 @@ import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment, useState } from 'react';
 import Button from '../Button';
 
+type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave';
+type ModalText = {
+  question: string;
+  warning: string;
+}
+
 interface ConfirmationDialogProps {
   children?: React.ReactNode;
   show: boolean;
-  onConfirmation?: Function;
-  question: string;
-  warning: string;
+  onYesClick?: Function;
+  variant?: ConfDialogVariant;
   yesBtnClass: string;
   noBtnClass: string;
+  labelYes: string;
+  labelNo: string;
 }
-
 
 export default function ConfirmationDialog({
   show = false,
-  onConfirmation,
-  question,
-  warning,
-  yesBtnClass = "primary-blue",
-  noBtnClass
+  onYesClick,
+  labelYes = 'Yes',
+  labelNo = 'No',
+  variant
 }: ConfirmationDialogProps) {
+
+
+  // set text based on  variant
+  const text: ModalText = { question: '', warning: ''};
+
+  switch(variant) {
+    case 'close': { text.question = 'Are you sure you want to close?'; text.warning = 'Any unsaved changes may be lost.'; }
+    case 'cancel': { text.question = 'Are you sure you want to cancel?'; text.warning = 'Any unsaved changes may be lost.'; }
+    case 'delete': { text.question = 'Are you sure you want to delete?'; text.warning = 'This action cannot be undone.'; }
+    case 'logout': { text.question = 'Are you sure you want to logout?'; text.warning = ''; }
+    case 'leave': { text.question = 'Are you sure you want to leave this page?'; text.warning = 'Any unsaved changes may be lost.'; }
+  }
 
   const [dialogVisible, setVisible] = useState(show);
 
@@ -53,14 +70,13 @@ export default function ConfirmationDialog({
               <Dialog.Panel className="px-7 pt-2 transform bg-primary-white text-left align-middle shadow-xl transition-all">
                 <div>
                   <div className="text-center">
-                    <div className='text text-primary-navy font-bold text-xl'>{question}</div>
-                    <div className='text text-primary-navy font-bold text-xl'>{warning}</div>
+                    <div className='text text-primary-navy font-bold text-xl'>{text.question}</div>
+                    <div className='text text-primary-navy font-bold text-xl'>{text.warning}</div>
                   </div>
                   <div className="w-full mt-4 flex justify-center items-center mb-4">
-                    <Button className={yesBtnClass + ' w-32'} variant='secondary' text="No" onClick={() => setVisible(false)} />
-                    <Button className={noBtnClass + " ml-4 w-32"} text="Yes" onClick={() => { onConfirmation(); setVisible(false) }} />
+                    <Button className='w-32' variant='secondary' text={labelNo} onClick={() => setVisible(false)} />
+                    <Button className={variant === 'delete' ? 'ml-4 w-32 bg-primary-red' : 'ml-4 w-32'}  text={labelYes} onClick={() => { onYesClick(); setVisible(false) }} />
                   </div>
-
                 </div>
               </Dialog.Panel>
             </Transition.Child>
