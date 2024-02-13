@@ -11,7 +11,7 @@ type ModalText = {
 interface ConfirmationDialogProps {
   children?: React.ReactNode;
   show: boolean;
-  onYesClick?: Function;
+  onYesClick?: () => void;
   variant?: ConfDialogVariant;
   yesBtnClass: string;
   noBtnClass: string;
@@ -39,11 +39,11 @@ export default function ConfirmationDialog({
     case 'leave': { text.question = 'Are you sure you want to leave this page?'; text.warning = 'Any unsaved changes may be lost.'; }
   }
 
-  const [dialogVisible, setVisible] = useState(show);
+  const [visible, setVisible] = useState<boolean>(show);
 
   return (
     <PopupModal
-      show={dialogVisible}
+      show={visible}
       showCloseIcon={false}
     >
       <div className="text-center">
@@ -52,7 +52,7 @@ export default function ConfirmationDialog({
       </div>
       <div className="w-full mt-4 flex justify-center items-center mb-4">
         <Button className='w-32' variant='secondary' text={labelNo} onClick={() => setVisible(false)} />
-        <Button className={variant === 'delete' ? 'ml-4 w-32 bg-primary-red' : 'ml-4 w-32'} text={labelYes} onClick={() => { onYesClick(); setVisible(false) }} />
+        <Button className='ml-4 w-32' variant={variant === 'delete' ? 'tertiary' : 'primary'} text={labelYes} onClick={onYesClick} />
       </div>
     </PopupModal>
   );
