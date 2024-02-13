@@ -1,26 +1,50 @@
 import { bookingConflictsColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { useEffect } from 'react';
+import useAxios from 'hooks/useAxios';
+import { useEffect, useMemo } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { useSetRecoilState } from 'recoil';
 import { newBookingState } from 'state/booking/newBookingState';
+import { TForm } from '../reducer';
+import { bookingStatusMap } from 'config/bookings';
+import { dateToSimple } from 'services/dateService';
+import { Spinner } from 'components/global/Spinner';
 
-const rows = [
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-];
+// const rows = [
+//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
+//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
+//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
+//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
+// ];
 
 interface BarringIssueViewProps {
   steps: string[];
+  formData: TForm;
 }
 
-export default function BookingConflictsView({ steps }: BarringIssueViewProps) {
+export default function BookingConflictsView({ steps, formData }: BarringIssueViewProps) {
   const { nextStep, previousStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
-  const confirmedBookings = rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed');
+  const { data = [], loading, fetchData } = useAxios();
+  const rows = useMemo(
+    () =>
+      data?.map?.((b) => ({
+        ...b,
+        venue: b.Venue.Name,
+        date: dateToSimple(b.Date),
+        bookingStatus: bookingStatusMap[b.StatusCode],
+      })),
+    [data],
+  );
+  const confirmedBookings = useMemo(() => rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed'), [rows]);
+  useEffect(() => {
+    fetchData({
+      url: '/api/bookings/conflict',
+      method: 'POST',
+      data: formData,
+    });
+  }, []);
 
   useEffect(() => {
     setViewHeader({ stepIndex: activeStep });
@@ -44,6 +68,9 @@ export default function BookingConflictsView({ steps }: BarringIssueViewProps) {
       goToStep(steps.indexOf('New Booking Details'));
     }
   };
+  if (loading) {
+    return <Spinner size={'sm'} />;
+  }
 
   return (
     <div className="flex flex-col">

@@ -30,7 +30,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
       <PopupModal show={visible} onClose={handleModalClose} title={steps[stepIndex]}>
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView onChange={onFormDataChange} formData={state.form} onClose={() => null} />
-          <BookingConflictsView steps={steps} />
+          <BookingConflictsView formData={state.form} steps={steps} />
           <BarringIssueView />
         </Wizard>
       </PopupModal>
