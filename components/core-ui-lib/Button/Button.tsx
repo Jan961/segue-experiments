@@ -54,16 +54,22 @@ export default function Button({
       onClick={onClick}
     >
       {prefixIconName && (
-        <span>
+        <span className='col-span-1'>
           <Icon aria-hidden="true" iconName={prefixIconName} {...iconProps} />
         </span>
       )}
 
-      <div className='col-span-11 text-center'>
+      <div className='col-span-10 text-center'>
         {text || ''}
       </div>
 
-      {sufixIconName && <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />}
+      {sufixIconName && (
+        <span className='col-span-1'>
+          <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />
+        </span>
+      )}
+
+
     </button>
   );
 }
