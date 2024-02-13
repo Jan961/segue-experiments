@@ -49,7 +49,7 @@ export default function Button({
     <button
       id={id}
       type="button"
-      className={classNames(endClass, { 'flex items-center gap-1': prefixIconName || sufixIconName })}
+      className={classNames(endClass, { 'items-center gap-1 grid grid-cols-12': prefixIconName || sufixIconName })}
       disabled={disabled}
       onClick={onClick}
     >
@@ -58,7 +58,11 @@ export default function Button({
           <Icon aria-hidden="true" iconName={prefixIconName} {...iconProps} />
         </span>
       )}
-      {text || ''}
+
+      <div className='col-span-11 text-center'>
+        {text || ''}
+      </div>
+
       {sufixIconName && <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />}
     </button>
   );

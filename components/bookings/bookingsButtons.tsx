@@ -12,7 +12,7 @@ export default function BookingsButtons() {
       <Button
         text="Booking Reports"
         className="w-[155px]"
-        iconProps={{ className: 'h-4 w-3 ml-2' }}
+        iconProps={{ className: 'h-4 w-3' }}
         sufixIconName={'excel'}
       ></Button>
       <Button text="Venue History" className="w-[155px]"></Button>
