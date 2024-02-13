@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import classNames from 'classnames';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -16,13 +16,7 @@ import { dateTypeState } from 'state/booking/dateTypeState';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { useWizard } from 'react-use-wizard';
 import { newBookingState } from 'state/booking/newBookingState';
-
-const initialState = {
-  fromDate: null,
-  toDate: null,
-  venue: null,
-  dayType: null,
-};
+import { TForm } from '../reducer';
 
 type PerformanceItem = {
   hasPerformance?: boolean;
@@ -35,10 +29,12 @@ type PerformanceData = {
 };
 
 type AddBookingProps = {
+  formData: TForm;
+  onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
 
-const NewBookingView = ({ onClose }: AddBookingProps) => {
+const NewBookingView = ({ onClose, onChange, formData }: AddBookingProps) => {
   const { nextStep, activeStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
@@ -49,10 +45,9 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
   const [bookingDict, setBookingDict] = useRecoilState(bookingState);
   const [stage, setStage] = useState<number>(0);
   const [loading, setIsLoading] = useState<boolean>(false);
-  const [formData, setFormData] = useState(initialState);
   const [error, setError] = useState<string>('');
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
-  const [isDayTypeOnly, setIsDayTypeOnly] = useState(false);
+  const { fromDate, toDate, dateType, isDateTypeOnly, venueId } = formData;
   const availableDates = useMemo(() => {
     const dates = [];
     const productionSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Production');
@@ -96,12 +91,6 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
       })),
     [venueDict],
   );
-  const handleOnChange = (e) => {
-    let { name, value }: { name: string; value: any } = e.target;
-    if (name === 'fromDate' || name === 'toDate') value = value || '';
-    if (name === 'venue') value = parseInt(value, 10);
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
   const goToNext = () => {
     nextStep();
     // setStage((prev) => prev + 1);
@@ -112,7 +101,6 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
   const onModalClose = () => {
     setError('');
     setStage(0);
-    setFormData(initialState);
     onClose();
   };
   const addBookings = async () => {
@@ -122,7 +110,7 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
       const { hasPerformance, performanceTimes, date } = booking;
       if (hasPerformance) {
         const DateBlockId = getDateBlockId(schedule, date);
-        payload.push({ DateBlockId, performanceTimes, VenueId: formData.venue, Date: date });
+        payload.push({ DateBlockId, performanceTimes, VenueId: formData.venueId, Date: date });
       }
     }
     setIsLoading(true);
@@ -167,8 +155,8 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
               className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
               minDate={minDate ? new Date(minDate) : null}
               maxDate={maxDate ? new Date(maxDate) : null}
-              value={formData.fromDate ? new Date(formData.fromDate) : null}
-              onChange={(date) => handleOnChange({ target: { name: 'fromDate', value: date?.toLocaleDateString() } })}
+              value={fromDate ? new Date(fromDate) : null}
+              onChange={(date) => onChange({ fromDate: date?.toLocaleDateString() })}
             />
           </div>
         )}
@@ -180,39 +168,31 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
               popperClassName="!z-[51]"
               inputClass="w-full"
               className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
-              value={formData?.toDate ? new Date(formData?.toDate) : null}
-              minDate={formData?.fromDate ? new Date(formData?.fromDate) : new Date()}
+              value={toDate ? new Date(toDate) : null}
+              minDate={fromDate ? new Date(fromDate) : new Date()}
               maxDate={maxDate ? new Date(maxDate) : null}
-              onChange={(date) => handleOnChange({ target: { name: 'toDate', value: date?.toLocaleDateString() } })}
+              onChange={(date) => onChange({ toDate: date?.toLocaleDateString() })}
             />
           </div>
         )}
-        {isDayTypeOnly && (
+        {isDateTypeOnly && (
           <Typeahead
             className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
             options={DayTypeOptions}
             disabled={stage !== 0}
-            onChange={(value) =>
-              handleOnChange({ target: { name: 'dayType', value } } as React.ChangeEvent<
-                HTMLInputElement | HTMLSelectElement
-              >)
-            }
-            value={formData.dayType}
+            onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
+            value={dateType}
             placeholder={'Please select a DayType'}
           />
         )}
-        {!isDayTypeOnly && (
+        {!isDateTypeOnly && (
           <>
             <Typeahead
               className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
               options={VenueOptions}
               disabled={stage !== 0}
-              onChange={(value) =>
-                handleOnChange({ target: { name: 'venue', value } } as React.ChangeEvent<
-                  HTMLInputElement | HTMLSelectElement
-                >)
-              }
-              value={formData.venue}
+              onChange={(value) => onChange({ venueId: parseInt(value as string, 10) })}
+              value={venueId}
               placeholder={'Please select a venue'}
             />
             <Checkbox
@@ -225,10 +205,10 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
             <div className="flex flex-wrap item-center w-full gap-2">
               <Button className="px-4" variant="secondary" text="Gap Suggest" onClick={console.log} />
               <Button
-                className="px-4"
+                className="px-4 flex-grow"
                 variant="secondary"
                 text="Continue with DayType only"
-                onClick={() => setIsDayTypeOnly(true)}
+                onClick={() => onChange({ isDateTypeOnly: true })}
               />
             </div>
           </>
@@ -254,13 +234,13 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
       <div className="grid grid-cols-3 my-4 gap-2">
         <Button
           onClick={stage === 0 ? goToNext : addBookings}
-          disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
+          disabled={!(venueId || dateType) || !fromDate || !toDate}
           className="px-6"
           text={'Check Mileage'}
         ></Button>
         <Button
           onClick={stage === 0 ? goToNext : addBookings}
-          disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
+          disabled={!(venueId || dateType) || !fromDate || !toDate}
           variant="secondary"
           text={'Cancel'}
         ></Button>
@@ -270,13 +250,13 @@ const NewBookingView = ({ onClose }: AddBookingProps) => {
               setStage((stage) => stage - 1);
               setError('');
             }}
-            disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
+            disabled={!(venueId || dateType) || !fromDate || !toDate}
             text="Reject"
           ></Button>
         )}
         <Button
           onClick={stage === 0 ? goToNext : addBookings}
-          // disabled={!(formData.venue || formData.dayType) || !formData.fromDate || !formData.toDate}
+          // disabled={!(venue || dayType) || !fromDate || !toDate}
           text={stage === 0 ? 'Next' : 'Accept'}
         ></Button>
       </div>
