@@ -9,9 +9,8 @@ import BarringIssueView from './views/BarringIssueView';
 import { useReducer } from 'react';
 import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
-import { Actions, INITIAL_STATE } from 'config/AddBooking';
-
-const steps = ['Create New Booking', 'Booking Conflict', 'Barring Issue', 'New Booking Details', 'Preview New Booking'];
+import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
+import { BookingWithVenueDTO } from 'interfaces';
 
 type AddBookingProps = {
   visible: boolean;
@@ -25,12 +24,20 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
   };
+  const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
+    dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
+  };
   return (
     <>
       <PopupModal show={visible} onClose={handleModalClose} title={steps[stepIndex]}>
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
-          <NewBookingView onChange={onFormDataChange} formData={state.form} onClose={() => null} />
-          <BookingConflictsView formData={state.form} steps={steps} />
+          <NewBookingView
+            updateBookingConflicts={updateBookingConflicts}
+            onChange={onFormDataChange}
+            formData={state.form}
+            onClose={() => null}
+          />
+          <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView />
         </Wizard>
       </PopupModal>

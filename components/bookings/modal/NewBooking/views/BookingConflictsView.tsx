@@ -1,32 +1,23 @@
 import { bookingConflictsColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import useAxios from 'hooks/useAxios';
 import { useEffect, useMemo } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { useSetRecoilState } from 'recoil';
 import { newBookingState } from 'state/booking/newBookingState';
-import { TForm } from '../reducer';
 import { bookingStatusMap } from 'config/bookings';
 import { dateToSimple } from 'services/dateService';
-import { Spinner } from 'components/global/Spinner';
-
-// const rows = [
-//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-//   { venue: 'Alhambra, Dunfermline', date: '02/02/24', bookingStatus: 'Pencilled' },
-// ];
+import { BookingWithVenueDTO } from 'interfaces';
+import { steps } from 'config/AddBooking';
 
 interface BarringIssueViewProps {
-  steps: string[];
-  formData: TForm;
+  data?: BookingWithVenueDTO[];
 }
 
-export default function BookingConflictsView({ steps, formData }: BarringIssueViewProps) {
+export default function BookingConflictsView({ data }: BarringIssueViewProps) {
   const { nextStep, previousStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
-  const { data = [], loading, fetchData } = useAxios();
+
   const rows = useMemo(
     () =>
       data?.map?.((b) => ({
@@ -38,13 +29,6 @@ export default function BookingConflictsView({ steps, formData }: BarringIssueVi
     [data],
   );
   const confirmedBookings = useMemo(() => rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed'), [rows]);
-  useEffect(() => {
-    fetchData({
-      url: '/api/bookings/conflict',
-      method: 'POST',
-      data: formData,
-    });
-  }, []);
 
   useEffect(() => {
     setViewHeader({ stepIndex: activeStep });
@@ -68,9 +52,6 @@ export default function BookingConflictsView({ steps, formData }: BarringIssueVi
       goToStep(steps.indexOf('New Booking Details'));
     }
   };
-  if (loading) {
-    return <Spinner size={'sm'} />;
-  }
 
   return (
     <div className="flex flex-col">

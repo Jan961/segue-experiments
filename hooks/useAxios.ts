@@ -24,7 +24,7 @@ const useAxios = (): UseAxiosReturn => {
   useEffect(() => {
     return () => cancelRef.current?.('Component unMounted');
   }, []);
-  const fetchData = useCallback(async ({ url, method = 'POST', data, config = {} }: FetchRequest) => {
+  const fetchData = useCallback(async ({ url, method = 'POST', data, config = {} }: FetchRequest): Promise<any> => {
     setLoading(true);
     setError(null);
     try {
@@ -39,12 +39,14 @@ const useAxios = (): UseAxiosReturn => {
         }),
       });
       setData(response.data);
+      return response.data;
     } catch (error) {
       if (axios.isCancel(error)) {
         console.log('Request canceled', error.message);
       } else {
         setError(error);
       }
+      return { error: error.message };
     } finally {
       setLoading(false);
     }
