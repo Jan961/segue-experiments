@@ -35,7 +35,7 @@ export const Tertiary: Story = {
   },
 };
 
-export const PrefixIcon: Story = {
+export const PrefixIconShort: Story = {
   args: {
     text: 'Primary Button',
     disabled: false,
@@ -47,11 +47,37 @@ export const PrefixIcon: Story = {
   },
 };
 
-export const SuffixIcon: Story = {
+export const PrefixIconLong: Story = {
+  args: {
+    text: 'Primary Button',
+    disabled: false,
+    className: 'w-72',
+    prefixIconName: 'edit',
+    iconProps:{
+      stroke:"#ffffff"
+    }
+  },
+};
+
+
+export const SuffixIconShort: Story = {
   args: {
     text: 'Primary Button',
     disabled: false,
     className: 'w-36',
+    sufixIconName: 'edit',
+    iconProps:{
+      stroke:"#ffffff",
+    }
+  },
+};
+
+
+export const SuffixIconLong: Story = {
+  args: {
+    text: 'Primary Button',
+    disabled: false,
+    className: 'w-72',
     sufixIconName: 'edit',
     iconProps:{
       stroke:"#ffffff"

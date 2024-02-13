@@ -49,17 +49,27 @@ export default function Button({
     <button
       id={id}
       type="button"
-      className={classNames(endClass, { 'flex items-center gap-1': prefixIconName || sufixIconName })}
+      className={classNames(endClass, { 'items-center gap-1 grid grid-cols-12': prefixIconName || sufixIconName })}
       disabled={disabled}
       onClick={onClick}
     >
       {prefixIconName && (
-        <span>
+        <span className='col-span-1'>
           <Icon aria-hidden="true" iconName={prefixIconName} {...iconProps} />
         </span>
       )}
-      {text || ''}
-      {sufixIconName && <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />}
+
+      <div className='col-span-10 text-center'>
+        {text || ''}
+      </div>
+
+      {sufixIconName && (
+        <span className='col-span-1'>
+          <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />
+        </span>
+      )}
+
+
     </button>
   );
 }
