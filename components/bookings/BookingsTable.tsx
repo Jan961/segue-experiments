@@ -75,11 +75,6 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       });
   };
 
-  const handleCancelNote = () => {
-    setProductionItem(null);
-    setShowModal(false);
-  };
-
   useEffect(() => {
     if (tableRef && tableRef.current && filter?.scrollToDate) {
       const rowIndex = rowData.findIndex(({ date }) => date === filter.scrollToDate);
@@ -152,7 +147,8 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         show={showModal}
         productionItem={productionItem}
         onSave={handleSaveNote}
-        onCancel={handleCancelNote}
+        onCancel={() => setShowModal(false)}
+        onShow={() => setShowModal(true)}
       />
       {showAddBookingModal.visible && (
         <AddBooking {...showAddBookingModal} onClose={() => setShowAddBookingModal(AddBookingInitialState)} />
