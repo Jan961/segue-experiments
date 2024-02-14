@@ -9,39 +9,37 @@ const meta: Meta<typeof ConfirmationDialoig> = {
 export default meta;
 type Story = StoryObj<typeof ConfirmationDialoig>;
 
-export const GlobalModal1a: Story = {
+export const CloseModal: Story = {
   args: {
     variant: 'close',
-    show: true
+    show: true,
   },
 };
 
-export const GlobalModal2a: Story = {
-    args: {
-      variant: 'cancel',
-      show: true
-    },
-  };
+export const CancelModal: Story = {
+  args: {
+    variant: 'cancel',
+    show: true,
+  },
+};
 
-  export const GlobalModal3: Story = {
-    args: {
-      variant: 'delete',
-      show: true
-    },
-  };
-  
-  export const GlobalModal4: Story = {
-    args: {
-      variant: 'logout',
-      show: true
-    },
-  };
-  
+export const DeleteModal: Story = {
+  args: {
+    variant: 'delete',
+    show: true,
+  },
+};
 
-  export const GlobalModal5: Story = {
-    args: {
-      variant: 'leave',
-      show: true
-    },
-  };
-  
+export const LogoutModal: Story = {
+  args: {
+    variant: 'logout',
+    show: true,
+  },
+};
+
+export const LeavePageModal: Story = {
+  args: {
+    variant: 'leave',
+    show: true,
+  },
+};
