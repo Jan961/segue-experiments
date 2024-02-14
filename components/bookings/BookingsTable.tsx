@@ -5,6 +5,7 @@ import NotesPopup from './NotesPopup';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
+import axios from 'axios';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -61,8 +62,17 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   };
 
   const handleSaveNote = (value) => {
-    console.log(value);
     setShowModal(false);
+
+    // SK-25 PL - run update booking to add the new note
+    axios
+      .patch('/api/bookings/update/', { BookingId: productionItem.Id, Notes: value })
+      .then(({ data }) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        alert(error);
+      });
   };
 
   const handleCancelNote = () => {
@@ -140,7 +150,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       </div>
       <NotesPopup
         show={showModal}
-        value={productionItem?.note || ''}
+        productionItem={productionItem}
         onSave={handleSaveNote}
         onCancel={handleCancelNote}
       />
