@@ -4,7 +4,7 @@ export const confOptions = {
     warning: 'Any unsaved changes may be lost.',
   },
   cancel: {
-    question: 'Are you sure you want to cancel??',
+    question: 'Are you sure you want to cancel?',
     warning: 'Any unsaved changes may be lost.',
   },
   delete: {
