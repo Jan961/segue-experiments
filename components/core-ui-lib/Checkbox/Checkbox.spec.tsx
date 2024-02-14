@@ -1,39 +1,30 @@
-// import { render, fireEvent } from '@testing-library/react';
-// import Checkbox from './Checkbox';
+import { render, fireEvent, screen } from '@testing-library/react';
+import Checkbox from './Checkbox';
 
-// describe('Checkbox Component', () => {
-//   test('renders checkbox correctly', () => {
-//     const { getByTestId } = render(<Checkbox id="1" onChange={() => {}} testId="1" />);
-//     const checkbox = getByTestId('core-ui-lib-checkbox-1');
-//     expect(checkbox).toBeInTheDocument();
-//   });
+describe('Checkbox Component', () => {
+  test('renders checkbox correctly', () => {
+    const onChangeHandler = jest.fn();
 
-//   test('handles onChange event correctly', () => {
-//     let isChecked = false;
-//     const handleChange = () => {
-//       isChecked = !isChecked;
-//     };
-//     const { getByTestId } = render(<Checkbox id="2" onChange={handleChange} testId="2" />);
-//     const checkbox = getByTestId('core-ui-lib-checkbox-2');
-//     fireEvent.click(checkbox);
-//     expect(isChecked).toBe(true);
-//   });
+    render(<Checkbox id="1" onChange={onChangeHandler} testId="1" disabled />);
+    expect(screen.getByTestId('core-ui-lib-checkbox-1')).toBeInTheDocument();
+  });
 
-//   test('disables checkbox when disabled prop is true', () => {
-//     const { getByTestId } = render(<Checkbox id="3" onChange={() => {}} disabled testId="3" />);
-//     const checkbox = getByTestId('core-ui-lib-checkbox-3') as HTMLInputElement;
-//     expect(checkbox.disabled).toBe(true);
-//   });
-//   test('sets intermediate state when showIntermediate prop is true', () => {
-//     const { getByTestId } = render(<Checkbox id="4" onChange={() => {}} showIntermediate testId="4" />);
-//     const checkbox = getByTestId('core-ui-lib-checkbox-4') as HTMLInputElement;
-//     expect(checkbox.indeterminate).toBe(true);
-//   });
+  test('handles onChange event correctly', () => {
+    let isChecked = false;
+    const handleChange = () => {
+      isChecked = !isChecked;
+    };
 
-//   test('displays label text when label prop is provided', () => {
-//     const labelText = 'Checkbox Label';
-//     const { getByText } = render(<Checkbox id="5" onChange={() => {}} label={labelText} testId="5" />);
-//     const label = getByText(labelText);
-//     expect(label).toBeInTheDocument();
-//   });
-// });
+    render(<Checkbox id="2" onChange={handleChange} testId="2" disabled />);
+    fireEvent.click(screen.getByTestId('core-ui-lib-checkbox-2'));
+    expect(isChecked).toBe(true);
+  });
+
+  test('disables checkbox when disabled prop is true', () => {
+    const onChangeHandler = jest.fn();
+
+    render(<Checkbox id="3" onChange={onChangeHandler} disabled testId="3" />);
+    const checkbox = screen.getByTestId('core-ui-lib-checkbox-3') as HTMLInputElement;
+    expect(checkbox.disabled).toBe(true);
+  });
+});
