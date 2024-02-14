@@ -185,7 +185,7 @@ export const getPreviousMonday = (date) => {
 };
 
 export const getNextMondayDateString = (date: string) => {
-  const inputDate = moment(date);
+  const inputDate = moment.utc(date);
   if (!inputDate.isValid()) {
     return '';
   }
