@@ -16,10 +16,11 @@ interface TableProps {
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
   gridOptions?: any;
+  displayHeader?: boolean;
 }
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -52,7 +53,7 @@ export default forwardRef(function Table(
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          headerHeight={51}
+          headerHeight={displayHeader ? 51 : 0}
           rowHeight={43}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}

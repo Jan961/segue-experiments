@@ -72,8 +72,8 @@ export const gapSuggestColumnDefs = [
 ];
 
 export const tourSummaryColumnDefs = [
-  // { headerName: 'Production Code', field: 'prod', cellRenderer: DefaultCellRenderer, flex: 1  },
-  { headerName: 'Name', field: 'name', cellRenderer: DefaultCellRenderer, width: 200 },
-  { headerName: 'Value', field: 'value', cellRenderer: DefaultCellRenderer, width: 100 },
+  { headerName: 'Production Code', field: 'prod', cellRenderer: DefaultCellRenderer, width: 180, headerClass: 'text-center' },
+  { headerName: 'Name', field: 'name', cellRenderer: DefaultCellRenderer, width: 200, headerClass: 'text-center' },
+  { headerName: 'Value', field: 'value', cellRenderer: DefaultCellRenderer, width: 70, headerClass: 'text-center' },
 ];
 
