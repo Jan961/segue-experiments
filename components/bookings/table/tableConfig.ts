@@ -70,3 +70,10 @@ export const gapSuggestColumnDefs = [
     headerClass: 'text-center',
   },
 ];
+
+export const tourSummaryColumnDefs = [
+  // { headerName: 'Production Code', field: 'prod', cellRenderer: DefaultCellRenderer, flex: 1  },
+  { headerName: 'Name', field: 'name', cellRenderer: DefaultCellRenderer, width: 200 },
+  { headerName: 'Value', field: 'value', cellRenderer: DefaultCellRenderer, width: 100 },
+];
+
