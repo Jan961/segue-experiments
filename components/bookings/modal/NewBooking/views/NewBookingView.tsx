@@ -21,6 +21,7 @@ import useAxios from 'hooks/useAxios';
 import { steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 
 type PerformanceItem = {
   hasPerformance?: boolean;
@@ -44,6 +45,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
   const schedule = useRecoilValue(scheduleSelector);
+  const currentProduction = useRecoilValue(currentProductionSelector);
   const dayTypes = useRecoilValue(dateTypeState);
   const DayTypeOptions = useMemo(() => dayTypes.map(({ Id: value, Name: text }) => ({ text, value })), [dayTypes]);
   const [perfDict, setPerfDict] = useRecoilState(performanceState);
@@ -54,6 +56,10 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
+  const productionCode = useMemo(
+    () => (currentProduction ? `${currentProduction?.ShowCode}${currentProduction?.Code}` : 'All'),
+    [currentProduction],
+  );
   const availableDates = useMemo(() => {
     const dates = [];
     const productionSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Production');
@@ -170,12 +176,13 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
-    <>
+    <div>
       {loading && (
         <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
           <Spinner className="w-full" size="lg" />
         </div>
       )}
+      <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-2 px-4 rounded-lg" onSubmit={handleOnSubmit}>
         {stage === 0 && (
           <div className="flex flex-col my-2">
@@ -295,7 +302,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         )}
         {fetchingBookingConflicts && <Loader variant={'sm'} />}
       </div>
-    </>
+    </div>
   );
 };
 
