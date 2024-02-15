@@ -50,3 +50,11 @@ export const barringIssueColumnDefs = [
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
   { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
 ];
+
+
+export const tourSummaryColumnDefs = [
+  // { headerName: 'Production Code', field: 'prod', cellRenderer: DefaultCellRenderer, flex: 1  },
+  { headerName: 'Name', field: 'name', cellRenderer: DefaultCellRenderer, width: 200 },
+  { headerName: 'Value', field: 'value', cellRenderer: DefaultCellRenderer, width: 100 },
+];
+
