@@ -50,3 +50,11 @@ export const barringIssueColumnDefs = [
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
   { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
 ];
+
+export const gapSuggestColumnDefs = [
+  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Seats', field: 'seats', cellRenderer: DefaultCellRenderer, width: 75 },
+  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: DefaultCellRenderer, width: 75 },
+  { headerName: 'Barring Check', field: 'barringCheck', cellRenderer: DefaultCellRenderer, flex: 1 },
+];

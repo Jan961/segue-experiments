@@ -53,7 +53,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const [error, setError] = useState<string>('');
   const [performancesData, setPerformancesData] = useState<PerformanceData>({});
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
-  const { fromDate, toDate, dateType, isDateTypeOnly, venueId } = formData;
+  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
   const availableDates = useMemo(() => {
     const dates = [];
     const productionSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Production');
@@ -89,14 +89,22 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     );
   }, [formData.fromDate, formData.toDate, availableDates]);
 
-  const VenueOptions = useMemo(
-    () =>
-      Object.values(venueDict).map((venue) => ({
+  const VenueOptions = useMemo(() => {
+    const options = [];
+    const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
+    for (const venueId in venueDict) {
+      const venue = venueDict[venueId];
+      const option = {
         text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
         value: venue?.Id,
-      })),
-    [venueDict],
-  );
+      };
+      if (shouldFilterVenues && currentProductionVenues.includes(parseInt(venueId, 10))) {
+        continue;
+      }
+      options.push(option);
+    }
+    return options;
+  }, [venueDict, shouldFilterVenues, bookingDict]);
   const goToNext = () => {
     fetchData({
       url: '/api/bookings/conflict',
@@ -157,6 +165,9 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const onPerformanceDataChange = (date: string, key: string, value: any) => {
     setError('');
     setPerformancesData((prev) => ({ ...prev, [date]: { ...(prev?.[date] || {}), [key]: value, date } }));
+  };
+  const goToGapSuggestion = () => {
+    goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
     <>
@@ -219,12 +230,12 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
             <Checkbox
               id="shouldFilterVenues"
               labelClassName="text-white"
-              onChange={console.log}
-              checked={false}
+              onChange={(e: any) => onChange({ shouldFilterVenues: e.target.checked })}
+              checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
             />
             <div className="flex flex-wrap item-center w-full gap-2">
-              <Button className="px-4" variant="secondary" text="Gap Suggest" onClick={console.log} />
+              <Button className="px-4" variant="secondary" text="Gap Suggest" onClick={goToGapSuggestion} />
               <Button
                 className="px-4 flex-grow"
                 variant="secondary"

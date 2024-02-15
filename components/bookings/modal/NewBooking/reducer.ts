@@ -12,6 +12,7 @@ export type TForm = {
   isDateTypeOnly?: boolean;
   venueId?: number;
   dateType?: number;
+  shouldFilterVenues?: boolean;
 };
 
 export type TState = {

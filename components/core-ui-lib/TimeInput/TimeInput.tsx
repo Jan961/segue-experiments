@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Label from '../Label';
+import classNames from 'classnames';
 
 type Time = {
   hrs?: string;
@@ -14,6 +15,7 @@ interface TimeInputProps {
   value: string | Time;
   name?: string; // Also ID
   disabled?: boolean;
+  className?: string;
 }
 
 const baseClass =
@@ -22,7 +24,7 @@ const DEFAULT_TIME = { hrs: '00', min: '00', sec: '00' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
-export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInputProps) {
+export default function TimeInput({ onChange, value, onBlur, disabled, className }: TimeInputProps) {
   const [time, setTime] = useState<Time>(DEFAULT_TIME);
   const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
@@ -52,7 +54,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInp
 
   const handleBlur = () => {
     onChange(time);
-    onBlur(time);
+    onBlur?.(time);
   };
 
   useEffect(() => {
@@ -71,7 +73,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInp
   return disabled ? (
     <Label text={`${time.hrs} : ${time.min}`} className={`${baseClass} ${disabledClass}`} />
   ) : (
-    <div onBlur={handleBlur} className={baseClass}>
+    <div onBlur={handleBlur} className={classNames(baseClass, className)}>
       <input
         name="hrs"
         value={time.hrs}

@@ -11,6 +11,7 @@ import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
+import GapSuggest from '../GapSuggest';
 
 type AddBookingProps = {
   visible: boolean;
@@ -39,6 +40,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView />
+          <GapSuggest />
         </Wizard>
       </PopupModal>
     </>

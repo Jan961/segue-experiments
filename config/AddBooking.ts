@@ -5,6 +5,7 @@ export const INITIAL_STATE = {
     isDateTypeOnly: false,
     dateType: null,
     venueId: null,
+    shouldFilterVenues: false,
   },
   bookingConflicts: [],
 };
@@ -18,6 +19,7 @@ export const steps = [
   'Create New Booking',
   'Booking Conflict',
   'Barring Issue',
+  'Venue Gap Suggestions',
   'New Booking Details',
   'Preview New Booking',
 ];
