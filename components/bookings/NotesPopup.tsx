@@ -13,21 +13,27 @@ interface NotesPopupProps {
 }
 
 export default function NotesPopup({ show, onSave, onCancel, onShow, productionItem }: NotesPopupProps) {
-  const [note, setNote] = useState<string>(productionItem?.note || '');
+  const [note, setNote] = useState<string>('');
+  const [noteChange, setChanged] = useState<boolean>(false);
   const [confirm, setConfirm] = useState<boolean>(false);
 
   useEffect(() => {
-    setNote(productionItem?.note || '');
+    setNote(productionItem?.note || ''); 
   }, [productionItem?.note]);
 
   const confirmCancel = () => {
-    if (productionItem?.note !== note) {
+    if (noteChange) {
       setConfirm(true);
       onCancel();
     } else {
       handleCancel();
     }
   };
+
+  const changeNote = (text) => {
+    setChanged(true);
+    setNote(text);
+  }
 
   const handleCancel = () => {
     setNote('');
@@ -58,7 +64,7 @@ export default function NotesPopup({ show, onSave, onCancel, onShow, productionI
           <h3 className="text w-[482px] text-lg font-bold text-primary-navy">
             {productionItem?.venue !== undefined ? productionItem?.venue : ''}
           </h3>
-          <TextArea className="mt-2 w-[482px] h-[237px]" value={note} onChange={(e) => setNote(e.target.value)} />
+          <TextArea className="mt-2 w-[482px] h-[237px]" value={note} onChange={(e) => changeNote(e.target.value)} />
           <div className="w-full mt-4 mb-8 flex justify-end items-center">
             <Button className="w-33" variant="secondary" text="Cancel" onClick={confirmCancel} />
             <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
