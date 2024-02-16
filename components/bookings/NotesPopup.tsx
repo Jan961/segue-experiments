@@ -18,7 +18,7 @@ export default function NotesPopup({ show, onSave, onCancel, onShow, productionI
   const [confirm, setConfirm] = useState<boolean>(false);
 
   useEffect(() => {
-    setNote(productionItem?.note || ''); 
+    setNote(productionItem?.note || '');
   }, [productionItem?.note]);
 
   const confirmCancel = () => {
@@ -30,10 +30,10 @@ export default function NotesPopup({ show, onSave, onCancel, onShow, productionI
     }
   };
 
-  const changeNote = (text) => {
+  const changeNote = (text: string) => {
     setChanged(true);
     setNote(text);
-  }
+  };
 
   const handleCancel = () => {
     setNote('');
