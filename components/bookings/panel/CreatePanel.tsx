@@ -42,7 +42,7 @@ export default function CreatePanel({ finish }: CreatePanelProps) {
 
   const commonButtonClasses = 'w-full p-4 mb-4';
 
-  const { prevBookings, nextBookings } = findPrevAndNextBookings(bookingDict, selectedDate);
+  const { prevBookings, nextBookings } = findPrevAndNextBookings(bookingDict, selectedDate, selectedDate);
 
   React.useEffect(() => {
     reset();

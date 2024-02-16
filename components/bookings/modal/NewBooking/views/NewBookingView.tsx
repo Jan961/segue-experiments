@@ -111,8 +111,8 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               value={fromDate ? new Date(fromDate) : null}
               onChange={(date) =>
                 onChange({
-                  fromDate: date?.toISOString(),
-                  ...(!toDate && { toDate: date?.toISOString() }),
+                  fromDate: date?.toLocaleDateString(),
+                  ...(!toDate && { toDate: date?.toLocaleDateString() }),
                 })
               }
             />
@@ -161,7 +161,13 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               label="Hide venues with existing bookings for this production?"
             />
             <div className="flex flex-wrap item-center w-full gap-2">
-              <Button className="px-4" variant="secondary" text="Gap Suggest" onClick={goToGapSuggestion} />
+              <Button
+                className="px-4"
+                disabled={!(fromDate && toDate)}
+                variant="secondary"
+                text="Gap Suggest"
+                onClick={goToGapSuggestion}
+              />
               <Button
                 className="px-4 flex-grow"
                 variant="secondary"

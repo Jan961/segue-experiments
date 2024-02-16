@@ -1,10 +1,14 @@
+// import { findPrevAndNextBookings } from 'components/bookings/panel/utils/findPrevAndNextBooking';
 import { gapSuggestColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
 import TextInput from 'components/core-ui-lib/TextInput';
 import TimeInput from 'components/core-ui-lib/TimeInput';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { getKey } from 'services/dateService';
+import { bookingState } from 'state/booking/bookingState';
 
 const defaultFormState = {
   minFromLastVenue: null,
@@ -17,7 +21,13 @@ const defaultFormState = {
   excludeLondonVenues: false,
 };
 
-const GapSuggest = () => {
+type GapSuggestProps = {
+  startDate: string;
+  endDate: string;
+};
+
+const GapSuggest = ({ startDate, endDate }: GapSuggestProps) => {
+  const bookingDict = useRecoilValue(bookingState);
   const [formData, setFormData] = useState(defaultFormState);
   const [rows, setRows] = useState(null);
   const {
@@ -30,6 +40,18 @@ const GapSuggest = () => {
     excludeLondonVenues,
     minSeats,
   } = formData;
+  // const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, getKey(startDate), getKey(endDate));
+  const canGapSuggest = useMemo(() => {
+    const bookingList = Object.values(bookingDict);
+    const bookingInRange = bookingList.filter((booking) => {
+      const can =
+        new Date(getKey(booking.Date)) >= new Date(getKey(startDate)) &&
+        new Date(getKey(booking.Date)) <= new Date(getKey(endDate));
+      return can;
+    });
+    const comfirmedBookings = bookingInRange.some((booking) => booking.StatusCode === 'C');
+    return !comfirmedBookings;
+  }, [startDate, endDate]);
   const handleOnChange = (event: any) => {
     let { id, value } = event.target;
     if (id === 'maxTravelTimeFromLastVenue' || id === 'maxTravelTimeToNextVenue') {
@@ -51,6 +73,13 @@ const GapSuggest = () => {
   const getSuggestions = () => {
     setRows([]);
   };
+  if (!canGapSuggest) {
+    return (
+      <div className="text-red-500 font-medium my-1">
+        Selected Date Range contains confirmed bookings. To get suggestions, please select range without bookings
+      </div>
+    );
+  }
   return (
     <div className="py-4 text-primary-input-text w-[700px]">
       <form>
@@ -87,7 +116,7 @@ const GapSuggest = () => {
           </div>
           <div className="col-span-3">
             <TimeInput
-              className="w-full"
+              className="w-full h-[31px] [&>input]:!h-[29px] [&>input]:!w-11 !justify-center"
               value={maxTravelTimeFromLastVenue}
               onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeFromLastVenue', value } })}
             />
@@ -115,7 +144,7 @@ const GapSuggest = () => {
           </div>
           <div className="col-span-3">
             <TimeInput
-              className="w-full"
+              className="w-full h-[31px] [&>input]:!h-[29px] [&>input]:!w-11 !justify-center"
               value={maxTravelTimeToNextVenue}
               onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeToNextVenue', value } })}
             />
@@ -144,7 +173,12 @@ const GapSuggest = () => {
             />
           </div>
         </div>
-        <Button onClick={getSuggestions} className="float-right my-3 px-3" variant="primary" text="Get Suggestions" />
+        <Button
+          onClick={getSuggestions}
+          className="float-right my-3 px-4 font-normal"
+          variant="primary"
+          text="Get Suggestions"
+        />
       </form>
       {rows !== null && (
         <div className="w-full h-60 flex flex-col">

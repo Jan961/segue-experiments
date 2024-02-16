@@ -52,9 +52,21 @@ export const barringIssueColumnDefs = [
 ];
 
 export const gapSuggestColumnDefs = [
-  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Seats', field: 'seats', cellRenderer: DefaultCellRenderer, width: 75 },
-  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: DefaultCellRenderer, width: 75 },
-  { headerName: 'Barring Check', field: 'barringCheck', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1, headerClass: 'text-center' },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1, headerClass: 'text-center' },
+  { headerName: 'Seats', field: 'seats', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
+  {
+    headerName: 'Travel Time',
+    field: 'travelTime',
+    cellRenderer: DefaultCellRenderer,
+    width: 75,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Barring Check',
+    field: 'barringCheck',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
 ];

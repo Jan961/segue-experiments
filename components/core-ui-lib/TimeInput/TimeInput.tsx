@@ -77,6 +77,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled, className
       <input
         name="hrs"
         value={time.hrs}
+        placeholder="hh"
         type="text"
         className="w-10 h-comp-height border-none focus:ring-0 text-end ring-0"
         onChange={handleInputChange}
@@ -88,6 +89,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled, className
       <input
         name="min"
         value={time.min}
+        placeholder="mm"
         className="w-10 h-comp-height border-none focus:ring-0 ring-0"
         onChange={handleInputChange}
         onBlur={handleInputBlur}
