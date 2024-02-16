@@ -49,7 +49,7 @@ export const GapPanel = ({ finish, setGapVenueIds }: GapPanelProps) => {
   const [results, setResults] = React.useState<GapSuggestionReponse>(undefined);
   const [refreshing, setRefreshing] = React.useState(false);
   const [sliderActive, setSlidersActive] = React.useState(false);
-  const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, selectedDate);
+  const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, selectedDate, selectedDate);
   const startVIds = prevBookings.map((id) => bookingDict[id].VenueId);
   const endVIds = nextBookings.map((id) => bookingDict[id].VenueId);
   const [sliderMax, setSliderMax] = React.useState<number>(undefined);

@@ -11,6 +11,7 @@ import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
+import GapSuggestionView from './views/GapSuggestionView';
 
 type AddBookingProps = {
   visible: boolean;
@@ -29,16 +30,22 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   };
   return (
     <>
-      <PopupModal show={visible} onClose={handleModalClose} title={steps[stepIndex]}>
+      <PopupModal
+        show={visible}
+        onClose={handleModalClose}
+        titleClass="text-xl text-primary-navy text-bold"
+        title={steps[stepIndex]}
+      >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView
             updateBookingConflicts={updateBookingConflicts}
             onChange={onFormDataChange}
             formData={state.form}
-            onClose={() => null}
+            onClose={onClose}
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView />
+          <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>
     </>
