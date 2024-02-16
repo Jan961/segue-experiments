@@ -7,13 +7,13 @@ import TimeInput from 'components/core-ui-lib/TimeInput';
 import { useState } from 'react';
 
 const defaultFormState = {
-  minFromLastVenue: 0,
-  maxFromLastVenue: 0,
+  minFromLastVenue: null,
+  maxFromLastVenue: null,
   maxTravelTimeFromLastVenue: '',
-  minToNextVenue: 0,
-  maxToNextVenue: 0,
+  minToNextVenue: null,
+  maxToNextVenue: null,
   maxTravelTimeToNextVenue: '',
-  minSeats: 0,
+  minSeats: null,
   excludeLondonVenues: false,
 };
 
@@ -37,7 +37,7 @@ const GapSuggest = () => {
     } else if (id === 'excludeLondonVenues') {
       value = event.target.checked;
     } else {
-      value = parseInt(value, 10);
+      value = value ? parseInt(value, 10) : null;
     }
     setFormData((prev) => ({ ...prev, [id]: value }));
     console.log(id, value, event.target?.checked);
@@ -66,13 +66,13 @@ const GapSuggest = () => {
           <div className="col-span-3 text-center">Max Travel Time</div>
         </div>
         <div className="grid grid-cols-12 gap-7 my-1 items-center">
-          <div className="col-span-3">From last venue</div>
+          <div className="col-span-3">From Last Venue</div>
           <div className="col-span-3">
             <TextInput
               className="w-full"
               placeHolder="Enter Miles"
               id="minFromLastVenue"
-              value={minFromLastVenue + ''}
+              value={minFromLastVenue as string}
               onChange={handleOnChange}
             />
           </div>
@@ -81,7 +81,7 @@ const GapSuggest = () => {
               className="w-full"
               placeHolder="Enter Miles"
               id="maxFromLastVenue"
-              value={maxFromLastVenue + ''}
+              value={maxFromLastVenue as string}
               onChange={handleOnChange}
             />
           </div>
@@ -94,13 +94,13 @@ const GapSuggest = () => {
           </div>
         </div>
         <div className="grid grid-cols-12 gap-7 my-1 items-center">
-          <div className="col-span-3">To next venue</div>
+          <div className="col-span-3">To Next Venue</div>
           <div className="col-span-3">
             <TextInput
               className="w-full"
               placeHolder="Enter Miles"
               id="minToNextVenue"
-              value={minToNextVenue + ''}
+              value={minToNextVenue as string}
               onChange={handleOnChange}
             />
           </div>
@@ -109,7 +109,7 @@ const GapSuggest = () => {
               className="w-full"
               placeHolder="Enter Miles"
               id="maxToNextVenue"
-              value={maxToNextVenue + ''}
+              value={maxToNextVenue as string}
               onChange={handleOnChange}
             />
           </div>
@@ -122,19 +122,21 @@ const GapSuggest = () => {
           </div>
         </div>
         <div className="grid grid-cols-12 gap-7 my-1">
-          <div className="col-span-3">Min no: Seats</div>
+          <div className="col-span-3">Min No: Seats</div>
           <div className="col-span-3">
             <TextInput
               className="w-full"
               placeHolder="Enter Seats"
               id="minSeats"
-              value={minSeats + ''}
+              value={minSeats as string}
               onChange={handleOnChange}
             />
           </div>
           <div className="col-span-6 float-right">
             <Checkbox
-              label="Exclude Central London Venues"
+              className="flex flex-row-reverse"
+              labelClassName="!text-base"
+              label="Include Excluded Venues"
               id="excludeLondonVenues"
               name="excludeLondonVenues"
               checked={excludeLondonVenues}
@@ -142,7 +144,7 @@ const GapSuggest = () => {
             />
           </div>
         </div>
-        <Button onClick={getSuggestions} className="float-right my-3" variant="primary" text="Get Suggestions" />
+        <Button onClick={getSuggestions} className="float-right my-3 px-3" variant="primary" text="Get Suggestions" />
       </form>
       {rows !== null && (
         <div className="w-full h-60 flex flex-col">

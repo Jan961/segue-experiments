@@ -36,7 +36,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
             updateBookingConflicts={updateBookingConflicts}
             onChange={onFormDataChange}
             formData={state.form}
-            onClose={() => null}
+            onClose={onClose}
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView />

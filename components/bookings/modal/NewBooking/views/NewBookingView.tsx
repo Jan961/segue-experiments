@@ -1,14 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
 import classNames from 'classnames';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { Spinner } from 'components/global/Spinner';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { venueState } from 'state/booking/venueState';
-import { scheduleSelector } from 'state/booking/selectors/scheduleSelector';
-import { performanceState } from 'state/booking/performanceState';
 import { bookingState } from 'state/booking/bookingState';
-import { getDateBlockId } from '../../../panel/utils/getDateBlockId';
-import PerformanceRowEditor from '../PerformanceRowEditor';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
@@ -22,16 +16,7 @@ import { steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
-
-type PerformanceItem = {
-  hasPerformance?: boolean;
-  performanceTimes?: string[];
-  date?: string;
-};
-
-type PerformanceData = {
-  [key: string]: PerformanceItem;
-};
+import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 
 type AddBookingProps = {
   formData: TForm;
@@ -44,56 +29,25 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
-  const schedule = useRecoilValue(scheduleSelector);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const dayTypes = useRecoilValue(dateTypeState);
   const DayTypeOptions = useMemo(() => dayTypes.map(({ Id: value, Name: text }) => ({ text, value })), [dayTypes]);
-  const [perfDict, setPerfDict] = useRecoilState(performanceState);
-  const [bookingDict, setBookingDict] = useRecoilState(bookingState);
+  const bookingDict = useRecoilValue(bookingState);
+  const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
-  const [loading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [performancesData, setPerformancesData] = useState<PerformanceData>({});
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
   const productionCode = useMemo(
     () => (currentProduction ? `${currentProduction?.ShowCode}${currentProduction?.Code}` : 'All'),
     [currentProduction],
   );
-  const availableDates = useMemo(() => {
-    const dates = [];
-    const productionSchedule = schedule.Sections?.find?.((schedule) => schedule.Name === 'Production');
-    for (const Date of productionSchedule?.Dates || []) {
-      const { GetInFitUpIds = [], OtherIds = [], PerformanceIds = [], RehearsalIds = [], BookingIds = [] } = Date || {};
-      if ([...GetInFitUpIds, ...OtherIds, ...PerformanceIds, ...RehearsalIds, ...BookingIds].length === 0) {
-        dates.push(Date.Date);
-      } else if (BookingIds.length) {
-        const hasUnConfirmedBookings = BookingIds.some((id) => bookingDict?.[id]?.StatusCode === 'U');
-        if (hasUnConfirmedBookings) {
-          dates.push(Date.Date);
-        }
-      }
-    }
-    return dates;
-  }, [schedule]);
 
   useEffect(() => {
     setViewHeader({ stepIndex: activeStep });
   }, [activeStep]);
 
-  const [minDate, maxDate] = useMemo(
-    () => [availableDates?.[0], availableDates?.[availableDates.length - 1]],
-    [availableDates],
-  );
-  const dateRange = useMemo(() => {
-    const { fromDate, toDate } = formData || {};
-    if (!fromDate || !toDate) return [];
-    const start = new Date(fromDate);
-    const end = new Date(toDate);
-    return availableDates.filter(
-      (date) => new Date(date).valueOf() > start.valueOf() && new Date(date).valueOf() < end.valueOf(),
-    );
-  }, [formData.fromDate, formData.toDate, availableDates]);
+  const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
   const VenueOptions = useMemo(() => {
     const options = [];
@@ -128,7 +82,6 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         nextStep();
       }
     });
-    // setStage((prev) => prev + 1);
   };
   const handleOnSubmit = async (e) => {
     e.preventDefault();
@@ -138,50 +91,11 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     setStage(0);
     onClose();
   };
-  const addBookings = async () => {
-    setError('');
-    const payload = [];
-    for (const booking of Object.values(performancesData)) {
-      const { hasPerformance, performanceTimes, date } = booking;
-      if (hasPerformance) {
-        const DateBlockId = getDateBlockId(schedule, date);
-        payload.push({ DateBlockId, performanceTimes, VenueId: formData.venueId, Date: date });
-      }
-    }
-    setIsLoading(true);
-    try {
-      const { data } = await axios.post('/api/bookings/add', payload);
-      const newBookingsDict = data.bookings.reduce((dict, curr) => {
-        dict[curr.Id] = curr;
-        return dict;
-      }, {});
-      const newPerformanceDict = data.performances.reduce((dict, curr) => {
-        dict[curr.Id] = curr;
-        return dict;
-      }, {});
-      setBookingDict({ ...bookingDict, ...newBookingsDict });
-      setPerfDict({ ...perfDict, ...newPerformanceDict });
-      setIsLoading(false);
-      onModalClose();
-    } catch (e) {
-      setIsLoading(false);
-      setError('Something went wrong. Please try again later.');
-    }
-  };
-  const onPerformanceDataChange = (date: string, key: string, value: any) => {
-    setError('');
-    setPerformancesData((prev) => ({ ...prev, [date]: { ...(prev?.[date] || {}), [key]: value, date } }));
-  };
   const goToGapSuggestion = () => {
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
     <div>
-      {loading && (
-        <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
-          <Spinner className="w-full" size="lg" />
-        </div>
-      )}
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-2 px-4 rounded-lg" onSubmit={handleOnSubmit}>
         {stage === 0 && (
@@ -195,7 +109,12 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               minDate={minDate ? new Date(minDate) : null}
               maxDate={maxDate ? new Date(maxDate) : null}
               value={fromDate ? new Date(fromDate) : null}
-              onChange={(date) => onChange({ fromDate: date?.toLocaleDateString() })}
+              onChange={(date) =>
+                onChange({
+                  fromDate: date?.toISOString(),
+                  ...(!toDate && { toDate: date?.toISOString() }),
+                })
+              }
             />
           </div>
         )}
@@ -252,52 +171,26 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
             </div>
           </>
         )}
-        {stage === 1 && (
-          <div className="flex flex-col">
-            <div className="grid grid-cols-12 text-white p-2 text-sm font-bold">
-              <div className="col-span-6 text-white px-2 ">Date</div>
-              <div className="col-span-2 text-white px-2">Perf Y/N</div>
-              <div className="col-span-2 text-white px-2">No: Perf</div>
-              <div className="col-span-2 text-white px-2">Time</div>
-            </div>
-            <div className="p-2 bg-white rounded-lg max-h-[400px] overflow-y-scroll">
-              {dateRange.length === 0 && <div className="text-red-500">All dates booked!!</div>}
-              {dateRange.map((date, i) => (
-                <PerformanceRowEditor onPerformanceDataChange={onPerformanceDataChange} key={i} date={date} />
-              ))}
-            </div>
-          </div>
-        )}
       </form>
       {error && <div className="text-red-500 font-medium my-1">{error}</div>}
       <div className="grid grid-cols-3 my-4 gap-2">
         <Button
-          onClick={stage === 0 ? goToNext : addBookings}
+          onClick={() => null}
           disabled={!(venueId || dateType) || !fromDate || !toDate}
           className="px-6"
           text={'Check Mileage'}
         ></Button>
         <Button
-          onClick={stage === 0 ? goToNext : addBookings}
+          onClick={onModalClose}
           disabled={!(venueId || dateType) || !fromDate || !toDate}
           variant="secondary"
           text={'Cancel'}
         ></Button>
-        {stage === 1 && (
-          <Button
-            onClick={() => {
-              setStage((stage) => stage - 1);
-              setError('');
-            }}
-            disabled={!(venueId || dateType) || !fromDate || !toDate}
-            text="Reject"
-          ></Button>
-        )}
         {!fetchingBookingConflicts && (
           <Button
-            onClick={stage === 0 ? goToNext : addBookings}
-            disabled={!(venueId || dateType) || !fromDate || !toDate}
-            text={stage === 0 ? 'Next' : 'Accept'}
+            onClick={goToNext}
+            disabled={(isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate}
+            text={'Next'}
           ></Button>
         )}
         {fetchingBookingConflicts && <Loader variant={'sm'} />}
