@@ -116,7 +116,7 @@ const GapSuggest = ({ startDate, endDate }: GapSuggestProps) => {
           </div>
           <div className="col-span-3">
             <TimeInput
-              className="w-full h-[31px] [&>input]:!h-[29px] [&>input]:!w-11 !justify-center"
+              className="w-full h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
               value={maxTravelTimeFromLastVenue}
               onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeFromLastVenue', value } })}
             />
@@ -144,7 +144,7 @@ const GapSuggest = ({ startDate, endDate }: GapSuggestProps) => {
           </div>
           <div className="col-span-3">
             <TimeInput
-              className="w-full h-[31px] [&>input]:!h-[29px] [&>input]:!w-11 !justify-center"
+              className="w-full h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
               value={maxTravelTimeToNextVenue}
               onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeToNextVenue', value } })}
             />
