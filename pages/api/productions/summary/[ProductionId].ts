@@ -74,6 +74,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const others = entryTypeSummary.filter(
       (summary) => !['Get-In / Fit-Up', 'Travel Day', 'Rehearsal', 'Declared Holiday'].includes(summary.name),
     );
+    // const others = entryTypeSummary.filter((summary) => {
+    //   if (!['Get-In / Fit-Up', 'Travel Day', 'Rehearsal', 'Declared Holiday'].includes(summary.name)) {
+    //     summary['prodCode'] = prodCode;
+    //     return summary;
+    //   }
+    // });
+
     const otherDays = sum(
       productionSummary
         .filter((item) => item.StatusCode === 'C' && item.Item !== 'Rehearsal')
@@ -138,6 +145,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         [
           {
             name: 'Remaining Days',
+            prodCode,
             value: workingDays - otherDays || 0,
           },
         ],
