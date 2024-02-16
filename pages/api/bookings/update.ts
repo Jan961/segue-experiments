@@ -17,7 +17,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ...(StatusCode && { StatusCode }),
       ...(VenueId && { VenueId }),
       ...(PencilNum && { PencilNum }),
-      ...(Notes && { Notes }),
+      ...(Object.prototype.hasOwnProperty.call(inc, 'Notes') && { Notes }),
     };
     const updated = await updateBooking(booking as Booking);
     const mapped = bookingMapper(updated);
