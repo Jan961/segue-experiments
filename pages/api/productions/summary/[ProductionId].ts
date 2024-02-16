@@ -69,18 +69,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const entryTypeSummary = productionSummary
       .filter((summaryItem) => summaryItem.StatusCode === 'C' && !['Booking'].includes(summaryItem.Item))
       .sort((a, b) => a.DateTypeSeqNo - b.DateTypeSeqNo)
-      .map((item) => ({ name: item.Item, value: Number(item.Count), order: item.DateTypeSeqNo }));
+      .map((item) => ({ name: item.Item, value: Number(item.Count), order: item.DateTypeSeqNo, prodCode }));
     const summary = objectify(entryTypeSummary, (s) => s.name);
     const others = entryTypeSummary.filter(
       (summary) => !['Get-In / Fit-Up', 'Travel Day', 'Rehearsal', 'Declared Holiday'].includes(summary.name),
     );
-    // const others = entryTypeSummary.filter((summary) => {
-    //   if (!['Get-In / Fit-Up', 'Travel Day', 'Rehearsal', 'Declared Holiday'].includes(summary.name)) {
-    //     summary['prodCode'] = prodCode;
-    //     return summary;
-    //   }
-    // });
-
     const otherDays = sum(
       productionSummary
         .filter((item) => item.StatusCode === 'C' && item.Item !== 'Rehearsal')
