@@ -27,7 +27,7 @@ describe('Button Component', () => {
 
     render(<Button id="3" text="Click Me" onClick={onClickHandler} disabled={true} />);
 
-    const button = screen.getByTestId('3');
-    expect(button).toHaveAttribute('disabled');
+    const button = screen.getByText('Click Me');
+    expect(button).toBeDisabled();
   });
 });

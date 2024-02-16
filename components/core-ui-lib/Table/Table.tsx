@@ -3,7 +3,8 @@ import GridStyles from './gridStyles';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 
-const AUTO_HEIGHT_LIMIT = 2;
+// const AUTO_HEIGHT_LIMIT = 2;
+export const AUTO_HEIGHT_LIMIT = 2;
 
 export type StyleProps = {
   headerColor?: string;
