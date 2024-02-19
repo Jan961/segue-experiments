@@ -17,10 +17,11 @@ interface TableProps {
   onRowClicked?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
+  overrideHLimit?: boolean;
 }
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true }: TableProps,
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true, overrideHLimit = false }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -31,14 +32,16 @@ export default forwardRef(function Table(
 
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
-    if (rowData?.length > 0 && rowData?.length < AUTO_HEIGHT_LIMIT && params.api) {
-      params.api.updateGridOptions({ domLayout: 'autoHeight' });
-    }
+
+      if (rowData?.length > 0 && rowData?.length < AUTO_HEIGHT_LIMIT && params.api) {
+        params.api.updateGridOptions({ domLayout: 'autoHeight' });
+      }
+    
   };
 
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
-      if (rowData?.length < AUTO_HEIGHT_LIMIT) {
+      if (rowData?.length < AUTO_HEIGHT_LIMIT && !overrideHLimit) {
         gridApi.updateGridOptions({ domLayout: 'autoHeight' });
       } else {
         gridApi.updateGridOptions({ domLayout: 'normal' });
