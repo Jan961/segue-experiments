@@ -23,3 +23,18 @@ export const steps = [
   'New Booking Details',
   'Preview New Booking',
 ];
+
+export const BookingTypes = [
+  {
+    text: 'Venue',
+    value: 'venueType',
+  },
+  {
+    text: 'Day Type Only',
+    value: 'dateTypeOnly',
+  },
+];
+export const BookingTypeMap = {
+  VENUE: 'venueType',
+  DATE_TYPE: 'dateTypeOnly',
+};
