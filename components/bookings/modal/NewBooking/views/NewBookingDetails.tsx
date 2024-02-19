@@ -1,5 +1,6 @@
 import { NewBookingColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
+import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
 import { useWizard } from 'react-use-wizard';
 
@@ -111,7 +112,7 @@ export default function NewBookingDetails() {
         <div className="flex flex-row gap-2">
           <p className="min-w-fit text-primary-dark-blue">This is a run of dates. Y/N</p>
           {/* <TimeInput label="hhgffghffgfg" value={'22:00'} name="time" onChange={() => ''} disabled /> */}
-          {/* <Checkbox name="date" /> */}
+          <Checkbox name="date" />
         </div>
       </div>
       <div className=" w-[700px] lg:w-[1154px] h-[440px] z-[999] flex flex-col ">

@@ -27,6 +27,9 @@ const GridStyles = createGlobalStyle<StyleProps>`
    .ag-checkbox-cell{
        justify-content: center !important;
     }
+   .ag-checkbox-edit{
+       justify-content: center !important;
+    }
     
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
     border: none;
