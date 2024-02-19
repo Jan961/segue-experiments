@@ -2,9 +2,11 @@ import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
+import { bookingState } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
+import useAxios from 'hooks/useAxios';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -29,10 +31,12 @@ const AddBookingInitialState = {
 export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(filterState);
+  const [bookingDict, setBookingDict] = useRecoilState(bookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
   const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(AddBookingInitialState);
+  const { fetchData } = useAxios();
 
   const gridOptions = {
     defaultColDef,
@@ -60,14 +64,21 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     }
   };
 
-  const handleSaveNote = (value) => {
-    console.log(value);
+  const handleSaveNote = (value: string) => {
     setShowModal(false);
-  };
-
-  const handleCancelNote = () => {
-    setProductionItem(null);
-    setShowModal(false);
+    
+    fetchData({
+      url: '/api/bookings/update/', 
+      method: 'POST',
+      data: { Id: productionItem.Id, Notes: value }})
+      .then((data: any) => {
+        const updatedBooking = { ...bookingDict[data.Id], ...data };
+        const replacement = { ...bookingDict, [data.Id]: updatedBooking };
+        setBookingDict(replacement);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   useEffect(() => {
@@ -140,9 +151,10 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       </div>
       <NotesPopup
         show={showModal}
-        value={productionItem?.note || ''}
+        productionItem={productionItem}
         onSave={handleSaveNote}
-        onCancel={handleCancelNote}
+        onCancel={() => setShowModal(false)}
+        onShow={() => setShowModal(true)}
       />
       {showAddBookingModal.visible && (
         <AddBooking {...showAddBookingModal} onClose={() => setShowAddBookingModal(AddBookingInitialState)} />
