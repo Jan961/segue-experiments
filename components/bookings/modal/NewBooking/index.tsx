@@ -12,6 +12,7 @@ import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
+import NewBookingDetails from './views/NewBookingDetails';
 
 type AddBookingProps = {
   visible: boolean;
@@ -37,6 +38,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
         title={steps[stepIndex]}
       >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
+          <NewBookingDetails />
           <NewBookingView
             updateBookingConflicts={updateBookingConflicts}
             onChange={onFormDataChange}
