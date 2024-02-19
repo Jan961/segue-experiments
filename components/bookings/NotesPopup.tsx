@@ -1,5 +1,6 @@
 import Button from 'components/core-ui-lib/Button';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import Loader from 'components/core-ui-lib/Loader';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import { useEffect, useState } from 'react';
@@ -19,6 +20,7 @@ export default function NotesPopup({ show, onSave, onCancel, onShow, productionI
 
   useEffect(() => {
     setNote(productionItem?.note || '');
+    setChanged(false);
   }, [productionItem?.note]);
 
   const confirmCancel = () => {
@@ -45,23 +47,12 @@ export default function NotesPopup({ show, onSave, onCancel, onShow, productionI
     onShow();
   };
 
-  // SK-25 PL - add Production Code | Prod Date | Prod Venue
-  // accommodates undefined values in the off chance some are created
-  const summary = [];
-  if (productionItem?.production !== undefined && productionItem?.production !== '') {
-    summary.push(productionItem?.production);
-  }
-
-  if (productionItem?.date !== undefined && productionItem?.date !== '') {
-    summary.push(productionItem?.date);
-  }
-
   return (
     <div>
       <PopupModal show={show} title="View / Edit Notes" titleClass="text-primary-navy" onClose={confirmCancel}>
         <div>
-          <h3 className="text w-[482px] text-lg font-bold text-primary-navy">{summary.join(' | ')}</h3>
-          <h3 className="text w-[482px] text-lg font-bold text-primary-navy">
+          <h3 className="text-responsive-lg font-bold text-primary-navy">{`${productionItem?.production} | ${productionItem?.date}`}</h3>
+          <h3 className="text-responsive-lg font-bold text-primary-navy">
             {productionItem?.venue !== undefined ? productionItem?.venue : ''}
           </h3>
           <TextArea className="mt-2 w-[482px] h-[237px]" value={note} onChange={(e) => changeNote(e.target.value)} />
@@ -75,8 +66,8 @@ export default function NotesPopup({ show, onSave, onCancel, onShow, productionI
       <ConfirmationDialog
         variant="cancel"
         show={confirm}
-        onYesClick={() => handleCancel()}
-        onNoClick={() => dismissCancel()}
+        onYesClick={handleCancel}
+        onNoClick={dismissCancel}
       />
     </div>
   );
