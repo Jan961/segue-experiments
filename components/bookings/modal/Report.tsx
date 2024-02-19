@@ -39,13 +39,19 @@ export default function Report({
     }
   }, [ProductionId]);
 
-  const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-      defaultMinHeight: 10
-    },
-  };
+
+  /**
+   * used to get the table length based on the number of rows supplied
+   * the first table will be given more space to accommodate the header
+   */
+  const getTableStyle = (numRows: number, index: number) => {    
+    // first table
+    if(index === 0){
+      return tableLens[numRows]
+    } else {
+      return tableLens[numRows - 1]
+    }
+  }
 
   return (
     <>
@@ -63,14 +69,14 @@ export default function Report({
           {productionSummary.length ? (
             <div>
               {productionSummary.map((item, index) => (
-             <div className={"w-[460px] flex flex-col " + tableLens[item.length - 1]}>
+             <div className={"w-[440px] mb-5 flex-col " + getTableStyle(item.length, index)}>
             <Table 
               key={index}
               columnDefs={tourSummaryColumnDefs} 
               rowData={item} 
               styleProps={styleProps} 
-              gridOptions={gridOptions} 
               displayHeader={index === 0 ? true : false}
+              overrideHLimit={true}
               />
            </div>
               ))}
