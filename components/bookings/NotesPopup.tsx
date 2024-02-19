@@ -1,4 +1,6 @@
 import Button from 'components/core-ui-lib/Button';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import Loader from 'components/core-ui-lib/Loader';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import { useEffect, useState } from 'react';
@@ -7,31 +9,66 @@ interface NotesPopupProps {
   show: boolean;
   onSave: (n: string) => void;
   onCancel: () => void;
-  value?: string;
+  onShow: () => void;
+  productionItem: any;
 }
 
-export default function NotesPopup({ show, value, onSave, onCancel }: NotesPopupProps) {
-  const [note, setNote] = useState<string>(value || '');
+export default function NotesPopup({ show, onSave, onCancel, onShow, productionItem }: NotesPopupProps) {
+  const [note, setNote] = useState<string>('');
+  const [noteChange, setChanged] = useState<boolean>(false);
+  const [confirm, setConfirm] = useState<boolean>(false);
 
   useEffect(() => {
-    setNote(value);
-  }, [value]);
+    setNote(productionItem?.note || '');
+    setChanged(false);
+  }, [productionItem?.note]);
+
+  const confirmCancel = () => {
+    if (noteChange) {
+      setConfirm(true);
+      onCancel();
+    } else {
+      handleCancel();
+    }
+  };
+
+  const changeNote = (text: string) => {
+    setChanged(true);
+    setNote(text);
+  };
 
   const handleCancel = () => {
     setNote('');
     onCancel();
   };
 
+  const dismissCancel = () => {
+    setConfirm(false);
+    onShow();
+  };
+
   return (
-    <PopupModal show={show} title="View / Edit Notes" titleClass="text-primary-navy" onClose={() => null}>
-      <div>
-        <h2 className="text-primary-navy">PROD_CODE | DATE |VENUE</h2>
-        <TextArea className="mt-2 w-[461px] h-[237px]" value={note} onChange={(e) => setNote(e.target.value)} />
-        <div className="w-full mt-4 flex justify-end items-center">
-          <Button className="w-33" variant="secondary" text="Cancel" onClick={handleCancel} />
-          <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
+    <div>
+      <PopupModal show={show} title="View / Edit Notes" titleClass="text-primary-navy" onClose={confirmCancel}>
+        <div>
+          <h3 className="text-responsive-lg font-bold text-primary-navy">{`${productionItem?.production} | ${productionItem?.date}`}</h3>
+          <h3 className="text-responsive-lg font-bold text-primary-navy">
+            {productionItem?.venue !== undefined ? productionItem?.venue : ''}
+          </h3>
+          <TextArea className="mt-2 w-[482px] h-[237px]" value={note} onChange={(e) => changeNote(e.target.value)} />
+          <div className="w-full mt-4 mb-8 flex justify-end items-center">
+            <Button className="w-33" variant="secondary" text="Cancel" onClick={confirmCancel} />
+            <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
+          </div>
         </div>
-      </div>
-    </PopupModal>
+      </PopupModal>
+
+      <ConfirmationDialog
+        variant="cancel"
+        show={confirm}
+        onYesClick={handleCancel}
+        onNoClick={dismissCancel}
+      />
+    </div>
   );
 }

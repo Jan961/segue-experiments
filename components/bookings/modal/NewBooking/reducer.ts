@@ -1,4 +1,5 @@
 import { Actions, INITIAL_STATE } from 'config/AddBooking';
+import { BookingWithVenueDTO } from 'interfaces';
 
 export type TAction = {
   type: string;
@@ -11,10 +12,12 @@ export type TForm = {
   isDateTypeOnly?: boolean;
   venueId?: number;
   dateType?: number;
+  shouldFilterVenues?: boolean;
 };
 
 export type TState = {
   form: TForm;
+  bookingConflicts: BookingWithVenueDTO[];
 };
 
 const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
@@ -29,6 +32,11 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
           ...form,
           ...payload,
         },
+      };
+    case Actions.UPDATE_BOOKING_CONFLICTS:
+      return {
+        ...state,
+        bookingConflicts: payload,
       };
     default:
       return state;
