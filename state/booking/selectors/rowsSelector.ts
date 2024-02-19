@@ -61,7 +61,7 @@ export const rowsSelector = selector({
       addRow(g.Date, 'Get-in, Fit-Up', g, helper.getInFitUpDetails);
     });
     Object.values(bookings).forEach((b) => {
-      const performancesGroup = b.PerformanceIds?.reduce((performancesByDate, performanceId) => {
+      const performancesGroup = b.PerformanceIds.reduce((performancesByDate, performanceId) => {
         const performance = performanceDict[performanceId];
         const performanceDate = new Date(getKey(performance.Date)).toISOString();
         if (performancesByDate[performanceDate]) {
@@ -70,9 +70,8 @@ export const rowsSelector = selector({
           performancesByDate[performanceDate] = [performanceId];
         }
         return performancesByDate;
-      }, {}) || {};
+      }, {});
       Object.keys(performancesGroup).forEach((date) => {
-        console.log(date)
         bookedDates.push(getKey(date));
         addRow(date, 'Performance', { ...b, PerformanceIds: performancesGroup[date] }, helper.getBookingDetails);
       });
