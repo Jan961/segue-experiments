@@ -9,29 +9,47 @@ import BarringIssueView from './views/BarringIssueView';
 import { useReducer } from 'react';
 import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
-import { Actions, INITIAL_STATE } from 'config/AddBooking';
-
-const steps = ['Create New Booking', 'Booking Conflict', 'Barring Issue', 'New Booking Details', 'Preview New Booking'];
+import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
+import { BookingWithVenueDTO } from 'interfaces';
+import GapSuggestionView from './views/GapSuggestionView';
 
 type AddBookingProps = {
   visible: boolean;
+  startDate?: string;
+  endDate?: string;
   onClose: () => void;
 };
 
-const AddBooking = ({ visible, onClose }: AddBookingProps) => {
+const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { stepIndex } = useRecoilValue(newBookingState);
   const handleModalClose = () => onClose?.();
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => {
+    return { ...INITIAL_STATE, form: { ...INITIAL_STATE.form, fromDate: startDate, toDate: endDate } };
+  });
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
   };
+  const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
+    dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
+  };
   return (
     <>
-      <PopupModal show={visible} onClose={handleModalClose} title={steps[stepIndex]}>
+      <PopupModal
+        show={visible}
+        onClose={handleModalClose}
+        titleClass="text-xl text-primary-navy text-bold"
+        title={steps[stepIndex]}
+      >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
-          <NewBookingView onChange={onFormDataChange} formData={state.form} onClose={() => null} />
-          <BookingConflictsView steps={steps} />
+          <NewBookingView
+            updateBookingConflicts={updateBookingConflicts}
+            onChange={onFormDataChange}
+            formData={state.form}
+            onClose={onClose}
+          />
+          <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView />
+          <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>
     </>
