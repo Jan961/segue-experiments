@@ -12,11 +12,12 @@ import { useWizard } from 'react-use-wizard';
 import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { steps } from 'config/AddBooking';
+import { BookingTypeMap, BookingTypes, steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import Select from 'components/core-ui-lib/Select';
 
 type AddBookingProps = {
   formData: TForm;
@@ -39,8 +40,15 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
   const productionCode = useMemo(
-    () => (currentProduction ? `${currentProduction?.ShowCode}${currentProduction?.Code}` : 'All'),
+    () =>
+      currentProduction
+        ? `${currentProduction?.ShowCode}${currentProduction?.Code} ${currentProduction?.ShowName}`
+        : 'All',
     [currentProduction],
+  );
+  const bookingTypeValue = useMemo(
+    () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
+    [isDateTypeOnly],
   );
 
   useEffect(() => {
@@ -69,7 +77,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
-      data: formData,
+      data: { ...formData, ProductionId: currentProduction?.Id },
     }).then((data: any) => {
       updateBookingConflicts(data);
       if (data.error) {
@@ -133,15 +141,23 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
             />
           </div>
         )}
+        <Select
+          className="w-[160px] my-2"
+          value={bookingTypeValue}
+          options={BookingTypes}
+          onChange={(v) => onChange({ isDateTypeOnly: v === BookingTypeMap.DATE_TYPE })}
+        />
         {isDateTypeOnly && (
-          <Typeahead
-            className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
-            options={DayTypeOptions}
-            disabled={stage !== 0}
-            onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
-            value={dateType}
-            placeholder={'Please select a DayType'}
-          />
+          <>
+            <Typeahead
+              className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
+              options={DayTypeOptions}
+              disabled={stage !== 0}
+              onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
+              value={dateType}
+              placeholder={'Please select a Day Type'}
+            />
+          </>
         )}
         {!isDateTypeOnly && (
           <>
@@ -160,21 +176,13 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
             />
-            <div className="flex flex-wrap item-center w-full gap-2">
-              <Button
-                className="px-4"
-                disabled={!(fromDate && toDate)}
-                variant="secondary"
-                text="Gap Suggest"
-                onClick={goToGapSuggestion}
-              />
-              <Button
-                className="px-4 flex-grow"
-                variant="secondary"
-                text="Continue with DayType only"
-                onClick={() => onChange({ isDateTypeOnly: true })}
-              />
-            </div>
+            <Button
+              className="px-4"
+              disabled={!(fromDate && toDate)}
+              variant="secondary"
+              text="Gap Suggest"
+              onClick={goToGapSuggestion}
+            />
           </>
         )}
       </form>
