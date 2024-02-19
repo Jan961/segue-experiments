@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
+import AddBooking from './modal/NewBooking';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -13,12 +14,25 @@ const defaultColDef = {
   wrapHeaderText: true,
 };
 
+type AddBookingModalState = {
+  visible: boolean;
+  startDate?: string;
+  endDate?: string;
+};
+
+const AddBookingInitialState = {
+  visible: false,
+  startDate: null,
+  endDate: null,
+};
+
 export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(filterState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
+  const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(AddBookingInitialState);
 
   const gridOptions = {
     defaultColDef,
@@ -32,6 +46,14 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   };
 
   const handleCellClick = (e) => {
+    if (!e.data.Id) {
+      setShowAddBookingModal({
+        visible: true,
+        startDate: e.data.dateTime,
+        endDate: e.data.dateTime,
+      });
+      return;
+    }
     if (e.column.colId === 'note') {
       setProductionItem(e.data);
       setShowModal(true);
@@ -122,6 +144,9 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         onSave={handleSaveNote}
         onCancel={handleCancelNote}
       />
+      {showAddBookingModal.visible && (
+        <AddBooking {...showAddBookingModal} onClose={() => setShowAddBookingModal(AddBookingInitialState)} />
+      )}
     </>
   );
 }

@@ -15,13 +15,17 @@ import GapSuggestionView from './views/GapSuggestionView';
 
 type AddBookingProps = {
   visible: boolean;
+  startDate?: string;
+  endDate?: string;
   onClose: () => void;
 };
 
-const AddBooking = ({ visible, onClose }: AddBookingProps) => {
+const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { stepIndex } = useRecoilValue(newBookingState);
   const handleModalClose = () => onClose?.();
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => {
+    return { ...INITIAL_STATE, form: { ...INITIAL_STATE.form, fromDate: startDate, toDate: endDate } };
+  });
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
   };
