@@ -43,7 +43,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
 
   const handleSaveNote = (value: string) => {
     setShowModal(false);
-    console.log('value: ' + value);
+    
     // SK-25 PL - run update booking to add the new note
     axios
       .patch('/api/bookings/update/', { Id: productionItem.Id, Notes: value })
