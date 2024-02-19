@@ -5,7 +5,7 @@ import Table from 'components/core-ui-lib/Table';
 import { tourSummaryColumnDefs, styleProps } from '../table/tableConfig';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
-const tableLens = ['h-[48px]', 'h-[96px]', 'h-[144px]', 'h-[192px]', 'h-[240px]', 'h-[288px]']
+const tableLens = ['h-[46px]', 'h-[90px]', 'h-[132px]', 'h-[192px]', 'h-[240px]', 'h-[261px]']
 
 export default function Report({
   visible,
@@ -47,7 +47,7 @@ export default function Report({
   const getTableStyle = (numRows: number, index: number) => {    
     // first table
     if(index === 0){
-      return tableLens[numRows]
+      return 'h-[97px]'
     } else {
       return tableLens[numRows - 1]
     }
@@ -69,7 +69,7 @@ export default function Report({
           {productionSummary.length ? (
             <div>
               {productionSummary.map((item, index) => (
-             <div className={"w-[440px] mb-5 flex-col " + getTableStyle(item.length, index)}>
+             <div className={"w-[438px] mb-2 flex-col " + getTableStyle(item.length, index)}>
             <Table 
               key={index}
               columnDefs={tourSummaryColumnDefs} 
