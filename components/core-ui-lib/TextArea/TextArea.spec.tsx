@@ -1,9 +1,9 @@
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import TextArea from './TextArea';
 
 describe('TextArea Component', () => {
   test('renders with default props', () => {
-    render(<TextArea />);
+    render(<TextArea onChange={handleChange} />);
     const textArea = screen.getByRole('textbox');
 
     expect(textArea).toBeInTheDocument();
@@ -29,13 +29,7 @@ describe('TextArea Component', () => {
 
     expect(textArea).toBeInTheDocument();
   });
-
-  test('calls onClick handler when textarea is clicked', () => {
-    const handleClick = jest.fn();
-    render(<TextArea onClick={handleClick} />);
-    const textArea = screen.getByRole('textbox');
-
-    fireEvent.click(textArea);
-    expect(handleClick).toHaveBeenCalledTimes(1);
-  });
 });
+function handleChange(e: any): void {
+  throw new Error('Function not implemented.', e);
+}

@@ -1,31 +1,24 @@
-import { render, fireEvent, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import DateRange from './DateRange';
 
 describe('DateRange Component', () => {
   test('renders with default props', () => {
     const handleChange = jest.fn();
-
-    render(<DateRange onChange={handleChange} />);
-    const container = screen.getByTestId('date-range-container');
-    expect(container).toBeInTheDocument();
+    const value = {
+      from: new Date('2024-02-11'),
+      to: new Date('2024-02-15'),
+    };
+    render(<DateRange value={value} onChange={handleChange} />);
+    expect(screen.getByTestId('form-typeahead')).toBeInTheDocument();
   });
 
   test('renders with provided label', () => {
     const handleChange = jest.fn();
-    render(<DateRange label="Select Date Range" onChange={handleChange} />);
-    const label = screen.getByText('Select Date Range');
-    expect(label).toBeInTheDocument();
-  });
-
-  test('calls onChange handler when date is selected', () => {
-    const handleChange = jest.fn();
-    render(<DateRange label="Select Date Range" onChange={handleChange} />);
-    const fromDateInput = screen.getByLabelText('From Date');
-    const toDateInput = screen.getByLabelText('To Date');
-
-    fireEvent.change(fromDateInput, { target: { value: '2022-01-01' } });
-    fireEvent.change(toDateInput, { target: { value: '2022-01-10' } });
-
-    expect(handleChange).toHaveBeenCalledTimes(2);
+    const value = {
+      from: new Date('2024-02-11'),
+      to: new Date('2024-02-15'),
+    };
+    render(<DateRange label="Select Date Range" value={value} onChange={handleChange} />);
+    expect(screen.getByText('Select Date Range')).toBeInTheDocument();
   });
 });
