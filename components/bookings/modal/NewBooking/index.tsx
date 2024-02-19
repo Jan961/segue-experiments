@@ -11,6 +11,7 @@ import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
+import NewBookingDetails from './views/NewBookingDetails';
 
 type AddBookingProps = {
   visible: boolean;
@@ -31,6 +32,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
     <>
       <PopupModal show={visible} onClose={handleModalClose} title={steps[stepIndex]}>
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
+          <NewBookingDetails />
           <NewBookingView
             updateBookingConflicts={updateBookingConflicts}
             onChange={onFormDataChange}

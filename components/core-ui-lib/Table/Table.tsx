@@ -16,10 +16,11 @@ interface TableProps {
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
   gridOptions?: any;
+  getRowStyle?: any;
 }
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, getRowStyle }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -58,6 +59,7 @@ export default forwardRef(function Table(
           onRowClicked={onRowClicked}
           gridOptions={gridOptions}
           onGridReady={onGridReady}
+          getRowStyle={getRowStyle}
         />
       </div>
     </>

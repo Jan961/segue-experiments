@@ -14,8 +14,20 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-header-cell-moving-background-color: ${(props) => props.headerColor || '#FBFBFB'};
     --ag-row-border: 1px solid #dadce5;
     --ag-odd-row-background-color: #F8F8F8;
+
+
+     --ag-checkbox-background-color: transparent ;
+    --ag-checkbox-checked-color: #617293;
+    --ag-checkbox-unchecked-color: #617293;
+    --ag-checkbox-indeterminate-color: #617293;
+
+ 
 }
 
+   .ag-checkbox-cell{
+       justify-content: center !important;
+    }
+    
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
     border: none;
 }

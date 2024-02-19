@@ -50,14 +50,16 @@ const Checkbox = ({
         value={value}
         checked={checked}
         disabled={disabled}
-        className="peer relative appearance-none shrink-0 w-4 h-4 rounded-sm focus:ring-primary-input-text text-base"
+        className="peer relative appearance-none shrink-0 w-4 h-4 rounded-sm focus:ring-transparent  focus:checked:bg-primary-input-text checked:hover:bg-primary-input-text  checked:bg-primary-input-text border-2"
       />
+
       {label && (
         <label className={classNames('text-primary-label text-sm leading-8 font-normal ', labelClassName)}>
           {label}
         </label>
       )}
-      <svg
+
+      {/* <svg
         xmlns="http://www.w3.org/2000/svg"
         width="19"
         height="19"
@@ -74,7 +76,7 @@ const Checkbox = ({
             <rect width="19" height="19" fill="white" />
           </clipPath>
         </defs>
-      </svg>
+      </svg> */}
       {showIntermediate && (
         <svg
           xmlns="http://www.w3.org/2000/svg"
