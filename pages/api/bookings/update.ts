@@ -7,16 +7,17 @@ import { checkAccess, getEmailFromReq } from 'services/userService';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const inc = req.body as BookingDTO;
+    const { Id, Date: FirstDate, StatusCode, VenueId, PencilNum, Notes } = inc;
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId: inc.Id });
     if (!access) return res.status(401).end();
     const booking: Partial<Booking> = {
-      Id: inc.Id, // Where
-      FirstDate: new Date(inc.Date),
-      StatusCode: inc.StatusCode,
-      VenueId: inc.VenueId,
-      PencilNum: inc.PencilNum,
-      Notes: inc.Notes,
+      Id,
+      ...(FirstDate && { FirstDate: new Date(FirstDate) }),
+      ...(StatusCode && { StatusCode }),
+      ...(VenueId && { VenueId }),
+      ...(PencilNum && { PencilNum }),
+      ...(Object.prototype.hasOwnProperty.call(inc, 'Notes') && { Notes }),
     };
     const updated = await updateBooking(booking as Booking);
     const mapped = bookingMapper(updated);
