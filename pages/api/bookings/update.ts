@@ -25,8 +25,4 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     console.log(err);
     res.status(500).json({ err });
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 3db4262 (editing notes are possible but removing a note is not supported by the api)

@@ -6,7 +6,7 @@ import { bookingState } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
-import axios from 'axios';
+import useAxios from 'hooks/useAxios';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -36,6 +36,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
   const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(AddBookingInitialState);
+  const { fetchData } = useAxios();
 
   const gridOptions = {
     defaultColDef,
@@ -66,16 +67,17 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const handleSaveNote = (value: string) => {
     setShowModal(false);
     
-    // SK-25 PL - run update booking to add the new note
-    axios
-      .patch('/api/bookings/update/', { Id: productionItem.Id, Notes: value })
-      .then(({ data }) => {
+    fetchData({
+      url: '/api/bookings/update/', 
+      method: 'POST',
+      data: { Id: productionItem.Id, Notes: value }})
+      .then((data: any) => {
         const updatedBooking = { ...bookingDict[data.Id], ...data };
         const replacement = { ...bookingDict, [data.Id]: updatedBooking };
         setBookingDict(replacement);
       })
       .catch((error) => {
-        alert(error);
+        console.log(error);
       });
   };
 
