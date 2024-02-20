@@ -2,6 +2,7 @@ import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import TableTooltip from './TableTooltip';
 
 const AUTO_HEIGHT_LIMIT = 2;
 
@@ -50,14 +51,19 @@ export default forwardRef(function Table(
       <GridStyles {...styleProps} />
       <div className="ag-theme-quartz h-full">
         <AgGridReact
+          defaultColDef={{
+            tooltipComponent: TableTooltip,
+          }}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={51}
           rowHeight={43}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
-          gridOptions={gridOptions}
           onGridReady={onGridReady}
+          tooltipHideDelay={5000}
+          tooltipShowDelay={0}
+          gridOptions={gridOptions}
         />
       </div>
     </>
