@@ -9,11 +9,10 @@ interface NotesPopupProps {
   show: boolean;
   onSave: (n: string) => void;
   onCancel: () => void;
-  onShow: () => void;
   productionItem: any;
 }
 
-export default function NotesPopup({ show, onSave, onCancel, onShow, productionItem }: NotesPopupProps) {
+export default function NotesPopup({ show, onSave, onCancel, productionItem }: NotesPopupProps) {
   const [note, setNote] = useState<string>('');
   const [confirm, setConfirm] = useState<boolean>(false);
   const [confVariant, setVariant] = useState<ConfDialogVariant>('close');
