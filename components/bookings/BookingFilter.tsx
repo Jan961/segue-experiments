@@ -25,6 +25,12 @@ export default function BookingsButtons() {
     }
   }, [ProductionId, scheduleStart, scheduleEnd]);
 
+  useEffect(() => {
+    if (!startDate && !endDate) {
+      setFilter((prevfilter) => ({ ...prevfilter, startDate: scheduleStartDate, endDate: scheduleEndDate }));
+    }
+  }, [startDate, endDate, scheduleStartDate, scheduleEndDate]);
+
   return (
     <div className="bg-white">
       <DateRange
