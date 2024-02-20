@@ -155,7 +155,6 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         productionItem={productionItem}
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
-        onShow={() => setShowModal(true)}
       />
       {showAddBookingModal.visible && (
         <AddBooking {...showAddBookingModal} onClose={() => setShowAddBookingModal(AddBookingInitialState)} />
