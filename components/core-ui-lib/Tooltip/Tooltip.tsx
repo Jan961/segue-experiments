@@ -18,7 +18,8 @@ const Tooltip: React.FC<TooltipProps> = ({
   height = 'h-auto', width = 'w-auto',
   bgColorClass = 'primary-navy', 
   txtColorClass = 'text-white',
-  useManualToggle, manualToggle
+  useManualToggle = false, 
+  manualToggle
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
 
