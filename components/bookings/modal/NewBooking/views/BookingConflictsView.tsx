@@ -66,7 +66,7 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
           gridOptions={gridOptions}
         />
       </div>
-      <div className="py-3 w-full flex items-center justify-end">
+      <div className="pt-3 w-full flex items-center justify-end">
         <Button className="w-33" variant="secondary" text="Back" onClick={() => previousStep()} />
         <Button
           className="ml-3 w-33"

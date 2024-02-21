@@ -26,7 +26,10 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     const inputClass = error ? '!border-primary-red' : '!border-primary-border';
 
     return (
-      <div className={`relative ${disabled ? 'disabled-input' : ''}`} onClick={onClick}>
+      <div
+        className={`TextInput flex justify-between items-center relative ${disabled ? 'disabled-input' : ''}`}
+        onClick={onClick}
+      >
         <input
           ref={ref}
           id={id}
@@ -38,7 +41,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           {...rest}
         />
         {iconName && (
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+          <div className="input-icon pointer-events-none inset-y-0 right-0 flex items-center pr-2">
             <Icon aria-hidden="true" iconName={iconName} />
           </div>
         )}
