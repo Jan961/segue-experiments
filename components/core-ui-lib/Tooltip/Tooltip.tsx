@@ -1,4 +1,4 @@
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 
 export interface TooltipProps {
   title?: string;
@@ -9,15 +9,30 @@ export interface TooltipProps {
   width?: string;
   bgColorClass?: string;
   txtColorClass?: string;
+  useManualToggle?: boolean;
+  manualToggle?: boolean;
 }
 
 const Tooltip: React.FC<TooltipProps> = ({ 
   title, body, children, position = 'top',
   height = 'h-auto', width = 'w-auto',
   bgColorClass = 'primary-navy', 
-  txtColorClass = 'text-white'
+  txtColorClass = 'text-white',
+  useManualToggle, manualToggle
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
+
+  useEffect(() => {
+    if(useManualToggle){
+      setShowTooltip(manualToggle);
+    }
+  }, [manualToggle])
+
+  const toogleTooltip = () => {
+    if(!useManualToggle){
+      setShowTooltip(!showTooltip);
+    }
+  }
 
   const getPositionStyle = () => {
     switch (position) {
@@ -52,7 +67,7 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <div className="relative">
-      <div onMouseEnter={() => setShowTooltip(!showTooltip)} onMouseLeave={() => setShowTooltip(!showTooltip)}>
+      <div onMouseEnter={toogleTooltip} onMouseLeave={toogleTooltip}>
         {children}
       </div>
       {showTooltip && (
