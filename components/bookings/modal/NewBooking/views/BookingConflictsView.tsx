@@ -58,7 +58,7 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
       <span className="py-4 text-responsive-sm text-primary-input-text">{`This booking would conflict with ${
         rows?.length || 0
       } bookings`}</span>
-      <div className="w-[634px] h-60 flex flex-col">
+      <div className="w-[634px] max-h-[calc(100%-140px)] flex flex-col">
         <Table
           columnDefs={bookingConflictsColumnDefs}
           rowData={rows}
