@@ -38,15 +38,16 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
         title={steps[stepIndex]}
       >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
-          <NewBookingDetails />
           <NewBookingView
             updateBookingConflicts={updateBookingConflicts}
             onChange={onFormDataChange}
             formData={state.form}
             onClose={onClose}
           />
+
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView />
+          <NewBookingDetails data={state.form} />
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

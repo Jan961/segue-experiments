@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CustomCellRendererProps } from 'ag-grid-react';
 import Select from 'components/core-ui-lib/Select';
 
@@ -42,13 +42,27 @@ const SelectDayTypeRender = (props: CustomCellRendererProps) => {
     [],
   );
 
+  const [initialValue, setInitialValue] = useState(props.data.perf ? 'Performance' : '-');
+
+  useEffect(() => {
+    setInitialValue(props.data.perf ? 'Performance' : '-');
+  }, [props.data.perf]);
+
+  const handleChange = (selectedValue) => {
+    props.node.setDataValue('dayType', selectedValue);
+
+    props.node.setDataValue('perf', selectedValue === 'Performance');
+  };
+
+  console.log('props >>> daytype:>> ', props.node);
   return (
     <div className="w-[98%] h-full mx-auto  ">
       <Select
         options={mappedDayTypeOptions}
-        value={props.value}
+        value={initialValue}
         className="!shadow-none border-none"
         buttonClass=" border border-primary-border "
+        onChange={handleChange}
       />
     </div>
   );

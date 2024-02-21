@@ -15,6 +15,8 @@ import NoPerfRender from './NoPerfRender';
 import { ISelectCellEditorParams } from 'ag-grid-community';
 
 import SelectVenueRender from './SelectVenueRender';
+import SelectPencilRender from './SelectPencilRender';
+import CheckPerfRender from './CheckPerfRender';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -61,14 +63,6 @@ export const barringIssueColumnDefs = [
   { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
 ];
 
-const venue = ['Venue Dropdown', 'Performance'];
-
-const pencilNo = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-
-// const mappedPencilNo = pencilNo.map((value, index) => {
-//   return { text: value === '0' ? '-' : value, value: index };
-// });
-
 export const NewBookingColumnDefs = [
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 130 },
 
@@ -77,8 +71,11 @@ export const NewBookingColumnDefs = [
     headerName: 'Perf Y/N',
     field: 'perf',
     width: 100,
-    editable: true,
+    cellRenderer: CheckPerfRender,
+    editable: false,
     cellStyle: {
+      height: 'fit-content',
+
       width: 100,
     },
   },
@@ -102,9 +99,9 @@ export const NewBookingColumnDefs = [
     field: 'venue',
 
     cellRenderer: SelectVenueRender,
-    cellEditorParams: {
-      values: venue,
-    },
+    // cellEditorParams: {
+    //   values: venue,
+    // },
     width: 242,
     cellStyle: {
       overflow: 'visible',
@@ -134,22 +131,28 @@ export const NewBookingColumnDefs = [
     headerName: 'Booking Status',
     field: 'bookingStatus',
     cellRenderer: SelectBookingStatusRender,
+    maxWidth: 146,
     width: 146,
+    cellStyle: {
+      overflow: 'visible',
+      width: 146,
+    },
   },
   {
     headerName: 'Pencil No.',
     field: 'pencilNo',
-    // cellRenderer: SelectPencilRender,
-    // options: mappedPencilNo,
+    cellRenderer: SelectPencilRender,
+
     width: 100,
     maxWidth: 100,
-    editable: true,
-    cellEditor: 'agSelectCellEditor',
+    // editable: true,
+
     cellEditorParams: {
-      values: pencilNo,
+      // values: pencilNo,
       valueListMaxHeight: 200,
       valueListMaxWidth: 150,
     } as ISelectCellEditorParams,
+
     cellStyle: {
       overflow: 'visible',
       // marginLeft: 'auto',

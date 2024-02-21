@@ -4,15 +4,26 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
 import { useWizard } from 'react-use-wizard';
 
-const rows = [
+// type Payload = {
+//   date: string;
+//   perf: boolean;
+//   dayType: number | null;
+//   venue: number;
+//   times: string[] | null;
+//   bookingStatus: string | null;
+//   pencilNo: number | null;
+//   notes: string | null;
+// };
+
+const dummyData = [
   {
     date: 'Mon 02/01/23',
     perf: true,
     dayType: 'Performance',
-    venue: 'Venue A',
-    noPerf: 5,
-    times: '23:40',
-    bookingStatus: 'Confirmed',
+    venue: 1,
+    noPerf: 1,
+    times: [''],
+    bookingStatus: 'C',
     pencilNo: '1',
     notes: 'Lorem ipsum',
   },
@@ -23,7 +34,7 @@ const rows = [
     venue: 'Venue A',
     noPerf: 5,
     times: '23:40',
-    bookingStatus: 'Pencilled',
+    bookingStatus: 'U',
     pencilNo: '2',
     notes: 'Lorem ipsum',
   },
@@ -34,7 +45,7 @@ const rows = [
     venue: 'Venue A',
     noPerf: 5,
     times: '23:40',
-    bookingStatus: 'Pencilled',
+    bookingStatus: 'U',
     pencilNo: '2',
     notes: 'Lorem ipsum',
   },
@@ -45,7 +56,7 @@ const rows = [
     venue: 'Venue A',
     noPerf: 5,
     times: '23:40',
-    bookingStatus: 'Pencilled',
+    bookingStatus: 'U',
     pencilNo: '2',
     notes: 'Lorem ipsum',
   },
@@ -56,8 +67,8 @@ const rows = [
     venue: 'Venue A',
     noPerf: 5,
     times: '23:40',
-    bookingStatus: 'Pencilled',
-    pencilNo: '2',
+    bookingStatus: 'U',
+    pencilNo: '3',
     notes: 'Lorem ipsum',
   },
   {
@@ -67,18 +78,26 @@ const rows = [
     venue: 'Venue A',
     noPerf: 5,
     times: '23:40',
-    bookingStatus: 'Pencilled',
+    bookingStatus: 'U',
     pencilNo: '2',
     notes: 'Lorem ipsum',
   },
 ];
 
 export default function NewBookingDetails() {
-  // const [rows, setRows] = useState([]);
-  // const [showModal, setShowModal] = useState<boolean>(false);
-  // const [productionItem, setProductionItem] = useState(null);
+  // const currentDate = new Date(data.fromDate);
+  // const toDate = new Date(data.toDate);
+  // while (currentDate <= toDate) {
+  //   const formattedDate = `${currentDate.toLocaleDateString('en-US', {
+  //     weekday: 'short',
+  //     year: 'numeric',
+  //     month: '2-digit',
+  //     day: '2-digit',
+  //   })}`;
+  //   console.log('formattedDate :>>>> ', formattedDate);
+  // }
+
   const { nextStep, previousStep } = useWizard();
-  // const setViewHeader = useSetRecoilState(newBookingState);
 
   const gridOptions = {
     autoSizeStrategy: {
@@ -98,11 +117,14 @@ export default function NewBookingDetails() {
   // };
 
   const getRowStyle = (params) => {
-    const zIndex = rows.length - params.node.rowIndex; // Calculate z-index in descending order
+    const zIndex = dummyData.length - params.node.rowIndex; // Calculate z-index in descending order
 
     return {
       zIndex: zIndex.toString(), // Convert the zIndex to string and apply
     };
+  };
+  const PreviewBooking = () => {
+    console.table('samn');
   };
 
   return (
@@ -118,7 +140,7 @@ export default function NewBookingDetails() {
       <div className=" w-[700px] lg:w-[1154px] h-[440px] z-[999] flex flex-col ">
         <Table
           columnDefs={NewBookingColumnDefs}
-          rowData={rows}
+          rowData={dummyData}
           styleProps={styleProps}
           gridOptions={gridOptions}
           // onCellClicked={handleCellClick}
@@ -130,7 +152,7 @@ export default function NewBookingDetails() {
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={close} />
-            <Button className=" w-33" text="Preview Booking" onClick={() => nextStep()} />
+            <Button className=" w-33" text="Preview Booking" onClick={() => PreviewBooking()} />
           </div>
         </div>
       </div>

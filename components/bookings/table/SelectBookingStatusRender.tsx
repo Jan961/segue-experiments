@@ -1,14 +1,9 @@
 import { CustomCellRendererProps } from 'ag-grid-react';
 import Select from 'components/core-ui-lib/Select';
 import { statusOptions } from 'config/bookings';
-const SelectBookingStatusRender = (props: CustomCellRendererProps) => {
-  // console.log('props select table render:>> ', props);
-  // const bookingStatus = ['-', 'Pencilled', 'Confirmed', 'Cancelled', 'Suspended'];
 
-  // const mappedBookingStatus = bookingStatus.map((value, index) => {
-  //   return { text: value, value: value };
-  // });
-  console.log('statusOptions :>> ', statusOptions);
+const SelectBookingStatusRender = (props: CustomCellRendererProps) => {
+  console.log('props.value :>> ', props.value);
   return (
     <div className="w-[98%] h-full mx-auto  ">
       <Select

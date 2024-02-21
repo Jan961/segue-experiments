@@ -31,7 +31,6 @@ const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) =
     label = '',
   } = props;
 
-  console.log('props Select:>> ', props);
   const [selectedOption, setSelectedOption] = useState<SelectOption>({ text: '', value: '' });
 
   const handleOptionSelect = (v: string) => {
