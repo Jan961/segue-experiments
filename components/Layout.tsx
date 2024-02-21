@@ -65,7 +65,9 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
       <main className="h-full w-full flex flex-rows flex-1">
         <PopoutMenu menuIsOpen={state.menuPinned || menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
         {isLoading && <LoadingOverlay />}
-        <div className={`${flush ? 'flex-1' : 'mt-24 flex-1 px-4'} ${state.menuPinned ? 'ml-64 pl-1' : ''}`}>
+        <div
+          className={`flex flex-col ${flush ? 'flex-1' : 'mt-24 flex-1 px-4'} ${state.menuPinned ? 'ml-64 pl-1' : ''}`}
+        >
           {children}
         </div>
       </main>
