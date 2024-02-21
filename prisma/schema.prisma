@@ -162,6 +162,7 @@ model Venue {
   IsDeleted                                                 Boolean              @default(dbgenerated("(b'0')")) @map("VenueIsDeleted") @db.Bit(1)
   VenueNotes                                                String?              @db.LongText
   VenueWarningNotes                                         String?              @db.LongText
+  VenueExcludeFromChecks                                    Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1)
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
@@ -212,12 +213,12 @@ model VenueRole {
 }
 
 model VenueVenue {
-  Venue1Id Int   @map("VVVenue1Id")
-  Venue2Id Int   @map("VVVenue2Id")
-  Mileage  Int?  @map("VVMileage")
-  TimeMins Int?  @map("VVTimeMins")
-  Venue1   Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue2   Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+  Venue1Id Int     @map("VVVenue1Id")
+  Venue2Id Int     @map("VVVenue2Id")
+  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
+  TimeMins Int?    @map("VVTimeMins")
+  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
 
   @@id([Venue1Id, Venue2Id])
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
@@ -225,30 +226,31 @@ model VenueVenue {
 }
 
 model DateBlock {
-  Id                    Int          @id @default(autoincrement()) @map("DateBlockId")
-  ProductionId          Int          @map("DateBlockProductionId")
-  Name                  String       @map("DateBlockName") @db.VarChar(45)
-  StartDate             DateTime     @map("DateBlockStartDate") @db.Date
-  EndDate               DateTime     @map("DateBlockEndDate") @db.Date
-  IsPrimary             Boolean      @map("DateBlockIsPrimary")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  Booking               Booking[]
-  Production            Production   @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_DateBlock")
-  GetInFitUp            GetInFitUp[]
-  Other                 Other[]
-  Rehearsal             Rehearsal[]
+  Id           Int          @id @default(autoincrement()) @map("DateBlockId")
+  ProductionId Int          @map("DateBlockProductionId")
+  Name         String       @map("DateBlockName") @db.VarChar(45)
+  StartDate    DateTime     @map("DateBlockStartDate") @db.Date
+  EndDate      DateTime     @map("DateBlockEndDate") @db.Date
+  IsPrimary    Boolean      @default(dbgenerated("(b'0')")) @map("DateBlockIsPrimary") @db.Bit(1)
+  Booking      Booking[]
+  Production   Production   @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_DateBlock")
+  GetInFitUp   GetInFitUp[]
+  Other        Other[]
+  Rehearsal    Rehearsal[]
 
   @@unique([ProductionId, Name], map: "DateBlockName")
   @@unique([ProductionId, StartDate], map: "SECONDARY")
 }
 
 model GetInFitUp {
-  Id          Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
-  DateBlockId Int       @map("GetInFitUpDateBlockId")
-  VenueId     Int       @map("GetInFitUpVenueId")
-  StatusCode  String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
-  Date        DateTime  @map("GetInFitUpDate") @db.Date
-  DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
-  Venue       Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
+  Id              Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
+  DateBlockId     Int       @map("GetInFitUpDateBlockId")
+  VenueId         Int       @map("GetInFitUpVenueId")
+  StatusCode      String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
+  Date            DateTime  @map("GetInFitUpDate") @db.Date
+  Notes           String?   @db.LongText @map("GetInFitUpNotes")
+  DateBlock       DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
+  Venue           Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
 
   @@index([DateBlockId], map: "DateBlock_GetInFitUpDay_idx")
   @@index([VenueId], map: "Venue_GetInFitUpDay_idx")
@@ -260,6 +262,7 @@ model Other {
   DateTypeId  Int       @map("OtherDateTypeId")
   StatusCode  String    @map("OtherStatusCode") @db.Char(1)
   Date        DateTime  @map("OtherDate") @db.Date
+  Notes       String?   @db.LongText @map("OtherNotes")
   DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Other")
   DateType    DateType  @relation(fields: [DateTypeId], references: [Id], onUpdate: Restrict, map: "DateType_Other")
 
@@ -282,14 +285,16 @@ model Performance {
 }
 
 model Rehearsal {
-  Id          Int       @id @default(autoincrement()) @map("RehearsalId")
-  DateBlockId Int       @map("RehearsalDateBlockId")
-  Town        String?   @map("RehearsalTown") @db.VarChar(50)
-  StatusCode  String    @default("U") @map("RehearsalStatusCode") @db.Char(1)
-  Date        DateTime  @map("RehearsalDate") @db.Date
-  DateTypeId  Int?      @map("RehearsalDateTypeId")
-  DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
-  DateType    DateType? @relation(fields: [DateTypeId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "DateType_Rehearsal")
+  Id               Int       @id @default(autoincrement()) @map("RehearsalId")
+  DateBlockId      Int       @map("RehearsalDateBlockId")
+  Town             String?   @map("RehearsalTown") @db.VarChar(50)
+  StatusCode       String    @default("U") @map("RehearsalStatusCode") @db.Char(1)
+  Date             DateTime  @map("RehearsalDate") @db.Date
+  DateTypeId       Int?      @map("RehearsalDateTypeId")
+  Notes            String?   @db.LongText @map("RehearsalNotes")
+  VenueId          Int?      @map("RehearsalVenueId")
+  DateBlock        DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
+  DateType         DateType? @relation(fields: [DateTypeId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "DateType_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
@@ -681,8 +686,8 @@ view SalesFiguresView {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingTravelView {
   BookingDateBlockId Int
-  FromBookingId      Int  @default(0)
-  Mileage            Int?
+  FromBookingId      Int      @default(0)
+  Mileage            Decimal? @db.Decimal(5, 1)
   TimeMins           Int?
 
   @@ignore
@@ -719,7 +724,7 @@ view ScheduleView {
   PencilNum           Int?
   VenueId             Int?
   VenueSeats          Float?
-  Mileage             Int?
+  Mileage             Decimal?  @db.Decimal(5, 1)
   TimeMins            Int?
   DateTypeId          Int?
   DateTypeName        String?   @db.VarChar(30)
@@ -788,7 +793,7 @@ view DateBlockDatesView {
   PencilNum           Int?
   VenueId             Int?
   VenueSeats          Float?
-  Mileage             Int?
+  Mileage             Decimal? @db.Decimal(5, 1)
   TimeMins            Int?
   DateTypeId          Int?
   DateTypeName        String?  @db.VarChar(30)
@@ -821,9 +826,9 @@ view BookingDateDiffView {
 
 /// The underlying view does not contain salesSetTotalsViewa valid unique identifier and can therefore currently not be handled by Prisma Client.
 view VenueVenueView {
-  FromVenueId Int  @default(0)
-  ToVenueId   Int  @default(0)
-  Mileage     Int?
+  FromVenueId Int     @default(0)
+  ToVenueId   Int     @default(0)
+  Mileage     Decimal @default(0.0) @db.Decimal(5, 1)
   TimeMins    Int?
 
   @@ignore
@@ -953,7 +958,7 @@ view ScheduledDatesView {
   StatusCode  String   @default("") @db.Char(1)
   PencilNum   Int?
   VenueSeats  Float?
-  Mileage     Int?
+  Mileage     Decimal? @db.Decimal(5, 1)
   TimeMins    Int?
 
   @@ignore

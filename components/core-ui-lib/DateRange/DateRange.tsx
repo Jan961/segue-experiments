@@ -63,14 +63,8 @@ export default function DateRange({
 
   useEffect(() => {
     checkDateRangeValid(value.from, value.to);
-    if (!value) {
-      setDateRange({ from: minDate, to: maxDate });
-    } else {
-      const from = value.from || minDate;
-      const to = value?.to || maxDate;
-      setDateRange({ from, to });
-    }
-  }, [value, minDate, maxDate]);
+    setDateRange({ from: value.from, to: value.to });
+  }, [value]);
 
   const handleDateFromChange = (v: Date) => {
     const updatedDate = { ...dateRange, from: v };
