@@ -1,11 +1,21 @@
 import Barring from './modal/barring';
 import Button from 'components/core-ui-lib/Button';
 import AddBooking from './modal/NewBooking';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { useRecoilValue } from 'recoil';
+import { getProductionById } from 'services/productionService';
 
 export default function BookingsButtons() {
   const [showAddNewBookingModal, setShowAddNewBookingModal] = useState(false);
   const [showBarringModal, setShowBarringModal] = useState(false);
+  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const [prodctionItem, setProductionItem] = useState({})
+
+  useEffect(() => {
+    
+  }, [ProductionId]);
+
   return (
     <div className="grid grid-cols-2 grid-rows-2 gap-4">
       <Button text="Create New Booking" className="w-[155px]" onClick={() => setShowAddNewBookingModal(true)}></Button>
