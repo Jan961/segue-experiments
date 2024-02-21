@@ -9,7 +9,6 @@ export type StyleProps = {
 };
 
 interface TableProps {
-  id: string;
   rowData?: any[];
   columnDefs?: any[];
   styleProps?: StyleProps;
@@ -23,7 +22,7 @@ const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
 export default forwardRef(function Table(
-  { id, rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -75,7 +74,6 @@ export default forwardRef(function Table(
     <>
       <GridStyles {...styleProps} />
       <div
-        id={id}
         className="ag-theme-quartz"
         style={{
           height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : 'auto',
