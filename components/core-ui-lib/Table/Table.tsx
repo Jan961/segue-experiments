@@ -16,12 +16,10 @@ interface TableProps {
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
   gridOptions?: any;
-  displayHeader?: boolean;
-  overrideHLimit?: boolean;
 }
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true, overrideHLimit = false }: TableProps,
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -32,16 +30,14 @@ export default forwardRef(function Table(
 
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
-
-      if (rowData?.length > 0 && rowData?.length < AUTO_HEIGHT_LIMIT && params.api) {
-        params.api.updateGridOptions({ domLayout: 'autoHeight' });
-      }
-    
+    if (rowData?.length > 0 && rowData?.length < AUTO_HEIGHT_LIMIT && params.api) {
+      params.api.updateGridOptions({ domLayout: 'autoHeight' });
+    }
   };
 
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
-      if (rowData?.length < AUTO_HEIGHT_LIMIT && !overrideHLimit) {
+      if (rowData?.length < AUTO_HEIGHT_LIMIT) {
         gridApi.updateGridOptions({ domLayout: 'autoHeight' });
       } else {
         gridApi.updateGridOptions({ domLayout: 'normal' });
@@ -56,7 +52,7 @@ export default forwardRef(function Table(
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          headerHeight={displayHeader ? 51 : 0}
+          headerHeight={51}
           rowHeight={43}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
