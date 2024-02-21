@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 
-import Tooltip from './Tooltip';
+import Tooltip, { TooltipProps } from './Tooltip';
 import Button from 'components/core-ui-lib/Button';
 
 const meta: Meta<typeof Tooltip> = {
@@ -11,7 +11,7 @@ export default meta;
 
 type Story = StoryObj<typeof Tooltip>;
 
-export const Btn_Tooltip_Top: Story = (args) => (
+export const Btn_Tooltip_Top: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <Button
             text="Sample Button"
@@ -30,7 +30,7 @@ Btn_Tooltip_Top.args = {
     txtColorClass: 'text-white',
 };
 
-export const Btn_Tooltip_Bottom: Story = (args) => (
+export const Btn_Tooltip_Bottom: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <Button
             text="Sample Button"
@@ -49,7 +49,7 @@ Btn_Tooltip_Bottom.args = {
     txtColorClass: 'text-white',
 };
 
-export const Btn_Tooltip_Left: Story = (args) => (
+export const Btn_Tooltip_Left: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <Button
             text="Sample Button"
@@ -69,7 +69,7 @@ Btn_Tooltip_Left.args = {
 };
 
 
-export const Btn_Tooltip_Right: Story = (args) => (
+export const Btn_Tooltip_Right: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <Button
             text="Sample Button"
@@ -88,7 +88,7 @@ Btn_Tooltip_Right.args = {
     txtColorClass: 'text-white',
 };
 
-export const Txt_Tooltip_DefaultPos: Story = (args) => (
+export const Txt_Tooltip_DefaultPos: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <div className='text text-center text-primary-navy font-bold text-xl'>
             Hover over me to see a tooltip
@@ -104,7 +104,7 @@ Txt_Tooltip_DefaultPos.args = {
     txtColorClass: 'text-white',
 };
 
-export const Txt_Tooltip_Custom_Size_Colour: Story = (args) => (
+export const Txt_Tooltip_Custom_Size_Colour: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <div className='text-primary-blue font-bold text-xl'>
             Hover over me to see a tooltip
@@ -120,7 +120,7 @@ Txt_Tooltip_Custom_Size_Colour.args = {
     txtColorClass: 'text-white',
 };
 
-export const Txt_Tooltip_With_Title: Story = (args) => (
+export const Txt_Tooltip_With_Title: Story = (args: TooltipProps) => (
     <Tooltip {...args}>
         <div className='text-primary-blue font-bold text-xl'>
             Hover over me to see a tooltip

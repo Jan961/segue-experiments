@@ -1,9 +1,9 @@
 import React, { useState, ReactNode } from 'react';
 
-interface TooltipProps {
-  title: string;
-  body: string;
-  children: ReactNode;
+export interface TooltipProps {
+  title?: string;
+  body?: string;
+  children?: ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   height?: string;
   width?: string;
