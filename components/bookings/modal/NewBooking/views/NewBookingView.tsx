@@ -19,6 +19,7 @@ import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
+import Tooltip from 'components/core-ui-lib/Tooltip';
 
 type AddBookingProps = {
   formData: TForm;
@@ -130,7 +131,14 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               checked={isRunOfDates}
               label="This is a run of dates. Y/N"
             />
-            <Icon iconName="info-circle-solid" />
+            <Tooltip
+              body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
+              position="right"
+              width="w-[140px]"
+              bgColorClass="primary-input-text"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
           </div>
         )}
         <Select
