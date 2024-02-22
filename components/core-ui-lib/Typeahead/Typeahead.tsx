@@ -39,7 +39,7 @@ const COMP_HEIGHT = '1.9375rem';
 export interface TypeaheadProps extends WithTestId {
   value?: string | number | undefined;
   onChange: (value: string | number) => void;
-  renderOption?: (option: TypeaheadOption) => React.ReactNode;
+  renderOption?: (option: TypeaheadOption) => React.ReactElement;
   options: TypeaheadOption[];
   className?: string;
   placeholder?: string;
