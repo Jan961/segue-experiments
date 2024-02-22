@@ -27,7 +27,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
     return (
       <div
-        className={`TextInput flex justify-between items-center relative ${disabled ? 'disabled-input' : ''}`}
+        className={`flex justify-between items-center relative ${disabled ? 'disabled-input' : ''}`}
         onClick={onClick}
       >
         <input

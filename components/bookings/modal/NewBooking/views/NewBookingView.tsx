@@ -108,7 +108,6 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
-          labelClass="font-[Calibri]"
           className=" bg-white my-2 justify-between"
           onChange={({ from, to }) =>
             onChange({
@@ -150,7 +149,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
             />
             <Checkbox
               id="shouldFilterVenues"
-              labelClassName="text-white font-[Calibri]"
+              labelClassName="text-white"
               onChange={(e: any) => onChange({ shouldFilterVenues: e.target.checked })}
               checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
