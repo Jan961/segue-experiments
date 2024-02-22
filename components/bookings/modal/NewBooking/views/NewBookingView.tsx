@@ -18,6 +18,7 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
+import Icon from 'components/core-ui-lib/Icon';
 
 type AddBookingProps = {
   formData: TForm;
@@ -38,7 +39,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
-  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
+  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
   const productionCode = useMemo(
     () =>
       currentProduction
@@ -108,7 +109,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
-          className=" bg-white my-2 justify-between"
+          className=" bg-white my-2"
           onChange={({ from, to }) =>
             onChange({
               fromDate: from?.toISOString() || '',
@@ -119,11 +120,29 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
         />
+        {!isDateTypeOnly && (
+          <div className="flex items-center gap-2 my-1 justify-start">
+            <Checkbox
+              className="!w-fit"
+              id="shouldFilterVenues"
+              labelClassName="text-white w-fit"
+              onChange={(e: any) => onChange({ isRunOfDates: e.target.checked })}
+              checked={isRunOfDates}
+              label="This is a run of dates. Y/N"
+            />
+            <Icon iconName="info-circle-solid" />
+          </div>
+        )}
         <Select
           className="w-[160px] my-2 !border-0"
           value={bookingTypeValue}
           options={BookingTypes}
-          onChange={(v) => onChange({ isDateTypeOnly: v === BookingTypeMap.DATE_TYPE })}
+          onChange={(v) =>
+            onChange({
+              isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
+              isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
+            })
+          }
         />
         {isDateTypeOnly && (
           <>

@@ -6,6 +6,7 @@ export const INITIAL_STATE = {
     dateType: null,
     venueId: null,
     shouldFilterVenues: false,
+    isRunOfDates: false,
   },
   bookingConflicts: [],
 };
