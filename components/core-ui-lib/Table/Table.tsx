@@ -41,25 +41,17 @@ export default forwardRef(function Table(
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
     if (rowData?.length > 0) {
-      if (gridHeight < autoHeightLimit && params.api) {
-        console.log('Grid ready auto', gridHeight, autoHeightLimit);
-        params.api.updateGridOptions({ domLayout: 'autoHeight' });
-      } else {
-        console.log('Grid ready normal', gridHeight, autoHeightLimit);
-        params.api.updateGridOptions({ domLayout: 'normal' });
-      }
+      gridHeight < autoHeightLimit && params.api
+        ? params.api.updateGridOptions({ domLayout: 'autoHeight' })
+        : params.api.updateGridOptions({ domLayout: 'normal' });
     }
   };
 
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
-      if (gridHeight < autoHeightLimit) {
-        console.log('useffect auto', gridHeight, autoHeightLimit);
-        gridApi.updateGridOptions({ domLayout: 'autoHeight' });
-      } else {
-        console.log('useffect normal', gridHeight, autoHeightLimit);
-        gridApi.updateGridOptions({ domLayout: 'normal' });
-      }
+      gridHeight < autoHeightLimit && gridApi
+        ? gridApi.updateGridOptions({ domLayout: 'autoHeight' })
+        : gridApi.updateGridOptions({ domLayout: 'normal' });
     }
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
