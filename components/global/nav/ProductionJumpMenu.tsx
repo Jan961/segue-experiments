@@ -68,9 +68,7 @@ export default function ProductionJumpMenu() {
         value={selected}
         label="Production"
         placeholder="Please select a Production"
-        renderOption={(option, selectedOption, handleOptionSelect) => (
-          <ProductionOption option={option} selectedOption={selectedOption} handleOptionSelect={handleOptionSelect} />
-        )}
+        renderOption={(option) => <ProductionOption option={option} />}
         options={productions}
         onChange={goToProduction}
       />
