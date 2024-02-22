@@ -77,9 +77,7 @@ export default async function handle(req, res) {
           });
 
           promises.push(bookingPromise);
-        }
-
-        if (isRehearsal) {
+        } else if (isRehearsal) {
           const rehearsalPromise = tx.rehearsal.create({
             data: {
               DateBlock: {
@@ -98,9 +96,7 @@ export default async function handle(req, res) {
           });
 
           promises.push(rehearsalPromise);
-        }
-
-        if (isGetInFitUp) {
+        } else if (isGetInFitUp) {
           const getInFitUpPromise = tx.getInFitUp.create({
             data: {
               Date: new Date(bookingDate),
@@ -118,26 +114,28 @@ export default async function handle(req, res) {
           });
 
           promises.push(getInFitUpPromise);
+        } else {
+          const getOther = tx.other.create({
+            data: {
+              DateBlock: {
+                connect: {
+                  Id: DateBlockId,
+                },
+              },
+              StatusCode: BookingStatus,
+              Date: new Date(bookingDate),
+              DateType: {
+                connect: {
+                  Id: DateTypeId,
+                },
+              },
+            },
+          });
+          promises.push(getOther);
         }
-        const getOther = tx.other.create({
-          data: {
-            DateBlock: {
-              connect: {
-                Id: DateBlockId,
-              },
-            },
-            StatusCode: BookingStatus,
-            Date: new Date(bookingDate),
-            DateType: {
-              connect: {
-                Id: DateTypeId,
-              },
-            },
-          },
-        });
-        promises.push(getOther);
       }
       const createdItems = await Promise.allSettled(promises);
+
       for (const item of createdItems) {
         if (item.status === 'fulfilled') {
           bookings.push(bookingMapper(item.value));
