@@ -42,8 +42,10 @@ export default forwardRef(function Table(
     setGridApi(params.api);
     if (rowData?.length > 0) {
       if (gridHeight < autoHeightLimit && params.api) {
+        console.log('Grid ready auto', gridHeight, autoHeightLimit);
         params.api.updateGridOptions({ domLayout: 'autoHeight' });
       } else {
+        console.log('Grid ready normal', gridHeight, autoHeightLimit);
         params.api.updateGridOptions({ domLayout: 'normal' });
       }
     }
@@ -52,8 +54,10 @@ export default forwardRef(function Table(
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
       if (gridHeight < autoHeightLimit) {
+        console.log('useffect auto', gridHeight, autoHeightLimit);
         gridApi.updateGridOptions({ domLayout: 'autoHeight' });
       } else {
+        console.log('useffect normal', gridHeight, autoHeightLimit);
         gridApi.updateGridOptions({ domLayout: 'normal' });
       }
     }
@@ -76,7 +80,7 @@ export default forwardRef(function Table(
       <div
         className="ag-theme-quartz"
         style={{
-          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : 'auto',
+          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : '',
         }}
       >
         <AgGridReact
