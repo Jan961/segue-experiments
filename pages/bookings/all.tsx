@@ -30,9 +30,8 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
       <div className="mb-8">
         <Filters />
       </div>
-      <div className="w-full h-full">
-        <BookingsTable rowData={rows} />
-      </div>
+
+      <BookingsTable rowData={rows} />
     </Layout>
   );
 };

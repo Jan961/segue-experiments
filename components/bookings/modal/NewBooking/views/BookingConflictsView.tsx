@@ -58,7 +58,7 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
       <span className="py-4 text-responsive-sm text-primary-input-text">{`This booking would conflict with ${
         rows?.length || 0
       } bookings`}</span>
-      <div className="w-[634px] h-60 flex flex-col">
+      <div className="w-[634px] max-h-[calc(100%-140px)] flex flex-col">
         <Table
           columnDefs={bookingConflictsColumnDefs}
           rowData={rows}
@@ -66,7 +66,7 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
           gridOptions={gridOptions}
         />
       </div>
-      <div className="py-3 w-full flex items-center justify-end">
+      <div className="pt-3 w-full flex items-center justify-end">
         <Button className="w-33" variant="secondary" text="Back" onClick={() => previousStep()} />
         <Button
           className="ml-3 w-33"
