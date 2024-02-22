@@ -97,6 +97,7 @@
     "react-range-slider-input": "^3.0.7",
     "react-simple-timefield": "^3.3.1",
     "react-use-wizard": "^2.2.4",
+    "react-windowed-select": "^5.2.0",
     "recoil": "^0.7.7",
     "rxjs": "^7.5.7",
     "serverless-mysql": "^1.5.4",
