@@ -5,11 +5,18 @@ import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
+import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
+import { ITooltipParams } from 'ag-grid-community';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
 export const columnDefs = [
-  { headerName: 'Production', field: 'production', cellRenderer: DefaultCellRenderer, width: 120 },
+  {
+    headerName: 'Production',
+    field: 'production',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
   {
     headerName: 'Date',
     field: 'date',
@@ -36,7 +43,16 @@ export const columnDefs = [
     cellRenderer: MilesRenderer,
   },
   { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 110 },
-  { headerName: '', field: 'note', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
+  {
+    headerName: '',
+    field: 'note',
+    cellRenderer: NoteColumnRenderer,
+    resizable: false,
+    width: 50,
+    tooltipValueGetter: (params: ITooltipParams) => (params.value ? 'View Notes' : 'No Notes'),
+    tooltipComponentParams: { left: '-2.5rem' },
+    tooltipComponent: TableTooltip,
+  },
 ];
 
 export const bookingConflictsColumnDefs = [
@@ -70,3 +86,10 @@ export const gapSuggestColumnDefs = [
     headerClass: 'text-center',
   },
 ];
+
+export const tourSummaryColumnDefs = [
+  { headerName: 'Production\nCode', field: 'prodCode', cellRenderer: DefaultCellRenderer, width: 150, headerClass: 'text-center' },
+  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 200, headerClass: 'text-center' },
+  { headerName: '', field: 'value', cellRenderer: DefaultCellRenderer, width: 84, headerClass: 'text-center', resizable: false },
+];
+

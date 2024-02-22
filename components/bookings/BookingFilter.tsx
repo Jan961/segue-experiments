@@ -25,11 +25,17 @@ export default function BookingsButtons() {
     }
   }, [ProductionId, scheduleStart, scheduleEnd]);
 
+  useEffect(() => {
+    if (!startDate && !endDate) {
+      setFilter((prevfilter) => ({ ...prevfilter, startDate: scheduleStartDate, endDate: scheduleEndDate }));
+    }
+  }, [startDate, endDate, scheduleStartDate, scheduleEndDate]);
+
   return (
     <div className="bg-white">
       <DateRange
         disabled={!ProductionId}
-        className="bg-primary-white"
+        className="bg-primary-white justify-between"
         label="Date"
         onChange={onChange}
         value={{ from: startDate, to: endDate }}

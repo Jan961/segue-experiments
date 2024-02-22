@@ -37,7 +37,7 @@ export default function BarringIssueView() {
       <span className="py-4 text-responsive-sm text-primary-input-text">
         A Barring Check has found potential issues
       </span>
-      <div className="w-[634px] h-60 flex flex-col">
+      <div className="w-[634px] flex flex-col">
         <Table columnDefs={barringIssueColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
         <div className="py-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />

@@ -6,14 +6,13 @@ import { BookingWithVenueDTO } from 'interfaces';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { startDate, endDate, venueId, productionId } = req.body;
+    const { fromDate, toDate, productionId } = req.body;
     const results: Booking[] = await prisma.booking.findMany({
       where: {
         FirstDate: {
-          ...(startDate && { gte: new Date(startDate) }),
-          ...(endDate && { lte: new Date(endDate) }),
+          ...(fromDate && { gte: new Date(fromDate) }),
+          ...(toDate && { lte: new Date(toDate) }),
         },
-        ...(venueId && { VenueId: venueId }),
         DateBlock: {
           ProductionId: productionId,
         },
