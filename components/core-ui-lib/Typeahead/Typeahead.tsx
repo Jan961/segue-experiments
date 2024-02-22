@@ -3,6 +3,7 @@ import { Combobox, Transition } from '@headlessui/react';
 import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
+import classNames from 'classnames';
 
 export type TypeaheadOption = { text: string; value: string | number; [key: string]: any };
 
@@ -61,7 +62,10 @@ export default function Typeahead({
 
   return (
     <div
-      className={`shadow-sm-shadow border border-primary-border rounded-md flex items-center text-sm ${className} `}
+      className={classNames(
+        `shadow-sm-shadow border border-primary-border rounded-md flex items-center text-sm`,
+        className,
+      )}
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
     >
       {label && (

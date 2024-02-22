@@ -1,5 +1,6 @@
-import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
 
 interface PopupModalProps {
@@ -34,7 +35,7 @@ export default function PopupModal({
           <div className="fixed inset-0 bg-black/75 z-10" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto z-20">
+        <div className={`${calibri.variable} font-calibri fixed inset-0 overflow-y-auto z-20`}>
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
