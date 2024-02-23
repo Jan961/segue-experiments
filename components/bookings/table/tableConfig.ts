@@ -93,15 +93,13 @@ export const tourSummaryColumnDefs = [
     field: 'prodCode',
     cellRenderer: DefaultCellRenderer,
     width: 100,
-    headerClass: 'text-center',
   },
-  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 220, headerClass: 'text-center' },
+  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 220 },
   {
     headerName: '',
     field: 'value',
     cellRenderer: DefaultCellRenderer,
     width: 115,
-    headerClass: 'text-center',
     resizable: false,
   },
 ];

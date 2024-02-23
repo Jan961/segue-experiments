@@ -64,13 +64,13 @@ export default function Report({
             <Spinner className="w-full" size="lg" />
           </div>
         )}
-        <div className="py-4 overflow-y-auto max-h-[90vh]">
+        <div className="py-4 overflow-y-auto max-h-[90vh] w-[438px]">
           {productionSummary.length ? (
             <div>
               {productionSummary.map((item, index) => (
                 <div key={index} className={item.bold ? 'font-bold' : 'font-normal'}>
                   {item.length > 0 && (
-                    <div className={'w-[438px] mb-2 flex-col '}>
+                    <div className={'mb-2'}>
                       <Table
                         key={index}
                         columnDefs={tourSummaryColumnDefs}
