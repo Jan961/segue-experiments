@@ -164,7 +164,6 @@ export default function Typeahead({
         onFocus={onInputFocus}
         styles={colourStyles}
         placeholder={placeholder}
-        menuIsOpen
       />
     </div>
   );
