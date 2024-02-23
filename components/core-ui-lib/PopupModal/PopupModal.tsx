@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
@@ -10,6 +10,8 @@ interface PopupModalProps {
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
+  bgOpacity?: string;
+  contOpacity?: string;
 }
 
 export default function PopupModal({
@@ -19,7 +21,20 @@ export default function PopupModal({
   onClose = () => null,
   titleClass,
   showCloseIcon = true,
+  bgOpacity = 'opacity-100',
+  contOpacity = '',
 }: PopupModalProps) {
+  const [backgroundOpacity, setBgOpacity] = useState(bgOpacity);
+  const [contentOpacity, setContOpacity] = useState(bgOpacity);
+
+  useEffect(() => {
+    setBgOpacity(bgOpacity);
+  }, [bgOpacity]);
+
+  useEffect(() => {
+    setContOpacity(contOpacity);
+  }, [contOpacity]);
+
   return (
     <Transition appear show={show} as={Fragment}>
       <Dialog as="div" className="relative z-150" onClose={() => null}>
@@ -27,16 +42,16 @@ export default function PopupModal({
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
-          enterTo="opacity-100"
+          enterTo={backgroundOpacity}
           leave="ease-in duration-200"
-          leaveFrom="opacity-100"
+          leaveFrom={backgroundOpacity}
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/75 z-10" />
         </Transition.Child>
 
         <div className={`${calibri.variable} font-calibri fixed inset-0 overflow-y-auto z-20`}>
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className={`flex min-h-full items-center justify-center p-4 text-center ${contentOpacity}`}>
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"

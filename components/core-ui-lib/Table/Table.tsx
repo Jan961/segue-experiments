@@ -15,6 +15,7 @@ interface TableProps {
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
   gridOptions?: any;
+  displayHeader?: boolean;
 }
 
 const ROW_HEIGHT = 43;
@@ -22,7 +23,7 @@ const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions }: TableProps,
+  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -41,21 +42,17 @@ export default forwardRef(function Table(
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
     if (rowData?.length > 0) {
-      if (gridHeight < autoHeightLimit && params.api) {
-        params.api.updateGridOptions({ domLayout: 'autoHeight' });
-      } else {
-        params.api.updateGridOptions({ domLayout: 'normal' });
-      }
+      gridHeight < autoHeightLimit && params.api
+        ? params.api.updateGridOptions({ domLayout: 'autoHeight' })
+        : params.api.updateGridOptions({ domLayout: 'normal' });
     }
   };
 
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
-      if (gridHeight < autoHeightLimit) {
-        gridApi.updateGridOptions({ domLayout: 'autoHeight' });
-      } else {
-        gridApi.updateGridOptions({ domLayout: 'normal' });
-      }
+      gridHeight < autoHeightLimit && gridApi
+        ? gridApi.updateGridOptions({ domLayout: 'autoHeight' })
+        : gridApi.updateGridOptions({ domLayout: 'normal' });
     }
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
@@ -76,7 +73,7 @@ export default forwardRef(function Table(
       <div
         className="ag-theme-quartz"
         style={{
-          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : 'auto',
+          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : '',
         }}
       >
         <AgGridReact
@@ -85,7 +82,7 @@ export default forwardRef(function Table(
           }}
           rowData={rowData}
           columnDefs={columnDefs}
-          headerHeight={HEADER_HEIGHT}
+          headerHeight={displayHeader ? HEADER_HEIGHT : 0}
           rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}

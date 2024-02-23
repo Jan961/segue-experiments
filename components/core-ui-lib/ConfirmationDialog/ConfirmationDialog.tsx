@@ -14,6 +14,7 @@ interface ConfirmationDialogProps {
   noBtnClass: string;
   labelYes: string;
   labelNo: string;
+  bgOpacity: string;
 }
 
 const confOptions = {
@@ -46,6 +47,7 @@ export default function ConfirmationDialog({
   labelYes = 'Yes',
   labelNo = 'No',
   variant,
+  bgOpacity = 'opacity-100',
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -59,7 +61,7 @@ export default function ConfirmationDialog({
   };
 
   return (
-    <PopupModal show={visible} showCloseIcon={false}>
+    <PopupModal show={visible} showCloseIcon={false} bgOpacity={bgOpacity}>
       <div className="-mt-5">
         <div className="text-center">
           <div className="text text-primary-navy font-bold text-xl">{confOptions[variant].question}</div>

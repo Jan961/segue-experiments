@@ -18,6 +18,8 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
+import Icon from 'components/core-ui-lib/Icon';
+import Tooltip from 'components/core-ui-lib/Tooltip';
 
 type AddBookingProps = {
   formData: TForm;
@@ -38,7 +40,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
-  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
+  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
   const productionCode = useMemo(
     () =>
       currentProduction
@@ -103,12 +105,12 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
-    <div className="w-[385px]">
+    <div className="w-[385px] pb-6">
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
-          className=" bg-white my-2 justify-between"
+          className=" bg-white my-2 w-fit"
           onChange={({ from, to }) =>
             onChange({
               fromDate: from?.toISOString() || '',
@@ -119,11 +121,36 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
         />
+        {!isDateTypeOnly && (
+          <div className="flex items-center gap-2 my-1 justify-start">
+            <Checkbox
+              className="!w-fit"
+              id="shouldFilterVenues"
+              labelClassName="text-white w-fit"
+              onChange={(e: any) => onChange({ isRunOfDates: e.target.checked })}
+              checked={isRunOfDates}
+              label="This is a run of dates. Y/N"
+            />
+            <Tooltip
+              body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
+              position="right"
+              width="w-[140px]"
+              bgColorClass="primary-input-text"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
+          </div>
+        )}
         <Select
           className="w-[160px] my-2 !border-0"
           value={bookingTypeValue}
           options={BookingTypes}
-          onChange={(v) => onChange({ isDateTypeOnly: v === BookingTypeMap.DATE_TYPE })}
+          onChange={(v) =>
+            onChange({
+              isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
+              isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
+            })
+          }
         />
         {isDateTypeOnly && (
           <>
@@ -167,7 +194,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         )}
       </form>
       {error && <div className="text-red-500 font-medium my-1">{error}</div>}
-      <div className="flex my-4 justify-between">
+      <div className="flex mt-4 justify-between">
         <div className={classNames({ 'cursor-not-allowed': !(venueId || dateType) || !fromDate || !toDate })}>
           <Button
             onClick={() => null}
