@@ -4,7 +4,7 @@ import Icon from '../Icon';
 import classNames from 'classnames';
 import Label from '../Label';
 
-export type SelectOption = { text: string; value: string };
+export type SelectOption = { text: string; value: string | number };
 
 export interface SelectProps {
   value?: string;

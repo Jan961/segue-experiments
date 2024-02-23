@@ -7,7 +7,10 @@ import { useRecoilValue } from 'recoil';
 const SelectDayTypeRender = (props: CustomCellRendererProps) => {
   const dayTypes = useRecoilValue(dateTypeState);
 
-  const DayTypeOptions = useMemo(() => [...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))], [dayTypes]);
+  const DayTypeOptions = useMemo(
+    () => [...dayTypes.map(({ Id: value, Name: text }) => ({ text, value })), { text: 'Performance', value: -1 }],
+    [dayTypes],
+  );
 
   // const dayTypeOptions = [
   //   '-',
