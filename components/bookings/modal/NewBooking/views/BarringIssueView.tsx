@@ -1,6 +1,7 @@
 import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
+import { steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
@@ -37,7 +38,7 @@ export default function BarringIssueView({ bookingConflicts }: BarringIssueViewP
     if (bookingConflicts?.length > 0) {
       previousStep();
     } else {
-      goToStep(0);
+      goToStep(steps.indexOf('Create New Booking'));
     }
   };
 
