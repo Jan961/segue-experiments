@@ -5,8 +5,6 @@ import Table from 'components/core-ui-lib/Table';
 import { tourSummaryColumnDefs, styleProps } from '../table/tableConfig';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
-const tableLens = ['h-[46px]', 'h-[89px]', 'h-[132px]', 'h-[175px]', 'h-[240px]', 'h-[261px]', 'h-[304px]'];
-
 export default function Report({
   visible,
   onClose,
@@ -49,7 +47,6 @@ export default function Report({
       type: 'fitGridWidth',
       defaultMinWidth: 50,
     },
-    suppressHeaders: true, // Hide the header
     getRowStyle: (params) => {
       if (params.data.bold) {
         return { fontWeight: '800' };
@@ -57,19 +54,6 @@ export default function Report({
         return { fontWeight: 'normal' };
       }
     },
-  };
-
-  /**
-   * used to get the table length based on the number of rows supplied
-   * the first table will be given more space to accommodate the header
-   */
-  const getTableStyle = (numRows: number, index: number) => {
-    // first table
-    if (index === 0) {
-      return 'h-[269px]';
-    } else {
-      return tableLens[numRows - 1];
-    }
   };
 
   return (
@@ -86,7 +70,7 @@ export default function Report({
               {productionSummary.map((item, index) => (
                 <div key={index} className={item.bold ? 'font-bold' : 'font-normal'}>
                   {item.length > 0 && (
-                    <div className={'w-[438px] mb-2 flex-col ' + getTableStyle(item.length, index)}>
+                    <div className={'w-[438px] mb-2 flex-col '}>
                       <Table
                         key={index}
                         columnDefs={tourSummaryColumnDefs}
