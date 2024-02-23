@@ -41,21 +41,17 @@ export default forwardRef(function Table(
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
     if (rowData?.length > 0) {
-      if (gridHeight < autoHeightLimit && params.api) {
-        params.api.updateGridOptions({ domLayout: 'autoHeight' });
-      } else {
-        params.api.updateGridOptions({ domLayout: 'normal' });
-      }
+      gridHeight < autoHeightLimit && params.api
+        ? params.api.updateGridOptions({ domLayout: 'autoHeight' })
+        : params.api.updateGridOptions({ domLayout: 'normal' });
     }
   };
 
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
-      if (gridHeight < autoHeightLimit) {
-        gridApi.updateGridOptions({ domLayout: 'autoHeight' });
-      } else {
-        gridApi.updateGridOptions({ domLayout: 'normal' });
-      }
+      gridHeight < autoHeightLimit && gridApi
+        ? gridApi.updateGridOptions({ domLayout: 'autoHeight' })
+        : gridApi.updateGridOptions({ domLayout: 'normal' });
     }
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
@@ -76,7 +72,7 @@ export default forwardRef(function Table(
       <div
         className="ag-theme-quartz"
         style={{
-          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : 'auto',
+          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : '',
         }}
       >
         <AgGridReact
