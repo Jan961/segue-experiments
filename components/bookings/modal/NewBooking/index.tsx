@@ -48,7 +48,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             onClose={onClose}
           />
           <BookingConflictsView data={state.bookingConflicts} />
-          <BarringIssueView />
+          <BarringIssueView bookingConflicts={state.bookingConflicts} />
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

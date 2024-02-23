@@ -105,12 +105,12 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
-    <div className="w-[385px]">
+    <div className="w-[385px] pb-6">
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
-          className=" bg-white my-2"
+          className=" bg-white my-2 w-fit"
           onChange={({ from, to }) =>
             onChange({
               fromDate: from?.toISOString() || '',
@@ -194,7 +194,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         )}
       </form>
       {error && <div className="text-red-500 font-medium my-1">{error}</div>}
-      <div className="flex my-4 justify-between">
+      <div className="flex mt-4 justify-between">
         <div className={classNames({ 'cursor-not-allowed': !(venueId || dateType) || !fromDate || !toDate })}>
           <Button
             onClick={() => null}
