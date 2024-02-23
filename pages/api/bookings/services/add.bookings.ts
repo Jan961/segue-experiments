@@ -1,12 +1,18 @@
 import prisma from 'lib/prisma';
 import { AddBookingsParams } from '../interface/add.interface'; // Adjust the import path as needed
-import { bookingMapper, performanceMapper } from 'lib/mappers';
+import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
 
 export class BookingService {
   static async createBookings(bookingsData: AddBookingsParams[]) {
     const promises = [];
     const bookings = [];
     let performances = [];
+    const rehearsals = [];
+    const getInFitUps = [];
+    const others = [];
+
+    const orderMap = new Map();
+    let counter = 1;
 
     await prisma.$transaction(async (tx) => {
       for (const bookingData of bookingsData) {
@@ -61,6 +67,7 @@ export class BookingService {
           });
 
           promises.push(bookingPromise);
+          orderMap.set(counter, 'booking');
         } else if (isRehearsal) {
           const rehearsalPromise = tx.rehearsal.create({
             data: {
@@ -71,6 +78,13 @@ export class BookingService {
               },
               StatusCode: BookingStatus,
               Date: new Date(bookingDate),
+              Notes,
+              // VenueId: {
+              //   connect: {
+              //     Id: VenueId,
+              //   },
+              // },
+              VenueId,
               DateType: {
                 connect: {
                   Id: DateTypeId,
@@ -80,15 +94,18 @@ export class BookingService {
           });
 
           promises.push(rehearsalPromise);
+          orderMap.set(counter, 'rehearsal');
         } else if (isGetInFitUp) {
           const getInFitUpPromise = tx.getInFitUp.create({
             data: {
-              Date: new Date(bookingDate),
               DateBlock: {
                 connect: {
                   Id: DateBlockId,
                 },
               },
+              StatusCode: BookingStatus,
+              Date: new Date(bookingDate),
+              Notes,
               Venue: {
                 connect: {
                   Id: VenueId,
@@ -98,6 +115,7 @@ export class BookingService {
           });
 
           promises.push(getInFitUpPromise);
+          orderMap.set(counter, 'getInFitUp');
         } else {
           const getOther = tx.other.create({
             data: {
@@ -108,6 +126,7 @@ export class BookingService {
               },
               StatusCode: BookingStatus,
               Date: new Date(bookingDate),
+              Notes,
               DateType: {
                 connect: {
                   Id: DateTypeId,
@@ -116,23 +135,68 @@ export class BookingService {
             },
           });
           promises.push(getOther);
+          orderMap.set(counter, 'other');
         }
+
+        counter++;
       }
+      counter = 1;
+      // const createdItems = await Promise.allSettled(promises);
+
+      // // Processing created items
+      // for (const item of createdItems) {
+      //   if (item.status === 'fulfilled') {
+      //     bookings.push(bookingMapper(item.value));
+      //     if (item.value.Performance) {
+      //       performances = performances.concat(
+      //         item.value.Performance.map((performance) => performanceMapper(performance)),
+      //       );
+      //     }
+      //   }
+      // }
+
       const createdItems = await Promise.allSettled(promises);
 
-      // Processing created items
+      console.log(createdItems);
+
       for (const item of createdItems) {
         if (item.status === 'fulfilled') {
-          bookings.push(bookingMapper(item.value));
-          if (item.value.Performance) {
-            performances = performances.concat(
-              item.value.Performance.map((performance) => performanceMapper(performance)),
-            );
+          const type = orderMap.get(counter);
+          counter++;
+          console.log('type : ', type);
+
+          const value = item.value;
+          // Assuming value contains a property `type` to distinguish between booking, rehearsal, etc.
+          // This requires your creation logic to somehow include this information in the result.
+          switch (type) {
+            case 'booking':
+              bookings.push(bookingMapper(value));
+              if (value.Performance) {
+                performances = performances.concat(value.Performance.map(performanceMapper));
+              }
+              break;
+            case 'rehearsal':
+              rehearsals.push(rehearsalMapper(value));
+              break;
+            case 'getInFitUp':
+              getInFitUps.push(getInFitUpMapper(value));
+              break;
+            case 'other':
+              others.push(otherMapper(value));
+              break;
+            default:
+              // Handle any unexpected types
+              break;
           }
+        } else if (item.status === 'rejected') {
+          // Log the error or handle rejected promises as needed
+          // console.error(item.reason);
         }
       }
-    });
 
-    return { bookings, performances };
+      // Continue with your return or further processing
+      // return { bookings, performances, rehearsals, getInFitUps, others };
+    });
+    return { bookings, performances, rehearsals, getInFitUps, others };
   }
 }

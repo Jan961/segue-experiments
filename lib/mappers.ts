@@ -82,6 +82,9 @@ export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
   Date: convertDate(r.Date),
   Town: r.Town,
   StatusCode: r.StatusCode,
+  Notes: r.Notes,
+  DateType: r.DateTypeId, // Assuming the DateType ID is stored in DateTypeId
+  VenueId: r.VenueId,
 });
 
 export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
@@ -131,6 +134,7 @@ export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => ({
   Id: gifu.Id,
   VenueId: gifu.VenueId,
   StatusCode: gifu.StatusCode as StatusCode,
+  Notes: gifu.Notes,
 });
 
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
