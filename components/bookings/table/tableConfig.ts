@@ -49,7 +49,8 @@ export const columnDefs = [
     cellRenderer: NoteColumnRenderer,
     resizable: false,
     width: 50,
-    tooltipValueGetter: (params: ITooltipParams) => (params.value ? 'View Notes' : 'No Notes'),
+    tooltipValueGetter: (params: ITooltipParams) =>
+      params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
     tooltipComponentParams: { left: '-2.5rem' },
     tooltipComponent: TableTooltip,
   },
@@ -88,8 +89,20 @@ export const gapSuggestColumnDefs = [
 ];
 
 export const tourSummaryColumnDefs = [
-  { headerName: 'Production\nCode', field: 'prodCode', cellRenderer: DefaultCellRenderer, width: 150, headerClass: 'text-center' },
+  {
+    headerName: 'Production\nCode',
+    field: 'prodCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+    headerClass: 'text-center',
+  },
   { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 200, headerClass: 'text-center' },
-  { headerName: '', field: 'value', cellRenderer: DefaultCellRenderer, width: 84, headerClass: 'text-center', resizable: false },
+  {
+    headerName: '',
+    field: 'value',
+    cellRenderer: DefaultCellRenderer,
+    width: 84,
+    headerClass: 'text-center',
+    resizable: false,
+  },
 ];
-
