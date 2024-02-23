@@ -38,6 +38,7 @@ export default function SelectVenueRender(props: CustomCellRendererProps) {
       setIsDayOff(false);
     }
   }, [props.data.dayType]);
+  console.log('props.value :>> ', props);
   return (
     <>
       {isDayOff ? (

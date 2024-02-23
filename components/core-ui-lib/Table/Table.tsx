@@ -1,9 +1,8 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
 import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-
-const AUTO_HEIGHT_LIMIT = 2;
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+// import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
   headerColor?: string;
@@ -19,47 +18,84 @@ interface TableProps {
   getRowStyle?: any;
 }
 
+const ROW_HEIGHT = 43;
+const HEADER_HEIGHT = 51;
+const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
+
 export default forwardRef(function Table(
   { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, getRowStyle }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
-
+  const [autoHeightLimit, setAutoHeightLimit] = useState<number>(400);
   useImperativeHandle(ref, () => ({
     getApi: () => gridApi,
   }));
 
+  const gridHeight = useMemo(() => {
+    if (rowData?.length > 0) {
+      return HEADER_HEIGHT + rowData.length * ROW_HEIGHT;
+    }
+    return HEADER_HEIGHT;
+  }, [rowData]);
+
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
-    if (rowData?.length > 0 && rowData?.length < AUTO_HEIGHT_LIMIT && params.api) {
-      params.api.updateGridOptions({ domLayout: 'autoHeight' });
+    if (rowData?.length > 0) {
+      if (gridHeight < autoHeightLimit && params.api) {
+        params.api.updateGridOptions({ domLayout: 'autoHeight' });
+      } else {
+        params.api.updateGridOptions({ domLayout: 'normal' });
+      }
     }
   };
 
   useEffect(() => {
     if (rowData?.length > 0 && gridApi) {
-      if (rowData?.length < AUTO_HEIGHT_LIMIT) {
+      if (gridHeight < autoHeightLimit) {
         gridApi.updateGridOptions({ domLayout: 'autoHeight' });
       } else {
         gridApi.updateGridOptions({ domLayout: 'normal' });
       }
     }
-  }, [rowData]);
+  }, [rowData, gridApi, autoHeightLimit, gridHeight]);
+
+  useEffect(() => {
+    setAutoHeightLimit(window.innerHeight - DELTA);
+    const handleResize = () => {
+      setAutoHeightLimit(window.innerHeight - DELTA);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   return (
     <>
       <GridStyles {...styleProps} />
-      <div className="ag-theme-quartz h-full">
+      <div
+        className="ag-theme-quartz"
+        style={{
+          height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : 'auto',
+        }}
+      >
         <AgGridReact
+          // defaultColDef={{
+          //   tooltipComponent: TableTooltip,
+          // }}
           rowData={rowData}
           columnDefs={columnDefs}
-          headerHeight={51}
-          rowHeight={43}
+          headerHeight={HEADER_HEIGHT}
+          rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
-          gridOptions={gridOptions}
           onGridReady={onGridReady}
           getRowStyle={getRowStyle}
+          tooltipHideDelay={5000}
+          tooltipShowDelay={0}
+          gridOptions={gridOptions}
+          reactiveCustomComponents
         />
       </div>
     </>

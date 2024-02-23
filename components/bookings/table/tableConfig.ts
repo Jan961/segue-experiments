@@ -5,8 +5,9 @@ import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
+import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
+import { ITooltipParams } from 'ag-grid-community';
 
-import TimeInput from 'components/core-ui-lib/TimeInput';
 import SelectBookingStatusRender from './SelectBookingStatusRender';
 
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -18,10 +19,17 @@ import SelectVenueRender from './SelectVenueRender';
 import SelectPencilRender from './SelectPencilRender';
 import CheckPerfRender from './CheckPerfRender';
 
+import TimeArrayRender from './TimeArrayRender';
+
 export const styleProps = { headerColor: tileColors.bookings };
 
 export const columnDefs = [
-  { headerName: 'Production', field: 'production', cellRenderer: DefaultCellRenderer, width: 120 },
+  {
+    headerName: 'Production',
+    field: 'production',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
   {
     headerName: 'Date',
     field: 'date',
@@ -48,7 +56,16 @@ export const columnDefs = [
     cellRenderer: MilesRenderer,
   },
   { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 110 },
-  { headerName: '', field: 'note', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
+  {
+    headerName: '',
+    field: 'note',
+    cellRenderer: NoteColumnRenderer,
+    resizable: false,
+    width: 50,
+    tooltipValueGetter: (params: ITooltipParams) => (params.value ? 'View Notes' : 'No Notes'),
+    tooltipComponentParams: { left: '-2.5rem' },
+    tooltipComponent: TableTooltip,
+  },
 ];
 
 export const bookingConflictsColumnDefs = [
@@ -112,8 +129,17 @@ export const NewBookingColumnDefs = [
   {
     headerName: 'No Perf',
     field: 'noPerf',
-    editable: true,
+
+    // editable: (params) => params.data.dayType === 'Performance',
+    editable: false,
     cellRenderer: NoPerfRender,
+    // cellEditor: NoPerfRenderEditor,
+    valueGetter: (params) => {
+      // Your logic to derive the value based on data
+      const isPerformance = params.data.dayType === 'Performance';
+      return isPerformance ? params.data.noPerf : '';
+    },
+
     width: 75,
     cellStyle: {
       height: 'fit-content',
@@ -123,9 +149,28 @@ export const NewBookingColumnDefs = [
   {
     headerName: 'Times',
     field: 'times',
-    editable: true,
-    cellRenderer: TimeInput,
+    // editable: true,
+    wrapText: true,
+    cellRenderer: TimeArrayRender,
     width: 80,
+
+    valueGetter: function (params) {
+      console.log('params g:>> ', params.data.noPerf);
+
+      // Access the component instance and force update
+      if (params.api && params.api.getRenderedNodes) {
+        const renderedNodes = params.api.getRenderedNodes();
+        const nodeToUpdate = renderedNodes.find((node) => node.data.id === params.data.id);
+
+        if (nodeToUpdate && nodeToUpdate.childFlowsRendererInstance) {
+          // Assuming childFlowsRendererInstance is a reference to TimeArrayRender component instance
+          nodeToUpdate.childFlowsRendererInstance.forceUpdate();
+        }
+      }
+
+      // Return the value for the cell
+      return params.data.noPerf;
+    },
   },
   {
     headerName: 'Booking Status',

@@ -7,16 +7,17 @@ import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { dateTypeState } from 'state/booking/dateTypeState';
-import DateInput from 'components/core-ui-lib/DateInput';
 import { useWizard } from 'react-use-wizard';
 import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { steps } from 'config/AddBooking';
+import { BookingTypeMap, BookingTypes, steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import Select from 'components/core-ui-lib/Select';
+import DateRange from 'components/core-ui-lib/DateRange';
 
 type AddBookingProps = {
   formData: TForm;
@@ -39,8 +40,15 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
   const productionCode = useMemo(
-    () => (currentProduction ? `${currentProduction?.ShowCode}${currentProduction?.Code}` : 'All'),
+    () =>
+      currentProduction
+        ? `${currentProduction?.ShowCode}${currentProduction?.Code} ${currentProduction?.ShowName}`
+        : 'All',
     [currentProduction],
+  );
+  const bookingTypeValue = useMemo(
+    () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
+    [isDateTypeOnly],
   );
 
   useEffect(() => {
@@ -69,7 +77,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
-      data: formData,
+      data: { ...formData, ProductionId: currentProduction?.Id },
     }).then((data: any) => {
       updateBookingConflicts(data);
       if (data.error) {
@@ -98,50 +106,36 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     <div>
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-2 px-4 rounded-lg" onSubmit={handleOnSubmit}>
-        {stage === 0 && (
-          <div className="flex flex-col my-2">
-            <div className="text-white text-sm font-bold pl-2">Date</div>
-            <DateInput
-              placeholder="DD/MM/YY"
-              popperClassName="!z-[51]"
-              inputClass="w-full"
-              className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
-              minDate={minDate ? new Date(minDate) : null}
-              maxDate={maxDate ? new Date(maxDate) : null}
-              value={fromDate ? new Date(fromDate) : null}
-              onChange={(date) =>
-                onChange({
-                  fromDate: date?.toLocaleDateString(),
-                  ...(!toDate && { toDate: date?.toLocaleDateString() }),
-                })
-              }
-            />
-          </div>
-        )}
-        {stage === 0 && (
-          <div className="flex flex-col my-2">
-            <div className="text-white text-sm font-bold pl-2">Last Date</div>
-            <DateInput
-              placeholder="DD/MM/YY"
-              popperClassName="!z-[51]"
-              inputClass="w-full"
-              className="rounded border-gray-300 px-3 z-90 w-full my-1 h-9"
-              value={toDate ? new Date(toDate) : null}
-              minDate={fromDate ? new Date(fromDate) : new Date()}
-              maxDate={maxDate ? new Date(maxDate) : null}
-              onChange={(date) => onChange({ toDate: date?.toLocaleDateString() })}
-            />
-          </div>
-        )}
+        <DateRange
+          label="Date"
+          className="!w-full bg-white justify-around"
+          onChange={({ from, to }) =>
+            onChange({
+              fromDate: from?.toISOString() || '',
+              toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
+            })
+          }
+          value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
+          minDate={minDate ? new Date(minDate) : null}
+          maxDate={maxDate ? new Date(maxDate) : null}
+        />
+        <Select
+          className="w-[160px] my-2"
+          value={bookingTypeValue}
+          options={BookingTypes}
+          onChange={(v) => onChange({ isDateTypeOnly: v === BookingTypeMap.DATE_TYPE })}
+        />
         {isDateTypeOnly && (
-          <Typeahead
-            className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
-            options={DayTypeOptions}
-            disabled={stage !== 0}
-            onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
-            value={dateType}
-            placeholder={'Please select a DayType'}
-          />
+          <>
+            <Typeahead
+              className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
+              options={DayTypeOptions}
+              disabled={stage !== 0}
+              onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
+              value={dateType}
+              placeholder={'Please select a Day Type'}
+            />
+          </>
         )}
         {!isDateTypeOnly && (
           <>
@@ -160,21 +154,13 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
             />
-            <div className="flex flex-wrap item-center w-full gap-2">
-              <Button
-                className="px-4"
-                disabled={!(fromDate && toDate)}
-                variant="secondary"
-                text="Gap Suggest"
-                onClick={goToGapSuggestion}
-              />
-              <Button
-                className="px-4 flex-grow"
-                variant="secondary"
-                text="Continue with DayType only"
-                onClick={() => onChange({ isDateTypeOnly: true })}
-              />
-            </div>
+            <Button
+              className="px-4"
+              disabled={!(fromDate && toDate)}
+              variant="secondary"
+              text="Gap Suggest"
+              onClick={goToGapSuggestion}
+            />
           </>
         )}
       </form>
@@ -186,12 +172,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
           className="px-6"
           text={'Check Mileage'}
         ></Button>
-        <Button
-          onClick={onModalClose}
-          disabled={!(venueId || dateType) || !fromDate || !toDate}
-          variant="secondary"
-          text={'Cancel'}
-        ></Button>
+        <Button onClick={onModalClose} variant="secondary" text={'Cancel'}></Button>
         {!fetchingBookingConflicts && (
           <Button
             onClick={goToNext}

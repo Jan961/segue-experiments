@@ -86,3 +86,7 @@
 .unstyled::-webkit-calendar-picker-indicator {
   display: none;
 }
+
+.ag-theme-balham .ag-cell-inline-editing {
+  height: 100%;
+}

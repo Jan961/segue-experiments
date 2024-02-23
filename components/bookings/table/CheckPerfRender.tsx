@@ -18,6 +18,7 @@ const CheckPerfRender = (props: CustomCellRendererProps) => {
       props.node.setDataValue('dayType', 'Performance');
     } else {
       props.node.setDataValue('dayType', '-');
+      props.node.setDataValue('noPerf', 0);
     }
   };
 
