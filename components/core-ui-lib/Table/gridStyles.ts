@@ -14,6 +14,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-header-cell-moving-background-color: ${(props) => props.headerColor || '#FBFBFB'};
     --ag-row-border: 1px solid #dadce5;
     --ag-odd-row-background-color: #F8F8F8;
+
+    .ag-layout-auto-height .ag-center-cols-viewport {
+        min-height: 0px;
+    }
 }
 
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
@@ -41,6 +45,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-family: 'Calibri', sans-serif;
     font-weight: 600;
     font-size: 16px;
+    justify-content: center;
 }
 .ag-header-cell-resize::after {
     background-color: #FFF
