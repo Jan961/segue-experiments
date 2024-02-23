@@ -45,6 +45,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-family: 'Calibri', sans-serif;
     font-weight: 600;
     font-size: 16px;
+    justify-content: center;
 }
 .ag-header-cell-resize::after {
     background-color: #FFF
