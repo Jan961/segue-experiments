@@ -21,7 +21,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
     setNote(productionItem?.note || '');
   }, [productionItem?.note]);
 
-  const showConfModal = (mode:ConfDialogVariant) => {
+  const showConfModal = (mode: ConfDialogVariant) => {
     if (productionItem?.note !== note) {
       setVariant(mode);
       setConfirm(true);
@@ -34,18 +34,27 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
     setConfirm(false);
     setNote(productionItem?.note);
     onCancel();
-  }
+  };
 
   return (
     <div>
-      <PopupModal show={show} title="View / Edit Notes" titleClass="text-primary-navy" onClose={() => showConfModal('close')}>
+      <PopupModal
+        show={show}
+        title="View | Edit Notes"
+        titleClass="text-primary-navy"
+        onClose={() => showConfModal('close')}
+        hasOverlay={confirm}
+      >
         <div>
-          <h3 className="text-responsive-lg font-bold text-primary-navy">{`${productionItem?.production} | ${productionItem?.date}`}</h3>
-          <h3 className="text-responsive-lg font-bold text-primary-navy">
-            {productionItem?.venue !== undefined ? productionItem?.venue : ''}
-          </h3>
-          <TextArea className="mt-2 w-[482px] h-[237px]" value={note} onChange={(e) => setNote(e.target.value)} />
-          <div className="w-full mt-4 mb-8 flex justify-end items-center">
+          <h3 className="text-responsive-lg font-bold text-primary-navy">{`${productionItem?.production} | ${productionItem?.date} | ${
+            productionItem?.venue !== undefined ? productionItem?.venue : ''
+          }`}</h3>
+          <TextArea
+            className={'mt-2 h-[237px] w-full min-w-[508px]'}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <div className="w-full mt-4 mb-4 flex justify-end items-center">
             <Button className="w-33" variant="secondary" text="Cancel" onClick={() => showConfModal('cancel')} />
             <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
           </div>
@@ -57,6 +66,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
         show={confirm}
         onYesClick={handleCancel}
         onNoClick={() => setConfirm(false)}
+        hasOverlay={false}
       />
     </div>
   );

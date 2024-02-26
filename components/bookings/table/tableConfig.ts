@@ -49,7 +49,8 @@ export const columnDefs = [
     cellRenderer: NoteColumnRenderer,
     resizable: false,
     width: 50,
-    tooltipValueGetter: (params: ITooltipParams) => (params.value ? 'View Notes' : 'No Notes'),
+    tooltipValueGetter: (params: ITooltipParams) =>
+      params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
     tooltipComponentParams: { left: '-2.5rem' },
     tooltipComponent: TableTooltip,
   },
