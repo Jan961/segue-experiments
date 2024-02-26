@@ -119,6 +119,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             value: cancelledBookings || 0,
             bold: false,
           },
+          ...(others || []),
         ],
         cancelledPerformances > 0
           ? [
@@ -187,7 +188,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             bold: true,
           },
         ],
-        [...(others || [])],
         [
           {
             name: 'Venues on Tour',
