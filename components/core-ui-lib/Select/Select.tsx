@@ -16,6 +16,7 @@ export interface SelectProps {
   options?: SelectOption[];
   testId?: string;
   label?: string;
+  inline?: boolean;
 }
 
 const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) => {
@@ -29,12 +30,12 @@ const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) =
     placeHolder = 'Please select a value',
     testId = '',
     label = '',
+    inline = false,
   } = props;
 
   const [selectedOption, setSelectedOption] = useState<SelectOption>({ text: '', value: '' });
 
   const handleOptionSelect = (v: string) => {
-    console.log(v);
     const selected = options.find(({ value }) => value === v);
     setSelectedOption(selected);
     onChange(v);
@@ -49,7 +50,9 @@ const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) =
   return (
     <div
       ref={ref}
-      className={`${className} !shadow-sm-shadow border border-primary-border rounded-md flex items-center ${disabledClass}`}
+      className={classNames(`${className}  flex items-center ${disabledClass}`, {
+        '!shadow-sm-shadow border border-primary-border rounded-md': !inline,
+      })}
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
     >
       {label && (
@@ -62,7 +65,12 @@ const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) =
           <>
             <div className="relative w-full">
               <Listbox.Button
-                className={`${buttonClass} relative w-full h-[1.9375rem] cursor-default rounded-md bg-white pl-3 pr-10 text-left focus:outline-none focus:ring-0`}
+                className={classNames(
+                  `${buttonClass} relative w-full h-[1.9375rem] cursor-default rounded-md bg-white pl-3 pr-10 text-left focus:outline-none focus:ring-0`,
+                  {
+                    'border border-primary-border': inline,
+                  },
+                )}
               >
                 <span className="block truncate text-primary-input-text text-base">
                   {selectedOption?.text || placeHolder}

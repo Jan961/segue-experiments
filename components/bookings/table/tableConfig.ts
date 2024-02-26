@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams , ISelectCellEditorParams } from 'ag-grid-community';
+import { ITooltipParams, ISelectCellEditorParams } from 'ag-grid-community';
 
 import SelectBookingStatusRender from './SelectBookingStatusRender';
 
@@ -89,57 +89,35 @@ export const NewBookingColumnDefs = [
     field: 'perf',
     width: 100,
     cellRenderer: CheckPerfRender,
-    editable: false,
-    cellStyle: {
-      height: 'fit-content',
-
-      width: 100,
-    },
   },
 
   {
     headerName: 'Day Type',
     field: 'dayType',
-    editable: false,
     cellRenderer: SelectDayTypeRender,
-    width: 170,
-    maxWidth: 160,
-
+    width: 230,
+    maxWidth: 230,
     cellStyle: {
       overflow: 'visible',
-      width: 160,
-      maxWidth: 160,
     },
   },
   {
     headerName: 'Venue',
     field: 'venue',
-
     cellRenderer: SelectVenueRender,
-    // cellEditorParams: {
-    //   values: venue,
-    // },
-    width: 242,
+    flex: 1,
     cellStyle: {
       overflow: 'visible',
-      width: 242,
-      maxWidth: 242,
     },
   },
   {
     headerName: 'No Perf',
     field: 'noPerf',
-
-    // editable: (params) => params.data.dayType === 'Performance',
-    editable: false,
     cellRenderer: NoPerfRender,
-    // cellEditor: NoPerfRenderEditor,
     valueGetter: (params) => {
-      // Your logic to derive the value based on data
       const isPerformance = params.data.dayType === 'Performance';
       return isPerformance ? params.data.noPerf : '';
     },
-
     width: 75,
     cellStyle: {
       height: 'fit-content',
@@ -180,7 +158,6 @@ export const NewBookingColumnDefs = [
     width: 146,
     cellStyle: {
       overflow: 'visible',
-      width: 146,
     },
   },
   {
@@ -200,15 +177,9 @@ export const NewBookingColumnDefs = [
 
     cellStyle: {
       overflow: 'visible',
-      // marginLeft: 'auto',
-      // marginRight: 'auto',
-      zIndex: '200',
-      // text: 'center',
-      width: 80,
-      maxWidth: 80,
     },
   },
-  { headerName: 'Notes', field: 'notes', width: 100, cellRenderer: NoteColumnRenderer },
+  { headerName: 'Notes', field: 'notes', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
 ];
 
 export const gapSuggestColumnDefs = [

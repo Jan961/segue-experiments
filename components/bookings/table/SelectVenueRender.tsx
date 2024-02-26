@@ -44,13 +44,8 @@ export default function SelectVenueRender(props: CustomCellRendererProps) {
       {isDayOff ? (
         <p>Day off</p>
       ) : (
-        <div className="w-[98%] h-full mx-auto">
-          <Select
-            options={VenueOptions}
-            value={props.value}
-            className="!shadow-none border-none"
-            buttonClass=" border border-primary-border !text-red-500"
-          />
+        <div className="pl-1 pr-2">
+          <Select options={VenueOptions} value={props.value} inline />
         </div>
       )}
     </>

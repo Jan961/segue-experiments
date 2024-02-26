@@ -1,10 +1,11 @@
 // import NoPerfRenderEditor from 'components/bookings/table/NoPerfRenderEditor';
 import { NewBookingColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
-
+import { addDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
+import { TForm } from '../reducer';
 
 type BookingDataItem = {
   date: string;
@@ -21,25 +22,20 @@ type BookingDataItem = {
   isGetInFitUp: boolean;
 };
 type NewBookingDetailsProps = {
-  data: {
-    fromDate: Date;
-    toDate: Date;
-    venueId?: number;
-    dateType?: number;
-  };
+  formData: TForm;
 };
 
-export default function NewBookingDetails(data: NewBookingDetailsProps) {
-  console.log('data new booking data.data :>> ', data);
+export default function NewBookingDetailsView({ formData }: NewBookingDetailsProps) {
+  const { fromDate, toDate, dateType, venueId } = formData;
   const [bookingData, setBookingData] = useState<BookingDataItem[]>([]);
   useEffect(() => {
-    const currentDate = new Date(data.data.fromDate);
-    const toDate = new Date(data.data.toDate);
+    let startDate = new Date(fromDate);
+    const endDate = new Date(toDate);
     const dates = [];
 
-    while (currentDate <= toDate) {
+    while (startDate <= endDate) {
       console.log('while :>> ');
-      const formattedDate = `${currentDate.toLocaleDateString('en-US', {
+      const formattedDate = `${startDate.toLocaleDateString('en-US', {
         weekday: 'short',
         day: '2-digit',
         month: '2-digit',
@@ -51,13 +47,13 @@ export default function NewBookingDetails(data: NewBookingDetailsProps) {
       const dateObject = {
         date: reorderedDate,
         perf: false, // Set your default values
-        dayType: data.data?.dateType,
-        venue: data.data.venueId,
+        dayType: dateType,
+        venue: venueId,
         noPerf: 0,
         times: '',
         bookingStatus: '',
         pencilNo: '',
-        notes: 'Lorem ipsum',
+        notes: '',
         isBooking: false,
         isRehearsal: false,
         isGetInFitUp: false,
@@ -66,10 +62,10 @@ export default function NewBookingDetails(data: NewBookingDetailsProps) {
       // console.log('formattedDate  reorderedDate...:>> ', reorderedDate);
 
       // Increment currentDate by one day for the next iteration
-      currentDate.setDate(currentDate.getDate() + 1);
+      startDate = addDays(startDate, 1);
     }
     setBookingData(dates);
-  }, [data.data.fromDate, data.data.toDate]);
+  }, [fromDate, toDate]);
 
   const { nextStep, previousStep } = useWizard();
 
@@ -93,13 +89,6 @@ export default function NewBookingDetails(data: NewBookingDetailsProps) {
   //   }
   // };
 
-  const getRowStyle = (params) => {
-    const zIndex = bookingData.length - params.node.rowIndex; // Calculate z-index in descending order
-
-    return {
-      zIndex: zIndex.toString(), // Convert the zIndex to string and apply
-    };
-  };
   const PreviewBooking = () => {
     console.table(bookingData);
   };
@@ -120,8 +109,6 @@ export default function NewBookingDetails(data: NewBookingDetailsProps) {
           rowData={bookingData}
           styleProps={styleProps}
           gridOptions={gridOptions}
-          // onCellClicked={handleCellClick}
-          getRowStyle={getRowStyle}
         />
 
         <div className="py-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">

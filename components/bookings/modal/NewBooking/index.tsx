@@ -12,7 +12,7 @@ import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
-import NewBookingDetails from './views/NewBookingDetails';
+import NewBookingDetailsView from './views/NewBookingDetailsView';
 
 type AddBookingProps = {
   visible: boolean;
@@ -46,7 +46,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
-          <NewBookingDetails data={state.form} />
+          <NewBookingDetailsView formData={state.form} />
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

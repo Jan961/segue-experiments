@@ -3,15 +3,13 @@ import Select from 'components/core-ui-lib/Select';
 import { statusOptions } from 'config/bookings';
 
 const SelectBookingStatusRender = (props: CustomCellRendererProps) => {
-  console.log('props.value :>> ', props.value);
   return (
-    <div className="w-[98%] h-full mx-auto  ">
+    <div className="pl-1 pr-2">
       <Select
         onChange={(value) => ({ target: { id: 'status', value } })}
         options={statusOptions}
         value={props.value}
-        className="!shadow-none border-none"
-        buttonClass=" border border-primary-border"
+        inline
       />
     </div>
   );

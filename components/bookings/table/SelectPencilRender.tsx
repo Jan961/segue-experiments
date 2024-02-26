@@ -6,13 +6,13 @@ const SelectTableRender = (props: CustomCellRendererProps) => {
     return { text: value === '' ? '-' : value, value };
   });
   return (
-    <div className="w-full h-full p-1">
+    <div className="pl-1 pr-2">
       <Select
         onChange={(value) => ({ target: { id: 'pencilNo', value } })}
         options={mappedPencilNo}
         value={props.value.toString()}
-        className="!shadow-none border-none"
         buttonClass=" border border-primary-border"
+        inline
       />
     </div>
   );
