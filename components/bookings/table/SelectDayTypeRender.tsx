@@ -69,7 +69,7 @@ const SelectDayTypeRender = (props: CustomCellRendererProps) => {
       <Select
         options={DayTypeOptions}
         value={initialValue}
-        className="!shadow-none border-none"
+        className="!shadow-none !border-none"
         buttonClass=" border border-primary-border "
         onChange={handleChange}
       />

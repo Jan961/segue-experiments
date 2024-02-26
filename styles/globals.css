@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Required by Typeahead (react-select) */
+input[type='text']:focus {
+  box-shadow: none;
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;

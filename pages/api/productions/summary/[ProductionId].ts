@@ -90,90 +90,107 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       data: [
         [
           {
-            name: 'Production Duration Days',
+            name: 'Day Off (Pencilled)',
             prodCode,
-            value: numberOfDays || 0,
-          },
-        ],
-        [
-          {
-            name: 'Available Working Days',
-            prodCode,
-            value: workingDays || 0,
-          },
-        ],
-        [
-          {
-            name: 'Bookings(Pencilled)',
-            prodCode,
-            value: pencilledBookings || 0,
-          },
-          {
-            name: 'Bookings',
-            prodCode,
-            value: bookings || 0,
-          },
-          {
-            name: 'Rehearsal',
-            prodCode,
-            value: summary?.Rehearsal?.value || 0,
+            value: pencilledDayOff || 0,
+            bold: false,
           },
           {
             name: 'Get-In / Fit-Up',
             prodCode,
             value: summary?.['Get-In / Fit-Up']?.value || 0,
+            bold: false,
           },
           {
-            name: 'Travel Day',
+            name: 'Rehearsals (Pencilled)',
             prodCode,
-            value: summary?.['Travel Day']?.value || 0,
+            value: pencilledRehearsals || 0,
+            bold: false,
+          },
+          {
+            name: 'Performance Days (Pencilled)',
+            prodCode,
+            value: pencilledBookings || 0,
+            bold: false,
+          },
+          {
+            name: 'Performance Days (Cancelled)',
+            prodCode,
+            value: cancelledBookings || 0,
+            bold: false,
+          },
+          ...(others || []),
+        ],
+        cancelledPerformances > 0
+          ? [
+              {
+                name: 'Performances (Cancelled)',
+                prodCode,
+                value: Number(cancelledPerformances) || 0,
+                bold: false,
+              },
+              {
+                name: 'Total Performances',
+                prodCode,
+                value: totalPerformances || 0,
+                bold: true,
+              },
+            ]
+          : [
+              {
+                name: 'Total Performances',
+                prodCode,
+                value: totalPerformances || 0,
+                bold: true,
+              },
+            ],
+        [
+          {
+            name: 'Production Duration Days',
+            prodCode,
+            value: numberOfDays || 0,
+            bold: false,
+          },
+          {
+            name: 'Available Working Days',
+            prodCode,
+            value: workingDays || 0,
+            bold: false,
+          },
+          {
+            name: 'Performance Days',
+            prodCode,
+            value: bookings || 0,
+            bold: false,
           },
           {
             name: 'Declared Holiday',
             prodCode,
             value: summary?.['Declared Holiday']?.value || 0,
+            bold: false,
           },
-          ...(others || []),
-        ],
-        [
+          {
+            name: 'Rehearsal',
+            prodCode,
+            value: summary?.Rehearsal?.value || 0,
+            bold: false,
+          },
+          {
+            name: 'Travel Days',
+            prodCode,
+            value: summary?.['Travel Day']?.value || 0,
+            bold: false,
+          },
           {
             name: 'Remaining Days',
             prodCode,
             value: workingDays - otherDays || 0,
+            bold: true,
           },
         ],
         [
           {
-            name: 'Bookings(Cancelled)',
-            prodCode,
-            value: cancelledBookings || 0,
-          },
-          {
-            name: 'Rehearsals(Pencilled)',
-            prodCode,
-            value: pencilledRehearsals || 0,
-          },
-          {
-            name: 'Day Off(Pencilled)',
-            prodCode,
-            value: pencilledDayOff || 0,
-          },
-        ],
-        [
-          {
-            name: 'Total Performances',
-            prodCode,
-            value: totalPerformances || 0,
-          },
-          {
-            name: 'Performances(Cancelled)',
-            prodCode,
-            value: Number(cancelledPerformances) || 0,
-          },
-        ],
-        [
-          {
-            name: 'Venues on Production',
+            name: 'Venues on Tour',
             prodCode,
             value: totalVenuesonProduction || 0,
           },

@@ -18,6 +18,8 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
+import Icon from 'components/core-ui-lib/Icon';
+import Tooltip from 'components/core-ui-lib/Tooltip';
 
 type AddBookingProps = {
   formData: TForm;
@@ -38,7 +40,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
-  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
+  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
   const productionCode = useMemo(
     () =>
       currentProduction
@@ -103,12 +105,12 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
-    <div>
+    <div className="w-[385px] pb-6">
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
-      <form className="flex flex-col bg-primary-navy py-2 px-4 rounded-lg" onSubmit={handleOnSubmit}>
+      <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
-          className="!w-full bg-white justify-around"
+          className=" bg-white my-2 w-fit"
           onChange={({ from, to }) =>
             onChange({
               fromDate: from?.toISOString() || '',
@@ -119,16 +121,41 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
         />
+        {!isDateTypeOnly && (
+          <div className="flex items-center gap-2 my-1 justify-start">
+            <Checkbox
+              className="!w-fit"
+              id="shouldFilterVenues"
+              labelClassName="text-white w-fit"
+              onChange={(e: any) => onChange({ isRunOfDates: e.target.checked })}
+              checked={isRunOfDates}
+              label="This is a run of dates. Y/N"
+            />
+            <Tooltip
+              body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
+              position="right"
+              width="w-[140px]"
+              bgColorClass="primary-input-text"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
+          </div>
+        )}
         <Select
-          className="w-[160px] my-2"
+          className="w-[160px] my-2 !border-0"
           value={bookingTypeValue}
           options={BookingTypes}
-          onChange={(v) => onChange({ isDateTypeOnly: v === BookingTypeMap.DATE_TYPE })}
+          onChange={(v) =>
+            onChange({
+              isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
+              isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
+            })
+          }
         />
         {isDateTypeOnly && (
           <>
             <Typeahead
-              className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
+              className={'my-2 w-full !border-0'}
               options={DayTypeOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
@@ -140,7 +167,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         {!isDateTypeOnly && (
           <>
             <Typeahead
-              className={classNames('my-2', { 'max-w-full': stage === 1, 'w-full': stage === 0 })}
+              className={classNames('my-2 w-full !border-0')}
               options={VenueOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ venueId: parseInt(value as string, 10) })}
@@ -154,31 +181,43 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
             />
-            <Button
-              className="px-4"
-              disabled={!(fromDate && toDate)}
-              variant="secondary"
-              text="Gap Suggest"
-              onClick={goToGapSuggestion}
-            />
+            <div className={classNames('w-full', { 'cursor-not-allowed': !(fromDate && toDate) })}>
+              <Button
+                className="px-4 my-2 !w-full"
+                disabled={!(fromDate && toDate)}
+                variant="secondary"
+                text="Gap Suggest"
+                onClick={goToGapSuggestion}
+              />
+            </div>
           </>
         )}
       </form>
       {error && <div className="text-red-500 font-medium my-1">{error}</div>}
-      <div className="grid grid-cols-3 my-4 gap-2">
-        <Button
-          onClick={() => null}
-          disabled={!(venueId || dateType) || !fromDate || !toDate}
-          className="px-6"
-          text={'Check Mileage'}
-        ></Button>
-        <Button onClick={onModalClose} variant="secondary" text={'Cancel'}></Button>
-        {!fetchingBookingConflicts && (
+      <div className="flex mt-4 justify-between">
+        <div className={classNames({ 'cursor-not-allowed': !(venueId || dateType) || !fromDate || !toDate })}>
           <Button
-            onClick={goToNext}
-            disabled={(isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate}
-            text={'Next'}
+            onClick={() => null}
+            disabled={!(venueId || dateType) || !fromDate || !toDate}
+            className="px-6"
+            text={'Check Mileage'}
           ></Button>
+        </div>
+        <Button className="px-8" onClick={onModalClose} variant="secondary" text={'Cancel'}></Button>
+        {!fetchingBookingConflicts && (
+          <div
+            className={classNames({
+              'cursor-not-allowed':
+                (isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate,
+            })}
+          >
+            <Button
+              className="px-9"
+              onClick={goToNext}
+              disabled={(isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate}
+              text={'Next'}
+            ></Button>
+          </div>
         )}
         {fetchingBookingConflicts && <Loader variant={'sm'} />}
       </div>

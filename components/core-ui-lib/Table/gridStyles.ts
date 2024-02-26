@@ -29,7 +29,11 @@ const GridStyles = createGlobalStyle<StyleProps>`
     }
    .ag-checkbox-edit{
        justify-content: center !important;
+    
+    .ag-layout-auto-height .ag-center-cols-viewport {
+        min-height: 0px;
     }
+}
     
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
     border: none;
@@ -56,6 +60,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-family: 'Calibri', sans-serif;
     font-weight: 600;
     font-size: 16px;
+    justify-content: center;
 }
 .ag-header-cell-resize::after {
     background-color: #FFF

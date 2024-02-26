@@ -6,14 +6,13 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';
+import { ITooltipParams , ISelectCellEditorParams } from 'ag-grid-community';
 
 import SelectBookingStatusRender from './SelectBookingStatusRender';
 
 import SelectDayTypeRender from './SelectDayTypeRender';
 
 import NoPerfRender from './NoPerfRender';
-import { ISelectCellEditorParams } from 'ag-grid-community';
 
 import SelectVenueRender from './SelectVenueRender';
 import SelectPencilRender from './SelectPencilRender';
@@ -62,7 +61,8 @@ export const columnDefs = [
     cellRenderer: NoteColumnRenderer,
     resizable: false,
     width: 50,
-    tooltipValueGetter: (params: ITooltipParams) => (params.value ? 'View Notes' : 'No Notes'),
+    tooltipValueGetter: (params: ITooltipParams) =>
+      params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
     tooltipComponentParams: { left: '-2.5rem' },
     tooltipComponent: TableTooltip,
   },
@@ -228,5 +228,22 @@ export const gapSuggestColumnDefs = [
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',
+  },
+];
+
+export const tourSummaryColumnDefs = [
+  {
+    headerName: 'Production Code',
+    field: 'prodCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 100,
+  },
+  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 220 },
+  {
+    headerName: '',
+    field: 'value',
+    cellRenderer: DefaultCellRenderer,
+    width: 115,
+    resizable: false,
   },
 ];

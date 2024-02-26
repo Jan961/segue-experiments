@@ -58,7 +58,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       });
       return;
     }
-    if (e.column.colId === 'note') {
+    if (e.column.colId === 'note' && e.data.venue && e.data.dayType) {
       setProductionItem(e.data);
       setShowModal(true);
     }

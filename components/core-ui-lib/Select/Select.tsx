@@ -49,7 +49,7 @@ const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) =
   return (
     <div
       ref={ref}
-      className={`${className} shadow-sm-shadow border border-primary-border rounded-md flex items-center ${disabledClass}`}
+      className={`${className} !shadow-sm-shadow border border-primary-border rounded-md flex items-center ${disabledClass}`}
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
     >
       {label && (
