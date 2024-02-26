@@ -10,8 +10,7 @@ interface PopupModalProps {
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
-  bgOpacity?: string;
-  contOpacity?: string;
+  hasOverlay?: boolean;
 }
 
 export default function PopupModal({
@@ -21,19 +20,13 @@ export default function PopupModal({
   onClose = () => null,
   titleClass,
   showCloseIcon = true,
-  bgOpacity = 'opacity-100',
-  contOpacity = '',
+  hasOverlay = false,
 }: PopupModalProps) {
-  const [backgroundOpacity, setBgOpacity] = useState(bgOpacity);
-  const [contentOpacity, setContOpacity] = useState(bgOpacity);
+  const [overlay, setOverlay] = useState<boolean>(false);
 
   useEffect(() => {
-    setBgOpacity(bgOpacity);
-  }, [bgOpacity]);
-
-  useEffect(() => {
-    setContOpacity(contOpacity);
-  }, [contOpacity]);
+    setOverlay(hasOverlay);
+  }, [hasOverlay]);
 
   return (
     <Transition appear show={show} as={Fragment}>
@@ -42,16 +35,20 @@ export default function PopupModal({
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
-          enterTo={backgroundOpacity}
+          enterTo={overlay ? 'opacity-0' : 'opacity-100'}
           leave="ease-in duration-200"
-          leaveFrom={backgroundOpacity}
+          leaveFrom={overlay ? 'opacity-0' : 'opacity-100'}
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/75 z-10" />
         </Transition.Child>
 
         <div className={`${calibri.variable} font-calibri fixed inset-0 overflow-y-auto z-20`}>
-          <div className={`flex min-h-full items-center justify-center p-4 text-center ${contentOpacity}`}>
+          <div
+            className={`flex min-h-full items-center justify-center p-4 text-center ${
+              overlay ? 'bg-black opacity-50' : 'opacity-100'
+            }`}
+          >
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
