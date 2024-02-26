@@ -13,6 +13,7 @@ export type TForm = {
   venueId?: number;
   dateType?: number;
   shouldFilterVenues?: boolean;
+  isRunOfDates?: boolean;
 };
 
 export type TState = {

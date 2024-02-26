@@ -79,6 +79,8 @@ export default function Typeahead({
       option: (styles, { isDisabled, isSelected }) => {
         return {
           ...styles,
+          fontSize: '1rem',
+          lineHeight: '1.5rem',
           backgroundColor: isDisabled ? undefined : isSelected ? '#21345BCC' : undefined,
           color: isDisabled ? '#ccc' : isSelected ? '#FFF' : '#617293',
           cursor: isDisabled ? 'not-allowed' : 'default',
