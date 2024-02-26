@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import { createGlobalStyle, styled } from 'styled-components';
 import { StyleProps } from './Table';
 
 const GridStyles = createGlobalStyle<StyleProps>`
@@ -14,6 +14,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-header-cell-moving-background-color: ${(props) => props.headerColor || '#FBFBFB'};
     --ag-row-border: 1px solid #dadce5;
     --ag-odd-row-background-color: #F8F8F8;
+
+    .ag-layout-auto-height .ag-center-cols-viewport {
+        min-height: 0px;
+    }
 }
 
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
@@ -41,10 +45,46 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-family: 'Calibri', sans-serif;
     font-weight: 600;
     font-size: 16px;
+    justify-content: center;
 }
 .ag-header-cell-resize::after {
     background-color: #FFF
 }
+`;
+
+interface TableTooltipProps {
+  background?: string;
+  border?: string;
+  color?: string;
+  left?: string;
+  top?: string;
+}
+
+export const StyledTableTooltip = styled.div<TableTooltipProps>`
+  position: relative;
+  padding: 0.5rem;
+  left: ${(props) => props.left};
+  top: ${(props) => props.top};
+  z-index: 500;
+  background: ${(props) => props.background};
+  boxshadow: 0 2px 5px ${(props) => props.border};
+  border: 1px solid ${(props) => props.border};
+  border-radius: 0.625rem;
+  font-family: 'Calibri', sans-serif;
+  font-size: 0.9375rem;
+  font-style: normal;
+  font-weight: 400;
+  color: ${(props) => props.color};
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%; /* To the right of the tooltip */
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent black;
+  }
 `;
 
 export default GridStyles;

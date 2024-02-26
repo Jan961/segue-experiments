@@ -33,6 +33,7 @@ export const Primary: Story = {
         <Icon iconName="exit" {...args} />
         <Icon iconName="excel" fill="#7B568D" {...args} />
         <Icon iconName="cross" {...args} />
+        <Icon iconName="info-circle-solid" {...args} />
       </div>
     );
   },

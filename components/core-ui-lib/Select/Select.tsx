@@ -62,7 +62,7 @@ const Select = forwardRef(
             <>
               <div className="relative w-full">
                 <Listbox.Button className="relative w-full h-[1.9375rem] cursor-default rounded-md bg-white pl-3 pr-10 text-left focus:outline-none focus:ring-0">
-                  <span className="block truncate text-primary-input-text text-base">
+                  <span className="block truncate text-primary-input-text font-bold text-base">
                     {selectedOption?.text || placeHolder}
                   </span>
                   <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">

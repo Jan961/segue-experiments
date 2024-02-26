@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
 
-type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave';
+export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave';
 
 interface ConfirmationDialogProps {
   children?: React.ReactNode;
@@ -56,7 +56,6 @@ export default function ConfirmationDialog({
   // yes = true, false = no
   const handleAction = (action: boolean) => {
     action ? onYesClick() : onNoClick();
-    setVisible(false);
   };
 
   return (

@@ -58,7 +58,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       });
       return;
     }
-    if (e.column.colId === 'note') {
+    if (e.column.colId === 'note' && e.data.venue && e.data.dayType) {
       setProductionItem(e.data);
       setShowModal(true);
     }
@@ -66,11 +66,12 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
 
   const handleSaveNote = (value: string) => {
     setShowModal(false);
-    
+
     fetchData({
-      url: '/api/bookings/update/', 
+      url: '/api/bookings/update/',
       method: 'POST',
-      data: { Id: productionItem.Id, Notes: value }})
+      data: { Id: productionItem.Id, Notes: value },
+    })
       .then((data: any) => {
         const updatedBooking = { ...bookingDict[data.Id], ...data };
         const replacement = { ...bookingDict, [data.Id]: updatedBooking };
@@ -154,7 +155,6 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         productionItem={productionItem}
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
-        onShow={() => setShowModal(true)}
       />
       {showAddBookingModal.visible && (
         <AddBooking {...showAddBookingModal} onClose={() => setShowAddBookingModal(AddBookingInitialState)} />

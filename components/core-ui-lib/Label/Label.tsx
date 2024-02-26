@@ -13,6 +13,6 @@ const labelClassMap = {
   lg: 'text-lg',
 };
 export default function Label({ text, variant = 'sm', className = '' }: LabelProps) {
-  const basClass = `text-primary-label ${labelClassMap[variant]}`;
+  const basClass = `text-primary-label font-calibri ${labelClassMap[variant]}`;
   return <span className={`${basClass} ${className}`}>{text}</span>;
 }
