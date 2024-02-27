@@ -1,11 +1,18 @@
+<<<<<<< HEAD
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
+=======
+import { useEffect, useMemo, useState } from 'react';
+import PopupModal from 'components/core-ui-lib/PopupModal';
+import Typeahead from 'components/core-ui-lib/Typeahead';
+>>>>>>> 057e36d (a start at SK-49-VenueHistory with the venue select modal)
 import { bookingState } from 'state/booking/bookingState';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
+<<<<<<< HEAD
 import { useRouter } from 'next/router';
 import SalesTable from 'components/marketing/sales/table';
 import { SalesSubmit, SalesTableVariant } from 'components/marketing/sales/table/SalesTable';
@@ -13,12 +20,15 @@ import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 import useAxios from 'hooks/useAxios';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
+=======
+>>>>>>> 057e36d (a start at SK-49-VenueHistory with the venue select modal)
 
 interface VenueHistoryProps {
   visible: boolean;
   onCancel: () => void;
 }
 
+<<<<<<< HEAD
 type TableWrapperProps = {
   multiplier: number;
 }
@@ -56,6 +66,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
+=======
+export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+  const [open, setOpen] = useState<boolean>(visible);
+  const bookingDict = useRecoilValue(bookingState);
+  const venueDict = useRecoilValue(venueState);
+
+  const handleModalCancel = () => onCancel?.();
+>>>>>>> 057e36d (a start at SK-49-VenueHistory with the venue select modal)
 
   const VenueOptions = useMemo(() => {
     const options = [];
@@ -74,6 +92,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     return options;
   }, [venueDict, bookingDict]);
 
+<<<<<<< HEAD
 
   useEffect(() => {
     setShowVenueSelect(visible);
@@ -374,5 +393,42 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </div>
       </PopupModal>
     </div>
+=======
+  const [venueId, setVenueId] = useState<number>(0);
+  // const [stage, setStage] = useState<number>(0);
+
+  useEffect(() => {
+    setOpen(visible);
+  }, [visible]);
+
+  return (
+    <PopupModal
+      show={open}
+      title="Venue History"
+      titleClass="text-xl text-primary-navy font-bold -mt-2"
+      onClose={handleModalCancel}
+    >
+      <div className="w-[417px] h-[130px]">
+        <div className="text  text-primary-navy">Please select a venue for comparision</div>
+
+        <Typeahead
+          className={classNames('my-2 w-full !border-0 text-primary-navy')}
+          options={VenueOptions}
+          // disabled={stage !== 0}
+          onChange={(value) => setVenueId(parseInt(value as string, 10))}
+          value={venueId}
+          placeholder={'Please select a venue'}
+          label="Venue"
+        />
+
+        <Button
+          className="px-8 mt-4 float-right"
+          onClick={handleModalCancel}
+          variant="secondary"
+          text={'Cancel'}
+        ></Button>
+      </div>
+    </PopupModal>
+>>>>>>> 057e36d (a start at SK-49-VenueHistory with the venue select modal)
   );
 };
