@@ -23,15 +23,13 @@ const CheckPerfRender = (props: CustomCellRendererProps) => {
   };
 
   return (
-    <>
-      <Checkbox
-        name="perfCheckbox"
-        checked={perfChecked}
-        onChange={handleCheckboxChange}
-        id="perf"
-        className=" justify-center mt-3"
-      />
-    </>
+    <Checkbox
+      name="perfCheckbox"
+      checked={perfChecked}
+      onChange={handleCheckboxChange}
+      id="perf"
+      className="w-[1.1875rem] h-[1.1875rem]"
+    />
   );
 };
 export default CheckPerfRender;

@@ -24,10 +24,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
     }
    .ag-checkbox-edit{
        justify-content: center !important;
-    
-    .ag-layout-auto-height .ag-center-cols-viewport {
-        min-height: 0px !important;
-    }
+}
+
+.ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
+    min-height: 0px!important;
 }
     
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
@@ -40,14 +40,14 @@ const GridStyles = createGlobalStyle<StyleProps>`
         content: '';
         position: absolute;
         right: 0px;
-        top: 25%;
-        height: 50%;
+        top: 7px;
+        bottom: 7px;
         border-right: 1px solid #617293;
     }
 }
 
 .ag-header-cell {
-    padding-left: 8px;
+    text-wrap: wrap;
 }
 
 .ag-header-cell-label {
@@ -59,6 +59,14 @@ const GridStyles = createGlobalStyle<StyleProps>`
 }
 .ag-header-cell-resize::after {
     background-color: #FFF
+}
+
+.ag-row {
+    z-index: 0;
+}
+
+.ag-row.ag-row-focus {
+    z-index: 1;
 }
 `;
 

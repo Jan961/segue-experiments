@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams, ISelectCellEditorParams } from 'ag-grid-community';
+import { ITooltipParams } from 'ag-grid-community';
 
 import SelectBookingStatusRender from './SelectBookingStatusRender';
 
@@ -65,6 +65,11 @@ export const columnDefs = [
       params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
     tooltipComponentParams: { left: '-2.5rem' },
     tooltipComponent: TableTooltip,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
   },
 ];
 
@@ -81,14 +86,20 @@ export const barringIssueColumnDefs = [
 ];
 
 export const NewBookingColumnDefs = [
-  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 130 },
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 112, maxWidth: 112 },
 
   // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
   {
-    headerName: 'Perf Y/N',
+    headerName: `Perf Y/N`,
     field: 'perf',
-    width: 100,
+    width: 72,
+    maxWidth: 72,
     cellRenderer: CheckPerfRender,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.75rem',
+    },
   },
 
   {
@@ -118,10 +129,12 @@ export const NewBookingColumnDefs = [
       const isPerformance = params.data.dayType === 'Performance';
       return isPerformance ? params.data.noPerf : '';
     },
-    width: 75,
+    width: 72,
+    maxWidth: 72,
     cellStyle: {
-      height: 'fit-content',
-      paddingTop: '10px',
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.75rem',
     },
   },
   {
@@ -130,24 +143,11 @@ export const NewBookingColumnDefs = [
     // editable: true,
     wrapText: true,
     cellRenderer: TimeArrayRender,
-    width: 80,
-
-    valueGetter: function (params) {
-      console.log('params g:>> ', params.data.noPerf);
-
-      // Access the component instance and force update
-      if (params.api && params.api.getRenderedNodes) {
-        const renderedNodes = params.api.getRenderedNodes();
-        const nodeToUpdate = renderedNodes.find((node) => node.data.id === params.data.id);
-
-        if (nodeToUpdate && nodeToUpdate.childFlowsRendererInstance) {
-          // Assuming childFlowsRendererInstance is a reference to TimeArrayRender component instance
-          nodeToUpdate.childFlowsRendererInstance.forceUpdate();
-        }
-      }
-
-      // Return the value for the cell
-      return params.data.noPerf;
+    width: 102,
+    maxWidth: 102,
+    cellStyle: {
+      display: 'flex',
+      paddingTop: '0.3rem',
     },
   },
   {
@@ -167,19 +167,23 @@ export const NewBookingColumnDefs = [
 
     width: 100,
     maxWidth: 100,
-    // editable: true,
-
-    cellEditorParams: {
-      // values: pencilNo,
-      valueListMaxHeight: 200,
-      valueListMaxWidth: 150,
-    } as ISelectCellEditorParams,
-
     cellStyle: {
       overflow: 'visible',
     },
   },
-  { headerName: 'Notes', field: 'notes', cellRenderer: NoteColumnRenderer, resizable: false, width: 50 },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    cellRenderer: NoteColumnRenderer,
+    resizable: false,
+    width: 85,
+    maxWidth: 85,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.4rem',
+    },
+  },
 ];
 
 export const gapSuggestColumnDefs = [

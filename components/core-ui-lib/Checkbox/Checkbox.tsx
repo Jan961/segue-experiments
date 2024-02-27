@@ -40,7 +40,7 @@ const Checkbox = ({
   }, [showIntermediate]);
 
   return (
-    <div className={`w-full ${checked || showIntermediate ? 'flex' : ''} flex items-center gap-2 ${className}`}>
+    <div className={`${checked || showIntermediate ? 'flex' : ''} flex items-center gap-2 ${className}`}>
       <input
         id={`form-input-checkbox-${id}`}
         data-testid={`core-ui-lib-checkbox-${testId}`}
@@ -50,7 +50,7 @@ const Checkbox = ({
         value={value}
         checked={checked}
         disabled={disabled}
-        className="peer relative appearance-none shrink-0 w-4 h-4 rounded-sm focus:ring-transparent  focus:checked:bg-primary-input-text checked:hover:bg-primary-input-text  checked:bg-primary-input-text border-2"
+        className="peer relative appearance-none shrink-0 w-[1.1875rem] h-[1.1875rem] rounded-sm focus:ring-transparent  focus:checked:bg-primary-input-text checked:hover:bg-primary-input-text  checked:bg-primary-input-text border-2"
       />
 
       {label && <Label text={label} className={labelClassName} variant="sm"></Label>}

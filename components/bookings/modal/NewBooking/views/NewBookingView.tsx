@@ -23,12 +23,13 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 
 type AddBookingProps = {
   formData: TForm;
+  productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
 
-const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }: AddBookingProps) => {
+const NewBookingView = ({ onClose, onChange, formData, productionCode, updateBookingConflicts }: AddBookingProps) => {
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
@@ -41,13 +42,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
-  const productionCode = useMemo(
-    () =>
-      currentProduction
-        ? `${currentProduction?.ShowCode}${currentProduction?.Code} ${currentProduction?.ShowName}`
-        : 'All',
-    [currentProduction],
-  );
+
   const bookingTypeValue = useMemo(
     () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
     [isDateTypeOnly],

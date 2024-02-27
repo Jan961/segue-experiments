@@ -23,9 +23,10 @@ type BookingDataItem = {
 };
 type NewBookingDetailsProps = {
   formData: TForm;
+  productionCode: string;
 };
 
-export default function NewBookingDetailsView({ formData }: NewBookingDetailsProps) {
+export default function NewBookingDetailsView({ formData, productionCode }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
   const [bookingData, setBookingData] = useState<BookingDataItem[]>([]);
   useEffect(() => {
@@ -34,7 +35,6 @@ export default function NewBookingDetailsView({ formData }: NewBookingDetailsPro
     const dates = [];
 
     while (startDate <= endDate) {
-      console.log('while :>> ');
       const formattedDate = `${startDate.toLocaleDateString('en-US', {
         weekday: 'short',
         day: '2-digit',
@@ -74,10 +74,11 @@ export default function NewBookingDetailsView({ formData }: NewBookingDetailsPro
       type: 'fitGridWidth',
       defaultMinWidth: 50,
       editable: true,
+      wrapHeaderText: true,
     },
-    // frameworkComponents: {
-    //   customTextEditor: NoPerfRenderEditor,
-    // },
+    getRowId: (params) => {
+      return params.data.date;
+    },
   };
   const goToPreviousStep = () => {
     previousStep();
@@ -94,16 +95,11 @@ export default function NewBookingDetailsView({ formData }: NewBookingDetailsPro
   };
 
   return (
-    <div className="flex flex-col">
+    <>
       <div className="flex justify-between">
-        <h3 className="text-lg font-bold leading-6 undefined pb-2"> MTM223 Menopause the Musical 2</h3>
-        {/* <div className="flex flex-row gap-2">
-          <p className="min-w-fit text-primary-dark-blue">This is a run of dates. Y/N</p>
-        
-          <Checkbox name="date" />
-        </div> */}
+        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
-      <div className=" w-[700px] lg:w-[1154px] h-full  z-[999] flex flex-col ">
+      <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
         <Table
           columnDefs={NewBookingColumnDefs}
           rowData={bookingData}
@@ -120,6 +116,6 @@ export default function NewBookingDetailsView({ formData }: NewBookingDetailsPro
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

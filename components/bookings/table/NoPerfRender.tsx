@@ -11,30 +11,24 @@ const NoPerfRender = (props: CustomCellRendererProps) => {
   }, [props.data.dayType]);
 
   const handleChange = (event: any) => {
-    // Handle the change event here
-
     let newValue = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
     if (newValue === '') {
       newValue = '0';
     }
     // limit from 0-9
-    // newValue = newValue.length > 0 ? newValue[0] : '0';
     newValue = Math.min(9, Math.max(0, parseInt(newValue, 10))).toString();
-
-    setIsNoPerf(parseInt(newValue));
-
-    // console.log('event.target.value :>> ', event.target.value);
-    // setIsNoPerf(event.target.value);
-    // / Take only the first character, default to '0' if empty
-    props.node.setDataValue('noPerf', parseInt(newValue));
-
-    // You can perform any logic based on the new value
-    console.log('New value:', event.target.value);
+    const intValue = parseInt(newValue);
+    setIsNoPerf(intValue);
+    props.node.setData({ ...props.data, noPerf: intValue });
+    props.node.setRowHeight(intValue > 1 ? intValue * 35 + 9 : 43);
+    props.api.onRowHeightChanged();
   };
   return (
     <>
       {isDisabled ? (
-        <div className={`text-center border-2 mx-auto border-gray fo rounded-sm line text-sm p-0 m-0 w-5 h-5`}></div>
+        <div
+          className={`text-center border-2 mx-auto border-primary-input-text rounded-sm line text-sm p-0 w-[1.1875rem] h-[1.1875rem]`}
+        ></div>
       ) : (
         <>
           <input
@@ -42,9 +36,8 @@ const NoPerfRender = (props: CustomCellRendererProps) => {
             inputMode="numeric"
             value={isNoPerf}
             onChange={handleChange}
-            className="text-center border-2 mx-auto border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm p-0 m-0 w-5 h-5 flex focus:!ring-0 "
+            className="text-center border-2 border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm p-0 w-[1.1875rem] h-[1.1875rem] flex focus:!ring-0 "
           />
-          {/* {props.value} */}
         </>
       )}
     </>

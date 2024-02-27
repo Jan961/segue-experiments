@@ -3,15 +3,16 @@ import { CustomCellRendererProps } from 'ag-grid-react';
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { useEffect, useState } from 'react';
 
-const TimeArrayRender = (props: CustomCellRendererProps & { noPerfValue: number }) => {
+const TimeArrayRender = (props: CustomCellRendererProps) => {
+  const { data } = props;
   const [isPerformanceArrayTime, setPerformanceArrayTime] = useState<string[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
-  useEffect(() => {
-    setIsDisabled(!props.data.perf);
-  }, [props.data.dayType, props.data.perf]);
 
   useEffect(() => {
-    console.log(' >>>>>>Time:>> ');
+    setIsDisabled(!data.perf);
+  }, [data.perf]);
+
+  useEffect(() => {
     setPerformanceArrayTime((prevTimes) => {
       const newTimes = Array(props.data.noPerf)
         .fill('')
@@ -24,7 +25,6 @@ const TimeArrayRender = (props: CustomCellRendererProps & { noPerfValue: number 
     setPerformanceArrayTime((prevTimes) => {
       const newTimes = [...prevTimes];
       newTimes[index] = newTime;
-      console.log('newTimes :>> ', newTimes);
       return newTimes;
     });
   };
@@ -34,23 +34,17 @@ const TimeArrayRender = (props: CustomCellRendererProps & { noPerfValue: number 
       {isDisabled ? (
         ''
       ) : (
-        <>
-          <div
-            className={`flex flex-col p-2 gap-2   ${
-              props.data.noPerf > 1 ? '' : 'overflow-y-hidden'
-            } overflow-x-hidden ${isDisabled ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}
-          >
-            {props.data.noPerf > 0 &&
-              isPerformanceArrayTime.map((time, index) => (
-                <TimeInput
-                  key={index}
-                  onChange={(e) => handleTimeChange(index, e)}
-                  value={time}
-                  className="bg-white border-none "
-                />
-              ))}
-          </div>
-        </>
+        <div className={`flex flex-col px-2 gap-1`}>
+          {props.data.noPerf > 0 &&
+            isPerformanceArrayTime.map((time, index) => (
+              <TimeInput
+                key={index}
+                onChange={(e) => handleTimeChange(index, e)}
+                value={time}
+                className="bg-white h-10"
+              />
+            ))}
+        </div>
       )}
     </>
   );

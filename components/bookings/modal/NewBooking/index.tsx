@@ -6,13 +6,14 @@ import NewBookingView from './views/NewBookingView';
 import BookingConflictsView from './views/BookingConflictsView';
 import { newBookingState } from 'state/booking/newBookingState';
 import BarringIssueView from './views/BarringIssueView';
-import { useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 
 type AddBookingProps = {
   visible: boolean;
@@ -23,6 +24,16 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   const { stepIndex } = useRecoilValue(newBookingState);
   const handleModalClose = () => onClose?.();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const currentProduction = useRecoilValue(currentProductionSelector);
+
+  const productionCode = useMemo(
+    () =>
+      currentProduction
+        ? `${currentProduction?.ShowCode}${currentProduction?.Code} ${currentProduction?.ShowName}`
+        : 'All',
+    [currentProduction],
+  );
+
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
   };
@@ -43,10 +54,11 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
             onChange={onFormDataChange}
             formData={state.form}
             onClose={onClose}
+            productionCode={productionCode}
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
-          <NewBookingDetailsView formData={state.form} />
+          <NewBookingDetailsView formData={state.form} productionCode={productionCode} />
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

@@ -1,6 +1,6 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent, RowHeightParams } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 // import TableTooltip from './TableTooltip';
 
@@ -17,6 +17,7 @@ interface TableProps {
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
+  getRowHeight?: (params: RowHeightParams) => number;
 }
 
 const ROW_HEIGHT = 43;
@@ -33,6 +34,7 @@ export default forwardRef(function Table(
     gridOptions,
     getRowStyle,
     displayHeader = true,
+    getRowHeight,
   }: TableProps,
   ref,
 ) {
@@ -87,9 +89,6 @@ export default forwardRef(function Table(
         }}
       >
         <AgGridReact
-          // defaultColDef={{
-          //   tooltipComponent: TableTooltip,
-          // }}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? HEADER_HEIGHT : 0}
@@ -101,6 +100,7 @@ export default forwardRef(function Table(
           tooltipHideDelay={5000}
           tooltipShowDelay={0}
           gridOptions={gridOptions}
+          getRowHeight={getRowHeight}
           reactiveCustomComponents
         />
       </div>
