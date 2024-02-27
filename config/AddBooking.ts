@@ -35,7 +35,27 @@ export const BookingTypes = [
     value: 'dateTypeOnly',
   },
 ];
+
 export const BookingTypeMap = {
   VENUE: 'venueType',
   DATE_TYPE: 'dateTypeOnly',
 };
+
+export const OTHER_DAY_TYPES = [
+  {
+    text: 'Performance',
+    value: -1,
+  },
+  {
+    text: 'Rehearsal',
+    value: -2,
+  },
+  {
+    text: 'Get in / Fit Up',
+    value: -3,
+  },
+  {
+    text: 'Get Out',
+    value: -4,
+  },
+];
