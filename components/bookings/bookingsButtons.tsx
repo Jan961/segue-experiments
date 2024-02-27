@@ -7,12 +7,14 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { BookingReports } from './modal/BookingReports';
+import { VenueHistory } from './modal/VenueHistory';
 
 export default function BookingsButtons() {
   const [showAddNewBookingModal, setShowAddNewBookingModal] = useState<boolean>(false);
   const [showBarringModal, setShowBarringModal] = useState<boolean>(false);
   const [bookingsDisabled, setBookingsDisabled] = useState<boolean>(false);
   const [showBookingReportsModal, setShowBookingReportsModal] = useState<boolean>();
+  const [showVenueHistory, setShowVenueHistory] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const production = useRecoilValue(currentProductionSelector);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
@@ -47,7 +49,12 @@ export default function BookingsButtons() {
         sufixIconName={'excel'}
         onClick={() => setShowBookingReportsModal(true)}
       ></Button>
-      <Button disabled={disabled} text="Venue History" className="w-[155px]"></Button>
+      <Button
+        onClick={() => setShowVenueHistory(true)}
+        disabled={disabled}
+        text="Venue History"
+        className="w-[155px]"
+      ></Button>
 
       <Button
         disabled={disabled}
@@ -63,6 +70,7 @@ export default function BookingsButtons() {
       {showBookingReportsModal && (
         <BookingReports visible={showBookingReportsModal} onClose={() => setShowBookingReportsModal(false)} />
       )}
+      {showVenueHistory && <VenueHistory visible={showVenueHistory} onCancel={() => setShowVenueHistory(false)} />}
     </div>
   );
 }
