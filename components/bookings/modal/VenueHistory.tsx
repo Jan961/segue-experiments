@@ -7,6 +7,7 @@ import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { Spinner } from 'components/global/Spinner';
 import { useRouter } from 'next/router';
@@ -21,6 +22,8 @@ import SalesTable from 'components/marketing/sales/SalesTable';
 import SalesTable from 'components/marketing/sales/table';
 import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -28,6 +31,7 @@ interface VenueHistoryProps {
 }
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   const [open, setOpen] = useState<boolean>(visible);
@@ -55,6 +59,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
 
 >>>>>>> 8aa7bee (a start at SK-49-VenueHistory with the venue select modal)
+=======
+  const [open, setOpen] = useState<boolean>(visible);
+  const bookingDict = useRecoilValue(bookingState);
+  const venueDict = useRecoilValue(venueState);
+
+  const handleModalCancel = () => onCancel?.();
+
+>>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
   const VenueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
@@ -76,6 +88,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   // const [stage, setStage] = useState<number>(0);
 
   useEffect(() => {
+<<<<<<< HEAD
     setShowVenueSelect(visible);
   }, [visible]);
 
@@ -129,6 +142,31 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               <div className="text text-primary-navy">Please select a venue for comparision</div>
 
 <<<<<<< HEAD
+=======
+    setOpen(visible);
+  }, [visible]);
+
+  return (
+    <PopupModal
+      show={open}
+      title="Venue History"
+      titleClass="text-xl text-primary-navy font-bold -mt-2"
+      onClose={handleModalCancel}
+    >
+      <div className="w-[417px] h-[130px]">
+        <div className="text  text-primary-navy">Please select a venue for comparision</div>
+
+        <Typeahead
+          className={classNames('my-2 w-full !border-0 text-primary-navy')}
+          options={VenueOptions}
+          // disabled={stage !== 0}
+          onChange={(value) => setVenueId(parseInt(value as string, 10))}
+          value={venueId}
+          placeholder={'Please select a venue'}
+          label="Venue"
+        />
+
+>>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
         <Button
           className="px-8 mt-4 float-right"
           onClick={handleModalCancel}
@@ -137,6 +175,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         ></Button>
       </div>
     </PopupModal>
+<<<<<<< HEAD
 =======
               <Typeahead
                 className={classNames('my-2 w-full !border-0 text-primary-navy')}
@@ -235,5 +274,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       </PopupModal>
     </div>
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+>>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
   );
 };
