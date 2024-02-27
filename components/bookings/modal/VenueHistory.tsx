@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
@@ -19,11 +20,17 @@ import { useEffect, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
+=======
+import { useEffect, useMemo, useState } from 'react';
+import PopupModal from 'components/core-ui-lib/PopupModal';
+import Typeahead from 'components/core-ui-lib/Typeahead';
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 import { bookingState } from 'state/booking/bookingState';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -89,12 +96,15 @@ import Table from 'components/core-ui-lib/Table';
 import { venueHistCompColumnDefs, styleProps } from '../table/tableConfig';
 import formatInputDate from 'utils/dateInputFormat';
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 
 interface VenueHistoryProps {
   visible: boolean;
   onCancel: () => void;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -187,14 +197,21 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   // const [selectedVenue, setSelectedVenue] = useState<any>(null);
   const [bookings, setBookings] = useState([]);
   
+=======
+export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+  const [open, setOpen] = useState<boolean>(visible);
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
 
   const handleModalCancel = () => onCancel?.();
+<<<<<<< HEAD
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
 
   const [venueId, setVenueId] = useState<number>(0);
   const [venueDesc, setVenueDesc] = useState<string>('');
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 
   const VenueOptions = useMemo(() => {
     const options = [];
@@ -213,6 +230,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     return options;
   }, [venueDict, bookingDict]);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -725,24 +743,47 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     <div>
     <PopupModal
       show={showVenueSelectModal}
+=======
+  const [venueId, setVenueId] = useState<number>(0);
+  // const [stage, setStage] = useState<number>(0);
+
+  useEffect(() => {
+    setOpen(visible);
+  }, [visible]);
+
+  return (
+    <PopupModal
+      show={open}
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
       title="Venue History"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={handleModalCancel}
     >
       <div className="w-[417px] h-[130px]">
+<<<<<<< HEAD
         <div className="text text-primary-navy">Please select a venue for comparision</div>
+=======
+        <div className="text  text-primary-navy">Please select a venue for comparision</div>
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 
         <Typeahead
           className={classNames('my-2 w-full !border-0 text-primary-navy')}
           options={VenueOptions}
           // disabled={stage !== 0}
+<<<<<<< HEAD
           onChange={(value) => goToVenueSelection(parseInt(value as string, 10))}
+=======
+          onChange={(value) => setVenueId(parseInt(value as string, 10))}
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
           value={venueId}
           placeholder={'Please select a venue'}
           label="Venue"
         />
 
+<<<<<<< HEAD
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
         <Button
           className="px-8 mt-4 float-right"
           onClick={handleModalCancel}
@@ -751,6 +792,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         ></Button>
       </div>
     </PopupModal>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -1036,5 +1078,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     </PopupModal>
     </div>
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
   );
 };
