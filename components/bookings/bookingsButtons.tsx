@@ -16,17 +16,8 @@ export default function BookingsButtons() {
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   useEffect(() => {
-    if (production === undefined || production.IsArchived === true) {
-      setBookingsDisabled(true);
-    } else {
-      setBookingsDisabled(false);
-    }
-
-    if (!ProductionId) {
-      setDisabled(true);
-    } else {
-      setDisabled(false);
-    }
+    setBookingsDisabled(production === undefined || production.IsArchived === true);
+    setDisabled(!ProductionId);
   }, [production, ProductionId]);
 
   return (
