@@ -52,7 +52,7 @@ export default function NewBookingDetailsView({
     }
 
     const isPerformance = dayTypeOption && dayTypeOption.text === 'Performance';
-    const isFiltered = DAY_TYPE_FILTERS.includes(dayTypeOption.text);
+    const isFiltered = dayTypeOption && DAY_TYPE_FILTERS.includes(dayTypeOption.text);
     let startDate = new Date(fromDate);
     const endDate = new Date(toDate);
     const dates = [];
@@ -82,8 +82,6 @@ export default function NewBookingDetailsView({
         isGetInFitUp: false,
       };
       dates.push(dateObject);
-      // console.log('formattedDate  reorderedDate...:>> ', reorderedDate);
-
       // Increment currentDate by one day for the next iteration
       startDate = addDays(startDate, 1);
     }

@@ -17,7 +17,7 @@ export default function SelectVenueRenderer({ dayTypeOptions, data, value }: Sel
   const bookingDict = useRecoilValue(bookingState);
   const [isDayOff, setIsDayOff] = useState(false);
   const selectedDayTypeOption = dayTypeOptions.find(({ value }) => data.dayType === value);
-  const showDayType = !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
+  const showDayType = selectedDayTypeOption && !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
 
   const venueOptions = useMemo(() => {
     const options = [];

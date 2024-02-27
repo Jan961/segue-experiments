@@ -137,7 +137,7 @@ const NewBookingView = ({
               body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
               position="right"
               width="w-[140px]"
-              bgColorClass="primary-input-text"
+              bgColorClass="bg-slate-500"
             >
               <Icon iconName="info-circle-solid" />
             </Tooltip>
@@ -185,7 +185,9 @@ const NewBookingView = ({
               checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
             />
-            <div className={classNames('w-full', { 'cursor-not-allowed': !(fromDate && toDate) })}>
+            <div
+              className={classNames('w-full', { 'cursor-not-allowed caret-primary-input-text': !(fromDate && toDate) })}
+            >
               <Button
                 className="px-4 my-2 !w-full"
                 disabled={!(fromDate && toDate)}
@@ -199,7 +201,11 @@ const NewBookingView = ({
       </form>
       {error && <div className="text-red-500 font-medium my-1">{error}</div>}
       <div className="flex mt-4 justify-between">
-        <div className={classNames({ 'cursor-not-allowed': !(venueId || dateType) || !fromDate || !toDate })}>
+        <div
+          className={classNames({
+            'cursor-not-allowed caret-primary-input-text': !(venueId || dateType) || !fromDate || !toDate,
+          })}
+        >
           <Button
             onClick={() => null}
             disabled={!(venueId || dateType) || !fromDate || !toDate}
@@ -211,7 +217,7 @@ const NewBookingView = ({
         {!fetchingBookingConflicts && (
           <div
             className={classNames({
-              'cursor-not-allowed':
+              'cursor-not-allowed caret-primary-input-text':
                 (isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate,
             })}
           >
