@@ -20,7 +20,7 @@ type BarringIssueViewProps = {
 };
 
 export default function BarringIssueView({ bookingConflicts }: BarringIssueViewProps) {
-  const { nextStep, previousStep, activeStep, goToStep } = useWizard();
+  const { previousStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
 
   useEffect(() => {
@@ -51,7 +51,11 @@ export default function BarringIssueView({ bookingConflicts }: BarringIssueViewP
         <Table columnDefs={barringIssueColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
         <div className="py-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-          <Button className="ml-3 w-33" text="Continue" onClick={() => nextStep()} />
+          <Button
+            className="ml-3 w-33"
+            text="Continue"
+            onClick={() => goToStep(steps.indexOf('New Booking Details'))}
+          />
         </div>
       </div>
     </div>

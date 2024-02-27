@@ -8,6 +8,18 @@ import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
 
+import SelectBookingStatusRender from './SelectBookingStatusRender';
+
+import SelectDayTypeRender from './SelectDayTypeRender';
+
+import NoPerfRender from './NoPerfRender';
+
+import SelectVenueRender from './SelectVenueRender';
+import SelectPencilRender from './SelectPencilRender';
+import CheckPerfRender from './CheckPerfRender';
+
+import TimeArrayRender from './TimeArrayRender';
+
 export const styleProps = { headerColor: tileColors.bookings };
 
 export const columnDefs = [
@@ -53,6 +65,11 @@ export const columnDefs = [
       params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
     tooltipComponentParams: { left: '-2.5rem' },
     tooltipComponent: TableTooltip,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
   },
 ];
 
@@ -66,6 +83,107 @@ export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
   { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
+];
+
+export const NewBookingColumnDefs = [
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 112, maxWidth: 112 },
+
+  // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
+  {
+    headerName: `Perf Y/N`,
+    field: 'perf',
+    width: 72,
+    maxWidth: 72,
+    cellRenderer: CheckPerfRender,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.75rem',
+    },
+  },
+
+  {
+    headerName: 'Day Type',
+    field: 'dayType',
+    cellRenderer: SelectDayTypeRender,
+    width: 230,
+    maxWidth: 230,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
+  {
+    headerName: 'Venue',
+    field: 'venue',
+    cellRenderer: SelectVenueRender,
+    flex: 1,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
+  {
+    headerName: 'No Perf',
+    field: 'noPerf',
+    cellRenderer: NoPerfRender,
+    valueGetter: (params) => {
+      const isPerformance = params.data.dayType === 'Performance';
+      return isPerformance ? params.data.noPerf : '';
+    },
+    width: 72,
+    maxWidth: 72,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.75rem',
+    },
+  },
+  {
+    headerName: 'Times',
+    field: 'times',
+    // editable: true,
+    wrapText: true,
+    cellRenderer: TimeArrayRender,
+    width: 102,
+    maxWidth: 102,
+    cellStyle: {
+      display: 'flex',
+      paddingTop: '0.3rem',
+    },
+  },
+  {
+    headerName: 'Booking Status',
+    field: 'bookingStatus',
+    cellRenderer: SelectBookingStatusRender,
+    maxWidth: 146,
+    width: 146,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
+  {
+    headerName: 'Pencil No.',
+    field: 'pencilNo',
+    cellRenderer: SelectPencilRender,
+
+    width: 100,
+    maxWidth: 100,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    cellRenderer: NoteColumnRenderer,
+    resizable: false,
+    width: 85,
+    maxWidth: 85,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.4rem',
+    },
+  },
 ];
 
 export const gapSuggestColumnDefs = [

@@ -1,8 +1,8 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent, RowHeightParams } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import TableTooltip from './TableTooltip';
+// import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
   headerColor?: string;
@@ -16,6 +16,8 @@ interface TableProps {
   onRowClicked?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
+  getRowStyle?: any;
+  getRowHeight?: (params: RowHeightParams) => number;
 }
 
 const ROW_HEIGHT = 43;
@@ -23,7 +25,17 @@ const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true }: TableProps,
+  {
+    rowData,
+    columnDefs,
+    styleProps,
+    onCellClicked,
+    onRowClicked,
+    gridOptions,
+    getRowStyle,
+    displayHeader = true,
+    getRowHeight,
+  }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -77,9 +89,6 @@ export default forwardRef(function Table(
         }}
       >
         <AgGridReact
-          defaultColDef={{
-            tooltipComponent: TableTooltip,
-          }}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? HEADER_HEIGHT : 0}
@@ -87,9 +96,12 @@ export default forwardRef(function Table(
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
           onGridReady={onGridReady}
+          getRowStyle={getRowStyle}
           tooltipHideDelay={5000}
           tooltipShowDelay={0}
           gridOptions={gridOptions}
+          getRowHeight={getRowHeight}
+          reactiveCustomComponents
         />
       </div>
     </>

@@ -112,7 +112,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       onChange(null);
     }
   };
-
+  console.log('selectedDate :>> ', selectedDate, value);
   return (
     <div className={`relative h-[1.9375rem]`} onFocus={handleInputFocus}>
       <div className="absolute right-3 top-3 z-10">
