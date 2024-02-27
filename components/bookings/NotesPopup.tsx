@@ -43,6 +43,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
         title="View | Edit Notes"
         titleClass="text-primary-navy"
         onClose={() => showConfModal('close')}
+        hasOverlay={confirm}
       >
         <div>
           <h3 className="text-responsive-lg font-bold text-primary-navy">{`${productionItem?.production} | ${productionItem?.date} | ${
@@ -65,6 +66,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
         show={confirm}
         onYesClick={handleCancel}
         onNoClick={() => setConfirm(false)}
+        hasOverlay={false}
       />
     </div>
   );
