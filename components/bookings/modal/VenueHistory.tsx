@@ -9,6 +9,7 @@ import Button from 'components/core-ui-lib/Button';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { Spinner } from 'components/global/Spinner';
 import { useRouter } from 'next/router';
@@ -33,6 +34,8 @@ import Table from 'components/core-ui-lib/Table';
 import { venueHistCompColumnDefs, styleProps } from '../table/tableConfig';
 import formatInputDate from 'utils/dateInputFormat';
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -40,6 +43,7 @@ interface VenueHistoryProps {
 }
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -82,11 +86,15 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [bookings, setBookings] = useState([]);
   
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+  const [open, setOpen] = useState<boolean>(visible);
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
 
   const handleModalCancel = () => onCancel?.();
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
 =======
@@ -94,6 +102,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [venueDesc, setVenueDesc] = useState<string>('');
 
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
   const VenueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
@@ -111,6 +121,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     return options;
   }, [venueDict, bookingDict]);
 
+<<<<<<< HEAD
 
   useEffect(() => {
 <<<<<<< HEAD
@@ -248,24 +259,47 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     <div>
     <PopupModal
       show={showVenueSelectModal}
+=======
+  const [venueId, setVenueId] = useState<number>(0);
+  // const [stage, setStage] = useState<number>(0);
+
+  useEffect(() => {
+    setOpen(visible);
+  }, [visible]);
+
+  return (
+    <PopupModal
+      show={open}
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
       title="Venue History"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
       onClose={handleModalCancel}
     >
       <div className="w-[417px] h-[130px]">
+<<<<<<< HEAD
         <div className="text text-primary-navy">Please select a venue for comparision</div>
+=======
+        <div className="text  text-primary-navy">Please select a venue for comparision</div>
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 
         <Typeahead
           className={classNames('my-2 w-full !border-0 text-primary-navy')}
           options={VenueOptions}
           // disabled={stage !== 0}
+<<<<<<< HEAD
           onChange={(value) => goToVenueSelection(parseInt(value as string, 10))}
+=======
+          onChange={(value) => setVenueId(parseInt(value as string, 10))}
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
           value={venueId}
           placeholder={'Please select a venue'}
           label="Venue"
         />
 
+<<<<<<< HEAD
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
         <Button
           className="px-8 mt-4 float-right"
           onClick={handleModalCancel}
@@ -274,6 +308,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         ></Button>
       </div>
     </PopupModal>
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -444,5 +479,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     </PopupModal>
     </div>
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
   );
 };
