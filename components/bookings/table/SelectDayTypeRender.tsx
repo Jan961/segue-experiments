@@ -1,32 +1,27 @@
-import { useEffect, useMemo, useState } from 'react';
-import { CustomCellRendererProps } from 'ag-grid-react';
+import { useEffect, useState } from 'react';
 import Select from 'components/core-ui-lib/Select';
-import { dateTypeState } from 'state/booking/dateTypeState';
-import { useRecoilValue } from 'recoil';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { ICellRendererParams } from 'ag-grid-community';
 
-const SelectDayTypeRender = (props: CustomCellRendererProps) => {
-  const dayTypes = useRecoilValue(dateTypeState);
+interface SelectDayTypeRendererProps extends ICellRendererParams {
+  dayTypeOptions: SelectOption[];
+}
 
-  const DayTypeOptions = useMemo(
-    () => [...dayTypes.map(({ Id: value, Name: text }) => ({ text, value })), { text: 'Performance', value: -1 }],
-    [dayTypes],
-  );
-
-  const [initialValue, setInitialValue] = useState(props.data.perf ? 'Performance' : '-');
+const SelectDayTypeRender = ({ value, node, dayTypeOptions }: SelectDayTypeRendererProps) => {
+  const [selectedDateType, setSelectedDateType] = useState<string>('');
 
   useEffect(() => {
-    setInitialValue(props.data.perf ? 'Performance' : '-');
-  }, [props.data.perf]);
+    setSelectedDateType(value);
+  }, [value]);
 
   const handleChange = (selectedValue) => {
-    props.node.setDataValue('dayType', selectedValue);
-
-    props.node.setDataValue('perf', selectedValue === 'Performance');
+    node.setDataValue('dayType', selectedValue);
+    node.setDataValue('perf', selectedValue === 'Performance');
   };
 
   return (
     <div className="pl-1 pr-2">
-      <Select options={DayTypeOptions} value={initialValue} onChange={handleChange} inline />
+      <Select options={dayTypeOptions} value={selectedDateType} onChange={handleChange} inline />
     </div>
   );
 };

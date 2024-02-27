@@ -113,7 +113,7 @@ model DateType {
   Id                          Int         @id @default(autoincrement()) @map("DateTypeId")
   Name                        String      @unique(map: "OtherDayTypeName_UNIQUE") @map("DateTypeName") @db.VarChar(30)
   DateTypeAffectsAvailability Boolean     @default(dbgenerated("(b'0')")) @db.Bit(1)
-  DateTypeSeqNo               Int?        @db.UnsignedTinyInt
+  SeqNo                       Int?        @db.UnsignedTinyInt@map("DateTypeSeqNo")
   Other                       Other[]
   Rehearsal                   Rehearsal[]
 }
