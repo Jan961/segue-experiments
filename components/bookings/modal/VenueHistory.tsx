@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
@@ -7,11 +8,17 @@ import { useEffect, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 >>>>>>> 057e36d (a start at SK-49-VenueHistory with the venue select modal)
+=======
+import { useEffect, useMemo, useState } from 'react';
+import PopupModal from 'components/core-ui-lib/PopupModal';
+import Typeahead from 'components/core-ui-lib/Typeahead';
+>>>>>>> 8aa7bee (a start at SK-49-VenueHistory with the venue select modal)
 import { bookingState } from 'state/booking/bookingState';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 import { useRouter } from 'next/router';
@@ -42,12 +49,15 @@ import SalesTable from 'components/marketing/sales/SalesTable';
 import SalesTable from 'components/marketing/sales/table';
 import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8aa7bee (a start at SK-49-VenueHistory with the venue select modal)
 
 interface VenueHistoryProps {
   visible: boolean;
   onCancel: () => void;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 type TableWrapperProps = {
   multiplier: number;
@@ -106,6 +116,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const [venueDesc, setVenueDesc] = useState<string>('');
 
+=======
+export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
+  const [open, setOpen] = useState<boolean>(visible);
+  const bookingDict = useRecoilValue(bookingState);
+  const venueDict = useRecoilValue(venueState);
+
+  const handleModalCancel = () => onCancel?.();
+>>>>>>> 8aa7bee (a start at SK-49-VenueHistory with the venue select modal)
 
   const VenueOptions = useMemo(() => {
     const options = [];
@@ -124,6 +142,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     return options;
   }, [venueDict, bookingDict]);
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -487,6 +506,35 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+  const [venueId, setVenueId] = useState<number>(0);
+  // const [stage, setStage] = useState<number>(0);
+
+  useEffect(() => {
+    setOpen(visible);
+  }, [visible]);
+
+  return (
+    <PopupModal
+      show={open}
+      title="Venue History"
+      titleClass="text-xl text-primary-navy font-bold -mt-2"
+      onClose={handleModalCancel}
+    >
+      <div className="w-[417px] h-[130px]">
+        <div className="text  text-primary-navy">Please select a venue for comparision</div>
+
+        <Typeahead
+          className={classNames('my-2 w-full !border-0 text-primary-navy')}
+          options={VenueOptions}
+          // disabled={stage !== 0}
+          onChange={(value) => setVenueId(parseInt(value as string, 10))}
+          value={venueId}
+          placeholder={'Please select a venue'}
+          label="Venue"
+        />
+
+>>>>>>> 8aa7bee (a start at SK-49-VenueHistory with the venue select modal)
         <Button
           className="px-8 mt-4 float-right"
           onClick={handleModalCancel}
@@ -495,6 +543,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         ></Button>
       </div>
     </PopupModal>
+<<<<<<< HEAD
 >>>>>>> 057e36d (a start at SK-49-VenueHistory with the venue select modal)
 =======
           <Button
@@ -602,5 +651,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       </PopupModal>
     </div>
 >>>>>>> f2dd4a2 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
+=======
+>>>>>>> 8aa7bee (a start at SK-49-VenueHistory with the venue select modal)
   );
 };
