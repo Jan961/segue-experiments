@@ -20,9 +20,9 @@ export const steps = [
   'Create New Booking',
   'Booking Conflict',
   'Barring Issue',
-  'Venue Gap Suggestions',
   'New Booking Details',
   'Preview New Booking',
+  'Venue Gap Suggestions',
 ];
 
 export const BookingTypes = [
@@ -39,3 +39,5 @@ export const BookingTypeMap = {
   VENUE: 'venueType',
   DATE_TYPE: 'dateTypeOnly',
 };
+
+export const DayTypeEdit = {};
