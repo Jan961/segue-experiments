@@ -108,13 +108,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             bold: false,
           },
           {
-            name: 'Booked Venues (Pencilled)',
+            name: 'Bookings (Pencilled)',
             prodCode,
             value: pencilledBookings || 0,
             bold: false,
           },
           {
-            name: 'Booked Venues (Cancelled)',
+            name: 'Bookings (Cancelled)',
             prodCode,
             value: cancelledBookings || 0,
             bold: false,
@@ -158,7 +158,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             bold: false,
           },
           {
-            name: 'Booked Venues',
+            name: 'Bookings',
             prodCode,
             value: bookings || 0,
             bold: false,
