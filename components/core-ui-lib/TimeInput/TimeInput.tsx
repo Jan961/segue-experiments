@@ -19,7 +19,7 @@ interface TimeInputProps {
 }
 
 const baseClass =
-  'flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
+  'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
 const DEFAULT_TIME = { hrs: '00', min: '00', sec: '00' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
@@ -79,7 +79,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled, className
         value={time.hrs}
         placeholder="hh"
         type="text"
-        className="w-10 h-comp-height border-none focus:ring-0 text-end ring-0"
+        className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
         onChange={handleInputChange}
         onBlur={handleInputBlur}
         onFocus={(e) => e.target.select}
@@ -90,7 +90,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled, className
         name="min"
         value={time.min}
         placeholder="mm"
-        className="w-10 h-comp-height border-none focus:ring-0 ring-0"
+        className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
         onChange={handleInputChange}
         onBlur={handleInputBlur}
         onFocus={(e) => e.target.select}

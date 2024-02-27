@@ -7,6 +7,10 @@ export interface AddBookingsParams {
   DateBlockId: number;
   VenueId: number;
   performanceTimes: string[];
+  DateTypeId: number;
+  BookingStatus: string;
+  PencilNo: number;
+  Notes: string;
 }
 
 export default async function handle(req, res) {
