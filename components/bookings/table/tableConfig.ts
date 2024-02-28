@@ -7,16 +7,12 @@ import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
-
-import SelectBookingStatusRender from './SelectBookingStatusRender';
-
+import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
-
-import NoPerfRender from './NoPerfRender';
-
-import SelectVenueRender from './SelectVenueRender';
-import SelectPencilRender from './SelectPencilRender';
-import CheckPerfRender from './CheckPerfRender';
+import NoPerfRenderer from './NoPerfRenderer';
+import SelectVenueRenderer from './SelectVenueRenderer';
+import SelectPencilRenderer from './SelectPencilRenderer';
+import CheckPerfRenderer from './CheckPerfRenderer';
 
 import TimeArrayRender from './TimeArrayRender';
 
@@ -33,28 +29,29 @@ export const columnDefs = [
     headerName: 'Date',
     field: 'date',
     cellRenderer: DateColumnRenderer,
-    width: 130,
+    minWidth: 120,
   },
-  { headerName: 'Week', field: 'week', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 300, flex: 2 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 200, flex: 1 },
+  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 65 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
   { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 120 },
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
     cellRenderer: DefaultCellRenderer,
-    resizable: false,
+    resizable: true,
     width: 120,
   },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'No. of Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 120 },
-  { headerName: 'Performance Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 200 },
+  { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 70 },
+  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 95, minWidth: 95 },
   {
     headerName: 'Miles',
     field: 'miles',
     cellRenderer: MilesRenderer,
+    width: 70,
   },
-  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 110 },
+  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80 },
   {
     headerName: '',
     field: 'note',
@@ -85,7 +82,7 @@ export const barringIssueColumnDefs = [
   { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
 ];
 
-export const NewBookingColumnDefs = [
+export const newBookingColumnDefs = (dayTypeOptions = []) => [
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 112, maxWidth: 112 },
 
   // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
@@ -94,7 +91,10 @@ export const NewBookingColumnDefs = [
     field: 'perf',
     width: 72,
     maxWidth: 72,
-    cellRenderer: CheckPerfRender,
+    cellRenderer: CheckPerfRenderer,
+    cellRendererParams: {
+      dayTypeOptions,
+    },
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -106,6 +106,9 @@ export const NewBookingColumnDefs = [
     headerName: 'Day Type',
     field: 'dayType',
     cellRenderer: SelectDayTypeRender,
+    cellRendererParams: {
+      dayTypeOptions,
+    },
     width: 230,
     maxWidth: 230,
     cellStyle: {
@@ -115,7 +118,10 @@ export const NewBookingColumnDefs = [
   {
     headerName: 'Venue',
     field: 'venue',
-    cellRenderer: SelectVenueRender,
+    cellRenderer: SelectVenueRenderer,
+    cellRendererParams: {
+      dayTypeOptions,
+    },
     flex: 1,
     cellStyle: {
       overflow: 'visible',
@@ -124,11 +130,7 @@ export const NewBookingColumnDefs = [
   {
     headerName: 'No Perf',
     field: 'noPerf',
-    cellRenderer: NoPerfRender,
-    valueGetter: (params) => {
-      const isPerformance = params.data.dayType === 'Performance';
-      return isPerformance ? params.data.noPerf : '';
-    },
+    cellRenderer: NoPerfRenderer,
     width: 72,
     maxWidth: 72,
     cellStyle: {
@@ -153,7 +155,7 @@ export const NewBookingColumnDefs = [
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
-    cellRenderer: SelectBookingStatusRender,
+    cellRenderer: SelectBookingStatusRenderer,
     maxWidth: 146,
     width: 146,
     cellStyle: {
@@ -163,8 +165,10 @@ export const NewBookingColumnDefs = [
   {
     headerName: 'Pencil No.',
     field: 'pencilNo',
-    cellRenderer: SelectPencilRender,
-
+    cellRenderer: SelectPencilRenderer,
+    cellRendererParams: {
+      dayTypeOptions,
+    },
     width: 100,
     maxWidth: 100,
     cellStyle: {

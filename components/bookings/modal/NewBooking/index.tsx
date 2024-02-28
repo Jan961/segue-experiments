@@ -15,6 +15,30 @@ import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import PreviewNewBooking from './views/PreviewNewBooking';
+import { dateTypeState } from 'state/booking/dateTypeState';
+
+export const OTHER_DAY_TYPES = [
+  {
+    text: '-',
+    value: -1,
+  },
+  {
+    text: 'Performance',
+    value: -2,
+  },
+  {
+    text: 'Rehearsal',
+    value: -3,
+  },
+  {
+    text: 'Get in / Fit Up',
+    value: -4,
+  },
+  {
+    text: 'Get Out',
+    value: -5,
+  },
+];
 
 type AddBookingProps = {
   visible: boolean;
@@ -26,6 +50,11 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   const handleModalClose = () => onClose?.();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const currentProduction = useRecoilValue(currentProductionSelector);
+  const dayTypes = useRecoilValue(dateTypeState);
+  const dayTypeOptions = useMemo(
+    () => [...OTHER_DAY_TYPES, ...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))],
+    [dayTypes],
+  );
 
   const productionCode = useMemo(
     () =>
@@ -52,6 +81,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView
             updateBookingConflicts={updateBookingConflicts}
+            dayTypeOptions={dayTypeOptions}
             onChange={onFormDataChange}
             formData={state.form}
             onClose={onClose}
@@ -59,7 +89,12 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
-          <NewBookingDetailsView formData={state.form} productionCode={productionCode} />
+          {/* <NewBookingDetailsView formData={state.form} productionCode={productionCode} /> */}
+          <NewBookingDetailsView
+            formData={state.form}
+            productionCode={productionCode}
+            dayTypeOptions={dayTypeOptions}
+          />
           <PreviewNewBooking formData={state.form} productionCode={productionCode} />
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>

@@ -1,18 +1,25 @@
-import { CustomCellRendererProps } from 'ag-grid-react';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { ICellRendererParams } from 'ag-grid-community';
 import Select from 'components/core-ui-lib/Select';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { venueState } from 'state/booking/venueState';
 
-export default function SelectVenueRender(props: CustomCellRendererProps) {
+interface SelectVenueRendererProps extends ICellRendererParams {
+  dayTypeOptions: SelectOption[];
+}
+
+const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
+
+export default function SelectVenueRenderer({ dayTypeOptions, data, value }: SelectVenueRendererProps) {
   const venueDict = useRecoilValue(venueState);
   const bookingDict = useRecoilValue(bookingState);
   const [isDayOff, setIsDayOff] = useState(false);
-  //   console.log('venueDict :>> ', venueDict);
-  //   console.log('bookingDict :>> ', bookingDict);
+  const selectedDayTypeOption = dayTypeOptions.find(({ value }) => data.dayType === value);
+  const showDayType = selectedDayTypeOption && !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
 
-  const VenueOptions = useMemo(() => {
+  const venueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
     for (const venueId in venueDict) {
@@ -30,22 +37,24 @@ export default function SelectVenueRender(props: CustomCellRendererProps) {
   }, [venueDict, bookingDict]);
 
   useEffect(() => {
-    console.log('use effect selectVenuRender ');
-    if (props.data.dayType === 'Day Off') {
+    if (data.dayType === 'Day Off') {
       setIsDayOff(true);
-      console.log('props.data.dayType >>:>> ', props.data.dayType);
     } else {
       setIsDayOff(false);
     }
-  }, [props.data.dayType]);
-  console.log('props.value :>> ', props);
+  }, [data.dayType]);
+
   return (
     <>
       {isDayOff ? (
         <p>Day off</p>
       ) : (
         <div className="pl-1 pr-2">
-          <Select options={VenueOptions} value={props.value} inline />
+          <Select
+            options={showDayType ? dayTypeOptions : venueOptions}
+            value={showDayType ? data.dayType : value}
+            inline
+          />
         </div>
       )}
     </>

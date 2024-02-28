@@ -58,6 +58,12 @@ export default forwardRef(function Table(
         ? params.api.updateGridOptions({ domLayout: 'autoHeight' })
         : params.api.updateGridOptions({ domLayout: 'normal' });
     }
+
+    const columnDefs = params.api.getColumnDefs();
+    const updColDefs = columnDefs.map((column) => {
+      return { ...column, headerClass: 'text-center' };
+    });
+    params.api.updateGridOptions({ columnDefs: updColDefs });
   };
 
   useEffect(() => {
