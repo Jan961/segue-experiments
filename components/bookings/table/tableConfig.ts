@@ -311,3 +311,61 @@ export const barredVenueColumnDefs = [
   },
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
 ];
+
+
+export const venueHistCompColumnDefs = (optionsLength = 0) => [
+  {
+    headerName: 'Order for Comparison',
+    field: 'compOrder',
+    cellRenderer: SelectCompOrderRender,
+    cellRendererParams: {
+      optionsLength,
+    },
+    width: 125,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Production',
+    field: 'prodNum',
+    cellRenderer: DefaultCellRenderer,
+    width: 115,
+  },
+  {
+    headerName: 'Date of First Performance',
+    field: 'firstPerfDt',
+    cellRenderer: DateColumnRenderer,
+    width: 130,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'No. Perfs',
+    field: 'numPerfs',
+    cellRenderer: DefaultCellRenderer,
+    width: 70,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Production Duration (Wks)',
+    field: 'prodWks',
+    cellRenderer: DefaultCellRenderer,
+    width: 140,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Sales Data',
+    cellRenderer: SalesDataButtonRenderer,
+    width: 115,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+
+];
