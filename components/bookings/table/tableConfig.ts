@@ -15,6 +15,7 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
+<<<<<<< HEAD
 import TimeArrayRenderer from './TimeArrayRenderer';
 <<<<<<< HEAD
 import IconRenderer from './IconRenderer';
@@ -23,7 +24,15 @@ import { formatMinutes } from 'utils/booking';
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+<<<<<<< HEAD
 >>>>>>> 14383bc (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+=======
+import TimeArrayRender from './TimeArrayRender';
+import SalesDataButtonRenderer from './SalesDataButtonRenderer';
+import SelectCompOrderRender from './SelectCompOrderRender';
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+>>>>>>> 3a6cc8d (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -303,6 +312,7 @@ export const tourSummaryColumnDefs = [
 ];
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 export const barredVenueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
@@ -343,29 +353,49 @@ export const barredVenueColumnDefs = [
 =======
 =======
 =======
+>>>>>>> 3a6cc8d (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
 
 
 export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) => [
+=======
+
+
+export const venueHistCompColumnDefs = (optionsLength = 0) => [
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
     cellRenderer: SelectCompOrderRender,
     cellRendererParams: {
       optionsLength,
+<<<<<<< HEAD
       selectForComparison
     },
     width: 120,
     cellStyle: {
       textAlign: 'center',
       overflow: 'visible',
+=======
+    },
+    width: 125,
+    cellStyle: {
+      textAlign: 'center',
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
     },
   },
 >>>>>>> 226d528 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
   {
     headerName: 'Production',
+<<<<<<< HEAD
     field: 'prodName',
     cellRenderer: DefaultCellRenderer,
     width: 350,
+=======
+    field: 'prodNum',
+    cellRenderer: DefaultCellRenderer,
+    width: 115,
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
   },
   {
     headerName: 'Date of First Performance',
@@ -397,6 +427,7 @@ export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) 
   {
     headerName: 'Sales Data',
     cellRenderer: SalesDataButtonRenderer,
+<<<<<<< HEAD
     width: 150,
     cellStyle: {
       textAlign: 'center',
@@ -510,4 +541,16 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 =======
 ];
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+<<<<<<< HEAD
 >>>>>>> 14383bc (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+=======
+    width: 115,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+
+];
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+>>>>>>> 3a6cc8d (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
