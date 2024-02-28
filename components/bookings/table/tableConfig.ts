@@ -15,6 +15,7 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
+<<<<<<< HEAD
 import TimeArrayRenderer from './TimeArrayRenderer';
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -47,6 +48,11 @@ import SelectCompOrderRender from './SelectCompOrderRender';
 >>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+import TimeArrayRender from './TimeArrayRender';
+import SalesDataButtonRenderer from './SalesDataButtonRenderer';
+import SelectCompOrderRender from './SelectCompOrderRender';
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -350,6 +356,7 @@ export const tourSummaryColumnDefs = [
   },
 <<<<<<< HEAD
 ];
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -716,6 +723,8 @@ export const venueColumnDefs = [
 =======
 >>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
 =======
+=======
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 
 
 export const venueHistCompColumnDefs = (optionsLength = 0) => [
@@ -773,6 +782,7 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
     },
   },
 
+<<<<<<< HEAD
 =======
 >>>>>>> a31260e (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 ];
@@ -787,3 +797,6 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 =======
 ];
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+];
+>>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
