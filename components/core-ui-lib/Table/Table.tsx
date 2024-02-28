@@ -1,8 +1,8 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
+import { GridApi, GridReadyEvent, RowHeightParams } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import TableTooltip from './TableTooltip';
+// import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
   headerColor?: string;
@@ -17,6 +17,8 @@ interface TableProps {
   onRowSelected?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
+  getRowStyle?: any;
+  getRowHeight?: (params: RowHeightParams) => number;
 }
 
 const ROW_HEIGHT = 43;
@@ -31,7 +33,9 @@ export default forwardRef(function Table(
     onCellClicked,
     onRowClicked,
     gridOptions,
+    getRowStyle,
     displayHeader = true,
+    getRowHeight,
     onRowSelected = () => null,
   }: TableProps,
   ref,
@@ -56,6 +60,12 @@ export default forwardRef(function Table(
         ? params.api.updateGridOptions({ domLayout: 'autoHeight' })
         : params.api.updateGridOptions({ domLayout: 'normal' });
     }
+
+    const columnDefs = params.api.getColumnDefs();
+    const updColDefs = columnDefs.map((column) => {
+      return { ...column, headerClass: 'text-center' };
+    });
+    params.api.updateGridOptions({ columnDefs: updColDefs });
   };
 
   useEffect(() => {
@@ -87,9 +97,6 @@ export default forwardRef(function Table(
         }}
       >
         <AgGridReact
-          defaultColDef={{
-            tooltipComponent: TableTooltip,
-          }}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? HEADER_HEIGHT : 0}
@@ -98,9 +105,12 @@ export default forwardRef(function Table(
           onRowClicked={onRowClicked}
           onRowSelected={onRowSelected}
           onGridReady={onGridReady}
+          getRowStyle={getRowStyle}
           tooltipHideDelay={5000}
           tooltipShowDelay={0}
           gridOptions={gridOptions}
+          getRowHeight={getRowHeight}
+          reactiveCustomComponents
         />
       </div>
     </>

@@ -20,9 +20,9 @@ export const steps = [
   'Create New Booking',
   'Booking Conflict',
   'Barring Issue',
-  'Venue Gap Suggestions',
   'New Booking Details',
   'Preview New Booking',
+  'Venue Gap Suggestions',
 ];
 
 export const BookingTypes = [
@@ -70,3 +70,4 @@ export const DEFAULT_GAP_SUGGEST_FORM_STATE = {
   minSeats: null,
   excludeLondonVenues: false,
 };
+export const DayTypeEdit = {};

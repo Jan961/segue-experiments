@@ -6,12 +6,11 @@ import { bookingState } from 'state/booking/bookingState';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import { dateTypeState } from 'state/booking/dateTypeState';
 import { useWizard } from 'react-use-wizard';
 import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { BookingTypeMap, BookingTypes, OTHER_DAY_TYPES, steps } from 'config/AddBooking';
+import { BookingTypeMap, BookingTypes, steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
@@ -20,37 +19,36 @@ import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 type AddBookingProps = {
   formData: TForm;
+  dayTypeOptions: SelectOption[];
+  productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
 
-const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }: AddBookingProps) => {
+const NewBookingView = ({
+  onClose,
+  onChange,
+  formData,
+  productionCode,
+  dayTypeOptions,
+  updateBookingConflicts,
+}: AddBookingProps) => {
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
   const currentProduction = useRecoilValue(currentProductionSelector);
-  const dayTypes = useRecoilValue(dateTypeState);
-  const DayTypeOptions = useMemo(
-    () => [...OTHER_DAY_TYPES, ...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))],
-    [dayTypes],
-  );
   const bookingDict = useRecoilValue(bookingState);
   const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
-  const productionCode = useMemo(
-    () =>
-      currentProduction
-        ? `${currentProduction?.ShowCode}${currentProduction?.Code} ${currentProduction?.ShowName}`
-        : 'All',
-    [currentProduction],
-  );
+
   const bookingTypeValue = useMemo(
     () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
     [isDateTypeOnly],
@@ -150,6 +148,8 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
           options={BookingTypes}
           onChange={(v) =>
             onChange({
+              venueId: NaN,
+              dateType: NaN,
               isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
               isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
             })
@@ -159,7 +159,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
           <>
             <Typeahead
               className={'my-2 w-full !border-0'}
-              options={DayTypeOptions}
+              options={dayTypeOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
               value={dateType}

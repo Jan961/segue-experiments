@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
@@ -12,6 +12,7 @@ interface PopupModalProps {
   titleClass?: string;
   showCloseIcon?: boolean;
   panelClass?: string;
+  hasOverlay?: boolean;
 }
 
 export default function PopupModal({
@@ -22,7 +23,14 @@ export default function PopupModal({
   titleClass,
   showCloseIcon = true,
   panelClass,
+  hasOverlay = false,
 }: PopupModalProps) {
+  const [overlay, setOverlay] = useState<boolean>(false);
+
+  useEffect(() => {
+    setOverlay(hasOverlay);
+  }, [hasOverlay]);
+
   return (
     <Transition appear show={show} as={Fragment}>
       <Dialog as="div" className="relative z-150" onClose={() => null}>
@@ -30,16 +38,20 @@ export default function PopupModal({
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
-          enterTo="opacity-100"
+          enterTo={overlay ? 'opacity-0' : 'opacity-100'}
           leave="ease-in duration-200"
-          leaveFrom="opacity-100"
+          leaveFrom={overlay ? 'opacity-0' : 'opacity-100'}
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black/75 z-10" />
         </Transition.Child>
 
         <div className={`${calibri.variable} font-calibri fixed inset-0 overflow-y-auto z-20`}>
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div
+            className={`flex min-h-full items-center justify-center p-4 text-center ${
+              overlay ? 'bg-black opacity-50' : 'opacity-100'
+            }`}
+          >
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
