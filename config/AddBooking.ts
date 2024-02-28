@@ -59,3 +59,14 @@ export const OTHER_DAY_TYPES = [
     value: -4,
   },
 ];
+
+export const DEFAULT_GAP_SUGGEST_FORM_STATE = {
+  minFromLastVenue: null,
+  maxFromLastVenue: null,
+  maxTravelTimeFromLastVenue: '',
+  minToNextVenue: null,
+  maxToNextVenue: null,
+  maxTravelTimeToNextVenue: '',
+  minSeats: null,
+  excludeLondonVenues: false,
+};

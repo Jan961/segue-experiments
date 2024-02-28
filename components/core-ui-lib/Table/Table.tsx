@@ -14,6 +14,7 @@ interface TableProps {
   styleProps?: StyleProps;
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
+  onRowSelected?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
 }
@@ -23,7 +24,16 @@ const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true }: TableProps,
+  {
+    rowData,
+    columnDefs,
+    styleProps,
+    onCellClicked,
+    onRowClicked,
+    gridOptions,
+    displayHeader = true,
+    onRowSelected = () => null,
+  }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
@@ -86,6 +96,7 @@ export default forwardRef(function Table(
           rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
+          onRowSelected={onRowSelected}
           onGridReady={onGridReady}
           tooltipHideDelay={5000}
           tooltipShowDelay={0}

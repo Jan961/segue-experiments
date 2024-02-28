@@ -39,6 +39,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
         onClose={handleModalClose}
         titleClass="text-xl text-primary-navy text-bold"
         title={steps[stepIndex]}
+        panelClass="relative"
       >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView

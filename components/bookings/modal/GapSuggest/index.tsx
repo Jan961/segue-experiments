@@ -1,188 +1,111 @@
 // import { findPrevAndNextBookings } from 'components/bookings/panel/utils/findPrevAndNextBooking';
+import axios from 'axios';
+import { findPreviosAndNextBookings, hasContinuosGap } from 'components/bookings/panel/utils/findClosestBooking';
 import { gapSuggestColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
-import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
-import TextInput from 'components/core-ui-lib/TextInput';
-import TimeInput from 'components/core-ui-lib/TimeInput';
-import { useMemo, useState } from 'react';
+import { GapSuggestionReponse, GapSuggestionUnbalancedProps } from 'pages/api/venue/read/distance';
+import { useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { getKey } from 'services/dateService';
 import { bookingState } from 'state/booking/bookingState';
-
-const defaultFormState = {
-  minFromLastVenue: null,
-  maxFromLastVenue: null,
-  maxTravelTimeFromLastVenue: '',
-  minToNextVenue: null,
-  maxToNextVenue: null,
-  maxTravelTimeToNextVenue: '',
-  minSeats: null,
-  excludeLondonVenues: false,
-};
+import { rowsSelector } from 'state/booking/selectors/rowsSelector';
+import Form from './Form';
 
 type GapSuggestProps = {
   startDate: string;
   endDate: string;
+  onOkClick?: () => void;
 };
 
-const GapSuggest = ({ startDate, endDate }: GapSuggestProps) => {
+const gridOptions = {
+  autoSizeStrategy: {
+    type: 'fitGridWidth',
+    defaultMinWidth: 50,
+  },
+  rowSelection: 'multiple',
+  suppressRowClickSelection: true,
+};
+
+const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestProps) => {
   const bookingDict = useRecoilValue(bookingState);
-  const [formData, setFormData] = useState(defaultFormState);
+  const { rows: bookings } = useRecoilValue(rowsSelector);
+  // const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState(null);
-  const {
-    minFromLastVenue,
-    minToNextVenue,
-    maxFromLastVenue,
-    maxToNextVenue,
-    maxTravelTimeFromLastVenue,
-    maxTravelTimeToNextVenue,
-    excludeLondonVenues,
-    minSeats,
-  } = formData;
-  // const { nextBookings, prevBookings } = findPrevAndNextBookings(bookingDict, getKey(startDate), getKey(endDate));
-  const canGapSuggest = useMemo(() => {
-    const bookingList = Object.values(bookingDict);
-    const bookingInRange = bookingList.filter((booking) => {
-      const can =
-        new Date(getKey(booking.Date)) >= new Date(getKey(startDate)) &&
-        new Date(getKey(booking.Date)) <= new Date(getKey(endDate));
-      return can;
-    });
-    const comfirmedBookings = bookingInRange.some((booking) => booking.StatusCode === 'C');
-    return !comfirmedBookings;
-  }, [startDate, endDate]);
-  const handleOnChange = (event: any) => {
-    let { id, value } = event.target;
-    if (id === 'maxTravelTimeFromLastVenue' || id === 'maxTravelTimeToNextVenue') {
-      value = `${value.hrs}:${value.min}`;
-    } else if (id === 'excludeLondonVenues') {
-      value = event.target.checked;
-    } else {
-      value = value ? parseInt(value, 10) : null;
+  const [selectedVenueIds, setSelectedVenueIds] = useState([]);
+  const tableRef = useRef(null);
+  const filteredRows = useMemo(
+    () => rows?.filter((row) => !selectedVenueIds.includes(row.VenueId)),
+    [selectedVenueIds, rows],
+  );
+  const canGapSuggest = useMemo(
+    () => hasContinuosGap(bookingDict, startDate, endDate),
+    [startDate, endDate, bookingDict],
+  );
+  const [prevVenueId, nextVenueId] = useMemo(() => {
+    const { previousBooking, nextBooking } = findPreviosAndNextBookings(bookings, startDate, endDate);
+    return [previousBooking?.venueId, nextBooking?.venueId];
+  }, [bookings, startDate, endDate]);
+  const getSuggestions = async (data: Partial<GapSuggestionUnbalancedProps>) => {
+    // setLoading(true);
+    try {
+      const response = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', {
+        ...data,
+        StartVenue: prevVenueId,
+        EndVenue: nextVenueId,
+      });
+      if (response.status >= 200 && response.status < 400) {
+        setRows(response.data?.VenueInfo);
+      }
+    } catch (error) {
+      setRows([]);
     }
-    setFormData((prev) => ({ ...prev, [id]: value }));
-    console.log(id, value, event.target?.checked);
+    // setLoading(false);
   };
-  const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-    },
+  const exportTableData = () => {
+    tableRef.current?.getApi?.()?.exportDataAsExcel?.();
   };
-  const getSuggestions = () => {
-    setRows([]);
+  const onRowSelected = (e: any) => {
+    setSelectedVenueIds((prev) => [...prev, e.data.VenueId]);
   };
   if (!canGapSuggest) {
     return (
-      <div className="text-red-500 font-medium my-1">
-        Selected Date Range contains confirmed bookings. To get suggestions, please select range without bookings
-      </div>
+      <p className="text-primary font-medium my-1 mb-10 w-[370px]">
+        Selected Date Range contains confirmed bookings.
+        <br /> To get suggestions, please select range without bookings
+      </p>
     );
   }
   return (
-    <div className="py-4 text-primary-input-text w-[700px]">
-      <form>
-        <div className="grid grid-cols-12 gap-7">
-          <div className="col-span-3"></div>
-          <div className="col-span-6 text-center">Mileage</div>
-          <div className="col-span-3"></div>
-        </div>
-        <div className="grid grid-cols-12 gap-7 my-1">
-          <div className="col-span-3"></div>
-          <div className="col-span-3 text-center">Min</div>
-          <div className="col-span-3 text-center">Max</div>
-          <div className="col-span-3 text-center">Max Travel Time</div>
-        </div>
-        <div className="grid grid-cols-12 gap-7 my-1 items-center">
-          <div className="col-span-3">From Last Venue</div>
-          <div className="col-span-3">
-            <TextInput
-              className="w-full"
-              placeHolder="Enter Miles"
-              id="minFromLastVenue"
-              value={minFromLastVenue as string}
-              onChange={handleOnChange}
-            />
-          </div>
-          <div className="col-span-3">
-            <TextInput
-              className="w-full"
-              placeHolder="Enter Miles"
-              id="maxFromLastVenue"
-              value={maxFromLastVenue as string}
-              onChange={handleOnChange}
-            />
-          </div>
-          <div className="col-span-3">
-            <TimeInput
-              className="w-full h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
-              value={maxTravelTimeFromLastVenue}
-              onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeFromLastVenue', value } })}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-12 gap-7 my-1 items-center">
-          <div className="col-span-3">To Next Venue</div>
-          <div className="col-span-3">
-            <TextInput
-              className="w-full"
-              placeHolder="Enter Miles"
-              id="minToNextVenue"
-              value={minToNextVenue as string}
-              onChange={handleOnChange}
-            />
-          </div>
-          <div className="col-span-3">
-            <TextInput
-              className="w-full"
-              placeHolder="Enter Miles"
-              id="maxToNextVenue"
-              value={maxToNextVenue as string}
-              onChange={handleOnChange}
-            />
-          </div>
-          <div className="col-span-3">
-            <TimeInput
-              className="w-full h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
-              value={maxTravelTimeToNextVenue}
-              onChange={(value) => handleOnChange({ target: { id: 'maxTravelTimeToNextVenue', value } })}
-            />
-          </div>
-        </div>
-        <div className="grid grid-cols-12 gap-7 my-1">
-          <div className="col-span-3">Min No: Seats</div>
-          <div className="col-span-3">
-            <TextInput
-              className="w-full"
-              placeHolder="Enter Seats"
-              id="minSeats"
-              value={minSeats as string}
-              onChange={handleOnChange}
-            />
-          </div>
-          <div className="col-span-6 float-right">
-            <Checkbox
-              className="flex flex-row-reverse"
-              labelClassName="!text-base"
-              label="Include Excluded Venues"
-              id="excludeLondonVenues"
-              name="excludeLondonVenues"
-              checked={excludeLondonVenues}
-              onChange={handleOnChange}
-            />
-          </div>
-        </div>
-        <Button
-          onClick={getSuggestions}
-          className="float-right my-3 px-4 font-normal"
-          variant="primary"
-          text="Get Suggestions"
-        />
-      </form>
+    <div className="text-primary-input-text w-[700px]">
+      <Form onSave={getSuggestions} />
       {rows !== null && (
-        <div className="w-full h-60 flex flex-col">
-          <Table columnDefs={gapSuggestColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
+        <div className="w-full h-60 flex flex-col pt-4">
+          <Table
+            onRowSelected={onRowSelected}
+            ref={tableRef}
+            columnDefs={gapSuggestColumnDefs}
+            rowData={filteredRows?.slice(0, 30)}
+            styleProps={styleProps}
+            gridOptions={gridOptions}
+          />
+        </div>
+      )}
+      {rows?.length && (
+        <div className="flex gap-2 justify-end items-center mt-3">
+          <Button
+            onClick={exportTableData}
+            className="float-right px-4 w-33 font-normal"
+            variant="primary"
+            text="Export"
+            iconProps={{ className: 'h-4 w-3' }}
+            sufixIconName={'excel'}
+          />
+          <Button
+            onClick={onOkClick}
+            className="float-right px-4 font-normal w-33 text-center"
+            variant="primary"
+            text="OK"
+          />
         </div>
       )}
     </div>
