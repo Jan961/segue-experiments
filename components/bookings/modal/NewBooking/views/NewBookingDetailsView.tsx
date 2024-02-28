@@ -3,7 +3,7 @@ import { newBookingColumnDefs, styleProps } from 'components/bookings/table/tabl
 import Button from 'components/core-ui-lib/Button';
 import { addDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { TForm } from '../reducer';
 import NotesPopup from 'components/bookings/NotesPopup';
@@ -43,6 +43,7 @@ export default function NewBookingDetailsView({
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const { nextStep, previousStep } = useWizard();
+  const tableRef = useRef(null);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -72,7 +73,7 @@ export default function NewBookingDetailsView({
         perf: isPerformance,
         dayType: dateType,
         venue: venueId,
-        noPerf: 0,
+        noPerf: null,
         times: '',
         bookingStatus: isFiltered ? 'U' : '', // U for Pencilled
         pencilNo: '',
@@ -103,14 +104,20 @@ export default function NewBookingDetailsView({
     previousStep();
   };
 
-  const PreviewBooking = () => {
-    console.table(bookingData);
+  const previewBooking = () => {
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+      console.log(rowData); // or do something else with rowData
+    }
   };
 
   const handleCellClick = (e) => {
-    console.log(e);
+    const { column, data } = e;
     setBookingRow(e.data);
-    if (e.column.colId === 'notes') {
+    if (column.colId === 'notes' && !Number.isNaN(data.venue) && !Number.isNaN(data.dayType)) {
       setShowNotesModal(true);
     }
   };
@@ -123,6 +130,15 @@ export default function NewBookingDetailsView({
     setBookingData(updated);
   };
 
+  const handleSaveBooking = () => {
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+    }
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -130,6 +146,7 @@ export default function NewBookingDetailsView({
       </div>
       <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
         <Table
+          ref={tableRef}
           columnDefs={columnDefs}
           rowData={bookingData}
           styleProps={styleProps}
@@ -147,7 +164,8 @@ export default function NewBookingDetailsView({
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={close} />
-            <Button className=" w-33" text="Preview Booking" onClick={() => PreviewBooking()} />
+            <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
+            <Button className=" w-33" text="Accept" onClick={handleSaveBooking} />
           </div>
         </div>
       </div>

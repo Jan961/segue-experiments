@@ -15,8 +15,7 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
-
-import TimeArrayRender from './TimeArrayRender';
+import TimeArrayRenderer from './TimeArrayRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -146,7 +145,7 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
     field: 'times',
     // editable: true,
     wrapText: true,
-    cellRenderer: TimeArrayRender,
+    cellRenderer: TimeArrayRenderer,
     width: 102,
     maxWidth: 102,
     cellStyle: {
