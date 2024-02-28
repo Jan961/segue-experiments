@@ -16,6 +16,22 @@ export type TForm = {
   isRunOfDates?: boolean;
 };
 
+export type PreviewDataItem = {
+  production: string;
+  date: string;
+  week: string;
+  venue: number;
+  town: string;
+  perf: boolean;
+  dayType: string;
+  bookingStatus: string;
+  capacity: number;
+  noPerf: number;
+  perfTimes: string;
+  miles: string;
+  travelTime: string;
+};
+
 export type TState = {
   form: TForm;
   bookingConflicts: BookingWithVenueDTO[];

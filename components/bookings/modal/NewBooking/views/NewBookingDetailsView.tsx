@@ -6,20 +6,21 @@ import Table from 'components/core-ui-lib/Table';
 import { useEffect, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { TForm } from '../reducer';
+import { steps } from 'config/AddBooking';
 
 type BookingDataItem = {
-  date: string;
-  perf: boolean;
-  dayType: string;
-  venue: number;
-  noPerf: number;
-  times: string;
-  bookingStatus: string;
-  pencilNo: number;
-  notes: string;
-  isBooking: boolean;
-  isRehearsal: boolean;
-  isGetInFitUp: boolean;
+  date?: string;
+  perf?: boolean;
+  dayType?: string;
+  venue?: number;
+  noPerf?: number;
+  times?: string;
+  bookingStatus?: string;
+  pencilNo?: number;
+  notes?: string;
+  isBooking?: boolean;
+  isRehearsal?: boolean;
+  isGetInFitUp?: boolean;
 };
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -67,7 +68,7 @@ export default function NewBookingDetailsView({ formData, productionCode }: NewB
     setBookingData(dates);
   }, [fromDate, toDate]);
 
-  const { nextStep, previousStep } = useWizard();
+  const { nextStep, previousStep, goToStep } = useWizard();
 
   const gridOptions = {
     autoSizeStrategy: {
@@ -92,6 +93,7 @@ export default function NewBookingDetailsView({ formData, productionCode }: NewB
 
   const PreviewBooking = () => {
     console.table(bookingData);
+    goToStep(steps.indexOf('Preview New Booking'));
   };
 
   return (

@@ -14,6 +14,7 @@ import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import PreviewNewBooking from './views/PreviewNewBooking';
 
 type AddBookingProps = {
   visible: boolean;
@@ -59,6 +60,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
           <NewBookingDetailsView formData={state.form} productionCode={productionCode} />
+          <PreviewNewBooking formData={state.form} productionCode={productionCode} />
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>
