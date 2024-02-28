@@ -94,6 +94,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
             productionCode={productionCode}
             dayTypeOptions={dayTypeOptions}
           />
+          <div>Preview booking</div>
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

@@ -198,9 +198,9 @@ export const gapSuggestColumnDefs = [
   { headerName: 'Seats', field: 'Capacity', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
   {
     headerName: 'Travel Time',
-    field: 'MileageFromStart',
+    field: 'TravelTime',
     cellRenderer: DefaultCellRenderer,
-    width: 70,
+    width: 80,
     headerClass: 'text-center',
   },
   {

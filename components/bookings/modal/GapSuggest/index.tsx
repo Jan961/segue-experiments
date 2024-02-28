@@ -10,6 +10,7 @@ import { useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import Form from './Form';
+import { formatMinutes } from 'utils/booking';
 
 type GapSuggestProps = {
   startDate: string;
@@ -33,18 +34,26 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
   const [rows, setRows] = useState(null);
   const [selectedVenueIds, setSelectedVenueIds] = useState([]);
   const tableRef = useRef(null);
-  const filteredRows = useMemo(
-    () => rows?.filter((row) => !selectedVenueIds.includes(row.VenueId)),
-    [selectedVenueIds, rows],
-  );
+  const filteredRows = useMemo(() => {
+    const filteredRows = [];
+    for (const row of rows || []) {
+      if (!selectedVenueIds.includes(row.VenueId)) {
+        filteredRows.push({ ...row, TravelTime: formatMinutes(row.MinsFromStart) });
+      }
+    }
+    return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
+  }, [selectedVenueIds, rows]);
+
   const canGapSuggest = useMemo(
     () => hasContinuosGap(bookingDict, startDate, endDate),
     [startDate, endDate, bookingDict],
   );
+
   const [prevVenueId, nextVenueId] = useMemo(() => {
     const { previousBooking, nextBooking } = findPreviosAndNextBookings(bookings, startDate, endDate);
     return [previousBooking?.venueId, nextBooking?.venueId];
   }, [bookings, startDate, endDate]);
+
   const getSuggestions = async (data: Partial<GapSuggestionUnbalancedProps>) => {
     // setLoading(true);
     try {
@@ -61,12 +70,15 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
     }
     // setLoading(false);
   };
+
   const exportTableData = () => {
     tableRef.current?.getApi?.()?.exportDataAsExcel?.();
   };
+
   const onRowSelected = (e: any) => {
     setSelectedVenueIds((prev) => [...prev, e.data.VenueId]);
   };
+
   if (!canGapSuggest) {
     return (
       <p className="text-primary font-medium my-1 mb-10 w-[370px]">
@@ -75,6 +87,7 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
       </p>
     );
   }
+
   return (
     <div className="text-primary-input-text w-[700px]">
       <Form onSave={getSuggestions} />

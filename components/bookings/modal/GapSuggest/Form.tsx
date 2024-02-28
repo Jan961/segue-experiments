@@ -128,7 +128,7 @@ const Form = ({ onSave }: FormProps) => {
             onChange={handleOnChange}
           />
         </div>
-        <div className="col-span-6 float-right items-center flex">
+        <div className="col-span-6 items-center justify-end flex">
           <Checkbox
             className="flex flex-row-reverse"
             labelClassName="!text-base"

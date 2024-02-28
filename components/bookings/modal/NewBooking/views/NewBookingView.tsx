@@ -106,7 +106,7 @@ const NewBookingView = ({
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
-    <div className="w-[385px] pb-6">
+    <div className="w-[385px]">
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
