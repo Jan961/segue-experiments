@@ -142,7 +142,7 @@ export default function NewBookingDetailsView({
           onSave={handleSaveNote}
           onCancel={() => setShowNotesModal(false)}
         />
-        <div className="py-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
+        <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
           <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />

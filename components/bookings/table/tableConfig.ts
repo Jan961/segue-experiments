@@ -7,6 +7,8 @@ import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
+import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
+import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
 import NoPerfRenderer from './NoPerfRenderer';
@@ -191,21 +193,21 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
 ];
 
 export const gapSuggestColumnDefs = [
-  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1, headerClass: 'text-center' },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1, headerClass: 'text-center' },
-  { headerName: 'Seats', field: 'seats', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
+  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
+  { headerName: 'Town', field: 'Town', cellRenderer: DefaultCellRenderer, width: 140, headerClass: 'text-center' },
+  { headerName: 'Seats', field: 'Capacity', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
   {
     headerName: 'Travel Time',
-    field: 'travelTime',
+    field: 'TravelTime',
     cellRenderer: DefaultCellRenderer,
-    width: 75,
+    width: 80,
     headerClass: 'text-center',
   },
   {
     headerName: 'Barring Check',
     field: 'barringCheck',
-    cellRenderer: DefaultCellRenderer,
-    flex: 1,
+    cellRenderer: BarringCheckButtonRenderer,
+    width: 140,
     headerClass: 'text-center',
   },
 ];

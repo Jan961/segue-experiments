@@ -42,7 +42,6 @@ const NewBookingView = ({
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
   const currentProduction = useRecoilValue(currentProductionSelector);
-
   const bookingDict = useRecoilValue(bookingState);
   const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
@@ -107,18 +106,18 @@ const NewBookingView = ({
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
   return (
-    <div className="w-[385px] pb-6">
+    <div className="w-[385px]">
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
           className=" bg-white my-2 w-fit"
-          onChange={({ from, to }) =>
+          onChange={({ from, to }) => {
             onChange({
               fromDate: from?.toISOString() || '',
               toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
-            })
-          }
+            });
+          }}
           value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}

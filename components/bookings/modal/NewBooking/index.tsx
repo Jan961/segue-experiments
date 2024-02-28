@@ -76,6 +76,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
         onClose={handleModalClose}
         titleClass="text-xl text-primary-navy text-bold"
         title={steps[stepIndex]}
+        panelClass="relative"
       >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView
@@ -93,6 +94,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
             productionCode={productionCode}
             dayTypeOptions={dayTypeOptions}
           />
+          <div>Preview booking</div>
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

@@ -51,9 +51,15 @@ class BookingHelper {
   }
 
   getRehearsalDetails(rehearsal: RehearsalDTO) {
+    const { Id, VenueId } = rehearsal;
+    const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     return {
-      Id: rehearsal?.Id,
-      town: rehearsal.Town,
+      Id,
+      town: town || rehearsal.Town,
+      venue,
+      capacity,
+      count,
+      venueId,
     };
   }
 
