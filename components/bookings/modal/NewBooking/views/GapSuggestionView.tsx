@@ -13,12 +13,12 @@ const GapSuggestionView = ({ startDate, endDate }: GapSuggestProps) => {
     goToStep(0);
   };
   return (
-    <div className="pb-6">
-      <GapSuggest startDate={startDate} endDate={endDate} />
+    <>
       <div>
-        <Button className="px-4" variant="primary" onClick={onCancel} text="back" />
+        <GapSuggest onOkClick={onCancel} startDate={startDate} endDate={endDate} />
       </div>
-    </div>
+      <Button className="w-33 absolute bottom-5 left-5" variant="secondary" onClick={onCancel} text="Back" />
+    </>
   );
 };
 

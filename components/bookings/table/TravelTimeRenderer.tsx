@@ -15,7 +15,7 @@ const TravelTimeRenderer = (props: CustomCellRendererProps) => {
   }, [dateTime, distance, productionId, venueId]);
   return (
     <div className="w-full h-full pr-[2px]">
-      <div className={`h-full px-4`}>{time}</div>
+      <div className={`h-full ml-1`}>{time}</div>
     </div>
   );
 };

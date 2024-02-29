@@ -109,7 +109,8 @@ export type GetInFitUpDTO = {
 export type RehearsalDTO = {
   Id?: number;
   Date: string;
-  Town: string;
+  VenueId: number;
+  Town?: string;
   StatusCode?: string;
   Notes: string;
   DateType: number;
@@ -177,6 +178,7 @@ export type BookingWithVenueDTO = BookingDTO & {
 export type DateTypeDTO = {
   Id: number;
   Name: string;
+  Order: number;
 };
 
 export type PerformanceDTO = {

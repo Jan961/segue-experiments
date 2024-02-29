@@ -80,11 +80,11 @@ export const dateBlockMapper = (db: DateBlock): DateBlockDTO => ({
 export const rehearsalMapper = (r: Rehearsal): RehearsalDTO => ({
   Id: r.Id,
   Date: convertDate(r.Date),
+  VenueId: r.VenueId,
   Town: r.Town,
   StatusCode: r.StatusCode,
   Notes: r.Notes,
   DateType: r.DateTypeId, // Assuming the DateType ID is stored in DateTypeId
-  VenueId: r.VenueId,
 });
 
 export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
@@ -150,6 +150,7 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({
   Id: dt.Id,
   Name: dt.Name,
+  Order: dt.SeqNo,
 });
 
 export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({

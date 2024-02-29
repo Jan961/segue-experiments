@@ -1,20 +1,45 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import { Combobox, Transition } from '@headlessui/react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import WindowedSelect, {
+  components,
+  createFilter,
+  StylesConfig,
+  OptionProps,
+  DropdownIndicatorProps,
+  IndicatorsContainerProps,
+} from 'react-windowed-select';
 import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
 
+const Option = (props: OptionProps) => {
+  return <components.Option className="w-full" {...props} />;
+};
+
+const IndicatorsContainer = (props: IndicatorsContainerProps) => {
+  return (
+    <div className="p-0">
+      <components.IndicatorsContainer {...props} />
+    </div>
+  );
+};
+
+const DropdownIndicator = (props: DropdownIndicatorProps) => {
+  return (
+    <components.DropdownIndicator {...props} className="px-1">
+      <Icon iconName="chevron-down" variant="xs" />
+    </components.DropdownIndicator>
+  );
+};
+
 export type TypeaheadOption = { text: string; value: string | number; [key: string]: any };
+
+const COMP_HEIGHT = '1.9375rem';
 
 export interface TypeaheadProps extends WithTestId {
   value?: string | number | undefined;
   onChange: (value: string | number) => void;
-  renderOption?: (
-    option: TypeaheadOption,
-    selectedOption: TypeaheadOption,
-    handleOptionSelect: (option: TypeaheadOption) => void,
-  ) => React.ReactNode;
+  renderOption?: (option: TypeaheadOption) => React.ReactElement;
   options: TypeaheadOption[];
   className?: string;
   placeholder?: string;
@@ -30,25 +55,67 @@ export default function Typeahead({
   className,
   renderOption,
   placeholder = '',
-  name = '',
   disabled = false,
   testId,
-  label = '',
+  label,
 }: TypeaheadProps) {
   const inputRef = useRef(null);
-  const [query, setQuery] = useState<string>('');
+
+  const colourStyles: StylesConfig = useMemo(
+    () => ({
+      control: (styles) => ({
+        ...styles,
+        fontWeight: 'bold',
+        fontSize: '1rem',
+        lineHeight: '1.5rem',
+        backgroundColor: '#FFF',
+        padding: '0 4px 0 4px',
+        border: 0,
+        // This line disable the blue border
+        boxShadow: 'none',
+        minHeight: COMP_HEIGHT,
+        height: COMP_HEIGHT,
+      }),
+      option: (styles, { isDisabled, isSelected }) => {
+        return {
+          ...styles,
+          fontSize: '1rem',
+          lineHeight: '1.5rem',
+          backgroundColor: isDisabled ? undefined : isSelected ? '#21345BCC' : undefined,
+          color: isDisabled ? '#ccc' : isSelected ? '#FFF' : '#617293',
+          cursor: isDisabled ? 'not-allowed' : 'default',
+          ':active': {
+            ...styles[':active'],
+            backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
+          },
+          ':hover': {
+            ...styles[':active'],
+            color: '#FFF',
+            backgroundColor: '#21345B99',
+          },
+        };
+      },
+      valueContainer: (styles) => ({
+        ...styles,
+        height: COMP_HEIGHT,
+        padding: '0 6px',
+      }),
+      input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
+      placeholder: (styles) => ({ ...styles }),
+      singleValue: (styles) => ({ ...styles, color: '#617293' }),
+      indicatorsContainer: (styles) => ({
+        ...styles,
+        height: COMP_HEIGHT,
+      }),
+      menu: (styles) => ({ ...styles, zIndex: 20 }),
+    }),
+    [],
+  );
+
   const [selectedOption, setSelectedOption] = useState<TypeaheadOption>({ text: '', value: '' });
 
-  const filteredOptions = useMemo(() => {
-    return query === ''
-      ? options
-      : options.filter(({ text = '' }) => {
-          return text.toLowerCase().includes(query.toLowerCase());
-        });
-  }, [query, options]);
-
   const onInputFocus = () => {
-    inputRef.current?.select();
+    inputRef.current?.Select?.focus();
   };
 
   const handleOptionSelect = (o: TypeaheadOption) => {
@@ -58,7 +125,16 @@ export default function Typeahead({
 
   useEffect(() => {
     setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
-  }, [value]);
+  }, [value, options]);
+
+  const customFilter = createFilter({ ignoreAccents: false });
+
+  const customComponents = {
+    Option: (option) => (renderOption ? renderOption(option) : <Option {...option} />),
+    IndicatorSeparator: null,
+    IndicatorsContainer,
+    DropdownIndicator,
+  };
 
   return (
     <div
@@ -73,57 +149,22 @@ export default function Typeahead({
           <Label text={label} />
         </div>
       )}
-      <Combobox name={name} value={selectedOption} onChange={handleOptionSelect} disabled={disabled}>
-        <div className="w-full relative">
-          <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left">
-            <Combobox.Button className="w-full flex items-center pr-2">
-              <Combobox.Input
-                data-testid={`${testId ? `form-typeahead-input-${testId}` : 'form-typeahead-input'}`}
-                ref={inputRef}
-                className="w-full h-[1.9375rem] border-none px-3 text-primary-input-text font-bold text-base focus:outline-none focus:ring-0"
-                displayValue={(o: TypeaheadOption) => o?.text || ''}
-                onChange={(event) => setQuery(event.target.value)}
-                onFocus={onInputFocus}
-                placeholder={placeholder}
-              />
-              <Icon iconName="chevron-down" variant="xs" aria-hidden="true" />
-            </Combobox.Button>
-          </div>
-          <Transition
-            as={Fragment}
-            leave="transition ease-in duration-100"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-            afterLeave={() => setQuery('')}
-          >
-            <Combobox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 font-bold text-base shadow-lg focus:outline-none">
-              {filteredOptions.length === 0 && query !== '' ? (
-                <div className="relative cursor-default select-none px-4 py-2">Nothing found.</div>
-              ) : (
-                filteredOptions.map((o) =>
-                  renderOption ? (
-                    renderOption?.(o, selectedOption, handleOptionSelect)
-                  ) : (
-                    <Combobox.Option
-                      key={o.value}
-                      className={({ active }) =>
-                        `relative cursor-default select-none py-2 px-4 ${
-                          active ? 'bg-primary-list-row-active text-white' : 'text-primary-input-text'
-                        } hover:'bg-primary-list-row-hover hover:text-white active:'bg-primary-list-row-active active:text-white`
-                      }
-                      value={o}
-                    >
-                      {({ selected }) => (
-                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>{o.text}</span>
-                      )}
-                    </Combobox.Option>
-                  ),
-                )
-              )}
-            </Combobox.Options>
-          </Transition>
-        </div>
-      </Combobox>
+
+      <WindowedSelect
+        ref={inputRef}
+        className="w-full"
+        onChange={handleOptionSelect}
+        value={selectedOption}
+        components={customComponents}
+        getOptionLabel={(props: TypeaheadOption) => props.text}
+        windowThreshold={50}
+        isDisabled={disabled}
+        filterOption={customFilter}
+        options={options}
+        onFocus={onInputFocus}
+        styles={colourStyles}
+        placeholder={placeholder}
+      />
     </div>
   );
 }

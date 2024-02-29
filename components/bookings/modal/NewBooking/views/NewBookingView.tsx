@@ -6,7 +6,6 @@ import { bookingState } from 'state/booking/bookingState';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import { dateTypeState } from 'state/booking/dateTypeState';
 import { useWizard } from 'react-use-wizard';
 import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
@@ -18,34 +17,38 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
+import Icon from 'components/core-ui-lib/Icon';
+import Tooltip from 'components/core-ui-lib/Tooltip';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 type AddBookingProps = {
   formData: TForm;
+  dayTypeOptions: SelectOption[];
+  productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
 
-const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }: AddBookingProps) => {
+const NewBookingView = ({
+  onClose,
+  onChange,
+  formData,
+  productionCode,
+  dayTypeOptions,
+  updateBookingConflicts,
+}: AddBookingProps) => {
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
   const venueDict = useRecoilValue(venueState);
   const currentProduction = useRecoilValue(currentProductionSelector);
-  const dayTypes = useRecoilValue(dateTypeState);
-  const DayTypeOptions = useMemo(() => dayTypes.map(({ Id: value, Name: text }) => ({ text, value })), [dayTypes]);
   const bookingDict = useRecoilValue(bookingState);
   const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
-  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues } = formData;
-  const productionCode = useMemo(
-    () =>
-      currentProduction
-        ? `${currentProduction?.ShowCode}${currentProduction?.Code} ${currentProduction?.ShowName}`
-        : 'All',
-    [currentProduction],
-  );
+  const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
+
   const bookingTypeValue = useMemo(
     () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
     [isDateTypeOnly],
@@ -108,28 +111,55 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
-          className=" bg-white my-2 justify-between"
-          onChange={({ from, to }) =>
+          className=" bg-white my-2 w-fit"
+          onChange={({ from, to }) => {
             onChange({
               fromDate: from?.toISOString() || '',
               toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
-            })
-          }
+            });
+          }}
           value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
           minDate={minDate ? new Date(minDate) : null}
           maxDate={maxDate ? new Date(maxDate) : null}
         />
+        {!isDateTypeOnly && (
+          <div className="flex items-center gap-2 my-1 justify-start">
+            <Checkbox
+              className="!w-fit"
+              id="shouldFilterVenues"
+              labelClassName="text-white w-fit"
+              onChange={(e: any) => onChange({ isRunOfDates: e.target.checked })}
+              checked={isRunOfDates}
+              label="This is a run of dates. Y/N"
+            />
+            <Tooltip
+              body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
+              position="right"
+              width="w-[140px]"
+              bgColorClass="bg-slate-500"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
+          </div>
+        )}
         <Select
           className="w-[160px] my-2 !border-0"
           value={bookingTypeValue}
           options={BookingTypes}
-          onChange={(v) => onChange({ isDateTypeOnly: v === BookingTypeMap.DATE_TYPE })}
+          onChange={(v) =>
+            onChange({
+              venueId: NaN,
+              dateType: NaN,
+              isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
+              isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
+            })
+          }
         />
         {isDateTypeOnly && (
           <>
             <Typeahead
               className={'my-2 w-full !border-0'}
-              options={DayTypeOptions}
+              options={dayTypeOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
               value={dateType}
@@ -154,7 +184,9 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
               checked={shouldFilterVenues}
               label="Hide venues with existing bookings for this production?"
             />
-            <div className={classNames('w-full', { 'cursor-not-allowed': !(fromDate && toDate) })}>
+            <div
+              className={classNames('w-full', { 'cursor-not-allowed caret-primary-input-text': !(fromDate && toDate) })}
+            >
               <Button
                 className="px-4 my-2 !w-full"
                 disabled={!(fromDate && toDate)}
@@ -167,8 +199,12 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         )}
       </form>
       {error && <div className="text-red-500 font-medium my-1">{error}</div>}
-      <div className="flex my-4 justify-between">
-        <div className={classNames({ 'cursor-not-allowed': !(venueId || dateType) || !fromDate || !toDate })}>
+      <div className="flex mt-4 justify-between">
+        <div
+          className={classNames({
+            'cursor-not-allowed caret-primary-input-text': !(venueId || dateType) || !fromDate || !toDate,
+          })}
+        >
           <Button
             onClick={() => null}
             disabled={!(venueId || dateType) || !fromDate || !toDate}
@@ -180,7 +216,7 @@ const NewBookingView = ({ onClose, onChange, formData, updateBookingConflicts }:
         {!fetchingBookingConflicts && (
           <div
             className={classNames({
-              'cursor-not-allowed':
+              'cursor-not-allowed caret-primary-input-text':
                 (isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate,
             })}
           >

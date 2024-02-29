@@ -26,9 +26,11 @@ const colorsConfig = {
   'disabled-input': '#E9EBF0CC',
   'primary-input-text': '#617293',
   'primary-border': '#E9EBF0',
-  'primary-list-row-hover': '#21345b99',
-  'primary-list-row-active': '#21345bcc',
-  'primary-label': '#21345bcc',
+  'primary-list-row-hover': '#21345B99',
+  'primary-list-row-active': '#21345BCC',
+  'primary-label': '#21345BCC',
+  primary: '#082B4B',
+  secondary: '#617293',
 };
 
 module.exports = {
