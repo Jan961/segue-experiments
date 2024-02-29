@@ -100,9 +100,10 @@ export type BookingDTO = {
 
 export type GetInFitUpDTO = {
   Id: number;
-  VenueId: number;
+  VenueId?: number; // check field name
   Date: string;
-  StatusCode: StatusCode;
+  StatusCode: string;
+  Notes: string;
 };
 
 export type RehearsalDTO = {
@@ -111,6 +112,9 @@ export type RehearsalDTO = {
   VenueId: number;
   Town?: string;
   StatusCode?: string;
+  Notes: string;
+  DateType: number;
+  DateBlockId?: number;
 };
 
 export type DateDTO = {
@@ -154,9 +158,10 @@ export type VenueMinimalDTO = {
 export type OtherDTO = {
   Id: number;
   Date: string;
-  DateTypeId: number;
-  DateTypeName?: string;
+  DateTypeId: number; // check name ?
+  DateTypeName?: string; // missing field at response
   StatusCode: StatusCode;
+  Notes?: string;
 };
 
 export type BookingWithVenueDTO = BookingDTO & {
