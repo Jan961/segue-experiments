@@ -226,12 +226,12 @@ export const tourSummaryColumnDefs = [
     cellRenderer: DefaultCellRenderer,
     width: 75,
   },
-  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 265 },
+  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 320 },
   {
     headerName: '',
     field: 'value',
     cellRenderer: DefaultCellRenderer,
-    width: 85,
+    width: 90,
     resizable: false,
   },
 ];
