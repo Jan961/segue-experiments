@@ -5,29 +5,16 @@ import { addDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { TForm } from '../reducer';
+import { BookingItem, TForm } from '../reducer';
 import NotesPopup from 'components/bookings/NotesPopup';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ColDef } from 'ag-grid-community';
 
-type BookingDataItem = {
-  date: string;
-  perf: boolean;
-  dayType: string;
-  venue: number;
-  noPerf: number;
-  times: string;
-  bookingStatus: string;
-  pencilNo: number;
-  notes: string;
-  isBooking: boolean;
-  isRehearsal: boolean;
-  isGetInFitUp: boolean;
-};
 type NewBookingDetailsProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
   productionCode: string;
+  onChange: (booking: BookingItem[]) => void;
 };
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
@@ -36,10 +23,11 @@ export default function NewBookingDetailsView({
   formData,
   dayTypeOptions = [],
   productionCode,
+  onChange,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
-  const [bookingData, setBookingData] = useState<BookingDataItem[]>([]);
-  const [bookingRow, setBookingRow] = useState<BookingDataItem>(null);
+  const [bookingData, setBookingData] = useState<BookingItem[]>([]);
+  const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const { nextStep, previousStep } = useWizard();
@@ -82,6 +70,7 @@ export default function NewBookingDetailsView({
         isRehearsal: false,
         isGetInFitUp: false,
       };
+
       dates.push(dateObject);
       // Increment currentDate by one day for the next iteration
       startDate = addDays(startDate, 1);
@@ -101,7 +90,10 @@ export default function NewBookingDetailsView({
     },
   };
   const goToPreviousStep = () => {
-    previousStep();
+    const isDirty = tableRef.current.isDirty();
+    if (!isDirty) {
+      previousStep();
+    }
   };
 
   const previewBooking = () => {
@@ -110,7 +102,7 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      console.log(rowData); // or do something else with rowData
+      onChange(rowData);
     }
   };
 
