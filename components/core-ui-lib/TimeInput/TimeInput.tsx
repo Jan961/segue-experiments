@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import Label from '../Label';
 import classNames from 'classnames';
 
-type Time = {
+export type Time = {
   hrs?: string;
   min?: string;
   sec?: string;

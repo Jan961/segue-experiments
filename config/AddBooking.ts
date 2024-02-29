@@ -9,11 +9,13 @@ export const INITIAL_STATE = {
     isRunOfDates: false,
   },
   bookingConflicts: [],
+  booking: [],
 };
 
 export const Actions = {
   UPDATE_FORM_DATA: 'UPDATE_FORM_DATA',
   UPDATE_BOOKING_CONFLICTS: 'UPDATE_BOOKING_CONFLICTS',
+  UPDATE_BOOKING: 'UPDATE_BOOKING',
 };
 
 export const steps = [
@@ -35,9 +37,39 @@ export const BookingTypes = [
     value: 'dateTypeOnly',
   },
 ];
+
 export const BookingTypeMap = {
   VENUE: 'venueType',
   DATE_TYPE: 'dateTypeOnly',
 };
 
+export const OTHER_DAY_TYPES = [
+  {
+    text: 'Performance',
+    value: -1,
+  },
+  {
+    text: 'Rehearsal',
+    value: -2,
+  },
+  {
+    text: 'Get in / Fit Up',
+    value: -3,
+  },
+  {
+    text: 'Get Out',
+    value: -4,
+  },
+];
+
+export const DEFAULT_GAP_SUGGEST_FORM_STATE = {
+  minFromLastVenue: null,
+  maxFromLastVenue: null,
+  maxTravelTimeFromLastVenue: '',
+  minToNextVenue: null,
+  maxToNextVenue: null,
+  maxTravelTimeToNextVenue: '',
+  minSeats: null,
+  includeExcludedVenues: false,
+};
 export const DayTypeEdit = {};

@@ -2,6 +2,7 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
+import classNames from 'classnames';
 
 interface PopupModalProps {
   title?: string;
@@ -10,6 +11,7 @@ interface PopupModalProps {
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
+  panelClass?: string;
   hasOverlay?: boolean;
 }
 
@@ -20,6 +22,7 @@ export default function PopupModal({
   onClose = () => null,
   titleClass,
   showCloseIcon = true,
+  panelClass,
   hasOverlay = false,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
@@ -58,7 +61,12 @@ export default function PopupModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="px-7 pt-7 transform bg-primary-white text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel
+                className={classNames(
+                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
+                  panelClass,
+                )}
+              >
                 {showCloseIcon && (
                   <Icon
                     iconName="cross"
