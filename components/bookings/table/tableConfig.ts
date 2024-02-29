@@ -221,17 +221,17 @@ export const gapSuggestColumnDefs = [
 
 export const tourSummaryColumnDefs = [
   {
-    headerName: 'Production Code',
+    headerName: 'Prod Code',
     field: 'prodCode',
     cellRenderer: DefaultCellRenderer,
-    width: 100,
+    width: 75,
   },
-  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 220 },
+  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 265 },
   {
     headerName: '',
     field: 'value',
     cellRenderer: DefaultCellRenderer,
-    width: 115,
+    width: 85,
     resizable: false,
   },
 ];
