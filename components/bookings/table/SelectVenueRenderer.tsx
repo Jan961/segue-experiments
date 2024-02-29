@@ -12,7 +12,7 @@ interface SelectVenueRendererProps extends ICellRendererParams {
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
 
-export default function SelectVenueRenderer({ dayTypeOptions, data, value, node }: SelectVenueRendererProps) {
+export default function SelectVenueRenderer({ dayTypeOptions, data, value, setValue }: SelectVenueRendererProps) {
   const venueDict = useRecoilValue(venueState);
   const bookingDict = useRecoilValue(bookingState);
   const selectedDayTypeOption = dayTypeOptions.find(({ value }) => data.dayType === value);
@@ -36,7 +36,7 @@ export default function SelectVenueRenderer({ dayTypeOptions, data, value, node 
   }, [venueDict, bookingDict]);
 
   const handleVenueChange = (venue) => {
-    node.setData({ ...data, venue });
+    setValue(venue);
   };
 
   return (

@@ -150,7 +150,7 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
   {
     headerName: 'Times',
     field: 'times',
-    // editable: true,
+    getColId: () => 'times',
     wrapText: true,
     cellRenderer: TimeArrayRenderer,
     width: 102,
