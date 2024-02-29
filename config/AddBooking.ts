@@ -9,11 +9,13 @@ export const INITIAL_STATE = {
     isRunOfDates: false,
   },
   bookingConflicts: [],
+  booking: [],
 };
 
 export const Actions = {
   UPDATE_FORM_DATA: 'UPDATE_FORM_DATA',
   UPDATE_BOOKING_CONFLICTS: 'UPDATE_BOOKING_CONFLICTS',
+  UPDATE_BOOKING: 'UPDATE_BOOKING',
 };
 
 export const steps = [
