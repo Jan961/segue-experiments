@@ -1,7 +1,7 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
 import { GridApi, GridReadyEvent, RowHeightParams } from 'ag-grid-community';
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 // import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
@@ -42,8 +42,10 @@ export default forwardRef(function Table(
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
   const [autoHeightLimit, setAutoHeightLimit] = useState<number>(400);
+  const isDirty = useRef(false);
   useImperativeHandle(ref, () => ({
     getApi: () => gridApi,
+    isDirty: () => isDirty.current,
   }));
 
   const gridHeight = useMemo(() => {
@@ -52,6 +54,10 @@ export default forwardRef(function Table(
     }
     return HEADER_HEIGHT;
   }, [rowData]);
+
+  const handleCellValueChanged = () => {
+    isDirty.current = true;
+  };
 
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
@@ -104,6 +110,7 @@ export default forwardRef(function Table(
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
           onRowSelected={onRowSelected}
+          onComponentStateChanged={handleCellValueChanged}
           onGridReady={onGridReady}
           getRowStyle={getRowStyle}
           tooltipHideDelay={5000}
