@@ -9,45 +9,31 @@ import BarringIssueView from './views/BarringIssueView';
 import { useMemo, useReducer } from 'react';
 import reducer, { TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
-import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
+import { Actions, INITIAL_STATE, OTHER_DAY_TYPES, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { dateTypeState } from 'state/booking/dateTypeState';
 
-export const OTHER_DAY_TYPES = [
-  {
-    text: '-',
-    value: -1,
-  },
-  {
-    text: 'Performance',
-    value: -2,
-  },
-  {
-    text: 'Rehearsal',
-    value: -3,
-  },
-  {
-    text: 'Get in / Fit Up',
-    value: -4,
-  },
-  {
-    text: 'Get Out',
-    value: -5,
-  },
-];
-
 type AddBookingProps = {
   visible: boolean;
   onClose: () => void;
+  startDate?: string;
+  endDate?: string;
 };
 
-const AddBooking = ({ visible, onClose }: AddBookingProps) => {
+const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { stepIndex } = useRecoilValue(newBookingState);
   const handleModalClose = () => onClose?.();
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
+    ...INITIAL_STATE,
+    form: {
+      ...INITIAL_STATE.form,
+      fromDate: startDate,
+      toDate: endDate,
+    },
+  }));
   const currentProduction = useRecoilValue(currentProductionSelector);
   const dayTypes = useRecoilValue(dateTypeState);
   const dayTypeOptions = useMemo(

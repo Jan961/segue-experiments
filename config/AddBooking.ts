@@ -45,20 +45,24 @@ export const BookingTypeMap = {
 
 export const OTHER_DAY_TYPES = [
   {
-    text: 'Performance',
+    text: '-',
     value: -1,
   },
   {
-    text: 'Rehearsal',
+    text: 'Performance',
     value: -2,
   },
   {
-    text: 'Get in / Fit Up',
+    text: 'Rehearsal',
     value: -3,
   },
   {
-    text: 'Get Out',
+    text: 'Get in / Fit Up',
     value: -4,
+  },
+  {
+    text: 'Get Out',
+    value: -5,
   },
 ];
 
