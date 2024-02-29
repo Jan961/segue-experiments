@@ -114,7 +114,6 @@ export type RehearsalDTO = {
   StatusCode?: string;
   Notes: string;
   DateType: number;
-  VenueId: number;
   DateBlockId?: number;
 };
 
