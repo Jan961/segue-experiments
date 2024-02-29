@@ -75,13 +75,19 @@ export const columnDefs = [
 export const bookingConflictsColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Booking Status', field: 'bookingStatus', cellRenderer: DefaultCellRenderer, width: 145 },
+  {
+    headerName: 'Booking Status',
+    field: 'bookingStatus',
+    cellRenderer: DefaultCellRenderer,
+    width: 145,
+    resizable: false,
+  },
 ];
 
 export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75 },
+  { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = []) => [
@@ -200,7 +206,7 @@ export const gapSuggestColumnDefs = [
     headerName: 'Travel Time',
     field: 'TravelTime',
     cellRenderer: DefaultCellRenderer,
-    width: 80,
+    width: 90,
     headerClass: 'text-center',
   },
   {
@@ -209,6 +215,7 @@ export const gapSuggestColumnDefs = [
     cellRenderer: BarringCheckButtonRenderer,
     width: 140,
     headerClass: 'text-center',
+    resizable: false,
   },
 ];
 

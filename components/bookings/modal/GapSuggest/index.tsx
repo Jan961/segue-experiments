@@ -30,7 +30,6 @@ const gridOptions = {
 const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
-  // const [loading, setLoading] = useState(false);
   const [rows, setRows] = useState(null);
   const [selectedVenueIds, setSelectedVenueIds] = useState([]);
   const tableRef = useRef(null);
@@ -54,8 +53,11 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
     return [previousBooking?.venueId, nextBooking?.venueId];
   }, [bookings, startDate, endDate]);
 
-  const getSuggestions = async (data: Partial<GapSuggestionUnbalancedProps>) => {
-    // setLoading(true);
+  const getSuggestions = async (
+    data: Partial<GapSuggestionUnbalancedProps>,
+    onSuccess: (res: any) => void,
+    onError: (err: any) => void,
+  ) => {
     try {
       const response = await axios.post<GapSuggestionReponse>('/api/venue/read/distance', {
         ...data,
@@ -63,12 +65,14 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
         EndVenue: nextVenueId,
       });
       if (response.status >= 200 && response.status < 400) {
+        setSelectedVenueIds([]);
         setRows(response.data?.VenueInfo);
+        onSuccess(response.data);
       }
     } catch (error) {
+      onError(error);
       setRows([]);
     }
-    // setLoading(false);
   };
 
   const exportTableData = () => {
@@ -92,7 +96,7 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
     <div className="text-primary-input-text w-[700px]">
       <Form onSave={getSuggestions} />
       {rows !== null && (
-        <div className="w-full h-60 flex flex-col pt-4">
+        <div className="w-full overflow-hidden flex flex-col pt-4" style={{ maxHeight: 'calc(100vh - 400px)' }}>
           <Table
             onRowSelected={onRowSelected}
             ref={tableRef}

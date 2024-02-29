@@ -1,6 +1,7 @@
 import { getTimeInMins } from 'components/bookings/panel/utils/AddNewBooking';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
+import Loader from 'components/core-ui-lib/Loader';
 import TextInput from 'components/core-ui-lib/TextInput';
 import TimeInput from 'components/core-ui-lib/TimeInput';
 import { DEFAULT_GAP_SUGGEST_FORM_STATE } from 'config/AddBooking';
@@ -8,11 +9,16 @@ import { GapSuggestionUnbalancedProps } from 'pages/api/venue/read/distance';
 import { useState } from 'react';
 
 type FormProps = {
-  onSave: (data: Partial<GapSuggestionUnbalancedProps>) => Promise<void>;
+  onSave: (
+    data: Partial<GapSuggestionUnbalancedProps>,
+    onSuccess: (data?: any) => void,
+    onError: (error?: any) => void,
+  ) => Promise<void>;
 };
 
 const Form = ({ onSave }: FormProps) => {
   const [formData, setFormData] = useState(DEFAULT_GAP_SUGGEST_FORM_STATE);
+  const [loading, setLoading] = useState(false);
   const {
     minFromLastVenue,
     minToNextVenue,
@@ -20,7 +26,7 @@ const Form = ({ onSave }: FormProps) => {
     maxToNextVenue,
     maxTravelTimeFromLastVenue,
     maxTravelTimeToNextVenue,
-    excludeLondonVenues,
+    includeExcludedVenues,
     minSeats,
   } = formData;
 
@@ -28,7 +34,7 @@ const Form = ({ onSave }: FormProps) => {
     let { id, value } = event.target;
     if (id === 'maxTravelTimeFromLastVenue' || id === 'maxTravelTimeToNextVenue') {
       value = `${value.hrs}:${value.min}`;
-    } else if (id === 'excludeLondonVenues') {
+    } else if (id === 'includeExcludedVenues') {
       value = event.target.checked;
     } else {
       value = value ? parseInt(value, 10) : null;
@@ -41,12 +47,17 @@ const Form = ({ onSave }: FormProps) => {
       MaxFromMiles: formData.maxFromLastVenue,
       MinToMiles: formData.minToNextVenue,
       MaxToMiles: formData.maxToNextVenue,
-      ExcludeLondonVenues: formData.excludeLondonVenues,
+      IncludeExcludedVenues: formData.includeExcludedVenues,
       MinSeats: formData.minSeats,
       MaxFromTime: getTimeInMins(formData.maxTravelTimeFromLastVenue),
       MaxToTime: getTimeInMins(formData.maxTravelTimeToNextVenue),
     };
-    onSave(data);
+    setLoading(true);
+    onSave(
+      data,
+      () => setLoading(false),
+      () => setLoading(true),
+    );
   };
   return (
     <form>
@@ -118,7 +129,7 @@ const Form = ({ onSave }: FormProps) => {
         </div>
       </div>
       <div className="grid grid-cols-12 gap-3 my-2">
-        <div className="col-span-2 text-sm">Min No: Seats</div>
+        <div className="col-span-2 text-sm flex items-center">Min No. Seats</div>
         <div className="col-span-4">
           <TextInput
             className="w-full"
@@ -133,9 +144,9 @@ const Form = ({ onSave }: FormProps) => {
             className="flex flex-row-reverse"
             labelClassName="!text-base"
             label="Include Excluded Venues"
-            id="excludeLondonVenues"
-            name="excludeLondonVenues"
-            checked={excludeLondonVenues}
+            id="includeExcludedVenues"
+            name="includeExcludedVenues"
+            checked={includeExcludedVenues}
             onChange={handleOnChange}
           />
         </div>
@@ -145,7 +156,9 @@ const Form = ({ onSave }: FormProps) => {
         className="float-right px-4 font-normal"
         variant="primary"
         text="Get Suggestions"
-      />
+      >
+        {loading && <Loader />}
+      </Button>
     </form>
   );
 };

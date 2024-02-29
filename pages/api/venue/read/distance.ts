@@ -23,6 +23,7 @@ export interface GapSuggestionUnbalancedProps {
   MaxFromTime?: number;
   MaxToTime?: number;
   ExcludeLondonVenues?: boolean;
+  IncludeExcludedVenues?: boolean;
 }
 
 export type VenueWithDistance = {
@@ -51,6 +52,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     MinToMiles,
     MaxToMiles,
     ExcludeLondonVenues,
+    IncludeExcludedVenues,
     MinSeats = 0,
     MaxFromTime,
     MaxToTime,
@@ -177,6 +179,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Id: true,
         Seats: true,
         Name: true,
+        ExcludeFromChecks: true,
         VenueAddress: {
           where: {
             TypeName: 'main',
@@ -202,13 +205,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const capacityMap = new Map<number, any>(
       capacities.map((venue: any) => [
         venue.Id,
-        { Seats: venue.Seats, Address: venue.VenueAddress?.[0], Name: venue.Name },
+        {
+          Seats: venue.Seats,
+          Address: venue.VenueAddress?.[0],
+          Name: venue.Name,
+          ExcludeFromChecks: venue.ExcludeFromChecks,
+        },
       ]),
     );
     const VenueInfo = venuesWithDistanceData
       .map((x) => {
-        const { Seats, Address = {}, Name } = capacityMap.get(x.VenueId) || {};
+        const { Seats, Address = {}, Name, ExcludeFromChecks } = capacityMap.get(x.VenueId) || {};
         if (Address.Town === 'London' && ExcludeLondonVenues) return null;
+        if (!IncludeExcludedVenues && ExcludeFromChecks) return null;
         return { ...x, Capacity: Seats, ...Address, Name };
       })
       .filter((venue) => venue && venue.Capacity >= MinSeats);

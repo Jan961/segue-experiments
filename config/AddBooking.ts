@@ -70,6 +70,6 @@ export const DEFAULT_GAP_SUGGEST_FORM_STATE = {
   maxToNextVenue: null,
   maxTravelTimeToNextVenue: '',
   minSeats: null,
-  excludeLondonVenues: false,
+  includeExcludedVenues: false,
 };
 export const DayTypeEdit = {};
