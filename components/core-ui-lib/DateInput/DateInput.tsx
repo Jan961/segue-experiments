@@ -97,7 +97,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     setErrorMsg('');
     if (inputValue) {
       if (regex.test(inputValue) && moment(inputValue, 'DD/MM/YY').isValid()) {
-        const date = moment(inputValue, 'DD/MM/YY').toDate();
+        const date = moment.utc(inputValue, 'DD/MM/YY').toDate();
         onChange(date);
         setSelectedDate(date);
       } else {

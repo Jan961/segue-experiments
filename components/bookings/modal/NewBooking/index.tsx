@@ -7,7 +7,7 @@ import BookingConflictsView from './views/BookingConflictsView';
 import { newBookingState } from 'state/booking/newBookingState';
 import BarringIssueView from './views/BarringIssueView';
 import { useMemo, useReducer } from 'react';
-import reducer, { TForm } from './reducer';
+import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, steps } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
@@ -69,6 +69,11 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
   const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
   };
+
+  const handleSaveNewBooking = (booking: BookingItem[]) => {
+    dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
+  };
+
   return (
     <>
       <PopupModal
@@ -76,6 +81,7 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
         onClose={handleModalClose}
         titleClass="text-xl text-primary-navy text-bold"
         title={steps[stepIndex]}
+        panelClass="relative"
       >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView
@@ -92,7 +98,9 @@ const AddBooking = ({ visible, onClose }: AddBookingProps) => {
             formData={state.form}
             productionCode={productionCode}
             dayTypeOptions={dayTypeOptions}
+            onChange={handleSaveNewBooking}
           />
+          <div>Preview booking</div>
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
       </PopupModal>

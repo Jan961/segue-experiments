@@ -7,16 +7,19 @@ interface SelectDayTypeRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
 }
 
-const SelectDayTypeRender = ({ value, node, dayTypeOptions }: SelectDayTypeRendererProps) => {
+const SelectDayTypeRender = ({ data, value, node, dayTypeOptions }: SelectDayTypeRendererProps) => {
   const [selectedDateType, setSelectedDateType] = useState<string>('');
 
   useEffect(() => {
-    setSelectedDateType(value);
-  }, [value]);
+    if (data && dayTypeOptions) {
+      const performance = dayTypeOptions?.find(({ text }) => text === 'Performance');
+      const dayTypeIndex = data.perf ? performance.value : value;
+      setSelectedDateType(dayTypeIndex);
+    }
+  }, [data, value, dayTypeOptions]);
 
   const handleChange = (selectedValue) => {
     node.setDataValue('dayType', selectedValue);
-    node.setDataValue('perf', selectedValue === 'Performance');
   };
 
   return (
