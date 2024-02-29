@@ -54,7 +54,7 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
   };
 
   return (
-    <div className="flex flex-col pb-6">
+    <div className="flex flex-col">
       <span className="pb-2 text-responsive-sm text-primary-input-text">{`This booking would conflict with ${
         rows?.length || 0
       } bookings`}</span>
@@ -76,7 +76,7 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
         />
       </div>
       {confirmedBookings && confirmedBookings.length > 0 && (
-        <span className="w-full text-end text-responsive-sm text-primary-red">
+        <span className="w-full text-end text-responsive-sm text-primary-red mt-2">
           Warning! Booking clash with existing confirmed booking.
         </span>
       )}

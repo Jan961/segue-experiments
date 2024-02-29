@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import Icon, { IconName, IconProps } from '../Icon/Icon';
+import { PropsWithChildren } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
@@ -40,7 +41,8 @@ export default function Button({
   prefixIconName,
   sufixIconName,
   iconProps,
-}: ButtonProps) {
+  children,
+}: PropsWithChildren<ButtonProps>) {
   const variantClass = ClassMap.get(variant);
   const disabledClass = disabled
     ? `!bg-disabled-button bg-opacity-65 text-white !cursor-not-allowed !pointer-events-none`
@@ -66,7 +68,7 @@ export default function Button({
       )}
 
       <div className="col-span-10 text-center">{text || ''}</div>
-
+      {children}
       {sufixIconName && (
         <span className="col-span-1 absolute right-2">
           <Icon aria-hidden="true" iconName={sufixIconName} {...iconProps} />
