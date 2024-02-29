@@ -93,7 +93,10 @@ export default function NewBookingDetailsView({
   const goToPreviousStep = () => {
     const isDirty = tableRef.current.isDirty();
     if (!isDirty) {
-      previousStep();
+      const isDirty = tableRef.current.isDirty();
+      if (!isDirty) {
+        previousStep();
+      }
     }
   };
 

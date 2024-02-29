@@ -162,7 +162,7 @@ model Venue {
   IsDeleted                                                 Boolean              @default(dbgenerated("(b'0')")) @map("VenueIsDeleted") @db.Bit(1)
   VenueNotes                                                String?              @db.LongText
   VenueWarningNotes                                         String?              @db.LongText
-  VenueExcludeFromChecks                                    Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ExcludeFromChecks                                         Boolean              @default(dbgenerated("(b'0')")) @db.Bit(1) @map("VenueExcludeFromChecks")
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]

@@ -1,5 +1,6 @@
 import { Actions, INITIAL_STATE } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
+import { debug } from 'utils/logging';
 
 export type TAction = {
   type: string;
@@ -55,7 +56,7 @@ export type TState = {
 const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
   const { payload = {}, type } = action;
   const { form } = state;
-
+  debug(type, payload);
   switch (type) {
     case Actions.UPDATE_FORM_DATA:
       return {
