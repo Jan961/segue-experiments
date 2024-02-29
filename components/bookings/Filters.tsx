@@ -9,7 +9,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState, intialBookingFilterState } from 'state/booking/filterState';
 import { useMemo, useState } from 'react';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
-import { statusOptions } from 'config/bookings';
+import { allStatusOptions } from 'config/bookings';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import moment from 'moment';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
@@ -90,7 +90,7 @@ const Filters = () => {
             value={filter.status}
             className="bg-white w-52"
             label="Status"
-            options={statusOptions}
+            options={allStatusOptions}
           />
           <BookingFilter />
           <TextInput
