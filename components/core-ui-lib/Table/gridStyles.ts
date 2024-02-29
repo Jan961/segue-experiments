@@ -39,6 +39,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     justify-content: center !important;
 }
 
+.ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
     min-height: 0px!important;
 }
