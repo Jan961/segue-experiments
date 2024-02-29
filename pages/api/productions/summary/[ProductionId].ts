@@ -187,6 +187,78 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             value: workingDays - otherDays || 0,
             bold: true,
           },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
+          {
+            name: 'Remaining Days',
+            prodCode,
+            value: workingDays - otherDays || 0,
+            bold: true,
+          },
         ],
         [
           {

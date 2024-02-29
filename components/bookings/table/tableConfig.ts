@@ -150,7 +150,7 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
   {
     headerName: 'Times',
     field: 'times',
-    // editable: true,
+    getColId: () => 'times',
     wrapText: true,
     cellRenderer: TimeArrayRenderer,
     width: 102,
@@ -221,17 +221,17 @@ export const gapSuggestColumnDefs = [
 
 export const tourSummaryColumnDefs = [
   {
-    headerName: 'Production Code',
+    headerName: 'Prod Code',
     field: 'prodCode',
     cellRenderer: DefaultCellRenderer,
-    width: 100,
+    width: 75,
   },
-  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 220 },
+  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 320 },
   {
     headerName: '',
     field: 'value',
     cellRenderer: DefaultCellRenderer,
-    width: 115,
+    width: 90,
     resizable: false,
   },
 ];

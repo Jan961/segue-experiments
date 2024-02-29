@@ -55,7 +55,7 @@ export default forwardRef(function Table(
     return HEADER_HEIGHT;
   }, [rowData]);
 
-  const handleCellValueChanged = () => {
+  const handleCellValueChange = () => {
     isDirty.current = true;
   };
 
@@ -110,7 +110,7 @@ export default forwardRef(function Table(
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
           onRowSelected={onRowSelected}
-          onComponentStateChanged={handleCellValueChanged}
+          onCellValueChanged={handleCellValueChange}
           onGridReady={onGridReady}
           getRowStyle={getRowStyle}
           tooltipHideDelay={5000}

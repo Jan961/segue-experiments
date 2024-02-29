@@ -1,6 +1,6 @@
-import { bookingMapper, performanceMapper } from 'lib/mappers';
-import prisma from 'lib/prisma';
 import { loggingService } from 'services/loggingService';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { BookingService } from './services/add.bookings'; // Adjust the import path as needed
 
 export interface AddBookingsParams {
   Date: string;
@@ -13,59 +13,14 @@ export interface AddBookingsParams {
   Notes: string;
 }
 
-export default async function handle(req, res) {
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const BookingsData = req.body as AddBookingsParams[];
-    const promises = [];
-    const bookings = [];
-    let performances = [];
-    await prisma.$transaction(async (tx) => {
-      for (const BookingData of BookingsData) {
-        const { DateBlockId, VenueId, Date: bookingDate, performanceTimes = [] } = BookingData || {};
-        const performances = performanceTimes.map((time) => ({
-          create: {
-            Time: new Date(`${bookingDate}T${time}`),
-            Date: new Date(bookingDate),
-          },
-        }));
-        const created = tx.booking.create({
-          data: {
-            FirstDate: new Date(bookingDate),
-            DateBlock: {
-              connect: {
-                Id: DateBlockId,
-              },
-            },
-            Venue: {
-              connect: {
-                Id: VenueId,
-              },
-            },
-            Performance: {
-              createMany: {
-                data: performances.map((p) => p.create),
-              },
-            },
-          },
-          include: {
-            Performance: true,
-            Venue: true,
-          },
-        });
-        promises.push(created);
-      }
-      const createdBookings = await Promise.allSettled(promises);
-      for (const createdBooking of createdBookings) {
-        if (createdBooking.status === 'fulfilled') {
-          bookings.push(bookingMapper(createdBooking.value));
-          performances = performances.concat(
-            createdBooking.value.Performance.map((performance) => performanceMapper(performance)),
-          );
-        }
-      }
-      return createdBookings;
-    });
-    res.status(200).json({ bookings, performances });
+    const bookingsData = req.body; // Assuming your body is already in the correct format
+
+    const { bookings, performances, rehearsals, getInFitUps, others } =
+      await BookingService.createBookings(bookingsData);
+
+    res.status(200).json({ bookings, performances, rehearsals, getInFitUps, others });
   } catch (e) {
     await loggingService.logError(e);
     res.status(500).json({ err: 'Error creating booking' });
