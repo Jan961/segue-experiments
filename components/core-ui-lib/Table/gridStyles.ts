@@ -19,11 +19,24 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-checkbox-unchecked-color: #617293;
     --ag-checkbox-indeterminate-color: #617293;
 }
-   .ag-checkbox-cell{
-       justify-content: center !important;
-    }
-   .ag-checkbox-edit{
-       justify-content: center !important;
+
+.ag-body-viewport {
+    overflow: visible;
+}
+
+.ag-root,
+.ag-root-wrapper, 
+.ag-center-cols-clipper, 
+.ag-center-cols-viewport,
+.ag-body-viewport-wrapper {
+    overflow: visible !important;
+}
+
+.ag-checkbox-cell{
+    justify-content: center !important;
+}
+.ag-checkbox-edit{
+    justify-content: center !important;
 }
 
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {

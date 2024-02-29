@@ -1,6 +1,7 @@
-import { Venue, VenueVenue } from '@prisma/client';
+import { VenueVenue } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { unique } from 'radash';
 
 export interface GapSuggestionParams {
   StartVenue: number;
@@ -19,6 +20,8 @@ export interface GapSuggestionUnbalancedProps {
   MinToMiles?: number;
   MaxToMiles?: number;
   MinSeats?: number;
+  MaxFromTime?: number;
+  MaxToTime?: number;
   ExcludeLondonVenues?: boolean;
 }
 
@@ -49,6 +52,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     MaxToMiles,
     ExcludeLondonVenues,
     MinSeats = 0,
+    MaxFromTime,
+    MaxToTime,
   } = req.body as GapSuggestionUnbalancedProps;
   const SLIDER_MIN = 25;
 
@@ -85,6 +90,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         Venue1Id: StartVenue,
         Mileage: { gte: MinFromMiles, lte: MaxFromMiles },
+        ...(MaxFromTime && { TimeMins: { lte: MaxFromTime } }),
       },
       select: {
         Venue2Id: true,
@@ -97,6 +103,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         Venue2Id: StartVenue,
         Mileage: { gte: MinFromMiles, lte: MaxFromMiles },
+        ...(MaxFromTime && { TimeMins: { lte: MaxFromTime } }),
       },
       select: {
         Venue1Id: true,
@@ -109,6 +116,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         Venue1Id: EndVenue,
         Mileage: { gte: MinToMiles, lte: MaxToMiles },
+        ...(MaxToTime && { TimeMins: { lte: MaxToTime } }),
       },
       select: {
         Venue2Id: true,
@@ -121,6 +129,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         Venue2Id: EndVenue,
         Mileage: { gte: MinToMiles, lte: MaxToMiles },
+        ...(MaxToTime && { TimeMins: { lte: MaxToTime } }),
       },
       select: {
         Venue1Id: true,
@@ -162,11 +171,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         MinsFromStart: startRelation.Mins,
         MinsFromEnd: endVenueRelationsMap.get(startRelation.VenueId).Mins,
       }));
-
+    const VenueIds = unique(venuesWithDistanceData.map((x) => x.VenueId));
     const capacities = await prisma.venue.findMany({
       select: {
         Id: true,
         Seats: true,
+        Name: true,
         VenueAddress: {
           where: {
             TypeName: 'main',
@@ -185,20 +195,23 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
       where: {
         Id: {
-          in: venuesWithDistanceData.map((x) => x.VenueId),
+          in: VenueIds,
         },
       },
     });
     const capacityMap = new Map<number, any>(
-      capacities.map((venue: any) => [venue.Id, { Seats: venue.Seats, Address: venue.VenueAddress?.[0] }]),
+      capacities.map((venue: any) => [
+        venue.Id,
+        { Seats: venue.Seats, Address: venue.VenueAddress?.[0], Name: venue.Name },
+      ]),
     );
     const VenueInfo = venuesWithDistanceData
       .map((x) => {
-        const { Seats, Address = {} } = capacityMap.get(x.VenueId) || {};
+        const { Seats, Address = {}, Name } = capacityMap.get(x.VenueId) || {};
         if (Address.Town === 'London' && ExcludeLondonVenues) return null;
-        return { ...x, Capacity: Seats, ...Address };
+        return { ...x, Capacity: Seats, ...Address, Name };
       })
-      .filter((venue, i) => venue && venue.Capacity >= MinSeats);
+      .filter((venue) => venue && venue.Capacity >= MinSeats);
     const result: GapSuggestionReponse = {
       SliderMax: sliderMax,
       DefaultMin: safeMin,

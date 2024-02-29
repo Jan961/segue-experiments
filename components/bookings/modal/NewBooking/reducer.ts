@@ -31,16 +31,31 @@ export type PreviewDataItem = {
   miles: string;
   travelTime: string;
 };
+export type BookingItem = {
+  date: string;
+  perf: boolean;
+  dayType: number;
+  venue: number;
+  noPerf: number;
+  times: string;
+  bookingStatus: string;
+  pencilNo: string;
+  notes: string;
+  isBooking: boolean;
+  isRehearsal: boolean;
+  isGetInFitUp: boolean;
+};
 
 export type TState = {
   form: TForm;
   bookingConflicts: BookingWithVenueDTO[];
+  booking: BookingItem[];
 };
 
 const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
   const { payload = {}, type } = action;
   const { form } = state;
-  console.log(type, payload);
+
   switch (type) {
     case Actions.UPDATE_FORM_DATA:
       return {
@@ -54,6 +69,11 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
       return {
         ...state,
         bookingConflicts: payload,
+      };
+    case Actions.UPDATE_BOOKING:
+      return {
+        ...state,
+        booking: payload,
       };
     default:
       return state;

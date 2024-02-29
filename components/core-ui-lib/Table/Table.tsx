@@ -14,6 +14,7 @@ interface TableProps {
   styleProps?: StyleProps;
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
+  onRowSelected?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
@@ -35,6 +36,7 @@ export default forwardRef(function Table(
     getRowStyle,
     displayHeader = true,
     getRowHeight,
+    onRowSelected = () => null,
   }: TableProps,
   ref,
 ) {
@@ -101,6 +103,7 @@ export default forwardRef(function Table(
           rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
+          onRowSelected={onRowSelected}
           onGridReady={onGridReady}
           getRowStyle={getRowStyle}
           tooltipHideDelay={5000}

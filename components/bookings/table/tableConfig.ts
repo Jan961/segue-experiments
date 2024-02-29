@@ -7,14 +7,15 @@ import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
+import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
+import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
 import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
-
-import TimeArrayRender from './TimeArrayRender';
+import TimeArrayRenderer from './TimeArrayRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -23,33 +24,34 @@ export const columnDefs = [
     headerName: 'Production',
     field: 'production',
     cellRenderer: DefaultCellRenderer,
-    width: 120,
+    width: 106,
   },
   {
     headerName: 'Date',
     field: 'date',
     cellRenderer: DateColumnRenderer,
+    width: 120,
     minWidth: 120,
   },
-  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 65 },
+  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55 },
   { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
-  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 120 },
+  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
     cellRenderer: DefaultCellRenderer,
     resizable: true,
-    width: 120,
+    width: 105,
   },
-  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
+  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 70 },
-  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 95, minWidth: 95 },
+  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
   {
     headerName: 'Miles',
     field: 'miles',
     cellRenderer: MilesRenderer,
-    width: 70,
+    width: 69,
   },
   { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80 },
   {
@@ -144,7 +146,7 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
     field: 'times',
     // editable: true,
     wrapText: true,
-    cellRenderer: TimeArrayRender,
+    cellRenderer: TimeArrayRenderer,
     width: 102,
     maxWidth: 102,
     cellStyle: {
@@ -191,21 +193,21 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
 ];
 
 export const gapSuggestColumnDefs = [
-  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1, headerClass: 'text-center' },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, flex: 1, headerClass: 'text-center' },
-  { headerName: 'Seats', field: 'seats', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
+  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
+  { headerName: 'Town', field: 'Town', cellRenderer: DefaultCellRenderer, width: 140, headerClass: 'text-center' },
+  { headerName: 'Seats', field: 'Capacity', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
   {
     headerName: 'Travel Time',
-    field: 'travelTime',
+    field: 'TravelTime',
     cellRenderer: DefaultCellRenderer,
-    width: 75,
+    width: 80,
     headerClass: 'text-center',
   },
   {
     headerName: 'Barring Check',
     field: 'barringCheck',
-    cellRenderer: DefaultCellRenderer,
-    flex: 1,
+    cellRenderer: BarringCheckButtonRenderer,
+    width: 140,
     headerClass: 'text-center',
   },
 ];

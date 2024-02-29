@@ -47,6 +47,7 @@ export default function PreviewNewBooking({ formData, productionCode }: NewBooki
 
   const filterBookingsByDateRange = (bookings, startDate, endDate) => {
     // const startDate = new Date(start);
+
     // const endDate = new Date(end);
     console.log('startDate-- :>> ', startDate);
     console.log('endDate-- :>> ', endDate);

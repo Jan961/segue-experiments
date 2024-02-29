@@ -3,32 +3,19 @@ import { newBookingColumnDefs, styleProps } from 'components/bookings/table/tabl
 import Button from 'components/core-ui-lib/Button';
 import { addDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { TForm } from '../reducer';
-import { steps } from 'config/AddBooking';
+import { BookingItem, TForm } from '../reducer';
 import NotesPopup from 'components/bookings/NotesPopup';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ColDef } from 'ag-grid-community';
+import { steps } from 'config/AddBooking';
 
-type BookingDataItem = {
-  date?: string;
-  perf?: boolean;
-  dayType?: string;
-  venue?: number;
-  noPerf?: number;
-  times?: string;
-  bookingStatus?: string;
-  pencilNo?: number;
-  notes?: string;
-  isBooking?: boolean;
-  isRehearsal?: boolean;
-  isGetInFitUp?: boolean;
-};
 type NewBookingDetailsProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
   productionCode: string;
+  onChange: (booking: BookingItem[]) => void;
 };
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
@@ -37,13 +24,15 @@ export default function NewBookingDetailsView({
   formData,
   dayTypeOptions = [],
   productionCode,
+  onChange,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
-  const [bookingData, setBookingData] = useState<BookingDataItem[]>([]);
-  const [bookingRow, setBookingRow] = useState<BookingDataItem>(null);
+  const [bookingData, setBookingData] = useState<BookingItem[]>([]);
+  const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const { nextStep, previousStep, goToStep } = useWizard();
+  const tableRef = useRef(null);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -73,7 +62,7 @@ export default function NewBookingDetailsView({
         perf: isPerformance,
         dayType: dateType,
         venue: venueId,
-        noPerf: 0,
+        noPerf: null,
         times: '',
         bookingStatus: isFiltered ? 'U' : '', // U for Pencilled
         pencilNo: '',
@@ -82,6 +71,7 @@ export default function NewBookingDetailsView({
         isRehearsal: false,
         isGetInFitUp: false,
       };
+
       dates.push(dateObject);
       // Increment currentDate by one day for the next iteration
       startDate = addDays(startDate, 1);
@@ -101,18 +91,27 @@ export default function NewBookingDetailsView({
     },
   };
   const goToPreviousStep = () => {
-    previousStep();
+    const isDirty = tableRef.current.isDirty();
+    if (!isDirty) {
+      previousStep();
+    }
   };
 
-  const PreviewBooking = () => {
-    console.table(bookingData);
-    goToStep(steps.indexOf('Preview New Booking'));
+  const previewBooking = () => {
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+      onChange(rowData);
+      goToStep(steps.indexOf('Preview New Booking'));
+    }
   };
 
   const handleCellClick = (e) => {
-    console.log(e);
+    const { column, data } = e;
     setBookingRow(e.data);
-    if (e.column.colId === 'notes') {
+    if (column.colId === 'notes' && !Number.isNaN(data.venue) && !Number.isNaN(data.dayType)) {
       setShowNotesModal(true);
     }
   };
@@ -125,6 +124,15 @@ export default function NewBookingDetailsView({
     setBookingData(updated);
   };
 
+  const handleSaveBooking = () => {
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+    }
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -132,6 +140,7 @@ export default function NewBookingDetailsView({
       </div>
       <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
         <Table
+          ref={tableRef}
           columnDefs={columnDefs}
           rowData={bookingData}
           styleProps={styleProps}
@@ -144,12 +153,13 @@ export default function NewBookingDetailsView({
           onSave={handleSaveNote}
           onCancel={() => setShowNotesModal(false)}
         />
-        <div className="py-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
+        <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
           <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={close} />
-            <Button className=" w-33" text="Preview Booking" onClick={() => PreviewBooking()} />
+            <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
+            <Button className=" w-33" text="Accept" onClick={handleSaveBooking} />
           </div>
         </div>
       </div>
