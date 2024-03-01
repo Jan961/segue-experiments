@@ -6,7 +6,7 @@ import NewBookingView from './views/NewBookingView';
 import BookingConflictsView from './views/BookingConflictsView';
 import { newBookingState } from 'state/booking/newBookingState';
 import BarringIssueView from './views/BarringIssueView';
-import { useMemo, useReducer } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, OTHER_DAY_TYPES, steps } from 'config/AddBooking';
@@ -15,6 +15,7 @@ import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { dateTypeState } from 'state/booking/dateTypeState';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 
 type AddBookingProps = {
   visible: boolean;
@@ -25,6 +26,8 @@ type AddBookingProps = {
 
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { stepIndex } = useRecoilValue(newBookingState);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [hasOverlay, sethasOverlay] = useState<boolean>(false);
   const handleModalClose = () => onClose?.();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
     ...INITIAL_STATE,
@@ -60,6 +63,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
+  const handleConfirmationDisplay = (isVisible) => {
+    sethasOverlay(isVisible);
+  };
+
   return (
     <>
       <PopupModal
@@ -68,6 +75,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
         titleClass="text-xl text-primary-navy text-bold"
         title={steps[stepIndex]}
         panelClass="relative"
+        hasOverlay={hasOverlay}
       >
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView
@@ -84,11 +92,20 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             formData={state.form}
             productionCode={productionCode}
             dayTypeOptions={dayTypeOptions}
-            onChange={handleSaveNewBooking}
+            onSubmit={handleSaveNewBooking}
+            onConfirmationDisplay={handleConfirmationDisplay}
+            onClose={onClose}
           />
           <div>Preview booking</div>
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
+        <ConfirmationDialog
+          variant="close"
+          show={!!showConfirmation}
+          onYesClick={onClose}
+          onNoClick={() => setShowConfirmation(false)}
+          hasOverlay={false}
+        />
       </PopupModal>
     </>
   );

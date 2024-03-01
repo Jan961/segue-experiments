@@ -6,15 +6,15 @@ interface SelectPencilRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
 }
 
-const pencilNos = [{ text: '-', value: '9' }].concat(
-  Array.from({ length: 9 }, (_, index) => ({ text: `${index}`, value: `${index}` })),
+const pencilNos = [{ text: '-', value: '8' }].concat(
+  Array.from({ length: 9 }, (_, index) => ({ text: `${index + 1}`, value: `${index + 1}` })),
 );
 
-const SelectPencilRenderer = ({ value, node }: SelectPencilRendererProps) => {
+const SelectPencilRenderer = ({ value, setValue }: SelectPencilRendererProps) => {
   return (
     <div className="pl-1 pr-2">
       <Select
-        onChange={(value) => node.setDataValue('pencilNo', value)}
+        onChange={(value) => setValue(value)}
         options={pencilNos}
         value={value.toString()}
         buttonClass=" border border-primary-border"

@@ -1,29 +1,42 @@
 import { useEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 
-const NoPerfRenderer = ({ value, data, api, node }: ICellRendererParams) => {
+const ROW_HEIGHT = 35;
+const MARGIN = 9;
+
+const NoPerfRenderer = ({ value, setValue, data, api, node }: ICellRendererParams) => {
   const [isDisabled, setIsDisabled] = useState(true);
   const [noOfPerfs, setNoOfPerfs] = useState<string | number>(value);
 
+  const updateRowHeight = (height: number) => {
+    node.setRowHeight(height);
+    api.onRowHeightChanged();
+  };
+
   useEffect(() => {
+    if (!data.perf) {
+      setValue(null);
+      setNoOfPerfs(null);
+      updateRowHeight(ROW_HEIGHT + MARGIN);
+    }
     setIsDisabled(!data.perf);
-  }, [data.perf]);
+  }, [data]);
 
   const handleChange = (event: any) => {
     let newValue = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
     if (newValue === '') {
       setNoOfPerfs(null);
-      node.setData({ ...data, noPerf: 0 });
-      node.setRowHeight(43);
-      api.onRowHeightChanged();
+      setValue(0);
+      updateRowHeight(ROW_HEIGHT + MARGIN);
+      node.setData({ ...data, noOfPerfs: 0 });
     } else {
       newValue = Math.min(9, Math.max(1, parseInt(newValue, 10))).toString();
       const intValue = parseInt(newValue);
       if (!isNaN(intValue) && intValue > 0) {
         setNoOfPerfs(intValue);
-        node.setData({ ...data, noPerf: intValue });
-        node.setRowHeight(intValue > 1 ? intValue * 35 + 9 : 43);
-        api.onRowHeightChanged();
+        setValue(intValue);
+        updateRowHeight(intValue > 1 ? intValue * ROW_HEIGHT + MARGIN : ROW_HEIGHT + MARGIN);
+        node.setData({ ...data, noOfPerfs: intValue });
       }
     }
   };
