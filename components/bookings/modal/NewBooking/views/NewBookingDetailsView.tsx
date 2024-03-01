@@ -18,7 +18,7 @@ type NewBookingDetailsProps = {
   dayTypeOptions: SelectOption[];
   productionCode: string;
   onSubmit: (booking: BookingItem[]) => void;
-  onConfirmationDisplay: (isVisible: boolean) => void;
+  toggleModalOverlay: (overlayStatus: boolean) => void;
   onClose: () => void;
 };
 
@@ -29,7 +29,7 @@ export default function NewBookingDetailsView({
   dayTypeOptions = [],
   productionCode,
   onSubmit,
-  onConfirmationDisplay,
+  toggleModalOverlay,
   onClose,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
@@ -107,7 +107,7 @@ export default function NewBookingDetailsView({
     if (isDirty) {
       confirmationType.current = 'leave';
       setShowConfirmation(true);
-      onConfirmationDisplay(true);
+      toggleModalOverlay(true);
     } else {
       goToNewBooking();
     }
@@ -118,7 +118,7 @@ export default function NewBookingDetailsView({
     if (isDirty) {
       confirmationType.current = 'cancel';
       setShowConfirmation(true);
-      onConfirmationDisplay(true);
+      toggleModalOverlay(true);
     } else {
       onClose();
     }
@@ -126,12 +126,12 @@ export default function NewBookingDetailsView({
 
   const handleNoClick = () => {
     setShowConfirmation(false);
-    onConfirmationDisplay(false);
+    toggleModalOverlay(false);
   };
 
   const handleYesClick = () => {
     setShowConfirmation(null);
-    onConfirmationDisplay(false);
+    toggleModalOverlay(false);
     if (confirmationType.current === 'leave') {
       goToNewBooking();
     } else if (confirmationType.current === 'cancel') {
@@ -153,6 +153,7 @@ export default function NewBookingDetailsView({
     const { column, data } = e;
     if (column.colId === 'notes' && !Number.isNaN(data.venue) && data.dayType !== null) {
       setShowNotesModal(true);
+      toggleModalOverlay(true);
     }
   };
 
@@ -162,6 +163,7 @@ export default function NewBookingDetailsView({
 
   const handleSaveNote = (value: string) => {
     setShowNotesModal(false);
+    toggleModalOverlay(false);
     const updated = bookingData.map((booking) =>
       booking.date === bookingRow.date ? { ...bookingRow, notes: value } : booking,
     );
@@ -175,6 +177,11 @@ export default function NewBookingDetailsView({
         rowData.push(node.data);
       });
     }
+  };
+
+  const handleNoteCancel = () => {
+    setShowNotesModal(false);
+    toggleModalOverlay(false);
   };
 
   return (
@@ -196,7 +203,7 @@ export default function NewBookingDetailsView({
           show={showNotesModal}
           productionItem={bookingRow}
           onSave={handleSaveNote}
-          onCancel={() => setShowNotesModal(false)}
+          onCancel={handleNoteCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
           <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />

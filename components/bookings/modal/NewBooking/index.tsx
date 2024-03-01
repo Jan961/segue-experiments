@@ -63,8 +63,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
-  const handleConfirmationDisplay = (isVisible) => {
-    sethasOverlay(isVisible);
+  const toggleModalOverlay = (overlayStatus: boolean) => {
+    sethasOverlay(overlayStatus);
   };
 
   return (
@@ -93,7 +93,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             productionCode={productionCode}
             dayTypeOptions={dayTypeOptions}
             onSubmit={handleSaveNewBooking}
-            onConfirmationDisplay={handleConfirmationDisplay}
+            toggleModalOverlay={toggleModalOverlay}
             onClose={onClose}
           />
           <div>Preview booking</div>
