@@ -29,6 +29,8 @@ const colorsConfig = {
   'primary-list-row-hover': '#21345B99',
   'primary-list-row-active': '#21345BCC',
   'primary-label': '#21345BCC',
+  primary: '#082B4B',
+  secondary: '#617293',
 };
 
 module.exports = {

@@ -6,25 +6,21 @@ import { useRecoilValue } from 'recoil';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { BookingReports } from './modal/BookingReports';
 
 export default function BookingsButtons() {
-  const [showAddNewBookingModal, setShowAddNewBookingModal] = useState(false);
-  const [showBarringModal, setShowBarringModal] = useState(false);
-  const [btnDisabled, setBtnDisabled] = useState(false);
-  const [disableTooltip, setDisableTooltip] = useState(true);
-  const { productions } = useRecoilValue(productionJumpState);
+  const [showAddNewBookingModal, setShowAddNewBookingModal] = useState<boolean>(false);
+  const [showBarringModal, setShowBarringModal] = useState<boolean>(false);
+  const [bookingsDisabled, setBookingsDisabled] = useState<boolean>(false);
+  const [showBookingReportsModal, setShowBookingReportsModal] = useState<boolean>();
+  const [disabled, setDisabled] = useState<boolean>(false);
   const production = useRecoilValue(currentProductionSelector);
+  const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   useEffect(() => {
-    console.log(productions);
-    // console.log({production, ProductionId, path })
-    if (production === undefined || production.IsArchived === true) {
-      setBtnDisabled(true);
-      setDisableTooltip(false);
-    } else {
-      setBtnDisabled(false);
-    }
-  }, [production]);
+    setBookingsDisabled(production === undefined || production.IsArchived === true);
+    setDisabled(!ProductionId);
+  }, [production, ProductionId]);
 
   return (
     <div className="grid grid-cols-2 grid-rows-2 gap-4">
@@ -32,27 +28,29 @@ export default function BookingsButtons() {
         body="Please select a current Production"
         position="left"
         width="w-44"
-        useManualToggle={disableTooltip}
-        manualToggle={!disableTooltip}
+        // disable tooltip when Production Dropdown = "Please select a production"
+        manualToggle={!ProductionId ? false : bookingsDisabled}
+        useManualToggle={!ProductionId ? true : !bookingsDisabled}
       >
         <Button
-          disabled={btnDisabled}
+          disabled={bookingsDisabled}
           text="Create New Booking"
           className="w-[155px]"
           onClick={() => setShowAddNewBookingModal(true)}
         ></Button>
       </Tooltip>
       <Button
-        disabled={btnDisabled}
+        disabled={disabled}
         text="Booking Reports"
         className="w-[155px]"
         iconProps={{ className: 'h-4 w-3' }}
         sufixIconName={'excel'}
+        onClick={() => setShowBookingReportsModal(true)}
       ></Button>
-      <Button disabled={btnDisabled} text="Venue History" className="w-[155px]"></Button>
+      <Button disabled={disabled} text="Venue History" className="w-[155px]"></Button>
 
       <Button
-        disabled={btnDisabled}
+        disabled={disabled}
         text="Barring Check"
         className="w-[155px]"
         onClick={() => setShowBarringModal(true)}
@@ -61,6 +59,9 @@ export default function BookingsButtons() {
       {showBarringModal && <Barring visible={showBarringModal} onClose={() => setShowBarringModal(false)} />}
       {showAddNewBookingModal && (
         <AddBooking visible={showAddNewBookingModal} onClose={() => setShowAddNewBookingModal(false)} />
+      )}
+      {showBookingReportsModal && (
+        <BookingReports visible={showBookingReportsModal} onClose={() => setShowBookingReportsModal(false)} />
       )}
     </div>
   );

@@ -1,8 +1,8 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
-import { GridApi, GridReadyEvent } from 'ag-grid-community';
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
-import TableTooltip from './TableTooltip';
+import { GridApi, GridReadyEvent, RowHeightParams } from 'ag-grid-community';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+// import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
   headerColor?: string;
@@ -14,8 +14,11 @@ interface TableProps {
   styleProps?: StyleProps;
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
+  onRowSelected?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
+  getRowStyle?: any;
+  getRowHeight?: (params: RowHeightParams) => number;
 }
 
 const ROW_HEIGHT = 43;
@@ -23,13 +26,26 @@ const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
 export default forwardRef(function Table(
-  { rowData, columnDefs, styleProps, onCellClicked, onRowClicked, gridOptions, displayHeader = true }: TableProps,
+  {
+    rowData,
+    columnDefs,
+    styleProps,
+    onCellClicked,
+    onRowClicked,
+    gridOptions,
+    getRowStyle,
+    displayHeader = true,
+    getRowHeight,
+    onRowSelected = () => null,
+  }: TableProps,
   ref,
 ) {
   const [gridApi, setGridApi] = useState<GridApi | undefined>();
   const [autoHeightLimit, setAutoHeightLimit] = useState<number>(400);
+  const isDirty = useRef(false);
   useImperativeHandle(ref, () => ({
     getApi: () => gridApi,
+    isDirty: () => isDirty.current,
   }));
 
   const gridHeight = useMemo(() => {
@@ -39,6 +55,10 @@ export default forwardRef(function Table(
     return HEADER_HEIGHT;
   }, [rowData]);
 
+  const handleCellValueChange = () => {
+    isDirty.current = true;
+  };
+
   const onGridReady = (params: GridReadyEvent) => {
     setGridApi(params.api);
     if (rowData?.length > 0) {
@@ -46,6 +66,12 @@ export default forwardRef(function Table(
         ? params.api.updateGridOptions({ domLayout: 'autoHeight' })
         : params.api.updateGridOptions({ domLayout: 'normal' });
     }
+
+    const columnDefs = params.api.getColumnDefs();
+    const updColDefs = columnDefs.map((column) => {
+      return { ...column, headerClass: 'text-center' };
+    });
+    params.api.updateGridOptions({ columnDefs: updColDefs });
   };
 
   useEffect(() => {
@@ -77,19 +103,21 @@ export default forwardRef(function Table(
         }}
       >
         <AgGridReact
-          defaultColDef={{
-            tooltipComponent: TableTooltip,
-          }}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? HEADER_HEIGHT : 0}
           rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
+          onRowSelected={onRowSelected}
+          onCellValueChanged={handleCellValueChange}
           onGridReady={onGridReady}
+          getRowStyle={getRowStyle}
           tooltipHideDelay={5000}
           tooltipShowDelay={0}
           gridOptions={gridOptions}
+          getRowHeight={getRowHeight}
+          reactiveCustomComponents
         />
       </div>
     </>

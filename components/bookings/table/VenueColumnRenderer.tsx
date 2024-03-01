@@ -24,7 +24,7 @@ export default function VenueColumnRenderer(props: CustomCellRendererProps) {
 
   return (
     <div className="w-full h-full pr-[2px]">
-      <div className={`h-full px-4 ${getEndClass()}`}>{props.value}</div>
+      <div className={`h-full px-4 truncate ${getEndClass()}`}>{props.value}</div>
     </div>
   );
 }

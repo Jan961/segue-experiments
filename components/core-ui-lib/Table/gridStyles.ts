@@ -14,12 +14,36 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-header-cell-moving-background-color: ${(props) => props.headerColor || '#FBFBFB'};
     --ag-row-border: 1px solid #dadce5;
     --ag-odd-row-background-color: #F8F8F8;
-
-    .ag-layout-auto-height .ag-center-cols-viewport {
-        min-height: 0px;
-    }
+     --ag-checkbox-background-color: transparent ;
+    --ag-checkbox-checked-color: #617293;
+    --ag-checkbox-unchecked-color: #617293;
+    --ag-checkbox-indeterminate-color: #617293;
 }
 
+.ag-body-viewport {
+    overflow: visible;
+}
+
+.ag-root,
+.ag-root-wrapper, 
+.ag-center-cols-clipper, 
+.ag-center-cols-viewport,
+.ag-body-viewport-wrapper {
+    overflow: visible !important;
+}
+
+.ag-checkbox-cell{
+    justify-content: center !important;
+}
+.ag-checkbox-edit{
+    justify-content: center !important;
+}
+
+.ag-center-cols-container,
+.ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
+    min-height: 0px!important;
+}
+    
 .ag-ltr .ag-cell-focus:not(.ag-cell-range-selected):focus-within {
     border: none;
 }
@@ -30,14 +54,14 @@ const GridStyles = createGlobalStyle<StyleProps>`
         content: '';
         position: absolute;
         right: 0px;
-        top: 25%;
-        height: 50%;
+        top: 7px;
+        bottom: 7px;
         border-right: 1px solid #617293;
     }
 }
 
 .ag-header-cell {
-    padding-left: 8px;
+    text-wrap: wrap;
 }
 
 .ag-header-cell-label {
@@ -49,6 +73,14 @@ const GridStyles = createGlobalStyle<StyleProps>`
 }
 .ag-header-cell-resize::after {
     background-color: #FFF
+}
+
+.ag-row {
+    z-index: 0;
+}
+
+.ag-row.ag-row-focus {
+    z-index: 1;
 }
 `;
 
