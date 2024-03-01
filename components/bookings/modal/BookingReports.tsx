@@ -20,34 +20,34 @@ export const BookingReports = ({ visible = false, onClose }: BookingReportProps)
     <PopupModal
       show={open}
       title="Booking Reports"
-      titleClass="text-lg text-primary-navy text-bold -mt-2"
+      titleClass="text-xl text-primary-navy text-bold mb-4 -mt-2"
       onClose={handleModalClose}
     >
-      <div className="mb-7">
+      <div className="-mb-1">
         <Button
           text="Tour Schedule"
-          className="w-[230px] h-[30px] mb-3"
+          className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName={'excel'}
         ></Button>
 
         <Button
           text="Travel Summary"
-          className="w-[230px] h-[30px] mb-3"
+          className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName={'excel'}
         ></Button>
 
         <Button
           text="All Productions Masterplan"
-          className="w-[230px] h-[30px] mb-3"
+          className="w-[230px] mb-3 pl-5"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName={'excel'}
         ></Button>
 
         <Button
           text="Multiple Pencil Report"
-          className="w-[230px] h-[30px] mb-3"
+          className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName={'excel'}
         ></Button>
