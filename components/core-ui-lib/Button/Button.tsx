@@ -15,7 +15,6 @@ export interface ButtonProps {
   prefixIconName?: IconName | string;
   sufixIconName?: IconName | string;
   iconProps?: Partial<IconProps>;
-  textClass?: string;
 }
 
 const baseClass =
@@ -41,7 +40,6 @@ export default function Button({
   onClick,
   prefixIconName,
   sufixIconName,
-  textClass,
   iconProps,
   children,
 }: PropsWithChildren<ButtonProps>) {
@@ -69,7 +67,7 @@ export default function Button({
         </span>
       )}
 
-      <div className={classNames('col-span-10 text-center', textClass)}>{text || ''}</div>
+      <div className="col-span-10 text-center">{text || ''}</div>
       {children}
       {sufixIconName && (
         <span className="col-span-1 absolute right-2">
