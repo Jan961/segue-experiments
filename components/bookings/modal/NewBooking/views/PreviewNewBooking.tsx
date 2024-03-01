@@ -46,17 +46,12 @@ export default function PreviewNewBooking({ formData, productionCode }: NewBooki
   console.log('Future End Date:,,,', pastStartDateF);
 
   const filterBookingsByDateRange = (bookings, startDate, endDate) => {
-    // const startDate = new Date(start);
-
-    // const endDate = new Date(end);
     console.log('startDate-- :>> ', startDate);
     console.log('endDate-- :>> ', endDate);
     const filteredBookings = [];
     bookings.forEach((booking) => {
       const bookingDate = booking.dateTime;
       const bookingDateB = moment(bookingDate).format('YYYY-MM-DD');
-
-      //   console.log('bookingDate :>> ', bookingDateB);
 
       // Check if the booking date is within the specified range
       const isWithinRange = bookingDateB >= startDate && bookingDate <= endDate;
@@ -66,19 +61,22 @@ export default function PreviewNewBooking({ formData, productionCode }: NewBooki
         filteredBookings.push(booking);
       }
     });
-    // console.log('filteredBookings :>> ', filteredBookings);
-    return filteredBookings;
-    // return bookings.filter((booking) => {
-    //   const bookingDate = new Date(booking.date);
-    //   // Check if the booking date is within the specified range
+    const sortedFilteredBookings = filteredBookings.sort((a, b) => {
+      const dateA: any = moment(a.dateTime).toDate();
+      const dateB: any = moment(b.dateTime).toDate();
 
-    //   return bookingDate >= startDate && bookingDate <= endDate;
-    // });
+      return dateA - dateB;
+    });
+    // return filteredBookings;
+    return sortedFilteredBookings;
   };
 
-  const filteredBookings = filterBookingsByDateRange(bookings, pastStartDateP, pastStartDateF);
+  const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
+  const filteredBookingsBottom = filterBookingsByDateRange(bookings, sqlToDate, pastStartDateF);
+  const mergedFilteredBookings = [...filteredBookingsTop, ...filteredBookingsBottom];
 
-  console.log('filter booking ,,,', filteredBookings);
+  console.log('filter booking ,,,', filteredBookingsTop);
+  console.log('filteredBookingsBottom :>> ', filteredBookingsBottom);
 
   //   const dummyData: PreviewDataItem[] = [
   //     {
@@ -153,7 +151,7 @@ export default function PreviewNewBooking({ formData, productionCode }: NewBooki
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table rowData={filteredBookings} columnDefs={columnDefs} styleProps={styleProps} />
+        <Table rowData={mergedFilteredBookings} columnDefs={columnDefs} styleProps={styleProps} />
 
         <div className="py-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
