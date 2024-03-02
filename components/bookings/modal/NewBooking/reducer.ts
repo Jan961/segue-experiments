@@ -12,7 +12,7 @@ export type TForm = {
   toDate?: string;
   isDateTypeOnly?: boolean;
   venueId?: number;
-  dateType?: number;
+  dateType?: any;
   shouldFilterVenues?: boolean;
   isRunOfDates?: boolean;
 };
@@ -33,6 +33,7 @@ export type PreviewDataItem = {
   travelTime: string;
 };
 export type BookingItem = {
+  map(arg0: (item: any) => any): unknown;
   date: string;
   perf: boolean;
   dayType: number;

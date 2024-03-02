@@ -10,12 +10,16 @@ import NotesPopup from 'components/bookings/NotesPopup';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ColDef } from 'ag-grid-community';
 import { steps } from 'config/AddBooking';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 type NewBookingDetailsProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
   productionCode: string;
-  onChange: (booking: BookingItem[]) => void;
+  onSubmit: (booking: BookingItem[]) => void;
+  onConfirmationDisplay: (isVisible: boolean) => void;
+  onClose: () => void;
 };
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
@@ -24,15 +28,19 @@ export default function NewBookingDetailsView({
   formData,
   dayTypeOptions = [],
   productionCode,
-  onChange,
+  onSubmit,
+  onConfirmationDisplay,
+  onClose,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
-  const { nextStep, previousStep, goToStep } = useWizard();
+  const { goToStep } = useWizard();
   const tableRef = useRef(null);
+  const confirmationType = useRef<ConfDialogVariant>('cancel');
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -83,20 +91,54 @@ export default function NewBookingDetailsView({
     autoSizeStrategy: {
       type: 'fitGridWidth',
       defaultMinWidth: 50,
-      editable: true,
       wrapHeaderText: true,
     },
     getRowId: (params) => {
       return params.data.date;
     },
   };
-  const goToPreviousStep = () => {
+
+  const goToNewBooking = () => {
+    goToStep(steps.indexOf('Create New Booking'));
+  };
+  const goToMileage = () => {
+    goToStep(steps.indexOf('Check Mileage'));
+  };
+
+  const handleBackButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
-    if (!isDirty) {
-      const isDirty = tableRef.current.isDirty();
-      if (!isDirty) {
-        previousStep();
-      }
+    if (isDirty) {
+      confirmationType.current = 'leave';
+      setShowConfirmation(true);
+      onConfirmationDisplay(true);
+    } else {
+      goToNewBooking();
+    }
+  };
+
+  const handleCancelButtonClick = () => {
+    const isDirty = tableRef.current.isDirty();
+    if (isDirty) {
+      confirmationType.current = 'cancel';
+      setShowConfirmation(true);
+      onConfirmationDisplay(true);
+    } else {
+      onClose();
+    }
+  };
+
+  const handleNoClick = () => {
+    setShowConfirmation(false);
+    onConfirmationDisplay(false);
+  };
+
+  const handleYesClick = () => {
+    setShowConfirmation(null);
+    onConfirmationDisplay(false);
+    if (confirmationType.current === 'leave') {
+      goToNewBooking();
+    } else if (confirmationType.current === 'cancel') {
+      onClose();
     }
   };
 
@@ -106,17 +148,21 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      onChange(rowData);
+      onSubmit(rowData);
+      console.table(rowData);
       goToStep(steps.indexOf('Preview New Booking'));
     }
   };
 
   const handleCellClick = (e) => {
     const { column, data } = e;
-    setBookingRow(e.data);
-    if (column.colId === 'notes' && !Number.isNaN(data.venue) && !Number.isNaN(data.dayType)) {
+    if (column.colId === 'notes' && !Number.isNaN(data.venue) && data.dayType !== null) {
       setShowNotesModal(true);
     }
+  };
+
+  const handleRowSelected = ({ data }) => {
+    setBookingRow(data);
   };
 
   const handleSaveNote = (value: string) => {
@@ -149,6 +195,7 @@ export default function NewBookingDetailsView({
           styleProps={styleProps}
           gridOptions={gridOptions}
           onCellClicked={handleCellClick}
+          onRowClicked={handleRowSelected}
         />
         <NotesPopup
           show={showNotesModal}
@@ -157,14 +204,21 @@ export default function NewBookingDetailsView({
           onCancel={() => setShowNotesModal(false)}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />
+          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => goToMileage()} />
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-            <Button className="w-33 " variant="secondary" text="Cancel" onClick={close} />
+            <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
+            <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
             <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
             <Button className=" w-33" text="Accept" onClick={handleSaveBooking} />
           </div>
         </div>
+        <ConfirmationDialog
+          variant={confirmationType.current}
+          show={showConfirmation}
+          onYesClick={handleYesClick}
+          onNoClick={handleNoClick}
+          hasOverlay={false}
+        />
       </div>
     </>
   );

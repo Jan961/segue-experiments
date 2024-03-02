@@ -12,6 +12,7 @@ import { venueState } from 'state/booking/venueState';
 import { distanceState } from 'state/booking/distanceState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { steps } from 'config/AddBooking';
 // type PreviewDataItem = {
 //   production: string;
 //   date: string;
@@ -33,7 +34,7 @@ type NewBookingDetailsProps = {
   data: BookingItem;
   dayTypeOptions: SelectOption[];
 };
-export default function PreviewNewBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
+export default function MileageBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const distanceDict = useRecoilValue(distanceState);
   console.log('distanceDict :>> ', distanceDict);
@@ -168,9 +169,9 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
   //     },
   //     // Add more dummy data as needed
   //   ];
-  const { nextStep, previousStep } = useWizard();
-  const goToPreviousStep = () => {
-    previousStep();
+  const { goToStep } = useWizard();
+  const goToNewBookingDetail = () => {
+    goToStep(steps.indexOf('New Booking Details'));
   };
   return (
     <>
@@ -182,8 +183,7 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
 
         <div className="py-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-            <Button className=" w-33  " text="Accept" onClick={() => nextStep()} />
+            <Button className=" w-33  " text="Close" onClick={() => goToNewBookingDetail()} />
           </div>
         </div>
       </div>
