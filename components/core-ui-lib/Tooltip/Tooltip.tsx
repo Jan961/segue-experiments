@@ -61,7 +61,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   };
 
   return (
-    <div className="relative z-[9999]">
+    <div className={classNames('relative', showTooltip && 'z-[9999]')}>
       <div onMouseEnter={toggleTooltip} onMouseLeave={toggleTooltip}>
         {children}
       </div>
