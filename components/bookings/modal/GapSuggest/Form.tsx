@@ -18,7 +18,7 @@ type FormProps = {
 
 const Form = ({ onSave }: FormProps) => {
   const [formData, setFormData] = useState(DEFAULT_GAP_SUGGEST_FORM_STATE);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const {
     minFromLastVenue,
     minToNextVenue,
