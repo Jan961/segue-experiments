@@ -45,7 +45,6 @@ export default function Report({
     defaultColDef,
     autoSizeStrategy: {
       type: 'fitGridWidth',
-      defaultMinWidth: 50,
     },
     getRowStyle: (params) => {
       if (params.data.bold) {
@@ -64,13 +63,13 @@ export default function Report({
             <Spinner className="w-full" size="lg" />
           </div>
         )}
-        <div className="py-4 overflow-y-auto max-h-[90vh] w-[438px]">
+        <div className="py-4 overflow-y-auto overflow-x-hidden max-h-[85vh] w-[500px]">
           {productionSummary.length ? (
-            <div>
+            <>
               {productionSummary.map((item, index) => (
-                <div key={index} className={item.bold ? 'font-bold' : 'font-normal'}>
+                <div key={index} className={`w-full ${item.bold ? 'font-bold' : 'font-normal'}`}>
                   {item.length > 0 && (
-                    <div className={'mb-2'}>
+                    <div className={'w-full mb-2 overflow-x-hidden'}>
                       <Table
                         key={index}
                         columnDefs={tourSummaryColumnDefs}
@@ -83,7 +82,7 @@ export default function Report({
                   )}
                 </div>
               ))}
-            </div>
+            </>
           ) : (
             <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
           )}

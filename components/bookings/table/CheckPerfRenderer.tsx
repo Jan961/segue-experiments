@@ -7,22 +7,22 @@ interface CheckPerfRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
 }
 
-const CheckPerfRenderer = ({ data, dayTypeOptions, node }: CheckPerfRendererProps) => {
+const CheckPerfRenderer = ({ data, dayTypeOptions, node, setValue }: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState(false);
+  const performanceOption = dayTypeOptions?.find(({ text }) => text === 'Performance');
 
   useEffect(() => {
-    const dayType = dayTypeOptions.find(({ value }) => value === data.dayType);
-    setPerfChecked(dayType && dayType.text === 'Performance');
-  }, [data.dayType, dayTypeOptions]);
+    setPerfChecked(data.perf || (performanceOption && data.dayType === performanceOption.value));
+  }, [data, dayTypeOptions]);
 
   const handleCheckboxChange = (e) => {
     const checked = e.target.checked;
     setPerfChecked(checked);
+    setValue(checked);
     node.setData({
       ...data,
-      perf: !perfChecked,
-      dayType: checked ? 'Performance' : '-',
-      noPerf: checked ? data.noOfPerfs : 0,
+      perf: checked,
+      dayType: checked ? performanceOption.value : '',
     });
   };
 

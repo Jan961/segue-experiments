@@ -49,7 +49,7 @@ export default function BarringIssueView({ bookingConflicts }: BarringIssueViewP
       </span>
       <div className="w-[634px] flex flex-col">
         <Table columnDefs={barringIssueColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
-        <div className="py-3 w-full flex items-center justify-end">
+        <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
           <Button
             className="ml-3 w-33"

@@ -1,7 +1,7 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import Select from 'components/core-ui-lib/Select';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { venueState } from 'state/booking/venueState';
@@ -12,10 +12,9 @@ interface SelectVenueRendererProps extends ICellRendererParams {
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
 
-export default function SelectVenueRenderer({ dayTypeOptions, data, value }: SelectVenueRendererProps) {
+export default function SelectVenueRenderer({ dayTypeOptions, data, value, setValue }: SelectVenueRendererProps) {
   const venueDict = useRecoilValue(venueState);
   const bookingDict = useRecoilValue(bookingState);
-  const [isDayOff, setIsDayOff] = useState(false);
   const selectedDayTypeOption = dayTypeOptions.find(({ value }) => data.dayType === value);
   const showDayType = selectedDayTypeOption && !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
 
@@ -36,27 +35,18 @@ export default function SelectVenueRenderer({ dayTypeOptions, data, value }: Sel
     return options;
   }, [venueDict, bookingDict]);
 
-  useEffect(() => {
-    if (data.dayType === 'Day Off') {
-      setIsDayOff(true);
-    } else {
-      setIsDayOff(false);
-    }
-  }, [data.dayType]);
+  const handleVenueChange = (venue) => {
+    setValue(venue);
+  };
 
   return (
-    <>
-      {isDayOff ? (
-        <p>Day off</p>
-      ) : (
-        <div className="pl-1 pr-2">
-          <Select
-            options={showDayType ? dayTypeOptions : venueOptions}
-            value={showDayType ? data.dayType : value}
-            inline
-          />
-        </div>
-      )}
-    </>
+    <div className="pl-1 pr-2">
+      <Select
+        options={showDayType ? dayTypeOptions : venueOptions}
+        value={showDayType ? data.dayType : value}
+        inline
+        onChange={handleVenueChange}
+      />
+    </div>
   );
 }
