@@ -29,7 +29,7 @@ type AddBookingProps = {
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { stepIndex } = useRecoilValue(newBookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const [hasOverlay, sethasOverlay] = useState<boolean>(false);
+  const [hasOverlay, setHasOverlay] = useState<boolean>(false);
   const handleModalClose = () => onClose?.();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
     ...INITIAL_STATE,
@@ -65,10 +65,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
-  const handleConfirmationDisplay = (isVisible) => {
-    sethasOverlay(isVisible);
-  };
-
   return (
     <>
       <PopupModal
@@ -96,7 +92,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             productionCode={productionCode}
             dayTypeOptions={dayTypeOptions}
             onSubmit={handleSaveNewBooking}
-            onConfirmationDisplay={handleConfirmationDisplay}
+            toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
             onClose={onClose}
           />
           <PreviewNewBooking
