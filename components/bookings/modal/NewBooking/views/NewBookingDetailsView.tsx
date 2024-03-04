@@ -149,7 +149,7 @@ export default function NewBookingDetailsView({
         rowData.push(node.data);
       });
       onSubmit(rowData);
-      console.table(rowData);
+
       goToStep(steps.indexOf('Preview New Booking'));
     }
   };

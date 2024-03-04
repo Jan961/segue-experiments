@@ -10,7 +10,7 @@ import BookingsTable from 'components/bookings/BookingsTable';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useBookingFilter();
-  console.log('rows :>> ', rows);
+
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">

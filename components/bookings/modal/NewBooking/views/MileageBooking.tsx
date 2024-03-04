@@ -2,7 +2,7 @@ import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import { useWizard } from 'react-use-wizard';
-import { BookingItem, TForm } from '../reducer';
+import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import { getDateDaysAgo, getDateDaysInFuture, toSql } from 'services/dateService';
@@ -16,16 +16,16 @@ import { steps } from 'config/AddBooking';
 type NewBookingDetailsProps = {
   formData: TForm;
   productionCode: string;
-  data: BookingItem;
+  data: BookingItem[];
   dayTypeOptions: SelectOption[];
 };
 export default function MileageBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   //   const distanceDict = useRecoilValue(distanceState);
 
-  const updateData: any = data.map((item: any) => ({
+  const updateData: PreviewDataItem[] = data.map((item: any) => ({
     ...item,
-
+    color: true,
     venue: venueDict[item.venue].Name,
     town: venueDict[item.venue].Town,
     dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,

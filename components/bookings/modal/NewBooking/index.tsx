@@ -90,12 +90,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
-          {/* <NewBookingDetailsView formData={state.form} productionCode={productionCode} /> */}
-          {/* <NewBookingDetailsView
-            formData={state.form}
-            productionCode={productionCode}
-            dayTypeOptions={dayTypeOptions}
-          /> */}
+
           <NewBookingDetailsView
             formData={state.form}
             productionCode={productionCode}
@@ -116,7 +111,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             data={state.booking}
             dayTypeOptions={dayTypeOptions}
           />
-          {/* <div>Preview booking</div> */}
+
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
         <ConfirmationDialog

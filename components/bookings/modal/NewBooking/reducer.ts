@@ -12,7 +12,7 @@ export type TForm = {
   toDate?: string;
   isDateTypeOnly?: boolean;
   venueId?: number;
-  dateType?: any;
+  dateType?: number;
   shouldFilterVenues?: boolean;
   isRunOfDates?: boolean;
 };
@@ -20,7 +20,7 @@ export type TForm = {
 export type PreviewDataItem = {
   production: string;
   date: string;
-  week: string;
+  week: number;
   venue: number;
   town: string;
   perf: boolean;
@@ -34,7 +34,7 @@ export type PreviewDataItem = {
 };
 export type BookingItem = {
   map(arg0: (item: any) => any): unknown;
-  date: string;
+  date: string | Date;
   perf: boolean;
   dayType: number;
   venue: number;
