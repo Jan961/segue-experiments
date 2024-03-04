@@ -157,7 +157,7 @@ const Form = ({ onSave }: FormProps) => {
         variant="primary"
         text="Get Suggestions"
       >
-        {loading && <Loader />}
+        {loading && <Loader className="ml-2" iconProps={{ stroke: '#FFF' }} />}
       </Button>
     </form>
   );

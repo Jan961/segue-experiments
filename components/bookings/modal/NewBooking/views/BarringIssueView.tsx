@@ -48,6 +48,7 @@ export default function BarringIssueView({ bookingConflicts }: BarringIssueViewP
         A Barring Check has found potential issues
       </span>
       <div className="w-[634px] flex flex-col">
+        <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
         <Table columnDefs={barringIssueColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
         <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
