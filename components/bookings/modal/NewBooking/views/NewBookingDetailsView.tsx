@@ -12,13 +12,16 @@ import { ColDef } from 'ag-grid-community';
 import { steps } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import { toISO } from 'services/dateService';
 
 type NewBookingDetailsProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
+  venueOptions: SelectOption[];
   productionCode: string;
+  dateBlockId: number;
   onSubmit: (booking: BookingItem[]) => void;
-  onConfirmationDisplay: (isVisible: boolean) => void;
+  toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
 };
 
@@ -27,9 +30,11 @@ const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / 
 export default function NewBookingDetailsView({
   formData,
   dayTypeOptions = [],
+  venueOptions = [],
   productionCode,
+  dateBlockId,
   onSubmit,
-  onConfirmationDisplay,
+  toggleModalOverlay,
   onClose,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
@@ -37,24 +42,25 @@ export default function NewBookingDetailsView({
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
-  const { nextStep, goToStep } = useWizard();
+  const { goToStep } = useWizard();
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   useEffect(() => {
     let dayTypeOption = null;
-    if (dayTypeOptions) {
-      setColumnDefs(newBookingColumnDefs(dayTypeOptions));
+    if (dayTypeOptions && venueOptions) {
+      setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
       dayTypeOption = dayTypeOptions.find(({ value }) => value === dateType);
     }
 
     const isPerformance = dayTypeOption && dayTypeOption.text === 'Performance';
+    const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
+    const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
     const isFiltered = dayTypeOption && DAY_TYPE_FILTERS.includes(dayTypeOption.text);
     let startDate = new Date(fromDate);
     const endDate = new Date(toDate);
     const dates = [];
-
     while (startDate <= endDate) {
       const formattedDate = `${startDate.toLocaleDateString('en-US', {
         weekday: 'short',
@@ -66,7 +72,9 @@ export default function NewBookingDetailsView({
       const reorderedDate = formattedDate.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/$3');
 
       const dateObject = {
+        dateBlockId,
         date: reorderedDate,
+        dateAsISOString: toISO(startDate),
         perf: isPerformance,
         dayType: dateType,
         venue: venueId,
@@ -75,9 +83,9 @@ export default function NewBookingDetailsView({
         bookingStatus: isFiltered ? 'U' : '', // U for Pencilled
         pencilNo: '',
         notes: '',
-        isBooking: false,
-        isRehearsal: false,
-        isGetInFitUp: false,
+        isBooking: isPerformance,
+        isRehearsal,
+        isGetInFitUp,
       };
 
       dates.push(dateObject);
@@ -85,7 +93,7 @@ export default function NewBookingDetailsView({
       startDate = addDays(startDate, 1);
     }
     setBookingData(dates);
-  }, [fromDate, toDate, dateType, venueId, dayTypeOptions]);
+  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId]);
 
   const gridOptions = {
     autoSizeStrategy: {
@@ -101,13 +109,16 @@ export default function NewBookingDetailsView({
   const goToNewBooking = () => {
     goToStep(steps.indexOf('Create New Booking'));
   };
+  const goToMileage = () => {
+    goToStep(steps.indexOf('Check Mileage'));
+  };
 
   const handleBackButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
     if (isDirty) {
       confirmationType.current = 'leave';
       setShowConfirmation(true);
-      onConfirmationDisplay(true);
+      toggleModalOverlay(true);
     } else {
       goToNewBooking();
     }
@@ -118,7 +129,7 @@ export default function NewBookingDetailsView({
     if (isDirty) {
       confirmationType.current = 'cancel';
       setShowConfirmation(true);
-      onConfirmationDisplay(true);
+      toggleModalOverlay(true);
     } else {
       onClose();
     }
@@ -126,12 +137,12 @@ export default function NewBookingDetailsView({
 
   const handleNoClick = () => {
     setShowConfirmation(false);
-    onConfirmationDisplay(false);
+    toggleModalOverlay(false);
   };
 
   const handleYesClick = () => {
     setShowConfirmation(null);
-    onConfirmationDisplay(false);
+    toggleModalOverlay(false);
     if (confirmationType.current === 'leave') {
       goToNewBooking();
     } else if (confirmationType.current === 'cancel') {
@@ -146,6 +157,8 @@ export default function NewBookingDetailsView({
         rowData.push(node.data);
       });
       onSubmit(rowData);
+
+      goToStep(steps.indexOf('Preview New Booking'));
     }
   };
 
@@ -153,6 +166,7 @@ export default function NewBookingDetailsView({
     const { column, data } = e;
     if (column.colId === 'notes' && !Number.isNaN(data.venue) && data.dayType !== null) {
       setShowNotesModal(true);
+      toggleModalOverlay(true);
     }
   };
 
@@ -162,19 +176,16 @@ export default function NewBookingDetailsView({
 
   const handleSaveNote = (value: string) => {
     setShowNotesModal(false);
+    toggleModalOverlay(false);
     const updated = bookingData.map((booking) =>
       booking.date === bookingRow.date ? { ...bookingRow, notes: value } : booking,
     );
     setBookingData(updated);
   };
 
-  const handleSaveBooking = () => {
-    if (tableRef.current.getApi()) {
-      const rowData = [];
-      tableRef.current.getApi().forEachNode((node) => {
-        rowData.push(node.data);
-      });
-    }
+  const handleNotesCancel = () => {
+    setShowNotesModal(false);
+    toggleModalOverlay(false);
   };
 
   return (
@@ -196,15 +207,14 @@ export default function NewBookingDetailsView({
           show={showNotesModal}
           productionItem={bookingRow}
           onSave={handleSaveNote}
-          onCancel={() => setShowNotesModal(false)}
+          onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />
+          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => goToMileage()} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
             <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
-            <Button className=" w-33" text="Accept" onClick={handleSaveBooking} />
           </div>
         </div>
         <ConfirmationDialog

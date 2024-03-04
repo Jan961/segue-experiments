@@ -24,6 +24,7 @@ export const steps = [
   'Barring Issue',
   'New Booking Details',
   'Preview New Booking',
+  'Check Mileage',
   'Venue Gap Suggestions',
 ];
 
