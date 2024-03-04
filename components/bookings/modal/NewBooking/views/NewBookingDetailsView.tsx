@@ -18,7 +18,7 @@ type NewBookingDetailsProps = {
   dayTypeOptions: SelectOption[];
   productionCode: string;
   onSubmit: (booking: BookingItem[]) => void;
-  toggleModalOverlay: (overlayStatus: boolean) => void;
+  toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
 };
 
@@ -179,7 +179,7 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const handleNoteCancel = () => {
+  const handleNotesCancel = () => {
     setShowNotesModal(false);
     toggleModalOverlay(false);
   };
@@ -203,7 +203,7 @@ export default function NewBookingDetailsView({
           show={showNotesModal}
           productionItem={bookingRow}
           onSave={handleSaveNote}
-          onCancel={handleNoteCancel}
+          onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
           <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />

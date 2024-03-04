@@ -38,20 +38,22 @@ export default function PopupModal({
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
-          enterTo={overlay ? 'opacity-0' : 'opacity-100'}
+          enterTo="opacity-100"
           leave="ease-in duration-200"
-          leaveFrom={overlay ? 'opacity-0' : 'opacity-100'}
+          leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/75 z-10" />
+          <div className="fixed inset-0 z-10" />
         </Transition.Child>
 
-        <div className={`${calibri.variable} font-calibri fixed inset-0 overflow-y-auto z-20`}>
-          <div
-            className={`flex min-h-full items-center justify-center p-4 text-center ${
-              overlay ? 'bg-black opacity-50' : 'opacity-100'
-            }`}
-          >
+        <div
+          className={classNames(
+            calibri.variable,
+            'font-calibri fixed inset-0 overflow-y-auto z-20',
+            overlay ? '' : 'bg-black/75',
+          )}
+        >
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
