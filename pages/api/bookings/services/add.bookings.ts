@@ -1,0 +1,157 @@
+import prisma from 'lib/prisma';
+import { AddBookingsParams } from '../interface/add.interface'; // Adjust the import path as needed
+import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
+import { createGetInFitUp, createNewBooking, createNewRehearsal, createOtherBooking } from 'services/bookingService';
+
+export class BookingService {
+  static async createBookings(bookingsData: AddBookingsParams[]) {
+    const promises = [];
+    const bookings = [];
+    let performances = [];
+    const rehearsals = [];
+    const getInFitUps = [];
+    const others = [];
+
+    const orderMap = new Map();
+    let counter = 1;
+
+    await prisma.$transaction(async (tx) => {
+      for (const bookingData of bookingsData) {
+        const {
+          DateBlockId,
+          VenueId,
+          Date: BookingDate,
+          performanceTimes = [],
+          BookingStatus: StatusCode,
+          PencilNo: PencilNum,
+          Notes,
+          isBooking,
+          isRehearsal,
+          isGetInFitUp,
+          DateTypeId,
+        } = bookingData || {};
+
+        if (isBooking) {
+          const Performances = performanceTimes.map((time) => ({
+            Time: `${BookingDate}T${time}`,
+            Date: BookingDate,
+          }));
+
+          const bookingPromise = createNewBooking(
+            {
+              DateBlockId,
+              PencilNum,
+              Notes,
+              VenueId,
+              Performances,
+              BookingDate,
+              StatusCode,
+            },
+            tx,
+          );
+          promises.push(bookingPromise);
+          orderMap.set(counter, 'booking');
+        } else if (isRehearsal) {
+          const rehearsalPromise = createNewRehearsal(
+            {
+              DateBlockId,
+              Notes,
+              DateTypeId,
+              VenueId,
+              StatusCode,
+              BookingDate,
+            },
+            tx,
+          );
+          promises.push(rehearsalPromise);
+          orderMap.set(counter, 'rehearsal');
+        } else if (isGetInFitUp) {
+          const getInFitUpPromise = createGetInFitUp(
+            {
+              DateBlockId,
+              VenueId,
+              Notes,
+              BookingDate,
+              StatusCode,
+            },
+            tx,
+          );
+
+          promises.push(getInFitUpPromise);
+          orderMap.set(counter, 'getInFitUp');
+        } else {
+          const getOther = createOtherBooking(
+            {
+              DateBlockId,
+              DateTypeId,
+              Notes,
+              BookingDate,
+              StatusCode,
+            },
+            tx,
+          );
+          promises.push(getOther);
+          orderMap.set(counter, 'other');
+        }
+        counter++;
+      }
+      counter = 1;
+      // const createdItems = await Promise.allSettled(promises);
+
+      // // Processing created items
+      // for (const item of createdItems) {
+      //   if (item.status === 'fulfilled') {
+      //     bookings.push(bookingMapper(item.value));
+      //     if (item.value.Performance) {
+      //       performances = performances.concat(
+      //         item.value.Performance.map((performance) => performanceMapper(performance)),
+      //       );
+      //     }
+      //   }
+      // }
+
+      const createdItems = await Promise.allSettled(promises);
+
+      console.log(createdItems);
+
+      for (const item of createdItems) {
+        if (item.status === 'fulfilled') {
+          const type = orderMap.get(counter);
+          counter++;
+          console.log('type : ', type);
+
+          const value = item.value;
+          // Assuming value contains a property `type` to distinguish between booking, rehearsal, etc.
+          // This requires your creation logic to somehow include this information in the result.
+          switch (type) {
+            case 'booking':
+              bookings.push(bookingMapper(value));
+              if (value.Performance) {
+                performances = performances.concat(value.Performance.map(performanceMapper));
+              }
+              break;
+            case 'rehearsal':
+              rehearsals.push(rehearsalMapper(value));
+              break;
+            case 'getInFitUp':
+              getInFitUps.push(getInFitUpMapper(value));
+              break;
+            case 'other':
+              others.push(otherMapper(value));
+              break;
+            default:
+              // Handle any unexpected types
+              break;
+          }
+        } else if (item.status === 'rejected') {
+          // Log the error or handle rejected promises as needed
+          // console.error(item.reason);
+        }
+      }
+
+      // Continue with your return or further processing
+      // return { bookings, performances, rehearsals, getInFitUps, others };
+    });
+    return { bookings, performances, rehearsals, getInFitUps, others };
+  }
+}

@@ -238,3 +238,16 @@ export const isValidDateString = (date: string): boolean => {
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
 };
+
+export const convertLocalDateToUTC = (date: Date) => {
+  return new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    ),
+  );
+};
