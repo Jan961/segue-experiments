@@ -72,6 +72,7 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
 
   const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
   const filteredBookingsBottom = filterBookingsByDateRange(bookings, sqlToDate, pastStartDateF);
+  //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
   const { nextStep, previousStep } = useWizard();
