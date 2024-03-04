@@ -3,6 +3,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import moment from 'moment';
+import { convertLocalDateToUTC } from 'services/dateService';
 
 interface DateInputProps {
   value?: string | Date;
@@ -123,7 +124,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName="!z-50"
-          onSelect={onChange}
+          onSelect={(e) => onChange(convertLocalDateToUTC(e))}
           onChange={() => null}
           selected={selectedDate}
           openToDate={selectedDate}
