@@ -82,6 +82,9 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .ag-row.ag-row-focus {
     z-index: 1;
 }
+.custom-red-row {
+  background-color: #fad0cc; /* Set your desired background color */
+}
 `;
 
 interface TableTooltipProps {

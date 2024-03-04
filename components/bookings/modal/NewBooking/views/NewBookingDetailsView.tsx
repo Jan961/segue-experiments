@@ -37,7 +37,7 @@ export default function NewBookingDetailsView({
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
-  const { nextStep, goToStep } = useWizard();
+  const { goToStep } = useWizard();
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
@@ -101,6 +101,9 @@ export default function NewBookingDetailsView({
   const goToNewBooking = () => {
     goToStep(steps.indexOf('Create New Booking'));
   };
+  const goToMileage = () => {
+    goToStep(steps.indexOf('Check Mileage'));
+  };
 
   const handleBackButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
@@ -146,6 +149,8 @@ export default function NewBookingDetailsView({
         rowData.push(node.data);
       });
       onSubmit(rowData);
+
+      goToStep(steps.indexOf('Preview New Booking'));
     }
   };
 
@@ -199,7 +204,7 @@ export default function NewBookingDetailsView({
           onCancel={() => setShowNotesModal(false)}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => nextStep()} />
+          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => goToMileage()} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />

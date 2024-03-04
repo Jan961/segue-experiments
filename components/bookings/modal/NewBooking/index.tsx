@@ -14,8 +14,10 @@ import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import PreviewNewBooking from './views/PreviewNewBooking';
 import { dateTypeState } from 'state/booking/dateTypeState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import MileageBooking from './views/MileageBooking';
 
 type AddBookingProps = {
   visible: boolean;
@@ -88,6 +90,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
+
           <NewBookingDetailsView
             formData={state.form}
             productionCode={productionCode}
@@ -96,7 +99,19 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             onConfirmationDisplay={handleConfirmationDisplay}
             onClose={onClose}
           />
-          <div>Preview booking</div>
+          <PreviewNewBooking
+            formData={state.form}
+            productionCode={productionCode}
+            data={state.booking}
+            dayTypeOptions={dayTypeOptions}
+          />
+          <MileageBooking
+            formData={state.form}
+            productionCode={productionCode}
+            data={state.booking}
+            dayTypeOptions={dayTypeOptions}
+          />
+
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
         <ConfirmationDialog
