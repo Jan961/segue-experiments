@@ -93,18 +93,23 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
   }
 
   return (
-    <div className="text-primary-input-text w-[700px]">
-      <Form onSave={getSuggestions} />
+    <div className="text-primary-input-text w-[700px] flex-col">
+      <div className="flex flex-col">
+        <Form onSave={getSuggestions} />
+      </div>
       {rows !== null && (
-        <div className="w-full overflow-hidden flex flex-col pt-4" style={{ maxHeight: 'calc(100vh - 400px)' }}>
-          <Table
-            onRowSelected={onRowSelected}
-            ref={tableRef}
-            columnDefs={gapSuggestColumnDefs}
-            rowData={filteredRows?.slice(0, 30)}
-            styleProps={styleProps}
-            gridOptions={gridOptions}
-          />
+        <div className="block">
+          <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
+          <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+            <Table
+              onRowSelected={onRowSelected}
+              ref={tableRef}
+              columnDefs={gapSuggestColumnDefs}
+              rowData={filteredRows?.slice(0, 30)}
+              styleProps={styleProps}
+              gridOptions={gridOptions}
+            />
+          </div>
         </div>
       )}
       {rows?.length && (

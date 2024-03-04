@@ -18,7 +18,7 @@ type FormProps = {
 
 const Form = ({ onSave }: FormProps) => {
   const [formData, setFormData] = useState(DEFAULT_GAP_SUGGEST_FORM_STATE);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const {
     minFromLastVenue,
     minToNextVenue,
@@ -157,7 +157,7 @@ const Form = ({ onSave }: FormProps) => {
         variant="primary"
         text="Get Suggestions"
       >
-        {loading && <Loader />}
+        {loading && <Loader className="ml-2" iconProps={{ stroke: '#FFF' }} />}
       </Button>
     </form>
   );
