@@ -121,7 +121,6 @@ export default forwardRef(function Table(
           tooltipShowDelay={0}
           gridOptions={gridOptions}
           getRowHeight={getRowHeight}
-          reactiveCustomComponents
         />
       </div>
     </>

@@ -90,7 +90,7 @@ export const barringIssueColumnDefs = [
   { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
 ];
 
-export const newBookingColumnDefs = (dayTypeOptions = []) => [
+export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 112, maxWidth: 112 },
 
   // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
@@ -129,6 +129,7 @@ export const newBookingColumnDefs = (dayTypeOptions = []) => [
     cellRenderer: SelectVenueRenderer,
     cellRendererParams: {
       dayTypeOptions,
+      venueOptions,
     },
     flex: 1,
     cellStyle: {

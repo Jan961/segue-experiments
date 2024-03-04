@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { venueState } from 'state/booking/venueState';
-import { bookingState } from 'state/booking/bookingState';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
@@ -24,6 +22,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 type AddBookingProps = {
   formData: TForm;
   dayTypeOptions: SelectOption[];
+  venueOptions: SelectOption[];
   productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   onChange: (change: Partial<TForm>) => void;
@@ -36,13 +35,13 @@ const NewBookingView = ({
   formData,
   productionCode,
   dayTypeOptions,
+  venueOptions,
   updateBookingConflicts,
 }: AddBookingProps) => {
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
-  const venueDict = useRecoilValue(venueState);
+
   const currentProduction = useRecoilValue(currentProductionSelector);
-  const bookingDict = useRecoilValue(bookingState);
   const scheduleRange = useRecoilValue(dateBlockSelector);
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
@@ -60,22 +59,6 @@ const NewBookingView = ({
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
-  const VenueOptions = useMemo(() => {
-    const options = [];
-    const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
-    for (const venueId in venueDict) {
-      const venue = venueDict[venueId];
-      const option = {
-        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
-        value: venue?.Id,
-      };
-      if (shouldFilterVenues && currentProductionVenues.includes(parseInt(venueId, 10))) {
-        continue;
-      }
-      options.push(option);
-    }
-    return options;
-  }, [venueDict, shouldFilterVenues, bookingDict]);
   const goToNext = () => {
     fetchData({
       url: '/api/bookings/conflict',
@@ -171,7 +154,7 @@ const NewBookingView = ({
           <>
             <Typeahead
               className={classNames('my-2 w-full !border-0')}
-              options={VenueOptions}
+              options={venueOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ venueId: parseInt(value as string, 10) })}
               value={venueId}

@@ -43,8 +43,6 @@ export const deleteBookingById = async (BookingId: any) => {
 };
 
 export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number) => {
-  console.log(FirstDate);
-
   return prisma.booking.create({
     data: {
       FirstDate,
@@ -105,8 +103,6 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
   });
 
   const daysDiff = differenceInDays(FirstDate, booking.FirstDate);
-
-  console.log(`Moving booking by ${daysDiff} day(s)`);
 
   await prisma.$transaction(async (tx) => {
     for (const perf of booking.Performance) {
@@ -193,10 +189,7 @@ type NewRehearsal = {
   DateTypeId: number;
 };
 
-export const createNewRehearsal = (
-  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, DateTypeId }: NewRehearsal,
-  tx: any,
-) => {
+export const createNewRehearsal = ({ DateBlockId, StatusCode, BookingDate, Notes, VenueId }: NewRehearsal, tx: any) => {
   return (tx || prisma).rehearsal.create({
     data: {
       Notes,
@@ -207,17 +200,7 @@ export const createNewRehearsal = (
           Id: DateBlockId,
         },
       },
-      // Venue: {
-      //   connect: {
-      //     Id: VenueId,
-      //   },
-      // },
       VenueId,
-      DateType: {
-        connect: {
-          Id: DateTypeId,
-        },
-      },
     },
   });
 };
