@@ -67,7 +67,7 @@ export default function ConfirmationDialog({
           <div className="text text-primary-navy font-bold text-xl">{confOptions[variant].question}</div>
           <div className="text text-primary-navy font-bold text-xl">{confOptions[variant].warning}</div>
         </div>
-        <div className="w-full mt-4 flex justify-center items-center mb-4">
+        <div className="w-full mt-4 flex justify-center items-center">
           <Button className="w-32" variant="secondary" text={labelNo} onClick={() => handleAction(false)} />
           <Button
             className="ml-4 w-32"
