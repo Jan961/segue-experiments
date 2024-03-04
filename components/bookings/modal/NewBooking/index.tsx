@@ -18,6 +18,10 @@ import PreviewNewBooking from './views/PreviewNewBooking';
 import { dateTypeState } from 'state/booking/dateTypeState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import MileageBooking from './views/MileageBooking';
+import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import { venueState } from 'state/booking/venueState';
+import { bookingState } from 'state/booking/bookingState';
+import useAxios from 'hooks/useAxios';
 
 type AddBookingProps = {
   visible: boolean;
@@ -27,7 +31,10 @@ type AddBookingProps = {
 };
 
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
+  const { fetchData } = useAxios();
   const { stepIndex } = useRecoilValue(newBookingState);
+  const venueDict = useRecoilValue(venueState);
+  const bookingDict = useRecoilValue(bookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
   const handleModalClose = () => onClose?.();
@@ -39,7 +46,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       toDate: endDate,
     },
   }));
+
   const currentProduction = useRecoilValue(currentProductionSelector);
+  const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
+  const primaryBlock = scheduleDateBlocks?.find(({ IsPrimary }) => !!IsPrimary);
+
   const dayTypes = useRecoilValue(dateTypeState);
   const dayTypeOptions = useMemo(
     () => [...OTHER_DAY_TYPES, ...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))],
@@ -54,6 +65,23 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     [currentProduction],
   );
 
+  const venueOptions = useMemo(() => {
+    const options = [];
+    const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
+    for (const venueId in venueDict) {
+      const venue = venueDict[venueId];
+      const option = {
+        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
+        value: venue?.Id,
+      };
+      if (state.form.shouldFilterVenues && currentProductionVenues.includes(parseInt(venueId, 10))) {
+        continue;
+      }
+      options.push(option);
+    }
+    return options;
+  }, [venueDict, state.form.shouldFilterVenues, bookingDict]);
+
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
   };
@@ -63,6 +91,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
 
   const handleSaveNewBooking = (booking: BookingItem[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
+    fetchData({
+      url: '/api/bookings/add',
+      method: 'POST',
+      data: booking,
+    });
   };
 
   return (
@@ -83,6 +116,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             formData={state.form}
             onClose={onClose}
             productionCode={productionCode}
+            venueOptions={venueOptions}
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
@@ -90,7 +124,9 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           <NewBookingDetailsView
             formData={state.form}
             productionCode={productionCode}
+            dateBlockId={primaryBlock?.Id}
             dayTypeOptions={dayTypeOptions}
+            venueOptions={venueOptions}
             onSubmit={handleSaveNewBooking}
             toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
             onClose={onClose}

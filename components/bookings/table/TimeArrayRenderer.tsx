@@ -10,7 +10,7 @@ const TimeArrayRenderer = ({ data, setValue }: CustomCellRendererProps) => {
 
   useEffect(() => {
     setIsDisabled(!data.perf);
-    console.log(data);
+
     if (data.noPerf) {
       const newTimes = Array(data.noPerf).fill({ hrs: '', min: '', sec: '' });
       setPerformanceTimes(newTimes);
