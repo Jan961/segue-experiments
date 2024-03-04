@@ -224,9 +224,9 @@ export const tourSummaryColumnDefs = [
     headerName: 'Prod Code',
     field: 'prodCode',
     cellRenderer: DefaultCellRenderer,
-    width: 75,
+    width: 100,
   },
-  { headerName: '', field: 'name', cellRenderer: DefaultCellRenderer, width: 320 },
+  { headerName: ' ', field: 'name', cellRenderer: DefaultCellRenderer, width: 305 },
   {
     headerName: '',
     field: 'value',
