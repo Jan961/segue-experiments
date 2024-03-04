@@ -5,7 +5,7 @@ import { useWizard } from 'react-use-wizard';
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { getDateDaysAgo, getDateDaysInFuture, toSql , calculateWeekNumber } from 'services/dateService';
+import { getDateDaysAgo, getDateDaysInFuture, toSql, calculateWeekNumber } from 'services/dateService';
 import moment from 'moment';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
@@ -17,8 +17,15 @@ type NewBookingDetailsProps = {
   productionCode: string;
   data: BookingItem[];
   dayTypeOptions: SelectOption[];
+  onSaveBooking: () => void;
 };
-export default function PreviewNewBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
+export default function PreviewNewBooking({
+  formData,
+  productionCode,
+  data,
+  dayTypeOptions,
+  onSaveBooking,
+}: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
 
@@ -88,10 +95,7 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
   //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
-  const { nextStep, previousStep } = useWizard();
-  const goToPreviousStep = () => {
-    previousStep();
-  };
+  const { previousStep } = useWizard();
 
   return (
     <>
@@ -108,8 +112,8 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
 
         <div className="py-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-            <Button className=" w-33  " text="Accept" onClick={() => nextStep()} />
+            <Button className="w-33" variant="secondary" text="Back" onClick={previousStep} />
+            <Button className="w-33" text="Accept" onClick={onSaveBooking} />
           </div>
         </div>
       </div>

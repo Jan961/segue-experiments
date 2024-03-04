@@ -183,15 +183,6 @@ export default function NewBookingDetailsView({
     setBookingData(updated);
   };
 
-  const handleSaveBooking = () => {
-    if (tableRef.current.getApi()) {
-      const rowData = [];
-      tableRef.current.getApi().forEachNode((node) => {
-        rowData.push(node.data);
-      });
-    }
-  };
-
   const handleNotesCancel = () => {
     setShowNotesModal(false);
     toggleModalOverlay(false);
@@ -224,7 +215,6 @@ export default function NewBookingDetailsView({
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
             <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
-            <Button className=" w-33" text="Accept" onClick={handleSaveBooking} />
           </div>
         </div>
         <ConfirmationDialog

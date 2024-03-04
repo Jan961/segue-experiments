@@ -89,12 +89,15 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
   };
 
-  const handleSaveNewBooking = (booking: BookingItem[]) => {
+  const setNewBookingOnStore = (booking: BookingItem[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
+  };
+
+  const handleSaveNewBooking = () => {
     fetchData({
       url: '/api/bookings/add',
       method: 'POST',
-      data: booking,
+      data: state.booking,
     });
   };
 
@@ -127,7 +130,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             dateBlockId={primaryBlock?.Id}
             dayTypeOptions={dayTypeOptions}
             venueOptions={venueOptions}
-            onSubmit={handleSaveNewBooking}
+            onSubmit={setNewBookingOnStore}
             toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
             onClose={onClose}
           />
@@ -136,6 +139,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             productionCode={productionCode}
             data={state.booking}
             dayTypeOptions={dayTypeOptions}
+            onSaveBooking={handleSaveNewBooking}
           />
           <MileageBooking
             formData={state.form}
