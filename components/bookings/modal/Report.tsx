@@ -45,7 +45,6 @@ export default function Report({
     defaultColDef,
     autoSizeStrategy: {
       type: 'fitGridWidth',
-      defaultMinWidth: 50,
     },
     getRowStyle: (params) => {
       if (params.data.bold) {
