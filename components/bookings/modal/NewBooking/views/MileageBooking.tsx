@@ -8,7 +8,7 @@ import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import { getDateDaysAgo, getDateDaysInFuture, toSql } from 'services/dateService';
 import moment from 'moment';
 import { venueState } from 'state/booking/venueState';
-// import { distanceState } from 'state/booking/distanceState';
+import { distanceState } from 'state/booking/distanceState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { steps } from 'config/AddBooking';
@@ -21,20 +21,58 @@ type NewBookingDetailsProps = {
 };
 export default function MileageBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
-  //   const distanceDict = useRecoilValue(distanceState);
+  const distanceDict = useRecoilValue(distanceState);
+  const dataVenueId = data.map((item) => {
+    return item.venue;
+  });
+  console.log('dataVenueId... :>> ', dataVenueId);
+  const milesWithVenueId = distanceDict[22].stops.flatMap((item) =>
+    item.option.map((optionItem) => ({
+      VenueId: optionItem.VenueId,
+      Miles: optionItem.Miles,
+      Mins: optionItem.Mins,
+    })),
+  );
+  console.log('milesWithVenueId :>> ', milesWithVenueId);
 
-  const updateData: PreviewDataItem[] = data.map((item: any) => ({
-    ...item,
-    color: true,
-    venue: venueDict[item.venue].Name,
-    town: venueDict[item.venue].Town,
-    dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
-    production: productionCode.split(' ')[0],
-    bookingStatus: bookingStatusMap[item.bookingStatus],
-    status: item.bookingStatus,
-    performanceCount: item.noPerf?.toString() || '',
-    performanceTimes: item.times,
-  }));
+  //   const updateData: PreviewDataItem[] = data.map((item: any) => ({
+  //     ...item,
+  //     color: true,
+  //     venue: venueDict[item.venue].Name,
+  //     town: venueDict[item.venue].Town,
+  //     dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
+  //     production: productionCode.split(' ')[0],
+  //     bookingStatus: bookingStatusMap[item.bookingStatus],
+  //     status: item.bookingStatus,
+  //     performanceCount: item.noPerf?.toString() || '',
+  //     performanceTimes: item.times,
+  //   }));
+  const updateData: PreviewDataItem[] = data.map((item: any) => {
+    // Find the matching mileage for the venue in data
+    const matchingMileage = milesWithVenueId.find((mileage) => mileage.VenueId === item.venue);
+
+    return {
+      ...item,
+      color: true,
+      venue: venueDict[item.venue].Name,
+      town: venueDict[item.venue].Town,
+      dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
+      production: productionCode.split(' ')[0],
+      bookingStatus: bookingStatusMap[item.bookingStatus],
+      status: item.bookingStatus,
+      performanceCount: item.noPerf?.toString() || '',
+      performanceTimes: item.times,
+      Miles: matchingMileage ? matchingMileage.Miles : null,
+      Mins: matchingMileage ? matchingMileage.Mins : null,
+    };
+  });
+  const rowClassRules = {
+    'custom-red-row': (params) => {
+      const rowData = params.data;
+      // Apply custom style if the 'color' property is true
+      return rowData && rowData.color === true;
+    },
+  };
 
   const { rows: bookings } = useRecoilValue(rowsSelector);
 
@@ -76,6 +114,7 @@ export default function MileageBooking({ formData, productionCode, data, dayType
   const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
   const filteredBookingsBottom = filterBookingsByDateRange(bookings, sqlToDate, pastStartDateF);
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
+  console.log('mergedFilteredBookings :>> ', mergedFilteredBookings);
 
   const { goToStep } = useWizard();
   const goToNewBookingDetail = () => {
@@ -87,7 +126,12 @@ export default function MileageBooking({ formData, productionCode, data, dayType
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table rowData={mergedFilteredBookings} columnDefs={columnDefs} styleProps={styleProps} />
+        <Table
+          rowData={mergedFilteredBookings}
+          columnDefs={columnDefs}
+          styleProps={styleProps}
+          rowClassRules={rowClassRules}
+        />
 
         <div className="py-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
