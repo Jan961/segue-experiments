@@ -16,6 +16,7 @@ import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
+<<<<<<< HEAD
 import IconRenderer from './IconRenderer';
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -39,6 +40,10 @@ import SelectCompOrderRender from './SelectCompOrderRender';
 >>>>>>> ef562f9 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 =======
 >>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
+=======
+import SalesDataButtonRenderer from './SalesDataButtonRenderer';
+import SelectCompOrderRender from './SelectCompOrderRender';
+>>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -344,6 +349,7 @@ export const tourSummaryColumnDefs = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 export const barredVenueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
@@ -517,12 +523,18 @@ export const venueColumnDefs = [
 
 
 export const venueHistCompColumnDefs = (optionsLength = 0) => [
+=======
+
+
+export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) => [
+>>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
     cellRenderer: SelectCompOrderRender,
     cellRendererParams: {
       optionsLength,
+<<<<<<< HEAD
     },
     width: 125,
     cellStyle: {
@@ -630,6 +642,17 @@ export const venueColumnDefs = [
 <<<<<<< HEAD
 =======
   {
+=======
+      selectForComparison
+    },
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
+  },
+  {
+>>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
     headerName: 'Production',
     field: 'prodName',
     cellRenderer: DefaultCellRenderer,
@@ -669,6 +692,7 @@ export const venueColumnDefs = [
     cellStyle: {
       textAlign: 'center',
     },
+<<<<<<< HEAD
     resizable: false
   },
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
@@ -747,3 +771,7 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 >>>>>>> a31260e (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 ];
 >>>>>>> 0c9e4c4 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+  },
+];
+>>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
