@@ -16,6 +16,8 @@ import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
+import SalesDataButtonRenderer from './SalesDataButtonRenderer';
+import SelectCompOrderRender from './SelectCompOrderRender';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -234,5 +236,64 @@ export const tourSummaryColumnDefs = [
     cellRenderer: DefaultCellRenderer,
     width: 90,
     resizable: false,
+  },
+];
+
+
+export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) => [
+  {
+    headerName: 'Order for Comparison',
+    field: 'compOrder',
+    cellRenderer: SelectCompOrderRender,
+    cellRendererParams: {
+      optionsLength,
+      selectForComparison
+    },
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
+  },
+  {
+    headerName: 'Production',
+    field: 'prodName',
+    cellRenderer: DefaultCellRenderer,
+    width: 350,
+  },
+  {
+    headerName: 'Date of First Performance',
+    field: 'firstPerfDt',
+    cellRenderer: DateColumnRenderer,
+    width: 130,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'No. Perfs',
+    field: 'numPerfs',
+    cellRenderer: DefaultCellRenderer,
+    width: 70,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Production Duration (Wks)',
+    field: 'prodWks',
+    cellRenderer: DefaultCellRenderer,
+    width: 140,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Sales Data',
+    cellRenderer: SalesDataButtonRenderer,
+    width: 150,
+    cellStyle: {
+      textAlign: 'center',
+    },
   },
 ];
