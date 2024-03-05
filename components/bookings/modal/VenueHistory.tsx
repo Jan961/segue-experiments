@@ -50,7 +50,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [venueId, setVenueId] = useState<number>(0);
   const [venueDesc, setVenueDesc] = useState<string>('');
 
-
   const VenueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
