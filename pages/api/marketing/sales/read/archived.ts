@@ -58,7 +58,7 @@ export default async function handle(req, res) {
 
     const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(
       bookingIds,
-    )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate`;
+    )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate limit 300`;
     const formattedData: TSalesView[] = data.filter(
       (x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales',
     );
@@ -79,6 +79,7 @@ export default async function handle(req, res) {
       formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
     );
 
+
     res.send({
       input: bookingIds.map((x) => ({ BookingId: x })),
       response: commonData.reduce(
@@ -95,6 +96,6 @@ export default async function handle(req, res) {
       ),
     });
   } catch (error) {
-    res.status(403).json({ error: 'Error occurred while generating search results.', message: error.message });
+    res.status(500).json({ error: 'Error occurred while generating search results.', message: error.message });
   }
 }
