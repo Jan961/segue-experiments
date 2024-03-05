@@ -33,6 +33,7 @@ export default function NewBookingDetailsView({
   onClose,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId } = formData;
+  console.log('formData :>> ', formData);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
@@ -41,6 +42,7 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -101,9 +103,6 @@ export default function NewBookingDetailsView({
   const goToNewBooking = () => {
     goToStep(steps.indexOf('Create New Booking'));
   };
-  const goToMileage = () => {
-    goToStep(steps.indexOf('Check Mileage'));
-  };
 
   const handleBackButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
@@ -139,6 +138,22 @@ export default function NewBookingDetailsView({
       goToNewBooking();
     } else if (confirmationType.current === 'cancel') {
       onClose();
+    }
+  };
+
+  const goToMileage = () => {
+    if (tableRef.current.isDirty()) {
+      setChangesMade(true);
+
+      if (tableRef.current.getApi()) {
+        const rowData = [];
+        tableRef.current.getApi().forEachNode((node) => {
+          rowData.push(node.data);
+        });
+        onSubmit(rowData);
+
+        goToStep(steps.indexOf('Check Mileage'));
+      }
     }
   };
 
@@ -196,6 +211,9 @@ export default function NewBookingDetailsView({
           gridOptions={gridOptions}
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
+          onCellValueChange={() => {
+            setChangesMade(true);
+          }}
         />
         <NotesPopup
           show={showNotesModal}
@@ -204,7 +222,12 @@ export default function NewBookingDetailsView({
           onCancel={() => setShowNotesModal(false)}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => goToMileage()} />
+          <Button
+            className=" w-33  place-self-start  "
+            text="Check Mileage"
+            onClick={goToMileage}
+            disabled={!changesMade}
+          />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />

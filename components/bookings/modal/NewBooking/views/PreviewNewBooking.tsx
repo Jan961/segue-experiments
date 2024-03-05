@@ -5,12 +5,13 @@ import { useWizard } from 'react-use-wizard';
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { getDateDaysAgo, getDateDaysInFuture, toSql , calculateWeekNumber } from 'services/dateService';
+import { getDateDaysAgo, getDateDaysInFuture, toSql, calculateWeekNumber } from 'services/dateService';
 import moment from 'moment';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import { distanceState } from 'state/booking/distanceState';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -21,23 +22,38 @@ type NewBookingDetailsProps = {
 export default function PreviewNewBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
+  const distanceDict = useRecoilValue(distanceState);
+
+  const milesWithVenueId = distanceDict[22].stops.flatMap((item) =>
+    item.option.map((optionItem) => ({
+      VenueId: optionItem.VenueId,
+      Miles: optionItem.Miles,
+      Mins: optionItem.Mins,
+    })),
+  );
 
   const { rows: bookings } = useRecoilValue(rowsSelector);
 
-  const updateData: PreviewDataItem[] = data.map((item: any) => ({
-    ...item,
+  const updateData: PreviewDataItem[] = data.map((item: any) => {
+    const matchingMileage = milesWithVenueId.find((mileage) => mileage.VenueId === item.venue);
 
-    color: true,
-    venue: venueDict[item.venue].Name,
-    town: venueDict[item.venue].Town,
-    dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
-    production: productionCode.split(' ')[0],
-    bookingStatus: bookingStatusMap[item.bookingStatus],
-    status: item.bookingStatus,
-    performanceCount: item.noPerf?.toString() || '',
-    performanceTimes: item.times,
-    week: calculateWeekNumber(new Date(production.StartDate), new Date(item.date)),
-  }));
+    return {
+      ...item,
+      color: true,
+      venue: venueDict[item.venue].Name,
+      town: venueDict[item.venue].Town,
+      capacity: venueDict[item.venue].Seats,
+      dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
+      production: productionCode.split(' ')[0],
+      bookingStatus: bookingStatusMap[item.bookingStatus],
+      status: item.bookingStatus,
+      performanceCount: item.noPerf?.toString() || '',
+      performanceTimes: item.times,
+      week: calculateWeekNumber(new Date(production.StartDate), new Date(item.date)),
+      Miles: matchingMileage ? matchingMileage.Miles : null,
+      Mins: matchingMileage ? matchingMileage.Mins : null,
+    };
+  });
 
   const rowClassRules = {
     'custom-red-row': (params) => {
@@ -53,7 +69,16 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
   const sqlToDate = toSql(toDate);
 
   const pastStartDate = getDateDaysAgo(sqlFromDate, 5);
-  const futureEndDate = getDateDaysInFuture(sqlToDate, 5);
+  // future date is set according to condition
+  const isSameDate = fromDate === toDate;
+  // If the dates are the same, add 2 days to toDateSet, otherwise add 1 day
+  const daysToAdd = isSameDate ? 2 : 1;
+  const daysToFu = isSameDate ? 7 : 6;
+
+  const toDateSet = getDateDaysInFuture(sqlToDate, daysToAdd);
+  const toDateM = moment(toDateSet).format('YYYY-MM-DD');
+
+  const futureEndDate = getDateDaysInFuture(sqlToDate, daysToFu);
 
   const pastStartDateP = moment(pastStartDate).format('YYYY-MM-DD');
   const pastStartDateF = moment(futureEndDate).format('YYYY-MM-DD');
@@ -84,7 +109,7 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
 
   const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
 
-  const filteredBookingsBottom = filterBookingsByDateRange(bookings, sqlToDate, pastStartDateF);
+  const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateM, pastStartDateF);
   //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
@@ -106,7 +131,7 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
           rowClassRules={rowClassRules}
         />
 
-        <div className="py-8 w-full flex justify-end  gap-3 float-right">
+        <div className="pt-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
             <Button className=" w-33  " text="Accept" onClick={() => nextStep()} />

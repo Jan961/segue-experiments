@@ -15,6 +15,7 @@ interface TableProps {
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
   onRowSelected?: (e) => void;
+  onCellValueChange?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
@@ -33,9 +34,9 @@ export default forwardRef(function Table(
     styleProps,
     onCellClicked,
     onRowClicked,
+    onCellValueChange,
     gridOptions,
     getRowStyle,
-
     rowClassRules,
     displayHeader = true,
     getRowHeight,
@@ -58,8 +59,9 @@ export default forwardRef(function Table(
     return HEADER_HEIGHT;
   }, [rowData]);
 
-  const handleCellValueChange = () => {
+  const handleCellValueChange = (e) => {
     isDirty.current = true;
+    onCellValueChange(e);
   };
 
   const onGridReady = (params: GridReadyEvent) => {
