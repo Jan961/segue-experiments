@@ -293,6 +293,7 @@ export const tourSummaryColumnDefs = [
     resizable: false,
   },
 ];
+<<<<<<< HEAD
 
 export const barredVenueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
@@ -468,3 +469,5 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 =======
 >>>>>>> a31260e (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 ];
+=======
+>>>>>>> f3a124c (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
