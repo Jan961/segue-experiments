@@ -18,6 +18,7 @@ interface TableProps {
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
+  rowClassRules?: any;
   getRowHeight?: (params: RowHeightParams) => number;
 }
 
@@ -34,6 +35,8 @@ export default forwardRef(function Table(
     onRowClicked,
     gridOptions,
     getRowStyle,
+
+    rowClassRules,
     displayHeader = true,
     getRowHeight,
     onRowSelected = () => null,
@@ -113,11 +116,11 @@ export default forwardRef(function Table(
           onCellValueChanged={handleCellValueChange}
           onGridReady={onGridReady}
           getRowStyle={getRowStyle}
+          rowClassRules={rowClassRules}
           tooltipHideDelay={5000}
           tooltipShowDelay={0}
           gridOptions={gridOptions}
           getRowHeight={getRowHeight}
-          reactiveCustomComponents
         />
       </div>
     </>

@@ -14,8 +14,14 @@ import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import PreviewNewBooking from './views/PreviewNewBooking';
 import { dateTypeState } from 'state/booking/dateTypeState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import MileageBooking from './views/MileageBooking';
+import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import { venueState } from 'state/booking/venueState';
+import { bookingState } from 'state/booking/bookingState';
+import useAxios from 'hooks/useAxios';
 
 type AddBookingProps = {
   visible: boolean;
@@ -25,9 +31,12 @@ type AddBookingProps = {
 };
 
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
+  const { fetchData } = useAxios();
   const { stepIndex } = useRecoilValue(newBookingState);
+  const venueDict = useRecoilValue(venueState);
+  const bookingDict = useRecoilValue(bookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const [hasOverlay, sethasOverlay] = useState<boolean>(false);
+  const [hasOverlay, setHasOverlay] = useState<boolean>(false);
   const handleModalClose = () => onClose?.();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
     ...INITIAL_STATE,
@@ -37,7 +46,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       toDate: endDate,
     },
   }));
+
   const currentProduction = useRecoilValue(currentProductionSelector);
+  const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
+  const primaryBlock = scheduleDateBlocks?.find(({ IsPrimary }) => !!IsPrimary);
+
   const dayTypes = useRecoilValue(dateTypeState);
   const dayTypeOptions = useMemo(
     () => [...OTHER_DAY_TYPES, ...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))],
@@ -52,6 +65,23 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     [currentProduction],
   );
 
+  const venueOptions = useMemo(() => {
+    const options = [];
+    const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
+    for (const venueId in venueDict) {
+      const venue = venueDict[venueId];
+      const option = {
+        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
+        value: venue?.Id,
+      };
+      if (state.form.shouldFilterVenues && currentProductionVenues.includes(parseInt(venueId, 10))) {
+        continue;
+      }
+      options.push(option);
+    }
+    return options;
+  }, [venueDict, state.form.shouldFilterVenues, bookingDict]);
+
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
   };
@@ -59,12 +89,16 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
   };
 
-  const handleSaveNewBooking = (booking: BookingItem[]) => {
+  const setNewBookingOnStore = (booking: BookingItem[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
-  const handleConfirmationDisplay = (isVisible) => {
-    sethasOverlay(isVisible);
+  const handleSaveNewBooking = () => {
+    fetchData({
+      url: '/api/bookings/add',
+      method: 'POST',
+      data: state.booking,
+    });
   };
 
   return (
@@ -85,18 +119,35 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             formData={state.form}
             onClose={onClose}
             productionCode={productionCode}
+            venueOptions={venueOptions}
           />
           <BookingConflictsView data={state.bookingConflicts} />
           <BarringIssueView bookingConflicts={state.bookingConflicts} />
+
           <NewBookingDetailsView
             formData={state.form}
             productionCode={productionCode}
+            dateBlockId={primaryBlock?.Id}
             dayTypeOptions={dayTypeOptions}
-            onSubmit={handleSaveNewBooking}
-            onConfirmationDisplay={handleConfirmationDisplay}
+            venueOptions={venueOptions}
+            onSubmit={setNewBookingOnStore}
+            toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
             onClose={onClose}
           />
-          <div>Preview booking</div>
+          <PreviewNewBooking
+            formData={state.form}
+            productionCode={productionCode}
+            data={state.booking}
+            dayTypeOptions={dayTypeOptions}
+            onSaveBooking={handleSaveNewBooking}
+          />
+          <MileageBooking
+            formData={state.form}
+            productionCode={productionCode}
+            data={state.booking}
+            dayTypeOptions={dayTypeOptions}
+          />
+
           <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
         </Wizard>
         <ConfirmationDialog
