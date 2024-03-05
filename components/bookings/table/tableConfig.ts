@@ -265,5 +265,8 @@ export const barredVenueColumnDefs = [
     width: 40,
     headerClass: 'text-center',
     resizable: false,
+    cellStyle: {
+      overflow: 'visible',
+    },
   },
 ];

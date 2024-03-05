@@ -15,16 +15,22 @@ export type BarredVenue = {
 };
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { venueId, productionId, excludeLondon } = req.body;
+  const { venueId, productionId, excludeLondon, includeExcluded, barDistance, seats } = req.body;
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
+  if (!venueId) return res.status(401).json({ errorMessage: 'Venue is required.', error: true });
   if (!access) return res.status(401).end();
 
   try {
     const result = await prisma.VenueVenue.findMany({
       where: {
         Venue1Id: venueId,
+        ...(barDistance && { Mileage: { lte: barDistance } }),
+        Venue2: {
+          ...(!includeExcluded && { ExcludeFromChecks: false }),
+          ...(seats && { Seats: { gte: seats } }),
+        },
       },
       select: {
         Mileage: true,
@@ -56,6 +62,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
+    console.table(result);
     const filteredResults: BarredVenue[] = result
       .map(({ Mileage, TimeMins, Venue2 }) => {
         const { FirstDate, Id: BookingId } =

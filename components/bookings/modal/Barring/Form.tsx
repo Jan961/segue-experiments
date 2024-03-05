@@ -86,8 +86,8 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
               name="venue"
               label="Venue"
               onChange={(selectedVenue) => handleOnChange({ venueId: selectedVenue })}
-              options={[{ value: 0, text: '-- Select Venue --' }, ...venueOptions]}
-              placeholder="-- Select Venue --"
+              options={venueOptions}
+              placeholder="Please select a venue"
               value={venueId}
             />
           </div>

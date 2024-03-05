@@ -11,6 +11,7 @@ import { formatMinutes } from 'utils/booking';
 import { gridOptions } from '../GapSuggest';
 import { barredVenueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import moment from 'moment';
+import Label from 'components/core-ui-lib/Label';
 
 type BarringProps = {
   visible: boolean;
@@ -37,13 +38,15 @@ export default function Barring({ visible, onClose }: BarringProps) {
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
   }, [selectedVenueIds, rows]);
   const fetchBarredVenues = async (formData) => {
-    const { productionId, venueId, includeExcluded } = formData;
+    const { productionId, venueId, includeExcluded, seats, barDistance } = formData;
     setIsLoading(true);
     axios
       .post('/api/productions/venue/barred', {
-        productionId: parseInt(productionId),
-        venueId: parseInt(venueId),
-        excludeLondon: includeExcluded,
+        productionId: parseInt(productionId, 10),
+        venueId: parseInt(venueId, 10),
+        seats: parseInt(seats || 0, 10),
+        barDistance: parseInt(barDistance || 0, 10),
+        includeExcluded,
       })
       .then((response) => {
         setRows(response?.data);
@@ -75,14 +78,17 @@ export default function Barring({ visible, onClose }: BarringProps) {
             <Spinner className="w-full" size="lg" />
           </div>
         )}
-        <div className="flex-col">
-          <div className="mt-6 mb-4">
+        <div className="flex flex-col">
+          <div className="mt-6 flex-col">
             <Form onSubmit={fetchBarredVenues} />
           </div>
           {rows !== null && (
             <div className="block">
-              <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
-              <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
+              <Label className="text-md my-2" text="Check the box of venues you wish to remove from this list."></Label>
+              <div
+                className="w-full overflow-hidden flex flex-col z-[500]"
+                style={{ maxHeight: 'calc(100vh - 450px)' }}
+              >
                 <Table
                   onRowSelected={onRowSelected}
                   ref={tableRef}
