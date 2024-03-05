@@ -6,10 +6,10 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Label from 'components/core-ui-lib/Label';
-import { venueState } from 'state/booking/venueState';
 import Button from 'components/core-ui-lib/Button';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import useProductionOptions from 'hooks/useProductionOptions';
+import useVenueOptions from 'hooks/useVenueOptions';
 
 const INITIAL_FORM_STATE = {
   productionId: null,
@@ -24,7 +24,6 @@ const INITIAL_FORM_STATE = {
 
 const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
-  const venueDict = useRecoilValue(venueState);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction.Id });
   const { productionId, venueId, barDistance = '', includeExcluded, seats = '', fromDate, toDate } = formData;
@@ -34,14 +33,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
     return { minDate: selectedProduction?.StartDate, maxDate: selectedProduction?.EndDate };
   }, [productionId, productions]);
   const productionOptions = useProductionOptions(true);
-  const venueOptions = useMemo(
-    () =>
-      Object.values(venueDict).map((venue) => ({
-        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
-        value: venue?.Id,
-      })),
-    [venueDict],
-  );
+  const venueOptions = useVenueOptions();
   const handleOnSubmit = () => {
     onSubmit(formData);
   };
