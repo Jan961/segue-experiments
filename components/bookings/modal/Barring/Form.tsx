@@ -9,6 +9,7 @@ import Label from 'components/core-ui-lib/Label';
 import { venueState } from 'state/booking/venueState';
 import Button from 'components/core-ui-lib/Button';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import useProductionOptions from 'hooks/useProductionOptions';
 
 const INITIAL_FORM_STATE = {
   productionId: null,
@@ -32,14 +33,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
     const selectedProduction = productions?.find((production) => production.Id === productionId);
     return { minDate: selectedProduction?.StartDate, maxDate: selectedProduction?.EndDate };
   }, [productionId, productions]);
-  const productionOptions = useMemo(
-    () =>
-      productions.map((production) => ({
-        text: `${production.ShowCode}${production.Code} ${production.ShowName}`,
-        value: production.Id,
-      })),
-    [productions],
-  );
+  const productionOptions = useProductionOptions(true);
   const venueOptions = useMemo(
     () =>
       Object.values(venueDict).map((venue) => ({

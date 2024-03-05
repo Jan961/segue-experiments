@@ -62,7 +62,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-    console.table(result);
     const filteredResults: BarredVenue[] = result
       .map(({ Mileage, TimeMins, Venue2 }) => {
         const { FirstDate, Id: BookingId } =
