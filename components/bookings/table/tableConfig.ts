@@ -16,6 +16,7 @@ import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
+import IconRenderer from './IconRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -232,6 +233,36 @@ export const tourSummaryColumnDefs = [
     field: 'value',
     cellRenderer: DefaultCellRenderer,
     width: 90,
+    resizable: false,
+  },
+];
+
+export const barredVenueColumnDefs = [
+  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
+  {
+    headerName: 'Date',
+    field: 'FormattedDate',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Miles',
+    field: 'Mileage',
+    cellRenderer: DefaultCellRenderer,
+    width: 65,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'info',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconName: 'info-circle-solid',
+      popover: true,
+    },
+    width: 40,
+    headerClass: 'text-center',
     resizable: false,
   },
 ];

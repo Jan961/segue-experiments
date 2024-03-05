@@ -18,7 +18,7 @@ type GapSuggestProps = {
   onOkClick?: () => void;
 };
 
-const gridOptions = {
+export const gridOptions = {
   autoSizeStrategy: {
     type: 'fitGridWidth',
     defaultMinWidth: 50,

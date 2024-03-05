@@ -1,4 +1,4 @@
-import Barring from './modal/barring';
+import Barring from './modal/Barring';
 import Button from 'components/core-ui-lib/Button';
 import AddBooking from './modal/NewBooking';
 import { useEffect, useState } from 'react';
