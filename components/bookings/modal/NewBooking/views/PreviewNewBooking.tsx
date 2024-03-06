@@ -30,8 +30,7 @@ export default function PreviewNewBooking({
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
   const distanceDict = useRecoilValue(distanceState);
-
-  const milesWithVenueId = distanceDict[22].stops.flatMap((item) =>
+  const milesWithVenueId = distanceDict[production.Id].stops.flatMap((item) =>
     item.option.map((optionItem) => ({
       VenueId: optionItem.VenueId,
       Miles: optionItem.Miles,
