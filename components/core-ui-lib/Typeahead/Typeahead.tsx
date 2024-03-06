@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import WindowedSelect, {
   components,
   createFilter,
@@ -48,19 +48,20 @@ export interface TypeaheadProps extends WithTestId {
   label?: string;
 }
 
-export default function Typeahead({
-  value,
-  onChange,
-  options,
-  className,
-  renderOption,
-  placeholder = '',
-  disabled = false,
-  testId,
-  label,
-}: TypeaheadProps) {
-  const inputRef = useRef(null);
-
+export default forwardRef(function Typeahead(
+  {
+    value,
+    onChange,
+    options,
+    className,
+    renderOption,
+    placeholder = '',
+    disabled = false,
+    testId,
+    label,
+  }: TypeaheadProps,
+  ref,
+) {
   const colourStyles: StylesConfig = useMemo(
     () => ({
       control: (styles) => ({
@@ -114,10 +115,6 @@ export default function Typeahead({
 
   const [selectedOption, setSelectedOption] = useState<TypeaheadOption>({ text: '', value: '' });
 
-  const onInputFocus = () => {
-    inputRef.current?.Select?.focus();
-  };
-
   const handleOptionSelect = (o: TypeaheadOption) => {
     setSelectedOption(o);
     onChange(o.value);
@@ -151,7 +148,7 @@ export default function Typeahead({
       )}
 
       <WindowedSelect
-        ref={inputRef}
+        ref={ref}
         className="w-full"
         onChange={handleOptionSelect}
         value={selectedOption}
@@ -161,10 +158,10 @@ export default function Typeahead({
         isDisabled={disabled}
         filterOption={customFilter}
         options={options}
-        onFocus={onInputFocus}
         styles={colourStyles}
         placeholder={placeholder}
+        isSearchable={false}
       />
     </div>
   );
-}
+});

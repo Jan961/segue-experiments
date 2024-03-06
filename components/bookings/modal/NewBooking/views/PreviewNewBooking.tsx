@@ -18,8 +18,15 @@ type NewBookingDetailsProps = {
   productionCode: string;
   data: BookingItem[];
   dayTypeOptions: SelectOption[];
+  onSaveBooking: () => void;
 };
-export default function PreviewNewBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
+export default function PreviewNewBooking({
+  formData,
+  productionCode,
+  data,
+  dayTypeOptions,
+  onSaveBooking,
+}: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
   const distanceDict = useRecoilValue(distanceState);
@@ -113,10 +120,7 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
   //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
-  const { nextStep, previousStep } = useWizard();
-  const goToPreviousStep = () => {
-    previousStep();
-  };
+  const { previousStep } = useWizard();
 
   return (
     <>
@@ -133,8 +137,8 @@ export default function PreviewNewBooking({ formData, productionCode, data, dayT
 
         <div className="pt-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-            <Button className=" w-33  " text="Accept" onClick={() => nextStep()} />
+            <Button className="w-33" variant="secondary" text="Back" onClick={previousStep} />
+            <Button className="w-33" text="Accept" onClick={onSaveBooking} />
           </div>
         </div>
       </div>

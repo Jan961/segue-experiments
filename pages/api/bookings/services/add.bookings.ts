@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { AddBookingsParams } from '../interface/add.interface'; // Adjust the import path as needed
 import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
+import { createGetInFitUp, createNewBooking, createNewRehearsal, createOtherBooking } from 'services/bookingService';
 
 export class BookingService {
   static async createBookings(bookingsData: AddBookingsParams[]) {
@@ -19,10 +20,10 @@ export class BookingService {
         const {
           DateBlockId,
           VenueId,
-          Date: bookingDate,
+          Date: BookingDate,
           performanceTimes = [],
-          BookingStatus,
-          PencilNo,
+          BookingStatus: StatusCode,
+          PencilNo: PencilNum,
           Notes,
           isBooking,
           isRehearsal,
@@ -31,113 +32,70 @@ export class BookingService {
         } = bookingData || {};
 
         if (isBooking) {
-          const performancesData = performanceTimes.map((time) => ({
-            create: {
-              Time: new Date(`${bookingDate}T${time}`),
-              Date: new Date(bookingDate),
-            },
-          }));
-
-          const bookingPromise = tx.booking.create({
-            data: {
-              FirstDate: new Date(bookingDate),
-              DateBlock: {
-                connect: {
-                  Id: DateBlockId,
-                },
-              },
-              Venue: {
-                connect: {
-                  Id: VenueId,
-                },
-              },
-              Performance: {
-                createMany: {
-                  data: performancesData.map((p) => p.create),
-                },
-              },
-              StatusCode: BookingStatus,
-              PencilNum: PencilNo,
-              Notes,
-            },
-            include: {
-              Performance: true,
-              Venue: true,
-            },
+          const Performances = performanceTimes.map((time) => {
+            const datePart = BookingDate.split('T')[0];
+            return {
+              Time: `${datePart}T${time}:00Z`,
+              Date: BookingDate,
+            };
           });
 
+          const bookingPromise = createNewBooking(
+            {
+              DateBlockId,
+              PencilNum,
+              Notes,
+              VenueId,
+              Performances,
+              BookingDate,
+              StatusCode,
+            },
+            tx,
+          );
           promises.push(bookingPromise);
           orderMap.set(counter, 'booking');
         } else if (isRehearsal) {
-          const rehearsalPromise = tx.rehearsal.create({
-            data: {
-              DateBlock: {
-                connect: {
-                  Id: DateBlockId,
-                },
-              },
-              StatusCode: BookingStatus,
-              Date: new Date(bookingDate),
+          const rehearsalPromise = createNewRehearsal(
+            {
+              DateBlockId,
               Notes,
-              // VenueId: {
-              //   connect: {
-              //     Id: VenueId,
-              //   },
-              // },
+              DateTypeId,
               VenueId,
-              DateType: {
-                connect: {
-                  Id: DateTypeId,
-                },
-              },
+              StatusCode,
+              BookingDate,
             },
-          });
-
+            tx,
+          );
           promises.push(rehearsalPromise);
           orderMap.set(counter, 'rehearsal');
         } else if (isGetInFitUp) {
-          const getInFitUpPromise = tx.getInFitUp.create({
-            data: {
-              DateBlock: {
-                connect: {
-                  Id: DateBlockId,
-                },
-              },
-              StatusCode: BookingStatus,
-              Date: new Date(bookingDate),
+          const getInFitUpPromise = createGetInFitUp(
+            {
+              DateBlockId,
+              VenueId,
               Notes,
-              Venue: {
-                connect: {
-                  Id: VenueId,
-                },
-              },
+              BookingDate,
+              StatusCode,
             },
-          });
+            tx,
+          );
 
           promises.push(getInFitUpPromise);
           orderMap.set(counter, 'getInFitUp');
         } else {
-          const getOther = tx.other.create({
-            data: {
-              DateBlock: {
-                connect: {
-                  Id: DateBlockId,
-                },
-              },
-              StatusCode: BookingStatus,
-              Date: new Date(bookingDate),
+          const getOther = createOtherBooking(
+            {
+              DateBlockId,
+              DateTypeId,
               Notes,
-              DateType: {
-                connect: {
-                  Id: DateTypeId,
-                },
-              },
+              BookingDate,
+              StatusCode,
             },
-          });
+            tx,
+          );
           promises.push(getOther);
           orderMap.set(counter, 'other');
         }
-
         counter++;
       }
       counter = 1;
@@ -163,7 +121,6 @@ export class BookingService {
         if (item.status === 'fulfilled') {
           const type = orderMap.get(counter);
           counter++;
-          console.log('type : ', type);
 
           const value = item.value;
           // Assuming value contains a property `type` to distinguish between booking, rehearsal, etc.

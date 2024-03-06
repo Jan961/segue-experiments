@@ -25,6 +25,12 @@ export const dateStringToPerformancePair = (dateString: string) => {
   };
 };
 
+// expects a string in DD/MM/YY format
+export const simpleToDate = (stringToFormat: string) => {
+  const parts = stringToFormat.split('/');
+  return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
+};
+
 export const dateToSimple = (dateToFormat: Date | string) => {
   if (!dateToFormat) return 'DD/MM/YY';
   const date = safeDate(dateToFormat);
@@ -237,4 +243,17 @@ export function formatDuration(
 export const isValidDateString = (date: string): boolean => {
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
+};
+
+export const convertLocalDateToUTC = (date: Date) => {
+  return new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    ),
+  );
 };

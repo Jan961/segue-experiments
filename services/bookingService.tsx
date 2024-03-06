@@ -43,8 +43,6 @@ export const deleteBookingById = async (BookingId: any) => {
 };
 
 export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number) => {
-  console.log(FirstDate);
-
   return prisma.booking.create({
     data: {
       FirstDate,
@@ -106,8 +104,6 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
 
   const daysDiff = differenceInDays(FirstDate, booking.FirstDate);
 
-  console.log(`Moving booking by ${daysDiff} day(s)`);
-
   await prisma.$transaction(async (tx) => {
     for (const perf of booking.Performance) {
       await tx.performance.update({
@@ -137,6 +133,133 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
     },
     include: {
       Performance: true,
+    },
+  });
+};
+
+type NewPerformance = {
+  Date: string;
+  Time: string;
+};
+
+type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string };
+
+export const createNewBooking = (
+  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum }: NewBooking,
+  tx: any,
+) => {
+  return (tx || prisma).booking.create({
+    data: {
+      Notes,
+      PencilNum,
+      StatusCode,
+      FirstDate: new Date(BookingDate),
+      DateBlock: {
+        connect: {
+          Id: DateBlockId,
+        },
+      },
+      Venue: {
+        connect: {
+          Id: VenueId,
+        },
+      },
+      Performance: {
+        createMany: {
+          data: Performances.map((p: NewPerformance) => ({
+            Date: new Date(p.Date),
+            Time: new Date(p.Time),
+          })),
+        },
+      },
+    },
+    include: {
+      Performance: true,
+      Venue: true,
+    },
+  });
+};
+
+type NewRehearsal = {
+  DateBlockId: number;
+  StatusCode: string;
+  BookingDate: string;
+  Notes: string;
+  VenueId: number;
+  DateTypeId: number;
+};
+
+export const createNewRehearsal = ({ DateBlockId, StatusCode, BookingDate, Notes, VenueId }: NewRehearsal, tx: any) => {
+  return (tx || prisma).rehearsal.create({
+    data: {
+      Notes,
+      StatusCode,
+      Date: new Date(BookingDate),
+      DateBlock: {
+        connect: {
+          Id: DateBlockId,
+        },
+      },
+      VenueId,
+    },
+  });
+};
+
+type NewGetInFitUp = {
+  DateBlockId: number;
+  StatusCode: string;
+  BookingDate: string;
+  Notes: string;
+  VenueId: number;
+};
+
+export const createGetInFitUp = ({ DateBlockId, StatusCode, BookingDate, Notes, VenueId }: NewGetInFitUp, tx: any) => {
+  return (tx || prisma).getInFitUp.create({
+    data: {
+      StatusCode,
+      Notes,
+      Date: new Date(BookingDate),
+      DateBlock: {
+        connect: {
+          Id: DateBlockId,
+        },
+      },
+      Venue: {
+        connect: {
+          Id: VenueId,
+        },
+      },
+    },
+  });
+};
+
+type NewOtherBooking = {
+  DateBlockId: number;
+  BookingDate: string;
+  StatusCode: string;
+  Notes: string;
+  DateTypeId: number;
+};
+
+export const createOtherBooking = (
+  { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId }: NewOtherBooking,
+  tx: any,
+) => {
+  return (tx || prisma).other.create({
+    data: {
+      Notes,
+      StatusCode,
+      Date: new Date(BookingDate),
+      DateBlock: {
+        connect: {
+          Id: DateBlockId,
+        },
+      },
+      DateType: {
+        connect: {
+          Id: DateTypeId,
+        },
+      },
     },
   });
 };

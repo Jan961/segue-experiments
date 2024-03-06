@@ -3,6 +3,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import TextInput from '../TextInput';
 import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import moment from 'moment';
+import { convertLocalDateToUTC } from 'services/dateService';
+import { shortDateRegex } from 'utils/regexUtils';
 
 interface DateInputProps {
   value?: string | Date;
@@ -89,6 +91,12 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     }
   };
 
+  useEffect(() => {
+    if (inputValue && inputValue.match(shortDateRegex)) {
+      inputRef?.current?.select();
+    }
+  }, [inputValue]);
+
   const handleInputFocus = () => {
     inputRef?.current?.select();
   };
@@ -114,7 +122,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   };
 
   return (
-    <div className={`relative h-[1.9375rem]`} onFocus={handleInputFocus}>
+    <div className={`relative h-[1.9375rem]`}>
       <div className="absolute right-3 top-3 z-10">
         <DatePicker
           ref={dpRef}
@@ -123,7 +131,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
           popperClassName="!z-50"
-          onSelect={onChange}
+          onSelect={(e) => onChange(convertLocalDateToUTC(e))}
           onChange={() => null}
           selected={selectedDate}
           openToDate={selectedDate}
