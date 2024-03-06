@@ -294,6 +294,7 @@ export const tourSummaryColumnDefs = [
   },
 ];
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 export const barredVenueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
@@ -332,6 +333,26 @@ export const barredVenueColumnDefs = [
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
+=======
+=======
+
+
+export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) => [
+  {
+    headerName: 'Order for Comparison',
+    field: 'compOrder',
+    cellRenderer: SelectCompOrderRender,
+    cellRendererParams: {
+      optionsLength,
+      selectForComparison
+    },
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
+  },
+>>>>>>> 226d528 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
   {
     headerName: 'Production',
     field: 'prodName',
@@ -374,6 +395,7 @@ export const barredVenueColumnDefs = [
     },
     resizable: false
   },
+<<<<<<< HEAD
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
 ];
 <<<<<<< HEAD
@@ -471,3 +493,7 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 ];
 =======
 >>>>>>> f3a124c (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+];
+>>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
+>>>>>>> 226d528 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
