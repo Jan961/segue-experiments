@@ -693,6 +693,7 @@ export const venueColumnDefs = [
       textAlign: 'center',
     },
 <<<<<<< HEAD
+<<<<<<< HEAD
     resizable: false
   },
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
@@ -772,6 +773,9 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 ];
 >>>>>>> 0c9e4c4 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 =======
+=======
+    resizable: false
+>>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
   },
 ];
 >>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
