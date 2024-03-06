@@ -626,6 +626,51 @@ export const venueColumnDefs = [
     headerClass: 'text-center',
 >>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
   },
+<<<<<<< HEAD
+=======
+  {
+    headerName: 'Production',
+    field: 'prodName',
+    cellRenderer: DefaultCellRenderer,
+    width: 350,
+  },
+  {
+    headerName: 'Date of First Performance',
+    field: 'firstPerfDt',
+    cellRenderer: DateColumnRenderer,
+    width: 130,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'No. Perfs',
+    field: 'numPerfs',
+    cellRenderer: DefaultCellRenderer,
+    width: 70,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Production Duration (Wks)',
+    field: 'prodWks',
+    cellRenderer: DefaultCellRenderer,
+    width: 140,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Sales Data',
+    cellRenderer: SalesDataButtonRenderer,
+    width: 150,
+    cellStyle: {
+      textAlign: 'center',
+    },
+    resizable: false
+  },
+>>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
 ];
 <<<<<<< HEAD
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
