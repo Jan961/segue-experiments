@@ -706,6 +706,7 @@ export const venueColumnDefs = [
     },
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     resizable: false
   },
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
@@ -791,6 +792,9 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 =======
     resizable: false
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+    resizable: false
+>>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
   },
 ];
 >>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
