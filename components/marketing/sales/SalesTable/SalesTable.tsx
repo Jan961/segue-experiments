@@ -121,13 +121,11 @@ export default function SalesTable({
 
     }).catch((error) => console.log(error));
 
-
-    useEffect(() => {
-      bookingComparison(bookings);
-    })
-
   }
 
+  useEffect(() => {
+    bookingComparison(bookings);
+  }, [bookings])
 
   return (
     <div className={classNames(containerWidth, containerHeight)}>
