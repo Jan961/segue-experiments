@@ -295,5 +295,6 @@ export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) 
     cellStyle: {
       textAlign: 'center',
     },
+    resizable: false
   },
 ];
