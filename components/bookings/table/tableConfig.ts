@@ -328,6 +328,51 @@ export const barredVenueColumnDefs = [
       overflow: 'visible',
     },
   },
+<<<<<<< HEAD
+=======
+  {
+    headerName: 'Production',
+    field: 'prodName',
+    cellRenderer: DefaultCellRenderer,
+    width: 350,
+  },
+  {
+    headerName: 'Date of First Performance',
+    field: 'firstPerfDt',
+    cellRenderer: DateColumnRenderer,
+    width: 130,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'No. Perfs',
+    field: 'numPerfs',
+    cellRenderer: DefaultCellRenderer,
+    width: 70,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Production Duration (Wks)',
+    field: 'prodWks',
+    cellRenderer: DefaultCellRenderer,
+    width: 140,
+    cellStyle: {
+      textAlign: 'center',
+    },
+  },
+  {
+    headerName: 'Sales Data',
+    cellRenderer: SalesDataButtonRenderer,
+    width: 150,
+    cellStyle: {
+      textAlign: 'center',
+    },
+    resizable: false
+  },
+>>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
 ];
 export const venueColumnDefs = [
   {
