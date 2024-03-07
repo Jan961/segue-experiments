@@ -11,6 +11,7 @@ export const gridOptions = {
   }
 }
 
+<<<<<<< HEAD
 const getCellColor = (data) => {
   if(data.isNotOnSale){
     return { backgroundColor: '#ED1111', color: 'white'}
@@ -24,14 +25,21 @@ const getCellColor = (data) => {
 }
 
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
+=======
+export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) => [
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
     {
       headerName: 'Order for Comparison',
       field: 'compOrder',
       cellRenderer: SelectCompOrderRender,
       cellRendererParams: {
         optionsLength,
+<<<<<<< HEAD
         selectForComparison,
         selectedBookings
+=======
+        selectForComparison
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
       },
       width: 120,
       cellStyle: {
@@ -73,7 +81,10 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
       },
     },
     {
+<<<<<<< HEAD
       field: 'salesBtn',
+=======
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
       headerName: 'Sales Data',
       cellRenderer: SalesDataButtonRenderer,
       width: 108,
@@ -90,6 +101,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
       field: 'week',
       cellRenderer: DefaultCellRenderer,
       width: 120,
+<<<<<<< HEAD
       cellStyle: (params) => {
         return {  
           ...getCellColor(params.data),
@@ -100,6 +112,15 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     },
     {
       headerName: 'Date',
+=======
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+    },
+    {
+      headerName: 'Week of',
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
       field: 'weekOf',
       cellRenderer: DateColumnRenderer,
       width: 120,
@@ -187,6 +208,9 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
         textAlign: 'center',
         overflow: 'visible',
       },
+<<<<<<< HEAD
       resizable: false
+=======
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
     },
   ]

@@ -1,3 +1,32 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+import { useEffect, useState } from 'react';
+import Select from 'components/core-ui-lib/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { ICellRendererParams } from 'ag-grid-community';
+import { getNumericalOptions } from 'utils/getNumericalOptions';
+
+interface SelectCompOrderRenderProps extends ICellRendererParams {
+  optionsLength: number;
+  bookingId: number;
+}
+
+const SelectCompOrderRender = ({ value, node, optionsLength, bookingId }: SelectCompOrderRenderProps) => {
+  const [selectedOrderVal, setSelectedOrderVal] = useState(null);
+
+  const options = getNumericalOptions(optionsLength);
+  console.log(options);
+
+  useEffect(() => {
+    setSelectedOrderVal(value);
+  }, [value]);
+
+  const handleChange = (selectedValue) => {
+    alert(selectedValue)
+  };
+=======
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 import Select from 'components/core-ui-lib/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import { getNumericalOptions } from 'utils/getNumericalOptions';
@@ -6,6 +35,7 @@ import { getNumericalOptions } from 'utils/getNumericalOptions';
 interface SelectCompOrderRenderProps extends ICellRendererParams {
   optionsLength: number;
   bookingId: number;
+<<<<<<< HEAD
   selectForComparison: (value) => void;
   selectedBookings;
 }
@@ -19,6 +49,14 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, selectedB
     // );
   
   const setOption = (selectedVal) => {
+=======
+  selectForComparison: (value) => void
+}
+
+const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props }: SelectCompOrderRenderProps) => {
+  const options = getNumericalOptions(props.optionsLength + 1);
+  const setOption = (selectedVal: string) => {
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
     setValue(selectedVal);
     selectForComparison({
       order: parseInt(selectedVal), 
@@ -28,15 +66,34 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, selectedB
       numPerfs: props.data.numPerfs
     });
   }
+<<<<<<< HEAD
 
   return (
     <div className="pl-1 pr-2 mt-1">
     <Select
+=======
+>>>>>>> b951a0f (SalesTable component added, Venue History integrates new component, table UI perfected)
+
+  return (
+    <div className="pl-1 pr-2">
+    <Select
+<<<<<<< HEAD
+      onChange={handleChange}
+      options={options}
+      value={selectedOrderVal}
+      inline
+=======
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
       onChange={(selectedVal) => setOption(selectedVal)}
       options={options}
       value={value}
       inline
+<<<<<<< HEAD
       placeholder='-'
+=======
+      placeHolder='-'
+>>>>>>> b951a0f (SalesTable component added, Venue History integrates new component, table UI perfected)
+>>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
     />
   </div>
   );
