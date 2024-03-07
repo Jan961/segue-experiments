@@ -73,12 +73,12 @@ export default function MileageBooking({ formData, productionCode, data, dayType
   const isSameDate = fromDate === toDate;
   // If the dates are the same, add 2 days to toDateSet, otherwise add 1 day
   const daysToAdd = isSameDate ? 2 : 1;
-  const daysToFu = isSameDate ? 7 : 6;
+  const daysInFuture = isSameDate ? 7 : 6;
 
   const toDateSet = getDateDaysInFuture(sqlToDate, daysToAdd);
-  const toDateM = moment(toDateSet).format('YYYY-MM-DD');
+  const toDateBottomSet = moment(toDateSet).format('YYYY-MM-DD');
 
-  const futureEndDate = getDateDaysInFuture(sqlToDate, daysToFu);
+  const futureEndDate = getDateDaysInFuture(sqlToDate, daysInFuture);
 
   const pastStartDateP = moment(pastStartDate).format('YYYY-MM-DD');
   const pastStartDateF = moment(futureEndDate).format('YYYY-MM-DD');
@@ -108,9 +108,10 @@ export default function MileageBooking({ formData, productionCode, data, dayType
   };
 
   const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
-  const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateM, pastStartDateF);
+  const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateBottomSet, pastStartDateF);
+
+  //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
-  console.log('mergedFilteredBookings :>> ', mergedFilteredBookings);
 
   const { goToStep } = useWizard();
   const goToNewBookingDetail = () => {

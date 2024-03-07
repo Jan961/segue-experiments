@@ -28,7 +28,6 @@ export default function PreviewNewBooking({
   dayTypeOptions,
   onSaveBooking,
 }: NewBookingDetailsProps) {
-  console.log('onSaveBooking :>> ', onSaveBooking);
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
   const distanceDict = useRecoilValue(distanceState);
@@ -46,8 +45,6 @@ export default function PreviewNewBooking({
     const matchingMileage = milesWithVenueId.find((mileage) => mileage.VenueId === item.venue);
 
     const calculateWeek = () => {
-      console.log('item :>> ', item.date);
-      console.log('production.StartDate :>> ', production);
       return calculateWeekNumber(new Date(production.StartDate), new Date(item.date));
     };
     return {
@@ -85,13 +82,13 @@ export default function PreviewNewBooking({
   // future date is set according to condition
   const isSameDate = fromDate === toDate;
   // If the dates are the same, add 2 days to toDateSet, otherwise add 1 day
-  const daysToAdd = isSameDate ? -3 : -4;
-  const daysToFu = isSameDate ? 7 : 6;
+  const daysToAdd = isSameDate ? 2 : 1;
+  const daysInFuture = isSameDate ? 7 : 6;
 
   const toDateSet = getDateDaysInFuture(sqlToDate, daysToAdd);
-  const toDateM = moment(toDateSet).format('YYYY-MM-DD');
+  const toDateBottomSet = moment(toDateSet).format('YYYY-MM-DD');
 
-  const futureEndDate = getDateDaysInFuture(sqlToDate, daysToFu);
+  const futureEndDate = getDateDaysInFuture(sqlToDate, daysInFuture);
 
   const pastStartDateP = moment(pastStartDate).format('YYYY-MM-DD');
   const pastStartDateF = moment(futureEndDate).format('YYYY-MM-DD');
@@ -116,13 +113,14 @@ export default function PreviewNewBooking({
 
       return dateA - dateB;
     });
-    // return filteredBookings;
+
     return sortedFilteredBookings;
   };
 
   const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
 
-  const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateM, pastStartDateF);
+  const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateBottomSet, pastStartDateF);
+
   //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
@@ -130,7 +128,6 @@ export default function PreviewNewBooking({
 
   const previousStepFunc = () => {
     goToStep(steps.indexOf('New Booking Details'));
-    console.log('data preview modal :>> ', data);
   };
   return (
     <>

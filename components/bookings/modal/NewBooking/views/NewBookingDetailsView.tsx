@@ -39,12 +39,7 @@ export default function NewBookingDetailsView({
   toggleModalOverlay,
   onClose,
 }: NewBookingDetailsProps) {
-  const fromDate = formData.fromDate;
-  const toDate = formData.toDate;
-  const dateType = formData.dateType;
-  const venueId = formData.venueId;
-
-  // const { fromDate, toDate, dateType, venueId } = formData;
+  const { fromDate, toDate, dateType, venueId } = formData;
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
