@@ -149,7 +149,7 @@ const NewBookingView = ({
               body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
               position="right"
               width="w-[140px]"
-              bgColorClass="bg-slate-500"
+              bgColorClass="primary-input-text"
             >
               <Icon iconName="info-circle-solid" />
             </Tooltip>

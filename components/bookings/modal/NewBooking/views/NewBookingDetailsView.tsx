@@ -16,6 +16,7 @@ import { toISO } from 'services/dateService';
 
 type NewBookingDetailsProps = {
   formData: TForm;
+  data: BookingItem[];
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
   productionCode: string;
@@ -33,6 +34,7 @@ export default function NewBookingDetailsView({
   venueOptions = [],
   productionCode,
   dateBlockId,
+  data,
   onSubmit,
   toggleModalOverlay,
   onClose,
@@ -46,6 +48,7 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -95,6 +98,12 @@ export default function NewBookingDetailsView({
     setBookingData(dates);
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId]);
 
+  useEffect(() => {
+    if (data !== null && data.length > 0) {
+      setBookingData(data);
+    }
+  }, [data]);
+
   const gridOptions = {
     autoSizeStrategy: {
       type: 'fitGridWidth',
@@ -108,9 +117,6 @@ export default function NewBookingDetailsView({
 
   const goToNewBooking = () => {
     goToStep(steps.indexOf('Create New Booking'));
-  };
-  const goToMileage = () => {
-    goToStep(steps.indexOf('Check Mileage'));
   };
 
   const handleBackButtonClick = () => {
@@ -150,7 +156,7 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const previewBooking = () => {
+  const goToMileage = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
@@ -158,6 +164,17 @@ export default function NewBookingDetailsView({
       });
       onSubmit(rowData);
 
+      goToStep(steps.indexOf('Check Mileage'));
+    }
+  };
+
+  const previewBooking = () => {
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+      onSubmit(rowData);
       goToStep(steps.indexOf('Preview New Booking'));
     }
   };
@@ -202,6 +219,9 @@ export default function NewBookingDetailsView({
           gridOptions={gridOptions}
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
+          onCellValueChange={() => {
+            setChangesMade(true);
+          }}
         />
         <NotesPopup
           show={showNotesModal}
@@ -210,7 +230,12 @@ export default function NewBookingDetailsView({
           onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => goToMileage()} />
+          <Button
+            className=" w-33  place-self-start  "
+            text="Check Mileage"
+            onClick={goToMileage}
+            disabled={!changesMade}
+          />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />

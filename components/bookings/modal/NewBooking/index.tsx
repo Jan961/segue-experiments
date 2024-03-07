@@ -130,6 +130,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           <BarringIssueView barringConflicts={state.barringConflicts} />
           <NewBookingDetailsView
             formData={state.form}
+            data={state.booking}
             productionCode={productionCode}
             dateBlockId={primaryBlock?.Id}
             dayTypeOptions={dayTypeOptions}
