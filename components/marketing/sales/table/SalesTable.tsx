@@ -262,14 +262,26 @@ export default function SalesTable({
   const exec = (variant: string, data: any) => {
     switch (variant) {
       case 'salesComparison':
+<<<<<<< HEAD
+=======
+        console.log({ function: 'salesComparison', data: data })
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
+<<<<<<< HEAD
+=======
+        console.log({ function: 'salesSnapshot', data: data })
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
+<<<<<<< HEAD
+=======
+        console.log({ function: 'prodComparision', data: data })
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         productionComparision(data);
         break;
     }

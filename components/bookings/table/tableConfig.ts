@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';
+import { ITooltipParams } from 'ag-grid-community';                  
 import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
@@ -16,10 +16,17 @@ import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
+<<<<<<< HEAD
 import IconRenderer from './IconRenderer';
+<<<<<<< HEAD
 import { formatMinutes } from 'utils/booking';
+=======
+=======
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+>>>>>>> 14383bc (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 
 export const styleProps = { headerColor: tileColors.bookings };
+
 
 export const columnDefs = [
   {
@@ -292,6 +299,7 @@ export const tourSummaryColumnDefs = [
     width: 90,
     resizable: false,
   },
+<<<<<<< HEAD
 ];
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -496,4 +504,10 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 =======
 ];
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
+<<<<<<< HEAD
 >>>>>>> 226d528 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+=======
+];
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+>>>>>>> 14383bc (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
