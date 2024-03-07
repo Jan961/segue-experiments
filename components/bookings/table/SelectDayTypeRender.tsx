@@ -16,6 +16,7 @@ const SelectDayTypeRender = ({
   eGridCell,
 }: SelectDayTypeRendererProps) => {
   const [selectedDateType, setSelectedDateType] = useState<string>('');
+
   const elRef = useRef(null);
 
   useEffect(() => {
@@ -24,7 +25,7 @@ const SelectDayTypeRender = ({
       const dayTypeIndex = data.perf ? performance.value : value;
       setSelectedDateType(dayTypeIndex);
     }
-  }, [data, value, dayTypeOptions]);
+  }, [data, value, dayTypeOptions, node]);
 
   useEffect(() => {
     if (eGridCell) {
