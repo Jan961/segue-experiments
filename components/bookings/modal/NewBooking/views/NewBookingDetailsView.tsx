@@ -157,18 +157,14 @@ export default function NewBookingDetailsView({
   };
 
   const goToMileage = () => {
-    if (tableRef.current.isDirty()) {
-      setChangesMade(true);
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+      onSubmit(rowData);
 
-      if (tableRef.current.getApi()) {
-        const rowData = [];
-        tableRef.current.getApi().forEachNode((node) => {
-          rowData.push(node.data);
-        });
-        onSubmit(rowData);
-
-        goToStep(steps.indexOf('Check Mileage'));
-      }
+      goToStep(steps.indexOf('Check Mileage'));
     }
   };
 
