@@ -26,6 +26,13 @@ const ROW_HEIGHT = 43;
 const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
+export const defaultGridOptions = {
+  autoSizeStrategy: {
+    type: 'fitGridWidth',
+    defaultMinWidth: 50,
+  },
+};
+
 export default forwardRef(function Table(
   {
     rowData,
@@ -33,7 +40,7 @@ export default forwardRef(function Table(
     styleProps,
     onCellClicked,
     onRowClicked,
-    gridOptions,
+    gridOptions = defaultGridOptions,
     getRowStyle,
 
     rowClassRules,

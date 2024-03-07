@@ -80,7 +80,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       }
       options.push(option);
     }
-    return options;
+    return options.sort((a, b) => a.text.localeCompare(b.text));
   }, [venueDict, state.form.shouldFilterVenues, bookingDict]);
 
   const onFormDataChange = (change: Partial<TForm>) => {

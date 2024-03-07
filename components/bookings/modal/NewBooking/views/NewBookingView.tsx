@@ -18,7 +18,6 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 
 type AddBookingProps = {
@@ -50,7 +49,7 @@ const NewBookingView = ({
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, fetchData: api } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
 
   const bookingTypeValue = useMemo(
@@ -64,11 +63,12 @@ const NewBookingView = ({
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
-  const fetchBarredVenues = (skipRedirect = false) => {
+  const fetchBarredVenues = (skipRedirect = false): Promise<any> => {
     const { venueId, fromDate: startDate, toDate: endDate } = formData;
-    setLoading(true);
-    axios
-      .post('/api/productions/venue/barred', {
+    return api({
+      url: '/api/productions/venue/barred',
+      method: 'POST',
+      data: {
         productionId: currentProduction?.Id,
         venueId,
         seats: 400,
@@ -76,22 +76,16 @@ const NewBookingView = ({
         includeExcluded: false,
         startDate,
         endDate,
-      })
-      .then((response) => {
-        updateBarringConflicts(response?.data);
-        if (skipRedirect) return;
-        if (response?.data?.length > 0) {
-          goToStep(steps.indexOf('Barring Issue'));
-        } else {
-          goToStep(steps.indexOf('New Booking Details'));
-        }
-      })
-      .catch((error) => {
-        console.log('Error fetching Barred Venues', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      },
+    }).then((data: any) => {
+      updateBarringConflicts(data);
+      if (skipRedirect) return;
+      if (data?.length > 0) {
+        goToStep(steps.indexOf('Barring Issue'));
+      } else {
+        goToStep(steps.indexOf('New Booking Details'));
+      }
+    });
   };
 
   const goToNext = () => {
@@ -99,7 +93,7 @@ const NewBookingView = ({
       url: '/api/bookings/conflict',
       method: 'POST',
       data: { ...formData, ProductionId: currentProduction?.Id },
-    }).then((data: any) => {
+    }).then(async (data: any) => {
       updateBookingConflicts(data);
       if (data.error) {
         console.log(data.error);
@@ -108,7 +102,7 @@ const NewBookingView = ({
       if (!data?.length) {
         fetchBarredVenues(false);
       } else {
-        fetchBarredVenues(true);
+        await fetchBarredVenues(true);
         nextStep();
       }
     });
