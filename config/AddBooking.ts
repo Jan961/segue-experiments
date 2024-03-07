@@ -10,12 +10,14 @@ export const INITIAL_STATE = {
   },
   bookingConflicts: [],
   booking: [],
+  barringConflicts: [],
 };
 
 export const Actions = {
   UPDATE_FORM_DATA: 'UPDATE_FORM_DATA',
   UPDATE_BOOKING_CONFLICTS: 'UPDATE_BOOKING_CONFLICTS',
   UPDATE_BOOKING: 'UPDATE_BOOKING',
+  UPDATE_BARRED_VENUES: 'UPDATE_BARRED_VENUES',
 };
 
 export const steps = [

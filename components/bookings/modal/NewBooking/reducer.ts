@@ -1,5 +1,6 @@
 import { Actions, INITIAL_STATE } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { debug } from 'utils/logging';
 
 export type TAction = {
@@ -53,6 +54,7 @@ export type BookingItem = {
 export type TState = {
   form: TForm;
   bookingConflicts: BookingWithVenueDTO[];
+  barringConflicts: BarredVenue[];
   booking: BookingItem[];
 };
 
@@ -78,6 +80,11 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
       return {
         ...state,
         booking: payload,
+      };
+    case Actions.UPDATE_BARRED_VENUES:
+      return {
+        ...state,
+        barringConflicts: payload,
       };
     default:
       return state;
