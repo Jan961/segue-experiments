@@ -264,15 +264,20 @@ export default function SalesTable({
       case 'salesComparison':
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'salesComparison', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        console.log({ function: 'salesComparison', data: data })
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -280,10 +285,14 @@ export default function SalesTable({
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        console.log({ function: 'salesSnapshot', data: data })
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -291,6 +300,9 @@ export default function SalesTable({
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        console.log({ function: 'prodComparision', data: data })
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         productionComparision(data);
         break;
     }

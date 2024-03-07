@@ -18,6 +18,7 @@ import CheckPerfRenderer from './CheckPerfRenderer';
 <<<<<<< HEAD
 import TimeArrayRenderer from './TimeArrayRenderer';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import IconRenderer from './IconRenderer';
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -26,6 +27,8 @@ import TimeArrayRender from './TimeArrayRender';
 import SalesDataButtonRenderer from './SalesDataButtonRenderer';
 import SelectCompOrderRender from './SelectCompOrderRender';
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -278,6 +281,7 @@ export const tourSummaryColumnDefs = [
     resizable: false,
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
 ];
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -374,3 +378,6 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 
 ];
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+];
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
