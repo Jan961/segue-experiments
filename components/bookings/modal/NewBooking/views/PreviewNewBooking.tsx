@@ -11,6 +11,8 @@ import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import { distanceState } from 'state/booking/distanceState';
+import { steps } from 'config/AddBooking';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -28,23 +30,40 @@ export default function PreviewNewBooking({
 }: NewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
+  const distanceDict = useRecoilValue(distanceState);
+  const milesWithVenueId = distanceDict[production.Id].stops.flatMap((item) =>
+    item.option.map((optionItem) => ({
+      VenueId: optionItem.VenueId,
+      Miles: optionItem.Miles,
+      Mins: optionItem.Mins,
+    })),
+  );
 
   const { rows: bookings } = useRecoilValue(rowsSelector);
 
-  const updateData: PreviewDataItem[] = data.map((item: any) => ({
-    ...item,
+  const updateData: PreviewDataItem[] = data.map((item: any) => {
+    const matchingMileage = milesWithVenueId.find((mileage) => mileage.VenueId === item.venue);
 
-    color: true,
-    venue: venueDict[item.venue].Name,
-    town: venueDict[item.venue].Town,
-    dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
-    production: productionCode.split(' ')[0],
-    bookingStatus: bookingStatusMap[item.bookingStatus],
-    status: item.bookingStatus,
-    performanceCount: item.noPerf?.toString() || '',
-    performanceTimes: item.times,
-    week: calculateWeekNumber(new Date(production.StartDate), new Date(item.date)),
-  }));
+    const calculateWeek = () => {
+      return calculateWeekNumber(new Date(production.StartDate), new Date(item.date));
+    };
+    return {
+      ...item,
+      color: true,
+      venue: venueDict[item.venue].Name,
+      town: venueDict[item.venue].Town,
+      capacity: venueDict[item.venue].Seats,
+      dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
+      production: productionCode.split(' ')[0],
+      bookingStatus: bookingStatusMap[item.bookingStatus],
+      status: item.bookingStatus,
+      performanceCount: item.noPerf?.toString() || '',
+      performanceTimes: item.times,
+      week: calculateWeek(),
+      Miles: matchingMileage ? matchingMileage.Miles : null,
+      Mins: matchingMileage ? matchingMileage.Mins : null,
+    };
+  });
 
   const rowClassRules = {
     'custom-red-row': (params) => {
@@ -60,7 +79,16 @@ export default function PreviewNewBooking({
   const sqlToDate = toSql(toDate);
 
   const pastStartDate = getDateDaysAgo(sqlFromDate, 5);
-  const futureEndDate = getDateDaysInFuture(sqlToDate, 5);
+  // future date is set according to condition
+  const isSameDate = fromDate === toDate;
+  // If the dates are the same, add 2 days to toDateSet, otherwise add 1 day
+  const daysToAdd = isSameDate ? 2 : 1;
+  const daysInFuture = isSameDate ? 7 : 6;
+
+  const toDateSet = getDateDaysInFuture(sqlToDate, daysToAdd);
+  const toDateBottomSet = moment(toDateSet).format('YYYY-MM-DD');
+
+  const futureEndDate = getDateDaysInFuture(sqlToDate, daysInFuture);
 
   const pastStartDateP = moment(pastStartDate).format('YYYY-MM-DD');
   const pastStartDateF = moment(futureEndDate).format('YYYY-MM-DD');
@@ -85,18 +113,22 @@ export default function PreviewNewBooking({
 
       return dateA - dateB;
     });
-    // return filteredBookings;
+
     return sortedFilteredBookings;
   };
 
   const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
 
-  const filteredBookingsBottom = filterBookingsByDateRange(bookings, sqlToDate, pastStartDateF);
+  const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateBottomSet, pastStartDateF);
+
   //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
-  const { previousStep } = useWizard();
+  const { goToStep } = useWizard();
 
+  const previousStepFunc = () => {
+    goToStep(steps.indexOf('New Booking Details'));
+  };
   return (
     <>
       <div className="flex justify-between">
@@ -110,9 +142,9 @@ export default function PreviewNewBooking({
           rowClassRules={rowClassRules}
         />
 
-        <div className="py-8 w-full flex justify-end  gap-3 float-right">
+        <div className="pt-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={previousStep} />
+            <Button className="w-33" variant="secondary" text="Back" onClick={previousStepFunc} />
             <Button className="w-33" text="Accept" onClick={onSaveBooking} />
           </div>
         </div>

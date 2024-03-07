@@ -126,6 +126,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
 
           <NewBookingDetailsView
             formData={state.form}
+            data={state.booking}
             productionCode={productionCode}
             dateBlockId={primaryBlock?.Id}
             dayTypeOptions={dayTypeOptions}
