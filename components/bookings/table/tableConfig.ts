@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';                  
+import { ITooltipParams } from 'ag-grid-community';
 import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
@@ -19,7 +19,6 @@ import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
-
 
 export const columnDefs = [
   {
@@ -303,6 +302,7 @@ export const barredVenueColumnDefs = [
     },
   },
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   {
     headerName: 'Production',
@@ -437,4 +437,6 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
   },
 
 >>>>>>> 0c9e4c4 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a31260e (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 ];
