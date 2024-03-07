@@ -7,7 +7,6 @@ import Button from 'components/core-ui-lib/Button';
 import { Spinner } from 'components/global/Spinner';
 import Label from 'components/core-ui-lib/Label';
 import useAxios from 'hooks/useAxios';
-import { defaultGridOptions } from 'components/core-ui-lib/Table/Table';
 import moment from 'moment';
 
 type BarringCheckProps = {
@@ -71,7 +70,6 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
     setSelectedVenueIds((prev) => [...prev, e.data.Id]);
   };
   const gridOptions = {
-    ...defaultGridOptions,
     rowSelection: 'multiple',
     suppressRowClickSelection: true,
   };
