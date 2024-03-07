@@ -46,7 +46,6 @@ export default function NewBookingDetailsView({
 
   // const { fromDate, toDate, dateType, venueId } = formData;
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
-  console.log('data +++:>> ', data);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
@@ -101,10 +100,14 @@ export default function NewBookingDetailsView({
       // Increment currentDate by one day for the next iteration
       startDate = addDays(startDate, 1);
     }
-
     setBookingData(dates);
-    setBookingData(data !== null ? data : dates);
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId]);
+
+  useEffect(() => {
+    if (data !== null && data.length > 0) {
+      setBookingData(data);
+    }
+  }, [data]);
 
   const gridOptions = {
     autoSizeStrategy: {
