@@ -104,17 +104,6 @@ export default function NewBookingDetailsView({
     }
   }, [data]);
 
-  const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-      wrapHeaderText: true,
-    },
-    getRowId: (params) => {
-      return params.data.date;
-    },
-  };
-
   const goToNewBooking = () => {
     goToStep(steps.indexOf('Create New Booking'));
   };
@@ -216,7 +205,6 @@ export default function NewBookingDetailsView({
           columnDefs={columnDefs}
           rowData={bookingData}
           styleProps={styleProps}
-          gridOptions={gridOptions}
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
           onCellValueChange={() => {

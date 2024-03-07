@@ -31,6 +31,9 @@ const DEFAULT_GRID_OPTIONS = {
   autoSizeStrategy: {
     type: 'fitGridWidth',
     defaultMinWidth: 50,
+    defaultColDef: {
+      wrapHeaderText: true,
+    },
   },
   suppressHeaderFocus: true,
 };
@@ -131,6 +134,7 @@ export default forwardRef(function Table(
           tooltipShowDelay={0}
           gridOptions={{ ...DEFAULT_GRID_OPTIONS, ...gridOptions }}
           getRowHeight={getRowHeight}
+          navigateToNextCell={() => null}
         />
       </div>
     </>
