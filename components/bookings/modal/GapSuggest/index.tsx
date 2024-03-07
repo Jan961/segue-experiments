@@ -1,4 +1,3 @@
-// import { findPrevAndNextBookings } from 'components/bookings/panel/utils/findPrevAndNextBooking';
 import axios from 'axios';
 import { findPreviosAndNextBookings, hasContinuosGap } from 'components/bookings/panel/utils/findClosestBooking';
 import { gapSuggestColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
@@ -11,10 +10,12 @@ import { bookingState } from 'state/booking/bookingState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
 import Form from './Form';
 import { formatMinutes } from 'utils/booking';
+import BarringCheck from './BarringCheck';
 
 type GapSuggestProps = {
   startDate: string;
   endDate: string;
+  productionId: number;
   onOkClick?: () => void;
 };
 
@@ -27,11 +28,12 @@ export const gridOptions = {
   suppressRowClickSelection: true,
 };
 
-const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestProps) => {
+const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }: GapSuggestProps) => {
   const bookingDict = useRecoilValue(bookingState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
   const [rows, setRows] = useState(null);
-  const [selectedVenueIds, setSelectedVenueIds] = useState([]);
+  const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
+  const [barringCheckContext, setBarringCheckContext] = useState<number | null>(null);
   const tableRef = useRef(null);
   const filteredRows = useMemo(() => {
     const filteredRows = [];
@@ -75,6 +77,13 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
     }
   };
 
+  const onCellClicked = (e: any) => {
+    const { column, data } = e;
+    if (column.colId === 'barringCheck') {
+      setBarringCheckContext(data.VenueId);
+    }
+  };
+
   const exportTableData = () => {
     tableRef.current?.getApi?.()?.exportDataAsExcel?.();
   };
@@ -97,7 +106,7 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
       <div className="flex flex-col">
         <Form onSave={getSuggestions} />
       </div>
-      {rows !== null && (
+      {rows?.length && (
         <div className="block">
           <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
           <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
@@ -105,6 +114,7 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
               onRowSelected={onRowSelected}
               ref={tableRef}
               columnDefs={gapSuggestColumnDefs}
+              onCellClicked={onCellClicked}
               rowData={filteredRows?.slice(0, 30)}
               styleProps={styleProps}
               gridOptions={gridOptions}
@@ -129,6 +139,16 @@ const GapSuggest = ({ startDate, endDate, onOkClick = () => null }: GapSuggestPr
             text="OK"
           />
         </div>
+      )}
+      {barringCheckContext && (
+        <BarringCheck
+          visible={!!barringCheckContext}
+          startDate={startDate}
+          endDate={endDate}
+          venueId={barringCheckContext}
+          productionId={productionId}
+          onClose={() => setBarringCheckContext(null)}
+        />
       )}
     </div>
   );

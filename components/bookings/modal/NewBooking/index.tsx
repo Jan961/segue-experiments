@@ -22,6 +22,7 @@ import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { venueState } from 'state/booking/venueState';
 import { bookingState } from 'state/booking/bookingState';
 import useAxios from 'hooks/useAxios';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 
 type AddBookingProps = {
   visible: boolean;
@@ -88,6 +89,9 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
   const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
   };
+  const updateBarringConflicts = (barringConflicts: BarredVenue[]) => {
+    dispatch(actionSpreader(Actions.UPDATE_BARRED_VENUES, barringConflicts));
+  };
 
   const setNewBookingOnStore = (booking: BookingItem[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
@@ -114,6 +118,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
         <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
           <NewBookingView
             updateBookingConflicts={updateBookingConflicts}
+            updateBarringConflicts={updateBarringConflicts}
             dayTypeOptions={dayTypeOptions}
             onChange={onFormDataChange}
             formData={state.form}
@@ -121,9 +126,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             productionCode={productionCode}
             venueOptions={venueOptions}
           />
-          <BookingConflictsView data={state.bookingConflicts} />
-          <BarringIssueView bookingConflicts={state.bookingConflicts} />
-
+          <BookingConflictsView hasBarringIssues={state?.barringConflicts?.length > 0} data={state.bookingConflicts} />
+          <BarringIssueView barringConflicts={state.barringConflicts} />
           <NewBookingDetailsView
             formData={state.form}
             productionCode={productionCode}
@@ -147,8 +151,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
             data={state.booking}
             dayTypeOptions={dayTypeOptions}
           />
-
-          <GapSuggestionView startDate={state.form.fromDate} endDate={state.form.toDate} />
+          <GapSuggestionView
+            productionId={currentProduction?.Id}
+            startDate={state.form.fromDate}
+            endDate={state.form.toDate}
+          />
         </Wizard>
         <ConfirmationDialog
           variant="close"

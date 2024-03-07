@@ -18,6 +18,8 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import axios from 'axios';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 
 type AddBookingProps = {
   formData: TForm;
@@ -25,6 +27,7 @@ type AddBookingProps = {
   venueOptions: SelectOption[];
   productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
+  updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
@@ -37,6 +40,7 @@ const NewBookingView = ({
   dayTypeOptions,
   venueOptions,
   updateBookingConflicts,
+  updateBarringConflicts,
 }: AddBookingProps) => {
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
@@ -46,6 +50,7 @@ const NewBookingView = ({
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
+  const [loading, setLoading] = useState<boolean>(false);
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
 
   const bookingTypeValue = useMemo(
@@ -59,6 +64,36 @@ const NewBookingView = ({
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
+  const fetchBarredVenues = (skipRedirect = false) => {
+    const { venueId, fromDate: startDate, toDate: endDate } = formData;
+    setLoading(true);
+    axios
+      .post('/api/productions/venue/barred', {
+        productionId: currentProduction?.Id,
+        venueId,
+        seats: 400,
+        barDistance: 25,
+        includeExcluded: false,
+        startDate,
+        endDate,
+      })
+      .then((response) => {
+        updateBarringConflicts(response?.data);
+        if (skipRedirect) return;
+        if (response?.data?.length > 0) {
+          goToStep(steps.indexOf('Barring Issue'));
+        } else {
+          goToStep(steps.indexOf('New Booking Details'));
+        }
+      })
+      .catch((error) => {
+        console.log('Error fetching Barred Venues', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const goToNext = () => {
     fetchData({
       url: '/api/bookings/conflict',
@@ -71,8 +106,9 @@ const NewBookingView = ({
         return;
       }
       if (!data?.length) {
-        goToStep(steps.indexOf('Barring Issue'));
+        fetchBarredVenues(false);
       } else {
+        fetchBarredVenues(true);
         nextStep();
       }
     });
@@ -211,7 +247,7 @@ const NewBookingView = ({
             ></Button>
           </div>
         )}
-        {fetchingBookingConflicts && <Loader variant={'sm'} />}
+        {(fetchingBookingConflicts || loading) && <Loader variant={'sm'} />}
       </div>
     </div>
   );
