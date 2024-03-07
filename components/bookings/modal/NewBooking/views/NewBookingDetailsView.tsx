@@ -16,6 +16,7 @@ import { toISO } from 'services/dateService';
 
 type NewBookingDetailsProps = {
   formData: TForm;
+  data: BookingItem[];
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
   productionCode: string;
@@ -33,13 +34,19 @@ export default function NewBookingDetailsView({
   venueOptions = [],
   productionCode,
   dateBlockId,
+  data,
   onSubmit,
   toggleModalOverlay,
   onClose,
 }: NewBookingDetailsProps) {
-  const { fromDate, toDate, dateType, venueId } = formData;
-  console.log('formData :>> ', formData);
+  const fromDate = formData.fromDate;
+  const toDate = formData.toDate;
+  const dateType = formData.dateType;
+  const venueId = formData.venueId;
+
+  // const { fromDate, toDate, dateType, venueId } = formData;
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
+  console.log('data +++:>> ', data);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
@@ -94,7 +101,9 @@ export default function NewBookingDetailsView({
       // Increment currentDate by one day for the next iteration
       startDate = addDays(startDate, 1);
     }
+
     setBookingData(dates);
+    setBookingData(data !== null ? data : dates);
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId]);
 
   const gridOptions = {
@@ -172,7 +181,6 @@ export default function NewBookingDetailsView({
         rowData.push(node.data);
       });
       onSubmit(rowData);
-
       goToStep(steps.indexOf('Preview New Booking'));
     }
   };

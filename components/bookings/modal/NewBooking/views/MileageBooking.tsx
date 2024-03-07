@@ -26,7 +26,7 @@ export default function MileageBooking({ formData, productionCode, data, dayType
   const distanceDict = useRecoilValue(distanceState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
 
-  const milesWithVenueId = distanceDict[22].stops.flatMap((item) =>
+  const milesWithVenueId = distanceDict[production.Id].stops.flatMap((item) =>
     item.option.map((optionItem) => ({
       VenueId: optionItem.VenueId,
       Miles: optionItem.Miles,

@@ -12,6 +12,7 @@ import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { distanceState } from 'state/booking/distanceState';
+import { steps } from 'config/AddBooking';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -27,6 +28,7 @@ export default function PreviewNewBooking({
   dayTypeOptions,
   onSaveBooking,
 }: NewBookingDetailsProps) {
+  console.log('onSaveBooking :>> ', onSaveBooking);
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
   const distanceDict = useRecoilValue(distanceState);
@@ -43,6 +45,11 @@ export default function PreviewNewBooking({
   const updateData: PreviewDataItem[] = data.map((item: any) => {
     const matchingMileage = milesWithVenueId.find((mileage) => mileage.VenueId === item.venue);
 
+    const calculateWeek = () => {
+      console.log('item :>> ', item.date);
+      console.log('production.StartDate :>> ', production);
+      return calculateWeekNumber(new Date(production.StartDate), new Date(item.date));
+    };
     return {
       ...item,
       color: true,
@@ -55,7 +62,7 @@ export default function PreviewNewBooking({
       status: item.bookingStatus,
       performanceCount: item.noPerf?.toString() || '',
       performanceTimes: item.times,
-      week: calculateWeekNumber(new Date(production.StartDate), new Date(item.date)),
+      week: calculateWeek(),
       Miles: matchingMileage ? matchingMileage.Miles : null,
       Mins: matchingMileage ? matchingMileage.Mins : null,
     };
@@ -78,7 +85,7 @@ export default function PreviewNewBooking({
   // future date is set according to condition
   const isSameDate = fromDate === toDate;
   // If the dates are the same, add 2 days to toDateSet, otherwise add 1 day
-  const daysToAdd = isSameDate ? 2 : 1;
+  const daysToAdd = isSameDate ? -3 : -4;
   const daysToFu = isSameDate ? 7 : 6;
 
   const toDateSet = getDateDaysInFuture(sqlToDate, daysToAdd);
@@ -119,8 +126,12 @@ export default function PreviewNewBooking({
   //   merge the filer data
   const mergedFilteredBookings = [...filteredBookingsTop, ...updateData, ...filteredBookingsBottom];
 
-  const { previousStep } = useWizard();
+  const { goToStep } = useWizard();
 
+  const previousStepFunc = () => {
+    goToStep(steps.indexOf('New Booking Details'));
+    console.log('data preview modal :>> ', data);
+  };
   return (
     <>
       <div className="flex justify-between">
@@ -136,7 +147,7 @@ export default function PreviewNewBooking({
 
         <div className="pt-8 w-full flex justify-end  gap-3 float-right">
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={previousStep} />
+            <Button className="w-33" variant="secondary" text="Back" onClick={previousStepFunc} />
             <Button className="w-33" text="Accept" onClick={onSaveBooking} />
           </div>
         </div>
