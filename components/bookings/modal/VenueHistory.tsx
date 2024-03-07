@@ -90,8 +90,8 @@ import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
 =======
 import { Spinner } from 'components/global/Spinner';
-import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
+<<<<<<< HEAD
 import Table from 'components/core-ui-lib/Table';
 import { venueHistCompColumnDefs, styleProps } from '../table/tableConfig';
 import formatInputDate from 'utils/dateInputFormat';
@@ -103,6 +103,10 @@ import formatInputDate from 'utils/dateInputFormat';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import SalesTable from 'components/marketing/sales/SalesTable';
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+import SalesTable from 'components/marketing/sales/table';
+import { ProdComp } from 'components/marketing/sales/table/SalesTable';
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -164,9 +168,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
   const [bookings, setBookings] = useState([]);
   const [rowData, setRowData] = useState([]);
-  const { productions } = useRecoilValue(productionJumpState);
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
+<<<<<<< HEAD
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+  const [compData, setCompData] = useState<ProdComp>();
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
@@ -220,7 +227,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 <<<<<<< HEAD
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
 
-  const [venueId, setVenueId] = useState<number>(0);
   const [venueDesc, setVenueDesc] = useState<string>('');
 =======
 >>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
@@ -255,6 +261,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   }, [visible]);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const showError = (error: string) => {
     alert(error)
     setErrorMessage(error);
@@ -285,49 +292,26 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       wrapHeaderText: true,
     },
   };
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
-  const goToVenueSelection = (venueID: number) => {
-    setVenueId(venueID);
-    const venue = venueDict[venueID];
-    setVenueDesc(venue.Code + ' ' + venue.Name + ' ' + venue.Town);
-    prepareBookingSection(venue);
-  }
+  const toggleModal = (type: string, data) => {
+    switch (type) {
+      case 'venue':
+        const venue = venueDict[data];
+        setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
 
-  const prepareBookingSection = async (venue) => {
-    setLoading(true);
-    try {
-      fetchData({
-        url: '/api/marketing/archivedSales/bookingSelection',
-        method: 'POST',
-        data: {
-          salesByType: 'venue',
-          venueCode: venue.Code,
-          showCode: router.query.ShowCode
-        },
-      }).then((data: any) => {
-        if(data.length > 0){
-        const processedBookings = [];
-        data.forEach(booking => {
-          const production = productions.find(production => production.Id === booking.ProductionId)
+        const compData: ProdComp = {
+          venueId: data,
+          showCode: router.query.ShowCode.toString()
+        }
 
-          processedBookings.push({
-            BookingId: booking.BookingId,
-            prodName: production.ShowCode + production.Code + ' ' + production.ShowName,
-            firstPerfDt: formatInputDate(booking.BookingFirstDate, '/'),
-            numPerfs: booking.performanceCount,
-            prodWks: booking.ProductionLengthWeeks,
-            prodCode: booking.FullProductionCode
-          });
-        });
-
-        setRowData(processedBookings);
+        setCompData(compData);
         setShowVenueSelect(false);
         setShowCompSelect(true);
-      } else {
-        setVenueSelectView('error');
-      }
-      });
+        break;
 
+<<<<<<< HEAD
 
     } catch (error: any) {
       console.error(error);
@@ -486,8 +470,25 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const showResults = () => {
     setShowCompSelect(false);
     setShowResults(true);
+=======
+      case 'bookingList':
+        setBookings(data);
+        setShowCompSelect(false);
+        setShowResults(true);
+        break;
+    }
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   }
 
+  const handleBtnBack = (type: string) => {
+    if(type === 'salesComparison'){
+      setShowResults(false);
+      setShowCompSelect(true);
+    } else if(type === 'prodComparision'){
+      setShowCompSelect(false);
+      setShowVenueSelect(true);
+    }
+  }
 
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
   return (
@@ -922,6 +923,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 onChange={(value) => toggleModal('venue', parseInt(value as string, 10))}
 =======
                 onChange={(value) => goToVenueSelection(parseInt(value as string, 10))}
@@ -934,6 +936,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 onChange={(value) => goToVenueSelection(parseInt(value as string, 10))}
                 value={venueId}
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+                onChange={(value) => toggleModal('venue', parseInt(value as string, 10))}
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
                 placeholder={'Please select a venue'}
                 label="Venue"
               />
@@ -975,8 +980,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
         </div>
-
-
       </PopupModal>
 
       <PopupModal
@@ -985,6 +988,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
       >
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         <div className="w-[920px] h-auto">
@@ -1016,6 +1020,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
 <<<<<<< HEAD
+=======
+        <div className="w-[920px] h-auto">
+          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
+
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
           <SalesTable
             containerHeight='h-auto'
             containerWidth='w-[920px]'
@@ -1031,6 +1040,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             handleBackBtnClick={() => handleBtnBack('prodComparision')}
             showBackBtn={true}
             //handleError={() => setVenueSelectView('error')}
+<<<<<<< HEAD
           />
 
 <<<<<<< HEAD
@@ -1081,6 +1091,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
           </div>
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+          />
+
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         </div>
       </PopupModal>
 
@@ -1092,10 +1106,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       >
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         <div className="min-w-[1000px] h-auto">
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
 <<<<<<< HEAD
+=======
+        <div className="min-w-[1000px] h-auto">
+          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
+
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
           <SalesTable
             containerHeight='h-auto'
             containerWidth='w-auto'
@@ -1113,6 +1133,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             showBackBtn={true}
           />
         </div>
+<<<<<<< HEAD
 =======
         <SalesTable
           containerHeight='h-[734px]'
@@ -1121,6 +1142,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           bookings={bookings}
         />
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
       </PopupModal>
     </div>
 >>>>>>> f2dd4a2 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)

@@ -2,20 +2,30 @@ import classNames from 'classnames';
 import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import Table from 'components/core-ui-lib/Table';
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { tileColors } from 'config/global';
 =======
 import { Spinner } from 'components/global/Spinner';
 import { tileColors } from 'config/global';
 import useAxios from 'hooks/useAxios';
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+import { Spinner } from 'components/global/Spinner';
+import { tileColors } from 'config/global';
+import useAxios from 'hooks/useAxios';
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
 import { gridOptions, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import { useRecoilValue } from 'recoil';
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { venueState } from 'state/booking/venueState';
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+import { venueState } from 'state/booking/venueState';
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
 
@@ -28,6 +38,7 @@ type Booking = {
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
 
 type Submit = {
@@ -38,11 +49,14 @@ type Submit = {
 
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 export type ProdComp = {
   venueId: number;
   showCode: string;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 export type SalesSubmit = {
   type: SalesTableVariant,
@@ -51,6 +65,8 @@ export type SalesSubmit = {
 
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 interface SalesTableProps {
   module: string;
   containerWidth: string;
@@ -61,10 +77,14 @@ interface SalesTableProps {
   primaryBtnTxt?: string;
   showPrimaryBtn?: boolean;
 <<<<<<< HEAD
+<<<<<<< HEAD
   handlePrimaryBtnClick?: (data: Submit) => void;
 =======
   handlePrimaryBtnClick?: (data: any) => void;
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+  handlePrimaryBtnClick?: (data: any) => void;
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
   handleSecondaryBtnClick?: () => void;
@@ -72,6 +92,7 @@ interface SalesTableProps {
   backBtnTxt?: string;
   showBackBtn?: boolean;
   handleBackBtnClick?: () => void;
+<<<<<<< HEAD
 <<<<<<< HEAD
   handleCellClick?: (e: any) => void;
   handleCellValChange?: (e: any) => void;
@@ -82,17 +103,23 @@ interface SalesTableProps {
 export default function SalesTable({
 
 =======
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 }
 
 type SalesTableVariant = 'prodComparision' | 'prodSnapshot' | 'salesComparison';
 
 export default function SalesTable({
+<<<<<<< HEAD
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   module = 'bookings',
   containerHeight,
   containerWidth,
   variant,
   data,
+<<<<<<< HEAD
 <<<<<<< HEAD
   primaryBtnTxt,
   showPrimaryBtn = false,
@@ -115,6 +142,8 @@ export default function SalesTable({
   const [response, setResponse] = useState<Submit>({ type: '', data: [] });
   const { productions } = useRecoilValue(productionJumpState);
 =======
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   handleError,
   primaryBtnTxt = 'Ok',
   showPrimaryBtn,
@@ -137,11 +166,15 @@ export default function SalesTable({
   const [errorMessage, setErrorMessage] = useState('');
 
   const [response, setResponse] = useState([]);
+<<<<<<< HEAD
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   const salesSnapshot = (data: any) => {
@@ -307,6 +340,8 @@ bookings.forEach((booking, index) => {
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   const onSubmit = () => {
     if(variant === 'prodComparision'){
     if(response.length < 2){
@@ -493,15 +528,20 @@ bookings.forEach((booking, index) => {
       case 'salesComparison':
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'salesComparison', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        console.log({ function: 'salesComparison', data: data })
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -514,6 +554,9 @@ bookings.forEach((booking, index) => {
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        console.log({ function: 'salesSnapshot', data: data })
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         salesSnapshot(data);
         break;
 
@@ -522,6 +565,7 @@ bookings.forEach((booking, index) => {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'prodComparision', data: data })
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -532,11 +576,15 @@ bookings.forEach((booking, index) => {
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        console.log({ function: 'prodComparision', data: data })
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
         productionComparision(data);
         break;
     }
   }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   return (
@@ -599,6 +647,8 @@ bookings.forEach((booking, index) => {
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   useEffect(() => {
     exec(variant, data);
   }, [data, variant]);
@@ -670,6 +720,9 @@ bookings.forEach((booking, index) => {
   );
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
