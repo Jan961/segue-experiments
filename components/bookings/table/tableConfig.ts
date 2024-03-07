@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';
+import { ITooltipParams } from 'ag-grid-community';                  
 import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
@@ -16,6 +16,7 @@ import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
+<<<<<<< HEAD
 <<<<<<< HEAD
 import IconRenderer from './IconRenderer';
 <<<<<<< HEAD
@@ -44,8 +45,11 @@ import SelectCompOrderRender from './SelectCompOrderRender';
 import SalesDataButtonRenderer from './SalesDataButtonRenderer';
 import SelectCompOrderRender from './SelectCompOrderRender';
 >>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
+=======
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
 export const styleProps = { headerColor: tileColors.bookings };
+
 
 export const columnDefs = [
   {
@@ -344,6 +348,7 @@ export const tourSummaryColumnDefs = [
     width: 90,
     resizable: false,
   },
+<<<<<<< HEAD
 ];
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -779,3 +784,6 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
   },
 ];
 >>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
+=======
+];
+>>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
