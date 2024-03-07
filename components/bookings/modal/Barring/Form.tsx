@@ -8,8 +8,8 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import Label from 'components/core-ui-lib/Label';
 import Button from 'components/core-ui-lib/Button';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
-import useProductionOptions from 'hooks/useProductionOptions';
-import useVenueOptions from 'hooks/useVenueOptions';
+import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
+import { productionOptionsSelector } from 'state/booking/selectors/productionOptionsSelector';
 
 const INITIAL_FORM_STATE = {
   productionId: null,
@@ -25,6 +25,7 @@ const INITIAL_FORM_STATE = {
 const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const currentProduction = useRecoilValue(currentProductionSelector);
+  const venueOptions = useRecoilValue(venueOptionsSelector([]));
   const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction.Id });
   const { productionId, venueId, barDistance = '', includeExcluded, seats = '', fromDate, toDate } = formData;
   const formRef = useRef(null);
@@ -32,8 +33,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
     const selectedProduction = productions?.find((production) => production.Id === productionId);
     return { minDate: selectedProduction?.StartDate, maxDate: selectedProduction?.EndDate };
   }, [productionId, productions]);
-  const productionOptions = useProductionOptions(true);
-  const venueOptions = useVenueOptions();
+  const productionOptions = useRecoilValue(productionOptionsSelector(true));
   const handleOnSubmit = () => {
     onSubmit(formData);
   };

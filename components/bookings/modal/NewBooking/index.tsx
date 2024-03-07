@@ -19,10 +19,10 @@ import { dateTypeState } from 'state/booking/dateTypeState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import MileageBooking from './views/MileageBooking';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
-import { venueState } from 'state/booking/venueState';
 import { bookingState } from 'state/booking/bookingState';
 import useAxios from 'hooks/useAxios';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 
 type AddBookingProps = {
   visible: boolean;
@@ -34,7 +34,6 @@ type AddBookingProps = {
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { fetchData } = useAxios();
   const { stepIndex } = useRecoilValue(newBookingState);
-  const venueDict = useRecoilValue(venueState);
   const bookingDict = useRecoilValue(bookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
@@ -65,23 +64,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
         : 'All',
     [currentProduction],
   );
-
-  const venueOptions = useMemo(() => {
-    const options = [];
-    const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
-    for (const venueId in venueDict) {
-      const venue = venueDict[venueId];
-      const option = {
-        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
-        value: venue?.Id,
-      };
-      if (state.form.shouldFilterVenues && currentProductionVenues.includes(parseInt(venueId, 10))) {
-        continue;
-      }
-      options.push(option);
-    }
-    return options.sort((a, b) => a.text.localeCompare(b.text));
-  }, [venueDict, state.form.shouldFilterVenues, bookingDict]);
+  const currentProductionVenues = useMemo(
+    () => Object.values(bookingDict).map((booking) => booking.VenueId),
+    [bookingDict],
+  );
+  const venueOptions = useRecoilValue(
+    venueOptionsSelector(state.form.shouldFilterVenues ? currentProductionVenues : []),
+  );
 
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
