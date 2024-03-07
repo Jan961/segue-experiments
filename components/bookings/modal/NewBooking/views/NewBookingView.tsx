@@ -188,6 +188,7 @@ const NewBookingView = ({
               disabled={stage !== 0}
               onChange={(value) => onChange({ venueId: parseInt(value as string, 10) })}
               value={venueId}
+              isSearchable
               placeholder={'Please select a venue'}
             />
             <Checkbox

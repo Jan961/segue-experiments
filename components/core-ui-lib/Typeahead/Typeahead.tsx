@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 import WindowedSelect, {
   components,
   createFilter,
@@ -46,6 +46,8 @@ export interface TypeaheadProps extends WithTestId {
   name?: string;
   disabled?: boolean;
   label?: string;
+  inline?: boolean;
+  isSearchable?: boolean;
 }
 
 export default forwardRef(function Typeahead(
@@ -59,6 +61,8 @@ export default forwardRef(function Typeahead(
     disabled = false,
     testId,
     label,
+    inline = false,
+    isSearchable = false,
   }: TypeaheadProps,
   ref,
 ) {
@@ -77,20 +81,26 @@ export default forwardRef(function Typeahead(
         minHeight: COMP_HEIGHT,
         height: COMP_HEIGHT,
       }),
-      option: (styles, { isDisabled, isSelected }) => {
+      option: (styles, { isDisabled, isSelected, isFocused }) => {
         return {
           ...styles,
           fontSize: '1rem',
           lineHeight: '1.5rem',
-          backgroundColor: isDisabled ? undefined : isSelected ? '#21345BCC' : undefined,
-          color: isDisabled ? '#ccc' : isSelected ? '#FFF' : '#617293',
+          backgroundColor: isDisabled
+            ? undefined
+            : isSelected
+            ? '#21345BCC'
+            : isFocused
+            ? '#21345B99'
+            : styles.backgroundColor,
+          color: isDisabled ? '#ccc' : isSelected || isFocused ? '#FFF' : '#617293',
           cursor: isDisabled ? 'not-allowed' : 'default',
           ':active': {
             ...styles[':active'],
             backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
           },
           ':hover': {
-            ...styles[':active'],
+            ...styles[':hover'],
             color: '#FFF',
             backgroundColor: '#21345B99',
           },
@@ -103,7 +113,14 @@ export default forwardRef(function Typeahead(
       }),
       input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
       placeholder: (styles) => ({ ...styles }),
-      singleValue: (styles) => ({ ...styles, color: '#617293' }),
+      singleValue: (styles) => ({
+        ...styles,
+        color: '#617293',
+        '::selection': {
+          color: 'red',
+          background: 'yellow',
+        },
+      }),
       indicatorsContainer: (styles) => ({
         ...styles,
         height: COMP_HEIGHT,
@@ -112,6 +129,8 @@ export default forwardRef(function Typeahead(
     }),
     [],
   );
+
+  const inputRef = useRef(null);
 
   const [selectedOption, setSelectedOption] = useState<TypeaheadOption>({ text: '', value: '' });
 
@@ -136,7 +155,8 @@ export default forwardRef(function Typeahead(
   return (
     <div
       className={classNames(
-        `shadow-sm-shadow border border-primary-border rounded-md flex items-center text-sm`,
+        `border border-primary-border rounded-md flex items-center text-sm`,
+        { 'shadow-sm-shadow': !inline },
         className,
       )}
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
@@ -149,6 +169,7 @@ export default forwardRef(function Typeahead(
 
       <WindowedSelect
         ref={ref}
+        tabIndex={11}
         className="w-full"
         onChange={handleOptionSelect}
         value={selectedOption}
@@ -160,7 +181,8 @@ export default forwardRef(function Typeahead(
         options={options}
         styles={colourStyles}
         placeholder={placeholder}
-        isSearchable={false}
+        isSearchable={isSearchable}
+        onFocus={() => inputRef.current?.focus()}
       />
     </div>
   );

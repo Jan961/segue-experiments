@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
+import Typeahead from 'components/core-ui-lib/Typeahead';
 
 interface SelectDayTypeRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
@@ -31,9 +31,10 @@ const SelectDayTypeRender = ({
       const setFocus = () => {
         elRef?.current?.focus();
       };
-      window.addEventListener('keydown', setFocus);
+      eGridCell.addEventListener('focusin', setFocus);
+
       return () => {
-        window.removeEventListener('keydown', setFocus);
+        eGridCell.removeEventListener('focusin', setFocus);
       };
     }
   }, [eGridCell]);
@@ -44,12 +45,19 @@ const SelectDayTypeRender = ({
     const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
     const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
     setValue(selectedValue);
-    node.setData({ ...data, dayType: selectedValue, isBooking, isRehearsal, isGetInFitUp });
+    node.setData({ ...data, perf: isBooking, dayType: selectedValue, isBooking, isRehearsal, isGetInFitUp });
   };
 
   return (
-    <div className="pl-1 pr-2" tabIndex={1}>
-      <Select ref={elRef} options={dayTypeOptions} value={selectedDateType} onChange={handleChange} inline />
+    <div className="pl-1 pr-2 mt-1" tabIndex={1}>
+      <Typeahead
+        ref={elRef}
+        options={dayTypeOptions}
+        value={selectedDateType}
+        onChange={handleChange}
+        inline
+        isSearchable={false}
+      />
     </div>
   );
 };
