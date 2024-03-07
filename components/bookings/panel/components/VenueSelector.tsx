@@ -1,10 +1,8 @@
-import { useMemo } from 'react';
 import FormTypeahead from 'components/global/forms/FormTypeahead';
 import { VenueInfo } from 'components/bookings/modal/VenueInfo';
 import ViewBookingHistory from 'components/bookings/modal/ViewBookingHistory';
-import { VenueMinimalDTO } from 'interfaces';
 import { useRecoilValue } from 'recoil';
-import { venueState } from 'state/booking/venueState';
+import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 
 export interface VenueSelectorProps {
   venueId: number;
@@ -12,16 +10,7 @@ export interface VenueSelectorProps {
   disabled?: boolean;
 }
 export const VenueSelector = ({ venueId, onChange, disabled = false }: VenueSelectorProps) => {
-  const venues = useRecoilValue(venueState);
-
-  const venueOptions = useMemo(
-    () =>
-      Object.values(venues).map((v: VenueMinimalDTO) => ({
-        value: v.Id,
-        name: `${v.Code} - ${v.Name}, ${v.Town}`,
-      })),
-    [venues],
-  );
+  const venueOptions = useRecoilValue(venueOptionsSelector([]));
   return (
     <>
       <FormTypeahead
