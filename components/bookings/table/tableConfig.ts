@@ -16,6 +16,7 @@ import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
+import IconRenderer from './IconRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -85,9 +86,9 @@ export const bookingConflictsColumnDefs = [
 ];
 
 export const barringIssueColumnDefs = [
-  { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'miles', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
+  { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Date', field: 'Date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
@@ -142,11 +143,6 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     cellRenderer: NoPerfRenderer,
     width: 72,
     maxWidth: 72,
-    cellStyle: {
-      display: 'flex',
-      justifyContent: 'center',
-      paddingTop: '0.75rem',
-    },
   },
   {
     headerName: 'Times',
@@ -234,5 +230,38 @@ export const tourSummaryColumnDefs = [
     cellRenderer: DefaultCellRenderer,
     width: 90,
     resizable: false,
+  },
+];
+
+export const barredVenueColumnDefs = [
+  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
+  {
+    headerName: 'Date',
+    field: 'FormattedDate',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Miles',
+    field: 'Mileage',
+    cellRenderer: DefaultCellRenderer,
+    width: 65,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'info',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconName: 'info-circle-solid',
+      popover: true,
+    },
+    width: 40,
+    headerClass: 'text-center',
+    resizable: false,
+    cellStyle: {
+      overflow: 'visible',
+    },
   },
 ];

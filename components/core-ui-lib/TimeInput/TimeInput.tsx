@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import Label from '../Label';
 import classNames from 'classnames';
 
@@ -8,7 +8,7 @@ export type Time = {
   sec?: string;
 };
 
-interface TimeInputProps {
+export interface TimeInputProps {
   onChange: (e: any) => void;
   onBlur?: (e: any) => void;
   label?: string;
@@ -24,78 +24,99 @@ const DEFAULT_TIME = { hrs: '00', min: '00', sec: '00' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
-export default function TimeInput({ onChange, value, onBlur, disabled, className }: TimeInputProps) {
-  const [time, setTime] = useState<Time>(DEFAULT_TIME);
-  const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    const v = value.replace(/^\D/, '');
-    if (v.length < 3) {
-      if (name === 'hrs' && (v === '' || parseInt(value) < 24)) {
-        setTime((prev) => ({ ...prev, [name]: v }));
-      } else if (name === 'min' && (v === '' || parseInt(value) < 60)) {
-        setTime((prev) => ({ ...prev, [name]: v }));
+const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
+  ({ onChange, value, onBlur, disabled, className }: TimeInputProps, ref) => {
+    const [time, setTime] = useState<Time>(DEFAULT_TIME);
+    const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
+    const hrsRef = useRef(null);
+    const minsRef = useRef(null);
+    const handleInputChange = (e) => {
+      const { name, value } = e.target;
+      const v = value.replace(/^\D/, '');
+      if (v.length < 3) {
+        if (name === 'hrs' && (v === '' || parseInt(value) < 24)) {
+          setTime((prev) => ({ ...prev, [name]: v }));
+        } else if (name === 'min' && (v === '' || parseInt(value) < 60)) {
+          setTime((prev) => ({ ...prev, [name]: v }));
+        }
       }
-    }
-  };
+    };
 
-  const handleInputBlur = (e) => {
-    if (!disabled) {
-      const { name } = e.target;
-      const currValue = time[name];
-      if (currValue.length === 0) {
-        setTime((prev) => ({ ...prev, [name]: '00' }));
-      } else if (currValue.length === 1) {
-        setTime((prev) => ({ ...prev, [name]: `0${currValue}` }));
+    const handleInputBlur = (e) => {
+      if (!disabled) {
+        const { name } = e.target;
+        if (name === 'hrs') {
+          minsRef.current.select();
+        }
+        const currValue = time[name];
+        if (currValue.length === 0) {
+          setTime((prev) => ({ ...prev, [name]: '00' }));
+        } else if (currValue.length === 1) {
+          setTime((prev) => ({ ...prev, [name]: `0${currValue}` }));
+        }
       }
-    }
-  };
+    };
 
-  const handleBlur = () => {
-    onChange(time);
-    onBlur?.(time);
-  };
+    const handleBlur = () => {
+      onChange(time);
+      onBlur?.(time);
+    };
 
-  useEffect(() => {
-    if (value) {
-      if (isOfTypTime(value)) {
-        setTime(value);
-      } else if (typeof value === 'string') {
-        const parts = value.split(':');
-        setTime({ hrs: parts[0] || '00', min: parts[1] || '00', sec: parts[1] || '00' });
+    const handleMinKeyDown = (e) => {
+      if (e.shiftKey && e.code === 'Tab') {
+        hrsRef.current.select();
       }
-    } else {
-      setTime(DEFAULT_TIME);
-    }
-  }, [value]);
+    };
 
-  return disabled ? (
-    <Label text={`${time.hrs} : ${time.min}`} className={`${baseClass} ${disabledClass}`} />
-  ) : (
-    <div onBlur={handleBlur} className={classNames(baseClass, className)}>
-      <input
-        name="hrs"
-        value={time.hrs}
-        placeholder="hh"
-        type="text"
-        className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-        onChange={handleInputChange}
-        onBlur={handleInputBlur}
-        onFocus={(e) => e.target.select}
-        disabled={disabled}
-      />
-      <span className="">:</span>
-      <input
-        name="min"
-        value={time.min}
-        placeholder="mm"
-        className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
-        onChange={handleInputChange}
-        onBlur={handleInputBlur}
-        onFocus={(e) => e.target.select}
-        disabled={disabled}
-      />
-    </div>
-  );
-}
+    useEffect(() => {
+      if (value) {
+        if (isOfTypTime(value)) {
+          setTime(value);
+        } else if (typeof value === 'string') {
+          const parts = value.split(':');
+          setTime({ hrs: parts[0] || '00', min: parts[1] || '00', sec: parts[1] || '00' });
+        }
+      } else {
+        setTime(DEFAULT_TIME);
+      }
+    }, [value]);
+
+    return disabled ? (
+      <Label text={`${time.hrs} : ${time.min}`} className={`${baseClass} ${disabledClass}`} />
+    ) : (
+      <div ref={ref} onBlur={handleBlur} className={classNames(baseClass, className)}>
+        <input
+          ref={hrsRef}
+          name="hrs"
+          value={time.hrs}
+          placeholder="hh"
+          type="text"
+          className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onFocus={(e) => e.target.select}
+          disabled={disabled}
+          tabIndex={1}
+        />
+        <span className="">:</span>
+        <input
+          ref={minsRef}
+          name="min"
+          value={time.min}
+          placeholder="mm"
+          className="w-8 h-5/6 border-none focus:ring-0 text-center ring-0 p-0"
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onFocus={(e) => e.target.select}
+          disabled={disabled}
+          tabIndex={2}
+          onKeyDown={handleMinKeyDown}
+        />
+      </div>
+    );
+  },
+);
+
+TimeInput.displayName = 'TimeInput';
+
+export default TimeInput;

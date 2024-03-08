@@ -15,6 +15,7 @@ interface TableProps {
   onCellClicked?: (e) => void;
   onRowClicked?: (e) => void;
   onRowSelected?: (e) => void;
+  onCellValueChange?: (e) => void;
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
@@ -26,6 +27,17 @@ const ROW_HEIGHT = 43;
 const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
+const DEFAULT_GRID_OPTIONS = {
+  autoSizeStrategy: {
+    type: 'fitGridWidth',
+    defaultMinWidth: 50,
+    defaultColDef: {
+      wrapHeaderText: true,
+    },
+  },
+  suppressHeaderFocus: true,
+};
+
 export default forwardRef(function Table(
   {
     rowData,
@@ -33,9 +45,9 @@ export default forwardRef(function Table(
     styleProps,
     onCellClicked,
     onRowClicked,
-    gridOptions,
+    onCellValueChange,
+    gridOptions = {},
     getRowStyle,
-
     rowClassRules,
     displayHeader = true,
     getRowHeight,
@@ -58,8 +70,9 @@ export default forwardRef(function Table(
     return HEADER_HEIGHT;
   }, [rowData]);
 
-  const handleCellValueChange = () => {
+  const handleCellValueChange = (e) => {
     isDirty.current = true;
+    onCellValueChange(e);
   };
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -119,8 +132,9 @@ export default forwardRef(function Table(
           rowClassRules={rowClassRules}
           tooltipHideDelay={5000}
           tooltipShowDelay={0}
-          gridOptions={gridOptions}
+          gridOptions={{ ...DEFAULT_GRID_OPTIONS, ...gridOptions }}
           getRowHeight={getRowHeight}
+          navigateToNextCell={() => null}
         />
       </div>
     </>
