@@ -176,6 +176,7 @@ const NewBookingView = ({
               disabled={stage !== 0}
               onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
               value={dateType}
+              isSearchable
               placeholder={'Please select a Day Type'}
             />
           </>
