@@ -1,7 +1,7 @@
 import Button from 'components/core-ui-lib/Button';
 import Select from 'components/core-ui-lib/Select';
 
-import { SearchBox } from 'components/global/SearchBox';
+// import { SearchBox } from 'components/global/SearchBox';
 import GlobalToolbar from 'components/toolbar';
 import { useRecoilState } from 'recoil';
 import { filterVenueState } from 'state/booking/filterVenueState';
@@ -50,7 +50,7 @@ export default function VenueFilter() {
             placeHolder="Select Country"
             //   options={allStatusOptions}
           />
-          <SearchBox />
+          {/* <SearchBox /> */}
           <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
           <Button text="Add New" className="text-sm leading-8 w-[100px]" />
         </div>
