@@ -6,7 +6,7 @@ import NewBookingView from './views/NewBookingView';
 import BookingConflictsView from './views/BookingConflictsView';
 import { newBookingState } from 'state/booking/newBookingState';
 import BarringIssueView from './views/BarringIssueView';
-import { useMemo, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, OTHER_DAY_TYPES, steps } from 'config/AddBooking';
@@ -26,18 +26,18 @@ import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelect
 
 type AddBookingProps = {
   visible: boolean;
-  onClose: () => void;
+  onClose: (bookings?: any) => void;
   startDate?: string;
   endDate?: string;
 };
 
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
-  const { fetchData } = useAxios();
+  const { fetchData, data } = useAxios();
+
   const { stepIndex } = useRecoilValue(newBookingState);
   const bookingDict = useRecoilValue(bookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
-  const handleModalClose = () => onClose?.();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
     ...INITIAL_STATE,
     form: {
@@ -46,6 +46,12 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       toDate: endDate,
     },
   }));
+
+  useEffect(() => {
+    if (data) {
+      onClose(data);
+    }
+  }, [data]);
 
   const currentProduction = useRecoilValue(currentProductionSelector);
   const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
@@ -95,67 +101,65 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
   };
 
   return (
-    <>
-      <PopupModal
-        show={visible}
-        onClose={handleModalClose}
-        titleClass="text-xl text-primary-navy text-bold"
-        title={steps[stepIndex]}
-        panelClass="relative"
-        hasOverlay={hasOverlay}
-      >
-        <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
-          <NewBookingView
-            updateBookingConflicts={updateBookingConflicts}
-            updateBarringConflicts={updateBarringConflicts}
-            dayTypeOptions={dayTypeOptions}
-            onChange={onFormDataChange}
-            formData={state.form}
-            onClose={onClose}
-            productionCode={productionCode}
-            venueOptions={venueOptions}
-          />
-          <BookingConflictsView hasBarringIssues={state?.barringConflicts?.length > 0} data={state.bookingConflicts} />
-          <BarringIssueView barringConflicts={state.barringConflicts} />
-          <NewBookingDetailsView
-            formData={state.form}
-            data={state.booking}
-            productionCode={productionCode}
-            dateBlockId={primaryBlock?.Id}
-            dayTypeOptions={dayTypeOptions}
-            venueOptions={venueOptions}
-            onSubmit={setNewBookingOnStore}
-            toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
-            onClose={onClose}
-          />
-          <PreviewNewBooking
-            formData={state.form}
-            productionCode={productionCode}
-            data={state.booking}
-            dayTypeOptions={dayTypeOptions}
-            onSaveBooking={handleSaveNewBooking}
-          />
-          <MileageBooking
-            formData={state.form}
-            productionCode={productionCode}
-            data={state.booking}
-            dayTypeOptions={dayTypeOptions}
-          />
-          <GapSuggestionView
-            productionId={currentProduction?.Id}
-            startDate={state.form.fromDate}
-            endDate={state.form.toDate}
-          />
-        </Wizard>
-        <ConfirmationDialog
-          variant="close"
-          show={!!showConfirmation}
-          onYesClick={onClose}
-          onNoClick={() => setShowConfirmation(false)}
-          hasOverlay={false}
+    <PopupModal
+      show={visible}
+      onClose={() => onClose()}
+      titleClass="text-xl text-primary-navy text-bold"
+      title={steps[stepIndex]}
+      panelClass="relative"
+      hasOverlay={hasOverlay}
+    >
+      <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
+        <NewBookingView
+          updateBookingConflicts={updateBookingConflicts}
+          updateBarringConflicts={updateBarringConflicts}
+          dayTypeOptions={dayTypeOptions}
+          onChange={onFormDataChange}
+          formData={state.form}
+          onClose={onClose}
+          productionCode={productionCode}
+          venueOptions={venueOptions}
         />
-      </PopupModal>
-    </>
+        <BookingConflictsView hasBarringIssues={state?.barringConflicts?.length > 0} data={state.bookingConflicts} />
+        <BarringIssueView barringConflicts={state.barringConflicts} />
+        <NewBookingDetailsView
+          formData={state.form}
+          data={state.booking}
+          productionCode={productionCode}
+          dateBlockId={primaryBlock?.Id}
+          dayTypeOptions={dayTypeOptions}
+          venueOptions={venueOptions}
+          onSubmit={setNewBookingOnStore}
+          toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
+          onClose={onClose}
+        />
+        <PreviewNewBooking
+          formData={state.form}
+          productionCode={productionCode}
+          data={state.booking}
+          dayTypeOptions={dayTypeOptions}
+          onSaveBooking={handleSaveNewBooking}
+        />
+        <MileageBooking
+          formData={state.form}
+          productionCode={productionCode}
+          data={state.booking}
+          dayTypeOptions={dayTypeOptions}
+        />
+        <GapSuggestionView
+          productionId={currentProduction?.Id}
+          startDate={state.form.fromDate}
+          endDate={state.form.toDate}
+        />
+      </Wizard>
+      <ConfirmationDialog
+        variant="close"
+        show={!!showConfirmation}
+        onYesClick={onClose}
+        onNoClick={() => setShowConfirmation(false)}
+        hasOverlay={false}
+      />
+    </PopupModal>
   );
 };
 

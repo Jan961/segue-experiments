@@ -7,14 +7,11 @@ import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
 import useAxios from 'hooks/useAxios';
+import { useRouter } from 'next/router';
 
 interface BookingsTableProps {
   rowData?: any;
 }
-
-const defaultColDef = {
-  wrapHeaderText: true,
-};
 
 type AddBookingModalState = {
   visible: boolean;
@@ -22,7 +19,7 @@ type AddBookingModalState = {
   endDate?: string;
 };
 
-const AddBookingInitialState = {
+const addBookingInitialState = {
   visible: false,
   startDate: null,
   endDate: null,
@@ -30,20 +27,16 @@ const AddBookingInitialState = {
 
 export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
+  const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookingDict, setBookingDict] = useRecoilState(bookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-  const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(AddBookingInitialState);
+  const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(addBookingInitialState);
   const { fetchData } = useAxios();
 
   const gridOptions = {
-    defaultColDef,
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-    },
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
@@ -138,6 +131,13 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     }
   }, [rowData]);
 
+  const handleClose = (bookings = null) => {
+    if (bookings) {
+      router.reload();
+    }
+    setShowAddBookingModal(addBookingInitialState);
+  };
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
@@ -156,9 +156,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
-      {showAddBookingModal.visible && (
-        <AddBooking {...showAddBookingModal} onClose={() => setShowAddBookingModal(AddBookingInitialState)} />
-      )}
+      {showAddBookingModal.visible && <AddBooking {...showAddBookingModal} onClose={handleClose} />}
     </>
   );
 }
