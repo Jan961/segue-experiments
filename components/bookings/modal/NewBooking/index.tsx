@@ -53,7 +53,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
 
   const dayTypes = useRecoilValue(dateTypeState);
   const dayTypeOptions = useMemo(
-    () => [...OTHER_DAY_TYPES, ...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))],
+    () =>
+      [...OTHER_DAY_TYPES, ...dayTypes.map(({ Id: value, Name: text }) => ({ text, value }))].sort((a, b) =>
+        a.text.localeCompare(b.text),
+      ),
     [dayTypes],
   );
 
