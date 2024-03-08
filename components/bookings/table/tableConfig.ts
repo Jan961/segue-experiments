@@ -270,3 +270,33 @@ export const barredVenueColumnDefs = [
     },
   },
 ];
+export const VenueColumnDefs = [
+  {
+    headerName: 'Venue Code',
+    field: 'VenueCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Venue Name',
+    field: 'VenueName',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Town',
+    field: 'VenueTown',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Capacity',
+    field: 'VenueCapacity',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+];
