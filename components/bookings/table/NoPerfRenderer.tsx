@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
+import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 
 const ROW_HEIGHT = 35;
 const MARGIN = 9;
 
-const NoPerfRenderer = ({ value, setValue, data, api, node }: ICellRendererParams) => {
+const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRendererParams) => {
   const [isDisabled, setIsDisabled] = useState(true);
-  const [noOfPerfs, setNoOfPerfs] = useState<string | number>(value);
+  const [noOfPerfs, setNoOfPerfs] = useState<string>(value);
 
   const updateRowHeight = (height: number) => {
     node.setRowHeight(height);
@@ -16,7 +17,7 @@ const NoPerfRenderer = ({ value, setValue, data, api, node }: ICellRendererParam
   useEffect(() => {
     if (!data.perf) {
       setValue(null);
-      setNoOfPerfs(null);
+      setNoOfPerfs('');
       updateRowHeight(ROW_HEIGHT + MARGIN);
     }
     setIsDisabled(!data.perf);
@@ -25,7 +26,7 @@ const NoPerfRenderer = ({ value, setValue, data, api, node }: ICellRendererParam
   const handleChange = (event: any) => {
     let newValue = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
     if (newValue === '') {
-      setNoOfPerfs(null);
+      setNoOfPerfs('');
       setValue(0);
       updateRowHeight(ROW_HEIGHT + MARGIN);
       node.setData({ ...data, noOfPerfs: 0 });
@@ -33,7 +34,7 @@ const NoPerfRenderer = ({ value, setValue, data, api, node }: ICellRendererParam
       newValue = Math.min(9, Math.max(1, parseInt(newValue, 10))).toString();
       const intValue = parseInt(newValue);
       if (!isNaN(intValue) && intValue > 0) {
-        setNoOfPerfs(intValue);
+        setNoOfPerfs(newValue);
         setValue(intValue);
         updateRowHeight(intValue > 1 ? intValue * ROW_HEIGHT + MARGIN : ROW_HEIGHT + MARGIN);
         node.setData({ ...data, noOfPerfs: intValue });
@@ -41,25 +42,20 @@ const NoPerfRenderer = ({ value, setValue, data, api, node }: ICellRendererParam
     }
   };
   return (
-    <>
+    <div className="mt-2.5 w-full flex justify-center">
       {isDisabled ? (
         <div
-          className={`text-center border-2 mx-auto border-primary-input-text rounded-sm line text-sm p-0 w-[1.1875rem] h-[1.1875rem]`}
+          className={`border-2 mx-auto border-primary-input-text rounded-sm line text-sm p-0 w-[1.2rem] !h-[1.2rem]`}
         ></div>
       ) : (
-        <>
-          <input
-            type="text"
-            inputMode="numeric"
-            min={1}
-            max={9}
-            value={noOfPerfs}
-            onChange={handleChange}
-            className="text-center border-2 border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm p-0 w-[1.1875rem] h-[1.1875rem] flex focus:!ring-0 "
-          />
-        </>
+        <TextInputRenderer
+          eGridCell={eGridCell}
+          value={noOfPerfs}
+          onChange={handleChange}
+          className="w-[1.2rem] !h-[1.2rem] !text-center border-2 border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm p-0 w-[1.1875rem] h-[1.1875rem] focus:!ring-0"
+        />
       )}
-    </>
+    </div>
   );
 };
 
