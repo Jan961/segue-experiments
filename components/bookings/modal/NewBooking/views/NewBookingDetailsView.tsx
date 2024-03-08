@@ -39,7 +39,7 @@ export default function NewBookingDetailsView({
   toggleModalOverlay,
   onClose,
 }: NewBookingDetailsProps) {
-  const { fromDate, toDate, dateType, venueId } = formData;
+  const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
@@ -89,6 +89,7 @@ export default function NewBookingDetailsView({
         isBooking: isPerformance,
         isRehearsal,
         isGetInFitUp,
+        isRunOfDates,
       };
 
       dates.push(dateObject);
@@ -96,7 +97,7 @@ export default function NewBookingDetailsView({
       startDate = addDays(startDate, 1);
     }
     setBookingData(dates);
-  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId]);
+  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates]);
 
   useEffect(() => {
     if (data !== null && data.length > 0) {
@@ -105,11 +106,6 @@ export default function NewBookingDetailsView({
   }, [data]);
 
   const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-      wrapHeaderText: true,
-    },
     getRowId: (params) => {
       return params.data.date;
     },
@@ -216,9 +212,9 @@ export default function NewBookingDetailsView({
           columnDefs={columnDefs}
           rowData={bookingData}
           styleProps={styleProps}
-          gridOptions={gridOptions}
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
+          gridOptions={gridOptions}
           onCellValueChange={() => {
             setChangesMade(true);
           }}

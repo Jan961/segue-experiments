@@ -143,11 +143,6 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     cellRenderer: NoPerfRenderer,
     width: 72,
     maxWidth: 72,
-    cellStyle: {
-      display: 'flex',
-      justifyContent: 'center',
-      paddingTop: '0.75rem',
-    },
   },
   {
     headerName: 'Times',
