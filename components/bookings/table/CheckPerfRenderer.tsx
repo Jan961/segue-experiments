@@ -1,6 +1,6 @@
 import { ICellRendererParams } from 'ag-grid-community';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CHeckboxRenderer';
+import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 import { useEffect, useState } from 'react';
 
 interface CheckPerfRendererProps extends ICellRendererParams {
