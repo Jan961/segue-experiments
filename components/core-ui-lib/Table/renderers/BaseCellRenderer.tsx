@@ -22,7 +22,7 @@ const BaseCellRenderer = ({ children, eGridCell, onBlur = emptyFn, onFocus = emp
     }
   }, [eGridCell]);
 
-  return children;
+  return <div>{children}</div>;
 };
 
 export default BaseCellRenderer;
