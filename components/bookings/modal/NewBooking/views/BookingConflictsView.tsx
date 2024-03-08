@@ -10,11 +10,12 @@ import { dateToSimple } from 'services/dateService';
 import { BookingWithVenueDTO } from 'interfaces';
 import { steps } from 'config/AddBooking';
 
-interface BarringIssueViewProps {
+interface BookingConflictsViewProps {
   data?: BookingWithVenueDTO[];
+  hasBarringIssues?: boolean;
 }
 
-export default function BookingConflictsView({ data }: BarringIssueViewProps) {
+export default function BookingConflictsView({ data, hasBarringIssues }: BookingConflictsViewProps) {
   const { nextStep, previousStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
 
@@ -45,7 +46,6 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
   };
 
   const handleContinueClick = async () => {
-    const hasBarringIssues = true; // Barring issues check
     if (hasBarringIssues) {
       nextStep();
     } else {

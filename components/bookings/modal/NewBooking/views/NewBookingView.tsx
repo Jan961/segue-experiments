@@ -18,6 +18,7 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 
 type AddBookingProps = {
   formData: TForm;
@@ -25,6 +26,7 @@ type AddBookingProps = {
   venueOptions: SelectOption[];
   productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
+  updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
@@ -37,6 +39,7 @@ const NewBookingView = ({
   dayTypeOptions,
   venueOptions,
   updateBookingConflicts,
+  updateBarringConflicts,
 }: AddBookingProps) => {
   const { nextStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
@@ -46,6 +49,7 @@ const NewBookingView = ({
   const [stage, setStage] = useState<number>(0);
   const [error, setError] = useState<string>('');
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
+  const { loading, fetchData: api } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
 
   const bookingTypeValue = useMemo(
@@ -59,20 +63,46 @@ const NewBookingView = ({
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
+  const fetchBarredVenues = (skipRedirect = false): Promise<any> => {
+    const { venueId, fromDate: startDate, toDate: endDate } = formData;
+    return api({
+      url: '/api/productions/venue/barred',
+      method: 'POST',
+      data: {
+        productionId: currentProduction?.Id,
+        venueId,
+        seats: 400,
+        barDistance: 25,
+        includeExcluded: false,
+        startDate,
+        endDate,
+      },
+    }).then((data: any) => {
+      updateBarringConflicts(data);
+      if (skipRedirect) return;
+      if (data?.length > 0) {
+        goToStep(steps.indexOf('Barring Issue'));
+      } else {
+        goToStep(steps.indexOf('New Booking Details'));
+      }
+    });
+  };
+
   const goToNext = () => {
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
       data: { ...formData, ProductionId: currentProduction?.Id },
-    }).then((data: any) => {
+    }).then(async (data: any) => {
       updateBookingConflicts(data);
       if (data.error) {
         console.log(data.error);
         return;
       }
       if (!data?.length) {
-        goToStep(steps.indexOf('Barring Issue'));
+        fetchBarredVenues(false);
       } else {
+        await fetchBarredVenues(true);
         nextStep();
       }
     });
@@ -119,7 +149,7 @@ const NewBookingView = ({
               body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
               position="right"
               width="w-[140px]"
-              bgColorClass="bg-slate-500"
+              bgColorClass="primary-input-text"
             >
               <Icon iconName="info-circle-solid" />
             </Tooltip>
@@ -158,6 +188,7 @@ const NewBookingView = ({
               disabled={stage !== 0}
               onChange={(value) => onChange({ venueId: parseInt(value as string, 10) })}
               value={venueId}
+              isSearchable
               placeholder={'Please select a venue'}
             />
             <Checkbox
@@ -211,7 +242,7 @@ const NewBookingView = ({
             ></Button>
           </div>
         )}
-        {fetchingBookingConflicts && <Loader variant={'sm'} />}
+        {(fetchingBookingConflicts || loading) && <Loader variant={'sm'} />}
       </div>
     </div>
   );

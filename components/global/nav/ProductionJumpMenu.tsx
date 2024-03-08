@@ -71,6 +71,7 @@ export default function ProductionJumpMenu() {
         renderOption={(option) => <ProductionOption option={option} />}
         options={productions}
         onChange={goToProduction}
+        isSearchable
       />
       <div className="flex  items-center ml-1 mr-4">
         <Checkbox

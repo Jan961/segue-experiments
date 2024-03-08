@@ -2,24 +2,17 @@ import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/ta
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { steps } from 'config/AddBooking';
-import { BookingWithVenueDTO } from 'interfaces';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { useSetRecoilState } from 'recoil';
 import { newBookingState } from 'state/booking/newBookingState';
 
-const rows = [
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '56' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '02' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '73' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '19' },
-];
-
 type BarringIssueViewProps = {
-  bookingConflicts?: BookingWithVenueDTO[];
+  barringConflicts?: BarredVenue[];
 };
 
-export default function BarringIssueView({ bookingConflicts }: BarringIssueViewProps) {
+export default function BarringIssueView({ barringConflicts }: BarringIssueViewProps) {
   const { previousStep, activeStep, goToStep } = useWizard();
   const setViewHeader = useSetRecoilState(newBookingState);
 
@@ -35,7 +28,7 @@ export default function BarringIssueView({ bookingConflicts }: BarringIssueViewP
   };
 
   const goToPreviousStep = () => {
-    if (bookingConflicts?.length > 0) {
+    if (barringConflicts?.length > 0) {
       previousStep();
     } else {
       goToStep(steps.indexOf('Create New Booking'));
@@ -48,8 +41,12 @@ export default function BarringIssueView({ bookingConflicts }: BarringIssueViewP
         A Barring Check has found potential issues
       </span>
       <div className="w-[634px] flex flex-col">
-        <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
-        <Table columnDefs={barringIssueColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
+        <Table
+          columnDefs={barringIssueColumnDefs}
+          rowData={barringConflicts}
+          styleProps={styleProps}
+          gridOptions={gridOptions}
+        />
         <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
           <Button

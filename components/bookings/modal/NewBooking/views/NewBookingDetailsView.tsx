@@ -16,6 +16,7 @@ import { toISO } from 'services/dateService';
 
 type NewBookingDetailsProps = {
   formData: TForm;
+  data: BookingItem[];
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
   productionCode: string;
@@ -33,11 +34,12 @@ export default function NewBookingDetailsView({
   venueOptions = [],
   productionCode,
   dateBlockId,
+  data,
   onSubmit,
   toggleModalOverlay,
   onClose,
 }: NewBookingDetailsProps) {
-  const { fromDate, toDate, dateType, venueId } = formData;
+  const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
@@ -46,6 +48,7 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -86,6 +89,7 @@ export default function NewBookingDetailsView({
         isBooking: isPerformance,
         isRehearsal,
         isGetInFitUp,
+        isRunOfDates,
       };
 
       dates.push(dateObject);
@@ -93,14 +97,15 @@ export default function NewBookingDetailsView({
       startDate = addDays(startDate, 1);
     }
     setBookingData(dates);
-  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId]);
+  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates]);
+
+  useEffect(() => {
+    if (data !== null && data.length > 0) {
+      setBookingData(data);
+    }
+  }, [data]);
 
   const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-      wrapHeaderText: true,
-    },
     getRowId: (params) => {
       return params.data.date;
     },
@@ -108,9 +113,6 @@ export default function NewBookingDetailsView({
 
   const goToNewBooking = () => {
     goToStep(steps.indexOf('Create New Booking'));
-  };
-  const goToMileage = () => {
-    goToStep(steps.indexOf('Check Mileage'));
   };
 
   const handleBackButtonClick = () => {
@@ -150,7 +152,7 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const previewBooking = () => {
+  const goToMileage = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
@@ -158,6 +160,17 @@ export default function NewBookingDetailsView({
       });
       onSubmit(rowData);
 
+      goToStep(steps.indexOf('Check Mileage'));
+    }
+  };
+
+  const previewBooking = () => {
+    if (tableRef.current.getApi()) {
+      const rowData = [];
+      tableRef.current.getApi().forEachNode((node) => {
+        rowData.push(node.data);
+      });
+      onSubmit(rowData);
       goToStep(steps.indexOf('Preview New Booking'));
     }
   };
@@ -199,9 +212,12 @@ export default function NewBookingDetailsView({
           columnDefs={columnDefs}
           rowData={bookingData}
           styleProps={styleProps}
-          gridOptions={gridOptions}
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
+          gridOptions={gridOptions}
+          onCellValueChange={() => {
+            setChangesMade(true);
+          }}
         />
         <NotesPopup
           show={showNotesModal}
@@ -210,7 +226,12 @@ export default function NewBookingDetailsView({
           onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={() => goToMileage()} />
+          <Button
+            className=" w-33  place-self-start  "
+            text="Check Mileage"
+            onClick={goToMileage}
+            disabled={!changesMade}
+          />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
