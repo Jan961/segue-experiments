@@ -82,12 +82,15 @@ export default function Barring({ visible, onClose }: BarringProps) {
           <div className="mt-6 flex-col">
             <Form onSubmit={fetchBarredVenues} />
           </div>
-          {rows !== null && (
+          {Array.isArray(rows) && rows.length === 0 && (
+            <Label className="text-md my-2" text="A Barring Check has found no issues."></Label>
+          )}
+          {(rows !== null && rows?.length > 0 && (
             <div className="block">
               <Label className="text-md my-2" text="Check the box of venues you wish to remove from this list."></Label>
               <div
-                className="w-full overflow-hidden flex flex-col z-[500]"
-                style={{ maxHeight: 'calc(100vh - 450px)' }}
+                className="w-full overflow-hidden flex flex-col z-[500] min-h-40"
+                style={{ maxHeight: 'calc(100vh - 450px)', minHeight: '110px' }}
               >
                 <Table
                   onRowSelected={onRowSelected}
@@ -99,8 +102,9 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 />
               </div>
             </div>
-          )}
-          {rows?.length && (
+          )) ||
+            ''}
+          {(rows?.length && (
             <div className="flex gap-2 justify-end items-center mt-3">
               <Button
                 onClick={exportTableData}
@@ -117,7 +121,8 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 text="OK"
               />
             </div>
-          )}
+          )) ||
+            ''}
         </div>
       </PopupModal>
     </>
