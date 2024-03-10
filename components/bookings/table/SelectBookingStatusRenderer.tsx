@@ -6,12 +6,12 @@ import { useEffect, useState } from 'react';
 
 const SelectBookingStatusRenderer = ({ eGridCell, value, setValue, data, node, api }: CustomCellRendererProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-
+  const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
   useEffect(() => {
     if (data) {
-      if (data.isRunOfDates && node.rowIndex > 0) {
-        setIsDisabled(true);
-      }
+      const { isRunOfDates, dayType } = data;
+      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
+      setValue(dayType === null || dayType === '' ? null : pencilled);
     }
   }, [data, node]);
 
