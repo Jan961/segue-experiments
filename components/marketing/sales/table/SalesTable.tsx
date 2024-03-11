@@ -1,21 +1,11 @@
 import classNames from 'classnames';
 import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import Table from 'components/core-ui-lib/Table';
-<<<<<<< HEAD
 import { tileColors } from 'config/global';
-=======
-import { Spinner } from 'components/global/Spinner';
-import { tileColors } from 'config/global';
-import useAxios from 'hooks/useAxios';
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
 import { gridOptions, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import { useRecoilValue } from 'recoil';
-<<<<<<< HEAD
-=======
-import { venueState } from 'state/booking/venueState';
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
 
@@ -27,7 +17,6 @@ type Booking = {
   numPerfs: number;
 }
 
-<<<<<<< HEAD
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
 
 type Submit = {
@@ -36,21 +25,16 @@ type Submit = {
 }
 
 
-=======
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 export type ProdComp = {
   venueId: number;
   showCode: string;
 }
 
-<<<<<<< HEAD
 export type SalesSubmit = {
   type: SalesTableVariant,
   data: any;
 }
 
-=======
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 interface SalesTableProps {
   module: string;
   containerWidth: string;
@@ -60,11 +44,7 @@ interface SalesTableProps {
   handleError?: () => void;
   primaryBtnTxt?: string;
   showPrimaryBtn?: boolean;
-<<<<<<< HEAD
   handlePrimaryBtnClick?: (data: Submit) => void;
-=======
-  handlePrimaryBtnClick?: (data: any) => void;
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
   handleSecondaryBtnClick?: () => void;
@@ -72,7 +52,6 @@ interface SalesTableProps {
   backBtnTxt?: string;
   showBackBtn?: boolean;
   handleBackBtnClick?: () => void;
-<<<<<<< HEAD
   handleCellClick?: (e: any) => void;
   handleCellValChange?: (e: any) => void;
   cellRenderParams?: any;
@@ -81,19 +60,11 @@ interface SalesTableProps {
 
 export default function SalesTable({
 
-=======
-}
-
-type SalesTableVariant = 'prodComparision' | 'prodSnapshot' | 'salesComparison';
-
-export default function SalesTable({
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   module = 'bookings',
   containerHeight,
   containerWidth,
   variant,
   data,
-<<<<<<< HEAD
   primaryBtnTxt,
   showPrimaryBtn = false,
   handlePrimaryBtnClick,
@@ -114,30 +85,6 @@ export default function SalesTable({
   const [rowData, setRowData] = useState([]);
   const [response, setResponse] = useState<Submit>({ type: '', data: [] });
   const { productions } = useRecoilValue(productionJumpState);
-=======
-  handleError,
-  primaryBtnTxt = 'Ok',
-  showPrimaryBtn,
-  handlePrimaryBtnClick,
-  secondaryBtnText = 'Cancel',
-  showSecondaryBtn,
-  handleSecondaryBtnClick,
-  showExportBtn,
-  backBtnTxt = 'Back',
-  showBackBtn,
-  handleBackBtnClick
-}: Partial<SalesTableProps>) {
-
-  const { fetchData } = useAxios();
-  const [columnDefs, setColumnDefs] = useState([]);
-  const [rowData, setRowData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const venueDict = useRecoilValue(venueState);
-  const { productions } = useRecoilValue(productionJumpState);
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [response, setResponse] = useState([]);
->>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] }
@@ -488,21 +435,26 @@ bookings.forEach((booking, index) => {
   const exec = (variant: string, data: any) => {
     switch (variant) {
       case 'salesComparison':
-        console.log({ function: 'salesComparison', data: data })
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
+<<<<<<< HEAD
         console.log({ function: 'salesSnapshot', data: data })
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> c4ebbe1 (a few fixes to ensure vercel can successfully build when merging)
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'prodComparision', data: data })
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> c4ebbe1 (a few fixes to ensure vercel can successfully build when merging)
         productionComparision(data);
         break;
     }
