@@ -492,13 +492,17 @@ bookings.forEach((booking, index) => {
     switch (variant) {
       case 'salesComparison':
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'salesComparison', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         console.log({ function: 'salesSnapshot', data: data })
@@ -508,6 +512,8 @@ bookings.forEach((booking, index) => {
 =======
         console.log({ function: 'salesSnapshot', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
         salesSnapshot(data);
         break;
 
@@ -515,6 +521,7 @@ bookings.forEach((booking, index) => {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'prodComparision', data: data })
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -523,6 +530,8 @@ bookings.forEach((booking, index) => {
 =======
         console.log({ function: 'prodComparision', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
         productionComparision(data);
         break;
     }
