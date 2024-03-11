@@ -22,9 +22,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [showVenueSelectModal, setShowVenueSelect] = useState<boolean>(visible);
   const [showCompSelectModal, setShowCompSelect] = useState<boolean>(false);
   const [showResultsModal, setShowResults] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [bookings, setBookings] = useState([]);
-  const [rowData, setRowData] = useState([]);
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
   const [compData, setCompData] = useState<ProdComp>();
 
