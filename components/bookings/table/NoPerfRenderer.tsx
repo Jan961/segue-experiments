@@ -43,18 +43,13 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
   };
   return (
     <div className="mt-2.5 w-full flex justify-center">
-      {isDisabled ? (
-        <div
-          className={`border-2 mx-auto border-primary-input-text rounded-sm line text-sm p-0 w-[1.2rem] !h-[1.2rem]`}
-        ></div>
-      ) : (
-        <TextInputRenderer
-          eGridCell={eGridCell}
-          value={noOfPerfs}
-          onChange={handleChange}
-          className="w-[1.2rem] !h-[1.2rem] !text-center border-2 border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm p-0 w-[1.1875rem] h-[1.1875rem] focus:!ring-0"
-        />
-      )}
+      <TextInputRenderer
+        eGridCell={eGridCell}
+        value={noOfPerfs}
+        onChange={handleChange}
+        disabled={isDisabled}
+        className="w-[1.2rem] !h-[1.2rem] !text-center border-2 border-primary-input-text focus:border-primary-input-text rounded-sm line text-sm !p-0 focus:!ring-0"
+      />
     </div>
   );
 };

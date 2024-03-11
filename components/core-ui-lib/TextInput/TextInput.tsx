@@ -38,6 +38,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           className={classNames(baseClass, inputClass, `${iconName ? 'pr-6' : ''}`, className)}
           onChange={onChange}
           placeholder={placeHolder}
+          disabled={disabled}
           value={value || ''}
           {...rest}
         />

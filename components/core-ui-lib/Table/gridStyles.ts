@@ -69,6 +69,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-family: 'Calibri', sans-serif;
     font-weight: 600;
     font-size: 16px;
+    text-align: center;
     justify-content: center;
 }
 .ag-header-cell-resize::after {

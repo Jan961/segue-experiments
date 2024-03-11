@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import Typeahead from 'components/core-ui-lib/Typeahead';
@@ -16,7 +16,16 @@ const SelectDayTypeRender = ({
   eGridCell,
 }: SelectDayTypeRendererProps) => {
   const [selectedDateType, setSelectedDateType] = useState<string>('');
-
+  const formattedOptions = useMemo(
+    () => [
+      {
+        text: '',
+        value: null,
+      },
+      ...dayTypeOptions,
+    ],
+    [dayTypeOptions],
+  );
   const elRef = useRef(null);
 
   useEffect(() => {
@@ -53,7 +62,7 @@ const SelectDayTypeRender = ({
     <div className="pl-1 pr-2 mt-1" tabIndex={1}>
       <Typeahead
         ref={elRef}
-        options={dayTypeOptions}
+        options={formattedOptions}
         value={selectedDateType}
         onChange={handleChange}
         inline
