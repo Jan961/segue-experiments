@@ -23,7 +23,7 @@ export default function VenueFilter() {
               titleClassName="text-primary-orange"
             ></GlobalToolbar>
           </div>
-          <div className="px-4 flex items-center gap-4 flex-wrap  py-1 w-full">
+          <div className="px-4 flex  gap-4 flex-wrap  py-1 w-full">
             <div className="w-full flex flex-row gap-5">
               <Select
                 onChange={(value) => onChange({ target: { id: 'status', value } })}
@@ -48,14 +48,16 @@ export default function VenueFilter() {
               onChange={(value) => onChange({ target: { id: 'status', value } })}
               //   disabled={!ProductionId}
               value={venueFilter.town}
-              className="bg-white w-52"
+              className="bg-white w-[460px] h-fit"
               label="Country"
               placeHolder="Select Country"
               //   options={allStatusOptions}
             />
             {/* <SearchBox /> */}
-            <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
-            <Button text="Add New" className="text-sm leading-8 w-[100px]" />
+            <div className=" flex flex-col gap-3 ">
+              <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
+              <Button text="Add New" className="text-sm leading-8 w-[100px]" />
+            </div>
           </div>
         </div>
       </div>

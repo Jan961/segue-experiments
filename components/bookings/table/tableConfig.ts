@@ -268,28 +268,28 @@ export const barredVenueColumnDefs = [
 export const venueColumnDefs = [
   {
     headerName: 'Venue Code',
-    field: 'VenueCode',
+    field: 'Code',
     cellRenderer: DefaultCellRenderer,
     width: 120,
     headerClass: 'text-center',
   },
   {
     headerName: 'Venue Name',
-    field: 'VenueName',
+    field: 'Name',
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',
   },
   {
     headerName: 'Town',
-    field: 'VenueTown',
+    field: 'Town',
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',
   },
   {
     headerName: 'Capacity',
-    field: 'VenueCapacity',
+    field: 'Seats',
     cellRenderer: DefaultCellRenderer,
     width: 120,
     headerClass: 'text-center',
