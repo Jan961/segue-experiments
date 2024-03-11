@@ -5,20 +5,18 @@ import { steps } from 'config/AddBooking';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { useSetRecoilState } from 'recoil';
-import { newBookingState } from 'state/booking/newBookingState';
 
 type BarringIssueViewProps = {
   barringConflicts?: BarredVenue[];
+  updateModalTitle: (title: string) => void;
 };
 
-export default function BarringIssueView({ barringConflicts }: BarringIssueViewProps) {
-  const { previousStep, activeStep, goToStep } = useWizard();
-  const setViewHeader = useSetRecoilState(newBookingState);
+export default function BarringIssueView({ barringConflicts, updateModalTitle }: BarringIssueViewProps) {
+  const { previousStep, goToStep } = useWizard();
 
   useEffect(() => {
-    setViewHeader({ stepIndex: activeStep });
-  }, [activeStep]);
+    updateModalTitle('Barring Issue');
+  }, []);
 
   const gridOptions = {
     autoSizeStrategy: {

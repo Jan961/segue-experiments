@@ -27,6 +27,7 @@ type NewBookingDetailsProps = {
   onSubmit: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
+  updateModalTitle: (title: string) => void;
 };
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
@@ -41,6 +42,7 @@ export default function NewBookingDetailsView({
   onSubmit,
   toggleModalOverlay,
   onClose,
+  updateModalTitle,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const venueDict = useRecoilValue(venueState);
@@ -53,6 +55,10 @@ export default function NewBookingDetailsView({
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [changesMade, setChangesMade] = useState<boolean>(false);
+
+  useEffect(() => {
+    updateModalTitle('New Booking Details');
+  }, []);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -216,7 +222,7 @@ export default function NewBookingDetailsView({
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{production.Id}</div>
+        <div className="text-primary-navy text-xl my-2 font-bold">{`${production.ShowCode}${production.Code}  ${production?.ShowName}`}</div>
       </div>
       <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
         <Table
