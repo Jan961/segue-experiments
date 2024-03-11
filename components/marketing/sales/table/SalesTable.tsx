@@ -262,17 +262,14 @@ export default function SalesTable({
   const exec = (variant: string, data: any) => {
     switch (variant) {
       case 'salesComparison':
-        console.log({ function: 'salesComparison', data: data })
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
-        console.log({ function: 'salesSnapshot', data: data })
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
-        console.log({ function: 'prodComparision', data: data })
         productionComparision(data);
         break;
     }
