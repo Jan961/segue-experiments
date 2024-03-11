@@ -14,45 +14,49 @@ export default function VenueFilter() {
   return (
     <>
       <div className="w-full flex items-center justify-between flex-wrap">
-        <div className="mx-0">
+        <div className=" w-full flex flex-row ">
           <div className="px-4">
             <GlobalToolbar
-              title="Venues"
-              //   searchFilter={venueFilter.town}
-              //   setSearchFilter={(town) => setVenueFilter({ town })}
+              title={'Venues'}
+              searchFilter={venueFilter.town}
+              setSearchFilter={(town) => setVenueFilter({ town })}
               titleClassName="text-primary-orange"
             ></GlobalToolbar>
           </div>
-          <Select
-            onChange={(value) => onChange({ target: { id: 'status', value } })}
-            //   disabled={!ProductionId}
-            value={venueFilter.town}
-            className="bg-white w-52"
-            label="Town"
-            placeHolder="Select Town"
-            //   options={allStatusOptions}
-          />
-          <Select
-            onChange={(value) => onChange({ target: { id: 'status', value } })}
-            //   disabled={!ProductionId}
-            value={venueFilter.town}
-            className="bg-white w-52"
-            label="On Production"
-            placeHolder="Select Production"
-            //   options={allStatusOptions}
-          />
-          <Select
-            onChange={(value) => onChange({ target: { id: 'status', value } })}
-            //   disabled={!ProductionId}
-            value={venueFilter.town}
-            className="bg-white w-52"
-            label="Country"
-            placeHolder="Select Country"
-            //   options={allStatusOptions}
-          />
-          {/* <SearchBox /> */}
-          <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
-          <Button text="Add New" className="text-sm leading-8 w-[100px]" />
+          <div className="px-4 flex items-center gap-4 flex-wrap  py-1 w-full">
+            <div className="w-full flex flex-row gap-5">
+              <Select
+                onChange={(value) => onChange({ target: { id: 'status', value } })}
+                //   disabled={!ProductionId}
+                value={venueFilter.town}
+                className="bg-white w-full"
+                label="Town"
+                placeHolder="Select Town"
+                //   options={allStatusOptions}
+              />
+              <Select
+                onChange={(value) => onChange({ target: { id: 'status', value } })}
+                //   disabled={!ProductionId}
+                value={venueFilter.town}
+                className="bg-white w-full"
+                label="On Production"
+                placeHolder="Select Production"
+                //   options={allStatusOptions}
+              />
+            </div>
+            <Select
+              onChange={(value) => onChange({ target: { id: 'status', value } })}
+              //   disabled={!ProductionId}
+              value={venueFilter.town}
+              className="bg-white w-52"
+              label="Country"
+              placeHolder="Select Country"
+              //   options={allStatusOptions}
+            />
+            {/* <SearchBox /> */}
+            <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
+            <Button text="Add New" className="text-sm leading-8 w-[100px]" />
+          </div>
         </div>
       </div>
     </>

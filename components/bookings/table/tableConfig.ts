@@ -265,7 +265,7 @@ export const barredVenueColumnDefs = [
     },
   },
 ];
-export const VenueColumnDefs = [
+export const venueColumnDefs = [
   {
     headerName: 'Venue Code',
     field: 'VenueCode',
