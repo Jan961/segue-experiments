@@ -263,25 +263,34 @@ export default function SalesTable({
     switch (variant) {
       case 'salesComparison':
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'salesComparison', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
         salesComparison(data);
         break;
 
       case 'salesSnapshot':
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'salesSnapshot', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         console.log({ function: 'prodComparision', data: data })
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
         productionComparision(data);
         break;
     }
