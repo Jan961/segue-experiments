@@ -56,7 +56,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
   const currentProduction = useRecoilValue(currentProductionSelector);
   const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
   const primaryBlock = scheduleDateBlocks?.find(({ IsPrimary }) => !!IsPrimary);
-
   const dayTypes = useRecoilValue(dateTypeState);
   const dayTypeOptions = useMemo(
     () =>
@@ -128,7 +127,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
         <NewBookingDetailsView
           formData={state.form}
           data={state.booking}
-          productionCode={productionCode}
+          production={currentProduction}
           dateBlockId={primaryBlock?.Id}
           dayTypeOptions={dayTypeOptions}
           venueOptions={venueOptions}
