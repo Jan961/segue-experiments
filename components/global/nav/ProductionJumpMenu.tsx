@@ -6,6 +6,40 @@ import { useRecoilState } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ProductionOption from './ProductionOption';
 
+const ARCHIVED_OPTION_STYLES = {
+  option: (styles, { isDisabled, isSelected, isFocused, data }) => {
+    return {
+      ...styles,
+      fontSize: '1rem',
+      lineHeight: '1.5rem',
+      backgroundColor: isDisabled
+        ? undefined
+        : isSelected && !data.IsArchived
+        ? '#21345BCC'
+        : isSelected && data.IsArchived
+        ? '#707070'
+        : isFocused && !data.IsArchived
+        ? '#21345B99'
+        : isFocused && data.IsArchived
+        ? '#464646b3'
+        : data.IsArchived
+        ? '#4646464d'
+        : '#FFF',
+      color: isDisabled ? '#ccc' : isSelected || isFocused ? '#FFF' : '#617293',
+      cursor: isDisabled ? 'not-allowed' : 'default',
+      ':active': {
+        ...styles[':active'],
+        backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
+      },
+      ':hover': {
+        ...styles[':hover'],
+        color: '#FFF',
+        backgroundColor: data.IsArchived ? '#464646b3' : '#21345B99',
+      },
+    };
+  },
+};
+
 export default function ProductionJumpMenu() {
   const router = useRouter();
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
@@ -69,6 +103,7 @@ export default function ProductionJumpMenu() {
         label="Production"
         placeholder="Please select a Production"
         renderOption={(option) => <ProductionOption option={option} />}
+        customStyles={ARCHIVED_OPTION_STYLES}
         options={productions}
         onChange={goToProduction}
         isSearchable
