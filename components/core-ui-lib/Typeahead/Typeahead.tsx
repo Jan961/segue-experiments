@@ -112,7 +112,7 @@ export default forwardRef(function Typeahead(
         padding: '0 6px',
       }),
       input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
-      placeholder: (styles) => ({ ...styles }),
+      placeholder: (styles) => ({ ...styles, color: '#617293' }),
       singleValue: (styles) => ({
         ...styles,
         color: '#617293',
@@ -170,7 +170,7 @@ export default forwardRef(function Typeahead(
       <WindowedSelect
         ref={ref}
         tabIndex={11}
-        className="w-full"
+        className="w-full placeholder-primary"
         onChange={handleOptionSelect}
         value={selectedOption}
         components={customComponents}
