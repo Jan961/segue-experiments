@@ -17,9 +17,11 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
 
   useEffect(() => {
     if (data) {
-      if (data.isRunOfDates && node.rowIndex > 0) {
-        setIsDisabled(true);
+      const { isRunOfDates, dayType } = data;
+      if (dayType === null || dayType === '') {
+        setValue(null);
       }
+      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
     }
   }, [data, node]);
 
@@ -35,7 +37,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         eGridCell={eGridCell}
         onChange={handleValueChange}
         options={pencilNos}
-        value={value.toString()}
+        value={value}
         inline
         isSearchable={false}
         disabled={isDisabled}

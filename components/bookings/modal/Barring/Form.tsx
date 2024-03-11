@@ -58,9 +58,9 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
           <div className="col-span-2 col-start-4 flex items-center justify-between pl-6">
-            <Label text="Bar Distance"></Label>
+            <Label className="!text-primary" text="Bar Distance"></Label>
             <TextInput
-              className="w-24"
+              className="w-24 placeholder-primary"
               id="barDistance"
               placeHolder="Enter Miles"
               onChange={(e) => handleOnChange({ barDistance: e.target.value })}
@@ -71,6 +71,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             <Typeahead
               name="venue"
               label="Venue"
+              className="placeholder-primary"
               onChange={(selectedVenue) => handleOnChange({ venueId: selectedVenue })}
               options={venueOptions}
               placeholder="Please select a venue"
@@ -78,10 +79,10 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
           <div className="col-span-2 col-start-4 row-start-2 flex items-center justify-between pl-6">
-            <Label text="Minimum Seats"></Label>
+            <Label className="!text-primary" text="Minimum Seats"></Label>
             <TextInput
               id="Seats"
-              className="w-24"
+              className="w-24 placeholder-primary"
               placeHolder="Enter Seats"
               onChange={(e) => handleOnChange({ seats: e.target.value })}
               value={seats}
@@ -90,6 +91,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
           <div className="col-span-3 row-start-3">
             <DateRange
               className="w-fit"
+              label="Date"
               onChange={({ from, to }) => handleOnChange({ fromDate: from?.toISOString(), toDate: to?.toISOString() })}
               value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
               minDate={minDate ? new Date(minDate) : null}

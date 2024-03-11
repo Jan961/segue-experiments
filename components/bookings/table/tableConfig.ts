@@ -239,14 +239,14 @@ export const barredVenueColumnDefs = [
     headerName: 'Date',
     field: 'FormattedDate',
     cellRenderer: DefaultCellRenderer,
-    width: 120,
+    width: 80,
     headerClass: 'text-center',
   },
   {
     headerName: 'Miles',
     field: 'Mileage',
     cellRenderer: DefaultCellRenderer,
-    width: 65,
+    width: 80,
     headerClass: 'text-center',
   },
   {
