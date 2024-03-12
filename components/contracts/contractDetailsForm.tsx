@@ -181,7 +181,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ShowDate: c.ShowDate,
         VenueContractStatus: c.VenueContractStatus,
         DealType: c.DealType,
-        ContractSignedDate: formatInputDate(c.ContractSignedDate, '-'),
+        ContractSignedDate: formatInputDate(c.ContractSignedDate),
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -191,8 +191,8 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.ContractNotes,
         GP: c.GP,
-        ContractReturnDate: formatInputDate(c.ContractReturnDate, '-'),
-        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate, '-'),
+        ContractReturnDate: formatInputDate(c.ContractReturnDate),
+        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {
