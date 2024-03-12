@@ -1,4 +1,4 @@
-import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const statusOptions: SelectOption[] = [
   { text: 'Confirmed', value: 'C' },

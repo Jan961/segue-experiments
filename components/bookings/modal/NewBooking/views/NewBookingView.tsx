@@ -15,7 +15,7 @@ import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
-import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';

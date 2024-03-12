@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 

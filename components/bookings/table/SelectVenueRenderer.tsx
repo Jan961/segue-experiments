@@ -1,4 +1,4 @@
-import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams, IRowNode } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 import { useEffect, useState } from 'react';

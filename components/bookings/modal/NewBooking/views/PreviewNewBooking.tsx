@@ -9,7 +9,7 @@ import { getDateDaysAgo, getDateDaysInFuture, toSql, calculateWeekNumber } from 
 import moment from 'moment';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
-import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { distanceState } from 'state/booking/distanceState';
 import { steps } from 'config/AddBooking';

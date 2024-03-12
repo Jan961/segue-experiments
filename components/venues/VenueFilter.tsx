@@ -1,5 +1,5 @@
 import Button from 'components/core-ui-lib/Button';
-import Select from 'components/core-ui-lib/SelectOld';
+import Select from 'components/core-ui-lib/Select';
 
 // import { SearchBox } from 'components/global/SearchBox';
 import GlobalToolbar from 'components/toolbar';
