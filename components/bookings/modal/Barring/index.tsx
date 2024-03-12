@@ -20,10 +20,10 @@ type BarringProps = {
   onClose: () => void;
 };
 
-const BarringGridOptions = {
+const barringGridOptions = {
   ...gridOptions,
   rowClassRules: {
-    '!bg-red-100': (params) => params.data.hasBarringConflict,
+    '!bg-primary-orange': (params) => params.data.hasBarringConflict,
   },
 };
 
@@ -112,7 +112,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                   columnDefs={barredVenueColumnDefs}
                   rowData={filteredRows?.slice(0, 30)}
                   styleProps={styleProps}
-                  gridOptions={BarringGridOptions}
+                  gridOptions={barringGridOptions}
                 />
               </div>
             </div>
