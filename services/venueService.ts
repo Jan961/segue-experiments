@@ -26,6 +26,11 @@ export const getAllVenues = async () => {
     where: {
       IsDeleted: false,
     },
+    // select: {
+    //   VenueAddress: {
+    //     Town: true,
+    //   },
+    // },
   });
 };
 
