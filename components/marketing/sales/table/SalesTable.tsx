@@ -107,6 +107,7 @@ interface SalesTableProps {
 <<<<<<< HEAD
   handleCellClick?: (e: any) => void;
   handleCellValChange?: (e: any) => void;
+<<<<<<< HEAD
   cellRenderParams?: any;
 }
 
@@ -119,6 +120,8 @@ export default function SalesTable({
 =======
   handleCellClick?: (e: any) => void;
 >>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
+=======
+>>>>>>> 442b778 (flow complete - ready for partial PR)
 }
 
 type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | '';
@@ -170,7 +173,8 @@ export default function SalesTable({
   backBtnTxt,
   showBackBtn,
   handleBackBtnClick,
-  handleCellClick
+  handleCellClick,
+  handleCellValChange
 }: Partial<SalesTableProps>) {
 
   const { fetchData } = useAxios();
@@ -364,13 +368,12 @@ bookings.forEach((booking, index) => {
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   const onSubmit = () => {
     switch (response.type) {
-      case 'prodComparision':
-        alert(response.data.length + ' | ' + JSON.stringify(response.data))
-        if (response.data.length < 2) {
-          setErrorMessage('Please select at least 2 venues for comparison.')
-        } else {
-          handlePrimaryBtnClick(response);
-        }
+      // case 'prodComparision':
+      //   if (response.data.length < 2) {
+      //     setErrorMessage('Please select at least 2 venues for comparison.')
+      //   } else {
+      //     handlePrimaryBtnClick(response);
+      //   }
       default:
         handlePrimaryBtnClick(response);
     }
@@ -385,7 +388,6 @@ bookings.forEach((booking, index) => {
       //I need some kind of wait function to ensure data is not undefined
       if (data !== undefined) {
         data.forEach(week => {
-          console.log({valueChange: week.valueChange, seatsChange: week.seatsChnage})
           tempRowData.push({
             week: week.week,
             weekOf: formatInputDate(week.weekOf),
@@ -481,35 +483,6 @@ bookings.forEach((booking, index) => {
 
   }
 
-  const selectForComparison = (selectedValue) => {
-    console.log('select for comparision: ' + JSON.stringify(selectedValue) )
-    let tempBookings = response.data.length === 0 ? [] : response.data;
-
-    if (selectedValue.order === null) {
-      const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
-      if (bookingToDel > -1) {
-        tempBookings.splice(bookingToDel, 1);
-        setResponse({type: 'prodComparision', data: tempBookings});
-      }
-    } else {
-      tempBookings.push({
-        BookingId: selectedValue.BookingId,
-        order: selectedValue.order,
-        prodCode: selectedValue.prodCode,
-        prodName: selectedValue.prodName,
-        numPerfs: selectedValue.numPerfs
-      });
-
-      //if length of tempBookings is >= 2, errorMessage can be removed
-      if (tempBookings.length >= 2) {
-        setErrorMessage('');
-      }
-
-      setResponse({type: 'prodComparision', data: tempBookings});
-    }
-  };
-
-
   const productionComparision = (prodComp: ProdComp) => {
     try {
       const venue = venueDict[prodComp.venueId];
@@ -538,7 +511,8 @@ bookings.forEach((booking, index) => {
           });
 
           setRowData(processedBookings);
-          setColumnDefs(prodComparisionColDefs(data.length, selectForComparison))
+          setColumnDefs(prodComparisionColDefs(data.length, handleCellValChange));
+          setResponse({type: 'prodComparision', data: []})
 
         } else {
           if (handleError) {
@@ -702,6 +676,7 @@ bookings.forEach((booking, index) => {
             styleProps={styleProps}
             gridOptions={gridOptions}
             onCellClicked={handleCellClick}
+            onCellValueChange={handleCellValChange}
           />
 
           <div className='float-left flex flex-row mt-5 text-primary-red'>
