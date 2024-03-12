@@ -2,16 +2,22 @@ import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/ta
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { steps } from 'config/AddBooking';
+import { BookingWithVenueDTO } from 'interfaces';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
 
 type BarringIssueViewProps = {
+  bookingConflicts: BookingWithVenueDTO[];
   barringConflicts?: BarredVenue[];
   updateModalTitle: (title: string) => void;
 };
 
-export default function BarringIssueView({ barringConflicts, updateModalTitle }: BarringIssueViewProps) {
+export default function BarringIssueView({
+  bookingConflicts,
+  barringConflicts,
+  updateModalTitle,
+}: BarringIssueViewProps) {
   const { previousStep, goToStep } = useWizard();
 
   useEffect(() => {
@@ -26,7 +32,7 @@ export default function BarringIssueView({ barringConflicts, updateModalTitle }:
   };
 
   const goToPreviousStep = () => {
-    if (barringConflicts?.length > 0) {
+    if (bookingConflicts?.length > 0) {
       previousStep();
     } else {
       goToStep(steps.indexOf('Create New Booking'));
