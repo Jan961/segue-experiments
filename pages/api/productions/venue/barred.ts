@@ -62,19 +62,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
     const filteredResults: BarredVenue[] = result
       .map(({ Mileage, TimeMins, Venue2 }) => {
-        let hasBarringConflict = false;
         const { FirstDate, Id: BookingId } =
           Venue2.Booking.find((booking) => booking.DateBlock.ProductionId === productionId) || {};
         const { Name, Code, Id, StatusCode, VenueAddress } = Venue2;
         const town = VenueAddress?.[0]?.Town;
         if (!FirstDate) return null;
-        if (
+        const hasBarringConflict =
           (Mileage <= barDistance || Venue2.seats <= seats) &&
           (!startDate || new Date(startDate) >= new Date(FirstDate)) &&
-          (!endDate || new Date(endDate) <= new Date(FirstDate))
-        ) {
-          hasBarringConflict = true;
-        }
+          (!endDate || new Date(endDate) <= new Date(FirstDate));
         return {
           Id,
           Name,
