@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { BookingItem, TForm } from '../reducer';
 import NotesPopup from 'components/bookings/NotesPopup';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
 import { ColDef } from 'ag-grid-community';
 import { steps } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';

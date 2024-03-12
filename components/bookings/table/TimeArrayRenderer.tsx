@@ -23,9 +23,10 @@ const TimeArrayRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProp
       const newTimes = Array(data.noPerf).fill({ hrs: '', min: '', sec: '' });
       setPerformanceTimes(newTimes);
     } else {
+      setValue('');
       setPerformanceTimes([]);
     }
-  }, [data]);
+  }, [data.perf, data.noPerf]);
 
   const handleTimeChange = (index: number, newTime: Time) => {
     const updatedTimes = [...performanceTimes];

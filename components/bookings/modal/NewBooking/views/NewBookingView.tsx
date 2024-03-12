@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useRecoilValue } from 'recoil';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
@@ -15,7 +15,7 @@ import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
@@ -171,7 +171,7 @@ const NewBookingView = ({
         </div>
         {isDateTypeOnly && (
           <>
-            <Typeahead
+            <Select
               className={'my-2 w-full !border-0'}
               options={dayTypeOptions}
               disabled={stage !== 0}
@@ -184,7 +184,7 @@ const NewBookingView = ({
         )}
         {!isDateTypeOnly && (
           <>
-            <Typeahead
+            <Select
               className={classNames('my-2 w-full !border-0')}
               options={venueOptions}
               disabled={stage !== 0}

@@ -1,5 +1,5 @@
 import { ICellRendererParams } from 'ag-grid-community';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
 import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 import { useEffect, useState } from 'react';
 

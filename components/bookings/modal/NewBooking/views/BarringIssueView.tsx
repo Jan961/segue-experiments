@@ -24,13 +24,6 @@ export default function BarringIssueView({
     updateModalTitle('Barring Issue');
   }, []);
 
-  const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-    },
-  };
-
   const goToPreviousStep = () => {
     if (bookingConflicts?.length > 0) {
       previousStep();
@@ -45,12 +38,7 @@ export default function BarringIssueView({
         A Barring Check has found potential issues
       </span>
       <div className="w-[634px] flex flex-col">
-        <Table
-          columnDefs={barringIssueColumnDefs}
-          rowData={barringConflicts}
-          styleProps={styleProps}
-          gridOptions={gridOptions}
-        />
+        <Table columnDefs={barringIssueColumnDefs} rowData={barringConflicts} styleProps={styleProps} />
         <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
           <Button

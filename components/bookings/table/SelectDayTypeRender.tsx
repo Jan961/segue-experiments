@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { useEffect, useMemo, useState } from 'react';
+import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
 import { ICellRendererParams } from 'ag-grid-community';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 
 interface SelectDayTypeRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
@@ -26,7 +26,6 @@ const SelectDayTypeRender = ({
     ],
     [dayTypeOptions],
   );
-  const elRef = useRef(null);
 
   useEffect(() => {
     if (data && dayTypeOptions) {
@@ -35,19 +34,6 @@ const SelectDayTypeRender = ({
       setSelectedDateType(dayTypeIndex);
     }
   }, [data, value, dayTypeOptions, node]);
-
-  useEffect(() => {
-    if (eGridCell) {
-      const setFocus = () => {
-        elRef?.current?.focus();
-      };
-      eGridCell.addEventListener('focusin', setFocus);
-
-      return () => {
-        eGridCell.removeEventListener('focusin', setFocus);
-      };
-    }
-  }, [eGridCell]);
 
   const handleChange = (selectedValue) => {
     const dayTypeOption = dayTypeOptions?.find(({ value }) => value === selectedValue);
@@ -60,8 +46,8 @@ const SelectDayTypeRender = ({
 
   return (
     <div className="pl-1 pr-2 mt-1" tabIndex={1}>
-      <Typeahead
-        ref={elRef}
+      <SelectRenderer
+        eGridCell={eGridCell}
         options={formattedOptions}
         value={selectedDateType}
         onChange={handleChange}

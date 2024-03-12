@@ -10,7 +10,7 @@ import moment from 'moment';
 import { venueState } from 'state/booking/venueState';
 import { distanceState } from 'state/booking/distanceState';
 import { bookingStatusMap } from 'config/bookings';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { SelectOption } from 'components/core-ui-lib/SelectOld/Select';
 import { steps } from 'config/AddBooking';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { useEffect } from 'react';
