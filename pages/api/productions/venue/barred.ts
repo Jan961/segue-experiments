@@ -26,10 +26,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const result = await prisma.VenueVenue.findMany({
       where: {
         Venue1Id: venueId,
-        ...(barDistance && { Mileage: { lte: barDistance } }),
         Venue2: {
           ...(!includeExcluded && { ExcludeFromChecks: false }),
-          ...(seats && { Seats: { gte: seats } }),
         },
       },
       select: {
@@ -69,8 +67,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const { Name, Code, Id, StatusCode, VenueAddress } = Venue2;
         const town = VenueAddress?.[0]?.Town;
         if (!FirstDate) return null;
-        if (startDate && new Date(startDate) >= new Date(FirstDate)) return null;
-        if (endDate && new Date(endDate) <= new Date(FirstDate)) return null;
+        const hasBarringConflict =
+          (Mileage <= barDistance || Venue2.seats <= seats) &&
+          (!startDate || new Date(startDate) >= new Date(FirstDate)) &&
+          (!endDate || new Date(endDate) <= new Date(FirstDate));
         return {
           Id,
           Name,
@@ -81,6 +81,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           BookingId,
           Date: FirstDate,
           town,
+          hasBarringConflict,
         };
       })
       .filter((x) => {
