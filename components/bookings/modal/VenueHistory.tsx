@@ -10,8 +10,11 @@ import Button from 'components/core-ui-lib/Button';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 import { Spinner } from 'components/global/Spinner';
+=======
+>>>>>>> 442b778 (flow complete - ready for partial PR)
 import { useRouter } from 'next/router';
 <<<<<<< HEAD
 import Table from 'components/core-ui-lib/Table';
@@ -76,6 +79,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [showResultsModal, setShowResults] = useState<boolean>(false);
 <<<<<<< HEAD
   const [bookings, setBookings] = useState([]);
+  const [selectedBookings, setSelBookings] = useState([]); // patch fix just to make available on main
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
   const [compData, setCompData] = useState<ProdComp>();
 <<<<<<< HEAD
@@ -92,11 +96,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
   const [showSalesSnapshot, setShowSalesSnapshot] = useState<boolean>(false);
   const [bookingId, setBookingId] = useState(0);
+<<<<<<< HEAD
 >>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
 
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+  const [venueID, setVenueID] = useState(null);
+>>>>>>> 442b778 (flow complete - ready for partial PR)
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
+
 
 
   const handleModalCancel = () => onCancel?.();
@@ -166,12 +175,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   const toggleModal = (type: string, data) => {
-    console.log('in toggle modal:', type, data)
     switch (type) {
       case 'venue':
+        if (isNaN(data)) break;
         const venue = venueDict[data];
         setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        setVenueID(data)
+>>>>>>> 442b778 (flow complete - ready for partial PR)
 
         const compData: ProdComp = {
           venueId: data,
@@ -183,14 +196,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         setShowCompSelect(true);
         break;
 
-      case 'bookingList':
-        setBookings(data);
+      case 'prodComparision':
+        setBookings(selectedBookings)
         setShowCompSelect(false);
         setShowResults(true);
         break;
 
       case 'salesSnapshot':
-        console.log('selected booking id for sales snap: ' + data);
         setBookingId(data);
         setShowSalesSnapshot(true);
     }
@@ -254,13 +266,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   }
 
   const handleBtnBack = (type: string) => {
-    if(type === 'salesComparison'){
+    if (type === 'salesComparison') {
       setShowResults(false);
       setShowCompSelect(true);
-    } else if(type === 'prodComparision'){
+    } else if (type === 'prodComparision') {
       setShowCompSelect(false);
       setShowVenueSelect(true);
-    } 
+    }
   }
 
   const handleTableCellClick = (e) => {
@@ -268,6 +280,38 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       toggleModal('salesSnapshot', e.data.BookingId)
     }
   }
+
+  const selectForComparison = (selectedValue) => {
+    if ('type' in selectedValue === false) {
+      let tempBookings = selectedBookings;
+      if (selectedValue.order === null) {
+        const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
+        if (bookingToDel > -1) {
+          tempBookings.splice(bookingToDel, 1);
+          setSelBookings(tempBookings);
+        }
+      } else {
+        tempBookings.push({
+          BookingId: selectedValue.BookingId,
+          order: selectedValue.order,
+          prodCode: selectedValue.prodCode,
+          prodName: selectedValue.prodName,
+          numPerfs: selectedValue.numPerfs
+        });
+
+        // if length of tempBookings is >= 2, errorMessage can be removed
+        // if (tempBookings.length >= 2) {
+        //   setErrorMessage('');
+        // }
+
+        setSelBookings(tempBookings);
+      }
+    }
+
+
+  };
+
+
 
   return (
     <div>
@@ -423,9 +467,15 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               <Typeahead
                 className={classNames('my-2 w-full !border-0 text-primary-navy')}
                 options={VenueOptions}
+<<<<<<< HEAD
                 // disabled={stage !== 0}
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+                isClearable
+                isSearchable
+                value={venueID}
+>>>>>>> 442b778 (flow complete - ready for partial PR)
                 onChange={(value) => toggleModal('venue', parseInt(value as string, 10))}
 =======
                 onChange={(value) => goToVenueSelection(parseInt(value as string, 10))}
@@ -499,6 +549,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             showBackBtn={true}
             //handleError={() => setVenueSelectView('error')}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            handleCellValChange={selectForComparison}
+>>>>>>> 442b778 (flow complete - ready for partial PR)
           />
 
 =======
@@ -560,6 +614,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             showPrimaryBtn={true}
             handleBackBtnClick={() => handleBtnBack('salesComparison')}
             showBackBtn={true}
+            backBtnTxt='Back'
           />
         </div>
 <<<<<<< HEAD
@@ -594,7 +649,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             primaryBtnTxt='Back'
             showPrimaryBtn={true}
             handlePrimaryBtnClick={() => setShowSalesSnapshot(false)}
-            //handleError={() => setVenueSelectView('error')}
+          //handleError={() => setVenueSelectView('error')}
           />
 
         </div>
