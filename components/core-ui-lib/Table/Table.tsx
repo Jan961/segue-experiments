@@ -35,7 +35,6 @@ const DEFAULT_GRID_OPTIONS = {
       wrapHeaderText: true,
     },
   },
-  suppressHeaderFocus: true,
 };
 
 export default forwardRef(function Table(

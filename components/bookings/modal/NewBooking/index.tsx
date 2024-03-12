@@ -4,12 +4,11 @@ import { Wizard } from 'react-use-wizard';
 import { AnimatePresence } from 'framer-motion';
 import NewBookingView from './views/NewBookingView';
 import BookingConflictsView from './views/BookingConflictsView';
-import { newBookingState } from 'state/booking/newBookingState';
 import BarringIssueView from './views/BarringIssueView';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
-import { Actions, INITIAL_STATE, OTHER_DAY_TYPES, steps } from 'config/AddBooking';
+import { Actions, INITIAL_STATE, OTHER_DAY_TYPES } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
@@ -34,7 +33,6 @@ type AddBookingProps = {
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
   const { fetchData, data } = useAxios();
 
-  const { stepIndex } = useRecoilValue(newBookingState);
   const bookingDict = useRecoilValue(bookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
@@ -82,12 +80,17 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
 
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
+    setNewBookingOnStore(null);
   };
   const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
   };
   const updateBarringConflicts = (barringConflicts: BarredVenue[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BARRED_VENUES, barringConflicts));
+  };
+
+  const updateModalTitle = (title: string) => {
+    dispatch(actionSpreader(Actions.UPDATE_MODAL_TITLE, title));
   };
 
   const setNewBookingOnStore = (booking: BookingItem[]) => {
@@ -107,7 +110,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       show={visible}
       onClose={() => onClose()}
       titleClass="text-xl text-primary-navy text-bold"
-      title={steps[stepIndex]}
+      title={state.modalTitle}
       panelClass="relative"
       hasOverlay={hasOverlay}
     >
@@ -121,9 +124,14 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           onClose={onClose}
           productionCode={productionCode}
           venueOptions={venueOptions}
+          updateModalTitle={updateModalTitle}
         />
-        <BookingConflictsView hasBarringIssues={state?.barringConflicts?.length > 0} data={state.bookingConflicts} />
-        <BarringIssueView barringConflicts={state.barringConflicts} />
+        <BookingConflictsView
+          hasBarringIssues={state?.barringConflicts?.length > 0}
+          data={state.bookingConflicts}
+          updateModalTitle={updateModalTitle}
+        />
+        <BarringIssueView barringConflicts={state.barringConflicts} updateModalTitle={updateModalTitle} />
         <NewBookingDetailsView
           formData={state.form}
           data={state.booking}
@@ -134,6 +142,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           onSubmit={setNewBookingOnStore}
           toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
           onClose={onClose}
+          updateModalTitle={updateModalTitle}
         />
         <PreviewNewBooking
           formData={state.form}
@@ -141,17 +150,20 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           data={state.booking}
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveNewBooking}
+          updateModalTitle={updateModalTitle}
         />
         <MileageBooking
           formData={state.form}
           productionCode={productionCode}
           data={state.booking}
           dayTypeOptions={dayTypeOptions}
+          updateModalTitle={updateModalTitle}
         />
         <GapSuggestionView
           productionId={currentProduction?.Id}
           startDate={state.form.fromDate}
           endDate={state.form.toDate}
+          updateModalTitle={updateModalTitle}
         />
       </Wizard>
       <ConfirmationDialog
