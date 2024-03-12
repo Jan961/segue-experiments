@@ -18,7 +18,7 @@ export default function SelectVenueRenderer({
   setValue,
 }: SelectVenueRendererProps) {
   const selectedDayTypeOption = dayTypeOptions.find(({ value }) => data.dayType === value);
-  const showDayType = selectedDayTypeOption && DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
+  const showDayType = selectedDayTypeOption && !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
 
   const handleVenueChange = (venue) => {
     setValue(venue);
