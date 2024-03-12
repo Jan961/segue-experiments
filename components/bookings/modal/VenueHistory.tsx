@@ -25,6 +25,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [bookings, setBookings] = useState([]);
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
   const [compData, setCompData] = useState<ProdComp>();
+  const [showSalesSnapshot, setShowSalesSnapshot] = useState<boolean>(false);
+  const [bookingId, setBookingId] = useState(0);
 
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
@@ -59,6 +61,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
 
   const toggleModal = (type: string, data) => {
+    console.log('in toggle modal:', type, data)
     switch (type) {
       case 'venue':
         const venue = venueDict[data];
@@ -79,6 +82,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         setShowCompSelect(false);
         setShowResults(true);
         break;
+
+      case 'salesSnapshot':
+        console.log('selected booking id for sales snap: ' + data);
+        setBookingId(data);
+        setShowSalesSnapshot(true);
     }
   }
 
@@ -89,6 +97,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     } else if(type === 'prodComparision'){
       setShowCompSelect(false);
       setShowVenueSelect(true);
+    } 
+  }
+
+  const handleTableCellClick = (e) => {
+    if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
+      toggleModal('salesSnapshot', e.data.BookingId)
     }
   }
 
@@ -140,7 +154,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 />
               </div>
             </div>
-
           )}
         </div>
       </PopupModal>
@@ -150,6 +163,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         title="Venue History"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
+        hasOverlay={showSalesSnapshot}
       >
         <div className="w-[920px] h-auto">
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
@@ -165,8 +179,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             secondaryBtnText='Cancel'
             showSecondaryBtn={true}
             handleSecondaryBtnClick={handleModalCancel}
-            handlePrimaryBtnClick={(bookings) => toggleModal('bookingList', bookings)}
+            handlePrimaryBtnClick={(r) => toggleModal(r.type, r.data)}
             handleBackBtnClick={() => handleBtnBack('prodComparision')}
+            backBtnTxt='Back'
+            handleCellClick={handleTableCellClick}
             showBackBtn={true}
             //handleError={() => setVenueSelectView('error')}
           />
@@ -199,6 +215,31 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             handleBackBtnClick={() => handleBtnBack('salesComparison')}
             showBackBtn={true}
           />
+        </div>
+      </PopupModal>
+
+      <PopupModal
+        show={showSalesSnapshot}
+        title="Venue History"
+        titleClass="text-xl text-primary-navy font-bold -mt-2"
+        onClose={handleModalCancel}
+        hasOverlay={false}
+      >
+        <div className="w-[920px] h-auto">
+          <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
+
+          <SalesTable
+            containerHeight='h-auto'
+            containerWidth='w-[920px]'
+            module='bookings'
+            data={bookingId}
+            variant='salesSnapshot'
+            primaryBtnTxt='Back'
+            showPrimaryBtn={true}
+            handlePrimaryBtnClick={() => setShowSalesSnapshot(false)}
+            //handleError={() => setVenueSelectView('error')}
+          />
+
         </div>
       </PopupModal>
     </div>
