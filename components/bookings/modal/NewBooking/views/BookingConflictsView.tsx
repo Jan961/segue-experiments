@@ -3,8 +3,6 @@ import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useMemo } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { useSetRecoilState } from 'recoil';
-import { newBookingState } from 'state/booking/newBookingState';
 import { bookingStatusMap } from 'config/bookings';
 import { dateToSimple } from 'services/dateService';
 import { BookingWithVenueDTO } from 'interfaces';
@@ -13,11 +11,11 @@ import { steps } from 'config/AddBooking';
 interface BookingConflictsViewProps {
   data?: BookingWithVenueDTO[];
   hasBarringIssues?: boolean;
+  updateModalTitle: (title: string) => void;
 }
 
-export default function BookingConflictsView({ data, hasBarringIssues }: BookingConflictsViewProps) {
-  const { nextStep, previousStep, activeStep, goToStep } = useWizard();
-  const setViewHeader = useSetRecoilState(newBookingState);
+export default function BookingConflictsView({ data, hasBarringIssues, updateModalTitle }: BookingConflictsViewProps) {
+  const { nextStep, previousStep, goToStep } = useWizard();
 
   const rows = useMemo(
     () =>
@@ -32,8 +30,8 @@ export default function BookingConflictsView({ data, hasBarringIssues }: Booking
   const confirmedBookings = useMemo(() => rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed'), [rows]);
 
   useEffect(() => {
-    setViewHeader({ stepIndex: activeStep });
-  }, [activeStep]);
+    updateModalTitle('Booking Conflict');
+  }, []);
 
   const gridOptions = {
     autoSizeStrategy: {

@@ -26,14 +26,20 @@ export default function SelectVenueRenderer({
 
   return (
     <div className="pl-1 pr-2 mt-1">
-      <SelectRenderer
-        eGridCell={eGridCell}
-        options={showDayType ? dayTypeOptions : venueOptions}
-        value={showDayType ? data.dayType : value}
-        inline
-        onChange={handleVenueChange}
-        isSearchable
-      />
+      {showDayType ? (
+        <div className="mt-1 p-2 border border-primary-border rounded-md w-full h-[1.9375rem] bg-primary-white flex items-center">
+          <span className="text-primary-input-text text-base font-bold leading-6">{selectedDayTypeOption.text}</span>
+        </div>
+      ) : (
+        <SelectRenderer
+          eGridCell={eGridCell}
+          options={venueOptions}
+          value={value}
+          inline
+          onChange={handleVenueChange}
+          isSearchable
+        />
+      )}
     </div>
   );
 }

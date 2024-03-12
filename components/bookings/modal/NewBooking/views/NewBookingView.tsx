@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
-import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
 import { BookingTypeMap, BookingTypes, steps } from 'config/AddBooking';
@@ -27,6 +26,7 @@ type AddBookingProps = {
   productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
+  updateModalTitle: (title: string) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
@@ -40,9 +40,9 @@ const NewBookingView = ({
   venueOptions,
   updateBookingConflicts,
   updateBarringConflicts,
+  updateModalTitle,
 }: AddBookingProps) => {
-  const { nextStep, activeStep, goToStep } = useWizard();
-  const setViewHeader = useSetRecoilState(newBookingState);
+  const { nextStep, goToStep } = useWizard();
 
   const currentProduction = useRecoilValue(currentProductionSelector);
   const scheduleRange = useRecoilValue(dateBlockSelector);
@@ -58,8 +58,8 @@ const NewBookingView = ({
   );
 
   useEffect(() => {
-    setViewHeader({ stepIndex: activeStep });
-  }, [activeStep]);
+    updateModalTitle('Create New Booking');
+  }, []);
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
@@ -217,12 +217,12 @@ const NewBookingView = ({
       <div className="flex mt-4 justify-between">
         <div
           className={classNames({
-            'cursor-not-allowed caret-primary-input-text': !(venueId || dateType) || !fromDate || !toDate,
+            'cursor-not-allowed caret-primary-input-text': !venueId || !fromDate || !toDate,
           })}
         >
           <Button
             onClick={() => null}
-            disabled={!(venueId || dateType) || !fromDate || !toDate}
+            disabled={!venueId || !fromDate || !toDate}
             className="px-6"
             text={'Check Mileage'}
           ></Button>

@@ -255,6 +255,7 @@ export const barredVenueColumnDefs = [
     cellRenderer: IconRenderer,
     cellRendererParams: {
       iconName: 'info-circle-solid',
+      tooltipPosition: 'left',
       popover: true,
     },
     width: 40,
@@ -263,5 +264,35 @@ export const barredVenueColumnDefs = [
     cellStyle: {
       overflow: 'visible',
     },
+  },
+];
+export const venueColumnDefs = [
+  {
+    headerName: 'Venue Code',
+    field: 'VenueCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Venue Name',
+    field: 'VenueName',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Town',
+    field: 'VenueTown',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Capacity',
+    field: 'VenueCapacity',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
   },
 ];
