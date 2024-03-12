@@ -20,6 +20,11 @@ type Booking = {
   numPerfs: number;
 }
 
+type Submit = {
+  data: any;
+  type: SalesTableVariant;
+}
+
 export type ProdComp = {
   venueId: number;
   showCode: string;
@@ -34,7 +39,7 @@ interface SalesTableProps {
   handleError?: () => void;
   primaryBtnTxt?: string;
   showPrimaryBtn?: boolean;
-  handlePrimaryBtnClick?: (data: any) => void;
+  handlePrimaryBtnClick?: (data: Submit) => void;
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
   handleSecondaryBtnClick?: () => void;
@@ -42,9 +47,11 @@ interface SalesTableProps {
   backBtnTxt?: string;
   showBackBtn?: boolean;
   handleBackBtnClick?: () => void;
+  handleCellClick?: (e: any) => void;
 }
 
-type SalesTableVariant = 'prodComparision' | 'prodSnapshot' | 'salesComparison';
+type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | '';
+
 
 export default function SalesTable({
   module = 'bookings',
@@ -53,16 +60,17 @@ export default function SalesTable({
   variant,
   data,
   handleError,
-  primaryBtnTxt = 'Ok',
-  showPrimaryBtn,
+  primaryBtnTxt,
+  showPrimaryBtn = false,
   handlePrimaryBtnClick,
-  secondaryBtnText = 'Cancel',
-  showSecondaryBtn,
+  secondaryBtnText,
+  showSecondaryBtn = false,
   handleSecondaryBtnClick,
-  showExportBtn,
-  backBtnTxt = 'Back',
+  showExportBtn = false,
+  backBtnTxt,
   showBackBtn,
-  handleBackBtnClick
+  handleBackBtnClick,
+  handleCellClick
 }: Partial<SalesTableProps>) {
 
   const { fetchData } = useAxios();
@@ -72,49 +80,54 @@ export default function SalesTable({
   const venueDict = useRecoilValue(venueState);
   const { productions } = useRecoilValue(productionJumpState);
   const [errorMessage, setErrorMessage] = useState('');
-
-  const [response, setResponse] = useState([]);
+  const [response, setResponse] = useState<Submit>();
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] }
 
   const onSubmit = () => {
-    if(variant === 'prodComparision'){
-    if(response.length < 2){
-      setErrorMessage('Please select at least 2 venues for comparison.')
-    } else {
-      handlePrimaryBtnClick(response);
+    switch (response.type) {
+      case 'prodComparision':
+        alert(response.data.length + ' | ' + JSON.stringify(response.data))
+        if (response.data.length < 2) {
+          setErrorMessage('Please select at least 2 venues for comparison.')
+        } else {
+          handlePrimaryBtnClick(response);
+        }
+      default:
+        handlePrimaryBtnClick(response);
     }
-  } else {
-    handlePrimaryBtnClick(response);
-  }
   }
 
   const salesSnapshot = (bookingId) => {
     let tempRowData = [];
-
     fetchData({
-      url: '/api/marketing/sales/read/' + bookingId,
+      url: '/api/marketing/sales/read/' + bookingId.toString(),
       method: 'GET'
     }).then((data: any) => {
-      data.forEach(week => {
-        tempRowData.push({
-          week: week.week,
-          weekOf: formatInputDate(week.weekOf, '/'),
-          seatsSold: week.seatsSold,
-          seatsSalePercentage: (week.seatsSalePercentage * 100).toFixed(2) + '%',
-          reserved: week.reserved,
-          reservedPercentage: ((parseInt(week.reserved) / week.capacity) * 100).toFixed(2) + '%',
-          totalValue: week.venueCurrencySymbol + (week.totalValue).toFixed(2),
-          valueChange: week.venueCurrencySymbol + (week.valueChange).toFixed(2),
-          seatsChange: week.seatsChange,
-          totalHolds: week.totalHolds === null ? 0 : week.totalHolds
-        })
-      });
+      //I need some kind of wait function to ensure data is not undefined
+      if (data !== undefined) {
+        data.forEach(week => {
+          console.log({valueChange: week.valueChange, seatsChange: week.seatsChnage})
+          tempRowData.push({
+            week: week.week,
+            weekOf: formatInputDate(week.weekOf),
+            seatsSold: week.seatsSold,
+            seatsSalePercentage: (week.seatsSalePercentage).toFixed(2) + '%',
+            reserved: week.reserved === '' ? 0 : week.reserved,
+            reservedPercentage: week.reserved === '' ? '0.00%' : ((parseInt(week.reserved) / week.capacity) * 100).toFixed(2) + '%',
+            totalValue: week.venueCurrencySymbol + (week.totalValue).toFixed(2),
+            valueChange: week.venueCurrencySymbol + (parseInt(week.valueChange)).toFixed(2),
+            seatsChange: week.seatsChange,
+            totalHolds: week.totalHolds === null ? 0 : week.totalHolds
+          })
+        });
 
-      setRowData(tempRowData);
-      setColumnDefs(salesColDefs);
-    });
+        setRowData(tempRowData);
+        setColumnDefs(salesColDefs);
+        setResponse({type: 'salesSnapshot', data: []})
+      }
+    }).catch(error => console.log(error));
   }
 
   const salesComparison = async (bookings: Array<Booking>) => {
@@ -134,7 +147,7 @@ export default function SalesTable({
         if (dataIndex === -1) {
           tempRowData.push({
             week: sale.SetBookingWeekNum,
-            weekOf: formatInputDate(sale.SetProductionWeekDate, '/'),
+            weekOf: formatInputDate(sale.SetProductionWeekDate),
             ...(function processData(data) {
               let obj = {};
               data.forEach(bookSale => {
@@ -192,12 +205,14 @@ export default function SalesTable({
   }
 
   const selectForComparison = (selectedValue) => {
-    let tempBookings = response;
+    console.log('select for comparision: ' + JSON.stringify(selectedValue) )
+    let tempBookings = response.data.length === 0 ? [] : response.data;
+
     if (selectedValue.order === null) {
-      const bookingToDel = tempBookings.findIndex(booking => booking.BookingId === selectedValue.BookingId);
+      const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
       if (bookingToDel > -1) {
         tempBookings.splice(bookingToDel, 1);
-        setResponse(tempBookings);
+        setResponse({type: 'prodComparision', data: tempBookings});
       }
     } else {
       tempBookings.push({
@@ -209,11 +224,11 @@ export default function SalesTable({
       });
 
       //if length of tempBookings is >= 2, errorMessage can be removed
-      if(tempBookings.length >= 2){
+      if (tempBookings.length >= 2) {
         setErrorMessage('');
       }
 
-      setResponse(tempBookings);
+      setResponse({type: 'prodComparision', data: tempBookings});
     }
   };
 
@@ -238,7 +253,7 @@ export default function SalesTable({
             processedBookings.push({
               BookingId: booking.BookingId,
               prodName: production.ShowCode + production.Code + ' ' + production.ShowName,
-              firstPerfDt: formatInputDate(booking.BookingFirstDate, '/'),
+              firstPerfDt: formatInputDate(booking.BookingFirstDate),
               numPerfs: booking.performanceCount,
               prodWks: booking.ProductionLengthWeeks,
               prodCode: booking.FullProductionCode
@@ -309,6 +324,7 @@ export default function SalesTable({
   }
 
   useEffect(() => {
+    setResponse({type: '', data: []})
     exec(variant, data);
   }, [data, variant]);
 
@@ -331,14 +347,15 @@ export default function SalesTable({
             rowData={rowData}
             styleProps={styleProps}
             gridOptions={gridOptions}
+            onCellClicked={handleCellClick}
           />
 
           <div className='float-left flex flex-row mt-5 text-primary-red'>
             {errorMessage}
           </div>
 
-          <div className='float-right flex flex-row mt-5'> 
-          {showBackBtn && (
+          <div className='float-right flex flex-row mt-5'>
+            {showBackBtn && (
               <div>
                 <Button
                   className="w-32"
@@ -354,7 +371,7 @@ export default function SalesTable({
                 <Button
                   className="ml-4 w-32"
                   onClick={handleSecondaryBtnClick}
-                  variant={showExportBtn? 'primary' : 'secondary'}
+                  variant={showExportBtn ? 'primary' : 'secondary'}
                   text={secondaryBtnText}
                   iconProps={showExportBtn && { className: 'h-4 w-3' }}
                   sufixIconName={showExportBtn && 'excel'}
@@ -368,7 +385,7 @@ export default function SalesTable({
                   className="ml-4 w-32"
                   variant='primary'
                   text={primaryBtnTxt}
-                  onClick={() => onSubmit()}
+                  onClick={onSubmit}
                 />
               </div>
             )}

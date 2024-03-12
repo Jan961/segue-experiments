@@ -60,6 +60,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
       },
     },
     {
+      field: 'salesBtn',
       headerName: 'Sales Data',
       cellRenderer: SalesDataButtonRenderer,
       width: 108,
@@ -82,7 +83,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
       },
     },
     {
-      headerName: 'Week of',
+      headerName: 'Date',
       field: 'weekOf',
       cellRenderer: DateColumnRenderer,
       width: 120,
