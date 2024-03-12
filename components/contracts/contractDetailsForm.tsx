@@ -182,10 +182,14 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         VenueContractStatus: c.VenueContractStatus,
         DealType: c.DealType,
 <<<<<<< HEAD
+<<<<<<< HEAD
         ContractSignedDate: formatInputDate(c.ContractSignedDate),
 =======
         ContractSignedDate: formatInputDate(c.ContractSignedDate, '-'),
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        ContractSignedDate: formatInputDate(c.ContractSignedDate),
+>>>>>>> 93cf814 (vercel build fixed)
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -196,12 +200,17 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ContractNotes: c.ContractNotes,
         GP: c.GP,
 <<<<<<< HEAD
+<<<<<<< HEAD
         ContractReturnDate: formatInputDate(c.ContractReturnDate),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
 =======
         ContractReturnDate: formatInputDate(c.ContractReturnDate, '-'),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate, '-'),
 >>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
+=======
+        ContractReturnDate: formatInputDate(c.ContractReturnDate),
+        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
+>>>>>>> 93cf814 (vercel build fixed)
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {
