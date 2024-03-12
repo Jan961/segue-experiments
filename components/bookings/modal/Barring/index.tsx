@@ -12,16 +12,27 @@ import { gridOptions } from '../GapSuggest';
 import { barredVenueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import moment from 'moment';
 import Label from 'components/core-ui-lib/Label';
+import { useRecoilValue } from 'recoil';
+import { venueState } from 'state/booking/venueState';
 
 type BarringProps = {
   visible: boolean;
   onClose: () => void;
 };
 
+const barringGridOptions = {
+  ...gridOptions,
+  rowClassRules: {
+    '!bg-primary-orange': (params) => params.data.hasBarringConflict,
+  },
+};
+
 export default function Barring({ visible, onClose }: BarringProps) {
   const [rows, setRows] = useState<BarredVenue[] | null>(null);
   const [loading, setIsLoading] = useState<boolean>(false);
   const [selectedVenueIds, setSelectedVenueIds] = useState([]);
+  const [selectedVenueName, setSelectedVenueName] = useState<string>('');
+  const venueDict = useRecoilValue(venueState);
   const tableRef = useRef(null);
   const filteredRows = useMemo(() => {
     const filteredRows = [];
@@ -29,27 +40,30 @@ export default function Barring({ visible, onClose }: BarringProps) {
       if (!selectedVenueIds.includes(row.Id)) {
         filteredRows.push({
           ...row,
-          info: `Venue is ${row.Mileage} from ${row.Name}`,
+          info: `${row.Name} is within ${row.Mileage} of ${selectedVenueName}`,
           FormattedDate: moment(row.Date).format('DD/MM/YY'),
           TravelTime: formatMinutes(row.TimeMins),
         });
       }
     }
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
-  }, [selectedVenueIds, rows]);
+  }, [rows, selectedVenueIds, selectedVenueName]);
   const fetchBarredVenues = async (formData) => {
     const { productionId, venueId, includeExcluded, seats, barDistance } = formData;
     setIsLoading(true);
+    const distance = parseInt(barDistance || 0, 10);
+    const minSeats = parseInt(seats || 0, 10);
     axios
       .post('/api/productions/venue/barred', {
         productionId: parseInt(productionId, 10),
         venueId: parseInt(venueId, 10),
-        seats: parseInt(seats || 0, 10),
-        barDistance: parseInt(barDistance || 0, 10),
+        ...(minSeats && { seats: minSeats }),
+        ...(distance !== 0 && { barDistance: distance }),
         includeExcluded,
       })
       .then((response) => {
         setRows(response?.data);
+        setSelectedVenueName(venueDict?.[venueId]?.Name);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -98,7 +112,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                   columnDefs={barredVenueColumnDefs}
                   rowData={filteredRows?.slice(0, 30)}
                   styleProps={styleProps}
-                  gridOptions={gridOptions}
+                  gridOptions={barringGridOptions}
                 />
               </div>
             </div>

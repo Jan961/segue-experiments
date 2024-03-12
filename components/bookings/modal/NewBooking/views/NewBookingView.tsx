@@ -217,12 +217,12 @@ const NewBookingView = ({
       <div className="flex mt-4 justify-between">
         <div
           className={classNames({
-            'cursor-not-allowed caret-primary-input-text': !(venueId || dateType) || !fromDate || !toDate,
+            'cursor-not-allowed caret-primary-input-text': !venueId || !fromDate || !toDate,
           })}
         >
           <Button
             onClick={() => null}
-            disabled={!(venueId || dateType) || !fromDate || !toDate}
+            disabled={!venueId || !fromDate || !toDate}
             className="px-6"
             text={'Check Mileage'}
           ></Button>
