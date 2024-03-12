@@ -96,7 +96,7 @@ const Filters = () => {
           <TextInput
             id={'venueText'}
             disabled={!ProductionId}
-            placeholder="Search bookings..."
+            placeHolder="Search bookings..."
             className="w-[310px]"
             iconName="search"
             value={filter.venueText}
