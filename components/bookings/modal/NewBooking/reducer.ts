@@ -56,6 +56,7 @@ export type TState = {
   bookingConflicts: BookingWithVenueDTO[];
   barringConflicts: BarredVenue[];
   booking: BookingItem[];
+  modalTitle: string;
 };
 
 const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
@@ -85,6 +86,11 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
       return {
         ...state,
         barringConflicts: payload,
+      };
+    case Actions.UPDATE_MODAL_TITLE:
+      return {
+        ...state,
+        modalTitle: payload,
       };
     default:
       return state;

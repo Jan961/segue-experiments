@@ -11,6 +11,7 @@ export const INITIAL_STATE = {
   bookingConflicts: [],
   booking: [],
   barringConflicts: [],
+  modalTitle: '',
 };
 
 export const Actions = {
@@ -18,6 +19,7 @@ export const Actions = {
   UPDATE_BOOKING_CONFLICTS: 'UPDATE_BOOKING_CONFLICTS',
   UPDATE_BOOKING: 'UPDATE_BOOKING',
   UPDATE_BARRED_VENUES: 'UPDATE_BARRED_VENUES',
+  UPDATE_MODAL_TITLE: 'UPDATE_MODAL_TITLE',
 };
 
 export const steps = [

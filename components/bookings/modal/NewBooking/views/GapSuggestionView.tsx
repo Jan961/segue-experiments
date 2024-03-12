@@ -1,18 +1,25 @@
 import Button from 'components/core-ui-lib/Button';
 import GapSuggest from '../../GapSuggest';
 import { useWizard } from 'react-use-wizard';
+import { useEffect } from 'react';
 
 type GapSuggestProps = {
   startDate: string;
   endDate: string;
   productionId: number;
+  updateModalTitle: (title: string) => void;
 };
 
-const GapSuggestionView = ({ startDate, endDate, productionId }: GapSuggestProps) => {
+const GapSuggestionView = ({ startDate, endDate, productionId, updateModalTitle }: GapSuggestProps) => {
   const { goToStep } = useWizard();
   const onCancel = () => {
     goToStep(0);
   };
+
+  useEffect(() => {
+    updateModalTitle('Venue Gap Suggestions');
+  }, []);
+
   return (
     <>
       <div>

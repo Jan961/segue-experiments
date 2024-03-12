@@ -13,18 +13,30 @@ import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { steps } from 'config/AddBooking';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import { useEffect } from 'react';
 
-type NewBookingDetailsProps = {
+type MileageBookingProps = {
   formData: TForm;
   productionCode: string;
   data: BookingItem[];
   dayTypeOptions: SelectOption[];
+  updateModalTitle: (title: string) => void;
 };
-export default function MileageBooking({ formData, productionCode, data, dayTypeOptions }: NewBookingDetailsProps) {
+export default function MileageBooking({
+  formData,
+  productionCode,
+  data,
+  dayTypeOptions,
+  updateModalTitle,
+}: MileageBookingProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
   const distanceDict = useRecoilValue(distanceState);
   const { rows: bookings } = useRecoilValue(rowsSelector);
+
+  useEffect(() => {
+    updateModalTitle('Check Mileage');
+  }, []);
 
   const milesWithVenueId = distanceDict[production.Id].stops.flatMap((item) =>
     item.option.map((optionItem) => ({
