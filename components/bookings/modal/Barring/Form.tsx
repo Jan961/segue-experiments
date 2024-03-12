@@ -26,7 +26,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const venueOptions = useRecoilValue(venueOptionsSelector([]));
-  const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction.Id });
+  const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction?.Id });
   const { productionId, venueId, barDistance = '', includeExcluded, seats = '', fromDate, toDate } = formData;
   const formRef = useRef(null);
   const { minDate, maxDate } = useMemo(() => {
@@ -52,6 +52,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             <Typeahead
               label="Production"
               name="production"
+              placeholder="Please select a Production"
               value={productionId}
               options={productionOptions}
               onChange={(production) => handleOnChange({ productionId: production })}
@@ -63,6 +64,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
               className="w-24 placeholder-primary"
               id="barDistance"
               placeHolder="Enter Miles"
+              type="number"
               onChange={(e) => handleOnChange({ barDistance: e.target.value })}
               value={barDistance}
             />
@@ -76,6 +78,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
               options={venueOptions}
               placeholder="Please select a venue"
               value={venueId}
+              isSearchable
             />
           </div>
           <div className="col-span-2 col-start-4 row-start-2 flex items-center justify-between pl-6">
@@ -84,6 +87,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
               id="Seats"
               className="w-24 placeholder-primary"
               placeHolder="Enter Seats"
+              type="number"
               onChange={(e) => handleOnChange({ seats: e.target.value })}
               value={seats}
             />
@@ -92,7 +96,12 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             <DateRange
               className="w-fit"
               label="Date"
-              onChange={({ from, to }) => handleOnChange({ fromDate: from?.toISOString(), toDate: to?.toISOString() })}
+              onChange={({ from, to }) =>
+                handleOnChange({
+                  fromDate: from?.toISOString() || '',
+                  toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
+                })
+              }
               value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
               minDate={minDate ? new Date(minDate) : null}
               maxDate={maxDate ? new Date(maxDate) : null}
@@ -110,7 +119,12 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
         </div>
-        <Button onClick={handleOnSubmit} className="float-right px-7 mt-5" text="Check Barring" />
+        <Button
+          disabled={!venueId || !productionId}
+          onClick={handleOnSubmit}
+          className="float-right px-7 mt-5"
+          text="Check Barring"
+        />
       </div>
     </form>
   );

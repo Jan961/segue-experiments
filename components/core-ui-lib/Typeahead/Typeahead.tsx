@@ -117,7 +117,7 @@ export default forwardRef(function Typeahead(
           padding: '0 6px',
         }),
         input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
-        placeholder: (styles) => ({ ...styles }),
+        placeholder: (styles) => ({ ...styles, color: '#617293' }),
         singleValue: (styles) => ({
           ...styles,
           color: '#617293',

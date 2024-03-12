@@ -255,6 +255,7 @@ export const barredVenueColumnDefs = [
     cellRenderer: IconRenderer,
     cellRendererParams: {
       iconName: 'info-circle-solid',
+      tooltipPosition: 'left',
       popover: true,
     },
     width: 40,
