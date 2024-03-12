@@ -39,18 +39,24 @@ type Booking = {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
 
+=======
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
 type Submit = {
   data: any;
   type: SalesTableVariant;
 }
 
+<<<<<<< HEAD
 
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
 export type ProdComp = {
   venueId: number;
   showCode: string;
@@ -78,6 +84,7 @@ interface SalesTableProps {
   showPrimaryBtn?: boolean;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   handlePrimaryBtnClick?: (data: Submit) => void;
 =======
   handlePrimaryBtnClick?: (data: any) => void;
@@ -85,6 +92,9 @@ interface SalesTableProps {
 =======
   handlePrimaryBtnClick?: (data: any) => void;
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+  handlePrimaryBtnClick?: (data: Submit) => void;
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
   handleSecondaryBtnClick?: () => void;
@@ -92,6 +102,7 @@ interface SalesTableProps {
   backBtnTxt?: string;
   showBackBtn?: boolean;
   handleBackBtnClick?: () => void;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
   handleCellClick?: (e: any) => void;
@@ -105,9 +116,13 @@ export default function SalesTable({
 =======
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+  handleCellClick?: (e: any) => void;
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
 }
 
-type SalesTableVariant = 'prodComparision' | 'prodSnapshot' | 'salesComparison';
+type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | '';
+
 
 export default function SalesTable({
 <<<<<<< HEAD
@@ -145,16 +160,17 @@ export default function SalesTable({
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   handleError,
-  primaryBtnTxt = 'Ok',
-  showPrimaryBtn,
+  primaryBtnTxt,
+  showPrimaryBtn = false,
   handlePrimaryBtnClick,
-  secondaryBtnText = 'Cancel',
-  showSecondaryBtn,
+  secondaryBtnText,
+  showSecondaryBtn = false,
   handleSecondaryBtnClick,
-  showExportBtn,
-  backBtnTxt = 'Back',
+  showExportBtn = false,
+  backBtnTxt,
   showBackBtn,
-  handleBackBtnClick
+  handleBackBtnClick,
+  handleCellClick
 }: Partial<SalesTableProps>) {
 
   const { fetchData } = useAxios();
@@ -164,12 +180,16 @@ export default function SalesTable({
   const venueDict = useRecoilValue(venueState);
   const { productions } = useRecoilValue(productionJumpState);
   const [errorMessage, setErrorMessage] = useState('');
+<<<<<<< HEAD
 
   const [response, setResponse] = useState([]);
 <<<<<<< HEAD
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+  const [response, setResponse] = useState<Submit>();
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] }
@@ -343,42 +363,48 @@ bookings.forEach((booking, index) => {
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   const onSubmit = () => {
-    if(variant === 'prodComparision'){
-    if(response.length < 2){
-      setErrorMessage('Please select at least 2 venues for comparison.')
-    } else {
-      handlePrimaryBtnClick(response);
+    switch (response.type) {
+      case 'prodComparision':
+        alert(response.data.length + ' | ' + JSON.stringify(response.data))
+        if (response.data.length < 2) {
+          setErrorMessage('Please select at least 2 venues for comparison.')
+        } else {
+          handlePrimaryBtnClick(response);
+        }
+      default:
+        handlePrimaryBtnClick(response);
     }
-  } else {
-    handlePrimaryBtnClick(response);
-  }
   }
 
   const salesSnapshot = (bookingId) => {
     let tempRowData = [];
-
     fetchData({
-      url: '/api/marketing/sales/read/' + bookingId,
+      url: '/api/marketing/sales/read/' + bookingId.toString(),
       method: 'GET'
     }).then((data: any) => {
-      data.forEach(week => {
-        tempRowData.push({
-          week: week.week,
-          weekOf: formatInputDate(week.weekOf, '/'),
-          seatsSold: week.seatsSold,
-          seatsSalePercentage: (week.seatsSalePercentage * 100).toFixed(2) + '%',
-          reserved: week.reserved,
-          reservedPercentage: ((parseInt(week.reserved) / week.capacity) * 100).toFixed(2) + '%',
-          totalValue: week.venueCurrencySymbol + (week.totalValue).toFixed(2),
-          valueChange: week.venueCurrencySymbol + (week.valueChange).toFixed(2),
-          seatsChange: week.seatsChange,
-          totalHolds: week.totalHolds === null ? 0 : week.totalHolds
-        })
-      });
+      //I need some kind of wait function to ensure data is not undefined
+      if (data !== undefined) {
+        data.forEach(week => {
+          console.log({valueChange: week.valueChange, seatsChange: week.seatsChnage})
+          tempRowData.push({
+            week: week.week,
+            weekOf: formatInputDate(week.weekOf),
+            seatsSold: week.seatsSold,
+            seatsSalePercentage: (week.seatsSalePercentage).toFixed(2) + '%',
+            reserved: week.reserved === '' ? 0 : week.reserved,
+            reservedPercentage: week.reserved === '' ? '0.00%' : ((parseInt(week.reserved) / week.capacity) * 100).toFixed(2) + '%',
+            totalValue: week.venueCurrencySymbol + (week.totalValue).toFixed(2),
+            valueChange: week.venueCurrencySymbol + (parseInt(week.valueChange)).toFixed(2),
+            seatsChange: week.seatsChange,
+            totalHolds: week.totalHolds === null ? 0 : week.totalHolds
+          })
+        });
 
-      setRowData(tempRowData);
-      setColumnDefs(salesColDefs);
-    });
+        setRowData(tempRowData);
+        setColumnDefs(salesColDefs);
+        setResponse({type: 'salesSnapshot', data: []})
+      }
+    }).catch(error => console.log(error));
   }
 
   const salesComparison = async (bookings: Array<Booking>) => {
@@ -398,7 +424,7 @@ bookings.forEach((booking, index) => {
         if (dataIndex === -1) {
           tempRowData.push({
             week: sale.SetBookingWeekNum,
-            weekOf: formatInputDate(sale.SetProductionWeekDate, '/'),
+            weekOf: formatInputDate(sale.SetProductionWeekDate),
             ...(function processData(data) {
               let obj = {};
               data.forEach(bookSale => {
@@ -456,12 +482,14 @@ bookings.forEach((booking, index) => {
   }
 
   const selectForComparison = (selectedValue) => {
-    let tempBookings = response;
+    console.log('select for comparision: ' + JSON.stringify(selectedValue) )
+    let tempBookings = response.data.length === 0 ? [] : response.data;
+
     if (selectedValue.order === null) {
-      const bookingToDel = tempBookings.findIndex(booking => booking.BookingId === selectedValue.BookingId);
+      const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
       if (bookingToDel > -1) {
         tempBookings.splice(bookingToDel, 1);
-        setResponse(tempBookings);
+        setResponse({type: 'prodComparision', data: tempBookings});
       }
     } else {
       tempBookings.push({
@@ -473,11 +501,11 @@ bookings.forEach((booking, index) => {
       });
 
       //if length of tempBookings is >= 2, errorMessage can be removed
-      if(tempBookings.length >= 2){
+      if (tempBookings.length >= 2) {
         setErrorMessage('');
       }
 
-      setResponse(tempBookings);
+      setResponse({type: 'prodComparision', data: tempBookings});
     }
   };
 
@@ -502,7 +530,7 @@ bookings.forEach((booking, index) => {
             processedBookings.push({
               BookingId: booking.BookingId,
               prodName: production.ShowCode + production.Code + ' ' + production.ShowName,
-              firstPerfDt: formatInputDate(booking.BookingFirstDate, '/'),
+              firstPerfDt: formatInputDate(booking.BookingFirstDate),
               numPerfs: booking.performanceCount,
               prodWks: booking.ProductionLengthWeeks,
               prodCode: booking.FullProductionCode
@@ -650,6 +678,7 @@ bookings.forEach((booking, index) => {
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   useEffect(() => {
+    setResponse({type: '', data: []})
     exec(variant, data);
   }, [data, variant]);
 
@@ -672,14 +701,15 @@ bookings.forEach((booking, index) => {
             rowData={rowData}
             styleProps={styleProps}
             gridOptions={gridOptions}
+            onCellClicked={handleCellClick}
           />
 
           <div className='float-left flex flex-row mt-5 text-primary-red'>
             {errorMessage}
           </div>
 
-          <div className='float-right flex flex-row mt-5'> 
-          {showBackBtn && (
+          <div className='float-right flex flex-row mt-5'>
+            {showBackBtn && (
               <div>
                 <Button
                   className="w-32"
@@ -695,7 +725,7 @@ bookings.forEach((booking, index) => {
                 <Button
                   className="ml-4 w-32"
                   onClick={handleSecondaryBtnClick}
-                  variant={showExportBtn? 'primary' : 'secondary'}
+                  variant={showExportBtn ? 'primary' : 'secondary'}
                   text={secondaryBtnText}
                   iconProps={showExportBtn && { className: 'h-4 w-3' }}
                   sufixIconName={showExportBtn && 'excel'}
@@ -709,7 +739,7 @@ bookings.forEach((booking, index) => {
                   className="ml-4 w-32"
                   variant='primary'
                   text={primaryBtnTxt}
-                  onClick={() => onSubmit()}
+                  onClick={onSubmit}
                 />
               </div>
             )}

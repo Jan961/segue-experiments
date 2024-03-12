@@ -100,6 +100,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       field: 'salesBtn',
 =======
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -107,6 +108,9 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+      field: 'salesBtn',
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
       headerName: 'Sales Data',
       cellRenderer: SalesDataButtonRenderer,
       width: 108,
@@ -147,6 +151,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
       },
     },
     {
+<<<<<<< HEAD
       headerName: 'Week of',
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -155,6 +160,9 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+      headerName: 'Date',
+>>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
       field: 'weekOf',
       cellRenderer: DateColumnRenderer,
       width: 120,
