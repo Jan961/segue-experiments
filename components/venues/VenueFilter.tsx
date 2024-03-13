@@ -31,7 +31,8 @@ export default function VenueFilter() {
                 value={venueFilter.town}
                 className="bg-white w-full"
                 label="Town"
-                placeHolder="Select Town"
+                placeholder="Select Town"
+                options={[]}
                 //   options={allStatusOptions}
               />
               <Select
@@ -40,7 +41,8 @@ export default function VenueFilter() {
                 value={venueFilter.town}
                 className="bg-white w-full"
                 label="On Production"
-                placeHolder="Select Production"
+                placeholder="Select Production"
+                options={[]}
                 //   options={allStatusOptions}
               />
             </div>
@@ -50,7 +52,8 @@ export default function VenueFilter() {
               value={venueFilter.town}
               className="bg-white w-52"
               label="Country"
-              placeHolder="Select Country"
+              placeholder="Select Country"
+              options={[]}
               //   options={allStatusOptions}
             />
             {/* <SearchBox /> */}
