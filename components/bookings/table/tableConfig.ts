@@ -341,3 +341,27 @@ export const venueContractDefs = [
     headerClass: 'text-center',
   },
 ];
+
+export const barredVenues = [
+  {
+    headerName: 'Barred Venues',
+    field: 'venue',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
+  {
+    field: 'notes',
+    cellRenderer: DefaultCellRenderer,
+    resizable: false,
+    width: 50,
+    maxWidth: 50,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '0.4rem',
+    },
+  },
+];

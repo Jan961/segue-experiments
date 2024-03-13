@@ -1,4 +1,4 @@
-import { styleProps, venueContractDefs } from 'components/bookings/table/tableConfig';
+import { barredVenues, styleProps, venueContractDefs } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Icon from 'components/core-ui-lib/Icon';
@@ -26,6 +26,15 @@ export default function AddEditVenueModal() {
       VenuePhone: '987-654-3210',
       VenueEmail: 'jane.smith@example.com',
       delete: 'Delete brn',
+    },
+    // Add more dummy data as needed
+  ];
+  const barredVenuesData = [
+    {
+      venue: 'Manager',
+    },
+    {
+      venue: 'Coordinator',
     },
     // Add more dummy data as needed
   ];
@@ -346,13 +355,69 @@ export default function AddEditVenueModal() {
                   />
                 </label>
               </div>
-              <label
-                htmlFor=""
-                className="grid grid-cols-[90px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full"
-              >
+              <label className="grid grid-cols-[90px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Flags</p>
                 <TextArea placeHolder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
               </label>
+            </div>
+            <div className="pt-7 ">
+              <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
+              <label className="grid grid-cols-[95px_minmax(100px,350px)]  gap-10   w-full">
+                <p className="text-primary-input-text">Barring Clause</p>
+                <TextArea
+                  placeHolder="Enter Barring Clause"
+                  className="w-full max-h-32 min-h-[50px]  justify-between"
+                />
+              </label>
+              <div className="grid grid-cols-2 gap-7 ">
+                <div className="flex flex-col gap-5 pt-5 ">
+                  <p className="text-primary-input-text">Barring Weeks</p>
+                  <label
+                    htmlFor=""
+                    className="grid grid-cols-[90px_minmax(200px,30px)] gap-10 justify-items-start  w-full"
+                  >
+                    <p className="text-primary-input-text">Pre Show</p>
+                    <TextInput placeHolder="Enter Pre Show Weeks" type="" className="w-full justify-between" />
+                  </label>
+                  <label
+                    htmlFor=""
+                    className="grid grid-cols-[90px_minmax(200px,30px)] gap-10 justify-items-start  w-full"
+                  >
+                    <p className="text-primary-input-text">Post Show</p>
+                    <TextInput
+                      placeHolder="Enter Post Show Weeks"
+                      type=""
+                      className="w-full justify-between"
+                      // inputClassName="w-full"
+                    />
+                  </label>
+                  <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+                    <p className="text-primary-input-text">Barring Miles</p>
+                    <TextInput
+                      placeHolder="Enter Barring Miles"
+                      type=""
+                      className="w-full justify-between"
+                      inputClassName="w-full"
+                    />
+                  </label>
+                </div>
+                <div className=" ">
+                  <div className="flex justify-end pb-3">
+                    <Button text="Add Barred Venue" className=" w-32" />
+                  </div>
+
+                  <Table styleProps={styleProps} columnDefs={barredVenues} rowData={barredVenuesData} />
+                </div>
+              </div>
+            </div>
+            <div className="pt-7">
+              <h2 className="text-xl text-primary-navy font-bold  pb-2">Confidential Warning Notes</h2>
+              <TextArea placeHolder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+            </div>
+            <div className="flex gap-4 pt-4 float-right">
+              <Button variant="secondary" text="Cancel" className="w-32" />
+              <Button variant="tertiary" text="Delete Venue" className="w-32" />
+              <Button text="Save and Close" className="w-32" />
             </div>
           </div>
         </div>
