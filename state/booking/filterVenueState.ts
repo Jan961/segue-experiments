@@ -5,6 +5,7 @@ export type FilterVenueState = {
   masterTaskText?: string;
   town?: string;
   country?: string;
+  productionId?: number;
 };
 
 export const intialVenueFilterState: FilterVenueState = {
@@ -12,6 +13,7 @@ export const intialVenueFilterState: FilterVenueState = {
   masterTaskText: '',
   town: '',
   country: '',
+  productionId: null,
 };
 
 export const filterVenueState = atom({

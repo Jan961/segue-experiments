@@ -1,13 +1,20 @@
 import Button from 'components/core-ui-lib/Button';
-import Select from 'components/core-ui-lib/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import Typeahead from 'components/core-ui-lib/Typeahead';
 
-// import { SearchBox } from 'components/global/SearchBox';
-import GlobalToolbar from 'components/toolbar';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterVenueState } from 'state/booking/filterVenueState';
+import { productionOptionsSelector } from 'state/booking/selectors/productionOptionsSelector';
 
-export default function VenueFilter() {
+export default function VenueFilter({
+  countryOptions,
+  townOptions,
+}: {
+  countryOptions: SelectOption[];
+  townOptions: SelectOption[];
+}) {
   const [venueFilter, setVenueFilter] = useRecoilState(filterVenueState);
+  const productionOptions = useRecoilValue(productionOptionsSelector(true));
   const onChange = (e: any) => {
     setVenueFilter({ ...venueFilter, [e.target.id]: e.target.value });
   };
@@ -15,45 +22,36 @@ export default function VenueFilter() {
     <>
       <div className="w-full flex items-center justify-between flex-wrap">
         <div className=" w-full flex flex-row ">
-          <div className="px-4">
-            <GlobalToolbar
-              title={'Venues'}
-              searchFilter={venueFilter.town}
-              setSearchFilter={(town) => setVenueFilter({ town })}
-              titleClassName="text-primary-orange"
-            ></GlobalToolbar>
-          </div>
           <div className="px-4 flex  gap-4 flex-wrap  py-1 w-full">
             <div className="w-full flex flex-row gap-5">
-              <Select
-                onChange={(value) => onChange({ target: { id: 'status', value } })}
-                //   disabled={!ProductionId}
+              <Typeahead
+                onChange={(value) => onChange({ target: { id: 'town', value } })}
                 value={venueFilter.town}
-                className="bg-white w-full"
+                className="bg-white w-full h-fit"
                 label="Town"
-                placeHolder="Select Town"
-                //   options={allStatusOptions}
+                placeholder="Select Town"
+                options={townOptions}
+                isSearchable
               />
-              <Select
-                onChange={(value) => onChange({ target: { id: 'status', value } })}
-                //   disabled={!ProductionId}
-                value={venueFilter.town}
-                className="bg-white w-full"
+              <Typeahead
+                onChange={(value) => onChange({ target: { id: 'productionId', value } })}
+                value={venueFilter.productionId}
+                className="bg-white w-full h-fit"
                 label="On Production"
-                placeHolder="Select Production"
-                //   options={allStatusOptions}
+                placeholder="Select Production"
+                options={productionOptions}
+                isSearchable
               />
             </div>
-            <Select
-              onChange={(value) => onChange({ target: { id: 'status', value } })}
-              //   disabled={!ProductionId}
-              value={venueFilter.town}
+            <Typeahead
+              onChange={(value) => onChange({ target: { id: 'country', value } })}
+              value={venueFilter.country}
               className="bg-white w-[460px] h-fit"
               label="Country"
-              placeHolder="Select Country"
-              //   options={allStatusOptions}
+              placeholder="Select Country"
+              options={countryOptions}
+              isSearchable
             />
-            {/* <SearchBox /> */}
             <div className=" flex flex-col gap-3 ">
               <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
               <Button text="Add New" className="text-sm leading-8 w-[100px]" />
