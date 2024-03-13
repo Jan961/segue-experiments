@@ -177,13 +177,14 @@ export default function SalesTable({
             suppressResize: true,
             suppressMovable: true,
             resizable: false,
-            headerClass: 'justify-center font-bold text-base ' + parentBorderClass,
+           // headerClass: 'justify-center font-bold text-base ', // + parentBorderClass,
             children: [{
               headerName: 'No. of Performances: ' + booking.numPerfs,
               suppressResize: true,
               suppressMovable: true,
               resizable: false,
-              headerClass: 'justify-center font-bold text-base ' + parentBorderClass,
+              flex: 1,
+              //headerClass: 'justify-center font-bold text-base ', //+ parentBorderClass,
               children: [
                 { headerName: 'Week', field: 'week', resizable: false, cellRenderer: DefaultCellRenderer, suppressMovable: true, headerClass: 'border-r-[1px] border-white text-center' },
                 { headerName: 'Date', field: 'weekOf', resizable: false, cellRenderer: DefaultCellRenderer, suppressMovable: true, headerClass: 'border-r-[1px] border-white' },
@@ -318,7 +319,7 @@ export default function SalesTable({
             columnDefs={columnDefs}
             rowData={rowData}
             styleProps={styleProps}
-            gridOptions={gridOptions}
+            gridOptions={[gridOptions, ]}
             onCellClicked={handleCellClick}
             onCellValueChange={handleCellValChange}
           />
