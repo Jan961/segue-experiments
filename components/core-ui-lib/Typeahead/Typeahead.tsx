@@ -169,7 +169,7 @@ export default forwardRef(function Typeahead(
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
     >
       {label && (
-        <div className="border-r border-primary-border px-3">
+        <div className="border-r w border-primary-border px-3">
           <Label text={label} />
         </div>
       )}

@@ -337,7 +337,7 @@ export const venueContractDefs = [
     headerName: '',
     field: 'delete',
     cellRenderer: DefaultCellRenderer,
-    width: 120,
+    width: 90,
     headerClass: 'text-center',
   },
 ];
