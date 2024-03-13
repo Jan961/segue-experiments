@@ -296,3 +296,48 @@ export const venueColumnDefs = [
     headerClass: 'text-center',
   },
 ];
+export const venueContractDefs = [
+  {
+    headerName: 'Role',
+    field: 'VenueRole',
+    cellRenderer: DefaultCellRenderer,
+    width: 135,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'First Name',
+    field: 'VenueFirstName',
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Last Name',
+    field: 'VenueLastName',
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Phone',
+    field: 'VenuePhone',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Email',
+    field: 'VenueEmail',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'delete',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+];
