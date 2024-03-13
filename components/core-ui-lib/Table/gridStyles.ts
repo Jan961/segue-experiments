@@ -39,7 +39,14 @@ const GridStyles = createGlobalStyle<StyleProps>`
     justify-content: center !important;
 }
 
+<<<<<<< HEAD
 
+=======
+.ag-header-group-cell {
+    border-right: 4px solid white;
+    border-bottom: 2px solid white;
+}
+>>>>>>> 824baba (global table grid styling for header grouping)
 
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
