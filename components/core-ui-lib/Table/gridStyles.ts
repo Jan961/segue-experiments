@@ -39,6 +39,11 @@ const GridStyles = createGlobalStyle<StyleProps>`
     justify-content: center !important;
 }
 
+.ag-header-group-cell {
+    border-right: 4px solid white;
+    border-bottom: 2px solid white;
+}
+
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
     min-height: 0px!important;
