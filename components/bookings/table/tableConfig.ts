@@ -7,7 +7,7 @@ import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
-import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
+import ButtonRenderer from './ButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -17,6 +17,8 @@ import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
+import TextInputRenderer from './TextInputRenderer';
+import CheckboxRenderer from './CheckboxRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -209,10 +211,13 @@ export const gapSuggestColumnDefs = [
   {
     headerName: 'Barring Check',
     field: 'barringCheck',
-    cellRenderer: BarringCheckButtonRenderer,
+    cellRenderer: ButtonRenderer,
     width: 140,
     headerClass: 'text-center',
     resizable: false,
+    cellRendererParams: {
+      buttonText: 'Run Barring Check',
+    },
   },
 ];
 
@@ -293,6 +298,68 @@ export const venueColumnDefs = [
     field: 'VenueCapacity',
     cellRenderer: DefaultCellRenderer,
     width: 120,
+    headerClass: 'text-center',
+  },
+];
+
+export const bookingShowsTableConfig = [
+  {
+    headerName: 'Show Name',
+    field: 'Name',
+    cellRenderer: TextInputRenderer,
+    headerClass: 'text-center',
+    flex: 1,
+  },
+  {
+    headerName: 'Show Code',
+    field: 'Code',
+    cellRenderer: TextInputRenderer,
+    width: 130,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Company',
+    field: '',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Productions',
+    field: '',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'View/Edit',
+    },
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
+    width: 200,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Archive',
+    field: 'IsArchived',
+    width: 72,
+    maxWidth: 72,
+    cellRenderer: CheckboxRenderer,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Delete',
+    field: 'Id',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconName: 'delete',
+      popover: false,
+    },
+    width: 70,
     headerClass: 'text-center',
   },
 ];

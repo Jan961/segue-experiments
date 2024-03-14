@@ -67,3 +67,10 @@ export const lookupShowCode = async (Code: string, AccountId: number) => {
 
   return show ? show.Id : undefined;
 };
+
+export const getShowsByAccountId = (AccountId: number) => {
+  return prisma.show.findMany({
+    where: { AccountId, IsDeleted: false },
+    include: showInclude,
+  });
+};
