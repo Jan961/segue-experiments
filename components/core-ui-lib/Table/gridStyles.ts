@@ -40,6 +40,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 .ag-header-group-cell {
@@ -47,6 +48,9 @@ const GridStyles = createGlobalStyle<StyleProps>`
     border-bottom: 2px solid white;
 }
 >>>>>>> 824baba (global table grid styling for header grouping)
+=======
+
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
 
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
