@@ -87,8 +87,8 @@ export const bookingConflictsColumnDefs = [
 
 export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Date', field: 'Date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [

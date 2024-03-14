@@ -15,22 +15,25 @@ const pencilNos = [{ text: '-', value: '8' }].concat(
 const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: SelectPencilRendererProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (data) {
-      const { isRunOfDates, dayType } = data;
-      if (dayType === null || dayType === '') {
-        setValue(null);
-      }
-      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
-    }
-  }, [data, node]);
-
   const handleValueChange = (value) => {
     setValue(value);
     if (data.isRunOfDates && node.rowIndex === 0) {
       api.forEachNode((node: IRowNode) => node.setData({ ...node.data, pencilNo: value }));
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      const { isRunOfDates, dayType } = data;
+      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
+      if (!data.isRunOfDates) {
+        setValue(dayType === null || dayType === '' ? null : value);
+      } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
+        handleValueChange(null);
+      }
+    }
+  }, [data, node]);
+
   return (
     <div className="pl-1 pr-2 mt-1">
       <SelectRenderer
