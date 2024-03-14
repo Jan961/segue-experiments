@@ -8,40 +8,206 @@ import Table from 'components/core-ui-lib/Table';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Tooltip from 'components/core-ui-lib/Tooltip';
+import { useState } from 'react';
 
 export default function AddEditVenueModal() {
+  const getRowStyle = (params) => {
+    if (params.node.rowIndex === 0) {
+      // Change 'red' to your desired background color
+      return { background: '#fad0cc' };
+    }
+    return null;
+  };
   const dummyVenueContractData = [
     {
-      VenueRole: 'Manager',
-      VenueFirstName: 'John',
-      VenueLastName: 'Doe',
-      VenuePhone: '123-456-7890',
-      VenueEmail: 'john.doe@example.com',
-      delete: 'Delete btn',
+      VenueRole: 'Enter Job title',
+      VenueFirstName: 'Enter First Name',
+      VenueLastName: 'Enter Last Name',
+      VenuePhone: 'Enter Phone No.',
+      VenueEmail: 'Enter Email Address',
+      delete: true,
     },
     {
-      VenueRole: 'Coordinator',
-      VenueFirstName: 'Jane',
-      VenueLastName: 'Smith',
-      VenuePhone: '987-654-3210',
-      VenueEmail: 'jane.smith@example.com',
-      delete: 'Delete brn',
+      VenueRole: 'Box Office Default',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Box Office Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Finance Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Front of House Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Marketing Contact',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Marketing Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Operations Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Stage Door',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Technical Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Venue Chief LX',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Venue Head of Sound',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Venue Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Venue Programming',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
+    },
+    {
+      VenueRole: 'Venue Stage Manager',
+      VenueFirstName: 'First Name',
+      VenueLastName: 'Last Name',
+      VenuePhone: '(00) 0000 000000',
+      VenueEmail: 'name@theatrecompany.com',
+      delete: false,
     },
     // Add more dummy data as needed
   ];
+
   const barredVenuesData = [
     {
-      venue: 'Manager',
+      venueOptions: 'test',
     },
     {
-      venue: 'Coordinator',
+      venueOptions: 'test-2',
     },
     // Add more dummy data as needed
   ];
+  const [formData, setFormData] = useState({
+    venueCode: '',
+    venueName: '',
+    venueStatus: '',
+  });
+
+  // const handleInputChange = (field, value) => {
+  //   setFormData({
+  //     ...formData,
+  //     [field]: value,
+  //   });
+  // };
+  const handleInputChange = (field, value) => {
+    let sanitizedValue = value;
+
+    // Additional logic for Venue Code field
+    if (field === 'venueCode') {
+      // Ensure only letters are allowed
+      sanitizedValue = sanitizedValue.replace(/[^a-zA-Z]/g, '');
+
+      // // Capitalize the value
+      // sanitizedValue = sanitizedValue.toUpperCase();
+    }
+
+    setFormData({
+      ...formData,
+      [field]: sanitizedValue,
+    });
+  };
+
+  const handleSaveAndClose = () => {
+    // Validate Venue Name
+    if (!formData.venueName) {
+      alert('Venue Name is required.');
+      return;
+    }
+
+    // Validate Venue Code
+    if (!formData.venueCode) {
+      alert('Venue Code is required.');
+      return;
+    }
+    // Validate Venue Code
+    if (!/^[A-Z]{6}$/.test(formData.venueCode)) {
+      alert('Venue Code must be exactly 6 uppercase letters.');
+      return;
+    }
+
+    console.log('Form Data:', formData);
+    // Add logic to save the formData to the database or perform any other actions
+
+    // Close the modal or perform any other necessary actions
+  };
   return (
     <>
       <PopupModal title="Add / Edit Venue" show panelClass="relative" titleClass="text-xl text-primary-navy ">
-        <div className="w-[1026px]">
+        <form className="w-[1026px]">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
           <div className="grid grid-cols-2 gap-5">
             <label htmlFor="" className="flex flex-row gap-5 justify-between">
@@ -51,18 +217,40 @@ export default function AddEditVenueModal() {
                 position="right"
                 body="Venue Code is the first three letters of the town followed by the first three letters of the venue. eg. King's Theatre, Glasgow would have the code GLAKIN."
               >
-                <TextInput placeHolder="Enter Venue Code" type="" className="w-[364px]" iconName="info-circle-solid" />
+                <TextInput
+                  placeHolder="Enter Venue Code"
+                  type=""
+                  id="venueCode"
+                  className="w-[364px]"
+                  iconName="info-circle-solid"
+                  value={formData.venueCode}
+                  onBlur={() => handleInputChange('venueCode', formData.venueCode.toUpperCase())}
+                  onChange={(e) => handleInputChange('venueCode', e.target.value)}
+                />
               </Tooltip>
             </label>
             <Select
               label="Venue Status"
+              options={[
+                { text: 'Open', value: 'open' },
+                { text: 'Closed', value: 'closed' },
+                { text: 'Warning', value: 'warning' },
+              ]}
+              onChange={(value) => handleInputChange('venueStatus', value)}
+              value={formData.venueStatus}
               placeHolder="<Venue Status DROPDOWN>"
               className="w-[430px] font-bold place-self-end "
             />
 
             <label htmlFor="" className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Venue Name</p>
-              <TextInput placeHolder="Enter Venue Name" type="" className="w-[364px]" />
+              <TextInput
+                placeHolder="Enter Venue Name"
+                type=""
+                className="w-[364px]"
+                value={formData.venueName}
+                onChange={(e) => handleInputChange('venueName', e.target.value)}
+              />
             </label>
             <div className="flex flex-row justify-between pl-20">
               <Checkbox
@@ -290,7 +478,12 @@ export default function AddEditVenueModal() {
               <h2 className="text-xl text-primary-navy font-bold ">Venue Contacts</h2>
               <Button variant="primary" text="Add New Contact" />
             </div>
-            <Table columnDefs={venueContractDefs} rowData={dummyVenueContractData} styleProps={styleProps} />
+            <Table
+              columnDefs={venueContractDefs}
+              rowData={dummyVenueContractData}
+              styleProps={styleProps}
+              getRowStyle={getRowStyle}
+            />
           </div>
           <div className="pt-7">
             <h2 className="text-xl text-primary-navy font-bold ">Technical</h2>
@@ -417,10 +610,10 @@ export default function AddEditVenueModal() {
             <div className="flex gap-4 pt-4 float-right">
               <Button variant="secondary" text="Cancel" className="w-32" />
               <Button variant="tertiary" text="Delete Venue" className="w-32" />
-              <Button text="Save and Close" className="w-32" />
+              <Button text="Save and Close" className="w-32" onClick={handleSaveAndClose} />
             </div>
           </div>
-        </div>
+        </form>
       </PopupModal>
     </>
   );
