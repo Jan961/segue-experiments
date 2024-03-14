@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 import { bookingState } from 'state/booking/bookingState';
@@ -25,7 +25,9 @@ import SalesTable from 'components/marketing/sales/SalesTable';
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
 =======
 import SalesTable from 'components/marketing/sales/table';
+import { SalesSubmit, SalesTableVariant } from 'components/marketing/sales/table/SalesTable';
 import { ProdComp } from 'components/marketing/sales/table/SalesTable';
+<<<<<<< HEAD
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 9af7f99 (a start at SK-49-VenueHistory with the venue select modal)
@@ -48,11 +50,15 @@ import SalesTable from 'components/marketing/sales/SalesTable';
 import SalesTable from 'components/marketing/sales/table';
 import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+import useAxios from 'hooks/useAxios';
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
 
 interface VenueHistoryProps {
   visible: boolean;
   onCancel: () => void;
 }
+
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
 <<<<<<< HEAD
@@ -78,6 +84,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 <<<<<<< HEAD
   const [showResultsModal, setShowResults] = useState<boolean>(false);
 <<<<<<< HEAD
+<<<<<<< HEAD
   const [bookings, setBookings] = useState([]);
   const [selectedBookings, setSelBookings] = useState([]); // patch fix just to make available on main
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
@@ -94,6 +101,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [compData, setCompData] = useState<ProdComp>();
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
+=======
+  const [selectedBookings, setSelBookings] = useState([]); // patch fix just to make available on main
+  const [venueSelectView, setVenueSelectView] = useState<string>('select');
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
   const [showSalesSnapshot, setShowSalesSnapshot] = useState<boolean>(false);
   const [bookingId, setBookingId] = useState(0);
 <<<<<<< HEAD
@@ -105,10 +116,16 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> 442b778 (flow complete - ready for partial PR)
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [prodCompData, setProdCompData] = useState<any>();
+  const [salesCompData, setSalesCompData] = useState<any>();
+  const [salesSnapData, setSalesSnapData] = useState<any>();
+  const [currView, setCurrView] = useState<SalesTableVariant>('venue');
 
-
+  const { fetchData } = useAxios();
 
   const handleModalCancel = () => onCancel?.();
+<<<<<<< HEAD
 
 <<<<<<< HEAD
   const [venueDesc, setVenueDesc] = useState<string>('');
@@ -144,6 +161,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 =======
 >>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
+=======
+  const [venueDesc, setVenueDesc] = useState<string>('');
+
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
   const VenueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
@@ -169,7 +190,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     setShowVenueSelect(visible);
   }, [visible]);
 
+  const showError = (error: string) => {
+    alert(error);
+  }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -192,18 +217,21 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         }
 
         setCompData(compData);
+=======
+  const toggleModal = (type: SalesTableVariant) => {
+    switch (type) {
+      case 'prodComparision':
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
         setShowVenueSelect(false);
         setShowCompSelect(true);
         break;
 
-      case 'prodComparision':
-        setBookings(selectedBookings)
+      case 'salesComparison':
         setShowCompSelect(false);
         setShowResults(true);
         break;
 
       case 'salesSnapshot':
-        setBookingId(data);
         setShowSalesSnapshot(true);
     }
 =======
@@ -265,6 +293,74 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
   }
 
+  const getData = (dataInput: any) => {
+    switch (currView) {
+      case 'venue':
+        if(isNaN(dataInput)) break;
+        const venue = venueDict[dataInput];
+        if(venue.Code === undefined) break;
+        setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
+        setVenueID(dataInput)
+        setLoading(true);
+
+        try {
+          fetchData({
+            url: '/api/marketing/archivedSales/bookingSelection',
+            method: 'POST',
+            data: {
+              salesByType: 'venue',
+              venueCode: venue.Code,
+              showCode: router.query.ShowCode.toString()
+            },
+          }).then((data: any) => {
+            if (data !== undefined) {
+              setProdCompData(data);
+              setCurrView('prodComparision')
+              toggleModal('prodComparision')
+            } else {
+              showError('No comparision data for this venue');
+            }
+          });
+        } catch (error) {
+          alert(error)
+        }
+
+        break;
+
+      case 'prodComparision':
+        fetchData({
+          url: '/api/marketing/sales/read/archived',
+          method: 'POST',
+          data: { bookingIds: selectedBookings.map(obj => obj.BookingId) },
+        }).then((data: any) => {
+          if (data !== undefined) {
+            setSalesCompData({tableData: data.response, bookingIds: selectedBookings});
+            setCurrView('salesComparison')
+            toggleModal('salesComparison')
+          } else {
+            showError('No sales to show');
+          }
+        });
+
+        break;
+
+      case 'salesSnapshot':
+        fetchData({
+          url: '/api/marketing/sales/read/' + dataInput.toString(),
+          method: 'POST',
+        }).then((data: any) => {
+          if (data !== undefined) {
+            console.log(data)
+            setSalesSnapData(data);
+            setCurrView('salesSnapshot')
+            toggleModal('salesSnapshot')
+          } else {
+            showError('No sales to show');
+          }
+        });
+    }
+  }
+
   const handleBtnBack = (type: string) => {
     if (type === 'salesComparison') {
       setShowResults(false);
@@ -277,7 +373,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      toggleModal('salesSnapshot', e.data.BookingId)
+     getData(e.data.BookingId);
     }
   }
 
@@ -307,11 +403,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         setSelBookings(tempBookings);
       }
     }
-
-
   };
-
-
 
   return (
     <div>
@@ -475,6 +567,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 isClearable
                 isSearchable
                 value={venueID}
+<<<<<<< HEAD
 >>>>>>> 442b778 (flow complete - ready for partial PR)
                 onChange={(value) => toggleModal('venue', parseInt(value as string, 10))}
 =======
@@ -484,6 +577,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
                 onChange={(value) => toggleModal('venue', parseInt(value as string, 10))}
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+                onChange={(value) => getData(value)}
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
                 placeholder={'Please select a venue'}
                 label="Venue"
               />
@@ -535,24 +631,28 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             containerHeight='h-auto'
             containerWidth='w-[920px]'
             module='bookings'
-            data={compData}
             variant='prodComparision'
             primaryBtnTxt='Compare'
             showPrimaryBtn={true}
             secondaryBtnText='Cancel'
             showSecondaryBtn={true}
             handleSecondaryBtnClick={handleModalCancel}
-            handlePrimaryBtnClick={(r) => toggleModal(r.type, r.data)}
+            handlePrimaryBtnClick={(r) => getData(r.data)}
             handleBackBtnClick={() => handleBtnBack('prodComparision')}
             backBtnTxt='Back'
             handleCellClick={handleTableCellClick}
             showBackBtn={true}
+<<<<<<< HEAD
             //handleError={() => setVenueSelectView('error')}
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
             handleCellValChange={selectForComparison}
 >>>>>>> 442b778 (flow complete - ready for partial PR)
+=======
+            handleCellValChange={selectForComparison}
+            data={prodCompData}
+>>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
           />
 
 =======
@@ -603,7 +703,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             containerHeight='h-auto'
             containerWidth='w-auto'
             module='bookings'
-            data={bookings}
             variant='salesComparison'
             showExportBtn={true}
             showSecondaryBtn={true}
@@ -615,6 +714,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             handleBackBtnClick={() => handleBtnBack('salesComparison')}
             showBackBtn={true}
             backBtnTxt='Back'
+            data={salesCompData}
           />
         </div>
 <<<<<<< HEAD
@@ -644,12 +744,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             containerHeight='h-auto'
             containerWidth='w-[920px]'
             module='bookings'
-            data={bookingId}
             variant='salesSnapshot'
             primaryBtnTxt='Back'
             showPrimaryBtn={true}
             handlePrimaryBtnClick={() => setShowSalesSnapshot(false)}
-          //handleError={() => setVenueSelectView('error')}
+            data={salesSnapData}
           />
 
         </div>
