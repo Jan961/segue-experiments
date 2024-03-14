@@ -1,9 +1,9 @@
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import { useRef } from 'react';
 import BaseCellRenderer from './BaseCellRenderer';
-import { TypeaheadProps } from 'components/core-ui-lib/Typeahead/Typeahead';
+import { SelectProps } from 'components/core-ui-lib/Select/Select';
 
-interface SelectRendererProps extends TypeaheadProps {
+interface SelectRendererProps extends SelectProps {
   id?: string;
   eGridCell: HTMLElement;
 }
@@ -17,7 +17,7 @@ const SelectRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
 
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
-      <Typeahead ref={selectRef} {...props} />
+      <Select ref={selectRef} {...props} />
     </BaseCellRenderer>
   );
 };

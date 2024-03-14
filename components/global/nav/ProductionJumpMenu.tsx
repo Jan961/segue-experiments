@@ -1,5 +1,5 @@
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
@@ -97,7 +97,7 @@ export default function ProductionJumpMenu() {
   if (!productionJump?.productions?.length) return null;
   return (
     <>
-      <Typeahead
+      <Select
         className="border-0 !shadow-none w-[420px]"
         value={selected}
         label="Production"
@@ -107,6 +107,7 @@ export default function ProductionJumpMenu() {
         options={productions}
         onChange={goToProduction}
         isSearchable
+        isClearable={false}
       />
       <div className="flex  items-center ml-1 mr-4">
         <Checkbox

@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
@@ -49,7 +49,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
       <div>
         <div className=" grid grid-cols-5 gap-x-4 gap-y-3">
           <div className="col-span-3 w-[360px]">
-            <Typeahead
+            <Select
               label="Production"
               name="production"
               placeholder="Please select a Production"
@@ -70,7 +70,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
           <div className="col-span-3 row-start-2 w-[360px]">
-            <Typeahead
+            <Select
               name="venue"
               label="Venue"
               className="placeholder-primary"

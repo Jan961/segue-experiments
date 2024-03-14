@@ -131,7 +131,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}
         />
-        <BarringIssueView barringConflicts={state.barringConflicts} updateModalTitle={updateModalTitle} />
+        <BarringIssueView
+          bookingConflicts={state.bookingConflicts}
+          barringConflicts={state.barringConflicts}
+          updateModalTitle={updateModalTitle}
+        />
         <NewBookingDetailsView
           formData={state.form}
           data={state.booking}
