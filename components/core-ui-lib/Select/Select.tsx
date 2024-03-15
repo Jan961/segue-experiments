@@ -169,7 +169,7 @@ export default forwardRef(function Select(
       data-testid={`${testId ? `form-select-${testId}` : 'form-select'}`}
     >
       {label && (
-        <div className="border-r border-primary-border px-3">
+        <div className="border-r min-w-fit border-primary-border px-3">
           <Label text={label} />
         </div>
       )}

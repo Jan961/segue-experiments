@@ -44,6 +44,7 @@ export default function VenueFilter({
                 label="Town"
                 placeholder="Select Town"
                 options={townOptions}
+                isSearchable
               />
 
               <Select
@@ -53,6 +54,7 @@ export default function VenueFilter({
                 label="On Production"
                 placeholder="Select Production"
                 options={productionOptions}
+                isSearchable
               />
             </div>
             <div className="flex items-start gap-4 w-full ">
@@ -63,6 +65,7 @@ export default function VenueFilter({
                 label="Country"
                 placeholder="Select Country"
                 options={countryOptions}
+                isSearchable
               />
               <TextInput
                 id={'venueText'}
