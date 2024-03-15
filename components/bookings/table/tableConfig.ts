@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';                  
+import { ITooltipParams } from 'ag-grid-community';
 import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
@@ -15,11 +15,9 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
-<<<<<<< HEAD
 import TimeArrayRenderer from './TimeArrayRenderer';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import IconRenderer from './IconRenderer';
+<<<<<<< HEAD
 <<<<<<< HEAD
 import { formatMinutes } from 'utils/booking';
 =======
@@ -39,9 +37,10 @@ import SelectCompOrderRender from './SelectCompOrderRender';
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 >>>>>>> ef562f9 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
 
 export const styleProps = { headerColor: tileColors.bookings };
-
 
 export const columnDefs = [
   {
@@ -96,6 +95,7 @@ export const columnDefs = [
   },
 ];
 
+<<<<<<< HEAD
 export const previewColumnDefs = [
   {
     headerName: 'Production',
@@ -154,6 +154,8 @@ export const previewColumnDefs = [
   },
 ];
 
+=======
+>>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
 export const bookingConflictsColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
@@ -168,8 +170,8 @@ export const bookingConflictsColumnDefs = [
 
 export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
+  { headerName: 'Date', field: 'Date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
@@ -314,9 +316,8 @@ export const tourSummaryColumnDefs = [
     width: 90,
     resizable: false,
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
 ];
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -362,29 +363,41 @@ export const barredVenueColumnDefs = [
 =======
 >>>>>>> 3a6cc8d (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 =======
-
-
-export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) => [
 =======
+>>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
 
-
-export const venueHistCompColumnDefs = (optionsLength = 0) => [
->>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+export const barredVenueColumnDefs = [
+  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
   {
-    headerName: 'Order for Comparison',
-    field: 'compOrder',
-    cellRenderer: SelectCompOrderRender,
+    headerName: 'Date',
+    field: 'FormattedDate',
+    cellRenderer: DefaultCellRenderer,
+    width: 80,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Miles',
+    field: 'Mileage',
+    cellRenderer: DefaultCellRenderer,
+    width: 80,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'info',
+    cellRenderer: IconRenderer,
     cellRendererParams: {
-      optionsLength,
-<<<<<<< HEAD
-      selectForComparison
+      iconName: 'info-circle-solid',
+      tooltipPosition: 'left',
+      popover: true,
     },
-    width: 120,
+    width: 40,
+    headerClass: 'text-center',
+    resizable: false,
     cellStyle: {
-      textAlign: 'center',
       overflow: 'visible',
-=======
     },
+<<<<<<< HEAD
     width: 125,
     cellStyle: {
       textAlign: 'center',
@@ -440,6 +453,8 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
       textAlign: 'center',
     },
     resizable: false
+=======
+>>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
   },
 <<<<<<< HEAD
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
@@ -541,6 +556,7 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 >>>>>>> f3a124c (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 =======
 ];
+<<<<<<< HEAD
 >>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
 <<<<<<< HEAD
 >>>>>>> 226d528 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
@@ -556,9 +572,39 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
     cellStyle: {
       textAlign: 'center',
     },
+=======
+export const venueColumnDefs = [
+  {
+    headerName: 'Venue Code',
+    field: 'VenueCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
   },
-
+  {
+    headerName: 'Venue Name',
+    field: 'VenueName',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Town',
+    field: 'VenueTown',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Capacity',
+    field: 'VenueCapacity',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+>>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
+  },
 ];
+<<<<<<< HEAD
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 <<<<<<< HEAD
 >>>>>>> 3a6cc8d (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
@@ -567,3 +613,5 @@ export const venueHistCompColumnDefs = (optionsLength = 0) => [
 ];
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 >>>>>>> ef562f9 (feature/SK-49-VenueHistoryModalSK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+>>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)

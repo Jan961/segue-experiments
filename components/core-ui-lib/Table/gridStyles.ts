@@ -88,14 +88,23 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .custom-red-row {
   background-color: #fad0cc; /* Set your desired background color */
 }
+
+.custom-pinned-header {
+  border-color: white !important;
+  border-top: 102px solid; 
+  border-right: 3px solid;
+}
 `;
 
+
+
+
 interface TableTooltipProps {
-  background?: string;
-  border?: string;
-  color?: string;
-  left?: string;
-  top?: string;
+    background?: string;
+    border?: string;
+    color?: string;
+    left?: string;
+    top?: string;
 }
 
 export const StyledTableTooltip = styled.div<TableTooltipProps>`
