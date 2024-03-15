@@ -96,6 +96,9 @@ export const columnDefs = [
 ];
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 6da9241 (bookings tableConfig seemed to be missing previewColDefs causing the build to fail)
 export const previewColumnDefs = [
   {
     headerName: 'Production',
@@ -107,8 +110,13 @@ export const previewColumnDefs = [
     headerName: 'Date',
     field: 'date',
     cellRenderer: DateColumnRenderer,
+<<<<<<< HEAD
     width: 123,
     minWidth: 123,
+=======
+    width: 120,
+    minWidth: 120,
+>>>>>>> 6da9241 (bookings tableConfig seemed to be missing previewColDefs causing the build to fail)
   },
   { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 60 },
   { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
@@ -117,17 +125,23 @@ export const previewColumnDefs = [
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
+<<<<<<< HEAD
     valueFormatter: ({ value, data }) =>
       value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
     cellStyle: {
       paddingLeft: '0.5rem',
     },
+=======
+    cellRenderer: DefaultCellRenderer,
+    resizable: true,
+>>>>>>> 6da9241 (bookings tableConfig seemed to be missing previewColDefs causing the build to fail)
     width: 105,
   },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
   { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
   {
+<<<<<<< HEAD
     valueFormatter: (params) => (params.value === -1 ? 'No Data' : params.value),
     headerName: 'Miles',
     field: 'miles',
@@ -156,6 +170,15 @@ export const previewColumnDefs = [
 
 =======
 >>>>>>> a76f448 (flow complete will loading handlers and the week row does not repeat on the sales comparison table)
+=======
+    headerName: 'Miles',
+    field: 'miles',
+    cellRenderer: MilesRenderer,
+    width: 80,
+  },
+  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80, resizable: false },
+];
+>>>>>>> 6da9241 (bookings tableConfig seemed to be missing previewColDefs causing the build to fail)
 export const bookingConflictsColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
@@ -170,8 +193,8 @@ export const bookingConflictsColumnDefs = [
 
 export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Date', field: 'Date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
