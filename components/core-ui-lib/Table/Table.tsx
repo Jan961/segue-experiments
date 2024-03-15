@@ -139,7 +139,7 @@ export default forwardRef(function Table(
           getRowHeight={getRowHeight}
           navigateToNextCell={() => null}
           defaultColDef={DEFAULT_COLUMN_DEF}
-          suppressScrollOnNewData={true}
+          suppressScrollOnNewData
         />
       </div>
     </>
