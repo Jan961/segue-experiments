@@ -1,5 +1,5 @@
 import Table from 'components/core-ui-lib/Table';
-import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
+import { styleProps, previewColumnDefs } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import { useWizard } from 'react-use-wizard';
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
@@ -13,7 +13,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { distanceState } from 'state/booking/distanceState';
 import { steps } from 'config/AddBooking';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -47,8 +47,6 @@ export default function PreviewNewBooking({
   useEffect(() => {
     updateModalTitle('Preview New Booking');
   }, []);
-
-  const filteredColumnDefs = useMemo(() => columnDefs.filter(({ field }) => field !== 'note'), []);
 
   const updateData: PreviewDataItem[] = data.map((item: any) => {
     const matchingMileage = milesWithVenueId.find((mileage) => mileage.VenueId === item.venue);
@@ -140,7 +138,7 @@ export default function PreviewNewBooking({
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
         <Table
           rowData={mergedFilteredBookings}
-          columnDefs={filteredColumnDefs}
+          columnDefs={previewColumnDefs}
           styleProps={styleProps}
           rowClassRules={rowClassRules}
         />
