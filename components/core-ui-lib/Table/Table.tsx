@@ -145,6 +145,7 @@ export default forwardRef(function Table(
           defaultColDef={DEFAULT_COLUMN_DEF}
           pagination={pagination}
           paginationPageSize={paginationPageSize}
+          suppressScrollOnNewData
         />
       </div>
     </>
