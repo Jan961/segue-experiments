@@ -6,14 +6,7 @@ import { useEffect, useState } from 'react';
 
 const SelectBookingStatusRenderer = ({ eGridCell, value, setValue, data, node, api }: CustomCellRendererProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (data) {
-      if (data.isRunOfDates && node.rowIndex > 0) {
-        setIsDisabled(true);
-      }
-    }
-  }, [data, node]);
+  const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
 
   const handleValueChange = (value) => {
     setValue(value);
@@ -21,6 +14,18 @@ const SelectBookingStatusRenderer = ({ eGridCell, value, setValue, data, node, a
       api.forEachNode((node: IRowNode) => node.setData({ ...node.data, bookingStatus: value }));
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      const { isRunOfDates, dayType } = data;
+      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
+      if (!data.isRunOfDates) {
+        setValue(dayType === null || dayType === '' ? null : pencilled);
+      } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
+        handleValueChange(null);
+      }
+    }
+  }, [data, node]);
 
   return (
     <div className="pl-1 pr-2 mt-1">

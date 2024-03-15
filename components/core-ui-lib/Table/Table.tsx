@@ -27,15 +27,18 @@ const ROW_HEIGHT = 43;
 const HEADER_HEIGHT = 51;
 const DELTA = 250; // Set as const for now. We may look to accept it as a prop if necessary
 
+const DEFAULT_COLUMN_DEF = {
+  wrapHeaderText: true,
+  suppressHeaderMenuButton: true,
+  suppressHeaderFilterButton: true,
+  menuTabs: [],
+};
+
 const DEFAULT_GRID_OPTIONS = {
   autoSizeStrategy: {
     type: 'fitGridWidth',
     defaultMinWidth: 50,
-    defaultColDef: {
-      wrapHeaderText: true,
-    },
   },
-  suppressHeaderFocus: true,
 };
 
 export default forwardRef(function Table(
@@ -135,6 +138,7 @@ export default forwardRef(function Table(
           gridOptions={{ ...DEFAULT_GRID_OPTIONS, ...gridOptions }}
           getRowHeight={getRowHeight}
           navigateToNextCell={() => null}
+          defaultColDef={DEFAULT_COLUMN_DEF}
         />
       </div>
     </>

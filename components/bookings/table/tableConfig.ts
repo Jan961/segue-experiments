@@ -73,6 +73,42 @@ export const columnDefs = [
   },
 ];
 
+export const previewColumnDefs = [
+  {
+    headerName: 'Production',
+    field: 'production',
+    cellRenderer: DefaultCellRenderer,
+    width: 118,
+  },
+  {
+    headerName: 'Date',
+    field: 'date',
+    cellRenderer: DateColumnRenderer,
+    width: 120,
+    minWidth: 120,
+  },
+  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 60 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
+  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
+  {
+    headerName: 'Booking Status',
+    field: 'bookingStatus',
+    cellRenderer: DefaultCellRenderer,
+    resizable: true,
+    width: 105,
+  },
+  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
+  { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
+  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
+  {
+    headerName: 'Miles',
+    field: 'miles',
+    cellRenderer: MilesRenderer,
+    width: 80,
+  },
+  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80, resizable: false },
+];
 export const bookingConflictsColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
@@ -87,8 +123,8 @@ export const bookingConflictsColumnDefs = [
 
 export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Date', field: 'Date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
+  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
@@ -239,14 +275,14 @@ export const barredVenueColumnDefs = [
     headerName: 'Date',
     field: 'FormattedDate',
     cellRenderer: DefaultCellRenderer,
-    width: 120,
+    width: 80,
     headerClass: 'text-center',
   },
   {
     headerName: 'Miles',
     field: 'Mileage',
     cellRenderer: DefaultCellRenderer,
-    width: 65,
+    width: 80,
     headerClass: 'text-center',
   },
   {
@@ -255,6 +291,7 @@ export const barredVenueColumnDefs = [
     cellRenderer: IconRenderer,
     cellRendererParams: {
       iconName: 'info-circle-solid',
+      tooltipPosition: 'left',
       popover: true,
     },
     width: 40,

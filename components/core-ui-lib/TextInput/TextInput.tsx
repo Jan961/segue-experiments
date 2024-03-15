@@ -14,6 +14,7 @@ export interface TextInputProps {
   error?: string;
   onFocus?: (e: any) => void;
   onBlur?: (e: any) => void;
+  type?: string;
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
@@ -36,6 +37,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           className={classNames(baseClass, inputClass, `${iconName ? 'pr-6' : ''}`, className)}
           onChange={onChange}
           placeholder={placeHolder}
+          disabled={disabled}
           value={value || ''}
           {...rest}
         />

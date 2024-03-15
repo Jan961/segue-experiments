@@ -1,24 +1,25 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import { useRecoilValue } from 'recoil';
+import Select from 'components/core-ui-lib/Select';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
-import { newBookingState } from 'state/booking/newBookingState';
 import { TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { BookingTypeMap, BookingTypes, steps } from 'config/AddBooking';
+import { steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
-import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
+import Toggle from 'components/core-ui-lib/Toggle/Toggle';
+import Label from 'components/core-ui-lib/Label';
+import { dateToSimple } from 'services/dateService';
 
 type AddBookingProps = {
   formData: TForm;
@@ -27,6 +28,7 @@ type AddBookingProps = {
   productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
+  updateModalTitle: (title: string) => void;
   onChange: (change: Partial<TForm>) => void;
   onClose: () => void;
 };
@@ -40,9 +42,9 @@ const NewBookingView = ({
   venueOptions,
   updateBookingConflicts,
   updateBarringConflicts,
+  updateModalTitle,
 }: AddBookingProps) => {
-  const { nextStep, activeStep, goToStep } = useWizard();
-  const setViewHeader = useSetRecoilState(newBookingState);
+  const { nextStep, goToStep } = useWizard();
 
   const currentProduction = useRecoilValue(currentProductionSelector);
   const scheduleRange = useRecoilValue(dateBlockSelector);
@@ -52,14 +54,9 @@ const NewBookingView = ({
   const { loading, fetchData: api } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
 
-  const bookingTypeValue = useMemo(
-    () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
-    [isDateTypeOnly],
-  );
-
   useEffect(() => {
-    setViewHeader({ stepIndex: activeStep });
-  }, [activeStep]);
+    updateModalTitle('Create New Booking');
+  }, []);
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
 
@@ -78,7 +75,7 @@ const NewBookingView = ({
         endDate,
       },
     }).then((data: any) => {
-      updateBarringConflicts(data);
+      updateBarringConflicts(data.map((barredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.Date) })));
       if (skipRedirect) return;
       if (data?.length > 0) {
         goToStep(steps.indexOf('Barring Issue'));
@@ -118,6 +115,9 @@ const NewBookingView = ({
   const goToGapSuggestion = () => {
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
+  const onCheckMileage = () => {
+    goToStep(steps.indexOf('Check Mileage'));
+  };
   return (
     <div className="w-[385px]">
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
@@ -155,34 +155,36 @@ const NewBookingView = ({
             </Tooltip>
           </div>
         )}
-        <Select
-          className="w-[160px] my-2 !border-0"
-          value={bookingTypeValue}
-          options={BookingTypes}
-          onChange={(v) =>
-            onChange({
-              venueId: NaN,
-              dateType: NaN,
-              isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
-              isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
-            })
-          }
-        />
+        <div className="flex items-center gap-2">
+          <Label className="text-white font-bold" text="Set Venue" />
+          <Toggle
+            label="SetVenue"
+            checked={isDateTypeOnly}
+            onChange={(value) =>
+              onChange({
+                isDateTypeOnly: value,
+                isRunOfDates: value ? false : isRunOfDates,
+              })
+            }
+          />
+          <Label className="text-white font-bold" text="Set Day Type" />
+        </div>
         {isDateTypeOnly && (
           <>
-            <Typeahead
+            <Select
               className={'my-2 w-full !border-0'}
               options={dayTypeOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
               value={dateType}
+              isSearchable
               placeholder={'Please select a Day Type'}
             />
           </>
         )}
         {!isDateTypeOnly && (
           <>
-            <Typeahead
+            <Select
               className={classNames('my-2 w-full !border-0')}
               options={venueOptions}
               disabled={stage !== 0}
@@ -216,12 +218,12 @@ const NewBookingView = ({
       <div className="flex mt-4 justify-between">
         <div
           className={classNames({
-            'cursor-not-allowed caret-primary-input-text': !(venueId || dateType) || !fromDate || !toDate,
+            'cursor-not-allowed caret-primary-input-text': !venueId || !fromDate || !toDate,
           })}
         >
           <Button
-            onClick={() => null}
-            disabled={!(venueId || dateType) || !fromDate || !toDate}
+            onClick={onCheckMileage}
+            disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
             className="px-6"
             text={'Check Mileage'}
           ></Button>

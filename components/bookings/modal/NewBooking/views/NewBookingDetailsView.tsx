@@ -3,7 +3,7 @@ import { newBookingColumnDefs, styleProps } from 'components/bookings/table/tabl
 import Button from 'components/core-ui-lib/Button';
 import { addDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { BookingItem, TForm } from '../reducer';
 import NotesPopup from 'components/bookings/NotesPopup';
@@ -13,17 +13,21 @@ import { steps } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { toISO } from 'services/dateService';
+import { ProductionDTO } from 'interfaces';
+import { venueState } from 'state/booking/venueState';
+import { useRecoilValue } from 'recoil';
 
 type NewBookingDetailsProps = {
   formData: TForm;
   data: BookingItem[];
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
-  productionCode: string;
+  production: Partial<ProductionDTO>;
   dateBlockId: number;
   onSubmit: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
+  updateModalTitle: (title: string) => void;
 };
 
 const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
@@ -32,14 +36,16 @@ export default function NewBookingDetailsView({
   formData,
   dayTypeOptions = [],
   venueOptions = [],
-  productionCode,
+  production,
   dateBlockId,
   data,
   onSubmit,
   toggleModalOverlay,
   onClose,
+  updateModalTitle,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
+  const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
@@ -49,6 +55,10 @@ export default function NewBookingDetailsView({
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [changesMade, setChangesMade] = useState<boolean>(false);
+
+  useEffect(() => {
+    updateModalTitle('New Booking Details');
+  }, []);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -99,6 +109,14 @@ export default function NewBookingDetailsView({
     setBookingData(dates);
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates]);
 
+  const productionItem = useMemo(() => {
+    return {
+      production: `${production.ShowCode}${production.Code}`,
+      venue: bookingRow?.venue ? venueDict[bookingRow.venue].Name : '',
+      date: bookingRow?.date || null,
+    };
+  }, [production, bookingRow, venueDict]);
+
   useEffect(() => {
     if (data !== null && data.length > 0) {
       setBookingData(data);
@@ -143,7 +161,7 @@ export default function NewBookingDetailsView({
   };
 
   const handleYesClick = () => {
-    setShowConfirmation(null);
+    setShowConfirmation(false);
     toggleModalOverlay(false);
     if (confirmationType.current === 'leave') {
       goToNewBooking();
@@ -204,7 +222,7 @@ export default function NewBookingDetailsView({
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
+        <div className="text-primary-navy text-xl my-2 font-bold">{`${production.ShowCode}${production.Code}  ${production?.ShowName}`}</div>
       </div>
       <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
         <Table
@@ -221,7 +239,7 @@ export default function NewBookingDetailsView({
         />
         <NotesPopup
           show={showNotesModal}
-          productionItem={bookingRow}
+          productionItem={productionItem}
           onSave={handleSaveNote}
           onCancel={handleNotesCancel}
         />

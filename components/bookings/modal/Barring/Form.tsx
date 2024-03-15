@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
@@ -26,7 +26,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const venueOptions = useRecoilValue(venueOptionsSelector([]));
-  const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction.Id });
+  const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction?.Id });
   const { productionId, venueId, barDistance = '', includeExcluded, seats = '', fromDate, toDate } = formData;
   const formRef = useRef(null);
   const { minDate, maxDate } = useMemo(() => {
@@ -49,40 +49,45 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
       <div>
         <div className=" grid grid-cols-5 gap-x-4 gap-y-3">
           <div className="col-span-3 w-[360px]">
-            <Typeahead
+            <Select
               label="Production"
               name="production"
+              placeholder="Please select a Production"
               value={productionId}
               options={productionOptions}
               onChange={(production) => handleOnChange({ productionId: production })}
             />
           </div>
           <div className="col-span-2 col-start-4 flex items-center justify-between pl-6">
-            <Label text="Bar Distance"></Label>
+            <Label className="!text-primary" text="Bar Distance"></Label>
             <TextInput
-              className="w-24"
+              className="w-24 placeholder-primary"
               id="barDistance"
               placeHolder="Enter Miles"
+              type="number"
               onChange={(e) => handleOnChange({ barDistance: e.target.value })}
               value={barDistance}
             />
           </div>
           <div className="col-span-3 row-start-2 w-[360px]">
-            <Typeahead
+            <Select
               name="venue"
               label="Venue"
+              className="placeholder-primary"
               onChange={(selectedVenue) => handleOnChange({ venueId: selectedVenue })}
               options={venueOptions}
               placeholder="Please select a venue"
               value={venueId}
+              isSearchable
             />
           </div>
           <div className="col-span-2 col-start-4 row-start-2 flex items-center justify-between pl-6">
-            <Label text="Minimum Seats"></Label>
+            <Label className="!text-primary" text="Minimum Seats"></Label>
             <TextInput
               id="Seats"
-              className="w-24"
+              className="w-24 placeholder-primary"
               placeHolder="Enter Seats"
+              type="number"
               onChange={(e) => handleOnChange({ seats: e.target.value })}
               value={seats}
             />
@@ -90,7 +95,13 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
           <div className="col-span-3 row-start-3">
             <DateRange
               className="w-fit"
-              onChange={({ from, to }) => handleOnChange({ fromDate: from?.toISOString(), toDate: to?.toISOString() })}
+              label="Date"
+              onChange={({ from, to }) =>
+                handleOnChange({
+                  fromDate: from?.toISOString() || '',
+                  toDate: !toDate && !to ? from?.toISOString() : to?.toISOString() || '',
+                })
+              }
               value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
               minDate={minDate ? new Date(minDate) : null}
               maxDate={maxDate ? new Date(maxDate) : null}
@@ -108,7 +119,12 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
         </div>
-        <Button onClick={handleOnSubmit} className="float-right px-7 mt-5" text="Check Barring" />
+        <Button
+          disabled={!venueId || !productionId}
+          onClick={handleOnSubmit}
+          className="float-right px-7 mt-5"
+          text="Check Barring"
+        />
       </div>
     </form>
   );

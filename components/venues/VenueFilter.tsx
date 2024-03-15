@@ -42,7 +42,7 @@ export default function VenueFilter({
                 value={venueFilter.town}
                 className="bg-white w-full font-bold h-fit"
                 label="Town"
-                placeHolder="Select Town"
+                placeholder="Select Town"
                 options={townOptions}
               />
 
@@ -51,7 +51,7 @@ export default function VenueFilter({
                 value={venueFilter.productionId}
                 className="bg-white w-full font-bold h-fit"
                 label="On Production"
-                placeHolder="Select Production"
+                placeholder="Select Production"
                 options={productionOptions}
               />
             </div>
@@ -61,7 +61,7 @@ export default function VenueFilter({
                 value={venueFilter.country}
                 className="bg-white w-full h-fit font-bold"
                 label="Country"
-                placeHolder="Select Country"
+                placeholder="Select Country"
                 options={countryOptions}
               />
               <TextInput
