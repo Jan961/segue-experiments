@@ -7,7 +7,7 @@ import Label from '../Label';
 export type SelectOption = { text: string; value: string | number };
 
 export interface SelectProps {
-  value?: string;
+  value?: string | number;
   disabled?: boolean;
   className?: string;
   buttonClass?: string;

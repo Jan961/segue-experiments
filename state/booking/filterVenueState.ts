@@ -6,10 +6,12 @@ export type FilterVenueState = {
   town?: string;
   country?: string;
   productionId?: number;
+  Name?: string;
 };
 
 export const intialVenueFilterState: FilterVenueState = {
   venueId: null,
+  Name: '',
   masterTaskText: '',
   town: '',
   country: '',

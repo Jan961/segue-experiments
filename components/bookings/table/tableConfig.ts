@@ -293,5 +293,6 @@ export const venueColumnDefs = [
     cellRenderer: DefaultCellRenderer,
     width: 120,
     headerClass: 'text-center',
+    resizable: false,
   },
 ];

@@ -15,7 +15,8 @@ import axios from 'axios';
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { venueTownList = [], venueCountryList = [] } = props;
   const [venues, setVenues] = useState([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [filterVenues, setFilterVenues] = useState([]);
+  // const [loading, setLoading] = useState<boolean>(false);
   const venuesFilter = useRecoilValue(filterVenueState);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
   const countryOptions = useMemo(
@@ -24,11 +25,11 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   );
 
   const fetchVenues = useCallback(async (payload) => {
-    setLoading(true);
+    // setLoading(true);
     const { data } = await axios.post('/api/venue/list', {
       ...payload,
     });
-    console.log(loading);
+
     const venusList = data?.map(({ Code, Id, Name, Seats, VenueAddress }) => ({
       Code,
       Id,
@@ -37,21 +38,45 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
       Town: VenueAddress?.[0]?.Town,
     }));
     setVenues(venusList);
-    setLoading(false);
+    setFilterVenues(venusList);
+
+    // setLoading(false);
   }, []);
+
   useEffect(() => {
     const { productionId, town, country } = venuesFilter;
     if (productionId || town || country) {
       fetchVenues({ productionId, town, country });
+    } else {
+      setFilterVenues([]);
     }
   }, [venuesFilter]);
+
+  const handleSearchInputChange = (e) => {
+    const serchText = e.target.value;
+
+    if (serchText === '') {
+      setFilterVenues(venues);
+    } else {
+      const updatedVenues = venues.filter(({ Name }) => {
+        return Name.includes(serchText);
+      });
+
+      setFilterVenues(updatedVenues);
+    }
+  };
 
   return (
     <Layout title="Venues | Segue" flush>
       <div className="mb-8">
-        <VenueFilter townOptions={townOptions} countryOptions={countryOptions} />
+        <VenueFilter
+          townOptions={townOptions}
+          countryOptions={countryOptions}
+          onSearchInputChange={handleSearchInputChange}
+        />
       </div>
-      <VenueTable items={venues} />
+
+      <VenueTable items={filterVenues} />
     </Layout>
   );
 }
