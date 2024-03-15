@@ -11,14 +11,27 @@ export const gridOptions = {
   }
 }
 
-export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) => [
+const getCellColor = (data) => {
+  if(data.isNotOnSale){
+    return { backgroundColor: '#ED1111', color: 'white'}
+  }  else if (data.isBrochureReleased) {
+    return { backgroundColor: '#FFE606', color: 'white'}
+  } else if (data.isSingleSeats) {
+    return { backgroundColor: '#10841C', color: 'white'}
+  } else {
+    return {}; 
+  }
+}
+
+export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
     {
       headerName: 'Order for Comparison',
       field: 'compOrder',
       cellRenderer: SelectCompOrderRender,
       cellRendererParams: {
         optionsLength,
-        selectForComparison
+        selectForComparison,
+        selectedBookings
       },
       width: 120,
       cellStyle: {
@@ -77,9 +90,12 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
       field: 'week',
       cellRenderer: DefaultCellRenderer,
       width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
+      cellStyle: (params) => {
+        return {  
+          ...getCellColor(params.data),
+          textAlign: 'center',
+          overflow: 'visible',
+        }
       },
     },
     {
@@ -171,5 +187,6 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
         textAlign: 'center',
         overflow: 'visible',
       },
+      resizable: false
     },
   ]

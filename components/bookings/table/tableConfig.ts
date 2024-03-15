@@ -6,7 +6,7 @@ import VenueColumnRenderer from './VenueColumnRenderer';
 import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';                  
+import { ITooltipParams } from 'ag-grid-community';
 import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
@@ -15,23 +15,10 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
-<<<<<<< HEAD
 import TimeArrayRenderer from './TimeArrayRenderer';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import IconRenderer from './IconRenderer';
-=======
->>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
-=======
-import TimeArrayRender from './TimeArrayRender';
-import SalesDataButtonRenderer from './SalesDataButtonRenderer';
-import SelectCompOrderRender from './SelectCompOrderRender';
->>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
-=======
->>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 
 export const styleProps = { headerColor: tileColors.bookings };
-
 
 export const columnDefs = [
   {
@@ -86,42 +73,6 @@ export const columnDefs = [
   },
 ];
 
-export const previewColumnDefs = [
-  {
-    headerName: 'Production',
-    field: 'production',
-    cellRenderer: DefaultCellRenderer,
-    width: 118,
-  },
-  {
-    headerName: 'Date',
-    field: 'date',
-    cellRenderer: DateColumnRenderer,
-    width: 120,
-    minWidth: 120,
-  },
-  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 60 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
-  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
-  {
-    headerName: 'Booking Status',
-    field: 'bookingStatus',
-    cellRenderer: DefaultCellRenderer,
-    resizable: true,
-    width: 105,
-  },
-  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
-  { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
-  {
-    headerName: 'Miles',
-    field: 'miles',
-    cellRenderer: MilesRenderer,
-    width: 80,
-  },
-  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80, resizable: false },
-];
 export const bookingConflictsColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
@@ -136,8 +87,8 @@ export const bookingConflictsColumnDefs = [
 
 export const barringIssueColumnDefs = [
   { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
-  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
+  { headerName: 'Date', field: 'Date', cellRenderer: DefaultCellRenderer, width: 110 },
+  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 75, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
@@ -280,104 +231,68 @@ export const tourSummaryColumnDefs = [
     width: 90,
     resizable: false,
   },
-<<<<<<< HEAD
-<<<<<<< HEAD
 ];
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
-
-export const venueHistCompColumnDefs = (optionsLength = 0, selectForComparison) => [
-=======
-
-
-export const venueHistCompColumnDefs = (optionsLength = 0) => [
->>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+export const barredVenueColumnDefs = [
+  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
   {
-    headerName: 'Order for Comparison',
-    field: 'compOrder',
-    cellRenderer: SelectCompOrderRender,
+    headerName: 'Date',
+    field: 'FormattedDate',
+    cellRenderer: DefaultCellRenderer,
+    width: 80,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Miles',
+    field: 'Mileage',
+    cellRenderer: DefaultCellRenderer,
+    width: 80,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'info',
+    cellRenderer: IconRenderer,
     cellRendererParams: {
-      optionsLength,
-<<<<<<< HEAD
-      selectForComparison
+      iconName: 'info-circle-solid',
+      tooltipPosition: 'left',
+      popover: true,
     },
-    width: 120,
+    width: 40,
+    headerClass: 'text-center',
+    resizable: false,
     cellStyle: {
-      textAlign: 'center',
       overflow: 'visible',
-=======
     },
-    width: 125,
-    cellStyle: {
-      textAlign: 'center',
->>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
-    },
-  },
-  {
-    headerName: 'Production',
-<<<<<<< HEAD
-    field: 'prodName',
-    cellRenderer: DefaultCellRenderer,
-    width: 350,
-=======
-    field: 'prodNum',
-    cellRenderer: DefaultCellRenderer,
-    width: 115,
->>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
-  },
-  {
-    headerName: 'Date of First Performance',
-    field: 'firstPerfDt',
-    cellRenderer: DateColumnRenderer,
-    width: 130,
-    cellStyle: {
-      textAlign: 'center',
-    },
-  },
-  {
-    headerName: 'No. Perfs',
-    field: 'numPerfs',
-    cellRenderer: DefaultCellRenderer,
-    width: 70,
-    cellStyle: {
-      textAlign: 'center',
-    },
-  },
-  {
-    headerName: 'Production Duration (Wks)',
-    field: 'prodWks',
-    cellRenderer: DefaultCellRenderer,
-    width: 140,
-    cellStyle: {
-      textAlign: 'center',
-    },
-  },
-  {
-    headerName: 'Sales Data',
-    cellRenderer: SalesDataButtonRenderer,
-<<<<<<< HEAD
-    width: 150,
-    cellStyle: {
-      textAlign: 'center',
-    },
-    resizable: false
   },
 ];
->>>>>>> b5184e9 (SalesTable component added, Venue History integrates new component, table UI perfected)
-=======
-];
->>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
-=======
-    width: 115,
-    cellStyle: {
-      textAlign: 'center',
-    },
+export const venueColumnDefs = [
+  {
+    headerName: 'Venue Code',
+    field: 'VenueCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
   },
-
+  {
+    headerName: 'Venue Name',
+    field: 'VenueName',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Town',
+    field: 'VenueTown',
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Capacity',
+    field: 'VenueCapacity',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
 ];
->>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
-=======
-];
->>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)

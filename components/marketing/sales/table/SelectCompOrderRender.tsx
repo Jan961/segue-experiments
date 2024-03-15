@@ -6,12 +6,19 @@ import { getNumericalOptions } from 'utils/getNumericalOptions';
 interface SelectCompOrderRenderProps extends ICellRendererParams {
   optionsLength: number;
   bookingId: number;
-  selectForComparison: (value) => void
+  selectForComparison: (value) => void;
+  selectedBookings;
 }
 
-const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props }: SelectCompOrderRenderProps) => {
-  const options = getNumericalOptions(props.optionsLength + 1);
-  const setOption = (selectedVal: string) => {
+const SelectCompOrderRender = ({ value, setValue, selectForComparison, selectedBookings, ...props }: SelectCompOrderRenderProps) => {
+  let options = getNumericalOptions(props.optionsLength + 1);
+
+    // Filter options to remove those where 'order' matches any 'selectedBooking.order'
+    // options = options.filter(option => 
+    //   !selectedBookings.some(selectedBooking => selectedBooking.order === parseInt(option.value))
+    // );
+  
+  const setOption = (selectedVal) => {
     setValue(selectedVal);
     selectForComparison({
       order: parseInt(selectedVal), 
@@ -23,13 +30,13 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props 
   }
 
   return (
-    <div className="pl-1 pr-2">
+    <div className="pl-1 pr-2 mt-1">
     <Select
       onChange={(selectedVal) => setOption(selectedVal)}
       options={options}
       value={value}
       inline
-      placeHolder='-'
+      placeholder='-'
     />
   </div>
   );
