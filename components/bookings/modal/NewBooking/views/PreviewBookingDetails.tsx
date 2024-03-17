@@ -63,6 +63,7 @@ export default function PreviewBookingDetails({
       const rowsWithVenues = newDates.filter(
         ({ venue, bookingStatus }) => !!venue && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
       );
+
       if (rowsWithVenues?.length > 0) {
         // Find consecutive dates with same venue. Only the last date will have mileage information
         const rowsWithUniqueVenue = rowsWithVenues.reduce((acc, item) => {

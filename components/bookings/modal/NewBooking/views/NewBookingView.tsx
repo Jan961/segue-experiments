@@ -127,6 +127,7 @@ const NewBookingView = ({
       date: formattedDateWithWeekDay(d, 'Short'),
       dateAsISOString: d,
       venue: venueId,
+      bookingStatus: 'U',
     }));
     onSubmit(bookings);
   };
