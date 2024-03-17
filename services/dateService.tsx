@@ -92,6 +92,13 @@ export const getWeekDayLong = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-US', { weekday: 'long' });
 };
 
+export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
+  const date = safeDate(dateToFormat);
+  const weekday = weekDayFormat === 'Long' ? getWeekDayLong(date) : getWeekDayShort(date);
+  const ukDate = dateToSimple(date);
+  return `${weekday} ${ukDate}`;
+};
+
 // Broken week number calculation
 export const weeks = (showDate: string, firstShowDate: string): number => {
   const date = moment(showDate, 'YYYY-MM-DD');
@@ -256,4 +263,15 @@ export const convertLocalDateToUTC = (date: Date) => {
       date.getSeconds(),
     ),
   );
+};
+
+export const getDatesInRange = (startDate, endDate) => {
+  if (moment(startDate).isSame(moment(endDate), 'day')) return [endDate];
+  let date = startDate;
+  const dates = [date];
+  do {
+    date = moment(date).add(1, 'day');
+    dates.push(date.toISOString());
+  } while (moment(date).isBefore(endDate));
+  return dates;
 };

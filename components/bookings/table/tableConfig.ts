@@ -17,6 +17,7 @@ import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
+import { formatMinutes } from 'utils/booking';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -84,8 +85,8 @@ export const previewColumnDefs = [
     headerName: 'Date',
     field: 'date',
     cellRenderer: DateColumnRenderer,
-    width: 120,
-    minWidth: 120,
+    width: 123,
+    minWidth: 123,
   },
   { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 60 },
   { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
@@ -104,11 +105,21 @@ export const previewColumnDefs = [
   {
     headerName: 'Miles',
     field: 'miles',
-    cellRenderer: MilesRenderer,
+    cellRenderer: DefaultCellRenderer,
     width: 80,
   },
-  { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80, resizable: false },
+  {
+    headerName: 'Travel Time',
+    field: 'travelTime',
+    valueFormatter: (params) => formatMinutes(Number(params.value)),
+    width: 90,
+    cellStyle: {
+      paddingLeft: '0.5rem',
+    },
+    resizable: false,
+  },
 ];
+
 export const bookingConflictsColumnDefs = [
   { headerName: 'Venue', field: 'venue', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
