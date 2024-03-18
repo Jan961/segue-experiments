@@ -7,21 +7,25 @@ export default function index() {
       title: 'Company Information',
       route: '/company-information',
       color: 'bg-primary-pink',
+      icon: null,
     },
     {
       title: 'Users',
       route: '/users',
       color: 'bg-primary-pink',
+      icon: null,
     },
     {
       title: 'Payment Details',
       route: '/payment-details',
       color: 'bg-primary-pink',
+      icon: null,
     },
     {
       title: 'Account Preferences',
       route: '/account-preferences',
       color: 'bg-primary-pink',
+      icon: null,
     },
   ];
   return (
