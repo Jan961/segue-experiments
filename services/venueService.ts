@@ -110,8 +110,8 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 
         return {
           VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : null,
-          Mins: match?.TimeMins ? match.TimeMins : null,
+          Miles: match?.Mileage ? match.Mileage : -1,
+          Mins: match?.TimeMins ? match.TimeMins : -1,
         };
       }),
     };

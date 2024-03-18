@@ -126,8 +126,12 @@ export default forwardRef(function Select(
             background: 'yellow',
           },
         }),
-        indicatorsContainer: (styles) => ({
+        clearIndicator: (styles) => ({
           ...styles,
+          paddingLeft: '0 !important',
+          paddingRight: '0 !important',
+          paddingTop: '4px  !important',
+          paddingBottom: '4px  !important',
           height: COMP_HEIGHT,
         }),
         menu: (styles) => ({ ...styles, zIndex: 20 }),

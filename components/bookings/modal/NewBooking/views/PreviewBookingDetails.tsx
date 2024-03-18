@@ -12,6 +12,7 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { useEffect, useState } from 'react';
 import { DistanceParams } from 'distance';
 import axios from 'axios';
+import { getVenueForDayType } from 'components/bookings/utils';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -61,7 +62,7 @@ export default function PreviewBookingDetails({
     if (newDates) {
       // Filter all rows that have a venue and booking status is Pencilled or Confirmed
       const rowsWithVenues = newDates.filter(
-        ({ venue, bookingStatus }) => !!venue && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
+        ({ item }) => typeof item.venue === 'number' && (item.bookingStatus === 'C' || item.bookingStatus === 'U'),
       );
 
       if (rowsWithVenues?.length > 0) {
@@ -135,7 +136,10 @@ export default function PreviewBookingDetails({
       return {
         ...item,
         highlightRow: true,
-        venue: item.venue && item.dayType !== null ? venueDict[item.venue].Name : '',
+        venue:
+          item.venue && item.dayType !== null
+            ? venueDict[item.venue].Name
+            : getVenueForDayType(dayTypeOptions, item.dayType),
         town: item.venue && item.dayType !== null ? venueDict[item.venue].Town : '',
         capacity: item.venue && item.dayType !== null ? venueDict[item.venue].Seats : null,
         dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
