@@ -18,21 +18,6 @@ export type TForm = {
   isRunOfDates?: boolean;
 };
 
-export type PreviewDataItem = {
-  production: string;
-  date: string;
-  week: number;
-  venue: number;
-  town: string;
-  perf: boolean;
-  dayType: string;
-  bookingStatus: string;
-  capacity: number;
-  noPerf: number;
-  perfTimes: string;
-  miles: string;
-  travelTime: string;
-};
 export type BookingItem = {
   map(arg0: (item: any) => any): unknown;
   date: string | Date;
@@ -49,6 +34,24 @@ export type BookingItem = {
   isBooking: boolean;
   isRehearsal: boolean;
   isGetInFitUp: boolean;
+};
+
+export type PreviewDataItem = {
+  production: string;
+  date: string | Date;
+  week: number;
+  venue: string;
+  town: string;
+  perf: boolean;
+  dayType: string;
+  bookingStatus: string;
+  capacity: string;
+  noPerf: number;
+  perfTimes: string;
+  miles: string;
+  travelTime: string;
+  highlightRow?: boolean;
+  item: BookingItem;
 };
 
 export type TState = {

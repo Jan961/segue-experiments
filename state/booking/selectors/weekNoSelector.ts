@@ -3,8 +3,7 @@ import { sort } from 'radash';
 import { dateBlockState } from '../dateBlockState';
 import { parseISO } from 'date-fns';
 import { sortedBookingSelector } from './sortedBookingSelector';
-import { calculateWeekNumber } from 'services/dateService';
-import { getArrayOfDatesBetween } from 'utils/getDatesBetween';
+import { calculateWeekNumber, getArrayOfDatesBetween } from 'services/dateService';
 
 export const weekNoSelector = selector({
   key: 'weekNoSelector',
