@@ -16,7 +16,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const { venueTownList = [], venueCountryList = [] } = props;
   const [venues, setVenues] = useState([]);
   const [filterVenues, setFilterVenues] = useState([]);
-  // const [loading, setLoading] = useState<boolean>(false);
   const venuesFilter = useRecoilValue(filterVenueState);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
   const countryOptions = useMemo(
@@ -25,7 +24,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   );
 
   const fetchVenues = useCallback(async (payload) => {
-    // setLoading(true);
     const { data } = await axios.post('/api/venue/list', {
       ...payload,
     });
@@ -39,8 +37,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     }));
     setVenues(venusList);
     setFilterVenues(venusList);
-
-    // setLoading(false);
   }, []);
 
   useEffect(() => {

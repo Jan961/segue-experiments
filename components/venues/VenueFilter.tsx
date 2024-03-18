@@ -69,7 +69,6 @@ export default function VenueFilter({
               />
               <TextInput
                 id={'venueText'}
-                // disabled={!venueFilter.productionId}
                 placeHolder="Search venues..."
                 className="w-[510px] !align-top"
                 iconName="search"
