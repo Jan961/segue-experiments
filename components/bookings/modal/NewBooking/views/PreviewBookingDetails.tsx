@@ -12,7 +12,6 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { useEffect, useState } from 'react';
 import { DistanceParams } from 'distance';
 import axios from 'axios';
-import { getVenueForDayType } from 'components/bookings/utils';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -139,7 +138,7 @@ export default function PreviewBookingDetails({
         venue:
           item.venue && item.dayType !== null
             ? venueDict[item.venue].Name
-            : getVenueForDayType(dayTypeOptions, item.dayType),
+            : dayTypeOptions.find((option) => option.value === item.dayType)?.text,
         town: item.venue && item.dayType !== null ? venueDict[item.venue].Town : '',
         capacity: item.venue && item.dayType !== null ? venueDict[item.venue].Seats : null,
         dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
