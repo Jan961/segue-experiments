@@ -170,27 +170,24 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const goToMileage = () => {
+  const storeNewBookingDetails = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
       onSubmit(rowData);
-
-      goToStep(steps.indexOf('Check Mileage'));
     }
   };
 
-  const previewBooking = () => {
-    if (tableRef.current.getApi()) {
-      const rowData = [];
-      tableRef.current.getApi().forEachNode((node) => {
-        rowData.push(node.data);
-      });
-      onSubmit(rowData);
-      goToStep(steps.indexOf('Preview New Booking'));
-    }
+  const handePreviewBookingClick = () => {
+    storeNewBookingDetails();
+    goToStep(steps.indexOf('Preview New Booking'));
+  };
+
+  const handeCheckMIleageClick = () => {
+    storeNewBookingDetails();
+    goToStep(steps.indexOf('Check Mileage'));
   };
 
   const handleCellClick = (e) => {
@@ -247,13 +244,13 @@ export default function NewBookingDetailsView({
           <Button
             className=" w-33  place-self-start  "
             text="Check Mileage"
-            onClick={goToMileage}
+            onClick={handeCheckMIleageClick}
             disabled={!changesMade}
           />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
-            <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
+            <Button className=" w-33" text="Preview Booking" onClick={handePreviewBookingClick} />
           </div>
         </div>
         <ConfirmationDialog
