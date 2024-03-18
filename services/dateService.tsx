@@ -265,6 +265,10 @@ export const convertLocalDateToUTC = (date: Date) => {
   );
 };
 
+export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
+  return (start1 <= end2 && start1 >= start2) || (end1 >= start1 && end1 <= end2);
+};
+
 export const getArrayOfDatesBetween = (start: string, end: string) => {
   const arr = [];
 
