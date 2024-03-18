@@ -8,13 +8,7 @@ type Props = {
 const VenueTable = ({ items }: Props) => {
   return (
     <div className="w-full h-[calc(100%-140px)]">
-      <Table
-        columnDefs={venueColumnDefs}
-        rowData={items}
-        styleProps={styleProps}
-        pagination={true}
-        paginationPageSize={50}
-      />
+      <Table columnDefs={venueColumnDefs} rowData={items} styleProps={styleProps} />
     </div>
   );
 };

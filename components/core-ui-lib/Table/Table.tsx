@@ -19,8 +19,6 @@ interface TableProps {
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
-  pagination?: boolean;
-  paginationPageSize?: number;
   rowClassRules?: any;
   getRowHeight?: (params: RowHeightParams) => number;
 }
@@ -54,8 +52,6 @@ export default forwardRef(function Table(
     gridOptions = {},
     getRowStyle,
     rowClassRules,
-    pagination,
-    paginationPageSize,
     displayHeader = true,
     getRowHeight,
     onRowSelected = () => null,
@@ -143,8 +139,6 @@ export default forwardRef(function Table(
           getRowHeight={getRowHeight}
           navigateToNextCell={() => null}
           defaultColDef={DEFAULT_COLUMN_DEF}
-          pagination={pagination}
-          paginationPageSize={paginationPageSize}
           suppressScrollOnNewData
         />
       </div>
