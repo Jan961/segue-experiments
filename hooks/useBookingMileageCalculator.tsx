@@ -8,12 +8,14 @@ import { getStops } from 'utils/getStops';
 
 const useMileageCalculator = () => {
   const [distance, setDistance] = useRecoilState(distanceState);
+
   const bookingDict = useRecoilValue(bookingState);
   const performanceDict = useRecoilValue(performanceState);
   const [loading, setLoading] = useState(false);
   const shouldRefresh = useMemo(() => !loading && Object.values(distance).some((x) => x.outdated), [distance]);
   const refresh = useCallback(async () => {
     const stops = getStops(bookingDict, performanceDict);
+
     let updatedDistance = { ...distance };
     setLoading(true);
     const promises = Object.keys(stops).map(async (prodId) => {
@@ -27,11 +29,12 @@ const useMileageCalculator = () => {
     setDistance((prev) => ({ ...prev, ...updatedDistance }));
     setLoading(false);
   }, [bookingDict, distance, setDistance]);
+
   useEffect(() => {
-    console.log('shouldRefresh', shouldRefresh);
     if (!shouldRefresh) return;
     refresh();
   }, [shouldRefresh]);
+
   return { loading, distance };
 };
 

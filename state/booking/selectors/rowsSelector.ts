@@ -8,11 +8,10 @@ import { productionJumpState } from '../productionJumpState';
 import { objectify } from 'radash';
 import moment from 'moment';
 import { bookingRow, bookingStatusMap } from 'config/bookings';
-import { calculateWeekNumber, getKey } from 'services/dateService';
+import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/dateService';
 import { performanceState } from '../performanceState';
 import BookingHelper from 'utils/booking';
 import { dateBlockState } from '../dateBlockState';
-import { getArrayOfDatesBetween } from 'utils/getDatesBetween';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
