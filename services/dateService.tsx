@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, addDays } from 'date-fns';
 import moment from 'moment';
 
 export const safeDate = (date: Date | string) => {
@@ -93,10 +93,10 @@ export const getWeekDayLong = (dateToFormat: Date | string) => {
 };
 
 export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
-  const date = safeDate(dateToFormat);
-  const weekday = weekDayFormat === 'Long' ? getWeekDayLong(date) : getWeekDayShort(date);
-  const ukDate = dateToSimple(date);
-  return `${weekday} ${ukDate}`;
+  if (!dateToFormat) return '';
+  const shortFormat = 'ddd DD/MM/YY';
+  const longFormat = 'dddd DD/MM/YYYY';
+  return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 
 // Broken week number calculation
@@ -265,13 +265,11 @@ export const convertLocalDateToUTC = (date: Date) => {
   );
 };
 
-export const getDatesInRange = (startDate, endDate) => {
-  if (moment(startDate).isSame(moment(endDate), 'day')) return [endDate];
-  let date = startDate;
-  const dates = [date];
-  do {
-    date = moment(date).add(1, 'day');
-    dates.push(date.toISOString());
-  } while (moment(date).isBefore(endDate));
-  return dates;
+export const getArrayOfDatesBetween = (start: string, end: string) => {
+  const arr = [];
+
+  for (let dt = new Date(start); dt <= new Date(end); dt = addDays(dt, 1)) {
+    arr.push(new Date(dt).toISOString());
+  }
+  return arr.map(getKey);
 };

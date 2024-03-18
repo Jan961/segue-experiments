@@ -19,7 +19,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { dateToSimple, formattedDateWithWeekDay, getDatesInRange } from 'services/dateService';
+import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 
 type AddBookingProps = {
   formData: TForm;
@@ -122,7 +122,7 @@ const NewBookingView = ({
   };
 
   const createBookingsForDateRange = () => {
-    const dates = getDatesInRange(fromDate, toDate);
+    const dates = getArrayOfDatesBetween(fromDate, toDate);
     const bookings = dates.map((d) => ({
       date: formattedDateWithWeekDay(d, 'Short'),
       dateAsISOString: d,
