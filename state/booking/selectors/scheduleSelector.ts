@@ -5,7 +5,7 @@ import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { performanceState } from '../performanceState';
 import { otherState } from '../otherState';
-import { getArrayOfDatesBetween } from 'utils/getDatesBetween';
+import { getArrayOfDatesBetween } from 'services/dateService';
 
 const getKey = (date: string) => date.split('T')[0];
 
