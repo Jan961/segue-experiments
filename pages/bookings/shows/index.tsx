@@ -25,7 +25,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
         <div className="flex gap-2 items-center">
           <Checkbox
             className="flex flex-row-reverse"
-            value={isArchived}
+            checked={isArchived}
             label="Include archived"
             id={''}
             onChange={handleArchive}
