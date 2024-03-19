@@ -97,10 +97,9 @@ export const previewColumnDefs = [
     field: 'bookingStatus',
     valueFormatter: ({ value, data }) =>
       value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
-    cellStyle: ({ value }) => ({
+    cellStyle: {
       paddingLeft: '0.5rem',
-      fontStyle: value === 'Pencilled' ? 'italic' : 'normal',
-    }),
+    },
     width: 105,
   },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },

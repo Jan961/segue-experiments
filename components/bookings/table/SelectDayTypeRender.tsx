@@ -62,7 +62,7 @@ const SelectDayTypeRender = ({
         value={selectedDateType}
         onChange={handleChange}
         inline
-        isSearchable={false}
+        isSearchable
       />
     </div>
   );

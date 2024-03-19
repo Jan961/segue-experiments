@@ -27,7 +27,6 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
     if (data) {
       const { isRunOfDates, dayType, bookingStatus } = data;
       const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
-      console.log('Pencil renderer', data, pencilled);
 
       setIsDisabled(
         (isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '' || bookingStatus !== pencilled,
