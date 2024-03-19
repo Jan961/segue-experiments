@@ -1,5 +1,5 @@
 import Layout from 'components/Layout';
-import Tiles from 'components/global/Tiles';
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 
 export default function index() {
   const links = [
@@ -7,24 +7,28 @@ export default function index() {
       title: 'Company Information',
       route: '/company-information',
       color: 'bg-primary-pink',
-      textClass: 'whitespace-pre-wrap',
+      textClass: '!mt-0 whitespace-pre-wrap w-[80px]',
+      boxClass: 'max-h-[95px] max-w-[180px]',
     },
     {
       title: 'Users',
       route: '/users',
       color: 'bg-primary-pink',
+      boxClass: 'max-h-[95px] max-w-[180px]',
     },
     {
       title: 'Payment Details',
       route: '/payment-details',
       color: 'bg-primary-pink',
-      textClass: 'whitespace-pre-wrap w-[60px]',
+      boxClass: 'max-h-[95px] max-w-[180px]',
+      textClass: '!mt-0 whitespace-pre-wrap w-[80px]',
     },
     {
       title: 'Account Preferences',
       route: '/account-preferences',
       color: 'bg-primary-pink',
-      textClass: 'whitespace-pre-wrap w-[80px]',
+      boxClass: 'max-h-[95px] max-w-[180px]',
+      textClass: '!mt-0 whitespace-pre-wrap w-[85px]',
     },
   ];
   return (
@@ -34,10 +38,10 @@ export default function index() {
         <ul
           data-testid="system-admin-tiles"
           role="list"
-          className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-4 mt-20 mx-auto"
+          className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-4 mt-20 mx-auto "
         >
           {links.map((link) => (
-            <Tiles key={link.route} link={link} />
+            <SwitchBoardItem key={link.route} link={link} />
           ))}
         </ul>
       </div>
