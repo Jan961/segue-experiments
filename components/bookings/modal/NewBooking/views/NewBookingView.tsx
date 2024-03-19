@@ -123,6 +123,7 @@ const NewBookingView = ({
 
   const createBookingsForDateRange = () => {
     const dates = getArrayOfDatesBetween(fromDate, toDate);
+
     const bookings = dates.map((d) => ({
       date: formattedDateWithWeekDay(d, 'Short'),
       dateAsISOString: d,

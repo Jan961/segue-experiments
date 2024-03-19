@@ -126,8 +126,12 @@ export default forwardRef(function Select(
             background: 'yellow',
           },
         }),
-        indicatorsContainer: (styles) => ({
+        clearIndicator: (styles) => ({
           ...styles,
+          paddingLeft: '0 !important',
+          paddingRight: '0 !important',
+          paddingTop: '4px  !important',
+          paddingBottom: '4px  !important',
           height: COMP_HEIGHT,
         }),
         menu: (styles) => ({ ...styles, zIndex: 20 }),
@@ -169,7 +173,7 @@ export default forwardRef(function Select(
       data-testid={`${testId ? `form-select-${testId}` : 'form-select'}`}
     >
       {label && (
-        <div className="border-r border-primary-border px-3">
+        <div className="border-r min-w-fit border-primary-border px-3">
           <Label text={label} />
         </div>
       )}
