@@ -21,6 +21,12 @@ const rowClassRules = {
   },
 };
 
+const gridOptions = {
+  getRowStyle: (params) => {
+    return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
+  },
+};
+
 export type PreviewBookingDetailsProps = {
   formData: TForm;
   productionCode: string;
@@ -36,9 +42,7 @@ export default function PreviewBookingDetails({
 }: PreviewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
-
   const { rows: bookings } = useRecoilValue(rowsSelector);
-
   const [rows, setRows] = useState([]);
 
   const fetchMileageforVenues = async (payload: DistanceParams, rowsToUpdate: any) => {
@@ -60,9 +64,7 @@ export default function PreviewBookingDetails({
   const getDistanceInfo = (previousDates, newDates, futureDates) => {
     if (newDates) {
       // Filter all rows that have a venue and booking status is Pencilled or Confirmed
-      const rowsWithVenues = newDates.filter(
-        ({ item }) => typeof item.venue === 'number' && (item.bookingStatus === 'C' || item.bookingStatus === 'U'),
-      );
+      const rowsWithVenues = newDates.filter(({ item }) => typeof item.venue === 'number');
 
       if (rowsWithVenues?.length > 0) {
         // Find consecutive dates with same venue. Only the last date will have mileage information
@@ -135,10 +137,9 @@ export default function PreviewBookingDetails({
       return {
         ...item,
         highlightRow: true,
-        venue:
-          item.venue && item.dayType !== null
-            ? venueDict[item.venue].Name
-            : dayTypeOptions.find((option) => option.value === item.dayType)?.text,
+        venue: item.venue
+          ? venueDict[item.venue].Name
+          : dayTypeOptions.find((option) => option.value === item.dayType)?.text,
         town: item.venue && item.dayType !== null ? venueDict[item.venue].Town : '',
         capacity: item.venue && item.dayType !== null ? venueDict[item.venue].Seats : null,
         dayType: dayTypeOptions.find((option) => option.value === item.dayType)?.text,
@@ -181,7 +182,13 @@ export default function PreviewBookingDetails({
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table rowData={rows} columnDefs={previewColumnDefs} styleProps={styleProps} rowClassRules={rowClassRules} />
+        <Table
+          gridOptions={gridOptions}
+          rowData={rows}
+          columnDefs={previewColumnDefs}
+          styleProps={styleProps}
+          rowClassRules={rowClassRules}
+        />
       </div>
     </>
   );

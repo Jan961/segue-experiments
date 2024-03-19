@@ -95,16 +95,12 @@ export const previewColumnDefs = [
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
-    cellRenderer: DefaultCellRenderer,
-    resizable: true,
+    valueFormatter: ({ value, data }) =>
+      value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
+    cellStyle: {
+      paddingLeft: '0.5rem',
+    },
     width: 105,
-  },
-  {
-    headerName: 'Pencil No.',
-    field: 'pencilNo',
-    cellRenderer: DefaultCellRenderer,
-    width: 100,
-    maxWidth: 100,
   },
   { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
   { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
@@ -224,6 +220,9 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     headerName: 'Booking Status',
     field: 'bookingStatus',
     cellRenderer: SelectBookingStatusRenderer,
+    cellRendererParams: {
+      dayTypeOptions,
+    },
     maxWidth: 180,
     width: 180,
     cellStyle: {

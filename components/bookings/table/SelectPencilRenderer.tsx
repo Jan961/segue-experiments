@@ -3,6 +3,7 @@ import { ICellRendererParams, IRowNode } from 'ag-grid-community';
 
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 import { useEffect, useState } from 'react';
+import { statusOptions } from 'config/bookings';
 
 interface SelectPencilRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
@@ -24,10 +25,14 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
 
   useEffect(() => {
     if (data) {
-      const { isRunOfDates, dayType } = data;
-      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
+      const { isRunOfDates, dayType, bookingStatus } = data;
+      const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
+
+      setIsDisabled(
+        (isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '' || bookingStatus !== pencilled,
+      );
       if (!data.isRunOfDates) {
-        setValue(dayType === null || dayType === '' ? null : value);
+        setValue(dayType === null || dayType === '' || bookingStatus !== pencilled ? null : value);
       } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
         handleValueChange(null);
       }
