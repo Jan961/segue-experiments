@@ -23,7 +23,7 @@ type BarringProps = {
 const barringGridOptions = {
   ...gridOptions,
   rowClassRules: {
-    '!bg-primary-orange': (params) => params.data.hasBarringConflict,
+    '!bg-primary-orange !bg-opacity-25': (params) => params.data.hasBarringConflict,
   },
 };
 
