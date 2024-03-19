@@ -1,15 +1,27 @@
-import { IRowNode } from 'ag-grid-community';
-import { CustomCellRendererProps } from 'ag-grid-react';
+import { ICellRendererParams, IRowNode } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 import { statusOptions } from 'config/bookings';
 import { useEffect, useState } from 'react';
+import { allowEditingForSelectedDayType } from '../utils';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
-const SelectBookingStatusRenderer = ({ eGridCell, value, setValue, data, node, api }: CustomCellRendererProps) => {
+interface SelectBookingStatusRendererProps extends ICellRendererParams {
+  dayTypeOptions: SelectOption[];
+}
+
+const SelectBookingStatusRenderer = ({
+  eGridCell,
+  value,
+  setValue,
+  data,
+  node,
+  api,
+  dayTypeOptions,
+}: SelectBookingStatusRendererProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
-  const pencilled = statusOptions.find(({ text }) => text === 'Pencilled').value;
 
   const handleValueChange = (value) => {
-    setValue(value);
+    node.setData({ ...data, bookingStatus: value });
     if (data.isRunOfDates && node.rowIndex === 0) {
       api.forEachNode((node: IRowNode) => node.setData({ ...node.data, bookingStatus: value }));
     }
@@ -18,9 +30,14 @@ const SelectBookingStatusRenderer = ({ eGridCell, value, setValue, data, node, a
   useEffect(() => {
     if (data) {
       const { isRunOfDates, dayType } = data;
-      setIsDisabled((isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '');
+      setIsDisabled(
+        (isRunOfDates && node.rowIndex > 0) ||
+          dayType === null ||
+          dayType === '' ||
+          !allowEditingForSelectedDayType(dayTypeOptions, dayType),
+      );
       if (!data.isRunOfDates) {
-        setValue(dayType === null || dayType === '' ? null : pencilled);
+        setValue(dayType === null || dayType === '' ? null : value);
       } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
         handleValueChange(null);
       }
