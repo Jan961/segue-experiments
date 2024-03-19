@@ -20,9 +20,9 @@ export default function Tiles({ link }: TilesItemProps) {
 
   return (
     <div
-      className={` w-[180px] h-[95px] flex justify-center items-center px-5 font-bold rounded-md shadow-md  ${baseClass}`}
+      className={` w-[180px] min-h-[95px] flex justify-center items-center px-5 font-bold rounded-md shadow-md  ${baseClass}`}
     >
-      <Link href={link.disabled ? '#' : link.route} className={`text-white text-center text `}>
+      <Link href={link.disabled ? '#' : link.route} className={`text-white text-center leading-5  `}>
         <p className={` ${link.textClass}`}>{link.title}</p>
       </Link>
     </div>
