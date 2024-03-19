@@ -23,7 +23,7 @@ type BarringProps = {
 const barringGridOptions = {
   ...gridOptions,
   rowClassRules: {
-    '!bg-primary-orange': (params) => params.data.hasBarringConflict,
+    '!bg-primary-orange !bg-opacity-25': (params) => params.data.hasBarringConflict,
   },
 };
 
@@ -49,16 +49,18 @@ export default function Barring({ visible, onClose }: BarringProps) {
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
   }, [rows, selectedVenueIds, selectedVenueName]);
   const fetchBarredVenues = async (formData) => {
-    const { productionId, venueId, includeExcluded, seats, barDistance } = formData;
+    const { productionId, venueId, includeExcluded, seats, barDistance, fromDate, toDate } = formData;
     setIsLoading(true);
     const distance = parseInt(barDistance || 0, 10);
     const minSeats = parseInt(seats || 0, 10);
     axios
-      .post('/api/productions/venue/barred', {
+      .post('/api/productions/venue/barringCheck', {
         productionId: parseInt(productionId, 10),
         venueId: parseInt(venueId, 10),
         ...(minSeats && { seats: minSeats }),
         ...(distance !== 0 && { barDistance: distance }),
+        ...(fromDate && { startDate: fromDate }),
+        ...(toDate && { endDate: toDate }),
         includeExcluded,
       })
       .then((response) => {

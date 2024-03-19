@@ -26,6 +26,33 @@ export const getAllVenues = async () => {
     where: {
       IsDeleted: false,
     },
+    // select: {
+    //   VenueAddress: {
+    //     Town: true,
+    //   },
+    // },
+  });
+};
+
+export const getUniqueVenueTownlist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Town'],
+    where: {
+      Town: {
+        not: null,
+      },
+    },
+  });
+};
+
+export const getUniqueVenueCountrylist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Country'],
+    where: {
+      Country: {
+        not: null,
+      },
+    },
   });
 };
 
@@ -83,8 +110,8 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 
         return {
           VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : null,
-          Mins: match?.TimeMins ? match.TimeMins : null,
+          Miles: match?.Mileage ? match.Mileage : -1,
+          Mins: match?.TimeMins ? match.TimeMins : -1,
         };
       }),
     };
