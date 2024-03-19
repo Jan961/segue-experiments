@@ -18,7 +18,7 @@ import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
 import TextInputRenderer from './TextInputRenderer';
-import CheckboxRenderer from './CheckboxRenderer';
+import TableCheckboxRenderer from './TableCheckboxRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -343,7 +343,8 @@ export const bookingShowsTableConfig = [
     field: 'IsArchived',
     width: 72,
     maxWidth: 72,
-    cellRenderer: CheckboxRenderer,
+    cellRenderer: TableCheckboxRenderer,
+    cellRendererParams: {},
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -357,6 +358,7 @@ export const bookingShowsTableConfig = [
     cellRenderer: IconRenderer,
     cellRendererParams: {
       iconName: 'delete',
+      tooltipPosition: 'left',
       popover: false,
     },
     width: 70,

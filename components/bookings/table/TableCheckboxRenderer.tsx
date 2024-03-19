@@ -1,12 +1,13 @@
 import { ICellRendererParams } from 'ag-grid-community';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 import { useEffect, useState } from 'react';
 
 interface CheckPerfRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
 }
 
-const CheckboxRenderer = ({ eGridCell, data, node, setValue, value, colDef }: CheckPerfRendererProps) => {
+const TableCheckboxRenderer = ({ eGridCell, data, node, setValue, value, colDef }: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState<boolean>(false);
 
   useEffect(() => {
@@ -25,4 +26,4 @@ const CheckboxRenderer = ({ eGridCell, data, node, setValue, value, colDef }: Ch
 
   return <CheckboxRenderer eGridCell={eGridCell} checked={perfChecked} onChange={handleCheckboxChange} id="perf" />;
 };
-export default CheckboxRenderer;
+export default TableCheckboxRenderer;
