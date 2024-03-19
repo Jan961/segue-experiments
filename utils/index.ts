@@ -1,5 +1,3 @@
-import { array } from 'prop-types';
-
 export const safeJsonParse = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
@@ -37,6 +35,6 @@ export const isNullOrEmpty = (value: any) => {
   } else if (typeof value === 'string') {
     return value === '';
   } else if (Array.isArray(value)) {
-    return array.length === 0;
+    return value.length === 0;
   }
 };
