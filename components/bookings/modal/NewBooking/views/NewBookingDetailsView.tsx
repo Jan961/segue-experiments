@@ -54,7 +54,6 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   useEffect(() => {
     updateModalTitle('New Booking Details');
@@ -221,7 +220,7 @@ export default function NewBookingDetailsView({
       <div className="flex justify-between">
         <div className="text-primary-navy text-xl my-2 font-bold">{`${production.ShowCode}${production.Code}  ${production?.ShowName}`}</div>
       </div>
-      <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
+      <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
         <Table
           ref={tableRef}
           columnDefs={columnDefs}
@@ -230,9 +229,6 @@ export default function NewBookingDetailsView({
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
-          onCellValueChange={() => {
-            setChangesMade(true);
-          }}
         />
         <NotesPopup
           show={showNotesModal}
@@ -241,12 +237,7 @@ export default function NewBookingDetailsView({
           onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button
-            className=" w-33  place-self-start  "
-            text="Check Mileage"
-            onClick={handeCheckMIleageClick}
-            disabled={!changesMade}
-          />
+          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={handeCheckMIleageClick} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />

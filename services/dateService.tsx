@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore, addDays } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid } from 'date-fns';
 import moment from 'moment';
 
 export const safeDate = (date: Date | string) => {
@@ -271,9 +271,11 @@ export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: D
 
 export const getArrayOfDatesBetween = (start: string, end: string) => {
   const arr = [];
-
-  for (let dt = new Date(start); dt <= new Date(end); dt = addDays(dt, 1)) {
-    arr.push(new Date(dt).toISOString());
+  if (!isValid(new Date(start)) || !isValid(new Date(end))) {
+    return [];
+  }
+  for (let dt = moment.utc(start); dt <= moment.utc(end); dt = dt.add(1, 'days')) {
+    arr.push(dt.toISOString());
   }
   return arr.map(getKey);
 };
