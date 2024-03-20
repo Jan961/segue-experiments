@@ -1,4 +1,5 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import classNames from 'classnames';
 import Icon from 'components/core-ui-lib/Icon';
 import Link from 'next/link';
 
@@ -23,14 +24,21 @@ interface SwitchBoardItemProps {
 export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
   const content = (
     <>
-      <Icon
-        iconName={link.iconName}
-        variant="5xl"
-        className="lg:h-13 lg:w-13 md:h-10 md:w-10"
-        stroke={link.stroke}
-        fill={link.fill}
-      />
-      <span className={`text-center lg:text-responsive-lg md:text-base lg:mt-3 md:mt-2 ${link.textClass}`}>
+      {link.iconName ? (
+        <Icon
+          iconName={link.iconName}
+          variant="5xl"
+          className="lg:h-13 lg:w-13 md:h-10 md:w-10"
+          stroke={link.stroke}
+          fill={link.fill}
+        />
+      ) : null}
+      <span
+        className={classNames(
+          'text-center whitespace-break-spaces lg:text-responsive-lg md:text-base lg:mt-3 md:mt-2 mt-0 leading-[2.0625rem]',
+          { 'w-min': !link.iconName },
+        )}
+      >
         {link.title}
       </span>
     </>
