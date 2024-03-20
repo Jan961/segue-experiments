@@ -37,7 +37,7 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
         setNoOfPerfs(newValue);
         setValue(intValue);
         updateRowHeight(intValue > 1 ? intValue * ROW_HEIGHT + MARGIN : ROW_HEIGHT + MARGIN);
-        node.setData({ ...data, noOfPerfs: intValue });
+        node.setData({ ...data, noPerf: intValue });
       }
     }
   };

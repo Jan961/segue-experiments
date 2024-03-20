@@ -54,7 +54,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
-          <div className="w-full mt-4 mb-4 flex justify-end items-center">
+          <div className="w-full mt-4 flex justify-end items-center">
             <Button className="w-33" variant="secondary" text="Cancel" onClick={() => showConfModal('cancel')} />
             <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
           </div>
