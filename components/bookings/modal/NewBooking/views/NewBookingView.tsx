@@ -88,6 +88,9 @@ const NewBookingView = ({
   };
 
   const goToNext = () => {
+    if (formData.dateType) {
+      goToStep(steps.indexOf('New Booking Details'));
+    }
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
@@ -128,7 +131,6 @@ const NewBookingView = ({
       date: formattedDateWithWeekDay(d, 'Short'),
       dateAsISOString: d,
       venue: venueId,
-      bookingStatus: 'U',
     }));
     onSubmit(bookings);
   };
@@ -183,6 +185,7 @@ const NewBookingView = ({
               onChange({
                 isDateTypeOnly: value,
                 isRunOfDates: value ? false : isRunOfDates,
+                dateType: value ? dateType : null,
               })
             }
           />

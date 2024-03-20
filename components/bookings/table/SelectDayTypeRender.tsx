@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
+import { statusOptions } from 'config/bookings';
 
 interface SelectDayTypeRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
@@ -15,6 +16,7 @@ const SelectDayTypeRender = ({
   dayTypeOptions,
   eGridCell,
 }: SelectDayTypeRendererProps) => {
+  const pencilledStatus = statusOptions.find(({ text }) => text === 'Pencilled').value;
   const [selectedDateType, setSelectedDateType] = useState<string>('');
   const formattedOptions = useMemo(
     () => [
@@ -41,7 +43,15 @@ const SelectDayTypeRender = ({
     const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
     const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
     setValue(selectedValue);
-    node.setData({ ...data, perf: isBooking, dayType: selectedValue, isBooking, isRehearsal, isGetInFitUp });
+    node.setData({
+      ...data,
+      perf: isBooking,
+      dayType: selectedValue,
+      isBooking,
+      isRehearsal,
+      isGetInFitUp,
+      bookingStatus: pencilledStatus,
+    });
   };
 
   return (
@@ -52,7 +62,7 @@ const SelectDayTypeRender = ({
         value={selectedDateType}
         onChange={handleChange}
         inline
-        isSearchable={false}
+        isSearchable
       />
     </div>
   );

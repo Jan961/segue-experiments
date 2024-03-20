@@ -16,6 +16,7 @@ import { toISO } from 'services/dateService';
 import { ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
+import { isNullOrEmpty } from 'utils';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -29,8 +30,6 @@ type NewBookingDetailsProps = {
   onClose: () => void;
   updateModalTitle: (title: string) => void;
 };
-
-const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
 
 export default function NewBookingDetailsView({
   formData,
@@ -60,6 +59,15 @@ export default function NewBookingDetailsView({
   }, []);
 
   useEffect(() => {
+    if (bookingData && tableRef.current) {
+      // This is required afyer saving the note so the value gets updated on the grid
+      tableRef.current.getApi()?.refreshCells({
+        force: true,
+      });
+    }
+  }, [bookingData]);
+
+  useEffect(() => {
     let dayTypeOption = null;
     if (dayTypeOptions && venueOptions) {
       setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
@@ -69,7 +77,7 @@ export default function NewBookingDetailsView({
     const isPerformance = dayTypeOption && dayTypeOption.text === 'Performance';
     const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
     const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
-    const isFiltered = dayTypeOption && DAY_TYPE_FILTERS.includes(dayTypeOption.text);
+
     let startDate = new Date(fromDate);
     const endDate = new Date(toDate);
     const dates = [];
@@ -92,7 +100,7 @@ export default function NewBookingDetailsView({
         venue: venueId,
         noPerf: null,
         times: '',
-        bookingStatus: isFiltered ? 'U' : '', // U for Pencilled
+        bookingStatus: dateType !== null ? 'U' : '', // U for Pencilled
         pencilNo: '',
         notes: '',
         isBooking: isPerformance,
@@ -184,14 +192,15 @@ export default function NewBookingDetailsView({
     goToStep(steps.indexOf('Preview New Booking'));
   };
 
-  const handeCheckMIleageClick = () => {
+  const handeCheckMileageClick = () => {
     storeNewBookingDetails();
     goToStep(steps.indexOf('Check Mileage'));
   };
 
   const handleCellClick = (e) => {
     const { column, data } = e;
-    if (column.colId === 'notes' && !Number.isNaN(data.venue) && data.dayType !== null) {
+
+    if (column.colId === 'notes' && !Number.isNaN(data.venue) && !isNullOrEmpty(data.dayType)) {
       setShowNotesModal(true);
       toggleModalOverlay(true);
     }
@@ -237,7 +246,7 @@ export default function NewBookingDetailsView({
           onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={handeCheckMIleageClick} />
+          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={handeCheckMileageClick} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
