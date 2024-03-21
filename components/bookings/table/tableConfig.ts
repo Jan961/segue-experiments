@@ -18,7 +18,6 @@ import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
 import TextInputRenderer from './TextInputRenderer';
-import TableCheckboxRenderer from './TableCheckboxRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -308,6 +307,7 @@ export const bookingShowsTableConfig = [
     field: 'Name',
     cellRenderer: TextInputRenderer,
     headerClass: 'text-center',
+    width: 396,
     flex: 1,
   },
   {
@@ -321,12 +321,12 @@ export const bookingShowsTableConfig = [
     headerName: 'Company',
     field: '',
     cellRenderer: DefaultCellRenderer,
-    flex: 1,
+    width: 270,
     headerClass: 'text-center',
   },
   {
     headerName: 'Productions',
-    field: '',
+    field: 'productions',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'View/Edit',
@@ -335,15 +335,15 @@ export const bookingShowsTableConfig = [
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
     },
-    width: 200,
+    width: 143,
     headerClass: 'text-center',
   },
   {
     headerName: 'Archive',
     field: 'IsArchived',
-    width: 72,
-    maxWidth: 72,
-    cellRenderer: TableCheckboxRenderer,
+    width: 92,
+    maxWidth: 92,
+    cellRenderer: SelectableColumnRenderer,
     cellRendererParams: {},
     cellStyle: {
       display: 'flex',
@@ -353,15 +353,34 @@ export const bookingShowsTableConfig = [
     headerClass: 'text-center',
   },
   {
+    headerName: '',
+    field: 'EditId',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'Save',
+      variant: 'primary',
+    },
+    resizable: false,
+    cellStyle: {
+      paddingLeft: '0.5em',
+    },
+    width: 60,
+    headerClass: 'text-center',
+  },
+  {
     headerName: 'Delete',
     field: 'Id',
-    cellRenderer: IconRenderer,
+    cellRenderer: ButtonRenderer,
     cellRendererParams: {
-      iconName: 'delete',
-      tooltipPosition: 'left',
-      popover: false,
+      buttonText: 'Delete',
+      variant: 'primary',
     },
-    width: 70,
+    cellStyle: {
+      paddingLeft: '0.5em',
+      paddingRight: '0.6em',
+    },
+    width: 84,
+    resizable: false,
     headerClass: 'text-center',
   },
 ];

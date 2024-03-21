@@ -8,32 +8,52 @@ import ShowsTable from 'components/bookings/ShowsTable';
 import { showMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { showsList = [] } = props;
   const [isArchived, setIsArchived] = useState<boolean>(false);
+  const [isAddRow, setIsAddRow] = useState<boolean>(false);
 
   const handleArchive = () => {
     setIsArchived(!isArchived);
   };
 
+  const unArchivedList = useMemo(() => {
+    return showsList.filter((item) => !item.IsArchived);
+  }, [showsList]);
+
+  const archivedList = useMemo(() => {
+    return showsList.filter((item) => item.IsArchived);
+  }, [showsList]);
+
+  const rowsData = useMemo(() => {
+    if (isArchived) return [...unArchivedList, ...archivedList];
+    return [...unArchivedList];
+  }, [unArchivedList, archivedList]);
+
+  const addNewRow = () => {
+    setIsAddRow(!isAddRow);
+  };
+
   return (
     <Layout title="Shows | Segue" flush>
-      <div className="flex items-center justify-between py-5">
-        <h1 className="text-primary-orange text-4xl font-bold">Shows</h1>
-        <div className="flex gap-2 items-center">
-          <Checkbox
-            className="flex flex-row-reverse"
-            checked={isArchived}
-            label="Include archived"
-            id={''}
-            onChange={handleArchive}
-          />
-          <Button text="Add New Show" />
+      <div className="w-9/12 mx-auto">
+        <div className="flex items-center justify-between py-5">
+          <h1 className="text-primary-orange text-4xl font-bold">Shows</h1>
+          <div className="flex gap-2 items-center">
+            <Checkbox
+              className="flex flex-row-reverse"
+              checked={isArchived}
+              label="Include archived"
+              id={''}
+              onChange={handleArchive}
+            />
+            <Button onClick={addNewRow} text="Add New Show" />
+          </div>
         </div>
+        <ShowsTable isAddRow={isAddRow} addNewRow={addNewRow} rowsData={rowsData} />
       </div>
-      <ShowsTable rowsData={showsList} />
     </Layout>
   );
 }

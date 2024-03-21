@@ -12,6 +12,15 @@ const TextInputRenderer = (props: SelectDayTypeRendererProps) => {
   const [inputValue, setInputValue] = useState(value || '');
   const elRef = useRef(null);
 
+  const [placeholder, setPlaceholder] = useState<string>('Please enter Show Name');
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    if (colDef?.field === 'Code') {
+      setPlaceholder('Show Code');
+    }
+  }, [colDef]);
+
   useEffect(() => {
     if (value) {
       setInputValue(value);
@@ -35,11 +44,22 @@ const TextInputRenderer = (props: SelectDayTypeRendererProps) => {
     setInputValue(e.target.value);
     setValue(e.target.value);
     node.setData({ ...data, [colDef?.field]: e.target.value });
+    setError('');
+    if (e.target.value.length === 0) {
+      setError('error');
+    }
   };
 
   return (
     <div className="pl-1 pr-2 mt-1" tabIndex={1}>
-      <TextInput className="w-full" ref={elRef} value={inputValue} onChange={handleChange} />
+      <TextInput
+        error={error}
+        placeHolder={placeholder}
+        className="w-full"
+        ref={elRef}
+        value={inputValue}
+        onChange={handleChange}
+      />
     </div>
   );
 };
