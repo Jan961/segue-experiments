@@ -18,7 +18,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
 
   const handleValueChange = (value) => {
     setValue(value);
-    if (data.isRunOfDates && node.rowIndex === 0) {
+    if (data.isRunOfDates) {
       api.forEachNode((node: IRowNode) => node.setData({ ...node.data, pencilNo: value }));
     }
   };
