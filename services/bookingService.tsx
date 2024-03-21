@@ -200,7 +200,7 @@ export const createNewRehearsal = ({ DateBlockId, StatusCode, BookingDate, Notes
           Id: DateBlockId,
         },
       },
-      VenueId,
+      ...(VenueId && { VenueId }),
     },
   });
 };
