@@ -25,7 +25,7 @@ export default function SelectVenueRenderer({
   const handleVenueChange = (venue) => {
     setValue(venue);
     if (data.isRunOfDates && node.rowIndex === 0) {
-      api.forEachNode((node: IRowNode) => node.setData({ ...node.data, venue: value }));
+      api.forEachNode((node: IRowNode) => node.setData({ ...node.data, venue }));
     }
   };
 
@@ -33,15 +33,14 @@ export default function SelectVenueRenderer({
     if (data) {
       const { isRunOfDates } = data;
       setIsDisabled(isRunOfDates && node.rowIndex > 0);
-      if (venueAsDayType) {
-        setValue(null);
-      }
+
+      setValue(venueAsDayType && !data.isRunOfDates ? null : value);
     }
   }, [data, node, setIsDisabled]);
 
   return (
     <div className="pl-1 pr-2 mt-1">
-      {venueAsDayType ? (
+      {venueAsDayType && !data.isRunOfDates ? (
         <div className="mt-1 p-2 border border-primary-border rounded-md w-full h-[1.9375rem] bg-primary-white flex items-center">
           <span className="text-primary-input-text text-base font-bold leading-6 truncate">{venueAsDayType}</span>
         </div>
@@ -54,6 +53,7 @@ export default function SelectVenueRenderer({
           onChange={handleVenueChange}
           isSearchable
           disabled={isDisabled}
+          isClearable={!data.isRunOfDates}
         />
       )}
     </div>

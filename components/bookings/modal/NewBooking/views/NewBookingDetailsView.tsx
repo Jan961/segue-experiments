@@ -213,10 +213,19 @@ export default function NewBookingDetailsView({
   const handleSaveNote = (value: string) => {
     setShowNotesModal(false);
     toggleModalOverlay(false);
-    const updated = bookingData.map((booking) =>
-      booking.date === bookingRow.date ? { ...bookingRow, notes: value } : booking,
-    );
-    setBookingData(updated);
+
+    if (formData.isRunOfDates) {
+      const rowNodes = [];
+      tableRef.current.getApi().forEachNode(({ data }) => {
+        rowNodes.push({ ...data, notes: value });
+      });
+      setBookingData(rowNodes);
+    } else {
+      const updated = bookingData.map((booking) =>
+        booking.date === bookingRow.date ? { ...bookingRow, notes: value } : booking,
+      );
+      setBookingData(updated);
+    }
   };
 
   const handleNotesCancel = () => {
