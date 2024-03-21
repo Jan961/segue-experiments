@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
@@ -18,16 +18,6 @@ const SelectDayTypeRender = ({
 }: SelectDayTypeRendererProps) => {
   const pencilledStatus = statusOptions.find(({ text }) => text === 'Pencilled').value;
   const [selectedDateType, setSelectedDateType] = useState<string>('');
-  const formattedOptions = useMemo(
-    () => [
-      {
-        text: '',
-        value: null,
-      },
-      ...dayTypeOptions,
-    ],
-    [dayTypeOptions],
-  );
 
   useEffect(() => {
     if (data && dayTypeOptions) {
@@ -58,11 +48,12 @@ const SelectDayTypeRender = ({
     <div className="pl-1 pr-2 mt-1" tabIndex={1}>
       <SelectRenderer
         eGridCell={eGridCell}
-        options={formattedOptions}
+        options={dayTypeOptions}
         value={selectedDateType}
         onChange={handleChange}
         inline
         isSearchable
+        isClearable={!data?.isRunOfDates}
       />
     </div>
   );

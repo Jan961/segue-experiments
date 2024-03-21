@@ -27,6 +27,7 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue }: 
       perf: checked,
       dayType: checked ? performanceOption.value : '',
       bookingStatus: checked ? pencilledStatus : '',
+      pencilNo: null,
     });
   };
 
