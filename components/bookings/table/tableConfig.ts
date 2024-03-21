@@ -315,6 +315,8 @@ export const barredVenueColumnDefs = [
     headerName: '',
     field: 'info',
     cellRenderer: IconRenderer,
+    tooltipComponentParams: { color: '#ffffff', backgroundColor: '#617293' },
+    tooltipValueGetter: (props) => props?.data?.info,
     cellRendererParams: {
       iconName: 'info-circle-solid',
       tooltipPosition: 'left',

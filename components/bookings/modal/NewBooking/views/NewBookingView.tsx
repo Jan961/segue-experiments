@@ -20,6 +20,7 @@ import { BarredVenue } from 'pages/api/productions/venue/barred';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
 import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import { debug } from 'utils/logging';
 
 type AddBookingProps = {
   formData: TForm;
@@ -76,38 +77,47 @@ const NewBookingView = ({
         startDate,
         endDate,
       },
-    }).then((data: any) => {
-      updateBarringConflicts(data.map((barredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.Date) })));
-      if (skipRedirect) return;
-      if (data?.length > 0) {
-        goToStep(steps.indexOf('Barring Issue'));
-      } else {
-        goToStep(steps.indexOf('New Booking Details'));
-      }
-    });
+    })
+      .then((data: any) => {
+        updateBarringConflicts(data.map((barredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.Date) })));
+        if (skipRedirect) return;
+        if (data?.length > 0) {
+          goToStep(steps.indexOf('Barring Issue'));
+        } else {
+          goToStep(steps.indexOf('New Booking Details'));
+        }
+      })
+      .catch((error) => {
+        debug(error);
+      });
   };
 
   const goToNext = () => {
-    if (formData.dateType) {
-      goToStep(steps.indexOf('New Booking Details'));
-    }
     fetchData({
       url: '/api/bookings/conflict',
       method: 'POST',
       data: { ...formData, ProductionId: currentProduction?.Id },
-    }).then(async (data: any) => {
-      updateBookingConflicts(data);
-      if (data.error) {
-        console.log(data.error);
-        return;
-      }
-      if (!data?.length) {
-        fetchBarredVenues(false);
-      } else {
-        await fetchBarredVenues(true);
-        nextStep();
-      }
-    });
+    })
+      .then(async (data: any) => {
+        updateBookingConflicts(data);
+        if (data.error) {
+          console.log(data.error);
+          return;
+        }
+        if (!data?.length) {
+          if (!isDateTypeOnly) {
+            goToStep(steps.indexOf('New Booking Details'));
+          } else {
+            fetchBarredVenues(false);
+          }
+        } else {
+          if (!isDateTypeOnly) await fetchBarredVenues(true);
+          nextStep();
+        }
+      })
+      .catch((error) => {
+        debug(error);
+      });
   };
 
   const handleOnSubmit = async (e) => {
