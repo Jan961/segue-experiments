@@ -1,6 +1,6 @@
 import { Show } from '@prisma/client';
 import Table from 'components/core-ui-lib/Table';
-import { bookingShowsTableConfig, styleProps } from './table/tableConfig';
+import { bookingShowsTableConfig, styleProps } from '../bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';

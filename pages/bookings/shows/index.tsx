@@ -4,7 +4,7 @@ import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import { InitialState } from 'lib/recoil';
 import { getShowsByAccountId } from 'services/ShowService';
-import ShowsTable from 'components/bookings/ShowsTable';
+import ShowsTable from 'components/shows/ShowsTable';
 import { showMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';

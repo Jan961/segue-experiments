@@ -7,7 +7,6 @@ import MilesRenderer from './MilesRenderer';
 import TravelTimeRenderer from './TravelTimeRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
-import ButtonRenderer from './ButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -18,6 +17,7 @@ import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
 import TextInputRenderer from './TextInputRenderer';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
@@ -345,7 +345,6 @@ export const bookingShowsTableConfig = [
     width: 92,
     maxWidth: 92,
     cellRenderer: TableCheckboxRenderer,
-    cellRendererParams: {},
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
