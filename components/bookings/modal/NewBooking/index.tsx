@@ -13,10 +13,10 @@ import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
-import PreviewNewBooking from './views/PreviewNewBooking';
+import PreviewNewBookingView from './views/PreviewBookingView';
 import { dateTypeState } from 'state/booking/dateTypeState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import MileageBooking from './views/MileageBooking';
+import CheckMileageView from './views/CheckMileageView';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { bookingState } from 'state/booking/bookingState';
 import useAxios from 'hooks/useAxios';
@@ -120,6 +120,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           updateBarringConflicts={updateBarringConflicts}
           dayTypeOptions={dayTypeOptions}
           onChange={onFormDataChange}
+          onSubmit={setNewBookingOnStore}
           formData={state.form}
           onClose={onClose}
           productionCode={productionCode}
@@ -131,7 +132,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}
         />
-        <BarringIssueView barringConflicts={state.barringConflicts} updateModalTitle={updateModalTitle} />
+        <BarringIssueView
+          bookingConflicts={state.bookingConflicts}
+          barringConflicts={state.barringConflicts}
+          updateModalTitle={updateModalTitle}
+        />
         <NewBookingDetailsView
           formData={state.form}
           data={state.booking}
@@ -144,7 +149,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           onClose={onClose}
           updateModalTitle={updateModalTitle}
         />
-        <PreviewNewBooking
+        <PreviewNewBookingView
           formData={state.form}
           productionCode={productionCode}
           data={state.booking}
@@ -152,12 +157,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           onSaveBooking={handleSaveNewBooking}
           updateModalTitle={updateModalTitle}
         />
-        <MileageBooking
+        <CheckMileageView
           formData={state.form}
           productionCode={productionCode}
           data={state.booking}
           dayTypeOptions={dayTypeOptions}
           updateModalTitle={updateModalTitle}
+          previousView={state.modalTitle}
         />
         <GapSuggestionView
           productionId={currentProduction?.Id}

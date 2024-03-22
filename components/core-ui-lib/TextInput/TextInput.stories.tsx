@@ -14,13 +14,13 @@ const meta: Meta<typeof TextInput> = {
 export default meta;
 
 export const Input = () => {
-  const [{ value }, updateArgs] = useArgs();
-  return <TextInput value={value} onChange={(e) => updateArgs(e.target.value)} />;
+  const [{ value }, updateArgs] = useArgs<{ value: string }>();
+  return <TextInput value={value} onChange={(e) => updateArgs({ value: e.target.value })} />;
 };
 
 export const SearchInput = () => {
-  const [{ value }, updateArgs] = useArgs();
-  return <TextInput iconName="search" value={value} onChange={(e) => updateArgs(e.target.value)} />;
+  const [{ value }, updateArgs] = useArgs<{ value: string }>();
+  return <TextInput iconName="search" value={value} onChange={(e) => updateArgs({ value: e.target.value })} />;
 };
 
 export const Disabled = () => {

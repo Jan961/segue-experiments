@@ -1,23 +1,26 @@
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import { useRecoilValue } from 'recoil';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
-import { TForm } from '../reducer';
+import { BookingItem, TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { BookingTypeMap, BookingTypes, steps } from 'config/AddBooking';
+import { steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
-import Select from 'components/core-ui-lib/Select';
 import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
+import Toggle from 'components/core-ui-lib/Toggle/Toggle';
+import Label from 'components/core-ui-lib/Label';
+import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
+import { debug } from 'utils/logging';
 
 type AddBookingProps = {
   formData: TForm;
@@ -28,12 +31,14 @@ type AddBookingProps = {
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   updateModalTitle: (title: string) => void;
   onChange: (change: Partial<TForm>) => void;
+  onSubmit: (booking: Partial<BookingItem>[]) => void;
   onClose: () => void;
 };
 
 const NewBookingView = ({
   onClose,
   onChange,
+  onSubmit,
   formData,
   productionCode,
   dayTypeOptions,
@@ -51,11 +56,6 @@ const NewBookingView = ({
   const { loading: fetchingBookingConflicts, fetchData } = useAxios();
   const { loading, fetchData: api } = useAxios();
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
-
-  const bookingTypeValue = useMemo(
-    () => (isDateTypeOnly ? BookingTypeMap.DATE_TYPE : BookingTypeMap.VENUE),
-    [isDateTypeOnly],
-  );
 
   useEffect(() => {
     updateModalTitle('Create New Booking');
@@ -77,15 +77,19 @@ const NewBookingView = ({
         startDate,
         endDate,
       },
-    }).then((data: any) => {
-      updateBarringConflicts(data);
-      if (skipRedirect) return;
-      if (data?.length > 0) {
-        goToStep(steps.indexOf('Barring Issue'));
-      } else {
-        goToStep(steps.indexOf('New Booking Details'));
-      }
-    });
+    })
+      .then((data: any) => {
+        updateBarringConflicts(data.map((barredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.Date) })));
+        if (skipRedirect) return;
+        if (data?.length > 0) {
+          goToStep(steps.indexOf('Barring Issue'));
+        } else {
+          goToStep(steps.indexOf('New Booking Details'));
+        }
+      })
+      .catch((error) => {
+        debug(error);
+      });
   };
 
   const goToNext = () => {
@@ -93,30 +97,57 @@ const NewBookingView = ({
       url: '/api/bookings/conflict',
       method: 'POST',
       data: { ...formData, ProductionId: currentProduction?.Id },
-    }).then(async (data: any) => {
-      updateBookingConflicts(data);
-      if (data.error) {
-        console.log(data.error);
-        return;
-      }
-      if (!data?.length) {
-        fetchBarredVenues(false);
-      } else {
-        await fetchBarredVenues(true);
-        nextStep();
-      }
-    });
+    })
+      .then(async (data: any) => {
+        updateBookingConflicts(data);
+        if (data.error) {
+          console.log(data.error);
+          return;
+        }
+        if (!data?.length) {
+          if (!isDateTypeOnly) {
+            goToStep(steps.indexOf('New Booking Details'));
+          } else {
+            fetchBarredVenues(false);
+          }
+        } else {
+          if (!isDateTypeOnly) await fetchBarredVenues(true);
+          nextStep();
+        }
+      })
+      .catch((error) => {
+        debug(error);
+      });
   };
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
   };
+
   const onModalClose = () => {
     setError('');
     setStage(0);
     onClose();
   };
+
   const goToGapSuggestion = () => {
     goToStep(steps.indexOf('Venue Gap Suggestions'));
+  };
+
+  const createBookingsForDateRange = () => {
+    const dates = getArrayOfDatesBetween(fromDate, toDate);
+
+    const bookings = dates.map((d) => ({
+      date: formattedDateWithWeekDay(d, 'Short'),
+      dateAsISOString: d,
+      venue: venueId,
+    }));
+    onSubmit(bookings);
+  };
+
+  const handleCheckMileageClick = () => {
+    createBookingsForDateRange();
+    goToStep(steps.indexOf('Check Mileage'));
   };
   return (
     <div className="w-[385px]">
@@ -155,22 +186,24 @@ const NewBookingView = ({
             </Tooltip>
           </div>
         )}
-        <Select
-          className="w-[160px] my-2 !border-0"
-          value={bookingTypeValue}
-          options={BookingTypes}
-          onChange={(v) =>
-            onChange({
-              venueId: NaN,
-              dateType: NaN,
-              isDateTypeOnly: v === BookingTypeMap.DATE_TYPE,
-              isRunOfDates: v === BookingTypeMap.DATE_TYPE ? false : isRunOfDates,
-            })
-          }
-        />
+        <div className="flex items-center gap-2">
+          <Label className="text-white font-bold" text="Set Venue" />
+          <Toggle
+            label="SetVenue"
+            checked={isDateTypeOnly}
+            onChange={(value) =>
+              onChange({
+                isDateTypeOnly: value,
+                isRunOfDates: value ? false : isRunOfDates,
+                dateType: value ? dateType : null,
+              })
+            }
+          />
+          <Label className="text-white font-bold" text="Set Day Type" />
+        </div>
         {isDateTypeOnly && (
           <>
-            <Typeahead
+            <Select
               className={'my-2 w-full !border-0'}
               options={dayTypeOptions}
               disabled={stage !== 0}
@@ -183,7 +216,7 @@ const NewBookingView = ({
         )}
         {!isDateTypeOnly && (
           <>
-            <Typeahead
+            <Select
               className={classNames('my-2 w-full !border-0')}
               options={venueOptions}
               disabled={stage !== 0}
@@ -221,8 +254,8 @@ const NewBookingView = ({
           })}
         >
           <Button
-            onClick={() => null}
-            disabled={!venueId || !fromDate || !toDate}
+            onClick={handleCheckMileageClick}
+            disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
             className="px-6"
             text={'Check Mileage'}
           ></Button>

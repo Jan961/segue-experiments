@@ -1,15 +1,14 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import Icon from '../Icon';
 import { IconName } from '../Icon/Icon';
 import classNames from 'classnames';
-
 export interface TextInputProps {
   id?: string;
   value?: string;
   disabled?: boolean;
   className?: string;
   inputClassName?: string;
-  onChange?: (e: any) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeHolder?: string;
   onClick?: (e: any) => void;
   iconName?: IconName;

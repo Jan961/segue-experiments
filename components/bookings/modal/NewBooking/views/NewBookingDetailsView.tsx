@@ -16,6 +16,7 @@ import { toISO } from 'services/dateService';
 import { ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
+import { isNullOrEmpty } from 'utils';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -29,8 +30,6 @@ type NewBookingDetailsProps = {
   onClose: () => void;
   updateModalTitle: (title: string) => void;
 };
-
-const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
 
 export default function NewBookingDetailsView({
   formData,
@@ -54,11 +53,19 @@ export default function NewBookingDetailsView({
   const tableRef = useRef(null);
   const confirmationType = useRef<ConfDialogVariant>('cancel');
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
-  const [changesMade, setChangesMade] = useState<boolean>(false);
 
   useEffect(() => {
     updateModalTitle('New Booking Details');
   }, []);
+
+  useEffect(() => {
+    if (bookingData && tableRef.current) {
+      // This is required afyer saving the note so the value gets updated on the grid
+      tableRef.current.getApi()?.refreshCells({
+        force: true,
+      });
+    }
+  }, [bookingData]);
 
   useEffect(() => {
     let dayTypeOption = null;
@@ -70,7 +77,7 @@ export default function NewBookingDetailsView({
     const isPerformance = dayTypeOption && dayTypeOption.text === 'Performance';
     const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
     const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
-    const isFiltered = dayTypeOption && DAY_TYPE_FILTERS.includes(dayTypeOption.text);
+
     let startDate = new Date(fromDate);
     const endDate = new Date(toDate);
     const dates = [];
@@ -93,7 +100,7 @@ export default function NewBookingDetailsView({
         venue: venueId,
         noPerf: null,
         times: '',
-        bookingStatus: isFiltered ? 'U' : '', // U for Pencilled
+        bookingStatus: dateType !== null ? 'U' : '', // U for Pencilled
         pencilNo: '',
         notes: '',
         isBooking: isPerformance,
@@ -170,32 +177,30 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const goToMileage = () => {
+  const storeNewBookingDetails = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
       onSubmit(rowData);
-
-      goToStep(steps.indexOf('Check Mileage'));
     }
   };
 
-  const previewBooking = () => {
-    if (tableRef.current.getApi()) {
-      const rowData = [];
-      tableRef.current.getApi().forEachNode((node) => {
-        rowData.push(node.data);
-      });
-      onSubmit(rowData);
-      goToStep(steps.indexOf('Preview New Booking'));
-    }
+  const handePreviewBookingClick = () => {
+    storeNewBookingDetails();
+    goToStep(steps.indexOf('Preview New Booking'));
+  };
+
+  const handeCheckMileageClick = () => {
+    storeNewBookingDetails();
+    goToStep(steps.indexOf('Check Mileage'));
   };
 
   const handleCellClick = (e) => {
     const { column, data } = e;
-    if (column.colId === 'notes' && !Number.isNaN(data.venue) && data.dayType !== null) {
+
+    if (column.colId === 'notes' && !Number.isNaN(data.venue) && !isNullOrEmpty(data.dayType)) {
       setShowNotesModal(true);
       toggleModalOverlay(true);
     }
@@ -208,10 +213,19 @@ export default function NewBookingDetailsView({
   const handleSaveNote = (value: string) => {
     setShowNotesModal(false);
     toggleModalOverlay(false);
-    const updated = bookingData.map((booking) =>
-      booking.date === bookingRow.date ? { ...bookingRow, notes: value } : booking,
-    );
-    setBookingData(updated);
+
+    if (formData.isRunOfDates) {
+      const rowNodes = [];
+      tableRef.current.getApi().forEachNode(({ data }) => {
+        rowNodes.push({ ...data, notes: value });
+      });
+      setBookingData(rowNodes);
+    } else {
+      const updated = bookingData.map((booking) =>
+        booking.date === bookingRow.date ? { ...bookingRow, notes: value } : booking,
+      );
+      setBookingData(updated);
+    }
   };
 
   const handleNotesCancel = () => {
@@ -224,7 +238,7 @@ export default function NewBookingDetailsView({
       <div className="flex justify-between">
         <div className="text-primary-navy text-xl my-2 font-bold">{`${production.ShowCode}${production.Code}  ${production?.ShowName}`}</div>
       </div>
-      <div className=" w-[700px] lg:w-[1154px] h-full flex flex-col ">
+      <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
         <Table
           ref={tableRef}
           columnDefs={columnDefs}
@@ -233,9 +247,6 @@ export default function NewBookingDetailsView({
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
-          onCellValueChange={() => {
-            setChangesMade(true);
-          }}
         />
         <NotesPopup
           show={showNotesModal}
@@ -244,16 +255,11 @@ export default function NewBookingDetailsView({
           onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button
-            className=" w-33  place-self-start  "
-            text="Check Mileage"
-            onClick={goToMileage}
-            disabled={!changesMade}
-          />
+          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={handeCheckMileageClick} />
           <div className="flex gap-4">
             <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
-            <Button className=" w-33" text="Preview Booking" onClick={previewBooking} />
+            <Button className=" w-33" text="Preview Booking" onClick={handePreviewBookingClick} />
           </div>
         </div>
         <ConfirmationDialog

@@ -1,13 +1,13 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { ICellRendererParams } from 'ag-grid-community';
+import { ICellRendererParams, IRowNode } from 'ag-grid-community';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
+import { useEffect, useState } from 'react';
+import { getVenueForDayType } from '../utils';
 
 interface SelectVenueRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
   venueOptions: SelectOption[];
 }
-
-const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
 
 export default function SelectVenueRenderer({
   venueOptions,
@@ -15,20 +15,34 @@ export default function SelectVenueRenderer({
   eGridCell,
   data,
   value,
+  node,
+  api,
   setValue,
 }: SelectVenueRendererProps) {
-  const selectedDayTypeOption = dayTypeOptions.find(({ value }) => data.dayType === value);
-  const showDayType = selectedDayTypeOption && !DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
+  const venueAsDayType = getVenueForDayType(dayTypeOptions, data.dayType);
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
 
   const handleVenueChange = (venue) => {
     setValue(venue);
+    if (data.isRunOfDates && node.rowIndex === 0) {
+      api.forEachNode((node: IRowNode) => node.setData({ ...node.data, venue }));
+    }
   };
+
+  useEffect(() => {
+    if (data) {
+      const { isRunOfDates } = data;
+      setIsDisabled(isRunOfDates && node.rowIndex > 0);
+
+      setValue(venueAsDayType && !data.isRunOfDates ? null : value);
+    }
+  }, [data, node, setIsDisabled]);
 
   return (
     <div className="pl-1 pr-2 mt-1">
-      {showDayType ? (
+      {venueAsDayType && !data.isRunOfDates ? (
         <div className="mt-1 p-2 border border-primary-border rounded-md w-full h-[1.9375rem] bg-primary-white flex items-center">
-          <span className="text-primary-input-text text-base font-bold leading-6">{selectedDayTypeOption.text}</span>
+          <span className="text-primary-input-text text-base font-bold leading-6 truncate">{venueAsDayType}</span>
         </div>
       ) : (
         <SelectRenderer
@@ -38,6 +52,8 @@ export default function SelectVenueRenderer({
           inline
           onChange={handleVenueChange}
           isSearchable
+          disabled={isDisabled}
+          isClearable={!data.isRunOfDates}
         />
       )}
     </div>

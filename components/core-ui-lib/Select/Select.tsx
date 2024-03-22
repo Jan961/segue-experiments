@@ -1,119 +1,201 @@
-import { Fragment, LegacyRef, forwardRef, useEffect, useState } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
+import React, { forwardRef, useEffect, useMemo, useState } from 'react';
+import { matchSorter } from 'match-sorter';
+import WindowedSelect, {
+  components,
+  StylesConfig,
+  OptionProps,
+  DropdownIndicatorProps,
+  IndicatorsContainerProps,
+} from 'react-windowed-select';
+import { WithTestId } from 'types';
 import Icon from '../Icon';
-import classNames from 'classnames';
 import Label from '../Label';
+import classNames from 'classnames';
 
-export type SelectOption = { text: string; value: string | number };
+const Option = (props: OptionProps) => {
+  return <components.Option className="w-full" {...props} />;
+};
 
-export interface SelectProps {
-  value?: string;
-  disabled?: boolean;
+const IndicatorsContainer = (props: IndicatorsContainerProps) => {
+  return (
+    <div className="p-0">
+      <components.IndicatorsContainer {...props} />
+    </div>
+  );
+};
+
+const DropdownIndicator = (props: DropdownIndicatorProps) => {
+  return (
+    <components.DropdownIndicator {...props} className="px-1">
+      <Icon iconName="chevron-down" variant="xs" />
+    </components.DropdownIndicator>
+  );
+};
+
+export type SelectOption = { text: string; value: string | number; [key: string]: any };
+
+const COMP_HEIGHT = '1.9375rem';
+
+export interface SelectProps extends WithTestId {
+  value?: string | number | undefined;
+  onChange: (value: string | number) => void;
+  renderOption?: (option: OptionProps) => React.ReactElement;
+  customStyles?: Partial<StylesConfig>;
+  options: SelectOption[];
   className?: string;
-  buttonClass?: string;
-  onChange?: (value: string) => void;
-  placeHolder?: string;
-  options?: SelectOption[];
-  testId?: string;
+  placeholder?: string;
+  name?: string;
+  disabled?: boolean;
   label?: string;
   inline?: boolean;
+  isSearchable?: boolean;
+  isClearable?: boolean;
 }
 
-const Select = forwardRef((props: SelectProps, ref: LegacyRef<HTMLDivElement>) => {
-  const {
-    value = '',
-    options = [],
-    className = '',
-    buttonClass = '',
-    disabled = false,
+export default forwardRef(function Select(
+  {
+    value,
     onChange,
-    placeHolder = 'Please select a value',
-    testId = '',
-    label = '',
+    options = [],
+    className,
+    renderOption,
+    customStyles = {},
+    placeholder = '',
+    disabled = false,
+    testId,
+    label,
     inline = false,
-  } = props;
+    isSearchable = false,
+    isClearable = true,
+  }: SelectProps,
+  ref,
+) {
+  const colourStyles: StylesConfig = useMemo(
+    () => ({
+      ...{
+        control: (styles, { isDisabled }) => ({
+          ...styles,
+          fontWeight: 'bold',
+          fontSize: '1rem',
+          lineHeight: '1.5rem',
+          backgroundColor: isDisabled ? '#E9EBF0CC' : '#FFF',
+          padding: '0 4px 0 4px',
+          border: 0,
+          // This line disable the blue border
+          boxShadow: 'none',
+          minHeight: COMP_HEIGHT,
+          height: COMP_HEIGHT,
+        }),
+        option: (styles, { isDisabled, isSelected, isFocused }) => {
+          return {
+            ...styles,
+            fontSize: '1rem',
+            lineHeight: '1.5rem',
+            backgroundColor: isDisabled
+              ? undefined
+              : isSelected
+              ? '#21345BCC'
+              : isFocused
+              ? '#21345B99'
+              : styles.backgroundColor,
+            color: isDisabled ? '#ccc' : isSelected || isFocused ? '#FFF' : '#617293',
+            cursor: isDisabled ? 'not-allowed' : 'default',
+            ':active': {
+              ...styles[':active'],
+              backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
+            },
+            ':hover': {
+              ...styles[':hover'],
+              color: '#FFF',
+              backgroundColor: '#21345B99',
+            },
+          };
+        },
+        valueContainer: (styles) => ({
+          ...styles,
+          height: COMP_HEIGHT,
+          padding: '0 6px',
+        }),
+        input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
+        placeholder: (styles) => ({ ...styles, color: '#617293' }),
+        singleValue: (styles) => ({
+          ...styles,
+          color: '#617293',
+          '::selection': {
+            color: 'red',
+            background: 'yellow',
+          },
+        }),
+        clearIndicator: (styles) => ({
+          ...styles,
+          paddingLeft: '0 !important',
+          paddingRight: '0 !important',
+          paddingTop: '4px  !important',
+          paddingBottom: '4px  !important',
+          height: COMP_HEIGHT,
+        }),
+        menu: (styles) => ({ ...styles, zIndex: 20 }),
+      },
+      ...customStyles,
+    }),
+    [customStyles],
+  );
 
+  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>([]);
   const [selectedOption, setSelectedOption] = useState<SelectOption>({ text: '', value: '' });
+  useEffect(() => {
+    setFilteredOptions(options);
+  }, [options]);
 
-  const handleOptionSelect = (v: string) => {
-    const selected = options.find(({ value }) => value === v);
-    setSelectedOption(selected);
-    onChange(v);
+  const handleOptionSelect = (o: SelectOption) => {
+    setSelectedOption(o);
+    onChange(o ? o.value : null);
   };
 
   useEffect(() => {
     setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
   }, [value, options]);
 
-  const disabledClass = disabled ? `!bg-disabled !cursor-not-allowed !pointer-events-none` : '';
+  const customComponents = {
+    Option: (option) => (renderOption ? renderOption(option) : <Option {...option} />),
+    IndicatorSeparator: null,
+    IndicatorsContainer,
+    DropdownIndicator,
+  };
 
   return (
     <div
-      ref={ref}
-      className={classNames(`${className}  flex items-center ${disabledClass}`, {
-        '!shadow-sm-shadow border border-primary-border rounded-md': !inline,
-      })}
-      data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
+      className={classNames(
+        `border border-primary-border rounded-md flex items-center text-sm`,
+        { 'shadow-sm-shadow': !inline },
+        className,
+      )}
+      data-testid={`${testId ? `form-select-${testId}` : 'form-select'}`}
     >
       {label && (
-        <div className="flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3">
+        <div className="border-r min-w-fit border-primary-border px-3">
           <Label text={label} />
         </div>
       )}
-      <Listbox value={value} onChange={handleOptionSelect} disabled={disabled}>
-        {({ open }) => (
-          <>
-            <div className="relative w-full">
-              <Listbox.Button
-                className={classNames(
-                  `${buttonClass} relative w-full h-[1.9375rem] cursor-default rounded-md bg-white pl-3 pr-10 text-left focus:outline-none focus:ring-0`,
-                  {
-                    'border border-primary-border': inline,
-                  },
-                )}
-              >
-                <span className="block truncate text-primary-input-text text-base">
-                  {selectedOption?.text || placeHolder}
-                </span>
-                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                  <Icon iconName="chevron-down" variant="xs" aria-hidden="true" />
-                </span>
-              </Listbox.Button>
 
-              <Transition
-                show={open}
-                as={Fragment}
-                leave="transition ease-in duration-100"
-                leaveFrom="opacity-100"
-                leaveTo="opacity-0"
-              >
-                <Listbox.Options className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  {options.map((o) => (
-                    <Listbox.Option
-                      key={o.value}
-                      className={({ active }) =>
-                        classNames(
-                          active ? 'bg-primary-list-row-active text-white' : 'text-primary-input-text',
-                          'relative cursor-default select-none py-2 pl-3 pr-9',
-                        )
-                      }
-                      value={o.value}
-                    >
-                      {({ selected }) => (
-                        <span className={classNames(selected ? 'font-medium' : 'font-normal', 'block truncate')}>
-                          {o.text}
-                        </span>
-                      )}
-                    </Listbox.Option>
-                  ))}
-                </Listbox.Options>
-              </Transition>
-            </div>
-          </>
-        )}
-      </Listbox>
+      <WindowedSelect
+        ref={ref}
+        className="w-full"
+        onInputChange={(inputValue) => {
+          setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
+        }}
+        onChange={handleOptionSelect}
+        value={selectedOption}
+        components={customComponents}
+        getOptionLabel={(props: SelectOption) => props.text}
+        windowThreshold={50}
+        isDisabled={disabled}
+        options={filteredOptions}
+        styles={colourStyles}
+        placeholder={placeholder}
+        isSearchable={isSearchable}
+        isClearable={isClearable}
+      />
     </div>
   );
 });
-Select.displayName = 'Select';
-export default Select;

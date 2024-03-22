@@ -8,6 +8,7 @@ import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
 import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
+import { isNullOrEmpty } from 'utils';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -51,7 +52,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       });
       return;
     }
-    if (e.column.colId === 'note' && e.data.venue && e.data.dayType) {
+    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
       setProductionItem(e.data);
       setShowModal(true);
     }

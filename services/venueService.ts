@@ -26,6 +26,33 @@ export const getAllVenues = async () => {
     where: {
       IsDeleted: false,
     },
+    // select: {
+    //   VenueAddress: {
+    //     Town: true,
+    //   },
+    // },
+  });
+};
+
+export const getUniqueVenueTownlist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Town'],
+    where: {
+      Town: {
+        not: null,
+      },
+    },
+  });
+};
+
+export const getUniqueVenueCountrylist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Country'],
+    where: {
+      Country: {
+        not: null,
+      },
+    },
   });
 };
 
@@ -83,10 +110,25 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 
         return {
           VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : null,
-          Mins: match?.TimeMins ? match.TimeMins : null,
+          Miles: match?.Mileage ? match.Mileage : -1,
+          Mins: match?.TimeMins ? match.TimeMins : -1,
         };
       }),
     };
   });
+};
+
+export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO> => {
+  const [id1, id2] = stop.Ids;
+
+  // Get the distances for all possible combinations (optimisation possible)
+  const distance = await prisma.venueVenue.findMany({
+    where: {
+      Venue1Id: id1, // And
+      Venue2Id: id2,
+    },
+  });
+
+  const { Venue1Id, TimeMins, Mileage } = distance[0];
+  return { Date: stop.Date, option: [{ VenueId: Venue1Id, Mins: TimeMins, Miles: Mileage }] };
 };
