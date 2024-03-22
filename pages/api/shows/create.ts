@@ -16,6 +16,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.status(200).end();
   } catch (error) {
     console.log(error);
-    res.status(403).json({ message: `Error occurred while creating Show ${error?.message}`, ok: false });
+    if (error.code === 'P2002' && error.meta && error.meta.target.includes('SECONDARY')) {
+      // The target might not exactly match 'SECONDARY', depending on Prisma version and database
+      res.status(409).json({ error: 'A show with the specified AccountId and Code already exists.' });
+    } else {
+      res.status(500).json({ error: `Error occurred while creating Show ${error?.message}`, ok: false });
+    }
   }
 }
