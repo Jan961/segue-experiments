@@ -1,6 +1,7 @@
 import { selector } from 'recoil';
 import { rehearsalState } from '../rehearsalState';
 import { bookingState } from '../bookingState';
+import { dateTypeState } from '../dateTypeState';
 import { getInFitUpState } from '../getInFitUpState';
 import { otherState } from '../otherState';
 import { venueState } from '../venueState';
@@ -12,6 +13,7 @@ import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/da
 import { performanceState } from '../performanceState';
 import BookingHelper from 'utils/booking';
 import { dateBlockState } from '../dateBlockState';
+import { DAY_TYPE_FILTERS } from 'components/bookings/utils';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
@@ -25,6 +27,7 @@ export const rowsSelector = selector({
     const performanceDict = get(performanceState);
     const other = get(otherState);
     const venueDict = get(venueState);
+    const dayTypes = get(dateTypeState);
     const { productions } = get(productionJumpState);
     const productionDict = objectify(productions, (production) => production.Id);
     const dateBlocks = get(dateBlockState);
@@ -37,7 +40,18 @@ export const rowsSelector = selector({
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
       const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
+      const getVenueForDayType = (venue, type, dateType) => {
+        if (!venue) {
+          if (type === 'Other') {
+            return dayTypes.find(({ Id }) => Id === dateType)?.Name || '';
+          }
+          return DAY_TYPE_FILTERS.includes(type) ? type : venue;
+        }
+        return venue;
+      };
+
       const row = {
+        ...rowData,
         week,
         dateTime: date,
         date: date ? moment(date).format('ddd DD/MM/YY') : '',
@@ -47,8 +61,9 @@ export const rowsSelector = selector({
         dayType: type,
         bookingStatus: bookingStatusMap[data?.StatusCode] || '',
         status: data?.StatusCode,
-        ...rowData,
+        venue: getVenueForDayType(rowData.venue, type, data.DateTypeId),
       };
+
       rows.push(row);
     };
     Object.values(rehearsals).forEach((r) => {
