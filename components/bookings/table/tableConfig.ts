@@ -18,6 +18,7 @@ import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
 import TextInputRenderer from './TextInputRenderer';
+import TableCheckboxRenderer from './TableCheckboxRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -343,7 +344,7 @@ export const bookingShowsTableConfig = [
     field: 'IsArchived',
     width: 92,
     maxWidth: 92,
-    cellRenderer: SelectableColumnRenderer,
+    cellRenderer: TableCheckboxRenderer,
     cellRendererParams: {},
     cellStyle: {
       display: 'flex',
@@ -353,7 +354,7 @@ export const bookingShowsTableConfig = [
     headerClass: 'text-center',
   },
   {
-    headerName: '',
+    headerName: 'Save / Delete',
     field: 'EditId',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
@@ -363,23 +364,21 @@ export const bookingShowsTableConfig = [
     resizable: false,
     cellStyle: {
       paddingLeft: '0.5em',
+      width: 80,
     },
-    width: 60,
+    width: 90,
     headerClass: 'text-center',
   },
   {
-    headerName: 'Delete',
+    headerName: '',
     field: 'Id',
+    width: 80,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Delete',
-      variant: 'primary',
+      variant: 'tertiary',
+      width: 80,
     },
-    cellStyle: {
-      paddingLeft: '0.5em',
-      paddingRight: '0.6em',
-    },
-    width: 84,
     resizable: false,
     headerClass: 'text-center',
   },
