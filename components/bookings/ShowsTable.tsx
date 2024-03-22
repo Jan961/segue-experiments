@@ -90,7 +90,7 @@ const ShowsTable = ({
       try {
         const data = { ...intShowData, Code: currentShow.Code, Name: currentShow.Name };
         delete data.Id;
-        await axios.post(`/api/shows/create`, { show: data });
+        await axios.post(`/api/shows/create`, data);
       } finally {
         setIsLoading(false);
         setIsEdited(false);

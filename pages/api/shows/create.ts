@@ -14,7 +14,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     res.status(200).end();
-  } catch (err) {
-    res.status(403).json({ err: 'Error occurred while generating search results.' });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ message: `Error occurred while creating Show ${error?.message}`, ok: false });
   }
 }
