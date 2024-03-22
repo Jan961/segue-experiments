@@ -147,7 +147,7 @@ export default function PreviewBookingDetails({
         bookingStatus: bookingStatusMap[item.bookingStatus],
         status: item.bookingStatus,
         performanceCount: item.noPerf?.toString() || '',
-        perfTimes: item.times,
+        performanceTimes: item.times,
         week: calculateWeek(),
         miles: '',
         travelTime: '',
