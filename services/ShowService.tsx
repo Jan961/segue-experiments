@@ -68,9 +68,13 @@ export const lookupShowCode = async (Code: string, AccountId: number) => {
   return show ? show.Id : undefined;
 };
 
-export const getShowsByAccountId = (AccountId: number) => {
-  return prisma.show.findMany({
+export const getShowsByAccountId = async (AccountId: number) => {
+  const shows = await prisma.show.findMany({
     where: { AccountId, IsDeleted: false },
     include: showInclude,
+  });
+
+  return shows.slice().sort((a, b) => {
+    return a.Name.localeCompare(b.Name);
   });
 };

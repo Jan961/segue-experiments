@@ -89,7 +89,8 @@ const ShowsTable = ({
       setIsLoading(true);
       try {
         const data = { ...intShowData, Code: currentShow.Code, Name: currentShow.Name };
-        await axios.post(`/api/shows/create`, data);
+        delete data.Id;
+        await axios.post(`/api/shows/create`, { show: data });
       } finally {
         setIsLoading(false);
         setIsEdited(false);
