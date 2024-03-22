@@ -1,4 +1,5 @@
 import { CustomCellRendererProps } from 'ag-grid-react';
+import classNames from 'classnames';
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { distanceState } from 'state/booking/distanceState';
@@ -10,11 +11,17 @@ const MilesRenderer = (props: CustomCellRendererProps) => {
     const productionDistance = distance?.[productionId] || {};
     const { option = [] } = productionDistance?.stops?.find((x) => x.Date === dateTime) || {};
     const venue = option?.find((x) => x.VenueId === venueId);
-    return venue?.Miles || '';
+    return venue?.Miles === -1 ? 'No Data' : venue?.Miles;
   }, [dateTime, distance, productionId, venueId]);
   return (
-    <div className="w-full h-full pr-[2px]">
-      <div className={`h-full px-4`}>{miles}</div>
+    <div className="pr-[2px]">
+      <div
+        className={classNames('w-full h-full px-1', {
+          'bg-primary-red text-italics text-primary-yellow': miles === 'No Data',
+        })}
+      >
+        {miles}
+      </div>
     </div>
   );
 };

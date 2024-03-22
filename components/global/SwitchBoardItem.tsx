@@ -33,8 +33,8 @@ export const SwitchBoardItem = ({ link }: SwitchBoardItemProps) => {
       ) : null}
       <span
         className={classNames(
-          'text-center whitespace-break-spaces lg:text-responsive-lg md:text-base lg:mt-3 md:mt-2 mt-0 !leading-[1.1875rem]',
-          { 'w-min': !link.iconName },
+          'text-center whitespace-break-spaces lg:text-responsive-lg md:text-base mt-0 !leading-[1.1875rem]',
+          { 'w-min': !link.iconName, 'lg:mt-3 md:mt-2': !!link.iconName },
         )}
       >
         {link.title}
