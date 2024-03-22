@@ -53,7 +53,7 @@ export const columnDefs = [
     headerName: 'Miles',
     field: 'miles',
     cellRenderer: MilesRenderer,
-    width: 69,
+    width: 75,
   },
   { headerName: 'Travel Time', field: 'travelTime', cellRenderer: TravelTimeRenderer, width: 80 },
   {
@@ -206,7 +206,6 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
   {
     headerName: 'Times',
     field: 'times',
-    getColId: () => 'times',
     wrapText: true,
     cellRenderer: TimeArrayRenderer,
     width: 102,
@@ -315,6 +314,8 @@ export const barredVenueColumnDefs = [
     headerName: '',
     field: 'info',
     cellRenderer: IconRenderer,
+    tooltipComponentParams: { color: '#ffffff', backgroundColor: '#617293' },
+    tooltipValueGetter: (props) => props?.data?.info,
     cellRendererParams: {
       iconName: 'info-circle-solid',
       tooltipPosition: 'left',

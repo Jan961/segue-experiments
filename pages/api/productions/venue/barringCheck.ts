@@ -51,6 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const results = bookingsWithDistances
       .map(({ Venue, FirstDate }) => {
+        let info = '';
         const distanceInfo1 = Venue.VenueVenue1[0];
         const distanceInfo2 = Venue.VenueVenue2[0];
         const distanceInfo = distanceInfo1 || distanceInfo2 || null;
@@ -66,6 +67,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             new Date(barringStartDate),
             new Date(barringEndDate),
           );
+          if (barringPeriodOverlap) {
+            info = info + `${Venue.Name} bars ${givenVenue.Name} for selected period \n`;
+          }
         }
         let givenVenueBarringPeriodOverlap = false;
         if (
@@ -86,6 +90,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             new Date(barringStartDate),
             new Date(barringEndDate),
           );
+          if (givenVenueBarringPeriodOverlap) {
+            info = info + `${givenVenue.Name} bars ${Venue.Name} over period overlap \n`;
+          }
         }
 
         // Determine if within barring distance and meets seat requirements
@@ -96,6 +103,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           (distance !== null && givenVenueBarringMiles && distance.lte(givenVenueBarringMiles));
         // Determine if barred based on combined criteria
         const isBarred = barringPeriodOverlap || givenVenueBarringPeriodOverlap || seatsCheck || mileageCheck;
+        if (mileageCheck) {
+          info = info + `${givenVenue.Name} is within ${Miles} of ${Venue.Name} `;
+        }
 
         return {
           Id: Venue.Id,
@@ -103,6 +113,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           Mileage: distance,
           Date: FirstDate,
           hasBarringConflict: isBarred,
+          info,
         };
       })
       .sort((a, b) => Number(a.Mileage) - Number(b.Mileage));

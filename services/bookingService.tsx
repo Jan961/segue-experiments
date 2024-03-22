@@ -168,7 +168,7 @@ export const createNewBooking = (
         createMany: {
           data: Performances.map((p: NewPerformance) => ({
             Date: new Date(p.Date),
-            Time: new Date(p.Time),
+            Time: p.Time ? new Date(p.Time) : null,
           })),
         },
       },
@@ -200,7 +200,7 @@ export const createNewRehearsal = ({ DateBlockId, StatusCode, BookingDate, Notes
           Id: DateBlockId,
         },
       },
-      VenueId,
+      ...(VenueId && { VenueId }),
     },
   });
 };

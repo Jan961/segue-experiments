@@ -9,9 +9,7 @@ interface SelectPencilRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
 }
 
-const pencilNos = [{ text: '-', value: '8' }].concat(
-  Array.from({ length: 9 }, (_, index) => ({ text: `${index + 1}`, value: `${index + 1}` })),
-);
+const pencilNos = Array.from({ length: 9 }, (_, index) => ({ text: `${index + 1}`, value: `${index + 1}` }));
 
 const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: SelectPencilRendererProps) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);

@@ -40,7 +40,6 @@ export default function Barring({ visible, onClose }: BarringProps) {
       if (!selectedVenueIds.includes(row.Id)) {
         filteredRows.push({
           ...row,
-          info: `${row.Name} is within ${row.Mileage} of ${selectedVenueName}`,
           FormattedDate: moment(row.Date).format('DD/MM/YY'),
           TravelTime: formatMinutes(row.TimeMins),
         });
