@@ -40,14 +40,15 @@ export const rowsSelector = selector({
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
       const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
-      const getVenueForDayType = (venue, type, dateType) => {
-        if (!venue) {
+      const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
+      const getValueForDayType = (value, type) => {
+        if (!value) {
           if (type === 'Other') {
-            return dayTypes.find(({ Id }) => Id === dateType)?.Name || '';
+            return otherDayType;
           }
-          return DAY_TYPE_FILTERS.includes(type) ? type : venue;
+          return DAY_TYPE_FILTERS.includes(type) ? type : value;
         }
-        return venue;
+        return value;
       };
 
       const row = {
@@ -58,10 +59,11 @@ export const rowsSelector = selector({
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,
-        dayType: type,
+        dayType: type === 'Other' ? otherDayType : type,
         bookingStatus: bookingStatusMap[data?.StatusCode] || '',
         status: data?.StatusCode,
-        venue: getVenueForDayType(rowData.venue, type, data.DateTypeId),
+        venue: getValueForDayType(rowData.venue, type),
+        town: getValueForDayType(rowData.town, type),
       };
 
       rows.push(row);
