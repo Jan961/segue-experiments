@@ -4,7 +4,6 @@ import { BookingService } from './services/add.bookings'; // Adjust the import p
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
 
 const mapToPrismaFields = (values: BookingItem[] = []) => {
-  console.log('mapToPrismaFields', values);
   const mapped = values
     .filter((item) => item.dayType !== null && item.bookingStatus !== null)
     .map((item) => {
