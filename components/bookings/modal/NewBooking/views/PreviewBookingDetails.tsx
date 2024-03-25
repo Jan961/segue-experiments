@@ -83,12 +83,16 @@ export default function PreviewBookingDetails({
         }, []);
 
         const previousRowToUpdate = previousDates?.findLast(
-          ({ venue, bookingStatus }) =>
-            !!venue && typeof venue === 'number' && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
+          ({ venueId, bookingStatus }) =>
+            !!venueId &&
+            typeof venueId === 'number' &&
+            (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
         );
         const nextRowToUpdate = futureDates?.find(
-          ({ venue, bookingStatus }) =>
-            !!venue && typeof venue === 'number' && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
+          ({ venueId, bookingStatus }) =>
+            !!venueId &&
+            typeof venueId === 'number' &&
+            (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
         );
 
         if (previousRowToUpdate) {
