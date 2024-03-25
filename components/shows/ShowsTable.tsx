@@ -1,10 +1,11 @@
 import { Show } from '@prisma/client';
 import Table from 'components/core-ui-lib/Table';
-import { bookingShowsTableConfig, styleProps } from '../bookings/table/tableConfig';
+import { styleProps } from '../bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
+import { tableConfig } from './table/tableConfig';
 
 const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -23,10 +24,12 @@ const ShowsTable = ({
   rowsData,
   isAddRow = false,
   addNewRow,
+  isArchived = false,
 }: {
   rowsData: Show[];
   isAddRow: boolean;
   addNewRow: () => void;
+  isArchived: boolean;
 }) => {
   const tableRef = useRef(null);
 
@@ -67,7 +70,7 @@ const ShowsTable = ({
       try {
         const payloadData = { ...currentShow, IsArchived: e.data.IsArchived };
         await axios.put(`/api/shows/update/${currentShow?.Id}`, payloadData);
-        if (payloadData.IsArchived) {
+        if (payloadData.IsArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
           const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
           const transaction = {
@@ -124,7 +127,7 @@ const ShowsTable = ({
   return (
     <>
       <Table
-        columnDefs={bookingShowsTableConfig}
+        columnDefs={tableConfig}
         ref={tableRef}
         rowData={rowsData}
         styleProps={styleProps}

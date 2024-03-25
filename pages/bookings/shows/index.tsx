@@ -52,7 +52,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
             <Button disabled={isAddRow} onClick={addNewRow} text="Add New Show" />
           </div>
         </div>
-        <ShowsTable isAddRow={isAddRow} addNewRow={addNewRow} rowsData={rowsData} />
+        <ShowsTable isArchived={isArchived} isAddRow={isAddRow} addNewRow={addNewRow} rowsData={rowsData} />
       </div>
     </Layout>
   );
