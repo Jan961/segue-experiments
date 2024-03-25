@@ -197,6 +197,7 @@ const NewBookingView = ({
                 isDateTypeOnly: value,
                 isRunOfDates: value ? false : isRunOfDates,
                 dateType: value ? dateType : null,
+                venueId: null,
               })
             }
           />
