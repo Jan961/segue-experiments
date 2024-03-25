@@ -6,6 +6,7 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 import { tableConfig } from './table/tableConfig';
+import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 
 const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -48,9 +49,8 @@ const ShowsTable = ({
   };
 
   useEffect(() => {
-    if (isAddRow && tableRef) {
-      const gridApi = tableRef.current.getApi();
-      gridApi.applyTransaction({ add: [{}], addIndex: 0 });
+    if (isAddRow) {
+      applyTransactionToGrid(tableRef, { add: [{}], addIndex: 0 });
     }
   }, [isAddRow, tableRef]);
 
@@ -76,7 +76,7 @@ const ShowsTable = ({
           const transaction = {
             remove: [rowDataToRemove],
           };
-          gridApi.applyTransaction(transaction);
+          applyTransactionToGrid(tableRef, transaction);
         }
       } finally {
         setIsLoading(false);
@@ -118,7 +118,7 @@ const ShowsTable = ({
       const transaction = {
         remove: [rowDataToRemove],
       };
-      gridApi.applyTransaction(transaction);
+      applyTransactionToGrid(tableRef, transaction);
     } finally {
       setIsLoading(false);
     }
