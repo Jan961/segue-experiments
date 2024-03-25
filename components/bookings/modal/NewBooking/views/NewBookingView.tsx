@@ -21,6 +21,7 @@ import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
 import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 import { debug } from 'utils/logging';
+import { isNullOrEmpty } from 'utils';
 
 type AddBookingProps = {
   formData: TForm;
@@ -104,7 +105,7 @@ const NewBookingView = ({
           console.log(data.error);
           return;
         }
-        if (!data?.length) {
+        if (isNullOrEmpty(data)) {
           if (isDateTypeOnly) {
             goToStep(steps.indexOf('New Booking Details'));
           } else {
@@ -112,8 +113,8 @@ const NewBookingView = ({
           }
         } else if (!isDateTypeOnly) {
           await fetchBarredVenues(true);
+          nextStep();
         }
-        nextStep();
       })
       .catch((error) => {
         debug(error);
