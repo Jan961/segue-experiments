@@ -97,7 +97,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
       prev = stop;
       return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: null, Mins: null })) };
     }
-
+    const prevIdsAsString = prev.Ids.join(',');
     return {
       Date: stop.Date,
       option: stop.Ids.map((id: number) => {
@@ -108,11 +108,17 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
         )[0];
         prev = stop;
 
-        return {
-          VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : -1,
-          Mins: match?.TimeMins ? match.TimeMins : -1,
-        };
+        return prevIdsAsString === stop.Ids.join(',')
+          ? {
+              VenueId: id,
+              Miles: match?.Mileage,
+              Mins: match?.TimeMins,
+            }
+          : {
+              VenueId: id,
+              Miles: match?.Mileage ? match.Mileage : -1,
+              Mins: match?.TimeMins ? match.TimeMins : -1,
+            };
       }),
     };
   });

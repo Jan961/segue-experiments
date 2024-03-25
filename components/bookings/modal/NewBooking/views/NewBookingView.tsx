@@ -105,15 +105,15 @@ const NewBookingView = ({
           return;
         }
         if (!data?.length) {
-          if (!isDateTypeOnly) {
+          if (isDateTypeOnly) {
             goToStep(steps.indexOf('New Booking Details'));
           } else {
             fetchBarredVenues(false);
           }
-        } else {
-          if (!isDateTypeOnly) await fetchBarredVenues(true);
-          nextStep();
+        } else if (!isDateTypeOnly) {
+          await fetchBarredVenues(true);
         }
+        nextStep();
       })
       .catch((error) => {
         debug(error);
