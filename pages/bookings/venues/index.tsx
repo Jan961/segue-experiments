@@ -67,7 +67,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     <>
       <Layout title="Venues | Segue" flush>
         <div className="max-w-5xl mx-auto">
-          <div className="mb-8 ">
+          <div className="mb-4">
             <VenueFilter
               townOptions={townOptions}
               countryOptions={countryOptions}
