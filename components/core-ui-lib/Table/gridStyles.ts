@@ -39,6 +39,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     justify-content: center !important;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -55,6 +56,9 @@ const GridStyles = createGlobalStyle<StyleProps>`
 =======
 
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+
+>>>>>>> Stashed changes
 
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {

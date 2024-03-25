@@ -58,13 +58,14 @@ export default async function handle(req, res) {
           },
         };
       }
+
       return {
         ...acc,
         [key]: {
           week: sale.SetBookingWeekNum ? `Week-${sale.SetBookingWeekNum}` : '',
           weekOf: sale.SetSalesFiguresDate,
           seatsSold: parseInt(sale.Seats) || 0,
-          seatsSalePercentage: (sale.Seats / sale.TotalCapacity) * 100,
+          seatsSaleChange: '',
           reservations: '',
           reserved: '',
           venueCurrencySymbol: sale.VenueCurrencySymbol,
@@ -91,6 +92,23 @@ export default async function handle(req, res) {
         },
       };
     }, {});
+
+
+    Object.entries(groupedData).forEach(([key, groupValue], index) => {
+    
+      const last = groupedData[Object.keys(groupedData)[index -1]]
+      const current = groupedData[Object.keys(groupedData)[index]]
+     
+      // reserved value will also be added here
+      groupedData[key].valueChange = index === 0 ? current.totalValue : current.totalValue - last.totalValue;
+      groupedData[key].seatsSaleChange = index === 0 ? current.totalValue : current.totalValue - last.totalValue;
+
+      // const seatsSoldChange = current.seatsSold - last.seatsSold;
+
+      groupedData[key].seatsChange = index === 0 ? current.seatsSold : current.seatsSold - last.seatsSold;
+
+    });
+
     res.json(Object.values(groupedData));
   } catch (err) {
     console.log(err);

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -35,11 +36,17 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+import { useEffect, useMemo, useRef, useState } from 'react';
+import PopupModal from 'components/core-ui-lib/PopupModal';
+import Select from 'components/core-ui-lib/Select';
+>>>>>>> Stashed changes
 import { bookingState } from 'state/booking/bookingState';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -53,11 +60,14 @@ import Button from 'components/core-ui-lib/Button';
 >>>>>>> 442b778 (flow complete - ready for partial PR)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 import { useRouter } from 'next/router';
 import SalesTable from 'components/marketing/sales/table';
 import { SalesSubmit, SalesTableVariant } from 'components/marketing/sales/table/SalesTable';
 import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 import useAxios from 'hooks/useAxios';
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 import styled from 'styled-components';
@@ -131,12 +141,19 @@ import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+import styled from 'styled-components';
+import { Spinner } from 'components/global/Spinner';
+import checkNan from 'utils/checkNan';
+import { BookingSelectionView } from 'pages/api/marketing/archivedSales/bookingSelection';
+>>>>>>> Stashed changes
 
 interface VenueHistoryProps {
   visible: boolean;
   onCancel: () => void;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -145,6 +162,8 @@ interface VenueHistoryProps {
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 type TableWrapperProps = {
   multiplier: number;
 }
@@ -157,18 +176,22 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [showVenueSelectModal, setShowVenueSelect] = useState<boolean>(visible);
   const [showCompSelectModal, setShowCompSelect] = useState<boolean>(false);
   const [showResultsModal, setShowResults] = useState<boolean>(false);
-  const [selectedBookings, setSelBookings] = useState([]); // patch fix just to make available on main
+  const [selectedBookings, setSelBookings] = useState([]);
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
   const [showSalesSnapshot, setShowSalesSnapshot] = useState<boolean>(false);
   const [venueID, setVenueID] = useState(null);
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
   const [loading, setLoading] = useState<boolean>(false);
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const [prodCompData, setProdCompData] = useState<any>();
+=======
+  const [prodCompData, setProdCompData] = useState<Array<BookingSelectionView>>();
+>>>>>>> Stashed changes
   const [salesCompData, setSalesCompData] = useState<any>();
   const [salesSnapData, setSalesSnapData] = useState<any>();
   const [currView, setCurrView] = useState<SalesTableVariant>('venue');
@@ -186,6 +209,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
@@ -281,6 +305,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 =======
 
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+
+>>>>>>> Stashed changes
   const VenueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
@@ -298,6 +325,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     return options;
   }, [venueDict, bookingDict]);
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -308,18 +336,22 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 
   useEffect(() => {
     setShowVenueSelect(visible);
   }, [visible]);
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
   const showError = (error: string) => {
-    alert(error)
     setErrorMessage(error);
     setShowError(true);
   }
@@ -340,6 +372,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
       case 'salesSnapshot':
         setShowSalesSnapshot(true);
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
   const gridOptions = {
@@ -385,10 +418,18 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const getData = (dataInput: any, view: string) => {
+=======
+    }
+  }
+
+
+  const getData = (dataInput: number | object | string, view: string) => {
+    if(dataInput === null) return;
+>>>>>>> Stashed changes
     switch (view) {
       case 'venue':
-        if (isNaN(dataInput)) break;
-        const venue = venueDict[dataInput];
+        if (checkNan(dataInput)) break;
+        const venue = typeof dataInput === 'number' ? venueDict[dataInput] : undefined;
         if (venue === undefined) break;
         setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
         setVenueID(dataInput)
@@ -404,8 +445,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               venueCode: venue.Code,
               showCode: router.query.ShowCode.toString()
             },
-          }).then((data: any) => {
-            if (data !== undefined && data.length > 0) {
+          }).then((data) => {
+            if (data !== undefined && data !== null && typeof data === 'object') {
+              console.log(data)
               setProdCompData(data);
               setCurrView('prodComparision')
               toggleModal('prodComparision')
@@ -414,7 +456,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             }
           });
         } catch (error) {
-          alert(error)
+          console.log(error)
         }
 
         break;
@@ -442,6 +484,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           url: '/api/marketing/sales/read/' + dataInput.toString(),
           method: 'POST',
         }).then((data: any) => {
+          alert(dataInput.toString())
           if (data !== undefined) {
             setSalesSnapData(data);
             toggleModal('salesSnapshot')
@@ -473,6 +516,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     }
   }
 
+
   const selectForComparison = (selectedValue) => {
     if ('type' in selectedValue === false) {
       let tempBookings = selectedBookings;
@@ -501,11 +545,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         if (tempBookings.length >= 2) {
           setErrorMessage('');
         }
-        setSelBookings(tempBookings);
       }
     }
   };
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
   const selectForComparison = (selectedValue) => {
@@ -556,6 +600,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
   return (
     <div>
       <PopupModal
@@ -569,10 +615,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           {venueSelectView === 'select' ? (
             <div>
               <div className="text text-primary-navy">Please select a venue for comparision</div>
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 
               <Select
                 className={classNames('my-2 w-full !border-0 text-primary-navy')}
@@ -645,7 +694,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             showBackBtn={true}
             handleCellValChange={selectForComparison}
             data={prodCompData}
-            cellRenderParams={{selected: selectedBookings}}
+            cellRenderParams={selectedBookings}
           />
 
         </div>
@@ -708,6 +757,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </div>
       </PopupModal>
     </div>
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
   const [venueId, setVenueId] = useState<number>(0);
@@ -1453,5 +1503,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
   );
 };

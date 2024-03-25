@@ -5,7 +5,7 @@ import { unique } from 'radash';
 import { lookupShowCode } from 'services/ShowService';
 import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService';
 
-type BookingSelectionView = {
+export type BookingSelectionView = {
   BookingId: number;
   BookingStatusCode: string;
   BookingFirstDate: string;

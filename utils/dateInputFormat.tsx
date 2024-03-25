@@ -1,16 +1,15 @@
-function formatInputDate(dateString:string, delimiter:string) {
+function formatInputDate(dateString) {
   if (!dateString) {
     return null;
   }
 
-  const usrLocale = navigator.language;
-
   const date = new Date(dateString);
 
-  const year = date.getFullYear().toString().slice(-2);
+  const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -40,6 +39,9 @@ function formatInputDate(dateString:string, delimiter:string) {
 =======
   return `${year}/${month}/${day}`;
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+  return `${day}/${month}/${year}`;
+>>>>>>> Stashed changes
 }
 
 export default formatInputDate;

@@ -1,7 +1,8 @@
 import DefaultCellRenderer from "components/bookings/table/DefaultCellRenderer";
-import SelectCompOrderRender from "./SelectCompOrderRender";
 import DateColumnRenderer from "components/bookings/table/DateColumnRenderer";
 import SalesDataButtonRenderer from "./SalesDataButtonRenderer";
+import SelectRenderer from "components/core-ui-lib/Table/renderers/SelectRenderer";
+import { getNumericalOptions } from "utils/getNumericalOptions";
 
 export const gridOptions = {
   autoSizeStrategy: {
@@ -11,25 +12,30 @@ export const gridOptions = {
   }
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 const getCellColor = (data) => {
-  if(data.isNotOnSale){
-    return { backgroundColor: '#ED1111', color: 'white'}
-  }  else if (data.isBrochureReleased) {
-    return { backgroundColor: '#FFE606', color: 'white'}
+  if (data.isNotOnSale) {
+    return { backgroundColor: '#ED1111', color: 'white' }
+  } else if (data.isBrochureReleased) {
+    return { backgroundColor: '#FFE606', color: 'white' }
   } else if (data.isSingleSeats) {
-    return { backgroundColor: '#10841C', color: 'white'}
+    return { backgroundColor: '#10841C', color: 'white' }
   } else {
-    return {}; 
+    return {};
   }
 }
 
+
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) => [
@@ -68,6 +74,29 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
         selectedBookings
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
       },
+=======
+    {
+      headerName: 'Order for Comparison',
+      field: 'compOrder',
+      cellRenderer: SelectRenderer,
+      cellRendererParams: (params) => ({
+        options:  getNumericalOptions(optionsLength, selectedBookings !== undefined ? selectedBookings.map(booking => booking.order) : []),
+        selectForComparison,
+        selectedBookings,
+        placeholder: '-',
+        inline: true,
+        className: 'mt-1 w-[112px]',
+        onChange: (value) => { 
+          selectForComparison({
+            order: parseInt(value),
+            BookingId: params.data.BookingId,
+            prodCode: params.data.prodCode,
+            prodName: params.data.prodName,
+            numPerfs: params.data.numPerfs
+          });
+        }
+      }),
+>>>>>>> Stashed changes
       width: 120,
       cellStyle: {
         textAlign: 'center',
@@ -108,6 +137,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
       },
     },
     {
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -126,6 +156,9 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
       field: 'salesBtn',
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+      field: 'salesBtn',
+>>>>>>> Stashed changes
       headerName: 'Sales Data',
       cellRenderer: SalesDataButtonRenderer,
       width: 108,
@@ -135,6 +168,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
       resizable: false
     },
   ];
+<<<<<<< Updated upstream
   
   export const salesColDefs = [
     {
@@ -165,10 +199,24 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
       cellStyle: {
+=======
+
+
+export const salesColDefs = (currencySymbol) => [
+  {
+    headerName: 'Week',
+    field: 'week',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: (params) => {
+      return {
+        ...getCellColor(params.data),
+>>>>>>> Stashed changes
         textAlign: 'center',
         overflow: 'visible',
-      },
+      }
     },
+<<<<<<< Updated upstream
     {
 <<<<<<< HEAD
       headerName: 'Week of',
@@ -191,77 +239,89 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
         textAlign: 'center',
         overflow: 'visible',
       },
+=======
+  },
+  {
+    headerName: 'Date',
+    field: 'weekOf',
+    cellRenderer: DateColumnRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+>>>>>>> Stashed changes
     },
-    {
-      headerName: 'Seat Sold No.',
-      field: 'seatsSold',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Seat Sold No.',
+    field: 'seatsSold',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
-    {
-      headerName: 'Seats Sold %',
-      field: 'seatsSalePercentage',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Seats Sold ' + currencySymbol,
+    field: 'seatsSaleChange',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
-    {
-      headerName: 'Reserved No',
-      field: 'reserved',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Reserved No',
+    field: 'reserved',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
-    {
-      headerName: 'Reserved %',
-      field: 'reservedPercentage',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Reserved %',
+    field: 'reservedPercentage',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
-    {
-      headerName: 'Total Value',
-      field: 'totalValue',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Total Value',
+    field: 'totalValue',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
-    {
-      headerName: 'Value Change',
-      field: 'valueChange',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Value Change',
+    field: 'valueChange',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
-    {
-      headerName: 'Seats Change',
-      field: 'seatsChange',
-      cellRenderer: DefaultCellRenderer,
-      width: 120,
-      cellStyle: {
-        textAlign: 'center',
-        overflow: 'visible',
-      },
+  },
+  {
+    headerName: 'Seats Change',
+    field: 'seatsChange',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
     },
+<<<<<<< Updated upstream
     {
       headerName: 'Total Holds',
       field: 'totalHolds',
@@ -285,5 +345,18 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
       resizable: false
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+  },
+  {
+    headerName: 'Total Holds',
+    field: 'totalHolds',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+>>>>>>> Stashed changes
     },
-  ]
+    resizable: false
+  },
+]

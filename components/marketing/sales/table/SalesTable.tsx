@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import Table from 'components/core-ui-lib/Table';
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -21,10 +22,14 @@ import useAxios from 'hooks/useAxios';
 =======
 import { tileColors } from 'config/global';
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+import { tileColors } from 'config/global';
+>>>>>>> Stashed changes
 import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
 import { gridOptions, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import { useRecoilValue } from 'recoil';
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -36,8 +41,11 @@ import { venueState } from 'state/booking/venueState';
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
+import { BookingSelectionView } from 'pages/api/marketing/archivedSales/bookingSelection';
 
 type Booking = {
   BookingId: number;
@@ -47,6 +55,7 @@ type Booking = {
   numPerfs: number;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -64,11 +73,16 @@ export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComp
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
 
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
+
+>>>>>>> Stashed changes
 type Submit = {
   data: any;
   type: SalesTableVariant;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -85,11 +99,15 @@ type Submit = {
 =======
 
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+
+>>>>>>> Stashed changes
 export type ProdComp = {
   venueId: number;
   showCode: string;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -98,11 +116,14 @@ export type ProdComp = {
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 export type SalesSubmit = {
   type: SalesTableVariant,
   data: any;
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -113,15 +134,18 @@ export type SalesSubmit = {
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
 interface SalesTableProps {
   module: string;
   containerWidth: string;
   containerHeight: string;
   variant: SalesTableVariant;
-  data?: Array<Booking> | number | ProdComp;
+  data?: Array<Booking> | number | ProdComp | Array<BookingSelectionView>;
   handleError?: () => void;
   primaryBtnTxt?: string;
   showPrimaryBtn?: boolean;
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -139,6 +163,9 @@ interface SalesTableProps {
 =======
   handlePrimaryBtnClick?: (data: Submit) => void;
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+  handlePrimaryBtnClick?: (data: Submit) => void;
+>>>>>>> Stashed changes
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
   handleSecondaryBtnClick?: () => void;
@@ -146,6 +173,7 @@ interface SalesTableProps {
   backBtnTxt?: string;
   showBackBtn?: boolean;
   handleBackBtnClick?: () => void;
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -157,12 +185,17 @@ interface SalesTableProps {
   handleCellClick?: (e: any) => void;
   handleCellValChange?: (e: any) => void;
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+  handleCellClick?: (e: any) => void;
+  handleCellValChange?: (e: any) => void;
+>>>>>>> Stashed changes
   cellRenderParams?: any;
 }
 
 
 export default function SalesTable({
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 =======
@@ -186,17 +219,22 @@ export default function SalesTable({
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
   module = 'bookings',
   containerHeight,
   containerWidth,
   variant,
   data,
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
   primaryBtnTxt,
   showPrimaryBtn = false,
   handlePrimaryBtnClick,
@@ -217,6 +255,7 @@ export default function SalesTable({
   const [rowData, setRowData] = useState([]);
   const [response, setResponse] = useState<Submit>({ type: '', data: [] });
   const { productions } = useRecoilValue(productionJumpState);
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 =======
@@ -269,8 +308,15 @@ export default function SalesTable({
 <<<<<<< HEAD
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
-  const salesSnapshot = (data: any) => {
+=======
+  const [currencySymbol, setCurrency] = useState("£");
+  const [currAvail, setCurrAvail] = useState(false);
+ 
+  // set table style props based on module
+  const styleProps = { headerColor: tileColors[module] }
 
+>>>>>>> Stashed changes
+  const salesSnapshot = (data: any) => {
     let tempRowData = [];
 
     data.forEach(week => {
@@ -278,21 +324,27 @@ export default function SalesTable({
         week: week.week,
         weekOf: formatInputDate(week.weekOf),
         seatsSold: week.seatsSold,
-        seatsSalePercentage: (week.seatsSalePercentage).toFixed(2) + '%',
+        seatsSaleChange:  week.venueCurrencySymbol + parseFloat(week.seatsSaleChange).toFixed(2),
         reserved: week.reserved === '' ? 0 : week.reserved,
         reservedPercentage: week.reserved === '' ? '0.00%' : ((parseInt(week.reserved) / week.capacity) * 100).toFixed(2) + '%',
         totalValue: week.venueCurrencySymbol + (week.totalValue).toFixed(2),
-        valueChange: week.venueCurrencySymbol + (parseInt(week.valueChange)).toFixed(2),
+        valueChange: week.venueCurrencySymbol + parseFloat(week.valueChange).toFixed(2),
         seatsChange: week.seatsChange,
         totalHolds: week.totalHolds === null ? 0 : week.totalHolds,
         isSingleSeats: week.isSingleSeats,
         isNotOnSale: week.isNotOnSale,
         isBrochureReleased: week.isBrochureReleased
-      })
+      });
+
+      // temp currency get until the proper currency access function can be found
+      if(!currAvail && week.venueCurrencySymbol !== ''){
+        setCurrAvail(true);
+        setCurrency(week.venueCurrencySymbol);
+      }
     });
 
     setRowData(tempRowData);
-    setColumnDefs(salesColDefs);
+    setColumnDefs(salesColDefs(currencySymbol));
   }
 
 
@@ -300,75 +352,75 @@ export default function SalesTable({
     let tempRowData = [];
     let tempColDef = [];
 
-const weekColumn = {
-  headerName: 'Wk', // Empty header name
-  field: 'week',
-  cellRenderer: DefaultCellRenderer,
-  suppressMovable: true,
-  headerClass: 'custom-pinned-header', // Make header transparent
-  pinned: 'left',
-  lockPinned: true,
-  width: 80,
-  resizable: false
-};
+    const weekColumn = {
+      headerName: 'Wk', // Empty header name
+      field: 'week',
+      cellRenderer: DefaultCellRenderer,
+      suppressMovable: true,
+      headerClass: 'custom-pinned-header', // Make header transparent
+      pinned: 'left',
+      lockPinned: true,
+      width: 80,
+      resizable: false
+    };
 
-// Add the 'Week' column as a pinned column on the left
-tempColDef.push(weekColumn);
+    // Add the 'Week' column as a pinned column on the left
+    tempColDef.push(weekColumn);
 
-// Prepare the rest of the column definitions based on bookings
-bookings.forEach((booking, index) => {
-  let borderClasses = 'border-b-2 border-white';
-  if (index < bookings.length - 1) {
-    borderClasses += ' border-r-4';
-  }
+    // Prepare the rest of the column definitions based on bookings
+    bookings.forEach((booking, index) => {
+      let borderClasses = 'border-b-2 border-white';
+      if (index < bookings.length - 1) {
+        borderClasses += ' border-r-4';
+      }
 
-  // Define the main column group for each booking
-  let mainColGroup = {
-    headerName: booking.prodName + ' ' + booking.prodCode,
-    headerGroupComponent: 'AGGridHeaderGroupComponent',
-    headerClass: 'justify-center font-bold text-base ' + borderClasses,
-    children: [
-      {
-        headerName: 'No. of Performances: ' + booking.numPerfs,
+      // Define the main column group for each booking
+      let mainColGroup = {
+        headerName: booking.prodName + ' ' + booking.prodCode,
+        headerGroupComponent: 'AGGridHeaderGroupComponent',
         headerClass: 'justify-center font-bold text-base ' + borderClasses,
-        marryChildren: true,
         children: [
           {
-            headerName: 'Date',
-            field: 'weekOf',
-            cellRenderer: DefaultCellRenderer,
-            suppressMovable: true,
-            headerClass: 'border-r-[1px] border-white',
-            width: 100,
-            resizable: false
-          },
-          {
-            headerName: 'Seats Sold',
-            field: booking.prodCode + '_seats',
-            cellRenderer: DefaultCellRenderer,
-            suppressMovable: true,
-            headerClass: 'border-r-[1px] border-white text-center',
-            width: 80,
-            resizable: false
-          },
-          {
-            headerName: 'Sales Value',
-            field: booking.prodCode + '_saleValue',
-            cellRenderer: DefaultCellRenderer,
-            suppressMovable: true,
-            headerClass: 'text-center' + (index < bookings.length - 1 ? ' border-r-4 border-white' : ''),
-            width: 120,
-            resizable: false
+            headerName: 'No. of Performances: ' + booking.numPerfs,
+            headerClass: 'justify-center font-bold text-base ' + borderClasses,
+            marryChildren: true,
+            children: [
+              {
+                headerName: 'Date',
+                field: 'weekOf',
+                cellRenderer: DefaultCellRenderer,
+                suppressMovable: true,
+                headerClass: 'border-r-[1px] border-white',
+                width: 100,
+                resizable: false
+              },
+              {
+                headerName: 'Seats Sold',
+                field: booking.prodCode + '_seats',
+                cellRenderer: DefaultCellRenderer,
+                suppressMovable: true,
+                headerClass: 'border-r-[1px] border-white text-center',
+                width: 80,
+                resizable: false
+              },
+              {
+                headerName: 'Sales Value',
+                field: booking.prodCode + '_saleValue',
+                cellRenderer: DefaultCellRenderer,
+                suppressMovable: true,
+                headerClass: 'text-center' + (index < bookings.length - 1 ? ' border-r-4 border-white' : ''),
+                width: 120,
+                resizable: false
+              },
+            ],
           },
         ],
-      },
-    ],
-  };
+      };
 
-  // Push the main column group onto the tempColDef array
-  tempColDef.push(mainColGroup);
-});
-  
+      // Push the main column group onto the tempColDef array
+      tempColDef.push(mainColGroup);
+    });
+
     // Processing the row data
     data.forEach(sale => {
       tempRowData.push({
@@ -386,19 +438,18 @@ bookings.forEach((booking, index) => {
         })(sale.data)
       });
     });
-  
+
     // Set the columnDefs and rowData in your state or whatever you use to update the AG Grid
     setColumnDefs(tempColDef);
     setRowData(tempRowData);
   }
-  
+
 
   const productionComparision = (data: any) => {
 
     const processedBookings = [];
     data.forEach(booking => {
       const production = productions.find(production => production.Id === booking.ProductionId);
-
       processedBookings.push({
         BookingId: booking.BookingId,
         prodName: production.ShowCode + production.Code + ' ' + production.ShowName,
@@ -420,15 +471,13 @@ bookings.forEach((booking, index) => {
   }, [variant]);
 
   const exec = (variant: string, data) => {
-
-   
-
     switch (variant) {
       case 'salesComparison':
         salesComparison(data.tableData, data.bookingIds)
         break;
 
       case 'salesSnapshot':
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 =======
@@ -589,10 +638,13 @@ bookings.forEach((booking, index) => {
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -612,17 +664,14 @@ bookings.forEach((booking, index) => {
 =======
         console.log({ function: 'prodComparision', data: data })
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> Stashed changes
         productionComparision(data);
         break;
     }
-=======
-    setRowData(processedBookings);
-    setColumnDefs(prodComparisionColDefs(data.length, handleCellValChange));
-    setResponse({ type: 'prodComparision', data: [] })
-
->>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
   }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -633,6 +682,8 @@ bookings.forEach((booking, index) => {
   }
 
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes
   return (
     <div className={classNames(containerWidth, containerHeight)}>
       <div>
@@ -690,6 +741,7 @@ bookings.forEach((booking, index) => {
   );
 }
 
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 =======
 =======
@@ -789,3 +841,5 @@ return (
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
 =======
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+>>>>>>> Stashed changes

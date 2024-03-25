@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatInputDate from 'utils/dateInputFormat';
+import formatFormDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -181,6 +181,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ShowDate: c.ShowDate,
         VenueContractStatus: c.VenueContractStatus,
         DealType: c.DealType,
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -194,6 +195,9 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
 =======
         ContractSignedDate: formatInputDate(c.ContractSignedDate),
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+        ContractSignedDate: formatFormDate(c.ContractSignedDate),
+>>>>>>> Stashed changes
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -203,6 +207,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.ContractNotes,
         GP: c.GP,
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -220,6 +225,10 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ContractReturnDate: formatInputDate(c.ContractReturnDate),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
 >>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
+=======
+        ContractReturnDate: formatFormDate(c.ContractReturnDate),
+        ContractReceivedBackDate: formatFormDate(c.ContractReceivedBackDate),
+>>>>>>> Stashed changes
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {
