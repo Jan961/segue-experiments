@@ -1,22 +1,31 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Layout from 'components/Layout';
 import VenueFilter from 'components/venues/VenueFilter';
 import VenueTable from 'components/venues/VenueTable';
+import AddEditVenueModal from 'components/venues/modal/AddEditVenueModal';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useRecoilValue } from 'recoil';
 import { getUniqueVenueCountrylist, getUniqueVenueTownlist } from 'services/venueService';
-import { filterVenueState } from 'state/booking/filterVenueState';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import { InitialState } from 'lib/recoil';
 import axios from 'axios';
+import { defaultVenueFilters } from 'config/bookings';
+import { debounce } from 'radash';
 
+export type VenueFilters = {
+  venueId: string;
+  town: string;
+  country: string;
+  productionId: string;
+  search: string;
+};
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { venueTownList = [], venueCountryList = [] } = props;
+  const [filters, setFilters] = useState<VenueFilters>(defaultVenueFilters);
   const [venues, setVenues] = useState([]);
-  const [filterVenues, setFilterVenues] = useState([]);
-  const venuesFilter = useRecoilValue(filterVenueState);
+  const { productionId, town, country, search } = filters;
+  const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
   const countryOptions = useMemo(
     () => venueCountryList.map(({ Country }) => ({ text: Country, value: Country })),
@@ -24,56 +33,53 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   );
 
   const fetchVenues = useCallback(async (payload) => {
-    const { data } = await axios.post('/api/venue/list', {
-      ...payload,
-    });
-
-    const venusList = data?.map(({ Code, Id, Name, Seats, VenueAddress }) => ({
-      Code,
-      Id,
-      Name,
-      Seats,
-      Town: VenueAddress?.[0]?.Town,
-    }));
-    setVenues(venusList);
-    setFilterVenues(venusList);
+    setVenues(null);
+    try {
+      const { data } = await axios.post('/api/venue/list', {
+        ...payload,
+      });
+      const venusList = data?.map(({ Code, Id, Name, Seats, VenueAddress }) => ({
+        Code,
+        Id,
+        Name,
+        Seats,
+        Town: VenueAddress?.[0]?.Town,
+      }));
+      setVenues(venusList);
+    } catch (err) {
+      setVenues([]);
+    }
   }, []);
 
   useEffect(() => {
-    const { productionId, town, country } = venuesFilter;
-    if (productionId || town || country) {
-      fetchVenues({ productionId, town, country });
+    if (productionId || town || country || search) {
+      filterVenues({ productionId, town, country, searchQuery: search });
     } else {
-      setFilterVenues([]);
+      setVenues([]);
     }
-  }, [venuesFilter]);
+  }, [productionId, town, country, search]);
 
-  const handleSearchInputChange = (e) => {
-    const serchText = e.target.value;
-
-    if (serchText === '') {
-      setFilterVenues(venues);
-    } else {
-      const updatedVenues = venues.filter(({ Name }) => {
-        return Name.includes(serchText);
-      });
-
-      setFilterVenues(updatedVenues);
-    }
+  const updateFilters = (change) => {
+    setFilters((prevFilters) => ({ ...prevFilters, ...change }));
   };
 
   return (
-    <Layout title="Venues | Segue" flush>
-      <div className="mb-8">
-        <VenueFilter
-          townOptions={townOptions}
-          countryOptions={countryOptions}
-          onSearchInputChange={handleSearchInputChange}
-        />
-      </div>
-
-      <VenueTable items={filterVenues} />
-    </Layout>
+    <>
+      <Layout title="Venues | Segue" flush>
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-8 ">
+            <VenueFilter
+              townOptions={townOptions}
+              countryOptions={countryOptions}
+              onFilterChange={updateFilters}
+              filters={filters}
+            />
+          </div>
+          <VenueTable items={venues} />
+        </div>
+      </Layout>
+      <AddEditVenueModal />
+    </>
   );
 }
 

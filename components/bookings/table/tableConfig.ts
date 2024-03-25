@@ -17,6 +17,7 @@ import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
+import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
 
 export const styleProps = { headerColor: tileColors.bookings };
@@ -358,5 +359,94 @@ export const venueColumnDefs = [
     width: 120,
     headerClass: 'text-center',
     resizable: false,
+  },
+];
+export const venueContractDefs = [
+  {
+    headerName: 'Role',
+    field: 'VenueRole',
+    cellRenderer: DefaultCellRenderer,
+    width: 135,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'First Name',
+    field: 'VenueFirstName',
+    editable: true,
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Last Name',
+    field: 'VenueLastName',
+    editable: true,
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Phone',
+    field: 'VenuePhone',
+    editable: true,
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: 'Email',
+    field: 'VenueEmail',
+    editable: true,
+    cellRenderer: DefaultCellRenderer,
+    flex: 1,
+    headerClass: 'text-center',
+  },
+
+  {
+    headerName: '',
+    field: 'delete',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconName: 'delete',
+      tooltipPosition: 'left',
+      popover: true,
+    },
+    width: 40,
+    headerClass: 'text-center',
+    resizable: false,
+  },
+];
+
+export const barredVenues = [
+  {
+    headerName: 'Barred Venues',
+    field: 'venue',
+    // this uses copy of selectBarredVenuesRenderer
+    cellRenderer: SelectBarredVenuesRenderer,
+    // cellRendererParams: {
+    //   venueOptions,
+    // },
+    flex: 1,
+    cellStyle: {
+      overflow: 'visible',
+    },
+  },
+
+  {
+    headerName: '',
+    field: 'info',
+    cellRenderer: IconRenderer,
+    cellRendererParams: {
+      iconName: 'delete',
+      tooltipPosition: 'left',
+      popover: true,
+    },
+    width: 40,
+    headerClass: 'text-center',
+    resizable: false,
+    cellStyle: {
+      overflow: 'visible',
+    },
   },
 ];

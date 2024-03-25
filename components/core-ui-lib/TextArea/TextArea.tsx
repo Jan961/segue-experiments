@@ -6,12 +6,12 @@ export interface TextInputProps {
   disabled?: boolean;
   className?: string;
   onChange?: (e: any) => void;
-  placeHolder?: string;
+  placeholder?: string;
   onClick?: (e: any) => void;
 }
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
-  ({ id, value = '', className = '', disabled = false, onChange, placeHolder = '', onClick }, ref) => {
+  ({ id, value = '', className = '', disabled = false, onChange, placeholder = '', onClick }, ref) => {
     const baseClass = `block min-w-fit h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md !border-primary-border outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
     const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
@@ -23,7 +23,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
           className={`${baseClass} ${disabledClass} ${className}`}
           disabled={disabled}
           onChange={onChange}
-          placeholder={placeHolder}
+          placeholder={placeholder}
           value={value || ''}
         />
       </div>
