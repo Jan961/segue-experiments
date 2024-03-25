@@ -77,7 +77,7 @@ const Form = ({ onSave }: FormProps) => {
         <div className="col-span-4">
           <TextInput
             className="w-full"
-            placeHolder="Enter Miles"
+            placeholder="Enter Miles"
             id="minFromLastVenue"
             value={minFromLastVenue as string}
             onChange={handleOnChange}
@@ -86,7 +86,7 @@ const Form = ({ onSave }: FormProps) => {
         <div className="col-span-4">
           <TextInput
             className="w-full"
-            placeHolder="Enter Miles"
+            placeholder="Enter Miles"
             id="maxFromLastVenue"
             value={maxFromLastVenue as string}
             onChange={handleOnChange}
@@ -105,7 +105,7 @@ const Form = ({ onSave }: FormProps) => {
         <div className="col-span-4">
           <TextInput
             className="w-full"
-            placeHolder="Enter Miles"
+            placeholder="Enter Miles"
             id="minToNextVenue"
             value={minToNextVenue as string}
             onChange={handleOnChange}
@@ -114,7 +114,7 @@ const Form = ({ onSave }: FormProps) => {
         <div className="col-span-4">
           <TextInput
             className="w-full"
-            placeHolder="Enter Miles"
+            placeholder="Enter Miles"
             id="maxToNextVenue"
             value={maxToNextVenue as string}
             onChange={handleOnChange}
@@ -133,7 +133,7 @@ const Form = ({ onSave }: FormProps) => {
         <div className="col-span-4">
           <TextInput
             className="w-full"
-            placeHolder="Enter Seats"
+            placeholder="Enter Seats"
             id="minSeats"
             value={minSeats as string}
             onChange={handleOnChange}

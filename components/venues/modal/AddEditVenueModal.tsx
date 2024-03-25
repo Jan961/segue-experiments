@@ -206,7 +206,7 @@ export default function AddEditVenueModal() {
   };
   return (
     <>
-      <PopupModal title="Add / Edit Venue" show panelClass="relative" titleClass="text-xl text-primary-navy ">
+      <PopupModal title="Add / Edit Venue" show={false} panelClass="relative" titleClass="text-xl text-primary-navy ">
         <form className="w-[1026px]">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
           <div className="grid grid-cols-2 gap-5">
@@ -218,7 +218,7 @@ export default function AddEditVenueModal() {
                 body="Venue Code is the first three letters of the town followed by the first three letters of the venue. eg. King's Theatre, Glasgow would have the code GLAKIN."
               >
                 <TextInput
-                  placeHolder="Enter Venue Code"
+                  placeholder="Enter Venue Code"
                   type=""
                   id="venueCode"
                   className="w-[364px]"
@@ -238,14 +238,14 @@ export default function AddEditVenueModal() {
               ]}
               onChange={(value) => handleInputChange('venueStatus', value)}
               value={formData.venueStatus}
-              placeHolder="<Venue Status DROPDOWN>"
+              placeholder="<Venue Status DROPDOWN>"
               className="w-[430px] font-bold place-self-end "
             />
 
             <label htmlFor="" className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Venue Name</p>
               <TextInput
-                placeHolder="Enter Venue Name"
+                placeholder="Enter Venue Name"
                 type=""
                 className="w-[364px]"
                 value={formData.venueName}
@@ -271,7 +271,7 @@ export default function AddEditVenueModal() {
             <label className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Venue Family</p>
               <Select
-                placeHolder="Venue Family Dropdown"
+                placeholder="Venue Family Dropdown"
                 className="w-[364px] font-bold"
                 onChange={function (value: string | number): void {
                   console.log('value :>> ', value);
@@ -284,7 +284,7 @@ export default function AddEditVenueModal() {
               <p className="text-primary-input-text">Currency</p>
               <Select
                 className="mr-[175px] font-bold"
-                placeHolder="Currency Dropdown"
+                placeholder="Currency Dropdown"
                 onChange={function (value: string | number): void {
                   console.log('value :>> ', value);
                   throw new Error('Function not implemented.');
@@ -294,11 +294,11 @@ export default function AddEditVenueModal() {
             </label>
             <label htmlFor="" className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Capacity</p>
-              <TextInput placeHolder="Enter Capacity" type="" className="w-[364px]" />
+              <TextInput placeholder="Enter Capacity" type="" className="w-[364px]" />
             </label>
             <label htmlFor="" className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Town Population</p>
-              <TextInput placeHolder="Enter Town Population" type="" className="w-[364px]" />
+              <TextInput placeholder="Enter Town Population" type="" className="w-[364px]" />
             </label>
             <label
               htmlFor=""
@@ -306,7 +306,7 @@ export default function AddEditVenueModal() {
             >
               <p className="text-primary-input-text">Website</p>
               <TextInput
-                placeHolder="Enter Venue Website"
+                placeholder="Enter Venue Website"
                 type=""
                 className="w-full justify-between"
                 inputClassName="w-full"
@@ -317,7 +317,7 @@ export default function AddEditVenueModal() {
               className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
             >
               <p className="text-primary-input-text">Notes</p>
-              <TextArea placeHolder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+              <TextArea placeholder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
             </label>
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
@@ -327,7 +327,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className=" text-primary-input-text">Address 1</p>
                 <TextInput
-                  placeHolder="Enter Address 1"
+                  placeholder="Enter Address 1"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -336,7 +336,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Address 2</p>
                 <TextInput
-                  placeHolder="Enter Address 2"
+                  placeholder="Enter Address 2"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -345,7 +345,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Address 3</p>
                 <TextInput
-                  placeHolder="Enter Address 3"
+                  placeholder="Enter Address 3"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -354,7 +354,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Town</p>
                 <TextInput
-                  placeHolder="Enter Town"
+                  placeholder="Enter Town"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -363,7 +363,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Postcode</p>
                 <TextInput
-                  placeHolder="Enter Postcode"
+                  placeholder="Enter Postcode"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -373,7 +373,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Country</p>
                 <TextInput
-                  placeHolder="Enter Country"
+                  placeholder="Enter Country"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -382,7 +382,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">What3Words Stage Door</p>
                 <TextInput
-                  placeHolder="what.three.words"
+                  placeholder="what.three.words"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -391,7 +391,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">What3Words Loading</p>
                 <TextInput
-                  placeHolder="what.three.words"
+                  placeholder="what.three.words"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -403,7 +403,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Address 1</p>
                 <TextInput
-                  placeHolder="Enter Address 1"
+                  placeholder="Enter Address 1"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -412,7 +412,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Address 2</p>
                 <TextInput
-                  placeHolder="Enter Address 2"
+                  placeholder="Enter Address 2"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -421,7 +421,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Address 3</p>
                 <TextInput
-                  placeHolder="Enter Address 3"
+                  placeholder="Enter Address 3"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -430,7 +430,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Town</p>
                 <TextInput
-                  placeHolder="Enter Town"
+                  placeholder="Enter Town"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -439,7 +439,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Postcode</p>
                 <TextInput
-                  placeHolder="Enter Postcode"
+                  placeholder="Enter Postcode"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -449,7 +449,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Country</p>
                 <TextInput
-                  placeHolder="Enter Country"
+                  placeholder="Enter Country"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -491,7 +491,7 @@ export default function AddEditVenueModal() {
               <label htmlFor="" className="flex flex-row gap-10 justify-between  w-[700px]">
                 <p className="text-primary-input-text">Tech Specs URL</p>
                 <TextInput
-                  placeHolder="Enter Tech Specs URL"
+                  placeholder="Enter Tech Specs URL"
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
@@ -504,7 +504,7 @@ export default function AddEditVenueModal() {
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Tech LX Desk</p>
                   <TextInput
-                    placeHolder="Enter Tech LX Desk"
+                    placeholder="Enter Tech LX Desk"
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
@@ -512,12 +512,12 @@ export default function AddEditVenueModal() {
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">LX Notes</p>
-                  <TextArea placeHolder="Notes Field" className="!w-[380px] max-h-40 min-h-[50px]  justify-between" />
+                  <TextArea placeholder="Notes Field" className="!w-[380px] max-h-40 min-h-[50px]  justify-between" />
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Stage Size</p>
                   <TextInput
-                    placeHolder="Enter Stage Size"
+                    placeholder="Enter Stage Size"
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
@@ -528,7 +528,7 @@ export default function AddEditVenueModal() {
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Sound Desk</p>
                   <TextInput
-                    placeHolder="Enter Sound Desk"
+                    placeholder="Enter Sound Desk"
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
@@ -536,12 +536,12 @@ export default function AddEditVenueModal() {
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">LX Notes</p>
-                  <TextArea placeHolder="Notes Field" className="!w-[380px] max-h-40 min-h-[50px]  justify-between" />
+                  <TextArea placeholder="Notes Field" className="!w-[380px] max-h-40 min-h-[50px]  justify-between" />
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Grid Height</p>
                   <TextInput
-                    placeHolder="Enter Grid Height"
+                    placeholder="Enter Grid Height"
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
@@ -550,7 +550,7 @@ export default function AddEditVenueModal() {
               </div>
               <label className="grid grid-cols-[90px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Flags</p>
-                <TextArea placeHolder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+                <TextArea placeholder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
               </label>
             </div>
             <div className="pt-7 ">
@@ -558,7 +558,7 @@ export default function AddEditVenueModal() {
               <label className="grid grid-cols-[95px_minmax(100px,350px)]  gap-10   w-full">
                 <p className="text-primary-input-text">Barring Clause</p>
                 <TextArea
-                  placeHolder="Enter Barring Clause"
+                  placeholder="Enter Barring Clause"
                   className="w-full max-h-32 min-h-[50px]  justify-between"
                 />
               </label>
@@ -570,7 +570,7 @@ export default function AddEditVenueModal() {
                     className="grid grid-cols-[90px_minmax(200px,30px)] gap-10 justify-items-start  w-full"
                   >
                     <p className="text-primary-input-text">Pre Show</p>
-                    <TextInput placeHolder="Enter Pre Show Weeks" type="" className="w-full justify-between" />
+                    <TextInput placeholder="Enter Pre Show Weeks" type="" className="w-full justify-between" />
                   </label>
                   <label
                     htmlFor=""
@@ -578,7 +578,7 @@ export default function AddEditVenueModal() {
                   >
                     <p className="text-primary-input-text">Post Show</p>
                     <TextInput
-                      placeHolder="Enter Post Show Weeks"
+                      placeholder="Enter Post Show Weeks"
                       type=""
                       className="w-full justify-between"
                       // inputClassName="w-full"
@@ -587,7 +587,7 @@ export default function AddEditVenueModal() {
                   <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                     <p className="text-primary-input-text">Barring Miles</p>
                     <TextInput
-                      placeHolder="Enter Barring Miles"
+                      placeholder="Enter Barring Miles"
                       type=""
                       className="w-full justify-between"
                       inputClassName="w-full"
@@ -605,7 +605,7 @@ export default function AddEditVenueModal() {
             </div>
             <div className="pt-7">
               <h2 className="text-xl text-primary-navy font-bold  pb-2">Confidential Warning Notes</h2>
-              <TextArea placeHolder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+              <TextArea placeholder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
             </div>
             <div className="flex gap-4 pt-4 float-right">
               <Button variant="secondary" text="Cancel" className="w-32" />

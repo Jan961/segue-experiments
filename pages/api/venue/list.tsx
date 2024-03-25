@@ -2,8 +2,31 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { country, town, productionId } = req.body;
+  const { country, town, productionId, searchQuery } = req.body;
   const queryConditions: any = {};
+  if (searchQuery) {
+    queryConditions.OR = [
+      {
+        Name: {
+          contains: searchQuery,
+        },
+      },
+      {
+        Code: {
+          contains: searchQuery,
+        },
+      },
+      {
+        VenueAddress: {
+          some: {
+            Town: {
+              contains: searchQuery,
+            },
+          },
+        },
+      },
+    ];
+  }
   if (country) {
     queryConditions.VenueAddress = {
       some: {
@@ -34,16 +57,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const venues = await prisma.venue.findMany({
       where: queryConditions,
       include: {
-        VenueAddress: true, // Adjust according to your needs
+        VenueAddress: true,
         Booking: {
           include: {
-            DateBlock: true, // Adjust according to your needs
+            DateBlock: true,
           },
         },
       },
     });
     res.status(200).json(venues);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Unable to fetch venues' });
   }
 }

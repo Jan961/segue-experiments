@@ -63,7 +63,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             <TextInput
               className="w-24 placeholder-primary"
               id="barDistance"
-              placeHolder="Enter Miles"
+              placeholder="Enter Miles"
               type="number"
               onChange={(e) => handleOnChange({ barDistance: e.target.value })}
               value={barDistance}
@@ -86,7 +86,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             <TextInput
               id="Seats"
               className="w-24 placeholder-primary"
-              placeHolder="Enter Seats"
+              placeholder="Enter Seats"
               type="number"
               onChange={(e) => handleOnChange({ seats: e.target.value })}
               value={seats}

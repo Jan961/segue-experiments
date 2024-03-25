@@ -9,7 +9,7 @@ export interface TextInputProps {
   className?: string;
   inputClassName?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeHolder?: string;
+  placeholder?: string;
   onClick?: (e: any) => void;
   iconName?: IconName;
   error?: string;
@@ -26,7 +26,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       className = '',
       disabled = false,
       onChange,
-      placeHolder = '',
+      placeholder = '',
       onClick,
       iconName,
       error,
@@ -49,7 +49,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           type="text"
           className={classNames(baseClass, inputClass, `${iconName ? 'pr-6' : ''}`, className)}
           onChange={onChange}
-          placeholder={placeHolder}
+          placeholder={placeholder}
           disabled={disabled}
           value={value || ''}
           {...rest}
