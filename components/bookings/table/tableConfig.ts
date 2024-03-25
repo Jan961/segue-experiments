@@ -19,6 +19,7 @@ import IconRenderer from './IconRenderer';
 import TextInputRenderer from './TextInputRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
+import { formatMinutes } from 'utils/booking';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -72,6 +73,52 @@ export const columnDefs = [
       justifyContent: 'center',
       alignItems: 'center',
     },
+  },
+];
+
+export const previewColumnDefs = [
+  {
+    headerName: 'Production',
+    field: 'production',
+    cellRenderer: DefaultCellRenderer,
+    width: 118,
+  },
+  {
+    headerName: 'Date',
+    field: 'date',
+    cellRenderer: DateColumnRenderer,
+    width: 123,
+    minWidth: 123,
+  },
+  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 60 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
+  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
+  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
+  {
+    headerName: 'Booking Status',
+    field: 'bookingStatus',
+    cellRenderer: DefaultCellRenderer,
+    resizable: true,
+    width: 105,
+  },
+  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 100 },
+  { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
+  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
+  {
+    headerName: 'Miles',
+    field: 'miles',
+    cellRenderer: DefaultCellRenderer,
+    width: 80,
+  },
+  {
+    headerName: 'Travel Time',
+    field: 'travelTime',
+    valueFormatter: (params) => formatMinutes(Number(params.value)),
+    width: 90,
+    cellStyle: {
+      paddingLeft: '0.5rem',
+    },
+    resizable: false,
   },
 ];
 

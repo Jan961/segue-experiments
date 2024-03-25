@@ -5,7 +5,7 @@ import Select from 'components/core-ui-lib/Select';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
-import { TForm } from '../reducer';
+import { BookingItem, TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
 import { steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
@@ -19,7 +19,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
-import { dateToSimple } from 'services/dateService';
+import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
 
 type AddBookingProps = {
   formData: TForm;
@@ -30,12 +30,14 @@ type AddBookingProps = {
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
   updateModalTitle: (title: string) => void;
   onChange: (change: Partial<TForm>) => void;
+  onSubmit: (booking: Partial<BookingItem>[]) => void;
   onClose: () => void;
 };
 
 const NewBookingView = ({
   onClose,
   onChange,
+  onSubmit,
   formData,
   productionCode,
   dayTypeOptions,
@@ -104,18 +106,34 @@ const NewBookingView = ({
       }
     });
   };
+
   const handleOnSubmit = async (e) => {
     e.preventDefault();
   };
+
   const onModalClose = () => {
     setError('');
     setStage(0);
     onClose();
   };
+
   const goToGapSuggestion = () => {
     goToStep(steps.indexOf('Venue Gap Suggestions'));
   };
-  const onCheckMileage = () => {
+
+  const createBookingsForDateRange = () => {
+    const dates = getArrayOfDatesBetween(fromDate, toDate);
+    const bookings = dates.map((d) => ({
+      date: formattedDateWithWeekDay(d, 'Short'),
+      dateAsISOString: d,
+      venue: venueId,
+      bookingStatus: 'U',
+    }));
+    onSubmit(bookings);
+  };
+
+  const handleCheckMileageClick = () => {
+    createBookingsForDateRange();
     goToStep(steps.indexOf('Check Mileage'));
   };
   return (
@@ -222,7 +240,7 @@ const NewBookingView = ({
           })}
         >
           <Button
-            onClick={onCheckMileage}
+            onClick={handleCheckMileageClick}
             disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
             className="px-6"
             text={'Check Mileage'}
