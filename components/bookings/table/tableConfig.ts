@@ -28,12 +28,6 @@ const milesCellStyle = ({ value, data }) => ({
   color: value === -1 ? '#FFBE43' : '#617293',
   fontStyle: value === -1 ? 'italic' : 'normal',
 });
-const travelTimeCellStyle = ({ value, data }) => ({
-  paddingLeft: '0.5rem',
-  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : '#FFF',
-  color: value === -1 ? '#FFBE43' : '#617293',
-  fontStyle: value === -1 ? 'italic' : 'normal',
-});
 
 export const columnDefs = [
   {
@@ -75,7 +69,7 @@ export const columnDefs = [
     field: 'travelTime',
     width: 90,
     valueFormatter: travelTimeFormatter,
-    cellStyle: travelTimeCellStyle,
+    cellStyle: milesCellStyle,
   },
   {
     headerName: '',
@@ -138,7 +132,7 @@ export const previewColumnDefs = [
     field: 'travelTime',
     valueFormatter: travelTimeFormatter,
     width: 90,
-    cellStyle: travelTimeCellStyle,
+    cellStyle: milesCellStyle,
     resizable: false,
   },
 ];

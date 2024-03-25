@@ -67,7 +67,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       data: { Id: productionItem.Id, Notes: value },
     })
       .then((data: any) => {
-        const updatedBooking = { ...bookingDict[data.Id], Notes: data.Notes };
+        const updatedBooking = { ...bookingDict[data.Id], ...data };
         const replacement = { ...bookingDict, [data.Id]: updatedBooking };
         setBookingDict(replacement);
       })
