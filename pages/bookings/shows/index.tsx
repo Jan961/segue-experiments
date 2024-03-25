@@ -21,16 +21,16 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 
   const unArchivedList = useMemo(() => {
     return showsList.filter((item) => !item.IsArchived);
-  }, [showsList]);
+  }, [showsList, isArchived]);
 
   const archivedList = useMemo(() => {
     return showsList.filter((item) => item.IsArchived);
-  }, [showsList]);
+  }, [showsList, isArchived]);
 
   const rowsData = useMemo(() => {
     if (isArchived) return [...unArchivedList, ...archivedList];
     return [...unArchivedList];
-  }, [unArchivedList, archivedList]);
+  }, [unArchivedList, archivedList, isArchived]);
 
   const addNewRow = () => {
     setIsAddRow(!isAddRow);
