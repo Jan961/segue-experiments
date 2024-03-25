@@ -127,6 +127,9 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO> => {
   const [id1, id2] = stop.Ids;
 
+  if (!id1 || !id2 || id1 === id2) {
+    return { Date: stop.Date, option: [{ VenueId: id1, Mins: null, Miles: null }] };
+  }
   // Get the distances for all possible combinations (optimisation possible)
   const distance = await prisma.venueVenue.findMany({
     where: {

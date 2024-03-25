@@ -90,15 +90,14 @@ export default function PreviewBookingDetails({
           ({ venue, bookingStatus }) =>
             !!venue && typeof venue === 'number' && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
         );
+
         if (previousRowToUpdate) {
           rowsWithUniqueVenue.unshift(previousRowToUpdate);
         }
-
         if (nextRowToUpdate) {
           rowsWithUniqueVenue.push(nextRowToUpdate);
         }
 
-        console.log('rowsWithVenues', rowsWithVenues, previousDates, futureDates);
         const payload = rowsWithUniqueVenue.map((row) => {
           return { Date: row.dateTime || row.dateAsISOString, Ids: [row.venueId || row.item?.venue] };
         });
