@@ -33,3 +33,11 @@ export const bookingRow = {
   capacity: null,
   note: '',
 };
+
+export const defaultVenueFilters = {
+  venueId: null,
+  town: '',
+  country: '',
+  productionId: null,
+  search: '',
+};
