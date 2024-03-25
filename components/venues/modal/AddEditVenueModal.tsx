@@ -196,10 +196,9 @@ export default function AddEditVenueModal() {
     // Validate Venue Code
     if (!/^[A-Z]{6}$/.test(formData.venueCode)) {
       alert('Venue Code must be exactly 6 uppercase letters.');
-      return;
+      
     }
 
-    console.log('Form Data:', formData);
     // Add logic to save the formData to the database or perform any other actions
 
     // Close the modal or perform any other necessary actions
@@ -273,10 +272,7 @@ export default function AddEditVenueModal() {
               <Select
                 placeholder="Venue Family Dropdown"
                 className="w-[364px] font-bold"
-                onChange={function (value: string | number): void {
-                  console.log('value :>> ', value);
-                  throw new Error('Function not implemented.');
-                }}
+                onChange={console.log}
                 options={[]}
               />
             </label>
@@ -285,10 +281,7 @@ export default function AddEditVenueModal() {
               <Select
                 className="mr-[175px] font-bold"
                 placeholder="Currency Dropdown"
-                onChange={function (value: string | number): void {
-                  console.log('value :>> ', value);
-                  throw new Error('Function not implemented.');
-                }}
+                onChange={console.log}
                 options={[]}
               />
             </label>

@@ -17,8 +17,7 @@ import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
-import IconRendererVenue from './IconRendererVenue';
-import SelectBarredVenuesRenderer from './SelectVenueRenderer copy';
+import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
 
 export const styleProps = { headerColor: tileColors.bookings };
@@ -407,7 +406,7 @@ export const venueContractDefs = [
   {
     headerName: '',
     field: 'delete',
-    cellRenderer: IconRendererVenue,
+    cellRenderer: IconRenderer,
     cellRendererParams: {
       iconName: 'delete',
       tooltipPosition: 'left',
@@ -423,6 +422,7 @@ export const barredVenues = [
   {
     headerName: 'Barred Venues',
     field: 'venue',
+    // this uses copy of selectBarredVenuesRenderer
     cellRenderer: SelectBarredVenuesRenderer,
     // cellRendererParams: {
     //   venueOptions,
