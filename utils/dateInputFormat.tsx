@@ -14,6 +14,7 @@ function formatInputDate(dateString:string, delimiter:string) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   return `${year}/${month}/${day}`;
 =======
 =======
@@ -36,6 +37,9 @@ function formatInputDate(dateString:string, delimiter:string) {
 >>>>>>> 6849499 (merged main into VenueHistory and added final modal with column grouping - UI still needs tweaked and code needs tidied)
 =======
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
+=======
+  return `${year}/${month}/${day}`;
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 }
 
 export default formatInputDate;

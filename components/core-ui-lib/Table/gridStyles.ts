@@ -41,6 +41,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 .ag-header-group-cell {
@@ -51,6 +52,9 @@ const GridStyles = createGlobalStyle<StyleProps>`
 =======
 
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {

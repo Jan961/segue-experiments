@@ -14,6 +14,9 @@ export const gridOptions = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 const getCellColor = (data) => {
   if(data.isNotOnSale){
     return { backgroundColor: '#ED1111', color: 'white'}
@@ -27,6 +30,7 @@ const getCellColor = (data) => {
 }
 
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
+<<<<<<< HEAD
 =======
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) => [
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -36,12 +40,15 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) => [
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
     {
       headerName: 'Order for Comparison',
       field: 'compOrder',
       cellRenderer: SelectCompOrderRender,
       cellRendererParams: {
         optionsLength,
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -56,6 +63,10 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
         selectForComparison
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+        selectForComparison,
+        selectedBookings
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
       },
       width: 120,
       cellStyle: {
@@ -101,6 +112,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       field: 'salesBtn',
 =======
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -111,6 +123,9 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
       field: 'salesBtn',
 >>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
+=======
+      field: 'salesBtn',
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
       headerName: 'Sales Data',
       cellRenderer: SalesDataButtonRenderer,
       width: 108,
@@ -130,6 +145,9 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
       cellStyle: (params) => {
         return {  
           ...getCellColor(params.data),
@@ -140,6 +158,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
     },
     {
       headerName: 'Date',
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -163,6 +182,8 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 =======
       headerName: 'Date',
 >>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
       field: 'weekOf',
       cellRenderer: DateColumnRenderer,
       width: 120,
@@ -253,6 +274,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       resizable: false
 =======
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -260,5 +282,8 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison) =
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+      resizable: false
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
     },
   ]

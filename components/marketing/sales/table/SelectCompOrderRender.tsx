@@ -1,6 +1,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 import { useEffect, useState } from 'react';
@@ -38,6 +39,8 @@ const SelectCompOrderRender = ({ value, node, optionsLength, bookingId }: Select
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 import Select from 'components/core-ui-lib/Select';
 import { ICellRendererParams } from 'ag-grid-community';
 import { getNumericalOptions } from 'utils/getNumericalOptions';
@@ -48,6 +51,9 @@ interface SelectCompOrderRenderProps extends ICellRendererParams {
   bookingId: number;
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   selectForComparison: (value) => void;
   selectedBookings;
 }
@@ -61,6 +67,7 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, selectedB
     // );
   
   const setOption = (selectedVal) => {
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -79,6 +86,8 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props 
   const options = getNumericalOptions(props.optionsLength + 1);
   const setOption = (selectedVal: string) => {
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
     setValue(selectedVal);
     selectForComparison({
       order: parseInt(selectedVal), 
@@ -91,10 +100,14 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props 
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 
   return (
     <div className="pl-1 pr-2 mt-1">
     <Select
+<<<<<<< HEAD
 =======
 >>>>>>> b951a0f (SalesTable component added, Venue History integrates new component, table UI perfected)
 =======
@@ -120,10 +133,13 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props 
 >>>>>>> 9e52513 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
       onChange={(selectedVal) => setOption(selectedVal)}
       options={options}
       value={value}
       inline
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
       placeholder='-'
@@ -136,6 +152,9 @@ const SelectCompOrderRender = ({ value, setValue, selectForComparison, ...props 
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+      placeholder='-'
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
     />
   </div>
   );

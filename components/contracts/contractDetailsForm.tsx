@@ -183,6 +183,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         DealType: c.DealType,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         ContractSignedDate: formatInputDate(c.ContractSignedDate),
 =======
         ContractSignedDate: formatInputDate(c.ContractSignedDate, '-'),
@@ -190,6 +191,9 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
 =======
         ContractSignedDate: formatInputDate(c.ContractSignedDate),
 >>>>>>> 93cf814 (vercel build fixed)
+=======
+        ContractSignedDate: formatInputDate(c.ContractSignedDate),
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -199,6 +203,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.ContractNotes,
         GP: c.GP,
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
         ContractReturnDate: formatInputDate(c.ContractReturnDate),
@@ -211,6 +216,10 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ContractReturnDate: formatInputDate(c.ContractReturnDate),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
 >>>>>>> 93cf814 (vercel build fixed)
+=======
+        ContractReturnDate: formatInputDate(c.ContractReturnDate),
+        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {

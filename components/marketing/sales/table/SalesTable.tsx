@@ -4,6 +4,7 @@ import Table from 'components/core-ui-lib/Table';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { tileColors } from 'config/global';
 =======
 import { Spinner } from 'components/global/Spinner';
@@ -17,10 +18,14 @@ import { Spinner } from 'components/global/Spinner';
 import { tileColors } from 'config/global';
 import useAxios from 'hooks/useAxios';
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+import { tileColors } from 'config/global';
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
 import { gridOptions, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
@@ -29,6 +34,8 @@ import { venueState } from 'state/booking/venueState';
 =======
 import { venueState } from 'state/booking/venueState';
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
 
@@ -44,6 +51,7 @@ type Booking = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
 
 =======
@@ -52,11 +60,16 @@ export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComp
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
 
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
+
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 type Submit = {
   data: any;
   type: SalesTableVariant;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -69,6 +82,9 @@ type Submit = {
 =======
 
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 export type ProdComp = {
   venueId: number;
   showCode: string;
@@ -77,13 +93,17 @@ export type ProdComp = {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 export type SalesSubmit = {
   type: SalesTableVariant,
   data: any;
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -91,6 +111,8 @@ export type SalesSubmit = {
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 interface SalesTableProps {
   module: string;
   containerWidth: string;
@@ -103,6 +125,7 @@ interface SalesTableProps {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   handlePrimaryBtnClick?: (data: Submit) => void;
 =======
   handlePrimaryBtnClick?: (data: any) => void;
@@ -113,6 +136,9 @@ interface SalesTableProps {
 =======
   handlePrimaryBtnClick?: (data: Submit) => void;
 >>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
+=======
+  handlePrimaryBtnClick?: (data: Submit) => void;
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
   handleSecondaryBtnClick?: () => void;
@@ -123,15 +149,21 @@ interface SalesTableProps {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
   handleCellClick?: (e: any) => void;
   handleCellValChange?: (e: any) => void;
 <<<<<<< HEAD
+=======
+  handleCellClick?: (e: any) => void;
+  handleCellValChange?: (e: any) => void;
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   cellRenderParams?: any;
 }
 
 
 export default function SalesTable({
 
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -152,6 +184,8 @@ export default function SalesTable({
 =======
 
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   module = 'bookings',
   containerHeight,
   containerWidth,
@@ -160,6 +194,9 @@ export default function SalesTable({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   primaryBtnTxt,
   showPrimaryBtn = false,
   handlePrimaryBtnClick,
@@ -180,6 +217,7 @@ export default function SalesTable({
   const [rowData, setRowData] = useState([]);
   const [response, setResponse] = useState<Submit>({ type: '', data: [] });
   const { productions } = useRecoilValue(productionJumpState);
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -219,6 +257,8 @@ export default function SalesTable({
 >>>>>>> dae467b (logic from Fri 8th for venue history merged with branch which was rebased with main yesterday)
 =======
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] }
@@ -226,6 +266,9 @@ export default function SalesTable({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const salesSnapshot = (data: any) => {
 
     let tempRowData = [];
@@ -386,6 +429,7 @@ bookings.forEach((booking, index) => {
         break;
 
       case 'salesSnapshot':
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -543,10 +587,13 @@ bookings.forEach((booking, index) => {
 =======
         console.log({ function: 'salesSnapshot', data: data })
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
         salesSnapshot(data);
         break;
 
       case 'prodComparision':
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -579,6 +626,13 @@ bookings.forEach((booking, index) => {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+=======
+        productionComparision(data);
+        break;
+    }
+  }
+
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   return (
     <div className={classNames(containerWidth, containerHeight)}>
       <div>
@@ -636,6 +690,7 @@ bookings.forEach((booking, index) => {
   );
 }
 
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> 0a75d01 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
@@ -732,3 +787,5 @@ return (
 }
 
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7

@@ -3,6 +3,7 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
@@ -29,6 +30,11 @@ import { useEffect, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Typeahead from 'components/core-ui-lib/Typeahead';
 >>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
+=======
+import { useEffect, useMemo, useRef, useState } from 'react';
+import PopupModal from 'components/core-ui-lib/PopupModal';
+import Select from 'components/core-ui-lib/Select';
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 import { bookingState } from 'state/booking/bookingState';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
@@ -42,13 +48,17 @@ import Button from 'components/core-ui-lib/Button';
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 442b778 (flow complete - ready for partial PR)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 import { useRouter } from 'next/router';
 import SalesTable from 'components/marketing/sales/table';
 import { SalesSubmit, SalesTableVariant } from 'components/marketing/sales/table/SalesTable';
 import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 import useAxios from 'hooks/useAxios';
+<<<<<<< HEAD
 <<<<<<< HEAD
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
@@ -117,6 +127,10 @@ import { ProdComp } from 'components/marketing/sales/table/SalesTable';
 >>>>>>> 33f7f26 (salesTable component complete and integrated with venueHistory - still to integrate SalesSnapshot with venueHistory)
 =======
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+import styled from 'styled-components';
+import { Spinner } from 'components/global/Spinner';
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -128,6 +142,9 @@ interface VenueHistoryProps {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 type TableWrapperProps = {
   multiplier: number;
 }
@@ -148,6 +165,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const venueDict = useRecoilValue(venueState);
   const [loading, setLoading] = useState<boolean>(false);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const [prodCompData, setProdCompData] = useState<any>();
   const [salesCompData, setSalesCompData] = useState<any>();
   const [salesSnapData, setSalesSnapData] = useState<any>();
@@ -166,6 +186,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
+<<<<<<< HEAD
 =======
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
   const router = useRouter();
@@ -257,6 +278,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [venueDesc, setVenueDesc] = useState<string>('');
 
 >>>>>>> cb179e0 (restructed SalesTable component so its only used for processing the UI and does not complete any API request)
+=======
+
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const VenueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
@@ -281,6 +305,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 
   useEffect(() => {
     setShowVenueSelect(visible);
@@ -288,6 +315,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const showError = (error: string) => {
     alert(error)
     setErrorMessage(error);
@@ -310,6 +340,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
       case 'salesSnapshot':
         setShowSalesSnapshot(true);
+<<<<<<< HEAD
 =======
   const gridOptions = {
     autoSizeStrategy: {
@@ -348,6 +379,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   }
 
 <<<<<<< HEAD
+=======
+    }
+  }
+
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   const getData = (dataInput: any, view: string) => {
     switch (view) {
       case 'venue':
@@ -470,6 +506,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     }
   };
 
+<<<<<<< HEAD
 =======
   const selectForComparison = (selectedValue) => {
     let tempIds = bookings;
@@ -517,6 +554,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   }
 
 >>>>>>> bdad6b3 (SalesTable component added, Venue History integrates new component, table UI perfected)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   return (
     <div>
       <PopupModal
@@ -531,6 +570,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             <div>
               <div className="text text-primary-navy">Please select a venue for comparision</div>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
 
               <Select
                 className={classNames('my-2 w-full !border-0 text-primary-navy')}
@@ -666,6 +708,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </div>
       </PopupModal>
     </div>
+<<<<<<< HEAD
 =======
   const [venueId, setVenueId] = useState<number>(0);
   // const [stage, setStage] = useState<number>(0);
@@ -1408,5 +1451,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 >>>>>>> e349e74 (SK-49 venue history - venue select complete, comparision modal in progress - no-verify used as this is mid-dev)
 =======
 >>>>>>> a4bc5b2 (a start at SK-49-VenueHistory with the venue select modal)
+=======
+>>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
   );
 };
