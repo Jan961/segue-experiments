@@ -65,7 +65,6 @@ export default function PreviewBookingDetails({
     if (newDates) {
       // Filter all rows that have a venue and booking status is Pencilled or Confirmed
       const rowsWithVenues = newDates.filter(({ item }) => typeof item.venue === 'number');
-
       if (rowsWithVenues?.length > 0) {
         // Find consecutive dates with same venue. Only the last date will have mileage information
         const rowsWithUniqueVenue = rowsWithVenues.reduce((acc, item) => {
@@ -84,10 +83,12 @@ export default function PreviewBookingDetails({
         }, []);
 
         const previousRowToUpdate = previousDates?.findLast(
-          ({ venue, bookingStatus }) => !!venue && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
+          ({ venue, bookingStatus }) =>
+            !!venue && typeof venue === 'number' && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
         );
         const nextRowToUpdate = futureDates?.find(
-          ({ venue, bookingStatus }) => !!venue && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
+          ({ venue, bookingStatus }) =>
+            !!venue && typeof venue === 'number' && (bookingStatus === 'Confirmed' || bookingStatus === 'Pencilled'),
         );
         if (previousRowToUpdate) {
           rowsWithUniqueVenue.unshift(previousRowToUpdate);
@@ -97,8 +98,9 @@ export default function PreviewBookingDetails({
           rowsWithUniqueVenue.push(nextRowToUpdate);
         }
 
+        console.log('rowsWithVenues', rowsWithVenues, previousDates, futureDates);
         const payload = rowsWithUniqueVenue.map((row) => {
-          return { Date: row.dateTime || row.dateAsISOString, Ids: [row.venueId || row.item.venue] };
+          return { Date: row.dateTime || row.dateAsISOString, Ids: [row.venueId || row.item?.venue] };
         });
         fetchMileageforVenues(payload, [...previousDates, ...newDates, ...futureDates]);
       }
