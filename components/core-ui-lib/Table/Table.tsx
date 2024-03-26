@@ -88,7 +88,7 @@ export default forwardRef(function Table(
 
     const columnDefs = params.api.getColumnDefs();
     const updColDefs = columnDefs.map((column) => {
-      return { ...column, headerClass: column.headerClass ? `${column.headerClass} text-center` : 'text-center' };
+      return { ...column, headerClass: 'text-center' };
     });
     params.api.updateGridOptions({ columnDefs: updColDefs });
   };

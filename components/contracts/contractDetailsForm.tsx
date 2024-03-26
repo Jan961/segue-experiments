@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatFormDate from 'utils/dateInputFormat';
+import formatInputDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -181,23 +181,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ShowDate: c.ShowDate,
         VenueContractStatus: c.VenueContractStatus,
         DealType: c.DealType,
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         ContractSignedDate: formatInputDate(c.ContractSignedDate),
-=======
-        ContractSignedDate: formatInputDate(c.ContractSignedDate, '-'),
->>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
-=======
-        ContractSignedDate: formatInputDate(c.ContractSignedDate),
->>>>>>> 93cf814 (vercel build fixed)
-=======
-        ContractSignedDate: formatInputDate(c.ContractSignedDate),
->>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
-=======
-        ContractSignedDate: formatFormDate(c.ContractSignedDate),
->>>>>>> Stashed changes
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -207,28 +191,8 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.ContractNotes,
         GP: c.GP,
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
         ContractReturnDate: formatInputDate(c.ContractReturnDate),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
-=======
-        ContractReturnDate: formatInputDate(c.ContractReturnDate, '-'),
-        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate, '-'),
->>>>>>> b3eedf3 (a few fixes to ensure vercel can successfully build when merging)
-=======
-        ContractReturnDate: formatInputDate(c.ContractReturnDate),
-        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
->>>>>>> 93cf814 (vercel build fixed)
-=======
-        ContractReturnDate: formatInputDate(c.ContractReturnDate),
-        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
->>>>>>> 8a88ade007900e868d3fa39b3cd647ad1df005b7
-=======
-        ContractReturnDate: formatFormDate(c.ContractReturnDate),
-        ContractReceivedBackDate: formatFormDate(c.ContractReceivedBackDate),
->>>>>>> Stashed changes
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {
