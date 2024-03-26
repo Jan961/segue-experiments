@@ -14,6 +14,7 @@ import { performanceState } from '../performanceState';
 import BookingHelper from 'utils/booking';
 import { dateBlockState } from '../dateBlockState';
 import { DAY_TYPE_FILTERS } from 'components/bookings/utils';
+import { distanceState } from '../distanceState';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
@@ -32,6 +33,16 @@ export const rowsSelector = selector({
     const productionDict = objectify(productions, (production) => production.Id);
     const dateBlocks = get(dateBlockState);
     const helper = new BookingHelper({ performanceDict, venueDict, productionDict });
+    const distance = get(distanceState);
+    const getDistance = (productionId, dateTime, venueId) => {
+      const productionDistance = distance?.[productionId] || {};
+      const { option = [] } = productionDistance?.stops?.find((x) => x.Date === dateTime) || {};
+      const venue = option?.find((x) => x.VenueId === venueId);
+      return {
+        miles: venue?.Miles,
+        travelTime: venue?.Mins,
+      };
+    };
     const { start, end } = helper.getRangeFromDateBlocks(dateBlocks);
     const rows: any = [];
     const bookedDates: string[] = [];
@@ -50,6 +61,7 @@ export const rowsSelector = selector({
         }
         return value;
       };
+      const { miles = '', travelTime = '' } = getDistance(ProductionId, date, data.VenueId);
 
       const row = {
         ...rowData,
@@ -64,6 +76,8 @@ export const rowsSelector = selector({
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
         town: getValueForDayType(rowData.town, type),
+        miles,
+        travelTime,
       };
 
       rows.push(row);

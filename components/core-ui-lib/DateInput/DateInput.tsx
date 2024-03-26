@@ -141,7 +141,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       </div>
       <div className={errorMsg ? 'animate-shake' : ''}>
         <TextInput
-          placeHolder={placeholder}
+          placeholder={placeholder}
           ref={inputRef}
           value={inputValue}
           iconName="calendar"
