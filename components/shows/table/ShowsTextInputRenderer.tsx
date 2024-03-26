@@ -34,7 +34,7 @@ const ShowsTextInputRenderer = (props: ICellRendererParams) => {
     <div className="pl-1 pr-2 mt-1" tabIndex={1}>
       <TextInputRenderer
         eGridCell={eGridCell}
-        placeHolder={placeholder}
+        placeholder={placeholder}
         className="w-full"
         value={inputValue}
         error={error}
