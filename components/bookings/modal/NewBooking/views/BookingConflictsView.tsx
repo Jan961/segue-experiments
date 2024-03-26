@@ -4,7 +4,7 @@ import Table from 'components/core-ui-lib/Table';
 import { useEffect, useMemo } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { bookingStatusMap } from 'config/bookings';
-import { dateToSimple } from 'services/dateService';
+import { formattedDateWithWeekDay } from 'services/dateService';
 import { BookingWithVenueDTO } from 'interfaces';
 import { steps } from 'config/AddBooking';
 
@@ -22,7 +22,7 @@ export default function BookingConflictsView({ data, hasBarringIssues, updateMod
       data?.map?.((b) => ({
         ...b,
         venue: b.Venue.Name,
-        date: dateToSimple(b.Date),
+        date: formattedDateWithWeekDay(b.Date, 'Short'),
         bookingStatus: bookingStatusMap[b.StatusCode],
       })),
     [data],

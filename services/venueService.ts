@@ -26,6 +26,33 @@ export const getAllVenues = async () => {
     where: {
       IsDeleted: false,
     },
+    // select: {
+    //   VenueAddress: {
+    //     Town: true,
+    //   },
+    // },
+  });
+};
+
+export const getUniqueVenueTownlist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Town'],
+    where: {
+      Town: {
+        not: null,
+      },
+    },
+  });
+};
+
+export const getUniqueVenueCountrylist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Country'],
+    where: {
+      Country: {
+        not: null,
+      },
+    },
   });
 };
 
@@ -70,7 +97,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
       prev = stop;
       return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: null, Mins: null })) };
     }
-
+    const prevIdsAsString = prev.Ids.join(',');
     return {
       Date: stop.Date,
       option: stop.Ids.map((id: number) => {
@@ -81,11 +108,17 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
         )[0];
         prev = stop;
 
-        return {
-          VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : null,
-          Mins: match?.TimeMins ? match.TimeMins : null,
-        };
+        return prevIdsAsString === stop.Ids.join(',')
+          ? {
+              VenueId: id,
+              Miles: match?.Mileage,
+              Mins: match?.TimeMins,
+            }
+          : {
+              VenueId: id,
+              Miles: match?.Mileage ? match.Mileage : -1,
+              Mins: match?.TimeMins ? match.TimeMins : -1,
+            };
       }),
     };
   });
@@ -94,6 +127,9 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
 export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO> => {
   const [id1, id2] = stop.Ids;
 
+  if (!id1 || !id2 || id1 === id2) {
+    return { Date: stop.Date, option: [{ VenueId: id1, Mins: null, Miles: null }] };
+  }
   // Get the distances for all possible combinations (optimisation possible)
   const distance = await prisma.venueVenue.findMany({
     where: {

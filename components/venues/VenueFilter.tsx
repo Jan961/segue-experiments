@@ -1,64 +1,80 @@
 import Button from 'components/core-ui-lib/Button';
-import Select from 'components/core-ui-lib/Select';
+import Select, { SelectOption } from 'components/core-ui-lib/Select/Select';
+import TextInput from 'components/core-ui-lib/TextInput';
+import { useRecoilValue } from 'recoil';
+import { productionOptionsSelector } from 'state/booking/selectors/productionOptionsSelector';
+import { defaultVenueFilters } from 'config/bookings';
+import { VenueFilters } from 'pages/bookings/venues';
 
-// import { SearchBox } from 'components/global/SearchBox';
-import GlobalToolbar from 'components/toolbar';
-import { useRecoilState } from 'recoil';
-import { filterVenueState } from 'state/booking/filterVenueState';
-
-export default function VenueFilter() {
-  const [venueFilter, setVenueFilter] = useRecoilState(filterVenueState);
+export default function VenueFilter({
+  countryOptions,
+  townOptions,
+  onFilterChange,
+  filters,
+}: {
+  filters: VenueFilters;
+  countryOptions: SelectOption[];
+  townOptions: SelectOption[];
+  onFilterChange: (change: Partial<VenueFilters>) => void;
+}) {
+  const productionOptions = useRecoilValue(productionOptionsSelector(true));
   const onChange = (e: any) => {
-    setVenueFilter({ ...venueFilter, [e.target.id]: e.target.value });
+    onFilterChange({ ...filters, [e.target.id]: e.target.value });
   };
+  const onClearFilters = () => {
+    onFilterChange(defaultVenueFilters);
+  };
+
   return (
     <>
       <div className="w-full flex items-center justify-between flex-wrap">
         <div className=" w-full flex flex-row ">
-          <div className="px-4">
-            <GlobalToolbar
-              title={'Venues'}
-              searchFilter={venueFilter.town}
-              setSearchFilter={(town) => setVenueFilter({ town })}
-              titleClassName="text-primary-orange"
-            ></GlobalToolbar>
-          </div>
-          <div className="px-4 flex items-center gap-4 flex-wrap  py-1 w-full">
-            <div className="w-full flex flex-row gap-5">
+          <div className="flex  gap-4 flex-wrap  py-1 w-full">
+            <div className="w-full flex flex-row items-center gap-5">
+              <h1 className={`text-4xl font-bold text-primary-orange`}>Venues</h1>
               <Select
-                onChange={(value) => onChange({ target: { id: 'status', value } })}
-                //   disabled={!ProductionId}
-                value={venueFilter.town}
-                className="bg-white w-full"
+                onChange={(value) => onChange({ target: { id: 'town', value } })}
+                value={filters.town}
+                className="bg-white w-full font-bold h-fit"
                 label="Town"
                 placeholder="Select Town"
-                options={[]}
-                //   options={allStatusOptions}
+                options={townOptions}
+                isSearchable
               />
+
               <Select
-                onChange={(value) => onChange({ target: { id: 'status', value } })}
-                //   disabled={!ProductionId}
-                value={venueFilter.town}
-                className="bg-white w-full"
+                onChange={(value) => onChange({ target: { id: 'productionId', value } })}
+                value={filters.productionId}
+                className="bg-white w-full font-bold h-fit"
                 label="On Production"
                 placeholder="Select Production"
-                options={[]}
-                //   options={allStatusOptions}
+                options={productionOptions}
+                isSearchable
               />
             </div>
-            <Select
-              onChange={(value) => onChange({ target: { id: 'status', value } })}
-              //   disabled={!ProductionId}
-              value={venueFilter.town}
-              className="bg-white w-52"
-              label="Country"
-              placeholder="Select Country"
-              options={[]}
-              //   options={allStatusOptions}
-            />
-            {/* <SearchBox /> */}
-            <Button text="Clear Filters" className="text-sm leading-8 w-[100px]" />
-            <Button text="Add New" className="text-sm leading-8 w-[100px]" />
+            <div className="flex items-start gap-4 w-full">
+              <Select
+                onChange={(value) => onChange({ target: { id: 'country', value } })}
+                value={filters.country}
+                className="bg-white !w-[400px] h-fit font-bold"
+                label="Country"
+                placeholder="Select Country"
+                options={countryOptions}
+                isSearchable
+              />
+              <TextInput
+                id={'search'}
+                placeholder="Search venues..."
+                className="w-[470px] !align-top"
+                iconName="search"
+                value={filters.search}
+                onChange={onChange}
+              />
+              <div className="flex flex-col gap-3">
+                <Button text="Clear Filters" className="text-sm leading-8 w-[120px]" onClick={onClearFilters} />
+                <Button text="Add New" className="text-sm leading-8 w-[120px]" />
+              </div>
+            </div>
           </div>
         </div>
       </div>

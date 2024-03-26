@@ -1,17 +1,16 @@
 import Table from 'components/core-ui-lib/Table';
 import { styleProps, venueColumnDefs } from 'components/bookings/table/tableConfig';
+import { Venue } from 'interfaces';
+type Props = {
+  items?: Venue[];
+};
 
-export default function VenueTable() {
+const VenueTable = ({ items }: Props) => {
   return (
-    <div className="w-full h-[calc(100%-140px)]">
-      <Table
-        columnDefs={venueColumnDefs}
-        //   rowData={rows}
-        styleProps={styleProps}
-        //   onCellClicked={handleCellClick}
-        //   gridOptions={gridOptions}
-        //   ref={tableRef}
-      />
+    <div className="w-full h-[calc(100%-140px)] min-h-[150px]">
+      <Table columnDefs={items === null ? null : venueColumnDefs} rowData={items} styleProps={styleProps} />
     </div>
   );
-}
+};
+
+export default VenueTable;

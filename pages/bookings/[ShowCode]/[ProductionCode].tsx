@@ -73,6 +73,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
+
   let distance = {};
   const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
   // Map to DTO. The database can change and we want to control. More info in mappers.ts

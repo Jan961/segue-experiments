@@ -3,8 +3,8 @@ import Icon from 'components/core-ui-lib/Icon';
 
 export default function NoteColumnRenderer({ value, data, api }: CustomCellRendererProps) {
   const firstRowData = api.getDisplayedRowAtIndex(0).data;
-  const isNoteVisible =
-    (data.venue && data.dayType) || (data.isRunOfDates && firstRowData.venue && firstRowData.dayType);
+  const isNoteVisible = data.dayType || (data.isRunOfDates && firstRowData.venue && firstRowData.dayType);
+
   return (
     <div className="flex justify-center w-full">
       {isNoteVisible ? (

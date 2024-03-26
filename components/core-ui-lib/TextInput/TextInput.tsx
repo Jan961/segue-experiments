@@ -1,15 +1,15 @@
-import { forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 import Icon from '../Icon';
 import { IconName } from '../Icon/Icon';
 import classNames from 'classnames';
-
 export interface TextInputProps {
   id?: string;
   value?: string;
   disabled?: boolean;
   className?: string;
-  onChange?: (e: any) => void;
-  placeHolder?: string;
+  inputClassName?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
   onClick?: (e: any) => void;
   iconName?: IconName;
   error?: string;
@@ -20,7 +20,19 @@ export interface TextInputProps {
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
-    { id, value = '', className = '', disabled = false, onChange, placeHolder = '', onClick, iconName, error, ...rest },
+    {
+      id,
+      value = '',
+      className = '',
+      disabled = false,
+      onChange,
+      placeholder = '',
+      onClick,
+      iconName,
+      error,
+      inputClassName,
+      ...rest
+    },
     ref,
   ) => {
     const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
@@ -28,7 +40,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
     return (
       <div
-        className={`flex justify-between items-center relative ${disabled ? 'disabled-input' : ''}`}
+        className={`flex justify-between items-center relative  ${inputClassName} ${disabled ? 'disabled-input' : ''} `}
         onClick={onClick}
       >
         <input
@@ -37,7 +49,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           type="text"
           className={classNames(baseClass, inputClass, `${iconName ? 'pr-6' : ''}`, className)}
           onChange={onChange}
-          placeholder={placeHolder}
+          placeholder={placeholder}
           disabled={disabled}
           value={value || ''}
           {...rest}

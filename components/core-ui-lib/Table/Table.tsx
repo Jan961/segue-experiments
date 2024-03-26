@@ -48,7 +48,7 @@ export default forwardRef(function Table(
     styleProps,
     onCellClicked,
     onRowClicked,
-    onCellValueChange,
+    onCellValueChange = () => null,
     gridOptions = {},
     getRowStyle,
     rowClassRules,
@@ -140,6 +140,7 @@ export default forwardRef(function Table(
           navigateToNextCell={() => null}
           defaultColDef={DEFAULT_COLUMN_DEF}
           suppressScrollOnNewData
+          suppressContextMenu
         />
       </div>
     </>

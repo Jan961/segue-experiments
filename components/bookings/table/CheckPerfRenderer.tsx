@@ -1,6 +1,7 @@
 import { ICellRendererParams } from 'ag-grid-community';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
+import { statusOptions } from 'config/bookings';
 import { useEffect, useState } from 'react';
 
 interface CheckPerfRendererProps extends ICellRendererParams {
@@ -10,6 +11,7 @@ interface CheckPerfRendererProps extends ICellRendererParams {
 const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue }: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState(false);
   const performanceOption = dayTypeOptions?.find(({ text }) => text === 'Performance');
+  const pencilledStatus = statusOptions.find(({ text }) => text === 'Pencilled').value;
 
   useEffect(() => {
     const isChecked = data.perf || (performanceOption && data.dayType === performanceOption.value);
@@ -24,6 +26,8 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue }: 
       ...data,
       perf: checked,
       dayType: checked ? performanceOption.value : '',
+      bookingStatus: checked ? pencilledStatus : '',
+      pencilNo: null,
     });
   };
 
