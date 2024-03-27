@@ -71,8 +71,8 @@ export default function VenueFilter({
                 onChange={onChange}
               />
               <div className="flex flex-col gap-3">
-                <Button text="Clear Filters" className="text-sm leading-8 w-[120px]" onClick={onClearFilters} />
-                <Button text="Add New" className="text-sm leading-8 w-[120px]" />
+                <Button text="Clear Filters" className="w-[120px]" onClick={onClearFilters} />
+                <Button text="Add New" className="w-[120px]" />
               </div>
             </div>
           </div>
