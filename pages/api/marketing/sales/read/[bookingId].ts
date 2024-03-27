@@ -80,7 +80,6 @@ export default async function handle(req, res) {
           capacity: sale.TotalCapacity,
           isFinal: sale.SetIsFinalFigures,
           notOnSaleDate: sale.NotOnSaleDate,
-          // saleType: sale.SaleTypeName,
           ...(sale.SaleTypeName === 'General Sales' && {
             seatsSold: parseInt(sale.Seats),
             totalValue: parseFloat(sale.Value),

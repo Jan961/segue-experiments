@@ -15,6 +15,7 @@ export type BookingSelectionView = {
   ProductionId: number;
   FullProductionCode: string;
   ProductionLengthWeeks: number;
+  PerformanceCount: number;
 };
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -50,18 +51,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const data: BookingSelectionView[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`;
     const results = [];
     const uniqueIds = {};
-    const bookingIds = unique(data.map(booking => booking.BookingId))
+    const bookingIds = unique(data.map((booking) => booking.BookingId));
     const performances = await prisma.Performance.groupBy({
-      by:['BookingId'],
-      _count:{
+      by: ['BookingId'],
+      _count: {
         Id: true,
       },
-      where:{
-        BookingId:{
-          in: bookingIds
-        }
-      }
-    })
+      where: {
+        BookingId: {
+          in: bookingIds,
+        },
+      },
+    });
 
     const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
       acc[curr.BookingId] = curr._count?.Id;
@@ -76,7 +77,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
     res.send(
       results
-        .map((booking) => ({ ...booking, performanceCount: bookingPerformanceCountMap[booking.BookingId] }))
+        .map((booking) => ({ ...booking, PerformanceCount: bookingPerformanceCountMap[booking.BookingId] }))
         .sort((a, b) => a.BookingId - b.BookingId),
     );
   } catch (error) {

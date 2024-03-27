@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 import { bookingState } from 'state/booking/bookingState';
@@ -13,8 +13,7 @@ import useAxios from 'hooks/useAxios';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
 import { BookingSelectionView } from 'pages/api/marketing/archivedSales/bookingSelection';
-import { TSalesView } from 'types/MarketingTypes';
-import { parse, compareDesc } from 'date-fns';
+import { SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -23,12 +22,7 @@ interface VenueHistoryProps {
 
 type TableWrapperProps = {
   multiplier: number;
-}
-
-export type SalesComp = {
-  tableData: TSalesView;
-  bookingIds: Array<SelectedBooking>;
-}
+};
 
 type SelectedBooking = {
   BookingId: string;
@@ -36,10 +30,15 @@ type SelectedBooking = {
   prodCode: string;
   prodName: string;
   numPerfs: number;
-}
+};
+
+export type SalesComp = {
+  tableData: Array<SalesComparison>;
+  bookingIds: Array<SelectedBooking>;
+};
 
 const TableWrapper = styled.div<TableWrapperProps>`
-  width: ${props => props.multiplier > 4 ? '1300px' : `${props.multiplier * 300 + 100}px`};
+  width: ${(props) => (props.multiplier > 4 ? '1300px' : `${props.multiplier * 300 + 100}px`)};
   max-width: 100%; /* Ensure it doesn't exceed the viewport width */
   overflow-x: auto; /* Show horizontal scrollbar when content overflows */
 `;
@@ -59,7 +58,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [loading, setLoading] = useState<boolean>(false);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelectionView>>();
   const [salesCompData, setSalesCompData] = useState<SalesComp>();
-  const [salesSnapData, setSalesSnapData] = useState<any>();
+  const [salesSnapData, setSalesSnapData] = useState<Array<SalesSnapshot>>();
   const [currView, setCurrView] = useState<SalesTableVariant>('venue');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -85,7 +84,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     return options;
   }, [venueDict, bookingDict]);
 
-
   useEffect(() => {
     setShowVenueSelect(visible);
   }, [visible]);
@@ -107,17 +105,21 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       case 'salesSnapshot':
         setShowSalesSnapshot(true);
     }
-  }
+  };
 
   const getData = (dataInput: string | number, view: string) => {
     setErrorMessage('');
     switch (view) {
-      case 'venue':
-        if (typeof dataInput === 'number' && isNaN(dataInput)) break;
+      case 'venue': {
+        if (typeof dataInput === 'number' && isNaN(dataInput)) {
+          break;
+        }
         const venue = venueDict[dataInput];
-        if (venue === undefined) break;
+        if (venue === undefined) {
+          break;
+        }
         setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
-        setVenueID(dataInput)
+        setVenueID(dataInput);
 
         setLoading(true);
         try {
@@ -129,41 +131,48 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               venueCode: venue.Code,
               showCode: router.query.ShowCode.toString(),
             },
-          }).then((data: any) => {
-            if (data !== undefined && data.length > 0) {
-              
-              // Sort data by BookingFirstDate in descending order (newest production to oldest)
-              const sortedData = data.sort((a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime());
+          })
+            .then((data) => {
+              if (Array.isArray(data) && data.length > 0) {
+                const bookingData = data as Array<BookingSelectionView>;
 
-              setProdCompData(sortedData);
-              setCurrView('prodComparision');
-              toggleModal('prodComparision');
-            } else {
-              setVenueSelectView('error');
-            }
-          }).catch((error) => {
-            console.log(error);
-          });
+                // Sort data by BookingFirstDate in descending order (newest production to oldest)
+                const sortedData = bookingData.sort(
+                  (a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime(),
+                );
+
+                setProdCompData(sortedData);
+                setCurrView('prodComparision');
+                toggleModal('prodComparision');
+              } else {
+                setVenueSelectView('error');
+              }
+            })
+            .catch((error) => {
+              console.log(error);
+            });
         } catch (error) {
           console.log(error);
         }
 
         break;
+      }
 
-      case 'prodComparision':
+      case 'prodComparision': {
         if (selectedBookings.length < 2) {
           setErrorMessage('Please select at least 2 venues for comparison.');
-          return
+          return;
         }
 
         setLoading(true);
         fetchData({
           url: '/api/marketing/sales/read/archived',
           method: 'POST',
-          data: { bookingIds: selectedBookings.map(obj => obj.BookingId) },
+          data: { bookingIds: selectedBookings.map((obj) => obj.BookingId) },
         }).then((data: any) => {
-          if (data !== undefined && data.response.length > 0) {
-            setSalesCompData({ tableData: data.response, bookingIds: selectedBookings });
+          if (Array.isArray(data.reponse) && data.response.length > 0) {
+            const salesComp = data.response as Array<SalesComparison>;
+            setSalesCompData({ tableData: salesComp, bookingIds: selectedBookings });
             toggleModal('salesComparison');
           } else {
             setLoading(false);
@@ -172,80 +181,83 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         });
 
         break;
+      }
 
-      case 'salesSnapshot':
+      case 'salesSnapshot': {
         setLoading(true);
         fetchData({
           url: '/api/marketing/sales/read/' + dataInput.toString(),
           method: 'POST',
-        }).then((data: any) => {
-          if ('error' in data) {
-            setErrorMessage('An unexpected error has occurred')
-            setLoading(false);
-            return;
-          }
-          if (data !== undefined && data.length > 0) {
-            setSalesSnapData(data);
+        }).then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            const salesData = data as Array<SalesSnapshot>;
+            setSalesSnapData(salesData);
             toggleModal('salesSnapshot');
           } else {
             setLoading(false);
             setErrorMessage('No sales to show for this production');
           }
         });
+      }
     }
-  }
+  };
 
   const handleBtnBack = (type: string) => {
     setLoading(false);
     if (type === 'salesComparison') {
       setShowResults(false);
       setShowCompSelect(true);
-      setCurrView('prodComparision')
+      setCurrView('prodComparision');
     } else if (type === 'prodComparision') {
       setShowCompSelect(false);
       setShowVenueSelect(true);
       setCurrView('venue');
     } else if (type === 'venue') {
-      setVenueSelectView('select')
+      setVenueSelectView('select');
     }
-  }
+  };
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
       getData(e.data.BookingId, 'salesSnapshot');
     }
-  }
+  };
 
   const selectForComparison = (selectedValue) => {
-    if ('type' in selectedValue === false) {
-      let tempBookings = selectedBookings;
-      if (selectedValue.order === null || isNaN(selectedValue.order)) {
-        const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
-        if (bookingToDel > -1) {
-          tempBookings.splice(bookingToDel, 1);
-          setSelBookings(tempBookings);
-        }
-      } else {
-        // check to see if the booking has previously been added
-        const bookingIndex = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
-        if (bookingIndex === -1) {
-          tempBookings.push({
-            BookingId: selectedValue.BookingId,
-            order: selectedValue.order,
-            prodCode: selectedValue.prodCode,
-            prodName: selectedValue.prodName,
-            numPerfs: selectedValue.numPerfs
-          });
+    if (!('type' in selectedValue)) {
+      setSelBookings((prevBookings) => {
+        const tempBookings = [...prevBookings]; // Create a copy to avoid directly mutating state
+
+        if (selectedValue.order === null || isNaN(selectedValue.order)) {
+          const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
+          if (bookingToDel > -1) {
+            tempBookings.splice(bookingToDel, 1);
+            // Directly returning the new state here, no need to call setSelBookings again
+          }
         } else {
-          tempBookings[bookingIndex].order = selectedValue.order;
+          const bookingIndex = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
+          if (bookingIndex === -1) {
+            // Adding a new booking
+            tempBookings.push({
+              BookingId: selectedValue.BookingId,
+              order: selectedValue.order,
+              prodCode: selectedValue.prodCode,
+              prodName: selectedValue.prodName,
+              numPerfs: selectedValue.numPerfs,
+            });
+          } else {
+            // Updating an existing booking
+            tempBookings[bookingIndex] = { ...tempBookings[bookingIndex], order: selectedValue.order };
+          }
         }
 
-        // if length of tempBookings is >= 2, errorMessage can be removed
+        // If length of tempBookings is >= 2, errorMessage can be removed
         if (tempBookings.length >= 2) {
           setErrorMessage('');
         }
-        setSelBookings(tempBookings);
-      }
+
+        return tempBookings; // Return the new state
+      });
     }
   };
 
@@ -258,7 +270,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         onClose={handleModalCancel}
       >
         <div className="w-[417px] h-[130px]">
-
           {venueSelectView === 'select' ? (
             <div>
               <div className="text text-primary-navy">Please select a venue for comparision</div>
@@ -274,18 +285,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 label="Venue"
               />
 
-              <div className='float-right flex flex-row'>
-                {loading && (<Spinner size='sm' className='mt-4 mr-3' />)}
+              <div className="float-right flex flex-row">
+                {loading && <Spinner size="sm" className="mt-4 mr-3" />}
 
-                <Button
-                  className="px-8 mt-4 "
-                  onClick={handleModalCancel}
-                  variant="secondary"
-                  text={'Cancel'}
-                ></Button>
+                <Button className="px-8 mt-4 " onClick={handleModalCancel} variant="secondary" text={'Cancel'}></Button>
               </div>
             </div>
-
           ) : (
             <div>
               <div className="text text-primary-navy">
@@ -293,14 +298,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 Please go back and select another venue to continue.
               </div>
 
-              <div className='float-right flex flex-row mt-5'>
+              <div className="float-right flex flex-row mt-5">
                 <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text={'Back'} />
-                <Button
-                  className="ml-4 w-32"
-                  variant='secondary'
-                  text='Cancel'
-                  onClick={handleModalCancel}
-                />
+                <Button className="ml-4 w-32" variant="secondary" text="Cancel" onClick={handleModalCancel} />
               </div>
             </div>
           )}
@@ -319,18 +319,18 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
           <SalesTable
             key={JSON.stringify(selectedBookings)} // forces remount everytime selectedBookings is
-            containerHeight='h-auto'
-            containerWidth='w-[920px]'
-            module='bookings'
-            variant='prodComparision'
-            primaryBtnTxt='Compare'
+            containerHeight="h-auto"
+            containerWidth="w-[920px]"
+            module="bookings"
+            variant="prodComparision"
+            primaryBtnTxt="Compare"
             showPrimaryBtn={true}
-            secondaryBtnText='Cancel'
+            secondaryBtnText="Cancel"
             showSecondaryBtn={true}
             handleSecondaryBtnClick={handleModalCancel}
             handlePrimaryBtnClick={() => getData('', currView)}
             handleBackBtnClick={() => handleBtnBack('prodComparision')}
-            backBtnTxt='Back'
+            backBtnTxt="Back"
             handleCellClick={handleTableCellClick}
             showBackBtn={true}
             handleCellValChange={selectForComparison}
@@ -339,7 +339,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             processing={loading}
             errorMessage={errorMessage}
           />
-
         </div>
       </PopupModal>
 
@@ -349,33 +348,29 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
       >
-
         <TableWrapper multiplier={selectedBookings.length}>
-
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           <SalesTable
-            containerHeight='h-auto'
-            containerWidth='w-auto'
-            module='bookings'
-            variant='salesComparison'
+            containerHeight="h-auto"
+            containerWidth="w-auto"
+            module="bookings"
+            variant="salesComparison"
             showExportBtn={true}
             showSecondaryBtn={true}
-            secondaryBtnText='Export'
-            primaryBtnTxt='Close'
+            secondaryBtnText="Export"
+            primaryBtnTxt="Close"
             handleSecondaryBtnClick={() => alert('Export to Excel - SK-129')}
             handlePrimaryBtnClick={() => setShowResults(false)}
             showPrimaryBtn={true}
             handleBackBtnClick={() => handleBtnBack('salesComparison')}
             showBackBtn={true}
-            backBtnTxt='Back'
+            backBtnTxt="Back"
             data={salesCompData}
             processing={loading}
             errorMessage={errorMessage}
           />
-
         </TableWrapper>
-
       </PopupModal>
 
       <PopupModal
@@ -389,18 +384,17 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           <SalesTable
-            containerHeight='h-auto'
-            containerWidth='w-[1220px]'
-            module='bookings'
-            variant='salesSnapshot'
-            primaryBtnTxt='Back'
+            containerHeight="h-auto"
+            containerWidth="w-[1220px]"
+            module="bookings"
+            variant="salesSnapshot"
+            primaryBtnTxt="Back"
             showPrimaryBtn={true}
             handlePrimaryBtnClick={() => setShowSalesSnapshot(false)}
             data={salesSnapData}
             processing={loading}
             errorMessage={errorMessage}
           />
-
         </div>
       </PopupModal>
     </div>

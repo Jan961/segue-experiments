@@ -54,3 +54,31 @@ export type SeatsInfo = {
   BookingId: number;
   DataFound: boolean;
 };
+
+export type SalesComparison = {
+  SetBookingWeekNum: number;
+  SetIsFinalFigures: boolean;
+  SetProductionWeekDate: string;
+  data: Array<SeatsInfo>;
+};
+
+export type SalesSnapshot = {
+  week: string;
+  weekOf: string;
+  seatsSold: number;
+  seatsSaleChange: number;
+  reservations: number;
+  reserved: string;
+  venueCurrencySymbol: string;
+  totalValue: number;
+  valueChange: number;
+  totalHolds: string;
+  seatsChange: number;
+  isCopy: boolean;
+  isBrochureReleased: boolean;
+  isSingleSeats: boolean;
+  isNotOnSale: boolean;
+  capacity: number;
+  isFinal: boolean;
+  notOnSaleDate: string;
+};
