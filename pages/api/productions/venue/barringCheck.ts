@@ -131,16 +131,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         return {
-          Id: bv.Id,
-          Name: bv.Name,
-          Code: bv.Code,
-          Mileage: distance,
-          Date: FirstDate,
+          id: bv.Id,
+          name: bv.Name,
+          code: bv.Code,
+          mileage: distance,
+          date: FirstDate,
           hasBarringConflict: isBarred,
           info,
         };
       })
-      .sort((a, b) => Number(a?.Mileage || 0) - Number(b?.Mileage || 0));
+      .sort((a, b) => Number(a?.mileage || 0) - Number(b?.mileage || 0));
 
     res.json(results);
   } catch (error) {

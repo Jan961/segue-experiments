@@ -150,9 +150,9 @@ export const bookingConflictsColumnDefs = [
 ];
 
 export const barringIssueColumnDefs = [
-  { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Venue', field: 'name', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
+  { headerName: 'Miles', field: 'mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
@@ -300,17 +300,17 @@ export const tourSummaryColumnDefs = [
 ];
 
 export const barredVenueColumnDefs = [
-  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
+  { headerName: 'Venue', field: 'name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
   {
     headerName: 'Date',
-    field: 'FormattedDate',
+    field: 'formattedDate',
     cellRenderer: DefaultCellRenderer,
     width: 80,
     headerClass: 'text-center',
   },
   {
     headerName: 'Miles',
-    field: 'Mileage',
+    field: 'mileage',
     cellRenderer: DefaultCellRenderer,
     width: 80,
     headerClass: 'text-center',
