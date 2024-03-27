@@ -23,12 +23,11 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
   const filteredRows = useMemo(() => {
     const filteredRows = [];
-    console.log('barredVenues', barredVenues);
     for (const row of barredVenues || []) {
       if (!selectedVenueIds.includes(row.Id)) {
         filteredRows.push({
           ...row,
-          FormattedDate: moment(row.Date).format('DD/MM/YY'),
+          formattedDate: moment(row.Date).format('DD/MM/YY'),
         });
       }
     }
@@ -41,7 +40,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
   }, []);
   const fetchBarredVenues = () => {
     api({
-      url: '/api/productions/venue/barred',
+      url: '/api/productions/venue/barringCheck',
       method: 'POST',
       data: {
         productionId,
@@ -57,7 +56,8 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
         if (data.error) {
           return;
         }
-        setBarredVenues(data || []);
+        const venuesWithConflicts = data?.filter((venue) => venue.hasBarringConflict);
+        setBarredVenues(venuesWithConflicts || []);
       })
       .catch((error) => {
         console.log('Error fetching Barred Venues', error);

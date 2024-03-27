@@ -40,8 +40,8 @@ export default function Barring({ visible, onClose }: BarringProps) {
       if (!selectedVenueIds.includes(row.Id)) {
         filteredRows.push({
           ...row,
-          FormattedDate: moment(row.Date).format('DD/MM/YY'),
-          TravelTime: formatMinutes(row.TimeMins),
+          formattedDate: moment(row.Date).format('DD/MM/YY'),
+          travelTime: formatMinutes(row.TimeMins),
         });
       }
     }
