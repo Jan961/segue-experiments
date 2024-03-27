@@ -1,15 +1,11 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useClerk } from '@clerk/nextjs';
 import { userService } from 'services/user.service';
-
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import classNames from 'classnames';
 import { SegueLogo } from './global/SegueLogo';
 import useUrlPath from 'hooks';
-// import { FormInputSelect } from './global/forms/FormInputSelect';
-// import { availableLocales } from 'config/global';
-// import { useRecoilState } from 'recoil';
-// import { globalState } from 'state/global/globalState';
 import useStrings from 'hooks/useStrings';
 import Icon from './core-ui-lib/Icon';
 
@@ -20,6 +16,8 @@ interface HeaderNavButtonProps {
   containerClass?: string;
   href?: string;
 }
+
+const confVariant = 'logout';
 
 const HeaderNavButton = ({
   iconName,
@@ -59,28 +57,23 @@ const HeaderNavButton = ({
 const HeaderNavDivider = () => <span className="mx-2">{' | '}</span>;
 
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
-  // const [username, setUsername] = React.useState('My Account');
-  // const [userPrefs, setUserPrefs] = useRecoilState(globalState);
+  const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
   const getString = useStrings();
   const router = useRouter();
   const { isHome, navigateToHome } = useUrlPath();
   const isCurrentPathHome = isHome();
   const { signOut } = useClerk();
 
-  const logout = async () => {
+  const onLogout = () => {
+    setConfirmVisible(true);
+  };
+
+  const handleLogout = async () => {
+    setConfirmVisible(false);
     userService.logout();
     await signOut();
     router.push('/');
   };
-  /* const user = userService.userValue;
-   React.useEffect(() => {
-    if (user && user.name) {
-      setUsername(user.name);
-    }
-  }, [user]); 
-   const onLocaleChange = (e: any) => {
-    setUserPrefs({ ...userPrefs, locale: e.target.value });
-  }; */
 
   return (
     <nav>
@@ -104,19 +97,10 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             >
               {getString('global.home')}
             </HeaderNavButton>
-
-            {/* <div className="">
-              <FormInputSelect
-                onChange={onLocaleChange}
-                value={userPrefs.locale}
-                name={'locale'}
-                options={availableLocales}
-              />
-            </div> */}
             <HeaderNavDivider />
             <HeaderNavButton
               iconName="exit"
-              onClick={logout}
+              onClick={onLogout}
               className="bg-primary-purple shadow-sm-shadow"
               containerClass="cursor-pointer hover:scale-105"
             >
@@ -125,6 +109,13 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
           </div>
         </div>
       </div>
+      <ConfirmationDialog
+        variant={confVariant}
+        show={confirmVisible}
+        onYesClick={handleLogout}
+        onNoClick={() => setConfirmVisible(false)}
+        hasOverlay={false}
+      />
     </nav>
   );
 };
