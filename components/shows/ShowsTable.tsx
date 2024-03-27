@@ -7,8 +7,9 @@ import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 import { tableConfig } from './table/tableConfig';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
+import Prodcutions from './modal/Productions';
 
-const LoadingOverlay = () => (
+export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
     <Spinner size="lg" />
   </div>
@@ -40,6 +41,7 @@ const ShowsTable = ({
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [showProductionsModal, setShowProductionsModal] = useState<boolean>(false);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -55,10 +57,14 @@ const ShowsTable = ({
   }, [isAddRow, tableRef]);
 
   const handleCellClick = async (e) => {
+    console.log(e);
     setShowId(e.data.Id);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {
       setConfirm(true);
+    } else if (e.column.colId === 'productions') {
+      setShowProductionsModal(true);
+      setCurrentShow(e.data);
     } else if (
       e.column.colId === 'EditId' &&
       currentShow?.Id &&
@@ -85,7 +91,7 @@ const ShowsTable = ({
       }
     } else if (
       isAddRow &&
-      e.column.colId === 'EditId' &&
+      e.column.colId === 'editId' &&
       currentShow?.Name.length > 2 &&
       currentShow?.Code.length > 1
     ) {
@@ -143,6 +149,14 @@ const ShowsTable = ({
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
+
+      {showProductionsModal && (
+        <Prodcutions
+          visible={showProductionsModal}
+          onClose={() => setShowProductionsModal(false)}
+          showData={currentShow}
+        />
+      )}
     </>
   );
 };

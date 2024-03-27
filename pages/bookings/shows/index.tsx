@@ -5,7 +5,7 @@ import { getAccountIdFromReq } from 'services/userService';
 import { InitialState } from 'lib/recoil';
 import { getShowsByAccountId } from 'services/ShowService';
 import ShowsTable from 'components/shows/ShowsTable';
-import { showMapper } from 'lib/mappers';
+import { showMapper, showProductionMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
 import { useMemo, useState } from 'react';
@@ -62,7 +62,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
   const shows = (await getShowsByAccountId(AccountId)) || [];
-  const showsList = shows.map(showMapper);
+  console.log(shows);
+  const showsList = shows.map((show) => {
+    return {
+      ...showMapper(show),
+      productions: showProductionMapper(show),
+    };
+  });
   const initialState: InitialState = {
     global: {
       productionJump,
