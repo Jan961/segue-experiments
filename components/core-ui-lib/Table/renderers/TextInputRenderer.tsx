@@ -7,7 +7,7 @@ interface TextInputRendererProps extends TextInputProps {
   eGridCell: HTMLElement;
 }
 
-const TextInputRenderer = ({ eGridCell, ...props }: TextInputRendererProps) => {
+const TextInputRenderer = ({ eGridCell, error, ...props }: TextInputRendererProps) => {
   const inputRef = useRef(null);
 
   const handleOnFocus = () => {
@@ -16,7 +16,7 @@ const TextInputRenderer = ({ eGridCell, ...props }: TextInputRendererProps) => {
 
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
-      <TextInput ref={inputRef} {...props} />
+      <TextInput error={error} ref={inputRef} {...props} />
     </BaseCellRenderer>
   );
 };

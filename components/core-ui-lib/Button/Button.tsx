@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import Icon, { IconName, IconProps } from '../Icon/Icon';
 import { PropsWithChildren } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
 export interface ButtonProps {
   id?: string;

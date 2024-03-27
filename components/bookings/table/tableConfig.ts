@@ -5,7 +5,6 @@ import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
 import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
 import { ITooltipParams } from 'ag-grid-community';
-import BarringCheckButtonRenderer from './BarringCheckButtonRenderer';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -15,6 +14,7 @@ import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
 import TimeArrayRenderer from './TimeArrayRenderer';
 import IconRenderer from './IconRenderer';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
 
@@ -275,10 +275,13 @@ export const gapSuggestColumnDefs = [
   {
     headerName: 'Barring Check',
     field: 'barringCheck',
-    cellRenderer: BarringCheckButtonRenderer,
+    cellRenderer: ButtonRenderer,
     width: 140,
     headerClass: 'text-center',
     resizable: false,
+    cellRendererParams: {
+      buttonText: 'Run Barring Check',
+    },
   },
 ];
 
