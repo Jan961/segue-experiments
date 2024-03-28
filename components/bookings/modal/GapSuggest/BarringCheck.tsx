@@ -1,13 +1,13 @@
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { barredVenueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import Button from 'components/core-ui-lib/Button';
 import { Spinner } from 'components/global/Spinner';
 import Label from 'components/core-ui-lib/Label';
 import useAxios from 'hooks/useAxios';
-import moment from 'moment';
+import { dateToSimple } from 'services/dateService';
 
 type BarringCheckProps = {
   visible: boolean;
@@ -24,10 +24,10 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
   const filteredRows = useMemo(() => {
     const filteredRows = [];
     for (const row of barredVenues || []) {
-      if (!selectedVenueIds.includes(row.Id)) {
+      if (!selectedVenueIds.includes(row.id)) {
         filteredRows.push({
           ...row,
-          formattedDate: moment(row.Date).format('DD/MM/YY'),
+          formattedDate: dateToSimple(row.date),
         });
       }
     }
@@ -56,7 +56,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
         if (data.error) {
           return;
         }
-        const venuesWithConflicts = data?.filter((venue) => venue.hasBarringConflict);
+        const venuesWithConflicts = data?.filter((venue: BarredVenue) => venue.hasBarringConflict);
         setBarredVenues(venuesWithConflicts || []);
       })
       .catch((error) => {
@@ -67,7 +67,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
     tableRef.current?.getApi?.()?.exportDataAsExcel?.();
   };
   const onRowSelected = (e: any) => {
-    setSelectedVenueIds((prev) => [...prev, e.data.Id]);
+    setSelectedVenueIds((prev) => [...prev, e.data.id]);
   };
   const gridOptions = {
     rowSelection: 'multiple',

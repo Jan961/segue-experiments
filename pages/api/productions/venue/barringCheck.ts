@@ -1,9 +1,19 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { checkDateOverlap } from 'services/dateService';
 import { getDateFromWeekNumber } from 'utils/getDateFromWeekNum';
 
-const prisma = new PrismaClient();
+export type BarredVenue = {
+  id: number;
+  name: string;
+  code: string;
+  mileage: number;
+  date: string;
+  hasBarringConflict: boolean;
+  bookingId: number;
+  timeMins: number;
+  info: string;
+};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -16,6 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     venueId: VenueId,
     startDate,
     endDate,
+    includeExcluded,
     barDistance: Miles,
     seats: Seats,
   } = req.body;
@@ -45,15 +56,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const bookingsWithDistances = await prisma.booking.findMany({
       where: {
         DateBlock: { ProductionId },
-        ...(Seats && {
-          Venue: {
-            is: {
+        Venue: {
+          is: {
+            ...(!includeExcluded && {
+              ExcludeFromChecks: false,
+            }),
+            ...(Seats && {
               Seats: {
                 gte: Seats,
               },
-            },
+            }),
           },
-        }),
+        },
       },
       include: {
         Venue: {
@@ -66,15 +80,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     });
 
-    const results = bookingsWithDistances
-      .map(({ Venue: bv, FirstDate }) => {
+    const results: BarredVenue[] = bookingsWithDistances
+      .map(({ Venue: bv, FirstDate, Id }) => {
         // bv stands for booked Venue, All the venues booked on the specified production
         let info = '';
         let isBarred = false;
-        const distanceInfo1 = bv.VenueVenue1[0];
-        const distanceInfo2 = bv.VenueVenue2[0];
-        const distanceInfo = distanceInfo1 || distanceInfo2 || null;
-        const distance = distanceInfo?.Mileage;
+        const venueVenueInfo1 = bv.VenueVenue1[0];
+        const venueVenueInfo2 = bv.VenueVenue2[0];
+        const venueVenueInfo = venueVenueInfo1 || venueVenueInfo2 || null;
+        const distance = venueVenueInfo?.Mileage;
+        if (bv.Id === VenueId || !distance) return null;
         const {
           BarringWeeksPost: bvBarringWeeksPost,
           BarringWeeksPre: bvBarringWeeksPre,
@@ -129,18 +144,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           isBarred = true;
           info = info + `${uv.Name} bars ${bv.Name} over period overlap \n`;
         }
-
         return {
           id: bv.Id,
+          bookingId: Id,
           name: bv.Name,
           code: bv.Code,
           mileage: distance,
           date: FirstDate,
           hasBarringConflict: isBarred,
+          timeInMins: venueVenueInfo.TimeMins,
           info,
         };
       })
-      .sort((a, b) => Number(a?.mileage || 0) - Number(b?.mileage || 0));
+      .filter((venue?: BarredVenue) => venue)
+      .sort((a: BarredVenue, b: BarredVenue) => Number(a?.mileage || 0) - Number(b?.mileage || 0));
 
     res.json(results);
   } catch (error) {

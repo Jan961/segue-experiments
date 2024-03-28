@@ -16,7 +16,7 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
 import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
@@ -80,7 +80,11 @@ const NewBookingView = ({
       },
     })
       .then((data: any) => {
-        updateBarringConflicts(data.map((barredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.Date) })));
+        updateBarringConflicts(
+          data
+            .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
+            .filter((venue: BarredVenue) => venue.hasBarringConflict),
+        );
         if (skipRedirect) return;
         if (data?.length > 0) {
           goToStep(steps.indexOf('Barring Issue'));
