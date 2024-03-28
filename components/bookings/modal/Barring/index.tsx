@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { Spinner } from 'components/global/Spinner';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
@@ -10,10 +10,10 @@ import Table from 'components/core-ui-lib/Table';
 import { formatMinutes } from 'utils/booking';
 import { gridOptions } from '../GapSuggest';
 import { barredVenueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
-import moment from 'moment';
 import Label from 'components/core-ui-lib/Label';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
+import { dateToSimple } from 'services/dateService';
 
 type BarringProps = {
   visible: boolean;
@@ -37,11 +37,11 @@ export default function Barring({ visible, onClose }: BarringProps) {
   const filteredRows = useMemo(() => {
     const filteredRows = [];
     for (const row of rows || []) {
-      if (!selectedVenueIds.includes(row.Id)) {
+      if (!selectedVenueIds.includes(row.id)) {
         filteredRows.push({
           ...row,
-          formattedDate: moment(row.Date).format('DD/MM/YY'),
-          travelTime: formatMinutes(row.TimeMins),
+          formattedDate: dateToSimple(row.date),
+          travelTime: formatMinutes(row.timeMins),
         });
       }
     }
@@ -77,7 +77,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
   };
 
   const onRowSelected = (e: any) => {
-    setSelectedVenueIds((prev) => [...prev, e.data.Id]);
+    setSelectedVenueIds((prev) => [...prev, e.data.id]);
   };
   return (
     <>

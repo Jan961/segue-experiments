@@ -16,7 +16,8 @@
     "cy:local": "cypress open --env WEB_APP_URI=http://localhost:3000",
     "cy:ci": "npx cypress run",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "db-dev":"prisma studio"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
