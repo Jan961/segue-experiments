@@ -104,6 +104,7 @@ export type GetInFitUpDTO = {
   Date: string;
   StatusCode: string;
   Notes: string;
+  PencilNum?: number;
 };
 
 export type RehearsalDTO = {
@@ -115,6 +116,7 @@ export type RehearsalDTO = {
   Notes: string;
   DateType: number;
   DateBlockId?: number;
+  PencilNum?: number;
 };
 
 export type DateDTO = {
@@ -162,6 +164,7 @@ export type OtherDTO = {
   DateTypeName?: string; // missing field at response
   StatusCode: StatusCode;
   Notes?: string;
+  PencilNum?: number;
 };
 
 export type BookingWithVenueDTO = BookingDTO & {

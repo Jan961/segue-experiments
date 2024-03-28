@@ -71,6 +71,7 @@ export class BookingService {
               VenueId,
               StatusCode,
               BookingDate,
+              PencilNum,
             },
             tx,
           );
@@ -84,6 +85,7 @@ export class BookingService {
               Notes,
               BookingDate,
               StatusCode,
+              PencilNum,
             },
             tx,
           );
@@ -98,6 +100,7 @@ export class BookingService {
               Notes,
               BookingDate,
               StatusCode,
+              PencilNum,
             },
             tx,
           );
