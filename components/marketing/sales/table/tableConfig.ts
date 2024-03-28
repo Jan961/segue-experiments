@@ -34,7 +34,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
       onChange: (value) => {
         selectForComparison({
           order: parseInt(value),
-          BookingId: params.data.BookingId,
+          bookingId: params.data.bookingId,
           prodCode: params.data.prodCode,
           prodName: params.data.prodName,
           numPerfs: params.data.numPerfs,
@@ -55,7 +55,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     headerName: 'Production',
     field: 'prodName',
     cellRenderer: DefaultCellRenderer,
-    width: 345,
+    width: 330,
     headerClass: 'border-r-[1px] border-white',
     suppressMovable: true,
     sortable: false,
@@ -104,10 +104,10 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     field: 'salesBtn',
     headerName: 'Sales Data',
     cellRendererParams: {
-      text: 'Sales Data',
+      buttonText: 'Sales Data',
     },
     cellRenderer: ButtonRenderer,
-    width: 108,
+    width: 125,
     cellStyle: {
       textAlign: 'center',
     },

@@ -13,7 +13,7 @@ import { SalesComp } from 'components/bookings/modal/VenueHistory';
 import salesComparison from './utils/salesComparision';
 import { SalesSnapshot } from 'types/MarketingTypes';
 
-export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | '';
+export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue';
 
 export type ProdComp = {
   venueId: number;
@@ -29,16 +29,16 @@ interface SalesTableProps {
   errorMessage?: string;
   primaryBtnTxt?: string;
   showPrimaryBtn?: boolean;
-  handlePrimaryBtnClick?: () => void;
+  onPrimaryBtnClick?: () => void;
   secondaryBtnText?: string;
   showSecondaryBtn?: boolean;
-  handleSecondaryBtnClick?: () => void;
+  onSecondaryBtnClick?: () => void;
   showExportBtn?: boolean;
   backBtnTxt?: string;
   showBackBtn?: boolean;
-  handleBackBtnClick?: () => void;
-  handleCellClick?: (e) => void;
-  handleCellValChange?: (e) => void;
+  onBackBtnClick?: () => void;
+  onCellClick?: (e) => void;
+  onCellValChange?: (e) => void;
   cellRenderParams;
   processing?: boolean;
 }
@@ -51,16 +51,16 @@ export default function SalesTable({
   data,
   primaryBtnTxt,
   showPrimaryBtn = false,
-  handlePrimaryBtnClick,
+  onPrimaryBtnClick,
   secondaryBtnText,
   showSecondaryBtn = false,
-  handleSecondaryBtnClick,
+  onSecondaryBtnClick,
   showExportBtn = false,
   backBtnTxt,
   showBackBtn,
-  handleBackBtnClick,
-  handleCellClick,
-  handleCellValChange,
+  onBackBtnClick,
+  onCellClick,
+  onCellValChange,
   cellRenderParams,
   processing,
   errorMessage,
@@ -74,9 +74,10 @@ export default function SalesTable({
 
   const prodColDefs = useMemo(() => {
     if (variant === 'prodComparision' && Array.isArray(data)) {
-      return prodComparisionColDefs(data.length, handleCellValChange, cellRenderParams.selected);
+      return prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected);
     }
-  }, [data, handleCellValChange, cellRenderParams, variant]);
+    return [];
+  }, [data, onCellValChange, cellRenderParams, variant]);
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
@@ -93,7 +94,7 @@ export default function SalesTable({
       const production = productions.find((production) => production.Id === booking.ProductionId);
 
       processedBookings.push({
-        BookingId: booking.BookingId,
+        bookingId: booking.BookingId,
         prodName: production.ShowCode + production.Code + ' ' + production.ShowName,
         firstPerfDt: formatInputDate(booking.BookingFirstDate),
         numPerfs: booking.PerformanceCount,
@@ -103,28 +104,27 @@ export default function SalesTable({
     });
 
     setRowData(processedBookings);
-
     setColumnDefs(prodColDefs);
   };
 
-  const exec = (variant: string, data) => {
+  const exec = async (variant: string, data) => {
     switch (variant) {
-      case 'salesComparison':
-        salesComparison(data)
-          .then((tableData) => {
-            setColumnDefs(tableData.columnDef);
-            setRowData(tableData.rowData);
-          })
-          .catch((error) => console.log(error));
+      case 'salesComparison': {
+        const tableData = await salesComparison(data);
+        setColumnDefs(tableData.columnDef);
+        setRowData(tableData.rowData);
         break;
+      }
 
-      case 'salesSnapshot':
+      case 'salesSnapshot': {
         salesSnapshot(data);
         break;
+      }
 
-      case 'prodComparision':
+      case 'prodComparision': {
         productionComparision(data);
         break;
+      }
     }
   };
 
@@ -148,8 +148,8 @@ export default function SalesTable({
           columnDefs={columnDefs}
           rowData={rowData}
           styleProps={styleProps}
-          onCellClicked={handleCellClick}
-          onCellValueChange={handleCellValChange}
+          onCellClicked={onCellClick}
+          onCellValueChange={onCellValChange}
         />
 
         <div className="float-right flex flex-row mt-5 py-2">
@@ -159,7 +159,7 @@ export default function SalesTable({
 
           {showBackBtn && (
             <div>
-              <Button className="w-32" variant="secondary" text={backBtnTxt} onClick={handleBackBtnClick} />
+              <Button className="w-32" variant="secondary" text={backBtnTxt} onClick={onBackBtnClick} />
             </div>
           )}
 
@@ -167,7 +167,7 @@ export default function SalesTable({
             <div>
               <Button
                 className="ml-4 w-32"
-                onClick={handleSecondaryBtnClick}
+                onClick={onSecondaryBtnClick}
                 variant={showExportBtn ? 'primary' : 'secondary'}
                 text={secondaryBtnText}
                 iconProps={showExportBtn && { className: 'h-4 w-3' }}
@@ -182,7 +182,7 @@ export default function SalesTable({
                 className="ml-4 w-32 mr-1"
                 variant="primary"
                 text={primaryBtnTxt}
-                onClick={() => handlePrimaryBtnClick()}
+                onClick={() => onPrimaryBtnClick()}
               />
             </div>
           )}

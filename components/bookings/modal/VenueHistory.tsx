@@ -25,7 +25,7 @@ type TableWrapperProps = {
 };
 
 type SelectedBooking = {
-  BookingId: string;
+  bookingId: string;
   order: number;
   prodCode: string;
   prodName: string;
@@ -59,7 +59,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [prodCompData, setProdCompData] = useState<Array<BookingSelectionView>>();
   const [salesCompData, setSalesCompData] = useState<SalesComp>();
   const [salesSnapData, setSalesSnapData] = useState<Array<SalesSnapshot>>();
-  const [currView, setCurrView] = useState<SalesTableVariant>('venue');
   const [errorMessage, setErrorMessage] = useState('');
 
   const { fetchData } = useAxios();
@@ -67,7 +66,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
 
-  const VenueOptions = useMemo(() => {
+  const venueOptions = useMemo(() => {
     const options = [];
     const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
     for (const venueId in venueDict) {
@@ -107,98 +106,83 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     }
   };
 
-  const getData = (dataInput: string | number, view: string) => {
+  const getBookingSelection = async (venueID: string | number) => {
+    const venue = venueDict[venueID];
+    if (venue === undefined) {
+      return;
+    }
+    setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
+    setVenueID(venueID);
+
+    setLoading(true);
+    try {
+      const data = await fetchData({
+        url: '/api/marketing/archivedSales/bookingSelection',
+        method: 'POST',
+        data: {
+          salesByType: 'venue',
+          venueCode: venue.Code,
+          showCode: router.query.ShowCode.toString(),
+        },
+      });
+
+      if (Array.isArray(data) && data.length > 0) {
+        const bookingData = data as Array<BookingSelectionView>;
+
+        // Sort data by BookingFirstDate in descending order (newest production to oldest)
+        const sortedData = bookingData.sort(
+          (a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime(),
+        );
+
+        setProdCompData(sortedData);
+        toggleModal('prodComparision');
+      } else {
+        setVenueSelectView('error');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getProdComparision = async () => {
     setErrorMessage('');
-    switch (view) {
-      case 'venue': {
-        if (typeof dataInput === 'number' && isNaN(dataInput)) {
-          break;
-        }
-        const venue = venueDict[dataInput];
-        if (venue === undefined) {
-          break;
-        }
-        setVenueDesc(venue.Code + ' ' + venue.Name + ' | ' + venue.Town);
-        setVenueID(dataInput);
+    if (selectedBookings.length < 2) {
+      setErrorMessage('Please select at least 2 venues for comparison.');
+      return;
+    }
 
-        setLoading(true);
-        try {
-          fetchData({
-            url: '/api/marketing/archivedSales/bookingSelection',
-            method: 'POST',
-            data: {
-              salesByType: 'venue',
-              venueCode: venue.Code,
-              showCode: router.query.ShowCode.toString(),
-            },
-          })
-            .then((data) => {
-              if (Array.isArray(data) && data.length > 0) {
-                const bookingData = data as Array<BookingSelectionView>;
+    setLoading(true);
+    const data = await fetchData({
+      url: '/api/marketing/sales/read/archived',
+      method: 'POST',
+      data: { bookingIds: selectedBookings.map((obj) => obj.bookingId) },
+    });
 
-                // Sort data by BookingFirstDate in descending order (newest production to oldest)
-                const sortedData = bookingData.sort(
-                  (a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime(),
-                );
+    if (Array.isArray(data) && data.length !== 0) {
+      const salesComp = data as Array<SalesComparison>;
+      setSalesCompData({ tableData: salesComp, bookingIds: selectedBookings });
+      toggleModal('salesComparison');
+    } else {
+      setLoading(false);
+      setErrorMessage('No sales to compare for the selected productions');
+    }
+  };
 
-                setProdCompData(sortedData);
-                setCurrView('prodComparision');
-                toggleModal('prodComparision');
-              } else {
-                setVenueSelectView('error');
-              }
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-        } catch (error) {
-          console.log(error);
-        }
+  const getSalesSnapshot = async (bookingId: string) => {
+    setErrorMessage('');
+    setLoading(true);
+    const data = await fetchData({
+      url: '/api/marketing/sales/read/' + bookingId,
+      method: 'POST',
+    });
 
-        break;
-      }
-
-      case 'prodComparision': {
-        if (selectedBookings.length < 2) {
-          setErrorMessage('Please select at least 2 venues for comparison.');
-          return;
-        }
-
-        setLoading(true);
-        fetchData({
-          url: '/api/marketing/sales/read/archived',
-          method: 'POST',
-          data: { bookingIds: selectedBookings.map((obj) => obj.BookingId) },
-        }).then((data: any) => {
-          if (Array.isArray(data.reponse) && data.response.length > 0) {
-            const salesComp = data.response as Array<SalesComparison>;
-            setSalesCompData({ tableData: salesComp, bookingIds: selectedBookings });
-            toggleModal('salesComparison');
-          } else {
-            setLoading(false);
-            setErrorMessage('No sales to compare for the selected productions');
-          }
-        });
-
-        break;
-      }
-
-      case 'salesSnapshot': {
-        setLoading(true);
-        fetchData({
-          url: '/api/marketing/sales/read/' + dataInput.toString(),
-          method: 'POST',
-        }).then((data) => {
-          if (Array.isArray(data) && data.length > 0) {
-            const salesData = data as Array<SalesSnapshot>;
-            setSalesSnapData(salesData);
-            toggleModal('salesSnapshot');
-          } else {
-            setLoading(false);
-            setErrorMessage('No sales to show for this production');
-          }
-        });
-      }
+    if (Array.isArray(data) && data.length > 0) {
+      const salesData = data as Array<SalesSnapshot>;
+      setSalesSnapData(salesData);
+      toggleModal('salesSnapshot');
+    } else {
+      setLoading(false);
+      setErrorMessage('No sales to show for this production');
     }
   };
 
@@ -207,11 +191,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     if (type === 'salesComparison') {
       setShowResults(false);
       setShowCompSelect(true);
-      setCurrView('prodComparision');
     } else if (type === 'prodComparision') {
       setShowCompSelect(false);
       setShowVenueSelect(true);
-      setCurrView('venue');
     } else if (type === 'venue') {
       setVenueSelectView('select');
     }
@@ -219,45 +201,40 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      getData(e.data.BookingId, 'salesSnapshot');
+      getSalesSnapshot(e.data.bookingId);
     }
   };
 
   const selectForComparison = (selectedValue) => {
-    if (!('type' in selectedValue)) {
-      setSelBookings((prevBookings) => {
-        const tempBookings = [...prevBookings]; // Create a copy to avoid directly mutating state
-
-        if (selectedValue.order === null || isNaN(selectedValue.order)) {
-          const bookingToDel = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
-          if (bookingToDel > -1) {
-            tempBookings.splice(bookingToDel, 1);
-            // Directly returning the new state here, no need to call setSelBookings again
-          }
+    if ('type' in selectedValue === false) {
+      const tempBookings = selectedBookings;
+      if (selectedValue.order === null || isNaN(selectedValue.order)) {
+        const bookingToDel = tempBookings.findIndex((booking) => booking.bookingId === selectedValue.bookingId);
+        if (bookingToDel > -1) {
+          tempBookings.splice(bookingToDel, 1);
+          setSelBookings(tempBookings);
+        }
+      } else {
+        // check to see if the booking has previously been added
+        const bookingIndex = tempBookings.findIndex((booking) => booking.bookingId === selectedValue.bookingId);
+        if (bookingIndex === -1) {
+          tempBookings.push({
+            bookingId: selectedValue.bookingId,
+            order: selectedValue.order,
+            prodCode: selectedValue.prodCode,
+            prodName: selectedValue.prodName,
+            numPerfs: selectedValue.numPerfs,
+          });
         } else {
-          const bookingIndex = tempBookings.findIndex((booking) => booking.BookingId === selectedValue.BookingId);
-          if (bookingIndex === -1) {
-            // Adding a new booking
-            tempBookings.push({
-              BookingId: selectedValue.BookingId,
-              order: selectedValue.order,
-              prodCode: selectedValue.prodCode,
-              prodName: selectedValue.prodName,
-              numPerfs: selectedValue.numPerfs,
-            });
-          } else {
-            // Updating an existing booking
-            tempBookings[bookingIndex] = { ...tempBookings[bookingIndex], order: selectedValue.order };
-          }
+          tempBookings[bookingIndex].order = selectedValue.order;
         }
 
-        // If length of tempBookings is >= 2, errorMessage can be removed
+        // if length of tempBookings is >= 2, errorMessage can be removed
         if (tempBookings.length >= 2) {
           setErrorMessage('');
         }
-
-        return tempBookings; // Return the new state
-      });
+        setSelBookings(tempBookings);
+      }
     }
   };
 
@@ -276,11 +253,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
               <Select
                 className={classNames('my-2 w-full !border-0 text-primary-navy')}
-                options={VenueOptions}
+                options={venueOptions}
                 isClearable
                 isSearchable
                 value={venueID}
-                onChange={(value) => getData(value, currView)}
+                onChange={(value) => getBookingSelection(value)}
                 placeholder={'Please select a venue'}
                 label="Venue"
               />
@@ -327,13 +304,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             showPrimaryBtn={true}
             secondaryBtnText="Cancel"
             showSecondaryBtn={true}
-            handleSecondaryBtnClick={handleModalCancel}
-            handlePrimaryBtnClick={() => getData('', currView)}
-            handleBackBtnClick={() => handleBtnBack('prodComparision')}
+            onSecondaryBtnClick={handleModalCancel}
+            onPrimaryBtnClick={() => getProdComparision()}
+            onBackBtnClick={() => handleBtnBack('prodComparision')}
             backBtnTxt="Back"
-            handleCellClick={handleTableCellClick}
+            onCellClick={handleTableCellClick}
             showBackBtn={true}
-            handleCellValChange={selectForComparison}
+            onCellValChange={selectForComparison}
             data={prodCompData}
             cellRenderParams={{ selected: selectedBookings }}
             processing={loading}
@@ -360,10 +337,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             showSecondaryBtn={true}
             secondaryBtnText="Export"
             primaryBtnTxt="Close"
-            handleSecondaryBtnClick={() => alert('Export to Excel - SK-129')}
-            handlePrimaryBtnClick={() => setShowResults(false)}
+            onSecondaryBtnClick={() => alert('Export to Excel - SK-129')}
+            onPrimaryBtnClick={() => setShowResults(false)}
             showPrimaryBtn={true}
-            handleBackBtnClick={() => handleBtnBack('salesComparison')}
+            onBackBtnClick={() => handleBtnBack('salesComparison')}
             showBackBtn={true}
             backBtnTxt="Back"
             data={salesCompData}
@@ -390,7 +367,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             variant="salesSnapshot"
             primaryBtnTxt="Back"
             showPrimaryBtn={true}
-            handlePrimaryBtnClick={() => setShowSalesSnapshot(false)}
+            onPrimaryBtnClick={() => setShowSalesSnapshot(false)}
             data={salesSnapData}
             processing={loading}
             errorMessage={errorMessage}

@@ -89,7 +89,7 @@ const salesComparison = async (data: SalesComp) => {
         let obj = {};
         seatInfo.forEach((bookSale) => {
           const prodCode = data.bookingIds.find(
-            (booking) => parseInt(booking.BookingId) === bookSale.BookingId,
+            (booking) => parseInt(booking.bookingId) === bookSale.BookingId,
           ).prodCode;
           const seats = bookSale.Seats === null ? 0 : bookSale.Seats;
           const value = bookSale.ValueWithCurrencySymbol === '' ? 'No Sales' : bookSale.ValueWithCurrencySymbol;

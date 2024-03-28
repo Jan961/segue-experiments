@@ -79,21 +79,20 @@ export default async function handle(req, res) {
       formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
     );
 
-    res.send({
-      input: bookingIds.map((x) => ({ BookingId: x })),
-      response: commonData.reduce(
-        (acc, x, idx) => [
-          ...acc,
-          {
-            SetBookingWeekNum: x.SetBookingWeekNum,
-            SetProductionWeekDate: x.SetProductionWeekDate,
-            SetIsFinalFigures: x.SetIsFinalFigures,
-            data: rearrangeArray({ arr: result[idx], bookingIds }),
-          },
-        ],
-        [],
-      ),
-    });
+    const archivedSalesList = commonData.reduce(
+      (acc, x, idx) => [
+        ...acc,
+        {
+          SetBookingWeekNum: x.SetBookingWeekNum,
+          SetProductionWeekDate: x.SetProductionWeekDate,
+          SetIsFinalFigures: x.SetIsFinalFigures,
+          data: rearrangeArray({ arr: result[idx], bookingIds }),
+        },
+      ],
+      [],
+    );
+
+    res.send(archivedSalesList);
   } catch (error) {
     res.status(500).json({ error: 'Error occurred while generating search results.', message: error.message });
   }
