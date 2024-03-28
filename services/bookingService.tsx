@@ -187,13 +187,18 @@ type NewRehearsal = {
   Notes: string;
   VenueId: number;
   DateTypeId: number;
+  PencilNum: number;
 };
 
-export const createNewRehearsal = ({ DateBlockId, StatusCode, BookingDate, Notes, VenueId }: NewRehearsal, tx: any) => {
+export const createNewRehearsal = (
+  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum }: NewRehearsal,
+  tx: any,
+) => {
   return (tx || prisma).rehearsal.create({
     data: {
       Notes,
       StatusCode,
+      PencilNum,
       Date: new Date(BookingDate),
       DateBlock: {
         connect: {
@@ -211,13 +216,18 @@ type NewGetInFitUp = {
   BookingDate: string;
   Notes: string;
   VenueId: number;
+  PencilNum: number;
 };
 
-export const createGetInFitUp = ({ DateBlockId, StatusCode, BookingDate, Notes, VenueId }: NewGetInFitUp, tx: any) => {
+export const createGetInFitUp = (
+  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum }: NewGetInFitUp,
+  tx: any,
+) => {
   return (tx || prisma).getInFitUp.create({
     data: {
       StatusCode,
       Notes,
+      PencilNum,
       Date: new Date(BookingDate),
       DateBlock: {
         connect: {
@@ -239,16 +249,18 @@ type NewOtherBooking = {
   StatusCode: string;
   Notes: string;
   DateTypeId: number;
+  PencilNum: number;
 };
 
 export const createOtherBooking = (
-  { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId }: NewOtherBooking,
+  { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId, PencilNum }: NewOtherBooking,
   tx: any,
 ) => {
   return (tx || prisma).other.create({
     data: {
       Notes,
       StatusCode,
+      PencilNum,
       Date: new Date(BookingDate),
       DateBlock: {
         connect: {

@@ -249,7 +249,7 @@ model GetInFitUp {
   StatusCode          String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
   Date                DateTime  @map("GetInFitUpDate") @db.Date
   Notes               String?   @map("GetInFitUpNotes") @db.LongText
-  GetInFitUpPencilNum Int?
+  PencilNum           Int?      @map("GetInFitUpPencilNum")
   DateBlock           DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
   Venue               Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
 
@@ -264,7 +264,7 @@ model Other {
   StatusCode     String    @map("OtherStatusCode") @db.Char(1)
   Date           DateTime  @map("OtherDate") @db.Date
   Notes          String?   @map("OtherNotes") @db.LongText
-  OtherPencilNum Int?
+  PencilNum      Int?      @map("OtherPencilNum")
   DateBlock      DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Other")
   DateType       DateType  @relation(fields: [DateTypeId], references: [Id], onUpdate: Restrict, map: "DateType_Other")
 
@@ -295,7 +295,7 @@ model Rehearsal {
   DateTypeId         Int               @default(1) @map("RehearsalDateTypeId")
   VenueId            Int?              @map("RehearsalVenueId")
   Notes              String?           @map("RehearsalNotes") @db.LongText
-  RehearsalPencilNum Int?
+  PencilNum          Int?              @map("RehearsalPencilNum")
   DateBlock          DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
   DateType           RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
 
@@ -644,7 +644,7 @@ model Production {
   SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
   IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
   IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  ProductionLogo        Bytes?
+  Logo                  Bytes?                  @map("ProductionLogo")
   AccountUserProduction AccountUserProduction[]
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
