@@ -64,6 +64,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       },
+      orderBy: [
+        {
+          Code: 'asc',
+        },
+      ],
     });
     res.status(200).json(venues);
   } catch (error) {

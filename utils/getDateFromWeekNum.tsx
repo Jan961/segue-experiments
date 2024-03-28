@@ -8,6 +8,7 @@ function getDateFromWeekNum(weekNum: string | number, weekNumToDateMap: { [x: st
 }
 
 export const getDateFromWeekNumber = (date: string, weeknum: number) => {
+  if (!weeknum || !date) return null;
   const startDate = new Date(date);
   const numberOfDays = Math.abs(weeknum < 0 ? weeknum : weeknum - 1) * 7;
   startDate.setDate(weeknum < 0 ? startDate.getDate() - numberOfDays : startDate.getDate() + numberOfDays);
