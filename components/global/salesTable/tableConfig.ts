@@ -1,8 +1,8 @@
-import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
-import DateColumnRenderer from 'components/bookings/table/DateColumnRenderer';
 import getNumericalOptions from 'utils/getNumericalOptions';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
+import formatInputDate from 'utils/dateInputFormat';
 
 const getCellColor = (data) => {
   if (data.isNotOnSale) {
@@ -64,7 +64,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
   {
     headerName: 'Date of First Performance',
     field: 'firstPerfDt',
-    cellRenderer: DateColumnRenderer,
+    cellRenderer: DefaultCellRenderer,
     width: 130,
     cellStyle: {
       textAlign: 'center',
@@ -105,6 +105,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     headerName: 'Sales Data',
     cellRendererParams: {
       buttonText: 'Sales Data',
+      className: 'w-24'
     },
     cellRenderer: ButtonRenderer,
     width: 125,
@@ -138,7 +139,9 @@ export const salesColDefs = (currencySymbol) => [
   {
     headerName: 'Date',
     field: 'weekOf',
-    cellRenderer: DateColumnRenderer,
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.weekOf);
+    },
     width: 120,
     cellStyle: {
       textAlign: 'center',
@@ -245,7 +248,14 @@ export const salesColDefs = (currencySymbol) => [
         const previousTotalValue = previousRowData.totalValue + prevReservations;
         valueChange = currentValue - previousTotalValue;
       }
-      return currencySymbol + valueChange.toFixed(2).toString();
+
+      // if negative display the minus sign before the currencySymbol
+      if(valueChange < 0){
+        return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
+      } else {
+        return currencySymbol + valueChange.toFixed(2).toString();
+      }
+      
     },
     width: 120,
     cellStyle: {
@@ -262,13 +272,18 @@ export const salesColDefs = (currencySymbol) => [
     field: 'seatsChange',
     cellRenderer: function (params) {
       const rowIndex = params.node.rowIndex;
-      const currentValue = parseInt(params.data.seatsSold) + parseInt(params.data.reserved);
+      console.log(params.data)
+      const seatsSold = parseInt(params.data.seatsSold)
+      const reserved = params.data.reserved === "" ? 0 : parseInt(params.data.reserved);
+      const currentValue = seatsSold + reserved;
       let seatsChange;
       if (rowIndex === 0) {
         seatsChange = currentValue;
       } else {
         const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
-        const prevSeats = parseInt(previousRowData.seatsSold) + parseInt(previousRowData.reserved);
+        const prevSeatsSold = parseInt(previousRowData.seatsSold);
+        const prevReserved = previousRowData.reserved === "" ? 0 : parseInt(previousRowData.reserved);
+        const prevSeats = prevSeatsSold + prevReserved;
         seatsChange = currentValue - prevSeats;
       }
       return seatsChange.toString();

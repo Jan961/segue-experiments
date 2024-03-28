@@ -4,19 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
 import { lookupShowCode } from 'services/ShowService';
 import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService';
-
-export type BookingSelectionView = {
-  BookingId: number;
-  BookingStatusCode: string;
-  BookingFirstDate: string;
-  VenueId: number;
-  VenueCode: string;
-  VenueMainAddressTown: string;
-  ProductionId: number;
-  FullProductionCode: string;
-  ProductionLengthWeeks: number;
-  PerformanceCount: number;
-};
+import { BookingSelection } from 'types/MarketingTypes';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -48,7 +36,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     }
     const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-    const data: BookingSelectionView[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`;
+    const data: BookingSelection[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`;
     const results = [];
     const uniqueIds = {};
     const bookingIds = unique(data.map((booking) => booking.BookingId));

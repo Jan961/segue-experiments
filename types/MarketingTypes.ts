@@ -82,3 +82,16 @@ export type SalesSnapshot = {
   isFinal: boolean;
   notOnSaleDate: string;
 };
+
+export type BookingSelection = {
+  BookingId: number;
+  BookingStatusCode: string;
+  BookingFirstDate: string;
+  VenueId: number;
+  VenueCode: string;
+  VenueMainAddressTown: string;
+  ProductionId: number;
+  FullProductionCode: string;
+  ProductionLengthWeeks: number;
+  PerformanceCount: number;
+};
