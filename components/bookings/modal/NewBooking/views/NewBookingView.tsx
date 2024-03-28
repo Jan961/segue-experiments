@@ -67,7 +67,7 @@ const NewBookingView = ({
   const fetchBarredVenues = (skipRedirect = false): Promise<any> => {
     const { venueId, fromDate: startDate, toDate: endDate } = formData;
     return api({
-      url: '/api/productions/venue/barred',
+      url: '/api/productions/venue/barringCheck',
       method: 'POST',
       data: {
         productionId: currentProduction?.Id,

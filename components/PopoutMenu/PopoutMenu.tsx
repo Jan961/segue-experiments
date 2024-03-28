@@ -51,7 +51,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         labelClass: groupHeader,
         options: [
           { label: 'Bookings Home', value: '/bookings', labelClass: leve2 },
-          { label: 'Manage Shows / Productions', value: '', labelClass: leve2 },
+          { label: 'Manage Shows / Productions', value: '/bookings/shows', labelClass: leve2 },
           { label: 'Manage Venue Database', value: '/bookings/venues', labelClass: leve2 },
         ],
       },
