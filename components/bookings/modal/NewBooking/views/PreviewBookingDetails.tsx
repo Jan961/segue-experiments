@@ -3,8 +3,9 @@ import { styleProps, previewColumnDefs } from 'components/bookings/table/tableCo
 import { BookingItem, PreviewDataItem, TForm } from '../reducer';
 import { useRecoilValue } from 'recoil';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { getDateDaysAgo, getDateDaysInFuture, toSql, calculateWeekNumber } from 'services/dateService';
-import moment from 'moment';
+import { calculateWeekNumber } from 'services/dateService';
+
+import { addDays, subDays, parseISO, isWithinInterval } from 'date-fns';
 import { venueState } from 'state/booking/venueState';
 import { bookingStatusMap } from 'config/bookings';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -110,23 +111,23 @@ export default function PreviewBookingDetails({
     }
   };
 
-  const filterBookingsByDateRange = (bookings, startDate, endDate) => {
+  const filterBookingsByDateRange = (bookings = [], startDate: Date, endDate: Date) => {
     const filteredBookings = [];
     bookings.forEach((booking) => {
-      const bookingDate = booking.dateTime;
-      const bookingDateB = moment(bookingDate).format('YYYY-MM-DD');
+      const bookingDate = parseISO(booking.dateTime);
 
       // Check if the booking date is within the specified range
-      const isWithinRange = bookingDateB >= startDate && bookingDate <= endDate;
+      const isWithinRange = isWithinInterval(bookingDate, { start: startDate, end: endDate });
 
       if (isWithinRange) {
         // If the booking is within the range, push it to the new array
         filteredBookings.push(booking);
       }
     });
+
     const sortedFilteredBookings = filteredBookings.sort((a, b) => {
-      const dateA: any = moment(a.dateTime).toDate();
-      const dateB: any = moment(b.dateTime).toDate();
+      const dateA = parseISO(a.dateTime).getTime();
+      const dateB = parseISO(b.dateTime).getTime();
 
       return dateA - dateB;
     });
@@ -161,16 +162,13 @@ export default function PreviewBookingDetails({
     });
 
     const { fromDate, toDate } = formData;
-    const sqlFromDate = toSql(fromDate);
-    const sqlToDate = toSql(toDate);
-    const pastStartDate = getDateDaysAgo(sqlFromDate, 6);
-    const toDateSet = getDateDaysInFuture(sqlToDate, 1);
-    const toDateBottomSet = moment(toDateSet).format('YYYY-MM-DD');
-    const futureEndDate = getDateDaysInFuture(sqlToDate, 7);
-    const pastStartDateP = moment(pastStartDate).format('YYYY-MM-DD');
-    const pastStartDateF = moment(futureEndDate).format('YYYY-MM-DD');
-    const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDateP, sqlFromDate);
-    const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateBottomSet, pastStartDateF);
+    const fromDateAsDate = parseISO(fromDate);
+    const toDateAsDate = parseISO(toDate);
+    const pastStartDate = subDays(fromDateAsDate, 6);
+    const toDateSet = addDays(toDateAsDate, 1);
+    const futureEndDate = addDays(toDateAsDate, 7);
+    const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDate, fromDateAsDate);
+    const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateSet, futureEndDate);
     setRows([...filteredBookingsTop, ...rowItems, ...filteredBookingsBottom]);
     getDistanceInfo(filteredBookingsTop, rowItems, filteredBookingsBottom);
   };
