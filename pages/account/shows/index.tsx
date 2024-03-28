@@ -1,8 +1,7 @@
 import { GetServerSideProps } from 'next';
-import { ShowPageProps, getShowPageProps } from 'services/ShowService';
-import { Shows } from 'components/shows/Shows';
+import { getShowPageProps } from 'services/ShowService';
 
-const ShowSelection = ({ shows }: ShowPageProps) => <Shows shows={shows} />;
+const ShowSelection = () => null;
 
 export const getServerSideProps: GetServerSideProps = (ctx) => getShowPageProps(ctx);
 

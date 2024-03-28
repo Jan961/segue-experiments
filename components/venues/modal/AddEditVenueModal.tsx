@@ -196,7 +196,6 @@ export default function AddEditVenueModal() {
     // Validate Venue Code
     if (!/^[A-Z]{6}$/.test(formData.venueCode)) {
       alert('Venue Code must be exactly 6 uppercase letters.');
-      
     }
 
     // Add logic to save the formData to the database or perform any other actions
