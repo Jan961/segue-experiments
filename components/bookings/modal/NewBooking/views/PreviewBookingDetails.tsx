@@ -13,6 +13,7 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { useEffect, useState } from 'react';
 import { DistanceParams } from 'distance';
 import axios from 'axios';
+import { formatRowsForPencilledBookings } from 'components/bookings/utils';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -50,7 +51,7 @@ export default function PreviewBookingDetails({
     const { data } = await axios.post('/api/distance', payload);
 
     if (data && data.length > 0) {
-      const updated = rowsToUpdate.map((row) => {
+      let updatedRows = rowsToUpdate.map((row) => {
         const distance = data.find((d) => d.Date === row?.dateTime || d.Date === row?.dateAsISOString);
         if (distance) {
           const { Miles, Mins } = distance.option[0];
@@ -58,11 +59,12 @@ export default function PreviewBookingDetails({
         }
         return row;
       });
-      setRows(updated);
+      updatedRows = formatRowsForPencilledBookings(updatedRows);
+      setRows(updatedRows);
     }
   };
 
-  const getDistanceInfo = (previousDates, newDates, futureDates) => {
+  const updateDistanceInfo = (previousDates, newDates, futureDates) => {
     if (newDates) {
       // Filter all rows that have a venue and booking status is Pencilled or Confirmed
       const rowsWithVenues = newDates.filter(({ item }) => typeof item.venue === 'number');
@@ -169,8 +171,9 @@ export default function PreviewBookingDetails({
     const futureEndDate = addDays(toDateAsDate, 7);
     const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDate, fromDateAsDate);
     const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateSet, futureEndDate);
+
     setRows([...filteredBookingsTop, ...rowItems, ...filteredBookingsBottom]);
-    getDistanceInfo(filteredBookingsTop, rowItems, filteredBookingsBottom);
+    updateDistanceInfo(filteredBookingsTop, rowItems, filteredBookingsBottom);
   };
 
   useEffect(() => {
