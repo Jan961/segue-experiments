@@ -52,6 +52,7 @@ export default function PopupModal({
                     variant="lg"
                     className="hover:scale-105 fixed right-4 top-4"
                     onClick={onClose}
+                    data-testid="close-icon"
                   />
                 )}
                 <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>

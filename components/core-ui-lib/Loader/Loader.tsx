@@ -14,7 +14,12 @@ export default function Loader({ text, variant = 'sm' }: LoaderProps) {
   return (
     <div className="flex items-center gap-2">
       {text && <span className={`text-primary-label text-${variant}`}>{text}</span>}
-      <SpinIcon className="animate-spin" width={getSizeForVariant(variant)} height={getSizeForVariant(variant)} />
+      <SpinIcon
+        data-testid="spinIcon"
+        className="animate-spin"
+        width={getSizeForVariant(variant)}
+        height={getSizeForVariant(variant)}
+      />
     </div>
   );
 }

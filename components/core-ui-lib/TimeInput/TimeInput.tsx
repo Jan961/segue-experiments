@@ -8,8 +8,8 @@ type Time = {
 };
 
 interface TimeInputProps {
-  onChange: (e: any) => void;
-  onBlur?: (e: any) => void;
+  onChange: (e: unknown) => void;
+  onBlur?: (e: unknown) => void;
   label?: string;
   value: string | Time;
   name?: string; // Also ID
@@ -20,7 +20,7 @@ const baseClass =
   'flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
 const DEFAULT_TIME = { hrs: '00', min: '00', sec: '00' };
 
-const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
+const isOfTypTime = (t: unknown): t is Time => t.hrs !== undefined && t.min !== undefined;
 
 export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInputProps) {
   const [time, setTime] = useState<Time>(DEFAULT_TIME);
@@ -73,6 +73,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInp
   ) : (
     <div onBlur={handleBlur} className={baseClass}>
       <input
+        data-testid="hourInput"
         name="hrs"
         value={time.hrs}
         type="text"
@@ -84,6 +85,7 @@ export default function TimeInput({ onChange, value, onBlur, disabled }: TimeInp
       />
       <span className="">:</span>
       <input
+        data-testid="minInput"
         name="min"
         value={time.min}
         className="w-10 h-comp-height border-none focus:ring-0 ring-0"
