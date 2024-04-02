@@ -3,8 +3,6 @@ import NoteColumnRenderer from './NoteColumnRenderer';
 import DateColumnRenderer from './DateColumnRenderer';
 import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
-import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -17,6 +15,7 @@ import IconRenderer from './IconRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
+import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -44,7 +43,7 @@ export const columnDefs = [
     minWidth: 120,
   },
   { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 6, flex: 2 },
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
   { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
   {
@@ -74,17 +73,31 @@ export const columnDefs = [
   {
     headerName: '',
     field: 'note',
-    cellRenderer: NoteColumnRenderer,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: (params) => {
+      const isNoteVisible: boolean =
+        (params.data.venue && params.data.dayType) ||
+        (params.data.isRunOfDates && params.firstRowData.venue && params.firstRowData.dayType);
+
+      return {
+        position: 'left',
+        height: 'h-10',
+        tpActive: isNoteVisible,
+        body: params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
+        showIcon: isNoteVisible,
+        showText: false,
+        iconName: 'note-filled',
+        iconColor: params.value ? '#D41818' : '#FFF',
+        iconStroke: params.value ? '' : '#617293',
+      };
+    },
     resizable: false,
     width: 50,
-    tooltipValueGetter: (params: ITooltipParams) =>
-      params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
-    tooltipComponentParams: { left: '-2.5rem' },
-    tooltipComponent: TableTooltip,
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'visible',
     },
   },
 ];
