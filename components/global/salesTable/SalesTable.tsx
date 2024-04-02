@@ -4,8 +4,6 @@ import { tileColors } from 'config/global';
 import { useEffect, useMemo, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
 import { prodComparisionColDefs, salesColDefs } from './tableConfig'
-import Button from 'components/core-ui-lib/Button';
-import { Spinner } from 'components/global/Spinner';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 
@@ -46,35 +44,22 @@ export default function SalesTable({
   containerWidth,
   variant,
   data,
-  primaryBtnTxt,
-  showPrimaryBtn = false,
-  onPrimaryBtnClick,
-  secondaryBtnText,
-  showSecondaryBtn = false,
-  onSecondaryBtnClick,
-  showExportBtn = false,
-  backBtnTxt,
-  showBackBtn,
-  onBackBtnClick,
   onCellClick,
   onCellValChange,
   cellRenderParams,
-  processing,
-  errorMessage,
   productions
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [currency, setCurrency] = useState('£');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
-  const prodColDefs = useMemo(() => {
-    if (variant === 'prodComparision' && Array.isArray(data)) {
-      return prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected);
-    }
-    return [];
-  }, [data, onCellValChange, cellRenderParams, variant]);
+  // To be discussed and reviewed by Arun on his return - this is causing more issues than fixes just now
+  // const prodColDefs = useMemo(() => {
+  //   if (variant === 'prodComparision' && Array.isArray(data)) {
+  //     return prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected);
+  //   }
+  //   return [];
+  // }, [data, onCellValChange, cellRenderParams, variant]);
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
@@ -102,7 +87,7 @@ export default function SalesTable({
     });
     
     setRowData(processedBookings);
-    setColumnDefs(prodColDefs);
+    setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
   };
 
   const exec = async (variant: string, data) => {
@@ -131,14 +116,6 @@ export default function SalesTable({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variant]);
 
-  useEffect(() => {
-    setLoading(processing);
-  }, [processing]);
-
-  useEffect(() => {
-    setError(errorMessage);
-  }, [errorMessage]);
-
   return (
     <div className={classNames(containerWidth, containerHeight)}>
       <div>
@@ -149,8 +126,6 @@ export default function SalesTable({
           onCellClicked={onCellClick}
           onCellValueChange={onCellValChange}
         />
-
-      
       </div>
     </div>
   );

@@ -11,9 +11,10 @@ export type SeatsInfo = {
   DataFound: boolean;
 };
 
+// param.VenueCurrencySymbol to be added back in using unicode value
 const getSeatsRelatedInfo = (param: TSalesView): SeatsInfo => ({
   Seats: param.Seats,
-  ValueWithCurrencySymbol: param.Value ? `${param.VenueCurrencySymbol + numeral(param.Value).format('0,0.00')}` : '',
+  ValueWithCurrencySymbol: param.Value ? `${'£' + numeral(param.Value).format('0,0.00')}` : '',
   BookingId: param.BookingId,
   DataFound: true,
 });

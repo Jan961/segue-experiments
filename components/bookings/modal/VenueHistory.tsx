@@ -155,6 +155,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     } else {
       setLoading(false);
       setErrorMessage('No sales to compare for the selected productions');
+      return;
     }
   };
 
@@ -284,6 +285,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         <div className="w-[920px] h-auto">
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
+          {showCompSelectModal && (
           <SalesTable
             key={JSON.stringify(selectedBookings)}
             containerHeight="h-auto"
@@ -296,6 +298,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             cellRenderParams={{ selected: selectedBookings }}
             productions={productions}
           />
+          )}
 
           <div className="float-right flex flex-row mt-5 py-2">
             <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
@@ -319,6 +322,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         <TableWrapper multiplier={selectedBookings.length}>
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
+            {showResultsModal && (
           <SalesTable
             containerHeight="h-auto"
             containerWidth="w-auto"
@@ -326,6 +330,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             variant="salesComparison"
             data={salesCompData}
           />
+            )}
 
           <div className="float-right flex flex-row mt-5 py-2">
             <div className="text text-base text-primary-red mr-12">{errorMessage}</div>

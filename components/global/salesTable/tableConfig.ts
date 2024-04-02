@@ -23,8 +23,8 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     cellRenderer: SelectRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
-        optionsLength,
-        selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
+        optionsLength, []
+        // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
       ),
       selectForComparison,
       selectedBookings,
