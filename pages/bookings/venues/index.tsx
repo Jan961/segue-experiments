@@ -33,6 +33,11 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   );
 
   const fetchVenues = useCallback(async (payload) => {
+    const { productionId, town, country, searchQuery } = payload || {};
+    if (!(productionId || town || country || searchQuery)) {
+      setVenues([]);
+      return;
+    }
     setVenues(null);
     try {
       const { data } = await axios.post('/api/venue/list', {
@@ -52,11 +57,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   }, []);
 
   useEffect(() => {
-    if (productionId || town || country || search) {
-      filterVenues({ productionId, town, country, searchQuery: search });
-    } else {
-      setVenues([]);
-    }
+    filterVenues({ productionId, town, country, searchQuery: search });
   }, [productionId, town, country, search]);
 
   const updateFilters = (change) => {
