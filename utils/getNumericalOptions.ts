@@ -1,5 +1,5 @@
 function getNumericalOptions(optionsLength: number, omitList: number[]) {
-  if (optionsLength < 1) {
+  if (optionsLength <= 1) {
     return [{ text: '', value: null }];
   }
 
