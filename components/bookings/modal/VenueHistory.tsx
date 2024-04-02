@@ -7,13 +7,15 @@ import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
 import { useRouter } from 'next/router';
-import SalesTable from 'components/marketing/sales/table';
-import { SalesTableVariant } from 'components/marketing/sales/table/SalesTable';
+import SalesTable from 'components/global/salesTable';
+import { SalesTableVariant } from 'components/global/salesTable/SalesTable';
 import useAxios from 'hooks/useAxios';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
-import { BookingSelectionView } from 'pages/api/marketing/archivedSales/bookingSelection';
+import { BookingSelection } from 'types/MarketingTypes';
 import { SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
+import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -22,19 +24,6 @@ interface VenueHistoryProps {
 
 type TableWrapperProps = {
   multiplier: number;
-};
-
-type SelectedBooking = {
-  bookingId: string;
-  order: number;
-  prodCode: string;
-  prodName: string;
-  numPerfs: number;
-};
-
-export type SalesComp = {
-  tableData: Array<SalesComparison>;
-  bookingIds: Array<SelectedBooking>;
 };
 
 const TableWrapper = styled.div<TableWrapperProps>`
@@ -56,10 +45,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
   const [loading, setLoading] = useState<boolean>(false);
-  const [prodCompData, setProdCompData] = useState<Array<BookingSelectionView>>();
+  const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>();
   const [salesCompData, setSalesCompData] = useState<SalesComp>();
   const [salesSnapData, setSalesSnapData] = useState<Array<SalesSnapshot>>();
   const [errorMessage, setErrorMessage] = useState('');
+  const { productions } = useRecoilValue(productionJumpState);
 
   const { fetchData } = useAxios();
 
@@ -127,7 +117,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       });
 
       if (Array.isArray(data) && data.length > 0) {
-        const bookingData = data as Array<BookingSelectionView>;
+        const bookingData = data as Array<BookingSelection>;
 
         // Sort data by BookingFirstDate in descending order (newest production to oldest)
         const sortedData = bookingData.sort(
@@ -295,28 +285,29 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           <SalesTable
-            key={JSON.stringify(selectedBookings)} // forces remount everytime selectedBookings is
+            key={JSON.stringify(selectedBookings)}
             containerHeight="h-auto"
             containerWidth="w-[920px]"
             module="bookings"
             variant="prodComparision"
-            primaryBtnTxt="Compare"
-            showPrimaryBtn={true}
-            secondaryBtnText="Cancel"
-            showSecondaryBtn={true}
-            onSecondaryBtnClick={handleModalCancel}
-            onPrimaryBtnClick={() => getProdComparision()}
-            onBackBtnClick={() => handleBtnBack('prodComparision')}
-            backBtnTxt="Back"
             onCellClick={handleTableCellClick}
-            showBackBtn={true}
             onCellValChange={selectForComparison}
             data={prodCompData}
             cellRenderParams={{ selected: selectedBookings }}
-            processing={loading}
-            errorMessage={errorMessage}
+            productions={productions}
           />
+
+          <div className="float-right flex flex-row mt-5 py-2">
+            <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
+
+            {loading && <Spinner size="sm" className="mr-3" />}
+            <Button className="w-32" variant="secondary" text='Back' onClick={() => handleBtnBack('prodComparision')} />
+            <Button className="ml-4 w-32" onClick={handleModalCancel} variant='secondary' text='Cancel' />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text='Compare' onClick={() => getProdComparision()} />
+          </div>
+
         </div>
+
       </PopupModal>
 
       <PopupModal
@@ -333,20 +324,24 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             containerWidth="w-auto"
             module="bookings"
             variant="salesComparison"
-            showExportBtn={true}
-            showSecondaryBtn={true}
-            secondaryBtnText="Export"
-            primaryBtnTxt="Close"
-            onSecondaryBtnClick={() => alert('Export to Excel - SK-129')}
-            onPrimaryBtnClick={() => setShowResults(false)}
-            showPrimaryBtn={true}
-            onBackBtnClick={() => handleBtnBack('salesComparison')}
-            showBackBtn={true}
-            backBtnTxt="Back"
             data={salesCompData}
-            processing={loading}
-            errorMessage={errorMessage}
           />
+
+          <div className="float-right flex flex-row mt-5 py-2">
+            <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
+
+            {loading && <Spinner size="sm" className="mr-3" />}
+
+            <Button className="w-32" variant="secondary" text='Back' onClick={() => handleBtnBack('salesComparison')} />
+            <Button className="ml-4 w-32" onClick={() => alert('Export to Excel - SK-129')}
+              variant='primary'
+              text='Export'
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName='excel'
+            />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text='Close' onClick={() => setShowResults(false)} />
+          </div>
+
         </TableWrapper>
       </PopupModal>
 
@@ -372,6 +367,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             processing={loading}
             errorMessage={errorMessage}
           />
+
+          <div className="float-right flex flex-row mt-5 py-2">
+            <Button className="w-32" variant="primary" text='Close' onClick={() => setShowSalesSnapshot(false)} />
+          </div>
         </div>
       </PopupModal>
     </div>

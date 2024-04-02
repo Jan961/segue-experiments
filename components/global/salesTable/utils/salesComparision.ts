@@ -1,17 +1,32 @@
-import { SalesComp } from 'components/bookings/modal/VenueHistory';
-import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
+import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
+import { SalesComparison } from 'types/MarketingTypes';
 import formatInputDate from 'utils/dateInputFormat';
+
+export type SelectedBooking = {
+  bookingId: string;
+  order: number;
+  prodCode: string;
+  prodName: string;
+  numPerfs: number;
+};
+
+
+export type SalesComp = {
+  tableData: Array<SalesComparison>;
+  bookingIds: Array<SelectedBooking>;
+};
+
 
 const salesComparison = async (data: SalesComp) => {
   const tempRowData = [];
   const tempColDef = [];
 
   const weekColumn = {
-    headerName: 'Wk', // Empty header name
+    headerName: 'Wk', 
     field: 'week',
     cellRenderer: DefaultCellRenderer,
     suppressMovable: true,
-    headerClass: 'custom-pinned-header', // Make header transparent
+    headerClass: 'custom-pinned-header',
     pinned: 'left',
     lockPinned: true,
     width: 80,

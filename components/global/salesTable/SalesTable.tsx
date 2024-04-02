@@ -3,15 +3,11 @@ import Table from 'components/core-ui-lib/Table';
 import { tileColors } from 'config/global';
 import { useEffect, useMemo, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
-import { prodComparisionColDefs, salesColDefs } from './tableConfig';
-import { useRecoilValue } from 'recoil';
-import { productionJumpState } from 'state/booking/productionJumpState';
+import { prodComparisionColDefs, salesColDefs } from './tableConfig'
 import Button from 'components/core-ui-lib/Button';
 import { Spinner } from 'components/global/Spinner';
-import { BookingSelectionView } from 'pages/api/marketing/archivedSales/bookingSelection';
-import { SalesComp } from 'components/bookings/modal/VenueHistory';
-import salesComparison from './utils/salesComparision';
-import { SalesSnapshot } from 'types/MarketingTypes';
+import salesComparison, { SalesComp } from './utils/salesComparision';
+import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue';
 
@@ -25,7 +21,7 @@ interface SalesTableProps {
   containerWidth: string;
   containerHeight: string;
   variant: SalesTableVariant;
-  data?: Array<BookingSelectionView> | SalesComp | Array<SalesSnapshot>;
+  data?: Array<BookingSelection> | SalesComp | Array<SalesSnapshot>;
   errorMessage?: string;
   primaryBtnTxt?: string;
   showPrimaryBtn?: boolean;
@@ -41,6 +37,7 @@ interface SalesTableProps {
   onCellValChange?: (e) => void;
   cellRenderParams;
   processing?: boolean;
+  productions?: any;
 }
 
 export default function SalesTable({
@@ -64,10 +61,10 @@ export default function SalesTable({
   cellRenderParams,
   processing,
   errorMessage,
+  productions
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
-  const { productions } = useRecoilValue(productionJumpState);
   const [currency, setCurrency] = useState('£');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -88,8 +85,9 @@ export default function SalesTable({
     setColumnDefs(salesColDefs(currency));
   };
 
-  const productionComparision = (data: Array<BookingSelectionView>) => {
+  const productionComparision = (data: Array<BookingSelection>) => {
     const processedBookings = [];
+
     data.forEach((booking) => {
       const production = productions.find((production) => production.Id === booking.ProductionId);
 
@@ -102,7 +100,7 @@ export default function SalesTable({
         prodCode: booking.FullProductionCode,
       });
     });
-
+    
     setRowData(processedBookings);
     setColumnDefs(prodColDefs);
   };
@@ -152,41 +150,7 @@ export default function SalesTable({
           onCellValueChange={onCellValChange}
         />
 
-        <div className="float-right flex flex-row mt-5 py-2">
-          <div className="text text-base text-primary-red mr-12">{error}</div>
-
-          {loading && <Spinner size="sm" className="mr-3" />}
-
-          {showBackBtn && (
-            <div>
-              <Button className="w-32" variant="secondary" text={backBtnTxt} onClick={onBackBtnClick} />
-            </div>
-          )}
-
-          {showSecondaryBtn && (
-            <div>
-              <Button
-                className="ml-4 w-32"
-                onClick={onSecondaryBtnClick}
-                variant={showExportBtn ? 'primary' : 'secondary'}
-                text={secondaryBtnText}
-                iconProps={showExportBtn && { className: 'h-4 w-3' }}
-                sufixIconName={showExportBtn && 'excel'}
-              />
-            </div>
-          )}
-
-          {showPrimaryBtn && (
-            <div>
-              <Button
-                className="ml-4 w-32 mr-1"
-                variant="primary"
-                text={primaryBtnTxt}
-                onClick={() => onPrimaryBtnClick()}
-              />
-            </div>
-          )}
-        </div>
+      
       </div>
     </div>
   );
