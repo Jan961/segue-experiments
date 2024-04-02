@@ -17,8 +17,8 @@ export interface TooltipProps {
 const positionStyle = {
   top: 'bottom-full left-1/2 transform -translate-x-1/2 -translate-y-3',
   bottom: 'top-full left-1/2 transform -translate-x-1/2 translate-y-3',
-  left: 'top-1/2 right-full transform -translate-y-1/2 -translate-x-4',
-  right: 'top-1/2 left-full transform -translate-y-1/2 translate-x-4',
+  left: 'top-1/2 right-full transform -translate-y-1/2 -translate-x-3',
+  right: 'top-1/2 left-full transform -translate-y-1/2 translate-x-3',
 };
 
 const getArrowStyle = (bgColorClass: string) => ({
