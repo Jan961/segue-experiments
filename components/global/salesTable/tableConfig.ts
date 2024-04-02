@@ -28,7 +28,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
       ),
       selectForComparison,
       selectedBookings,
-      placeholder: '-',
+      placeholder: '',
       inline: true,
       className: 'mt-1 w-[112px]',
       onChange: (value) => {

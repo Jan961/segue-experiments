@@ -17,7 +17,7 @@
     "cy:ci": "npx cypress run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "db-dev":"prisma studio"
+    "db-dev": "prisma studio"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -64,6 +64,7 @@
     "csv": "^6.2.6",
     "csv-parser": "^3.0.0",
     "cypress": "^13.6.1",
+    "date-fns": "^3.6.0",
     "decimal.js": "^10.4.3",
     "devextreme-react": "^22.2.4",
     "dns": "file:./src/mock/dns",

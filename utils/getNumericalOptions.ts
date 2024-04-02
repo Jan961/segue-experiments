@@ -1,14 +1,10 @@
 function getNumericalOptions(optionsLength: number, omitList: number[]) {
-  if (optionsLength < 0) {
-    return [{ text: '-', value: null }];
+  if (optionsLength < 1) {
+    return [{ text: '', value: null }];
   }
 
-  return Array.from({ length: optionsLength + 1 }, (_, i) => {
-    if (i === 0) {
-      return { text: '-', value: null };
-    } else {
-      return { text: String(i), value: i };
-    }
+  return Array.from({ length: optionsLength }, (_, i) => {
+    return { text: String(i + 1), value: i + 1 };
   }).filter((option) => !omitList.includes(option.value));
 }
 
