@@ -92,7 +92,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
   const handleSaveNewBooking = async () => {
     try {
       const { data } = await axios.post('/api/bookings/add', state.booking);
-      console.log('Created new booking', data);
       onClose(data);
     } catch (e) {
       console.log('Failed to add new booking', e);
