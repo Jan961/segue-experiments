@@ -103,7 +103,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             CurrencyCode: true,
             Currency: {
               select: {
-                CurrencySymbol: true,
+                SymbolUnicode: true,
               },
             },
           },
@@ -141,7 +141,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       CompNotes,
     } = booking || {};
     const { Seats: Capacity, CurrencyCode } = booking?.Venue || {};
-    const { CurrencySymbol } = booking?.Venue?.Currency || {};
+    const { SymbolUnicode } = booking?.Venue?.Currency || {};
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
     const AvgTicketPrice = salesSummary && salesSummary.Value / salesSummary.Seats;
     const TotalSeats = Capacity * NumberOfPerformances;
@@ -157,7 +157,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
-        VenueCurrencySymbol: CurrencySymbol,
+        VenueCurrencySymbol: SymbolUnicode,
         seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(1)),
         ConversionRate,
         Capacity,

@@ -9,6 +9,7 @@ import AddBooking from './modal/NewBooking';
 import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { isNullOrEmpty } from 'utils';
+import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from './utils';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -85,44 +86,6 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       }
     }
   }, [filter, setFilter, rowData]);
-
-  const formatRowsForPencilledBookings = (values) => {
-    const pencilled = values.filter(({ bookingStatus }) => bookingStatus === 'Pencilled');
-    const groupedByDate = pencilled.reduce((acc, item) => {
-      if (acc[item.date] !== undefined) {
-        acc[item.date] = acc[item.date] + 1;
-      } else {
-        acc[item.date] = 1;
-      }
-      return acc;
-    }, {});
-
-    const multiple = Object.entries(groupedByDate)
-      .filter(([_, v]: [string, number]) => v > 1)
-      .map((arr) => arr[0]);
-
-    const updated = values.map((r) => (multiple.includes(r.date) ? { ...r, multipleVenuesOnSameDate: true } : r));
-    return updated;
-  };
-
-  const formatRowsForMultipeBookingsAtSameVenue = (values) => {
-    const groupedByVenue = values.reduce((acc, item) => {
-      if (item.venue) {
-        acc[item.venue] !== undefined ? (acc[item.venue] = acc[item.venue] + 1) : (acc[item.venue] = 1);
-      }
-
-      return acc;
-    }, {});
-
-    const venuesWithMultipleBookings = Object.entries(groupedByVenue)
-      .filter(([_, v]: [string, number]) => v > 1)
-      .map((arr) => arr[0]);
-
-    const updated = values.map((r) =>
-      venuesWithMultipleBookings.includes(r.venue) ? { ...r, venueHasMultipleBookings: true } : r,
-    );
-    return updated;
-  };
 
   useEffect(() => {
     if (rowData) {

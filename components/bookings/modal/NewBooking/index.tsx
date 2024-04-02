@@ -20,7 +20,7 @@ import CheckMileageView from './views/CheckMileageView';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { bookingState } from 'state/booking/bookingState';
 import useAxios from 'hooks/useAxios';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 
 type AddBookingProps = {
