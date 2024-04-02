@@ -16,7 +16,8 @@
     "cy:local": "cypress open --env WEB_APP_URI=http://localhost:3000",
     "cy:ci": "npx cypress run",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "db-dev":"prisma studio"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -103,6 +104,7 @@
     "rxjs": "^7.5.7",
     "serverless-mysql": "^1.5.4",
     "styled-components": "^6.1.8",
+    "swagger-ui-react": "^5.12.3",
     "tailwindcss": "^3.1.8",
     "tempfile": "^4.0.0",
     "tls": "file:./src/mock/tls",
