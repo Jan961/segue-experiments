@@ -87,7 +87,7 @@ export default function NewBookingDetailsView({
         day: '2-digit',
         month: '2-digit',
         year: '2-digit',
-      })}`.replace(',', ' ');
+      })}`.replace(',', '');
 
       const reorderedDate = formattedDate.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/$3');
 

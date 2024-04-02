@@ -22,9 +22,9 @@ export const styleProps = { headerColor: tileColors.bookings };
 
 const milesFormatter = (params) => (params.value === -1 ? 'No Data' : params.value);
 const travelTimeFormatter = (params) => (params.value === -1 ? 'No Data' : formatMinutes(Number(params.value)));
-const milesCellStyle = ({ value, data }) => ({
+const milesCellStyle = ({ value, data, node }) => ({
   paddingLeft: '0.5rem',
-  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : '#FFF',
+  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : node?.rowStyle?.backgroundColor,
   color: value === -1 ? '#FFBE43' : '#617293',
   fontStyle: value === -1 ? 'italic' : 'normal',
 });
