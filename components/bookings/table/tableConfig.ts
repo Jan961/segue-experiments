@@ -15,7 +15,6 @@ import IconRenderer from './IconRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
-import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -73,24 +72,7 @@ export const columnDefs = [
   {
     headerName: '',
     field: 'note',
-    cellRenderer: DefaultTextRenderer,
-    cellRendererParams: (params) => {
-      const isNoteVisible: boolean =
-        (params.data.venue && params.data.dayType) ||
-        (params.data.isRunOfDates && params.firstRowData.venue && params.firstRowData.dayType);
-
-      return {
-        position: 'left',
-        height: 'h-10',
-        tpActive: isNoteVisible,
-        body: params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
-        showIcon: isNoteVisible,
-        showText: false,
-        iconName: 'note-filled',
-        iconColor: params.value ? '#D41818' : '#FFF',
-        iconStroke: params.value ? '' : '#617293',
-      };
-    },
+    cellRenderer: NoteColumnRenderer,
     resizable: false,
     width: 50,
     cellStyle: {
@@ -335,8 +317,6 @@ export const barredVenueColumnDefs = [
     headerName: '',
     field: 'info',
     cellRenderer: IconRenderer,
-    tooltipComponentParams: { color: '#ffffff', backgroundColor: '#617293' },
-    tooltipValueGetter: (props) => props?.data?.info,
     cellRendererParams: {
       iconName: 'info-circle-solid',
       tooltipPosition: 'left',

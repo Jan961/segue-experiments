@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect, useMemo } from 'react';
+import React, { useState, ReactNode, useMemo } from 'react';
 import classNames from 'classnames';
 
 export interface TooltipProps {
@@ -10,8 +10,7 @@ export interface TooltipProps {
   width?: string;
   bgColorClass?: string;
   txtColorClass?: string;
-  useManualToggle?: boolean;
-  manualToggle?: boolean;
+  disabled?: boolean;
 }
 
 const positionStyle = {
@@ -37,20 +36,13 @@ const Tooltip: React.FC<TooltipProps> = ({
   width = 'w-auto',
   bgColorClass = 'primary-navy',
   txtColorClass = 'text-white',
-  useManualToggle = false,
-  manualToggle,
+  disabled = false,
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
 
-  useEffect(() => {
-    if (useManualToggle) {
-      setShowTooltip(manualToggle);
-    }
-  }, [manualToggle]);
-
   const toggleTooltip = () => {
-    if (!useManualToggle) {
+    if (!disabled) {
       setShowTooltip(!showTooltip);
     }
   };
@@ -67,8 +59,8 @@ const Tooltip: React.FC<TooltipProps> = ({
           >
             <div className={`${arrowStyle[position]}`}></div>
             <div className="text-center">
-              {title && <div className="font-bold leading-[1.125]">{title}</div>}
-              {body && <div className="leading-[1.125]">{body}</div>}
+              {title && <div className="font-bold leading-[1.125] break-words whitespace-normal">{title}</div>}
+              {body && <div className="leading-[1.125] break-words whitespace-normal">{body}</div>}
             </div>
           </div>
         </div>
