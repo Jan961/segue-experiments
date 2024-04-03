@@ -82,6 +82,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
     z-index: 0;
 }
 
+.ag-row:hover {
+    z-index: 2;
+}
+
 .ag-row.ag-row-focus {
     z-index: 1;
 }

@@ -3,8 +3,6 @@ import NoteColumnRenderer from './NoteColumnRenderer';
 import DateColumnRenderer from './DateColumnRenderer';
 import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
-import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -44,7 +42,7 @@ export const columnDefs = [
     minWidth: 120,
   },
   { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 6, flex: 2 },
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
   { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
   {
@@ -77,14 +75,11 @@ export const columnDefs = [
     cellRenderer: NoteColumnRenderer,
     resizable: false,
     width: 50,
-    tooltipValueGetter: (params: ITooltipParams) =>
-      params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
-    tooltipComponentParams: { left: '-2.5rem' },
-    tooltipComponent: TableTooltip,
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'visible',
     },
   },
 ];
@@ -322,8 +317,6 @@ export const barredVenueColumnDefs = [
     headerName: '',
     field: 'info',
     cellRenderer: IconRenderer,
-    tooltipComponentParams: { color: '#ffffff', backgroundColor: '#617293' },
-    tooltipValueGetter: (props) => props?.data?.info,
     cellRendererParams: {
       iconName: 'info-circle-solid',
       tooltipPosition: 'left',

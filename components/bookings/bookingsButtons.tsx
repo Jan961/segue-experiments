@@ -30,9 +30,7 @@ export default function BookingsButtons() {
         body="Please select a current Production"
         position="left"
         width="w-44"
-        // disable tooltip when Production Dropdown = "Please select a production"
-        manualToggle={!ProductionId ? false : bookingsDisabled}
-        useManualToggle={!ProductionId ? true : !bookingsDisabled}
+        disabled={!ProductionId ? true : !bookingsDisabled}
       >
         <Button
           disabled={bookingsDisabled}
