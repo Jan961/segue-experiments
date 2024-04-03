@@ -102,9 +102,9 @@ model Contract {
 }
 
 model Currency {
-  Code                                                               String           @map("CurrencyCode") @id @db.VarChar(3)
+  Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
   Name                                                               String           @map("CurrencyName") @db.VarChar(30)
-  SymbolUnicode                                                      Int?             @map("CurrencySymbolUnicode") 
+  SymbolUnicode                                                      Int?             @map("CurrencySymbolUnicode")
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Venue                                                              Venue[]
@@ -139,7 +139,6 @@ model Venue {
   Name                                                      String               @map("VenueName") @db.VarChar(255)
   StatusCode                                                String               @default("O") @map("VenueStatusCode") @db.VarChar(1)
   Website                                                   String?              @map("VenueWebsite") @db.VarChar(255)
-  Family                                                    String?              @map("VenueFamily") @db.VarChar(100)
   CurrencyCode                                              String               @map("VenueCurrencyCode") @db.VarChar(3)
   VATIndicator                                              Boolean              @default(dbgenerated("(b'0')")) @map("VenueVATIndicator") @db.Bit(1)
   TechSpecsURL                                              String?              @map("VenueTechSpecsURL") @db.VarChar(255)
@@ -163,10 +162,12 @@ model Venue {
   VenueWarningNotes                                         String?              @db.LongText
   ExcludeFromChecks                                         Boolean              @default(dbgenerated("(b'0')")) @map("VenueExcludeFromChecks") @db.Bit(1)
   VenueCountryId                                            Int?
+  FamilyId                                                  Int?                 @map("VenueVenueFamilyId")
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
   Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
+  VenueFamily                                               VenueFamily?         @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]   @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]   @relation("VenueBarredVenue_VBVVenueIdToVenue")
@@ -175,6 +176,7 @@ model Venue {
   VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([CurrencyCode], map: "Currency_Venue")
+  @@index([FamilyId], map: "Venue_VenueFamily")
 }
 
 model VenueBarredVenue {
@@ -243,30 +245,30 @@ model DateBlock {
 }
 
 model GetInFitUp {
-  Id                  Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
-  DateBlockId         Int       @map("GetInFitUpDateBlockId")
-  VenueId             Int       @map("GetInFitUpVenueId")
-  StatusCode          String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
-  Date                DateTime  @map("GetInFitUpDate") @db.Date
-  Notes               String?   @map("GetInFitUpNotes") @db.LongText
-  PencilNum           Int?      @map("GetInFitUpPencilNum")
-  DateBlock           DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
-  Venue               Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
+  Id          Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
+  DateBlockId Int       @map("GetInFitUpDateBlockId")
+  VenueId     Int       @map("GetInFitUpVenueId")
+  StatusCode  String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
+  Date        DateTime  @map("GetInFitUpDate") @db.Date
+  Notes       String?   @map("GetInFitUpNotes") @db.LongText
+  PencilNum   Int?      @map("GetInFitUpPencilNum")
+  DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
+  Venue       Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
 
   @@index([DateBlockId], map: "DateBlock_GetInFitUpDay_idx")
   @@index([VenueId], map: "Venue_GetInFitUpDay_idx")
 }
 
 model Other {
-  Id             Int       @id @default(autoincrement()) @map("OtherId")
-  DateBlockId    Int       @map("OtherDateBlockId")
-  DateTypeId     Int       @map("OtherDateTypeId")
-  StatusCode     String    @map("OtherStatusCode") @db.Char(1)
-  Date           DateTime  @map("OtherDate") @db.Date
-  Notes          String?   @map("OtherNotes") @db.LongText
-  PencilNum      Int?      @map("OtherPencilNum")
-  DateBlock      DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Other")
-  DateType       DateType  @relation(fields: [DateTypeId], references: [Id], onUpdate: Restrict, map: "DateType_Other")
+  Id          Int       @id @default(autoincrement()) @map("OtherId")
+  DateBlockId Int       @map("OtherDateBlockId")
+  DateTypeId  Int       @map("OtherDateTypeId")
+  StatusCode  String    @map("OtherStatusCode") @db.Char(1)
+  Date        DateTime  @map("OtherDate") @db.Date
+  Notes       String?   @map("OtherNotes") @db.LongText
+  PencilNum   Int?      @map("OtherPencilNum")
+  DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Other")
+  DateType    DateType  @relation(fields: [DateTypeId], references: [Id], onUpdate: Restrict, map: "DateType_Other")
 
   @@index([DateBlockId], map: "DateBlock_OtherDay_idx")
   @@index([DateTypeId], map: "OtherDayType_idx")
@@ -287,17 +289,17 @@ model Performance {
 }
 
 model Rehearsal {
-  Id                 Int               @id @default(autoincrement()) @map("RehearsalId")
-  DateBlockId        Int               @map("RehearsalDateBlockId")
-  Town               String?           @map("RehearsalTown") @db.VarChar(50)
-  StatusCode         String            @default("U") @map("RehearsalStatusCode") @db.Char(1)
-  Date               DateTime          @map("RehearsalDate") @db.Date
-  DateTypeId         Int               @default(1) @map("RehearsalDateTypeId")
-  VenueId            Int?              @map("RehearsalVenueId")
-  Notes              String?           @map("RehearsalNotes") @db.LongText
-  PencilNum          Int?              @map("RehearsalPencilNum")
-  DateBlock          DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
-  DateType           RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
+  Id          Int               @id @default(autoincrement()) @map("RehearsalId")
+  DateBlockId Int               @map("RehearsalDateBlockId")
+  Town        String?           @map("RehearsalTown") @db.VarChar(50)
+  StatusCode  String            @default("U") @map("RehearsalStatusCode") @db.Char(1)
+  Date        DateTime          @map("RehearsalDate") @db.Date
+  DateTypeId  Int               @default(1) @map("RehearsalDateTypeId")
+  VenueId     Int?              @map("RehearsalVenueId")
+  Notes       String?           @map("RehearsalNotes") @db.LongText
+  PencilNum   Int?              @map("RehearsalPencilNum")
+  DateBlock   DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
+  DateType    RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
@@ -733,6 +735,12 @@ model RehearsalDateType {
   Rehearsal                            Rehearsal[]
 }
 
+model VenueFamily {
+  Id    Int     @id @default(autoincrement()) @map("VenueFamilyId")
+  Name  String  @map("VenueFamilyName") @db.VarChar(50)
+  Venue Venue[]
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {
   SetId               Int      @default(0)
@@ -806,7 +814,7 @@ view VenueView {
   VenueName                    String  @db.VarChar(255)
   VenueStatusCode              String  @default("O") @db.VarChar(1)
   VenueWebsite                 String? @db.VarChar(255)
-  VenueFamily                  String? @db.VarChar(100)
+  VenueFamily                  String? @db.VarChar(50)
   VenueCurrencyCode            String  @db.VarChar(3)
   VenueVATIndicator            Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   VenueTechSpecsURL            String? @db.VarChar(255)
