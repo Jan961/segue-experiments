@@ -58,13 +58,14 @@ export default async function handle(req, res) {
           },
         };
       }
+
       return {
         ...acc,
         [key]: {
           week: sale.SetBookingWeekNum ? `Week-${sale.SetBookingWeekNum}` : '',
           weekOf: sale.SetSalesFiguresDate,
           seatsSold: parseInt(sale.Seats) || 0,
-          seatsSalePercentage: (sale.Seats / sale.TotalCapacity) * 100,
+          seatsSaleChange: '',
           reservations: '',
           reserved: '',
           venueCurrencySymbol: sale.VenueCurrencySymbol,
@@ -79,7 +80,6 @@ export default async function handle(req, res) {
           capacity: sale.TotalCapacity,
           isFinal: sale.SetIsFinalFigures,
           notOnSaleDate: sale.NotOnSaleDate,
-          // saleType: sale.SaleTypeName,
           ...(sale.SaleTypeName === 'General Sales' && {
             seatsSold: parseInt(sale.Seats),
             totalValue: parseFloat(sale.Value),
@@ -91,6 +91,7 @@ export default async function handle(req, res) {
         },
       };
     }, {});
+
     res.json(Object.values(groupedData));
   } catch (err) {
     console.log(err);

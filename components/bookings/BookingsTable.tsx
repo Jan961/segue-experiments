@@ -2,7 +2,7 @@ import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
-import { bookingState } from 'state/booking/bookingState';
+import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
@@ -15,27 +15,16 @@ interface BookingsTableProps {
   rowData?: any;
 }
 
-type AddBookingModalState = {
-  visible: boolean;
-  startDate?: string;
-  endDate?: string;
-};
-
-const addBookingInitialState = {
-  visible: false,
-  startDate: null,
-  endDate: null,
-};
-
 export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookingDict, setBookingDict] = useRecoilState(bookingState);
+  const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-  const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(addBookingInitialState);
+
   const { fetchData } = useAxios();
 
   const gridOptions = {
@@ -46,7 +35,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
 
   const handleCellClick = (e) => {
     if (!e.data.Id) {
-      setShowAddBookingModal({
+      setShowAddEditBookingModal({
         visible: true,
         startDate: e.data.dateTime,
         endDate: e.data.dateTime,
@@ -99,7 +88,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     if (bookings) {
       router.reload();
     }
-    setShowAddBookingModal(addBookingInitialState);
+    setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
 
   return (
@@ -120,7 +109,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
-      {showAddBookingModal.visible && <AddBooking {...showAddBookingModal} onClose={handleClose} />}
+      {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
     </>
   );
 }

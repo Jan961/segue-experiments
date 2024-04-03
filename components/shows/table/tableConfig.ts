@@ -54,7 +54,7 @@ export const tableConfig = [
     headerClass: 'text-center',
   },
   {
-    headerName: 'Save / Delete',
+    headerName: 'Save',
     field: 'EditId',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
@@ -62,22 +62,18 @@ export const tableConfig = [
       variant: 'primary',
     },
     resizable: false,
-    cellStyle: {
-      paddingLeft: '0.5em',
-      width: 80,
-    },
-    width: 90,
+    width: 74,
     headerClass: 'text-center',
   },
   {
-    headerName: '',
+    headerName: 'Delete',
     field: 'Id',
-    width: 80,
+    width: 90,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Delete',
       variant: 'tertiary',
-      width: 80,
+      paddingLeft: '0.5em',
     },
     resizable: false,
     headerClass: 'text-center',

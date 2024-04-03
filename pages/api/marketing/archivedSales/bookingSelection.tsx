@@ -1,20 +1,10 @@
 import { Prisma } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { unique } from 'radash';
 import { lookupShowCode } from 'services/ShowService';
 import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService';
-
-type BookingSelectionView = {
-  BookingId: number;
-  BookingStatusCode: string;
-  BookingFirstDate: string;
-  VenueId: number;
-  VenueCode: string;
-  VenueMainAddressTown: string;
-  ProductionId: number;
-  FullProductionCode: string;
-  ProductionLengthWeeks: number;
-};
+import { BookingSelection } from 'types/MarketingTypes';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -46,9 +36,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     }
     const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-    const data: BookingSelectionView[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`;
+    const data: BookingSelection[] = await prisma.$queryRaw`select * FROM BookingSelectionView ${where};`;
     const results = [];
     const uniqueIds = {};
+    const bookingIds = unique(data.map((booking) => booking.BookingId));
+    const performances = await prisma.Performance.groupBy({
+      by: ['BookingId'],
+      _count: {
+        Id: true,
+      },
+      where: {
+        BookingId: {
+          in: bookingIds,
+        },
+      },
+    });
+
+    const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
+      acc[curr.BookingId] = curr._count?.Id;
+      return acc;
+    }, {});
 
     data.forEach((selection) => {
       if (!uniqueIds[selection.ProductionId]) {
@@ -56,7 +63,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         results.push(selection); // Push the unique item to the result array
       }
     });
-    res.send(results.sort((a, b) => a.BookingId - b.BookingId));
+    res.send(
+      results
+        .map((booking) => ({ ...booking, PerformanceCount: bookingPerformanceCountMap[booking.BookingId] }))
+        .sort((a, b) => a.BookingId - b.BookingId),
+    );
   } catch (error) {
     console.log('Error:', error);
     res.status(500).send({ ok: false, message: error?.message });

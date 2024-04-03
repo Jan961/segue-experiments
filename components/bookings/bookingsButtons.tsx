@@ -1,21 +1,23 @@
 import Barring from './modal/Barring';
 import Button from 'components/core-ui-lib/Button';
-import AddBooking from './modal/NewBooking';
 import { useEffect, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { BookingReports } from './modal/BookingReports';
+import { VenueHistory } from './modal/VenueHistory';
+import { addEditBookingState } from 'state/booking/bookingState';
 
 export default function BookingsButtons() {
-  const [showAddNewBookingModal, setShowAddNewBookingModal] = useState<boolean>(false);
   const [showBarringModal, setShowBarringModal] = useState<boolean>(false);
   const [bookingsDisabled, setBookingsDisabled] = useState<boolean>(false);
   const [showBookingReportsModal, setShowBookingReportsModal] = useState<boolean>();
+  const [showVenueHistory, setShowVenueHistory] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const production = useRecoilValue(currentProductionSelector);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const setAddNewBookingModalVisible = useSetRecoilState(addEditBookingState);
 
   useEffect(() => {
     setBookingsDisabled(production === undefined || production.IsArchived === true);
@@ -36,7 +38,7 @@ export default function BookingsButtons() {
           disabled={bookingsDisabled}
           text="Create New Booking"
           className="w-[155px]"
-          onClick={() => setShowAddNewBookingModal(true)}
+          onClick={() => setAddNewBookingModalVisible({ visible: true, startDate: null, endDate: null })}
         ></Button>
       </Tooltip>
       <Button
@@ -47,7 +49,12 @@ export default function BookingsButtons() {
         sufixIconName={'excel'}
         onClick={() => setShowBookingReportsModal(true)}
       ></Button>
-      <Button disabled={disabled} text="Venue History" className="w-[155px]"></Button>
+      <Button
+        onClick={() => setShowVenueHistory(true)}
+        disabled={disabled}
+        text="Venue History"
+        className="w-[155px]"
+      ></Button>
 
       <Button
         disabled={disabled}
@@ -57,12 +64,11 @@ export default function BookingsButtons() {
       ></Button>
 
       {showBarringModal && <Barring visible={showBarringModal} onClose={() => setShowBarringModal(false)} />}
-      {showAddNewBookingModal && (
-        <AddBooking visible={showAddNewBookingModal} onClose={() => setShowAddNewBookingModal(false)} />
-      )}
+
       {showBookingReportsModal && (
         <BookingReports visible={showBookingReportsModal} onClose={() => setShowBookingReportsModal(false)} />
       )}
+      {showVenueHistory && <VenueHistory visible={showVenueHistory} onCancel={() => setShowVenueHistory(false)} />}
     </div>
   );
 }
