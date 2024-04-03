@@ -57,7 +57,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   }, []);
 
   useEffect(() => {
-    filterVenues({ productionId, town, country, searchQuery: search });
+    filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
   }, [productionId, town, country, search]);
 
   const updateFilters = (change) => {

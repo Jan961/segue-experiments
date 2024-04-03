@@ -11,9 +11,10 @@ export type SeatsInfo = {
   DataFound: boolean;
 };
 
+// param.VenueCurrencySymbol to be added back in using unicode value
 const getSeatsRelatedInfo = (param: TSalesView): SeatsInfo => ({
   Seats: param.Seats,
-  ValueWithCurrencySymbol: param.Value ? `${param.VenueCurrencySymbol + numeral(param.Value).format('0,0.00')}` : '',
+  ValueWithCurrencySymbol: param.Value ? `${'£' + numeral(param.Value).format('0,0.00')}` : '',
   BookingId: param.BookingId,
   DataFound: true,
 });
@@ -79,22 +80,21 @@ export default async function handle(req, res) {
       formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
     );
 
-    res.send({
-      input: bookingIds.map((x) => ({ BookingId: x })),
-      response: commonData.reduce(
-        (acc, x, idx) => [
-          ...acc,
-          {
-            SetBookingWeekNum: x.SetBookingWeekNum,
-            SetProductionWeekDate: x.SetProductionWeekDate,
-            SetIsFinalFigures: x.SetIsFinalFigures,
-            data: rearrangeArray({ arr: result[idx], bookingIds }),
-          },
-        ],
-        [],
-      ),
-    });
+    const archivedSalesList = commonData.reduce(
+      (acc, x, idx) => [
+        ...acc,
+        {
+          SetBookingWeekNum: x.SetBookingWeekNum,
+          SetProductionWeekDate: x.SetProductionWeekDate,
+          SetIsFinalFigures: x.SetIsFinalFigures,
+          data: rearrangeArray({ arr: result[idx], bookingIds }),
+        },
+      ],
+      [],
+    );
+
+    res.send(archivedSalesList);
   } catch (error) {
-    res.status(403).json({ error: 'Error occurred while generating search results.', message: error.message });
+    res.status(500).json({ error: 'Error occurred while generating search results.', message: error.message });
   }
 }
