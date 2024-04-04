@@ -1,15 +1,8 @@
 import { Prisma } from '@prisma/client';
 import prisma from 'lib/prisma';
-import { TSalesView } from 'types/MarketingTypes';
+import { SeatsInfo, TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
 import { checkAccess, getEmailFromReq } from 'services/userService';
-
-export type SeatsInfo = {
-  Seats: number | null;
-  ValueWithCurrencySymbol: string;
-  BookingId: number;
-  DataFound: boolean;
-};
 
 // param.VenueCurrencySymbol to be added back in using unicode value
 const getSeatsRelatedInfo = (param: TSalesView): SeatsInfo => ({
@@ -17,6 +10,7 @@ const getSeatsRelatedInfo = (param: TSalesView): SeatsInfo => ({
   ValueWithCurrencySymbol: param.Value ? `${'£' + numeral(param.Value).format('0,0.00')}` : '',
   BookingId: param.BookingId,
   DataFound: true,
+  SetSalesFiguresDate: param.SetSalesFiguresDate,
 });
 
 const getSeatsRelatedInfoAsNull = (bookingId: number): SeatsInfo => ({
@@ -24,6 +18,7 @@ const getSeatsRelatedInfoAsNull = (bookingId: number): SeatsInfo => ({
   ValueWithCurrencySymbol: '',
   BookingId: bookingId,
   DataFound: false,
+  SetSalesFiguresDate: '',
 });
 
 const rearrangeArray = ({ arr, bookingIds }: { arr: TSalesView[]; bookingIds: number[] }): SeatsInfo[] => {
