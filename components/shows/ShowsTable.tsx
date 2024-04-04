@@ -21,6 +21,10 @@ const rowClassRules = {
     // Apply custom style if the 'highlightRow' property is true
     return rowData && rowData.highlightRow;
   },
+  'custom-grey-row': (params) => {
+    const rowData = params.data;
+    return rowData && rowData.IsArchived;
+  },
 };
 
 const intShowData = {
@@ -54,9 +58,6 @@ const ShowsTable = ({
   const gridOptions = {
     getRowId: (params) => {
       return params.data.Id;
-    },
-    getRowStyle: (params) => {
-      return params.data.IsArchived ? { color: '#DADCE5' } : '';
     },
     overlayLoadingTemplate: isLoading && <LoadingOverlay />,
   };
