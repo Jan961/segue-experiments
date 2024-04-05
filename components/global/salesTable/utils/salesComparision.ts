@@ -10,19 +10,17 @@ export type SelectedBooking = {
   numPerfs: number;
 };
 
-
 export type SalesComp = {
   tableData: Array<SalesComparison>;
   bookingIds: Array<SelectedBooking>;
 };
-
 
 const salesComparison = async (data: SalesComp) => {
   const tempRowData = [];
   const tempColDef = [];
 
   const weekColumn = {
-    headerName: 'Wk', 
+    headerName: 'Wk',
     field: 'week',
     cellRenderer: DefaultCellRenderer,
     suppressMovable: true,
@@ -58,7 +56,7 @@ const salesComparison = async (data: SalesComp) => {
           children: [
             {
               headerName: 'Date',
-              field: 'weekOf',
+              field: booking.prodCode + '_date',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
               headerClass: 'border-r-[1px] border-white',
@@ -82,7 +80,7 @@ const salesComparison = async (data: SalesComp) => {
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
               headerClass: 'text-center' + (index < data.bookingIds.length - 1 ? ' border-r-4 border-white' : ''),
-              width: 120,
+              width: 122,
               resizable: false,
               sortable: false,
             },
@@ -97,9 +95,9 @@ const salesComparison = async (data: SalesComp) => {
 
   // Processing the row data
   data.tableData.forEach((sale) => {
+    console.log(sale);
     tempRowData.push({
       week: sale.SetBookingWeekNum,
-      weekOf: formatInputDate(sale.SetProductionWeekDate),
       ...(function processData(seatInfo) {
         let obj = {};
         seatInfo.forEach((bookSale) => {
@@ -108,7 +106,13 @@ const salesComparison = async (data: SalesComp) => {
           ).prodCode;
           const seats = bookSale.Seats === null ? 0 : bookSale.Seats;
           const value = bookSale.ValueWithCurrencySymbol === '' ? 'No Sales' : bookSale.ValueWithCurrencySymbol;
-          obj = { ...obj, [prodCode + '_seats']: seats, [prodCode + '_saleValue']: value };
+          const date = bookSale.SetSalesFiguresDate === '' ? '-' : formatInputDate(bookSale.SetSalesFiguresDate);
+          obj = {
+            ...obj,
+            [prodCode + '_seats']: seats,
+            [prodCode + '_saleValue']: value,
+            [prodCode + '_date']: date,
+          };
         });
         return obj;
       })(sale.data),

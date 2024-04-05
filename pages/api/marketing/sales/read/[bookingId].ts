@@ -62,7 +62,7 @@ export default async function handle(req, res) {
       return {
         ...acc,
         [key]: {
-          week: sale.SetBookingWeekNum ? `Week-${sale.SetBookingWeekNum}` : '',
+          week: sale.SetBookingWeekNum ? `Week ${sale.SetBookingWeekNum}` : '',
           weekOf: sale.SetSalesFiguresDate,
           seatsSold: parseInt(sale.Seats) || 0,
           seatsSaleChange: '',
