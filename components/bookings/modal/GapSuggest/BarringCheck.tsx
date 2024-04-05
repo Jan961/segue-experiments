@@ -95,7 +95,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
             Check the box of venues you wish to remove from this list.
           </div>
           <div
-            className="w-[634px] flex flex-col overflow-hidden min-h-40"
+            className="w-[634px] flex flex-col min-h-40"
             style={{ maxHeight: 'calc(100vh - 200px)', minHeight: '110px' }}
           >
             <Table

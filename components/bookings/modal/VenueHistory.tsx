@@ -12,8 +12,7 @@ import { SalesTableVariant } from 'components/global/salesTable/SalesTable';
 import useAxios from 'hooks/useAxios';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
-import { BookingSelection } from 'types/MarketingTypes';
-import { SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
+import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
 import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
@@ -58,18 +57,15 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const venueOptions = useMemo(() => {
     const options = [];
-    const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
     for (const venueId in venueDict) {
       const venue = venueDict[venueId];
       const option = {
         text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
         value: venue?.Id,
       };
-      if (currentProductionVenues.includes(parseInt(venueId, 10))) {
-        continue;
-      }
       options.push(option);
     }
+    options.sort((a, b) => a.text.localeCompare(b.text));
     return options;
   }, [venueDict, bookingDict]);
 
@@ -155,7 +151,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     } else {
       setLoading(false);
       setErrorMessage('No sales to compare for the selected productions');
-      return;
     }
   };
 
@@ -237,7 +232,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
       >
-        <div className="w-[417px] h-[130px]">
+        <div className="w-[417px]">
           {venueSelectView === 'select' ? (
             <div>
               <div className="text text-primary-navy">Please select a venue for comparision</div>
@@ -254,9 +249,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               />
 
               <div className="float-right flex flex-row">
-                {loading && <Spinner size="sm" className="mt-4 mr-3" />}
-
-                <Button className="px-8 mt-4 " onClick={handleModalCancel} variant="secondary" text={'Cancel'}></Button>
+                {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
+                <Button
+                  className="px-8 mt-2 -mb-1"
+                  onClick={handleModalCancel}
+                  variant="secondary"
+                  text={'Cancel'}
+                ></Button>
               </div>
             </div>
           ) : (
@@ -286,31 +285,29 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           {showCompSelectModal && (
-          <SalesTable
-            key={JSON.stringify(selectedBookings)}
-            containerHeight="h-auto"
-            containerWidth="w-[920px]"
-            module="bookings"
-            variant="prodComparision"
-            onCellClick={handleTableCellClick}
-            onCellValChange={selectForComparison}
-            data={prodCompData}
-            cellRenderParams={{ selected: selectedBookings }}
-            productions={productions}
-          />
+            <SalesTable
+              key={JSON.stringify(selectedBookings)}
+              containerHeight="h-auto"
+              containerWidth="w-[920px]"
+              module="bookings"
+              variant="prodComparision"
+              onCellClick={handleTableCellClick}
+              onCellValChange={selectForComparison}
+              data={prodCompData}
+              cellRenderParams={{ selected: selectedBookings }}
+              productions={productions}
+            />
           )}
 
           <div className="float-right flex flex-row mt-5 py-2">
             <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 
             {loading && <Spinner size="sm" className="mr-3" />}
-            <Button className="w-32" variant="secondary" text='Back' onClick={() => handleBtnBack('prodComparision')} />
-            <Button className="ml-4 w-32" onClick={handleModalCancel} variant='secondary' text='Cancel' />
-            <Button className="ml-4 w-32 mr-1" variant="primary" text='Compare' onClick={() => getProdComparision()} />
+            <Button className="w-32" variant="secondary" text="Back" onClick={() => handleBtnBack('prodComparision')} />
+            <Button className="ml-4 w-32" onClick={handleModalCancel} variant="secondary" text="Cancel" />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text="Compare" onClick={() => getProdComparision()} />
           </div>
-
         </div>
-
       </PopupModal>
 
       <PopupModal
@@ -322,31 +319,32 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         <TableWrapper multiplier={selectedBookings.length}>
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
-            {showResultsModal && (
-          <SalesTable
-            containerHeight="h-auto"
-            containerWidth="w-auto"
-            module="bookings"
-            variant="salesComparison"
-            data={salesCompData}
-          />
-            )}
+          {showResultsModal && (
+            <SalesTable
+              containerHeight="h-auto"
+              containerWidth="w-auto"
+              module="bookings"
+              variant="salesComparison"
+              data={salesCompData}
+            />
+          )}
 
           <div className="float-right flex flex-row mt-5 py-2">
             <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 
             {loading && <Spinner size="sm" className="mr-3" />}
 
-            <Button className="w-32" variant="secondary" text='Back' onClick={() => handleBtnBack('salesComparison')} />
-            <Button className="ml-4 w-32" onClick={() => alert('Export to Excel - SK-129')}
-              variant='primary'
-              text='Export'
+            <Button className="w-32" variant="secondary" text="Back" onClick={() => handleBtnBack('salesComparison')} />
+            <Button
+              className="ml-4 w-32"
+              onClick={() => alert('Export to Excel - SK-129')}
+              variant="primary"
+              text="Export"
               iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName='excel'
+              sufixIconName="excel"
             />
-            <Button className="ml-4 w-32 mr-1" variant="primary" text='Close' onClick={() => setShowResults(false)} />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={() => setShowResults(false)} />
           </div>
-
         </TableWrapper>
       </PopupModal>
 
@@ -374,7 +372,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
-            <Button className="w-32" variant="primary" text='Close' onClick={() => setShowSalesSnapshot(false)} />
+            <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
         </div>
       </PopupModal>

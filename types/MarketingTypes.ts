@@ -53,6 +53,7 @@ export type SeatsInfo = {
   ValueWithCurrencySymbol: string;
   BookingId: number;
   DataFound: boolean;
+  SetSalesFiguresDate: string;
 };
 
 export type SalesComparison = {
@@ -96,11 +97,11 @@ export type BookingSelection = {
   PerformanceCount: number;
 };
 
-export type SalesTable = 
-  'sales' |
-  'archived sales' |
-  'activities' |
-  'contact notes' |
-  'venue contacts' |
-  'promoter holds' |
-  'attachments';
+export type SalesTable =
+  | 'sales'
+  | 'archived sales'
+  | 'activities'
+  | 'contact notes'
+  | 'venue contacts'
+  | 'promoter holds'
+  | 'attachments';
