@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import NewBookingView from './views/NewBookingView';
 import BookingConflictsView from './views/BookingConflictsView';
 import BarringIssueView from './views/BarringIssueView';
-import { useMemo, useReducer, useState } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, OTHER_DAY_TYPES } from 'config/AddBooking';
@@ -21,18 +21,24 @@ import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { bookingState } from 'state/booking/bookingState';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
+import { rowsSelector } from 'state/booking/selectors/rowsSelector';
+import { statusOptions } from 'config/bookings';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
+import { getRunOfDates } from 'components/bookings/utils';
+import { isNullOrEmpty } from 'utils';
 
 type AddBookingProps = {
   visible: boolean;
   onClose: (bookings?: any) => void;
   startDate?: string;
   endDate?: string;
+  booking?: any;
 };
 
-const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
+const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookingProps) => {
   const bookingDict = useRecoilValue(bookingState);
+  const { rows: bookings } = useRecoilValue(rowsSelector);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
@@ -44,6 +50,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     },
   }));
 
+  const editBooking = !!booking && !startDate && !endDate;
   const currentProduction = useRecoilValue(currentProductionSelector);
   const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
   const primaryBlock = scheduleDateBlocks?.find(({ IsPrimary }) => !!IsPrimary);
@@ -90,6 +97,40 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
+  useEffect(() => {
+    if (booking) {
+      console.log('Booking is', booking);
+      // Check for run of dates
+      const filteredBookings = bookings.filter(
+        ({ venueId, dayType, bookingStatus }) =>
+          venueId === booking.venueId && dayType === booking.dayType && bookingStatus !== 'Cancelled',
+      );
+      const runOfDates = getRunOfDates(filteredBookings, booking);
+      const bookingsToEdit = isNullOrEmpty(runOfDates) ? [booking] : runOfDates;
+      // format booking and set on state
+      const formattedBooking: BookingItem[] = [bookingsToEdit].map((b) => {
+        return {
+          date: b.date,
+          dateAsISOString: b.dateTime,
+          dateBlockId: primaryBlock?.Id,
+          dayType: dayTypeOptions.find((option) => option.text === b.dayType)?.value,
+          venue: b.venueId,
+          perf: b.dayType === 'Performance',
+          bookingStatus: statusOptions.find((option) => option.text === b.dayType)?.value as string,
+          notes: b.note,
+          noPerf: b.performanceCount,
+          times: b.performanceTimes,
+          pencilNo: b.count,
+          isBooking: b.dayType === 'Performance',
+          isRehearsal: b.dayType === 'Rehearsal',
+          isGetInFitUp: b.dayType === 'Get in / Fit Up',
+        };
+      });
+
+      dispatch(actionSpreader(Actions.UPDATE_BOOKING, formattedBooking));
+    }
+  }, [booking]);
+
   const handleSaveNewBooking = async () => {
     const runTagForRunOfDates = nanoid(8);
     try {
@@ -114,28 +155,20 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       hasOverlay={hasOverlay}
     >
       <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
-        <NewBookingView
-          updateBookingConflicts={updateBookingConflicts}
-          updateBarringConflicts={updateBarringConflicts}
-          dayTypeOptions={dayTypeOptions}
-          onChange={onFormDataChange}
-          onSubmit={setNewBookingOnStore}
-          formData={state.form}
-          onClose={onClose}
-          productionCode={productionCode}
-          venueOptions={venueOptions}
-          updateModalTitle={updateModalTitle}
-        />
-        <BookingConflictsView
-          hasBarringIssues={state?.barringConflicts?.length > 0}
-          data={state.bookingConflicts}
-          updateModalTitle={updateModalTitle}
-        />
-        <BarringIssueView
-          bookingConflicts={state.bookingConflicts}
-          barringConflicts={state.barringConflicts}
-          updateModalTitle={updateModalTitle}
-        />
+        {!editBooking && (
+          <NewBookingView
+            updateBookingConflicts={updateBookingConflicts}
+            updateBarringConflicts={updateBarringConflicts}
+            dayTypeOptions={dayTypeOptions}
+            onChange={onFormDataChange}
+            onSubmit={setNewBookingOnStore}
+            formData={state.form}
+            onClose={onClose}
+            productionCode={productionCode}
+            venueOptions={venueOptions}
+            updateModalTitle={updateModalTitle}
+          />
+        )}
         <NewBookingDetailsView
           formData={state.form}
           data={state.booking}
@@ -168,6 +201,16 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           productionId={currentProduction?.Id}
           startDate={state.form.fromDate}
           endDate={state.form.toDate}
+          updateModalTitle={updateModalTitle}
+        />
+        <BookingConflictsView
+          hasBarringIssues={state?.barringConflicts?.length > 0}
+          data={state.bookingConflicts}
+          updateModalTitle={updateModalTitle}
+        />
+        <BarringIssueView
+          bookingConflicts={state.bookingConflicts}
+          barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
         />
       </Wizard>

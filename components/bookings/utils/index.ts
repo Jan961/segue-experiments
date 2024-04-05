@@ -1,5 +1,42 @@
+import { sub, format, add, parseISO } from 'date-fns';
+import { isNullOrEmpty } from 'utils';
+
 export const DAY_TYPE_FILTERS = ['Performance', 'Rehearsal', 'Tech / Dress', 'Get in / Fit Up', 'Get Out'];
 export const RUN_OF_DATES_DAY_TYPE_FILTERS = [...DAY_TYPE_FILTERS, 'Day Off'];
+
+const getNextBooking = (bookings, date, order: 'before' | 'after') => {
+  const nextDay = order === 'before' ? sub(date, { days: 1 }) : add(date, { days: 1 });
+  const formattedNextDay = format(nextDay, 'EEE dd/MM/yy');
+
+  const prev = bookings.findLast(({ date }) => formattedNextDay === date);
+  return prev;
+};
+
+export const getConsecutiveBookings = (bookings, givenDate, order: 'before' | 'after') => {
+  const result = [];
+  let consecutiveDate = givenDate;
+
+  while (consecutiveDate) {
+    const nextBooking = getNextBooking(bookings, consecutiveDate, order);
+    if (nextBooking) {
+      result.push(nextBooking);
+    }
+    consecutiveDate = nextBooking ? parseISO(nextBooking.dateTime) : null;
+  }
+  return result;
+};
+
+export const getRunOfDates = (bookings, booking) => {
+  if (isNullOrEmpty(bookings) || !booking) {
+    return [];
+  }
+  const bookingDate = parseISO(booking.dateTime);
+
+  const previousBookings = getConsecutiveBookings(bookings, bookingDate, 'before');
+  const futureBookings = getConsecutiveBookings(bookings, bookingDate, 'after');
+
+  return [...previousBookings, booking, ...futureBookings];
+};
 
 export const getVenueForDayType = (dayTypeOptions, dayType) => {
   const selectedDayTypeOption = dayTypeOptions.find(({ value }) => dayType === value);

@@ -7,12 +7,14 @@ export type AddEditBookingState = {
   visible: boolean;
   startDate?: string;
   endDate?: string;
+  booking?: any;
 };
 
 export const ADD_EDIT_MODAL_DEFAULT_STATE = {
   visible: false,
   startDate: null,
   endDate: null,
+  booking: null,
 };
 
 export const bookingState = atom({

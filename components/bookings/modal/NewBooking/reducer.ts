@@ -19,7 +19,6 @@ export type TForm = {
 };
 
 export type BookingItem = {
-  map(arg0: (item: any) => any): unknown;
   date: string | Date;
   dateBlockId: number;
   dateAsISOString: string;
