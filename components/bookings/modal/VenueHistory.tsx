@@ -12,7 +12,7 @@ import { SalesTableVariant } from 'components/global/salesTable/SalesTable';
 import useAxios from 'hooks/useAxios';
 import styled from 'styled-components';
 import { Spinner } from 'components/global/Spinner';
-import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/marketingTypes';
+import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
 import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
 import { productionJumpState } from 'state/booking/productionJumpState';
 

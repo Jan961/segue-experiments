@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import prisma from 'lib/prisma';
-import { SeatsInfo, TSalesView } from 'types/marketingTypes';
+import { SeatsInfo, TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 

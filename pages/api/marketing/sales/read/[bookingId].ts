@@ -1,5 +1,5 @@
 import prisma from 'lib/prisma';
-import { TSalesView } from 'types/marketingTypes';
+import { TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 

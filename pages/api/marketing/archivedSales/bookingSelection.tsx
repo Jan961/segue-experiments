@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
 import { lookupShowCode } from 'services/ShowService';
 import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService';
-import { BookingSelection } from 'types/marketingTypes';
+import { BookingSelection } from 'types/MarketingTypes';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
