@@ -141,3 +141,11 @@ export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO>
   const { Venue1Id, TimeMins, Mileage } = distance[0];
   return { Date: stop.Date, option: [{ VenueId: Venue1Id, Mins: TimeMins, Miles: Mileage }] };
 };
+
+export const getAllVenueFamilyList = () => {
+  return prisma.VenueFamily.findMany({
+    orderBy: {
+      Name: 'asc',
+    },
+  });
+};

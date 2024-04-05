@@ -1,16 +1,31 @@
+import { useState } from 'react';
 import { barredVenues, styleProps, venueContractDefs } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Icon from 'components/core-ui-lib/Icon';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import Table from 'components/core-ui-lib/Table';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Tooltip from 'components/core-ui-lib/Tooltip';
-import { useState } from 'react';
+import { barredVenuesData, dummyVenueContractData, initialVenueState, venueStatusOptions } from 'config/Venue';
+import schema from './validation';
 
-export default function AddEditVenueModal() {
+type AddEditVenueModalProps = {
+  visible: boolean;
+  venueCurrencyOptionList: SelectOption[];
+  venueFamilyOptionList: SelectOption[];
+  onClose: () => void;
+};
+
+export default function AddEditVenueModal({
+  visible,
+  venueCurrencyOptionList,
+  venueFamilyOptionList,
+  onClose,
+}: AddEditVenueModalProps) {
   const getRowStyle = (params) => {
     if (params.node.rowIndex === 0) {
       // Change 'red' to your desired background color
@@ -18,193 +33,63 @@ export default function AddEditVenueModal() {
     }
     return null;
   };
-  const dummyVenueContractData = [
-    {
-      VenueRole: 'Enter Job title',
-      VenueFirstName: 'Enter First Name',
-      VenueLastName: 'Enter Last Name',
-      VenuePhone: 'Enter Phone No.',
-      VenueEmail: 'Enter Email Address',
-      delete: true,
-    },
-    {
-      VenueRole: 'Box Office Default',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Box Office Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Finance Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Front of House Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Marketing Contact',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Marketing Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Operations Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Stage Door',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Technical Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Venue Chief LX',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Venue Head of Sound',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Venue Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Venue Programming',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    {
-      VenueRole: 'Venue Stage Manager',
-      VenueFirstName: 'First Name',
-      VenueLastName: 'Last Name',
-      VenuePhone: '(00) 0000 000000',
-      VenueEmail: 'name@theatrecompany.com',
-      delete: false,
-    },
-    // Add more dummy data as needed
-  ];
 
-  const barredVenuesData = [
-    {
-      venueOptions: 'test',
-    },
-    {
-      venueOptions: 'test-2',
-    },
-    // Add more dummy data as needed
-  ];
-  const [formData, setFormData] = useState({
-    venueCode: '',
-    venueName: '',
-    venueStatus: '',
-  });
-
-  // const handleInputChange = (field, value) => {
-  //   setFormData({
-  //     ...formData,
-  //     [field]: value,
-  //   });
-  // };
-  const handleInputChange = (field, value) => {
+  const [formData, setFormData] = useState(initialVenueState);
+  const [validationErrors, setValidationErrors] = useState({});
+  const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
-
-    // Additional logic for Venue Code field
     if (field === 'venueCode') {
-      // Ensure only letters are allowed
-      sanitizedValue = sanitizedValue.replace(/[^a-zA-Z]/g, '');
-
-      // // Capitalize the value
-      // sanitizedValue = sanitizedValue.toUpperCase();
+      sanitizedValue = sanitizedValue?.replace(/[^a-zA-Z]/g, '').toUpperCase();
     }
-
     setFormData({
       ...formData,
       [field]: sanitizedValue,
     });
   };
 
-  const handleSaveAndClose = () => {
-    // Validate Venue Name
-    if (!formData.venueName) {
-      alert('Venue Name is required.');
-      return;
+  const handleSaveAndClose = async () => {
+    const isValid = await validateVenue(formData);
+    if (isValid) {
+      // TODO: Api call to create/edit Venue
+      console.log(`Venue	errors`, validationErrors);
     }
-
-    // Validate Venue Code
-    if (!formData.venueCode) {
-      alert('Venue Code is required.');
-      return;
-    }
-    // Validate Venue Code
-    if (!/^[A-Z]{6}$/.test(formData.venueCode)) {
-      alert('Venue Code must be exactly 6 uppercase letters.');
-    }
-
-    // Add logic to save the formData to the database or perform any other actions
-
-    // Close the modal or perform any other necessary actions
   };
+  const addNewBarredVenue = () => {
+    console.log('Adding new venue is in Progress	');
+  };
+  const onAddNewVenueContact = () => {
+    console.log('Adding new venue is in Progress	');
+  };
+
+  async function validateVenue(data) {
+    return schema
+      .validate(
+        {
+          ...data,
+        },
+        { abortEarly: false },
+      )
+      .then(() => {
+        return true;
+      })
+      .catch((validationErrors) => {
+        const errors = {};
+        validationErrors.inner.forEach((error) => {
+          errors[error.path] = error.message;
+        });
+        setValidationErrors(errors);
+        return false;
+      });
+  }
   return (
     <>
-      <PopupModal title="Add / Edit Venue" show={false} panelClass="relative" titleClass="text-xl text-primary-navy ">
+      <PopupModal
+        onClose={onClose}
+        title="Add / Edit Venue"
+        show={visible}
+        panelClass="relative"
+        titleClass="text-xl text-primary-navy "
+      >
         <form className="w-[1026px]">
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
           <div className="grid grid-cols-2 gap-5">
@@ -216,24 +101,21 @@ export default function AddEditVenueModal() {
                 body="Venue Code is the first three letters of the town followed by the first three letters of the venue. eg. King's Theatre, Glasgow would have the code GLAKIN."
               >
                 <TextInput
-                  placeholder="Enter Venue Code"
-                  type=""
                   id="venueCode"
+                  type="text"
+                  maxlength={6}
                   className="w-[364px]"
+                  placeholder="Enter Venue Code"
                   iconName="info-circle-solid"
                   value={formData.venueCode}
-                  onBlur={() => handleInputChange('venueCode', formData.venueCode.toUpperCase())}
+                  onBlur={() => handleInputChange('venueCode', formData.venueCode)}
                   onChange={(e) => handleInputChange('venueCode', e.target.value)}
                 />
               </Tooltip>
             </label>
             <Select
               label="Venue Status"
-              options={[
-                { text: 'Open', value: 'open' },
-                { text: 'Closed', value: 'closed' },
-                { text: 'Warning', value: 'warning' },
-              ]}
+              options={venueStatusOptions}
               onChange={(value) => handleInputChange('venueStatus', value)}
               value={formData.venueStatus}
               placeholder="<Venue Status DROPDOWN>"
@@ -253,44 +135,55 @@ export default function AddEditVenueModal() {
             <div className="flex flex-row justify-between pl-20">
               <Checkbox
                 label="VAT Indicator"
-                id={''}
-                onChange={function (e: any): void {
-                  throw new Error('Function not implemented.', e);
-                }}
+                id={'vatIndicator'}
+                onChange={(e) => handleInputChange('vatIndicator', e.target.value)}
               />
               <Checkbox
-                label="Culturally Excempt Venue"
-                id={''}
-                onChange={function (e: any): void {
-                  throw new Error('Function not implemented.', e);
-                }}
+                label="Culturally Exempt Venue"
+                id={'culturallyExemptVenue'}
+                onChange={(e) => handleInputChange('culturallyExemptVenue', e.target.value)}
               />
             </div>
             <label className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Venue Family</p>
               <Select
+                name="venueFamily"
                 placeholder="Venue Family Dropdown"
                 className="w-[364px] font-bold"
-                onChange={console.log}
-                options={[]}
+                onChange={(value) => handleInputChange('venueFamily', value)}
+                options={venueFamilyOptionList}
               />
             </label>
             <label className="flex flex-row gap-5 justify-between  ">
               <p className="text-primary-input-text">Currency</p>
               <Select
+                name="currency"
                 className="mr-[175px] font-bold"
                 placeholder="Currency Dropdown"
-                onChange={console.log}
-                options={[]}
+                onChange={(value) => handleInputChange('currency', value)}
+                options={venueCurrencyOptionList}
+                isSearchable
               />
             </label>
             <label htmlFor="" className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Capacity</p>
-              <TextInput placeholder="Enter Capacity" type="" className="w-[364px]" />
+              <TextInput
+                placeholder="Enter Capacity"
+                type="number"
+                className="w-[364px]"
+                value={formData.venueCapacity}
+                onChange={(e) => handleInputChange('venueCapacity', e.target.value)}
+              />
             </label>
             <label htmlFor="" className="flex flex-row gap-5 justify-between ">
               <p className="text-primary-input-text">Town Population</p>
-              <TextInput placeholder="Enter Town Population" type="" className="w-[364px]" />
+              <TextInput
+                placeholder="Enter Town Population"
+                type="number"
+                className="w-[364px]"
+                value={formData.townPopulation}
+                onChange={(e) => handleInputChange('townPopulation', e.target.value)}
+              />
             </label>
             <label
               htmlFor=""
@@ -302,6 +195,8 @@ export default function AddEditVenueModal() {
                 type=""
                 className="w-full justify-between"
                 inputClassName="w-full"
+                value={formData.venuWebsite}
+                onChange={(e) => handleInputChange('venuWebsite', e.target.value)}
               />
             </label>
             <label
@@ -309,7 +204,12 @@ export default function AddEditVenueModal() {
               className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
             >
               <p className="text-primary-input-text">Notes</p>
-              <TextArea placeholder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+              <TextArea
+                placeholder="Notes Field"
+                className="w-full max-h-40 min-h-[50px]  justify-between"
+                value={formData.notes}
+                onChange={(e) => handleInputChange('notes', e.target.value)}
+              />
             </label>
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
@@ -323,6 +223,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.primaryAddress1}
+                  onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -332,6 +234,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.primaryAddress2}
+                  onChange={(e) => handleInputChange('primaryAddress2', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -341,6 +245,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.primaryAddress3}
+                  onChange={(e) => handleInputChange('primaryAddress3', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -350,6 +256,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.primaryTown}
+                  onChange={(e) => handleInputChange('primaryTown', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -359,6 +267,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.primaryPostCode}
+                  onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
                 />
               </label>
 
@@ -369,6 +279,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.primaryCountry}
+                  onChange={(e) => handleInputChange('primaryCountry', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
@@ -378,6 +290,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.what3WordsStage}
+                  onChange={(e) => handleInputChange('what3WordsStage', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
@@ -387,6 +301,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.what3WordsLoading}
+                  onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
                 />
               </label>
             </div>
@@ -399,6 +315,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.deliveryAddress1}
+                  onChange={(e) => handleInputChange('deliveryAddress1', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -408,6 +326,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.deliveryAddress2}
+                  onChange={(e) => handleInputChange('deliveryAddress2', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -417,6 +337,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.deliveryAddress3}
+                  onChange={(e) => handleInputChange('deliveryAddress3', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -426,6 +348,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.deliveryTown}
+                  onChange={(e) => handleInputChange('deliveryTown', e.target.value)}
                 />
               </label>
               <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
@@ -435,6 +359,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.deliveryPostCode}
+                  onChange={(e) => handleInputChange('deliveryPostCode', e.target.value)}
                 />
               </label>
 
@@ -445,6 +371,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.deliveryCountry}
+                  onChange={(e) => handleInputChange('deliveryCountry', e.target.value)}
                 />
               </label>
               <div className="flex flex-row items-center gap-4 justify-end ">
@@ -457,10 +385,8 @@ export default function AddEditVenueModal() {
                   <Icon iconName="info-circle-solid" />
                 </Tooltip>
                 <Checkbox
-                  id={''}
-                  onChange={function (e: any): void {
-                    throw new Error('Function not implemented.', e);
-                  }}
+                  id={'excludeFromChecks'}
+                  onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)}
                 />
               </div>
             </div>
@@ -468,7 +394,7 @@ export default function AddEditVenueModal() {
           <div className="pt-7">
             <div className="flex flex-row items-center justify-between  pb-5">
               <h2 className="text-xl text-primary-navy font-bold ">Venue Contacts</h2>
-              <Button variant="primary" text="Add New Contact" />
+              <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
             </div>
             <Table
               columnDefs={venueContractDefs}
@@ -487,6 +413,8 @@ export default function AddEditVenueModal() {
                   type=""
                   className="w-full justify-between"
                   inputClassName="w-full"
+                  value={formData.techSpecsUrl}
+                  onChange={(e) => handleInputChange('techSpecUrl', e.target.value)}
                 />
               </label>
               <Button text="Upload Venue Tech Spec" />
@@ -500,11 +428,18 @@ export default function AddEditVenueModal() {
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
+                    value={formData.techLXDesk}
+                    onChange={(e) => handleInputChange('techLXDesk', e.target.value)}
                   />
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">LX Notes</p>
-                  <TextArea placeholder="Notes Field" className="!w-[380px] max-h-40 min-h-[50px]  justify-between" />
+                  <TextArea
+                    placeholder="Notes Field"
+                    className="!w-[380px] max-h-40 min-h-[50px]  justify-between"
+                    value={formData.techLXNotes}
+                    onChange={(e) => handleInputChange('techLXNotes', e.target.value)}
+                  />
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Stage Size</p>
@@ -513,6 +448,8 @@ export default function AddEditVenueModal() {
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
+                    value={formData.stageSize}
+                    onChange={(e) => handleInputChange('stageSize', e.target.value)}
                   />
                 </label>
               </div>
@@ -520,29 +457,47 @@ export default function AddEditVenueModal() {
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Sound Desk</p>
                   <TextInput
+                    id="soundDesk"
                     placeholder="Enter Sound Desk"
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
+                    value={formData.soundDesk}
+                    onChange={(e) => handleInputChange('soundDesk', e.target.value)}
                   />
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">LX Notes</p>
-                  <TextArea placeholder="Notes Field" className="!w-[380px] max-h-40 min-h-[50px]  justify-between" />
+                  <TextArea
+                    id="soundLXNotes"
+                    placeholder="Notes Field"
+                    className="!w-[380px] max-h-40 min-h-[50px]  justify-between"
+                    value={formData.soundLXNotes}
+                    onChange={(e) => handleInputChange('soundLXNotes', e.target.value)}
+                  />
                 </label>
                 <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                   <p className="text-primary-input-text">Grid Height</p>
                   <TextInput
+                    id="gridHeight"
                     placeholder="Enter Grid Height"
                     type=""
                     className="w-full justify-between"
                     inputClassName="w-full"
+                    value={formData.gridHeight}
+                    onChange={(e) => handleInputChange('gridHeight', e.target.value)}
                   />
                 </label>
               </div>
               <label className="grid grid-cols-[90px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full">
                 <p className="text-primary-input-text">Flags</p>
-                <TextArea placeholder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+                <TextArea
+                  id="flags"
+                  placeholder="Notes Field"
+                  className="w-full max-h-40 min-h-[50px]  justify-between"
+                  value={formData.flags}
+                  onChange={(e) => handleInputChange('flags', e.target.value)}
+                />
               </label>
             </div>
             <div className="pt-7 ">
@@ -550,8 +505,11 @@ export default function AddEditVenueModal() {
               <label className="grid grid-cols-[95px_minmax(100px,350px)]  gap-10   w-full">
                 <p className="text-primary-input-text">Barring Clause</p>
                 <TextArea
+                  id="barringClause"
                   placeholder="Enter Barring Clause"
                   className="w-full max-h-32 min-h-[50px]  justify-between"
+                  value={formData.barringClause}
+                  onChange={(e) => handleInputChange('barringClause', e.target.value)}
                 />
               </label>
               <div className="grid grid-cols-2 gap-7 ">
@@ -562,7 +520,14 @@ export default function AddEditVenueModal() {
                     className="grid grid-cols-[90px_minmax(200px,30px)] gap-10 justify-items-start  w-full"
                   >
                     <p className="text-primary-input-text">Pre Show</p>
-                    <TextInput placeholder="Enter Pre Show Weeks" type="" className="w-full justify-between" />
+                    <TextInput
+                      id="preShow"
+                      placeholder="Enter Pre Show Weeks"
+                      type="number"
+                      className="w-full justify-between"
+                      value={formData.preShow}
+                      onChange={(e) => handleInputChange('preShow', e.target.value)}
+                    />
                   </label>
                   <label
                     htmlFor=""
@@ -570,37 +535,47 @@ export default function AddEditVenueModal() {
                   >
                     <p className="text-primary-input-text">Post Show</p>
                     <TextInput
+                      id="address2"
                       placeholder="Enter Post Show Weeks"
-                      type=""
+                      type="number"
                       className="w-full justify-between"
-                      // inputClassName="w-full"
+                      value={formData.postShow}
+                      onChange={(e) => handleInputChange('postShow', e.target.value)}
                     />
                   </label>
                   <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
                     <p className="text-primary-input-text">Barring Miles</p>
                     <TextInput
+                      id="barringMiles"
                       placeholder="Enter Barring Miles"
-                      type=""
+                      type="number"
                       className="w-full justify-between"
                       inputClassName="w-full"
+                      value={formData.barringMiles}
+                      onChange={(e) => handleInputChange('barringMiles', e.target.value)}
                     />
                   </label>
                 </div>
                 <div className=" ">
                   <div className="flex justify-end pb-3">
-                    <Button text="Add Barred Venue" className=" w-32" />
+                    <Button onClick={addNewBarredVenue} text="Add Barred Venue" className="w-32" />
                   </div>
-
                   <Table styleProps={styleProps} columnDefs={barredVenues} rowData={barredVenuesData} />
                 </div>
               </div>
             </div>
             <div className="pt-7">
               <h2 className="text-xl text-primary-navy font-bold  pb-2">Confidential Warning Notes</h2>
-              <TextArea placeholder="Notes Field" className="w-full max-h-40 min-h-[50px]  justify-between" />
+              <TextArea
+                id="confidentialNotes"
+                placeholder="Notes Field"
+                className="w-full max-h-40 min-h-[50px]  justify-between"
+                value={formData.confidentialNotes}
+                onChange={(e) => handleInputChange('confidentialNotes', e.target.value)}
+              />
             </div>
             <div className="flex gap-4 pt-4 float-right">
-              <Button variant="secondary" text="Cancel" className="w-32" />
+              <Button onClick={onClose} variant="secondary" text="Cancel" className="w-32" />
               <Button variant="tertiary" text="Delete Venue" className="w-32" />
               <Button text="Save and Close" className="w-32" onClick={handleSaveAndClose} />
             </div>

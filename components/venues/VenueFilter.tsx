@@ -11,11 +11,13 @@ export default function VenueFilter({
   townOptions,
   onFilterChange,
   filters,
+  showVenueModal,
 }: {
   filters: VenueFilters;
   countryOptions: SelectOption[];
   townOptions: SelectOption[];
   onFilterChange: (change: Partial<VenueFilters>) => void;
+  showVenueModal: () => void;
 }) {
   const productionOptions = useRecoilValue(productionOptionsSelector(true));
   const onChange = (e: any) => {
@@ -72,7 +74,7 @@ export default function VenueFilter({
               />
               <div className="flex flex-col gap-3">
                 <Button text="Clear Filters" className="w-[120px]" onClick={onClearFilters} />
-                <Button text="Add New" className="w-[120px]" />
+                <Button onClick={showVenueModal} text="Add New" className="w-[120px]" />
               </div>
             </div>
           </div>
