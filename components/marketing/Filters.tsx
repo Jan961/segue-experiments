@@ -15,6 +15,7 @@ import MarketingButtons from './MarketingButtons';
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const [selectedBooking, setSelBooking] = useRecoilState(bookingJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
   const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
   const todayOnSchedule = useMemo(
@@ -25,8 +26,6 @@ const Filters = () => {
     [schedule.Sections, todayKey],
   );
 
-  const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
-
   const goToToday = () => {
     const dateToScrollTo = format(new Date(), 'EEE dd/MM/yy');
     if (todayOnSchedule) {
@@ -35,12 +34,12 @@ const Filters = () => {
   };
 
   const bookingOptions = useMemo(
-    () => (bookingJump.bookings ? mapBookingsToProductionOptions(bookingJump.bookings) : []),
-    [bookingJump],
+    () => (selectedBooking.bookings ? mapBookingsToProductionOptions(selectedBooking.bookings) : []),
+    [selectedBooking],
   );
 
   const changeBooking = (value: string | number) => {
-    setBookingJump({ ...bookingJump, selected: Number(value) });
+    setSelBooking({ ...selectedBooking, selected: Number(value) });
   };
 
   return (
@@ -56,7 +55,7 @@ const Filters = () => {
         <div className="flex items-center gap-4">
           <Select
             onChange={changeBooking}
-            value={bookingJump.selected}
+            value={selectedBooking.selected}
             disabled={!ProductionId}
             placeholder="Select a Venue/Date"
             className="bg-white w-96"
