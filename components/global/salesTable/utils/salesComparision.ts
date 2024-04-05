@@ -1,5 +1,5 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
-import { SalesComparison } from 'types/MarketingTypes';
+import { SalesComparison } from 'types/marketingTypes';
 import formatInputDate from 'utils/dateInputFormat';
 
 export type SelectedBooking = {

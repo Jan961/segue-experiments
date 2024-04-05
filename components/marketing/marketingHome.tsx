@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
-import { SalesTable } from 'types/MarketingTypes';
+import { SalesTable } from 'types/marketingTypes';
 
 
 

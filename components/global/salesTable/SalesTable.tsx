@@ -1,11 +1,11 @@
 import classNames from 'classnames';
 import Table from 'components/core-ui-lib/Table';
 import { tileColors } from 'config/global';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
 import { prodComparisionColDefs, salesColDefs } from './tableConfig'
 import salesComparison, { SalesComp } from './utils/salesComparision';
-import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
+import { SalesSnapshot, BookingSelection } from 'types/marketingTypes';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue';
 

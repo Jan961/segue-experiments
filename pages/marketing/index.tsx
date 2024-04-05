@@ -25,13 +25,13 @@ const MarketingPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
 export default MarketingPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'marketing', AccountId);
-  const ProductionId = productionJump.selected;
+  const accountId = await getAccountIdFromReq(ctx.req);
+  const productionJump = await getProductionJumpState(ctx, 'marketing', accountId);
+  const productionId = productionJump.selected;
   let initialState: InitialState;
 
-  if (ProductionId !== null) {
-    const bookings: any[] = await getSaleableBookings(ProductionId);
+  if (productionId !== null) {
+    const bookings = await getSaleableBookings(productionId);
     const venueRoles = await getRoles();
     const selected = null;
     const bookingJump: BookingJump = {

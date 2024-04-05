@@ -27,7 +27,7 @@ const Filters = () => {
 
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
 
-  const gotoToday = () => {
+  const goToToday = () => {
     const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');
     if (todayOnSchedule) {
       setFilter({ ...filter, scrollToDate: dateToScrollTo });
@@ -69,19 +69,19 @@ const Filters = () => {
             text="Go To Today"
             disabled={!todayOnSchedule || !ProductionId}
             className="text-sm leading-8 w-[132px]"
-            onClick={gotoToday}
+            onClick={goToToday}
           />
           <Button
             text="Previous Date"
             disabled={!todayOnSchedule || !ProductionId}
             className="text-sm leading-8 w-[132px]"
-            onClick={gotoToday}
+            onClick={goToToday}
           />
           <Button
             text="Next Date"
             disabled={!todayOnSchedule || !ProductionId}
             className="text-sm leading-8 w-[132px]"
-            onClick={gotoToday}
+            onClick={goToToday}
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
