@@ -3,14 +3,14 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { filteredScheduleSelector } from 'state/booking/selectors/filteredScheduleSelector';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import moment from 'moment';
+import { format } from 'date-fns';
 import Button from 'components/core-ui-lib/Button';
 import GlobalToolbar from 'components/toolbar';
 import Select from 'components/core-ui-lib/Select';
 import Iframe from 'components/core-ui-lib/Iframe';
-import MarketingButtons from './marketingButtons';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import MarketingButtons from './MarketingButtons';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
@@ -28,7 +28,7 @@ const Filters = () => {
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
 
   const goToToday = () => {
-    const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');
+    const dateToScrollTo = format(new Date(), 'EEE dd/MM/yy');
     if (todayOnSchedule) {
       setFilter({ ...filter, scrollToDate: dateToScrollTo });
     }
@@ -42,8 +42,6 @@ const Filters = () => {
   const changeBooking = (value: string | number) => {
     setBookingJump({ ...bookingJump, selected: Number(value) });
   };
-
-  console.log(JSON.stringify(filter.status));
 
   return (
     <div className="w-full flex items-end justify-between flex-wrap">
