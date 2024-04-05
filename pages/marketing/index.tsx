@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
 import Filters from 'components/marketing/Filters';
-import MarketingHome from 'components/marketing/marketingHome';
+import MarketingHome from 'components/marketing/MarketingHome';
 import { getAccountIdFromReq } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';

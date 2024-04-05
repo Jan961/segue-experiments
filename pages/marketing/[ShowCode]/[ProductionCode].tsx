@@ -1,5 +1,5 @@
 import Layout from 'components/Layout';
-import MarketingHome from 'components/marketing/marketingHome';
+import MarketingHome from 'components/marketing/MarketingHome';
 import Filters from 'components/marketing/Filters';
 import { GetServerSideProps } from 'next';
 import { getAccountIdFromReq } from 'services/userService';
