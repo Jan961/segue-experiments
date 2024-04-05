@@ -9,16 +9,14 @@ import GlobalToolbar from 'components/toolbar';
 import Select from 'components/core-ui-lib/Select';
 import Iframe from 'components/core-ui-lib/Iframe';
 import MarketingButtons from './marketingButtons';
-import { venueState } from 'state/booking/venueState';
-import { bookingState } from 'state/booking/bookingState';
+import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
   const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
-  const venueDict = useRecoilValue(venueState);
-  const bookingDict = useRecoilValue(bookingState);
   const todayOnSchedule = useMemo(
     () =>
       schedule.Sections.map((x) => x.Dates)
@@ -27,6 +25,8 @@ const Filters = () => {
     [schedule.Sections, todayKey],
   );
 
+  const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
+
   const gotoToday = () => {
     const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');
     if (todayOnSchedule) {
@@ -34,23 +34,16 @@ const Filters = () => {
     }
   };
 
-    const venueOptions = useMemo(() => {
-      const options = [];
-      const currentProductionVenues = Object.values(bookingDict).map((booking) => booking.VenueId);
-      for (const venueId in venueDict) {
-        const venue = venueDict[venueId];
-        const option = {
-          text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
-          value: venue?.Id,
-        };
-        if (currentProductionVenues.includes(parseInt(venueId, 10))) {
-          continue;
-        }
-        options.push(option);
-      }
-      return options;
-    }, [venueDict, bookingDict]);
-  
+  const bookingOptions = useMemo(
+    () => (bookingJump.bookings ? mapBookingsToProductionOptions(bookingJump.bookings) : []),
+    [bookingJump],
+  );
+
+  const changeBooking = (value: string | number) => {
+    setBookingJump({ ...bookingJump, selected: Number(value) });
+  };
+
+  console.log(JSON.stringify(filter.status));
 
   return (
     <div className="w-full flex items-end justify-between flex-wrap">
@@ -64,17 +57,32 @@ const Filters = () => {
 
         <div className="flex items-center gap-4">
           <Select
-            onChange={(value) => alert('temp onChange till options are added')}
+            onChange={changeBooking}
+            value={bookingJump.selected}
             disabled={!ProductionId}
-            value={filter.status}
-            placeholder='Select a Venue/Date'
+            placeholder="Select a Venue/Date"
             className="bg-white w-96"
-            options={venueOptions}
+            options={bookingOptions}
           />
 
-          <Button text="Go To Today" disabled={!todayOnSchedule || !ProductionId} className="text-sm leading-8 w-[132px]" onClick={gotoToday} />
-          <Button text="Previous Date" disabled={!todayOnSchedule || !ProductionId} className="text-sm leading-8 w-[132px]" onClick={gotoToday} />
-          <Button text="Next Date" disabled={!todayOnSchedule || !ProductionId} className="text-sm leading-8 w-[132px]" onClick={gotoToday} />
+          <Button
+            text="Go To Today"
+            disabled={!todayOnSchedule || !ProductionId}
+            className="text-sm leading-8 w-[132px]"
+            onClick={gotoToday}
+          />
+          <Button
+            text="Previous Date"
+            disabled={!todayOnSchedule || !ProductionId}
+            className="text-sm leading-8 w-[132px]"
+            onClick={gotoToday}
+          />
+          <Button
+            text="Next Date"
+            disabled={!todayOnSchedule || !ProductionId}
+            className="text-sm leading-8 w-[132px]"
+            onClick={gotoToday}
+          />
 
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className="self-end -mt-[60px]">
