@@ -1,8 +1,12 @@
-type variant = 'xs' | 'sm' | 'md' | 'lg';
+import React, { useState } from 'react';
+import classNames from 'classnames';
+import { Spinner } from 'components/global/Spinner';
+
+type Variant = 'xs' | 'sm' | 'md' | 'lg';
 
 interface IframeProps {
   src: string;
-  variant?: variant;
+  variant?: Variant;
   className?: string;
 }
 
@@ -14,29 +18,46 @@ const IFRAME_SIZES = {
 };
 
 const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
+  const [isLoading, setIsLoading] = useState(true);
   const baseClass = `border-0 ${IFRAME_SIZES[variant]}`;
 
-  // Adding a transform scale to zoom out the content. Adjust the scale value as needed.
-  const scaleValue = 0.8; // Example scale value; adjust as needed.
+  // Calculate scaled dimensions for the transform
+  const scaleValue = 0.25; // Example scale value; adjust as needed
   const scaledWidth = parseInt(IFRAME_SIZES[variant].match(/w-\[(\d+)px\]/)[1]) / scaleValue;
   const scaledHeight = parseInt(IFRAME_SIZES[variant].match(/h-\[(\d+)px\]/)[1]) / scaleValue;
-  const transformStyle = {
+  const transformStyle: React.CSSProperties = {
     transform: `scale(${scaleValue})`,
     width: `${scaledWidth}px`,
     height: `${scaledHeight}px`,
-    transformOrigin: 'top left'
+    transformOrigin: 'top left',
+    visibility: isLoading ? 'hidden' : 'visible', 
   };
 
+  if (!src) {
+    // Display some text when there is no src
+    return (
+      <div className={`${baseClass} ${className} flex items-center justify-center`}>
+        No URL provided.
+      </div>
+    );
+  }
+
   return (
-    <div className={`${IFRAME_SIZES[variant]} overflow-hidden`} style={{ width: `${scaledWidth * scaleValue}px`, height: `${scaledHeight * scaleValue}px`, margin: 'auto' }}>
-      <iframe 
-        src={src} 
-        className={`${baseClass} ${className}`}
+    <div className={classNames(`${baseClass} overflow-hidden relative ${className}`)}>
+      {isLoading && (
+        <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
+          <Spinner size='sm' /> 
+        </div>
+      )}
+      <iframe
+        src={src}
         style={transformStyle}
-        allowFullScreen>
-      </iframe>
+        allowFullScreen
+        className="absolute"
+        onLoad={() => setIsLoading(false)} 
+      ></iframe>
     </div>
   );
-}
+};
 
 export default Iframe;

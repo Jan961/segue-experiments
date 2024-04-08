@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
 const MarketingHome = () => {
-  const [currView, setCurrView] = useState<SalesTable>('sales');
+  const [currView, setCurrView] = useState<SalesTable>('');
   const selectedBtnClass = '!bg-primary-green/[0.30] !text-primary-navy';
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
