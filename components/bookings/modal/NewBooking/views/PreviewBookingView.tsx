@@ -21,7 +21,7 @@ export default function PreviewBookingView(props: PreviewBookingViewProps) {
   };
 
   const areInputFieldsValid = useMemo(() => {
-    if (formData.isRunOfDates) {
+    if (data && formData.isRunOfDates) {
       const rowsWithNoDayType = data.filter(({ dayType }) => isNullOrEmpty(dayType));
       return isNullOrEmpty(rowsWithNoDayType);
     } else {

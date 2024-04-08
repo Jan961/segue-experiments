@@ -48,7 +48,7 @@ const NewBookingView = ({
   updateBarringConflicts,
   updateModalTitle,
 }: AddBookingProps) => {
-  const { nextStep, goToStep } = useWizard();
+  const { goToStep } = useWizard();
 
   const currentProduction = useRecoilValue(currentProductionSelector);
   const scheduleRange = useRecoilValue(dateBlockSelector);
@@ -118,7 +118,7 @@ const NewBookingView = ({
           }
         } else if (!isDateTypeOnly) {
           await fetchBarredVenues(true);
-          nextStep();
+          goToStep(steps.indexOf('Booking Conflict'));
         }
       })
       .catch((error) => {

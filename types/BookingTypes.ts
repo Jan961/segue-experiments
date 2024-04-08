@@ -66,6 +66,7 @@ type BookingRow = {
   performanceCount: number;
   performanceTimes: string;
   count: string;
+  runTag: string;
 };
 
 export type { IBooking, BookingRow };

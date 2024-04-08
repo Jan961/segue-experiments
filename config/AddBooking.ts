@@ -24,12 +24,12 @@ export const Actions = {
 
 export const steps = [
   'Create New Booking',
-  'Booking Conflict',
-  'Barring Issue',
   'New Booking Details',
   'Preview New Booking',
   'Check Mileage',
   'Venue Gap Suggestions',
+  'Booking Conflict',
+  'Barring Issue',
 ];
 
 export const BookingTypes = [

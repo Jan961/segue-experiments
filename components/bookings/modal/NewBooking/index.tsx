@@ -22,10 +22,8 @@ import { bookingState } from 'state/booking/bookingState';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import { statusOptions } from 'config/bookings';
 import axios from 'axios';
 import { nanoid } from 'nanoid';
-import { getRunOfDates } from 'components/bookings/utils';
 import { isNullOrEmpty } from 'utils';
 import { BookingRow } from 'types/BookingTypes';
 
@@ -101,11 +99,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   useEffect(() => {
     if (booking) {
       // Check for run of dates
-      const filteredBookings = bookings.filter(
-        ({ venueId, dayType, bookingStatus }) =>
-          venueId === booking.venueId && dayType === booking.dayType && bookingStatus !== 'Cancelled',
-      );
-      const runOfDates = getRunOfDates(filteredBookings, booking);
+      const runOfDates = bookings.filter(({ runTag }) => runTag === booking.runTag);
+
       if (runOfDates.length > 1) {
         onFormDataChange({ isRunOfDates: true });
       }
@@ -119,7 +114,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           dayType: dayTypeOptions.find((option) => option.text === b.dayType)?.value,
           venue: b.venueId,
           perf: b.dayType === 'Performance',
-          bookingStatus: statusOptions.find((option) => option.text === b.dayType)?.value as string,
+          bookingStatus: b.status,
           notes: b.note,
           noPerf: b.performanceCount,
           times: b.performanceTimes,
@@ -129,7 +124,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isGetInFitUp: b.dayType === 'Get in / Fit Up',
         };
       });
-
+      console.log('Editing ', booking, formattedBooking);
       dispatch(actionSpreader(Actions.UPDATE_BOOKING, formattedBooking));
     }
   }, [booking]);

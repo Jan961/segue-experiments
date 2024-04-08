@@ -30,7 +30,7 @@ class BookingHelper {
   }
 
   getBookingDetails(booking: BookingDTO) {
-    const { VenueId, PerformanceIds, Notes: note } = booking || {};
+    const { VenueId, PerformanceIds, Notes: note, RunTag: runTag } = booking || {};
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     const performanceTimes = PerformanceIds.map(
       (performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5),
@@ -47,11 +47,12 @@ class BookingHelper {
       note,
       performanceTimes,
       performanceCount: PerformanceIds?.length || 0,
+      runTag,
     };
   }
 
   getRehearsalDetails(rehearsal: RehearsalDTO) {
-    const { Id, VenueId } = rehearsal;
+    const { Id, VenueId, RunTag: runTag } = rehearsal;
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     return {
       Id,
@@ -60,25 +61,28 @@ class BookingHelper {
       capacity,
       count,
       venueId,
+      runTag,
     };
   }
 
   getOthersDetails(others: OtherDTO) {
-    const { DateTypeName: dayType } = others || {};
+    const { DateTypeName: dayType, RunTag: runTag } = others || {};
     return {
       Id: others?.Id,
       status: others.StatusCode,
       dayType,
+      runTag,
     };
   }
 
   getInFitUpDetails(gifu: GetInFitUpDTO) {
-    const { VenueId } = gifu;
+    const { VenueId, RunTag: runTag } = gifu;
     const venue = this.venueDict[VenueId];
     return {
       Id: gifu?.Id,
       venue: venue.Name,
       town: venue.Town,
+      runTag,
     };
   }
 
