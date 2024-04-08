@@ -45,6 +45,7 @@ model Booking {
   CastRateTicketNotes     String?               @map("BookingCastRateTicketNotes") @db.LongText
   CastRateTicketsArranged Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
   CastRateTicketsNotes    String?               @map("BookingCastRateTicketsNotes") @db.Text
+  RunTag                  String?               @map("BookingRunTag") @db.Char(8)
   BookedVenueHistory      BookedVenueHistory[]
   DateBlock               DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
   Venue                   Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
@@ -245,15 +246,16 @@ model DateBlock {
 }
 
 model GetInFitUp {
-  Id          Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
-  DateBlockId Int       @map("GetInFitUpDateBlockId")
-  VenueId     Int       @map("GetInFitUpVenueId")
-  StatusCode  String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
-  Date        DateTime  @map("GetInFitUpDate") @db.Date
-  Notes       String?   @map("GetInFitUpNotes") @db.LongText
-  PencilNum   Int?      @map("GetInFitUpPencilNum")
-  DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
-  Venue       Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
+  Id               Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
+  DateBlockId      Int       @map("GetInFitUpDateBlockId")
+  VenueId          Int       @map("GetInFitUpVenueId")
+  StatusCode       String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
+  Date             DateTime  @map("GetInFitUpDate") @db.Date
+  Notes            String?   @map("GetInFitUpNotes") @db.LongText
+  PencilNum        Int?      @map("GetInFitUpPencilNum")
+  RunTag           String?   @map("GetInFitUpRunTag") @db.Char(8)
+  DateBlock        DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
+  Venue            Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
 
   @@index([DateBlockId], map: "DateBlock_GetInFitUpDay_idx")
   @@index([VenueId], map: "Venue_GetInFitUpDay_idx")
@@ -267,6 +269,7 @@ model Other {
   Date        DateTime  @map("OtherDate") @db.Date
   Notes       String?   @map("OtherNotes") @db.LongText
   PencilNum   Int?      @map("OtherPencilNum")
+  RunTag      String?   @map("OtherRunTag") @db.Char(8)
   DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Other")
   DateType    DateType  @relation(fields: [DateTypeId], references: [Id], onUpdate: Restrict, map: "DateType_Other")
 
@@ -289,17 +292,18 @@ model Performance {
 }
 
 model Rehearsal {
-  Id          Int               @id @default(autoincrement()) @map("RehearsalId")
-  DateBlockId Int               @map("RehearsalDateBlockId")
-  Town        String?           @map("RehearsalTown") @db.VarChar(50)
-  StatusCode  String            @default("U") @map("RehearsalStatusCode") @db.Char(1)
-  Date        DateTime          @map("RehearsalDate") @db.Date
-  DateTypeId  Int               @default(1) @map("RehearsalDateTypeId")
-  VenueId     Int?              @map("RehearsalVenueId")
-  Notes       String?           @map("RehearsalNotes") @db.LongText
-  PencilNum   Int?              @map("RehearsalPencilNum")
-  DateBlock   DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
-  DateType    RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
+  Id              Int               @id @default(autoincrement()) @map("RehearsalId")
+  DateBlockId     Int               @map("RehearsalDateBlockId")
+  Town            String?           @map("RehearsalTown") @db.VarChar(50)
+  StatusCode      String            @default("U") @map("RehearsalStatusCode") @db.Char(1)
+  Date            DateTime          @map("RehearsalDate") @db.Date
+  DateTypeId      Int               @default(1) @map("RehearsalDateTypeId")
+  VenueId         Int?              @map("RehearsalVenueId")
+  Notes           String?           @map("RehearsalNotes") @db.LongText
+  PencilNum       Int?              @map("RehearsalPencilNum")
+  RunTag          String?           @map("RehearsalRunTag") @db.Char(8)
+  DateBlock       DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
+  DateType        RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
