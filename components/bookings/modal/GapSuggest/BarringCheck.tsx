@@ -50,6 +50,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
         includeExcluded: false,
         startDate,
         endDate,
+        filterBarredVenues: true,
       },
     })
       .then((data: any) => {

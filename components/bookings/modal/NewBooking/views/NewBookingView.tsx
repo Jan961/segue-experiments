@@ -77,6 +77,7 @@ const NewBookingView = ({
         includeExcluded: false,
         startDate,
         endDate,
+        filterBarredVenues: true,
       },
     })
       .then((data: any) => {
