@@ -29,6 +29,7 @@ export class BookingService {
           isRehearsal,
           isGetInFitUp,
           DateTypeId,
+          RunTag,
         } = bookingData || {};
 
         if (isBooking) {
@@ -57,6 +58,7 @@ export class BookingService {
               Performances,
               BookingDate,
               StatusCode,
+              RunTag,
             },
             tx,
           );
@@ -72,6 +74,7 @@ export class BookingService {
               StatusCode,
               BookingDate,
               PencilNum,
+              RunTag,
             },
             tx,
           );
@@ -86,6 +89,7 @@ export class BookingService {
               BookingDate,
               StatusCode,
               PencilNum,
+              RunTag,
             },
             tx,
           );
@@ -101,6 +105,7 @@ export class BookingService {
               BookingDate,
               StatusCode,
               PencilNum,
+              RunTag,
             },
             tx,
           );

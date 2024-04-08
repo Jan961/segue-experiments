@@ -22,6 +22,7 @@ import { bookingState } from 'state/booking/bookingState';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 import axios from 'axios';
+import { nanoid } from 'nanoid';
 
 type AddBookingProps = {
   visible: boolean;
@@ -90,8 +91,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
   };
 
   const handleSaveNewBooking = async () => {
+    const runTagForRunOfDates = nanoid(8);
     try {
-      const { data } = await axios.post('/api/bookings/add', state.booking);
+      const bookingsWithRunTag = state.booking.map((b) => ({
+        ...b,
+        runTag: state.form.isRunOfDates ? runTagForRunOfDates : nanoid(8),
+      }));
+      const { data } = await axios.post('/api/bookings/add', bookingsWithRunTag);
       onClose(data);
     } catch (e) {
       console.log('Failed to add new booking', e);
