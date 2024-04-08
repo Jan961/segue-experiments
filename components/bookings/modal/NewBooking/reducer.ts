@@ -34,6 +34,7 @@ export type BookingItem = {
   isBooking: boolean;
   isRehearsal: boolean;
   isGetInFitUp: boolean;
+  runTag?: string;
 };
 
 export type PreviewDataItem = {
