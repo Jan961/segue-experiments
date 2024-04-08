@@ -46,4 +46,26 @@ interface IBooking {
   VenueId: null | unknown;
 }
 
-export type { IBooking };
+type BookingRow = {
+  Id: string;
+  week;
+  dateTime: string;
+  date: string;
+  productionName: string;
+  production: string;
+  productionId: string;
+  dayType: string;
+  bookingStatus: string;
+  status: string;
+  venue: string;
+  town: string;
+  miles: string;
+  travelTime: string;
+  venueId: number;
+  note: string;
+  performanceCount: number;
+  performanceTimes: string;
+  count: string;
+};
+
+export type { IBooking, BookingRow };

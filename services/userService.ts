@@ -45,6 +45,6 @@ export const getAccountIdFromReq = async (req: any) => {
   return getAccountId(email);
 };
 
-export const checkAccess = async (email: string, items: AccessCheck): Promise<boolean> => {
+export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
   return checkAccessDirect(email, items);
 };

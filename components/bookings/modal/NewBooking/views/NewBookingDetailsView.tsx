@@ -29,6 +29,7 @@ type NewBookingDetailsProps = {
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
   updateModalTitle: (title: string) => void;
+  isNewBooking: boolean;
 };
 
 export default function NewBookingDetailsView({
@@ -42,6 +43,7 @@ export default function NewBookingDetailsView({
   toggleModalOverlay,
   onClose,
   updateModalTitle,
+  isNewBooking,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const venueDict = useRecoilValue(venueState);
@@ -55,7 +57,7 @@ export default function NewBookingDetailsView({
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   useEffect(() => {
-    updateModalTitle('New Booking Details');
+    updateModalTitle(`${isNewBooking ? 'New' : 'Edit'} Booking Details`);
   }, []);
 
   useEffect(() => {
@@ -150,6 +152,12 @@ export default function NewBookingDetailsView({
       goToNewBooking();
     }
   };
+
+  const handleDeleteBooking = () => {};
+
+  const handleMoveBooking = () => {};
+
+  const handleChangeBookingLength = () => {};
 
   const handleCancelButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
@@ -257,8 +265,22 @@ export default function NewBookingDetailsView({
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
           <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={handeCheckMileageClick} />
           <div className="flex gap-4">
-            <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
+            {isNewBooking && (
+              <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
+            )}
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
+            {!isNewBooking && (
+              <>
+                <Button className="w-33 " variant="tertiary" text="Delete Booking" onClick={handleDeleteBooking} />
+                <Button className="w-33 " variant="primary" text="Move Booking" onClick={handleMoveBooking} />
+                <Button
+                  className="w-33 px-4"
+                  variant="primary"
+                  text="Change Booking Length"
+                  onClick={handleChangeBookingLength}
+                />
+              </>
+            )}
             <Button className=" w-33" text="Preview Booking" onClick={handePreviewBookingClick} />
           </div>
         </div>

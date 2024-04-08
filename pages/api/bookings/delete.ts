@@ -1,18 +1,22 @@
-import { deleteBookingById } from 'services/bookingService';
+import { deleteBookingById, deleteRehearsalById } from 'services/bookingService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const BookingId = parseInt(req.body.bookingId);
+    const { bookings } = req.body;
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
+    bookings.forEach((booking) => {
+      if (booking.isRehearsal) {
+        await deleteRehearsalById(booking.Id);
+      } else if (booking.isBooking) {
+        await deleteBookingById(booking.Id);
+      }
+    });
 
-    await deleteBookingById(BookingId);
-
-    console.log(`Deleted: ${BookingId}`);
     return res.status(200).json({});
   } catch (e) {
     console.log(e);

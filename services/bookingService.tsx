@@ -42,6 +42,14 @@ export const deleteBookingById = async (BookingId: any) => {
   ]);
 };
 
+export const deleteRehearsalById = async (BookingId: any) => {
+  await prisma.rehearsal.delete({
+    where: {
+      Id: BookingId,
+    },
+  });
+};
+
 export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number) => {
   return prisma.booking.create({
     data: {

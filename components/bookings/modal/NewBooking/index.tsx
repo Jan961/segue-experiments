@@ -27,13 +27,14 @@ import axios from 'axios';
 import { nanoid } from 'nanoid';
 import { getRunOfDates } from 'components/bookings/utils';
 import { isNullOrEmpty } from 'utils';
+import { BookingRow } from 'types/BookingTypes';
 
 type AddBookingProps = {
   visible: boolean;
   onClose: (bookings?: any) => void;
   startDate?: string;
   endDate?: string;
-  booking?: any;
+  booking?: BookingRow;
 };
 
 const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookingProps) => {
@@ -99,16 +100,18 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
 
   useEffect(() => {
     if (booking) {
-      console.log('Booking is', booking);
       // Check for run of dates
       const filteredBookings = bookings.filter(
         ({ venueId, dayType, bookingStatus }) =>
           venueId === booking.venueId && dayType === booking.dayType && bookingStatus !== 'Cancelled',
       );
       const runOfDates = getRunOfDates(filteredBookings, booking);
+      if (runOfDates.length > 1) {
+        onFormDataChange({ isRunOfDates: true });
+      }
       const bookingsToEdit = isNullOrEmpty(runOfDates) ? [booking] : runOfDates;
       // format booking and set on state
-      const formattedBooking: BookingItem[] = [bookingsToEdit].map((b) => {
+      const formattedBooking: BookingItem[] = bookingsToEdit.map((b: BookingRow) => {
         return {
           date: b.date,
           dateAsISOString: b.dateTime,
@@ -170,6 +173,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           />
         )}
         <NewBookingDetailsView
+          isNewBooking={!editBooking}
           formData={state.form}
           data={state.booking}
           production={currentProduction}
