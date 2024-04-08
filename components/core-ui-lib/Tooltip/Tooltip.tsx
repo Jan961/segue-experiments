@@ -59,8 +59,10 @@ const Tooltip: React.FC<TooltipProps> = ({
           >
             <div className={`${arrowStyle[position]}`}></div>
             <div className="text-center">
-              {title && <div className="font-bold leading-[1.125] break-words whitespace-normal">{title}</div>}
-              {body && <div className="leading-[1.125] break-words whitespace-normal">{body}</div>}
+              {title && (
+                <div className="font-bold leading-[1.125] break-words whitespace-normal not-italic">{title}</div>
+              )}
+              {body && <div className="leading-[1.125] break-words whitespace-normal not-italic">{body}</div>}
             </div>
           </div>
         </div>
