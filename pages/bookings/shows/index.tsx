@@ -39,7 +39,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   return (
     <Layout title="Shows | Segue" flush>
       <div className="w-9/12 mx-auto">
-        <div className="flex items-center justify-between py-5">
+        <div className="flex items-center justify-between py-4">
           <h1 className="text-primary-orange text-4xl font-bold">Shows</h1>
           <div className="flex gap-2 items-center">
             <Checkbox

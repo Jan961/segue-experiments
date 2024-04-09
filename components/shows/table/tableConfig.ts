@@ -54,30 +54,31 @@ export const tableConfig = [
     headerClass: 'text-center',
   },
   {
-    headerName: 'Save / Delete',
+    headerName: '',
     field: 'EditId',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Save',
       variant: 'primary',
     },
-    resizable: false,
     cellStyle: {
-      paddingLeft: '0.5em',
-      width: 80,
+      paddingLeft: '0.75em',
     },
-    width: 90,
+    resizable: false,
+    width: 60,
     headerClass: 'text-center',
   },
   {
     headerName: '',
     field: 'Id',
-    width: 80,
+    width: 70,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Delete',
       variant: 'tertiary',
-      width: 80,
+    },
+    cellStyle: {
+      paddingRight: '0.5em',
     },
     resizable: false,
     headerClass: 'text-center',

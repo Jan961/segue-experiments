@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatFormDate from 'utils/dateInputFormat';
+import formatInputDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -181,7 +181,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ShowDate: c.ShowDate,
         VenueContractStatus: c.VenueContractStatus,
         DealType: c.DealType,
-        ContractSignedDate: formatFormDate(c.ContractSignedDate),
+        ContractSignedDate: formatInputDate(c.ContractSignedDate),
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -191,8 +191,8 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.ContractNotes,
         GP: c.GP,
-        ContractReturnDate: formatFormDate(c.ContractReturnDate),
-        ContractReceivedBackDate: formatFormDate(c.ContractReceivedBackDate),
+        ContractReturnDate: formatInputDate(c.ContractReturnDate),
+        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {

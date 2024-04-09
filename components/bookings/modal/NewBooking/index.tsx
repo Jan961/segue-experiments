@@ -5,7 +5,7 @@ import { AnimatePresence } from 'framer-motion';
 import NewBookingView from './views/NewBookingView';
 import BookingConflictsView from './views/BookingConflictsView';
 import BarringIssueView from './views/BarringIssueView';
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import { useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
 import { Actions, INITIAL_STATE, OTHER_DAY_TYPES } from 'config/AddBooking';
@@ -19,9 +19,10 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import CheckMileageView from './views/CheckMileageView';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { bookingState } from 'state/booking/bookingState';
-import useAxios from 'hooks/useAxios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
+import axios from 'axios';
+import { nanoid } from 'nanoid';
 
 type AddBookingProps = {
   visible: boolean;
@@ -31,8 +32,6 @@ type AddBookingProps = {
 };
 
 const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
-  const { fetchData, data } = useAxios();
-
   const bookingDict = useRecoilValue(bookingState);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
@@ -44,12 +43,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       toDate: endDate,
     },
   }));
-
-  useEffect(() => {
-    if (data) {
-      onClose(data);
-    }
-  }, [data]);
 
   const currentProduction = useRecoilValue(currentProductionSelector);
   const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
@@ -97,12 +90,18 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
-  const handleSaveNewBooking = () => {
-    fetchData({
-      url: '/api/bookings/add',
-      method: 'POST',
-      data: state.booking,
-    });
+  const handleSaveNewBooking = async () => {
+    const runTagForRunOfDates = nanoid(8);
+    try {
+      const bookingsWithRunTag = state.booking.map((b) => ({
+        ...b,
+        runTag: state.form.isRunOfDates ? runTagForRunOfDates : nanoid(8),
+      }));
+      const { data } = await axios.post('/api/bookings/add', bookingsWithRunTag);
+      onClose(data);
+    } catch (e) {
+      console.log('Failed to add new booking', e);
+    }
   };
 
   return (

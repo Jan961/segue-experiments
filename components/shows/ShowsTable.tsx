@@ -7,12 +7,25 @@ import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 import { tableConfig } from './table/tableConfig';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
+import { useRouter } from 'next/router';
 
 const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
     <Spinner size="lg" />
   </div>
 );
+
+const rowClassRules = {
+  'custom-red-row': (params) => {
+    const rowData = params.data;
+    // Apply custom style if the 'highlightRow' property is true
+    return rowData && rowData.highlightRow;
+  },
+  'custom-grey-row': (params) => {
+    const rowData = params.data;
+    return rowData && rowData.IsArchived;
+  },
+};
 
 const intShowData = {
   Id: '',
@@ -33,6 +46,7 @@ const ShowsTable = ({
   isArchived: boolean;
 }) => {
   const tableRef = useRef(null);
+  const router = useRouter();
 
   const [confirm, setConfirm] = useState<boolean>(false);
   const [showId, setShowId] = useState<number>(0);
@@ -50,7 +64,7 @@ const ShowsTable = ({
 
   useEffect(() => {
     if (isAddRow) {
-      applyTransactionToGrid(tableRef, { add: [{}], addIndex: 0 });
+      applyTransactionToGrid(tableRef, { add: [{ highlightRow: true }], addIndex: 0 });
     }
   }, [isAddRow, tableRef]);
 
@@ -82,6 +96,7 @@ const ShowsTable = ({
         setIsLoading(false);
         setIsEdited(false);
         setCurrentShow(intShowData);
+        router.replace(router.asPath);
       }
     } else if (
       isAddRow &&
@@ -95,10 +110,11 @@ const ShowsTable = ({
         delete data.Id;
         await axios.post(`/api/shows/create`, data);
       } finally {
-        setIsLoading(false);
         setIsEdited(false);
         setCurrentShow(intShowData);
         addNewRow();
+        router.replace(router.asPath);
+        setIsLoading(false);
       }
     }
   };
@@ -134,6 +150,7 @@ const ShowsTable = ({
         onCellClicked={handleCellClick}
         gridOptions={gridOptions}
         onCellValueChange={handleCellChanges}
+        rowClassRules={rowClassRules}
       />
       <ConfirmationDialog
         variant={'delete'}

@@ -10,5 +10,6 @@ export interface AddBookingsParams {
   isBooking?: boolean;
   isRehearsal?: boolean;
   isGetInFitUp?: boolean;
+  RunTag: string;
   // Add any additional fields needed for rehearsals and getInFitUp
 }
