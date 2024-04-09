@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -13,36 +13,43 @@ import formatInputDate from 'utils/dateInputFormat';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
-  const [bookingJump, setBooking] = useRecoilState(bookingJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const [bookings, setBooking] = useRecoilState(bookingJumpState);
   const [venueUrl, setVenueUrl] = useState('');
   const today = formatInputDate(new Date());
-  const [selectedIndex, setSelIndex] = useState(-1);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedValue, setSelectedValue] = useState(null);
   const [venueName, setVenueName] = useState('');
   const [venueId, setVenueId] = useState(0);
   const bookingOptions = useMemo(
-    () => (bookingJump.bookings ? mapBookingsToProductionOptions(bookingJump.bookings) : []),
-    [bookingJump],
+    () => (bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : []),
+    [bookings],
   );
+
+  useEffect(() => {
+    setSelectedIndex(-1);
+    setSelectedValue(0);
+  }, [bookings.bookings]);
 
   const todayOnSchedule = useMemo(() => {
     const todaysBookings = bookingOptions.filter((booking) => booking.date === today);
     return todaysBookings.length !== 0;
-  }, [bookingOptions]);
+  }, [bookingOptions, today]);
 
   const changeBooking = (value: string | number) => {
-    const selectedBooking = bookingOptions.find((booking) => booking.value === value);
-    setSelIndex(bookingOptions.findIndex((booking) => booking.value === value));
-    setSelectedValue(selectedBooking.value.toString());
+    if (value !== null) {
+      const selectedBooking = bookingOptions.find((booking) => booking.value === value);
+      setSelectedIndex(bookingOptions.findIndex((booking) => booking.value === value));
+      setSelectedValue(selectedBooking.value.toString());
 
-    const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
-    const booking = bookingJump.bookings.find((booking) => booking.Id === bookingIdentifier);
-    const website = booking.Venue.Website;
-    setVenueName(booking.Venue.Code + ' ' + booking.Venue.Name);
-    setVenueId(booking.Venue.Id);
-    setVenueUrl(website);
-    setBooking({ ...bookingJump, selected: bookingIdentifier });
+      const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
+      const booking = bookings.bookings.find((booking) => booking.Id === bookingIdentifier);
+      const website = booking.Venue.Website;
+      setVenueName(booking.Venue.Code + ' ' + booking.Venue.Name);
+      setVenueId(booking.Venue.Id);
+      setVenueUrl(website);
+      setBooking({ ...bookings, selected: bookingIdentifier });
+    }
   };
 
   const goToToday = () => {
@@ -76,7 +83,7 @@ const Filters = () => {
           <Select
             onChange={changeBooking}
             value={selectedValue}
-            disabled={!ProductionId}
+            disabled={!productionId}
             placeholder="Select a Venue/Date"
             className="bg-white w-[550px]"
             options={bookingOptions}
@@ -84,19 +91,19 @@ const Filters = () => {
 
           <Button
             text="Go To Today"
-            disabled={!todayOnSchedule || !ProductionId}
+            disabled={!todayOnSchedule || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />
           <Button
             text="Previous Date"
-            disabled={selectedIndex === 0 || selectedValue === null || !ProductionId}
+            disabled={selectedIndex === 0 || selectedValue === null || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToPrevious}
           />
           <Button
             text="Next Date"
-            disabled={selectedIndex === bookingOptions.length - 1 || !ProductionId}
+            disabled={selectedIndex === bookingOptions.length - 1 || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToNext}
           />

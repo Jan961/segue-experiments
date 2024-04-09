@@ -1,10 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
-import InputDialog from 'components/core-ui-lib/InputDialog/InputDialog';
+import InputDialog from 'components/marketing/InputDialog/InputDialog';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import { formatUrl } from 'utils/formatUrl';
 
 type MarketingBtnProps = {
   venueName: string;
@@ -12,7 +13,7 @@ type MarketingBtnProps = {
 };
 
 export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venueId }) => {
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const [showEditUrlModal, setShowEditUrl] = useState<boolean>(false);
   const [website, setWebsite] = useState('');
@@ -20,27 +21,31 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
   useEffect(() => {
     if (venueId !== 0) {
       const booking = bookingJump.bookings.find((booking) => booking.Venue.Id === venueId);
-      setWebsite(booking.Venue.Website);
+      if (booking !== undefined) {
+        const formattedUrl = formatUrl(booking.Venue.Website);
+        setWebsite(formattedUrl);
+      } else {
+        setWebsite('');
+      }
     }
   }, [venueId, bookingJump]);
 
-  const updateVenueWebsite = (website: string) => {
-    // intended using useAxios but it only supports get/post
-    axios
-      .put('/api/venue/update', { Website: website, VenueId: venueId })
-      .then(() => {
-        setBookingJump({
-          ...bookingJump,
-          bookings: bookingJump.bookings.map((booking) => {
-            if (booking.Venue.Id === venueId) {
-              return { ...booking, Venue: { ...booking.Venue, Website: website } };
-            }
-            setShowEditUrl(false);
-            return booking;
-          }),
-        });
-      })
-      .catch((error) => console.log('Error updating venue website', error));
+  const updateVenueWebsite = async (website: string) => {
+    try {
+      await axios.put('/api/venue/update', { Website: website, VenueId: venueId });
+      setBookingJump({
+        ...bookingJump,
+        bookings: bookingJump.bookings.map((booking) => {
+          if (booking.Venue.Id === venueId) {
+            return { ...booking, Venue: { ...booking.Venue, Website: website } };
+          }
+          setShowEditUrl(false);
+          return booking;
+        }),
+      });
+    } catch (error) {
+      console.log('Error updating venue website', error);
+    }
   };
 
   return (
@@ -48,14 +53,14 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
       <Button
         text={website === '' ? 'Add Landing Page' : 'Edit Landing Page'}
         className="w-[155px]"
-        disabled={bookingJump.selected === null || !ProductionId}
+        disabled={bookingJump.selected === null || !productionId}
         onClick={() => setShowEditUrl(true)}
       />
 
       <Button
         text="Marketing Reports"
         className="w-[165px]"
-        disabled={!ProductionId}
+        disabled={!productionId}
         iconProps={{ className: 'h-4 w-3' }}
         sufixIconName={'excel'}
       />
@@ -63,7 +68,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
       <Button
         text="Venue Website"
         className="w-[155px]"
-        disabled={!ProductionId || website === ''}
+        disabled={!productionId || website === ''}
         onClick={() => window.open(website, '_blank')}
       />
 

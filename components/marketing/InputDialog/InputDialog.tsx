@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import Button from '../Button';
-import PopupModal from '../PopupModal';
-import TextInput from '../TextInput';
-import ConfirmationDialog, { ConfDialogVariant } from '../ConfirmationDialog/ConfirmationDialog';
+import { useEffect, useState } from 'react';
+import Button from '../../core-ui-lib/Button';
+import PopupModal from '../../core-ui-lib/PopupModal';
+import TextInput from '../../core-ui-lib/TextInput';
+import ConfirmationDialog, { ConfDialogVariant } from '../../core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface InputDialogProps {
   titleText: string;
@@ -17,7 +17,6 @@ interface InputDialogProps {
   inputValue?: string;
 }
 
-
 const InputDialog = ({
   show = false,
   titleText,
@@ -28,11 +27,10 @@ const InputDialog = ({
   saveText,
   inputPlaceholder,
   inputLabel,
-  inputValue
+  inputValue,
 }: Partial<InputDialogProps>) => {
-
   const [visible, setVisible] = useState<boolean>(show);
-  const [showConfirm, setShowConf] = useState<boolean>(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
 
   useEffect(() => {
@@ -46,38 +44,38 @@ const InputDialog = ({
   const [inputVal, setInputVal] = useState('');
 
   const handleClose = () => {
-    if(inputVal !== inputValue) {
+    if (inputVal !== inputValue) {
       setConfVariant('close');
-      setShowConf(true);
+      setShowConfirm(true);
     } else {
       setVisible(false);
     }
-  }
+  };
 
   const handleCancel = () => {
-    if(inputVal !== inputValue) {
+    if (inputVal !== inputValue) {
       setConfVariant('cancel');
-      setShowConf(true);
+      setShowConfirm(true);
     } else {
       setVisible(false);
     }
-  }
+  };
 
   const dismissAll = () => {
-    setShowConf(false);
-    onCancelClick()
-  }
+    setShowConfirm(false);
+    onCancelClick();
+  };
 
   return (
     <PopupModal
       show={visible}
       title={titleText}
-      titleClass='text-responsive-2xl text-primary-navy font-bold -mt-2'
+      titleClass="text-responsive-2xl text-primary-navy font-bold -mt-2"
       showCloseIcon={true}
       hasOverlay={showConfirm}
       onClose={handleClose}
     >
-      <div className='w-[435px]'>
+      <div className="w-[435px]">
         <div className="text-xl text-primary-navy font-bold mb-4">{subTitleText}</div>
 
         <div className="text-base font-bold text-primary-navy">{inputLabel}</div>
@@ -91,24 +89,19 @@ const InputDialog = ({
 
         <div className="flex float-right mt-5">
           <Button className="w-32" variant="secondary" text={cancelText} onClick={handleCancel} />
-          <Button
-            className="ml-4 w-32"
-            variant={'primary'}
-            text={saveText}
-            onClick={() => onSaveClick(inputVal)}
-          />
+          <Button className="ml-4 w-32" variant={'primary'} text={saveText} onClick={() => onSaveClick(inputVal)} />
         </div>
 
         <ConfirmationDialog
-        variant={confVariant}
-        show={showConfirm}
-        onYesClick={dismissAll}
-        onNoClick={() => setShowConf(false)}
-        hasOverlay={false}
-      />
+          variant={confVariant}
+          show={showConfirm}
+          onYesClick={dismissAll}
+          onNoClick={() => setShowConfirm(false)}
+          hasOverlay={false}
+        />
       </div>
     </PopupModal>
   );
-}
+};
 
 export default InputDialog;
