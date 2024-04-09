@@ -4,11 +4,11 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 
 const IconRenderer = (props: CustomCellRendererProps) => {
   const { value } = props;
-  const { iconName } = props?.colDef?.cellRendererParams || {};
+  const { iconName, tooltipPosition = 'left' } = props?.colDef?.cellRendererParams || {};
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <Tooltip body={value} position="left" height="h-32" width="w-32" disabled={value === ''}>
+      <Tooltip body={value} position={tooltipPosition} height="h-32" width="w-32" disabled={value === ''}>
         <Icon iconName={iconName} />
       </Tooltip>
     </div>

@@ -1,13 +1,13 @@
 import PopupModal from 'components/core-ui-lib/PopupModal';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
+import { useMemo, useRef, useState } from 'react';
 import { barredVenueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import Button from 'components/core-ui-lib/Button';
 import { Spinner } from 'components/global/Spinner';
 import Label from 'components/core-ui-lib/Label';
-import useAxios from 'hooks/useAxios';
 import { dateToSimple } from 'services/dateService';
+import { useQuery } from '@tanstack/react-query';
+import { fetchBarredVenues } from './request';
 
 type BarringCheckProps = {
   visible: boolean;
@@ -19,7 +19,24 @@ type BarringCheckProps = {
 };
 
 const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onClose }: BarringCheckProps) => {
-  const [barredVenues, setBarredVenues] = useState<BarredVenue[]>([]);
+  const {
+    data: barredVenues = [],
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ['barringCheck' + venueId],
+    queryFn: () =>
+      fetchBarredVenues({
+        productionId,
+        venueId,
+        seats: 400,
+        barDistance: 25,
+        includeExcluded: false,
+        startDate,
+        endDate,
+        filterBarredVenues: true,
+      }),
+  });
   const [selectedVenueIds, setSelectedVenueIds] = useState<number[]>([]);
   const filteredRows = useMemo(() => {
     const filteredRows = [];
@@ -34,36 +51,6 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
     return filteredRows.sort((a, b) => a.Mileage - b.Mileage);
   }, [selectedVenueIds, barredVenues]);
   const tableRef = useRef(null);
-  const { loading, fetchData: api } = useAxios();
-  useEffect(() => {
-    fetchBarredVenues();
-  }, []);
-  const fetchBarredVenues = () => {
-    api({
-      url: '/api/productions/venue/barringCheck',
-      method: 'POST',
-      data: {
-        productionId,
-        venueId,
-        seats: 400,
-        barDistance: 25,
-        includeExcluded: false,
-        startDate,
-        endDate,
-        filterBarredVenues: true,
-      },
-    })
-      .then((data: any) => {
-        if (data.error) {
-          return;
-        }
-        const venuesWithConflicts = data?.filter((venue: BarredVenue) => venue.hasBarringConflict);
-        setBarredVenues(venuesWithConflicts || []);
-      })
-      .catch((error) => {
-        console.log('Error fetching Barred Venues', error);
-      });
-  };
   const exportTableData = () => {
     tableRef.current?.getApi?.()?.exportDataAsExcel?.();
   };
@@ -75,19 +62,19 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
     suppressRowClickSelection: true,
   };
   return (
-    <PopupModal show={visible} titleClass="text-xl text-primary-navy text-bold" title="Barring Check">
+    <PopupModal onClose={onClose} show={visible} titleClass="text-xl text-primary-navy text-bold" title="Barring Check">
       {loading && (
-        <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95 z-[60]">
+        <div className="w-full h-full min-h-60 min-w-60 absolute left-0 top-0 bg-white flex items-center opacity-95 z-[60]">
           <Spinner className="w-full" size="lg" />
         </div>
       )}
-      {barredVenues.length === 0 && (
+      {barredVenues?.length === 0 && !loading && (
         <Label
           className="py-4 text-responsive-sm text-primary-input-text"
-          text="A Barring check has found no issues"
+          text={error ? 'Something went wrong.Please try again' : 'A Barring check has found no issues'}
         ></Label>
       )}
-      {(barredVenues.length && (
+      {(barredVenues?.length && !loading && (
         <div className="flex flex-col">
           <div className="py-4 text-responsive-sm text-primary-input-text">
             A Barring Check has found potential issues
@@ -112,7 +99,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
       )) ||
         ''}
       <div className="pt-3 w-full flex items-center justify-end gap-2">
-        {(barredVenues.length && (
+        {(barredVenues?.length && !loading && (
           <Button
             onClick={exportTableData}
             className="float-right px-4 w-33 font-normal"

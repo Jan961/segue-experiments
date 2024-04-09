@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { checkDateOverlap } from 'services/dateService';
-import { getDateFromWeekNumber } from 'utils/getDateFromWeekNum';
+import { getDateFromWeekNumber } from 'utils/barring';
 
 export type BarredVenue = {
   id: number;
@@ -129,13 +129,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         !isBarred &&
         uvBarringEndDate &&
         uvBarringStartDate &&
-        bvBarringStartDate &&
-        bvBarringEndDate &&
+        FirstDate &&
         checkDateOverlap(
           new Date(uvBarringStartDate),
           new Date(uvBarringEndDate),
-          new Date(bvBarringStartDate),
-          new Date(bvBarringEndDate),
+          new Date(FirstDate),
+          new Date(FirstDate),
         );
       const uvBarredDistanceCheck =
         uvBarringPeriodOverlap && distance !== null && uvBarringMiles && distance?.lte(uvBarringMiles);

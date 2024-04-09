@@ -6,11 +6,19 @@ import { BookingWithVenueDTO } from 'interfaces';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
+import { gridOptions } from '../../GapSuggest';
 
 type BarringIssueViewProps = {
   bookingConflicts: BookingWithVenueDTO[];
   barringConflicts?: BarredVenue[];
   updateModalTitle: (title: string) => void;
+};
+
+const barringGridOptions = {
+  ...gridOptions,
+  rowClassRules: {
+    '!bg-primary-orange !bg-opacity-25': (params) => params?.data?.hasBarringConflict,
+  },
 };
 
 export default function BarringIssueView({
@@ -38,7 +46,12 @@ export default function BarringIssueView({
         A Barring Check has found potential issues
       </span>
       <div className="w-[634px] flex flex-col">
-        <Table columnDefs={barringIssueColumnDefs} rowData={barringConflicts} styleProps={styleProps} />
+        <Table
+          columnDefs={barringIssueColumnDefs}
+          rowData={barringConflicts}
+          styleProps={styleProps}
+          gridOptions={barringGridOptions}
+        />
         <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
           <Button
