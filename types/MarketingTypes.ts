@@ -96,3 +96,12 @@ export type BookingSelection = {
   ProductionLengthWeeks: number;
   PerformanceCount: number;
 };
+
+export type SalesTable =
+  | 'sales'
+  | 'archived sales'
+  | 'activities'
+  | 'contact notes'
+  | 'venue contacts'
+  | 'promoter holds'
+  | 'attachments';
