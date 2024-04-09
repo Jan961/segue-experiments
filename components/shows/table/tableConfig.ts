@@ -2,14 +2,19 @@ import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
-import { MultiColumnHeader } from './MultiColumnHeader';
-import DateColumnRenderer from 'components/bookings/table/DateColumnRenderer';
+import CustomDateCell from './CustomDateCell';
+import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
+import CustomSelectCell from './CustomSelectCell';
+import { SALES_FIG_OPTIONS } from '../constants';
 
 export const tableConfig = [
   {
     headerName: 'Show Name',
     field: 'Name',
     cellRenderer: ShowsTextInputRenderer,
+    cellRendererParams: {
+      placeholder: 'Please enter Show Name',
+    },
     headerClass: 'text-center',
     width: 396,
     flex: 1,
@@ -17,6 +22,9 @@ export const tableConfig = [
   {
     headerName: 'Show Code',
     field: 'Code',
+    cellRendererParams: {
+      placeholder: 'Please enter Show Code',
+    },
     cellRenderer: ShowsTextInputRenderer,
     width: 130,
     headerClass: 'text-center',
@@ -89,9 +97,13 @@ export const tableConfig = [
 export const productionsTableConfig = [
   {
     headerName: 'Show',
+    headerClass: 'justify-center font-bold text-base ',
     field: 'Name',
-    cellRenderer: DefaultCellRenderer,
-    headerClass: 'text-center',
+    cellRenderer: ShowNameAndCodeRenderer,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
     width: 265,
     flex: 1,
   },
@@ -104,21 +116,77 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Rehearsals',
+    headerClass: 'justify-center font-bold text-base ',
+    marryChildren: true,
     children: [
-      { headerName: 'Start', field: 'DateBlock[1].StartDate', cellRenderer: DateColumnRenderer, width: 80, height: 20 },
-      { headerName: 'End', field: 'DateBlock[1].EndDate', cellRenderer: DateColumnRenderer, width: 80, height: 20 },
+      {
+        headerName: 'Start',
+        field: 'DateBlock',
+        cellRendererParams: {
+          internalField: 'StartDate',
+          fieldIndex: 1,
+        },
+        cellRenderer: CustomDateCell,
+        suppressMovable: true,
+        headerClass: 'border-r-[1px] border-white text-center',
+        width: 80,
+        resizable: false,
+        sortable: false,
+      },
+      {
+        headerName: 'End',
+        field: 'DateBlock',
+        cellRendererParams: {
+          internalField: 'EndDate',
+          fieldIndex: 1,
+        },
+        cellRenderer: CustomDateCell,
+        suppressMovable: true,
+        headerClass: 'border-r-[1px] border-white text-center',
+        width: 80,
+        resizable: false,
+        sortable: false,
+      },
     ],
-    height: 30,
-    headerClass: 'text-center',
-    headerComponentFramework: MultiColumnHeader,
   },
   {
     headerName: 'Production Dates',
+    headerClass: 'justify-center font-bold text-base ',
+    marryChildren: true,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
     children: [
-      { headerName: 'Start', field: 'DateBlock[0].StartDate', cellRenderer: DateColumnRenderer, width: 80, height: 20 },
-      { headerName: 'End', field: 'DateBlock[0].EndDate', cellRenderer: DateColumnRenderer, width: 80, height: 20 },
+      {
+        headerName: 'Start',
+        field: 'DateBlock',
+        cellRendererParams: {
+          internalField: 'StartDate',
+          fieldIndex: 0,
+        },
+        cellRenderer: CustomDateCell,
+        suppressMovable: true,
+        headerClass: 'border-r-[1px] border-white text-center',
+        width: 80,
+        resizable: false,
+        sortable: false,
+      },
+      {
+        headerName: 'End',
+        field: 'DateBlock',
+        cellRendererParams: {
+          internalField: 'EndDate',
+          fieldIndex: 0,
+        },
+        cellRenderer: CustomDateCell,
+        suppressMovable: true,
+        headerClass: 'border-r-[1px] border-white text-center',
+        width: 80,
+        resizable: false,
+        sortable: false,
+      },
     ],
-    headerClass: 'text-center',
   },
   {
     headerName: 'Production Image',
@@ -128,27 +196,41 @@ export const productionsTableConfig = [
     cellRendererParams: {
       buttonText: 'Upload',
     },
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
     headerClass: 'text-center',
   },
   {
     headerName: 'Region',
     field: 'EditId',
-    cellRenderer: DefaultCellRenderer,
+    cellRenderer: CustomSelectCell,
+    cellRendererParams: {
+      options: SALES_FIG_OPTIONS,
+      placeholder: 'Select Region(s)',
+    },
     width: 170,
     headerClass: 'text-center',
   },
   {
     headerName: 'Email Address for Sales Figures',
-    field: 'Id',
+    field: '',
+    cellRendererParams: {
+      placeholder: 'Enter email address',
+    },
     width: 172,
-    cellRenderer: DefaultCellRenderer,
+    cellRenderer: ShowsTextInputRenderer,
     headerClass: 'text-center',
   },
   {
     headerName: 'Input Freq of Sales Figs',
     field: 'Id',
     width: 150,
-    cellRenderer: DefaultCellRenderer,
+    cellRenderer: CustomSelectCell,
+    cellRendererParams: {
+      options: SALES_FIG_OPTIONS,
+    },
     headerClass: 'text-center',
   },
   {
@@ -165,37 +247,32 @@ export const productionsTableConfig = [
     headerClass: 'text-center',
   },
   {
-    headerName: 'Save / Delete',
+    headerName: '',
+    field: 'editId',
     cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'Save',
+      variant: 'primary',
+    },
+    resizable: false,
+    cellStyle: {
+      paddingLeft: '0.5em',
+      width: 80,
+    },
+    width: 90,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'deleteId',
+    width: 80,
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'Delete',
+      variant: 'tertiary',
+      width: 80,
+    },
     resizable: false,
     headerClass: 'text-center',
-    children: [
-      {
-        headerName: '',
-        field: 'EditId',
-        cellRenderer: ButtonRenderer,
-        cellRendererParams: {
-          buttonText: 'Save',
-          variant: 'primary',
-        },
-        width: 80,
-        height: 20,
-        suppressColumnsToolPanel: true,
-        resizable: false,
-      },
-      {
-        headerName: '',
-        field: 'Id',
-        cellRenderer: ButtonRenderer,
-        cellRendererParams: {
-          buttonText: 'Delete',
-          variant: 'tertiary',
-        },
-        width: 80,
-        height: 20,
-        suppressColumnsToolPanel: true,
-        resizable: false,
-      },
-    ],
   },
 ];
