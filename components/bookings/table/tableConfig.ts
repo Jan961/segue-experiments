@@ -73,6 +73,9 @@ export const columnDefs = [
     headerName: '',
     field: 'note',
     cellRenderer: NoteColumnRenderer,
+    cellRendererParams: {
+      tpActive: true,
+    },
     resizable: false,
     width: 50,
     cellStyle: {
@@ -245,6 +248,9 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     headerName: 'Notes',
     field: 'notes',
     cellRenderer: NoteColumnRenderer,
+    cellRendererParams: {
+      tpActive: false,
+    },
     resizable: false,
     width: 85,
     maxWidth: 85,

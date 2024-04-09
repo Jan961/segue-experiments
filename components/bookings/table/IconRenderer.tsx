@@ -8,7 +8,7 @@ const IconRenderer = (props: CustomCellRendererProps) => {
 
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <Tooltip body={value} position={tooltipPosition} height="h-32" width="w-32" disabled={value === ''}>
+      <Tooltip body={value} position={tooltipPosition} height="h-auto" width="w-32" disabled={value === ''}>
         <Icon iconName={iconName} />
       </Tooltip>
     </div>
