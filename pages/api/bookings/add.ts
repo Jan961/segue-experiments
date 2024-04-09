@@ -19,6 +19,7 @@ const mapToPrismaFields = (values: BookingItem[] = []) => {
         isBooking: item.isBooking || item.perf,
         isRehearsal: item.isRehearsal,
         isGetInFitUp: item.isGetInFitUp,
+        RunTag: item.runTag,
       };
       return mappedItem;
     });
