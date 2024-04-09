@@ -1,3 +1,3 @@
-import ConfirmationDialog from './ConfirmationDialog';
+import InputDialog from './InputDialog';
 
-export default ConfirmationDialog;
+export default InputDialog;

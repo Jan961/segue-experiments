@@ -1,24 +1,28 @@
 import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import InputDialog from 'components/core-ui-lib/InputDialog/InputDialog';
-import { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
-export const MarketingButtons = ({ venueName, venueId }) => {
+type MarketingBtnProps = {
+  venueName: string;
+  venueId: number;
+};
+
+export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venueId }) => {
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const [showEditUrlModal, setShowEditUrl] = useState<boolean>(false);
-  const [website, setWebsite] = useState('')
+  const [website, setWebsite] = useState('');
 
   useEffect(() => {
-    if(venueId !== 0){
-      const booking = bookingJump.bookings.find(booking => booking.Venue.Id === venueId);
-      console.log(booking)
+    if (venueId !== 0) {
+      const booking = bookingJump.bookings.find((booking) => booking.Venue.Id === venueId);
       setWebsite(booking.Venue.Website);
     }
-  }, [venueId]);
+  }, [venueId, bookingJump]);
 
   const updateVenueWebsite = (website: string) => {
     // intended using useAxios but it only supports get/post
@@ -35,7 +39,8 @@ export const MarketingButtons = ({ venueName, venueId }) => {
             return booking;
           }),
         });
-      }).catch((error) => console.log('Error updating venue website', error));
+      })
+      .catch((error) => console.log('Error updating venue website', error));
   };
 
   return (
@@ -43,7 +48,7 @@ export const MarketingButtons = ({ venueName, venueId }) => {
       <Button
         text={website === '' ? 'Add Landing Page' : 'Edit Landing Page'}
         className="w-[155px]"
-        disabled={!ProductionId}
+        disabled={bookingJump.selected === null || !ProductionId}
         onClick={() => setShowEditUrl(true)}
       />
 
@@ -58,7 +63,7 @@ export const MarketingButtons = ({ venueName, venueId }) => {
       <Button
         text="Venue Website"
         className="w-[155px]"
-        disabled={!ProductionId}
+        disabled={!ProductionId || website === ''}
         onClick={() => window.open(website, '_blank')}
       />
 
@@ -68,10 +73,10 @@ export const MarketingButtons = ({ venueName, venueId }) => {
         subTitleText={venueName}
         onCancelClick={() => setShowEditUrl(false)}
         onSaveClick={(value) => updateVenueWebsite(value)}
-        cancelText='Cancel'
-        saveText='Save and Close'
-        inputPlaceholder='Enter Landing Page'
-        inputLabel='Landing Page'
+        cancelText="Cancel"
+        saveText="Save and Close"
+        inputPlaceholder="Enter Landing Page"
+        inputLabel="Landing Page"
         inputValue={website}
       />
     </div>

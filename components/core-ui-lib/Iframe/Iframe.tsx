@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import { Spinner } from 'components/global/Spinner';
+import { formatUrl } from 'utils/formatUrl';
 
 type Variant = 'xs' | 'sm' | 'md' | 'lg';
 
@@ -30,31 +31,28 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
     width: `${scaledWidth}px`,
     height: `${scaledHeight}px`,
     transformOrigin: 'top left',
-    visibility: isLoading ? 'hidden' : 'visible', 
+    visibility: isLoading ? 'hidden' : 'visible',
   };
+  const formattedUrl = formatUrl(src);
 
   if (!src) {
     // Display some text when there is no src
-    return (
-      <div className={`${baseClass} ${className} flex items-center justify-center`}>
-        No URL provided.
-      </div>
-    );
+    return <div className={`${baseClass} ${className} flex items-center justify-center`}>No URL provided.</div>;
   }
 
   return (
     <div className={classNames(`${baseClass} overflow-hidden relative ${className}`)}>
       {isLoading && (
         <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
-          <Spinner size='sm' /> 
+          <Spinner size="sm" />
         </div>
       )}
       <iframe
-        src={src}
+        src={formattedUrl}
         style={transformStyle}
         allowFullScreen
         className="absolute"
-        onLoad={() => setIsLoading(false)} 
+        onLoad={() => setIsLoading(false)}
       ></iframe>
     </div>
   );
