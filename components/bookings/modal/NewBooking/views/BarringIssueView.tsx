@@ -1,15 +1,14 @@
 import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { steps } from 'config/AddBooking';
-import { BookingWithVenueDTO } from 'interfaces';
+import { getStepIndex } from 'config/AddBooking';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { gridOptions } from '../../GapSuggest';
 
 type BarringIssueViewProps = {
-  bookingConflicts: BookingWithVenueDTO[];
+  isNewBooking: boolean;
   barringConflicts?: BarredVenue[];
   updateModalTitle: (title: string) => void;
 };
@@ -21,22 +20,18 @@ const barringGridOptions = {
   },
 };
 
-export default function BarringIssueView({
-  bookingConflicts,
-  barringConflicts,
-  updateModalTitle,
-}: BarringIssueViewProps) {
-  const { previousStep, goToStep } = useWizard();
+export default function BarringIssueView({ isNewBooking, barringConflicts, updateModalTitle }: BarringIssueViewProps) {
+  const { goToStep } = useWizard();
 
   useEffect(() => {
     updateModalTitle('Barring Issue');
   }, []);
 
   const goToPreviousStep = () => {
-    if (bookingConflicts?.length > 0) {
-      previousStep();
+    if (isNewBooking) {
+      goToStep(getStepIndex(isNewBooking, 'Create New Booking'));
     } else {
-      goToStep(steps.indexOf('Create New Booking'));
+      goToStep(getStepIndex(false, 'New Booking Details'));
     }
   };
 
@@ -57,7 +52,7 @@ export default function BarringIssueView({
           <Button
             className="ml-3 w-33"
             text="Continue"
-            onClick={() => goToStep(steps.indexOf('New Booking Details'))}
+            onClick={() => goToStep(getStepIndex(isNewBooking, 'New Booking Details'))}
           />
         </div>
       </div>

@@ -122,9 +122,9 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isBooking: b.dayType === 'Performance',
           isRehearsal: b.dayType === 'Rehearsal',
           isGetInFitUp: b.dayType === 'Get in / Fit Up',
+          isRunOfDates: runOfDates.length > 1,
         };
       });
-      console.log('Editing ', booking, formattedBooking);
       dispatch(actionSpreader(Actions.UPDATE_BOOKING, formattedBooking));
     }
   }, [booking]);
@@ -187,8 +187,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveNewBooking}
           updateModalTitle={updateModalTitle}
+          isNewBooking={!editBooking}
         />
         <CheckMileageView
+          isNewBooking={!editBooking}
           formData={state.form}
           productionCode={productionCode}
           data={state.booking}
@@ -196,22 +198,24 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           updateModalTitle={updateModalTitle}
           previousView={state.modalTitle}
         />
-        <GapSuggestionView
-          productionId={currentProduction?.Id}
-          startDate={state.form.fromDate}
-          endDate={state.form.toDate}
-          updateModalTitle={updateModalTitle}
-        />
         <BookingConflictsView
           hasBarringIssues={state?.barringConflicts?.length > 0}
           data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}
         />
         <BarringIssueView
-          bookingConflicts={state.bookingConflicts}
+          isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
         />
+        {!editBooking && (
+          <GapSuggestionView
+            productionId={currentProduction?.Id}
+            startDate={state.form.fromDate}
+            endDate={state.form.toDate}
+            updateModalTitle={updateModalTitle}
+          />
+        )}
       </Wizard>
       <ConfirmationDialog
         variant="close"

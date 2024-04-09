@@ -20,7 +20,18 @@ const TimeArrayRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProp
     setIsDisabled(!data.perf);
 
     if (data.noPerf) {
-      const newTimes = Array(data.noPerf).fill({ hrs: '', min: '', sec: '' });
+      const times = data.times?.split(',');
+
+      const newTimes = Array(data.noPerf)
+        .fill('')
+        .map((_, i) => {
+          const time = times?.[i];
+          if (time) {
+            const [hrs = '', min = '', sec = ''] = time.split(':');
+            return { hrs, min, sec };
+          }
+          return { hrs: '', min: '', sec: '' };
+        });
       setPerformanceTimes(newTimes);
     } else {
       setValue('');

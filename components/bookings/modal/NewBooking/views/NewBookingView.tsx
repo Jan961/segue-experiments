@@ -7,7 +7,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
 import { BookingItem, TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { steps } from 'config/AddBooking';
+import { getStepIndex, steps } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
@@ -88,9 +88,9 @@ const NewBookingView = ({
         );
         if (skipRedirect) return;
         if (data?.length > 0) {
-          goToStep(steps.indexOf('Barring Issue'));
+          goToStep(getStepIndex(true, 'Barring Issue'));
         } else {
-          goToStep(steps.indexOf('New Booking Details'));
+          goToStep(getStepIndex(true, 'New Booking Details'));
         }
       })
       .catch((error) => {
@@ -112,13 +112,13 @@ const NewBookingView = ({
         }
         if (isNullOrEmpty(data)) {
           if (isDateTypeOnly) {
-            goToStep(steps.indexOf('New Booking Details'));
+            goToStep(getStepIndex(true, 'New Booking Details'));
           } else {
             fetchBarredVenues(false);
           }
         } else if (!isDateTypeOnly) {
           await fetchBarredVenues(true);
-          goToStep(steps.indexOf('Booking Conflict'));
+          goToStep(getStepIndex(true, 'Booking Conflict'));
         }
       })
       .catch((error) => {
@@ -137,7 +137,7 @@ const NewBookingView = ({
   };
 
   const goToGapSuggestion = () => {
-    goToStep(steps.indexOf('Venue Gap Suggestions'));
+    goToStep(getStepIndex(true, 'Venue Gap Suggestions'));
   };
 
   const createBookingsForDateRange = () => {
@@ -153,7 +153,7 @@ const NewBookingView = ({
 
   const handleCheckMileageClick = () => {
     createBookingsForDateRange();
-    goToStep(steps.indexOf('Check Mileage'));
+    goToStep(getStepIndex(true, 'Check Mileage'));
   };
   return (
     <div className="w-[385px]">

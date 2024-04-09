@@ -6,7 +6,7 @@ import { useWizard } from 'react-use-wizard';
 import { bookingStatusMap } from 'config/bookings';
 import { dateToSimple } from 'services/dateService';
 import { BookingWithVenueDTO } from 'interfaces';
-import { steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 
 interface BookingConflictsViewProps {
   data?: BookingWithVenueDTO[];
@@ -15,7 +15,7 @@ interface BookingConflictsViewProps {
 }
 
 export default function BookingConflictsView({ data, hasBarringIssues, updateModalTitle }: BookingConflictsViewProps) {
-  const { nextStep, previousStep, goToStep } = useWizard();
+  const { goToStep } = useWizard();
 
   const rows = useMemo(
     () =>
@@ -45,12 +45,11 @@ export default function BookingConflictsView({ data, hasBarringIssues, updateMod
 
   const handleContinueClick = async () => {
     if (hasBarringIssues) {
-      nextStep();
+      goToStep(getStepIndex(true, 'Barring Issue'));
     } else {
-      goToStep(steps.indexOf('New Booking Details'));
+      goToStep(getStepIndex(true, 'New Booking Details'));
     }
   };
-  console.table(rows);
 
   return (
     <div className="flex flex-col">
@@ -66,7 +65,12 @@ export default function BookingConflictsView({ data, hasBarringIssues, updateMod
         />
       </div>
       <div className="pt-3 w-full flex items-center justify-end">
-        <Button className="w-33" variant="secondary" text="Back" onClick={() => previousStep()} />
+        <Button
+          className="w-33"
+          variant="secondary"
+          text="Back"
+          onClick={() => goToStep(getStepIndex(true, 'Create New Booking'))}
+        />
         <Button
           className="ml-3 w-33"
           text="Continue"

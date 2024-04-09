@@ -30,7 +30,6 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         (isRunOfDates && node.rowIndex > 0) || dayType === null || dayType === '' || bookingStatus !== pencilled,
       );
       if (!data.isRunOfDates) {
-        console.log('SelectPencilRenderer', dayType, bookingStatus, value);
         setValue(dayType === null || dayType === '' || bookingStatus !== pencilled ? null : value);
       } else if (node.rowIndex === 0 && value !== null && (dayType === null || dayType === '')) {
         handleValueChange(null);
@@ -44,7 +43,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         eGridCell={eGridCell}
         onChange={handleValueChange}
         options={pencilNos}
-        value={value}
+        value={`${value}`}
         inline
         isSearchable={false}
         disabled={isDisabled}

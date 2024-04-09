@@ -9,7 +9,7 @@ import { BookingItem, TForm } from '../reducer';
 import NotesPopup from 'components/bookings/NotesPopup';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { ColDef } from 'ag-grid-community';
-import { steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { toISO } from 'services/dateService';
@@ -70,67 +70,72 @@ export default function NewBookingDetailsView({
   }, [bookingData]);
 
   useEffect(() => {
-    let dayTypeOption = null;
-    if (dayTypeOptions && venueOptions) {
-      setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
-      dayTypeOption = dayTypeOptions.find(({ value }) => value === dateType);
+    if (isNewBooking) {
+      let dayTypeOption = null;
+      if (dayTypeOptions && venueOptions) {
+        setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
+        dayTypeOption = dayTypeOptions.find(({ value }) => value === dateType);
+      }
+
+      const isPerformance = dayTypeOption && dayTypeOption.text === 'Performance';
+      const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
+      const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
+
+      let startDate = new Date(fromDate);
+      const endDate = new Date(toDate);
+      const dates = [];
+      while (startDate <= endDate) {
+        const formattedDate = `${startDate.toLocaleDateString('en-US', {
+          weekday: 'short',
+          day: '2-digit',
+          month: '2-digit',
+          year: '2-digit',
+        })}`.replace(',', '');
+
+        const reorderedDate = formattedDate.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/$3');
+
+        const dateObject = {
+          dateBlockId,
+          date: reorderedDate,
+          dateAsISOString: toISO(startDate),
+          perf: isPerformance,
+          dayType: dateType,
+          venue: venueId,
+          noPerf: null,
+          times: '',
+          bookingStatus: dateType !== null ? 'U' : '', // U for Pencilled
+          pencilNo: '',
+          notes: '',
+          isBooking: isPerformance,
+          isRehearsal,
+          isGetInFitUp,
+          isRunOfDates,
+        };
+
+        dates.push(dateObject);
+        // Increment currentDate by one day for the next iteration
+        startDate = addDays(startDate, 1);
+      }
+
+      setBookingData(dates);
     }
-
-    const isPerformance = dayTypeOption && dayTypeOption.text === 'Performance';
-    const isRehearsal = dayTypeOption && dayTypeOption.text === 'Rehearsal';
-    const isGetInFitUp = dayTypeOption && dayTypeOption.text === 'Get in / Fit Up';
-
-    let startDate = new Date(fromDate);
-    const endDate = new Date(toDate);
-    const dates = [];
-    while (startDate <= endDate) {
-      const formattedDate = `${startDate.toLocaleDateString('en-US', {
-        weekday: 'short',
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-      })}`.replace(',', '');
-
-      const reorderedDate = formattedDate.replace(/(\d+)\/(\d+)\/(\d+)/, '$2/$1/$3');
-
-      const dateObject = {
-        dateBlockId,
-        date: reorderedDate,
-        dateAsISOString: toISO(startDate),
-        perf: isPerformance,
-        dayType: dateType,
-        venue: venueId,
-        noPerf: null,
-        times: '',
-        bookingStatus: dateType !== null ? 'U' : '', // U for Pencilled
-        pencilNo: '',
-        notes: '',
-        isBooking: isPerformance,
-        isRehearsal,
-        isGetInFitUp,
-        isRunOfDates,
-      };
-
-      dates.push(dateObject);
-      // Increment currentDate by one day for the next iteration
-      startDate = addDays(startDate, 1);
-    }
-    setBookingData(dates);
-  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates]);
+  }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates, isNewBooking]);
 
   const productionItem = useMemo(() => {
     return {
       production: `${production.ShowCode}${production.Code}`,
       venue: bookingRow?.venue ? venueDict[bookingRow.venue].Name : '',
       date: bookingRow?.date || null,
+      note: bookingRow?.notes || '',
     };
   }, [production, bookingRow, venueDict]);
 
   useEffect(() => {
     if (data !== null && data.length > 0) {
+      setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
       setBookingData(data);
     }
-  }, [data]);
+  }, [data, dayTypeOptions, venueOptions]);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -139,7 +144,7 @@ export default function NewBookingDetailsView({
   };
 
   const goToNewBooking = () => {
-    goToStep(steps.indexOf('Create New Booking'));
+    goToStep(getStepIndex(isNewBooking, 'Create New Booking'));
   };
 
   const handleBackButtonClick = () => {
@@ -197,12 +202,12 @@ export default function NewBookingDetailsView({
 
   const handePreviewBookingClick = () => {
     storeNewBookingDetails();
-    goToStep(steps.indexOf('Preview New Booking'));
+    goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
   };
 
   const handeCheckMileageClick = () => {
     storeNewBookingDetails();
-    goToStep(steps.indexOf('Check Mileage'));
+    goToStep(getStepIndex(isNewBooking, 'Check Mileage'));
   };
 
   const handleCellClick = (e) => {
