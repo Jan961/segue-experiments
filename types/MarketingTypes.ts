@@ -104,4 +104,5 @@ export type SalesTable =
   | 'contact notes'
   | 'venue contacts'
   | 'promoter holds'
-  | 'attachments';
+  | 'attachments'
+  | '';
