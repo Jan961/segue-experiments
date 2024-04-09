@@ -1,5 +1,5 @@
 import Layout from 'components/Layout';
-import MarketingHome from 'components/marketing/marketingHome';
+import MarketingHome from 'components/marketing/MarketingHome';
 import Filters from 'components/marketing/Filters';
 import { GetServerSideProps } from 'next';
 import { getAccountIdFromReq } from 'services/userService';
@@ -11,8 +11,7 @@ import { BookingJump } from 'state/marketing/bookingJumpState';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 
 const Index = () => {
-
-   return (
+  return (
     <Layout title="Marketing | Segue" flush>
       <div className="mb-8">
         <Filters />
@@ -20,9 +19,8 @@ const Index = () => {
       <MarketingHome />
     </Layout>
   );
-   }
+};
 export default Index;
-
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
@@ -48,15 +46,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       marketing: {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
-      }
+      },
     };
   } else {
     initialState = {
       global: {
         productionJump,
-      }
-    }
+      },
+    };
   }
 
   return { props: { initialState } };
-}
+};

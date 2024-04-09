@@ -11,15 +11,11 @@ const MarketingHome = () => {
       {/* Green Box */}
       <div className="bg-primary-green/[0.15] w-[291px] h-full rounded-xl p-4 mr-5 flex flex-col">
         <div className="text-base mb-4">Marketing summary will get rendered here</div>
-        {/* Assuming you might want some content or spacing after the marketing summary */}
       </div>
 
-      {/* Content on the right of the green box */}
       <div className="flex-grow flex flex-col">
-        {/* Row for buttons */}
         <div className="flex flex-wrap items-center mb-4">
           {' '}
-          {/* mb-4 for some space between the rows */}
           <Button
             text="Sales"
             className={`w-[155px] ${currView === 'sales' && selectedBtnClass}`}
@@ -64,7 +60,6 @@ const MarketingHome = () => {
           />
         </div>
 
-        {/* Row for tables with red background */}
         <div className="flex-grow">
           <div className="text base">{currView}</div>
         </div>

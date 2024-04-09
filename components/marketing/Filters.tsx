@@ -14,7 +14,7 @@ import MarketingButtons from './MarketingButtons';
 
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
   const [selectedBooking, setSelBooking] = useRecoilState(bookingJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
   const todayKey = useMemo(() => new Date().toISOString().substring(0, 10), []);
@@ -56,7 +56,7 @@ const Filters = () => {
           <Select
             onChange={changeBooking}
             value={selectedBooking.selected}
-            disabled={!ProductionId}
+            disabled={!productionId}
             placeholder="Select a Venue/Date"
             className="bg-white w-96"
             options={bookingOptions}
@@ -64,19 +64,19 @@ const Filters = () => {
 
           <Button
             text="Go To Today"
-            disabled={!todayOnSchedule || !ProductionId}
+            disabled={!todayOnSchedule || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />
           <Button
             text="Previous Date"
-            disabled={!todayOnSchedule || !ProductionId}
+            disabled={!todayOnSchedule || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />
           <Button
             text="Next Date"
-            disabled={!todayOnSchedule || !ProductionId}
+            disabled={!todayOnSchedule || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />

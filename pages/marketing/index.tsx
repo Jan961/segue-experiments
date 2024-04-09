@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
 import Filters from 'components/marketing/Filters';
-import MarketingHome from 'components/marketing/marketingHome';
+import MarketingHome from 'components/marketing/MarketingHome';
 import { getAccountIdFromReq } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
@@ -8,7 +8,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
-import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers'
+import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MarketingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -47,15 +47,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       marketing: {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
-      }
+      },
     };
   } else {
     initialState = {
       global: {
         productionJump,
-      }
-    }
+      },
+    };
   }
 
   return { props: { initialState } };
-}
+};
