@@ -7,7 +7,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
 import { BookingItem, TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { getStepIndex, steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
