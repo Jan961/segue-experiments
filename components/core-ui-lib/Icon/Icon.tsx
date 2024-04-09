@@ -56,6 +56,9 @@ const IconNameMap = new Map([
   ['excel', 'ExcelIcon'],
   ['cross', 'CrossIcon'],
   ['info-circle-solid', 'InfoCircleSolidIcon'],
+  ['brochure-released', 'BrochureReleasedIcon'],
+  ['single-seats', 'SingleSeatsIcon'],
+  ['not-on-sale', 'NotOnSaleIcon']
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '5xl';

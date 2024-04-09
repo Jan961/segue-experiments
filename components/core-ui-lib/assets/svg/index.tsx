@@ -22,3 +22,6 @@ export { default as ExitIcon } from './Exit';
 export { default as ExcelIcon } from './Excel';
 export { default as CrossIcon } from './Cross';
 export { default as InfoCircleSolidIcon } from './InfoCircleSolid';
+export { default as NotOnSaleIcon } from './NotOnSale';
+export { default as SingleSeatsIcon } from './SingleSeats';
+export { default as BrochureReleasedIcon } from './BrochureReleased';

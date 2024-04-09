@@ -4,8 +4,7 @@ import { SalesTable } from 'types/MarketingTypes';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook, faSquareXmark, faUser } from '@fortawesome/free-solid-svg-icons';
+import Icon from 'components/core-ui-lib/Icon';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTable>('');
@@ -21,15 +20,15 @@ const MarketingHome = () => {
         </div>
         <div className="flex flex-col border-y-2 border-t-primary-navy border-b-0 py-4 mt-4">
           <div className="flex items-center text-primary-navy">
-            <FontAwesomeIcon icon={faUser} />
+            <Icon iconName={'single-seats'} fill="#FFF" variant="xs" />
             <div className="ml-4 bg-[#10841C] text-primary-white px-1">Down to single seat</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
-            <FontAwesomeIcon icon={faBook} />
+            <Icon iconName={'brochure-released'} fill="#FFF" variant="xs" />
             <div className="ml-4 bg-[#FFE606] text-primary-navy px-1">Brochure released</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
-            <FontAwesomeIcon icon={faSquareXmark} />
+            <Icon iconName={'not-on-sale'} fill="#FFF" variant="xs" />
             <div className="ml-4 bg-[#ED1111] text-primary-white px-1">Not on sale</div>
           </div>
         </div>
