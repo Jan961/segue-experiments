@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { checkDateOverlap } from 'services/dateService';
-import { getDateFromWeekNumber } from 'utils/getDateFromWeekNum';
+import { getDateFromWeekNumber } from 'utils/barring';
 
 export type BarredVenue = {
   id: number;
@@ -29,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     includeExcluded,
     barDistance: Miles,
     seats: Seats,
+    filterBarredVenues = false,
   } = req.body;
 
   if (!ProductionId || !VenueId) {
@@ -79,85 +80,87 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         },
       },
     });
+    let results: BarredVenue[] = [];
+    for (const { Venue: bv, FirstDate, Id } of bookingsWithDistances) {
+      // bv stands for booked Venue, All the venues booked on the specified production
+      let info = '';
+      let isBarred = false;
+      const venueVenueInfo1 = bv.VenueVenue1[0];
+      const venueVenueInfo2 = bv.VenueVenue2[0];
+      const venueVenueInfo = venueVenueInfo1 || venueVenueInfo2 || null;
+      const distance = venueVenueInfo?.Mileage;
+      if (bv.Id === VenueId || !distance) continue;
+      const {
+        BarringWeeksPost: bvBarringWeeksPost,
+        BarringWeeksPre: bvBarringWeeksPre,
+        BarringMiles: bvBarringMiles,
+      } = bv;
 
-    const results: BarredVenue[] = bookingsWithDistances
-      .map(({ Venue: bv, FirstDate, Id }) => {
-        // bv stands for booked Venue, All the venues booked on the specified production
-        let info = '';
-        let isBarred = false;
-        const venueVenueInfo1 = bv.VenueVenue1[0];
-        const venueVenueInfo2 = bv.VenueVenue2[0];
-        const venueVenueInfo = venueVenueInfo1 || venueVenueInfo2 || null;
-        const distance = venueVenueInfo?.Mileage;
-        if (bv.Id === VenueId || !distance) return null;
-        const {
-          BarringWeeksPost: bvBarringWeeksPost,
-          BarringWeeksPre: bvBarringWeeksPre,
-          BarringMiles: bvBarringMiles,
-        } = bv;
+      // Determine if within barring distance
+      const mileageCheck = distance !== null && distance <= Miles;
+      if (mileageCheck) {
+        isBarred = true;
+        info = info + `${uv.Name} is within ${Miles} miles of ${bv.Name} `;
+      }
 
-        // Determine if within barring distance
-        const mileageCheck = distance !== null && distance <= Miles;
-        if (mileageCheck) {
-          isBarred = true;
-          info = info + `${uv.Name} is within ${Miles} of ${bv.Name} `;
-        }
+      const bvBarredVenueList = bv.VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue.map(
+        (barredVenue) => barredVenue.BarredVenueId,
+      );
 
-        const bvBarredVenueList = bv.VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue.map(
-          (barredVenue) => barredVenue.BarredVenueId,
+      const bvBarringStartDate = getDateFromWeekNumber(FirstDate.toISOString(), -bvBarringWeeksPre);
+      const bvBarringEndDate = getDateFromWeekNumber(FirstDate.toISOString(), bvBarringWeeksPost);
+      const bvBarringPeriodOverlap =
+        !isBarred &&
+        startDate &&
+        endDate &&
+        bvBarringStartDate &&
+        bvBarringEndDate &&
+        checkDateOverlap(givenStartDate, givenEndDate, new Date(bvBarringStartDate), new Date(bvBarringEndDate));
+      const bvBarredDistanceCheck =
+        bvBarringPeriodOverlap && distance !== null && bvBarringMiles && distance?.lte(bvBarringMiles);
+      const bvBarredVenueCheck = bvBarringPeriodOverlap && bvBarredVenueList.includes(uv.Id);
+      if (bvBarredDistanceCheck || bvBarredVenueCheck) {
+        isBarred = true;
+        info = info + `${bv.Name} bars ${uv.Name} for selected period \n`;
+      }
+      const uvBarringStartDate = getDateFromWeekNumber(startDate, -uvBarringWeeksPre);
+      const uvBarringEndDate = getDateFromWeekNumber(endDate, uvBarringWeeksPost);
+      const uvBarringPeriodOverlap =
+        !isBarred &&
+        uvBarringEndDate &&
+        uvBarringStartDate &&
+        FirstDate &&
+        checkDateOverlap(
+          new Date(uvBarringStartDate),
+          new Date(uvBarringEndDate),
+          new Date(FirstDate),
+          new Date(FirstDate),
         );
-
-        const bvBarringStartDate = getDateFromWeekNumber(FirstDate.toISOString(), -bvBarringWeeksPre);
-        const bvBarringEndDate = getDateFromWeekNumber(FirstDate.toISOString(), bvBarringWeeksPost);
-        const bvBarringPeriodOverlap =
-          !isBarred &&
-          startDate &&
-          endDate &&
-          bvBarringStartDate &&
-          bvBarringEndDate &&
-          checkDateOverlap(givenStartDate, givenEndDate, new Date(bvBarringStartDate), new Date(bvBarringEndDate));
-        const bvBarredDistanceCheck =
-          bvBarringPeriodOverlap && distance !== null && bvBarringMiles && distance?.lte(bvBarringMiles);
-        const bvBarredVenueCheck = bvBarringPeriodOverlap && bvBarredVenueList.includes(uv.Id);
-        if (bvBarredDistanceCheck || bvBarredVenueCheck) {
-          isBarred = true;
-          info = info + `${bv.Name} bars ${uv.Name} for selected period \n`;
-        }
-        const uvBarringStartDate = getDateFromWeekNumber(startDate, -uvBarringWeeksPre);
-        const uvBarringEndDate = getDateFromWeekNumber(endDate, uvBarringWeeksPost);
-        const uvBarringPeriodOverlap =
-          !isBarred &&
-          uvBarringEndDate &&
-          uvBarringStartDate &&
-          bvBarringStartDate &&
-          bvBarringEndDate &&
-          checkDateOverlap(
-            new Date(uvBarringStartDate),
-            new Date(uvBarringEndDate),
-            new Date(bvBarringStartDate),
-            new Date(bvBarringEndDate),
-          );
-        const uvBarredDistanceCheck =
-          uvBarringPeriodOverlap && distance !== null && uvBarringMiles && distance?.lte(uvBarringMiles);
-        const uvBarredVenueCheck = uvBarringPeriodOverlap && uvBarredVenueList.includes(bv.Id);
-        if (uvBarredDistanceCheck || uvBarredVenueCheck) {
-          isBarred = true;
-          info = info + `${uv.Name} bars ${bv.Name} over period overlap \n`;
-        }
-        return {
-          id: bv.Id,
-          bookingId: Id,
-          name: bv.Name,
-          code: bv.Code,
-          mileage: distance,
-          date: FirstDate,
-          hasBarringConflict: isBarred,
-          timeInMins: venueVenueInfo.TimeMins,
-          info,
-        };
-      })
-      .filter((venue?: BarredVenue) => venue)
-      .sort((a: BarredVenue, b: BarredVenue) => Number(a?.mileage || 0) - Number(b?.mileage || 0));
+      const uvBarredDistanceCheck =
+        uvBarringPeriodOverlap && distance !== null && uvBarringMiles && distance?.lte(uvBarringMiles);
+      const uvBarredVenueCheck = uvBarringPeriodOverlap && uvBarredVenueList.includes(bv.Id);
+      if (uvBarredDistanceCheck || uvBarredVenueCheck) {
+        isBarred = true;
+        info = info + `${uv.Name} bars ${bv.Name} over period overlap \n`;
+      }
+      const barredVenue = {
+        id: bv.Id,
+        bookingId: Id,
+        name: bv.Name + ' ' + bv.Code,
+        code: bv.Code,
+        mileage: distance,
+        date: FirstDate,
+        hasBarringConflict: isBarred,
+        timeMins: venueVenueInfo.TimeMins,
+        info,
+      };
+      if (filterBarredVenues) {
+        if (isBarred) results.push(barredVenue);
+        continue;
+      }
+      results.push(barredVenue);
+    }
+    results = results.sort((a: BarredVenue, b: BarredVenue) => Number(a?.mileage || 0) - Number(b?.mileage || 0));
 
     res.json(results);
   } catch (error) {
