@@ -20,6 +20,6 @@ export const Sample: Story = {
     saveText: 'Save and Close',
     inputPlaceholder: 'Sample input text box',
     inputLabel: 'Sample Input',
-    inputValue: 'Test test'
+    inputValue: 'Test test',
   },
 };

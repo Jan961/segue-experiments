@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -26,23 +26,30 @@ const Filters = () => {
     [bookings],
   );
 
+  useEffect(() => {
+    setSelectedIndex(-1);
+    setSelectedValue(0);
+  }, [bookings.bookings]);
+
   const todayOnSchedule = useMemo(() => {
     const todaysBookings = bookingOptions.filter((booking) => booking.date === today);
     return todaysBookings.length !== 0;
-  }, [bookingOptions]);
+  }, [bookingOptions, today]);
 
   const changeBooking = (value: string | number) => {
-    const selectedBooking = bookingOptions.find((booking) => booking.value === value);
-    setSelectedIndex(bookingOptions.findIndex((booking) => booking.value === value));
-    setSelectedValue(selectedBooking.value.toString());
+    if (value !== null) {
+      const selectedBooking = bookingOptions.find((booking) => booking.value === value);
+      setSelectedIndex(bookingOptions.findIndex((booking) => booking.value === value));
+      setSelectedValue(selectedBooking.value.toString());
 
-    const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
-    const booking = bookings.bookings.find((booking) => booking.Id === bookingIdentifier);
-    const website = booking.Venue.Website;
-    setVenueName(booking.Venue.Code + ' ' + booking.Venue.Name);
-    setVenueId(booking.Venue.Id);
-    setVenueUrl(website);
-    setBooking({ ...bookings, selected: bookingIdentifier });
+      const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
+      const booking = bookings.bookings.find((booking) => booking.Id === bookingIdentifier);
+      const website = booking.Venue.Website;
+      setVenueName(booking.Venue.Code + ' ' + booking.Venue.Name);
+      setVenueId(booking.Venue.Id);
+      setVenueUrl(website);
+      setBooking({ ...bookings, selected: bookingIdentifier });
+    }
   };
 
   const goToToday = () => {

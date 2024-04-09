@@ -7,7 +7,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTable>('');
   const selectedBtnClass = '!bg-primary-green/[0.30] !text-primary-navy';
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
 
   return (
     <div className="flex w-full h-full">
@@ -22,49 +22,49 @@ const MarketingHome = () => {
           <Button
             text="Sales"
             className={`w-[155px] ${currView === 'sales' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('sales')}
           />
           <Button
             text="Archived Sales"
             className={`w-[155px] ${currView === 'archived sales' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('archived sales')}
           />
           <Button
             text="Activities"
             className={`w-[155px] ${currView === 'activities' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('activities')}
           />
           <Button
             text="Contact Notes"
             className={`w-[155px] ${currView === 'contact notes' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('contact notes')}
           />
           <Button
             text="Venue Contacts"
             className={`w-[155px] ${currView === 'venue contacts' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('venue contacts')}
           />
           <Button
             text="Promoter Holds"
             className={`w-[155px] ${currView === 'promoter holds' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('promoter holds')}
           />
           <Button
             text="Attachments"
             className={`w-[155px] ${currView === 'attachments' && selectedBtnClass}`}
-            disabled={!ProductionId}
+            disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('attachments')}
           />
