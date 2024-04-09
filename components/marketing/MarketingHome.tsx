@@ -3,6 +3,9 @@ import Button from 'components/core-ui-lib/Button';
 import { SalesTable } from 'types/MarketingTypes';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { Summary } from './Summary';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBook, faSquareXmark, faUser } from '@fortawesome/free-solid-svg-icons';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTable>('');
@@ -12,8 +15,24 @@ const MarketingHome = () => {
   return (
     <div className="flex w-full h-full">
       {/* Green Box */}
-      <div className="bg-primary-green/[0.15] w-[291px] h-full rounded-xl p-4 mr-5 flex flex-col">
-        <div className="text-base mb-4">Marketing summary will get rendered here</div>
+      <div className="bg-primary-green/[0.15] w-[291px] h-[788px] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5">
+        <div className="flex-grow overflow-y-auto">
+          <Summary />
+        </div>
+        <div className="flex flex-col border-y-2 border-t-primary-navy border-b-0 py-4 mt-4">
+          <div className="flex items-center text-primary-navy">
+            <FontAwesomeIcon icon={faUser} />
+            <div className="ml-4 bg-[#10841C] text-primary-white px-1">Down to single seat</div>
+          </div>
+          <div className="flex items-center text-primary-navy mt-2">
+            <FontAwesomeIcon icon={faBook} />
+            <div className="ml-4 bg-[#FFE606] text-primary-navy px-1">Brochure released</div>
+          </div>
+          <div className="flex items-center text-primary-navy mt-2">
+            <FontAwesomeIcon icon={faSquareXmark} />
+            <div className="ml-4 bg-[#ED1111] text-primary-white px-1">Not on sale</div>
+          </div>
+        </div>
       </div>
 
       <div className="flex-grow flex flex-col">

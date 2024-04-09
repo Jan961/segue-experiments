@@ -1,5 +1,3 @@
-import { faBook, faSquareXmark, faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { useRecoilValue } from 'recoil';
@@ -8,10 +6,9 @@ import React from 'react';
 import numeral from 'numeral';
 import { LoadingTab } from './tabs/LoadingTab';
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
-import { DescriptionList as DL } from 'components/global/DescriptionList';
-import moment from 'moment';
+import classNames from 'classnames';
 
-export const formatCurrency = (amount:number, currency:string) => {
+export const formatCurrency = (amount: number, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: currency || 'GBP',
@@ -25,6 +22,9 @@ export const Summary = () => {
   const { selected } = useRecoilValue(bookingJumpState);
   const [summary, setSummary] = React.useState<Partial<SummaryResponseDTO>>({});
   const [loading, setLoading] = React.useState(false);
+
+  const boldText = 'text-base font-bold text-primary-input-text';
+  const normalText = 'text-base font-normal text-primary-input-text';
 
   const search = async () => {
     try {
@@ -46,7 +46,10 @@ export const Summary = () => {
   if (loading) return <LoadingTab />;
 
   if (!summary) return null;
-  const weekNo = calculateWeekNumber(new Date(summary?.ProductionInfo?.StartDate), new Date(summary?.ProductionInfo?.Date));
+  const weekNo = calculateWeekNumber(
+    new Date(summary?.ProductionInfo?.StartDate),
+    new Date(summary?.ProductionInfo?.Date),
+  );
 
   if (!summary?.Info) return null;
 
@@ -55,88 +58,99 @@ export const Summary = () => {
   const notes = summary?.Notes;
 
   return (
-    <div className="text-sm mt-4">
-      <h3 className="mb-1 text-base font-bold text-primary-blue">General Info</h3>
-      <DL>
-        <DL.Term>First Date</DL.Term>
-        <DL.Desc>{dateToSimple(summary?.ProductionInfo?.Date)}</DL.Desc>
-        <DL.Term>Last Date</DL.Term>
-        <DL.Desc>{dateToSimple(summary?.ProductionInfo?.lastDate)}</DL.Desc>
-        <DL.Term>Number of Day(s)</DL.Term>
-        <DL.Desc>{summary?.ProductionInfo?.numberOfDays}</DL.Desc>
-        <DL.Term>Production Week No</DL.Term>
-        <DL.Desc>{weekNo}</DL.Desc>
-        <DL.Term>Performance Time(s)</DL.Term>
-        <DL.Desc>
+    <div className="text-sm mb-2">
+      <div className={classNames(boldText, 'text-lg')}>General Info</div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>First Date:</div>
+        <div className={normalText}>{dateToSimple(summary?.ProductionInfo?.Date)}</div>
+      </div>
+
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Last Date:</div>
+        <div className={normalText}>{dateToSimple(summary?.ProductionInfo?.lastDate)}</div>
+      </div>
+
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Number of Day(s):</div>
+        <div className={normalText}>{summary?.ProductionInfo?.numberOfDays}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Production Week No:</div>
+        <div className={normalText}>{weekNo}</div>
+      </div>
+      <div className="flex flex-row flex-wrap">
+        <div className={classNames(boldText, 'mr-1')}>Performance Time(s):</div>
+        <div className={normalText}>
           {summary.Performances?.map?.((x, i) => (
-            <p key={i}>{`${moment(x.Date).format('dddd').substring(0, 3)} ${dateToSimple(x.Date)} ${
-              x.Time ? getTimeFromDateAndTime(x.Time) : ''
-            }`}</p>
+            <p key={i}>{`${dateToSimple(x.Date)} ${x.Time ? getTimeFromDateAndTime(x.Time) : ''}`}</p>
           )) || 'N/A'}
-        </DL.Desc>
-      </DL>
-      <h3 className="mb-1 mt-4 text-base font-bold text-primary-blue">Sales Summary</h3>
-      <DL>
-        <DL.Term>Total Seats Sold</DL.Term>
-        <DL.Desc>{numeral(info.SeatsSold).format('0,0') || '-'}</DL.Desc>
-        <DL.Term>Total Sales ({currency})</DL.Term>
-        <DL.Desc>{info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'}</DL.Desc>
-        <DL.Term>Gross Potential</DL.Term>
-        <DL.Desc>{formatCurrency(info.GrossPotential, currency)}</DL.Desc>
-        <DL.Term>AVG Ticket Price</DL.Term>
-        <DL.Desc>{formatCurrency(info.AvgTicketPrice, currency)}</DL.Desc>
-        <DL.Term>Booking %</DL.Term>
-        <DL.Desc>{info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-'}</DL.Desc>
-        <DL.Term>Capacity</DL.Term>
-        <DL.Desc>{numeral(info.Capacity).format('0,0') || '-'}</DL.Desc>
-        <DL.Term>Perf(s)</DL.Term>
-        <DL.Desc>{summary?.Performances?.length}</DL.Desc>
-        <DL.Term>Total Seats</DL.Term>
-        <DL.Desc>{numeral(info.Seats).format('0,0') || '-'}</DL.Desc>
-        <DL.Term>Currency</DL.Term>
-        <DL.Desc>{info.VenueCurrencyCode || '-'}</DL.Desc>
-      </DL>
-      {notes && (
-        <>
-          <h3 className="mb-1 mt-4 text-base font-bold text-primary-blue">Notes</h3>
-          <DL inline={false}>
-            <DL.Term>Marketing Deal</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Booking Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.BookingNotes ? notes.BookingNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Booking Deal Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.BookingDealNotes ? notes.BookingDealNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Hold Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.HoldNotes ? notes.HoldNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Comp Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.CompNotes ? notes.CompNotes : 'None'}</span>
-            </DL.Desc>
-          </DL>
-        </>
-      )}
-      <div className="flex flex-col border-y-2 py-4 my-4">
-        <div className="flex items-center text-gray-700">
-          <FontAwesomeIcon icon={faUser} />
-          <div className="ml-4 bg-lime-500 text-black px-1">Down to single seat</div>
-        </div>
-        <div className="flex items-center text-gray-700 mt-2">
-          <FontAwesomeIcon icon={faBook} />
-          <div className="ml-4 bg-yellow-200 text-black px-1">Brochure released</div>
-        </div>
-        <div className="flex items-center text-gray-700 mt-2">
-          <FontAwesomeIcon icon={faSquareXmark} />
-          <div className="ml-4 bg-red-500 text-yellow-200 px-1">Not on sale</div>
         </div>
       </div>
+
+      <div className={classNames(boldText, 'text-lg mt-2')}>Sales Summary</div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Total Seats Sold:</div>
+        <div className={normalText}>{numeral(info.SeatsSold).format('0,0') || '-'}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Total Sales ({currency}):</div>
+        <div className={normalText}>{info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Gross Potential:</div>
+        <div className={normalText}>{formatCurrency(info.GrossPotential, currency)}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>AVG Ticket Price:</div>
+        <div className={normalText}>{formatCurrency(info.AvgTicketPrice, currency)}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Booking %:</div>
+        <div className={normalText}>{info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-'}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Capacity:</div>
+        <div className={normalText}>{numeral(info.Capacity).format('0,0') || '-'}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Perf(s):</div>
+        <div className={normalText}>{summary?.Performances?.length}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Total Seats:</div>
+        <div className={normalText}>{numeral(info.Seats).format('0,0') || '-'}</div>
+      </div>
+      <div className="flex flex-row">
+        <div className={classNames(boldText, 'mr-1')}>Currency:</div>
+        <div className={normalText}>{info.VenueCurrencyCode || '-'}</div>
+      </div>
+
+      {notes && (
+        <>
+          <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
+          <div className={classNames(boldText, 'mr-1')}>Marketing Deal:</div>
+          <div className={normalText}>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</div>
+          <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
+          <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
+
+          <div className="flex flex-row">
+            <div className={classNames(boldText, 'mr-1')}>Booking Deal Notes:</div>
+            <div className={normalText}>
+              <span>{notes.BookingDealNotes ? notes.BookingDealNotes : 'None'}</span>
+            </div>
+          </div>
+          <div className="flex flex-row">
+            <div className={classNames(boldText, 'mr-1')}>Hold Notes:</div>
+            <div className={normalText}>{notes.HoldNotes ? notes.HoldNotes : 'None'}</div>
+          </div>
+          <div className="flex flex-row">
+            <div className={classNames(boldText, 'mr-1')}>Comp Notes:</div>
+            <div className={normalText}>
+              <span>{notes.CompNotes ? notes.CompNotes : 'None'}</span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
