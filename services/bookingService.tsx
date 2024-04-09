@@ -142,10 +142,10 @@ type NewPerformance = {
   Time: string;
 };
 
-type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string };
+type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string; RunTag: string };
 
 export const createNewBooking = (
-  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum }: NewBooking,
+  { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: NewBooking,
   tx: any,
 ) => {
   return (tx || prisma).booking.create({
@@ -153,6 +153,7 @@ export const createNewBooking = (
       Notes,
       PencilNum,
       StatusCode,
+      RunTag,
       FirstDate: new Date(BookingDate),
       DateBlock: {
         connect: {
@@ -188,16 +189,18 @@ type NewRehearsal = {
   VenueId: number;
   DateTypeId: number;
   PencilNum: number;
+  RunTag: string;
 };
 
 export const createNewRehearsal = (
-  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum }: NewRehearsal,
+  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum, RunTag }: NewRehearsal,
   tx: any,
 ) => {
   return (tx || prisma).rehearsal.create({
     data: {
       Notes,
       StatusCode,
+      RunTag,
       PencilNum,
       Date: new Date(BookingDate),
       DateBlock: {
@@ -217,10 +220,11 @@ type NewGetInFitUp = {
   Notes: string;
   VenueId: number;
   PencilNum: number;
+  RunTag: string;
 };
 
 export const createGetInFitUp = (
-  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum }: NewGetInFitUp,
+  { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum, RunTag }: NewGetInFitUp,
   tx: any,
 ) => {
   return (tx || prisma).getInFitUp.create({
@@ -228,6 +232,7 @@ export const createGetInFitUp = (
       StatusCode,
       Notes,
       PencilNum,
+      RunTag,
       Date: new Date(BookingDate),
       DateBlock: {
         connect: {
@@ -250,10 +255,11 @@ type NewOtherBooking = {
   Notes: string;
   DateTypeId: number;
   PencilNum: number;
+  RunTag: string;
 };
 
 export const createOtherBooking = (
-  { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId, PencilNum }: NewOtherBooking,
+  { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId, PencilNum, RunTag }: NewOtherBooking,
   tx: any,
 ) => {
   return (tx || prisma).other.create({
@@ -261,6 +267,7 @@ export const createOtherBooking = (
       Notes,
       StatusCode,
       PencilNum,
+      RunTag,
       Date: new Date(BookingDate),
       DateBlock: {
         connect: {
