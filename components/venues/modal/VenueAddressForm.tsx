@@ -1,0 +1,204 @@
+import Checkbox from 'components/core-ui-lib/Checkbox';
+import Icon from 'components/core-ui-lib/Icon';
+import TextInput from 'components/core-ui-lib/TextInput';
+import Tooltip from 'components/core-ui-lib/Tooltip';
+import { initialVenueAddressDetails } from 'config/Venue';
+import { useState } from 'react';
+
+type VenueAddressFormProps = {
+  onChange: (data: any) => void;
+};
+const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
+  const [formData, setFormData] = useState(initialVenueAddressDetails);
+  const handleInputChange = (field: string, value: any) => {
+    let sanitizedValue = value;
+    if (field === 'venueCode') {
+      sanitizedValue = sanitizedValue?.replace(/[^a-zA-Z]/g, '').toUpperCase();
+    }
+    const updatedFormData = {
+      ...formData,
+      [field]: sanitizedValue,
+    };
+    setFormData(updatedFormData);
+    onChange(updatedFormData);
+  };
+  return (
+    <>
+      <div className="flex flex-col gap-5">
+        <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className=" text-primary-input-text">Address 1</p>
+          <TextInput
+            placeholder="Enter Address 1"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryAddress1}
+            onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Address 2</p>
+          <TextInput
+            placeholder="Enter Address 2"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryAddress2}
+            onChange={(e) => handleInputChange('primaryAddress2', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Address 3</p>
+          <TextInput
+            placeholder="Enter Address 3"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryAddress3}
+            onChange={(e) => handleInputChange('primaryAddress3', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Town</p>
+          <TextInput
+            placeholder="Enter Town"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryTown}
+            onChange={(e) => handleInputChange('primaryTown', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Postcode</p>
+          <TextInput
+            placeholder="Enter Postcode"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryPostCode}
+            onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
+          />
+        </label>
+
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Country</p>
+          <TextInput
+            placeholder="Enter Country"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryCountry}
+            onChange={(e) => handleInputChange('primaryCountry', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">What3Words Stage Door</p>
+          <TextInput
+            placeholder="what.three.words"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.what3WordsStage}
+            onChange={(e) => handleInputChange('what3WordsStage', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">What3Words Loading</p>
+          <TextInput
+            placeholder="what.three.words"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.what3WordsLoading}
+            onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
+          />
+        </label>
+      </div>
+      <div className="flex flex-col gap-5">
+        <h2 className="text-base text-primary-input-text font-bold pt-7">Delivery</h2>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Address 1</p>
+          <TextInput
+            placeholder="Enter Address 1"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryAddress1}
+            onChange={(e) => handleInputChange('deliveryAddress1', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Address 2</p>
+          <TextInput
+            placeholder="Enter Address 2"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryAddress2}
+            onChange={(e) => handleInputChange('deliveryAddress2', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Address 3</p>
+          <TextInput
+            placeholder="Enter Address 3"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryAddress3}
+            onChange={(e) => handleInputChange('deliveryAddress3', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Town</p>
+          <TextInput
+            placeholder="Enter Town"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryTown}
+            onChange={(e) => handleInputChange('deliveryTown', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Postcode</p>
+          <TextInput
+            placeholder="Enter Postcode"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryPostCode}
+            onChange={(e) => handleInputChange('deliveryPostCode', e.target.value)}
+          />
+        </label>
+
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Country</p>
+          <TextInput
+            placeholder="Enter Country"
+            type=""
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryCountry}
+            onChange={(e) => handleInputChange('deliveryCountry', e.target.value)}
+          />
+        </label>
+        <div className="flex flex-row items-center gap-4 justify-end ">
+          <p className="text-primary-input-text">Exclude from Barring Check and Venue Gap Suggestions</p>
+          <Tooltip
+            width="w-[200px]"
+            body="Selected venues will be excluded from Venue Gap Suggestions and Barring Checks. Selecting this check box will include this venue in that exclusion. This exclusion can be unselected when running the Suggestions or Barring Checks."
+            position="right"
+          >
+            <Icon iconName="info-circle-solid" />
+          </Tooltip>
+          <Checkbox id={'excludeFromChecks'} onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)} />
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default VenueAddressForm;

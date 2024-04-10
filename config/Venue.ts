@@ -132,27 +132,21 @@ export const barredVenuesData = [
   // Add more dummy data as needed
 ];
 
-export const initialVenueState = {
+export const initialMainVenueDetails = {
   venueCode: '',
-  venueName: '',
   venueStatus: '',
-  venueCapacity: '',
-  townPopulation: '',
-  venuWebsite: '',
-  confidentialNotes: '',
-  barringMiles: '',
-  postShow: '',
-  preShow: '',
-  barringClause: '',
-  flags: '',
-  gridHeight: '',
-  soundLXNotes: '',
-  soundDesk: '',
-  stageSize: '',
-  techLXNotes: '',
-  techLXDesk: '',
-  techSpecsUrl: '',
+  venueName: '',
+  vatIndicator: false,
+  culturallyExemptVenue: false,
+  venueFamily: null,
+  currency: '',
+  venueCapacity: null,
+  townPopulation: null,
+  venueWebsite: '',
+  notes: '',
+};
 
+export const initialVenueAddressDetails = {
   deliveryCountry: '',
   deliveryPostCode: '',
   deliveryTown: '',
@@ -166,10 +160,35 @@ export const initialVenueState = {
   primaryAddress3: '',
   primaryAddress2: '',
   primaryAddress1: '',
-
-  notes: '',
   what3WordsStage: '',
   what3WordsLoading: '',
+};
+
+export const initialVenueBarringRules = {
+  barringMiles: '',
+  postShow: '',
+  preShow: '',
+  barringClause: '',
+};
+
+export const initialVenueTechnicalDetails = {
+  flags: '',
+  gridHeight: '',
+  soundLXNotes: '',
+  soundDesk: '',
+  stageSize: '',
+  techLXNotes: '',
+  techLXDesk: '',
+  techSpecsUrl: '',
+};
+
+export const initialVenueState = {
+  ...initialMainVenueDetails,
+  ...initialVenueAddressDetails,
+  ...initialVenueBarringRules,
+  ...initialVenueTechnicalDetails,
+
+  confidentialNotes: '',
 };
 
 export const venueStatusOptions = [
