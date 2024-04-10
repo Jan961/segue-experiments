@@ -31,7 +31,6 @@ export const Summary = () => {
     const search = async () => {
       try {
         setLoading(true);
-        alert(selected);
         const { data } = await axios.get(`/api/marketing/summary/${selected}`);
         setSummary(data);
       } catch (error) {
