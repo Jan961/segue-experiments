@@ -31,6 +31,7 @@ export const Summary = () => {
     const search = async () => {
       try {
         setLoading(true);
+        alert(selected);
         const { data } = await axios.get(`/api/marketing/summary/${selected}`);
         setSummary(data);
       } catch (error) {
@@ -59,15 +60,40 @@ export const Summary = () => {
   const info = summary?.Info;
   const notes = summary?.Notes;
 
+  const generalInfo = [
+    { label: 'First Date:', data: dateToSimple(summary?.ProductionInfo?.Date) },
+    { label: 'Last Date:', data: dateToSimple(summary?.ProductionInfo?.lastDate) },
+    { label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
+    { label: 'Production Week No:', data: weekNo.toString() },
+  ];
+
+  const salesSummary = [
+    { label: 'Total Seats Sold:', data: numeral(info.SeatsSold).format('0,0') || '-' },
+    { label: `Total Sales ${currency}:`, data: info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-' },
+    { label: 'Gross Potential:', data: formatCurrency(info.GrossPotential, currency) },
+    { label: 'AVG Ticket Price:', data: formatCurrency(info.AvgTicketPrice, currency) },
+    { label: 'Booking %:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-' },
+    { label: 'Capacity:', data: numeral(info.Capacity).format('0,0') || '-' },
+    { label: 'Perf(s):', data: summary?.Performances?.length.toString() },
+    { label: 'Total Seats:', data: numeral(info.Seats).format('0,0') || '-' },
+    { label: 'Currency:', data: info.VenueCurrencyCode || '-' },
+  ];
+
+  const notesInfo = [
+    { label: 'Booking Deal Notes:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' },
+    { label: 'Hold Notes:', data: notes.HoldNotes ? notes.HoldNotes : 'None' },
+    { label: 'Comp Notes:', data: notes.CompNotes ? notes.CompNotes : 'None' },
+  ];
+
   return (
     <div className="text-sm mb-2">
       <div className={classNames(boldText, 'text-lg')}>General Info</div>
 
-      <SummaryRow label='First Date:' data={dateToSimple(summary?.ProductionInfo?.Date)} />
-      <SummaryRow label='Last Date:' data={dateToSimple(summary?.ProductionInfo?.lastDate)} />
-      <SummaryRow label='Number of Day(s):' data={summary?.ProductionInfo?.numberOfDays.toString()} />
-      <SummaryRow label='Production Week No:' data={weekNo.toString()} />
-      <SummaryRow label='Performance Time(s):' data={''} />
+      {generalInfo.map((item, index) => {
+        return <SummaryRow key={index} label={item.label} data={item.data} />;
+      })}
+
+      <SummaryRow label="Performance Time(s):" data={''} />
       <div className={normalText}>
         {summary.Performances?.map?.((x, i) => (
           <p key={i}>{`${dateToSimple(x.Date)} ${x.Time ? getTimeFromDateAndTime(x.Time) : ''}`}</p>
@@ -75,16 +101,10 @@ export const Summary = () => {
       </div>
 
       <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
-      <SummaryRow label='Total Seats Sold:' data={numeral(info.SeatsSold).format('0,0') || '-'} />
-      <SummaryRow label={`Total Sales ${currency}:`} data={info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'} />
-      <SummaryRow label='Gross Potential:' data={formatCurrency(info.GrossPotential, currency)} />
-      <SummaryRow label='AVG Ticket Price:' data={formatCurrency(info.AvgTicketPrice, currency)} />
-      <SummaryRow label='Booking %:' data={info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-'} />
-      <SummaryRow label='Capacity:' data={numeral(info.Capacity).format('0,0') || '-'} />
-      <SummaryRow label='Perf(s):' data={summary?.Performances?.length.toString()} />
-      <SummaryRow label='Total Seats:' data={numeral(info.Seats).format('0,0') || '-'} />
-      <SummaryRow label='Currency:' data={info.VenueCurrencyCode || '-'} />
-  
+      {salesSummary.map((item, index) => {
+        return <SummaryRow key={index} label={item.label} data={item.data} />;
+      })}
+
       {notes && (
         <>
           <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
@@ -93,9 +113,9 @@ export const Summary = () => {
           <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
           <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
 
-          <SummaryRow label='Booking Deal Notes:' data={notes.BookingDealNotes ? notes.BookingDealNotes : 'None'} />
-          <SummaryRow label='Hold Notes:' data={notes.HoldNotes ? notes.HoldNotes : 'None'} />
-          <SummaryRow label='Comp Notes:' data={notes.CompNotes ? notes.CompNotes : 'None'} />
+          {notesInfo.map((item, index) => {
+            return <SummaryRow key={index} label={item.label} data={item.data} />;
+          })}
         </>
       )}
     </div>
