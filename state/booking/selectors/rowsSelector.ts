@@ -88,7 +88,7 @@ export const rowsSelector = selector({
     });
     Object.values(getInFitUp).forEach((g) => {
       bookedDates.push(getKey(g.Date));
-      addRow(g.Date, 'Get-in, Fit-Up', g, helper.getInFitUpDetails);
+      addRow(g.Date, 'Get in / Fit Up', g, helper.getInFitUpDetails);
     });
     Object.values(bookings).forEach((b) => {
       const performancesGroup = b.PerformanceIds.reduce((performancesByDate, performanceId) => {

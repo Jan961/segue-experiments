@@ -28,6 +28,7 @@ type NewBookingDetailsProps = {
   onSubmit: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
+  onDelete: () => void;
   updateModalTitle: (title: string) => void;
   isNewBooking: boolean;
 };
@@ -40,6 +41,7 @@ export default function NewBookingDetailsView({
   dateBlockId,
   data,
   onSubmit,
+  onDelete,
   toggleModalOverlay,
   onClose,
   updateModalTitle,
@@ -158,11 +160,17 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const handleDeleteBooking = () => {};
+  const handleDeleteBooking = () => {
+    confirmationType.current = 'delete';
+    setShowConfirmation(true);
+    toggleModalOverlay(true);
+  };
 
-  const handleMoveBooking = () => {};
+  // Placeholder function to be implemented
+  const handleMoveBooking = () => null;
 
-  const handleChangeBookingLength = () => {};
+  // Placeholder function to be implemented
+  const handleChangeBookingLength = () => null;
 
   const handleCancelButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
@@ -187,6 +195,8 @@ export default function NewBookingDetailsView({
       goToNewBooking();
     } else if (confirmationType.current === 'cancel') {
       onClose();
+    } else if (confirmationType.current === 'delete') {
+      onDelete();
     }
   };
 

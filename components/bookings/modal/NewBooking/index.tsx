@@ -49,7 +49,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     },
   }));
 
-  const editBooking = !!booking && !startDate && !endDate;
+  const editBooking = !!booking;
   const currentProduction = useRecoilValue(currentProductionSelector);
   const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
   const primaryBlock = scheduleDateBlocks?.find(({ IsPrimary }) => !!IsPrimary);
@@ -108,6 +108,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       // format booking and set on state
       const formattedBooking: BookingItem[] = bookingsToEdit.map((b: BookingRow) => {
         return {
+          id: b.Id,
           date: b.date,
           dateAsISOString: b.dateTime,
           dateBlockId: primaryBlock?.Id,
@@ -129,7 +130,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     }
   }, [booking]);
 
-  const handleSaveNewBooking = async () => {
+  const saveNewBooking = async () => {
     const runTagForRunOfDates = nanoid(8);
     try {
       const bookingsWithRunTag = state.booking.map((b) => ({
@@ -141,6 +142,41 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     } catch (e) {
       console.log('Failed to add new booking', e);
     }
+  };
+
+  const deleteBooking = async () => {
+    try {
+      const { data } = await axios.post('/api/bookings/delete', state.booking);
+      onClose(data);
+    } catch (e) {
+      console.log('Failed to delete booking', e);
+    }
+  };
+
+  const updateBooking = async () => {
+    const bookingsToUpdate = state.booking.filter(({ id }) => !Number.isNaN(id));
+    let bookingsToCreate = state.booking.filter(({ id }) => Number.isNaN(id));
+    let result = null;
+    try {
+      const { data: updated } = await axios.post('/api/bookings/update', bookingsToUpdate);
+      result = updated;
+      if (!isNullOrEmpty(bookingsToCreate)) {
+        const runTagForRunOfDates = nanoid(8);
+        bookingsToCreate = bookingsToUpdate.map((b) => ({
+          ...b,
+          runTag: runTagForRunOfDates,
+        }));
+        const { data: created } = await axios.post('/api/bookings/add', bookingsToCreate);
+        result = { ...result, created };
+      }
+      onClose(result);
+    } catch (e) {
+      console.log('Failed to update booking', e);
+    }
+  };
+
+  const handleSaveBooking = async () => {
+    editBooking ? updateBooking() : saveNewBooking();
   };
 
   return (
@@ -178,6 +214,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           onSubmit={setNewBookingOnStore}
           toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
           onClose={onClose}
+          onDelete={deleteBooking}
           updateModalTitle={updateModalTitle}
         />
         <PreviewNewBookingView
@@ -185,7 +222,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           productionCode={productionCode}
           data={state.booking}
           dayTypeOptions={dayTypeOptions}
-          onSaveBooking={handleSaveNewBooking}
+          onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}
           isNewBooking={!editBooking}
         />

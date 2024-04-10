@@ -19,6 +19,7 @@ export type TForm = {
 };
 
 export type BookingItem = {
+  id?: string;
   date: string | Date;
   dateBlockId: number;
   dateAsISOString: string;

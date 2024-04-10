@@ -5,7 +5,7 @@ import TimeInput from 'components/core-ui-lib/TimeInput';
 import { Time } from 'components/core-ui-lib/TimeInput/TimeInput';
 import { useEffect, useRef, useState } from 'react';
 
-const TimeArrayRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProps) => {
+const PerformanceTimesRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProps) => {
   const [performanceTimes, setPerformanceTimes] = useState<Time[]>([]);
   const [isDisabled, setIsDisabled] = useState(true);
   const inputRef = useRef(null);
@@ -20,17 +20,17 @@ const TimeArrayRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProp
     setIsDisabled(!data.perf);
 
     if (data.noPerf) {
-      const times = data.times?.split(',');
+      const times = data.times?.split(';');
 
       const newTimes = Array(data.noPerf)
         .fill('')
         .map((_, i) => {
           const time = times?.[i];
           if (time) {
-            const [hrs = '', min = '', sec = ''] = time.split(':');
-            return { hrs, min, sec };
+            const [hrs = '', min = ''] = time.split(':');
+            return { hrs, min };
           }
-          return { hrs: '', min: '', sec: '' };
+          return { hrs: '', min: '' };
         });
       setPerformanceTimes(newTimes);
     } else {
@@ -44,7 +44,7 @@ const TimeArrayRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProp
     updatedTimes[index] = newTime;
 
     setPerformanceTimes(updatedTimes);
-    setValue(updatedTimes.map(({ hrs, min }) => `${hrs}:${min}`).join(','));
+    setValue(updatedTimes.map(({ hrs, min }) => `${hrs}:${min}`).join(';'));
   };
 
   return (
@@ -78,4 +78,4 @@ const TimeArrayRenderer = ({ data, setValue, eGridCell }: CustomCellRendererProp
   );
 };
 
-export default TimeArrayRenderer;
+export default PerformanceTimesRenderer;

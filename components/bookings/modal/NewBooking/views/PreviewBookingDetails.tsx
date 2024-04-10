@@ -169,8 +169,12 @@ export default function PreviewBookingDetails({
     const pastStartDate = subDays(fromDateAsDate, 6);
     const toDateSet = addDays(toDateAsDate, 1);
     const futureEndDate = addDays(toDateAsDate, 7);
-    const filteredBookingsTop = filterBookingsByDateRange(bookings, pastStartDate, fromDateAsDate);
-    const filteredBookingsBottom = filterBookingsByDateRange(bookings, toDateSet, futureEndDate);
+    // Remove any existing bookings being edited that are also present in rowSelector to avoid duplicates
+    const editedRowsIds = rowItems.map(({ item }) => item.id);
+    const bookingsWithDuplicatesRemoved = bookings.filter(({ Id }) => !editedRowsIds.includes(Id));
+
+    const filteredBookingsTop = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, pastStartDate, fromDateAsDate);
+    const filteredBookingsBottom = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, toDateSet, futureEndDate);
 
     setRows([...filteredBookingsTop, ...rowItems, ...filteredBookingsBottom]);
     updateDistanceInfo(filteredBookingsTop, rowItems, filteredBookingsBottom);

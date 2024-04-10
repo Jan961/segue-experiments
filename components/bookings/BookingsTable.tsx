@@ -52,8 +52,8 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     } else {
       setShowAddEditBookingModal({
         visible: true,
-        startDate: null,
-        endDate: null,
+        startDate: data.dateTime,
+        endDate: data.dateTime,
         booking: data,
       });
     }
