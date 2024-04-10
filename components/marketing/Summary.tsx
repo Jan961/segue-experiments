@@ -1,17 +1,15 @@
-import { faBook, faSquareXmark, faUser } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { useRecoilValue } from 'recoil';
 import axios from 'axios';
-import React from 'react';
+import { useEffect, useState } from 'react';
 import numeral from 'numeral';
 import { LoadingTab } from './tabs/LoadingTab';
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
-import { DescriptionList as DL } from 'components/global/DescriptionList';
-import moment from 'moment';
+import classNames from 'classnames';
+import SummaryRow from './SummaryRow';
 
-export const formatCurrency = (amount:number, currency:string) => {
+export const formatCurrency = (amount: number, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
     style: 'currency',
     currency: currency || 'GBP',
@@ -23,21 +21,25 @@ export const formatCurrency = (amount:number, currency:string) => {
 
 export const Summary = () => {
   const { selected } = useRecoilValue(bookingJumpState);
-  const [summary, setSummary] = React.useState<Partial<SummaryResponseDTO>>({});
-  const [loading, setLoading] = React.useState(false);
+  const [summary, setSummary] = useState<Partial<SummaryResponseDTO>>({});
+  const [loading, setLoading] = useState(false);
 
-  const search = async () => {
-    try {
-      setLoading(true);
-      const { data } = await axios.get(`/api/marketing/summary/${selected}`);
-      setSummary(data);
-    } catch (error) {
-      console.error(error);
-    }
-    setLoading(false);
-  };
+  const boldText = 'text-base font-bold text-primary-input-text';
+  const normalText = 'text-base font-normal text-primary-input-text';
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const search = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get(`/api/marketing/summary/${selected}`);
+        setSummary(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (selected) {
       search();
     }
@@ -46,7 +48,10 @@ export const Summary = () => {
   if (loading) return <LoadingTab />;
 
   if (!summary) return null;
-  const weekNo = calculateWeekNumber(new Date(summary?.ProductionInfo?.StartDate), new Date(summary?.ProductionInfo?.Date));
+  const weekNo = calculateWeekNumber(
+    new Date(summary?.ProductionInfo?.StartDate),
+    new Date(summary?.ProductionInfo?.Date),
+  );
 
   if (!summary?.Info) return null;
 
@@ -54,89 +59,68 @@ export const Summary = () => {
   const info = summary?.Info;
   const notes = summary?.Notes;
 
+  const generalInfo = [
+    { id: 1, label: 'First Date:', data: dateToSimple(summary?.ProductionInfo?.Date) },
+    { id: 2, label: 'Last Date:', data: dateToSimple(summary?.ProductionInfo?.lastDate) },
+    { id: 3, label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
+    { id: 4, label: 'Production Week No:', data: weekNo.toString() },
+  ];
+
+  const salesSummary = [
+    { id: 1, label: 'Total Seats Sold:', data: numeral(info.SeatsSold).format('0,0') || '-' },
+    {
+      id: 2,
+      label: `Total Sales ${currency}:`,
+      data: info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-',
+    },
+    { id: 3, label: 'Gross Potential:', data: formatCurrency(info.GrossPotential, currency) },
+    { id: 4, label: 'AVG Ticket Price:', data: formatCurrency(info.AvgTicketPrice, currency) },
+    { id: 5, label: 'Booking %:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-' },
+    { id: 6, label: 'Capacity:', data: numeral(info.Capacity).format('0,0') || '-' },
+    { id: 7, label: 'Perf(s):', data: summary?.Performances?.length.toString() },
+    { id: 8, label: 'Total Seats:', data: numeral(info.Seats).format('0,0') || '-' },
+    { id: 9, label: 'Currency:', data: info.VenueCurrencyCode || '-' },
+  ];
+
+  const notesInfo = [
+    { id: 1, label: 'Booking Deal Notes:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' },
+    { id: 2, label: 'Hold Notes:', data: notes.HoldNotes ? notes.HoldNotes : 'None' },
+    { id: 3, label: 'Comp Notes:', data: notes.CompNotes ? notes.CompNotes : 'None' },
+  ];
+
   return (
-    <div className="text-sm mt-4">
-      <h3 className="mb-1 text-base font-bold text-primary-blue">General Info</h3>
-      <DL>
-        <DL.Term>First Date</DL.Term>
-        <DL.Desc>{dateToSimple(summary?.ProductionInfo?.Date)}</DL.Desc>
-        <DL.Term>Last Date</DL.Term>
-        <DL.Desc>{dateToSimple(summary?.ProductionInfo?.lastDate)}</DL.Desc>
-        <DL.Term>Number of Day(s)</DL.Term>
-        <DL.Desc>{summary?.ProductionInfo?.numberOfDays}</DL.Desc>
-        <DL.Term>Production Week No</DL.Term>
-        <DL.Desc>{weekNo}</DL.Desc>
-        <DL.Term>Performance Time(s)</DL.Term>
-        <DL.Desc>
-          {summary.Performances?.map?.((x, i) => (
-            <p key={i}>{`${moment(x.Date).format('dddd').substring(0, 3)} ${dateToSimple(x.Date)} ${
-              x.Time ? getTimeFromDateAndTime(x.Time) : ''
-            }`}</p>
-          )) || 'N/A'}
-        </DL.Desc>
-      </DL>
-      <h3 className="mb-1 mt-4 text-base font-bold text-primary-blue">Sales Summary</h3>
-      <DL>
-        <DL.Term>Total Seats Sold</DL.Term>
-        <DL.Desc>{numeral(info.SeatsSold).format('0,0') || '-'}</DL.Desc>
-        <DL.Term>Total Sales ({currency})</DL.Term>
-        <DL.Desc>{info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-'}</DL.Desc>
-        <DL.Term>Gross Potential</DL.Term>
-        <DL.Desc>{formatCurrency(info.GrossPotential, currency)}</DL.Desc>
-        <DL.Term>AVG Ticket Price</DL.Term>
-        <DL.Desc>{formatCurrency(info.AvgTicketPrice, currency)}</DL.Desc>
-        <DL.Term>Booking %</DL.Term>
-        <DL.Desc>{info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-'}</DL.Desc>
-        <DL.Term>Capacity</DL.Term>
-        <DL.Desc>{numeral(info.Capacity).format('0,0') || '-'}</DL.Desc>
-        <DL.Term>Perf(s)</DL.Term>
-        <DL.Desc>{summary?.Performances?.length}</DL.Desc>
-        <DL.Term>Total Seats</DL.Term>
-        <DL.Desc>{numeral(info.Seats).format('0,0') || '-'}</DL.Desc>
-        <DL.Term>Currency</DL.Term>
-        <DL.Desc>{info.VenueCurrencyCode || '-'}</DL.Desc>
-      </DL>
+    <div className="text-sm mb-2">
+      <div className={classNames(boldText, 'text-lg')}>General Info</div>
+
+      {generalInfo.map((item) => (
+        <SummaryRow key={item.id} label={item.label} data={item.data} />
+      ))}
+
+      <SummaryRow label="Performance Time(s):" data={''} />
+      <div className={normalText}>
+        {summary.Performances?.map?.((x, i) => (
+          <p key={i}>{`${dateToSimple(x.Date)} ${x.Time ? getTimeFromDateAndTime(x.Time) : ''}`}</p>
+        )) || 'N/A'}
+      </div>
+
+      <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
+      {salesSummary.map((item) => (
+        <SummaryRow key={item.id} label={item.label} data={item.data} />
+      ))}
+
       {notes && (
         <>
-          <h3 className="mb-1 mt-4 text-base font-bold text-primary-blue">Notes</h3>
-          <DL inline={false}>
-            <DL.Term>Marketing Deal</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Booking Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.BookingNotes ? notes.BookingNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Booking Deal Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.BookingDealNotes ? notes.BookingDealNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Hold Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.HoldNotes ? notes.HoldNotes : 'None'}</span>
-            </DL.Desc>
-            <DL.Term>Comp Notes</DL.Term>
-            <DL.Desc className="mb-4">
-              <span>{notes.CompNotes ? notes.CompNotes : 'None'}</span>
-            </DL.Desc>
-          </DL>
+          <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
+          <div className={classNames(boldText, 'mr-1')}>Marketing Deal:</div>
+          <div className={normalText}>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</div>
+          <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
+          <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
+
+          {notesInfo.map((item) => (
+            <SummaryRow key={item.id} label={item.label} data={item.data} />
+          ))}
         </>
       )}
-      <div className="flex flex-col border-y-2 py-4 my-4">
-        <div className="flex items-center text-gray-700">
-          <FontAwesomeIcon icon={faUser} />
-          <div className="ml-4 bg-lime-500 text-black px-1">Down to single seat</div>
-        </div>
-        <div className="flex items-center text-gray-700 mt-2">
-          <FontAwesomeIcon icon={faBook} />
-          <div className="ml-4 bg-yellow-200 text-black px-1">Brochure released</div>
-        </div>
-        <div className="flex items-center text-gray-700 mt-2">
-          <FontAwesomeIcon icon={faSquareXmark} />
-          <div className="ml-4 bg-red-500 text-yellow-200 px-1">Not on sale</div>
-        </div>
-      </div>
     </div>
   );
 };

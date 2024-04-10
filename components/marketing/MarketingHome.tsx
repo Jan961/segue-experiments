@@ -3,6 +3,8 @@ import Button from 'components/core-ui-lib/Button';
 import { SalesTable } from 'types/MarketingTypes';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { Summary } from './Summary';
+import Icon from 'components/core-ui-lib/Icon';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTable>('');
@@ -12,8 +14,24 @@ const MarketingHome = () => {
   return (
     <div className="flex w-full h-full">
       {/* Green Box */}
-      <div className="bg-primary-green/[0.15] w-[291px] h-full rounded-xl p-4 mr-5 flex flex-col">
-        <div className="text-base mb-4">Marketing summary will get rendered here</div>
+      <div className="bg-primary-green/[0.15] w-[291px] h-[788px] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5">
+        <div className="flex-grow overflow-y-auto">
+          <Summary />
+        </div>
+        <div className="flex flex-col border-y-2 border-t-primary-navy border-b-0 py-4 mt-4">
+          <div className="flex items-center text-primary-navy">
+            <Icon iconName={'user-solid'} variant="sm" />
+            <div className="ml-4 bg-secondary-green text-primary-white px-1">Down to single seat</div>
+          </div>
+          <div className="flex items-center text-primary-navy mt-2">
+            <Icon iconName={'book-solid'} variant="sm" />
+            <div className="ml-4 bg-secondary-yellow text-primary-navy px-1">Brochure released</div>
+          </div>
+          <div className="flex items-center text-primary-navy mt-2">
+            <Icon iconName={'square-cross'} variant="sm" />
+            <div className="ml-4 bg-secondary-red text-primary-white px-1">Not on sale</div>
+          </div>
+        </div>
       </div>
 
       <div className="flex-grow flex flex-col">
