@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function SingleSeatsIcon(props: React.SVGProps<SVGSVGElement>) {
+export default function UserSolidIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
       <g clipPath="url(#clip0_3386_6000)">
