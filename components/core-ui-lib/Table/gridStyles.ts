@@ -97,11 +97,61 @@ const GridStyles = createGlobalStyle<StyleProps>`
     background-color: #DADCE5;
 }
 
-.custom-pinned-header {
+.custom-sm-pinned-header {
   border-color: white !important;
   border-top: 102px solid; 
   border-right: 3px solid;
 }
+
+.custom-header-1rb {
+    border-color: white !important;
+    border-top: 50px solid; 
+    border-right: 1px solid;
+  }
+
+  .custom-header-2rb {
+    border-color: white !important;
+    border-top: 50px solid; 
+    border-right: 2px solid;
+  }
+
+  .custom-header-3rb {
+    border-color: white !important;
+    border-top: 50px solid; 
+    border-right: 3px solid;
+  }
+
+  .custom-header-4rb {
+    border-color: white !important;
+    border-top: 50px solid; 
+    border-right: 4px solid;
+  }
+
+  .custom-header-end {
+    border-color: white !important;
+    border-top: 50px solid; 
+    margin-right: -20px;
+  }
+
+  .thick-border-b {
+    border-color: white !important;
+    border-bottom: 4px solid; 
+  }
+
+  .thick-border-t {
+    border-color: white !important;
+    border-top: 4px solid; 
+  }
+
+  .thick-border-l {
+    border-color: white !important;
+    border-left: 4px solid; 
+  }
+
+  .thick-border-r {
+    border-color: white !important;
+    border-right: 4px solid; 
+  }
 `;
 
 interface TableTooltipProps {

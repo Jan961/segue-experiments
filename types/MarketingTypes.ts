@@ -82,6 +82,7 @@ export type SalesSnapshot = {
   capacity: number;
   isFinal: boolean;
   notOnSaleDate: string;
+  saleType: string;
 };
 
 export type BookingSelection = {
@@ -97,7 +98,7 @@ export type BookingSelection = {
   PerformanceCount: number;
 };
 
-export type SalesTable =
+export type SalesTabs =
   | 'sales'
   | 'archived sales'
   | 'activities'

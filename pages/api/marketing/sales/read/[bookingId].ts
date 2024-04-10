@@ -50,10 +50,23 @@ export default async function handle(req, res) {
               seatsSold: parseInt(sale.Seats),
               venueCurrencySymbol: sale.VenueCurrencySymbol,
               totalValue: parseFloat(sale.Value),
+              saleType: 'general',
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
               reserved: sale.Seats,
               reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
+              saleType: 'general',
+            }),
+            ...(sale.SaleTypeName === 'School Sales' && {
+              seatsSold: parseInt(sale.Seats),
+              venueCurrencySymbol: sale.VenueCurrencySymbol,
+              totalValue: parseFloat(sale.Value),
+              saleType: 'school',
+            }),
+            ...(sale.SaleTypeName === 'School Reservations' && {
+              reserved: sale.Seats,
+              reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
+              saleType: 'school',
             }),
           },
         };
@@ -80,13 +93,27 @@ export default async function handle(req, res) {
           capacity: sale.TotalCapacity,
           isFinal: sale.SetIsFinalFigures,
           notOnSaleDate: sale.NotOnSaleDate,
+          saleType: '',
           ...(sale.SaleTypeName === 'General Sales' && {
             seatsSold: parseInt(sale.Seats),
             totalValue: parseFloat(sale.Value),
+            saleType: 'general',
           }),
           ...(sale.SaleTypeName === 'General Reservations' && {
             reserved: parseInt(sale.Seats),
             reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
+            saleType: 'general',
+          }),
+          ...(sale.SaleTypeName === 'School Sales' && {
+            seatsSold: parseInt(sale.Seats),
+            venueCurrencySymbol: sale.VenueCurrencySymbol,
+            totalValue: parseFloat(sale.Value),
+            saleType: 'school',
+          }),
+          ...(sale.SaleTypeName === 'School Reservations' && {
+            reserved: sale.Seats,
+            reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
+            saleType: 'school',
           }),
         },
       };

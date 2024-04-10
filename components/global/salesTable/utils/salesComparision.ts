@@ -24,7 +24,7 @@ const salesComparison = async (data: SalesComp) => {
     field: 'week',
     cellRenderer: DefaultCellRenderer,
     suppressMovable: true,
-    headerClass: 'custom-pinned-header',
+    headerClass: 'custom-sm-pinned-header',
     pinned: 'left',
     lockPinned: true,
     width: 80,

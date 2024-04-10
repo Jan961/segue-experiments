@@ -23,7 +23,8 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     cellRenderer: SelectRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
-        optionsLength, []
+        optionsLength,
+        [],
         // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
       ),
       selectForComparison,
@@ -105,7 +106,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
     headerName: 'Sales Data',
     cellRendererParams: {
       buttonText: 'Sales Data',
-      className: 'w-24'
+      className: 'w-24',
     },
     cellRenderer: ButtonRenderer,
     width: 125,
@@ -118,199 +119,320 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
   },
 ];
 
-export const salesColDefs = (currencySymbol) => [
-  {
-    headerName: 'Week',
-    field: 'week',
-    cellRenderer: DefaultCellRenderer,
-    width: 120,
-    cellStyle: (params) => {
-      return {
-        ...getCellColor(params.data),
+export const salesColDefs = (currencySymbol) => {
+  return [
+    {
+      headerName: 'Week',
+      field: 'week',
+      cellRenderer: DefaultCellRenderer,
+      cellStyle: (params) => {
+        return {
+          ...getCellColor(params.data),
+          textAlign: 'center',
+          overflow: 'visible',
+        };
+      },
+      suppressMovable: true,
+      headerClass: 'custom-header-3rb',
+      pinned: 'left',
+      lockPinned: true,
+      width: 120,
+      resizable: false,
+      sortable: false,
+    },
+    {
+      headerName: 'Date',
+      field: 'weekOf',
+      cellRenderer: function (params) {
+        return formatInputDate(params.data.weekOf);
+      },
+      cellStyle: (params) => {
+        return {
+          ...getCellColor(params.data),
+          textAlign: 'center',
+          overflow: 'visible',
+        };
+      },
+      suppressMovable: true,
+      headerClass: 'custom-header-4rb',
+      pinned: 'left',
+      lockPinned: true,
+      width: 120,
+      resizable: false,
+      sortable: false,
+    },
+    {
+      headerName: 'General Sales',
+      headerClass: 'justify-center font-bold text-base thick-border-b thick-border-r',
+      marryChildren: true,
+      children: [
+        {
+          headerName: 'Seat Sold No.',
+          field: 'seatsSold',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'general') {
+              return params.data.seatsSold;
+            } else {
+              return '-';
+            }
+          },
+          width: 90,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[1px] border-white ',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+        {
+          headerName: 'Seats Sold ' + currencySymbol,
+          field: 'seatsSaleChange',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'general') {
+              return currencySymbol + params.data.totalValue.toFixed(2);
+            } else {
+              return '-';
+            }
+          },
+          width: 90,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[1px] border-white',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+        {
+          headerName: 'Reserved No',
+          field: 'reserved',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'general') {
+              return params.data.reserved === '' ? 0 : params.data.reserved;
+            } else {
+              return '-';
+            }
+          },
+          width: 100,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[1px] border-white',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+        {
+          headerName: 'Reserved ' + currencySymbol,
+          field: 'reservations',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'general') {
+              return currencySymbol + (params.data.reservations === '' ? '0.00' : params.data.reservations);
+            } else {
+              return '-';
+            }
+          },
+          width: 100,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[4px] border-white',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+      ],
+    },
+    {
+      headerName: 'School Sales',
+      headerClass: 'justify-center font-bold text-base thick-border-b',
+      marryChildren: true,
+      children: [
+        {
+          headerName: 'Seat Sold No.',
+          field: 'seatsSold',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'school') {
+              return params.data.seatsSold;
+            } else {
+              return '-';
+            }
+          },
+          width: 90,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[1px] border-white ',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+        {
+          headerName: 'Seats Sold ' + currencySymbol,
+          field: 'seatsSaleChange',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'school') {
+              return currencySymbol + params.data.totalValue.toFixed(2);
+            } else {
+              return '-';
+            }
+          },
+          width: 90,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[1px] border-white',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+        {
+          headerName: 'Reserved No',
+          field: 'reserved',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'school') {
+              return params.data.reserved === '' ? 0 : params.data.reserved;
+            } else {
+              return '-';
+            }
+          },
+          width: 100,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[1px] border-white',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+        {
+          headerName: 'Reserved ' + currencySymbol,
+          field: 'reservations',
+          cellRenderer: function (params) {
+            if (params.data.saleType === 'school') {
+              return currencySymbol + (params.data.reservations === '' ? '0.00' : params.data.reservations);
+            } else {
+              return '-';
+            }
+          },
+          width: 100,
+          cellStyle: {
+            textAlign: 'center',
+            overflow: 'visible',
+          },
+          headerClass: 'border-r-[4px] border-white',
+          suppressMovable: true,
+          sortable: false,
+          resizable: false,
+        },
+      ],
+    },
+    {
+      headerName: 'Total Value',
+      field: 'totalValue',
+      cellRenderer: function (params) {
+        const currReserveValue = params.data.reservations === '' ? 0 : parseFloat(params.data.reservations);
+        const currentValue = params.data.totalValue + currReserveValue;
+        return currencySymbol + currentValue.toFixed(2).toString();
+      },
+      width: 75,
+      cellStyle: {
         textAlign: 'center',
         overflow: 'visible',
-      };
+      },
+      headerClass: 'custom-header-1rb',
+      suppressMovable: true,
+      sortable: false,
+      resizable: false,
     },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Date',
-    field: 'weekOf',
-    cellRenderer: function (params) {
-      return formatInputDate(params.data.weekOf);
-    },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Seat Sold No.',
-    field: 'seatsSold',
-    cellRenderer: DefaultCellRenderer,
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Seats Sold ' + currencySymbol,
-    field: 'seatsSaleChange',
-    cellRenderer: function (params) {
-      return currencySymbol + params.data.totalValue.toFixed(2);
-    },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Reserved No',
-    field: 'reserved',
-    cellRenderer: function (params) {
-      return params.data.reserved === '' ? 0 : params.data.reserved;
-    },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Reserved ' + currencySymbol,
-    field: 'reservations',
-    cellRenderer: function (params) {
-      return currencySymbol + (params.data.reservations === '' ? '0.00' : params.data.reservations);
-    },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Total Value',
-    field: 'totalValue',
-    cellRenderer: function (params) {
-      const currReserveValue = params.data.reservations === '' ? 0 : parseFloat(params.data.reservations);
-      const currentValue = params.data.totalValue + currReserveValue;
-      return currencySymbol + currentValue.toFixed(2).toString();
-    },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Value Change',
-    field: 'valueChange',
-    cellRenderer: function (params) {
-      const rowIndex = params.node.rowIndex;
-      const currReserveValue = params.data.reservations === '' ? 0 : parseFloat(params.data.reservations);
-      const currentValue = params.data.totalValue + currReserveValue;
-      let valueChange;
-      if (rowIndex === 0) {
-        valueChange = currentValue;
-      } else {
-        const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
-        const prevReservations = previousRowData.reservations === '' ? 0 : parseFloat(previousRowData.reservations);
-        const previousTotalValue = previousRowData.totalValue + prevReservations;
-        valueChange = currentValue - previousTotalValue;
-      }
+    {
+      headerName: 'Value Change',
+      field: 'valueChange',
+      cellRenderer: function (params) {
+        const rowIndex = params.node.rowIndex;
+        const currReserveValue = params.data.reservations === '' ? 0 : parseFloat(params.data.reservations);
+        const currentValue = params.data.totalValue + currReserveValue;
+        let valueChange;
+        if (rowIndex === 0) {
+          valueChange = currentValue;
+        } else {
+          const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
+          const prevReservations = previousRowData.reservations === '' ? 0 : parseFloat(previousRowData.reservations);
+          const previousTotalValue = previousRowData.totalValue + prevReservations;
+          valueChange = currentValue - previousTotalValue;
+        }
 
-      // if negative display the minus sign before the currencySymbol
-      if(valueChange < 0){
-        return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
-      } else {
-        return currencySymbol + valueChange.toFixed(2).toString();
-      }
-      
+        // if negative display the minus sign before the currencySymbol
+        if (valueChange < 0) {
+          return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
+        } else {
+          return currencySymbol + valueChange.toFixed(2).toString();
+        }
+      },
+      width: 85,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      headerClass: 'custom-header-1rb',
+      suppressMovable: true,
+      sortable: false,
+      resizable: false,
     },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
+    {
+      headerName: 'Seats Change',
+      field: 'seatsChange',
+      cellRenderer: function (params) {
+        const rowIndex = params.node.rowIndex;
+        console.log(params.data);
+        const seatsSold = parseInt(params.data.seatsSold);
+        const reserved = params.data.reserved === '' ? 0 : parseInt(params.data.reserved);
+        const currentValue = seatsSold + reserved;
+        let seatsChange;
+        if (rowIndex === 0) {
+          seatsChange = currentValue;
+        } else {
+          const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
+          const prevSeatsSold = parseInt(previousRowData.seatsSold);
+          const prevReserved = previousRowData.reserved === '' ? 0 : parseInt(previousRowData.reserved);
+          const prevSeats = prevSeatsSold + prevReserved;
+          seatsChange = currentValue - prevSeats;
+        }
+        return seatsChange.toString();
+      },
+      width: 85,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      headerClass: 'custom-header-1rb',
+      suppressMovable: true,
+      sortable: false,
+      resizable: false,
     },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Seats Change',
-    field: 'seatsChange',
-    cellRenderer: function (params) {
-      const rowIndex = params.node.rowIndex;
-      console.log(params.data)
-      const seatsSold = parseInt(params.data.seatsSold)
-      const reserved = params.data.reserved === "" ? 0 : parseInt(params.data.reserved);
-      const currentValue = seatsSold + reserved;
-      let seatsChange;
-      if (rowIndex === 0) {
-        seatsChange = currentValue;
-      } else {
-        const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
-        const prevSeatsSold = parseInt(previousRowData.seatsSold);
-        const prevReserved = previousRowData.reserved === "" ? 0 : parseInt(previousRowData.reserved);
-        const prevSeats = prevSeatsSold + prevReserved;
-        seatsChange = currentValue - prevSeats;
-      }
-      return seatsChange.toString();
+    {
+      headerName: 'Total Holds',
+      field: 'totalHolds',
+      cellRenderer: function (params) {
+        return params.data.totalHolds === null ? 0 : params.data.totalHolds;
+      },
+      width: 70,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      headerClass: 'custom-header-end',
+      suppressMovable: true,
+      sortable: false,
+      resizable: false,
     },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    headerClass: 'border-r-[1px] border-white',
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-  {
-    headerName: 'Total Holds',
-    field: 'totalHolds',
-    cellRenderer: function (params) {
-      return params.data.totalHolds === null ? 0 : params.data.totalHolds;
-    },
-    width: 120,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    suppressMovable: true,
-    sortable: false,
-    resizable: false,
-  },
-];
+  ];
+};

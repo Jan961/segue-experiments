@@ -20,22 +20,10 @@ interface SalesTableProps {
   containerHeight: string;
   variant: SalesTableVariant;
   data?: Array<BookingSelection> | SalesComp | Array<SalesSnapshot>;
-  errorMessage?: string;
-  primaryBtnTxt?: string;
-  showPrimaryBtn?: boolean;
-  onPrimaryBtnClick?: () => void;
-  secondaryBtnText?: string;
-  showSecondaryBtn?: boolean;
-  onSecondaryBtnClick?: () => void;
-  showExportBtn?: boolean;
-  backBtnTxt?: string;
-  showBackBtn?: boolean;
-  onBackBtnClick?: () => void;
   onCellClick?: (e) => void;
   onCellValChange?: (e) => void;
   cellRenderParams;
-  processing?: boolean;
-  productions?: any;
+  productions;
 }
 
 export default function SalesTable({
@@ -65,9 +53,9 @@ export default function SalesTable({
   const styleProps = { headerColor: tileColors[module] };
 
   const salesSnapshot = (data: Array<SalesSnapshot>) => {
-    setRowData(data);
-    setCurrency('£'); // currency accessor needs added here or value needs passed to salesColDefs
+    setCurrency('£');
     setColumnDefs(salesColDefs(currency));
+    setRowData(data);
   };
 
   const productionComparision = (data: Array<BookingSelection>) => {
@@ -125,6 +113,9 @@ export default function SalesTable({
           styleProps={styleProps}
           onCellClicked={onCellClick}
           onCellValueChange={onCellValChange}
+          gridOptions={{
+            alwaysShowHorizontalScroll: false,
+          }}
         />
       </div>
     </div>
