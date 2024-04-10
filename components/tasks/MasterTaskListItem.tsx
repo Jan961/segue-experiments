@@ -17,7 +17,7 @@ import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 
 interface TaskListItemProps {
-  task: MasterTask;
+  task: Partial<MasterTask>;
 }
 
 const TaskListItem = ({ task }: TaskListItemProps) => {
