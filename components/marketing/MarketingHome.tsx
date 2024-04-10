@@ -20,16 +20,16 @@ const MarketingHome = () => {
         </div>
         <div className="flex flex-col border-y-2 border-t-primary-navy border-b-0 py-4 mt-4">
           <div className="flex items-center text-primary-navy">
-            <Icon iconName={'user-solid'} fill="#FFF" variant="xs" />
-            <div className="ml-4 bg-[#10841C] text-primary-white px-1">Down to single seat</div>
+            <Icon iconName={'user-solid'} variant="sm" />
+            <div className="ml-4 bg-secondary-green text-primary-white px-1">Down to single seat</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
-            <Icon iconName={'book-solid'} fill="#FFF" variant="xs" />
-            <div className="ml-4 bg-[#FFE606] text-primary-navy px-1">Brochure released</div>
+            <Icon iconName={'book-solid'} variant="sm" />
+            <div className="ml-4 bg-secondary-yellow text-primary-navy px-1">Brochure released</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
-            <Icon iconName={'square-cross'} fill="#FFF" variant="xs" />
-            <div className="ml-4 bg-[#ED1111] text-primary-white px-1">Not on sale</div>
+            <Icon iconName={'square-cross'} variant="sm" />
+            <div className="ml-4 bg-secondary-red text-primary-white px-1">Not on sale</div>
           </div>
         </div>
       </div>

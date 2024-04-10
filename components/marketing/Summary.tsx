@@ -60,37 +60,41 @@ export const Summary = () => {
   const notes = summary?.Notes;
 
   const generalInfo = [
-    { label: 'First Date:', data: dateToSimple(summary?.ProductionInfo?.Date) },
-    { label: 'Last Date:', data: dateToSimple(summary?.ProductionInfo?.lastDate) },
-    { label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
-    { label: 'Production Week No:', data: weekNo.toString() },
+    { id: 1, label: 'First Date:', data: dateToSimple(summary?.ProductionInfo?.Date) },
+    { id: 2, label: 'Last Date:', data: dateToSimple(summary?.ProductionInfo?.lastDate) },
+    { id: 3, label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
+    { id: 4, label: 'Production Week No:', data: weekNo.toString() },
   ];
 
   const salesSummary = [
-    { label: 'Total Seats Sold:', data: numeral(info.SeatsSold).format('0,0') || '-' },
-    { label: `Total Sales ${currency}:`, data: info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-' },
-    { label: 'Gross Potential:', data: formatCurrency(info.GrossPotential, currency) },
-    { label: 'AVG Ticket Price:', data: formatCurrency(info.AvgTicketPrice, currency) },
-    { label: 'Booking %:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-' },
-    { label: 'Capacity:', data: numeral(info.Capacity).format('0,0') || '-' },
-    { label: 'Perf(s):', data: summary?.Performances?.length.toString() },
-    { label: 'Total Seats:', data: numeral(info.Seats).format('0,0') || '-' },
-    { label: 'Currency:', data: info.VenueCurrencyCode || '-' },
+    { id: 1, label: 'Total Seats Sold:', data: numeral(info.SeatsSold).format('0,0') || '-' },
+    {
+      id: 2,
+      label: `Total Sales ${currency}:`,
+      data: info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-',
+    },
+    { id: 3, label: 'Gross Potential:', data: formatCurrency(info.GrossPotential, currency) },
+    { id: 4, label: 'AVG Ticket Price:', data: formatCurrency(info.AvgTicketPrice, currency) },
+    { id: 5, label: 'Booking %:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-' },
+    { id: 6, label: 'Capacity:', data: numeral(info.Capacity).format('0,0') || '-' },
+    { id: 7, label: 'Perf(s):', data: summary?.Performances?.length.toString() },
+    { id: 8, label: 'Total Seats:', data: numeral(info.Seats).format('0,0') || '-' },
+    { id: 9, label: 'Currency:', data: info.VenueCurrencyCode || '-' },
   ];
 
   const notesInfo = [
-    { label: 'Booking Deal Notes:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' },
-    { label: 'Hold Notes:', data: notes.HoldNotes ? notes.HoldNotes : 'None' },
-    { label: 'Comp Notes:', data: notes.CompNotes ? notes.CompNotes : 'None' },
+    { id: 1, label: 'Booking Deal Notes:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' },
+    { id: 2, label: 'Hold Notes:', data: notes.HoldNotes ? notes.HoldNotes : 'None' },
+    { id: 3, label: 'Comp Notes:', data: notes.CompNotes ? notes.CompNotes : 'None' },
   ];
 
   return (
     <div className="text-sm mb-2">
       <div className={classNames(boldText, 'text-lg')}>General Info</div>
 
-      {generalInfo.map((item, index) => {
-        return <SummaryRow key={index} label={item.label} data={item.data} />;
-      })}
+      {generalInfo.map((item) => (
+        <SummaryRow key={item.id} label={item.label} data={item.data} />
+      ))}
 
       <SummaryRow label="Performance Time(s):" data={''} />
       <div className={normalText}>
@@ -100,9 +104,9 @@ export const Summary = () => {
       </div>
 
       <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
-      {salesSummary.map((item, index) => {
-        return <SummaryRow key={index} label={item.label} data={item.data} />;
-      })}
+      {salesSummary.map((item) => (
+        <SummaryRow key={item.id} label={item.label} data={item.data} />
+      ))}
 
       {notes && (
         <>
@@ -112,9 +116,9 @@ export const Summary = () => {
           <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
           <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
 
-          {notesInfo.map((item, index) => {
-            return <SummaryRow key={index} label={item.label} data={item.data} />;
-          })}
+          {notesInfo.map((item) => (
+            <SummaryRow key={item.id} label={item.label} data={item.data} />
+          ))}
         </>
       )}
     </div>
