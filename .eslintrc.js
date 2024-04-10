@@ -45,5 +45,12 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     'import/no-unresolved': 'off',
     'import/extensions': 'off',
+    'react/self-closing-comp': [
+      'error',
+      {
+        component: true,
+        html: true,
+      },
+    ],
   },
 };

@@ -43,7 +43,7 @@ const SelectPencilRenderer = ({ eGridCell, value, setValue, data, api, node }: S
         eGridCell={eGridCell}
         onChange={handleValueChange}
         options={pencilNos}
-        value={value}
+        value={`${value}`}
         inline
         isSearchable={false}
         disabled={isDisabled}

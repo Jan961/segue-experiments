@@ -1,6 +1,6 @@
 import Button from 'components/core-ui-lib/Button';
 import { useWizard } from 'react-use-wizard';
-import { steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 import { useEffect, useMemo } from 'react';
 import PreviewBookingDetails, { PreviewBookingDetailsProps } from './PreviewBookingDetails';
 import { isNullOrEmpty } from 'utils';
@@ -8,20 +8,21 @@ import { isNullOrEmpty } from 'utils';
 type PreviewBookingViewProps = PreviewBookingDetailsProps & {
   onSaveBooking: () => void;
   updateModalTitle: (title: string) => void;
+  isNewBooking: boolean;
 };
 export default function PreviewBookingView(props: PreviewBookingViewProps) {
   const { goToStep } = useWizard();
-  const { formData, data = [] } = props;
+  const { formData, data = [], isNewBooking } = props;
   useEffect(() => {
     props.updateModalTitle('Preview New Booking');
   }, []);
 
   const previousStepFunc = () => {
-    goToStep(steps.indexOf('New Booking Details'));
+    goToStep(getStepIndex(isNewBooking, 'New Booking Details'));
   };
 
   const areInputFieldsValid = useMemo(() => {
-    if (formData.isRunOfDates) {
+    if (data && formData.isRunOfDates) {
       const rowsWithNoDayType = data.filter(({ dayType }) => isNullOrEmpty(dayType));
       return isNullOrEmpty(rowsWithNoDayType);
     } else {

@@ -19,9 +19,11 @@ const NoPerfRenderer = ({ eGridCell, value, setValue, data, api, node }: ICellRe
       setValue(null);
       setNoOfPerfs('');
       updateRowHeight(ROW_HEIGHT + MARGIN);
+    } else if (value > 0) {
+      updateRowHeight(value * ROW_HEIGHT + MARGIN);
     }
     setIsDisabled(!data.perf);
-  }, [data.perf]);
+  }, [data.perf, value]);
 
   const handleChange = (event: any) => {
     let newValue = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters

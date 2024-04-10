@@ -38,22 +38,27 @@ const ShowsTable = ({
   rowsData,
   isAddRow = false,
   addNewRow,
+  isEdited = false,
+  handleEdit,
   isArchived = false,
 }: {
   rowsData: Show[];
   isAddRow: boolean;
   addNewRow: () => void;
   isArchived: boolean;
+  isEdited: boolean;
+  handleEdit: () => void;
 }) => {
   const tableRef = useRef(null);
   const router = useRouter();
+
+  const [isError, setIsError] = useState<boolean>(false);
 
   const [confirm, setConfirm] = useState<boolean>(false);
   const [showId, setShowId] = useState<number>(0);
   const [currentShow, setCurrentShow] = useState(intShowData);
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isEdited, setIsEdited] = useState<boolean>(false);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -94,7 +99,7 @@ const ShowsTable = ({
         }
       } finally {
         setIsLoading(false);
-        setIsEdited(false);
+        handleEdit();
         setCurrentShow(intShowData);
         router.replace(router.asPath);
       }
@@ -109,19 +114,22 @@ const ShowsTable = ({
         const data = { ...intShowData, Code: currentShow.Code, Name: currentShow.Name };
         delete data.Id;
         await axios.post(`/api/shows/create`, data);
-      } finally {
-        setIsEdited(false);
+        handleEdit();
         setCurrentShow(intShowData);
         addNewRow();
         router.replace(router.asPath);
         setIsLoading(false);
+        setIsError(false);
+      } catch (error) {
+        setIsLoading(false);
+        setIsError(true);
       }
     }
   };
 
   const handleCellChanges = (e) => {
     setCurrentShow(e.data);
-    setIsEdited(true);
+    handleEdit();
   };
 
   const handleDelete = async () => {
@@ -160,6 +168,12 @@ const ShowsTable = ({
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
+      {isError && (
+        <p className="text-red-600 absolute right-[4%] top-[21%] w-[9%]">
+          This Show Code is already in use.
+          <br /> Please change to a unique Show Code.
+        </p>
+      )}
     </>
   );
 };

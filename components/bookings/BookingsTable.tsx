@@ -10,6 +10,7 @@ import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { isNullOrEmpty } from 'utils';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from './utils';
+import { RowDoubleClickedEvent } from 'ag-grid-community';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -34,17 +35,27 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   };
 
   const handleCellClick = (e) => {
-    if (!e.data.Id) {
+    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
+      setProductionItem(e.data);
+      setShowModal(true);
+    }
+  };
+
+  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    const { data } = e;
+    if (!data.Id) {
       setShowAddEditBookingModal({
         visible: true,
         startDate: e.data.dateTime,
         endDate: e.data.dateTime,
       });
-      return;
-    }
-    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
-      setProductionItem(e.data);
-      setShowModal(true);
+    } else {
+      setShowAddEditBookingModal({
+        visible: true,
+        startDate: data.dateTime,
+        endDate: data.dateTime,
+        booking: data,
+      });
     }
   };
 
@@ -99,6 +110,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
           rowData={rows}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
+          onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
         />

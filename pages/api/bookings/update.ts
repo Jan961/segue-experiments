@@ -1,27 +1,49 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { updateBooking } from 'services/bookingService';
-import { BookingDTO } from 'interfaces';
+import set from 'date-fns/set';
 import { Booking } from '@prisma/client';
-import { bookingMapper } from 'lib/mappers';
 import { checkAccess, getEmailFromReq } from 'services/userService';
+import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
+import { parseISO } from 'date-fns';
+
+const formatBookings = (bookings) => {
+  return bookings.map((b) => {
+    return {
+      Id: b.id,
+      FirstDate: parseISO(b.dateAsISOString),
+      StatusCode: b.bookingStatus,
+      VenueId: b.venue,
+      PencilNum: b.pencilNo,
+      Notes: b.notes || '',
+    };
+  });
+};
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const inc = req.body as BookingDTO;
-    const { Id, Date: FirstDate, StatusCode, VenueId, PencilNum, Notes } = inc;
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId: inc.Id });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
-    const booking: Partial<Booking> = {
-      Id,
-      ...(FirstDate && { FirstDate: new Date(FirstDate) }),
-      ...(StatusCode && { StatusCode }),
-      ...(VenueId && { VenueId }),
-      ...(PencilNum && { PencilNum }),
-      ...(Object.prototype.hasOwnProperty.call(inc, 'Notes') && { Notes }),
-    };
-    const updated = await updateBooking(booking as Booking);
-    const mapped = bookingMapper(updated);
-    res.status(200).json(mapped);
+
+    const bookings = req.body as BookingItem;
+    const formattedBookings = formatBookings(bookings);
+
+    await Promise.all(
+      formattedBookings.map(async (booking, index) => {
+        const timesToUpdate = bookings[index].times;
+        let performanceTimes = null;
+        if (timesToUpdate) {
+          const splitTimes = timesToUpdate.split(';');
+          performanceTimes = splitTimes.map((pt) => {
+            const [hours, minutes] = pt.split(':');
+            return set(booking.FirstDate, { hours: Number(hours), minutes: Number(minutes) });
+          });
+        }
+        await updateBooking(booking as Booking, performanceTimes);
+      }),
+    );
+
+    res.status(200).json('Success');
   } catch (err) {
     console.log(err);
     res.status(500).json({ err });

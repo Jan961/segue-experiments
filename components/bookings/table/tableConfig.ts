@@ -10,7 +10,7 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
-import TimeArrayRenderer from './TimeArrayRenderer';
+import PerformanceTimesRenderer from './PerformanceTimesRenderer';
 import IconRenderer from './IconRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
@@ -210,7 +210,7 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     headerName: 'Times',
     field: 'times',
     wrapText: true,
-    cellRenderer: TimeArrayRenderer,
+    cellRenderer: PerformanceTimesRenderer,
     width: 102,
     maxWidth: 102,
     cellStyle: {

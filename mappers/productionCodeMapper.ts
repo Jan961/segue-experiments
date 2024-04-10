@@ -1,6 +1,6 @@
 import { getWeekDay, formatDateUK } from 'services/dateService';
 
-export const mapBookingsToProductionOptions = (bookings: any) => {
+export const mapBookingsToProductionOptions = (bookings) => {
   if (!bookings || bookings.length === 0) {
     return [];
   }
@@ -11,7 +11,7 @@ export const mapBookingsToProductionOptions = (bookings: any) => {
       const weekday = getWeekDay(date);
       const ukDate = formatDateUK(date);
       return {
-        name: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`,
+        text: `${b.Venue.Code} ${b.Venue.Name} ${weekday} ${ukDate} (${b.StatusCode})`,
         value: `${b.Id}`,
         date: ukDate,
       };

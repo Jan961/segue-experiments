@@ -1,12 +1,13 @@
 import Button from 'components/core-ui-lib/Button';
 import { useWizard } from 'react-use-wizard';
-import { steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 import { useEffect, useState } from 'react';
 import PreviewBookingDetails, { PreviewBookingDetailsProps } from './PreviewBookingDetails';
 
 type CheckMileageViewProps = PreviewBookingDetailsProps & {
   updateModalTitle: (title: string) => void;
   previousView: string;
+  isNewBooking: boolean;
 };
 export default function CheckMileageView(props: CheckMileageViewProps) {
   const { goToStep } = useWizard();
@@ -19,7 +20,7 @@ export default function CheckMileageView(props: CheckMileageViewProps) {
   }, []);
 
   const handleCloseClick = () => {
-    goToStep(steps.indexOf(previousView));
+    goToStep(getStepIndex(props.isNewBooking, previousView));
   };
   return (
     <>

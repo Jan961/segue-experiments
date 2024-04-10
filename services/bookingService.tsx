@@ -1,12 +1,7 @@
 import { Booking, Prisma } from '@prisma/client';
 import { addDays, differenceInDays } from 'date-fns';
 import prisma from 'lib/prisma';
-import { omit } from 'radash';
-
-export const updateBookingVenue = (date, venueID, productionID) => {
-  fetch(`/api/productions/booking/update/${productionID}/${venueID}/${date}`).then((res) => res.json());
-  return true;
-};
+import { isNullOrEmpty } from 'utils';
 
 const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
   Venue: true,
@@ -17,29 +12,75 @@ export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: Booking) => {
-  return prisma.booking.update({
-    where: {
-      Id: booking.Id,
-    },
-    data: omit(booking, ['Id']),
-    include: bookingInclude,
+export const updateBooking = async (booking: Booking, performances) => {
+  let updatedBooking = null;
+  let updatedPerformances = null;
+  await prisma.$transaction(async (tx) => {
+    updatedBooking = await tx.booking.update({
+      where: {
+        Id: booking.Id,
+      },
+      data: {
+        ...booking,
+        Performance: {
+          deleteMany: {
+            BookingId: booking.Id,
+          },
+        },
+      },
+      include: bookingInclude,
+    });
+
+    if (isNullOrEmpty(performances)) {
+      updatedPerformances = await tx.performance.create({
+        data: { BookingId: booking.Id, Date: booking.FirstDate, Time: null },
+      });
+    } else {
+      updatedPerformances = await tx.performance.createMany({
+        data: performances.map((time) => ({ BookingId: booking.Id, Date: time, Time: time })),
+      });
+    }
   });
+  return { ...updatedBooking, ...updatedPerformances };
 };
 
-export const deleteBookingById = async (BookingId: any) => {
+export const deleteBookingById = async (id: number) => {
   await prisma.$transaction([
     prisma.booking.delete({
       where: {
-        Id: BookingId,
+        Id: id,
       },
     }),
     prisma.performance.deleteMany({
       where: {
-        BookingId,
+        BookingId: id,
       },
     }),
   ]);
+};
+
+export const deleteRehearsalById = async (id: number) => {
+  await prisma.rehearsal.delete({
+    where: {
+      Id: id,
+    },
+  });
+};
+
+export const deleteGetInFitUpById = async (id: number) => {
+  await prisma.getInFitUp.delete({
+    where: {
+      Id: id,
+    },
+  });
+};
+
+export const deleteOtherById = async (id: number) => {
+  await prisma.other.delete({
+    where: {
+      Id: id,
+    },
+  });
 };
 
 export const createBooking = (VenueId: number, FirstDate: Date, DateBlockId: number) => {

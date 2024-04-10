@@ -1,7 +1,7 @@
 import { MasterTask } from '@prisma/client';
 import { atom } from 'recoil';
 
-export type MasterTaskStateType = MasterTask[];
+export type MasterTaskStateType = Partial<MasterTask>[];
 
 const intialState: MasterTaskStateType = [];
 

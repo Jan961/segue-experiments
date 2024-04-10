@@ -12,7 +12,7 @@ const mapToPrismaFields = (values: BookingItem[] = []) => {
         VenueId: item.venue,
         Date: item.dateAsISOString,
         DateTypeId: item.dayType,
-        performanceTimes: item.times ? item.times.split(',') : [],
+        performanceTimes: item.times ? item.times.split(';') : [],
         BookingStatus: item.bookingStatus,
         PencilNo: Number(item.pencilNo),
         Notes: item.notes,
