@@ -167,16 +167,24 @@ export default function PreviewBookingDetails({
     const fromDateAsDate = parseISO(fromDate);
     const toDateAsDate = parseISO(toDate);
     const pastStartDate = subDays(fromDateAsDate, 6);
+    const toStartDate = subDays(fromDateAsDate, 1);
     const toDateSet = addDays(toDateAsDate, 1);
     const futureEndDate = addDays(toDateAsDate, 7);
     // Remove any existing bookings being edited that are also present in rowSelector to avoid duplicates
     const editedRowsIds = rowItems.map(({ item }) => item.id);
     const bookingsWithDuplicatesRemoved = bookings.filter(({ Id }) => !editedRowsIds.includes(Id));
 
-    const filteredBookingsTop = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, pastStartDate, fromDateAsDate);
+    // filteredBookingsTop and filteredBookingsBottom exclude the dates for which the booking is being added or edited
+    const filteredBookingsTop = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, pastStartDate, toStartDate);
     const filteredBookingsBottom = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, toDateSet, futureEndDate);
 
-    setRows([...filteredBookingsTop, ...rowItems, ...filteredBookingsBottom]);
+    // Find any other bookings that already exist within the date range other than the ones being added or edited
+    const otherBookingsWithinDateRange = bookingsWithDuplicatesRemoved.filter(({ dateTime, dayType }) => {
+      const bookingDate = parseISO(dateTime);
+      return isWithinInterval(bookingDate, { start: fromDateAsDate, end: toDateAsDate }) && !!dayType;
+    });
+
+    setRows([...filteredBookingsTop, ...otherBookingsWithinDateRange, ...rowItems, ...filteredBookingsBottom]);
     updateDistanceInfo(filteredBookingsTop, rowItems, filteredBookingsBottom);
   };
 
