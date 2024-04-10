@@ -1,34 +1,37 @@
 import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { steps } from 'config/AddBooking';
-import { BookingWithVenueDTO } from 'interfaces';
+import { getStepIndex } from 'config/AddBooking';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
+import { gridOptions } from '../../GapSuggest';
 
 type BarringIssueViewProps = {
-  bookingConflicts: BookingWithVenueDTO[];
+  isNewBooking: boolean;
   barringConflicts?: BarredVenue[];
   updateModalTitle: (title: string) => void;
 };
 
-export default function BarringIssueView({
-  bookingConflicts,
-  barringConflicts,
-  updateModalTitle,
-}: BarringIssueViewProps) {
-  const { previousStep, goToStep } = useWizard();
+const barringGridOptions = {
+  ...gridOptions,
+  rowClassRules: {
+    '!bg-primary-orange !bg-opacity-25': (params) => params?.data?.hasBarringConflict,
+  },
+};
+
+export default function BarringIssueView({ isNewBooking, barringConflicts, updateModalTitle }: BarringIssueViewProps) {
+  const { goToStep } = useWizard();
 
   useEffect(() => {
     updateModalTitle('Barring Issue');
   }, []);
 
   const goToPreviousStep = () => {
-    if (bookingConflicts?.length > 0) {
-      previousStep();
+    if (isNewBooking) {
+      goToStep(getStepIndex(isNewBooking, 'Create New Booking'));
     } else {
-      goToStep(steps.indexOf('Create New Booking'));
+      goToStep(getStepIndex(false, 'New Booking Details'));
     }
   };
 
@@ -38,13 +41,18 @@ export default function BarringIssueView({
         A Barring Check has found potential issues
       </span>
       <div className="w-[634px] flex flex-col">
-        <Table columnDefs={barringIssueColumnDefs} rowData={barringConflicts} styleProps={styleProps} />
+        <Table
+          columnDefs={barringIssueColumnDefs}
+          rowData={barringConflicts}
+          styleProps={styleProps}
+          gridOptions={barringGridOptions}
+        />
         <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
           <Button
             className="ml-3 w-33"
             text="Continue"
-            onClick={() => goToStep(steps.indexOf('New Booking Details'))}
+            onClick={() => goToStep(getStepIndex(isNewBooking, 'New Booking Details'))}
           />
         </div>
       </div>

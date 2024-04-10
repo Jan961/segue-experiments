@@ -1,6 +1,15 @@
 import { AgGridReact } from 'ag-grid-react';
 import GridStyles from './gridStyles';
-import { GridApi, GridReadyEvent, RowHeightParams } from 'ag-grid-community';
+import {
+  CellClickedEvent,
+  CellValueChangedEvent,
+  GridApi,
+  GridReadyEvent,
+  RowClickedEvent,
+  RowDoubleClickedEvent,
+  RowHeightParams,
+  RowSelectedEvent,
+} from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 // import TableTooltip from './TableTooltip';
 
@@ -12,10 +21,11 @@ interface TableProps {
   rowData?: any[];
   columnDefs?: any[];
   styleProps?: StyleProps;
-  onCellClicked?: (e) => void;
-  onRowClicked?: (e) => void;
-  onRowSelected?: (e) => void;
-  onCellValueChange?: (e) => void;
+  onCellClicked?: (e: CellClickedEvent) => void;
+  onRowClicked?: (e: RowClickedEvent) => void;
+  onRowSelected?: (e: RowSelectedEvent) => void;
+  onRowDoubleClicked?: (e: RowDoubleClickedEvent) => void;
+  onCellValueChange?: (e: CellValueChangedEvent) => void;
   gridOptions?: any;
   displayHeader?: boolean;
   getRowStyle?: any;
@@ -35,6 +45,7 @@ const DEFAULT_COLUMN_DEF = {
 };
 
 const DEFAULT_GRID_OPTIONS = {
+  rowSelection: 'single',
   autoSizeStrategy: {
     type: 'fitGridWidth',
     defaultMinWidth: 50,
@@ -55,6 +66,7 @@ export default forwardRef(function Table(
     displayHeader = true,
     getRowHeight,
     onRowSelected = () => null,
+    onRowDoubleClicked = () => null,
   }: TableProps,
   ref,
 ) {
@@ -129,6 +141,7 @@ export default forwardRef(function Table(
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}
           onRowSelected={onRowSelected}
+          onRowDoubleClicked={onRowDoubleClicked}
           onCellValueChanged={handleCellValueChange}
           onGridReady={onGridReady}
           getRowStyle={getRowStyle}

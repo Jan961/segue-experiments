@@ -22,15 +22,27 @@ export const Actions = {
   UPDATE_MODAL_TITLE: 'UPDATE_MODAL_TITLE',
 };
 
-export const steps = [
+export const newBookingSteps = [
   'Create New Booking',
-  'Booking Conflict',
-  'Barring Issue',
   'New Booking Details',
   'Preview New Booking',
   'Check Mileage',
+  'Booking Conflict',
+  'Barring Issue',
   'Venue Gap Suggestions',
 ];
+
+export const editBookingSteps = [
+  'New Booking Details',
+  'Preview New Booking',
+  'Check Mileage',
+  'Booking Conflict',
+  'Barring Issue',
+];
+
+export const getStepIndex = (isNewBooking: boolean, step: string) => {
+  return isNewBooking ? newBookingSteps.indexOf(step) : editBookingSteps.indexOf(step);
+};
 
 export const BookingTypes = [
   {

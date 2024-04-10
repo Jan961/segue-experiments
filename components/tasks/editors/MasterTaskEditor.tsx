@@ -13,12 +13,12 @@ import { Spinner } from 'components/global/Spinner';
 import { priorityOptions } from 'utils/tasks';
 
 interface NewTaskFormProps {
-  task?: MasterTask;
+  task?: Partial<MasterTask>;
   triggerClose: () => void;
   open: boolean;
 }
 
-const DEFAULT_MASTER_TASK: MasterTask = {
+const DEFAULT_MASTER_TASK: Partial<MasterTask> = {
   Id: undefined,
   Code: 0,
   Name: '',
@@ -39,7 +39,7 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
   const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
   const [alert, setAlert] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [inputs, setInputs] = React.useState<MasterTask>(task || DEFAULT_MASTER_TASK);
+  const [inputs, setInputs] = React.useState<Partial<MasterTask>>(task || DEFAULT_MASTER_TASK);
   const [status, setStatus] = React.useState({ submitted: true, submitting: false });
   const priorityOptionList = React.useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),

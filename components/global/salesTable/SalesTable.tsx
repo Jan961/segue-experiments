@@ -1,9 +1,9 @@
 import classNames from 'classnames';
 import Table from 'components/core-ui-lib/Table';
 import { tileColors } from 'config/global';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
-import { prodComparisionColDefs, salesColDefs } from './tableConfig'
+import { prodComparisionColDefs, salesColDefs } from './tableConfig';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 
@@ -47,7 +47,7 @@ export default function SalesTable({
   onCellClick,
   onCellValChange,
   cellRenderParams,
-  productions
+  productions,
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -85,7 +85,7 @@ export default function SalesTable({
         prodCode: booking.FullProductionCode,
       });
     });
-    
+
     setRowData(processedBookings);
     setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
   };

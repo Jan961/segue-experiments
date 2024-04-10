@@ -7,8 +7,8 @@ SELECT
   `B2`.`BookingVenueId` AS `ToVenueId`
 FROM
   (
-    `frtxigoo_dev2`.`Booking` `B1`
-    JOIN `frtxigoo_dev2`.`Booking` `B2` ON(
+    `frtxigoo_dev`.`Booking` `B1`
+    JOIN `frtxigoo_dev`.`Booking` `B2` ON(
       `B1`.`BookingDateBlockId` = `B2`.`BookingDateBlockId`
       AND `B1`.`BookingFirstDate` < `B2`.`BookingFirstDate`
     )
