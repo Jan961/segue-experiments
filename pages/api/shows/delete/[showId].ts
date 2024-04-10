@@ -10,12 +10,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (!access) return res.status(401).end();
 
   try {
-    await prisma.show.update({
+    await prisma.show.delete({
       where: {
         Id: ShowId,
-      },
-      data: {
-        IsDeleted: true,
       },
     });
     res.status(200).end();
