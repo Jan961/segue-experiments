@@ -1,6 +1,6 @@
 import { ICellRendererParams } from 'ag-grid-community';
-import { useEffect, useState } from 'react';
-import DatePicker from 'react-datepicker';
+import DateInput from 'components/core-ui-lib/DateInput';
+import { useEffect, useRef, useState } from 'react';
 
 interface CustomDateCellProps extends ICellRendererParams {
   internalField?: string;
@@ -9,6 +9,7 @@ interface CustomDateCellProps extends ICellRendererParams {
 
 const CustomDateCell = ({ data, colDef: { field }, internalField, fieldIndex }: CustomDateCellProps) => {
   const [value, setValue] = useState(null);
+  const fromInputRef = useRef(null);
 
   useEffect(() => {
     if (internalField && fieldIndex) {
@@ -18,15 +19,19 @@ const CustomDateCell = ({ data, colDef: { field }, internalField, fieldIndex }: 
     }
   }, []);
 
+  const handleDateFromChange = (dateVal) => {
+    console.log(dateVal);
+  };
+
   return (
     <div className="ag-input-wrapper w-full h-full pr-[2px] rounded">
-      <DatePicker
-        portalId="root"
-        dateFormat={'dd/mm/yy'}
-        placeholderText="DD/MM/YY"
+      <DateInput
+        ref={fromInputRef}
         popperClassName="ag-custom-component-popup !z-50 rounded"
-        onChange={(date) => setValue(date)}
+        inputClass={`!shadow-none !border-primary-white`}
         value={value}
+        onChange={handleDateFromChange}
+        minDate={new Date()}
       />
     </div>
   );

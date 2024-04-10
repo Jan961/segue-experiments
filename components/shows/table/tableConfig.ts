@@ -5,7 +5,7 @@ import TableCheckboxRenderer from './TableCheckboxRenderer';
 import CustomDateCell from './CustomDateCell';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import CustomSelectCell from './CustomSelectCell';
-import { SALES_FIG_OPTIONS } from '../constants';
+import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
 
 export const tableConfig = [
   {
@@ -207,8 +207,12 @@ export const productionsTableConfig = [
     field: 'EditId',
     cellRenderer: CustomSelectCell,
     cellRendererParams: {
-      options: SALES_FIG_OPTIONS,
+      options: REGIONS_LIST,
       placeholder: 'Select Region(s)',
+      isMulti: true,
+    },
+    cellStyle: {
+      overflow: 'visible',
     },
     width: 170,
     headerClass: 'text-center',
@@ -230,6 +234,9 @@ export const productionsTableConfig = [
     cellRenderer: CustomSelectCell,
     cellRendererParams: {
       options: SALES_FIG_OPTIONS,
+    },
+    cellStyle: {
+      overflow: 'visible',
     },
     headerClass: 'text-center',
   },

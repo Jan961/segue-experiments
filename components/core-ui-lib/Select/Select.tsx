@@ -32,6 +32,15 @@ const DropdownIndicator = (props: DropdownIndicatorProps) => {
   );
 };
 
+const formatOptionLabel = ({ value, label }, { context }) => {
+  if (context === 'value') {
+    return value;
+  } else if (value.length > 2) {
+    return `+${value.length} selected`;
+  }
+  return label;
+};
+
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
 
 const COMP_HEIGHT = '1.9375rem';
@@ -50,6 +59,7 @@ export interface SelectProps extends WithTestId {
   inline?: boolean;
   isSearchable?: boolean;
   isClearable?: boolean;
+  isMulti?: boolean;
 }
 
 export default forwardRef(function Select(
@@ -67,6 +77,7 @@ export default forwardRef(function Select(
     inline = false,
     isSearchable = false,
     isClearable = true,
+    isMulti = false,
   }: SelectProps,
   ref,
 ) {
@@ -149,7 +160,8 @@ export default forwardRef(function Select(
 
   const handleOptionSelect = (o: SelectOption) => {
     setSelectedOption(o);
-    onChange(o ? o.value : null);
+    if (isMulti) onChange(o.map((option) => option.text));
+    else onChange(o ? o.value : null);
   };
 
   useEffect(() => {
@@ -195,6 +207,9 @@ export default forwardRef(function Select(
         placeholder={placeholder}
         isSearchable={isSearchable}
         isClearable={isClearable}
+        isMulti={isMulti}
+        formatOptionLabel={formatOptionLabel}
+        hideSelectedOptions={false}
       />
     </div>
   );
