@@ -12,7 +12,7 @@ interface IframeProps {
 }
 
 const IFRAME_SIZES = {
-  xs: 'w-[210px] h-[120px]',
+  xs: 'w-[150px] h-[81px]',
   sm: 'w-[326px] h-[183px]',
   md: 'w-[435px] h-[244px]',
   lg: 'w-[544px] h-[306px]',
@@ -53,7 +53,7 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
         allowFullScreen
         className="absolute"
         onLoad={() => setIsLoading(false)}
-      ></iframe>
+      />
     </div>
   );
 };
