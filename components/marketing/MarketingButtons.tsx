@@ -43,6 +43,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
           return booking;
         }),
       });
+      setShowEditUrl(false);
     } catch (error) {
       console.log('Error updating venue website', error);
     }
@@ -52,14 +53,14 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
     <div className="grid grid-cols-2 grid-rows-2 gap-4">
       <Button
         text={website === '' ? 'Add Landing Page' : 'Edit Landing Page'}
-        className="w-[155px]"
+        className="w-[155px] mt-5"
         disabled={bookingJump.selected === null || !productionId}
         onClick={() => setShowEditUrl(true)}
       />
 
       <Button
         text="Marketing Reports"
-        className="w-[165px]"
+        className="w-[165px] mt-5"
         disabled={!productionId}
         iconProps={{ className: 'h-4 w-3' }}
         sufixIconName={'excel'}

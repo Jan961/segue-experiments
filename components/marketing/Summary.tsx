@@ -23,6 +23,7 @@ export const Summary = () => {
   const { selected } = useRecoilValue(bookingJumpState);
   const [summary, setSummary] = useState<Partial<SummaryResponseDTO>>({});
   const [loading, setLoading] = useState(false);
+  const [summaryAvail, setSummaryAvail] = useState(false);
 
   const boldText = 'text-base font-bold text-primary-input-text';
   const normalText = 'text-base font-normal text-primary-input-text';
@@ -30,6 +31,7 @@ export const Summary = () => {
   useEffect(() => {
     const search = async () => {
       try {
+        setSummaryAvail(true);
         setLoading(true);
         const { data } = await axios.get(`/api/marketing/summary/${selected}`);
         setSummary(data);
@@ -40,8 +42,10 @@ export const Summary = () => {
       }
     };
 
-    if (selected) {
+    if (selected !== null) {
       search();
+    } else {
+      setSummaryAvail(false);
     }
   }, [selected]);
 
@@ -90,36 +94,40 @@ export const Summary = () => {
 
   return (
     <div className="text-sm mb-2">
-      <div className={classNames(boldText, 'text-lg')}>General Info</div>
+      {summaryAvail && (
+        <div>
+          <div className={classNames(boldText, 'text-lg')}>General Info</div>
 
-      {generalInfo.map((item) => (
-        <SummaryRow key={item.id} label={item.label} data={item.data} />
-      ))}
-
-      <SummaryRow label="Performance Time(s):" data={''} />
-      <div className={normalText}>
-        {summary.Performances?.map?.((x, i) => (
-          <p key={i}>{`${dateToSimple(x.Date)} ${x.Time ? getTimeFromDateAndTime(x.Time) : ''}`}</p>
-        )) || 'N/A'}
-      </div>
-
-      <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
-      {salesSummary.map((item) => (
-        <SummaryRow key={item.id} label={item.label} data={item.data} />
-      ))}
-
-      {notes && (
-        <>
-          <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
-          <div className={classNames(boldText, 'mr-1')}>Marketing Deal:</div>
-          <div className={normalText}>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</div>
-          <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
-          <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
-
-          {notesInfo.map((item) => (
+          {generalInfo.map((item) => (
             <SummaryRow key={item.id} label={item.label} data={item.data} />
           ))}
-        </>
+
+          <SummaryRow label="Performance Time(s):" data={''} />
+          <div className={normalText}>
+            {summary.Performances?.map?.((x, i) => (
+              <p key={i}>{`${dateToSimple(x.Date)} ${x.Time ? getTimeFromDateAndTime(x.Time) : ''}`}</p>
+            )) || 'N/A'}
+          </div>
+
+          <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
+          {salesSummary.map((item) => (
+            <SummaryRow key={item.id} label={item.label} data={item.data} />
+          ))}
+
+          {notes && (
+            <>
+              <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
+              <div className={classNames(boldText, 'mr-1')}>Marketing Deal:</div>
+              <div className={normalText}>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</div>
+              <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
+              <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
+
+              {notesInfo.map((item) => (
+                <SummaryRow key={item.id} label={item.label} data={item.data} />
+              ))}
+            </>
+          )}
+        </div>
       )}
     </div>
   );

@@ -645,19 +645,20 @@ model AccountUserProduction {
 }
 
 model Production {
-  Id                    Int                     @id @default(autoincrement()) @map("ProductionId")
-  ShowId                Int                     @map("ProductionShowId")
-  Code                  String                  @map("ProductionCode") @db.VarChar(10)
-  SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
-  IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
-  IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  Logo                  Bytes?                  @map("ProductionLogo")
-  AccountUserProduction AccountUserProduction[]
-  ConversionRate        ConversionRate[]
-  DateBlock             DateBlock[]
-  Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
-  ProductionRegion      ProductionRegion[]
-  ProductionTask        ProductionTask[]
+  Id                       Int                     @id @default(autoincrement()) @map("ProductionId")
+  ShowId                   Int                     @map("ProductionShowId")
+  Code                     String                  @map("ProductionCode") @db.VarChar(10)
+  SalesEmail               String?                 @map("ProductionSalesEmail") @db.VarChar(80)
+  IsArchived               Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
+  IsDeleted                Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
+  Logo                     Bytes?                  @map("ProductionLogo")
+  SalesFrequency           String                  @map("ProductionSalesFrequency")@default("W") @db.Char(1)
+  AccountUserProduction    AccountUserProduction[]
+  ConversionRate           ConversionRate[]
+  DateBlock                DateBlock[]
+  Show                     Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
+  ProductionRegion         ProductionRegion[]
+  ProductionTask           ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ShowId], map: "ShowMayHaveProduction")
