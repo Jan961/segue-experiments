@@ -168,12 +168,13 @@ export const salesColDefs = (currencySymbol) => {
       children: [
         {
           headerName: 'Seat Sold No.',
-          field: 'seatsSold',
+          field: 'genSeatsSold',
           cellRenderer: function (params) {
             if (params.data.saleType === 'general') {
-              return params.data.seatsSold;
+              return params.data.genSeatsSold === '' ? '-' : params.data.genSeatsSold;
             } else {
-              return '-';
+              const prevSeats = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genSeatsSold;
+              return prevSeats === '' || prevSeats === undefined ? '-' : prevSeats;
             }
           },
           width: 90,
@@ -191,9 +192,16 @@ export const salesColDefs = (currencySymbol) => {
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
             if (params.data.saleType === 'general') {
-              return currencySymbol + params.data.totalValue.toFixed(2);
+              if (params.data.genTotalValue === 0 || params.data.genTotalValue === '') {
+                return 0;
+              } else {
+                return currencySymbol + parseInt(params.data.genTotalValue).toFixed(2);
+              }
             } else {
-              return '-';
+              const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genTotalValue;
+              return prevTotal === '' || prevTotal === undefined
+                ? '-'
+                : currencySymbol + parseInt(prevTotal).toFixed(2);
             }
           },
           width: 90,
@@ -208,12 +216,13 @@ export const salesColDefs = (currencySymbol) => {
         },
         {
           headerName: 'Reserved No',
-          field: 'reserved',
+          field: 'genReserved',
           cellRenderer: function (params) {
             if (params.data.saleType === 'general') {
-              return params.data.reserved === '' ? 0 : params.data.reserved;
+              return params.data.genReserved === '' ? 0 : params.data.genReserved;
             } else {
-              return '-';
+              const prevRevVal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genReserved;
+              return prevRevVal === '' || prevRevVal === undefined ? '-' : prevRevVal;
             }
           },
           width: 100,
@@ -228,12 +237,13 @@ export const salesColDefs = (currencySymbol) => {
         },
         {
           headerName: 'Reserved ' + currencySymbol,
-          field: 'reservations',
+          field: 'genReservations',
           cellRenderer: function (params) {
             if (params.data.saleType === 'general') {
-              return currencySymbol + (params.data.reservations === '' ? '0.00' : params.data.reservations);
+              return currencySymbol + (params.data.genReservations === '' ? '0.00' : params.data.genReservations);
             } else {
-              return '-';
+              const prevRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genReservations;
+              return prevRev === '' || prevRev === undefined ? '-' : currencySymbol + parseFloat(prevRev).toFixed(2);
             }
           },
           width: 100,
@@ -255,12 +265,13 @@ export const salesColDefs = (currencySymbol) => {
       children: [
         {
           headerName: 'Seat Sold No.',
-          field: 'seatsSold',
+          field: 'schSeatsSold',
           cellRenderer: function (params) {
             if (params.data.saleType === 'school') {
-              return params.data.seatsSold;
+              return params.data.schSeatsSold === '' ? '-' : params.data.schSeatsSold;
             } else {
-              return '-';
+              const prevSeatsSold = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1).data.schSeatsSold;
+              return prevSeatsSold === '' || prevSeatsSold === undefined ? '-' : prevSeatsSold;
             }
           },
           width: 90,
@@ -278,9 +289,14 @@ export const salesColDefs = (currencySymbol) => {
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
             if (params.data.saleType === 'school') {
-              return params.data.totalValue !== '' ? currencySymbol + params.data.totalValue.toFixed(2) : '-';
+              return params.data.schTotalValue !== ''
+                ? currencySymbol + parseInt(params.data.schTotalValue).toFixed(2)
+                : '-';
             } else {
-              return '-';
+              const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1).data.schTotalValue;
+              return prevTotal === '' || prevTotal === undefined
+                ? '-'
+                : currencySymbol + parseInt(prevTotal).toFixed(2);
             }
           },
           width: 90,
@@ -295,12 +311,13 @@ export const salesColDefs = (currencySymbol) => {
         },
         {
           headerName: 'Reserved No',
-          field: 'reserved',
+          field: 'schReserved',
           cellRenderer: function (params) {
             if (params.data.saleType === 'school') {
-              return params.data.reserved === '' ? 0 : params.data.reserved;
+              return params.data.schReserved === '' ? 0 : params.data.schReserved;
             } else {
-              return '-';
+              const previousRevNo = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1).data.schReserved;
+              return previousRevNo;
             }
           },
           width: 100,
@@ -315,12 +332,13 @@ export const salesColDefs = (currencySymbol) => {
         },
         {
           headerName: 'Reserved ' + currencySymbol,
-          field: 'reservations',
+          field: 'schReservations',
           cellRenderer: function (params) {
             if (params.data.saleType === 'school') {
-              return currencySymbol + (params.data.reservations === '' ? '0.00' : params.data.reservations);
+              return currencySymbol + (params.data.schReservations === '' ? '0.00' : params.data.schReservations);
             } else {
-              return '-';
+              const previousRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1).data.schReservations;
+              return currencySymbol + previousRev;
             }
           },
           width: 100,
@@ -339,7 +357,7 @@ export const salesColDefs = (currencySymbol) => {
       headerName: 'Total Value',
       field: 'totalValue',
       cellRenderer: function (params) {
-        const currReserveValue = params.data.reservations === '' ? 0 : parseFloat(params.data.reservations);
+        const currReserveValue = params.data.totalValue === '' ? 0 : parseFloat(params.data.totalValue);
         const totalVal = params.data.totalValue === '' ? 0 : params.data.totalValue;
         const currentValue = currReserveValue + totalVal;
         return currentValue === 0 ? '-' : currencySymbol + currentValue.toFixed(2).toString();
@@ -371,14 +389,14 @@ export const salesColDefs = (currencySymbol) => {
           valueChange = currentValue - previousTotalValue;
         }
 
-        console.log(valueChange);
-
-        // // if negative display the minus sign before the currencySymbol
-        // if (valueChange < 0) {
-        //   return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
-        // } else {
-        //   return currencySymbol + valueChange.toFixed(2).toString();
-        // }
+        // if negative display the minus sign before the currencySymbol
+        if (valueChange < 0) {
+          return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
+        } else if (valueChange > 0) {
+          return currencySymbol + parseInt(valueChange).toFixed(2).toString();
+        } else {
+          return currencySymbol + '0.00';
+        }
       },
       width: 85,
       cellStyle: {
