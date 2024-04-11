@@ -5,7 +5,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Tooltip from 'components/core-ui-lib/Tooltip';
-import { initialMainVenueDetails, venueStatusOptions } from 'config/Venue';
+import { initialMainVenueDetails, venueStatusOptions } from 'config/venue';
 import { useState } from 'react';
 
 interface MainVenueFormProps {

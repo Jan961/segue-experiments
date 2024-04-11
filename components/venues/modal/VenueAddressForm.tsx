@@ -1,5 +1,5 @@
 import TextInput from 'components/core-ui-lib/TextInput';
-import { initialVenueAddressDetails } from 'config/Venue';
+import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 
 interface VenueAddressFormProps {

@@ -1,7 +1,7 @@
 import Button from 'components/core-ui-lib/Button';
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { initialVenueTechnicalDetails } from 'config/Venue';
+import { initialVenueTechnicalDetails } from 'config/venue';
 import { useState } from 'react';
 
 interface VenueTechnicalDetailsFormProps {

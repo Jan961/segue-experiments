@@ -1,7 +1,7 @@
 import { styleProps, venueContractDefs } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { dummyVenueContractData } from 'config/Venue';
+import { dummyVenueContractData } from 'config/venue';
 
 const VenueContactForm = () => {
   const getRowStyle = (params) => {

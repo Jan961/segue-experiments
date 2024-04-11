@@ -1,6 +1,6 @@
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { initialVenueBarringRules } from 'config/Venue';
+import { initialVenueBarringRules } from 'config/venue';
 import { useState } from 'react';
 
 interface VenueBarringFormProps {
