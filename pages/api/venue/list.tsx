@@ -2,7 +2,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { country, town, productionId, searchQuery } = req.body;
+  const { country, town, productionId, searchQuery, limit } = req.body;
   const queryConditions: any = {};
   if (searchQuery) {
     queryConditions.OR = [
@@ -55,6 +55,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   try {
     const venues = await prisma.venue.findMany({
+      ...(limit && { take: limit }),
       where: queryConditions,
       include: {
         VenueAddress: true,
@@ -64,6 +65,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       },
+      orderBy: [
+        {
+          Code: 'asc',
+        },
+      ],
     });
     res.status(200).json(venues);
   } catch (error) {

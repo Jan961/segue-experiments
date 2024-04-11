@@ -14,6 +14,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const { showsList = [] } = props;
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
+  const [isEdited, setIsEdited] = useState<boolean>(false);
 
   const handleArchive = () => {
     setIsArchived(!isArchived);
@@ -36,10 +37,14 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     setIsAddRow(!isAddRow);
   };
 
+  const handleEdit = () => {
+    setIsEdited(!isEdited);
+  };
+
   return (
     <Layout title="Shows | Segue" flush>
       <div className="w-9/12 mx-auto">
-        <div className="flex items-center justify-between py-5">
+        <div className="flex items-center justify-between py-4">
           <h1 className="text-primary-orange text-4xl font-bold">Shows</h1>
           <div className="flex gap-2 items-center">
             <Checkbox
@@ -47,12 +52,20 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               checked={isArchived}
               label="Include archived"
               id={''}
+              disabled={isEdited}
               onChange={handleArchive}
             />
             <Button disabled={isAddRow} onClick={addNewRow} text="Add New Show" />
           </div>
         </div>
-        <ShowsTable isArchived={isArchived} isAddRow={isAddRow} addNewRow={addNewRow} rowsData={rowsData} />
+        <ShowsTable
+          handleEdit={handleEdit}
+          isEdited={isEdited}
+          isArchived={isArchived}
+          isAddRow={isAddRow}
+          addNewRow={addNewRow}
+          rowsData={rowsData}
+        />
       </div>
     </Layout>
   );

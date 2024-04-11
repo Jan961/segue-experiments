@@ -39,6 +39,8 @@ const GridStyles = createGlobalStyle<StyleProps>`
     justify-content: center !important;
 }
 
+
+
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
     min-height: 0px!important;
@@ -80,11 +82,25 @@ const GridStyles = createGlobalStyle<StyleProps>`
     z-index: 0;
 }
 
+.ag-row:hover {
+    z-index: 2;
+}
+
 .ag-row.ag-row-focus {
     z-index: 1;
 }
 .custom-red-row {
   background-color: #fad0cc; /* Set your desired background color */
+}
+
+.custom-grey-row {
+    background-color: #DADCE5;
+}
+
+.custom-pinned-header {
+  border-color: white !important;
+  border-top: 102px solid; 
+  border-right: 3px solid;
 }
 `;
 

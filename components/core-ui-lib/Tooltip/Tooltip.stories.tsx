@@ -11,13 +11,13 @@ export default meta;
 
 type Story = StoryObj<typeof Tooltip>;
 
-export const btnTooltipTop: Story = (args: TooltipProps) => (
+export const BtnTooltipTop: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <Button text="Sample Button" className="w-[155px]" onClick={() => alert('I am a test storybook button')} />
   </Tooltip>
 );
 
-btnTooltipTop.args = {
+BtnTooltipTop.args = {
   body: 'Tooltip displayed at the top of the item',
   position: 'top',
   height: 'h-auto',
@@ -26,13 +26,13 @@ btnTooltipTop.args = {
   txtColorClass: 'text-white',
 };
 
-export const btntooltipBottom: Story = (args: TooltipProps) => (
+export const BtntooltipBottom: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <Button text="Sample Button" className="w-[155px]" onClick={() => alert('I am a test storybook button')} />
   </Tooltip>
 );
 
-btntooltipBottom.args = {
+BtntooltipBottom.args = {
   body: 'Tooltip displayed at the bottom of the item',
   position: 'bottom',
   height: 'h-auto',
@@ -41,13 +41,13 @@ btntooltipBottom.args = {
   txtColorClass: 'text-white',
 };
 
-export const btnTooltipLeft: Story = (args: TooltipProps) => (
+export const BtnTooltipLeft: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <Button text="Sample Button" className="w-[200px]" onClick={() => alert('I am a test storybook button')} />
   </Tooltip>
 );
 
-btnTooltipLeft.args = {
+BtnTooltipLeft.args = {
   body: 'Tooltip displayed at the left hand side of the item',
   position: 'left',
   height: 'h-auto',
@@ -56,13 +56,13 @@ btnTooltipLeft.args = {
   txtColorClass: 'text-white',
 };
 
-export const btnTooltipRight: Story = (args: TooltipProps) => (
+export const BtnTooltipRight: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <Button text="Sample Button" className="w-[155px]" onClick={() => alert('I am a test storybook button')} />
   </Tooltip>
 );
 
-btnTooltipRight.args = {
+BtnTooltipRight.args = {
   body: 'Tooltip displayed at the right hand side of the item',
   position: 'right',
   height: 'h-auto',
@@ -71,13 +71,13 @@ btnTooltipRight.args = {
   txtColorClass: 'text-white',
 };
 
-export const txtTooltipDefaultPos: Story = (args: TooltipProps) => (
+export const TxtTooltipDefaultPos: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <div className="text text-center text-primary-navy font-bold text-xl">Hover over me to see a tooltip</div>
   </Tooltip>
 );
 
-txtTooltipDefaultPos.args = {
+TxtTooltipDefaultPos.args = {
   body: 'Tooltip displayed at the top (default side) of the item',
   height: 'h-auto',
   width: 'w-auto',
@@ -85,13 +85,13 @@ txtTooltipDefaultPos.args = {
   txtColorClass: 'text-white',
 };
 
-export const txtTooltipCustomSizeColour: Story = (args: TooltipProps) => (
+export const TxtTooltipCustomSizeColour: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <div className="text-primary-blue font-bold text-xl">Hover over me to see a tooltip</div>
   </Tooltip>
 );
 
-txtTooltipCustomSizeColour.args = {
+TxtTooltipCustomSizeColour.args = {
   body: 'Tooltip displayed at the top (default side) of the item',
   height: 'h-24',
   width: 'w-32',
@@ -99,35 +99,15 @@ txtTooltipCustomSizeColour.args = {
   txtColorClass: 'text-white',
 };
 
-export const txtTooltipWithTitle: Story = (args: TooltipProps) => (
+export const TxtTooltipWithTitle: Story = (args: TooltipProps) => (
   <Tooltip {...args}>
     <div className="text-primary-blue font-bold text-xl">Hover over me to see a tooltip</div>
   </Tooltip>
 );
 
-txtTooltipWithTitle.args = {
+TxtTooltipWithTitle.args = {
   body: 'Tooltip displayed at the top (default side) of the item',
   title: 'Tooltip Title',
   bgColorClass: 'primary-blue',
   txtColorClass: 'text-white',
-};
-
-export const manualToogle: Story = (args: TooltipProps) => (
-  <Tooltip {...args}>
-    <div className="text-primary-blue font-bold text-xl">
-      Change the manualToogle prop from true/false in control to
-      <br />
-      toogle the tooltip in and out of view. This is used when an external <br />
-      function controls the visibility of the tooltip.
-    </div>
-  </Tooltip>
-);
-
-manualToogle.args = {
-  body: 'Tooltip displayed at the top (default side) of the item',
-  title: 'Tooltip Title',
-  bgColorClass: 'primary-blue',
-  txtColorClass: 'text-white',
-  useManualToggle: true,
-  manualToggle: true,
 };

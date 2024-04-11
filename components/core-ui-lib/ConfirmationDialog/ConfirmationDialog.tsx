@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
 
-export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave';
+export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return';
 
 interface ConfirmationDialogProps {
   children?: React.ReactNode;
@@ -37,6 +37,10 @@ const confOptions = {
   leave: {
     question: 'Are you sure you want to leave this page?',
     warning: 'Any unsaved changes may be lost.',
+  },
+  return: {
+    question: 'Are you sure you want to return to home?',
+    warning: '',
   },
 };
 

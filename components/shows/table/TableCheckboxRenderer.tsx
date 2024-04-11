@@ -18,7 +18,6 @@ const TableCheckboxRenderer = ({ eGridCell, data, node, setValue, value, colDef 
   const handleCheckboxChange = (checked) => {
     setPerfChecked(checked);
     setValue(checked);
-    console.log();
     node.setData({
       ...data,
       [colDef?.field]: checked,

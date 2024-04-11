@@ -96,6 +96,7 @@ export type BookingDTO = {
   CastRateTicketsArranged?: boolean;
   CastRateTicketsNotes?: string;
   PerformanceIds?: number[];
+  RunTag: string;
 };
 
 export type GetInFitUpDTO = {
@@ -104,6 +105,8 @@ export type GetInFitUpDTO = {
   Date: string;
   StatusCode: string;
   Notes: string;
+  PencilNum?: number;
+  RunTag: string;
 };
 
 export type RehearsalDTO = {
@@ -115,6 +118,8 @@ export type RehearsalDTO = {
   Notes: string;
   DateType: number;
   DateBlockId?: number;
+  PencilNum?: number;
+  RunTag: string;
 };
 
 export type DateDTO = {
@@ -162,6 +167,8 @@ export type OtherDTO = {
   DateTypeName?: string; // missing field at response
   StatusCode: StatusCode;
   Notes?: string;
+  PencilNum?: number;
+  RunTag: string;
 };
 
 export type BookingWithVenueDTO = BookingDTO & {

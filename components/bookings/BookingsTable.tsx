@@ -2,39 +2,30 @@ import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
-import { bookingState } from 'state/booking/bookingState';
+import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
 import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { isNullOrEmpty } from 'utils';
+import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from './utils';
+import { RowDoubleClickedEvent } from 'ag-grid-community';
 
 interface BookingsTableProps {
   rowData?: any;
 }
-
-type AddBookingModalState = {
-  visible: boolean;
-  startDate?: string;
-  endDate?: string;
-};
-
-const addBookingInitialState = {
-  visible: false,
-  startDate: null,
-  endDate: null,
-};
 
 export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookingDict, setBookingDict] = useRecoilState(bookingState);
+  const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-  const [showAddBookingModal, setShowAddBookingModal] = useState<AddBookingModalState>(addBookingInitialState);
+
   const { fetchData } = useAxios();
 
   const gridOptions = {
@@ -44,17 +35,27 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   };
 
   const handleCellClick = (e) => {
-    if (!e.data.Id) {
-      setShowAddBookingModal({
+    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
+      setProductionItem(e.data);
+      setShowModal(true);
+    }
+  };
+
+  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    const { data } = e;
+    if (!data.Id) {
+      setShowAddEditBookingModal({
         visible: true,
         startDate: e.data.dateTime,
         endDate: e.data.dateTime,
       });
-      return;
-    }
-    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
-      setProductionItem(e.data);
-      setShowModal(true);
+    } else {
+      setShowAddEditBookingModal({
+        visible: true,
+        startDate: data.dateTime,
+        endDate: data.dateTime,
+        booking: data,
+      });
     }
   };
 
@@ -86,44 +87,6 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     }
   }, [filter, setFilter, rowData]);
 
-  const formatRowsForPencilledBookings = (values) => {
-    const pencilled = values.filter(({ bookingStatus }) => bookingStatus === 'Pencilled');
-    const groupedByDate = pencilled.reduce((acc, item) => {
-      if (acc[item.date] !== undefined) {
-        acc[item.date] = acc[item.date] + 1;
-      } else {
-        acc[item.date] = 1;
-      }
-      return acc;
-    }, {});
-
-    const multiple = Object.entries(groupedByDate)
-      .filter(([_, v]: [string, number]) => v > 1)
-      .map((arr) => arr[0]);
-
-    const updated = values.map((r) => (multiple.includes(r.date) ? { ...r, multipleVenuesOnSameDate: true } : r));
-    return updated;
-  };
-
-  const formatRowsForMultipeBookingsAtSameVenue = (values) => {
-    const groupedByVenue = values.reduce((acc, item) => {
-      if (item.venue) {
-        acc[item.venue] !== undefined ? (acc[item.venue] = acc[item.venue] + 1) : (acc[item.venue] = 1);
-      }
-
-      return acc;
-    }, {});
-
-    const venuesWithMultipleBookings = Object.entries(groupedByVenue)
-      .filter(([_, v]: [string, number]) => v > 1)
-      .map((arr) => arr[0]);
-
-    const updated = values.map((r) =>
-      venuesWithMultipleBookings.includes(r.venue) ? { ...r, venueHasMultipleBookings: true } : r,
-    );
-    return updated;
-  };
-
   useEffect(() => {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
@@ -136,7 +99,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     if (bookings) {
       router.reload();
     }
-    setShowAddBookingModal(addBookingInitialState);
+    setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
 
   return (
@@ -147,6 +110,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
           rowData={rows}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
+          onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
         />
@@ -157,7 +121,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
-      {showAddBookingModal.visible && <AddBooking {...showAddBookingModal} onClose={handleClose} />}
+      {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
     </>
   );
 }

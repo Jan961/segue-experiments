@@ -7,7 +7,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import { useWizard } from 'react-use-wizard';
 import { BookingItem, TForm } from '../reducer';
 import useAxios from 'hooks/useAxios';
-import { steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 import Loader from 'components/core-ui-lib/Loader';
 import { BookingWithVenueDTO } from 'interfaces';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
@@ -16,7 +16,7 @@ import DateRange from 'components/core-ui-lib/DateRange';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import Toggle from 'components/core-ui-lib/Toggle/Toggle';
 import Label from 'components/core-ui-lib/Label';
 import { dateToSimple, formattedDateWithWeekDay, getArrayOfDatesBetween } from 'services/dateService';
@@ -48,7 +48,7 @@ const NewBookingView = ({
   updateBarringConflicts,
   updateModalTitle,
 }: AddBookingProps) => {
-  const { nextStep, goToStep } = useWizard();
+  const { goToStep } = useWizard();
 
   const currentProduction = useRecoilValue(currentProductionSelector);
   const scheduleRange = useRecoilValue(dateBlockSelector);
@@ -67,7 +67,7 @@ const NewBookingView = ({
   const fetchBarredVenues = (skipRedirect = false): Promise<any> => {
     const { venueId, fromDate: startDate, toDate: endDate } = formData;
     return api({
-      url: '/api/productions/venue/barred',
+      url: '/api/productions/venue/barringCheck',
       method: 'POST',
       data: {
         productionId: currentProduction?.Id,
@@ -77,15 +77,20 @@ const NewBookingView = ({
         includeExcluded: false,
         startDate,
         endDate,
+        filterBarredVenues: true,
       },
     })
       .then((data: any) => {
-        updateBarringConflicts(data.map((barredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.Date) })));
+        updateBarringConflicts(
+          data
+            .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
+            .filter((venue: BarredVenue) => venue.hasBarringConflict),
+        );
         if (skipRedirect) return;
         if (data?.length > 0) {
-          goToStep(steps.indexOf('Barring Issue'));
+          goToStep(getStepIndex(true, 'Barring Issue'));
         } else {
-          goToStep(steps.indexOf('New Booking Details'));
+          goToStep(getStepIndex(true, 'New Booking Details'));
         }
       })
       .catch((error) => {
@@ -107,13 +112,13 @@ const NewBookingView = ({
         }
         if (isNullOrEmpty(data)) {
           if (isDateTypeOnly) {
-            goToStep(steps.indexOf('New Booking Details'));
+            goToStep(getStepIndex(true, 'New Booking Details'));
           } else {
             fetchBarredVenues(false);
           }
         } else if (!isDateTypeOnly) {
           await fetchBarredVenues(true);
-          nextStep();
+          goToStep(getStepIndex(true, 'Booking Conflict'));
         }
       })
       .catch((error) => {
@@ -132,7 +137,7 @@ const NewBookingView = ({
   };
 
   const goToGapSuggestion = () => {
-    goToStep(steps.indexOf('Venue Gap Suggestions'));
+    goToStep(getStepIndex(true, 'Venue Gap Suggestions'));
   };
 
   const createBookingsForDateRange = () => {
@@ -148,7 +153,7 @@ const NewBookingView = ({
 
   const handleCheckMileageClick = () => {
     createBookingsForDateRange();
-    goToStep(steps.indexOf('Check Mileage'));
+    goToStep(getStepIndex(true, 'Check Mileage'));
   };
   return (
     <div className="w-[385px]">
@@ -260,9 +265,9 @@ const NewBookingView = ({
             disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
             className="px-6"
             text={'Check Mileage'}
-          ></Button>
+           />
         </div>
-        <Button className="px-8" onClick={onModalClose} variant="secondary" text={'Cancel'}></Button>
+        <Button className="px-8" onClick={onModalClose} variant="secondary" text={'Cancel'} />
         {!fetchingBookingConflicts && (
           <div
             className={classNames({
@@ -275,7 +280,7 @@ const NewBookingView = ({
               onClick={goToNext}
               disabled={(isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate}
               text={'Next'}
-            ></Button>
+             />
           </div>
         )}
         {(fetchingBookingConflicts || loading) && <Loader variant={'sm'} />}

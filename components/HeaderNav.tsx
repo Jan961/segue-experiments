@@ -1,17 +1,14 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useClerk } from '@clerk/nextjs';
 import { userService } from 'services/user.service';
-
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import classNames from 'classnames';
 import { SegueLogo } from './global/SegueLogo';
 import useUrlPath from 'hooks';
-// import { FormInputSelect } from './global/forms/FormInputSelect';
-// import { availableLocales } from 'config/global';
-// import { useRecoilState } from 'recoil';
-// import { globalState } from 'state/global/globalState';
 import useStrings from 'hooks/useStrings';
 import Icon from './core-ui-lib/Icon';
+import { ConfDialogVariant } from './core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface HeaderNavButtonProps {
   iconName: string;
@@ -59,28 +56,35 @@ const HeaderNavButton = ({
 const HeaderNavDivider = () => <span className="mx-2">{' | '}</span>;
 
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
-  // const [username, setUsername] = React.useState('My Account');
-  // const [userPrefs, setUserPrefs] = useRecoilState(globalState);
+  const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
+  const [confVariant, setConfVariant] = useState<ConfDialogVariant>('return');
   const getString = useStrings();
   const router = useRouter();
   const { isHome, navigateToHome } = useUrlPath();
   const isCurrentPathHome = isHome();
   const { signOut } = useClerk();
 
-  const logout = async () => {
-    userService.logout();
-    await signOut();
-    router.push('/');
-  };
-  /* const user = userService.userValue;
-   React.useEffect(() => {
-    if (user && user.name) {
-      setUsername(user.name);
+  // const onLogout = () => {
+  //   setConfirmVisible(true);
+  // };
+
+  const showConfirm = (type: ConfDialogVariant) => {
+    setConfVariant(type);
+    // don't attempt to return if on the dashboard
+    if (router.route === '/' && type === 'return') {
+      return;
     }
-  }, [user]); 
-   const onLocaleChange = (e: any) => {
-    setUserPrefs({ ...userPrefs, locale: e.target.value });
-  }; */
+    setConfirmVisible(true);
+  };
+  const onYesClick = async () => {
+    if (confVariant === 'logout') {
+      userService.logout();
+      await signOut();
+      router.push('/');
+    } else if (confVariant === 'return') {
+      navigateToHome();
+    }
+  };
 
   return (
     <nav>
@@ -92,7 +96,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             </div>
             <SegueLogo
               className={`${!isCurrentPathHome ? 'cursor-pointer hover:scale-105' : ''}`}
-              onClick={navigateToHome}
+              onClick={() => showConfirm('return')}
             />
           </div>
           <div className="flex flex-row items-center">
@@ -104,19 +108,10 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             >
               {getString('global.home')}
             </HeaderNavButton>
-
-            {/* <div className="">
-              <FormInputSelect
-                onChange={onLocaleChange}
-                value={userPrefs.locale}
-                name={'locale'}
-                options={availableLocales}
-              />
-            </div> */}
             <HeaderNavDivider />
             <HeaderNavButton
               iconName="exit"
-              onClick={logout}
+              onClick={() => showConfirm('logout')}
               className="bg-primary-purple shadow-sm-shadow"
               containerClass="cursor-pointer hover:scale-105"
             >
@@ -125,6 +120,13 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
           </div>
         </div>
       </div>
+      <ConfirmationDialog
+        variant={confVariant}
+        show={confirmVisible}
+        onYesClick={onYesClick}
+        onNoClick={() => setConfirmVisible(false)}
+        hasOverlay={false}
+      />
     </nav>
   );
 };

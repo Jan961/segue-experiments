@@ -19,7 +19,7 @@ export type TForm = {
 };
 
 export type BookingItem = {
-  map(arg0: (item: any) => any): unknown;
+  id?: string;
   date: string | Date;
   dateBlockId: number;
   dateAsISOString: string;
@@ -34,6 +34,7 @@ export type BookingItem = {
   isBooking: boolean;
   isRehearsal: boolean;
   isGetInFitUp: boolean;
+  runTag?: string;
 };
 
 export type PreviewDataItem = {

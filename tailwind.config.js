@@ -32,6 +32,9 @@ const colorsConfig = {
   'secondary-list-row-hover': '#464646b3',
   'secondary-list-row-active': '#707070',
   'primary-label': '#21345BCC',
+  'secondary-green': '#10841C',
+  'secondary-yellow': '#FFE606',
+  'secondary-red': '#ED1111',
   primary: '#082B4B',
   secondary: '#617293',
 };

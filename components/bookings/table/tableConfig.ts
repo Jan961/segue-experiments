@@ -3,8 +3,6 @@ import NoteColumnRenderer from './NoteColumnRenderer';
 import DateColumnRenderer from './DateColumnRenderer';
 import DefaultCellRenderer from './DefaultCellRenderer';
 import VenueColumnRenderer from './VenueColumnRenderer';
-import TableTooltip from 'components/core-ui-lib/Table/TableTooltip';
-import { ITooltipParams } from 'ag-grid-community';
 import SelectableColumnRenderer from './SelectableColumnRenderer';
 import SelectBookingStatusRenderer from './SelectBookingStatusRenderer';
 import SelectDayTypeRender from './SelectDayTypeRender';
@@ -12,7 +10,7 @@ import NoPerfRenderer from './NoPerfRenderer';
 import SelectVenueRenderer from './SelectVenueRenderer';
 import SelectPencilRenderer from './SelectPencilRenderer';
 import CheckPerfRenderer from './CheckPerfRenderer';
-import TimeArrayRenderer from './TimeArrayRenderer';
+import PerformanceTimesRenderer from './PerformanceTimesRenderer';
 import IconRenderer from './IconRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
@@ -22,9 +20,9 @@ export const styleProps = { headerColor: tileColors.bookings };
 
 const milesFormatter = (params) => (params.value === -1 ? 'No Data' : params.value);
 const travelTimeFormatter = (params) => (params.value === -1 ? 'No Data' : formatMinutes(Number(params.value)));
-const milesCellStyle = ({ value, data }) => ({
+const milesCellStyle = ({ value, data, node }) => ({
   paddingLeft: '0.5rem',
-  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : '#FFF',
+  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : node?.rowStyle?.backgroundColor,
   color: value === -1 ? '#FFBE43' : '#617293',
   fontStyle: value === -1 ? 'italic' : 'normal',
 });
@@ -44,7 +42,7 @@ export const columnDefs = [
     minWidth: 120,
   },
   { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 256, flex: 2 },
+  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 6, flex: 2 },
   { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
   { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
   {
@@ -75,16 +73,16 @@ export const columnDefs = [
     headerName: '',
     field: 'note',
     cellRenderer: NoteColumnRenderer,
+    cellRendererParams: {
+      tpActive: true,
+    },
     resizable: false,
     width: 50,
-    tooltipValueGetter: (params: ITooltipParams) =>
-      params.data.venue && params.data.dayType && (params.value ? 'View Notes' : 'No Notes'),
-    tooltipComponentParams: { left: '-2.5rem' },
-    tooltipComponent: TableTooltip,
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
+      overflow: 'visible',
     },
   },
 ];
@@ -150,9 +148,9 @@ export const bookingConflictsColumnDefs = [
 ];
 
 export const barringIssueColumnDefs = [
-  { headerName: 'Venue', field: 'Name', cellRenderer: DefaultCellRenderer, flex: 1 },
+  { headerName: 'Venue', field: 'name', cellRenderer: DefaultCellRenderer, flex: 1 },
   { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 110 },
-  { headerName: 'Miles', field: 'Mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
+  { headerName: 'Miles', field: 'mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
 export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
@@ -212,7 +210,7 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     headerName: 'Times',
     field: 'times',
     wrapText: true,
-    cellRenderer: TimeArrayRenderer,
+    cellRenderer: PerformanceTimesRenderer,
     width: 102,
     maxWidth: 102,
     cellStyle: {
@@ -250,6 +248,9 @@ export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => 
     headerName: 'Notes',
     field: 'notes',
     cellRenderer: NoteColumnRenderer,
+    cellRendererParams: {
+      tpActive: false,
+    },
     resizable: false,
     width: 85,
     maxWidth: 85,
@@ -303,17 +304,17 @@ export const tourSummaryColumnDefs = [
 ];
 
 export const barredVenueColumnDefs = [
-  { headerName: 'Venue', field: 'Name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
+  { headerName: 'Venue', field: 'name', cellRenderer: SelectableColumnRenderer, flex: 1, headerClass: 'text-center' },
   {
     headerName: 'Date',
-    field: 'FormattedDate',
+    field: 'formattedDate',
     cellRenderer: DefaultCellRenderer,
     width: 80,
     headerClass: 'text-center',
   },
   {
     headerName: 'Miles',
-    field: 'Mileage',
+    field: 'mileage',
     cellRenderer: DefaultCellRenderer,
     width: 80,
     headerClass: 'text-center',
@@ -322,8 +323,6 @@ export const barredVenueColumnDefs = [
     headerName: '',
     field: 'info',
     cellRenderer: IconRenderer,
-    tooltipComponentParams: { color: '#ffffff', backgroundColor: '#617293' },
-    tooltipValueGetter: (props) => props?.data?.info,
     cellRendererParams: {
       iconName: 'info-circle-solid',
       tooltipPosition: 'left',

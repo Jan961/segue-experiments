@@ -19,21 +19,25 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import CheckMileageView from './views/CheckMileageView';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { bookingState } from 'state/booking/bookingState';
-import useAxios from 'hooks/useAxios';
-import { BarredVenue } from 'pages/api/productions/venue/barred';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
+import { rowsSelector } from 'state/booking/selectors/rowsSelector';
+import axios from 'axios';
+import { nanoid } from 'nanoid';
+import { isNullOrEmpty } from 'utils';
+import { BookingRow } from 'types/BookingTypes';
 
 type AddBookingProps = {
   visible: boolean;
   onClose: (bookings?: any) => void;
   startDate?: string;
   endDate?: string;
+  booking?: BookingRow;
 };
 
-const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) => {
-  const { fetchData, data } = useAxios();
-
+const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookingProps) => {
   const bookingDict = useRecoilValue(bookingState);
+  const { rows: bookings } = useRecoilValue(rowsSelector);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [hasOverlay, setHasOverlay] = useState<boolean>(false);
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE, () => ({
@@ -45,12 +49,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     },
   }));
 
-  useEffect(() => {
-    if (data) {
-      onClose(data);
-    }
-  }, [data]);
-
+  const editBooking = !!booking;
   const currentProduction = useRecoilValue(currentProductionSelector);
   const { scheduleDateBlocks } = useRecoilValue(dateBlockSelector);
   const primaryBlock = scheduleDateBlocks?.find(({ IsPrimary }) => !!IsPrimary);
@@ -97,12 +96,87 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
-  const handleSaveNewBooking = () => {
-    fetchData({
-      url: '/api/bookings/add',
-      method: 'POST',
-      data: state.booking,
-    });
+  useEffect(() => {
+    if (booking) {
+      // Check for run of dates
+      const runOfDates = bookings.filter(({ runTag }) => runTag === booking.runTag);
+
+      if (runOfDates.length > 1) {
+        onFormDataChange({ isRunOfDates: true });
+      }
+      const bookingsToEdit = isNullOrEmpty(runOfDates) ? [booking] : runOfDates;
+      // format booking and set on state
+      const formattedBooking: BookingItem[] = bookingsToEdit.map((b: BookingRow) => {
+        return {
+          id: b.Id,
+          date: b.date,
+          dateAsISOString: b.dateTime,
+          dateBlockId: primaryBlock?.Id,
+          dayType: dayTypeOptions.find((option) => option.text === b.dayType)?.value,
+          venue: b.venueId,
+          perf: b.dayType === 'Performance',
+          bookingStatus: b.status,
+          notes: b.note,
+          noPerf: b.performanceCount,
+          times: b.performanceTimes,
+          pencilNo: b.count,
+          isBooking: b.dayType === 'Performance',
+          isRehearsal: b.dayType === 'Rehearsal',
+          isGetInFitUp: b.dayType === 'Get in / Fit Up',
+          isRunOfDates: runOfDates.length > 1,
+        };
+      });
+      dispatch(actionSpreader(Actions.UPDATE_BOOKING, formattedBooking));
+    }
+  }, [booking]);
+
+  const saveNewBooking = async () => {
+    const runTagForRunOfDates = nanoid(8);
+    try {
+      const bookingsWithRunTag = state.booking.map((b) => ({
+        ...b,
+        runTag: state.form.isRunOfDates ? runTagForRunOfDates : nanoid(8),
+      }));
+      const { data } = await axios.post('/api/bookings/add', bookingsWithRunTag);
+      onClose(data);
+    } catch (e) {
+      console.log('Failed to add new booking', e);
+    }
+  };
+
+  const deleteBooking = async () => {
+    try {
+      const { data } = await axios.post('/api/bookings/delete', state.booking);
+      onClose(data);
+    } catch (e) {
+      console.log('Failed to delete booking', e);
+    }
+  };
+
+  const updateBooking = async () => {
+    const bookingsToUpdate = state.booking.filter(({ id }) => !Number.isNaN(id));
+    let bookingsToCreate = state.booking.filter(({ id }) => Number.isNaN(id));
+    let result = null;
+    try {
+      const { data: updated } = await axios.post('/api/bookings/update', bookingsToUpdate);
+      result = updated;
+      if (!isNullOrEmpty(bookingsToCreate)) {
+        const runTagForRunOfDates = nanoid(8);
+        bookingsToCreate = bookingsToUpdate.map((b) => ({
+          ...b,
+          runTag: runTagForRunOfDates,
+        }));
+        const { data: created } = await axios.post('/api/bookings/add', bookingsToCreate);
+        result = { ...result, created };
+      }
+      onClose(result);
+    } catch (e) {
+      console.log('Failed to update booking', e);
+    }
+  };
+
+  const handleSaveBooking = async () => {
+    editBooking ? updateBooking() : saveNewBooking();
   };
 
   return (
@@ -115,29 +189,22 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
       hasOverlay={hasOverlay}
     >
       <Wizard wrapper={<AnimatePresence initial={false} mode="wait" />}>
-        <NewBookingView
-          updateBookingConflicts={updateBookingConflicts}
-          updateBarringConflicts={updateBarringConflicts}
-          dayTypeOptions={dayTypeOptions}
-          onChange={onFormDataChange}
-          onSubmit={setNewBookingOnStore}
-          formData={state.form}
-          onClose={onClose}
-          productionCode={productionCode}
-          venueOptions={venueOptions}
-          updateModalTitle={updateModalTitle}
-        />
-        <BookingConflictsView
-          hasBarringIssues={state?.barringConflicts?.length > 0}
-          data={state.bookingConflicts}
-          updateModalTitle={updateModalTitle}
-        />
-        <BarringIssueView
-          bookingConflicts={state.bookingConflicts}
-          barringConflicts={state.barringConflicts}
-          updateModalTitle={updateModalTitle}
-        />
+        {!editBooking && (
+          <NewBookingView
+            updateBookingConflicts={updateBookingConflicts}
+            updateBarringConflicts={updateBarringConflicts}
+            dayTypeOptions={dayTypeOptions}
+            onChange={onFormDataChange}
+            onSubmit={setNewBookingOnStore}
+            formData={state.form}
+            onClose={onClose}
+            productionCode={productionCode}
+            venueOptions={venueOptions}
+            updateModalTitle={updateModalTitle}
+          />
+        )}
         <NewBookingDetailsView
+          isNewBooking={!editBooking}
           formData={state.form}
           data={state.booking}
           production={currentProduction}
@@ -147,6 +214,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           onSubmit={setNewBookingOnStore}
           toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
           onClose={onClose}
+          onDelete={deleteBooking}
           updateModalTitle={updateModalTitle}
         />
         <PreviewNewBookingView
@@ -154,10 +222,12 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           productionCode={productionCode}
           data={state.booking}
           dayTypeOptions={dayTypeOptions}
-          onSaveBooking={handleSaveNewBooking}
+          onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}
+          isNewBooking={!editBooking}
         />
         <CheckMileageView
+          isNewBooking={!editBooking}
           formData={state.form}
           productionCode={productionCode}
           data={state.booking}
@@ -165,12 +235,24 @@ const AddBooking = ({ visible, onClose, startDate, endDate }: AddBookingProps) =
           updateModalTitle={updateModalTitle}
           previousView={state.modalTitle}
         />
-        <GapSuggestionView
-          productionId={currentProduction?.Id}
-          startDate={state.form.fromDate}
-          endDate={state.form.toDate}
+        <BookingConflictsView
+          hasBarringIssues={state?.barringConflicts?.length > 0}
+          data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}
         />
+        <BarringIssueView
+          isNewBooking={!editBooking}
+          barringConflicts={state.barringConflicts}
+          updateModalTitle={updateModalTitle}
+        />
+        {!editBooking && (
+          <GapSuggestionView
+            productionId={currentProduction?.Id}
+            startDate={state.form.fromDate}
+            endDate={state.form.toDate}
+            updateModalTitle={updateModalTitle}
+          />
+        )}
       </Wizard>
       <ConfirmationDialog
         variant="close"
