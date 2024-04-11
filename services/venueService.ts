@@ -1,4 +1,4 @@
-import { VenueVenue } from '@prisma/client';
+import { Venue, VenueAddress, VenueVenue } from '@prisma/client';
 import prisma from 'lib/prisma';
 
 export const getAllVenuesMin = async () => {
@@ -140,4 +140,25 @@ export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO>
 
   const { Venue1Id, TimeMins, Mileage } = distance[0];
   return { Date: stop.Date, option: [{ VenueId: Venue1Id, Mins: TimeMins, Miles: Mileage }] };
+};
+
+export const getAllVenueFamilyList = () => {
+  return prisma.VenueFamily.findMany({
+    orderBy: {
+      Name: 'asc',
+    },
+  });
+};
+
+export const createVenue = async (venue: Partial<Venue>, addresses: Partial<VenueAddress>[]) => {
+  return prisma.venue.create({
+    data: {
+      ...venue,
+      ...(addresses && {
+        VenueAddress: {
+          create: addresses,
+        },
+      }),
+    },
+  });
 };

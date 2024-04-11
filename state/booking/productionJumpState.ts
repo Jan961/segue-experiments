@@ -9,7 +9,7 @@ export interface ProductionJump {
   path?: string;
 }
 
-const intialState: ProductionJump = {
+export const intialState: ProductionJump = {
   productions: [],
   loading: false,
   includeArchived: false,
