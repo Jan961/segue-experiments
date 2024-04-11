@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import Button from 'components/core-ui-lib/Button';
 import { SalesTable } from 'types/MarketingTypes';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
 import Icon from 'components/core-ui-lib/Icon';
+import TabButton from 'components/core-ui-lib/TabButton';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTable>('');
@@ -14,14 +14,14 @@ const MarketingHome = () => {
   return (
     <div className="flex w-full h-full">
       {/* Green Box */}
-      <div className="bg-primary-green/[0.15] w-[291px] h-[788px] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5">
+      <div className="bg-primary-green/[0.15] w-[291px] h-[788px] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5 -mt-5">
         <div className="flex-grow overflow-y-auto">
           <Summary />
         </div>
-        <div className="flex flex-col border-y-2 border-t-primary-navy border-b-0 py-4 mt-4">
+        <div className="flex flex-col border-y-2 border-t-primary-input-text border-b-0 py-4 mt-4">
           <div className="flex items-center text-primary-navy">
             <Icon iconName={'user-solid'} variant="sm" />
-            <div className="ml-4 bg-secondary-green text-primary-white px-1">Down to single seat</div>
+            <div className="ml-4 bg-secondary-green text-primary-white px-1">Down to single seats</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
             <Icon iconName={'book-solid'} variant="sm" />
@@ -35,51 +35,51 @@ const MarketingHome = () => {
       </div>
 
       <div className="flex-grow flex flex-col">
-        <div className="flex flex-wrap items-center mb-4">
+        <div className="flex flex-wrap items-center mb-4 -mt-5">
           {' '}
-          <Button
+          <TabButton
             text="Sales"
             className={`w-[155px] ${currView === 'sales' && selectedBtnClass}`}
             disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('sales')}
           />
-          <Button
+          <TabButton
             text="Archived Sales"
             className={`w-[155px] ${currView === 'archived sales' && selectedBtnClass}`}
             disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('archived sales')}
           />
-          <Button
+          <TabButton
             text="Activities"
             className={`w-[155px] ${currView === 'activities' && selectedBtnClass}`}
             disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('activities')}
           />
-          <Button
+          <TabButton
             text="Contact Notes"
             className={`w-[155px] ${currView === 'contact notes' && selectedBtnClass}`}
             disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('contact notes')}
           />
-          <Button
+          <TabButton
             text="Venue Contacts"
             className={`w-[155px] ${currView === 'venue contacts' && selectedBtnClass}`}
             disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('venue contacts')}
           />
-          <Button
+          <TabButton
             text="Promoter Holds"
             className={`w-[155px] ${currView === 'promoter holds' && selectedBtnClass}`}
             disabled={!productionId}
             variant="secondary"
             onClick={() => setCurrView('promoter holds')}
           />
-          <Button
+          <TabButton
             text="Attachments"
             className={`w-[155px] ${currView === 'attachments' && selectedBtnClass}`}
             disabled={!productionId}

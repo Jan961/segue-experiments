@@ -15,26 +15,23 @@ const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
-  const [venueUrl, setVenueUrl] = useState('');
   const today = formatInputDate(new Date());
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedValue, setSelectedValue] = useState(null);
   const [venueName, setVenueName] = useState('');
   const [venueId, setVenueId] = useState(0);
-  const bookingOptions = useMemo(
-    () => (bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : []),
-    [bookings],
-  );
+  const [venueUrl, setVenueUrl] = useState('');
+  const bookingOptions = useMemo(() => {
+    const options = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+    options.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return options;
+  }, [bookings]);
 
   useEffect(() => {
-    setSelectedIndex(-1);
-    setSelectedValue(0);
+    if (bookings.selected !== null) {
+      changeBooking(bookings.selected.toString());
+    }
   }, [bookings.bookings]);
-
-  const todayOnSchedule = useMemo(() => {
-    const todaysBookings = bookingOptions.filter((booking) => booking.date === today);
-    return todaysBookings.length !== 0;
-  }, [bookingOptions, today]);
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {
@@ -49,12 +46,34 @@ const Filters = () => {
       setVenueId(booking.Venue.Id);
       setVenueUrl(website);
       setBooking({ ...bookings, selected: bookingIdentifier });
+    } else {
+      setSelectedIndex(-1);
+      setSelectedValue(0);
+      setBooking({ ...bookings, selected: null });
     }
   };
 
+  const parseDate = (inputDt) => {
+    const splitStrDt = inputDt.split('/');
+    const isoDate = splitStrDt[2] + '/' + splitStrDt[1] + '/' + splitStrDt[0];
+    return new Date(isoDate).getTime();
+  };
+
+  const futureBookings = () => {
+    return bookingOptions
+      .map((booking) => ({
+        ...booking,
+        parsedDate: parseDate(booking.date),
+      }))
+      .filter((booking) => booking.parsedDate >= parseDate(today))
+      .sort((a, b) => a.parsedDate - b.parsedDate);
+  };
+
   const goToToday = () => {
-    const todaysBooking = bookingOptions.find((booking) => booking.date === today);
-    changeBooking(todaysBooking.value);
+    const bookings = futureBookings();
+    if (bookings.length > 0) {
+      changeBooking(bookings[0].value);
+    }
   };
 
   const goToPrevious = () => {
@@ -71,7 +90,7 @@ const Filters = () => {
 
   return (
     <div className="w-full flex items-end justify-between flex-wrap">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col mb-4">
         <GlobalToolbar
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
@@ -79,7 +98,7 @@ const Filters = () => {
           title={'Marketing'}
         />
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mt-1">
           <Select
             onChange={changeBooking}
             value={selectedValue}
@@ -87,11 +106,13 @@ const Filters = () => {
             placeholder="Select a Venue/Date"
             className="bg-white w-[550px]"
             options={bookingOptions}
+            isClearable
+            isSearchable
           />
 
           <Button
             text="Go To Today"
-            disabled={!todayOnSchedule || !productionId}
+            disabled={futureBookings().length === 0 || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />
@@ -110,7 +131,7 @@ const Filters = () => {
 
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className="self-end -mt-[60px]">
-            <Iframe variant="xs" src={venueUrl} />
+            <Iframe variant="xs" src={venueUrl} className="" />
           </div>
         </div>
       </div>
