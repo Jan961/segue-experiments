@@ -106,18 +106,13 @@ export default function SalesTable({
 
   return (
     <div className={classNames(containerWidth, containerHeight)}>
-      <div>
-        <Table
-          columnDefs={columnDefs}
-          rowData={rowData}
-          styleProps={styleProps}
-          onCellClicked={onCellClick}
-          onCellValueChange={onCellValChange}
-          gridOptions={{
-            alwaysShowHorizontalScroll: false,
-          }}
-        />
-      </div>
+      <Table
+        columnDefs={columnDefs}
+        rowData={rowData}
+        styleProps={styleProps}
+        onCellClicked={onCellClick}
+        onCellValueChange={onCellValChange}
+      />
     </div>
   );
 }

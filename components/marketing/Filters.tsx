@@ -36,16 +36,13 @@ const Filters = () => {
   useEffect(() => {
     if (bookings.selected !== null && bookings.selected !== undefined) {
       changeBooking(bookings.selected.toString());
+    } else {
+      changeBooking(null);
     }
   }, [bookings.bookings]);
 
   useEffect(() => {
-    const futureBookings = bookingOptions
-      .map((booking) => ({
-        ...booking,
-        parsedDate: parseDate(booking.date),
-      }))
-      .filter((booking) => booking.parsedDate >= parseDate(today));
+    const futureBookings = bookingOptions.filter((booking) => parseDate(booking.date) >= parseDate(today));
 
     setFutureBookings({
       hasFutureBooking: futureBookings.length > 0,

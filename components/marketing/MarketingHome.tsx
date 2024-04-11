@@ -42,22 +42,30 @@ const MarketingHome = () => {
       setCurrView('');
       setBookingId(bookings[0].selected);
     }
-  }, [bookings, bookingId]);
+  }, [bookings]);
 
   useEffect(() => {
     if (bookingId) {
       getSales(bookingId.toString());
     }
-  }, [bookingId, getSales]);
+  }, [bookingId]);
+
+  // blocks all default scrolling functionality so top/side bar are fixed
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
 
   return (
     <div className="flex w-full h-full">
       {/* Green Box */}
-      <div className="bg-primary-green/[0.15] w-[291px] h-[788px] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5 -mt-5">
+      <div className="bg-primary-green/[0.15] w-[291px] h-[690PX] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5 -mt-5">
         <div className="flex-grow overflow-y-auto">
           <Summary />
         </div>
-        <div className="flex flex-col border-y-2 border-t-primary-input-text border-b-0 py-4 mt-4">
+        <div className="flex flex-col border-y-2 border-t-primary-input-text border-b-0 py-4 -mb-3.5">
           <div className="flex items-center text-primary-navy">
             <Icon iconName={'user-solid'} variant="sm" />
             <div className="ml-4 bg-secondary-green text-primary-white px-1">Down to single seats</div>
@@ -127,7 +135,7 @@ const MarketingHome = () => {
           />
         </div>
 
-        <div className="flex-grow">
+        <div className="h-[650px] overflow-y-hidden">
           {currView === 'sales' && (
             <div>
               {sales.length !== 0 && (

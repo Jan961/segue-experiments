@@ -278,7 +278,7 @@ export const salesColDefs = (currencySymbol) => {
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
             if (params.data.saleType === 'school') {
-              return currencySymbol + params.data.totalValue.toFixed(2);
+              return params.data.totalValue !== '' ? currencySymbol + params.data.totalValue.toFixed(2) : '-';
             } else {
               return '-';
             }
@@ -340,8 +340,9 @@ export const salesColDefs = (currencySymbol) => {
       field: 'totalValue',
       cellRenderer: function (params) {
         const currReserveValue = params.data.reservations === '' ? 0 : parseFloat(params.data.reservations);
-        const currentValue = params.data.totalValue + currReserveValue;
-        return currencySymbol + currentValue.toFixed(2).toString();
+        const totalVal = params.data.totalValue === '' ? 0 : params.data.totalValue;
+        const currentValue = currReserveValue + totalVal;
+        return currentValue === 0 ? '-' : currencySymbol + currentValue.toFixed(2).toString();
       },
       width: 75,
       cellStyle: {
@@ -370,12 +371,14 @@ export const salesColDefs = (currencySymbol) => {
           valueChange = currentValue - previousTotalValue;
         }
 
-        // if negative display the minus sign before the currencySymbol
-        if (valueChange < 0) {
-          return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
-        } else {
-          return currencySymbol + valueChange.toFixed(2).toString();
-        }
+        console.log(valueChange);
+
+        // // if negative display the minus sign before the currencySymbol
+        // if (valueChange < 0) {
+        //   return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
+        // } else {
+        //   return currencySymbol + valueChange.toFixed(2).toString();
+        // }
       },
       width: 85,
       cellStyle: {
@@ -392,7 +395,6 @@ export const salesColDefs = (currencySymbol) => {
       field: 'seatsChange',
       cellRenderer: function (params) {
         const rowIndex = params.node.rowIndex;
-        console.log(params.data);
         const seatsSold = parseInt(params.data.seatsSold);
         const reserved = params.data.reserved === '' ? 0 : parseInt(params.data.reserved);
         const currentValue = seatsSold + reserved;

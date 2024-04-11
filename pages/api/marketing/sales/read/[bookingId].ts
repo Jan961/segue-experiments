@@ -33,7 +33,6 @@ export default async function handle(req, res) {
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
-    console.log(access);
     if (!access) return res.status(401).end();
 
     const data =
@@ -77,12 +76,12 @@ export default async function handle(req, res) {
         [key]: {
           week: sale.SetBookingWeekNum ? `Week ${sale.SetBookingWeekNum}` : '',
           weekOf: sale.SetSalesFiguresDate,
-          seatsSold: parseInt(sale.Seats) || 0,
+          seatsSold: '',
           seatsSaleChange: '',
           reservations: '',
           reserved: '',
           venueCurrencySymbol: sale.VenueCurrencySymbol,
-          totalValue: parseFloat(sale.Value) || 0,
+          totalValue: '',
           valueChange: '',
           totalHolds: sale.TotalHoldSeats,
           seatsChange: '',
