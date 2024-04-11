@@ -69,7 +69,6 @@ const MainVenueForm = ({
           value={formData.venueStatus}
           placeholder="<Venue Status DROPDOWN>"
           className="w-[430px] font-bold place-self-end "
-          error={validationErrors.venueStatus}
         />
         {validationErrors.venueStatus && (
           <small className="text-primary-red justify-end">{validationErrors.venueStatus}</small>

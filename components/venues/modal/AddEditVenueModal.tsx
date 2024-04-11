@@ -58,10 +58,6 @@ export default function AddEditVenueModal({
     }
   };
 
-  // const onAddNewVenueContact = () => {
-  //   console.log('Adding new venue is in Progress	');
-  // };
-
   async function validateVenue(data) {
     return schema
       .validate(
