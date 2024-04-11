@@ -77,13 +77,18 @@ class BookingHelper {
 
   getInFitUpDetails(gifu: GetInFitUpDTO) {
     const { VenueId, RunTag: runTag } = gifu;
-    const venue = this.venueDict[VenueId];
-    return {
+    const gifuDetails = {
       Id: gifu?.Id,
-      venue: venue.Name,
-      town: venue.Town,
       runTag,
+      venue: '',
+      town: '',
     };
+    if (VenueId) {
+      const venue = this.venueDict[VenueId];
+      gifuDetails.venue = venue.Name;
+      gifuDetails.town = venue.Town;
+    }
+    return gifuDetails;
   }
 
   getRangeFromDateBlocks(dateBlocks: DateBlockDTO[]): { start: string; end: string } {

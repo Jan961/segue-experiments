@@ -1,6 +1,7 @@
-import { Booking, Prisma } from '@prisma/client';
+import { Booking, GetInFitUp, Prisma } from '@prisma/client';
 import { addDays, differenceInDays } from 'date-fns';
 import prisma from 'lib/prisma';
+import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
 
 const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
@@ -42,6 +43,15 @@ export const updateBooking = async (booking: Booking, performances) => {
     }
   });
   return { ...updatedBooking, ...updatedPerformances };
+};
+
+export const updateGetInFitUp = async (booking: GetInFitUp) => {
+  await prisma.getInFitUp.update({
+    data: omit(booking, ['Id']),
+    where: {
+      Id: booking.Id,
+    },
+  });
 };
 
 export const deleteBookingById = async (id: number) => {
@@ -280,11 +290,13 @@ export const createGetInFitUp = (
           Id: DateBlockId,
         },
       },
-      Venue: {
-        connect: {
-          Id: VenueId,
-        },
-      },
+      Venue: VenueId
+        ? {
+            connect: {
+              Id: VenueId,
+            },
+          }
+        : undefined,
     },
   });
 };
