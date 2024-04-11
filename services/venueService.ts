@@ -1,4 +1,4 @@
-import { Venue, VenueVenue } from '@prisma/client';
+import { Venue, VenueAddress, VenueVenue } from '@prisma/client';
 import prisma from 'lib/prisma';
 
 export const getAllVenuesMin = async () => {
@@ -150,8 +150,15 @@ export const getAllVenueFamilyList = () => {
   });
 };
 
-export const createVenue = async (venue: Partial<Venue>) => {
+export const createVenue = async (venue: Partial<Venue>, addresses: Partial<VenueAddress>[]) => {
   return prisma.venue.create({
-    data: venue,
+    data: {
+      ...venue,
+      ...(addresses && {
+        VenueAddress: {
+          create: addresses,
+        },
+      }),
+    },
   });
 };

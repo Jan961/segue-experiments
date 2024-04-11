@@ -1,7 +1,4 @@
-import Checkbox from 'components/core-ui-lib/Checkbox';
-import Icon from 'components/core-ui-lib/Icon';
 import TextInput from 'components/core-ui-lib/TextInput';
-import Tooltip from 'components/core-ui-lib/Tooltip';
 import { initialVenueAddressDetails } from 'config/Venue';
 import { useState } from 'react';
 
@@ -185,17 +182,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
             onChange={(e) => handleInputChange('deliveryCountry', e.target.value)}
           />
         </label>
-        <div className="flex flex-row items-center gap-4 justify-end ">
-          <p className="text-primary-input-text">Exclude from Barring Check and Venue Gap Suggestions</p>
-          <Tooltip
-            width="w-[200px]"
-            body="Selected venues will be excluded from Venue Gap Suggestions and Barring Checks. Selecting this check box will include this venue in that exclusion. This exclusion can be unselected when running the Suggestions or Barring Checks."
-            position="right"
-          >
-            <Icon iconName="info-circle-solid" />
-          </Tooltip>
-          <Checkbox id={'excludeFromChecks'} onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)} />
-        </div>
       </div>
     </>
   );

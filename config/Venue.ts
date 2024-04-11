@@ -144,6 +144,7 @@ export const initialMainVenueDetails = {
   townPopulation: null,
   venueWebsite: '',
   notes: '',
+  excludeFromChecks: false,
 };
 
 export const initialVenueAddressDetails = {
@@ -174,7 +175,7 @@ export const initialVenueBarringRules = {
 export const initialVenueTechnicalDetails = {
   flags: '',
   gridHeight: '',
-  soundLXNotes: '',
+  soundNotes: '',
   soundDesk: '',
   stageSize: '',
   techLXNotes: '',
@@ -187,7 +188,6 @@ export const initialVenueState = {
   ...initialVenueAddressDetails,
   ...initialVenueBarringRules,
   ...initialVenueTechnicalDetails,
-
   confidentialNotes: '',
 };
 

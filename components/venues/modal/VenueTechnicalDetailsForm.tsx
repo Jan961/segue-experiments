@@ -5,9 +5,10 @@ import { initialVenueTechnicalDetails } from 'config/Venue';
 import { useState } from 'react';
 
 type VenueTechnicalDetailsFormProps = {
+  validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
 };
-const VenueTechnicalDetailsForm = ({ onChange }: VenueTechnicalDetailsFormProps) => {
+const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState(initialVenueTechnicalDetails);
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
@@ -20,23 +21,26 @@ const VenueTechnicalDetailsForm = ({ onChange }: VenueTechnicalDetailsFormProps)
   return (
     <>
       <div className="flex flex-row  justify-between">
-        <label htmlFor="" className="flex flex-row gap-10 justify-between  w-[700px]">
-          <p className="text-primary-input-text">Tech Specs URL</p>
-          <TextInput
-            placeholder="Enter Tech Specs URL"
-            type=""
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.techSpecsUrl}
-            onChange={(e) => handleInputChange('techSpecUrl', e.target.value)}
-          />
-        </label>
+        <div className="flex flex-col">
+          <label htmlFor="" className="flex flex-row gap-10 justify-between  w-[700px]">
+            <p className="text-primary-input-text">Tech Specs URL</p>
+            <TextInput
+              placeholder="Enter Tech Specs URL"
+              type=""
+              className="w-full justify-between"
+              inputClassName="w-full"
+              value={formData.techSpecsUrl}
+              onChange={(e) => handleInputChange('techSpecsUrl', e.target.value)}
+            />
+          </label>
+          {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
+        </div>
         <Button text="Upload Venue Tech Spec" />
       </div>
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <p className="text-primary-input-text">Tech LX Desk</p>
+            <p className="text-primary-input-text">LX Desk</p>
             <TextInput
               placeholder="Enter Tech LX Desk"
               type=""
@@ -81,13 +85,13 @@ const VenueTechnicalDetailsForm = ({ onChange }: VenueTechnicalDetailsFormProps)
             />
           </label>
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <p className="text-primary-input-text">LX Notes</p>
+            <p className="text-primary-input-text">Sound Notes</p>
             <TextArea
-              id="soundLXNotes"
+              id="soundNotes"
               placeholder="Notes Field"
               className="!w-[380px] max-h-40 min-h-[50px]  justify-between"
-              value={formData.soundLXNotes}
-              onChange={(e) => handleInputChange('soundLXNotes', e.target.value)}
+              value={formData.soundNotes}
+              onChange={(e) => handleInputChange('soundNotes', e.target.value)}
             />
           </label>
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
