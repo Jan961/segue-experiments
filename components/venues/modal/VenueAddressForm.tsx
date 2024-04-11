@@ -2,9 +2,9 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/Venue';
 import { useState } from 'react';
 
-type VenueAddressFormProps = {
+interface VenueAddressFormProps {
   onChange: (data: any) => void;
-};
+}
 const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
   const [formData, setFormData] = useState(initialVenueAddressDetails);
   const handleInputChange = (field: string, value: any) => {
@@ -27,7 +27,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className=" text-primary-input-text">Address 1</p>
           <TextInput
             placeholder="Enter Address 1"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryAddress1}
@@ -38,7 +37,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Address 2</p>
           <TextInput
             placeholder="Enter Address 2"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryAddress2}
@@ -49,7 +47,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Address 3</p>
           <TextInput
             placeholder="Enter Address 3"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryAddress3}
@@ -60,7 +57,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Town</p>
           <TextInput
             placeholder="Enter Town"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryTown}
@@ -71,7 +67,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Postcode</p>
           <TextInput
             placeholder="Enter Postcode"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryPostCode}
@@ -83,7 +78,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Country</p>
           <TextInput
             placeholder="Enter Country"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.primaryCountry}
@@ -94,7 +88,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">What3Words Stage Door</p>
           <TextInput
             placeholder="what.three.words"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.what3WordsStage}
@@ -105,7 +98,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">What3Words Loading</p>
           <TextInput
             placeholder="what.three.words"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.what3WordsLoading}
@@ -119,7 +111,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Address 1</p>
           <TextInput
             placeholder="Enter Address 1"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryAddress1}
@@ -130,7 +121,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Address 2</p>
           <TextInput
             placeholder="Enter Address 2"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryAddress2}
@@ -141,7 +131,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Address 3</p>
           <TextInput
             placeholder="Enter Address 3"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryAddress3}
@@ -152,7 +141,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Town</p>
           <TextInput
             placeholder="Enter Town"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryTown}
@@ -163,7 +151,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Postcode</p>
           <TextInput
             placeholder="Enter Postcode"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryPostCode}
@@ -175,7 +162,6 @@ const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
           <p className="text-primary-input-text">Country</p>
           <TextInput
             placeholder="Enter Country"
-            type=""
             className="w-full justify-between"
             inputClassName="w-full"
             value={formData.deliveryCountry}

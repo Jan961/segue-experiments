@@ -3,11 +3,13 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueBarringRules } from 'config/Venue';
 import { useState } from 'react';
 
-type VenueBarringFormProps = {
-  onChange: (data: any) => void;
+interface VenueBarringFormProps {
   validationErrors?: Record<string, string>;
-};
-const VenueBarringForm = ({ onChange, validationErrors }: VenueBarringFormProps) => {
+  onChange: (data: any) => void;
+  updateValidationErrrors?: (key: string, value: string) => void;
+}
+
+const VenueBarringForm = ({ onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
   const [formData, setFormData] = useState(initialVenueBarringRules);
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
@@ -16,6 +18,9 @@ const VenueBarringForm = ({ onChange, validationErrors }: VenueBarringFormProps)
     };
     setFormData(updatedFormData);
     onChange(updatedFormData);
+    if (validationErrors?.[field]) {
+      updateValidationErrrors(field, null);
+    }
   };
   // const addNewBarredVenue = () => {
   //   console.log('Adding new venue is in Progress	');

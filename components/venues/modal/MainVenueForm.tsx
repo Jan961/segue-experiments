@@ -8,17 +8,19 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 import { initialMainVenueDetails, venueStatusOptions } from 'config/Venue';
 import { useState } from 'react';
 
-type MainVenueFormProps = {
+interface MainVenueFormProps {
   onChange: (data: any) => void;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   validationErrors?: Record<string, string>;
-};
+  updateValidationErrrors?: (key: string, value: string) => void;
+}
 const MainVenueForm = ({
   onChange,
   venueCurrencyOptionList,
   venueFamilyOptionList,
   validationErrors,
+  updateValidationErrrors,
 }: MainVenueFormProps) => {
   const [formData, setFormData] = useState(initialMainVenueDetails);
   const handleInputChange = (field: string, value: any) => {
@@ -32,6 +34,9 @@ const MainVenueForm = ({
     };
     setFormData(updatedFormData);
     onChange(updatedFormData);
+    if (validationErrors?.[field]) {
+      updateValidationErrrors(field, null);
+    }
   };
   return (
     <>
@@ -68,10 +73,12 @@ const MainVenueForm = ({
           onChange={(value) => handleInputChange('venueStatus', value)}
           value={formData.venueStatus}
           placeholder="<Venue Status DROPDOWN>"
-          className="w-[430px] font-bold place-self-end "
+          className="w-[430px] font-bold place-self-end"
         />
         {validationErrors.venueStatus && (
-          <small className="text-primary-red justify-end">{validationErrors.venueStatus}</small>
+          <small className="text-primary-red justify-end w-[430px] place-self-end">
+            {validationErrors.venueStatus}
+          </small>
         )}
       </div>
       <div className="flex flex-col">
@@ -79,7 +86,6 @@ const MainVenueForm = ({
           <p className="text-primary-input-text">Venue Name</p>
           <TextInput
             placeholder="Enter Venue Name"
-            type=""
             className="w-[364px]"
             value={formData.venueName}
             onChange={(e) => handleInputChange('venueName', e.target.value)}
@@ -159,7 +165,6 @@ const MainVenueForm = ({
         <p className="text-primary-input-text">Website</p>
         <TextInput
           placeholder="Enter Venue Website"
-          type=""
           className="w-full justify-between"
           inputClassName="w-full"
           value={formData.venueWebsite}

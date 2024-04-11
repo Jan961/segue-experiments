@@ -4,11 +4,17 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/Venue';
 import { useState } from 'react';
 
-type VenueTechnicalDetailsFormProps = {
+interface VenueTechnicalDetailsFormProps {
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
-};
-const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnicalDetailsFormProps) => {
+  updateValidationErrrors?: (key: string, value: string) => void;
+}
+
+const VenueTechnicalDetailsForm = ({
+  validationErrors,
+  onChange,
+  updateValidationErrrors,
+}: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState(initialVenueTechnicalDetails);
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
@@ -17,6 +23,9 @@ const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnica
     };
     setFormData(updatedFormData);
     onChange(updatedFormData);
+    if (validationErrors?.[field]) {
+      updateValidationErrrors(field, null);
+    }
   };
   return (
     <>
@@ -26,7 +35,6 @@ const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnica
             <p className="text-primary-input-text">Tech Specs URL</p>
             <TextInput
               placeholder="Enter Tech Specs URL"
-              type=""
               className="w-full justify-between"
               inputClassName="w-full"
               value={formData.techSpecsUrl}
@@ -43,7 +51,6 @@ const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnica
             <p className="text-primary-input-text">LX Desk</p>
             <TextInput
               placeholder="Enter Tech LX Desk"
-              type=""
               className="w-full justify-between"
               inputClassName="w-full"
               value={formData.techLXDesk}
@@ -63,7 +70,6 @@ const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnica
             <p className="text-primary-input-text">Stage Size</p>
             <TextInput
               placeholder="Enter Stage Size"
-              type=""
               className="w-full justify-between"
               inputClassName="w-full"
               value={formData.stageSize}
@@ -77,7 +83,6 @@ const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnica
             <TextInput
               id="soundDesk"
               placeholder="Enter Sound Desk"
-              type=""
               className="w-full justify-between"
               inputClassName="w-full"
               value={formData.soundDesk}
@@ -99,7 +104,6 @@ const VenueTechnicalDetailsForm = ({ validationErrors, onChange }: VenueTechnica
             <TextInput
               id="gridHeight"
               placeholder="Enter Grid Height"
-              type=""
               className="w-full justify-between"
               inputClassName="w-full"
               value={formData.gridHeight}

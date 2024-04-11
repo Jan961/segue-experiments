@@ -1,24 +1,22 @@
 import { useState } from 'react';
-// import { styleProps, venueContractDefs } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-// import Table from 'components/core-ui-lib/Table';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import { initialVenueState } from 'config/Venue';
-import schema from './validation';
+import schema from './AddEditVenuesValidationSchema';
 import MainVenueForm from './MainVenueForm';
 import VenueAddressForm from './VenueAddressForm';
 import VenueTechnicalDetailsForm from './VenueTechnicalDetailsForm';
 import VenueBarringForm from './VenueBarringForm';
 import axios from 'axios';
 
-type AddEditVenueModalProps = {
+interface AddEditVenueModalProps {
   visible: boolean;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   onClose: () => void;
-};
+}
 
 export default function AddEditVenueModal({
   visible,
@@ -26,16 +24,8 @@ export default function AddEditVenueModal({
   venueFamilyOptionList,
   onClose,
 }: AddEditVenueModalProps) {
-  // const getRowStyle = (params) => {
-  //   if (params.node.rowIndex === 0) {
-  //     // Change 'red' to your desired background color
-  //     return { background: '#fad0cc' };
-  //   }
-  //   return null;
-  // };
-
   const [formData, setFormData] = useState(initialVenueState);
-  const [validationErrors, setValidationErrors] = useState({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -59,28 +49,24 @@ export default function AddEditVenueModal({
   };
 
   async function validateVenue(data) {
-    return schema
-      .validate(
-        {
-          ...data,
-        },
-        { abortEarly: false },
-      )
-      .then(() => {
-        return true;
-      })
-      .catch((validationErrors) => {
-        const errors = {};
-        validationErrors.inner.forEach((error) => {
-          errors[error.path] = error.message;
-        });
-        setValidationErrors(errors);
-        console.log('validation Errors', errors);
-        return false;
+    try {
+      await schema.validate({ ...data }, { abortEarly: false });
+      return true;
+    } catch (validationErrors) {
+      const errors = {};
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
       });
+      setValidationErrors(errors);
+      console.log('validation Errors', errors);
+      return false;
+    }
   }
   const onChange = (data = {}) => {
     setFormData((prev) => ({ ...prev, ...data }));
+  };
+  const updateValidationErrors = (key: string, value: string) => {
+    setValidationErrors((prev) => ({ ...prev, [key]: value }));
   };
   return (
     <>
@@ -99,30 +85,27 @@ export default function AddEditVenueModal({
               venueFamilyOptionList={venueFamilyOptionList}
               onChange={onChange}
               validationErrors={validationErrors}
+              updateValidationErrrors={updateValidationErrors}
             />
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
           <div className="grid grid-cols-2 gap-5">
             <VenueAddressForm onChange={onChange} />
           </div>
-          {/* <div className="pt-7">
-            <div className="flex flex-row items-center justify-between  pb-5">
-              <h2 className="text-xl text-primary-navy font-bold ">Venue Contacts</h2>
-              <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
-            </div>
-            <Table
-              columnDefs={venueContractDefs}
-              rowData={dummyVenueContractData}
-              styleProps={styleProps}
-              getRowStyle={getRowStyle}
-            />
-          </div> */}
           <div className="pt-7">
             <h2 className="text-xl text-primary-navy font-bold ">Technical</h2>
-            <VenueTechnicalDetailsForm onChange={onChange} validationErrors={validationErrors} />
+            <VenueTechnicalDetailsForm
+              onChange={onChange}
+              validationErrors={validationErrors}
+              updateValidationErrrors={updateValidationErrors}
+            />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
-              <VenueBarringForm validationErrors={validationErrors} onChange={onChange} />
+              <VenueBarringForm
+                validationErrors={validationErrors}
+                onChange={onChange}
+                updateValidationErrrors={updateValidationErrors}
+              />
             </div>
             <div className="pt-7">
               <h2 className="text-xl text-primary-navy font-bold  pb-2">Confidential Warning Notes</h2>

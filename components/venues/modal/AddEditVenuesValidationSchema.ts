@@ -9,7 +9,7 @@ const venueSchema = Yup.object().shape({
   venueStatus: Yup.string()
     .oneOf(['O', 'C', 'W'], "Venue Status must be 'Open', 'Closed', or 'Warning'.")
     .required('Venue Status is a required field.'),
-  venueFamily: Yup.string().required('Venue Family is a required field.'),
+  venueFamily: Yup.number().required('Venue Family is a required field.'),
   currency: Yup.string().required('Currency is a required field.'),
   excludeFromChecks: Yup.boolean(),
   techSpecsUrl: Yup.mixed().required('Venue Tech Spec is a required field.'),
