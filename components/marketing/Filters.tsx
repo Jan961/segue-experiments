@@ -11,6 +11,11 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 
+type FutureBooking = {
+  hasFutureBooking: boolean;
+  nextBooking: any;
+};
+
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
@@ -21,6 +26,7 @@ const Filters = () => {
   const [venueName, setVenueName] = useState('');
   const [venueId, setVenueId] = useState(0);
   const [venueUrl, setVenueUrl] = useState('');
+  const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
   const bookingOptions = useMemo(() => {
     const options = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
     options.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -28,10 +34,24 @@ const Filters = () => {
   }, [bookings]);
 
   useEffect(() => {
-    if (bookings.selected !== null) {
+    if (bookings.selected !== null && bookings.selected !== undefined) {
       changeBooking(bookings.selected.toString());
     }
   }, [bookings.bookings]);
+
+  useEffect(() => {
+    const futureBookings = bookingOptions
+      .map((booking) => ({
+        ...booking,
+        parsedDate: parseDate(booking.date),
+      }))
+      .filter((booking) => booking.parsedDate >= parseDate(today));
+
+    setFutureBookings({
+      hasFutureBooking: futureBookings.length > 0,
+      nextBooking: futureBookings.length > 0 ? futureBookings[0] : null,
+    });
+  }, [bookingOptions]);
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {
@@ -53,26 +73,11 @@ const Filters = () => {
     }
   };
 
-  const parseDate = (inputDt) => {
-    const splitStrDt = inputDt.split('/');
-    const isoDate = splitStrDt[2] + '/' + splitStrDt[1] + '/' + splitStrDt[0];
-    return new Date(isoDate).getTime();
-  };
-
-  const futureBookings = () => {
-    return bookingOptions
-      .map((booking) => ({
-        ...booking,
-        parsedDate: parseDate(booking.date),
-      }))
-      .filter((booking) => booking.parsedDate >= parseDate(today))
-      .sort((a, b) => a.parsedDate - b.parsedDate);
-  };
+  const parseDate = (inputDt) => new Date(inputDt.split('/').reverse().join('/')).getTime();
 
   const goToToday = () => {
-    const bookings = futureBookings();
-    if (bookings.length > 0) {
-      changeBooking(bookings[0].value);
+    if (futureBookings.hasFutureBooking) {
+      changeBooking(futureBookings.nextBooking.value);
     }
   };
 
@@ -112,7 +117,7 @@ const Filters = () => {
 
           <Button
             text="Go To Today"
-            disabled={futureBookings().length === 0 || !productionId}
+            disabled={!futureBookings.hasFutureBooking || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />
