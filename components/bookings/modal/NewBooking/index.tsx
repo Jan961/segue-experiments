@@ -99,6 +99,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   const updateBookingOnStore = (booking: BookingItem[]) => {
     // Store updates separately as it is possible that the daytype has changed and instead of updating the booking,
     // we would need to delete the existing booking and create a new one in another table. e.g. Performance changed to Day Off
+    console.log('Updating booking on store', booking);
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
@@ -125,7 +126,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           notes: b.note,
           noPerf: b.performanceCount,
           times: b.performanceTimes,
-          pencilNo: b.count,
+          pencilNo: b.pencilNo,
           isBooking: b.dayType === 'Performance',
           isRehearsal: b.dayType === 'Rehearsal',
           isGetInFitUp: b.dayType === 'Get in / Fit Up',
@@ -133,6 +134,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         };
       });
       setBookingOnStore(formattedBooking);
+      updateBookingOnStore(formattedBooking);
     }
   }, [booking]);
 
@@ -213,7 +215,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         <NewBookingDetailsView
           isNewBooking={!editBooking}
           formData={state.form}
-          data={state.booking}
+          data={editBooking ? state.bookingUpdates : state.booking}
           production={currentProduction}
           dateBlockId={primaryBlock?.Id}
           dayTypeOptions={dayTypeOptions}
@@ -228,7 +230,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         <PreviewNewBookingView
           formData={state.form}
           productionCode={productionCode}
-          data={state.booking}
+          data={editBooking ? state.bookingUpdates : state.booking}
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}

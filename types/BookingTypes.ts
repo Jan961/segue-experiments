@@ -65,7 +65,7 @@ type BookingRow = {
   note: string;
   performanceCount: number;
   performanceTimes: string;
-  count: string;
+  pencilNo?: number;
   runTag: string;
 };
 

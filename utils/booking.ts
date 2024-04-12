@@ -52,7 +52,7 @@ class BookingHelper {
   }
 
   getRehearsalDetails(rehearsal: RehearsalDTO) {
-    const { Id, VenueId, RunTag: runTag } = rehearsal;
+    const { Id, VenueId, RunTag: runTag, PencilNum, Notes } = rehearsal;
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     return {
       Id,
@@ -62,23 +62,29 @@ class BookingHelper {
       count,
       venueId,
       runTag,
+      pencilNo: PencilNum,
+      note: Notes,
     };
   }
 
   getOthersDetails(others: OtherDTO) {
-    const { DateTypeName: dayType, RunTag: runTag } = others || {};
+    const { DateTypeName: dayType, RunTag: runTag, PencilNum, Notes } = others || {};
     return {
       Id: others?.Id,
       status: others.StatusCode,
       dayType,
       runTag,
+      pencilNo: PencilNum,
+      note: Notes,
     };
   }
 
   getInFitUpDetails(gifu: GetInFitUpDTO) {
-    const { VenueId, RunTag: runTag } = gifu;
+    const { VenueId, RunTag: runTag, PencilNum, Notes } = gifu;
     const gifuDetails = {
       Id: gifu?.Id,
+      pencilNo: PencilNum,
+      note: Notes,
       runTag,
       venue: '',
       town: '',

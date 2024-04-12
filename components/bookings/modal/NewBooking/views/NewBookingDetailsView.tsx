@@ -135,6 +135,7 @@ export default function NewBookingDetailsView({
   }, [production, bookingRow, venueDict]);
 
   useEffect(() => {
+    console.log('In NewBookingDetailsView', data);
     if (data !== null && data.length > 0) {
       setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
       setBookingData(data);
@@ -208,7 +209,7 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-
+      console.log('storeNewBookingDetails', isNewBooking, rowData);
       isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
     }
   };
