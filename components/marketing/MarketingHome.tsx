@@ -50,14 +50,6 @@ const MarketingHome = () => {
     }
   }, [bookingId]);
 
-  // blocks all default scrolling functionality so top/side bar are fixed
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, []);
-
   return (
     <div className="flex w-full h-full">
       {/* Green Box */}
