@@ -11,6 +11,8 @@ export const tableConfig = [
     headerClass: 'text-center',
     width: 396,
     flex: 1,
+    headerTooltip:
+      'This is the name of your Theatre Show e.g. “Touring Show”. A “Show” can have multiple “productions”, you can give a specific “production” a reference in the Production Section.',
   },
   {
     headerName: 'Show Code',
@@ -18,6 +20,8 @@ export const tableConfig = [
     cellRenderer: ShowsTextInputRenderer,
     width: 130,
     headerClass: 'text-center',
+    headerTooltip:
+      'The Show Code should be unique to this particular Show and should be a recognisable abbreviation for example Touring Show may be ‘TOUR’. This will be used in combination with the production code, eg Touring Show touring the UK in 2025 could be ‘TOURUK25’',
   },
   {
     headerName: 'Company',
@@ -25,6 +29,7 @@ export const tableConfig = [
     cellRenderer: DefaultCellRenderer,
     width: 270,
     headerClass: 'text-center',
+    headerTooltip: 'Please select the Company Name or “Special Purpose Vehicle” that is presenting this production.',
   },
   {
     headerName: 'Productions',
@@ -39,6 +44,8 @@ export const tableConfig = [
     },
     width: 143,
     headerClass: 'text-center',
+    headerTooltip:
+      'Access to view and edit all Productions of this particular Show. e.g. Touring Show UK Tour 2025; Touring Show USA Tour 2022',
   },
   {
     headerName: 'Archive',
@@ -52,6 +59,7 @@ export const tableConfig = [
       alignItems: 'center',
     },
     headerClass: 'text-center',
+    headerTooltip: 'Only when all activity (including “settlements”) is complete, select tick box to archive Show.',
   },
   {
     headerName: '',
