@@ -40,6 +40,8 @@ export default function SalesTable({
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
   const [currency, setCurrency] = useState('£');
+  const [height, setHeight] = useState(containerHeight);
+  const [width, setWidth] = useState(containerWidth);
 
   // To be discussed and reviewed by Arun on his return - this is causing more issues than fixes just now
   // const prodColDefs = useMemo(() => {
@@ -54,7 +56,21 @@ export default function SalesTable({
 
   const salesSnapshot = (data: Array<SalesSnapshot>) => {
     setCurrency('£');
-    setColumnDefs(salesColDefs(currency));
+
+    // check for school data
+    const found = data.find(data => data.schReservations !== "" ||
+      data.schReserved !== "" ||
+      data.schSeatsSold !== "" ||
+      data.schTotalValue !== "");
+
+
+    let colDefs = salesColDefs(currency, Boolean(found));
+    if (!Boolean(found)) {
+      colDefs = colDefs.filter(column => column.headerName !== 'School Sales');
+      setWidth('w-[935px]');
+    }
+
+    setColumnDefs(colDefs);
     setRowData(data);
   };
 
@@ -105,7 +121,7 @@ export default function SalesTable({
   }, [variant]);
 
   return (
-    <div className={classNames(containerWidth, containerHeight)}>
+    <div className={classNames(width, height)}>
       <Table
         columnDefs={columnDefs}
         rowData={rowData}

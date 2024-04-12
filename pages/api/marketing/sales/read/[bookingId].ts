@@ -46,26 +46,22 @@ export default async function handle(req, res) {
           [key]: {
             ...val,
             ...(sale.SaleTypeName === 'General Sales' && {
-              genSeatsSold: parseInt(sale.Seats),
+              genSeatsSold: sale.Seats,
               venueCurrencySymbol: sale.VenueCurrencySymbol,
-              genTotalValue: parseFloat(sale.Value),
-              saleType: 'general',
+              genTotalValue: sale.Value,
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
               genReserved: sale.Seats,
-              genReservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
-              saleType: 'general',
+              genReservations: sale.Value,
             }),
             ...(sale.SaleTypeName === 'School Sales' && {
-              schSeatsSold: parseInt(sale.Seats),
+              schSeatsSold: sale.Seats,
               venueCurrencySymbol: sale.VenueCurrencySymbol,
-              schTotalValue: parseFloat(sale.Value),
-              saleType: 'school',
+              schTotalValue: sale.Value,
             }),
             ...(sale.SaleTypeName === 'School Reservations' && {
               schReserved: sale.Seats,
-              schReservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
-              saleType: 'school',
+              schReservations: sale.Value,
             }),
           },
         };
@@ -96,27 +92,22 @@ export default async function handle(req, res) {
           capacity: sale.TotalCapacity,
           isFinal: sale.SetIsFinalFigures,
           notOnSaleDate: sale.NotOnSaleDate,
-          saleType: '',
           ...(sale.SaleTypeName === 'General Sales' && {
-            genSeatsSold: parseInt(sale.Seats),
-            genTotalValue: parseFloat(sale.Value),
-            saleType: 'general',
+            genSeatsSold: sale.Seats,
+            genTotalValue: sale.Value,
           }),
           ...(sale.SaleTypeName === 'General Reservations' && {
-            genReserved: parseInt(sale.Seats),
-            genReservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
-            saleType: 'general',
+            genReserved: sale.Seats,
+            genReservations: sale.Value,
           }),
           ...(sale.SaleTypeName === 'School Sales' && {
-            schSeatsSold: parseInt(sale.Seats),
+            schSeatsSold: sale.Seats,
             venueCurrencySymbol: sale.VenueCurrencySymbol,
-            schTotalValue: parseFloat(sale.Value),
-            saleType: 'school',
+            schTotalValue: sale.Value,
           }),
           ...(sale.SaleTypeName === 'School Reservations' && {
             schReserved: sale.Seats,
-            schReservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
-            saleType: 'school',
+            schReservations: sale.Value,
           }),
         },
       };

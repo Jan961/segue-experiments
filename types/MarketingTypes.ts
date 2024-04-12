@@ -66,23 +66,26 @@ export type SalesComparison = {
 export type SalesSnapshot = {
   week: string;
   weekOf: string;
-  seatsSold: number;
-  seatsSaleChange: number;
-  reservations: number;
-  reserved: string;
+  schSeatsSold: string;
+  genSeatsSold: string;
+  seatsSaleChange: string;
+  schReservations: string;
+  schReserved: string;
+  genReservations: string;
+  genReserved: string;
   venueCurrencySymbol: string;
-  totalValue: number;
-  valueChange: number;
+  schTotalValue: string;
+  genTotalValue: string;
+  valueChange: string;
   totalHolds: string;
-  seatsChange: number;
+  seatsChange: string;
   isCopy: boolean;
   isBrochureReleased: boolean;
   isSingleSeats: boolean;
   isNotOnSale: boolean;
-  capacity: number;
+  capacity: string;
   isFinal: boolean;
   notOnSaleDate: string;
-  saleType: string;
 };
 
 export type BookingSelection = {
