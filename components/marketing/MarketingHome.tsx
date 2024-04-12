@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SalesTable } from 'types/MarketingTypes';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -10,14 +10,6 @@ const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTable>('');
   const selectedBtnClass = '!bg-primary-green/[0.30] !text-primary-navy';
   const { selected: productionId } = useRecoilValue(productionJumpState);
-
-  // blocks all default scrolling functionality so top/side bar are fixed
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, []);
 
   return (
     <div className="flex w-full h-full">
