@@ -3,19 +3,22 @@ import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
 import { useState } from 'react';
+import { UiTransformedVenue } from 'utils/venue';
 
 interface VenueTechnicalDetailsFormProps {
+  venue: Partial<UiTransformedVenue>;
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
 }
 
 const VenueTechnicalDetailsForm = ({
+  venue,
   validationErrors,
   onChange,
   updateValidationErrrors,
 }: VenueTechnicalDetailsFormProps) => {
-  const [formData, setFormData] = useState(initialVenueTechnicalDetails);
+  const [formData, setFormData] = useState({ ...initialVenueTechnicalDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...formData,

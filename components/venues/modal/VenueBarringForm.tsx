@@ -2,15 +2,17 @@ import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueBarringRules } from 'config/venue';
 import { useState } from 'react';
+import { UiTransformedVenue } from 'utils/venue';
 
 interface VenueBarringFormProps {
+  venue: Partial<UiTransformedVenue>;
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
 }
 
-const VenueBarringForm = ({ onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
-  const [formData, setFormData] = useState(initialVenueBarringRules);
+const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
+  const [formData, setFormData] = useState({ ...initialVenueBarringRules, ...venue });
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...formData,

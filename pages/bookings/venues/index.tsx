@@ -15,6 +15,8 @@ import { intialState as intialProductionJumpState } from 'state/booking/producti
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { getAllCurrencyList } from 'services/currencyService';
+import { UiTransformedVenue, transformVenues } from 'utils/venue';
+import { initialVenueState } from 'config/venue';
 
 export type VenueFilters = {
   venueId: string;
@@ -26,8 +28,8 @@ export type VenueFilters = {
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { venueTownList = [], venueCountryList = [], venueCurrencyOptionList = [], venueFamilyOptionList = [] } = props;
   const [filters, setFilters] = useState<VenueFilters>(defaultVenueFilters);
-  const [showAddNewVenueModal, setShowAddNewVenueModal] = useState<boolean>(false);
   const [venues, setVenues] = useState([]);
+  const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
   const { productionId, town, country, search } = filters;
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
@@ -47,13 +49,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
       const { data } = await axios.post('/api/venue/list', {
         ...payload,
       });
-      const venusList = data?.map(({ Code, Id, Name, Seats, VenueAddress }) => ({
-        Code,
-        Id,
-        Name,
-        Seats,
-        Town: VenueAddress?.[0]?.Town,
-      }));
+      const venusList = transformVenues(data);
       setVenues(venusList);
     } catch (err) {
       setVenues([]);
@@ -68,6 +64,13 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     setFilters((prevFilters) => ({ ...prevFilters, ...change }));
   };
 
+  const onSelectVenue = useCallback(
+    (venue: UiTransformedVenue) => {
+      setEditVenueContext(venue);
+    },
+    [setEditVenueContext],
+  );
+
   return (
     <>
       <Layout title="Venues | Segue" flush>
@@ -78,18 +81,23 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               countryOptions={countryOptions}
               onFilterChange={updateFilters}
               filters={filters}
-              showVenueModal={() => setShowAddNewVenueModal(true)}
+              showVenueModal={() => setEditVenueContext(initialVenueState)}
             />
           </div>
-          <VenueTable items={venues} />
+          <VenueTable onSelectVenue={onSelectVenue} items={venues} />
         </div>
       </Layout>
-      <AddEditVenueModal
-        venueFamilyOptionList={venueFamilyOptionList}
-        venueCurrencyOptionList={venueCurrencyOptionList}
-        visible={showAddNewVenueModal}
-        onClose={() => setShowAddNewVenueModal(false)}
-      />
+      {!!editVenueContext && (
+        <AddEditVenueModal
+          venue={editVenueContext}
+          venueFamilyOptionList={venueFamilyOptionList}
+          venueCurrencyOptionList={venueCurrencyOptionList}
+          visible={!!editVenueContext}
+          onClose={() => {
+            setEditVenueContext(null);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -111,7 +119,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
   const venueCountryList = results[2].status === 'fulfilled' ? results[2].value : [];
   const venueCurrencyOptionList: SelectOption[] =
-    results[3].status === 'fulfilled' ? transformToOptions(results[3].value, 'Name', 'Code') : [];
+    results[3].status === 'fulfilled'
+      ? transformToOptions(results[3].value, null, 'Code', (item) => item.Code + ' ' + item.Name)
+      : [];
+  console.table(venueCurrencyOptionList);
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
 

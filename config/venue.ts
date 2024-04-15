@@ -166,9 +166,9 @@ export const initialVenueAddressDetails = {
 };
 
 export const initialVenueBarringRules = {
-  barringMiles: '',
-  postShow: '',
-  preShow: '',
+  barringMiles: null,
+  postShow: null,
+  preShow: null,
   barringClause: '',
 };
 

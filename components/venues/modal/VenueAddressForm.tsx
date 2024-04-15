@@ -1,12 +1,14 @@
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
+import { UiTransformedVenue } from 'utils/venue';
 
 interface VenueAddressFormProps {
+  venue: Partial<UiTransformedVenue>;
   onChange: (data: any) => void;
 }
-const VenueAddressForm = ({ onChange }: VenueAddressFormProps) => {
-  const [formData, setFormData] = useState(initialVenueAddressDetails);
+const VenueAddressForm = ({ venue, onChange }: VenueAddressFormProps) => {
+  const [formData, setFormData] = useState({ ...initialVenueAddressDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {

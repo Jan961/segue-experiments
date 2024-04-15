@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const {
       venueCode: Code,
       venueName: Name,
-      venueStatus: statusCode,
+      venueStatus: StatusCode,
       vatIndicator: VATIndicator,
       culturallyExempt: CulturallyExempt,
       venueFamily: FamilyId,
@@ -31,6 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       gridHeight: GridHeight,
       techSpecsUrl: TechSpecsURL,
       flags: VenueFlags,
+      excludeFromChecks: ExcludeFromChecks,
       primaryAddress1,
       primaryAddress2,
       primaryAddress3,
@@ -69,7 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         {
           Code,
           Name,
-          StatusCode: statusCode,
+          StatusCode,
           VATIndicator,
           CulturallyExempt,
           FamilyId,
@@ -91,6 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           GridHeight,
           TechSpecsURL,
           VenueFlags,
+          ExcludeFromChecks,
           VenueAccountId: accountId,
         },
         [primaryAddress, deliveryAddress],

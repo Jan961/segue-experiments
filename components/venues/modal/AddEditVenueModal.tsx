@@ -10,21 +10,26 @@ import VenueAddressForm from './VenueAddressForm';
 import VenueTechnicalDetailsForm from './VenueTechnicalDetailsForm';
 import VenueBarringForm from './VenueBarringForm';
 import axios from 'axios';
+import { UiTransformedVenue } from 'utils/venue';
+import { useRouter } from 'next/router';
 
 interface AddEditVenueModalProps {
   visible: boolean;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
+  venue?: UiTransformedVenue;
   onClose: () => void;
 }
 
 export default function AddEditVenueModal({
+  venue,
   visible,
   venueCurrencyOptionList,
   venueFamilyOptionList,
   onClose,
 }: AddEditVenueModalProps) {
-  const [formData, setFormData] = useState(initialVenueState);
+  const router = useRouter();
+  const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -37,18 +42,28 @@ export default function AddEditVenueModal({
     });
   };
 
+  const createVenue = async (venue: UiTransformedVenue) => {
+    return axios.post('/api/venue/create', venue).then(() => {
+      onClose();
+      router.replace(router.asPath);
+    });
+  };
+
+  const updateVenue = async (venue: UiTransformedVenue) => {
+    return axios.post('/api/venue/update/' + venue.id, venue).then(() => {
+      onClose();
+      router.replace(router.asPath);
+    });
+  };
+
   const handleSaveAndClose = async () => {
     const isValid = await validateVenue(formData);
     if (isValid) {
-      // TODO: Api call to create/edit Venue
-      axios.post('/api/venue/create', formData).then((response) => {
-        console.log(response);
-        onClose();
-      });
+      formData.id ? updateVenue(formData) : createVenue(formData);
     }
   };
 
-  async function validateVenue(data) {
+  async function validateVenue(data: UiTransformedVenue) {
     try {
       await schema.validate({ ...data }, { abortEarly: false });
       return true;
@@ -81,6 +96,7 @@ export default function AddEditVenueModal({
           <h2 className="text-xl text-primary-navy font-bold">Main</h2>
           <div className="grid grid-cols-2 gap-5">
             <MainVenueForm
+              venue={formData}
               venueCurrencyOptionList={venueCurrencyOptionList}
               venueFamilyOptionList={venueFamilyOptionList}
               onChange={onChange}
@@ -90,11 +106,12 @@ export default function AddEditVenueModal({
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
           <div className="grid grid-cols-2 gap-5">
-            <VenueAddressForm onChange={onChange} />
+            <VenueAddressForm venue={formData} onChange={onChange} />
           </div>
           <div className="pt-7">
             <h2 className="text-xl text-primary-navy font-bold ">Technical</h2>
             <VenueTechnicalDetailsForm
+              venue={formData}
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
@@ -102,6 +119,7 @@ export default function AddEditVenueModal({
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
               <VenueBarringForm
+                venue={formData}
                 validationErrors={validationErrors}
                 onChange={onChange}
                 updateValidationErrrors={updateValidationErrors}
@@ -112,7 +130,7 @@ export default function AddEditVenueModal({
               <TextArea
                 id="confidentialNotes"
                 placeholder="Notes Field"
-                className="w-full max-h-40 min-h-[50px]  justify-between"
+                className="w-full max-h-40 min-h-[50px] justify-between"
                 value={formData.confidentialNotes}
                 onChange={(e) => handleInputChange('confidentialNotes', e.target.value)}
               />

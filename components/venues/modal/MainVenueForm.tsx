@@ -7,22 +7,25 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { initialMainVenueDetails, venueStatusOptions } from 'config/venue';
 import { useState } from 'react';
+import { UiTransformedVenue } from 'utils/venue';
 
 interface MainVenueFormProps {
-  onChange: (data: any) => void;
+  venue: Partial<UiTransformedVenue>;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   validationErrors?: Record<string, string>;
+  onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
 }
 const MainVenueForm = ({
-  onChange,
+  venue,
   venueCurrencyOptionList,
   venueFamilyOptionList,
   validationErrors,
   updateValidationErrrors,
+  onChange,
 }: MainVenueFormProps) => {
-  const [formData, setFormData] = useState(initialMainVenueDetails);
+  const [formData, setFormData] = useState({ ...initialMainVenueDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -38,6 +41,7 @@ const MainVenueForm = ({
       updateValidationErrrors(field, null);
     }
   };
+  console.table(venueCurrencyOptionList);
   return (
     <>
       <div className="flex flex-col">
@@ -128,6 +132,7 @@ const MainVenueForm = ({
             name="currency"
             className="w-[364px] font-bold"
             placeholder="Currency Dropdown"
+            value={formData.currency}
             onChange={(value) => handleInputChange('currency', value)}
             options={venueCurrencyOptionList}
             isSearchable
