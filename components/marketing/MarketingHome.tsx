@@ -8,6 +8,7 @@ import TabButton from 'components/core-ui-lib/TabButton';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import useAxios from 'hooks/useAxios';
 import SalesTable from 'components/global/salesTable';
+import axios from 'axios';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTabs>('');
@@ -133,10 +134,11 @@ const MarketingHome = () => {
               {sales.length !== 0 && (
                 <SalesTable
                   containerHeight="h-auto"
-                  containerWidth="w-[1317px]"
+                  containerWidth="w-[1440px]"
                   module="marketing"
                   variant="salesSnapshot"
                   data={sales}
+                  booking={bookings[0].selected}
                 />
               )}
             </div>

@@ -6,6 +6,8 @@ import formatInputDate from 'utils/dateInputFormat';
 import { prodComparisionColDefs, salesColDefs } from './tableConfig';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
+import { format, parseISO } from 'date-fns';
+import axios from 'axios';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue';
 
@@ -24,6 +26,7 @@ interface SalesTableProps {
   onCellValChange?: (e) => void;
   cellRenderParams;
   productions;
+  booking?;
 }
 
 export default function SalesTable({
@@ -36,6 +39,7 @@ export default function SalesTable({
   onCellValChange,
   cellRenderParams,
   productions,
+  booking
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -64,10 +68,10 @@ export default function SalesTable({
       data.schTotalValue !== "");
 
 
-    let colDefs = salesColDefs(currency, Boolean(found));
+    let colDefs = salesColDefs(currency, Boolean(found), module === 'bookings' ? false : true, booking, setSalesActivity);
     if (!Boolean(found)) {
       colDefs = colDefs.filter(column => column.headerName !== 'School Sales');
-      setWidth('w-[935px]');
+      setWidth('w-[1065px]');
     }
 
     setColumnDefs(colDefs);
@@ -94,11 +98,78 @@ export default function SalesTable({
     setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
   };
 
+  const setSalesActivity = (type, selected, sale) => {
+    switch (type) {
+      case 'isSingleSeats': {
+        onSingleSeatChange(type, !sale.isSingleSeats, sale, selected);
+      }
+
+      case 'isBrochureReleased': {
+        onBrochureReleasedChange(type, !sale.isBrochureReleased, sale, selected);
+      }
+
+      case 'isNotOnSale': {
+        onIsNotOnSaleChange(type, !sale.isNotOnSale, sale, selected);
+      }
+    }
+  }
+
+  const onIsNotOnSaleChange = (key: string, value: boolean, sale: any, selected) => {
+    updateSaleSet('updateNotOnSale', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
+      [key.replace('is', 'Set')]: value,
+    });
+
+    setRowData((prevSales) =>
+      prevSales.map((s) => {
+        if (!value) {
+          const isOnSale = new Date(s.weekOf) < new Date(sale.weekOf);
+          return { ...s, [key]: isOnSale };
+        } else {
+          const isNotOnSale = new Date(s.weekOf) <= new Date(sale.weekOf);
+          return isNotOnSale ? { ...s, [key]: value } : s;
+        }
+      }),
+    );
+  };
+
+  const onSingleSeatChange = (key: string, value: boolean, sale: any, selected) => {
+    updateSaleSet('updateSingleSeats', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
+      [key.replace('is', 'Set')]: value,
+    });
+    setRowData((prevSales) =>
+      prevSales.map((s) => {
+        const isSingleSeat = new Date(s.weekOf) >= new Date(sale.weekOf);
+        return isSingleSeat ? { ...s, [key]: value } : s;
+      }),
+    );
+  }
+
+  const onBrochureReleasedChange = (key: string, value: boolean, sale: any, selected) => {
+    updateSaleSet('update', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
+      [key.replace('is', 'Set')]: value,
+    });
+    setRowData((prevSales) =>
+      prevSales.map((s) => {
+        if (sale.weekOf === s.weekOf && sale.week === s.week) {
+          return { ...s, [key]: value };
+        }
+        return s;
+      }),
+    );
+  };
+
+  const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update: any) => {
+    axios
+      .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
+      .catch((error: any) => console.log('failed to update sale', error));
+  };
+
   const exec = async (variant: string, data) => {
     switch (variant) {
       case 'salesComparison': {
         const tableData = await salesComparison(data);
         setColumnDefs(tableData.columnDef);
+
         setRowData(tableData.rowData);
         break;
       }

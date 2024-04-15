@@ -4,6 +4,7 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from 'utils/reverseDate';
+import IconRowRenderer from './renderers/IconRowRenderer';
 
 const getCellColor = (data, ignoreMonday, school) => {
   const saleDt = reverseDate(formatInputDate(data.weekOf))
@@ -11,25 +12,25 @@ const getCellColor = (data, ignoreMonday, school) => {
   const showMondayBorder = isMonday && !ignoreMonday;
 
   if (data.isNotOnSale) {
-    return { 
-      backgroundColor: '#ED1111', 
+    return {
+      backgroundColor: '#ED1111',
       color: 'white',
-      borderRightColor: !school && showMondayBorder ? '#FDCE74' : 'white',
+      borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
       borderRightWidth: showMondayBorder ? 15 : 0
     }
   } else if (data.isBrochureReleased) {
-    return { 
-      backgroundColor: '#FFE606', 
+    return {
+      backgroundColor: '#FFE606',
       color: '#617293',
-      borderRightColor: !school && showMondayBorder ? '#FDCE74' : 'white',
-      borderRightWidth: !school && showMondayBorder ? 15 : 0
+      borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
+      borderRightWidth: school && showMondayBorder ? 15 : 0
     }
   } else if (data.isSingleSeats) {
-    return { 
-      backgroundColor: '#10841C', 
+    return {
+      backgroundColor: '#10841C',
       color: 'white',
-      borderRightColor: !school && showMondayBorder ? '#FDCE74' : 'white',
-      borderRightWidth: !school && showMondayBorder ? 15 : 0
+      borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
+      borderRightWidth: school && showMondayBorder ? 15 : 0
     };
   } else {
     return isMonday && school ? { backgroundColor: '#FDCE74', color: '#617293' } : {};
@@ -140,7 +141,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
   },
 ];
 
-export const salesColDefs = (currencySymbol, schoolDataAvail) => {
+export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booking, setSalesActivity) => {
   return [
     {
       headerName: 'Week',
@@ -165,6 +166,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
       headerName: 'Date',
       field: 'weekOf',
       cellRenderer: function (params) {
+        console.log(params.data)
         return formatInputDate(params.data.weekOf);
       },
       cellStyle: (params) => {
@@ -235,12 +237,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
           headerName: 'Reserved No',
           field: 'genReserved',
           cellRenderer: function (params) {
-            if (params.data.genReserved === '') {
-              const prevRevVal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genReserved;
-              return prevRevVal === '' || prevRevVal === undefined ? '-' : prevRevVal;
-            } else {
-              return params.data.genReserved
-            }
+            return params.data.genReserved === '' ? '-' : params.data.genReserved
           },
           width: 100,
           cellStyle: {
@@ -256,12 +253,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
           headerName: 'Reserved ' + currencySymbol,
           field: 'genReservations',
           cellRenderer: function (params) {
-            if (params.data.genReservations === '') {
-              const prevRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genReservations;
-              return prevRev === '' || prevRev === undefined ? '-' : currencySymbol + parseFloat(prevRev).toFixed(2);
-            } else {
-              return currencySymbol + (params.data.genReservations === '' ? '0.00' : parseFloat(params.data.genReservations).toFixed(2));
-            }
+            return params.data.genReservations === '' ? '-' : currencySymbol + parseFloat(params.data.genReservations).toFixed(2);
           },
           width: 100,
           cellStyle: {
@@ -288,7 +280,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
               const prevSeatsSold = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schSeatsSold;
               return prevSeatsSold === '' || prevSeatsSold === undefined ? '-' : prevSeatsSold;
             } else {
-              return  params.data.schSeatsSold;
+              return params.data.schSeatsSold;
             }
           },
           width: 90,
@@ -328,12 +320,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
           headerName: 'Reserved No',
           field: 'schReserved',
           cellRenderer: function (params) {
-            if (params.data.schReserved === '') {
-              const previousRevNo = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schReserved;
-              return previousRevNo;
-            } else {
-              return params.data.schReserved;
-            }
+            return params.data.schReserved;
           },
           width: 100,
           cellStyle: {
@@ -382,7 +369,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
         const currentValue = totalReserve + totalSold;
         return currentValue === 0 ? '-' : currencySymbol + currentValue.toFixed(2).toString();
       },
-      width: 75,
+      width: 85,
       cellStyle: {
         textAlign: 'center',
         overflow: 'visible',
@@ -481,6 +468,39 @@ export const salesColDefs = (currencySymbol, schoolDataAvail) => {
         return params.data.totalHolds === null ? 0 : params.data.totalHolds;
       },
       width: 70,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      headerClass: 'custom-header-1rb',
+      suppressMovable: true,
+      sortable: false,
+      resizable: false,
+    },
+    isMarketing &&
+    {
+      headerName: 'Activity',
+      field: 'activity',
+      cellRenderer: IconRowRenderer,
+      cellRendererParams: (params) => ({
+        iconList: [
+          { 
+            name: 'user-solid', 
+            color: params.data.isSingleSeats ? '#10841C' : '#ddd', 
+            onClick: () => setSalesActivity('isSingleSeats', booking, params.data) 
+          },
+          { 
+            name: 'book-solid', 
+            color: params.data.isBrochureReleased ? '#FFE606' : '#ddd',  
+            onClick: () => setSalesActivity('isBrochureReleased', booking, params.data) 
+          },
+          { 
+            name: 'square-cross', 
+            color: params.data.isNotOnSale ? '#ED1111' : '#ddd', 
+            onClick: () => setSalesActivity('isNotOnSale', booking, params.data)}
+        ],
+      }),
+      width: 120,
       cellStyle: {
         textAlign: 'center',
         overflow: 'visible',
