@@ -7,6 +7,7 @@ export interface TextInputProps {
   value?: string;
   disabled?: boolean;
   className?: string;
+  maxlength?: number;
   inputClassName?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
