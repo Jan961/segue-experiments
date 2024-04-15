@@ -22,12 +22,18 @@ const CheckPerfRenderer = ({ eGridCell, data, dayTypeOptions, node, setValue }: 
   const handleCheckboxChange = (checked) => {
     setPerfChecked(checked);
     setValue(checked);
+    const isBooking = checked;
+    const isRehearsal = checked ? false : data.isRehearsal;
+    const isGetInFitUp = checked ? false : data.isRehearsal;
     node.setData({
       ...data,
       perf: checked,
       dayType: checked ? performanceOption.value : '',
       bookingStatus: checked ? pencilledStatus : '',
       pencilNo: null,
+      isBooking,
+      isRehearsal,
+      isGetInFitUp,
     });
   };
 

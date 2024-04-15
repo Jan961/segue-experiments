@@ -99,7 +99,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   const updateBookingOnStore = (booking: BookingItem[]) => {
     // Store updates separately as it is possible that the daytype has changed and instead of updating the booking,
     // we would need to delete the existing booking and create a new one in another table. e.g. Performance changed to Day Off
-    console.log('Updating booking on store', booking);
+
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
@@ -121,6 +121,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           dateBlockId: primaryBlock?.Id,
           dayType: dayTypeOptions.find((option) => option.text === b.dayType)?.value,
           venue: b.venueId,
+          runTag: b.runTag,
           perf: b.dayType === 'Performance',
           bookingStatus: b.status,
           notes: b.note,
@@ -162,23 +163,12 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   const updateBooking = async () => {
-    const bookingsToUpdate = state.booking.filter(({ id }) => !Number.isNaN(id));
-
-    let bookingsToCreate = state.booking.filter(({ id }) => Number.isNaN(id));
-    let result = null;
     try {
-      const { data: updated } = await axios.post('/api/bookings/update', bookingsToUpdate);
-      result = updated;
-      if (!isNullOrEmpty(bookingsToCreate)) {
-        const runTagForRunOfDates = nanoid(8);
-        bookingsToCreate = bookingsToUpdate.map((b) => ({
-          ...b,
-          runTag: runTagForRunOfDates,
-        }));
-        const { data: created } = await axios.post('/api/bookings/add', bookingsToCreate);
-        result = { ...result, created };
-      }
-      onClose(result);
+      const { data: updated } = await axios.post('/api/bookings/update', {
+        original: state.booking,
+        updated: state.bookingUpdates,
+      });
+      onClose(updated);
     } catch (e) {
       console.log('Failed to update booking', e);
     }

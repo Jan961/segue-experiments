@@ -75,10 +75,6 @@ export const OTHER_DAY_TYPES = [
     text: 'Get in / Fit Up',
     value: -4,
   },
-  {
-    text: 'Get Out',
-    value: -5,
-  },
 ];
 
 export const DEFAULT_GAP_SUGGEST_FORM_STATE = {

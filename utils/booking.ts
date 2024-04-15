@@ -30,7 +30,7 @@ class BookingHelper {
   }
 
   getBookingDetails(booking: BookingDTO) {
-    const { VenueId, PerformanceIds, Notes: note, RunTag: runTag } = booking || {};
+    const { VenueId, PerformanceIds, Notes: note, RunTag: runTag, PencilNum } = booking || {};
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     const performanceTimes = PerformanceIds.map(
       (performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5),
@@ -48,6 +48,8 @@ class BookingHelper {
       performanceTimes,
       performanceCount: PerformanceIds?.length || 0,
       runTag,
+      pencilNo: PencilNum,
+      isBooking: true,
     };
   }
 
@@ -64,6 +66,7 @@ class BookingHelper {
       runTag,
       pencilNo: PencilNum,
       note: Notes,
+      isRehearsal: true,
     };
   }
 
@@ -88,11 +91,14 @@ class BookingHelper {
       runTag,
       venue: '',
       town: '',
+      venueId: null,
+      isGetInFitUp: true,
     };
     if (VenueId) {
       const venue = this.venueDict[VenueId];
       gifuDetails.venue = venue.Name;
       gifuDetails.town = venue.Town;
+      gifuDetails.venueId = VenueId;
     }
     return gifuDetails;
   }
