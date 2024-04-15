@@ -39,7 +39,7 @@ export default function SalesTable({
   onCellValChange,
   cellRenderParams,
   productions,
-  booking
+  booking,
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -62,16 +62,22 @@ export default function SalesTable({
     setCurrency('£');
 
     // check for school data
-    const found = data.find(data => data.schReservations !== "" ||
-      data.schReserved !== "" ||
-      data.schSeatsSold !== "" ||
-      data.schTotalValue !== "");
+    const found = data.find(
+      (data) =>
+        data.schReservations !== '' || data.schReserved !== '' || data.schSeatsSold !== '' || data.schTotalValue !== '',
+    );
 
-
-    let colDefs = salesColDefs(currency, Boolean(found), module === 'bookings' ? false : true, booking, setSalesActivity);
-    if (!Boolean(found)) {
-      colDefs = colDefs.filter(column => column.headerName !== 'School Sales');
+    let colDefs = salesColDefs(
+      currency,
+      Boolean(found),
+      module !== 'bookings',
+      booking,
+      setSalesActivity,
+    );
+    if (!found) {
+      colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setWidth('w-[1065px]');
+      setHeight(containerHeight);
     }
 
     setColumnDefs(colDefs);
@@ -102,19 +108,22 @@ export default function SalesTable({
     switch (type) {
       case 'isSingleSeats': {
         onSingleSeatChange(type, !sale.isSingleSeats, sale, selected);
+        break;
       }
 
       case 'isBrochureReleased': {
         onBrochureReleasedChange(type, !sale.isBrochureReleased, sale, selected);
+        break;
       }
 
       case 'isNotOnSale': {
         onIsNotOnSaleChange(type, !sale.isNotOnSale, sale, selected);
+        break;
       }
     }
-  }
+  };
 
-  const onIsNotOnSaleChange = (key: string, value: boolean, sale: any, selected) => {
+  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
     updateSaleSet('updateNotOnSale', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -132,19 +141,25 @@ export default function SalesTable({
     );
   };
 
-  const onSingleSeatChange = (key: string, value: boolean, sale: any, selected) => {
+  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
     updateSaleSet('updateSingleSeats', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
     setRowData((prevSales) =>
       prevSales.map((s) => {
-        const isSingleSeat = new Date(s.weekOf) >= new Date(sale.weekOf);
+        // Use date comparison that includes the start of the date (midnight) for both dates being compared
+        const currentSaleDate = new Date(s.weekOf);
+        const targetSaleDate = new Date(sale.weekOf);
+        currentSaleDate.setHours(0, 0, 0, 0);
+        targetSaleDate.setHours(0, 0, 0, 0);
+
+        const isSingleSeat = currentSaleDate >= targetSaleDate;
         return isSingleSeat ? { ...s, [key]: value } : s;
       }),
     );
-  }
+  };
 
-  const onBrochureReleasedChange = (key: string, value: boolean, sale: any, selected) => {
+  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
     updateSaleSet('update', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -159,6 +174,7 @@ export default function SalesTable({
   };
 
   const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update: any) => {
+    console.log(update);
     axios
       .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
       .catch((error: any) => console.log('failed to update sale', error));

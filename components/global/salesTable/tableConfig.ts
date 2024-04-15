@@ -7,35 +7,34 @@ import { reverseDate } from 'utils/reverseDate';
 import IconRowRenderer from './renderers/IconRowRenderer';
 
 const getCellColor = (data, ignoreMonday, school) => {
-  const saleDt = reverseDate(formatInputDate(data.weekOf))
+  const saleDt = reverseDate(formatInputDate(data.weekOf));
   const isMonday = new Date(saleDt).getDay() === 1;
   const showMondayBorder = isMonday && !ignoreMonday;
 
-  if (data.isNotOnSale) {
-    return {
-      backgroundColor: '#ED1111',
-      color: 'white',
-      borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
-      borderRightWidth: showMondayBorder ? 15 : 0
-    }
-  } else if (data.isBrochureReleased) {
+  if (data.isBrochureReleased) {
     return {
       backgroundColor: '#FFE606',
       color: '#617293',
       borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
-      borderRightWidth: school && showMondayBorder ? 15 : 0
-    }
+      borderRightWidth: school && showMondayBorder ? 15 : 0,
+    };
   } else if (data.isSingleSeats) {
     return {
       backgroundColor: '#10841C',
       color: 'white',
       borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
-      borderRightWidth: school && showMondayBorder ? 15 : 0
+      borderRightWidth: school && showMondayBorder ? 15 : 0,
+    };
+  } else if (data.isNotOnSale) {
+    return {
+      backgroundColor: '#ED1111',
+      color: 'white',
+      borderRightColor: school && showMondayBorder ? '#FDCE74' : 'transparent',
+      borderRightWidth: showMondayBorder ? 15 : 0,
     };
   } else {
     return isMonday && school ? { backgroundColor: '#FDCE74', color: '#617293' } : {};
   }
-
 };
 
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
@@ -166,7 +165,6 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
       headerName: 'Date',
       field: 'weekOf',
       cellRenderer: function (params) {
-        console.log(params.data)
         return formatInputDate(params.data.weekOf);
       },
       cellStyle: (params) => {
@@ -237,7 +235,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           headerName: 'Reserved No',
           field: 'genReserved',
           cellRenderer: function (params) {
-            return params.data.genReserved === '' ? '-' : params.data.genReserved
+            return params.data.genReserved === '' ? '-' : params.data.genReserved;
           },
           width: 100,
           cellStyle: {
@@ -253,7 +251,9 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           headerName: 'Reserved ' + currencySymbol,
           field: 'genReservations',
           cellRenderer: function (params) {
-            return params.data.genReservations === '' ? '-' : currencySymbol + parseFloat(params.data.genReservations).toFixed(2);
+            return params.data.genReservations === ''
+              ? '-'
+              : currencySymbol + parseFloat(params.data.genReservations).toFixed(2);
           },
           width: 100,
           cellStyle: {
@@ -338,9 +338,14 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           cellRenderer: function (params) {
             if (params.data.schReservations === '') {
               const previousRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schReservations;
-              return previousRev === undefined || previousRev === '' ? '-' : currencySymbol + parseFloat(previousRev).toFixed(2);
+              return previousRev === undefined || previousRev === ''
+                ? '-'
+                : currencySymbol + parseFloat(previousRev).toFixed(2);
             } else {
-              return currencySymbol + (params.data.schReservations === '' ? '0.00' : parseFloat(params.data.schReservations).toFixed(2));
+              return (
+                currencySymbol +
+                (params.data.schReservations === '' ? '0.00' : parseFloat(params.data.schReservations).toFixed(2))
+              );
             }
           },
           width: 100,
@@ -397,8 +402,10 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           valueChange = currentValue;
         } else {
           const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
-          const prevSchResValue = previousRowData.schReservations === '' ? 0 : parseFloat(previousRowData.schReservations);
-          const prevGenResValue = previousRowData.genReservations === '' ? 0 : parseFloat(previousRowData.genReservations);
+          const prevSchResValue =
+            previousRowData.schReservations === '' ? 0 : parseFloat(previousRowData.schReservations);
+          const prevGenResValue =
+            previousRowData.genReservations === '' ? 0 : parseFloat(previousRowData.genReservations);
           const totalPrevReserve = prevSchResValue + prevGenResValue;
           const prevSchSoldVal = previousRowData.schTotalValue === '' ? 0 : parseFloat(previousRowData.schTotalValue);
           const prevGenSoldVal = previousRowData.genTotalValue === '' ? 0 : parseFloat(previousRowData.genTotalValue);
@@ -477,27 +484,27 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
       sortable: false,
       resizable: false,
     },
-    isMarketing &&
-    {
+    isMarketing && {
       headerName: 'Activity',
       field: 'activity',
       cellRenderer: IconRowRenderer,
       cellRendererParams: (params) => ({
         iconList: [
-          { 
-            name: 'user-solid', 
-            color: params.data.isSingleSeats ? '#10841C' : '#ddd', 
-            onClick: () => setSalesActivity('isSingleSeats', booking, params.data) 
+          {
+            name: 'user-solid',
+            color: params.data.isSingleSeats ? '#10841C' : '#ddd',
+            onClick: () => setSalesActivity('isSingleSeats', booking, params.data),
           },
-          { 
-            name: 'book-solid', 
-            color: params.data.isBrochureReleased ? '#FFE606' : '#ddd',  
-            onClick: () => setSalesActivity('isBrochureReleased', booking, params.data) 
+          {
+            name: 'book-solid',
+            color: params.data.isBrochureReleased ? '#FFE606' : '#ddd',
+            onClick: () => setSalesActivity('isBrochureReleased', booking, params.data),
           },
-          { 
-            name: 'square-cross', 
-            color: params.data.isNotOnSale ? '#ED1111' : '#ddd', 
-            onClick: () => setSalesActivity('isNotOnSale', booking, params.data)}
+          {
+            name: 'square-cross',
+            color: params.data.isNotOnSale ? '#ED1111' : '#ddd',
+            onClick: () => setSalesActivity('isNotOnSale', booking, params.data),
+          },
         ],
       }),
       width: 120,
