@@ -209,7 +209,6 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      console.log('storeNewBookingDetails', isNewBooking, rowData);
       isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
     }
   };

@@ -325,13 +325,7 @@ export const createGetInFitUp = (
           Id: DateBlockId,
         },
       },
-      Venue: VenueId
-        ? {
-            connect: {
-              Id: VenueId,
-            },
-          }
-        : undefined,
+      ...(VenueId && { Venue: { connect: { Id: VenueId } } }),
     },
   });
 };
