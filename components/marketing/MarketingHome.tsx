@@ -8,8 +8,8 @@ import TabButton from 'components/core-ui-lib/TabButton';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import useAxios from 'hooks/useAxios';
 import SalesTable from 'components/global/salesTable';
-import axios from 'axios';
 import Button from 'components/core-ui-lib/Button';
+import ArchSalesDialog, { ArchSalesDialogVariant } from './modal/ArchivedSalesDialog';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTabs>('');
@@ -18,10 +18,10 @@ const MarketingHome = () => {
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
   const [sales, setSales] = useState<Array<SalesSnapshot>>([]);
-  const [showVenueModal, setShowVenueModal] = useState<boolean>(false);
-  const [showTownModal, setShowTownModal] = useState<boolean>(false);
-  const [showVTModal, setShowVTModal] = useState<boolean>(false);
+  const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
+  const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
+  const [archivedData, setArchivedData] = useState()
   // const [archivedSales, setArchivedSales] = useState>();
 
   const { fetchData } = useAxios();
@@ -42,6 +42,17 @@ const MarketingHome = () => {
       setSales([]);
     }
   };
+
+  const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
+    setArchSaleVariant(variant);
+    if(variant === 'venue'){
+      const selectedBooking = bookings[0].bookings.find(booking => booking.Id === bookings[0].selected);
+      console.log(selectedBooking);
+      const venueId = selectedBooking.Venue.Id;
+      setArchivedData(venueId);
+    }
+    setShowArchSalesModal(true);
+  }
 
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
@@ -154,19 +165,19 @@ const MarketingHome = () => {
               <Button
                 text="For this Venue"
                 className="w-[132px] mb-3 pl-6"
-                onClick={() => setShowVenueModal(true)}
+                onClick={() => showArchSalesComp('venue')}
               />
 
               <Button
                 text="For this Town"
                 className="w-[132px] mb-3 pl-6"
-                onClick={() => setShowTownModal(true)}
+                onClick={() => showArchSalesComp('town')}
               /> 
 
               <Button
                 text="For this Venue / Town"
                 className="w-[230px] mb-3 pl-6"
-                onClick={() => setShowVTModal(true)}
+                onClick={() => showArchSalesComp('both')}
               />
 
               <Button
@@ -175,6 +186,12 @@ const MarketingHome = () => {
                 iconProps={{ className: 'h-4 w-3 ml-5' }}
                 sufixIconName={'excel'}
                 disabled={!archivedDataAvail}
+              />
+
+              <ArchSalesDialog 
+                show={showArchSalesModal}
+                variant={archSaleVariant}
+                data={archivedData}
               />
             </div>
           )}
