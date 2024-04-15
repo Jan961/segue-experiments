@@ -26,6 +26,7 @@ type NewBookingDetailsProps = {
   production: Partial<ProductionDTO>;
   dateBlockId: number;
   onSubmit: (booking: BookingItem[]) => void;
+  onUpdate: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
   onDelete: () => void;
@@ -41,6 +42,7 @@ export default function NewBookingDetailsView({
   dateBlockId,
   data,
   onSubmit,
+  onUpdate,
   onDelete,
   toggleModalOverlay,
   onClose,
@@ -133,6 +135,7 @@ export default function NewBookingDetailsView({
   }, [production, bookingRow, venueDict]);
 
   useEffect(() => {
+    console.log('In NewBookingDetailsView', data);
     if (data !== null && data.length > 0) {
       setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
       setBookingData(data);
@@ -206,7 +209,7 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      onSubmit(rowData);
+      isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
     }
   };
 

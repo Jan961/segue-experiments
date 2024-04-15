@@ -67,16 +67,10 @@ export default function SalesTable({
         data.schReservations !== '' || data.schReserved !== '' || data.schSeatsSold !== '' || data.schTotalValue !== '',
     );
 
-    let colDefs = salesColDefs(
-      currency,
-      Boolean(found),
-      module !== 'bookings',
-      booking,
-      setSalesActivity,
-    );
+    let colDefs = salesColDefs(currency, Boolean(found), module !== 'bookings', booking, setSalesActivity);
     if (!found) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
-      setWidth('w-[1065px]');
+      setWidth('w-[1085px]');
       setHeight(containerHeight);
     }
 

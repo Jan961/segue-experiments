@@ -6,11 +6,14 @@ import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
-import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { isNullOrEmpty } from 'utils';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from './utils';
 import { RowDoubleClickedEvent } from 'ag-grid-community';
+import axios from 'axios';
+import { rehearsalState } from 'state/booking/rehearsalState';
+import { getInFitUpState } from 'state/booking/getInFitUpState';
+import { otherState } from 'state/booking/otherState';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -20,13 +23,14 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
-  const [bookingDict, setBookingDict] = useRecoilState(bookingState);
+  const [bookings, setBookings] = useRecoilState(bookingState);
+  const [rehearsals, setRehearsals] = useRecoilState(rehearsalState);
+  const [getInFitUps, setGetInFitUps] = useRecoilState(getInFitUpState);
+  const [others, setOthers] = useRecoilState(otherState);
   const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-
-  const { fetchData } = useAxios();
 
   const gridOptions = {
     getRowStyle: (params) => {
@@ -59,22 +63,30 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     }
   };
 
-  const handleSaveNote = (value: string) => {
+  const handleSaveNote = async (value: string) => {
     setShowModal(false);
+    const { data } = await axios.post('/api/bookings/note/update', {
+      ...productionItem,
+      note: value,
+    });
 
-    fetchData({
-      url: '/api/bookings/update/',
-      method: 'POST',
-      data: { Id: productionItem.Id, Notes: value },
-    })
-      .then((data: any) => {
-        const updatedBooking = { ...bookingDict[data.Id], ...data };
-        const replacement = { ...bookingDict, [data.Id]: updatedBooking };
-        setBookingDict(replacement);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (productionItem.isBooking) {
+      const rowItem = bookings[data.Id];
+      const replacement = { ...bookings, [data.Id]: { ...rowItem, Notes: value } };
+      setBookings(replacement);
+    } else if (productionItem.isRehearsal) {
+      const rowItem = rehearsals[data.Id];
+      const replacement = { ...rehearsals, [data.Id]: { ...rowItem, Notes: value } };
+      setRehearsals(replacement);
+    } else if (productionItem.isGetInFitUp) {
+      const rowItem = getInFitUps[data.Id];
+      const replacement = { ...getInFitUps, [data.Id]: { ...rowItem, Notes: value } };
+      setGetInFitUps(replacement);
+    } else {
+      const rowItem = others[data.Id];
+      const replacement = { ...others, [data.Id]: { ...rowItem, Notes: value } };
+      setOthers(replacement);
+    }
   };
 
   useEffect(() => {

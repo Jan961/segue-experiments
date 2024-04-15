@@ -10,7 +10,6 @@ import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
-import { reverseDate } from 'utils/reverseDate';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -26,7 +25,7 @@ const Filters = () => {
   const [selectedValue, setSelectedValue] = useState(null);
   const [venueName, setVenueName] = useState('');
   const [venueId, setVenueId] = useState(0);
-  const [venueUrl, setVenueUrl] = useState('');
+  const [landingURL, setLandingURL] = useState('');
   const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
   const bookingOptions = useMemo(() => {
     const options = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
@@ -51,6 +50,10 @@ const Filters = () => {
     });
   }, [bookingOptions, today]);
 
+  const reverseDate = (inputDt) => {
+    return new Date(inputDt.split('/').reverse().join('/')).getTime();
+  };
+
   const changeBooking = (value: string | number) => {
     if (value !== null) {
       const selectedBooking = bookingOptions.find((booking) => booking.value === value);
@@ -59,10 +62,11 @@ const Filters = () => {
 
       const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
       const booking = bookings.bookings.find((booking) => booking.Id === bookingIdentifier);
-      const website = booking.Venue.Website;
+      const website = booking.LandingPageURL;
+
       setVenueName(booking.Venue.Code + ' ' + booking.Venue.Name);
       setVenueId(booking.Venue.Id);
-      setVenueUrl(website);
+      setLandingURL(website);
       setBooking({ ...bookings, selected: bookingIdentifier });
     } else {
       setSelectedIndex(-1);
@@ -131,8 +135,8 @@ const Filters = () => {
           />
 
           {/* Iframe placed next to buttons but in the same flex container */}
-          <div className="self-end -mt-[60px]">
-            <Iframe variant="xs" src={venueUrl} className="" />
+          <div className="self-end -mt-[60px] cursor-pointer">
+            <Iframe variant="xs" src={landingURL} className="" />
           </div>
         </div>
       </div>
