@@ -47,13 +47,27 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
           <Spinner size="sm" />
         </div>
       )}
-      <iframe
-        src={formattedUrl}
-        style={transformStyle}
-        allowFullScreen
-        className="absolute"
-        onLoad={() => setIsLoading(false)}
-       />
+      <div onClick={() => window.open(formattedUrl, '_blank')}>
+        <iframe
+          src={formattedUrl}
+          style={transformStyle}
+          allowFullScreen
+          className="absolute"
+          onLoad={() => setIsLoading(false)}
+        />
+      </div>
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          cursor: 'pointer',
+          zIndex: 10, // Ensure this is high enough to be above the iframe
+        }}
+        onClick={() => window.open(formattedUrl, '_blank')}
+      />
     </div>
   );
 };
