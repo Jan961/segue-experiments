@@ -65,8 +65,11 @@ type BookingRow = {
   note: string;
   performanceCount: number;
   performanceTimes: string;
-  count: string;
+  pencilNo?: number;
   runTag: string;
+  isBooking: boolean;
+  isRehearsal: boolean;
+  isGetInFitUp: boolean;
 };
 
 export type { IBooking, BookingRow };

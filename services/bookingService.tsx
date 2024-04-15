@@ -1,7 +1,25 @@
-import { Booking, Prisma } from '@prisma/client';
+import { Booking, GetInFitUp, Other, Prisma, Rehearsal } from '@prisma/client';
 import { addDays, differenceInDays } from 'date-fns';
 import prisma from 'lib/prisma';
+import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
+import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
+
+export interface AddBookingsParams {
+  Date: string;
+  DateBlockId: number;
+  VenueId: number;
+  performanceTimes: string[];
+  DateTypeId?: number;
+  BookingStatus: string;
+  PencilNo: number;
+  Notes: string;
+  isBooking?: boolean;
+  isRehearsal?: boolean;
+  isGetInFitUp?: boolean;
+  RunTag: string;
+  // Add any additional fields needed for rehearsals and getInFitUp
+}
 
 const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
   Venue: true,
@@ -42,6 +60,33 @@ export const updateBooking = async (booking: Booking, performances) => {
     }
   });
   return { ...updatedBooking, ...updatedPerformances };
+};
+
+export const updateGetInFitUp = async (booking: GetInFitUp) => {
+  await prisma.getInFitUp.update({
+    data: omit(booking, ['Id']),
+    where: {
+      Id: booking.Id,
+    },
+  });
+};
+
+export const updateRehearsal = async (booking: Rehearsal) => {
+  await prisma.rehearsal.update({
+    data: omit(booking, ['Id']),
+    where: {
+      Id: booking.Id,
+    },
+  });
+};
+
+export const updateOther = async (booking: Other) => {
+  await prisma.other.update({
+    data: omit(booking, ['Id']),
+    where: {
+      Id: booking.Id,
+    },
+  });
 };
 
 export const deleteBookingById = async (id: number) => {
@@ -280,11 +325,7 @@ export const createGetInFitUp = (
           Id: DateBlockId,
         },
       },
-      Venue: {
-        connect: {
-          Id: VenueId,
-        },
-      },
+      ...(VenueId && { Venue: { connect: { Id: VenueId } } }),
     },
   });
 };
@@ -322,4 +363,160 @@ export const createOtherBooking = (
       },
     },
   });
+};
+
+export const createMultipleBookings = async (bookingsData: AddBookingsParams[]) => {
+  const promises = [];
+  const bookings = [];
+  let performances = [];
+  const rehearsals = [];
+  const getInFitUps = [];
+  const others = [];
+
+  const orderMap = new Map();
+  let counter = 1;
+
+  await prisma.$transaction(async (tx) => {
+    for (const bookingData of bookingsData) {
+      const {
+        DateBlockId,
+        VenueId,
+        Date: BookingDate,
+        performanceTimes = [],
+        BookingStatus: StatusCode,
+        PencilNo: PencilNum,
+        Notes,
+        isBooking,
+        isRehearsal,
+        isGetInFitUp,
+        DateTypeId,
+        RunTag,
+      } = bookingData || {};
+
+      if (isBooking) {
+        const Performances =
+          performanceTimes.length > 0
+            ? performanceTimes.map((time) => {
+                const datePart = BookingDate.split('T')[0];
+                return {
+                  Time: `${datePart}T${time}:00Z`,
+                  Date: BookingDate,
+                };
+              })
+            : [
+                {
+                  Time: null,
+                  Date: BookingDate,
+                },
+              ];
+
+        const bookingPromise = createNewBooking(
+          {
+            DateBlockId,
+            PencilNum,
+            Notes,
+            VenueId,
+            Performances,
+            BookingDate,
+            StatusCode,
+            RunTag,
+          },
+          tx,
+        );
+        promises.push(bookingPromise);
+        orderMap.set(counter, 'booking');
+      } else if (isRehearsal) {
+        const rehearsalPromise = createNewRehearsal(
+          {
+            DateBlockId,
+            Notes,
+            DateTypeId,
+            VenueId,
+            StatusCode,
+            BookingDate,
+            PencilNum,
+            RunTag,
+          },
+          tx,
+        );
+        promises.push(rehearsalPromise);
+        orderMap.set(counter, 'rehearsal');
+      } else if (isGetInFitUp) {
+        const getInFitUpPromise = createGetInFitUp(
+          {
+            DateBlockId,
+            VenueId,
+            Notes,
+            BookingDate,
+            StatusCode,
+            PencilNum,
+            RunTag,
+          },
+          tx,
+        );
+
+        promises.push(getInFitUpPromise);
+        orderMap.set(counter, 'getInFitUp');
+      } else {
+        const getOther = createOtherBooking(
+          {
+            DateBlockId,
+            DateTypeId,
+            Notes,
+            BookingDate,
+            StatusCode,
+            PencilNum,
+            RunTag,
+          },
+          tx,
+        );
+        promises.push(getOther);
+        orderMap.set(counter, 'other');
+      }
+      counter++;
+    }
+    counter = 1;
+
+    const createdItems = await Promise.allSettled(promises);
+
+    console.log(createdItems);
+
+    for (const item of createdItems) {
+      if (item.status === 'fulfilled') {
+        const type = orderMap.get(counter);
+        counter++;
+
+        const value = item.value;
+        // Assuming value contains a property `type` to distinguish between booking, rehearsal, etc.
+        // This requires your creation logic to somehow include this information in the result.
+        switch (type) {
+          case 'booking':
+            bookings.push(bookingMapper(value));
+            if (value.Performance) {
+              performances = performances.concat(value.Performance.map(performanceMapper));
+            }
+            break;
+          case 'rehearsal':
+            rehearsals.push(rehearsalMapper(value));
+            break;
+          case 'getInFitUp':
+            getInFitUps.push(getInFitUpMapper(value));
+            break;
+          case 'other':
+            others.push(otherMapper(value));
+            break;
+          default:
+            // Handle any unexpected types
+            break;
+        }
+      } else if (item.status === 'rejected') {
+        // Log the error or handle rejected promises as needed
+        // console.error(item.reason);
+      }
+    }
+
+    // Continue with your return or further processing
+    // return { bookings, performances, rehearsals, getInFitUps, others };
+  });
+  return { bookings, performances, rehearsals, getInFitUps, others };
 };

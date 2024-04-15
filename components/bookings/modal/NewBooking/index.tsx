@@ -79,7 +79,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
 
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
-    setNewBookingOnStore(null);
+    setBookingOnStore(null);
   };
   const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
@@ -92,7 +92,14 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     dispatch(actionSpreader(Actions.UPDATE_MODAL_TITLE, title));
   };
 
-  const setNewBookingOnStore = (booking: BookingItem[]) => {
+  const setBookingOnStore = (booking: BookingItem[]) => {
+    dispatch(actionSpreader(Actions.SET_BOOKING, booking));
+  };
+
+  const updateBookingOnStore = (booking: BookingItem[]) => {
+    // Store updates separately as it is possible that the daytype has changed and instead of updating the booking,
+    // we would need to delete the existing booking and create a new one in another table. e.g. Performance changed to Day Off
+
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
@@ -114,19 +121,21 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           dateBlockId: primaryBlock?.Id,
           dayType: dayTypeOptions.find((option) => option.text === b.dayType)?.value,
           venue: b.venueId,
+          runTag: b.runTag,
           perf: b.dayType === 'Performance',
           bookingStatus: b.status,
           notes: b.note,
           noPerf: b.performanceCount,
           times: b.performanceTimes,
-          pencilNo: b.count,
+          pencilNo: b.pencilNo,
           isBooking: b.dayType === 'Performance',
           isRehearsal: b.dayType === 'Rehearsal',
           isGetInFitUp: b.dayType === 'Get in / Fit Up',
           isRunOfDates: runOfDates.length > 1,
         };
       });
-      dispatch(actionSpreader(Actions.UPDATE_BOOKING, formattedBooking));
+      setBookingOnStore(formattedBooking);
+      updateBookingOnStore(formattedBooking);
     }
   }, [booking]);
 
@@ -154,22 +163,12 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   const updateBooking = async () => {
-    const bookingsToUpdate = state.booking.filter(({ id }) => !Number.isNaN(id));
-    let bookingsToCreate = state.booking.filter(({ id }) => Number.isNaN(id));
-    let result = null;
     try {
-      const { data: updated } = await axios.post('/api/bookings/update', bookingsToUpdate);
-      result = updated;
-      if (!isNullOrEmpty(bookingsToCreate)) {
-        const runTagForRunOfDates = nanoid(8);
-        bookingsToCreate = bookingsToUpdate.map((b) => ({
-          ...b,
-          runTag: runTagForRunOfDates,
-        }));
-        const { data: created } = await axios.post('/api/bookings/add', bookingsToCreate);
-        result = { ...result, created };
-      }
-      onClose(result);
+      const { data: updated } = await axios.post('/api/bookings/update', {
+        original: state.booking,
+        updated: state.bookingUpdates,
+      });
+      onClose(updated);
     } catch (e) {
       console.log('Failed to update booking', e);
     }
@@ -195,7 +194,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
             updateBarringConflicts={updateBarringConflicts}
             dayTypeOptions={dayTypeOptions}
             onChange={onFormDataChange}
-            onSubmit={setNewBookingOnStore}
+            onSubmit={setBookingOnStore}
             formData={state.form}
             onClose={onClose}
             productionCode={productionCode}
@@ -206,12 +205,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         <NewBookingDetailsView
           isNewBooking={!editBooking}
           formData={state.form}
-          data={state.booking}
+          data={editBooking ? state.bookingUpdates : state.booking}
           production={currentProduction}
           dateBlockId={primaryBlock?.Id}
           dayTypeOptions={dayTypeOptions}
           venueOptions={venueOptions}
-          onSubmit={setNewBookingOnStore}
+          onSubmit={setBookingOnStore}
+          onUpdate={updateBookingOnStore}
           toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
           onClose={onClose}
           onDelete={deleteBooking}
@@ -220,7 +220,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         <PreviewNewBookingView
           formData={state.form}
           productionCode={productionCode}
-          data={state.booking}
+          data={editBooking ? state.bookingUpdates : state.booking}
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}
