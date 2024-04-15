@@ -12,7 +12,7 @@ interface VenueBarringFormProps {
 }
 
 const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
-  const [formData, setFormData] = useState({ ...initialVenueBarringRules, ...venue });
+  const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...formData,

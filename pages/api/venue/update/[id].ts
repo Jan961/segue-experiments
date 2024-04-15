@@ -7,9 +7,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).end(); // Method Not Allowed
   }
   try {
+    const VenueId = parseInt(req.query.id as string, 10);
+    if (!VenueId) {
+      return res.status(400).json({ error: 'missing required params' });
+    }
     const email = await getEmailFromReq(req);
     const accountId = await getAccountId(email);
-    const VenueId = parseInt(req.query.id as string, 10);
     const {
       venueCode: Code,
       venueName: Name,
@@ -91,9 +94,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Postcode: deliveryPostCode,
         TypeName: 'Delivery',
       });
-    }
-    if (!VenueId) {
-      return res.status(400).json({ error: 'missing required params' });
     }
     const updatedData = {
       Code,

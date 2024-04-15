@@ -8,7 +8,7 @@ interface VenueAddressFormProps {
   onChange: (data: any) => void;
 }
 const VenueAddressForm = ({ venue, onChange }: VenueAddressFormProps) => {
-  const [formData, setFormData] = useState({ ...initialVenueAddressDetails, ...venue });
+  const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueAddressDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {

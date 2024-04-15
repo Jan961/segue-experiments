@@ -25,7 +25,7 @@ const MainVenueForm = ({
   updateValidationErrrors,
   onChange,
 }: MainVenueFormProps) => {
-  const [formData, setFormData] = useState({ ...initialMainVenueDetails, ...venue });
+  const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialMainVenueDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -41,7 +41,6 @@ const MainVenueForm = ({
       updateValidationErrrors(field, null);
     }
   };
-  console.table(venueCurrencyOptionList);
   return (
     <>
       <div className="flex flex-col">
