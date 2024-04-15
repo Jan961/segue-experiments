@@ -1,0 +1,198 @@
+export const dummyVenueContractData = [
+  {
+    VenueRole: 'Enter Job title',
+    VenueFirstName: 'Enter First Name',
+    VenueLastName: 'Enter Last Name',
+    VenuePhone: 'Enter Phone No.',
+    VenueEmail: 'Enter Email Address',
+    delete: true,
+  },
+  {
+    VenueRole: 'Box Office Default',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Box Office Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Finance Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Front of House Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Marketing Contact',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Marketing Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Operations Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Stage Door',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Technical Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Venue Chief LX',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Venue Head of Sound',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Venue Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Venue Programming',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  {
+    VenueRole: 'Venue Stage Manager',
+    VenueFirstName: 'First Name',
+    VenueLastName: 'Last Name',
+    VenuePhone: '(00) 0000 000000',
+    VenueEmail: 'name@theatrecompany.com',
+    delete: false,
+  },
+  // Add more dummy data as needed
+];
+
+export const barredVenuesData = [
+  {
+    venueOptions: 'test',
+  },
+  {
+    venueOptions: 'test-2',
+  },
+  // Add more dummy data as needed
+];
+
+export const initialMainVenueDetails = {
+  venueCode: '',
+  venueStatus: '',
+  venueName: '',
+  vatIndicator: false,
+  culturallyExemptVenue: false,
+  venueFamily: null,
+  currency: '',
+  venueCapacity: null,
+  townPopulation: null,
+  venueWebsite: '',
+  notes: '',
+  excludeFromChecks: false,
+};
+
+export const initialVenueAddressDetails = {
+  deliveryCountry: '',
+  deliveryPostCode: '',
+  deliveryTown: '',
+  deliveryAddress3: '',
+  deliveryAddress2: '',
+  deliveryAddress1: '',
+
+  primaryCountry: '',
+  primaryPostCode: '',
+  primaryTown: '',
+  primaryAddress3: '',
+  primaryAddress2: '',
+  primaryAddress1: '',
+  what3WordsStage: '',
+  what3WordsLoading: '',
+};
+
+export const initialVenueBarringRules = {
+  barringMiles: '',
+  postShow: '',
+  preShow: '',
+  barringClause: '',
+};
+
+export const initialVenueTechnicalDetails = {
+  flags: '',
+  gridHeight: '',
+  soundNotes: '',
+  soundDesk: '',
+  stageSize: '',
+  techLXNotes: '',
+  techLXDesk: '',
+  techSpecsUrl: '',
+};
+
+export const initialVenueState = {
+  ...initialMainVenueDetails,
+  ...initialVenueAddressDetails,
+  ...initialVenueBarringRules,
+  ...initialVenueTechnicalDetails,
+  confidentialNotes: '',
+};
+
+export const venueStatusOptions = [
+  { text: 'Open', value: 'O' },
+  { text: 'Closed', value: 'C' },
+  { text: 'Warning', value: 'W' },
+];
