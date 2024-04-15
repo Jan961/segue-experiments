@@ -3,8 +3,11 @@ import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRendere
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
-import { reverseDate } from 'utils/reverseDate';
 import IconRowRenderer from './renderers/IconRowRenderer';
+
+const reverseDate = (inputDt) => {
+  return new Date(inputDt.split('/').reverse().join('/')).getTime();
+};
 
 const getCellColor = (data, ignoreMonday, school) => {
   const saleDt = reverseDate(formatInputDate(data.weekOf));
@@ -154,7 +157,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         };
       },
       suppressMovable: true,
-      headerClass: 'custom-header-3rb',
+      headerClass: 'group-header-normal',
       pinned: 'left',
       lockPinned: true,
       width: 120,
@@ -175,7 +178,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         };
       },
       suppressMovable: true,
-      headerClass: 'custom-header-4rb',
+      headerClass: 'group-header-normal',
       pinned: 'left',
       lockPinned: true,
       width: 120,
@@ -184,7 +187,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
     },
     {
       headerName: 'General Sales',
-      headerClass: 'justify-center font-bold text-base thick-border-b thick-border-r',
+      headerClass: 'group-header-parent',
       marryChildren: true,
       children: [
         {
@@ -203,7 +206,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[1px] border-white ',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -226,7 +229,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[1px] border-white',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -242,7 +245,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[1px] border-white',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -260,7 +263,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[4px] border-white',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -269,7 +272,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
     },
     {
       headerName: 'School Sales',
-      headerClass: 'justify-center font-bold text-base thick-border-b',
+      headerClass: 'group-header-parent',
       marryChildren: true,
       children: [
         {
@@ -288,7 +291,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[1px] border-white ',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -311,7 +314,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[1px] border-white',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -327,7 +330,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[1px] border-white',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -353,7 +356,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
             textAlign: 'center',
             overflow: 'visible',
           },
-          headerClass: 'border-r-[4px] border-white',
+          headerClass: 'group-header-child',
           suppressMovable: true,
           sortable: false,
           resizable: false,
@@ -374,12 +377,12 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         const currentValue = totalReserve + totalSold;
         return currentValue === 0 ? '-' : currencySymbol + currentValue.toFixed(2).toString();
       },
-      width: 85,
+      width: 100,
       cellStyle: {
         textAlign: 'center',
         overflow: 'visible',
       },
-      headerClass: 'custom-header-1rb',
+      headerClass: 'group-header-normal',
       suppressMovable: true,
       sortable: false,
       resizable: false,
@@ -428,7 +431,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         textAlign: 'center',
         overflow: 'visible',
       },
-      headerClass: 'custom-header-1rb',
+      headerClass: 'group-header-normal',
       suppressMovable: true,
       sortable: false,
       resizable: false,
@@ -463,7 +466,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         textAlign: 'center',
         overflow: 'visible',
       },
-      headerClass: 'custom-header-1rb',
+      headerClass: 'group-header-normal',
       suppressMovable: true,
       sortable: false,
       resizable: false,
@@ -474,12 +477,12 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
       cellRenderer: function (params) {
         return params.data.totalHolds === null ? 0 : params.data.totalHolds;
       },
-      width: 70,
+      width: 75,
       cellStyle: {
         textAlign: 'center',
         overflow: 'visible',
       },
-      headerClass: 'custom-header-1rb',
+      headerClass: 'group-header-normal',
       suppressMovable: true,
       sortable: false,
       resizable: false,
@@ -512,7 +515,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         textAlign: 'center',
         overflow: 'visible',
       },
-      headerClass: 'custom-header-end',
+      headerClass: 'group-header-normal',
       suppressMovable: true,
       sortable: false,
       resizable: false,
