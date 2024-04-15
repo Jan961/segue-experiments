@@ -99,6 +99,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   CastRateTicketsArranged: b.CastRateTicketsArranged,
   CastRateTicketsNotes: b.CastRateTicketsNotes,
   RunTag: b.RunTag,
+  LandingPageURL: b.LandingPageURL,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
