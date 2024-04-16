@@ -11,6 +11,7 @@ import VenueTechnicalDetailsForm from './VenueTechnicalDetailsForm';
 import VenueBarringForm from './VenueBarringForm';
 import axios from 'axios';
 import { UiTransformedVenue } from 'utils/venue';
+import { debug } from 'utils/logging';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -43,15 +44,21 @@ export default function AddEditVenueModal({
   };
 
   const createVenue = async (venue: UiTransformedVenue) => {
-    return axios.post('/api/venue/create', venue).then(() => {
+    try {
+      await axios.post('/api/venue/create', venue);
       onClose();
-    });
+    } catch (e) {
+      debug('Error creating venue', e);
+    }
   };
 
   const updateVenue = async (venue: UiTransformedVenue) => {
-    return axios.post('/api/venue/update/' + venue.id, venue).then(() => {
+    try {
+      await axios.post('/api/venue/update/' + venue.id, venue);
       onClose();
-    });
+    } catch (e) {
+      debug('Error updating venue', e);
+    }
   };
 
   const handleSaveAndClose = async () => {
