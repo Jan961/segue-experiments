@@ -9,6 +9,7 @@ import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
+import { getUniqueVenueTownlist } from 'services/venueService';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MarketingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -38,6 +39,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       selected,
       bookings: bookings.map(bookingMapperWithVenue),
     };
+    const townList = await getUniqueVenueTownlist();
 
     // See _app.tsx for how this is picked up
     initialState = {
@@ -47,6 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       marketing: {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
+        towns: townList,
       },
     };
   } else {

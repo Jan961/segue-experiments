@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { SalesTabs, SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -11,6 +11,9 @@ import SalesTable from 'components/global/salesTable';
 import Button from 'components/core-ui-lib/Button';
 import ArchSalesDialog, { ArchSalesDialogVariant } from './modal/ArchivedSalesDialog';
 import { VenueDTO } from 'interfaces';
+import { townState } from 'state/marketing/townState';
+import { venueState } from 'state/booking/venueState';
+import { bookingState } from 'state/booking/bookingState';
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTabs>('');
@@ -24,9 +27,26 @@ const MarketingHome = () => {
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
   const [archivedData, setArchivedData] = useState<VenueDTO>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
+  const townList = useRecoilValue(townState);
+  const venueDict = useRecoilValue(venueState);
+  const bookingDict = useRecoilValue(bookingState);
   // const [archivedSales, setArchivedSales] = useState>();
 
   const { fetchData } = useAxios();
+
+  const venueOptions = useMemo(() => {
+    const options = [];
+    for (const venueId in venueDict) {
+      const venue = venueDict[venueId];
+      const option = {
+        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
+        value: venue?.Id,
+      };
+      options.push(option);
+    }
+    options.sort((a, b) => a.text.localeCompare(b.text));
+    return options;
+  }, [venueDict, bookingDict]);
 
   const getSales = async (bookingId: string) => {
     const data = await fetchData({
@@ -47,9 +67,19 @@ const MarketingHome = () => {
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
-    const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
-    setArchivedData(selectedBooking.Venue);
-    setShowArchSalesModal(true);
+    if (variant === 'both') {
+      // get venue list
+      const venueTownData = {
+        townList: townList.towns,
+        venueList: venueOptions,
+      };
+
+      setArchivedData(venueTownData);
+    } else {
+      const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
+      setArchivedData(selectedBooking.Venue);
+      setShowArchSalesModal(true);
+    }
   };
 
   const showArchivedSales = async (selection) => {
