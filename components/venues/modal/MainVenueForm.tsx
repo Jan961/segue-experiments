@@ -7,22 +7,25 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { initialMainVenueDetails, venueStatusOptions } from 'config/venue';
 import { useState } from 'react';
+import { UiTransformedVenue } from 'utils/venue';
 
 interface MainVenueFormProps {
-  onChange: (data: any) => void;
+  venue: Partial<UiTransformedVenue>;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   validationErrors?: Record<string, string>;
+  onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
 }
 const MainVenueForm = ({
-  onChange,
+  venue,
   venueCurrencyOptionList,
   venueFamilyOptionList,
   validationErrors,
   updateValidationErrrors,
+  onChange,
 }: MainVenueFormProps) => {
-  const [formData, setFormData] = useState(initialMainVenueDetails);
+  const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialMainVenueDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -62,9 +65,7 @@ const MainVenueForm = ({
             />
           </Tooltip>
         </label>
-        {validationErrors.venueCode && (
-          <small className="text-primary-red flex justify-end">{validationErrors.venueCode}</small>
-        )}
+        {validationErrors.venueCode && <small className="text-primary-red flex">{validationErrors.venueCode}</small>}
       </div>
       <div className="flex flex-col">
         <Select
@@ -76,9 +77,7 @@ const MainVenueForm = ({
           className="w-[430px] font-bold place-self-end"
         />
         {validationErrors.venueStatus && (
-          <small className="text-primary-red justify-end w-[430px] place-self-end">
-            {validationErrors.venueStatus}
-          </small>
+          <small className="text-primary-red w-[430px]">{validationErrors.venueStatus}</small>
         )}
       </div>
       <div className="flex flex-col">
@@ -88,6 +87,7 @@ const MainVenueForm = ({
             placeholder="Enter Venue Name"
             className="w-[364px]"
             value={formData.venueName}
+            error={validationErrors.venueName}
             onChange={(e) => handleInputChange('venueName', e.target.value)}
           />
         </label>
@@ -102,9 +102,9 @@ const MainVenueForm = ({
         />
         <Checkbox
           label="Culturally Exempt Venue"
-          id={'culturallyExemptVenue'}
-          checked={formData.culturallyExemptVenue}
-          onChange={(e) => handleInputChange('culturallyExemptVenue', e.target.value)}
+          id={'culturallyExempt'}
+          checked={formData.culturallyExempt}
+          onChange={(e) => handleInputChange('culturallyExempt', e.target.value)}
         />
       </div>
       <div className="flex flex-col">
@@ -128,6 +128,7 @@ const MainVenueForm = ({
             name="currency"
             className="w-[364px] font-bold"
             placeholder="Currency Dropdown"
+            value={formData.currency}
             onChange={(value) => handleInputChange('currency', value)}
             options={venueCurrencyOptionList}
             isSearchable
@@ -142,7 +143,7 @@ const MainVenueForm = ({
             placeholder="Enter Capacity"
             type="number"
             className="w-[364px]"
-            value={formData.venueCapacity}
+            value={formData.venueCapacity + ''}
             onChange={(e) => handleInputChange('venueCapacity', parseFloat(e.target.value))}
           />
         </label>
@@ -154,7 +155,7 @@ const MainVenueForm = ({
           placeholder="Enter Town Population"
           type="number"
           className="w-[364px]"
-          value={formData.townPopulation}
+          value={formData.townPopulation + ''}
           onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
         />
       </label>

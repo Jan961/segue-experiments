@@ -20,7 +20,6 @@ export type IconName =
   | 'marketing'
   | 'tasks'
   | 'contracts'
-  | 'touring-management'
   | 'system-admin'
   | 'menu'
   | 'exit'
@@ -48,7 +47,6 @@ const IconNameMap = new Map([
   ['marketing', 'HornIcon'],
   ['tasks', 'SquareTickIcon'],
   ['contracts', 'PaperIcon'],
-  ['touring-management', 'LocationIcon'],
   ['production-management', 'LocationIcon'],
   ['system-admin', 'UserSettingIcon'],
   ['menu', 'MenuIcon'],

@@ -163,6 +163,8 @@ model Venue {
   ExcludeFromChecks                                         Boolean              @default(dbgenerated("(b'0')")) @map("VenueExcludeFromChecks") @db.Bit(1)
   VenueCountryId                                            Int?
   FamilyId                                                  Int?                 @map("VenueVenueFamilyId")
+  AddressStageDoorW3W                                       String?              @map("VenueAddressStageDoorW3W")@db.VarChar(70)
+  AddressLoadingW3W                                         String?              @map("VenueAddressLoadingW3W")@db.VarChar(70)
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
@@ -507,19 +509,21 @@ model ContractAttachedFile {
 }
 
 model VenueAddress {
-  Id       Int     @id @default(autoincrement()) @map("VenueAddressId")
-  VenueId  Int     @map("VenueAddressVenueId")
-  TypeName String  @map("VenueAddressTypeName") @db.VarChar(15)
-  Line1    String? @map("VenueAddress1") @db.VarChar(50)
-  Line2    String? @map("VenueAddress2") @db.VarChar(50)
-  Line3    String? @map("VenueAddress3") @db.VarChar(50)
-  Town     String? @map("VenueAddressTown") @db.VarChar(50)
-  County   String? @map("VenueAddressCounty") @db.VarChar(50)
-  Postcode String? @map("VenueAddressPostcode") @db.VarChar(12)
-  Country  String? @map("VenueAddressCountry") @db.VarChar(30)
-  Venue    Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+  Id                    Int      @id @default(autoincrement()) @map("VenueAddressId")
+  VenueId               Int      @map("VenueAddressVenueId")
+  TypeName              String   @map("VenueAddressTypeName") @db.VarChar(15)
+  Line1                 String?  @map("VenueAddress1") @db.VarChar(50)
+  Line2                 String?  @map("VenueAddress2") @db.VarChar(50)
+  Line3                 String?  @map("VenueAddress3") @db.VarChar(50)
+  Town                  String?  @map("VenueAddressTown") @db.VarChar(50)
+  County                String?  @map("VenueAddressCounty") @db.VarChar(50)
+  Postcode              String?  @map("VenueAddressPostcode") @db.VarChar(12)
+  CountryId             Int?     @map("VenueAddressCountryId")
+  Country               Country? @relation(fields: [CountryId], references: [Id], onDelete: NoAction, map: "CountryVenueAddress")
+  Venue                 Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueId], map: "Venue_VenueAddress")
+  @@index([CountryId], map: "CountryVenueAddress")
 }
 
 model User {
@@ -645,20 +649,20 @@ model AccountUserProduction {
 }
 
 model Production {
-  Id                       Int                     @id @default(autoincrement()) @map("ProductionId")
-  ShowId                   Int                     @map("ProductionShowId")
-  Code                     String                  @map("ProductionCode") @db.VarChar(10)
-  SalesEmail               String?                 @map("ProductionSalesEmail") @db.VarChar(80)
-  IsArchived               Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
-  IsDeleted                Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  Logo                     Bytes?                  @map("ProductionLogo")
-  SalesFrequency           String                  @map("ProductionSalesFrequency")@default("W") @db.Char(1)
-  AccountUserProduction    AccountUserProduction[]
-  ConversionRate           ConversionRate[]
-  DateBlock                DateBlock[]
-  Show                     Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
-  ProductionRegion         ProductionRegion[]
-  ProductionTask           ProductionTask[]
+  Id                    Int                     @id @default(autoincrement()) @map("ProductionId")
+  ShowId                Int                     @map("ProductionShowId")
+  Code                  String                  @map("ProductionCode") @db.VarChar(10)
+  SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
+  IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
+  IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
+  Logo                  Bytes?                  @map("ProductionLogo")
+  SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
+  AccountUserProduction AccountUserProduction[]
+  ConversionRate        ConversionRate[]
+  DateBlock             DateBlock[]
+  Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
+  ProductionRegion      ProductionRegion[]
+  ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ShowId], map: "ShowMayHaveProduction")
@@ -701,10 +705,11 @@ model AccountContact {
 }
 
 model Country {
-  CountryId           Int     @id @default(autoincrement())
-  CountryCode         String  @db.VarChar(3)
-  CountryName         String  @db.VarChar(40)
-  CountryCurrencyCode String? @db.VarChar(3)
+  Id                  Int            @map("CountryId")@id @default(autoincrement())
+  Code                String         @map("CountryCode")@db.VarChar(3)
+  Name                String         @map("CountryName")@db.VarChar(40)
+  CurrencyCode        String?        @map("CountryCurrencyCode")@db.VarChar(3)
+  VenueAddress        VenueAddress[]
 }
 
 model CountryInRegion {
@@ -854,14 +859,14 @@ view VenueView {
   VenueMainAddressTown         String? @db.VarChar(50)
   VenueMainAddressCounty       String? @db.VarChar(50)
   VenueMainAddressPostcode     String? @db.VarChar(12)
-  VenueMainAddressCountry      String? @db.VarChar(30)
+  VenueMainAddressCountry      String? @db.VarChar(40)
   VenueDeliveryAddress1        String? @db.VarChar(50)
   VenueDeliveryAddress2        String? @db.VarChar(50)
   VenueDeliveryAddress3        String? @db.VarChar(50)
   VenueDeliveryAddressTown     String? @db.VarChar(50)
   VenueDeliveryAddressCounty   String? @db.VarChar(50)
   VenueDeliveryAddressPostcode String? @db.VarChar(12)
-  VenueDeliveryAddressCountry  String? @db.VarChar(30)
+  VenueDeliveryAddressCountry  String? @db.VarChar(40)
   VenueMainNoteText            String? @db.LongText
   VenueWarningNoteText         String? @db.LongText
 

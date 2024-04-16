@@ -2,15 +2,17 @@ import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueBarringRules } from 'config/venue';
 import { useState } from 'react';
+import { UiTransformedVenue } from 'utils/venue';
 
 interface VenueBarringFormProps {
+  venue: Partial<UiTransformedVenue>;
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
 }
 
-const VenueBarringForm = ({ onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
-  const [formData, setFormData] = useState(initialVenueBarringRules);
+const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
+  const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...formData,
@@ -27,7 +29,7 @@ const VenueBarringForm = ({ onChange, validationErrors, updateValidationErrrors 
   // };
   return (
     <>
-      <label className="grid grid-cols-[95px_minmax(100px,350px)]  gap-10   w-full">
+      <label className="grid grid-cols-[100px_minmax(100px,350px)]  gap-10   w-full">
         <p className="text-primary-input-text">Barring Clause</p>
         <TextArea
           id="barringClause"
@@ -41,35 +43,35 @@ const VenueBarringForm = ({ onChange, validationErrors, updateValidationErrrors 
         <div className="flex flex-col gap-5 pt-5 ">
           <p className="text-primary-input-text">Barring Weeks</p>
           <div className="flex flex-col">
-            <label htmlFor="" className="grid grid-cols-[90px_minmax(200px,30px)] gap-10 justify-items-start  w-full">
+            <label htmlFor="" className="grid grid-cols-[100px_minmax(200px,30px)] gap-10 justify-items-start  w-full">
               <p className="text-primary-input-text">Pre Show</p>
               <TextInput
                 id="preShow"
                 placeholder="Enter Pre Show Weeks"
                 type="number"
                 className="w-full justify-between"
-                value={formData.preShow}
+                value={formData.preShow + ''}
                 onChange={(e) => handleInputChange('preShow', parseFloat(e.target.value))}
               />
             </label>
             {validationErrors.preShow && <small className="text-primary-red">{validationErrors.preShow}</small>}
           </div>
           <div className="flex flex-col">
-            <label htmlFor="" className="grid grid-cols-[90px_minmax(200px,30px)] gap-10 justify-items-start  w-full">
+            <label htmlFor="" className="grid grid-cols-[100px_minmax(200px,30px)] gap-10 justify-items-start  w-full">
               <p className="text-primary-input-text">Post Show</p>
               <TextInput
                 id="address2"
                 placeholder="Enter Post Show Weeks"
                 type="number"
                 className="w-full justify-between"
-                value={formData.postShow}
+                value={formData.postShow + ''}
                 onChange={(e) => handleInputChange('postShow', parseFloat(e.target.value))}
               />
             </label>
             {validationErrors.postShow && <small className="text-primary-red">{validationErrors.postShow}</small>}
           </div>
           <div className="flex flex-col">
-            <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+            <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
               <p className="text-primary-input-text">Barring Miles</p>
               <TextInput
                 id="barringMiles"
@@ -77,7 +79,7 @@ const VenueBarringForm = ({ onChange, validationErrors, updateValidationErrrors 
                 type="number"
                 className="w-full justify-between"
                 inputClassName="w-full"
-                value={formData.barringMiles}
+                value={formData.barringMiles + ''}
                 onChange={(e) => handleInputChange('barringMiles', parseFloat(e.target.value))}
               />
             </label>
