@@ -97,6 +97,7 @@ export type BookingDTO = {
   CastRateTicketsNotes?: string;
   PerformanceIds?: number[];
   RunTag: string;
+  LandingPageURL: string;
 };
 
 export type GetInFitUpDTO = {

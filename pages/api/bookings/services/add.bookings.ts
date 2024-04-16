@@ -115,19 +115,6 @@ export class BookingService {
         counter++;
       }
       counter = 1;
-      // const createdItems = await Promise.allSettled(promises);
-
-      // // Processing created items
-      // for (const item of createdItems) {
-      //   if (item.status === 'fulfilled') {
-      //     bookings.push(bookingMapper(item.value));
-      //     if (item.value.Performance) {
-      //       performances = performances.concat(
-      //         item.value.Performance.map((performance) => performanceMapper(performance)),
-      //       );
-      //     }
-      //   }
-      // }
 
       const createdItems = await Promise.allSettled(promises);
 

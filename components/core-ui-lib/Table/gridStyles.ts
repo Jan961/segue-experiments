@@ -20,6 +20,29 @@ const GridStyles = createGlobalStyle<StyleProps>`
     --ag-checkbox-indeterminate-color: #617293;
 }
 
+
+
+
+/* used for the parent header when a header group is used */
+.group-header-parent {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    justify-content: center;
+    border-bottom: 4px solid white;
+}
+
+/* used for other headers in a header group that are not children */
+.group-header-normal {
+  border-top: 50px solid white !important;
+  border-right: 2px solid white !important;
+}
+
+/* used with a group header for then children */
+.group-header-child {
+  border-right: 2px solid white !important;
+}
+
 .ag-body-viewport {
     overflow: visible;
 }
@@ -38,8 +61,6 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .ag-checkbox-edit{
     justify-content: center !important;
 }
-
-
 
 .ag-center-cols-container,
 .ag-theme-quartz .ag-layout-auto-height .ag-center-cols-viewport {
@@ -97,11 +118,12 @@ const GridStyles = createGlobalStyle<StyleProps>`
     background-color: #DADCE5;
 }
 
-.custom-pinned-header {
+.custom-sm-pinned-header {
   border-color: white !important;
   border-top: 102px solid; 
   border-right: 3px solid;
 }
+
 `;
 
 interface TableTooltipProps {
