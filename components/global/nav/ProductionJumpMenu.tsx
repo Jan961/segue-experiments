@@ -42,7 +42,6 @@ const ARCHIVED_OPTION_STYLES = {
 
 export default function ProductionJumpMenu() {
   const router = useRouter();
-  console.log(router.route);
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
   const productions = useMemo(() => {
