@@ -1,12 +1,12 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export const statusOptions: SelectOption[] = [
-  { text: 'ALL', value: 'all' },
   { text: 'Confirmed', value: 'C' },
   { text: 'Pencilled', value: 'U' },
   { text: 'Cancelled', value: 'X' },
   { text: 'Suspended', value: 'S' },
 ];
+export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 
 export const bookingStatusMap = {
   C: 'Confirmed',
@@ -32,4 +32,12 @@ export const bookingRow = {
   dayType: '',
   capacity: null,
   note: '',
+};
+
+export const defaultVenueFilters = {
+  venueId: null,
+  town: '',
+  country: '',
+  productionId: null,
+  search: '',
 };

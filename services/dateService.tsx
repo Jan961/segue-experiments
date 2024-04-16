@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid } from 'date-fns';
 import moment from 'moment';
 
 export const safeDate = (date: Date | string) => {
@@ -23,6 +23,12 @@ export const dateStringToPerformancePair = (dateString: string) => {
     Time: new Date(`${defaultDatePart}T${timePart}Z`),
     Date: new Date(`${datePart}`),
   };
+};
+
+// expects a string in DD/MM/YY format
+export const simpleToDate = (stringToFormat: string) => {
+  const parts = stringToFormat.split('/');
+  return new Date(Number(`20${parts[2]}`), Number(Number(parts[0]) - 1), Number(parts[1]));
 };
 
 export const dateToSimple = (dateToFormat: Date | string) => {
@@ -84,6 +90,13 @@ export const getWeekDayShort = (dateToFormat: Date | string) => {
 export const getWeekDayLong = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat);
   return date.toLocaleDateString('en-US', { weekday: 'long' });
+};
+
+export const formattedDateWithWeekDay = (dateToFormat: Date | string, weekDayFormat: 'Long' | 'Short') => {
+  if (!dateToFormat) return '';
+  const shortFormat = 'ddd DD/MM/YY';
+  const longFormat = 'dddd DD/MM/YYYY';
+  return moment(dateToFormat).format(weekDayFormat === 'Long' ? longFormat : shortFormat);
 };
 
 // Broken week number calculation
@@ -237,4 +250,32 @@ export function formatDuration(
 export const isValidDateString = (date: string): boolean => {
   const d = new Date(date);
   return d instanceof Date && !isNaN(d.getTime());
+};
+
+export const convertLocalDateToUTC = (date: Date) => {
+  return new Date(
+    Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      date.getHours(),
+      date.getMinutes(),
+      date.getSeconds(),
+    ),
+  );
+};
+
+export const checkDateOverlap = (start1: Date, end1: Date, start2: Date, end2: Date): boolean => {
+  return !((start1 < start2 && end1 < start2) || (start1 > end2 && end2 > end1));
+};
+
+export const getArrayOfDatesBetween = (start: string, end: string) => {
+  const arr = [];
+  if (!isValid(new Date(start)) || !isValid(new Date(end))) {
+    return [];
+  }
+  for (let dt = moment.utc(start); dt <= moment.utc(end); dt = dt.add(1, 'days')) {
+    arr.push(dt.toISOString());
+  }
+  return arr.map(getKey);
 };

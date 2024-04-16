@@ -30,7 +30,7 @@ class BookingHelper {
   }
 
   getBookingDetails(booking: BookingDTO) {
-    const { VenueId, PerformanceIds, Notes: note } = booking || {};
+    const { VenueId, PerformanceIds, Notes: note, RunTag: runTag, PencilNum } = booking || {};
     const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     const performanceTimes = PerformanceIds.map(
       (performanceId) => this.performanceDict[performanceId]?.Time?.substring(0, 5),
@@ -47,33 +47,60 @@ class BookingHelper {
       note,
       performanceTimes,
       performanceCount: PerformanceIds?.length || 0,
+      runTag,
+      pencilNo: PencilNum,
+      isBooking: true,
     };
   }
 
   getRehearsalDetails(rehearsal: RehearsalDTO) {
+    const { Id, VenueId, RunTag: runTag, PencilNum, Notes } = rehearsal;
+    const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
     return {
-      Id: rehearsal?.Id,
-      town: rehearsal.Town,
+      Id,
+      town: town || rehearsal.Town,
+      venue,
+      capacity,
+      count,
+      venueId,
+      runTag,
+      pencilNo: PencilNum,
+      note: Notes,
+      isRehearsal: true,
     };
   }
 
   getOthersDetails(others: OtherDTO) {
-    const { DateTypeName: dayType } = others || {};
+    const { DateTypeName: dayType, RunTag: runTag, PencilNum, Notes } = others || {};
     return {
       Id: others?.Id,
       status: others.StatusCode,
       dayType,
+      runTag,
+      pencilNo: PencilNum,
+      note: Notes,
     };
   }
 
   getInFitUpDetails(gifu: GetInFitUpDTO) {
-    const { VenueId } = gifu;
-    const venue = this.venueDict[VenueId];
-    return {
+    const { VenueId, RunTag: runTag, PencilNum, Notes } = gifu;
+    const gifuDetails = {
       Id: gifu?.Id,
-      venue: venue.Name,
-      town: venue.Town,
+      pencilNo: PencilNum,
+      note: Notes,
+      runTag,
+      venue: '',
+      town: '',
+      venueId: null,
+      isGetInFitUp: true,
     };
+    if (VenueId) {
+      const venue = this.venueDict[VenueId];
+      gifuDetails.venue = venue.Name;
+      gifuDetails.town = venue.Town;
+      gifuDetails.venueId = VenueId;
+    }
+    return gifuDetails;
   }
 
   getRangeFromDateBlocks(dateBlocks: DateBlockDTO[]): { start: string; end: string } {

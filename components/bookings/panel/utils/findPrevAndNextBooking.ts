@@ -1,7 +1,7 @@
 import { BookingDTO } from 'interfaces';
 
 // Optimisation possible. We can search outwards, rather than going over the whole lot
-export const findPrevAndNextBookings = (bookings: Record<number, BookingDTO>, specifiedDate: string) => {
+export const findPrevAndNextBookings = (bookings: Record<number, BookingDTO>, startDate: string, endDate: string) => {
   let prevDate = '1970-01-01'; // Allow initial comparisons
   let prevBookings: number[] = [];
 
@@ -15,7 +15,7 @@ export const findPrevAndNextBookings = (bookings: Record<number, BookingDTO>, sp
     const bDate = bookings[key].Date.split('T')[0];
     const id = bookings[key].Id;
 
-    if (bDate < specifiedDate) {
+    if (bDate < startDate) {
       // Get the more recent event that is before the date
       if (bDate > prevDate) {
         prevDate = bDate;
@@ -25,7 +25,7 @@ export const findPrevAndNextBookings = (bookings: Record<number, BookingDTO>, sp
       }
     }
 
-    if (bDate > specifiedDate) {
+    if (bDate > endDate) {
       // Get the earliest event that is after the date
       if (bDate < nextDate) {
         nextDate = bDate;

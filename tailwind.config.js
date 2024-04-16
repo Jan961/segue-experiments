@@ -26,9 +26,17 @@ const colorsConfig = {
   'disabled-input': '#E9EBF0CC',
   'primary-input-text': '#617293',
   'primary-border': '#E9EBF0',
-  'primary-list-row-hover': '#21345b99',
-  'primary-list-row-active': '#21345bcc',
-  'primary-label': '#21345bcc',
+  'primary-list-row-hover': '#21345B99',
+  'primary-list-row-active': '#21345BCC',
+  'secondary-list-row': '#4646464d',
+  'secondary-list-row-hover': '#464646b3',
+  'secondary-list-row-active': '#707070',
+  'primary-label': '#21345BCC',
+  'secondary-green': '#10841C',
+  'secondary-yellow': '#FFE606',
+  'secondary-red': '#ED1111',
+  primary: '#082B4B',
+  secondary: '#617293',
 };
 
 module.exports = {
@@ -256,4 +264,9 @@ module.exports = {
       },
     },
   },
+  safelist: [
+    {
+      pattern: /(bg|border)-(red|green|blue|slate|primary)-(100|200|300|400|500|600|700|800|input-text)/,
+    },
+  ],
 };

@@ -26,7 +26,6 @@ export const getShowPageProps = async (ctx: any) => {
 
 const showInclude = Prisma.validator<Prisma.ShowInclude>()({
   Production: {
-    where: { IsDeleted: false },
     include: { Show: true, DateBlock: true },
   },
 });
@@ -66,4 +65,15 @@ export const lookupShowCode = async (Code: string, AccountId: number) => {
   });
 
   return show ? show.Id : undefined;
+};
+
+export const getShowsByAccountId = async (AccountId: number) => {
+  const shows = await prisma.show.findMany({
+    where: { AccountId },
+    include: showInclude,
+  });
+
+  return shows.slice().sort((a, b) => {
+    return a.Name.localeCompare(b.Name);
+  });
 };

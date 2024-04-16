@@ -1,10 +1,44 @@
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import Typeahead from 'components/core-ui-lib/Typeahead';
+import Select from 'components/core-ui-lib/Select';
 import { useRouter } from 'next/router';
 import { useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ProductionOption from './ProductionOption';
+
+const ARCHIVED_OPTION_STYLES = {
+  option: (styles, { isDisabled, isSelected, isFocused, data }) => {
+    return {
+      ...styles,
+      fontSize: '1rem',
+      lineHeight: '1.5rem',
+      backgroundColor: isDisabled
+        ? undefined
+        : isSelected && !data.IsArchived
+        ? '#21345BCC'
+        : isSelected && data.IsArchived
+        ? '#707070'
+        : isFocused && !data.IsArchived
+        ? '#21345B99'
+        : isFocused && data.IsArchived
+        ? '#464646b3'
+        : data.IsArchived
+        ? '#4646464d'
+        : '#FFF',
+      color: isDisabled ? '#ccc' : isSelected || isFocused ? '#FFF' : '#617293',
+      cursor: isDisabled ? 'not-allowed' : 'default',
+      ':active': {
+        ...styles[':active'],
+        backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
+      },
+      ':hover': {
+        ...styles[':hover'],
+        color: '#FFF',
+        backgroundColor: data.IsArchived ? '#464646b3' : '#21345B99',
+      },
+    };
+  },
+};
 
 export default function ProductionJumpMenu() {
   const router = useRouter();
@@ -63,16 +97,17 @@ export default function ProductionJumpMenu() {
   if (!productionJump?.productions?.length) return null;
   return (
     <>
-      <Typeahead
+      <Select
         className="border-0 !shadow-none w-[420px]"
         value={selected}
         label="Production"
         placeholder="Please select a Production"
-        renderOption={(option, selectedOption, handleOptionSelect) => (
-          <ProductionOption option={option} selectedOption={selectedOption} handleOptionSelect={handleOptionSelect} />
-        )}
+        renderOption={(option) => <ProductionOption option={option} />}
+        customStyles={ARCHIVED_OPTION_STYLES}
         options={productions}
         onChange={goToProduction}
+        isSearchable
+        isClearable={false}
       />
       <div className="flex  items-center ml-1 mr-4">
         <Checkbox

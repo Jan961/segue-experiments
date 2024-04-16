@@ -15,16 +15,20 @@ export type BarredVenue = {
 };
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { venueId, productionId, excludeLondon } = req.body;
+  const { venueId, productionId, excludeLondon, includeExcluded, barDistance, seats, startDate, endDate } = req.body;
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
+  if (!venueId) return res.status(401).json({ errorMessage: 'Venue is required.', error: true });
   if (!access) return res.status(401).end();
 
   try {
     const result = await prisma.VenueVenue.findMany({
       where: {
         Venue1Id: venueId,
+        Venue2: {
+          ...(!includeExcluded && { ExcludeFromChecks: false }),
+        },
       },
       select: {
         Mileage: true,
@@ -63,6 +67,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const { Name, Code, Id, StatusCode, VenueAddress } = Venue2;
         const town = VenueAddress?.[0]?.Town;
         if (!FirstDate) return null;
+        const hasBarringConflict =
+          (Mileage <= barDistance || Venue2.seats <= seats) &&
+          (!startDate || new Date(startDate) >= new Date(FirstDate)) &&
+          (!endDate || new Date(endDate) <= new Date(FirstDate));
         return {
           Id,
           Name,
@@ -73,6 +81,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           BookingId,
           Date: FirstDate,
           town,
+          hasBarringConflict,
         };
       })
       .filter((x) => {

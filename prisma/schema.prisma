@@ -45,6 +45,7 @@ model Booking {
   CastRateTicketNotes     String?               @map("BookingCastRateTicketNotes") @db.LongText
   CastRateTicketsArranged Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
   CastRateTicketsNotes    String?               @map("BookingCastRateTicketsNotes") @db.Text
+  RunTag                  String                @map("BookingRunTag") @db.Char(8)
   BookedVenueHistory      BookedVenueHistory[]
   DateBlock               DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
   Venue                   Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
@@ -102,20 +103,20 @@ model Contract {
 }
 
 model Currency {
-  CurrencyCode                                                       String           @id @unique(map: "SECONDARY") @db.VarChar(3)
-  CurrencySymbol                                                     String           @db.VarChar(1)
+  Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
+  Name                                                               String           @map("CurrencyName") @db.VarChar(30)
+  SymbolUnicode                                                      Int?             @map("CurrencySymbolUnicode")
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Venue                                                              Venue[]
 }
 
 model DateType {
-  Id                          Int         @id @default(autoincrement()) @map("DateTypeId")
-  Name                        String      @unique(map: "OtherDayTypeName_UNIQUE") @map("DateTypeName") @db.VarChar(30)
-  DateTypeAffectsAvailability Boolean     @default(dbgenerated("(b'0')")) @db.Bit(1)
-  DateTypeSeqNo               Int?        @db.UnsignedTinyInt
+  Id                          Int     @id @default(autoincrement()) @map("DateTypeId")
+  Name                        String  @unique(map: "OtherDayTypeName_UNIQUE") @map("DateTypeName") @db.VarChar(30)
+  DateTypeAffectsAvailability Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SeqNo                       Int?    @map("DateTypeSeqNo") @db.UnsignedTinyInt
   Other                       Other[]
-  Rehearsal                   Rehearsal[]
 }
 
 model Show {
@@ -123,10 +124,8 @@ model Show {
   AccountId  Int          @map("ShowAccountId")
   Code       String       @map("ShowCode") @db.VarChar(10)
   Name       String       @map("ShowName") @db.VarChar(80)
-  Logo       Bytes?       @map("ShowLogo")
-  Type       String       @map("ShowType") @db.VarChar(1)
+  Type       String?      @map("ShowType") @db.VarChar(1)
   IsArchived Boolean      @default(dbgenerated("(b'0')")) @map("ShowIsArchived") @db.Bit(1)
-  IsDeleted  Boolean      @default(dbgenerated("(b'0')")) @map("ShowIsDeleted") @db.Bit(1)
   Production Production[]
   Account    Account      @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
 
@@ -140,7 +139,6 @@ model Venue {
   Name                                                      String               @map("VenueName") @db.VarChar(255)
   StatusCode                                                String               @default("O") @map("VenueStatusCode") @db.VarChar(1)
   Website                                                   String?              @map("VenueWebsite") @db.VarChar(255)
-  Family                                                    String?              @map("VenueFamily") @db.VarChar(100)
   CurrencyCode                                              String               @map("VenueCurrencyCode") @db.VarChar(3)
   VATIndicator                                              Boolean              @default(dbgenerated("(b'0')")) @map("VenueVATIndicator") @db.Bit(1)
   TechSpecsURL                                              String?              @map("VenueTechSpecsURL") @db.VarChar(255)
@@ -162,10 +160,14 @@ model Venue {
   IsDeleted                                                 Boolean              @default(dbgenerated("(b'0')")) @map("VenueIsDeleted") @db.Bit(1)
   VenueNotes                                                String?              @db.LongText
   VenueWarningNotes                                         String?              @db.LongText
+  ExcludeFromChecks                                         Boolean              @default(dbgenerated("(b'0')")) @map("VenueExcludeFromChecks") @db.Bit(1)
+  VenueCountryId                                            Int?
+  FamilyId                                                  Int?                 @map("VenueVenueFamilyId")
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
-  Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [CurrencyCode], onUpdate: Restrict, map: "Currency_Venue")
+  Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
+  VenueFamily                                               VenueFamily?         @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]   @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]   @relation("VenueBarredVenue_VBVVenueIdToVenue")
@@ -174,6 +176,7 @@ model Venue {
   VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([CurrencyCode], map: "Currency_Venue")
+  @@index([FamilyId], map: "Venue_VenueFamily")
 }
 
 model VenueBarredVenue {
@@ -212,12 +215,12 @@ model VenueRole {
 }
 
 model VenueVenue {
-  Venue1Id Int   @map("VVVenue1Id")
-  Venue2Id Int   @map("VVVenue2Id")
-  Mileage  Int?  @map("VVMileage")
-  TimeMins Int?  @map("VVTimeMins")
-  Venue1   Venue @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
-  Venue2   Venue @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
+  Venue1Id Int     @map("VVVenue1Id")
+  Venue2Id Int     @map("VVVenue2Id")
+  Mileage  Decimal @map("VVMileage") @db.Decimal(5, 1)
+  TimeMins Int?    @map("VVTimeMins")
+  Venue1   Venue   @relation("VenueVenue_VVVenue1IdToVenue", fields: [Venue1Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue1")
+  Venue2   Venue   @relation("VenueVenue_VVVenue2IdToVenue", fields: [Venue2Id], references: [Id], onDelete: Cascade, map: "Venue_VenueVenue2")
 
   @@id([Venue1Id, Venue2Id])
   @@index([Venue1Id], map: "Venue_VenueVenue1_idx")
@@ -225,17 +228,17 @@ model VenueVenue {
 }
 
 model DateBlock {
-  Id                    Int          @id @default(autoincrement()) @map("DateBlockId")
-  ProductionId          Int          @map("DateBlockProductionId")
-  Name                  String       @map("DateBlockName") @db.VarChar(45)
-  StartDate             DateTime     @map("DateBlockStartDate") @db.Date
-  EndDate               DateTime     @map("DateBlockEndDate") @db.Date
-  IsPrimary             Boolean      @map("DateBlockIsPrimary")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  Booking               Booking[]
-  Production            Production   @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_DateBlock")
-  GetInFitUp            GetInFitUp[]
-  Other                 Other[]
-  Rehearsal             Rehearsal[]
+  Id           Int          @id @default(autoincrement()) @map("DateBlockId")
+  ProductionId Int          @map("DateBlockProductionId")
+  Name         String       @map("DateBlockName") @db.VarChar(45)
+  StartDate    DateTime     @map("DateBlockStartDate") @db.Date
+  EndDate      DateTime     @map("DateBlockEndDate") @db.Date
+  IsPrimary    Boolean      @default(dbgenerated("(b'0')")) @map("DateBlockIsPrimary") @db.Bit(1)
+  Booking      Booking[]
+  Production   Production   @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_DateBlock")
+  GetInFitUp   GetInFitUp[]
+  Other        Other[]
+  Rehearsal    Rehearsal[]
 
   @@unique([ProductionId, Name], map: "DateBlockName")
   @@unique([ProductionId, StartDate], map: "SECONDARY")
@@ -244,11 +247,14 @@ model DateBlock {
 model GetInFitUp {
   Id          Int       @unique(map: "GetInFitUpDay_UNIQUE") @default(autoincrement()) @map("GetInFitUpId")
   DateBlockId Int       @map("GetInFitUpDateBlockId")
-  VenueId     Int       @map("GetInFitUpVenueId")
+  VenueId     Int?      @map("GetInFitUpVenueId")
   StatusCode  String    @default("U") @map("GetInFitUpStatusCode") @db.Char(1)
   Date        DateTime  @map("GetInFitUpDate") @db.Date
+  Notes       String?   @map("GetInFitUpNotes") @db.LongText
+  PencilNum   Int?      @map("GetInFitUpPencilNum")
+  RunTag      String    @map("GetInFitUpRunTag") @db.Char(8)
   DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_GetInFitUp")
-  Venue       Venue     @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
+  Venue       Venue?    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GetInFitUp")
 
   @@index([DateBlockId], map: "DateBlock_GetInFitUpDay_idx")
   @@index([VenueId], map: "Venue_GetInFitUpDay_idx")
@@ -260,6 +266,9 @@ model Other {
   DateTypeId  Int       @map("OtherDateTypeId")
   StatusCode  String    @map("OtherStatusCode") @db.Char(1)
   Date        DateTime  @map("OtherDate") @db.Date
+  Notes       String?   @map("OtherNotes") @db.LongText
+  PencilNum   Int?      @map("OtherPencilNum")
+  RunTag      String    @map("OtherRunTag") @db.Char(8)
   DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Other")
   DateType    DateType  @relation(fields: [DateTypeId], references: [Id], onUpdate: Restrict, map: "DateType_Other")
 
@@ -282,34 +291,43 @@ model Performance {
 }
 
 model Rehearsal {
-  Id          Int       @id @default(autoincrement()) @map("RehearsalId")
-  DateBlockId Int       @map("RehearsalDateBlockId")
-  Town        String?   @map("RehearsalTown") @db.VarChar(50)
-  StatusCode  String    @default("U") @map("RehearsalStatusCode") @db.Char(1)
-  Date        DateTime  @map("RehearsalDate") @db.Date
-  DateTypeId  Int?      @map("RehearsalDateTypeId")
-  DateBlock   DateBlock @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
-  DateType    DateType? @relation(fields: [DateTypeId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "DateType_Rehearsal")
+  Id          Int               @id @default(autoincrement()) @map("RehearsalId")
+  DateBlockId Int               @map("RehearsalDateBlockId")
+  Town        String?           @map("RehearsalTown") @db.VarChar(50)
+  StatusCode  String            @default("U") @map("RehearsalStatusCode") @db.Char(1)
+  Date        DateTime          @map("RehearsalDate") @db.Date
+  DateTypeId  Int               @default(1) @map("RehearsalDateTypeId")
+  VenueId     Int?              @map("RehearsalVenueId")
+  Notes       String?           @map("RehearsalNotes") @db.LongText
+  PencilNum   Int?              @map("RehearsalPencilNum")
+  RunTag      String            @map("RehearsalRunTag") @db.Char(8)
+  DateBlock   DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
+  DateType    RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
 }
 
 model Account {
-  AccountId              Int           @id @default(autoincrement())
-  AccountName            String        @db.VarChar(50)
-  AccountAddress1        String?       @db.VarChar(50)
-  AccountAddress2        String?       @db.VarChar(50)
-  AccountAddress3        String?       @db.VarChar(50)
-  AccountAddressTown     String?       @db.VarChar(50)
-  AccountAddressCounty   String?       @db.VarChar(50)
-  AccountAddressPostcode String?       @db.VarChar(20)
-  AccountAddressCountry  String?       @db.VarChar(30)
-  AccountVATNumber       String?       @db.VarChar(20)
-  AccountCurrencyCode    String        @db.VarChar(3)
-  AccountCompanyNumber   String?       @db.VarChar(20)
+  AccountId              Int                 @id @default(autoincrement())
+  AccountName            String              @db.VarChar(50)
+  AccountAddress1        String?             @db.VarChar(50)
+  AccountAddress2        String?             @db.VarChar(50)
+  AccountAddress3        String?             @db.VarChar(50)
+  AccountAddressTown     String?             @db.VarChar(50)
+  AccountAddressCounty   String?             @db.VarChar(50)
+  AccountAddressPostcode String?             @db.VarChar(20)
+  AccountAddressCountry  String?             @db.VarChar(30)
+  AccountVATNumber       String?             @db.VarChar(20)
+  AccountCurrencyCode    String              @db.VarChar(3)
+  AccountCompanyNumber   String?             @db.VarChar(20)
+  AccountLogo            Bytes?
+  AccountMainEmail       String?             @db.VarChar(120)
+  AccountNumPeople       Int?                @db.TinyInt
+  AccountContact         AccountContact?
   AccountUser            AccountUser[]
   MasterTask             MasterTask[]
+  ProductionCompany      ProductionCompany[]
   Show                   Show[]
 }
 
@@ -366,8 +384,8 @@ model ConversionRate {
   ConversionToCurrencyCode                                     String     @db.VarChar(3)
   ConversionProductionId                                       Int
   ConversionRate                                               Decimal    @db.Decimal(8, 4)
-  Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency Currency   @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency", fields: [ConversionFromCurrencyCode], references: [CurrencyCode], onUpdate: Restrict, map: "Currency_ConversionDate_From")
-  Currency_ConversionRate_ConversionToCurrencyCodeToCurrency   Currency   @relation("ConversionRate_ConversionToCurrencyCodeToCurrency", fields: [ConversionToCurrencyCode], references: [CurrencyCode], onUpdate: Restrict, map: "Currency_ConversionDate_To")
+  Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency Currency   @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency", fields: [ConversionFromCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_ConversionDate_From")
+  Currency_ConversionRate_ConversionToCurrencyCodeToCurrency   Currency   @relation("ConversionRate_ConversionToCurrencyCodeToCurrency", fields: [ConversionToCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_ConversionDate_To")
   Production                                                   Production @relation(fields: [ConversionProductionId], references: [Id], onUpdate: Restrict, map: "Production_ConversionRate")
 
   @@index([ConversionFromCurrencyCode], map: "Currency_ConversionDate_From_idx")
@@ -520,6 +538,7 @@ model AccountUser {
   Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
   UserId                Int                     @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
+  AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
   AccountUserPermission AccountUserPermission[]
@@ -605,6 +624,8 @@ model MasterTask {
   TaskStartByIsPostProduction    Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?    @map("TaskCompleteByWeekNum") @db.SmallInt
   TaskCompleteByIsPostProduction Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TaskRepeatFromWeekNum          Int?    @db.SmallInt
+  TaskRepeatToWeekNum            Int?    @db.SmallInt
   Account                        Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
   User                           User?   @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
 
@@ -624,17 +645,20 @@ model AccountUserProduction {
 }
 
 model Production {
-  Id                    Int                     @id @default(autoincrement()) @map("ProductionId")
-  ShowId                Int                     @map("ProductionShowId")
-  Code                  String                  @map("ProductionCode") @db.VarChar(10)
-  SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
-  IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
-  IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  AccountUserProduction AccountUserProduction[]
-  ConversionRate        ConversionRate[]
-  DateBlock             DateBlock[]
-  Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
-  ProductionTask        ProductionTask[]
+  Id                       Int                     @id @default(autoincrement()) @map("ProductionId")
+  ShowId                   Int                     @map("ProductionShowId")
+  Code                     String                  @map("ProductionCode") @db.VarChar(10)
+  SalesEmail               String?                 @map("ProductionSalesEmail") @db.VarChar(80)
+  IsArchived               Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
+  IsDeleted                Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
+  Logo                     Bytes?                  @map("ProductionLogo")
+  SalesFrequency           String                  @map("ProductionSalesFrequency")@default("W") @db.Char(1)
+  AccountUserProduction    AccountUserProduction[]
+  ConversionRate           ConversionRate[]
+  DateBlock                DateBlock[]
+  Show                     Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
+  ProductionRegion         ProductionRegion[]
+  ProductionTask           ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ShowId], map: "ShowMayHaveProduction")
@@ -655,12 +679,80 @@ model ProductionTask {
   StartByWeekNum             Int?          @map("TaskStartByWeekNum") @db.SmallInt
   StartByIsPostProduction    Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostProduction") @db.Bit(1)
   CompleteByWeekNum          Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
+  TaskCompletedDate          DateTime?     @db.Date
+  TaskRepeatFromWeekNum      Int?          @db.SmallInt
+  TaskRepeatToWeekNum        Int?          @db.SmallInt
   Production                 Production    @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ProductionTask")
   User                       User?         @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_ProductionTask_Assigned")
   TaskWatcher                TaskWatcher[]
 
   @@index([ProductionId], map: "Production_ProductionTask_fk")
   @@index([AssignedToUserId], map: "User_ProductionTask_Assigned")
+}
+
+model AccountContact {
+  AccContId        Int     @id @default(autoincrement())
+  AccContAccountId Int
+  AccContFirstName String  @db.VarChar(50)
+  AccContLastName  String? @db.VarChar(50)
+  AccContPhone     String? @db.VarChar(40)
+  AccContMainEmail String? @db.VarChar(120)
+  Account          Account @relation(fields: [AccContId], references: [AccountId], onDelete: Cascade, map: "Account_AccountContact")
+}
+
+model Country {
+  CountryId           Int     @id @default(autoincrement())
+  CountryCode         String  @db.VarChar(3)
+  CountryName         String  @db.VarChar(40)
+  CountryCurrencyCode String? @db.VarChar(3)
+}
+
+model CountryInRegion {
+  CountryId Int
+  RegionId  Int
+
+  @@id([CountryId, RegionId])
+}
+
+model ProductionCompany {
+  ProdCoId        Int     @id @default(autoincrement())
+  ProdCoAccountId Int
+  ProdCoName      String  @db.VarChar(50)
+  ProdCoWebSite   String? @db.VarChar(80)
+  ProdCoLogo      Bytes?
+  Account         Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+
+  @@index([ProdCoAccountId], map: "Account_ProductionCompany")
+}
+
+model ProductionRegion {
+  PRProductionId Int
+  PRRegionId     Int
+  Production     Production @relation(fields: [PRProductionId], references: [Id], onDelete: NoAction, map: "ProductionHasProductionRegion")
+  Region         Region     @relation(fields: [PRRegionId], references: [RegionId], onDelete: NoAction, map: "RegionHasProductionRegion")
+
+  @@id([PRProductionId, PRRegionId])
+  @@index([PRRegionId], map: "RegionHasProductionRegion")
+}
+
+model Region {
+  RegionId         Int                @id @default(autoincrement())
+  RegionName       String             @db.VarChar(50)
+  ProductionRegion ProductionRegion[]
+}
+
+model RehearsalDateType {
+  RehearsalDateTypeId                  Int         @id
+  RehearsalDateTypeName                String      @db.VarChar(30)
+  RehearsalDateTypeAffectsAvailability Boolean     @default(dbgenerated("(b'0')")) @db.Bit(1)
+  RehearsalDateTypeSeqNo               Int?        @db.UnsignedTinyInt
+  Rehearsal                            Rehearsal[]
+}
+
+model VenueFamily {
+  Id    Int     @id @default(autoincrement()) @map("VenueFamilyId")
+  Name  String  @map("VenueFamilyName") @db.VarChar(50)
+  Venue Venue[]
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -681,8 +773,8 @@ view SalesFiguresView {
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view BookingTravelView {
   BookingDateBlockId Int
-  FromBookingId      Int  @default(0)
-  Mileage            Int?
+  FromBookingId      Int      @default(0)
+  Mileage            Decimal? @db.Decimal(5, 1)
   TimeMins           Int?
 
   @@ignore
@@ -719,7 +811,7 @@ view ScheduleView {
   PencilNum           Int?
   VenueId             Int?
   VenueSeats          Float?
-  Mileage             Int?
+  Mileage             Decimal?  @db.Decimal(5, 1)
   TimeMins            Int?
   DateTypeId          Int?
   DateTypeName        String?   @db.VarChar(30)
@@ -736,7 +828,7 @@ view VenueView {
   VenueName                    String  @db.VarChar(255)
   VenueStatusCode              String  @default("O") @db.VarChar(1)
   VenueWebsite                 String? @db.VarChar(255)
-  VenueFamily                  String? @db.VarChar(100)
+  VenueFamily                  String? @db.VarChar(50)
   VenueCurrencyCode            String  @db.VarChar(3)
   VenueVATIndicator            Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   VenueTechSpecsURL            String? @db.VarChar(255)
@@ -788,7 +880,7 @@ view DateBlockDatesView {
   PencilNum           Int?
   VenueId             Int?
   VenueSeats          Float?
-  Mileage             Int?
+  Mileage             Decimal? @db.Decimal(5, 1)
   TimeMins            Int?
   DateTypeId          Int?
   DateTypeName        String?  @db.VarChar(30)
@@ -821,24 +913,10 @@ view BookingDateDiffView {
 
 /// The underlying view does not contain salesSetTotalsViewa valid unique identifier and can therefore currently not be handled by Prisma Client.
 view VenueVenueView {
-  FromVenueId Int  @default(0)
-  ToVenueId   Int  @default(0)
-  Mileage     Int?
+  FromVenueId Int     @default(0)
+  ToVenueId   Int     @default(0)
+  Mileage     Decimal @default(0.0) @db.Decimal(5, 1)
   TimeMins    Int?
-
-  @@ignore
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view ShowView {
-  ShowId         Int     @default(0)
-  ShowCode       String  @db.VarChar(10)
-  ShowName       String  @db.VarChar(80)
-  ShowLogo       Bytes?
-  ShowType       String  @db.VarChar(1)
-  ShowIsArchived Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ShowIsDeleted  Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ShowAccountId  Int
 
   @@ignore
 }
@@ -858,7 +936,6 @@ view SalesView {
   VenueCode                String    @db.VarChar(6)
   VenueName                String    @db.VarChar(255)
   VenueCurrencyCode        String    @db.VarChar(3)
-  VenueCurrencySymbol      String    @db.VarChar(1)
   ConversionToCurrencyCode String?   @db.VarChar(3)
   ConversionRate           Decimal?  @db.Decimal(8, 4)
   SetSalesFiguresDate      DateTime? @db.Date
@@ -953,7 +1030,7 @@ view ScheduledDatesView {
   StatusCode  String   @default("") @db.Char(1)
   PencilNum   Int?
   VenueSeats  Float?
-  Mileage     Int?
+  Mileage     Decimal? @db.Decimal(5, 1)
   TimeMins    Int?
 
   @@ignore
@@ -986,7 +1063,6 @@ view SalesSummaryView {
   EntryStatusCode          String    @default("") @db.Char(1)
   Value                    Decimal?  @db.Decimal(30, 2)
   VenueCurrencyCode        String?   @db.VarChar(3)
-  VenueCurrencySymbol      String?   @db.VarChar(1)
   ConversionRate           Decimal?  @db.Decimal(8, 4)
   ConversionToCurrencyCode String?   @db.VarChar(3)
   SaleTypeName             String?   @db.VarChar(45)
@@ -1029,12 +1105,24 @@ view ProductionView {
   ShowId               Int       @default(0)
   ShowCode             String    @db.VarChar(10)
   ShowName             String    @db.VarChar(80)
-  ShowType             String    @db.VarChar(1)
-  ShowLogo             Bytes?
+  ShowType             String?   @db.VarChar(1)
+  ProductionLogo       Bytes?
   RehearsalStartDate   DateTime? @db.Date
   RehearsalEndDate     DateTime? @db.Date
   ProductionStartDate  DateTime? @db.Date
   ProductionEndDate    DateTime? @db.Date
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view ShowView {
+  ShowId         Int     @default(0)
+  ShowCode       String  @db.VarChar(10)
+  ShowName       String  @db.VarChar(80)
+  ShowType       String? @db.VarChar(1)
+  ShowIsArchived Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ShowAccountId  Int
 
   @@ignore
 }

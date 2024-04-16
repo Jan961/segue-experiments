@@ -1,4 +1,4 @@
-import { VenueVenue } from '@prisma/client';
+import { Venue, VenueAddress, VenueVenue } from '@prisma/client';
 import prisma from 'lib/prisma';
 
 export const getAllVenuesMin = async () => {
@@ -25,6 +25,33 @@ export const getAllVenues = async () => {
   return prisma.venue.findMany({
     where: {
       IsDeleted: false,
+    },
+    // select: {
+    //   VenueAddress: {
+    //     Town: true,
+    //   },
+    // },
+  });
+};
+
+export const getUniqueVenueTownlist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Town'],
+    where: {
+      Town: {
+        not: null,
+      },
+    },
+  });
+};
+
+export const getUniqueVenueCountrylist = async () => {
+  return await prisma.venueAddress.groupBy({
+    by: ['Country'],
+    where: {
+      Country: {
+        not: null,
+      },
     },
   });
 };
@@ -70,7 +97,7 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
       prev = stop;
       return { Date: stop.Date, option: stop.Ids.map((id) => ({ VenueId: id, Miles: null, Mins: null })) };
     }
-
+    const prevIdsAsString = prev.Ids.join(',');
     return {
       Date: stop.Date,
       option: stop.Ids.map((id: number) => {
@@ -81,12 +108,57 @@ export const getDistances = async (stops: DistanceStop[]): Promise<DateDistances
         )[0];
         prev = stop;
 
-        return {
-          VenueId: id,
-          Miles: match?.Mileage ? match.Mileage : null,
-          Mins: match?.TimeMins ? match.TimeMins : null,
-        };
+        return prevIdsAsString === stop.Ids.join(',')
+          ? {
+              VenueId: id,
+              Miles: match?.Mileage,
+              Mins: match?.TimeMins,
+            }
+          : {
+              VenueId: id,
+              Miles: match?.Mileage ? match.Mileage : -1,
+              Mins: match?.TimeMins ? match.TimeMins : -1,
+            };
       }),
     };
+  });
+};
+
+export const getDistance = async (stop: DistanceStop): Promise<DateDistancesDTO> => {
+  const [id1, id2] = stop.Ids;
+
+  if (!id1 || !id2 || id1 === id2) {
+    return { Date: stop.Date, option: [{ VenueId: id1, Mins: null, Miles: null }] };
+  }
+  // Get the distances for all possible combinations (optimisation possible)
+  const distance = await prisma.venueVenue.findMany({
+    where: {
+      Venue1Id: id1, // And
+      Venue2Id: id2,
+    },
+  });
+
+  const { Venue1Id, TimeMins, Mileage } = distance[0];
+  return { Date: stop.Date, option: [{ VenueId: Venue1Id, Mins: TimeMins, Miles: Mileage }] };
+};
+
+export const getAllVenueFamilyList = () => {
+  return prisma.VenueFamily.findMany({
+    orderBy: {
+      Name: 'asc',
+    },
+  });
+};
+
+export const createVenue = async (venue: Partial<Venue>, addresses: Partial<VenueAddress>[]) => {
+  return prisma.venue.create({
+    data: {
+      ...venue,
+      ...(addresses && {
+        VenueAddress: {
+          create: addresses,
+        },
+      }),
+    },
   });
 };

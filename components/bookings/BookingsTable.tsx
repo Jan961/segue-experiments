@@ -2,50 +2,91 @@ import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
+import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
+import AddBooking from './modal/NewBooking';
+import { useRouter } from 'next/router';
+import { isNullOrEmpty } from 'utils';
+import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from './utils';
+import { RowDoubleClickedEvent } from 'ag-grid-community';
+import axios from 'axios';
+import { rehearsalState } from 'state/booking/rehearsalState';
+import { getInFitUpState } from 'state/booking/getInFitUpState';
+import { otherState } from 'state/booking/otherState';
 
 interface BookingsTableProps {
   rowData?: any;
 }
 
-const defaultColDef = {
-  wrapHeaderText: true,
-};
-
 export default function BookingsTable({ rowData }: BookingsTableProps) {
   const tableRef = useRef(null);
+  const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
+  const [bookings, setBookings] = useRecoilState(bookingState);
+  const [rehearsals, setRehearsals] = useRecoilState(rehearsalState);
+  const [getInFitUps, setGetInFitUps] = useRecoilState(getInFitUpState);
+  const [others, setOthers] = useRecoilState(otherState);
+  const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
 
   const gridOptions = {
-    defaultColDef,
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-    },
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
   };
 
   const handleCellClick = (e) => {
-    if (e.column.colId === 'note') {
+    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
       setProductionItem(e.data);
       setShowModal(true);
     }
   };
 
-  const handleSaveNote = (value) => {
-    console.log(value);
-    setShowModal(false);
+  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    const { data } = e;
+    if (!data.Id) {
+      setShowAddEditBookingModal({
+        visible: true,
+        startDate: e.data.dateTime,
+        endDate: e.data.dateTime,
+      });
+    } else {
+      setShowAddEditBookingModal({
+        visible: true,
+        startDate: data.dateTime,
+        endDate: data.dateTime,
+        booking: data,
+      });
+    }
   };
 
-  const handleCancelNote = () => {
-    setProductionItem(null);
+  const handleSaveNote = async (value: string) => {
     setShowModal(false);
+    const { data } = await axios.post('/api/bookings/note/update', {
+      ...productionItem,
+      note: value,
+    });
+
+    if (productionItem.isBooking) {
+      const rowItem = bookings[data.Id];
+      const replacement = { ...bookings, [data.Id]: { ...rowItem, Notes: value } };
+      setBookings(replacement);
+    } else if (productionItem.isRehearsal) {
+      const rowItem = rehearsals[data.Id];
+      const replacement = { ...rehearsals, [data.Id]: { ...rowItem, Notes: value } };
+      setRehearsals(replacement);
+    } else if (productionItem.isGetInFitUp) {
+      const rowItem = getInFitUps[data.Id];
+      const replacement = { ...getInFitUps, [data.Id]: { ...rowItem, Notes: value } };
+      setGetInFitUps(replacement);
+    } else {
+      const rowItem = others[data.Id];
+      const replacement = { ...others, [data.Id]: { ...rowItem, Notes: value } };
+      setOthers(replacement);
+    }
   };
 
   useEffect(() => {
@@ -58,44 +99,6 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     }
   }, [filter, setFilter, rowData]);
 
-  const formatRowsForPencilledBookings = (values) => {
-    const pencilled = values.filter(({ bookingStatus }) => bookingStatus === 'Pencilled');
-    const groupedByDate = pencilled.reduce((acc, item) => {
-      if (acc[item.date] !== undefined) {
-        acc[item.date] = acc[item.date] + 1;
-      } else {
-        acc[item.date] = 1;
-      }
-      return acc;
-    }, {});
-
-    const multiple = Object.entries(groupedByDate)
-      .filter(([_, v]: [string, number]) => v > 1)
-      .map((arr) => arr[0]);
-
-    const updated = values.map((r) => (multiple.includes(r.date) ? { ...r, multipleVenuesOnSameDate: true } : r));
-    return updated;
-  };
-
-  const formatRowsForMultipeBookingsAtSameVenue = (values) => {
-    const groupedByVenue = values.reduce((acc, item) => {
-      if (item.venue) {
-        acc[item.venue] !== undefined ? (acc[item.venue] = acc[item.venue] + 1) : (acc[item.venue] = 1);
-      }
-
-      return acc;
-    }, {});
-
-    const venuesWithMultipleBookings = Object.entries(groupedByVenue)
-      .filter(([_, v]: [string, number]) => v > 1)
-      .map((arr) => arr[0]);
-
-    const updated = values.map((r) =>
-      venuesWithMultipleBookings.includes(r.venue) ? { ...r, venueHasMultipleBookings: true } : r,
-    );
-    return updated;
-  };
-
   useEffect(() => {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
@@ -103,6 +106,13 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       setRows(formattedRows);
     }
   }, [rowData]);
+
+  const handleClose = (bookings = null) => {
+    if (bookings) {
+      router.reload();
+    }
+    setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
+  };
 
   return (
     <>
@@ -112,16 +122,18 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
           rowData={rows}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
+          onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
         />
       </div>
       <NotesPopup
         show={showModal}
-        value={productionItem?.note || ''}
+        productionItem={productionItem}
         onSave={handleSaveNote}
-        onCancel={handleCancelNote}
+        onCancel={() => setShowModal(false)}
       />
+      {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
     </>
   );
 }

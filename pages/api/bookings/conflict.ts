@@ -6,16 +6,17 @@ import { BookingWithVenueDTO } from 'interfaces';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { startDate, endDate, venueId, productionId } = req.body;
+    const { fromDate, toDate, ProductionId } = req.body;
     const results: Booking[] = await prisma.booking.findMany({
       where: {
         FirstDate: {
-          ...(startDate && { gte: new Date(startDate) }),
-          ...(endDate && { lte: new Date(endDate) }),
+          ...(fromDate && { gte: new Date(fromDate) }),
+          ...(toDate && { lte: new Date(toDate) }),
         },
-        ...(venueId && { VenueId: venueId }),
         DateBlock: {
-          ProductionId: productionId,
+          is: {
+            ProductionId,
+          },
         },
         StatusCode: {
           in: ['C', 'U'],
@@ -26,10 +27,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Venue: true,
       },
     });
+
     const conflicts: BookingWithVenueDTO[] = results
       .map(bookingMapperWithVenue)
       .sort((a, b) => new Date(a.Date).valueOf() - new Date(b.Date).valueOf());
-    res.status(200).json(conflicts);
+    res.status(200).json(conflicts || []);
   } catch (e) {
     console.log(e);
     res.status(500).json({ err: 'Error fetching report' });

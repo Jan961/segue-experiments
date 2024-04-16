@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { loggingService } from 'services/loggingService';
-import { DistanceStop, getDistances } from 'services/venueService';
+import { DistanceStop, getDistance, getDistances } from 'services/venueService';
 
 export type DistanceParams = DistanceStop[];
 
@@ -9,8 +9,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   if (req.method === 'POST') {
     try {
+      let searchResults = [];
       const stops: DistanceParams = req.body;
-      const searchResults = await getDistances(stops);
+      if (stops?.length === 1) {
+        const result = await getDistance(stops[0]);
+        searchResults = [result];
+      } else {
+        searchResults = await getDistances(stops);
+      }
+
       res.json(searchResults);
     } catch (e) {
       console.log(e);

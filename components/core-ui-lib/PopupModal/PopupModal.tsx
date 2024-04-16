@@ -1,6 +1,8 @@
+import React, { Fragment, useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import React, { Fragment } from 'react';
+import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
+import classNames from 'classnames';
 
 interface PopupModalProps {
   title?: string;
@@ -9,6 +11,8 @@ interface PopupModalProps {
   onClose?: () => void;
   titleClass?: string;
   showCloseIcon?: boolean;
+  panelClass?: string;
+  hasOverlay?: boolean;
 }
 
 export default function PopupModal({
@@ -18,7 +22,15 @@ export default function PopupModal({
   onClose = () => null,
   titleClass,
   showCloseIcon = true,
+  panelClass,
+  hasOverlay = false,
 }: PopupModalProps) {
+  const [overlay, setOverlay] = useState<boolean>(false);
+
+  useEffect(() => {
+    setOverlay(hasOverlay);
+  }, [hasOverlay]);
+
   return (
     <Transition appear show={show} as={Fragment}>
       <Dialog as="div" className="relative z-150" onClose={() => null}>
@@ -31,10 +43,16 @@ export default function PopupModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/75 z-10" />
+          <div className="fixed inset-0 z-10" />
         </Transition.Child>
 
-        <div className="fixed inset-0 overflow-y-auto z-20">
+        <div
+          className={classNames(
+            calibri.variable,
+            'font-calibri fixed inset-0 overflow-y-auto z-20',
+            overlay ? '' : 'bg-black/75',
+          )}
+        >
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child
               as={Fragment}
@@ -45,7 +63,12 @@ export default function PopupModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="px-7 pt-7 transform bg-primary-white text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel
+                className={classNames(
+                  'px-7 pt-7 pb-5 transform bg-primary-white text-left align-middle shadow-xl transition-all',
+                  panelClass,
+                )}
+              >
                 {showCloseIcon && (
                   <Icon
                     iconName="cross"

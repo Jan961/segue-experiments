@@ -1,6 +1,7 @@
 import { selector } from 'recoil';
 import { rehearsalState } from '../rehearsalState';
 import { bookingState } from '../bookingState';
+import { dateTypeState } from '../dateTypeState';
 import { getInFitUpState } from '../getInFitUpState';
 import { otherState } from '../otherState';
 import { venueState } from '../venueState';
@@ -8,11 +9,12 @@ import { productionJumpState } from '../productionJumpState';
 import { objectify } from 'radash';
 import moment from 'moment';
 import { bookingRow, bookingStatusMap } from 'config/bookings';
-import { calculateWeekNumber, getKey } from 'services/dateService';
+import { calculateWeekNumber, getKey, getArrayOfDatesBetween } from 'services/dateService';
 import { performanceState } from '../performanceState';
 import BookingHelper from 'utils/booking';
 import { dateBlockState } from '../dateBlockState';
-import { getArrayOfDatesBetween } from 'utils/getDatesBetween';
+import { DAY_TYPE_FILTERS } from 'components/bookings/utils';
+import { distanceState } from '../distanceState';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
@@ -26,10 +28,21 @@ export const rowsSelector = selector({
     const performanceDict = get(performanceState);
     const other = get(otherState);
     const venueDict = get(venueState);
+    const dayTypes = get(dateTypeState);
     const { productions } = get(productionJumpState);
     const productionDict = objectify(productions, (production) => production.Id);
     const dateBlocks = get(dateBlockState);
     const helper = new BookingHelper({ performanceDict, venueDict, productionDict });
+    const distance = get(distanceState);
+    const getDistance = (productionId, dateTime, venueId) => {
+      const productionDistance = distance?.[productionId] || {};
+      const { option = [] } = productionDistance?.stops?.find((x) => x.Date === dateTime) || {};
+      const venue = option?.find((x) => x.VenueId === venueId);
+      return {
+        miles: venue?.Miles,
+        travelTime: venue?.Mins,
+      };
+    };
     const { start, end } = helper.getRangeFromDateBlocks(dateBlocks);
     const rows: any = [];
     const bookedDates: string[] = [];
@@ -38,18 +51,35 @@ export const rowsSelector = selector({
       const production = productionDict[ProductionId] || {};
       const rowData = transformer(data);
       const week = calculateWeekNumber(new Date(PrimaryDateBlock?.StartDate), new Date(date));
+      const otherDayType = dayTypes.find(({ Id }) => Id === data.DateTypeId)?.Name;
+      const getValueForDayType = (value, type) => {
+        if (!value) {
+          if (type === 'Other') {
+            return otherDayType;
+          }
+          return DAY_TYPE_FILTERS.includes(type) ? type : value;
+        }
+        return value;
+      };
+      const { miles = '', travelTime = '' } = getDistance(ProductionId, date, data.VenueId);
+
       const row = {
+        ...rowData,
         week,
         dateTime: date,
         date: date ? moment(date).format('ddd DD/MM/YY') : '',
         productionName: getProductionName(production),
         production: getProductionCode(production),
         productionId: ProductionId,
-        dayType: type,
+        dayType: type === 'Other' ? otherDayType : type,
         bookingStatus: bookingStatusMap[data?.StatusCode] || '',
         status: data?.StatusCode,
-        ...rowData,
+        venue: getValueForDayType(rowData.venue, type),
+        town: getValueForDayType(rowData.town, type),
+        miles,
+        travelTime,
       };
+
       rows.push(row);
     };
     Object.values(rehearsals).forEach((r) => {
@@ -58,7 +88,7 @@ export const rowsSelector = selector({
     });
     Object.values(getInFitUp).forEach((g) => {
       bookedDates.push(getKey(g.Date));
-      addRow(g.Date, 'Get-in, Fit-Up', g, helper.getInFitUpDetails);
+      addRow(g.Date, 'Get in / Fit Up', g, helper.getInFitUpDetails);
     });
     Object.values(bookings).forEach((b) => {
       const performancesGroup = b.PerformanceIds.reduce((performancesByDate, performanceId) => {

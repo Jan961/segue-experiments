@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import DateInput from '../DateInput';
 import Label from '../Label';
 import { set, isBefore } from 'date-fns';
+import classNames from 'classnames';
 
 export type DateRangeValue = {
   from: Date;
@@ -22,6 +23,7 @@ interface DateRangePorps {
   value?: DateRangeValue;
   minDate?: Date;
   maxDate?: Date;
+  labelClass?: string;
 }
 
 const setDateWithoutTime = (date) => {
@@ -37,6 +39,7 @@ export default function DateRange({
   value,
   minDate = null,
   maxDate = null,
+  labelClass,
 }: DateRangePorps) {
   const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
@@ -63,14 +66,8 @@ export default function DateRange({
 
   useEffect(() => {
     checkDateRangeValid(value.from, value.to);
-    if (!value) {
-      setDateRange({ from: minDate, to: maxDate });
-    } else {
-      const from = value.from || minDate;
-      const to = value?.to || maxDate;
-      setDateRange({ from, to });
-    }
-  }, [value, minDate, maxDate]);
+    setDateRange({ from: value.from, to: value.to });
+  }, [value]);
 
   const handleDateFromChange = (v: Date) => {
     const updatedDate = { ...dateRange, from: v };
@@ -101,7 +98,12 @@ export default function DateRange({
       data-testid={`${testId ? `form-typeahead-${testId}` : 'form-typeahead'}`}
     >
       {label && (
-        <div className="flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3">
+        <div
+          className={classNames(
+            labelClass,
+            'flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3',
+          )}
+        >
           <Label text={label} />
         </div>
       )}

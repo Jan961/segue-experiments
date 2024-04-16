@@ -21,3 +21,7 @@ export { default as MenuIcon } from './Menu';
 export { default as ExitIcon } from './Exit';
 export { default as ExcelIcon } from './Excel';
 export { default as CrossIcon } from './Cross';
+export { default as InfoCircleSolidIcon } from './InfoCircleSolid';
+export { default as SquareCrossIcon } from './SquareCross';
+export { default as UserSolidIcon } from './UserSolid';
+export { default as BookSolidIcon } from './BookSolid';

@@ -53,4 +53,60 @@ export type SeatsInfo = {
   ValueWithCurrencySymbol: string;
   BookingId: number;
   DataFound: boolean;
+  SetSalesFiguresDate: string;
 };
+
+export type SalesComparison = {
+  SetBookingWeekNum: number;
+  SetIsFinalFigures: boolean;
+  SetProductionWeekDate: string;
+  data: Array<SeatsInfo>;
+};
+
+export type SalesSnapshot = {
+  week: string;
+  weekOf: string;
+  schSeatsSold: string;
+  genSeatsSold: string;
+  seatsSaleChange: string;
+  schReservations: string;
+  schReserved: string;
+  genReservations: string;
+  genReserved: string;
+  venueCurrencySymbol: string;
+  schTotalValue: string;
+  genTotalValue: string;
+  valueChange: string;
+  totalHolds: string;
+  seatsChange: string;
+  isCopy: boolean;
+  isBrochureReleased: boolean;
+  isSingleSeats: boolean;
+  isNotOnSale: boolean;
+  capacity: string;
+  isFinal: boolean;
+  notOnSaleDate: string;
+};
+
+export type BookingSelection = {
+  BookingId: number;
+  BookingStatusCode: string;
+  BookingFirstDate: string;
+  VenueId: number;
+  VenueCode: string;
+  VenueMainAddressTown: string;
+  ProductionId: number;
+  FullProductionCode: string;
+  ProductionLengthWeeks: number;
+  PerformanceCount: number;
+};
+
+export type SalesTabs =
+  | 'sales'
+  | 'archived sales'
+  | 'activities'
+  | 'contact notes'
+  | 'venue contacts'
+  | 'promoter holds'
+  | 'attachments'
+  | '';

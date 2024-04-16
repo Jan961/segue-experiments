@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatFormDate from 'utils/dateInputFormat';
+import formatInputDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -37,27 +37,27 @@ async function updateBooking(bookingId: number, bookingDetails: IBookingDetails)
     console.error('problem updating booking');
   }
 }
-async function updateContract(bookingId: number, contractDetails: IContractDetails) {
-  try {
-    const contractUpdateAddress = () => `/api/contracts/update/contract/${bookingId}`;
-    const response = await fetch(contractUpdateAddress(), {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(contractDetails),
-    });
-    if (response.ok) {
-      loggingService.logAction('Contracts', 'Update Address');
+// async function updateContract(bookingId: number, contractDetails: IContractDetails) {
+//   try {
+//     const contractUpdateAddress = () => `/api/contracts/update/contract/${bookingId}`;
+//     const response = await fetch(contractUpdateAddress(), {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(contractDetails),
+//     });
+//     if (response.ok) {
+//       loggingService.logAction('Contracts', 'Update Address');
 
-      const parsedResponse = await response.json();
-      return { success: true, contractData: parsedResponse };
-    }
-  } catch (error) {
-    loggingService.logError(error);
-    console.error('problem updating contract');
-  }
-}
+//       const parsedResponse = await response.json();
+//       return { success: true, contractData: parsedResponse };
+//     }
+//   } catch (error) {
+//     loggingService.logError(error);
+//     console.error('problem updating contract');
+//   }
+// }
 
 async function createContract(bookingId: number, contractDetails: IContractDetails) {
   try {
@@ -181,7 +181,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ShowDate: c.ShowDate,
         VenueContractStatus: c.VenueContractStatus,
         DealType: c.DealType,
-        ContractSignedDate: formatFormDate(c.ContractSignedDate),
+        ContractSignedDate: formatInputDate(c.ContractSignedDate),
         ContractSignedBy: c.ContractSignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.RoyaltyPC,
@@ -191,8 +191,8 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.ContractNotes,
         GP: c.GP,
-        ContractReturnDate: formatFormDate(c.ContractReturnDate),
-        ContractReceivedBackDate: formatFormDate(c.ContractReceivedBackDate),
+        ContractReturnDate: formatInputDate(c.ContractReturnDate),
+        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
         ContractCheckedBy: c.ContractCheckedBy,
       });
       if (contractExists) {

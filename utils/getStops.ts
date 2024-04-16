@@ -8,6 +8,7 @@ export const getStops = (bookingDict: BookingState, performanceDict: Performance
   // Get distances
   const bookings = Object.values(bookingDict);
   const bookingsByProduction = group(bookings, (booking) => booking.ProductionId);
+
   return Object.keys(bookingsByProduction).reduce((map, productionId) => {
     const grouped = bookingsByProduction[productionId]?.reduce(
       (acc, { VenueId, Date: BookingDate, PerformanceIds }) => {

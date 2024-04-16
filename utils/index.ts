@@ -1,3 +1,5 @@
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+
 export const safeJsonParse = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
@@ -27,4 +29,18 @@ export const mapRecursive = <T>(
     // return a recursive call to to map to process the next item.
     return mapRecursive<T>(theRest, callback, interimArray);
   }
+};
+
+export const isNullOrEmpty = (value: any) => {
+  if (!value || value === null) {
+    return true;
+  } else if (typeof value === 'string') {
+    return value === '';
+  } else if (Array.isArray(value)) {
+    return value.length === 0;
+  }
+};
+
+export const transformToOptions = (list: any[], textKey: string, valueKey: string): SelectOption[] => {
+  return list.map((listItem) => ({ text: listItem[textKey], value: listItem[valueKey] }));
 };

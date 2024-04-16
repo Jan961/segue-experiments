@@ -51,7 +51,8 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         labelClass: groupHeader,
         options: [
           { label: 'Bookings Home', value: '/bookings', labelClass: leve2 },
-          { label: 'Manage Shows / Productions', value: '', labelClass: leve2 },
+          { label: 'Manage Shows / Productions', value: '/bookings/shows', labelClass: leve2 },
+          { label: 'Manage Venue Database', value: '/bookings/venues', labelClass: leve2 },
         ],
       },
       {
@@ -129,6 +130,18 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: systemAdminIcon,
         labelClass: groupHeader,
         options: [
+          {
+            label: 'Company Information',
+            value: '',
+            labelClass: leve2,
+            options: [
+              { label: 'Company Details', value: '', labelClass: level3 },
+              { label: 'Staff Details', value: '', labelClass: level3 },
+              { label: 'System Administrator(s)', value: '', labelClass: level3 },
+              { label: 'Production Companies', value: '', labelClass: level3 },
+            ],
+          },
+
           {
             label: 'Users',
             value: '',

@@ -3,20 +3,19 @@ import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useMemo } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { useSetRecoilState } from 'recoil';
-import { newBookingState } from 'state/booking/newBookingState';
 import { bookingStatusMap } from 'config/bookings';
 import { dateToSimple } from 'services/dateService';
 import { BookingWithVenueDTO } from 'interfaces';
-import { steps } from 'config/AddBooking';
+import { getStepIndex } from 'config/AddBooking';
 
-interface BarringIssueViewProps {
+interface BookingConflictsViewProps {
   data?: BookingWithVenueDTO[];
+  hasBarringIssues?: boolean;
+  updateModalTitle: (title: string) => void;
 }
 
-export default function BookingConflictsView({ data }: BarringIssueViewProps) {
-  const { nextStep, previousStep, activeStep, goToStep } = useWizard();
-  const setViewHeader = useSetRecoilState(newBookingState);
+export default function BookingConflictsView({ data, hasBarringIssues, updateModalTitle }: BookingConflictsViewProps) {
+  const { goToStep } = useWizard();
 
   const rows = useMemo(
     () =>
@@ -31,8 +30,8 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
   const confirmedBookings = useMemo(() => rows?.filter(({ bookingStatus }) => bookingStatus === 'Confirmed'), [rows]);
 
   useEffect(() => {
-    setViewHeader({ stepIndex: activeStep });
-  }, [activeStep]);
+    updateModalTitle('Booking Conflict');
+  }, []);
 
   const gridOptions = {
     autoSizeStrategy: {
@@ -45,38 +44,42 @@ export default function BookingConflictsView({ data }: BarringIssueViewProps) {
   };
 
   const handleContinueClick = async () => {
-    const hasBarringIssues = true; // Barring issues check
     if (hasBarringIssues) {
-      nextStep();
+      goToStep(getStepIndex(true, 'Barring Issue'));
     } else {
-      goToStep(steps.indexOf('New Booking Details'));
+      goToStep(getStepIndex(true, 'New Booking Details'));
     }
   };
 
   return (
     <div className="flex flex-col">
-      <span className="py-4 text-responsive-sm text-primary-input-text">{`This booking would conflict with ${
-        confirmedBookings?.length || 0
+      <span className="pb-2 text-responsive-sm text-primary-input-text">{`This booking would conflict with ${
+        rows?.length || 0
       } bookings`}</span>
-      <div className="w-[634px] h-60 flex flex-col">
+      <div className="w-[634px] max-h-[calc(100%-140px)] flex flex-col">
         <Table
           columnDefs={bookingConflictsColumnDefs}
           rowData={rows}
           styleProps={styleProps}
           gridOptions={gridOptions}
         />
-        <div className="py-3 w-full flex items-center justify-end">
-          <Button className="w-33" variant="secondary" text="Back" onClick={() => previousStep()} />
-          <Button
-            className="ml-3 w-33"
-            text="Continue"
-            onClick={handleContinueClick}
-            disabled={confirmedBookings?.length > 0}
-          />
-        </div>
+      </div>
+      <div className="pt-3 w-full flex items-center justify-end">
+        <Button
+          className="w-33"
+          variant="secondary"
+          text="Back"
+          onClick={() => goToStep(getStepIndex(true, 'Create New Booking'))}
+        />
+        <Button
+          className="ml-3 w-33"
+          text="Continue"
+          onClick={handleContinueClick}
+          disabled={confirmedBookings?.length > 0}
+        />
       </div>
       {confirmedBookings && confirmedBookings.length > 0 && (
-        <span className="w-full text-end py-4 text-responsive-sm text-primary-red">
+        <span className="w-full text-end text-responsive-sm text-primary-red mt-2">
           Warning! Booking clash with existing confirmed booking.
         </span>
       )}

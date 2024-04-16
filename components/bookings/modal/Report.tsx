@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
-import { StyledDialog } from 'components/global/StyledDialog';
 import { Spinner } from 'components/global/Spinner';
+import Table from 'components/core-ui-lib/Table';
+import { tourSummaryColumnDefs, styleProps } from '../table/tableConfig';
+import PopupModal from 'components/core-ui-lib/PopupModal';
 
 export default function Report({
   visible,
@@ -30,45 +32,62 @@ export default function Report({
       .finally(() => setIsLoading(false));
   }, []);
   useEffect(() => {
-    if (ProductionId) fetchProductionSummary(ProductionId);
+    if (ProductionId) {
+      fetchProductionSummary(ProductionId);
+    }
   }, [ProductionId]);
+
+  const defaultColDef = {
+    wrapHeaderText: true,
+  };
+
+  const gridOptions = {
+    defaultColDef,
+    autoSizeStrategy: {
+      type: 'fitGridWidth',
+    },
+    getRowStyle: (params) => {
+      if (params.data.bold) {
+        return { fontWeight: '800' };
+      } else {
+        return { fontWeight: 'normal' };
+      }
+    },
+  };
+
   return (
     <>
-      <StyledDialog
-        className="w-1/4 max-w-full max-h-[95vh] relative"
-        open={visible}
-        onClose={onClose}
-        title="Production Summary"
-        width="xl"
-      >
+      <PopupModal show={visible} onClose={onClose} title="Tour Summary" titleClass="text-primary-navy">
         {loading && (
           <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-95">
             <Spinner className="w-full" size="lg" />
           </div>
         )}
-        <div className="py-4 overflow-y-auto max-h-[80vh]">
+        <div className="py-4 overflow-y-auto overflow-x-hidden max-h-[85vh] w-[500px]">
           {productionSummary.length ? (
-            <div className="grid grid-cols-1">
-              {productionSummary.map((summaryGroup, i) => (
-                <div key={i}>
-                  {summaryGroup.map((summaryItem, j) => (
-                    <div
-                      key={j}
-                      className={'grid rounded px-2 py-2 gap-4 grid-cols-[1fr_50px] bg-table-row-alternating'}
-                    >
-                      <div>{summaryItem.name}</div>
-                      <div>{summaryItem.value}</div>
+            <>
+              {productionSummary.map((item, index) => (
+                <div key={index} className={`w-full ${item.bold ? 'font-bold' : 'font-normal'}`}>
+                  {item.length > 0 && (
+                    <div className={'w-full mb-2 overflow-x-hidden'}>
+                      <Table
+                        key={index}
+                        columnDefs={tourSummaryColumnDefs}
+                        rowData={item}
+                        styleProps={styleProps}
+                        displayHeader={index === 0}
+                        gridOptions={gridOptions}
+                      />
                     </div>
-                  ))}
-                  <div className={'w-full h-[25px] white'}></div>
+                  )}
                 </div>
               ))}
-            </div>
+            </>
           ) : (
             <div className="text-primary-orange w-100 h-[100px] text-center">{error}</div>
           )}
         </div>
-      </StyledDialog>
+      </PopupModal>
     </>
   );
 }

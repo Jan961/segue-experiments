@@ -4,9 +4,6 @@ import Select from './Select';
 
 const meta: Meta<typeof Select> = {
   component: Select,
-  argTypes: {
-    disabled: { control: { type: 'boolean' } },
-  },
 };
 
 export default meta;
@@ -20,10 +17,10 @@ const values = [
 
 export const Primary: Story = {
   args: {
+    label: 'Production',
+    placeholder: 'Please select...',
     options: values,
     disabled: false,
-    className: 'w-96',
-    label: 'Some label',
-    placeHolder: 'Please select a value...',
+    className: 'w-128',
   },
 };

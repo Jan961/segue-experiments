@@ -96,20 +96,31 @@ export type BookingDTO = {
   CastRateTicketsArranged?: boolean;
   CastRateTicketsNotes?: string;
   PerformanceIds?: number[];
+  RunTag: string;
+  LandingPageURL: string;
 };
 
 export type GetInFitUpDTO = {
   Id: number;
-  VenueId: number;
+  VenueId?: number; // check field name
   Date: string;
-  StatusCode: StatusCode;
+  StatusCode: string;
+  Notes: string;
+  PencilNum?: number;
+  RunTag: string;
 };
 
 export type RehearsalDTO = {
   Id?: number;
   Date: string;
-  Town: string;
+  VenueId: number;
+  Town?: string;
   StatusCode?: string;
+  Notes: string;
+  DateType: number;
+  DateBlockId?: number;
+  PencilNum?: number;
+  RunTag: string;
 };
 
 export type DateDTO = {
@@ -153,9 +164,12 @@ export type VenueMinimalDTO = {
 export type OtherDTO = {
   Id: number;
   Date: string;
-  DateTypeId: number;
-  DateTypeName?: string;
+  DateTypeId: number; // check name ?
+  DateTypeName?: string; // missing field at response
   StatusCode: StatusCode;
+  Notes?: string;
+  PencilNum?: number;
+  RunTag: string;
 };
 
 export type BookingWithVenueDTO = BookingDTO & {
@@ -171,6 +185,7 @@ export type BookingWithVenueDTO = BookingDTO & {
 export type DateTypeDTO = {
   Id: number;
   Name: string;
+  Order: number;
 };
 
 export type PerformanceDTO = {

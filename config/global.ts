@@ -13,9 +13,11 @@ export const availableLocales = [
   },
 ];
 
-export const tileColors = {
+export const  tileColors = {
   bookings: '#EC6255',
+  marketing: '#41A29A'
 };
+
 
 export const homeIcon = {
   default: { iconName: 'home', stroke: '', fill: '' },

@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Required by Typeahead (react-select) */
+input[type='text']:focus {
+  box-shadow: none;
+}
+
 /* Firefox */
 * {
   scrollbar-width: thin;
@@ -85,4 +90,10 @@
 
 .unstyled::-webkit-calendar-picker-indicator {
   display: none;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

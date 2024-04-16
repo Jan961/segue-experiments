@@ -1,35 +1,38 @@
 import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
+import { getStepIndex } from 'config/AddBooking';
+import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
-import { useSetRecoilState } from 'recoil';
-import { newBookingState } from 'state/booking/newBookingState';
+import { gridOptions } from '../../GapSuggest';
 
-const rows = [
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '56' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '02' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '73' },
-  { venue: 'Alhambra, Dunfermline', date: '02/02/24', miles: '19' },
-];
+type BarringIssueViewProps = {
+  isNewBooking: boolean;
+  barringConflicts?: BarredVenue[];
+  updateModalTitle: (title: string) => void;
+};
 
-export default function BarringIssueView() {
-  const { nextStep, previousStep, activeStep } = useWizard();
-  const setViewHeader = useSetRecoilState(newBookingState);
+const barringGridOptions = {
+  ...gridOptions,
+  rowClassRules: {
+    '!bg-primary-orange !bg-opacity-25': (params) => params?.data?.hasBarringConflict,
+  },
+};
+
+export default function BarringIssueView({ isNewBooking, barringConflicts, updateModalTitle }: BarringIssueViewProps) {
+  const { goToStep } = useWizard();
 
   useEffect(() => {
-    setViewHeader({ stepIndex: activeStep });
-  }, [activeStep]);
-
-  const gridOptions = {
-    autoSizeStrategy: {
-      type: 'fitGridWidth',
-      defaultMinWidth: 50,
-    },
-  };
+    updateModalTitle('Barring Issue');
+  }, []);
 
   const goToPreviousStep = () => {
-    previousStep();
+    if (isNewBooking) {
+      goToStep(getStepIndex(isNewBooking, 'Create New Booking'));
+    } else {
+      goToStep(getStepIndex(false, 'New Booking Details'));
+    }
   };
 
   return (
@@ -37,11 +40,20 @@ export default function BarringIssueView() {
       <span className="py-4 text-responsive-sm text-primary-input-text">
         A Barring Check has found potential issues
       </span>
-      <div className="w-[634px] h-60 flex flex-col">
-        <Table columnDefs={barringIssueColumnDefs} rowData={rows} styleProps={styleProps} gridOptions={gridOptions} />
-        <div className="py-3 w-full flex items-center justify-end">
+      <div className="w-[634px] flex flex-col">
+        <Table
+          columnDefs={barringIssueColumnDefs}
+          rowData={barringConflicts}
+          styleProps={styleProps}
+          gridOptions={barringGridOptions}
+        />
+        <div className="pt-3 w-full flex items-center justify-end">
           <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-          <Button className="ml-3 w-33" text="Continue" onClick={() => nextStep()} />
+          <Button
+            className="ml-3 w-33"
+            text="Continue"
+            onClick={() => goToStep(getStepIndex(isNewBooking, 'New Booking Details'))}
+          />
         </div>
       </div>
     </div>
