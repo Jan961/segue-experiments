@@ -22,7 +22,7 @@ const baseClass =
   'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
 const DEFAULT_TIME = { hrs: '00', min: '00', sec: '00' };
 
-const isOfTypTime = (t: unknown): t is Time => t.hrs !== undefined && t.min !== undefined;
+const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
 const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
   ({ onChange, value, onBlur, disabled, className }: TimeInputProps, ref) => {
@@ -86,7 +86,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     ) : (
       <div ref={ref} onBlur={handleBlur} className={classNames(baseClass, className)}>
         <input
-        data-testid="hourInput"
+          data-testid="hourInput"
           ref={hrsRef}
           name="hrs"
           value={time.hrs}
