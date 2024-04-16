@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import prisma from 'lib/prisma';
 import {
   createMultipleBookings,
   deleteBookingById,
@@ -20,33 +21,30 @@ import { isNullOrEmpty } from 'utils';
 import { nanoid } from 'nanoid';
 import { mapToPrismaFields } from './utils';
 
-const formatBookings = (bookings) =>
-  bookings.map((b) => ({
-    Id: b.id,
-    FirstDate: parseISO(b.dateAsISOString),
-    StatusCode: b.bookingStatus,
-    VenueId: b.venue,
-    PencilNum: Number(b.pencilNo),
-    Notes: b.notes || '',
-  }));
+const formatBooking = (booking) => ({
+  Id: booking.id,
+  FirstDate: parseISO(booking.dateAsISOString),
+  StatusCode: booking.bookingStatus,
+  VenueId: booking.venue,
+  PencilNum: Number(booking.pencilNo),
+  Notes: booking.notes || '',
+});
 
-const formatNonPerformanceType = (bookings) =>
-  bookings.map((b) => ({
-    Id: b.id,
-    StatusCode: b.bookingStatus,
-    VenueId: b.venue,
-    PencilNum: Number(b.pencilNo),
-    Notes: b.notes || '',
-  }));
+const formatNonPerformanceType = (booking) => ({
+  Id: booking.id,
+  StatusCode: booking.bookingStatus,
+  VenueId: booking.venue,
+  PencilNum: Number(booking.pencilNo),
+  Notes: booking.notes || '',
+});
 
-const formatOtherType = (bookings) =>
-  bookings.map((b) => ({
-    Id: b.id,
-    StatusCode: b.bookingStatus,
-    DateTypeId: b.dayType,
-    PencilNum: Number(b.pencilNo),
-    Notes: b.notes || '',
-  }));
+const formatOtherType = (booking) => ({
+  Id: booking.id,
+  StatusCode: booking.bookingStatus,
+  DateTypeId: booking.dayType,
+  PencilNum: Number(booking.pencilNo),
+  Notes: booking.notes || '',
+});
 
 const updateBookings = async (values) => {
   try {
@@ -84,23 +82,86 @@ const updateBookings = async (values) => {
   }
 };
 
+const formatToPrisma = (booking: BookingItem) => {
+  if (booking.isBooking) {
+    return formatBooking(booking);
+  } else if (booking.isRehearsal || booking.isGetInFitUp) {
+    return formatNonPerformanceType(booking);
+  }
+  return formatOtherType(booking);
+};
+
+const getBookngType = (booking: BookingItem) => {
+  if (booking.isBooking) {
+    return 'booking';
+  } else if (booking.isRehearsal) {
+    return 'rehearsal';
+  } else if (booking.isGetInFitUp) {
+    return 'getInFitUp';
+  }
+  return 'other';
+};
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
-
     const { original, updated } = req.body;
-    // Check if this is a straight forward update or a delete-insert
-    const originalBooking = original[0] as BookingItem;
-    const updatedBooking = updated.find(({ id }) => id === originalBooking.id) as BookingItem;
-    if (updatedBooking) {
-      const canUpdate =
-        updatedBooking.isBooking === originalBooking.isBooking &&
-        updatedBooking.isRehearsal === originalBooking.isRehearsal &&
-        updatedBooking.isGetInFitUp === originalBooking.isGetInFitUp;
+    console.log(original, updated);
 
-      if (canUpdate) {
+    const rowsMap = {
+      booking: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
+      rehearsal: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
+      getInFitUp: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
+      other: { rowsToInsert: [], rowsToUpdate: [], rowsToDelete: [] },
+    };
+    // Check if this is a straight forward update or a delete-insert
+    const acc = updated.reduce((acc, booking: BookingItem) => {
+      const originalBooking = original.find(({ id }) => id === booking.id) as BookingItem;
+      const originalType = getBookngType(originalBooking);
+      const updatedType = getBookngType(booking);
+      const formatted = formatToPrisma(booking);
+      if (!formatted.Id) {
+        acc[updatedType].rowsToInsert.push(formatted);
+      } else {
+        const canUpdate =
+          originalBooking.isBooking === booking.isBooking &&
+          originalBooking.isRehearsal === booking.isRehearsal &&
+          originalBooking.isGetInFitUp === booking.isGetInFitUp;
+        if (canUpdate) {
+          acc[updatedType].rowsToUpdate.push(formatted);
+        } else {
+          acc[originalType].rowsToDelete.push(originalBooking);
+          acc[updatedType].rowsToInsert.push(formatted);
+        }
+      }
+      return acc;
+    }, rowsMap);
+
+    console.log('Reduced', acc);
+    const promises = [];
+    await prisma.$transaction(async (tx) => {
+      for (const bookingType of Object.entries(acc)) {
+        const [model, { rowsToInsert, rowsToUpdate, rowsToDelete }] = bookingType;
+        rowsToDelete.forEach((rowToDelete) => {
+          switch (model) {
+            case 'booking':
+              promises.push(deleteBookingById(rowToDelete));
+              break;
+            case 'rehearsal':
+              promises.push(deleteBookingById(rowToDelete));
+              break;
+            case 'getInFitUp':
+              promises.push(deleteBookingById(rowToDelete));
+              break;
+            default:
+              promises.push(deleteBookingById(rowToDelete));
+          }
+        });
+      }
+    });
+    /*  if (canUpdate) {
         if (updatedBooking.isBooking) {
           updateBookings(updated);
         } else if (updatedBooking.isGetInFitUp) {
@@ -126,7 +187,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           );
         }
       } else {
-        // delete original and insert updated in a prosma transaction
+        // delete original and insert updated in a prisma transaction
         await Promise.all(
           original.map(async (booking) => {
             if (booking.isRehearsal) {
@@ -141,8 +202,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           }),
         );
         await createMultipleBookings(mapToPrismaFields(updated));
-      }
-    }
+      } */
+
     res.status(200).json('Success');
   } catch (err) {
     console.log(err);

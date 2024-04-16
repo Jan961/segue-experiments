@@ -30,40 +30,40 @@ export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: Booking, performances) => {
+export const updateBooking = async (booking: Booking, performances, tx = prisma) => {
   let updatedBooking = null;
   let updatedPerformances = null;
-  await prisma.$transaction(async (tx) => {
-    updatedBooking = await tx.booking.update({
-      where: {
-        Id: booking.Id,
-      },
-      data: {
-        ...booking,
-        Performance: {
-          deleteMany: {
-            BookingId: booking.Id,
-          },
+
+  updatedBooking = await tx.booking.update({
+    where: {
+      Id: booking.Id,
+    },
+    data: {
+      ...booking,
+      Performance: {
+        deleteMany: {
+          BookingId: booking.Id,
         },
       },
-      include: bookingInclude,
-    });
-
-    if (isNullOrEmpty(performances)) {
-      updatedPerformances = await tx.performance.create({
-        data: { BookingId: booking.Id, Date: booking.FirstDate, Time: null },
-      });
-    } else {
-      updatedPerformances = await tx.performance.createMany({
-        data: performances.map((time) => ({ BookingId: booking.Id, Date: time, Time: time })),
-      });
-    }
+    },
+    include: bookingInclude,
   });
+
+  if (isNullOrEmpty(performances)) {
+    updatedPerformances = await tx.performance.create({
+      data: { BookingId: booking.Id, Date: booking.FirstDate, Time: null },
+    });
+  } else {
+    updatedPerformances = await tx.performance.createMany({
+      data: performances.map((time) => ({ BookingId: booking.Id, Date: time, Time: time })),
+    });
+  }
+
   return { ...updatedBooking, ...updatedPerformances };
 };
 
-export const updateGetInFitUp = async (booking: GetInFitUp) => {
-  await prisma.getInFitUp.update({
+export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
+  await tx.getInFitUp.update({
     data: omit(booking, ['Id']),
     where: {
       Id: booking.Id,
@@ -71,8 +71,8 @@ export const updateGetInFitUp = async (booking: GetInFitUp) => {
   });
 };
 
-export const updateRehearsal = async (booking: Rehearsal) => {
-  await prisma.rehearsal.update({
+export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
+  await tx.rehearsal.update({
     data: omit(booking, ['Id']),
     where: {
       Id: booking.Id,
@@ -80,8 +80,8 @@ export const updateRehearsal = async (booking: Rehearsal) => {
   });
 };
 
-export const updateOther = async (booking: Other) => {
-  await prisma.other.update({
+export const updateOther = async (booking: Other, tx = prisma) => {
+  await tx.other.update({
     data: omit(booking, ['Id']),
     where: {
       Id: booking.Id,
@@ -89,39 +89,37 @@ export const updateOther = async (booking: Other) => {
   });
 };
 
-export const deleteBookingById = async (id: number) => {
-  await prisma.$transaction([
-    prisma.booking.delete({
-      where: {
-        Id: id,
-      },
-    }),
-    prisma.performance.deleteMany({
-      where: {
-        BookingId: id,
-      },
-    }),
-  ]);
+export const deleteBookingById = async (id: number, tx = prisma) => {
+  await tx.booking.delete({
+    where: {
+      Id: id,
+    },
+  });
+  await tx.performance.deleteMany({
+    where: {
+      BookingId: id,
+    },
+  });
 };
 
-export const deleteRehearsalById = async (id: number) => {
-  await prisma.rehearsal.delete({
+export const deleteRehearsalById = async (id: number, tx = prisma) => {
+  await tx.rehearsal.delete({
     where: {
       Id: id,
     },
   });
 };
 
-export const deleteGetInFitUpById = async (id: number) => {
-  await prisma.getInFitUp.delete({
+export const deleteGetInFitUpById = async (id: number, tx = prisma) => {
+  await tx.getInFitUp.delete({
     where: {
       Id: id,
     },
   });
 };
 
-export const deleteOtherById = async (id: number) => {
-  await prisma.other.delete({
+export const deleteOtherById = async (id: number, tx = prisma) => {
+  await tx.other.delete({
     where: {
       Id: id,
     },
