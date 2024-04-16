@@ -46,7 +46,7 @@ export const Switchboard = () => {
       icon: null,
       stroke: '',
       fill: '#FFF',
-      iconName: 'touring-management',
+      iconName: 'production-management',
       color: 'bg-primary-purple',
     },
     {
