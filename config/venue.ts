@@ -148,14 +148,14 @@ export const initialMainVenueDetails = {
 };
 
 export const initialVenueAddressDetails = {
-  deliveryCountry: '',
+  deliveryCountry: null,
   deliveryPostCode: '',
   deliveryTown: '',
   deliveryAddress3: '',
   deliveryAddress2: '',
   deliveryAddress1: '',
 
-  primaryCountry: '',
+  primaryCountry: null,
   primaryPostCode: '',
   primaryTown: '',
   primaryAddress3: '',

@@ -17,6 +17,7 @@ interface AddEditVenueModalProps {
   visible: boolean;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
+  countryOptions: SelectOption[];
   venue?: UiTransformedVenue;
   onClose: () => void;
 }
@@ -26,6 +27,7 @@ export default function AddEditVenueModal({
   visible,
   venueCurrencyOptionList,
   venueFamilyOptionList,
+  countryOptions,
   onClose,
 }: AddEditVenueModalProps) {
   const router = useRouter();
@@ -106,7 +108,13 @@ export default function AddEditVenueModal({
           </div>
           <h2 className="text-xl text-primary-navy font-bold pt-7">Addresses</h2>
           <div className="grid grid-cols-2 gap-5">
-            <VenueAddressForm venue={formData} onChange={onChange} />
+            <VenueAddressForm
+              countryOptions={countryOptions}
+              venue={formData}
+              onChange={onChange}
+              validationErrors={validationErrors}
+              updateValidationErrrors={updateValidationErrors}
+            />
           </div>
           <div className="pt-7">
             <h2 className="text-xl text-primary-navy font-bold ">Technical</h2>

@@ -92,6 +92,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           venue={editVenueContext}
           venueFamilyOptionList={venueFamilyOptionList}
           venueCurrencyOptionList={venueCurrencyOptionList}
+          countryOptions={countryOptions}
           visible={!!editVenueContext}
           onClose={() => {
             setEditVenueContext(null);

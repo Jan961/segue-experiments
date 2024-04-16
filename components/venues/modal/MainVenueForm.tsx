@@ -65,9 +65,7 @@ const MainVenueForm = ({
             />
           </Tooltip>
         </label>
-        {validationErrors.venueCode && (
-          <small className="text-primary-red flex justify-end">{validationErrors.venueCode}</small>
-        )}
+        {validationErrors.venueCode && <small className="text-primary-red flex">{validationErrors.venueCode}</small>}
       </div>
       <div className="flex flex-col">
         <Select
@@ -79,9 +77,7 @@ const MainVenueForm = ({
           className="w-[430px] font-bold place-self-end"
         />
         {validationErrors.venueStatus && (
-          <small className="text-primary-red justify-end w-[430px] place-self-end">
-            {validationErrors.venueStatus}
-          </small>
+          <small className="text-primary-red w-[430px]">{validationErrors.venueStatus}</small>
         )}
       </div>
       <div className="flex flex-col">
@@ -91,6 +87,7 @@ const MainVenueForm = ({
             placeholder="Enter Venue Name"
             className="w-[364px]"
             value={formData.venueName}
+            error={validationErrors.venueName}
             onChange={(e) => handleInputChange('venueName', e.target.value)}
           />
         </label>

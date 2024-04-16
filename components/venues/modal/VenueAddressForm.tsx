@@ -1,3 +1,5 @@
+import Select from 'components/core-ui-lib/Select';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
@@ -5,9 +7,18 @@ import { UiTransformedVenue } from 'utils/venue';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
+  countryOptions: SelectOption[];
+  validationErrors?: Record<string, string>;
+  updateValidationErrrors?: (key: string, value: string) => void;
   onChange: (data: any) => void;
 }
-const VenueAddressForm = ({ venue, onChange }: VenueAddressFormProps) => {
+const VenueAddressForm = ({
+  venue,
+  countryOptions,
+  validationErrors,
+  updateValidationErrrors,
+  onChange,
+}: VenueAddressFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueAddressDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -20,21 +31,30 @@ const VenueAddressForm = ({ venue, onChange }: VenueAddressFormProps) => {
     };
     setFormData(updatedFormData);
     onChange(updatedFormData);
+    if (validationErrors?.[field]) {
+      updateValidationErrrors(field, null);
+    }
   };
   return (
     <>
       <div className="flex flex-col gap-5">
         <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className=" text-primary-input-text">Address 1</p>
-          <TextInput
-            placeholder="Enter Address 1"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.primaryAddress1}
-            onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
-          />
-        </label>
+        <div className="flex flex-col">
+          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+            <p className=" text-primary-input-text">Address 1</p>
+            <TextInput
+              placeholder="Enter Address 1"
+              className="w-full justify-between"
+              inputClassName="w-full"
+              value={formData.primaryAddress1}
+              error={validationErrors.primaryAddress1}
+              onChange={(e) => handleInputChange('primaryAddress1', e.target.value)}
+            />
+          </label>
+          {validationErrors.primaryAddress1 && (
+            <small className="text-primary-red flex">{validationErrors.primaryAddress1}</small>
+          )}
+        </div>
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 2</p>
           <TextInput
@@ -75,17 +95,23 @@ const VenueAddressForm = ({ venue, onChange }: VenueAddressFormProps) => {
             onChange={(e) => handleInputChange('primaryPostCode', e.target.value)}
           />
         </label>
-
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Country</p>
-          <TextInput
-            placeholder="Enter Country"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.primaryCountry}
-            onChange={(e) => handleInputChange('primaryCountry', e.target.value)}
-          />
-        </label>
+        <div className="flex flex-col">
+          <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+            <p className="text-primary-input-text">Country</p>
+            <Select
+              name="primaryCountry"
+              className="w-full font-bold"
+              placeholder="Country"
+              value={formData.primaryCountry}
+              onChange={(value) => handleInputChange('primaryCountry', parseInt(value as string, 10))}
+              options={countryOptions}
+              isSearchable
+            />
+          </label>
+          {validationErrors.primaryCountry && (
+            <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
+          )}
+        </div>
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Stage Door</p>
           <TextInput
@@ -160,14 +186,16 @@ const VenueAddressForm = ({ venue, onChange }: VenueAddressFormProps) => {
           />
         </label>
 
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Country</p>
-          <TextInput
-            placeholder="Enter Country"
-            className="w-full justify-between"
-            inputClassName="w-full"
+          <Select
+            name="deliveryCountry"
+            className="w-full font-bold"
+            placeholder="Country"
             value={formData.deliveryCountry}
-            onChange={(e) => handleInputChange('deliveryCountry', e.target.value)}
+            onChange={(value) => handleInputChange('deliveryCountry', parseInt(value as string, 10))}
+            options={countryOptions}
+            isSearchable
           />
         </label>
       </div>

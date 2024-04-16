@@ -34,7 +34,10 @@ const VenueTechnicalDetailsForm = ({
     <>
       <div className="flex flex-row  justify-between">
         <div className="flex flex-col">
-          <label htmlFor="techSpecsUrl" className="flex flex-row gap-10 w-[720px]">
+          <label
+            htmlFor="techSpecsUrl"
+            className="grid grid-cols-[100px_minmax(500px,_1fr)] gap-10 justify-between  w-full"
+          >
             <div className="text-primary-input-text text-no-wrap whitespace-normal">Tech Specs URL</div>
             <TextInput
               id="techSpecsUrl"
@@ -51,7 +54,7 @@ const VenueTechnicalDetailsForm = ({
       </div>
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
-          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">LX Desk</p>
             <TextInput
               placeholder="Enter Tech LX Desk"
@@ -61,16 +64,16 @@ const VenueTechnicalDetailsForm = ({
               onChange={(e) => handleInputChange('techLXDesk', e.target.value)}
             />
           </label>
-          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">LX Notes</p>
             <TextArea
               placeholder="Notes Field"
-              className="!w-[380px] max-h-40 min-h-[50px]  justify-between"
+              className="!w-full max-h-40 min-h-[50px]  justify-between"
               value={formData.techLXNotes}
               onChange={(e) => handleInputChange('techLXNotes', e.target.value)}
             />
           </label>
-          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Stage Size</p>
             <TextInput
               placeholder="Enter Stage Size"
@@ -82,7 +85,7 @@ const VenueTechnicalDetailsForm = ({
           </label>
         </div>
         <div className="flex flex-col gap-5">
-          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Sound Desk</p>
             <TextInput
               id="soundDesk"
@@ -93,17 +96,17 @@ const VenueTechnicalDetailsForm = ({
               onChange={(e) => handleInputChange('soundDesk', e.target.value)}
             />
           </label>
-          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Sound Notes</p>
             <TextArea
               id="soundNotes"
               placeholder="Notes Field"
-              className="!w-[380px] max-h-40 min-h-[50px]  justify-between"
+              className="!w-full max-h-40 min-h-[50px]  justify-between"
               value={formData.soundNotes}
               onChange={(e) => handleInputChange('soundNotes', e.target.value)}
             />
           </label>
-          <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Grid Height</p>
             <TextInput
               id="gridHeight"
@@ -115,7 +118,7 @@ const VenueTechnicalDetailsForm = ({
             />
           </label>
         </div>
-        <label className="grid grid-cols-[90px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full">
+        <label className="grid grid-cols-[100px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Flags</p>
           <TextArea
             id="flags"

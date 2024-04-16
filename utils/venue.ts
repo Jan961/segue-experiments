@@ -5,7 +5,7 @@ export interface PrimaryAddress {
   primaryAddress1?: string;
   primaryAddress2?: string;
   primaryAddress3?: string;
-  primaryCountry?: string;
+  primaryCountry?: number;
   primaryTown?: string;
   primaryPostCode?: string;
 }
@@ -15,7 +15,7 @@ export interface DeliveryAddress {
   deliveryAddress1?: string;
   deliveryAddress2?: string;
   deliveryAddress3?: string;
-  deliveryCountry?: string;
+  deliveryCountry?: number;
   deliveryTown?: string;
   deliveryPostCode?: string;
 }
