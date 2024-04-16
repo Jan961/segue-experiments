@@ -8,6 +8,7 @@ import { BookingSelection } from 'types/MarketingTypes';
 import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { VenueDTO } from 'interfaces';
+import { Spinner } from 'components/global/Spinner';
 
 export type ArchSalesDialogVariant = 'venue' | 'town' | 'both';
 
@@ -22,7 +23,7 @@ interface ArchSalesDialogProps {
 const title = {
   venue: 'Archived Sales for this Venue',
   town: 'Archived Sales for this Town',
-  both: 'Archived Slaes for any Venue / Town',
+  both: 'Archived Sales for any Venue / Town',
 };
 
 const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<ArchSalesDialogProps>) => {
@@ -30,7 +31,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
   const [selectedBookings, setSelectedBookings] = useState([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const { productions } = useRecoilValue(productionJumpState);
-  const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>();
+  const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>([]);
   const [subTitle, setSubTitle] = useState<string>('');
   const router = useRouter();
 
@@ -50,7 +51,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
         url: '/api/marketing/archivedSales/bookingSelection',
         method: 'POST',
         data: {
-          salesByType: 'venue',
+          salesByType: variant === 'venue' ? 'venue' : 'town',
           venueCode: venue.Code,
           showCode: router.query.ShowCode.toString(),
         },
@@ -74,7 +75,6 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
   const submitSelection = () => {
     if (selectedBookings.length < 2) {
       setErrorMessage('Please select at least 2 venues for comparison.');
-      
     } else {
       onSubmit(selectedBookings);
     }
@@ -118,8 +118,9 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
   }, [show]);
 
   useEffect(() => {
+    setProdCompData([]);
     getBookingSelection(data);
-  }, [data, getBookingSelection]);
+  }, [data, variant]);
 
   return (
     <PopupModal
@@ -130,23 +131,27 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
     >
       <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>
 
-      <SalesTable
-        containerHeight="h-auto"
-        containerWidth="w-[342px]"
-        module="marketing"
-        variant="prodCompArch"
-        onCellValChange={selectForComparison}
-        data={prodCompData}
-        cellRenderParams={{ selected: selectedBookings }}
-        productions={productions}
-      />
+      {prodCompData.length === 0 ? (
+        <Spinner size="md" />
+      ) : (
+        <SalesTable
+          containerHeight="h-auto"
+          containerWidth="w-[342px]"
+          module="marketing"
+          variant="prodCompArch"
+          onCellValChange={selectForComparison}
+          data={prodCompData}
+          cellRenderParams={{ selected: selectedBookings }}
+          productions={productions}
+        />
+      )}
 
       <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 
       <div className="float-right flex flex-row mt-5 py-2">
         <Button className="w-32" variant="secondary" text={'Cancel'} onClick={onCancel} />
 
-        <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={submitSelection} />
+        <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={() => submitSelection()} />
       </div>
     </PopupModal>
   );

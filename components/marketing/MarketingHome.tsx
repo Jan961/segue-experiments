@@ -47,10 +47,8 @@ const MarketingHome = () => {
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
-    if (variant === 'venue') {
-      const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
-      setArchivedData(selectedBooking.Venue);
-    }
+    const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
+    setArchivedData(selectedBooking.Venue);
     setShowArchSalesModal(true);
   };
 
@@ -85,7 +83,7 @@ const MarketingHome = () => {
       setCurrView('');
       setBookingId(bookings[0].selected);
     }
-  }, [bookings]);
+  }, [bookings[0].selected]);
 
   useEffect(() => {
     if (bookingId) {
@@ -122,49 +120,49 @@ const MarketingHome = () => {
           <TabButton
             text="Sales"
             className={`w-[155px] ${currView === 'sales' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('sales')}
           />
           <TabButton
             text="Archived Sales"
             className={`w-[155px] ${currView === 'archived sales' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('archived sales')}
           />
           <TabButton
             text="Activities"
             className={`w-[155px] ${currView === 'activities' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('activities')}
           />
           <TabButton
             text="Contact Notes"
             className={`w-[155px] ${currView === 'contact notes' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('contact notes')}
           />
           <TabButton
             text="Venue Contacts"
             className={`w-[155px] ${currView === 'venue contacts' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('venue contacts')}
           />
           <TabButton
             text="Promoter Holds"
             className={`w-[155px] ${currView === 'promoter holds' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('promoter holds')}
           />
           <TabButton
             text="Attachments"
             className={`w-[155px] ${currView === 'attachments' && selectedBtnClass}`}
-            disabled={!productionId}
+            disabled={!productionId || bookingId === null}
             variant="secondary"
             onClick={() => setCurrView('attachments')}
           />
