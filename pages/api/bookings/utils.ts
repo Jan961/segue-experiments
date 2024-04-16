@@ -1,17 +1,33 @@
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
 
-export const mapToPrismaFields = (values: BookingItem[] = []) => {
+export const mapNewBookingToPrismaFields = (values: BookingItem[] = []) => {
   const mapped = values
     .filter((item) => item.dayType !== null && item.bookingStatus !== null)
     .map((item) => {
       const mappedItem = {
         DateBlockId: Number(item.dateBlockId),
         VenueId: item.venue,
-        Date: item.dateAsISOString,
+        BookingDate: item.dateAsISOString,
         DateTypeId: item.dayType,
-        performanceTimes: item.times ? item.times.split(';') : [],
-        BookingStatus: item.bookingStatus,
-        PencilNo: Number(item.pencilNo),
+        Performances: item.times
+          ? item.times
+              .replace(/\s/g, '')
+              .split(';')
+              .map((time) => {
+                const datePart = item.dateAsISOString.split('T')[0];
+                return {
+                  Time: `${datePart}T${time}:00Z`,
+                  Date: item.dateAsISOString,
+                };
+              })
+          : [
+              {
+                Time: null,
+                Date: item.dateAsISOString,
+              },
+            ],
+        StatusCode: item.bookingStatus,
+        PencilNum: Number(item.pencilNo),
         Notes: item.notes,
         isBooking: item.isBooking || item.perf,
         isRehearsal: item.isRehearsal,
@@ -22,3 +38,55 @@ export const mapToPrismaFields = (values: BookingItem[] = []) => {
     });
   return mapped;
 };
+
+export const mapExistingBookingToPrismaFields = (value: BookingItem) => {
+  if (value.dayType === null && value.bookingStatus === null) {
+    throw new Error('Cannot update a booking with no day type and no status');
+  }
+
+  return {
+    Id: value.id,
+    VenueId: value.venue,
+    Performances: value.times
+      ? value.times
+          .replace(/\s/g, '')
+          .split(';')
+          .map((time) => {
+            const datePart = value.dateAsISOString.split('T')[0];
+            return {
+              Time: `${datePart}T${time}:00Z`,
+              Date: value.dateAsISOString,
+            };
+          })
+      : [
+          {
+            Time: null,
+            Date: value.dateAsISOString,
+          },
+        ],
+    StatusCode: value.bookingStatus,
+    PencilNum: Number(value.pencilNo),
+    Notes: value.notes,
+    RunTag: value.runTag,
+  };
+};
+
+export const mapNewRehearsalOrGIFUToPrismaFields = (booking) => ({
+  DateBlockId: Number(booking.dateBlockId),
+  StatusCode: booking.bookingStatus,
+  VenueId: booking.venue,
+  BookingDate: booking.dateAsISOString,
+  PencilNum: Number(booking.pencilNo),
+  Notes: booking.notes || '',
+  RunTag: booking.runTag,
+});
+
+export const mapNewOtherTypeToPrismaFields = (booking) => ({
+  DateBlockId: Number(booking.dateBlockId),
+  BookingDate: booking.dateAsISOString,
+  StatusCode: booking.bookingStatus,
+  DateTypeId: booking.dayType,
+  PencilNum: Number(booking.pencilNo),
+  Notes: booking.notes || '',
+  RunTag: booking.runTag,
+});

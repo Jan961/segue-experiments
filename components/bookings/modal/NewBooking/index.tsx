@@ -106,7 +106,9 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   useEffect(() => {
     if (booking) {
       // Check for run of dates
-      const runOfDates = bookings.filter(({ runTag }) => runTag === booking.runTag);
+      const runOfDates = bookings
+        .filter(({ runTag }) => runTag === booking.runTag)
+        .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
 
       if (runOfDates.length > 1) {
         onFormDataChange({ isRunOfDates: true });
@@ -164,9 +166,12 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
 
   const updateBooking = async () => {
     try {
+      const runTag = state.form.isRunOfDates ? state.booking[0].runTag : nanoid(8);
+      const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
+
       const { data: updated } = await axios.post('/api/bookings/update', {
         original: state.booking,
-        updated: state.bookingUpdates,
+        updated: bookingsUpdatedWithRunTag,
       });
       onClose(updated);
     } catch (e) {
