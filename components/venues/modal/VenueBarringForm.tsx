@@ -50,7 +50,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
                 placeholder="Enter Pre Show Weeks"
                 type="number"
                 className="w-full justify-between"
-                value={formData.preShow}
+                value={formData.preShow + ''}
                 onChange={(e) => handleInputChange('preShow', parseFloat(e.target.value))}
               />
             </label>
@@ -64,7 +64,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
                 placeholder="Enter Post Show Weeks"
                 type="number"
                 className="w-full justify-between"
-                value={formData.postShow}
+                value={formData.postShow + ''}
                 onChange={(e) => handleInputChange('postShow', parseFloat(e.target.value))}
               />
             </label>
@@ -79,7 +79,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
                 type="number"
                 className="w-full justify-between"
                 inputClassName="w-full"
-                value={formData.barringMiles}
+                value={formData.barringMiles + ''}
                 onChange={(e) => handleInputChange('barringMiles', parseFloat(e.target.value))}
               />
             </label>

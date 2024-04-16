@@ -49,6 +49,8 @@ export interface UiVenue {
   techSpecsUrl: string;
   flags: string;
   excludeFromChecks: boolean;
+  what3WordsStage?: string;
+  what3WordsLoading?: string;
 }
 
 export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => {

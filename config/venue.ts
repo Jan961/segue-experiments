@@ -137,7 +137,7 @@ export const initialMainVenueDetails = {
   venueStatus: '',
   venueName: '',
   vatIndicator: false,
-  culturallyExemptVenue: false,
+  culturallyExempt: false,
   venueFamily: null,
   currency: '',
   venueCapacity: null,
