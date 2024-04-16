@@ -42,12 +42,13 @@ const ARCHIVED_OPTION_STYLES = {
 
 export default function ProductionJumpMenu() {
   const router = useRouter();
+  console.log(router.route);
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
   const productions = useMemo(() => {
-    const productionOptions = [
-      { text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false },
-    ];
+    const productionOptions = router.route.includes('/marketing')
+      ? []
+      : [{ text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false }];
     for (const production of productionJump.productions) {
       if (includeArchived) {
         productionOptions.push({

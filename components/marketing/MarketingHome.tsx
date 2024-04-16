@@ -47,10 +47,8 @@ const MarketingHome = () => {
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
-    if (variant === 'venue') {
-      const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
-      setArchivedData(selectedBooking.Venue);
-    }
+    const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
+    setArchivedData(selectedBooking.Venue);
     setShowArchSalesModal(true);
   };
 
@@ -85,7 +83,7 @@ const MarketingHome = () => {
       setCurrView('');
       setBookingId(bookings[0].selected);
     }
-  }, [bookings]);
+  }, [bookings[0].selected]);
 
   useEffect(() => {
     if (bookingId) {
