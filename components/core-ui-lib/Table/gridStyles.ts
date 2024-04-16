@@ -30,6 +30,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-size: 16px;
     justify-content: center;
     border-bottom: 4px solid white;
+    border-right: 4px solid white;
 }
 
 /* used for other headers in a header group that are not children */

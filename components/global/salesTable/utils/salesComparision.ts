@@ -10,10 +10,10 @@ export type SelectedBooking = {
   numPerfs: number;
 };
 
-export type SalesComp = {
+export interface SalesComp {
   tableData: Array<SalesComparison>;
   bookingIds: Array<SelectedBooking>;
-};
+}
 
 const salesComparison = async (data: SalesComp) => {
   const tempRowData = [];
@@ -95,7 +95,6 @@ const salesComparison = async (data: SalesComp) => {
 
   // Processing the row data
   data.tableData.forEach((sale) => {
-    console.log(sale);
     tempRowData.push({
       week: sale.SetBookingWeekNum,
       ...(function processData(seatInfo) {
