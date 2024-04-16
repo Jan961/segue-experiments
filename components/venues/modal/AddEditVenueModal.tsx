@@ -11,7 +11,6 @@ import VenueTechnicalDetailsForm from './VenueTechnicalDetailsForm';
 import VenueBarringForm from './VenueBarringForm';
 import axios from 'axios';
 import { UiTransformedVenue } from 'utils/venue';
-import { useRouter } from 'next/router';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -30,7 +29,6 @@ export default function AddEditVenueModal({
   countryOptions,
   onClose,
 }: AddEditVenueModalProps) {
-  const router = useRouter();
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const handleInputChange = (field: string, value: any) => {
@@ -47,14 +45,12 @@ export default function AddEditVenueModal({
   const createVenue = async (venue: UiTransformedVenue) => {
     return axios.post('/api/venue/create', venue).then(() => {
       onClose();
-      router.replace(router.asPath);
     });
   };
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     return axios.post('/api/venue/update/' + venue.id, venue).then(() => {
       onClose();
-      router.replace(router.asPath);
     });
   };
 

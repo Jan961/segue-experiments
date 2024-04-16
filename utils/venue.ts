@@ -54,14 +54,14 @@ export interface UiVenue {
 }
 
 export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => {
-  const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, Country } = address || {};
+  const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, CountryId } = address || {};
   if (TypeName === 'Main') {
     return {
       primaryAddressId: id,
       primaryAddress1: Line1,
       primaryAddress2: Line2,
       primaryAddress3: Line3,
-      primaryCountry: Country,
+      primaryCountry: CountryId,
       primaryTown: Town,
       primaryPostCode: Postcode,
     };
@@ -71,7 +71,7 @@ export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => 
     deliveryAddress1: Line1,
     deliveryAddress2: Line2,
     deliveryAddress3: Line3,
-    deliveryCountry: Country,
+    deliveryCountry: CountryId,
     deliveryTown: Town,
     deliveryPostCode: Postcode,
   };
@@ -109,6 +109,8 @@ export const transformVenues = (Venues: (Venue & { VenueAddress: VenueAddress[] 
       VenueNotes,
       VenueWarningNotes,
       ExcludeFromChecks,
+      AddressStageDoorW3W,
+      AddressLoadingW3W,
     }) => {
       const address1 = trasformVenueAddress(VenueAddress?.[0]) || {};
       const address2 = trasformVenueAddress(VenueAddress?.[1]) || {};
@@ -139,6 +141,8 @@ export const transformVenues = (Venues: (Venue & { VenueAddress: VenueAddress[] 
         techSpecsUrl: TechSpecsURL,
         flags: VenueFlags,
         excludeFromChecks: ExcludeFromChecks,
+        what3WordsStage: AddressStageDoorW3W,
+        what3WordsLoading: AddressLoadingW3W,
         ...address1,
         ...address2,
       };

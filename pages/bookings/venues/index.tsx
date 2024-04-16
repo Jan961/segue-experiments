@@ -21,23 +21,23 @@ import { initialVenueState } from 'config/venue';
 export type VenueFilters = {
   venueId: string;
   town: string;
-  country: string;
+  country: number;
   productionId: string;
   search: string;
 };
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { venueTownList = [], venueCountryList = [], venueCurrencyOptionList = [], venueFamilyOptionList = [] } = props;
+  const {
+    venueTownList = [],
+    venueCountryOptionList = [],
+    venueCurrencyOptionList = [],
+    venueFamilyOptionList = [],
+  } = props;
   const [filters, setFilters] = useState<VenueFilters>(defaultVenueFilters);
   const [venues, setVenues] = useState([]);
   const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
   const { productionId, town, country, search } = filters;
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
-  const countryOptions = useMemo(
-    () => venueCountryList.map(({ Country }) => ({ text: Country, value: Country })),
-    [venueCountryList],
-  );
-
   const fetchVenues = useCallback(async (payload) => {
     const { productionId, town, country, searchQuery } = payload || {};
     if (!(productionId || town || country || searchQuery)) {
@@ -78,7 +78,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           <div className="mb-4">
             <VenueFilter
               townOptions={townOptions}
-              countryOptions={countryOptions}
+              countryOptions={venueCountryOptionList}
               onFilterChange={updateFilters}
               filters={filters}
               showVenueModal={() => setEditVenueContext(initialVenueState)}
@@ -92,7 +92,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           venue={editVenueContext}
           venueFamilyOptionList={venueFamilyOptionList}
           venueCurrencyOptionList={venueCurrencyOptionList}
-          countryOptions={countryOptions}
+          countryOptions={venueCountryOptionList}
           visible={!!editVenueContext}
           onClose={() => {
             setEditVenueContext(null);
@@ -118,15 +118,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
   const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
-  const venueCountryList = results[2].status === 'fulfilled' ? results[2].value : [];
+  const venueCountryOptionList: SelectOption[] =
+    results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
   const venueCurrencyOptionList: SelectOption[] =
     results[3].status === 'fulfilled'
       ? transformToOptions(results[3].value, null, 'Code', (item) => item.Code + ' ' + item.Name)
       : [];
-  console.table(venueCurrencyOptionList);
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
-
   const initialState = {
     global: {
       productionJump,
@@ -136,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       venueTownList,
-      venueCountryList,
+      venueCountryOptionList,
       venueCurrencyOptionList,
       venueFamilyOptionList,
       initialState,

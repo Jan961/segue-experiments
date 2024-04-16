@@ -39,6 +39,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       techSpecsUrl: TechSpecsURL,
       flags: VenueFlags,
       excludeFromChecks: ExcludeFromChecks,
+      what3WordsStage: AddressStageDoorW3W,
+      what3WordsLoading: AddressLoadingW3W,
       primaryAddressId,
       primaryAddress1,
       primaryAddress2,
@@ -70,7 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Line2: primaryAddress2,
         Line3: primaryAddress3,
         Town: primaryTown,
-        Country: primaryCountry,
+        CountryId: primaryCountry,
         Postcode: primaryPostCode,
         TypeName: 'Main',
       });
@@ -90,7 +92,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Line2: deliveryAddress2,
         Line3: deliveryAddress3,
         Town: deliveryTown,
-        Country: deliveryCountry,
+        CountryId: deliveryCountry,
         Postcode: deliveryPostCode,
         TypeName: 'Delivery',
       });
@@ -122,6 +124,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       VenueFlags,
       ExcludeFromChecks,
       VenueAccountId: accountId,
+      AddressStageDoorW3W,
+      AddressLoadingW3W,
     };
     const updatedVenue = await prisma.venue.update({
       where: {

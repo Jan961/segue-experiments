@@ -37,7 +37,7 @@ export const bookingRow = {
 export const defaultVenueFilters = {
   venueId: null,
   town: '',
-  country: '',
+  country: null,
   productionId: null,
   search: '',
 };

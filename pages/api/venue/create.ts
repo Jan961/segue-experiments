@@ -30,6 +30,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       stageSize: StageSize,
       gridHeight: GridHeight,
       techSpecsUrl: TechSpecsURL,
+      what3WordsStage: AddressStageDoorW3W,
+      what3WordsLoading: AddressLoadingW3W,
       flags: VenueFlags,
       excludeFromChecks: ExcludeFromChecks,
       primaryAddress1,
@@ -50,7 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Line2: primaryAddress2,
       Line3: primaryAddress3,
       Town: primaryTown,
-      Country: primaryCountry,
+      CountryId: primaryCountry,
       Postcode: primaryPostCode,
       TypeName: 'Main',
     };
@@ -60,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Line2: deliveryAddress2,
       Line3: deliveryAddress3,
       Town: deliveryTown,
-      Country: deliveryCountry,
+      CountryId: deliveryCountry,
       Postcode: deliveryPostCode,
       TypeName: 'Delivery',
     };
@@ -94,6 +96,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           VenueFlags,
           ExcludeFromChecks,
           VenueAccountId: accountId,
+          AddressLoadingW3W,
+          AddressStageDoorW3W,
         },
         [primaryAddress, deliveryAddress],
       );

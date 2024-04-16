@@ -30,7 +30,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (country) {
     queryConditions.VenueAddress = {
       some: {
-        Country: country,
+        CountryId: country,
       },
     };
   }
