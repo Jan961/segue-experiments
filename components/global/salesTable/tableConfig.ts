@@ -143,6 +143,67 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
   },
 ];
 
+export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
+  {
+    headerName: 'Order for Comparison',
+    field: 'compOrder',
+    cellRenderer: SelectRenderer,
+    cellRendererParams: (params) => ({
+      options: getNumericalOptions(
+        optionsLength,
+        [],
+        // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
+      ),
+      selectForComparison,
+      selectedBookings,
+      placeholder: '',
+      inline: true,
+      className: 'mt-1 w-[112px]',
+      onChange: (value) => {
+        selectForComparison({
+          order: parseInt(value),
+          bookingId: params.data.bookingId,
+          prodCode: params.data.prodCode,
+          prodName: params.data.prodName,
+          numPerfs: params.data.numPerfs,
+        });
+      },
+    }),
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
+    headerClass: 'border-r-[1px] border-white',
+    suppressMovable: true,
+    sortable: false,
+    resizable: false,
+  },
+  {
+    headerName: 'Production Code',
+    field: 'prodCode',
+    cellRenderer: DefaultCellRenderer,
+    width: 110,
+    headerClass: 'border-r-[1px] border-white',
+    suppressMovable: true,
+    sortable: false,
+    resizable: false,
+  },
+  {
+    headerName: 'Duration of Production',
+    field: 'prodWks',
+    cellRenderer: DefaultCellRenderer,
+    width: 110,
+    cellStyle: {
+      textAlign: 'center',
+    },
+    headerClass: 'border-r-[1px] border-white',
+    suppressMovable: true,
+    sortable: false,
+    resizable: false,
+  },
+];
+
 export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booking, setSalesActivity) => {
   return [
     {

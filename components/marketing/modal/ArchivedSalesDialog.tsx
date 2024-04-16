@@ -1,62 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import SalesTable from 'components/global/salesTable';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { BookingSelection } from 'types/MarketingTypes';
-import { venueState } from 'state/booking/venueState';
 import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
+import { VenueDTO } from 'interfaces';
 
-export type ArchSalesDialogVariant = 'venue' | 'town' | 'both'
+export type ArchSalesDialogVariant = 'venue' | 'town' | 'both';
 
 interface ArchSalesDialogProps {
   show: boolean;
   onCancel: () => void;
-  variant: ArchSalesDialogVariant,
-  data: any;
+  variant: ArchSalesDialogVariant;
+  data: VenueDTO;
+  onSubmit: (salesComp) => void;
 }
 
 const title = {
   venue: 'Archived Sales for this Venue',
   town: 'Archived Sales for this Town',
-  both: 'Archived Slaes for any Venue / Town'
-}
+  both: 'Archived Slaes for any Venue / Town',
+};
 
-const ArchSalesDialog = ({
-  show,
-  onCancel,
-  variant,
-  data
-}: Partial<ArchSalesDialogProps>) => {
+const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<ArchSalesDialogProps>) => {
   const [visible, setVisible] = useState<boolean>(show);
   const [selectedBookings, setSelectedBookings] = useState([]);
-  const [errorMessage, setErrorMessage] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string>('');
   const { productions } = useRecoilValue(productionJumpState);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>();
   const [subTitle, setSubTitle] = useState<string>('');
-  const venueDict = useRecoilValue(venueState);
   const router = useRouter();
-  
+
   const { fetchData } = useAxios();
 
   const handleModalCancel = () => onCancel?.();
 
-  useEffect(() => {
-    setVisible(show);
-  }, [show]);
-
-  useEffect(() => {
-    getBookingSelection(data);
-  }, [data]);
-
-  const getBookingSelection = async (venueID: string | number) => {
-    const venue = venueDict[data];
+  const getBookingSelection = async (venue) => {
     if (venue === undefined) {
       return;
     }
-    setSubTitle(variant === 'venue' ? venue.Name : venue.Town);
+
+    setSubTitle(venue.Name);
 
     try {
       const data = await fetchData({
@@ -78,9 +65,18 @@ const ArchSalesDialog = ({
         );
 
         setProdCompData(sortedData);
-      } 
+      }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const submitSelection = () => {
+    if (selectedBookings.length < 2) {
+      setErrorMessage('Please select at least 2 venues for comparison.');
+      
+    } else {
+      onSubmit(selectedBookings);
     }
   };
 
@@ -117,43 +113,43 @@ const ArchSalesDialog = ({
     }
   };
 
+  useEffect(() => {
+    setVisible(show);
+  }, [show]);
+
+  useEffect(() => {
+    getBookingSelection(data);
+  }, [data, getBookingSelection]);
+
   return (
     <PopupModal
-        show={visible}
-        title={title[variant]}
-        titleClass="text-xl text-primary-navy font-bold -mt-2"
-        onClose={handleModalCancel}
-      >
-
+      show={visible}
+      title={title[variant]}
+      titleClass="text-xl text-primary-navy font-bold -mt-2"
+      onClose={handleModalCancel}
+    >
       <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>
 
-      {/* <SalesTable
-              containerHeight="h-auto"
-              containerWidth="w-[920px]"
-              module="marketing"
-              variant="prodComparision"
-              onCellClick={(value) => console.log(value)}
-              onCellValChange={selectForComparison}
-              data={prodCompData}
-              cellRenderParams={{ selected: selectedBookings }}
-              productions={productions}
-            /> */}
+      <SalesTable
+        containerHeight="h-auto"
+        containerWidth="w-[342px]"
+        module="marketing"
+        variant="prodCompArch"
+        onCellValChange={selectForComparison}
+        data={prodCompData}
+        cellRenderParams={{ selected: selectedBookings }}
+        productions={productions}
+      />
 
-      <div className="w-full mt-4 flex justify-center items-center">
-          <Button 
-            className="w-32" 
-            variant="secondary" 
-            text={'Cancel'} 
-          />
+      <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 
-          <Button
-            className="ml-4 w-32"
-            variant='primary'
-            text='Accept'
-          />
-        </div>
+      <div className="float-right flex flex-row mt-5 py-2">
+        <Button className="w-32" variant="secondary" text={'Cancel'} onClick={onCancel} />
+
+        <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={submitSelection} />
+      </div>
     </PopupModal>
   );
-}
+};
 
 export default ArchSalesDialog;
