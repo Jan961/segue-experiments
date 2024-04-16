@@ -44,6 +44,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
   border-right: 2px solid white !important;
 }
 
+.right-border-full {
+    border-right: 1px solid white !important;
+}
+
 .ag-body-viewport {
     overflow: visible;
 }
