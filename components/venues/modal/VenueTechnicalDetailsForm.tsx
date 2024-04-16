@@ -57,7 +57,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">LX Desk</p>
             <TextInput
-              placeholder="Enter Tech LX Desk"
+              placeholder="Enter LX Desk"
               className="w-full justify-between"
               inputClassName="w-full"
               value={formData.techLXDesk}
