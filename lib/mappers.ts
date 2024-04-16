@@ -99,6 +99,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   CastRateTicketsArranged: b.CastRateTicketsArranged,
   CastRateTicketsNotes: b.CastRateTicketsNotes,
   RunTag: b.RunTag,
+  LandingPageURL: b.LandingPageURL,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
@@ -132,6 +133,7 @@ export const otherMapper = (o: Other): OtherDTO => ({
   PencilNum: o.PencilNum,
   StatusCode: o.StatusCode as StatusCode,
   RunTag: o.RunTag,
+  Notes: o.Notes,
 });
 
 export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => ({

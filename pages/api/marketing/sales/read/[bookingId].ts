@@ -1,6 +1,5 @@
 import prisma from 'lib/prisma';
 import { TSalesView } from 'types/MarketingTypes';
-import numeral from 'numeral';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 const getMapKey = ({
@@ -33,7 +32,6 @@ export default async function handle(req, res) {
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
-    console.log(access);
     if (!access) return res.status(401).end();
 
     const data =
@@ -47,13 +45,22 @@ export default async function handle(req, res) {
           [key]: {
             ...val,
             ...(sale.SaleTypeName === 'General Sales' && {
-              seatsSold: parseInt(sale.Seats),
+              genSeatsSold: sale.Seats,
               venueCurrencySymbol: sale.VenueCurrencySymbol,
-              totalValue: parseFloat(sale.Value),
+              genTotalValue: sale.Value,
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
-              reserved: sale.Seats,
-              reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
+              genReserved: sale.Seats,
+              genReservations: sale.Value,
+            }),
+            ...(sale.SaleTypeName === 'School Sales' && {
+              schSeatsSold: sale.Seats,
+              venueCurrencySymbol: sale.VenueCurrencySymbol,
+              schTotalValue: sale.Value,
+            }),
+            ...(sale.SaleTypeName === 'School Reservations' && {
+              schReserved: sale.Seats,
+              schReservations: sale.Value,
             }),
           },
         };
@@ -64,12 +71,16 @@ export default async function handle(req, res) {
         [key]: {
           week: sale.SetBookingWeekNum ? `Week ${sale.SetBookingWeekNum}` : '',
           weekOf: sale.SetSalesFiguresDate,
-          seatsSold: parseInt(sale.Seats) || 0,
+          schSeatsSold: '',
+          genSeatsSold: '',
           seatsSaleChange: '',
-          reservations: '',
-          reserved: '',
+          schReservations: '',
+          genReservations: '',
+          schReserved: '',
+          genReserved: '',
           venueCurrencySymbol: sale.VenueCurrencySymbol,
-          totalValue: parseFloat(sale.Value) || 0,
+          schTotalValue: '',
+          genTotalValue: '',
           valueChange: '',
           totalHolds: sale.TotalHoldSeats,
           seatsChange: '',
@@ -81,12 +92,21 @@ export default async function handle(req, res) {
           isFinal: sale.SetIsFinalFigures,
           notOnSaleDate: sale.NotOnSaleDate,
           ...(sale.SaleTypeName === 'General Sales' && {
-            seatsSold: parseInt(sale.Seats),
-            totalValue: parseFloat(sale.Value),
+            genSeatsSold: sale.Seats,
+            genTotalValue: sale.Value,
           }),
           ...(sale.SaleTypeName === 'General Reservations' && {
-            reserved: parseInt(sale.Seats),
-            reservations: sale.Value ? numeral(sale.Value).format(sale.VenueCurrencySymbol + '0,0.00') : '',
+            genReserved: sale.Seats,
+            genReservations: sale.Value,
+          }),
+          ...(sale.SaleTypeName === 'School Sales' && {
+            schSeatsSold: sale.Seats,
+            venueCurrencySymbol: sale.VenueCurrencySymbol,
+            schTotalValue: sale.Value,
+          }),
+          ...(sale.SaleTypeName === 'School Reservations' && {
+            schReserved: sale.Seats,
+            schReservations: sale.Value,
           }),
         },
       };

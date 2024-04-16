@@ -1,15 +1,60 @@
-import { useState } from 'react';
-import { SalesTable } from 'types/MarketingTypes';
-import { useRecoilValue } from 'recoil';
+import { useEffect, useState } from 'react';
+import { SalesTabs, SalesSnapshot } from 'types/MarketingTypes';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
 import Icon from 'components/core-ui-lib/Icon';
 import TabButton from 'components/core-ui-lib/TabButton';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import useAxios from 'hooks/useAxios';
+import SalesTable from 'components/global/salesTable';
+import axios from 'axios';
+import Button from 'components/core-ui-lib/Button';
 
 const MarketingHome = () => {
-  const [currView, setCurrView] = useState<SalesTable>('');
+  const [currView, setCurrView] = useState<SalesTabs>('');
   const selectedBtnClass = '!bg-primary-green/[0.30] !text-primary-navy';
   const { selected: productionId } = useRecoilValue(productionJumpState);
+  const bookings = useRecoilState(bookingJumpState);
+  const [bookingId, setBookingId] = useState(null);
+  const [sales, setSales] = useState<Array<SalesSnapshot>>([]);
+  const [showVenueModal, setShowVenueModal] = useState<boolean>(false);
+  const [showTownModal, setShowTownModal] = useState<boolean>(false);
+  const [showVTModal, setShowVTModal] = useState<boolean>(false);
+  const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
+  // const [archivedSales, setArchivedSales] = useState>();
+
+  const { fetchData } = useAxios();
+
+  const getSales = async (bookingId: string) => {
+    const data = await fetchData({
+      url: '/api/marketing/sales/read/' + bookingId,
+      method: 'POST',
+    });
+
+    setSales([]);
+
+    if (Array.isArray(data) && data.length > 0) {
+      const salesData = data as Array<SalesSnapshot>;
+      setSales(salesData);
+      setCurrView('sales');
+    } else {
+      setSales([]);
+    }
+  };
+
+  useEffect(() => {
+    if (bookings[0].selected !== bookingId) {
+      setCurrView('');
+      setBookingId(bookings[0].selected);
+    }
+  }, [bookings]);
+
+  useEffect(() => {
+    if (bookingId) {
+      getSales(bookingId.toString());
+    }
+  }, [bookingId]);
 
   return (
     <div className="flex w-full h-full">
@@ -88,8 +133,71 @@ const MarketingHome = () => {
           />
         </div>
 
-        <div className="flex-grow">
-          <div className="text base">{currView}</div>
+        <div className="h-[650px] overflow-y-hidden">
+          {currView === 'sales' && (
+            <div>
+              {sales.length !== 0 && (
+                <SalesTable
+                  containerHeight="h-auto"
+                  containerWidth="w-[1440px]"
+                  module="marketing"
+                  variant="salesSnapshot"
+                  data={sales}
+                  booking={bookings[0].selected}
+                />
+              )}
+            </div>
+          )}
+
+          {currView === 'archived sales' && (
+            <div className='flex flex-row gap-4'>
+              <Button
+                text="For this Venue"
+                className="w-[132px] mb-3 pl-6"
+                onClick={() => setShowVenueModal(true)}
+              />
+
+              <Button
+                text="For this Town"
+                className="w-[132px] mb-3 pl-6"
+                onClick={() => setShowTownModal(true)}
+              /> 
+
+              <Button
+                text="For this Venue / Town"
+                className="w-[230px] mb-3 pl-6"
+                onClick={() => setShowVTModal(true)}
+              />
+
+              <Button
+                text="Export Displayed Sales Data"
+                className="w-[230px] mb-3 pl-6"
+                iconProps={{ className: 'h-4 w-3 ml-5' }}
+                sufixIconName={'excel'}
+                disabled={!archivedDataAvail}
+              />
+            </div>
+          )}
+
+          {currView === 'activities' && (
+            <div>activities</div>
+          )}
+
+          {currView === 'contact notes' && (
+            <div>contact notes</div>
+          )}
+
+          {currView === 'venue contacts' && (
+            <div>venue contacts</div>
+          )}
+
+          {currView === 'promoter holds' && (
+            <div>promoter holds</div>
+          )}
+
+          {currView === 'attachments' && (
+            <div>attachments</div>
+          )}
         </div>
       </div>
     </div>
