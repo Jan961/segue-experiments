@@ -44,7 +44,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
   border-right: 2px solid white !important;
 }
 
-.header-normal {
+.right-border-full {
     border-right: 1px solid white !important;
 }
 
