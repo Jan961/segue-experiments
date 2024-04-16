@@ -91,7 +91,7 @@ const MarketingHome = () => {
     if (bookingId) {
       getSales(bookingId.toString());
     }
-  }, [bookingId, getSales]);
+  }, [bookingId]);
 
   return (
     <div className="flex w-full h-full">
