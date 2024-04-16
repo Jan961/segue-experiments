@@ -174,7 +174,7 @@ const MarketingHome = () => {
               {sales.length !== 0 && (
                 <SalesTable
                   containerHeight="h-auto"
-                  containerWidth="w-[1440px]"
+                  containerWidth="w-[1465px]"
                   module="marketing"
                   variant="salesSnapshot"
                   data={sales}

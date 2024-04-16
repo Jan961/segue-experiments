@@ -1,8 +1,6 @@
 import Button from 'components/core-ui-lib/Button';
 import { ICellRendererParams } from 'ag-grid-community';
 import { ButtonVariant } from 'components/core-ui-lib/Button/Button';
-import classNames from 'classnames';
-
 interface ButtonRendererProps extends ICellRendererParams {
   variant: ButtonVariant;
   buttonText: string;

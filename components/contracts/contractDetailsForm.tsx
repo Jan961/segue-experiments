@@ -37,27 +37,27 @@ async function updateBooking(bookingId: number, bookingDetails: IBookingDetails)
     console.error('problem updating booking');
   }
 }
-async function updateContract(bookingId: number, contractDetails: IContractDetails) {
-  try {
-    const contractUpdateAddress = () => `/api/contracts/update/contract/${bookingId}`;
-    const response = await fetch(contractUpdateAddress(), {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(contractDetails),
-    });
-    if (response.ok) {
-      loggingService.logAction('Contracts', 'Update Address');
+// async function updateContract(bookingId: number, contractDetails: IContractDetails) {
+//   try {
+//     const contractUpdateAddress = () => `/api/contracts/update/contract/${bookingId}`;
+//     const response = await fetch(contractUpdateAddress(), {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(contractDetails),
+//     });
+//     if (response.ok) {
+//       loggingService.logAction('Contracts', 'Update Address');
 
-      const parsedResponse = await response.json();
-      return { success: true, contractData: parsedResponse };
-    }
-  } catch (error) {
-    loggingService.logError(error);
-    console.error('problem updating contract');
-  }
-}
+//       const parsedResponse = await response.json();
+//       return { success: true, contractData: parsedResponse };
+//     }
+//   } catch (error) {
+//     loggingService.logError(error);
+//     console.error('problem updating contract');
+//   }
+// }
 
 async function createContract(bookingId: number, contractDetails: IContractDetails) {
   try {

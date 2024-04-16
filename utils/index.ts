@@ -41,6 +41,15 @@ export const isNullOrEmpty = (value: any) => {
   }
 };
 
-export const transformToOptions = (list: any[], textKey: string, valueKey: string): SelectOption[] => {
-  return list.map((listItem) => ({ text: listItem[textKey], value: listItem[valueKey] }));
+export const transformToOptions = (
+  list: any[],
+  textKey: string,
+  valueKey: string,
+  textFn?: (listItem: any) => string,
+  valueFn?: (listItem: any) => string,
+): SelectOption[] => {
+  return list.map((listItem) => ({
+    text: listItem?.[textKey] || textFn?.(listItem),
+    value: listItem?.[valueKey] || valueFn?.(listItem),
+  }));
 };
