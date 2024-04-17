@@ -1,11 +1,11 @@
 export interface AddBookingsParams {
-  Date: string;
+  BookingDate: string;
   DateBlockId: number;
   VenueId: number;
-  performanceTimes: string[];
+  Performances: any;
   DateTypeId?: number;
-  BookingStatus: string;
-  PencilNo: number;
+  StatusCode: string;
+  PencilNum: number;
   Notes: string;
   isBooking?: boolean;
   isRehearsal?: boolean;

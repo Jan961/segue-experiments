@@ -49,7 +49,7 @@ export default function PopupModal({
         <div
           className={classNames(
             calibri.variable,
-            'font-calibri fixed inset-0 overflow-y-auto z-20',
+            'font-calibri fixed inset-0 overflow-y-auto z-50',
             overlay ? '' : 'bg-black/75',
           )}
         >
