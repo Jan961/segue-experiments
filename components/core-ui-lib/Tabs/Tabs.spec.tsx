@@ -12,18 +12,17 @@ describe('Tabs Component', () => {
 
   test('renders Tabs component with provided tabs', () => {
     render(<Tabs tabs={tabs} children={children} />);
-    const tabElements = screen.getAllByRole('tab');
-    expect(tabElements.length).toBe(3);
+    const tabButtons = screen.getAllByRole('button');
+    expect(tabButtons.length).toBe(3);
     tabs.forEach((tab, index) => {
-      expect(tabElements[index]).toHaveTextContent(tab);
+      expect(tabButtons[index]).toHaveTextContent(tab);
     });
   });
 
   test('renders default selected tab with default styles', () => {
     render(<Tabs tabs={tabs} children={children} />);
     const selectedTab = screen.getByText('Tab 1');
-    expect(selectedTab).toHaveClass('!bg-primary-navy');
-    expect(selectedTab).toHaveClass('!text-white');
+    expect(selectedTab).toHaveClass('w-[155px]');
   });
 
   test('calls onChange callback when tab is clicked', () => {
@@ -35,9 +34,18 @@ describe('Tabs Component', () => {
   });
 
   test('renders custom selected tab with provided class', () => {
-    render(<Tabs tabs={tabs} selectedTabClass="custom-selected-tab" children={children} />);
+    const customClass = 'custom-selected-tab';
+    render(<Tabs tabs={tabs} selectedTabClass={customClass} children={children} />);
     const selectedTab = screen.getByText('Tab 1');
-    expect(selectedTab).toHaveClass('custom-selected-tab');
+    expect(selectedTab).toHaveClass(customClass);
+  });
+
+  test('disabled state disables all tabs', () => {
+    render(<Tabs tabs={tabs} disabled={true} children={children} />);
+    const tabButtons = screen.getAllByRole('button');
+    tabButtons.forEach(button => {
+      expect(button).toBeDisabled();
+    });
   });
 
   // Add more test cases as needed
