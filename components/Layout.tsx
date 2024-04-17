@@ -60,13 +60,13 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <header className="flex flex-col">
-        <HeaderNav menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen}></HeaderNav>
+        <HeaderNav menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
       </header>
       <main className="h-full w-full flex flex-rows flex-1">
         <PopoutMenu menuIsOpen={state.menuPinned || menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
         {isLoading && <LoadingOverlay />}
         <div
-          className={`flex flex-col ${flush ? 'flex-1' : 'mt-24 flex-1 px-4'} ${state.menuPinned ? 'ml-64 pl-1' : ''}`}
+          className={`flex flex-col ${flush ? 'flex-1' : 'mt-12 flex-1 px-4'} ${state.menuPinned ? 'ml-64 pl-1' : ''}`}
         >
           {children}
         </div>
