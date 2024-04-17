@@ -14,15 +14,15 @@ import { VenueDTO } from 'interfaces';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 
-export type SelectValue = {
+export type SelectOption = {
   text: string;
   value: any;
-}
+};
 
 export type DataList = {
-  townList: Array<SelectValue>;
-  venueList: Array<SelectValue>;
-}
+  townList: Array<SelectOption>;
+  venueList: Array<SelectOption>;
+};
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTabs>('');
@@ -65,10 +65,10 @@ const MarketingHome = () => {
       // get venue list
       const venueTownData = {
         townList: Object.values(townList).map((town) => {
-          return { text: town.Town, value: town.Town }
+          return { text: town.Town, value: town.Town };
         }),
         venueList: Object.values(venueDict).map((venue) => {
-          return { text: venue.Code + ' ' + venue.Name, value: venue }
+          return { text: venue.Code + ' ' + venue.Name, value: venue };
         }),
       };
       setArchivedData(venueTownData);
@@ -81,7 +81,7 @@ const MarketingHome = () => {
   };
 
   const showArchivedSales = async (selection) => {
-    setArchivedSalesTable(<div></div>);
+    setArchivedSalesTable(<div />);
     const selectedBookings = selection.map((obj) => obj.bookingId);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -105,7 +105,7 @@ const MarketingHome = () => {
       setArchivedDataAvail(true);
       setShowArchSalesModal(false);
     } else {
-      setErrorMessage('There are no sales data available for this particular selection.')
+      setErrorMessage('There are no sales data available for this particular selection.');
     }
   };
 
