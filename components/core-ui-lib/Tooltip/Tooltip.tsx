@@ -28,8 +28,8 @@ const getArrowStyle = (bgColorClass: string) => ({
 });
 
 const Tooltip: React.FC<TooltipProps> = ({
-  title,
-  body,
+  title = '',
+  body = '',
   children,
   position = 'top',
   height = 'h-auto',
@@ -42,7 +42,8 @@ const Tooltip: React.FC<TooltipProps> = ({
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
 
   const toggleTooltip = () => {
-    if (!disabled) {
+    const tpContentAvail = title.trim() !== '' || body.trim() !== '';
+    if (!disabled && tpContentAvail) {
       setShowTooltip(!showTooltip);
     }
   };
@@ -57,7 +58,7 @@ const Tooltip: React.FC<TooltipProps> = ({
           <div
             className={`z-[10000] relative flex flex-col justify-center p-4 ${txtColorClass} bg-${bgColorClass} rounded-md ${height} ${width} max-w-[300px]`}
           >
-            <div className={`${arrowStyle[position]}`}></div>
+            <div className={`${arrowStyle[position]}`} />
             <div className="text-center">
               {title && (
                 <div className="font-bold leading-[1.125] break-words whitespace-normal not-italic">{title}</div>
