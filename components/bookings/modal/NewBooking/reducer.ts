@@ -34,6 +34,7 @@ export type BookingItem = {
   isBooking: boolean;
   isRehearsal: boolean;
   isGetInFitUp: boolean;
+  isRunOfDates: boolean;
   runTag?: string;
 };
 

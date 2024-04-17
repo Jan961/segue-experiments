@@ -54,6 +54,7 @@ export default function NewBookingDetailsView({
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
+  const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const { goToStep } = useWizard();
   const tableRef = useRef(null);
@@ -135,12 +136,11 @@ export default function NewBookingDetailsView({
   }, [production, bookingRow, venueDict]);
 
   useEffect(() => {
-    console.log('In NewBookingDetailsView', data);
     if (data !== null && data.length > 0) {
-      setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
+      setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions, changeBookingLength));
       setBookingData(data);
     }
-  }, [data, dayTypeOptions, venueOptions]);
+  }, [data, dayTypeOptions, venueOptions, changeBookingLength]);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -171,9 +171,6 @@ export default function NewBookingDetailsView({
 
   // Placeholder function to be implemented
   const handleMoveBooking = () => null;
-
-  // Placeholder function to be implemented
-  const handleChangeBookingLength = () => null;
 
   const handleCancelButtonClick = () => {
     const isDirty = tableRef.current.isDirty();
@@ -294,8 +291,8 @@ export default function NewBookingDetailsView({
                 <Button
                   className="w-33 px-4"
                   variant="primary"
-                  text="Change Booking Length"
-                  onClick={handleChangeBookingLength}
+                  text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
+                  onClick={() => setchangeBookingLength((prev) => !prev)}
                 />
               </>
             )}

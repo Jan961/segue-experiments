@@ -10,10 +10,10 @@ export type SelectedBooking = {
   numPerfs: number;
 };
 
-export type SalesComp = {
+export interface SalesComp {
   tableData: Array<SalesComparison>;
   bookingIds: Array<SelectedBooking>;
-};
+}
 
 const salesComparison = async (data: SalesComp) => {
   const tempRowData = [];
@@ -59,7 +59,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_date',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'border-r-[1px] border-white',
+              headerClass: 'header-child',
               width: 100,
               resizable: false,
               sortable: false,
@@ -69,7 +69,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_seats',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'border-r-[1px] border-white text-center',
+              headerClass: 'header-child',
               width: 80,
               resizable: false,
               sortable: false,
@@ -79,7 +79,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_saleValue',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'text-center' + (index < data.bookingIds.length - 1 ? ' border-r-4 border-white' : ''),
+              headerClass: 'header-child',
               width: 122,
               resizable: false,
               sortable: false,
@@ -95,7 +95,6 @@ const salesComparison = async (data: SalesComp) => {
 
   // Processing the row data
   data.tableData.forEach((sale) => {
-    console.log(sale);
     tempRowData.push({
       week: sale.SetBookingWeekNum,
       ...(function processData(seatInfo) {

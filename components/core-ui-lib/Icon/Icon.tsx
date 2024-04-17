@@ -20,7 +20,6 @@ export type IconName =
   | 'marketing'
   | 'tasks'
   | 'contracts'
-  | 'touring-management'
   | 'system-admin'
   | 'menu'
   | 'exit'
@@ -28,7 +27,9 @@ export type IconName =
   | 'system-admin'
   | 'excel'
   | 'cross'
-  | 'info-circle-solid';
+  | 'info-circle-solid'
+  | 'minus-circle-solid'
+  | 'plus-circle-solid';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -48,7 +49,6 @@ const IconNameMap = new Map([
   ['marketing', 'HornIcon'],
   ['tasks', 'SquareTickIcon'],
   ['contracts', 'PaperIcon'],
-  ['touring-management', 'LocationIcon'],
   ['production-management', 'LocationIcon'],
   ['system-admin', 'UserSettingIcon'],
   ['menu', 'MenuIcon'],
@@ -59,6 +59,8 @@ const IconNameMap = new Map([
   ['book-solid', 'BookSolidIcon'],
   ['user-solid', 'UserSolidIcon'],
   ['square-cross', 'SquareCrossIcon'],
+  ['minus-circle-solid', 'MinusCircleSolidIcon'],
+  ['plus-circle-solid', 'PlusCircleSolidIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '5xl';

@@ -49,7 +49,7 @@ export default function PopupModal({
         <div
           className={classNames(
             calibri.variable,
-            'font-calibri fixed inset-0 overflow-y-auto z-20',
+            'font-calibri fixed inset-0 overflow-y-auto z-50',
             overlay ? '' : 'bg-black/75',
           )}
         >
@@ -75,6 +75,7 @@ export default function PopupModal({
                     variant="lg"
                     className="hover:scale-105 fixed right-4 top-4"
                     onClick={onClose}
+                    data-testid="close-icon"
                   />
                 )}
                 <Dialog.Title as="h3" className={`text-lg font-bold leading-6 ${titleClass}`}>

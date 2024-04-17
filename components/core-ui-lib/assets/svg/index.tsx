@@ -25,3 +25,5 @@ export { default as InfoCircleSolidIcon } from './InfoCircleSolid';
 export { default as SquareCrossIcon } from './SquareCross';
 export { default as UserSolidIcon } from './UserSolid';
 export { default as BookSolidIcon } from './BookSolid';
+export { default as MinusCircleSolidIcon } from './MinusCircleSolid';
+export { default as PlusCircleSolidIcon } from './PlusCircleSolid';

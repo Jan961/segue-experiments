@@ -15,27 +15,29 @@ import { intialState as intialProductionJumpState } from 'state/booking/producti
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { getAllCurrencyList } from 'services/currencyService';
+import { UiTransformedVenue, transformVenues } from 'utils/venue';
+import { initialVenueState } from 'config/venue';
 
 export type VenueFilters = {
   venueId: string;
   town: string;
-  country: string;
+  country: number;
   productionId: string;
   search: string;
 };
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { venueTownList = [], venueCountryList = [], venueCurrencyOptionList = [], venueFamilyOptionList = [] } = props;
+  const {
+    venueTownList = [],
+    venueCountryOptionList = [],
+    venueCurrencyOptionList = [],
+    venueFamilyOptionList = [],
+  } = props;
   const [filters, setFilters] = useState<VenueFilters>(defaultVenueFilters);
-  const [showAddNewVenueModal, setShowAddNewVenueModal] = useState<boolean>(false);
   const [venues, setVenues] = useState([]);
+  const [editVenueContext, setEditVenueContext] = useState<UiTransformedVenue>(null);
   const { productionId, town, country, search } = filters;
   const filterVenues = useMemo(() => debounce({ delay: 1000 }, (payload) => fetchVenues(payload)), []);
   const townOptions = useMemo(() => venueTownList.map(({ Town }) => ({ text: Town, value: Town })), [venueTownList]);
-  const countryOptions = useMemo(
-    () => venueCountryList.map(({ Country }) => ({ text: Country, value: Country })),
-    [venueCountryList],
-  );
-
   const fetchVenues = useCallback(async (payload) => {
     const { productionId, town, country, searchQuery } = payload || {};
     if (!(productionId || town || country || searchQuery)) {
@@ -47,13 +49,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
       const { data } = await axios.post('/api/venue/list', {
         ...payload,
       });
-      const venusList = data?.map(({ Code, Id, Name, Seats, VenueAddress }) => ({
-        Code,
-        Id,
-        Name,
-        Seats,
-        Town: VenueAddress?.[0]?.Town,
-      }));
+      const venusList = transformVenues(data);
       setVenues(venusList);
     } catch (err) {
       setVenues([]);
@@ -68,6 +64,13 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     setFilters((prevFilters) => ({ ...prevFilters, ...change }));
   };
 
+  const onSelectVenue = useCallback(
+    (venue: UiTransformedVenue) => {
+      setEditVenueContext(venue);
+    },
+    [setEditVenueContext],
+  );
+
   return (
     <>
       <Layout title="Venues | Segue" flush>
@@ -75,21 +78,27 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           <div className="mb-4">
             <VenueFilter
               townOptions={townOptions}
-              countryOptions={countryOptions}
+              countryOptions={venueCountryOptionList}
               onFilterChange={updateFilters}
               filters={filters}
-              showVenueModal={() => setShowAddNewVenueModal(true)}
+              showVenueModal={() => setEditVenueContext(initialVenueState)}
             />
           </div>
-          <VenueTable items={venues} />
+          <VenueTable onSelectVenue={onSelectVenue} items={venues} />
         </div>
       </Layout>
-      <AddEditVenueModal
-        venueFamilyOptionList={venueFamilyOptionList}
-        venueCurrencyOptionList={venueCurrencyOptionList}
-        visible={showAddNewVenueModal}
-        onClose={() => setShowAddNewVenueModal(false)}
-      />
+      {!!editVenueContext && (
+        <AddEditVenueModal
+          venue={editVenueContext}
+          venueFamilyOptionList={venueFamilyOptionList}
+          venueCurrencyOptionList={venueCurrencyOptionList}
+          countryOptions={venueCountryOptionList}
+          visible={!!editVenueContext}
+          onClose={() => {
+            setEditVenueContext(null);
+          }}
+        />
+      )}
     </>
   );
 }
@@ -109,12 +118,14 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
   const venueTownList = results[1].status === 'fulfilled' ? results[1].value : [];
-  const venueCountryList = results[2].status === 'fulfilled' ? results[2].value : [];
+  const venueCountryOptionList: SelectOption[] =
+    results[2].status === 'fulfilled' ? transformToOptions(results[2].value, 'Name', 'Id') : [];
   const venueCurrencyOptionList: SelectOption[] =
-    results[3].status === 'fulfilled' ? transformToOptions(results[3].value, 'Name', 'Code') : [];
+    results[3].status === 'fulfilled'
+      ? transformToOptions(results[3].value, null, 'Code', (item) => item.Code + ' ' + item.Name)
+      : [];
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
-
   const initialState = {
     global: {
       productionJump,
@@ -124,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       venueTownList,
-      venueCountryList,
+      venueCountryOptionList,
       venueCurrencyOptionList,
       venueFamilyOptionList,
       initialState,

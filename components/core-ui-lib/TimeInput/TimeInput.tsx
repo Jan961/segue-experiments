@@ -86,6 +86,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     ) : (
       <div ref={ref} onBlur={handleBlur} className={classNames(baseClass, className)}>
         <input
+          data-testid="hourInput"
           ref={hrsRef}
           name="hrs"
           value={time.hrs}
@@ -100,6 +101,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
         />
         <span className="">:</span>
         <input
+          data-testid="minInput"
           ref={minsRef}
           name="min"
           value={time.min}

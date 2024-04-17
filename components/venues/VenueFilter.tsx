@@ -56,7 +56,7 @@ export default function VenueFilter({
             </div>
             <div className="flex items-start gap-4 w-full">
               <Select
-                onChange={(value) => onChange({ target: { id: 'country', value } })}
+                onChange={(value) => onChange({ target: { id: 'country', value: parseInt(value as string, 10) } })}
                 value={filters.country}
                 className="bg-white !w-[400px] h-fit font-bold"
                 label="Country"
