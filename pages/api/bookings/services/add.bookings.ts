@@ -20,10 +20,10 @@ export class BookingService {
         const {
           DateBlockId,
           VenueId,
-          Date: BookingDate,
-          performanceTimes = [],
-          BookingStatus: StatusCode,
-          PencilNo: PencilNum,
+          BookingDate,
+          Performances,
+          StatusCode,
+          PencilNum,
           Notes,
           isBooking,
           isRehearsal,
@@ -33,7 +33,7 @@ export class BookingService {
         } = bookingData || {};
 
         if (isBooking) {
-          const Performances =
+          /* const Performances =
             performanceTimes.length > 0
               ? performanceTimes.map((time) => {
                   const datePart = BookingDate.split('T')[0];
@@ -47,7 +47,7 @@ export class BookingService {
                     Time: null,
                     Date: BookingDate,
                   },
-                ];
+                ]; */
 
           const bookingPromise = createNewBooking(
             {
