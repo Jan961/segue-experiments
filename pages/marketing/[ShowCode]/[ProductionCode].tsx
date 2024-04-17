@@ -9,7 +9,8 @@ import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
-import { getUniqueVenueTownlist } from 'services/venueService';
+import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
+import { objectify } from 'radash';
 
 const Index = () => {
   return (
@@ -39,6 +40,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       bookings: bookings.map(bookingMapperWithVenue),
     };
     const townList = await getUniqueVenueTownlist();
+    const venues = await getAllVenuesMin();
+
+    const venue = objectify(
+      venues,
+      (v) => v.Id,
+      (v: any) => {
+        const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      },
+    );
+  
 
     // See _app.tsx for how this is picked up
     initialState = {
@@ -49,6 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
         towns: townList,
+        venueList: venue
       },
     };
   } else {

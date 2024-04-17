@@ -12,3 +12,4 @@ export const townState = atom({
   key: 'townState',
   default: intialState,
 });
+

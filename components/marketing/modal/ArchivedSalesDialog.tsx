@@ -9,6 +9,9 @@ import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { VenueDTO } from 'interfaces';
 import { Spinner } from 'components/global/Spinner';
+import { DataList, SelectValue } from '../MarketingHome';
+import Select from 'components/core-ui-lib/Select';
+import classNames from 'classnames';
 
 export type ArchSalesDialogVariant = 'venue' | 'town' | 'both';
 
@@ -16,8 +19,9 @@ interface ArchSalesDialogProps {
   show: boolean;
   onCancel: () => void;
   variant: ArchSalesDialogVariant;
-  data: VenueDTO;
+  data: VenueDTO | DataList;
   onSubmit: (salesComp) => void;
+  error: string;
 }
 
 const title = {
@@ -26,25 +30,50 @@ const title = {
   both: 'Archived Sales for any Venue / Town',
 };
 
-const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<ArchSalesDialogProps>) => {
+const bothOptions = [
+  { text: 'Venue', value: 'Venue' },
+  { text: 'Town', value: 'Town' }
+]
+
+const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Partial<ArchSalesDialogProps>) => {
   const [visible, setVisible] = useState<boolean>(show);
   const [selectedBookings, setSelectedBookings] = useState([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const { productions } = useRecoilValue(productionJumpState);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>([]);
   const [subTitle, setSubTitle] = useState<string>('');
+  const [conditionType, setConditionType] = useState('Venue');
+  const [selectedCondition, setSelectedCondition] = useState(null);
+  const [venueList, setVenueList] = useState<Array<SelectValue>>([]);
+  const [townList, setTownList] = useState<Array<SelectValue>>([]);
   const router = useRouter();
 
   const { fetchData } = useAxios();
 
   const handleModalCancel = () => onCancel?.();
 
-  const getBookingSelection = async (venue) => {
-    if (venue === undefined) {
+  const getBookingSelection = async (data) => {
+    setProdCompData([]);
+    setErrorMessage('');
+    if (data === undefined) {
       return;
     }
 
+    let venue = null;
+    if(variant === 'both'){
+      if(conditionType === 'Venue'){
+        venue = selectedCondition;
+      } else if(conditionType === 'Town'){
+        venue = venueList.find(venue => venue.value.Town.includes(data) === true).value;
+      }
+    } else {
+      venue = data;
+    }
+
+    console.log(venue)
+
     setSubTitle(venue.Name);
+    setSelectedCondition(venue);
 
     try {
       const data = await fetchData({
@@ -66,6 +95,8 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
         );
 
         setProdCompData(sortedData);
+      } else {
+        setErrorMessage('There are no productions to compare.')
       }
     } catch (error) {
       console.log(error);
@@ -118,34 +149,102 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit }: Partial<Ar
   }, [show]);
 
   useEffect(() => {
-    setProdCompData([]);
-    getBookingSelection(data);
+    setErrorMessage(error);
+  }, [error])
+
+  useEffect(() => {
+    setErrorMessage('');
+    setSelectedBookings([]);
+    if (variant === 'both' && data !== undefined) {
+      setProdCompData([]);
+      setSelectedCondition(null);
+      if ('townList' in data && 'venueList' in data) {
+        setTownList(data.townList);
+        setVenueList(data.venueList)
+      }
+    } else {
+      setProdCompData([]);
+      getBookingSelection(data);
+    }
+
   }, [data, variant]);
 
   return (
     <PopupModal
       show={visible}
       title={title[variant]}
-      titleClass="text-xl text-primary-navy font-bold -mt-2"
+      titleClass={classNames("text-xl text-primary-navy font-bold -mt-2", variant === 'both' ? 'w-48' : '')}
       onClose={handleModalCancel}
     >
-      <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>
-
-      {prodCompData.length === 0 ? (
-        <Spinner size="md" />
-      ) : (
-        <SalesTable
-          containerHeight="h-auto"
-          containerWidth="w-[342px]"
-          module="marketing"
-          variant="prodCompArch"
-          onCellValChange={selectForComparison}
-          data={prodCompData}
-          cellRenderParams={{ selected: selectedBookings }}
-          productions={productions}
-        />
+      {variant !== 'both' && (
+        <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>
       )}
 
+
+      {variant === 'both' ? (
+        <div>
+
+          <Select
+            className={classNames('my-2 w-full !border-0 text-primary-navy')}
+            options={bothOptions}
+            isClearable
+            isSearchable
+            value={conditionType}
+            onChange={(value) => value === null ? setConditionType(null) : setConditionType(value.toString())}
+            placeholder={'Please select a condition'}
+            label={'Condition'}
+          />
+
+          <Select
+            className={classNames('my-2 w-full !border-0 text-primary-navy')}
+            options={conditionType === 'Venue' ? venueList : townList}
+            isClearable
+            isSearchable
+            value={selectedCondition}
+            onChange={(value) => getBookingSelection(value)}
+            placeholder={conditionType === null ? '' : 'Please select a ' + conditionType}
+            label={conditionType}
+          />
+
+          {selectedCondition !== null && errorMessage === '' && (
+
+            <div>
+              {prodCompData.length === 0  ? (
+                <Spinner size="md" />
+              ) : (
+                <SalesTable
+                  containerHeight="h-auto"
+                  containerWidth="w-[342px]"
+                  module="marketing"
+                  variant="prodCompArch"
+                  onCellValChange={selectForComparison}
+                  data={prodCompData}
+                  cellRenderParams={{ selected: selectedBookings }}
+                  productions={productions}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          {prodCompData.length === 0 ? (
+            <Spinner size="md" />
+          ) : (
+            <SalesTable
+              containerHeight="h-auto"
+              containerWidth="w-[342px]"
+              module="marketing"
+              variant="prodCompArch"
+              onCellValChange={selectForComparison}
+              data={prodCompData}
+              cellRenderParams={{ selected: selectedBookings }}
+              productions={productions}
+            />
+          )}
+        </div>
+
+      )}
       <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 
       <div className="float-right flex flex-row mt-5 py-2">

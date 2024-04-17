@@ -53,6 +53,7 @@ export type InitialState = Partial<{
     bookingJump?: BookingJump;
     venueRole?: VenueRole;
     towns?: Array<string>;
+    venueList?: Record<number, VenueMinimalDTO>;
   };
   account?: {
     user: UserState;
@@ -91,6 +92,7 @@ const states: {
     bookingJump: bookingJumpState,
     venueRole: venueRoleState,
     towns: townState,
+    venueList: venueState
   },
   account: {
     user: userState,
