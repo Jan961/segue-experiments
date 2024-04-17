@@ -1,10 +1,9 @@
-import { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { SalesTabs, SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
 import Icon from 'components/core-ui-lib/Icon';
-import TabButton from 'components/core-ui-lib/TabButton';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import useAxios from 'hooks/useAxios';
 import SalesTable from 'components/global/salesTable';
@@ -13,6 +12,8 @@ import ArchSalesDialog, { ArchSalesDialogVariant } from './modal/ArchivedSalesDi
 import { VenueDTO } from 'interfaces';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
+import Tabs from 'components/core-ui-lib/Tabs';
+import { Tab } from '@headlessui/react';
 
 export type SelectValue = {
   text: string;
@@ -24,21 +25,37 @@ export type DataList = {
   venueList: Array<SelectValue>;
 }
 
+interface SalesTableProps {
+  data: SalesSnapshot[]; // Replace `SalesSnapshot[]` with the correct type based on your actual data structure
+  booking: string; // Assuming booking is a string identifier
+}
+
+const MemoizedSalesTable = React.memo(({ data, booking }: SalesTableProps) => (
+  <SalesTable
+    containerHeight="h-auto"
+    containerWidth="w-[1465px]"
+    module="marketing"
+    variant="salesSnapshot"
+    data={data}
+    booking={booking}
+  />
+));
+
 const MarketingHome = () => {
-  const [currView, setCurrView] = useState<SalesTabs>('');
-  const selectedBtnClass = '!bg-primary-green/[0.30] !text-primary-navy';
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
-  const [sales, setSales] = useState<Array<SalesSnapshot>>([]);
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
   const [archivedData, setArchivedData] = useState<VenueDTO | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
+  const [sales, setSales] = useState([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
+
+  const tabs = ['Sales', 'Archived Sales', 'Activities', 'Contact Notes', 'Venue Contacts', 'Promoter Holds', 'Attachments'];
 
   const { fetchData } = useAxios();
 
@@ -53,7 +70,6 @@ const MarketingHome = () => {
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
       setSales(salesData);
-      setCurrView('sales');
     } else {
       setSales([]);
     }
@@ -111,7 +127,6 @@ const MarketingHome = () => {
 
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
-      setCurrView('');
       setBookingId(bookings[0].selected);
     }
   }, [bookings[0].selected]);
@@ -146,77 +161,18 @@ const MarketingHome = () => {
       </div>
 
       <div className="flex-grow flex flex-col">
-        <div className="flex flex-wrap items-center mb-4 -mt-5">
-          {' '}
-          <TabButton
-            text="Sales"
-            className={`w-[155px] ${currView === 'sales' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('sales')}
-          />
-          <TabButton
-            text="Archived Sales"
-            className={`w-[155px] ${currView === 'archived sales' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('archived sales')}
-          />
-          <TabButton
-            text="Activities"
-            className={`w-[155px] ${currView === 'activities' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('activities')}
-          />
-          <TabButton
-            text="Contact Notes"
-            className={`w-[155px] ${currView === 'contact notes' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('contact notes')}
-          />
-          <TabButton
-            text="Venue Contacts"
-            className={`w-[155px] ${currView === 'venue contacts' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('venue contacts')}
-          />
-          <TabButton
-            text="Promoter Holds"
-            className={`w-[155px] ${currView === 'promoter holds' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('promoter holds')}
-          />
-          <TabButton
-            text="Attachments"
-            className={`w-[155px] ${currView === 'attachments' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('attachments')}
-          />
-        </div>
 
-        <div className="h-[650px] overflow-y-hidden">
-          {currView === 'sales' && (
-            <div>
-              {sales.length !== 0 && (
-                <SalesTable
-                  containerHeight="h-auto"
-                  containerWidth="w-[1465px]"
-                  module="marketing"
-                  variant="salesSnapshot"
-                  data={sales}
-                  booking={bookings[0].selected}
-                />
-              )}
-            </div>
-          )}
+        <Tabs 
+          selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy" 
+          tabs={tabs}
+          disabled={!productionId || !bookingId}
+          >
+          <Tab.Panel className="h-[650px] overflow-y-hidden">
+          {sales && bookingId && <MemoizedSalesTable data={sales} booking={bookingId} />}
+          </Tab.Panel>
 
-          {currView === 'archived sales' && (
-            <div>
+          <Tab.Panel>
+          <div>
               <div className="flex flex-row gap-4">
                 <Button
                   text="For this Venue"
@@ -256,18 +212,16 @@ const MarketingHome = () => {
 
               {archivedSalesTable}
             </div>
-          )}
+          </Tab.Panel>
 
-          {currView === 'activities' && <div>activities</div>}
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">activities</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
+        </Tabs>
 
-          {currView === 'contact notes' && <div>contact notes</div>}
 
-          {currView === 'venue contacts' && <div>venue contacts</div>}
-
-          {currView === 'promoter holds' && <div>promoter holds</div>}
-
-          {currView === 'attachments' && <div>attachments</div>}
-        </div>
       </div>
     </div>
   );

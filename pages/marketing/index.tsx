@@ -36,10 +36,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const bookings = await getSaleableBookings(productionId);
     const venueRoles = await getRoles();
     const selected = null;
+    
     const bookingJump: BookingJump = {
       selected,
       bookings: bookings.map(bookingMapperWithVenue),
     };
+
     const townList = await getUniqueVenueTownlist();
 
     const venues = await getAllVenuesMin();
@@ -53,8 +55,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       },
     );
   
-
-
     // See _app.tsx for how this is picked up
     initialState = {
       global: {
