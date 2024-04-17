@@ -30,6 +30,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
     font-size: 16px;
     justify-content: center;
     border-bottom: 4px solid white;
+    border-right: 4px solid white;
 }
 
 /* used for other headers in a header group that are not children */
@@ -41,6 +42,10 @@ const GridStyles = createGlobalStyle<StyleProps>`
 /* used with a group header for then children */
 .group-header-child {
   border-right: 2px solid white !important;
+}
+
+.right-border-full {
+    border-right: 1px solid white !important;
 }
 
 .ag-body-viewport {

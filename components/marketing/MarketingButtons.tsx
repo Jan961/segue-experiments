@@ -62,7 +62,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
   return (
     <div className="grid grid-cols-2 grid-rows-2 gap-4">
       <Button
-        text={website === '' ? 'Add Landing Page' : 'Edit Landing Page'}
+        text={landingUrl === '' ? 'Add Landing Page' : 'Edit Landing Page'}
         className="w-[155px] mt-5"
         disabled={bookingJump.selected === null || !productionId}
         onClick={() => setShowEditUrl(true)}

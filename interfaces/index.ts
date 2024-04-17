@@ -172,13 +172,15 @@ export type OtherDTO = {
   RunTag: string;
 };
 
+export type VenueDTO = {
+  Id: number;
+  Code: string;
+  Website: string;
+  Name: string;
+};
+
 export type BookingWithVenueDTO = BookingDTO & {
-  Venue: {
-    Id: number;
-    Code: string;
-    Website: string;
-    Name: string;
-  };
+  Venue: VenueDTO;
   ProductionId?: number;
 };
 

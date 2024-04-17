@@ -15,6 +15,7 @@ import IconRenderer from './IconRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
+import AddDeleteRowRenderer from './AddDeleteRowRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -153,8 +154,14 @@ export const barringIssueColumnDefs = [
   { headerName: 'Miles', field: 'mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
-export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
-  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 112, maxWidth: 112 },
+export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = [], showAddDeleteRow = false) => [
+  {
+    headerName: 'Date',
+    field: 'date',
+    cellRenderer: showAddDeleteRow ? AddDeleteRowRenderer : DefaultCellRenderer,
+    width: showAddDeleteRow ? 155 : 112,
+    maxWidth: showAddDeleteRow ? 155 : 112,
+  },
 
   // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
   {
@@ -339,28 +346,29 @@ export const barredVenueColumnDefs = [
 export const venueColumnDefs = [
   {
     headerName: 'Venue Code',
-    field: 'Code',
+    field: 'venueCode',
     cellRenderer: DefaultCellRenderer,
     width: 120,
     headerClass: 'text-center',
   },
   {
     headerName: 'Venue Name',
-    field: 'Name',
+    field: 'venueName',
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',
   },
   {
     headerName: 'Town',
-    field: 'Town',
+    field: 'primaryTown',
+    valueFormatter: ({ value, data }) => value || data.deliveryTown,
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',
   },
   {
     headerName: 'Capacity',
-    field: 'Seats',
+    field: 'venueCapacity',
     cellRenderer: DefaultCellRenderer,
     width: 120,
     headerClass: 'text-center',

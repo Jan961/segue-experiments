@@ -3,13 +3,13 @@ import Table from 'components/core-ui-lib/Table';
 import { tileColors } from 'config/global';
 import { useEffect, useState } from 'react';
 import formatInputDate from 'utils/dateInputFormat';
-import { prodComparisionColDefs, salesColDefs } from './tableConfig';
+import { prodCompArchColDefs, prodComparisionColDefs, salesColDefs } from './tableConfig';
 import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import { format, parseISO } from 'date-fns';
 import axios from 'axios';
 
-export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue';
+export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
 export type ProdComp = {
   venueId: number;
@@ -79,6 +79,9 @@ export default function SalesTable({
   };
 
   const productionComparision = (data: Array<BookingSelection>) => {
+    if (data === undefined) {
+      return;
+    }
     const processedBookings = [];
 
     data.forEach((booking) => {
@@ -95,7 +98,12 @@ export default function SalesTable({
     });
 
     setRowData(processedBookings);
-    setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
+
+    if (variant === 'prodComparision') {
+      setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
+    } else {
+      setColumnDefs(prodCompArchColDefs(data.length, onCellValChange, cellRenderParams.selected));
+    }
   };
 
   const setSalesActivity = (type, selected, sale) => {
@@ -168,7 +176,6 @@ export default function SalesTable({
   };
 
   const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update: any) => {
-    console.log(update);
     axios
       .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
       .catch((error: any) => console.log('failed to update sale', error));
@@ -178,8 +185,9 @@ export default function SalesTable({
     switch (variant) {
       case 'salesComparison': {
         const tableData = await salesComparison(data);
+        const widthInt = data.bookingIds.length * 340;
+        setWidth('w-[' + widthInt.toString() + 'px]');
         setColumnDefs(tableData.columnDef);
-
         setRowData(tableData.rowData);
         break;
       }
@@ -190,6 +198,11 @@ export default function SalesTable({
       }
 
       case 'prodComparision': {
+        productionComparision(data);
+        break;
+      }
+
+      case 'prodCompArch': {
         productionComparision(data);
         break;
       }

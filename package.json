@@ -111,6 +111,7 @@
     "tailwindcss": "^3.1.8",
     "tempfile": "^4.0.0",
     "tls": "file:./src/mock/tls",
+    "uuid": "^8.3.2",
     "uuidv4": "^6.2.13",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.19.3/xlsx-0.19.3.tgz",
     "yup": "^0.32.9"
@@ -130,8 +131,8 @@
     "@storybook/test": "^7.6.7",
     "@svgr/webpack": "^8.1.0",
     "@tanstack/eslint-plugin-query": "^5.17.22",
-    "@testing-library/jest-dom": "^6.1.4",
-    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
     "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^29.5.10",
     "@types/node": "^12.12.21",

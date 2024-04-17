@@ -3,7 +3,13 @@ import { addDays, differenceInDays } from 'date-fns';
 import prisma from 'lib/prisma';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
-import { bookingMapper, performanceMapper, otherMapper, getInFitUpMapper, rehearsalMapper } from 'lib/mappers';
+
+type NewPerformance = {
+  Date: string;
+  Time: string;
+};
+
+type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string; RunTag: string };
 
 export interface AddBookingsParams {
   Date: string;
@@ -30,40 +36,62 @@ export type BookingsWithPerformances = Prisma.BookingGetPayload<{
   include: typeof bookingInclude;
 }>;
 
-export const updateBooking = async (booking: Booking, performances) => {
+export const updateBooking = async (booking: NewBooking, tx = prisma) => {
   let updatedBooking = null;
   let updatedPerformances = null;
-  await prisma.$transaction(async (tx) => {
+  const payload = {
+    ...omit(booking, ['Id', 'VenueId', 'Performances']),
+    ...(booking.VenueId && { Venue: { connect: { Id: booking.VenueId } } }),
+    Performance: {
+      deleteMany: {
+        BookingId: booking.Id,
+      },
+    },
+  };
+  try {
     updatedBooking = await tx.booking.update({
       where: {
         Id: booking.Id,
       },
-      data: {
-        ...booking,
-        Performance: {
-          deleteMany: {
-            BookingId: booking.Id,
-          },
-        },
-      },
+      data: payload,
       include: bookingInclude,
     });
 
-    if (isNullOrEmpty(performances)) {
+    if (isNullOrEmpty(booking.Performances)) {
       updatedPerformances = await tx.performance.create({
         data: { BookingId: booking.Id, Date: booking.FirstDate, Time: null },
       });
     } else {
       updatedPerformances = await tx.performance.createMany({
-        data: performances.map((time) => ({ BookingId: booking.Id, Date: time, Time: time })),
+        data: booking.Performances.map((p: NewPerformance) => ({
+          BookingId: booking.Id,
+          Date: new Date(p.Date),
+          Time: p.Time ? new Date(p.Time) : null,
+        })),
       });
     }
-  });
-  return { ...updatedBooking, ...updatedPerformances };
+    return { ...updatedBooking, ...updatedPerformances };
+  } catch (e) {
+    console.log('Error in booking service', e);
+  }
 };
 
-export const updateGetInFitUp = async (booking: GetInFitUp) => {
-  await prisma.getInFitUp.update({
+export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
+  const payload = {
+    ...omit(booking, ['Id', 'VenueId']),
+    ...(booking.VenueId && { Venue: { connect: { Id: booking.VenueId } } }),
+  };
+
+  await tx.getInFitUp.update({
+    data: payload,
+    where: {
+      Id: booking.Id,
+    },
+  });
+};
+
+export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
+  await tx.rehearsal.update({
     data: omit(booking, ['Id']),
     where: {
       Id: booking.Id,
@@ -71,8 +99,8 @@ export const updateGetInFitUp = async (booking: GetInFitUp) => {
   });
 };
 
-export const updateRehearsal = async (booking: Rehearsal) => {
-  await prisma.rehearsal.update({
+export const updateOther = async (booking: Other, tx = prisma) => {
+  await tx.other.update({
     data: omit(booking, ['Id']),
     where: {
       Id: booking.Id,
@@ -80,48 +108,37 @@ export const updateRehearsal = async (booking: Rehearsal) => {
   });
 };
 
-export const updateOther = async (booking: Other) => {
-  await prisma.other.update({
-    data: omit(booking, ['Id']),
+export const deleteBookingById = async (id: number, tx = prisma) => {
+  await tx.booking.delete({
     where: {
-      Id: booking.Id,
+      Id: id,
+    },
+  });
+  await tx.performance.deleteMany({
+    where: {
+      BookingId: id,
     },
   });
 };
 
-export const deleteBookingById = async (id: number) => {
-  await prisma.$transaction([
-    prisma.booking.delete({
-      where: {
-        Id: id,
-      },
-    }),
-    prisma.performance.deleteMany({
-      where: {
-        BookingId: id,
-      },
-    }),
-  ]);
-};
-
-export const deleteRehearsalById = async (id: number) => {
-  await prisma.rehearsal.delete({
+export const deleteRehearsalById = async (id: number, tx = prisma) => {
+  await tx.rehearsal.delete({
     where: {
       Id: id,
     },
   });
 };
 
-export const deleteGetInFitUpById = async (id: number) => {
-  await prisma.getInFitUp.delete({
+export const deleteGetInFitUpById = async (id: number, tx = prisma) => {
+  await tx.getInFitUp.delete({
     where: {
       Id: id,
     },
   });
 };
 
-export const deleteOtherById = async (id: number) => {
-  await prisma.other.delete({
+export const deleteOtherById = async (id: number, tx = prisma) => {
+  await tx.other.delete({
     where: {
       Id: id,
     },
@@ -223,18 +240,11 @@ export const changeBookingDate = async (Id: number, FirstDate: Date) => {
   });
 };
 
-type NewPerformance = {
-  Date: string;
-  Time: string;
-};
-
-type NewBooking = Partial<Booking> & { Performances: NewPerformance[]; BookingDate: string; RunTag: string };
-
 export const createNewBooking = (
   { Performances, VenueId, DateBlockId, BookingDate, StatusCode, Notes, PencilNum, RunTag }: NewBooking,
-  tx: any,
+  tx = prisma,
 ) => {
-  return (tx || prisma).booking.create({
+  return tx.booking.create({
     data: {
       Notes,
       PencilNum,
@@ -280,9 +290,9 @@ type NewRehearsal = {
 
 export const createNewRehearsal = (
   { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum, RunTag }: NewRehearsal,
-  tx: any,
+  tx = prisma,
 ) => {
-  return (tx || prisma).rehearsal.create({
+  return tx.rehearsal.create({
     data: {
       Notes,
       StatusCode,
@@ -311,9 +321,9 @@ type NewGetInFitUp = {
 
 export const createGetInFitUp = (
   { DateBlockId, StatusCode, BookingDate, Notes, VenueId, PencilNum, RunTag }: NewGetInFitUp,
-  tx: any,
+  tx = prisma,
 ) => {
-  return (tx || prisma).getInFitUp.create({
+  return tx.getInFitUp.create({
     data: {
       StatusCode,
       Notes,
@@ -342,9 +352,9 @@ type NewOtherBooking = {
 
 export const createOtherBooking = (
   { DateBlockId, BookingDate, StatusCode, Notes, DateTypeId, PencilNum, RunTag }: NewOtherBooking,
-  tx: any,
+  tx = prisma,
 ) => {
-  return (tx || prisma).other.create({
+  return tx.other.create({
     data: {
       Notes,
       StatusCode,
@@ -363,160 +373,4 @@ export const createOtherBooking = (
       },
     },
   });
-};
-
-export const createMultipleBookings = async (bookingsData: AddBookingsParams[]) => {
-  const promises = [];
-  const bookings = [];
-  let performances = [];
-  const rehearsals = [];
-  const getInFitUps = [];
-  const others = [];
-
-  const orderMap = new Map();
-  let counter = 1;
-
-  await prisma.$transaction(async (tx) => {
-    for (const bookingData of bookingsData) {
-      const {
-        DateBlockId,
-        VenueId,
-        Date: BookingDate,
-        performanceTimes = [],
-        BookingStatus: StatusCode,
-        PencilNo: PencilNum,
-        Notes,
-        isBooking,
-        isRehearsal,
-        isGetInFitUp,
-        DateTypeId,
-        RunTag,
-      } = bookingData || {};
-
-      if (isBooking) {
-        const Performances =
-          performanceTimes.length > 0
-            ? performanceTimes.map((time) => {
-                const datePart = BookingDate.split('T')[0];
-                return {
-                  Time: `${datePart}T${time}:00Z`,
-                  Date: BookingDate,
-                };
-              })
-            : [
-                {
-                  Time: null,
-                  Date: BookingDate,
-                },
-              ];
-
-        const bookingPromise = createNewBooking(
-          {
-            DateBlockId,
-            PencilNum,
-            Notes,
-            VenueId,
-            Performances,
-            BookingDate,
-            StatusCode,
-            RunTag,
-          },
-          tx,
-        );
-        promises.push(bookingPromise);
-        orderMap.set(counter, 'booking');
-      } else if (isRehearsal) {
-        const rehearsalPromise = createNewRehearsal(
-          {
-            DateBlockId,
-            Notes,
-            DateTypeId,
-            VenueId,
-            StatusCode,
-            BookingDate,
-            PencilNum,
-            RunTag,
-          },
-          tx,
-        );
-        promises.push(rehearsalPromise);
-        orderMap.set(counter, 'rehearsal');
-      } else if (isGetInFitUp) {
-        const getInFitUpPromise = createGetInFitUp(
-          {
-            DateBlockId,
-            VenueId,
-            Notes,
-            BookingDate,
-            StatusCode,
-            PencilNum,
-            RunTag,
-          },
-          tx,
-        );
-
-        promises.push(getInFitUpPromise);
-        orderMap.set(counter, 'getInFitUp');
-      } else {
-        const getOther = createOtherBooking(
-          {
-            DateBlockId,
-            DateTypeId,
-            Notes,
-            BookingDate,
-            StatusCode,
-            PencilNum,
-            RunTag,
-          },
-          tx,
-        );
-        promises.push(getOther);
-        orderMap.set(counter, 'other');
-      }
-      counter++;
-    }
-    counter = 1;
-
-    const createdItems = await Promise.allSettled(promises);
-
-    console.log(createdItems);
-
-    for (const item of createdItems) {
-      if (item.status === 'fulfilled') {
-        const type = orderMap.get(counter);
-        counter++;
-
-        const value = item.value;
-        // Assuming value contains a property `type` to distinguish between booking, rehearsal, etc.
-        // This requires your creation logic to somehow include this information in the result.
-        switch (type) {
-          case 'booking':
-            bookings.push(bookingMapper(value));
-            if (value.Performance) {
-              performances = performances.concat(value.Performance.map(performanceMapper));
-            }
-            break;
-          case 'rehearsal':
-            rehearsals.push(rehearsalMapper(value));
-            break;
-          case 'getInFitUp':
-            getInFitUps.push(getInFitUpMapper(value));
-            break;
-          case 'other':
-            others.push(otherMapper(value));
-            break;
-          default:
-            // Handle any unexpected types
-            break;
-        }
-      } else if (item.status === 'rejected') {
-        // Log the error or handle rejected promises as needed
-        // console.error(item.reason);
-      }
-    }
-
-    // Continue with your return or further processing
-    // return { bookings, performances, rehearsals, getInFitUps, others };
-  });
-  return { bookings, performances, rehearsals, getInFitUps, others };
 };
