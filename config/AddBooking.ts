@@ -43,7 +43,8 @@ export const editBookingSteps = [
 ];
 
 export const getStepIndex = (isNewBooking: boolean, step: string) => {
-  return isNewBooking ? newBookingSteps.indexOf(step) : editBookingSteps.indexOf(step);
+  const stepIndex = isNewBooking ? newBookingSteps.indexOf(step) : editBookingSteps.indexOf(step);
+  return stepIndex === -1 ? 0 : stepIndex;
 };
 
 export const BookingTypes = [
