@@ -144,6 +144,7 @@ const productionContentInclude = Prisma.validator<Prisma.ProductionSelect>()({
     include: {
       Booking: {
         include: {
+          Venue: true,
           Performance: true,
         },
       },
@@ -171,11 +172,11 @@ export const getProductionWithContent = async (Id: number) => {
   });
 };
 
-export const getProductionsWithContent = async (Id?: number, excludeArchived=true) => {
+export const getProductionsWithContent = async (Id?: number, excludeArchived = true) => {
   return await prisma.production.findMany({
     where: {
       ...(Id && { Id }),
-      ...(excludeArchived && {IsArchived:false}),
+      ...(excludeArchived && { IsArchived: false }),
     },
     include: productionContentInclude,
   });

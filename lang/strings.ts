@@ -11,6 +11,7 @@ const strings = {
       touringManagement: 'Touring Management',
       myAccount: 'My Account',
       logOut: 'Log Out',
+      projectManagement: 'Project Management',
     },
     bookings: {},
   },
@@ -26,6 +27,7 @@ const strings = {
       touringManagement: 'Touring Management',
       myAccount: 'My Account',
       logOut: 'Log Out',
+      projectManagement: 'Project Management',
     },
   },
   fr_FR: {
@@ -40,6 +42,7 @@ const strings = {
       touringManagement: 'Gestion de Tournée',
       myAccount: 'Mon Compte',
       logOut: 'Déconnexion',
+      projectManagement: 'Gestion de projet',
     },
   },
 };
