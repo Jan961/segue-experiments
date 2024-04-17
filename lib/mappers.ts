@@ -110,7 +110,7 @@ export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
     Name: b.Venue.Name,
     Website: b.Venue.Website,
   },
-  ProductionId: b.DateBlock?.ProductionId,
+  ProductionId: b.DateBlock?.ProductionId || null,
 });
 
 export const performanceMapper = (p: PerformanceType): PerformanceDTO => {

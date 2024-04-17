@@ -357,6 +357,10 @@ export interface IBookingDetails {
   ShowDate: string;
   TicketPriceNotes: string;
   VenueContractStatus: string;
+  PreShow?: number;
+  PostShow?: number;
+  BarringClause?: string;
+  BarringMiles?: number;
 }
 
 export interface IAttachedFile {
