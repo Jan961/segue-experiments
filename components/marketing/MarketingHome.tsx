@@ -15,6 +15,7 @@ import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
+import ActivityModal from './modal/ActivityModal';
 
 export type SelectOption = {
   text: string;
@@ -37,6 +38,7 @@ const MarketingHome = () => {
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
+  const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
   const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
@@ -230,7 +232,16 @@ const MarketingHome = () => {
             </div>
           </Tab.Panel>
 
-          <Tab.Panel className="w-42 h-24 flex justify-center items-center">activities</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">
+            <div className="flex flex-row gap-4 mb-5">
+              <Button
+                text="Show Activity Modal - Temporary Button"
+                className="w-[400px]"
+                onClick={() => setShowActivityModal(true)}
+              />
+              <ActivityModal show={showActivityModal} onCancel={() => setShowActivityModal(false)} />
+            </div>
+          </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
