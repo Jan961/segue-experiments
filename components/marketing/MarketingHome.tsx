@@ -11,6 +11,18 @@ import SalesTable from 'components/global/salesTable';
 import Button from 'components/core-ui-lib/Button';
 import ArchSalesDialog, { ArchSalesDialogVariant } from './modal/ArchivedSalesDialog';
 import { VenueDTO } from 'interfaces';
+import { townState } from 'state/marketing/townState';
+import { venueState } from 'state/booking/venueState';
+
+export type SelectOption = {
+  text: string;
+  value: any;
+};
+
+export type DataList = {
+  townList: Array<SelectOption>;
+  venueList: Array<SelectOption>;
+};
 
 const MarketingHome = () => {
   const [currView, setCurrView] = useState<SalesTabs>('');
@@ -22,9 +34,11 @@ const MarketingHome = () => {
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
-  const [archivedData, setArchivedData] = useState<VenueDTO>();
+  const [archivedData, setArchivedData] = useState<VenueDTO | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
-  // const [archivedSales, setArchivedSales] = useState>();
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const townList = useRecoilValue(townState);
+  const venueDict = useRecoilValue(venueState);
 
   const { fetchData } = useAxios();
 
@@ -47,12 +61,27 @@ const MarketingHome = () => {
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
-    const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
-    setArchivedData(selectedBooking.Venue);
+    if (variant === 'both') {
+      // get venue list
+      const venueTownData = {
+        townList: Object.values(townList).map((town) => {
+          return { text: town.Town, value: town.Town };
+        }),
+        venueList: Object.values(venueDict).map((venue) => {
+          return { text: venue.Code + ' ' + venue.Name, value: venue };
+        }),
+      };
+      setArchivedData(venueTownData);
+    } else {
+      const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
+      setArchivedData(selectedBooking.Venue);
+    }
+
     setShowArchSalesModal(true);
   };
 
   const showArchivedSales = async (selection) => {
+    setArchivedSalesTable(<div />);
     const selectedBookings = selection.map((obj) => obj.bookingId);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -75,6 +104,8 @@ const MarketingHome = () => {
       );
       setArchivedDataAvail(true);
       setShowArchSalesModal(false);
+    } else {
+      setErrorMessage('There are no sales data available for this particular selection.');
     }
   };
 
@@ -200,7 +231,7 @@ const MarketingHome = () => {
                 />
 
                 <Button
-                  text="For this Venue / Town"
+                  text="Any Venue / Town"
                   className="w-[230px] mb-3 pl-6"
                   onClick={() => showArchSalesComp('both')}
                 />
@@ -219,6 +250,7 @@ const MarketingHome = () => {
                   data={archivedData}
                   onCancel={() => setShowArchSalesModal(false)}
                   onSubmit={(bookings) => showArchivedSales(bookings)}
+                  error={errorMessage}
                 />
               </div>
 
