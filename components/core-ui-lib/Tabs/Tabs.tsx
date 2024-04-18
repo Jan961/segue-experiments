@@ -8,7 +8,7 @@ interface TabsProps {
   children: ReactElement[];
   onChange?: (index: number) => void;
   disabled?: boolean;
-  defaultIndex: number;
+  defaultIndex?: number;
 }
 
 export default function Tabs({
@@ -17,7 +17,7 @@ export default function Tabs({
   children,
   onChange,
   disabled = false,
-  defaultIndex,
+  defaultIndex = 0,
 }: TabsProps) {
   return (
     <div>
