@@ -8,6 +8,7 @@ interface TabsProps {
   children: ReactElement[];
   onChange?: (index: number) => void;
   disabled?: boolean;
+  defaultIndex: number;
 }
 
 export default function Tabs({
@@ -16,10 +17,11 @@ export default function Tabs({
   children,
   onChange,
   disabled = false,
+  defaultIndex,
 }: TabsProps) {
   return (
     <div>
-      <Tab.Group onChange={onChange}>
+      <Tab.Group defaultIndex={defaultIndex} onChange={onChange}>
         <Tab.List className="flex items-center mb-5 -mt-5">
           {tabs.map((tabLabel, index) => (
             <Tab key={tabLabel} as={Fragment}>
@@ -35,9 +37,7 @@ export default function Tabs({
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels>
-          {children}
-        </Tab.Panels>
+        <Tab.Panels>{children}</Tab.Panels>
       </Tab.Group>
     </div>
   );

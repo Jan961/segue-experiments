@@ -50,7 +50,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
       },
     );
-  
 
     // See _app.tsx for how this is picked up
     initialState = {
@@ -61,7 +60,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
         towns: townList,
-        venueList: venue
+        venueList: venue,
+        defaultTab: 0,
       },
     };
   } else {
