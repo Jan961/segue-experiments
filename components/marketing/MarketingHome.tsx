@@ -44,12 +44,12 @@ const MarketingHome = () => {
   const { fetchData } = useAxios();
 
   const getSales = async (bookingId: string) => {
+    setSalesTable(<div></div>);
+    
     const data = await fetchData({
       url: '/api/marketing/sales/read/' + bookingId,
       method: 'POST',
     });
-
-    setSalesTable(<div></div>);
 
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
