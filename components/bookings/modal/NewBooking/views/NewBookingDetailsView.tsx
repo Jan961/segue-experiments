@@ -81,7 +81,7 @@ export default function NewBookingDetailsView({
       direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
     const date = formattedDateWithWeekDay(rowDate, 'Short');
     const dateAsISOString = rowDate.toISOString();
-    const rowToAdd = { ...data, date, dateAsISOString, isRunOfDates: true };
+    const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, isRunOfDates: true };
     applyTransactionToGrid(tableRef, { add: [rowToAdd], addIndex: direction === 'before' ? 0 : index + 1 });
     tableRef.current.getApi().redrawRows();
   };
@@ -225,7 +225,7 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const storeNewBookingDetails = () => {
+  const storeBookingDetails = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
@@ -236,12 +236,12 @@ export default function NewBookingDetailsView({
   };
 
   const handePreviewBookingClick = () => {
-    storeNewBookingDetails();
+    storeBookingDetails();
     goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
   };
 
   const handeCheckMileageClick = () => {
-    storeNewBookingDetails();
+    storeBookingDetails();
     goToStep(getStepIndex(isNewBooking, 'Check Mileage'));
   };
 
@@ -278,6 +278,18 @@ export default function NewBookingDetailsView({
   const handleNotesCancel = () => {
     setShowNotesModal(false);
     toggleModalOverlay(false);
+  };
+
+  const handleChangeOrConfirmBooking = () => {
+    if (changeBookingLength) {
+      storeBookingDetails();
+    } else {
+      // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
+      if (bookingData.length === 1) {
+        setBookingData((prev) => [{ ...prev[0], isRunOfDates: true }]);
+      }
+    }
+    setchangeBookingLength((prev) => !prev);
   };
 
   return (
@@ -333,7 +345,7 @@ export default function NewBookingDetailsView({
                   className="w-33 px-4"
                   variant="primary"
                   text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
-                  onClick={() => setchangeBookingLength((prev) => !prev)}
+                  onClick={handleChangeOrConfirmBooking}
                 />
               </>
             )}
