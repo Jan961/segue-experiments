@@ -72,12 +72,8 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
               { label: 'Contact Notes', value: '', labelClass: level3 },
               { label: 'Venue Contacts', value: '', labelClass: level3 },
               { label: 'Promoter Holds', value: '', labelClass: level3 },
+              { label: 'Attachments', value: '', labelClass: level3 },
             ],
-          },
-          {
-            label: 'Venue Data Status',
-            value: `/marketing/venue/status`,
-            labelClass: leve2,
           },
           { label: 'Sales Entry', value: '/marketing/sales/entry', labelClass: leve2 },
           { label: 'Final Figures Entry', value: '/marketing/sales/final', labelClass: leve2 },
@@ -101,9 +97,10 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: contractsIcon,
         labelClass: groupHeader,
         options: [
-          { label: 'Deal Memo Contracts', value: '', labelClass: leve2 },
-          { label: 'ACC Contracts', value: '', labelClass: leve2 },
-          { label: 'Other Contracts', value: '', labelClass: leve2 },
+          { label: 'Venue Contracts', value: '', labelClass: leve2 },
+          { label: 'Artiste Contracts', value: '', labelClass: leve2 },
+          { label: 'Creative Contracts', value: '', labelClass: leve2 },
+          { label: 'SM/Tech/Crew Contracts', value: '', labelClass: leve2 },
         ],
       },
       {
