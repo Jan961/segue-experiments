@@ -89,17 +89,19 @@ model BookingContactNotes {
 }
 
 model Contract {
-  BookingId            Int                    @id @map("ContractBookingId")
-  StatusCode           String?                @map("ContactStatusCode") @db.VarChar(4)
-  SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
-  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(30)
-  ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
-  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(30)
-  RoyalPercentage      Decimal?               @map("RoyaltyPercentage") @db.Decimal(5, 2)
-  DealType             String?                @db.VarChar(4)
-  ContractNotes        String?                @db.LongText
-  Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
-  ContractAttachedFile ContractAttachedFile[]
+  BookingId                Int                    @id @map("ContractBookingId")
+  StatusCode               String?                @map("ContactStatusCode") @db.VarChar(4)
+  SignedDate               DateTime?              @map("ContractSignedDate") @db.Date
+  SignedBy                 String?                @map("ContractSignedBy") @db.VarChar(30)
+  ReturnDate               DateTime?              @map("ContractReturnDate") @db.Date
+  CheckedBy                String?                @map("ContractCheckedBy") @db.VarChar(30)
+  RoyalPercentage          Decimal?               @map("RoyaltyPercentage") @db.Decimal(5, 2)
+  DealType                 String?                @db.VarChar(4)
+  ContractNotes            String?                @db.LongText
+  ReceivedBackDate         DateTime?              @map("ContractReceivedBackDate")@db.Date
+  Exceptions               String?                @map("ContractExceptions")@db.LongText
+  Booking                  Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  ContractAttachedFile     ContractAttachedFile[]
 }
 
 model Currency {
@@ -163,8 +165,8 @@ model Venue {
   ExcludeFromChecks                                         Boolean              @default(dbgenerated("(b'0')")) @map("VenueExcludeFromChecks") @db.Bit(1)
   VenueCountryId                                            Int?
   FamilyId                                                  Int?                 @map("VenueVenueFamilyId")
-  AddressStageDoorW3W                                       String?              @map("VenueAddressStageDoorW3W")@db.VarChar(70)
-  AddressLoadingW3W                                         String?              @map("VenueAddressLoadingW3W")@db.VarChar(70)
+  AddressStageDoorW3W                                       String?              @map("VenueAddressStageDoorW3W") @db.VarChar(70)
+  AddressLoadingW3W                                         String?              @map("VenueAddressLoadingW3W") @db.VarChar(70)
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
@@ -509,18 +511,18 @@ model ContractAttachedFile {
 }
 
 model VenueAddress {
-  Id                    Int      @id @default(autoincrement()) @map("VenueAddressId")
-  VenueId               Int      @map("VenueAddressVenueId")
-  TypeName              String   @map("VenueAddressTypeName") @db.VarChar(15)
-  Line1                 String?  @map("VenueAddress1") @db.VarChar(50)
-  Line2                 String?  @map("VenueAddress2") @db.VarChar(50)
-  Line3                 String?  @map("VenueAddress3") @db.VarChar(50)
-  Town                  String?  @map("VenueAddressTown") @db.VarChar(50)
-  County                String?  @map("VenueAddressCounty") @db.VarChar(50)
-  Postcode              String?  @map("VenueAddressPostcode") @db.VarChar(12)
-  CountryId             Int?     @map("VenueAddressCountryId")
-  Country               Country? @relation(fields: [CountryId], references: [Id], onDelete: NoAction, map: "CountryVenueAddress")
-  Venue                 Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+  Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
+  VenueId   Int      @map("VenueAddressVenueId")
+  TypeName  String   @map("VenueAddressTypeName") @db.VarChar(15)
+  Line1     String?  @map("VenueAddress1") @db.VarChar(50)
+  Line2     String?  @map("VenueAddress2") @db.VarChar(50)
+  Line3     String?  @map("VenueAddress3") @db.VarChar(50)
+  Town      String?  @map("VenueAddressTown") @db.VarChar(50)
+  County    String?  @map("VenueAddressCounty") @db.VarChar(50)
+  Postcode  String?  @map("VenueAddressPostcode") @db.VarChar(12)
+  CountryId Int?     @map("VenueAddressCountryId")
+  Country   Country? @relation(fields: [CountryId], references: [Id], onDelete: NoAction, map: "CountryVenueAddress")
+  Venue     Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueId], map: "Venue_VenueAddress")
   @@index([CountryId], map: "CountryVenueAddress")
@@ -705,11 +707,11 @@ model AccountContact {
 }
 
 model Country {
-  Id                  Int            @map("CountryId")@id @default(autoincrement())
-  Code                String         @map("CountryCode")@db.VarChar(3)
-  Name                String         @map("CountryName")@db.VarChar(40)
-  CurrencyCode        String?        @map("CountryCurrencyCode")@db.VarChar(3)
-  VenueAddress        VenueAddress[]
+  Id           Int            @id @default(autoincrement()) @map("CountryId")
+  Code         String         @map("CountryCode") @db.VarChar(3)
+  Name         String         @map("CountryName") @db.VarChar(40)
+  CurrencyCode String?        @map("CountryCurrencyCode") @db.VarChar(3)
+  VenueAddress VenueAddress[]
 }
 
 model CountryInRegion {
