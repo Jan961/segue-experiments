@@ -11,30 +11,44 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 
+type FutureBooking = {
+  hasFutureBooking: boolean;
+  nextBooking: any;
+};
+
 const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
-  const [venueUrl, setVenueUrl] = useState('');
   const today = formatInputDate(new Date());
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedValue, setSelectedValue] = useState(null);
   const [venueName, setVenueName] = useState('');
   const [venueId, setVenueId] = useState(0);
-  const bookingOptions = useMemo(
-    () => (bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : []),
-    [bookings],
-  );
+  const [venueUrl, setVenueUrl] = useState('');
+  const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
+  const bookingOptions = useMemo(() => {
+    const options = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+    options.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return options;
+  }, [bookings]);
 
   useEffect(() => {
-    setSelectedIndex(-1);
-    setSelectedValue(0);
+    if (bookings.selected !== null && bookings.selected !== undefined) {
+      changeBooking(bookings.selected.toString());
+    } else {
+      changeBooking(null);
+    }
   }, [bookings.bookings]);
 
-  const todayOnSchedule = useMemo(() => {
-    const todaysBookings = bookingOptions.filter((booking) => booking.date === today);
-    return todaysBookings.length !== 0;
-  }, [bookingOptions, today]);
+  useEffect(() => {
+    const futureBookings = bookingOptions.filter((booking) => parseDate(booking.date) >= parseDate(today));
+
+    setFutureBookings({
+      hasFutureBooking: futureBookings.length > 0,
+      nextBooking: futureBookings.length > 0 ? futureBookings[0] : null,
+    });
+  }, [bookingOptions]);
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {
@@ -49,12 +63,19 @@ const Filters = () => {
       setVenueId(booking.Venue.Id);
       setVenueUrl(website);
       setBooking({ ...bookings, selected: bookingIdentifier });
+    } else {
+      setSelectedIndex(-1);
+      setSelectedValue(0);
+      setBooking({ ...bookings, selected: null });
     }
   };
 
+  const parseDate = (inputDt) => new Date(inputDt.split('/').reverse().join('/')).getTime();
+
   const goToToday = () => {
-    const todaysBooking = bookingOptions.find((booking) => booking.date === today);
-    changeBooking(todaysBooking.value);
+    if (futureBookings.hasFutureBooking) {
+      changeBooking(futureBookings.nextBooking.value);
+    }
   };
 
   const goToPrevious = () => {
@@ -71,7 +92,7 @@ const Filters = () => {
 
   return (
     <div className="w-full flex items-end justify-between flex-wrap">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col mb-4">
         <GlobalToolbar
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
@@ -79,7 +100,7 @@ const Filters = () => {
           title={'Marketing'}
         />
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mt-1">
           <Select
             onChange={changeBooking}
             value={selectedValue}
@@ -87,11 +108,13 @@ const Filters = () => {
             placeholder="Select a Venue/Date"
             className="bg-white w-[550px]"
             options={bookingOptions}
+            isClearable
+            isSearchable
           />
 
           <Button
             text="Go To Today"
-            disabled={!todayOnSchedule || !productionId}
+            disabled={!futureBookings.hasFutureBooking || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToToday}
           />
@@ -110,7 +133,7 @@ const Filters = () => {
 
           {/* Iframe placed next to buttons but in the same flex container */}
           <div className="self-end -mt-[60px]">
-            <Iframe variant="xs" src={venueUrl} />
+            <Iframe variant="xs" src={venueUrl} className="" />
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-function formatInputDate(dateString) {
+const formatInputDate = (dateString) => {
   if (!dateString) {
     return null;
   }
@@ -10,6 +10,6 @@ function formatInputDate(dateString) {
   const day = String(date.getDate()).padStart(2, '0');
 
   return `${day}/${month}/${year}`;
-}
+};
 
 export default formatInputDate;

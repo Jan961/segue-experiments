@@ -57,7 +57,7 @@ const InputDialog = ({
       setConfVariant('cancel');
       setShowConfirm(true);
     } else {
-      setVisible(false);
+      onCancelClick();
     }
   };
 
