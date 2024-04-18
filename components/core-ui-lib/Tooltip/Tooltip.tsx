@@ -43,7 +43,11 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   const toggleTooltip = () => {
     const tpContentAvail = title.trim() !== '' || body.trim() !== '';
-    if (!disabled && tpContentAvail) {
+    if (!tpContentAvail) {
+      return null;
+    }
+
+    if (!disabled) {
       setShowTooltip(!showTooltip);
     }
   };
