@@ -19,7 +19,7 @@ const Index = ({ bookings }: InferGetServerSidePropsType<typeof getServerSidePro
   }
 
   return (
-    <Layout title="Contracts | Seque">
+    <Layout title="Contracts | Segue">
       <div className="flex flex-auto flex-col w-full">
         <GlobalToolbar title={'Contracts'} />
         <div className="flex-row flex">
@@ -52,7 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const bookings = production.DateBlock.map((x) => x.Booking)
       .flat()
       .map(bookingMapperWithVenue);
-    console.log(bookings?.[0]);
     allBookings = [...allBookings, ...bookings];
   }
   allBookings = allBookings.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());

@@ -11,7 +11,7 @@ type Props = {
 const pagetitle = 'Marketing - Sale Entry';
 
 const Index = ({ items }: Props) => (
-  <Layout title={pagetitle + '| Seque'}>
+  <Layout title={pagetitle + '| Segue'}>
     <Toolbar title={pagetitle} searchFilter={''}></Toolbar>
     <div className="flex flex-auto">
       <SideMenu></SideMenu>

@@ -361,6 +361,7 @@ export interface IBookingDetails {
   PostShow?: number;
   BarringClause?: string;
   BarringMiles?: number;
+  MerchandiseNotes?: string;
 }
 
 export interface IAttachedFile {
