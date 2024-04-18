@@ -7,9 +7,8 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { BookingSelection } from 'types/MarketingTypes';
 import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
-import { VenueDTO } from 'interfaces';
 import { Spinner } from 'components/global/Spinner';
-import { DataList, SelectOption } from '../MarketingHome';
+import { DataList, SelectOption, VenueDetail } from '../MarketingHome';
 import Select from 'components/core-ui-lib/Select';
 import classNames from 'classnames';
 
@@ -19,7 +18,7 @@ interface ArchSalesDialogProps {
   show: boolean;
   onCancel: () => void;
   variant: ArchSalesDialogVariant;
-  data: VenueDTO | DataList;
+  data: VenueDetail | DataList;
   onSubmit: (salesComp) => void;
   error: string;
 }
@@ -60,17 +59,25 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
     }
 
     let venue = null;
+
     if (variant === 'both') {
+      let selectedVenue = null;
       if (conditionType === 'Venue') {
-        venue = selectedCondition;
+        selectedVenue = data;
       } else if (conditionType === 'Town') {
-        venue = venueList.find((venue) => venue.value.Town.includes(data) === true).value;
+        selectedVenue = venueList.find((venue) => venue.value.Town.includes(data) === true).value;
       }
+
+      venue = {
+        town: selectedVenue.Town,
+        name: selectedVenue.Name,
+        code: selectedVenue.Code,
+      };
     } else {
       venue = data;
+      setSubTitle(variant === 'town' ? venue.town : venue.name);
     }
 
-    setSubTitle(venue.Name);
     setSelectedCondition(venue);
 
     try {
@@ -79,7 +86,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
         method: 'POST',
         data: {
           salesByType: variant === 'venue' ? 'venue' : 'town',
-          venueCode: venue.Code,
+          venueCode: venue.code,
           showCode: router.query.ShowCode.toString(),
         },
       });

@@ -70,8 +70,7 @@ const Filters = () => {
       setBooking({ ...bookings, selected: bookingIdentifier });
     } else {
       setSelectedIndex(-1);
-      setSelectedValue(0);
-      setBooking({ ...bookings, selected: null });
+      setSelectedValue(null);
     }
   };
 
