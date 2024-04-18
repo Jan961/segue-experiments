@@ -24,7 +24,22 @@ const intProduction = {
   ShowName: '',
   ShowCode: '',
   IsArchived: false,
-  DateBlock: [],
+  DateBlock: [
+    {
+      EndDate: new Date(),
+      Id: '',
+      IsPrimary: false,
+      Name: 'Production',
+      StartDate: new Date(),
+    },
+    {
+      EndDate: new Date(),
+      Id: '',
+      IsPrimary: false,
+      Name: 'Reharsals',
+      StartDate: new Date(),
+    },
+  ],
   StartDate: '',
   EndDate: '',
 };
@@ -84,7 +99,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   useEffect(() => {
     if (isAddRow) {
       applyTransactionToGrid(tableRef, {
-        add: [{ ShowName: showData.Name, ShowCode: showData.Code, highlightRow: true }],
+        add: [{ ...intProduction, ShowName: showData.Name, ShowCode: showData.Code, highlightRow: true }],
         addIndex: 0,
       });
     }
@@ -117,9 +132,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (isAddRow && e.column.colId === 'editId') {
       setIsLoading(true);
       try {
-        const data = { ...intProduction, Code: showData.ShowCode, Name: showData.ShowName };
-        delete data.Id;
-        await axios.post(`/api/productions/create`, data);
+        console.log(showData, currentProduction, e);
+        // const data = { ...intProduction, Code: showData.ShowCode, Name: showData.ShowName };
+        // delete data.Id;
+        // await axios.post(`/api/productions/create`, data);
       } finally {
         setIsEdited(false);
         setCurrentProduction(intProduction);

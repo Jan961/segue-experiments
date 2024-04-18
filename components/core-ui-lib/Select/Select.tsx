@@ -175,6 +175,7 @@ export default forwardRef(function Select(
     DropdownIndicator,
   };
 
+  console.log(label);
   return (
     <div
       className={classNames(

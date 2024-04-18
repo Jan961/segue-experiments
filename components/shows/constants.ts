@@ -1,10 +1,10 @@
 export const SALES_FIG_OPTIONS = [
   {
-    value: 'daily',
+    value: 'D',
     text: 'Daily',
   },
   {
-    value: 'weekly',
+    value: 'W',
     text: 'Weekly',
   },
 ];

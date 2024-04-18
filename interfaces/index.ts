@@ -149,6 +149,9 @@ export type ProductionDTO = {
   DateBlock: DateBlockDTO[];
   StartDate?: string;
   EndDate?: string;
+  SalesEmail?: string;
+  SalesFrequency?: string;
+  RegionId?: string[];
 };
 
 export type VenueMinimalDTO = {

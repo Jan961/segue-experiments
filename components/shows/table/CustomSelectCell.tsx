@@ -11,14 +11,16 @@ interface CustomSelectCellProps extends ICellRendererParams {
   eGridCell: HTMLElement;
   placeholder?: string;
   isMulti?: boolean;
+  defaultValue?: string;
 }
 
 const CustomSelectCell = ({
   options = [],
-  value,
   setValue,
   eGridCell,
   placeholder = '',
+  defaultValue = '',
+  value,
   isMulti = false,
   ...props
 }: CustomSelectCellProps) => {
@@ -34,6 +36,8 @@ const CustomSelectCell = ({
 
   const CustomOption = ({ option }: { option: OptionProps }) => {
     const { label, isSelected } = option;
+
+    console.log(label, isSelected, option);
 
     return (
       <components.Option {...option}>
@@ -57,9 +61,9 @@ const CustomSelectCell = ({
         isClearable={false}
         options={options}
         onChange={handleChange}
-        className="ag-custom-component-popup !z-50 rounded"
+        className="ag-custom-component-popup !z-50 rounded p-1"
         placeholder={placeholder}
-        value={value}
+        value={defaultValue || value}
         isMulti={isMulti}
         ref={selectRef}
         renderOption={(option) => <CustomOption option={option} />}

@@ -43,11 +43,7 @@ export const tableConfig = [
     cellRendererParams: {
       buttonText: 'View/Edit',
     },
-    cellStyle: {
-      paddingRight: '0.75em',
-      paddingLeft: '0.75em',
-    },
-    width: 143,
+    width: 133,
     headerClass: 'text-center',
   },
   {
@@ -122,29 +118,39 @@ export const productionsTableConfig = [
     children: [
       {
         headerName: 'Start',
-        field: 'DateBlock',
-        cellRendererParams: {
-          internalField: 'StartDate',
-          fieldIndex: 1,
+        field: 'DateBlock[1].StartDate',
+        // cellRendererParams: {
+        //   internalField: 'StartDate',
+        //   fieldIndex: 1,
+        // },
+        cellStyle: {
+          paddingRight: '0.1em',
+          paddingLeft: '0.1em',
+          overflow: 'visible',
         },
         cellRenderer: CustomDateCell,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
-        width: 80,
+        width: 120,
         resizable: false,
         sortable: false,
       },
       {
         headerName: 'End',
-        field: 'DateBlock',
-        cellRendererParams: {
-          internalField: 'EndDate',
-          fieldIndex: 1,
+        field: 'DateBlock[1].EndDate',
+        // cellRendererParams: {
+        //   internalField: 'EndDate',
+        //   fieldIndex: 1,
+        // },
+        cellStyle: {
+          paddingRight: '0.1em',
+          paddingLeft: '0.1em',
+          overflow: 'visible',
         },
         cellRenderer: CustomDateCell,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
-        width: 80,
+        width: 120,
         resizable: false,
         sortable: false,
       },
@@ -154,36 +160,42 @@ export const productionsTableConfig = [
     headerName: 'Production Dates',
     headerClass: 'justify-center font-bold text-base ',
     marryChildren: true,
-    cellStyle: {
-      paddingRight: '0.75em',
-      paddingLeft: '0.75em',
-    },
     children: [
       {
         headerName: 'Start',
-        field: 'DateBlock',
-        cellRendererParams: {
-          internalField: 'StartDate',
-          fieldIndex: 0,
+        field: 'DateBlock[0].StartDate',
+        // cellRendererParams: {
+        //   internalField: 'StartDate',
+        //   fieldIndex: 0,
+        // },
+        cellStyle: {
+          paddingRight: '0.1em',
+          overflow: 'visible',
+          paddingLeft: '0.1em',
         },
         cellRenderer: CustomDateCell,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
-        width: 80,
+        width: 120,
         resizable: false,
         sortable: false,
       },
       {
         headerName: 'End',
-        field: 'DateBlock',
-        cellRendererParams: {
-          internalField: 'EndDate',
-          fieldIndex: 0,
+        field: 'DateBlock[0].EndDate',
+        // cellRendererParams: {
+        //   internalField: 'EndDate',
+        //   fieldIndex: 0,
+        // },
+        width: 120,
+        cellStyle: {
+          paddingRight: '0.1em',
+          paddingLeft: '0.1em',
+          overflow: 'visible',
         },
         cellRenderer: CustomDateCell,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
-        width: 80,
         resizable: false,
         sortable: false,
       },
@@ -192,20 +204,16 @@ export const productionsTableConfig = [
   {
     headerName: 'Production Image',
     field: 'IsArchived',
-    width: 120,
+    width: 80,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Upload',
-    },
-    cellStyle: {
-      paddingRight: '0.75em',
-      paddingLeft: '0.75em',
     },
     headerClass: 'text-center',
   },
   {
     headerName: 'Region',
-    field: 'EditId',
+    field: 'regionId',
     cellRenderer: CustomSelectCell,
     cellRendererParams: {
       options: REGIONS_LIST,
@@ -220,7 +228,7 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Email Address for Sales Figures',
-    field: '',
+    field: 'salesEmail',
     cellRendererParams: {
       placeholder: 'Enter email address',
     },
@@ -230,11 +238,12 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Input Freq of Sales Figs',
-    field: 'Id',
-    width: 150,
+    field: 'salesFrequency',
+    width: 120,
     cellRenderer: CustomSelectCell,
     cellRendererParams: {
       options: SALES_FIG_OPTIONS,
+      defaultValue: 'W',
     },
     cellStyle: {
       overflow: 'visible',
@@ -264,16 +273,15 @@ export const productionsTableConfig = [
     },
     resizable: false,
     cellStyle: {
-      paddingLeft: '0.5em',
       width: 80,
     },
-    width: 90,
+    width: 70,
     headerClass: 'text-center',
   },
   {
     headerName: '',
     field: 'deleteId',
-    width: 80,
+    width: 70,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Delete',

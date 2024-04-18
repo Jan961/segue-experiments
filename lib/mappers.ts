@@ -152,6 +152,7 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   ShowCode: t.Show.Code,
   DateBlock: t.DateBlock ? t.DateBlock.map(dateBlockMapper) : [],
   IsArchived: t.IsArchived,
+  SalesEmail: t.SalesEmail,
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({

@@ -81,7 +81,7 @@ const ShowsTable = ({
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {
       setConfirm(true);
-    } else if (e.column.colId === 'productions') {
+    } else if (e.column.colId === 'productions' && e.data.Id) {
       setShowProductionsModal(true);
       setCurrentShow(e.data);
     } else if (
