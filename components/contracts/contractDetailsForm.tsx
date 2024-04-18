@@ -179,25 +179,26 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
       const c = activeContractData[0];
       setBookingDetails({
         ShowDate: c.ShowDate,
-        VenueContractStatus: c.VenueContractStatus,
-        DealType: c.DealType,
-        ContractSignedDate: formatInputDate(c.ContractSignedDate),
-        ContractSignedBy: c.ContractSignedBy,
+        VenueContractStatus: c.Contract?.StatusCode,
+        DealType: c.Contract?.DealType,
+        ContractSignedDate: formatInputDate(c.Contract?.SignedDate),
+        ContractSignedBy: c.Contract?.SignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
-        RoyaltyPC: c.RoyaltyPC,
+        RoyaltyPC: c.Contract?.RoyaltyPercentage,
         CrewNotes: c.CrewNotes,
         MarketingDealNotes: c.MarketingDealNotes,
         TicketPriceNotes: c.TicketPriceNotes,
         BarringExemptions: c.BarringExemptions,
-        ContractNotes: c.ContractNotes,
+        ContractNotes: c.Contract?.ContractNotes,
         GP: c.GP,
-        ContractReturnDate: formatInputDate(c.ContractReturnDate),
+        ContractReturnDate: formatInputDate(c.Contract?.ReturnDate),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
-        ContractCheckedBy: c.ContractCheckedBy,
+        ContractCheckedBy: c.Contract?.CheckedBy,
         PreShow: c.Venue.BarringWeeksPre,
         PostShow: c.Venue.BarringWeeksPost,
         BarringClause: c.Venue.BarringClause,
         BarringMiles: c.Venue.BarringMiles,
+        MerchandiseNotes: c.MerchandiseNotes,
       });
       if (contractExists) {
         const firstContract = c.Contract[0];
@@ -329,9 +330,10 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   <option value="CSBP">CONTRACT SIGNED BOTH PARTIES AND UPLOADED</option>
                 </select>
                 <Label htmlFor="checkedby">Checked By:</Label>
-                <select className="border-none rounded-md">
+                <input value={bookingDetails.ContractCheckedBy} />
+                {/* <select className="border-none rounded-md">
                   <option>Peter Carlyle</option>
-                </select>
+                </select> */}
 
                 <Label htmlFor="checkedby">Returned to Venue: </Label>
                 <input
@@ -371,9 +373,10 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   onChange={(e) => formDataHandler('ContractSignedDate', e.currentTarget.value, '')}
                 />
                 <Label htmlFor="checkedby">Signed By:</Label>
-                <select className="border-none rounded-md">
+                <input type="text" value={bookingDetails.ContractSignedBy} />
+                {/* <select className="border-none rounded-md">
                   <option>Peter Carlyle</option>
-                </select>
+                </select> */}
                 <Label>Return Note By:</Label>
                 <select className="border-none rounded-md">
                   <option>-</option>
@@ -453,19 +456,6 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   value={bookingDetails.TicketPriceNotes}
                 />
               </div>
-
-              <div className="flex items-center justify-between flex-row">
-                <label htmlFor="date" className="sr-only text-primary-pink font-bold">
-                  Barring clause breaches
-                </label>
-                <textarea
-                  placeholder="Barring clause breaches..."
-                  className="border-gray-300 rounded-md w-full"
-                  onChange={(e) => formDataHandler('BarringClauseBreaches', e.currentTarget.value, 'contract')}
-                  value={contractDetails.BarringClauseBreaches}
-                />
-              </div>
-
               <div>
                 <label htmlFor="date" className="sr-only text-primary-pink font-bold">
                   Exemptions
@@ -491,6 +481,17 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   className="border-gray-300 rounded-md w-full"
                   onChange={(e) => formDataHandler('ContractNotes', e.currentTarget.value, '')}
                   value={bookingDetails.ContractNotes}
+                />
+              </div>
+              <div className="flex items-center justify-between flex-row">
+                <label htmlFor="date" className="sr-only text-primary-pink font-bold">
+                  Merchandise Notes
+                </label>
+                <textarea
+                  placeholder="Merchandise Notes"
+                  className="border-gray-300 rounded-md w-full"
+                  onChange={(e) => formDataHandler('BarringClauseBreaches', e.currentTarget.value, 'contract')}
+                  value={bookingDetails.MerchandiseNotes}
                 />
               </div>
             </div>

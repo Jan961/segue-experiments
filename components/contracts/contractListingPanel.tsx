@@ -37,7 +37,6 @@ const BookingDetailsListingPanel = ({
       <h1 className="text-primary-pink mt-4 mb-8 font-bold">Week</h1>
       {sortedBookings.length > 0 &&
         sortedBookings.map((booking, idx) => {
-          console.log(booking);
           return (
             <div
               onClick={() => handleContractChange(idx)}
