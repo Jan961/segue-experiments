@@ -194,6 +194,10 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ContractReturnDate: formatInputDate(c.ContractReturnDate),
         ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
         ContractCheckedBy: c.ContractCheckedBy,
+        PreShow: c.Venue.BarringWeeksPre,
+        PostShow: c.Venue.BarringWeeksPost,
+        BarringClause: c.Venue.BarringClause,
+        BarringMiles: c.Venue.BarringMiles,
       });
       if (contractExists) {
         const firstContract = c.Contract[0];
@@ -308,11 +312,11 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
             </div>
           </div>
           <form>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 mt-2 gap-8">
               <div className="grid grid-cols-2 gap-2">
-                <label htmlFor="status" className="text-primary-pink whitespace-nowrap font-bold">
-                  Run days:{' '}
-                </label>
+                <Label htmlFor="status" className="text-primary-pink whitespace-nowrap font-bold">
+                  Contract Status:{' '}
+                </Label>
                 <select
                   className="border-none rounded-md"
                   value={bookingDetails.VenueContractStatus}
@@ -324,10 +328,6 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   <option value="CSAR">CONTRACT SIGNED & RETURNED</option>
                   <option value="CSBP">CONTRACT SIGNED BOTH PARTIES AND UPLOADED</option>
                 </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 mt-2 gap-8">
-              <div className="grid grid-cols-2 gap-2">
                 <Label htmlFor="checkedby">Checked By:</Label>
                 <select className="border-none rounded-md">
                   <option>Peter Carlyle</option>
@@ -498,15 +498,15 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
               <span className="font-medium">Weeks:</span>
               <div>
                 <span className="text-primary-pink underline-offset-2 underline">Pre Show:</span>&nbsp;
-                <span>12</span>
+                <span>{bookingDetails?.PreShow}</span>
               </div>
               <div>
                 <span className="text-primary-pink underline-offset-2 underline">Post Show:</span>&nbsp;
-                <span>12</span>
+                <span>{bookingDetails?.PostShow}</span>
               </div>
               <div>
                 <span className="text-primary-pink underline-offset-2 underline">Miles:</span>&nbsp;
-                <span>30</span>
+                <span>{bookingDetails?.BarringMiles}</span>
               </div>
             </div>
             <div className="flex flex-row">

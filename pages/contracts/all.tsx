@@ -3,7 +3,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useState } from 'react';
 import ContractDetailsForm from 'components/contracts/contractDetailsForm';
 import ContractListingPanel from 'components/contracts/contractListingPanel';
+import { ProductionContent, getProductionsWithContent } from 'services/productionService';
 import GlobalToolbar from 'components/toolbar';
+import { bookingMapperWithVenue } from 'lib/mappers';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
@@ -44,7 +46,17 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
 
-  return { props: { bookings: [], initialState: { global: { productionJump } } } };
+  const productions: ProductionContent[] = await getProductionsWithContent();
+  let allBookings = [];
+  for (const production of productions) {
+    const bookings = production.DateBlock.map((x) => x.Booking)
+      .flat()
+      .map(bookingMapperWithVenue);
+    console.log(bookings?.[0]);
+    allBookings = [...allBookings, ...bookings];
+  }
+  allBookings = allBookings.sort((a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime());
+  return { props: { bookings: allBookings, initialState: { global: { productionJump } } } };
 };
 
 export default Index;
