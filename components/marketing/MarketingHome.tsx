@@ -231,7 +231,7 @@ const MarketingHome = () => {
                 />
 
                 <Button
-                  text="For this Venue / Town"
+                  text="Any Venue / Town"
                   className="w-[230px] mb-3 pl-6"
                   onClick={() => showArchSalesComp('both')}
                 />
