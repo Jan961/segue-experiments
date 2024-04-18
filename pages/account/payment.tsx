@@ -7,7 +7,7 @@ type Props = {
 };
 
 const Index = ({ items }: Props) => (
-  <Layout title="Payment | Seque">
+  <Layout title="Payment | Segue">
     <AccountPaymentDetails></AccountPaymentDetails>
   </Layout>
 );
