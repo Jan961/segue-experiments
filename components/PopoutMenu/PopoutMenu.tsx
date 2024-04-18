@@ -86,7 +86,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         ],
       },
       {
-        label: getStrings('global.tasks'),
+        label: getStrings('global.projectManagement'),
         value: '/tasks',
         icon: tasksIcon,
         labelClass: groupHeader,
@@ -101,7 +101,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: contractsIcon,
         labelClass: groupHeader,
         options: [
-          { label: 'Deal Memo', value: '', labelClass: leve2 },
+          { label: 'Deal Memo Contracts', value: '', labelClass: leve2 },
           { label: 'ACC Contracts', value: '', labelClass: leve2 },
           { label: 'Other Contracts', value: '', labelClass: leve2 },
         ],

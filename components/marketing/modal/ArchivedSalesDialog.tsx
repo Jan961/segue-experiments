@@ -9,7 +9,7 @@ import useAxios from 'hooks/useAxios';
 import { useRouter } from 'next/router';
 import { VenueDTO } from 'interfaces';
 import { Spinner } from 'components/global/Spinner';
-import { DataList, SelectValue } from '../MarketingHome';
+import { DataList, SelectOption } from '../MarketingHome';
 import Select from 'components/core-ui-lib/Select';
 import classNames from 'classnames';
 
@@ -32,8 +32,8 @@ const title = {
 
 const bothOptions = [
   { text: 'Venue', value: 'Venue' },
-  { text: 'Town', value: 'Town' }
-]
+  { text: 'Town', value: 'Town' },
+];
 
 const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Partial<ArchSalesDialogProps>) => {
   const [visible, setVisible] = useState<boolean>(show);
@@ -44,8 +44,8 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
   const [subTitle, setSubTitle] = useState<string>('');
   const [conditionType, setConditionType] = useState('Venue');
   const [selectedCondition, setSelectedCondition] = useState(null);
-  const [venueList, setVenueList] = useState<Array<SelectValue>>([]);
-  const [townList, setTownList] = useState<Array<SelectValue>>([]);
+  const [venueList, setVenueList] = useState<Array<SelectOption>>([]);
+  const [townList, setTownList] = useState<Array<SelectOption>>([]);
   const router = useRouter();
 
   const { fetchData } = useAxios();
@@ -60,17 +60,15 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
     }
 
     let venue = null;
-    if(variant === 'both'){
-      if(conditionType === 'Venue'){
+    if (variant === 'both') {
+      if (conditionType === 'Venue') {
         venue = selectedCondition;
-      } else if(conditionType === 'Town'){
-        venue = venueList.find(venue => venue.value.Town.includes(data) === true).value;
+      } else if (conditionType === 'Town') {
+        venue = venueList.find((venue) => venue.value.Town.includes(data) === true).value;
       }
     } else {
       venue = data;
     }
-
-    console.log(venue)
 
     setSubTitle(venue.Name);
     setSelectedCondition(venue);
@@ -96,7 +94,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
 
         setProdCompData(sortedData);
       } else {
-        setErrorMessage('There are no productions to compare.')
+        setErrorMessage('There are no productions to compare.');
       }
     } catch (error) {
       console.log(error);
@@ -150,7 +148,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
 
   useEffect(() => {
     setErrorMessage(error);
-  }, [error])
+  }, [error]);
 
   useEffect(() => {
     setErrorMessage('');
@@ -160,37 +158,32 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
       setSelectedCondition(null);
       if ('townList' in data && 'venueList' in data) {
         setTownList(data.townList);
-        setVenueList(data.venueList)
+        setVenueList(data.venueList);
       }
     } else {
       setProdCompData([]);
       getBookingSelection(data);
     }
-
   }, [data, variant]);
 
   return (
     <PopupModal
       show={visible}
       title={title[variant]}
-      titleClass={classNames("text-xl text-primary-navy font-bold -mt-2", variant === 'both' ? 'w-48' : '')}
+      titleClass={classNames('text-xl text-primary-navy font-bold -mt-2', variant === 'both' ? 'w-48' : '')}
       onClose={handleModalCancel}
     >
-      {variant !== 'both' && (
-        <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>
-      )}
-
+      {variant !== 'both' && <div className="text-xl text-primary-navy font-bold mb-4">{subTitle}</div>}
 
       {variant === 'both' ? (
         <div>
-
           <Select
             className={classNames('my-2 w-full !border-0 text-primary-navy')}
             options={bothOptions}
             isClearable
             isSearchable
             value={conditionType}
-            onChange={(value) => value === null ? setConditionType(null) : setConditionType(value.toString())}
+            onChange={(value) => setConditionType(value?.toString() || null)}
             placeholder={'Please select a condition'}
             label={'Condition'}
           />
@@ -207,9 +200,8 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
           />
 
           {selectedCondition !== null && errorMessage === '' && (
-
             <div>
-              {prodCompData.length === 0  ? (
+              {prodCompData.length === 0 ? (
                 <Spinner size="md" />
               ) : (
                 <SalesTable
@@ -243,7 +235,6 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
             />
           )}
         </div>
-
       )}
       <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 

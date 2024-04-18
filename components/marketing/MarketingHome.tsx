@@ -15,15 +15,15 @@ import { venueState } from 'state/booking/venueState';
 import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 
-export type SelectValue = {
+export type SelectOption = {
   text: string;
   value: any;
-}
+};
 
 export type DataList = {
-  townList: Array<SelectValue>;
-  venueList: Array<SelectValue>;
-}
+  townList: Array<SelectOption>;
+  venueList: Array<SelectOption>;
+};
 
 interface SalesTableProps {
   data: SalesSnapshot[]; // Replace `SalesSnapshot[]` with the correct type based on your actual data structure
@@ -81,10 +81,10 @@ const MarketingHome = () => {
       // get venue list
       const venueTownData = {
         townList: Object.values(townList).map((town) => {
-          return { text: town.Town, value: town.Town }
+          return { text: town.Town, value: town.Town };
         }),
         venueList: Object.values(venueDict).map((venue) => {
-          return { text: venue.Code + ' ' + venue.Name, value: venue }
+          return { text: venue.Code + ' ' + venue.Name, value: venue };
         }),
       };
       setArchivedData(venueTownData);
@@ -97,7 +97,7 @@ const MarketingHome = () => {
   };
 
   const showArchivedSales = async (selection) => {
-    setArchivedSalesTable(<div></div>);
+    setArchivedSalesTable(<div />);
     const selectedBookings = selection.map((obj) => obj.bookingId);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -121,7 +121,7 @@ const MarketingHome = () => {
       setArchivedDataAvail(true);
       setShowArchSalesModal(false);
     } else {
-      setErrorMessage('There are no sales data available for this particular selection.')
+      setErrorMessage('There are no sales data available for this particular selection.');
     }
   };
 
@@ -187,7 +187,7 @@ const MarketingHome = () => {
                 />
 
                 <Button
-                  text="For this Venue / Town"
+                  text="Any Venue / Town"
                   className="w-[230px] mb-3 pl-6"
                   onClick={() => showArchSalesComp('both')}
                 />
