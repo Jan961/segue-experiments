@@ -19,7 +19,7 @@ const Index = ({ bookings }: InferGetServerSidePropsType<typeof getServerSidePro
   }
 
   return (
-    <Layout title="Contracts | Seque">
+    <Layout title="Contracts | Segue">
       <div className="flex flex-auto flex-col w-full">
         <GlobalToolbar title={'Contracts'} />
         <div className="flex-row flex">
