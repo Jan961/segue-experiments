@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { SalesTabs, SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
+import { SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
@@ -25,22 +25,6 @@ export type DataList = {
   venueList: Array<SelectOption>;
 };
 
-interface SalesTableProps {
-  data: SalesSnapshot[]; // Replace `SalesSnapshot[]` with the correct type based on your actual data structure
-  booking: string; // Assuming booking is a string identifier
-}
-
-const MemoizedSalesTable = React.memo(({ data, booking }: SalesTableProps) => (
-  <SalesTable
-    containerHeight="h-auto"
-    containerWidth="w-[1465px]"
-    module="marketing"
-    variant="salesSnapshot"
-    data={data}
-    booking={booking}
-  />
-));
-
 const MarketingHome = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
@@ -50,7 +34,7 @@ const MarketingHome = () => {
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
   const [archivedData, setArchivedData] = useState<VenueDTO | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
-  const [sales, setSales] = useState([]);
+  const [salesTable, setSalesTable] = useState<ReactNode>();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
@@ -65,13 +49,22 @@ const MarketingHome = () => {
       method: 'POST',
     });
 
-    setSales([]);
+    setSalesTable(<div></div>);
 
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
-      setSales(salesData);
+      setSalesTable(
+        <SalesTable
+        containerHeight="h-auto"
+        containerWidth="w-[1465px]"
+        module="marketing"
+        variant="salesSnapshot"
+        data={salesData}
+        booking={bookingId}
+      />
+      );
     } else {
-      setSales([]);
+      setSalesTable(<div></div>);
     }
   };
 
@@ -168,7 +161,7 @@ const MarketingHome = () => {
           disabled={!productionId || !bookingId}
           >
           <Tab.Panel className="h-[650px] overflow-y-hidden">
-          {sales && bookingId && <MemoizedSalesTable data={sales} booking={bookingId} />}
+            {salesTable}
           </Tab.Panel>
 
           <Tab.Panel>
