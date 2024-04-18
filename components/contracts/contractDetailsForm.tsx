@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatFormDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -183,7 +182,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         ShowDate: c.ShowDate,
         VenueContractStatus: c.Contract?.StatusCode,
         DealType: c.Contract?.DealType,
-        ContractSignedDate: formatFormDate(c.Contract?.SignedDate),
+        ContractSignedDate: moment(c.Contract?.SignedDate).format('YYYY-MM-DD'),
         ContractSignedBy: c.Contract?.SignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.Contract?.RoyaltyPercentage,
@@ -193,8 +192,8 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.Contract?.ContractNotes,
         GP: c.Performance?.length * c.Venue?.Seats * 30,
-        ContractReturnDate: formatFormDate(c.Contract?.ReturnDate),
-        ContractReceivedBackDate: formatFormDate(c.ContractReceivedBackDate),
+        ContractReturnDate: moment(c.Contract?.ReturnDate).format('YYYY-MM-DD'),
+        ContractReceivedBackDate: moment(c.ContractReceivedBackDate).format('YYYY-MM-DD'),
         ContractCheckedBy: c.Contract?.CheckedBy,
         PreShow: c.Venue.BarringWeeksPre,
         PostShow: c.Venue.BarringWeeksPost,
@@ -370,7 +369,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                 <Label htmlFor="signedon">Signed on:</Label>
                 <input
                   id="signedon"
-                  type="datetime"
+                  type="date"
                   value={bookingDetails.ContractSignedDate}
                   className="w-full border-none rounded-md"
                   onChange={(e) => formDataHandler('ContractSignedDate', e.currentTarget.value, '')}
