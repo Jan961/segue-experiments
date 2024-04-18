@@ -110,9 +110,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         .filter(({ runTag }) => runTag === booking.runTag)
         .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
 
-      if (runOfDates.length > 1) {
-        onFormDataChange({ isRunOfDates: true });
-      }
+      onFormDataChange({ isRunOfDates: true });
+
       const bookingsToEdit = isNullOrEmpty(runOfDates) ? [booking] : runOfDates;
       // format booking and set on state
       const formattedBooking: BookingItem[] = bookingsToEdit.map((b: BookingRow) => {
@@ -133,7 +132,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isBooking: b.dayType === 'Performance',
           isRehearsal: b.dayType === 'Rehearsal',
           isGetInFitUp: b.dayType === 'Get in / Fit Up',
-          isRunOfDates: runOfDates.length > 1,
+          isRunOfDates: true,
         };
       });
       setBookingOnStore(formattedBooking);
