@@ -32,7 +32,7 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
     setProductionTasks(updatedProductionTasks);
   };
   return (
-    <Layout title="Tasks | Seque">
+    <Layout title="Tasks | Segue">
       <div className="flex flex-auto w-full">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
           <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'}></GlobalToolbar>
