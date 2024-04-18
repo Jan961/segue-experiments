@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -9,7 +9,6 @@ import useAxios from 'hooks/useAxios';
 import SalesTable from 'components/global/salesTable';
 import Button from 'components/core-ui-lib/Button';
 import ArchSalesDialog, { ArchSalesDialogVariant } from './modal/ArchivedSalesDialog';
-import { VenueDTO } from 'interfaces';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import Tabs from 'components/core-ui-lib/Tabs';
@@ -25,6 +24,12 @@ export type DataList = {
   venueList: Array<SelectOption>;
 };
 
+export type VenueDetail = {
+  name: string;
+  code: string;
+  town: string;
+};
+
 const MarketingHome = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
@@ -32,20 +37,28 @@ const MarketingHome = () => {
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
-  const [archivedData, setArchivedData] = useState<VenueDTO | DataList>();
+  const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
   const [salesTable, setSalesTable] = useState<ReactNode>();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
 
-  const tabs = ['Sales', 'Archived Sales', 'Activities', 'Contact Notes', 'Venue Contacts', 'Promoter Holds', 'Attachments'];
+  const tabs = [
+    'Sales',
+    'Archived Sales',
+    'Activities',
+    'Contact Notes',
+    'Venue Contacts',
+    'Promoter Holds',
+    'Attachments',
+  ];
 
   const { fetchData } = useAxios();
 
   const getSales = async (bookingId: string) => {
-    setSalesTable(<div></div>);
-    
+    setSalesTable(<div />);
+
     const data = await fetchData({
       url: '/api/marketing/sales/read/' + bookingId,
       method: 'POST',
@@ -55,16 +68,16 @@ const MarketingHome = () => {
       const salesData = data as Array<SalesSnapshot>;
       setSalesTable(
         <SalesTable
-        containerHeight="h-auto"
-        containerWidth="w-[1465px]"
-        module="marketing"
-        variant="salesSnapshot"
-        data={salesData}
-        booking={bookingId}
-      />
+          containerHeight="h-auto"
+          containerWidth="w-[1465px]"
+          module="marketing"
+          variant="salesSnapshot"
+          data={salesData}
+          booking={bookingId}
+        />,
       );
     } else {
-      setSalesTable(<div></div>);
+      setSalesTable(<div />);
     }
   };
 
@@ -83,7 +96,14 @@ const MarketingHome = () => {
       setArchivedData(venueTownData);
     } else {
       const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
-      setArchivedData(selectedBooking.Venue);
+      // extract the venue name, code and town
+      const venue = {
+        name: selectedBooking.Venue.Name,
+        code: selectedBooking.Venue.Code,
+        town: Object.values(venueDict).find((x) => x.Code === selectedBooking.Venue.Code).Town,
+      };
+
+      setArchivedData(venue);
     }
 
     setShowArchSalesModal(true);
@@ -154,40 +174,25 @@ const MarketingHome = () => {
       </div>
 
       <div className="flex-grow flex flex-col">
-
-        <Tabs 
-          selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy" 
+        <Tabs
+          selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy"
           tabs={tabs}
           disabled={!productionId || !bookingId}
-          >
-          <Tab.Panel className="h-[650px] overflow-y-hidden">
-            {salesTable}
-          </Tab.Panel>
+        >
+          <Tab.Panel className="h-[650px] overflow-y-hidden">{salesTable}</Tab.Panel>
 
           <Tab.Panel>
-          <div>
-              <div className="flex flex-row gap-4">
-                <Button
-                  text="For this Venue"
-                  className="w-[132px] mb-3 pl-6"
-                  onClick={() => showArchSalesComp('venue')}
-                />
+            <div>
+              <div className="flex flex-row gap-4 mb-5">
+                <Button text="For this Venue" className="w-[132px]" onClick={() => showArchSalesComp('venue')} />
 
-                <Button
-                  text="For this Town"
-                  className="w-[132px] mb-3 pl-6"
-                  onClick={() => showArchSalesComp('town')}
-                />
+                <Button text="For this Town" className="w-[132px]" onClick={() => showArchSalesComp('town')} />
 
-                <Button
-                  text="Any Venue / Town"
-                  className="w-[230px] mb-3 pl-6"
-                  onClick={() => showArchSalesComp('both')}
-                />
+                <Button text="Any Venue / Town" className="w-[132px]" onClick={() => showArchSalesComp('both')} />
 
                 <Button
                   text="Export Displayed Sales Data"
-                  className="w-[230px] mb-3 pl-6"
+                  className="w-[232px]"
                   iconProps={{ className: 'h-4 w-3 ml-5' }}
                   sufixIconName={'excel'}
                   disabled={!archivedDataAvail}
@@ -213,8 +218,6 @@ const MarketingHome = () => {
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
         </Tabs>
-
-
       </div>
     </div>
   );
