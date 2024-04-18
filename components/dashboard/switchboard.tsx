@@ -23,7 +23,7 @@ export const Switchboard = () => {
       color: 'bg-primary-green',
     },
     {
-      title: getStrings('global.tasks'),
+      title: getStrings('global.projectManagement'),
       route: '/tasks',
       icon: null,
       stroke: '',

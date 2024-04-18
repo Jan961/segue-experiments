@@ -1,4 +1,4 @@
-import { BookingDTO } from 'interfaces';
+import { BookingWithVenueDTO } from 'interfaces';
 import * as React from 'react';
 import { calculateWeekNumber, getWeekDayShort } from 'services/dateService';
 
@@ -8,7 +8,7 @@ function formatDate(showDate) {
 }
 
 interface BookingDetailsListingPanelProps {
-  bookings: BookingDTO[];
+  bookings: BookingWithVenueDTO[];
   activeContractIndex: number;
   setActiveContractIndex: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -37,6 +37,7 @@ const BookingDetailsListingPanel = ({
       <h1 className="text-primary-pink mt-4 mb-8 font-bold">Week</h1>
       {sortedBookings.length > 0 &&
         sortedBookings.map((booking, idx) => {
+          console.log(booking);
           return (
             <div
               onClick={() => handleContractChange(idx)}
@@ -60,7 +61,7 @@ const BookingDetailsListingPanel = ({
                   <div className="col-span-4">
                     {getWeekDayShort(booking.Date)}&nbsp;{formatDate(booking.Date)}
                   </div>
-                  <div className="col-span-7">{booking.VenueName}</div>
+                  <div className="col-span-7">{booking?.Venue?.Name}</div>
                 </div>
               </div>
             </div>
