@@ -9,7 +9,7 @@ const Index = (props) => {
   const [searchFilter, setSearchFilter] = useState('');
 
   return (
-    <Layout title="Global Activites | Seque">
+    <Layout title="Global Activites | Segue">
       <div className="flex flex-col px-4 flex-auto">
         <GlobalToolbar
           searchFilter={searchFilter}

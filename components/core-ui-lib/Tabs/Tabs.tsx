@@ -1,41 +1,43 @@
 import { Tab } from '@headlessui/react';
-import classNames from 'classnames';
 import { Fragment, ReactElement } from 'react';
+import TabButton from '../TabButton';
 
 interface TabsProps {
   tabs: string[];
   selectedTabClass?: string;
   children: ReactElement[];
-  onChange?: (i: number) => void;
+  onChange?: (index: number) => void;
+  disabled?: boolean;
 }
 
-const defaulTabClass =
-  'h-comp-height w-fit px-3 bg-white text-primary-input-text text-sm border border-primary-input-text flex justify-center items-center rounded-sm shadow-sm-shadow';
-const defaultSelectedTabClass = '!bg-primary-navy !text-white';
-
-export default function Tabs({ tabs = [], selectedTabClass = '', children, onChange }: TabsProps) {
+export default function Tabs({
+  tabs = [],
+  selectedTabClass = '',
+  children,
+  onChange,
+  disabled = false,
+}: TabsProps) {
   return (
     <div>
       <Tab.Group onChange={onChange}>
-        <Tab.List className="flex items-center">
-          {tabs?.map((t) => (
-            <Tab key={t} as={Fragment}>
-              {({ selected }) => {
-                return (
-                  <button
-                    className={classNames(
-                      defaulTabClass,
-                      selected ? `${selectedTabClass || defaultSelectedTabClass}` : '',
-                    )}
-                  >
-                    {t}
-                  </button>
-                );
-              }}
+        <Tab.List className="flex items-center mb-5 -mt-5">
+          {tabs.map((tabLabel, index) => (
+            <Tab key={tabLabel} as={Fragment}>
+              {({ selected }) => (
+                <TabButton
+                  text={tabLabel}
+                  className={`w-[155px] ${selected && !disabled ? selectedTabClass : ''}`}
+                  disabled={disabled}
+                  variant="secondary"
+                  onClick={() => onChange?.(index)}
+                />
+              )}
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels className="mt-2 min-h-24 h-full w-full border border-primary-navy">{children}</Tab.Panels>
+        <Tab.Panels>
+          {children}
+        </Tab.Panels>
       </Tab.Group>
     </div>
   );

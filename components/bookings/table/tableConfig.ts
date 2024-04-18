@@ -154,11 +154,21 @@ export const barringIssueColumnDefs = [
   { headerName: 'Miles', field: 'mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
-export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = [], showAddDeleteRow = false) => [
+export const newBookingColumnDefs = (
+  dayTypeOptions = [],
+  venueOptions = [],
+  addRow,
+  deleteRow,
+  showAddDeleteRow = false,
+) => [
   {
     headerName: 'Date',
     field: 'date',
     cellRenderer: showAddDeleteRow ? AddDeleteRowRenderer : DefaultCellRenderer,
+    cellRendererParams: {
+      addRow,
+      deleteRow,
+    },
     width: showAddDeleteRow ? 155 : 112,
     maxWidth: showAddDeleteRow ? 155 : 112,
   },

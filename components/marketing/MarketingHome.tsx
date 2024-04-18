@@ -1,58 +1,116 @@
 import { ReactNode, useEffect, useState } from 'react';
-import { SalesTabs, SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
+import { SalesSnapshot, SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
 import Icon from 'components/core-ui-lib/Icon';
-import TabButton from 'components/core-ui-lib/TabButton';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import useAxios from 'hooks/useAxios';
 import SalesTable from 'components/global/salesTable';
 import Button from 'components/core-ui-lib/Button';
 import ArchSalesDialog, { ArchSalesDialogVariant } from './modal/ArchivedSalesDialog';
-import { VenueDTO } from 'interfaces';
+import { townState } from 'state/marketing/townState';
+import { venueState } from 'state/booking/venueState';
+import Tabs from 'components/core-ui-lib/Tabs';
+import { Tab } from '@headlessui/react';
+
+export type SelectOption = {
+  text: string;
+  value: any;
+};
+
+export type DataList = {
+  townList: Array<SelectOption>;
+  venueList: Array<SelectOption>;
+};
+
+export type VenueDetail = {
+  name: string;
+  code: string;
+  town: string;
+};
 
 const MarketingHome = () => {
-  const [currView, setCurrView] = useState<SalesTabs>('');
-  const selectedBtnClass = '!bg-primary-green/[0.30] !text-primary-navy';
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
-  const [sales, setSales] = useState<Array<SalesSnapshot>>([]);
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
-  const [archivedData, setArchivedData] = useState<VenueDTO>();
+  const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
-  // const [archivedSales, setArchivedSales] = useState>();
+  const [salesTable, setSalesTable] = useState<ReactNode>();
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const townList = useRecoilValue(townState);
+  const venueDict = useRecoilValue(venueState);
+
+  const tabs = [
+    'Sales',
+    'Archived Sales',
+    'Activities',
+    'Contact Notes',
+    'Venue Contacts',
+    'Promoter Holds',
+    'Attachments',
+  ];
 
   const { fetchData } = useAxios();
 
   const getSales = async (bookingId: string) => {
+    setSalesTable(<div />);
+
     const data = await fetchData({
       url: '/api/marketing/sales/read/' + bookingId,
       method: 'POST',
     });
 
-    setSales([]);
-
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
-      setSales(salesData);
-      setCurrView('sales');
+      setSalesTable(
+        <SalesTable
+          containerHeight="h-auto"
+          containerWidth="w-[1465px]"
+          module="marketing"
+          variant="salesSnapshot"
+          data={salesData}
+          booking={bookingId}
+        />,
+      );
     } else {
-      setSales([]);
+      setSalesTable(<div />);
     }
   };
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
-    const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
-    setArchivedData(selectedBooking.Venue);
+    if (variant === 'both') {
+      // get venue list
+      const venueTownData = {
+        townList: Object.values(townList).map((town) => {
+          return { text: town.Town, value: town.Town };
+        }),
+        venueList: Object.values(venueDict).map((venue) => {
+          return { text: venue.Code + ' ' + venue.Name, value: venue };
+        }),
+      };
+      setArchivedData(venueTownData);
+    } else {
+      const selectedBooking = bookings[0].bookings.find((booking) => booking.Id === bookings[0].selected);
+      // extract the venue name, code and town
+      const venue = {
+        name: selectedBooking.Venue.Name,
+        code: selectedBooking.Venue.Code,
+        town: Object.values(venueDict).find((x) => x.Code === selectedBooking.Venue.Code).Town,
+      };
+
+      setArchivedData(venue);
+    }
+
     setShowArchSalesModal(true);
   };
 
   const showArchivedSales = async (selection) => {
+    setArchivedSalesTable(<div />);
     const selectedBookings = selection.map((obj) => obj.bookingId);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -75,12 +133,13 @@ const MarketingHome = () => {
       );
       setArchivedDataAvail(true);
       setShowArchSalesModal(false);
+    } else {
+      setErrorMessage('There are no sales data available for this particular selection.');
     }
   };
 
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
-      setCurrView('');
       setBookingId(bookings[0].selected);
     }
   }, [bookings[0].selected]);
@@ -115,99 +174,25 @@ const MarketingHome = () => {
       </div>
 
       <div className="flex-grow flex flex-col">
-        <div className="flex flex-wrap items-center mb-4 -mt-5">
-          {' '}
-          <TabButton
-            text="Sales"
-            className={`w-[155px] ${currView === 'sales' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('sales')}
-          />
-          <TabButton
-            text="Archived Sales"
-            className={`w-[155px] ${currView === 'archived sales' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('archived sales')}
-          />
-          <TabButton
-            text="Activities"
-            className={`w-[155px] ${currView === 'activities' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('activities')}
-          />
-          <TabButton
-            text="Contact Notes"
-            className={`w-[155px] ${currView === 'contact notes' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('contact notes')}
-          />
-          <TabButton
-            text="Venue Contacts"
-            className={`w-[155px] ${currView === 'venue contacts' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('venue contacts')}
-          />
-          <TabButton
-            text="Promoter Holds"
-            className={`w-[155px] ${currView === 'promoter holds' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('promoter holds')}
-          />
-          <TabButton
-            text="Attachments"
-            className={`w-[155px] ${currView === 'attachments' && selectedBtnClass}`}
-            disabled={!productionId || bookingId === null}
-            variant="secondary"
-            onClick={() => setCurrView('attachments')}
-          />
-        </div>
+        <Tabs
+          selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy"
+          tabs={tabs}
+          disabled={!productionId || !bookingId}
+        >
+          <Tab.Panel className="h-[650px] overflow-y-hidden">{salesTable}</Tab.Panel>
 
-        <div className="h-[650px] overflow-y-hidden">
-          {currView === 'sales' && (
+          <Tab.Panel>
             <div>
-              {sales.length !== 0 && (
-                <SalesTable
-                  containerHeight="h-auto"
-                  containerWidth="w-[1465px]"
-                  module="marketing"
-                  variant="salesSnapshot"
-                  data={sales}
-                  booking={bookings[0].selected}
-                />
-              )}
-            </div>
-          )}
+              <div className="flex flex-row gap-4 mb-5">
+                <Button text="For this Venue" className="w-[132px]" onClick={() => showArchSalesComp('venue')} />
 
-          {currView === 'archived sales' && (
-            <div>
-              <div className="flex flex-row gap-4">
-                <Button
-                  text="For this Venue"
-                  className="w-[132px] mb-3 pl-6"
-                  onClick={() => showArchSalesComp('venue')}
-                />
+                <Button text="For this Town" className="w-[132px]" onClick={() => showArchSalesComp('town')} />
 
-                <Button
-                  text="For this Town"
-                  className="w-[132px] mb-3 pl-6"
-                  onClick={() => showArchSalesComp('town')}
-                />
-
-                <Button
-                  text="For this Venue / Town"
-                  className="w-[230px] mb-3 pl-6"
-                  onClick={() => showArchSalesComp('both')}
-                />
+                <Button text="Any Venue / Town" className="w-[132px]" onClick={() => showArchSalesComp('both')} />
 
                 <Button
                   text="Export Displayed Sales Data"
-                  className="w-[230px] mb-3 pl-6"
+                  className="w-[232px]"
                   iconProps={{ className: 'h-4 w-3 ml-5' }}
                   sufixIconName={'excel'}
                   disabled={!archivedDataAvail}
@@ -219,23 +204,20 @@ const MarketingHome = () => {
                   data={archivedData}
                   onCancel={() => setShowArchSalesModal(false)}
                   onSubmit={(bookings) => showArchivedSales(bookings)}
+                  error={errorMessage}
                 />
               </div>
 
               {archivedSalesTable}
             </div>
-          )}
+          </Tab.Panel>
 
-          {currView === 'activities' && <div>activities</div>}
-
-          {currView === 'contact notes' && <div>contact notes</div>}
-
-          {currView === 'venue contacts' && <div>venue contacts</div>}
-
-          {currView === 'promoter holds' && <div>promoter holds</div>}
-
-          {currView === 'attachments' && <div>attachments</div>}
-        </div>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">activities</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
+        </Tabs>
       </div>
     </div>
   );
