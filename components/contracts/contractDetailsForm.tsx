@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatInputDate from 'utils/dateInputFormat';
+import formatFormDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -10,6 +10,7 @@ import { loggingService } from '../../services/loggingService';
 import classNames from 'classnames';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { Spinner } from 'components/global/Spinner';
+import moment from 'moment';
 
 export const Label = (props: any) => {
   return (
@@ -177,11 +178,12 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
   useEffect(() => {
     if (activeContractData.length > 0) {
       const c = activeContractData[0];
+      console.log(moment(c.Contract?.SignedDate).format('DD-MM-YYYY'));
       setBookingDetails({
         ShowDate: c.ShowDate,
         VenueContractStatus: c.Contract?.StatusCode,
         DealType: c.Contract?.DealType,
-        ContractSignedDate: formatInputDate(c.Contract?.SignedDate),
+        ContractSignedDate: formatFormDate(c.Contract?.SignedDate),
         ContractSignedBy: c.Contract?.SignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
         RoyaltyPC: c.Contract?.RoyaltyPercentage,
@@ -190,9 +192,9 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
         TicketPriceNotes: c.TicketPriceNotes,
         BarringExemptions: c.BarringExemptions,
         ContractNotes: c.Contract?.ContractNotes,
-        GP: c.GP,
-        ContractReturnDate: formatInputDate(c.Contract?.ReturnDate),
-        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
+        GP: c.Performance?.length * c.Venue?.Seats * 30,
+        ContractReturnDate: formatFormDate(c.Contract?.ReturnDate),
+        ContractReceivedBackDate: formatFormDate(c.ContractReceivedBackDate),
         ContractCheckedBy: c.Contract?.CheckedBy,
         PreShow: c.Venue.BarringWeeksPre,
         PostShow: c.Venue.BarringWeeksPost,
@@ -287,6 +289,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
   if (loading) return <Spinner size="lg" className="mx-auto mt-20" />;
 
   if (bookingDetails) {
+    console.log(bookingDetails.ContractSignedDate, bookingDetails.ContractReturnDate);
     return (
       <>
         <StyledDialog open={!!saveChangesBookingId} title="Unsaved Changes" onClose={cancelNavigation}>
@@ -367,7 +370,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                 <Label htmlFor="signedon">Signed on:</Label>
                 <input
                   id="signedon"
-                  type="date"
+                  type="datetime"
                   value={bookingDetails.ContractSignedDate}
                   className="w-full border-none rounded-md"
                   onChange={(e) => formDataHandler('ContractSignedDate', e.currentTarget.value, '')}
@@ -377,27 +380,16 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                 {/* <select className="border-none rounded-md">
                   <option>Peter Carlyle</option>
                 </select> */}
-                <Label>Return Note By:</Label>
+                {/* <Label>Return Note By:</Label>
                 <select className="border-none rounded-md">
                   <option>-</option>
                   <option>PeterCarlyle</option>
-                </select>
+                </select> */}
                 <Label>Bank Details Sent</Label>
                 <select className="border-none rounded-md">
                   <option>Yes</option>
                   <option>No</option>
                 </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-8 mt-2">
-              <div>
-                <Label>Artifacts</Label>
-                <div className="mt-2">
-                  {savedFiles && savedFiles.map((file) => convertFileBuffer(file))}
-                  <FileUploadButton disabled fileData={fileData} setFileData={setFileData} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
                 <Label>Gross Potential: </Label>
                 <input
                   className="w-full border-none rounded-md"
@@ -412,6 +404,15 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   onChange={(e) => formDataHandler('RoyaltyPC', e.currentTarget.value, '')}
                   value={bookingDetails.RoyaltyPC}
                 />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-8 mt-2">
+              <div>
+                <Label>Artifacts</Label>
+                <div className="mt-2">
+                  {savedFiles && savedFiles.map((file) => convertFileBuffer(file))}
+                  <FileUploadButton disabled fileData={fileData} setFileData={setFileData} />
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-1 gap-2 mt-8">
@@ -466,7 +467,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   name="date"
                   className="border-gray-300 rounded-md w-full"
                   onChange={(e) => formDataHandler('BarringExemptions', e.currentTarget.value, '')}
-                  value={bookingDetails.BarringExemptions}
+                  value={bookingDetails.BarringExemptions || 'none'}
                 />
               </div>
 
