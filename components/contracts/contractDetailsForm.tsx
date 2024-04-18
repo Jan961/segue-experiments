@@ -329,7 +329,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   <option value="CRNR">CONTRACT RECEIVED NOT RETURNED</option>
                   <option value="CRQR">CONTRACT RECEIVED QUESTIONS RAISED</option>
                   <option value="CSAR">CONTRACT SIGNED & RETURNED</option>
-                  <option value="CSBP">CONTRACT SIGNED BOTH PARTIES AND UPLOADED</option>
+                  <option value="CSAF">CONTRACT SIGNED BOTH PARTIES AND FILED</option>
                 </select>
                 <Label htmlFor="checkedby">Checked By:</Label>
                 <input value={bookingDetails.ContractCheckedBy} />
