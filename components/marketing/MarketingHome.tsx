@@ -13,6 +13,8 @@ import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
+import { useRouter } from 'next/router';
+import { tabState } from 'state/marketing/tabState';
 
 export type SelectOption = {
   text: string;
@@ -43,6 +45,10 @@ const MarketingHome = () => {
   const [errorMessage, setErrorMessage] = useState<string>('');
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
+  const [tabSet, setTabSet] = useState<boolean>(false);
+  const [tabIndex, setTabIndex] = useRecoilState(tabState);
+
+  const router = useRouter();
 
   const tabs = [
     'Sales',
@@ -150,6 +156,17 @@ const MarketingHome = () => {
     }
   }, [bookingId]);
 
+  // using tabSet to ensure this is only run once
+  // when a production is selected this code was re-run as a result the tabIndex was set to 0
+  if (!tabSet) {
+    const currentTab = router.query.tabIndex;
+    if (currentTab !== undefined) {
+      const tabIStr = currentTab.toString();
+      setTabIndex(parseInt(tabIStr));
+      setTabSet(true);
+    }
+  }
+
   return (
     <div className="flex w-full h-full">
       {/* Green Box */}
@@ -178,6 +195,7 @@ const MarketingHome = () => {
           selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy"
           tabs={tabs}
           disabled={!productionId || !bookingId}
+          defaultIndex={tabIndex}
         >
           <Tab.Panel className="h-[650px] overflow-y-hidden">{salesTable}</Tab.Panel>
 
