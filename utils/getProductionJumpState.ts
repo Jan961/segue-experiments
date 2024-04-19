@@ -27,8 +27,8 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           IsArchived: t.IsArchived,
           ShowCode: t.Show.Code,
           ShowName: t.Show.Name,
-          StartDate: db?.StartDate,
-          EndDate: db?.EndDate,
+          StartDate: db?.StartDate || null,
+          EndDate: db?.EndDate || null,
         };
       })
       .sort((a, b) => {
