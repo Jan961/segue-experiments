@@ -143,6 +143,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         isBarred = true;
         info = info + `${uv.Name} bars ${bv.Name} over period overlap \n`;
       }
+
+      if (!isBarred) {
+        info = 'No Barring Issues found';
+      }
       const barredVenue = {
         id: bv.Id,
         bookingId: Id,

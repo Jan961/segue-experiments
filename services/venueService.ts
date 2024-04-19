@@ -46,14 +46,7 @@ export const getUniqueVenueTownlist = async () => {
 };
 
 export const getUniqueVenueCountrylist = async () => {
-  return await prisma.venueAddress.groupBy({
-    by: ['Country'],
-    where: {
-      Country: {
-        not: null,
-      },
-    },
-  });
+  return await prisma.Country.findMany({});
 };
 
 export interface DistanceStop {

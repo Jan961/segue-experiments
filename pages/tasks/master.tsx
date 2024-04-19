@@ -10,7 +10,7 @@ import MasterTaskList from 'components/tasks/MasterTaskList';
 
 const MasterTasks = () => {
   return (
-    <Layout title="Master Tasks | Seque">
+    <Layout title="Master Tasks | Segue">
       <div className="flex flex-col flex-auto">
         <h1 className="mb-4 text-3xl font-bold text-purple-900">{'Master Tasks | Segue'}</h1>
         <MasterTaskButtons />

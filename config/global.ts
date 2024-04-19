@@ -42,8 +42,8 @@ export const tasksIcon = {
 };
 
 export const tourManagementIcon = {
-  default: { iconName: 'touring-management', stroke: '', fill: '' },
-  active: { iconName: 'touring-management', stroke: '#7B568D;', fill: '#7B568D' },
+  default: { iconName: 'production-management', stroke: '', fill: '' },
+  active: { iconName: 'production-management', stroke: '#7B568D;', fill: '#7B568D' },
 };
 
 export const systemAdminIcon = {

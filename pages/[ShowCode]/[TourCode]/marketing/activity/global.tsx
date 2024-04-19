@@ -4,11 +4,11 @@ import SideMenu from 'components/sideMenu';
 import GlobalActivites from 'components/marketing/activity/globa';
 
 const Index = () => (
-  <Layout title="Global Activites | Seque">
-    <Toolbar></Toolbar>
+  <Layout title="Global Activites | Segue">
+    <Toolbar />
     <div className="flex flex-auto">
-      <SideMenu></SideMenu>
-      <GlobalActivites></GlobalActivites>
+      <SideMenu />
+      <GlobalActivites />
     </div>
   </Layout>
 );

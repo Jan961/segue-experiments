@@ -1,9 +1,50 @@
-import { GetServerSideProps } from 'next';
-import { ProductionSelector } from 'components/ProductionSelector';
-import { AllProductionPageProps, getAllProductionPageProps } from 'services/productionService';
+import Layout from 'components/Layout';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { useState } from 'react';
+import ContractDetailsForm from 'components/contracts/contractDetailsForm';
+import ContractListingPanel from 'components/contracts/contractListingPanel';
+import GlobalToolbar from 'components/toolbar';
+import { getProductionJumpState } from 'utils/getProductionJumpState';
+import { getAccountId, getEmailFromReq } from 'services/userService';
 
-const ShowSelection = ({ productions }: AllProductionPageProps) => <ProductionSelector productions={productions} />;
+const Index = ({ bookings }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const [activeContractIndex, setActiveContractIndex] = useState<number | null>(null);
 
-export const getServerSideProps: GetServerSideProps = (ctx) => getAllProductionPageProps(ctx);
+  function incrementActiveContractIndex() {
+    if (activeContractIndex < bookings.length + 1) {
+      setActiveContractIndex(activeContractIndex + 1);
+    }
+  }
 
-export default ShowSelection;
+  return (
+    <Layout title="Contracts | Segue">
+      <div className="flex flex-auto flex-col w-full">
+        <GlobalToolbar title={'Contracts'} />
+        <div className="flex-row flex">
+          <ContractListingPanel
+            bookings={bookings}
+            activeContractIndex={activeContractIndex}
+            setActiveContractIndex={setActiveContractIndex}
+          />
+          {activeContractIndex !== null && (
+            <ContractDetailsForm
+              incrementActiveContractIndex={incrementActiveContractIndex}
+              activeContract={bookings?.[activeContractIndex]?.Id}
+            />
+          )}
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const email = await getEmailFromReq(ctx.req);
+  const AccountId = await getAccountId(email);
+
+  const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
+
+  return { props: { bookings: [], initialState: { global: { productionJump } } } };
+};
+
+export default Index;

@@ -8,7 +8,6 @@ import { SegueLogo } from './global/SegueLogo';
 import useUrlPath from 'hooks';
 import useStrings from 'hooks/useStrings';
 import Icon from './core-ui-lib/Icon';
-import { ConfDialogVariant } from './core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface HeaderNavButtonProps {
   iconName: string;
@@ -57,33 +56,17 @@ const HeaderNavDivider = () => <span className="mx-2">{' | '}</span>;
 
 export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
   const [confirmVisible, setConfirmVisible] = useState<boolean>(false);
-  const [confVariant, setConfVariant] = useState<ConfDialogVariant>('return');
   const getString = useStrings();
   const router = useRouter();
   const { isHome, navigateToHome } = useUrlPath();
   const isCurrentPathHome = isHome();
   const { signOut } = useClerk();
 
-  // const onLogout = () => {
-  //   setConfirmVisible(true);
-  // };
-
-  const showConfirm = (type: ConfDialogVariant) => {
-    setConfVariant(type);
-    // don't attempt to return if on the dashboard
-    if (router.route === '/' && type === 'return') {
-      return;
-    }
-    setConfirmVisible(true);
-  };
-  const onYesClick = async () => {
-    if (confVariant === 'logout') {
-      userService.logout();
-      await signOut();
-      router.push('/');
-    } else if (confVariant === 'return') {
-      navigateToHome();
-    }
+  const onLogout = async () => {
+    setConfirmVisible(false);
+    userService.logout();
+    await signOut();
+    router.push('/');
   };
 
   return (
@@ -96,7 +79,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             </div>
             <SegueLogo
               className={`${!isCurrentPathHome ? 'cursor-pointer hover:scale-105' : ''}`}
-              onClick={() => showConfirm('return')}
+              onClick={navigateToHome}
             />
           </div>
           <div className="flex flex-row items-center">
@@ -111,7 +94,7 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
             <HeaderNavDivider />
             <HeaderNavButton
               iconName="exit"
-              onClick={() => showConfirm('logout')}
+              onClick={() => setConfirmVisible(true)}
               className="bg-primary-purple shadow-sm-shadow"
               containerClass="cursor-pointer hover:scale-105"
             >
@@ -120,10 +103,11 @@ export const HeaderNav = ({ menuIsOpen, setMenuIsOpen }: any) => {
           </div>
         </div>
       </div>
+
       <ConfirmationDialog
-        variant={confVariant}
+        variant={'logout'}
         show={confirmVisible}
-        onYesClick={onYesClick}
+        onYesClick={onLogout}
         onNoClick={() => setConfirmVisible(false)}
         hasOverlay={false}
       />

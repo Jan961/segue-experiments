@@ -66,13 +66,13 @@ const Filters = () => {
                 text="Go To Today"
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => gotoToday()}
-              ></Button>
+              />
               <Button
                 text="Tour Summary"
                 disabled={ProductionId === -1 || !ProductionId}
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => setShowProductionSummary(true)}
-              ></Button>
+              />
               {showProductionSummary && (
                 <Report
                   visible={showProductionSummary}
@@ -102,7 +102,7 @@ const Filters = () => {
             value={filter.venueText}
             onChange={onChange}
           />
-          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters}></Button>
+          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
       <BookingsButtons />

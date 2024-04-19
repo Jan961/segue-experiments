@@ -14,10 +14,10 @@ const Index = ({ activeProductions }: Props) => {
   const [searchFilter] = useState('');
 
   return (
-    <Layout title={pagetitle + '| Seque'}>
+    <Layout title={pagetitle + '| Segue'}>
       <div className="flex flex-col flex-auto">
         <h1 className="mb-4 text-3xl font-bold text-primary-green ">{pagetitle + ' | Segue'}</h1>
-        <Entry productions={activeProductions} searchFilter={searchFilter}></Entry>
+        <Entry productions={activeProductions} searchFilter={searchFilter} />
       </div>
     </Layout>
   );

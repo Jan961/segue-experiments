@@ -137,7 +137,7 @@ export const initialMainVenueDetails = {
   venueStatus: '',
   venueName: '',
   vatIndicator: false,
-  culturallyExemptVenue: false,
+  culturallyExempt: false,
   venueFamily: null,
   currency: '',
   venueCapacity: null,
@@ -148,14 +148,14 @@ export const initialMainVenueDetails = {
 };
 
 export const initialVenueAddressDetails = {
-  deliveryCountry: '',
+  deliveryCountry: null,
   deliveryPostCode: '',
   deliveryTown: '',
   deliveryAddress3: '',
   deliveryAddress2: '',
   deliveryAddress1: '',
 
-  primaryCountry: '',
+  primaryCountry: null,
   primaryPostCode: '',
   primaryTown: '',
   primaryAddress3: '',
@@ -166,9 +166,9 @@ export const initialVenueAddressDetails = {
 };
 
 export const initialVenueBarringRules = {
-  barringMiles: '',
-  postShow: '',
-  preShow: '',
+  barringMiles: null,
+  postShow: null,
+  preShow: null,
   barringClause: '',
 };
 

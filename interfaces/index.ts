@@ -97,6 +97,7 @@ export type BookingDTO = {
   CastRateTicketsNotes?: string;
   PerformanceIds?: number[];
   RunTag: string;
+  LandingPageURL: string;
 };
 
 export type GetInFitUpDTO = {
@@ -174,13 +175,15 @@ export type OtherDTO = {
   RunTag: string;
 };
 
+export type VenueDTO = {
+  Id: number;
+  Code: string;
+  Website: string;
+  Name: string;
+};
+
 export type BookingWithVenueDTO = BookingDTO & {
-  Venue: {
-    Id: number;
-    Code: string;
-    Website: string;
-    Name: string;
-  };
+  Venue: VenueDTO;
   ProductionId?: number;
 };
 
@@ -357,6 +360,11 @@ export interface IBookingDetails {
   ShowDate: string;
   TicketPriceNotes: string;
   VenueContractStatus: string;
+  PreShow?: number;
+  PostShow?: number;
+  BarringClause?: string;
+  BarringMiles?: number;
+  MerchandiseNotes?: string;
 }
 
 export interface IAttachedFile {

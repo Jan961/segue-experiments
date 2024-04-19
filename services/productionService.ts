@@ -149,6 +149,7 @@ const productionContentInclude = Prisma.validator<Prisma.ProductionSelect>()({
     include: {
       Booking: {
         include: {
+          Venue: true,
           Performance: true,
         },
       },
