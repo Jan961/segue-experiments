@@ -17,7 +17,19 @@ export interface TextInputProps {
   onFocus?: (e: any) => void;
   onBlur?: (e: any) => void;
   type?: string;
+  showBorder?: boolean;
 }
+
+const hideBorder = {
+    border: 'none',
+    outline: 'none',
+    boxShadow: 'none',
+    "&:focus": {
+      outline: 'none',
+      boxShadow: 'none'
+    }
+  }
+
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
   (
@@ -32,6 +44,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       iconName,
       error,
       inputClassName,
+      showBorder = true,
       ...rest
     },
     ref,
@@ -53,6 +66,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           placeholder={placeholder}
           disabled={disabled}
           value={value || ''}
+          style={showBorder ? {} : hideBorder}
           {...rest}
         />
         {iconName && (

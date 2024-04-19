@@ -219,6 +219,11 @@ export type ActivityDTO = {
   Notes: string;
 };
 
+export type ActivityTypeDTO = {
+  Name: string;
+  Id: number;
+}
+
 export type BookingContactNoteDTO = {
   Id?: number;
   BookingId: number;

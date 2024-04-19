@@ -16,6 +16,7 @@ import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
 import ActivityModal from './modal/ActivityModal';
+import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 
 export type SelectOption = {
   text: string;
@@ -33,6 +34,11 @@ export type VenueDetail = {
   town: string;
 };
 
+type ActivityList = {
+  activities: Array<ActivityDTO>;
+  activityTypes: Array<ActivityTypeDTO>
+}
+
 const MarketingHome = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
@@ -41,6 +47,7 @@ const MarketingHome = () => {
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
+  const [activityTypes, setActivityTypes] = useState<Array<SelectOption>>(null);
   const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
   const [salesTable, setSalesTable] = useState<ReactNode>();
@@ -146,6 +153,23 @@ const MarketingHome = () => {
     }
   };
 
+  const getActivities = async (bookingId: string) => {
+    const data = await fetchData({
+      url: '/api/marketing/activities/' + bookingId,
+      method: 'POST',
+    });
+
+    if (typeof data === 'object') {
+      const activityList = data as ActivityList;
+
+      const actTypes = activityList.activityTypes.map((type) => {
+        return { text: type.Name, value: type.Id };
+      });
+
+      setActivityTypes(actTypes)
+    }
+  }
+
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
@@ -155,6 +179,7 @@ const MarketingHome = () => {
   useEffect(() => {
     if (bookingId) {
       getSales(bookingId.toString());
+      getActivities(bookingId.toString());
     }
   }, [bookingId]);
 
@@ -239,7 +264,12 @@ const MarketingHome = () => {
                 className="w-[400px]"
                 onClick={() => setShowActivityModal(true)}
               />
-              <ActivityModal show={showActivityModal} onCancel={() => setShowActivityModal(false)} />
+              <ActivityModal 
+                show={showActivityModal} 
+                onCancel={() => setShowActivityModal(false)} 
+                variant='add' 
+                activityTypes={activityTypes}
+              />
             </div>
           </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
