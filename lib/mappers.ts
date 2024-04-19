@@ -156,7 +156,7 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   IsArchived: t.IsArchived,
   SalesEmail: t.SalesEmail,
   SalesFrequency: t.SalesFrequency,
-  RegionId: t.ProductionRegion.map((productionReg) => productionReg.PRRegionId),
+  RegionId: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({

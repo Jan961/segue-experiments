@@ -76,7 +76,6 @@ const ShowsTable = ({
   }, [isAddRow, tableRef]);
 
   const handleCellClick = async (e) => {
-    console.log(e);
     setShowId(e.data.Id);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {

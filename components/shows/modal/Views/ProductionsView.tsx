@@ -1,4 +1,3 @@
-// import axios from "axios";
 import axios from 'axios';
 import { styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
@@ -12,11 +11,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 
-type ProductionsViewProps = {
+interface ProductionsViewProps {
   showData: any;
   showName: string;
   onClose: () => void;
-};
+}
 
 const intProduction = {
   Id: null,
