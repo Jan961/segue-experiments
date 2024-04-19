@@ -7,21 +7,25 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
+import { ActivityDTO } from 'interfaces';
+import formatInputDate from 'utils/dateInputFormat';
 
-type ActivityModalVariant = 'add' | 'edit';
+export type ActivityModalVariant = 'add' | 'edit';
 
 const titleOptions = {
   add: 'Add New Actvity',
-  edit: 'Edit Activity'
-}
+  edit: 'Edit Activity',
+};
 
 interface ActivityModalProps {
   show: boolean;
   onCancel: () => void;
-  onSave: () => void;
+  onSave: (variant: ActivityModalVariant, data: ActivityDTO) => void;
   variant: ActivityModalVariant;
   activityTypes: Array<SelectOption>;
   venueCurrency?: string;
+  bookingId;
+  data?: ActivityDTO;
 }
 
 export default function ActivityModal({
@@ -30,7 +34,9 @@ export default function ActivityModal({
   variant,
   onSave,
   activityTypes,
-  venueCurrency = '£'
+  venueCurrency = '£',
+  bookingId,
+  data,
 }: Partial<ActivityModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
@@ -44,7 +50,47 @@ export default function ActivityModal({
 
   useEffect(() => {
     setVisible(show);
+    initForm();
   }, [show]);
+
+  const initForm = () => {
+    if (variant === 'add') {
+      setActName('');
+      setActType(null);
+      setActDate(null);
+      setActFollowUp(false);
+      setFollowUpDt(null);
+      setCompanyCost('');
+      setVenueCost('');
+      setActNotes('');
+    } else if (variant === 'edit') {
+      setActName(data.Name);
+      setActType(data.ActivityTypeId);
+      setActDate(new Date(data.Date));
+      setActFollowUp(data.FollowUpRequired);
+      setFollowUpDt(new Date(data.FollowUpDate));
+      setCompanyCost(data.CompanyCost.toString());
+      setVenueCost(data.VenueCost.toString());
+      setActNotes(data.Notes);
+    }
+  };
+
+  const handleSave = () => {
+    const data: ActivityDTO = {
+      ActivityTypeId: actType,
+      BookingId: bookingId,
+      CompanyCost: parseFloat(companyCost),
+      VenueCost: parseFloat(venueCost),
+      Date: formatInputDate(actDate),
+      FollowUpRequired: actFollowUp,
+      FollowUpDate: formatInputDate(followUpDt),
+      Name: actName,
+      Notes: actNotes,
+      Id: null,
+    };
+
+    onSave(variant, data);
+  };
 
   return (
     <PopupModal show={visible} onClose={onCancel} showCloseIcon={true} hasOverlay={false}>
@@ -53,7 +99,7 @@ export default function ActivityModal({
         <div className="text-base font-bold text-primary-input-text">Activity Name</div>
         <TextInput
           className="w-full mb-4"
-          placeholder='Enter Activity Name'
+          placeholder="Enter Activity Name"
           id="input"
           value={actName}
           onChange={(event) => setActName(event.target.value)}
@@ -67,20 +113,20 @@ export default function ActivityModal({
           placeholder={'Please select from Venue or Town'}
           isClearable
           isSearchable
-          label='Type'
+          label="Type"
         />
 
-        <div className='flex flex-row mb-4'>
-          <div className='flex flex-col'>
+        <div className="flex flex-row mb-4">
+          <div className="flex flex-col">
             <DateInput
               onChange={(value) => setActDate(value)}
               value={actDate}
-              label='Date'
-              labelClassName='text-primary-input-text'
+              label="Date"
+              labelClassName="text-primary-input-text"
             />
           </div>
 
-          <div className='flex flex-col ml-[50px]'>
+          <div className="flex flex-col ml-[50px]">
             <Checkbox
               className="ml-5 mt-2"
               labelClassName="!text-base text-primary-input-text"
@@ -94,32 +140,31 @@ export default function ActivityModal({
         </div>
 
         {actFollowUp && (
-          <div className='flex flex-row mb-3'>
+          <div className="flex flex-row mb-3">
             <div className="text-base font-bold text-primary-input-text flex flex-col">Follow Up Date</div>
 
-            <div className='flex flex-col ml-5 -mt-1'>
+            <div className="flex flex-col ml-5 -mt-1">
               <DateInput
                 onChange={(value) => setFollowUpDt(value)}
                 value={followUpDt}
-                label='Date'
-                labelClassName='text-primary-input-text'
+                label="Date"
+                labelClassName="text-primary-input-text"
               />
             </div>
           </div>
         )}
 
-
-        <div className='flex flex-row'>
-          <div className='flex flex-col mr-[50px]'>
+        <div className="flex flex-row">
+          <div className="flex flex-col mr-[50px]">
             <div className="text-base font-bold text-primary-input-text">Company Cost</div>
-            <div className='flex flex-row'>
-              <div className='flex flex-col mr-2'>
+            <div className="flex flex-row">
+              <div className="flex flex-col mr-2">
                 <div className="text-base font-bold text-primary-input-text">{venueCurrency}</div>
               </div>
-              <div className='flex flex-col'>
+              <div className="flex flex-col">
                 <TextInput
                   className="w-full mb-4"
-                  placeholder='00.00'
+                  placeholder="00.00"
                   id="input"
                   value={companyCost}
                   onChange={(event) => setCompanyCost(event.target.value)}
@@ -128,16 +173,16 @@ export default function ActivityModal({
             </div>
           </div>
 
-          <div className='flex flex-col'>
+          <div className="flex flex-col">
             <div className="text-base font-bold text-primary-input-text">Venue Cost</div>
-            <div className='flex flex-row'>
-              <div className='flex flex-col mr-2'>
+            <div className="flex flex-row">
+              <div className="flex flex-col mr-2">
                 <div className="text-base font-bold text-primary-input-text">{venueCurrency}</div>
               </div>
-              <div className='flex flex-col'>
+              <div className="flex flex-col">
                 <TextInput
                   className="w-full mb-4"
-                  placeholder='00.00'
+                  placeholder="00.00"
                   id="input"
                   value={venueCost}
                   onChange={(event) => setVenueCost(event.target.value)}
@@ -151,15 +196,14 @@ export default function ActivityModal({
         <TextArea
           className={'mt-2 h-[162px] w-full'}
           value={actNotes}
-          placeholder='Notes Field'
+          placeholder="Notes Field"
           onChange={(e) => setActNotes(e.target.value)}
         />
 
         <div className="float-right flex flex-row mt-5 py-2">
           <Button className="ml-4 w-[132px]" onClick={onCancel} variant="secondary" text="Cancel" />
-          <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close                " onClick={onSave} />
+          <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
         </div>
-
       </div>
     </PopupModal>
   );

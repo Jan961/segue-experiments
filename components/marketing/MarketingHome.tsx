@@ -15,7 +15,7 @@ import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
-import ActivityModal from './modal/ActivityModal';
+import ActivityModal, { ActivityModalVariant } from './modal/ActivityModal';
 import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 
 export type SelectOption = {
@@ -36,8 +36,8 @@ export type VenueDetail = {
 
 type ActivityList = {
   activities: Array<ActivityDTO>;
-  activityTypes: Array<ActivityTypeDTO>
-}
+  activityTypes: Array<ActivityTypeDTO>;
+};
 
 const MarketingHome = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
@@ -161,14 +161,26 @@ const MarketingHome = () => {
 
     if (typeof data === 'object') {
       const activityList = data as ActivityList;
+      console.log(activityList);
 
       const actTypes = activityList.activityTypes.map((type) => {
         return { text: type.Name, value: type.Id };
       });
 
-      setActivityTypes(actTypes)
+      setActivityTypes(actTypes);
     }
-  }
+  };
+
+  const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
+    const response = await fetchData({
+      url: '/api/marketing/activities/create',
+      method: 'POST',
+      data,
+    });
+
+    alert(JSON.stringify(response));
+    setShowActivityModal(false);
+  };
 
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
@@ -264,11 +276,13 @@ const MarketingHome = () => {
                 className="w-[400px]"
                 onClick={() => setShowActivityModal(true)}
               />
-              <ActivityModal 
-                show={showActivityModal} 
-                onCancel={() => setShowActivityModal(false)} 
-                variant='add' 
+              <ActivityModal
+                show={showActivityModal}
+                onCancel={() => setShowActivityModal(false)}
+                variant="add"
                 activityTypes={activityTypes}
+                onSave={(variant, data) => saveActivity(variant, data)}
+                bookingId={bookingId}
               />
             </div>
           </Tab.Panel>

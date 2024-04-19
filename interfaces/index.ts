@@ -216,13 +216,14 @@ export type ActivityDTO = {
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
+  FollowUpDate: string;
   Notes: string;
 };
 
 export type ActivityTypeDTO = {
   Name: string;
   Id: number;
-}
+};
 
 export type BookingContactNoteDTO = {
   Id?: number;
