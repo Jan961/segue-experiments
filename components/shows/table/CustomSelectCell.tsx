@@ -37,8 +37,6 @@ const CustomSelectCell = ({
   const CustomOption = ({ option }: { option: OptionProps }) => {
     const { label, isSelected } = option;
 
-    console.log(label, isSelected, option);
-
     return (
       <components.Option {...option}>
         <div>
@@ -63,7 +61,7 @@ const CustomSelectCell = ({
         onChange={handleChange}
         className="ag-custom-component-popup !z-50 rounded p-1"
         placeholder={placeholder}
-        value={defaultValue || value}
+        value={value || defaultValue}
         isMulti={isMulti}
         ref={selectRef}
         renderOption={(option) => <CustomOption option={option} />}

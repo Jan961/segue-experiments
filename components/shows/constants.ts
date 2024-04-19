@@ -11,19 +11,15 @@ export const SALES_FIG_OPTIONS = [
 
 export const REGIONS_LIST = [
   {
-    value: 'all',
-    text: 'All Regions',
-  },
-  {
-    value: 'ukregion',
+    value: '8',
     text: 'UK, Ire, Channel Islands, IOM',
   },
   {
-    value: 'europe',
+    value: '4',
     text: 'Mainland Europe',
   },
   {
-    value: 'scandinavia',
+    value: '6',
     text: 'Scandinavia',
   },
   {
@@ -31,23 +27,55 @@ export const REGIONS_LIST = [
     text: 'Middle East',
   },
   {
-    value: 'asia',
+    value: '2',
     text: 'Asia',
   },
   {
-    value: 'auszone',
+    value: '3',
     text: 'Aus, NZ, S Pacific',
   },
   {
-    value: 'africa',
+    value: '1',
     text: 'Africa',
   },
   {
-    value: 'northAmerica',
+    value: '5',
     text: 'North America',
   },
   {
-    value: 'southAmerica',
+    value: '7',
     text: 'South America',
   },
 ];
+
+export const getConvertedPayload = (input) => {
+  const output = {
+    ShowId: input.ShowId,
+    Code: input.Code,
+    SalesEmail: input.SalesEmail,
+    IsArchived: input.IsArchived,
+    SalesFrequency: input.SalesFrequency,
+    RegionId: input.RegionId,
+    DateBlock: [],
+  };
+
+  if ('DateBlock[0].StartDate' in input) {
+    output.DateBlock.push({
+      Name: 'Rehearsal',
+      StartDate: input['DateBlock[0].StartDate'],
+      EndDate: input['DateBlock[0].EndDate'],
+      IsPrimary: true,
+    });
+  }
+
+  if ('DateBlock[1].StartDate' in input) {
+    output.DateBlock.push({
+      Name: 'Production',
+      StartDate: input['DateBlock[1].StartDate'],
+      EndDate: input['DateBlock[1].EndDate'],
+      IsPrimary: false,
+    });
+  }
+
+  return output;
+};

@@ -9,6 +9,7 @@ import { showMapper, showProductionMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
 import { useMemo, useState } from 'react';
+import { getRegionlist } from 'services/productionService';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { showsList = [] } = props;
@@ -75,7 +76,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
   const shows = (await getShowsByAccountId(AccountId)) || [];
-  console.log(shows);
+  const regionsList = await getRegionlist();
+
   const showsList = shows.map((show) => {
     return {
       ...showMapper(show),
@@ -91,6 +93,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     props: {
       showsList,
       initialState,
+      regionsList,
     },
   };
 };

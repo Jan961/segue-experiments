@@ -113,16 +113,16 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Rehearsals',
-    headerClass: 'justify-center font-bold text-base ',
+    headerGroupComponent: 'AGGridHeaderGroupComponent',
+    headerClass: 'justify-center font-bold text-base border-r-4',
     marryChildren: true,
     children: [
       {
         headerName: 'Start',
         field: 'DateBlock[1].StartDate',
-        // cellRendererParams: {
-        //   internalField: 'StartDate',
-        //   fieldIndex: 1,
-        // },
+        valueGetter: function (params) {
+          return params.data?.DateBlock ? params.data?.DateBlock[1]?.StartDate : null;
+        },
         cellStyle: {
           paddingRight: '0.1em',
           paddingLeft: '0.1em',
@@ -138,10 +138,9 @@ export const productionsTableConfig = [
       {
         headerName: 'End',
         field: 'DateBlock[1].EndDate',
-        // cellRendererParams: {
-        //   internalField: 'EndDate',
-        //   fieldIndex: 1,
-        // },
+        valueGetter: function (params) {
+          return params.data?.DateBlock ? params.data?.DateBlock[1]?.EndDate : null;
+        },
         cellStyle: {
           paddingRight: '0.1em',
           paddingLeft: '0.1em',
@@ -158,16 +157,16 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Production Dates',
-    headerClass: 'justify-center font-bold text-base ',
+    headerGroupComponent: 'AGGridHeaderGroupComponent',
+    headerClass: 'justify-center font-bold text-base border-r-4',
     marryChildren: true,
     children: [
       {
         headerName: 'Start',
         field: 'DateBlock[0].StartDate',
-        // cellRendererParams: {
-        //   internalField: 'StartDate',
-        //   fieldIndex: 0,
-        // },
+        valueGetter: function (params) {
+          return params.data?.DateBlock ? params.data?.DateBlock[0]?.StartDate : null;
+        },
         cellStyle: {
           paddingRight: '0.1em',
           overflow: 'visible',
@@ -183,10 +182,9 @@ export const productionsTableConfig = [
       {
         headerName: 'End',
         field: 'DateBlock[0].EndDate',
-        // cellRendererParams: {
-        //   internalField: 'EndDate',
-        //   fieldIndex: 0,
-        // },
+        valueGetter: function (params) {
+          return params.data?.DateBlock ? params.data?.DateBlock[0]?.EndDate : null;
+        },
         width: 120,
         cellStyle: {
           paddingRight: '0.1em',
@@ -228,7 +226,7 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Email Address for Sales Figures',
-    field: 'salesEmail',
+    field: 'SalesEmail',
     cellRendererParams: {
       placeholder: 'Enter email address',
     },
@@ -238,7 +236,7 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Input Freq of Sales Figs',
-    field: 'salesFrequency',
+    field: 'SalesFrequency',
     width: 120,
     cellRenderer: CustomSelectCell,
     cellRendererParams: {

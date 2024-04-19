@@ -6,6 +6,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Table from 'components/core-ui-lib/Table';
 import { LoadingOverlay } from 'components/shows/ShowsTable';
+import { getConvertedPayload } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -24,24 +25,11 @@ const intProduction = {
   ShowName: '',
   ShowCode: '',
   IsArchived: false,
-  DateBlock: [
-    {
-      EndDate: new Date(),
-      Id: '',
-      IsPrimary: false,
-      Name: 'Production',
-      StartDate: new Date(),
-    },
-    {
-      EndDate: new Date(),
-      Id: '',
-      IsPrimary: false,
-      Name: 'Reharsals',
-      StartDate: new Date(),
-    },
-  ],
   StartDate: '',
   EndDate: '',
+  SalesFrequency: '',
+  SalesEmail: '',
+  RegionId: [],
 };
 
 const rowClassRules = {
@@ -99,7 +87,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   useEffect(() => {
     if (isAddRow) {
       applyTransactionToGrid(tableRef, {
-        add: [{ ...intProduction, ShowName: showData.Name, ShowCode: showData.Code, highlightRow: true }],
+        add: [
+          {
+            ...intProduction,
+            ShowId: showData.Id,
+            ShowName: showData.Name,
+            ShowCode: showData.Code,
+            highlightRow: true,
+          },
+        ],
         addIndex: 0,
       });
     }
@@ -132,10 +128,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (isAddRow && e.column.colId === 'editId') {
       setIsLoading(true);
       try {
-        console.log(showData, currentProduction, e);
-        // const data = { ...intProduction, Code: showData.ShowCode, Name: showData.ShowName };
-        // delete data.Id;
-        // await axios.post(`/api/productions/create`, data);
+        const payloadData = getConvertedPayload(e.data);
+        await axios.post(`/api/productions/create`, payloadData);
       } finally {
         setIsEdited(false);
         setCurrentProduction(intProduction);
@@ -184,7 +178,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           </div>
         </div>
       </div>
-      <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
+      <div className=" w-[750px] lg:w-[1568px] h-full flex flex-col ">
         <Table
           ref={tableRef}
           columnDefs={productionsTableConfig}
