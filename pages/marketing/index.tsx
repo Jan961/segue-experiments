@@ -36,7 +36,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const bookings = await getSaleableBookings(productionId);
     const venueRoles = await getRoles();
     const selected = null;
-    
+
     const bookingJump: BookingJump = {
       selected,
       bookings: bookings.map(bookingMapperWithVenue),
@@ -54,7 +54,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
       },
     );
-  
+
     // See _app.tsx for how this is picked up
     initialState = {
       global: {
@@ -64,7 +64,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
         towns: townList,
-        venueList: venue
+        venueList: venue,
+        defaultTab: 0,
       },
     };
   } else {

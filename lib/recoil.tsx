@@ -20,6 +20,7 @@ import { MasterTaskStateType, masterTaskState } from 'state/tasks/masterTaskStat
 import { tasksfilterState, TasksFilterType } from 'state/tasks/tasksFilterState';
 import { GlobalStateType, globalState } from 'state/global/globalState';
 import { townState } from 'state/marketing/townState';
+import { tabState } from 'state/marketing/tabState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -54,6 +55,7 @@ export type InitialState = Partial<{
     venueRole?: VenueRole;
     towns?: Array<string>;
     venueList?: Record<number, VenueMinimalDTO>;
+    defaultTab?: number;
   };
   account?: {
     user: UserState;
@@ -92,7 +94,8 @@ const states: {
     bookingJump: bookingJumpState,
     venueRole: venueRoleState,
     towns: townState,
-    venueList: venueState
+    venueList: venueState,
+    defaultTab: tabState,
   },
   account: {
     user: userState,
