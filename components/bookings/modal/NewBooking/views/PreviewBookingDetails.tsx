@@ -36,12 +36,7 @@ export type PreviewBookingDetailsProps = {
   dayTypeOptions: SelectOption[];
   updateModalTitle: (title: string) => void;
 };
-export default function PreviewBookingDetails({
-  formData,
-  productionCode,
-  data,
-  dayTypeOptions,
-}: PreviewBookingDetailsProps) {
+export default function PreviewBookingDetails({ productionCode, data, dayTypeOptions }: PreviewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
   const production = useRecoilValue(currentProductionSelector);
   const { rows: bookings } = useRecoilValue(rowsSelector);
@@ -163,7 +158,8 @@ export default function PreviewBookingDetails({
       };
     });
 
-    const { fromDate, toDate } = formData;
+    const fromDate = data[0].dateAsISOString;
+    const toDate = data.length > 1 ? data[data.length - 1].dateAsISOString : fromDate;
     const fromDateAsDate = parseISO(fromDate);
     const toDateAsDate = parseISO(toDate);
     const pastStartDate = subDays(fromDateAsDate, 6);
