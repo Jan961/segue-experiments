@@ -7,7 +7,6 @@ import PreviewBookingDetails, { PreviewBookingDetailsProps } from './PreviewBook
 type CheckMileageViewProps = PreviewBookingDetailsProps & {
   updateModalTitle: (title: string) => void;
   previousView: string;
-  isNewBooking: boolean;
 };
 export default function CheckMileageView(props: CheckMileageViewProps) {
   const { goToStep } = useWizard();
