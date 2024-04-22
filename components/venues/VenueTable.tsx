@@ -8,14 +8,14 @@ type Props = {
 };
 
 const VenueTable = ({ items, onSelectVenue }: Props) => {
-  const onRowSelected = (e: any) => {
+  const handleCellClick = (e: { data: UiTransformedVenue }) => {
     onSelectVenue(e.data);
   };
 
   return (
     <div className="w-full h-[calc(100%-140px)] min-h-[150px]">
       <Table
-        onRowSelected={onRowSelected}
+        onCellClicked={handleCellClick}
         columnDefs={items === null ? null : venueColumnDefs}
         rowData={items}
         styleProps={styleProps}
