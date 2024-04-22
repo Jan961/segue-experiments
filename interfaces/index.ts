@@ -152,7 +152,8 @@ export type ProductionDTO = {
   EndDate?: string;
   SalesEmail?: string;
   SalesFrequency?: string;
-  RegionId?: number[];
+  RegionList?: number[];
+  IsDeleted?: boolean;
 };
 
 export type VenueMinimalDTO = {

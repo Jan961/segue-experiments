@@ -219,7 +219,7 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Region',
-    field: 'regionId',
+    field: 'RegionList',
     cellRenderer: CustomSelectCell,
     cellRendererParams: {
       options: REGIONS_LIST,

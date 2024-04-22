@@ -112,6 +112,7 @@ export const getAllProductions = async (AccountId: number) => {
       DateBlock: true,
     },
     where: {
+      IsDeleted: false,
       Show: {
         is: {
           AccountId,

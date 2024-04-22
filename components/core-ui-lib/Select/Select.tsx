@@ -32,13 +32,13 @@ const DropdownIndicator = (props: DropdownIndicatorProps) => {
   );
 };
 
-const formatOptionLabel = ({ value, label }, { context }) => {
+const formatOptionLabel = ({ value, text }, { context }) => {
   if (context === 'value') {
-    return value;
+    return text;
   } else if (value.length > 2) {
     return `+${value.length} selected`;
   }
-  return label;
+  return text;
 };
 
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
@@ -160,7 +160,7 @@ export default forwardRef(function Select(
 
   const handleOptionSelect = (o: SelectOption) => {
     setSelectedOption(o);
-    if (isMulti) onChange(o.map((option) => option.text));
+    if (isMulti) onChange(o.map((option) => option.value));
     else onChange(o ? o.value : null);
   };
 

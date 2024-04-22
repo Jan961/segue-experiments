@@ -1,11 +1,11 @@
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import ProductionsView from './Views/ProductionsView';
 
-type ProductionsProps = {
+interface ProductionsProps {
   visible: boolean;
   onClose: (production?: any) => void;
   showData: any;
-};
+}
 
 const Prodcutions = ({ visible, onClose, showData }: ProductionsProps) => {
   return (

@@ -22,6 +22,9 @@ const CustomSelectCell = ({
   defaultValue = '',
   value,
   isMulti = false,
+  node,
+  colDef,
+  data,
   ...props
 }: CustomSelectCellProps) => {
   const selectRef = useRef(null);
@@ -30,8 +33,12 @@ const CustomSelectCell = ({
     selectRef.current.focus();
   };
 
-  const handleChange = (e) => {
-    setValue(e);
+  const handleChange = (optValue) => {
+    setValue(optValue);
+    node.setData({
+      ...data,
+      [colDef?.field]: optValue,
+    });
   };
 
   const CustomOption = ({ option }: { option: OptionProps }) => {
@@ -53,6 +60,8 @@ const CustomSelectCell = ({
     );
   };
 
+  const defaultVal = !isMulti ? defaultValue : [];
+
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
       <Select
@@ -61,7 +70,7 @@ const CustomSelectCell = ({
         onChange={handleChange}
         className="ag-custom-component-popup !z-50 rounded p-1"
         placeholder={placeholder}
-        value={value || defaultValue}
+        value={value || defaultVal}
         isMulti={isMulti}
         ref={selectRef}
         renderOption={(option) => <CustomOption option={option} />}

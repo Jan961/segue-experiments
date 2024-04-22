@@ -28,7 +28,7 @@ const intProduction = {
   EndDate: '',
   SalesFrequency: '',
   SalesEmail: '',
-  RegionId: [],
+  RegionList: [],
 };
 
 const rowClassRules = {
@@ -60,6 +60,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     },
   };
 
+  console.log(showData);
+
   const addNewRow = () => {
     setIsAddRow(!isAddRow);
   };
@@ -67,16 +69,16 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [isArchived, setIsArchived] = useState<boolean>(false);
 
   const unArchivedList = useMemo(() => {
-    return showData.productions.filter((item) => !item.IsArchived);
+    return showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted);
   }, [showData, isArchived]);
 
   const archivedList = useMemo(() => {
-    return showData.productions.filter((item) => item.IsArchived);
+    return showData.productions.filter((item) => item.IsArchived && !item.IsDeleted);
   }, [showData, isArchived]);
 
   const rowsData = useMemo(() => {
-    return [...unArchivedList, ...archivedList];
-    // return [...unArchivedList];
+    if (isArchived) return [...unArchivedList, ...archivedList];
+    return [...unArchivedList];
   }, [unArchivedList, archivedList, isArchived]);
 
   const handleArchive = () => {
@@ -124,10 +126,17 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         setCurrentProduction(intProduction);
         router.replace(router.asPath);
       }
-    } else if (isAddRow && e.column.colId === 'editId') {
+    } else if (
+      isAddRow &&
+      e.column.colId === 'editId' &&
+      e.data.Code &&
+      'DateBlock[0].StartDate' in e.data &&
+      'DateBlock[0].EndDate' in e.data
+    ) {
       setIsLoading(true);
       try {
         const payloadData = getConvertedPayload(e.data);
+        console.log(e.data, payloadData);
         await axios.post(`/api/productions/create`, payloadData);
       } finally {
         setIsEdited(false);

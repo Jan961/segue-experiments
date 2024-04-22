@@ -37,7 +37,7 @@ export default function BookingsButtons() {
           text="Create New Booking"
           className="w-[155px]"
           onClick={() => setAddNewBookingModalVisible({ visible: true, startDate: null, endDate: null })}
-         />
+        />
       </Tooltip>
       <Button
         disabled={disabled}
@@ -46,20 +46,20 @@ export default function BookingsButtons() {
         iconProps={{ className: 'h-4 w-3' }}
         sufixIconName={'excel'}
         onClick={() => setShowBookingReportsModal(true)}
-       />
+      />
       <Button
         onClick={() => setShowVenueHistory(true)}
         disabled={disabled}
         text="Venue History"
         className="w-[155px]"
-       />
+      />
 
       <Button
         disabled={disabled}
         text="Barring Check"
         className="w-[155px]"
         onClick={() => setShowBarringModal(true)}
-       />
+      />
 
       {showBarringModal && <Barring visible={showBarringModal} onClose={() => setShowBarringModal(false)} />}
 
