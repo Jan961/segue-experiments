@@ -81,7 +81,7 @@ export default function NewBookingDetailsView({
       direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
     const date = formattedDateWithWeekDay(rowDate, 'Short');
     const dateAsISOString = rowDate.toISOString();
-    const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, isRunOfDates: true };
+    const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, id: null, isRunOfDates: true };
     applyTransactionToGrid(tableRef, { add: [rowToAdd], addIndex: direction === 'before' ? 0 : index + 1 });
     tableRef.current.getApi().redrawRows();
   };

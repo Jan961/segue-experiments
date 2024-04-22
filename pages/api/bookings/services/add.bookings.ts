@@ -33,22 +33,6 @@ export class BookingService {
         } = bookingData || {};
 
         if (isBooking) {
-          /* const Performances =
-            performanceTimes.length > 0
-              ? performanceTimes.map((time) => {
-                  const datePart = BookingDate.split('T')[0];
-                  return {
-                    Time: `${datePart}T${time}:00Z`,
-                    Date: BookingDate,
-                  };
-                })
-              : [
-                  {
-                    Time: null,
-                    Date: BookingDate,
-                  },
-                ]; */
-
           const bookingPromise = createNewBooking(
             {
               DateBlockId,
