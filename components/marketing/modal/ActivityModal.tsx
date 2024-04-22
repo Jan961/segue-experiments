@@ -8,7 +8,6 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { ActivityDTO } from 'interfaces';
-import formatInputDate from 'utils/dateInputFormat';
 
 export type ActivityModalVariant = 'add' | 'edit';
 
@@ -68,7 +67,7 @@ export default function ActivityModal({
       setActType(data.ActivityTypeId);
       setActDate(new Date(data.Date));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(new Date(data.FollowUpDate));
+      setFollowUpDt(new Date(data.DueByDate));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);
@@ -76,18 +75,21 @@ export default function ActivityModal({
   };
 
   const handleSave = () => {
-    const data: ActivityDTO = {
+    let data: ActivityDTO  = {
       ActivityTypeId: actType,
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
       VenueCost: parseFloat(venueCost),
-      Date: formatInputDate(actDate),
+      Date: actDate,
       FollowUpRequired: actFollowUp,
-      FollowUpDate: formatInputDate(followUpDt),
       Name: actName,
       Notes: actNotes,
-      Id: null,
     };
+
+    // only add the follow up date if the followUp required checkbox has been checked
+    if(actFollowUp) {
+      data = {...data, DueByDate: followUpDt}
+    }
 
     onSave(variant, data);
   };

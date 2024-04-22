@@ -161,8 +161,6 @@ const MarketingHome = () => {
 
     if (typeof data === 'object') {
       const activityList = data as ActivityList;
-      console.log(activityList);
-
       const actTypes = activityList.activityTypes.map((type) => {
         return { text: type.Name, value: type.Id };
       });
@@ -172,13 +170,11 @@ const MarketingHome = () => {
   };
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
-    const response = await fetchData({
+    await fetchData({
       url: '/api/marketing/activities/create',
       method: 'POST',
       data,
     });
-
-    alert(JSON.stringify(response));
     setShowActivityModal(false);
   };
 

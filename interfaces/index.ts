@@ -208,15 +208,15 @@ export type VenueContactDTO = {
 };
 
 export type ActivityDTO = {
-  Id: number;
-  Date: string;
+  Id?: number;
+  Date: Date | string;
   Name: string;
   BookingId: number;
   ActivityTypeId: number;
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
-  FollowUpDate: string;
+  DueByDate?: Date;
   Notes: string;
 };
 
