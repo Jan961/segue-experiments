@@ -109,7 +109,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
 
   const handleClose = (bookings = null) => {
     if (bookings) {
-      router.reload();
+      router.replace(router.asPath);
     }
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
