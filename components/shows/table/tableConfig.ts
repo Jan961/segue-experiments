@@ -2,9 +2,9 @@ import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
-import CustomDateCell from './CustomDateCell';
+import CustomDateCell from './CustomDateCellRenderer';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
-import CustomSelectCell from './CustomSelectCell';
+import CustomSelectCell from './CustomSelectCellRenderer';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
 
 export const tableConfig = [

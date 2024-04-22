@@ -60,8 +60,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     },
   };
 
-  console.log(showData);
-
   const addNewRow = () => {
     setIsAddRow(!isAddRow);
   };
@@ -136,7 +134,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       setIsLoading(true);
       try {
         const payloadData = getConvertedPayload(e.data);
-        console.log(e.data, payloadData);
         await axios.post(`/api/productions/create`, payloadData);
       } finally {
         setIsEdited(false);

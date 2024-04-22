@@ -114,6 +114,8 @@ export default forwardRef(function Table(
       gridHeight < autoHeightLimit && gridApi
         ? gridApi.updateGridOptions({ domLayout: 'autoHeight' })
         : gridApi.updateGridOptions({ domLayout: 'normal' });
+    } else if (rowData?.length === 0 && gridApi) {
+      gridApi.updateGridOptions({ domLayout: 'autoHeight' });
     }
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
