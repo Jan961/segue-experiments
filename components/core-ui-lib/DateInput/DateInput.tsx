@@ -127,8 +127,12 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   };
 
   return (
-    <div className={`relative h-[2.2rem] flex flex-row border border-primary-border rounded-md shadow-sm-shadow`}>
-      <div className='flex flex-col'>
+    <div
+      className={`relative h-[1.9375rem] flex flex-row rounded-md ${
+        label ? 'border border-primary-border shadow-sm-shadow' : ''
+      }`}
+    >
+      <div className="flex flex-col">
         {label && (
           <div className="border-r min-w-fit border-primary-border px-3">
             <Label className={labelClassName} text={label} />
@@ -158,7 +162,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           ref={inputRef}
           value={inputValue}
           iconName="calendar"
-          className={`w-28 ${inputClass}`}
+          className={`w-28 h-[1.8375rem] ${inputClass}`}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
