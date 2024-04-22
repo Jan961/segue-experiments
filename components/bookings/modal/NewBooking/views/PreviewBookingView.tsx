@@ -8,11 +8,13 @@ import { isNullOrEmpty } from 'utils';
 type PreviewBookingViewProps = PreviewBookingDetailsProps & {
   onSaveBooking: () => void;
   updateModalTitle: (title: string) => void;
-  isNewBooking: boolean;
 };
 export default function PreviewBookingView(props: PreviewBookingViewProps) {
   const { goToStep } = useWizard();
-  const { formData, data = [], isNewBooking } = props;
+  const { formData, originalRows, updatedRows = [], isNewBooking } = props;
+
+  const rows = isNewBooking ? originalRows : updatedRows;
+
   useEffect(() => {
     props.updateModalTitle('Preview New Booking');
   }, []);
@@ -22,13 +24,13 @@ export default function PreviewBookingView(props: PreviewBookingViewProps) {
   };
 
   const areInputFieldsValid = useMemo(() => {
-    if (data && formData.isRunOfDates) {
-      const rowsWithNoDayType = data.filter(({ dayType }) => isNullOrEmpty(dayType));
+    if (rows && formData.isRunOfDates) {
+      const rowsWithNoDayType = rows.filter(({ dayType }) => isNullOrEmpty(dayType));
       return isNullOrEmpty(rowsWithNoDayType);
     } else {
       return true;
     }
-  }, [data, formData]);
+  }, [rows, formData]);
 
   return (
     <>

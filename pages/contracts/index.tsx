@@ -1,50 +1,43 @@
 import Layout from 'components/Layout';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { useState } from 'react';
-import ContractDetailsForm from 'components/contracts/contractDetailsForm';
-import ContractListingPanel from 'components/contracts/contractListingPanel';
-import GlobalToolbar from 'components/toolbar';
-import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountId, getEmailFromReq } from 'services/userService';
+import { SwitchBoardItem } from 'components/global/SwitchBoardItem';
 
-const Index = ({ bookings }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [activeContractIndex, setActiveContractIndex] = useState<number | null>(null);
-
-  function incrementActiveContractIndex() {
-    if (activeContractIndex < bookings.length + 1) {
-      setActiveContractIndex(activeContractIndex + 1);
-    }
-  }
-
+export default function index() {
+  const links = [
+    {
+      title: 'Venue Contracts',
+      route: '/contracts/all',
+      color: 'bg-primary-blue',
+    },
+    {
+      title: 'Artiste Contracts',
+      route: '/contracts/artisteContracts',
+      color: 'bg-primary-blue',
+    },
+    {
+      title: 'Creative Contracts',
+      route: '/contracts/creativeContracts',
+      color: 'bg-primary-blue',
+    },
+    {
+      title: 'SM/Tech/Crew Contracts',
+      route: '/contracts/stateTechCrewContracts',
+      color: 'bg-primary-blue',
+    },
+  ];
   return (
     <Layout title="Contracts | Segue">
-      <div className="flex flex-auto flex-col w-full">
-        <GlobalToolbar title={'Contracts'} />
-        <div className="flex-row flex">
-          <ContractListingPanel
-            bookings={bookings}
-            activeContractIndex={activeContractIndex}
-            setActiveContractIndex={setActiveContractIndex}
-          />
-          {activeContractIndex !== null && (
-            <ContractDetailsForm
-              incrementActiveContractIndex={incrementActiveContractIndex}
-              activeContract={bookings?.[activeContractIndex]?.Id}
-            />
-          )}
-        </div>
+      <div className="mt-20 flex flex-col justify-center items-center">
+        <h1 className="text-4xl font-bold font-calibri text-primary-blue">Contracts</h1>
+        <ul
+          data-testid="system-admin-tiles"
+          role="list"
+          className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-4 mt-20 mx-auto "
+        >
+          {links.map((link) => (
+            <SwitchBoardItem key={link.route} link={link} />
+          ))}
+        </ul>
       </div>
     </Layout>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
-
-  const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
-
-  return { props: { bookings: [], initialState: { global: { productionJump } } } };
-};
-
-export default Index;
+}

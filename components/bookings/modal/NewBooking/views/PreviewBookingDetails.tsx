@@ -14,32 +14,32 @@ import { useEffect, useState } from 'react';
 import { DistanceParams } from 'distance';
 import axios from 'axios';
 import { formatRowsForPencilledBookings } from 'components/bookings/utils';
-
-const rowClassRules = {
-  'custom-red-row': (params) => {
-    const rowData = params.data;
-    // Apply custom style if the 'highlightRow' property is true
-    return rowData && rowData.highlightRow;
-  },
-};
+import { isNullOrEmpty } from 'utils';
 
 const gridOptions = {
   getRowStyle: (params) => {
-    return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
+    return {
+      fontStyle: params.data.bookingStatus === 'Pencilled' ? 'italic' : '',
+      ...(params.data.highlightRow && !params.data.isDeleted && { 'background-color': '#fad0cc' }),
+      ...(params.data.isDeleted && { 'background-color': '#D4D4D4' }),
+    };
   },
 };
 
 export type PreviewBookingDetailsProps = {
+  isNewBooking: boolean;
   formData: TForm;
   productionCode: string;
-  data: BookingItem[];
+  originalRows: BookingItem[];
+  updatedRows: BookingItem[];
   dayTypeOptions: SelectOption[];
   updateModalTitle: (title: string) => void;
 };
 export default function PreviewBookingDetails({
-  formData,
+  isNewBooking,
   productionCode,
-  data,
+  originalRows = [],
+  updatedRows = [],
   dayTypeOptions,
 }: PreviewBookingDetailsProps) {
   const venueDict = useRecoilValue(venueState);
@@ -137,7 +137,7 @@ export default function PreviewBookingDetails({
     return sortedFilteredBookings;
   };
 
-  const formatRowData = () => {
+  const formatRowData = (data) => {
     const rowItems: PreviewDataItem[] = data.map((item: any) => {
       const calculateWeek = () => {
         return calculateWeekNumber(new Date(production.StartDate), new Date(item.dateAsISOString));
@@ -163,21 +163,22 @@ export default function PreviewBookingDetails({
       };
     });
 
-    const { fromDate, toDate } = formData;
+    const fromDate = data[0].dateAsISOString;
+    const toDate = data.length > 1 ? data[data.length - 1].dateAsISOString : fromDate;
     const fromDateAsDate = parseISO(fromDate);
     const toDateAsDate = parseISO(toDate);
     const pastStartDate = subDays(fromDateAsDate, 6);
     const toStartDate = subDays(fromDateAsDate, 1);
     const toDateSet = addDays(toDateAsDate, 1);
     const futureEndDate = addDays(toDateAsDate, 7);
+
     // Remove any existing bookings being edited that are also present in rowSelector to avoid duplicates
     const editedRowsIds = rowItems.map(({ item }) => item.id);
-    const bookingsWithDuplicatesRemoved = bookings.filter(({ Id }) => !editedRowsIds.includes(Id));
+    const bookingsWithDuplicatesRemoved = bookings.filter(({ Id }) => !Id || !editedRowsIds.includes(Id));
 
     // filteredBookingsTop and filteredBookingsBottom exclude the dates for which the booking is being added or edited
     const filteredBookingsTop = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, pastStartDate, toStartDate);
     const filteredBookingsBottom = filterBookingsByDateRange(bookingsWithDuplicatesRemoved, toDateSet, futureEndDate);
-
     // Find any other bookings that already exist within the date range other than the ones being added or edited
     const otherBookingsWithinDateRange = bookingsWithDuplicatesRemoved.filter(({ dateTime, dayType }) => {
       const bookingDate = parseISO(dateTime);
@@ -189,10 +190,25 @@ export default function PreviewBookingDetails({
   };
 
   useEffect(() => {
-    if (data) {
-      formatRowData();
+    if (!isNullOrEmpty(originalRows)) {
+      if (isNewBooking) {
+        formatRowData(originalRows);
+      } else {
+        // Check if any dates were removed as a part of chnage booking length
+        const datesRemoved = originalRows
+          .filter(({ date }) => !updatedRows.find((ur) => ur.date === date))
+          .map((row) => ({ ...row, isDeleted: true }));
+
+        const combinedRows = [...datesRemoved, ...updatedRows].sort((a, b) => {
+          const dateA = parseISO(a.dateAsISOString).getTime();
+          const dateB = parseISO(b.dateAsISOString).getTime();
+
+          return dateA - dateB;
+        });
+        formatRowData(combinedRows);
+      }
     }
-  }, [data]);
+  }, [originalRows, updatedRows]);
 
   return (
     <>
@@ -200,13 +216,7 @@ export default function PreviewBookingDetails({
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table
-          gridOptions={gridOptions}
-          rowData={rows}
-          columnDefs={previewColumnDefs}
-          styleProps={styleProps}
-          rowClassRules={rowClassRules}
-        />
+        <Table gridOptions={gridOptions} rowData={rows} columnDefs={previewColumnDefs} styleProps={styleProps} />
       </div>
     </>
   );
