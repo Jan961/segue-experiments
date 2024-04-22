@@ -41,7 +41,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
   const { productions } = useRecoilValue(productionJumpState);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>([]);
   const [subTitle, setSubTitle] = useState<string>('');
-  const [conditionType, setConditionType] = useState('Venue');
+  const [conditionType, setConditionType] = useState('');
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [venueList, setVenueList] = useState<Array<SelectOption>>([]);
   const [townList, setTownList] = useState<Array<SelectOption>>([]);
@@ -151,6 +151,8 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
 
   useEffect(() => {
     setVisible(show);
+    setConditionType('');
+    setSelectedCondition(null);
   }, [show]);
 
   useEffect(() => {
@@ -187,23 +189,22 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
           <Select
             className={classNames('my-2 w-full !border-0 text-primary-navy')}
             options={bothOptions}
-            isClearable
-            isSearchable
             value={conditionType}
             onChange={(value) => setConditionType(value?.toString() || null)}
-            placeholder={'Please select a condition'}
-            label={'Condition'}
+            placeholder={'Please select from Venue or Town'}
+            isClearable={false}
+            isSearchable={false}
           />
 
           <Select
             className={classNames('my-2 w-full !border-0 text-primary-navy')}
-            options={conditionType === 'Venue' ? venueList : townList}
+            options={conditionType === '' ? [] : conditionType === 'Venue' ? venueList : townList}
             isClearable
             isSearchable
             value={selectedCondition}
             onChange={(value) => getBookingSelection(value)}
-            placeholder={conditionType === null ? '' : 'Please select a ' + conditionType}
-            label={conditionType}
+            placeholder={conditionType === '' ? '' : 'Please select a ' + conditionType}
+            disabled={conditionType === ''}
           />
 
           {selectedCondition !== null && errorMessage === '' && (

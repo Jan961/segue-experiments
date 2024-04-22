@@ -23,7 +23,14 @@ const milesFormatter = (params) => (params.value === -1 ? 'No Data' : params.val
 const travelTimeFormatter = (params) => (params.value === -1 ? 'No Data' : formatMinutes(Number(params.value)));
 const milesCellStyle = ({ value, data, node }) => ({
   paddingLeft: '0.5rem',
-  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : node?.rowStyle?.backgroundColor,
+  backgroundColor:
+    value === -1
+      ? '#D41818'
+      : data.isDeleted
+      ? '#D4D4D4'
+      : data.highlightRow
+      ? '#FAD0CC'
+      : node?.rowStyle?.backgroundColor,
   color: value === -1 ? '#FFBE43' : '#617293',
   fontStyle: value === -1 ? 'italic' : 'normal',
 });

@@ -169,10 +169,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       const runTag = state.form.isRunOfDates ? state.booking[0].runTag : nanoid(8);
       const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
 
-      const { data: updated } = await axios.post('/api/bookings/update', {
-        original: state.booking,
-        updated: bookingsUpdatedWithRunTag,
-      });
+      const { data: updated } = await axios.post(
+        `${state.form.isRunOfDates ? '/api/bookings/updateRunOfDates' : '/api/bookings/update'}`,
+        {
+          original: state.booking,
+          updated: bookingsUpdatedWithRunTag,
+        },
+      );
       onClose(updated);
     } catch (e) {
       console.log('Failed to update booking', e);
@@ -225,7 +228,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         <PreviewNewBookingView
           formData={state.form}
           productionCode={productionCode}
-          data={editBooking ? state.bookingUpdates : state.booking}
+          originalRows={state.booking}
+          updatedRows={state.bookingUpdates}
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}
@@ -235,7 +239,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isNewBooking={!editBooking}
           formData={state.form}
           productionCode={productionCode}
-          data={state.booking}
+          originalRows={state.booking}
+          updatedRows={state.bookingUpdates}
           dayTypeOptions={dayTypeOptions}
           updateModalTitle={updateModalTitle}
           previousView={state.modalTitle}
