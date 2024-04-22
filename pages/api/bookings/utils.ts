@@ -1,7 +1,8 @@
 import { BookingItem } from 'components/bookings/modal/NewBooking/reducer';
+import { AddBookingsParams } from './interface/add.interface';
 
-export const mapNewBookingToPrismaFields = (values: BookingItem[] = []) => {
-  const mapped = values
+export const mapNewBookingToPrismaFields = (values: BookingItem[] = []): AddBookingsParams[] => {
+  const mapped: AddBookingsParams[] = values
     .filter((item) => item.dayType !== null && item.bookingStatus !== null)
     .map((item) => {
       const mappedItem = {
