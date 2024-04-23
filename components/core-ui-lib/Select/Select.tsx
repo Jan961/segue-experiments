@@ -6,6 +6,8 @@ import WindowedSelect, {
   OptionProps,
   DropdownIndicatorProps,
   IndicatorsContainerProps,
+  MenuProps,
+  MultiValueProps,
 } from 'react-windowed-select';
 import { WithTestId } from 'types';
 import Icon from '../Icon';
@@ -22,6 +24,10 @@ const IndicatorsContainer = (props: IndicatorsContainerProps) => {
       <components.IndicatorsContainer {...props} />
     </div>
   );
+};
+
+const MultiValueRemove = () => {
+  return null;
 };
 
 const DropdownIndicator = (props: DropdownIndicatorProps) => {
@@ -41,12 +47,24 @@ const formatOptionLabel = ({ value, text }, { context }) => {
   return text;
 };
 
+const Menu = (props: MenuProps) => {
+  return (
+    <components.Menu className={`${props.isMulti && '!w-[258px]'}`} {...props}>
+      {props.children}
+    </components.Menu>
+  );
+};
+
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
+
+interface CustMultiValueProps extends MultiValueProps {
+  data: SelectOption;
+}
 
 const COMP_HEIGHT = '1.9375rem';
 
 export interface SelectProps extends WithTestId {
-  value?: string | number | undefined;
+  value?: string | number | number[] | undefined;
   onChange: (value: string | number) => void;
   renderOption?: (option: OptionProps) => React.ReactElement;
   customStyles?: Partial<StylesConfig>;
@@ -60,6 +78,7 @@ export interface SelectProps extends WithTestId {
   isSearchable?: boolean;
   isClearable?: boolean;
   isMulti?: boolean;
+  closeMenuOnSelect?: boolean;
 }
 
 export default forwardRef(function Select(
@@ -78,6 +97,7 @@ export default forwardRef(function Select(
     isSearchable = false,
     isClearable = true,
     isMulti = false,
+    closeMenuOnSelect = true,
   }: SelectProps,
   ref,
 ) {
@@ -165,14 +185,30 @@ export default forwardRef(function Select(
   };
 
   useEffect(() => {
-    setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
-  }, [value, options]);
+    if (isMulti && Array.isArray(value)) {
+      const selectedValues: any = options.filter((o: any) => value.includes(o.value));
+      setSelectedOption(selectedValues);
+    } else {
+      setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
+    }
+  }, [value, options, isMulti]);
+
+  const MultiValue = (props: CustMultiValueProps) => {
+    const { data } = props;
+    if (Array.isArray(selectedOption) && selectedOption.length > 1) {
+      return <components.MultiValue {...props}>Multiple</components.MultiValue>;
+    }
+    return <components.MultiValue {...props}>{data.text}</components.MultiValue>;
+  };
 
   const customComponents = {
     Option: (option) => (renderOption ? renderOption(option) : <Option {...option} />),
     IndicatorSeparator: null,
     IndicatorsContainer,
+    MultiValueRemove,
     DropdownIndicator,
+    Menu,
+    MultiValue,
   };
 
   return (
@@ -202,6 +238,7 @@ export default forwardRef(function Select(
         getOptionLabel={(props: SelectOption) => props.text}
         windowThreshold={50}
         isDisabled={disabled}
+        closeMenuOnSelect={closeMenuOnSelect}
         options={filteredOptions}
         styles={colourStyles}
         placeholder={placeholder}

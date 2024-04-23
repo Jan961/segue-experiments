@@ -2,10 +2,10 @@ import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
-import CustomDateCell from './CustomDateCellRenderer';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
-import CustomSelectCell from './CustomSelectCellRenderer';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
+import CustomDateCell from 'components/core-ui-lib/Table/renderers/CustomDateCellRenderer';
+import CustomSelectCell from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
 
 export const tableConfig = [
   {
@@ -122,7 +122,7 @@ export const productionsTableConfig = [
   {
     headerName: 'Rehearsals',
     headerGroupComponent: 'AGGridHeaderGroupComponent',
-    headerClass: 'justify-center font-bold text-base border-r-4',
+    headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
       {
@@ -166,7 +166,7 @@ export const productionsTableConfig = [
   {
     headerName: 'Production Dates',
     headerGroupComponent: 'AGGridHeaderGroupComponent',
-    headerClass: 'justify-center font-bold text-base border-r-4',
+    headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
       {
@@ -208,7 +208,7 @@ export const productionsTableConfig = [
     ],
   },
   {
-    headerName: 'Production Image',
+    headerName: 'Prod Image',
     field: 'IsArchived',
     width: 80,
     cellRenderer: ButtonRenderer,
@@ -245,7 +245,7 @@ export const productionsTableConfig = [
   {
     headerName: 'Input Freq of Sales Figs',
     field: 'SalesFrequency',
-    width: 120,
+    width: 130,
     cellRenderer: CustomSelectCell,
     cellRendererParams: {
       options: SALES_FIG_OPTIONS,
@@ -281,13 +281,13 @@ export const productionsTableConfig = [
     cellStyle: {
       width: 80,
     },
-    width: 70,
+    width: 60,
     headerClass: 'text-center',
   },
   {
     headerName: '',
     field: 'deleteId',
-    width: 70,
+    width: 74,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
       buttonText: 'Delete',
