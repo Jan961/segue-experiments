@@ -97,9 +97,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   const updateBookingOnStore = (booking: BookingItem[]) => {
-    // Store updates separately as it is possible that the daytype has changed and instead of updating the booking,
-    // we would need to delete the existing booking and create a new one in another table. e.g. Performance changed to Day Off
-
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
@@ -186,6 +183,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     editBooking ? updateBooking() : saveNewBooking();
   };
 
+  const handleBarringCheckComplete = () => {
+    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, 'Preview New Booking'));
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -224,6 +225,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           onClose={onClose}
           onDelete={deleteBooking}
           updateModalTitle={updateModalTitle}
+          onBarringCheckComplete={handleBarringCheckComplete}
+          updateBarringConflicts={updateBarringConflicts}
         />
         <PreviewNewBookingView
           formData={state.form}
@@ -254,6 +257,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
+          nextStep={state.barringNextStep}
         />
         {!editBooking && (
           <GapSuggestionView
