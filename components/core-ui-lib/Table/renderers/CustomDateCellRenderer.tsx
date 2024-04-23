@@ -2,7 +2,7 @@ import { ICellRendererParams } from 'ag-grid-community';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { useRef, useState } from 'react';
 
-const CustomDateCell = ({ data, colDef, value, setValue, node }: ICellRendererParams) => {
+const CustomDateCellRenderer = ({ data, colDef, value, setValue, node }: ICellRendererParams) => {
   const fromInputRef = useRef(null);
   const [error, setError] = useState<string>('');
 
@@ -36,4 +36,4 @@ const CustomDateCell = ({ data, colDef, value, setValue, node }: ICellRendererPa
   );
 };
 
-export default CustomDateCell;
+export default CustomDateCellRenderer;

@@ -18,7 +18,7 @@ const SelectRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
   return (
     <div className="pl-1 pr-2 mt-1">
       <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
-        <Select ref={selectRef} isClearable={false} {...props} />
+        <Select ref={selectRef} {...props} />
       </BaseCellRenderer>
     </div>
   );

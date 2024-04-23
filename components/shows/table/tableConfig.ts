@@ -4,8 +4,8 @@ import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRendere
 import TableCheckboxRenderer from './TableCheckboxRenderer';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
-import CustomDateCell from 'components/core-ui-lib/Table/renderers/CustomDateCellRenderer';
-import CustomSelectCell from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
+import CustomDateCellRenderer from 'components/core-ui-lib/Table/renderers/CustomDateCellRenderer';
+import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
 
 export const tableConfig = [
   {
@@ -136,7 +136,7 @@ export const productionsTableConfig = [
           paddingLeft: '0.1em',
           overflow: 'visible',
         },
-        cellRenderer: CustomDateCell,
+        cellRenderer: CustomDateCellRenderer,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
         width: 120,
@@ -154,7 +154,7 @@ export const productionsTableConfig = [
           paddingLeft: '0.1em',
           overflow: 'visible',
         },
-        cellRenderer: CustomDateCell,
+        cellRenderer: CustomDateCellRenderer,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
         width: 120,
@@ -180,7 +180,7 @@ export const productionsTableConfig = [
           overflow: 'visible',
           paddingLeft: '0.1em',
         },
-        cellRenderer: CustomDateCell,
+        cellRenderer: CustomDateCellRenderer,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
         width: 120,
@@ -199,7 +199,7 @@ export const productionsTableConfig = [
           paddingLeft: '0.1em',
           overflow: 'visible',
         },
-        cellRenderer: CustomDateCell,
+        cellRenderer: CustomDateCellRenderer,
         suppressMovable: true,
         headerClass: 'border-r-[1px] border-white text-center',
         resizable: false,
@@ -220,7 +220,7 @@ export const productionsTableConfig = [
   {
     headerName: 'Region',
     field: 'RegionList',
-    cellRenderer: CustomSelectCell,
+    cellRenderer: CustomSelectCelRenderer,
     cellRendererParams: {
       options: REGIONS_LIST,
       placeholder: 'Select Region(s)',
@@ -246,7 +246,7 @@ export const productionsTableConfig = [
     headerName: 'Input Freq of Sales Figs',
     field: 'SalesFrequency',
     width: 130,
-    cellRenderer: CustomSelectCell,
+    cellRenderer: CustomSelectCelRenderer,
     cellRendererParams: {
       options: SALES_FIG_OPTIONS,
       defaultValue: 'W',
