@@ -166,7 +166,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
-          showBorder={label === ''}
         />
       </div>
     </div>

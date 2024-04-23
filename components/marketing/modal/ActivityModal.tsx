@@ -75,7 +75,7 @@ export default function ActivityModal({
   };
 
   const handleSave = () => {
-    let data: ActivityDTO  = {
+    let data: ActivityDTO = {
       ActivityTypeId: actType,
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
@@ -87,8 +87,8 @@ export default function ActivityModal({
     };
 
     // only add the follow up date if the followUp required checkbox has been checked
-    if(actFollowUp) {
-      data = {...data, DueByDate: followUpDt}
+    if (actFollowUp) {
+      data = { ...data, DueByDate: followUpDt };
     }
 
     onSave(variant, data);
@@ -124,6 +124,7 @@ export default function ActivityModal({
               onChange={(value) => setActDate(value)}
               value={actDate}
               label="Date"
+              inputClass="!border-0 !shadow-none"
               labelClassName="text-primary-input-text"
             />
           </div>
@@ -150,6 +151,7 @@ export default function ActivityModal({
                 onChange={(value) => setFollowUpDt(value)}
                 value={followUpDt}
                 label="Date"
+                inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
               />
             </div>
