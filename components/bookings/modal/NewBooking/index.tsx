@@ -27,13 +27,13 @@ import { nanoid } from 'nanoid';
 import { isNullOrEmpty } from 'utils';
 import { BookingRow } from 'types/BookingTypes';
 
-type AddBookingProps = {
+interface AddBookingProps {
   visible: boolean;
   onClose: (bookings?: any) => void;
   startDate?: string;
   endDate?: string;
   booking?: BookingRow;
-};
+}
 
 const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookingProps) => {
   const bookingDict = useRecoilValue(bookingState);

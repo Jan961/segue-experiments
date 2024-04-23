@@ -21,6 +21,7 @@ import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import { Direction } from 'components/bookings/table/AddDeleteRowRenderer';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
+import MoveBooking from '../../MoveBooking';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -61,6 +62,7 @@ export default function NewBookingDetailsView({
   const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
+  const [showMoveBookingModal, setShowMoveBookingsModal] = useState<boolean>(false);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
   const [changeBookingLengthConfirmed, setchangeBookingLengthConfirmed] = useState<boolean>(false);
@@ -149,7 +151,7 @@ export default function NewBookingDetailsView({
       setBookingData(dates);
     }
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates, isNewBooking]);
-
+  const productionCode = `${production.ShowCode}${production.Code}  ${production?.ShowName}`;
   const productionItem = useMemo(() => {
     return {
       production: `${production.ShowCode}${production.Code}`,
@@ -228,7 +230,9 @@ export default function NewBookingDetailsView({
   };
 
   // Placeholder function to be implemented
-  const handleMoveBooking = () => null;
+  const handleMoveBooking = () => {
+    setShowMoveBookingsModal(true);
+  };
 
   const handleCancelButtonClick = () => {
     if (changeBookingLength) {
@@ -332,10 +336,14 @@ export default function NewBookingDetailsView({
     setchangeBookingLength((prev) => !prev);
   };
 
+  const handleMoveBookingClose = () => {
+    setShowMoveBookingsModal(false);
+  };
+
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{`${production.ShowCode}${production.Code}  ${production?.ShowName}`}</div>
+        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
         <Table
@@ -397,6 +405,15 @@ export default function NewBookingDetailsView({
             />
           </div>
         </div>
+        {showMoveBookingModal && (
+          <MoveBooking
+            visible={showMoveBookingModal}
+            onClose={handleMoveBookingClose}
+            productionCode={productionCode}
+            productionId={production.Id}
+            bookings={bookingData}
+          />
+        )}
         <ConfirmationDialog
           variant={confirmationType.current}
           show={showConfirmation}
