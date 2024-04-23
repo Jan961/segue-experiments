@@ -63,6 +63,7 @@ export default function NewBookingDetailsView({
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
+  const [changeBookingLengthConfirmed, setchangeBookingLengthConfirmed] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const { goToStep } = useWizard();
   const tableRef = useRef(null);
@@ -320,6 +321,7 @@ export default function NewBookingDetailsView({
 
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
+      setchangeBookingLengthConfirmed(true);
       storeBookingDetails();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
@@ -377,7 +379,7 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength}
+                  disabled={changeBookingLength || changeBookingLengthConfirmed}
                 />
                 <Button
                   className="w-33 px-4"
