@@ -97,9 +97,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   const updateBookingOnStore = (booking: BookingItem[]) => {
-    // Store updates separately as it is possible that the daytype has changed and instead of updating the booking,
-    // we would need to delete the existing booking and create a new one in another table. e.g. Performance changed to Day Off
-
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
@@ -169,10 +166,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       const runTag = state.form.isRunOfDates ? state.booking[0].runTag : nanoid(8);
       const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
 
-      const { data: updated } = await axios.post('/api/bookings/update', {
-        original: state.booking,
-        updated: bookingsUpdatedWithRunTag,
-      });
+      const { data: updated } = await axios.post(
+        `${state.form.isRunOfDates ? '/api/bookings/updateRunOfDates' : '/api/bookings/update'}`,
+        {
+          original: state.booking,
+          updated: bookingsUpdatedWithRunTag,
+        },
+      );
       onClose(updated);
     } catch (e) {
       console.log('Failed to update booking', e);
@@ -181,6 +181,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
 
   const handleSaveBooking = async () => {
     editBooking ? updateBooking() : saveNewBooking();
+  };
+
+  const handleBarringCheckComplete = () => {
+    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, 'Preview New Booking'));
   };
 
   return (
@@ -221,11 +225,14 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           onClose={onClose}
           onDelete={deleteBooking}
           updateModalTitle={updateModalTitle}
+          onBarringCheckComplete={handleBarringCheckComplete}
+          updateBarringConflicts={updateBarringConflicts}
         />
         <PreviewNewBookingView
           formData={state.form}
           productionCode={productionCode}
-          data={editBooking ? state.bookingUpdates : state.booking}
+          originalRows={state.booking}
+          updatedRows={state.bookingUpdates}
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}
@@ -235,7 +242,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isNewBooking={!editBooking}
           formData={state.form}
           productionCode={productionCode}
-          data={state.booking}
+          originalRows={state.booking}
+          updatedRows={state.bookingUpdates}
           dayTypeOptions={dayTypeOptions}
           updateModalTitle={updateModalTitle}
           previousView={state.modalTitle}
@@ -249,6 +257,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
+          nextStep={state.barringNextStep}
         />
         {!editBooking && (
           <GapSuggestionView
