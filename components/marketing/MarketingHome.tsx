@@ -15,6 +15,8 @@ import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
+import ActivityModal, { ActivityModalVariant } from './modal/ActivityModal';
+import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 
 export type SelectOption = {
   text: string;
@@ -32,13 +34,20 @@ export type VenueDetail = {
   town: string;
 };
 
+type ActivityList = {
+  activities: Array<ActivityDTO>;
+  activityTypes: Array<ActivityTypeDTO>;
+};
+
 const MarketingHome = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
+  const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
+  const [activityTypes, setActivityTypes] = useState<Array<SelectOption>>(null);
   const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
   const [salesTable, setSalesTable] = useState<ReactNode>();
@@ -144,6 +153,31 @@ const MarketingHome = () => {
     }
   };
 
+  const getActivities = async (bookingId: string) => {
+    const data = await fetchData({
+      url: '/api/marketing/activities/' + bookingId,
+      method: 'POST',
+    });
+
+    if (typeof data === 'object') {
+      const activityList = data as ActivityList;
+      const actTypes = activityList.activityTypes.map((type) => {
+        return { text: type.Name, value: type.Id };
+      });
+
+      setActivityTypes(actTypes);
+    }
+  };
+
+  const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
+    await fetchData({
+      url: '/api/marketing/activities/create',
+      method: 'POST',
+      data,
+    });
+    setShowActivityModal(false);
+  };
+
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
@@ -153,6 +187,7 @@ const MarketingHome = () => {
   useEffect(() => {
     if (bookingId) {
       getSales(bookingId.toString());
+      getActivities(bookingId.toString());
     }
   }, [bookingId]);
 
@@ -230,7 +265,23 @@ const MarketingHome = () => {
             </div>
           </Tab.Panel>
 
-          <Tab.Panel className="w-42 h-24 flex justify-center items-center">activities</Tab.Panel>
+          <Tab.Panel className="w-42 h-24 flex justify-center items-center">
+            <div className="flex flex-row gap-4 mb-5">
+              <Button
+                text="Show Activity Modal - Temporary Button"
+                className="w-[400px]"
+                onClick={() => setShowActivityModal(true)}
+              />
+              <ActivityModal
+                show={showActivityModal}
+                onCancel={() => setShowActivityModal(false)}
+                variant="add"
+                activityTypes={activityTypes}
+                onSave={(variant, data) => saveActivity(variant, data)}
+                bookingId={bookingId}
+              />
+            </div>
+          </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
