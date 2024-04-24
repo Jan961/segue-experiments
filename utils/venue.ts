@@ -1,4 +1,4 @@
-import { Venue, VenueAddress } from '@prisma/client';
+import { Venue, VenueAddress, VenueBarredVenue, VenueContact } from '@prisma/client';
 
 export interface PrimaryAddress {
   primaryAddressId?: number;
@@ -18,6 +18,24 @@ export interface DeliveryAddress {
   deliveryCountry?: number;
   deliveryTown?: string;
   deliveryPostCode?: string;
+}
+
+export interface UiVenueContact {
+  id?: number;
+  venueId?: number;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email?: string;
+  role?: string;
+  roleIndex?: string;
+  venueRoleId?: number;
+  roleName?: string;
+}
+
+export interface UiBarredVenue {
+  id?: number;
+  barredVenueId: number;
 }
 
 type UiVenueAddress = PrimaryAddress | DeliveryAddress;
@@ -51,7 +69,25 @@ export interface UiVenue {
   excludeFromChecks: boolean;
   what3WordsStage?: string;
   what3WordsLoading?: string;
+  barredVenues?: UiBarredVenue[];
 }
+
+export const transformVenueContacts = (contacts?: VenueContact): UiVenueContact => {
+  const { Id: id, VenueId, FirstName, LastName, Phone, Email, Role, RoleIndex, VenueRoleId, VenueRole } = contacts;
+
+  return {
+    id,
+    venueId: VenueId,
+    firstName: FirstName,
+    lastName: LastName,
+    phone: Phone,
+    email: Email,
+    role: Role,
+    roleIndex: RoleIndex,
+    venueRoleId: VenueRoleId,
+    roleName: VenueRole.Name,
+  };
+};
 
 export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => {
   const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, CountryId } = address || {};
@@ -79,7 +115,13 @@ export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => 
 
 export type UiTransformedVenue = UiVenue & PrimaryAddress & DeliveryAddress;
 
-export const transformVenues = (Venues: (Venue & { VenueAddress: VenueAddress[] })[]): UiTransformedVenue[] => {
+export const transformVenues = (
+  Venues: (Venue & {
+    VenueAddress: VenueAddress[];
+    VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: VenueBarredVenue[];
+    VenueContact: VenueContact[];
+  })[],
+): UiTransformedVenue[] => {
   return Venues.map(
     ({
       Id: id,
@@ -111,9 +153,16 @@ export const transformVenues = (Venues: (Venue & { VenueAddress: VenueAddress[] 
       ExcludeFromChecks,
       AddressStageDoorW3W,
       AddressLoadingW3W,
+      VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: BarredVenues,
+      VenueContact,
     }) => {
       const address1 = trasformVenueAddress(VenueAddress?.[0]) || {};
       const address2 = trasformVenueAddress(VenueAddress?.[1]) || {};
+      const barredVenues: UiBarredVenue[] = BarredVenues.map(({ Id: id, BarredVenueId: barredVenueId }) => ({
+        id,
+        barredVenueId,
+      }));
+      const venueContacts = VenueContact?.map((contact) => transformVenueContacts(contact));
       return {
         id,
         venueCode: Code,
@@ -143,9 +192,34 @@ export const transformVenues = (Venues: (Venue & { VenueAddress: VenueAddress[] 
         excludeFromChecks: ExcludeFromChecks,
         what3WordsStage: AddressStageDoorW3W,
         what3WordsLoading: AddressLoadingW3W,
+        barredVenues,
         ...address1,
         ...address2,
+        venueContacts,
       };
     },
   );
 };
+
+export const mapVenueContactToPrisma = ({
+  id: Id,
+  firstName: FirstName,
+  lastName: LastName,
+  phone: Phone,
+  email: Email,
+  venueRoleId: VenueRoleId,
+  roleName: RoleName,
+}: UiVenueContact): Partial<VenueContact & { RoleName?: string }> => {
+  return {
+    Id,
+    FirstName,
+    LastName,
+    Phone,
+    Email,
+    VenueRoleId,
+    RoleName,
+  };
+};
+
+export const filterEmptyVenueContacts = (venueContacts: UiVenueContact[]): UiVenueContact[] =>
+  venueContacts.filter(({ firstName, lastName, email, phone }) => firstName || lastName || email || phone);

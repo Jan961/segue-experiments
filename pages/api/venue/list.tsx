@@ -59,6 +59,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: queryConditions,
       include: {
         VenueAddress: true,
+        VenueContact: {
+          include: {
+            VenueRole: true,
+          },
+        },
+        VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: true,
         Booking: {
           include: {
             DateBlock: true,
