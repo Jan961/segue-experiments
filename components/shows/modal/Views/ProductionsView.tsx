@@ -105,12 +105,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'deleteId') {
       setConfirm(true);
-    } else if (e.column.colId === 'EditId_1' && isEdited) {
+    } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
       setIsLoading(true);
       try {
-        const payloadData = { ...currentProduction, IsArchived: e.data.IsArchived };
+        const payloadData = getConvertedPayload({ ...e.data, Id: currentProduction?.Id }, true);
         await axios.put(`/api/shows/productions/${currentProduction?.Id}`, payloadData);
-        if (payloadData.IsArchived && !isArchived) {
+        if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
           const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
           const transaction = {
@@ -133,7 +133,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     ) {
       setIsLoading(true);
       try {
-        const payloadData = getConvertedPayload(e.data);
+        const payloadData = getConvertedPayload(e.data, false);
         await axios.post(`/api/productions/create`, payloadData);
       } finally {
         setIsEdited(false);

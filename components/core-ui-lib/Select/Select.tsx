@@ -64,7 +64,7 @@ interface CustMultiValueProps extends MultiValueProps {
 const COMP_HEIGHT = '1.9375rem';
 
 export interface SelectProps extends WithTestId {
-  value?: string | number | number[] | undefined;
+  value?: string | number | any[] | undefined;
   onChange: (value: string | number) => void;
   renderOption?: (option: OptionProps) => React.ReactElement;
   customStyles?: Partial<StylesConfig>;
@@ -174,20 +174,40 @@ export default forwardRef(function Select(
 
   const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>([]);
   const [selectedOption, setSelectedOption] = useState<SelectOption>({ text: '', value: '' });
+
   useEffect(() => {
     setFilteredOptions(options);
   }, [options]);
 
   const handleOptionSelect = (o: SelectOption) => {
-    setSelectedOption(o);
-    if (isMulti) onChange(o.map((option) => option.value));
-    else onChange(o ? o.value : null);
+    if (isMulti) {
+      const latestSelectedOption = o[o.length - 1];
+      if (
+        latestSelectedOption.value === 'select_all' ||
+        (o.length === options.length && latestSelectedOption.value !== 'select_all')
+      ) {
+        const selectedValues: any = options;
+        setSelectedOption(selectedValues);
+        onChange(selectedValues.map((option) => option.value));
+      } else {
+        const selectedValues = o.filter((item) => item.value !== 'select_all');
+        setSelectedOption(selectedValues);
+        onChange(selectedValues.map((option) => option.value));
+      }
+    } else {
+      setSelectedOption(o);
+    }
   };
 
   useEffect(() => {
     if (isMulti && Array.isArray(value)) {
-      const selectedValues: any = options.filter((o: any) => value.includes(o.value));
-      setSelectedOption(selectedValues);
+      if (options.length === value.length || (Array.isArray(value) && value.includes('select_all'))) {
+        const selectedValues: any = options;
+        setSelectedOption(selectedValues);
+      } else {
+        const selectedValues: any = options.filter((o: any) => value.includes(o.value));
+        setSelectedOption(selectedValues);
+      }
     } else {
       setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
     }
