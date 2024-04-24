@@ -10,16 +10,20 @@ export const INITIAL_STATE = {
   },
   bookingConflicts: [],
   booking: [],
+  bookingUpdates: [],
   barringConflicts: [],
   modalTitle: '',
+  barringNextStep: '',
 };
 
 export const Actions = {
   UPDATE_FORM_DATA: 'UPDATE_FORM_DATA',
   UPDATE_BOOKING_CONFLICTS: 'UPDATE_BOOKING_CONFLICTS',
+  SET_BOOKING: 'SET_BOOKING',
   UPDATE_BOOKING: 'UPDATE_BOOKING',
   UPDATE_BARRED_VENUES: 'UPDATE_BARRED_VENUES',
   UPDATE_MODAL_TITLE: 'UPDATE_MODAL_TITLE',
+  SET_BARRING_NEXT_STEP: 'SET_BARRING_NEXT_STEP',
 };
 
 export const newBookingSteps = [
@@ -41,7 +45,8 @@ export const editBookingSteps = [
 ];
 
 export const getStepIndex = (isNewBooking: boolean, step: string) => {
-  return isNewBooking ? newBookingSteps.indexOf(step) : editBookingSteps.indexOf(step);
+  const stepIndex = isNewBooking ? newBookingSteps.indexOf(step) : editBookingSteps.indexOf(step);
+  return stepIndex === -1 ? 0 : stepIndex;
 };
 
 export const BookingTypes = [
@@ -72,10 +77,6 @@ export const OTHER_DAY_TYPES = [
   {
     text: 'Get in / Fit Up',
     value: -4,
-  },
-  {
-    text: 'Get Out',
-    value: -5,
   },
 ];
 

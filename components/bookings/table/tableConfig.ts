@@ -15,6 +15,7 @@ import IconRenderer from './IconRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
+import AddDeleteRowRenderer from './AddDeleteRowRenderer';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -22,7 +23,14 @@ const milesFormatter = (params) => (params.value === -1 ? 'No Data' : params.val
 const travelTimeFormatter = (params) => (params.value === -1 ? 'No Data' : formatMinutes(Number(params.value)));
 const milesCellStyle = ({ value, data, node }) => ({
   paddingLeft: '0.5rem',
-  backgroundColor: value === -1 ? '#D41818' : data.highlightRow ? '#FAD0CC' : node?.rowStyle?.backgroundColor,
+  backgroundColor:
+    value === -1
+      ? '#D41818'
+      : data.isDeleted
+      ? '#D4D4D4'
+      : data.highlightRow
+      ? '#FAD0CC'
+      : node?.rowStyle?.backgroundColor,
   color: value === -1 ? '#FFBE43' : '#617293',
   fontStyle: value === -1 ? 'italic' : 'normal',
 });
@@ -153,8 +161,24 @@ export const barringIssueColumnDefs = [
   { headerName: 'Miles', field: 'mileage', cellRenderer: DefaultCellRenderer, width: 90, resizable: false },
 ];
 
-export const newBookingColumnDefs = (dayTypeOptions = [], venueOptions = []) => [
-  { headerName: 'Date', field: 'date', cellRenderer: DefaultCellRenderer, width: 112, maxWidth: 112 },
+export const newBookingColumnDefs = (
+  dayTypeOptions = [],
+  venueOptions = [],
+  addRow,
+  deleteRow,
+  showAddDeleteRow = false,
+) => [
+  {
+    headerName: 'Date',
+    field: 'date',
+    cellRenderer: showAddDeleteRow ? AddDeleteRowRenderer : DefaultCellRenderer,
+    cellRendererParams: {
+      addRow,
+      deleteRow,
+    },
+    width: showAddDeleteRow ? 155 : 112,
+    maxWidth: showAddDeleteRow ? 155 : 112,
+  },
 
   // for perf y/n the style for the checkbox is givin in the components\core-ui-lib\Table\gridStyles.ts
   {

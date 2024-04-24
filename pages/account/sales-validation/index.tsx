@@ -9,7 +9,7 @@ type Props = {
 // @ts-ignore
 
 const Index = ({ items }: Props) => (
-  <Layout title="Booking | Seque">
+  <Layout title="Booking | Segue">
     <SalesDataValidation></SalesDataValidation>
   </Layout>
 );

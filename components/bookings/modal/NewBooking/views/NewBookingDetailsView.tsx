@@ -1,7 +1,7 @@
 // import NoPerfRenderEditor from 'components/bookings/table/NoPerfRenderEditor';
 import { newBookingColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
-import { addDays } from 'date-fns';
+import { addDays, parseISO, subDays } from 'date-fns';
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
@@ -12,11 +12,15 @@ import { ColDef } from 'ag-grid-community';
 import { getStepIndex } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { toISO } from 'services/dateService';
+import { dateToSimple, formattedDateWithWeekDay, toISO } from 'services/dateService';
 import { ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
 import { isNullOrEmpty } from 'utils';
+import applyTransactionToGrid from 'utils/applyTransactionToGrid';
+import { Direction } from 'components/bookings/table/AddDeleteRowRenderer';
+import axios from 'axios';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -26,11 +30,14 @@ type NewBookingDetailsProps = {
   production: Partial<ProductionDTO>;
   dateBlockId: number;
   onSubmit: (booking: BookingItem[]) => void;
+  onUpdate: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
   onDelete: () => void;
+  onBarringCheckComplete: () => void;
   updateModalTitle: (title: string) => void;
   isNewBooking: boolean;
+  updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
 };
 
 export default function NewBookingDetailsView({
@@ -41,17 +48,22 @@ export default function NewBookingDetailsView({
   dateBlockId,
   data,
   onSubmit,
+  onUpdate,
   onDelete,
   toggleModalOverlay,
   onClose,
   updateModalTitle,
   isNewBooking,
+  onBarringCheckComplete,
+  updateBarringConflicts,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
+  const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
+  const [changeBookingLengthConfirmed, setchangeBookingLengthConfirmed] = useState<boolean>(false);
   const [columnDefs, setColumnDefs] = useState<ColDef[]>([]);
   const { goToStep } = useWizard();
   const tableRef = useRef(null);
@@ -71,11 +83,26 @@ export default function NewBookingDetailsView({
     }
   }, [bookingData]);
 
+  const addRowToTable = (index: number, data: any, direction: Direction) => {
+    const rowDate =
+      direction === 'before' ? subDays(parseISO(data.dateAsISOString), 1) : addDays(parseISO(data.dateAsISOString), 1);
+    const date = formattedDateWithWeekDay(rowDate, 'Short');
+    const dateAsISOString = rowDate.toISOString();
+    const rowToAdd = { ...data, noPerf: null, times: '', date, dateAsISOString, id: null, isRunOfDates: true };
+    applyTransactionToGrid(tableRef, { add: [rowToAdd], addIndex: direction === 'before' ? 0 : index + 1 });
+    tableRef.current.getApi().redrawRows();
+  };
+
+  const removeRowFromTable = (data: any) => {
+    applyTransactionToGrid(tableRef, { remove: [data] });
+    tableRef.current.getApi().redrawRows();
+  };
+
   useEffect(() => {
     if (isNewBooking) {
       let dayTypeOption = null;
       if (dayTypeOptions && venueOptions) {
-        setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
+        setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable));
         dayTypeOption = dayTypeOptions.find(({ value }) => value === dateType);
       }
 
@@ -134,15 +161,49 @@ export default function NewBookingDetailsView({
 
   useEffect(() => {
     if (data !== null && data.length > 0) {
-      setColumnDefs(newBookingColumnDefs(dayTypeOptions, venueOptions));
+      setColumnDefs(
+        newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable, changeBookingLength),
+      );
       setBookingData(data);
     }
-  }, [data, dayTypeOptions, venueOptions]);
+  }, [data, dayTypeOptions, venueOptions, changeBookingLength]);
 
   const gridOptions = {
     getRowId: (params) => {
       return params.data.date;
     },
+  };
+
+  const checkForBarredVenues = async () => {
+    const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
+
+    const lastRow = tableRef.current
+      .getApi()
+      .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
+    try {
+      const response = await axios.post('/api/productions/venue/barringCheck', {
+        startDate: firstRow.data.dateAsISOString,
+        endDate: lastRow.data.dateAsISOString,
+        productionId: production.Id,
+        venueId: firstRow.data.venue,
+        seats: 400,
+        barDistance: 25,
+        includeExcluded: false,
+        filterBarredVenues: true,
+      });
+      if (!isNullOrEmpty(response.data)) {
+        onBarringCheckComplete();
+        const formatted = response.data
+          .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
+          .filter((venue: BarredVenue) => venue.hasBarringConflict);
+        updateBarringConflicts(formatted);
+        goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
+      } else {
+        goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+      }
+    } catch (e) {
+      console.log('Error getting barred venues');
+    }
   };
 
   const goToNewBooking = () => {
@@ -169,17 +230,20 @@ export default function NewBookingDetailsView({
   // Placeholder function to be implemented
   const handleMoveBooking = () => null;
 
-  // Placeholder function to be implemented
-  const handleChangeBookingLength = () => null;
-
   const handleCancelButtonClick = () => {
-    const isDirty = tableRef.current.isDirty();
-    if (isDirty) {
-      confirmationType.current = 'cancel';
-      setShowConfirmation(true);
-      toggleModalOverlay(true);
+    if (changeBookingLength) {
+      setBookingData([...data]);
+      tableRef.current.getApi().redrawRows();
+      setchangeBookingLength(false);
     } else {
-      onClose();
+      const isDirty = tableRef.current.isDirty();
+      if (isDirty) {
+        confirmationType.current = 'cancel';
+        setShowConfirmation(true);
+        toggleModalOverlay(true);
+      } else {
+        onClose();
+      }
     }
   };
 
@@ -200,29 +264,28 @@ export default function NewBookingDetailsView({
     }
   };
 
-  const storeNewBookingDetails = () => {
+  const storeBookingDetails = () => {
     if (tableRef.current.getApi()) {
       const rowData = [];
       tableRef.current.getApi().forEachNode((node) => {
         rowData.push(node.data);
       });
-      onSubmit(rowData);
+      isNewBooking ? onSubmit(rowData) : onUpdate(rowData);
     }
   };
 
   const handePreviewBookingClick = () => {
-    storeNewBookingDetails();
-    goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+    storeBookingDetails();
+    checkForBarredVenues();
   };
 
   const handeCheckMileageClick = () => {
-    storeNewBookingDetails();
+    storeBookingDetails();
     goToStep(getStepIndex(isNewBooking, 'Check Mileage'));
   };
 
   const handleCellClick = (e) => {
     const { column, data } = e;
-
     if (column.colId === 'notes' && !Number.isNaN(data.venue) && !isNullOrEmpty(data.dayType)) {
       setShowNotesModal(true);
       toggleModalOverlay(true);
@@ -256,6 +319,19 @@ export default function NewBookingDetailsView({
     toggleModalOverlay(false);
   };
 
+  const handleChangeOrConfirmBooking = () => {
+    if (changeBookingLength) {
+      setchangeBookingLengthConfirmed(true);
+      storeBookingDetails();
+    } else {
+      // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
+      if (bookingData.length === 1) {
+        setBookingData((prev) => [{ ...prev[0], isRunOfDates: true }]);
+      }
+    }
+    setchangeBookingLength((prev) => !prev);
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -278,7 +354,12 @@ export default function NewBookingDetailsView({
           onCancel={handleNotesCancel}
         />
         <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
-          <Button className=" w-33  place-self-start  " text="Check Mileage" onClick={handeCheckMileageClick} />
+          <Button
+            className=" w-33 place-self-start"
+            text="Check Mileage"
+            onClick={handeCheckMileageClick}
+            disabled={changeBookingLength}
+          />
           <div className="flex gap-4">
             {isNewBooking && (
               <Button className="w-33" variant="secondary" text="Back" onClick={handleBackButtonClick} />
@@ -286,17 +367,34 @@ export default function NewBookingDetailsView({
             <Button className="w-33 " variant="secondary" text="Cancel" onClick={handleCancelButtonClick} />
             {!isNewBooking && (
               <>
-                <Button className="w-33 " variant="tertiary" text="Delete Booking" onClick={handleDeleteBooking} />
-                <Button className="w-33 " variant="primary" text="Move Booking" onClick={handleMoveBooking} />
+                <Button
+                  className="w-33 "
+                  variant="tertiary"
+                  text="Delete Booking"
+                  onClick={handleDeleteBooking}
+                  disabled={changeBookingLength}
+                />
+                <Button
+                  className="w-33 "
+                  variant="primary"
+                  text="Move Booking"
+                  onClick={handleMoveBooking}
+                  disabled={changeBookingLength || changeBookingLengthConfirmed}
+                />
                 <Button
                   className="w-33 px-4"
                   variant="primary"
-                  text="Change Booking Length"
-                  onClick={handleChangeBookingLength}
+                  text={`${changeBookingLength ? 'Confirm New' : 'Change Booking'} Length`}
+                  onClick={handleChangeOrConfirmBooking}
                 />
               </>
             )}
-            <Button className=" w-33" text="Preview Booking" onClick={handePreviewBookingClick} />
+            <Button
+              className=" w-33"
+              text="Preview Booking"
+              onClick={handePreviewBookingClick}
+              disabled={changeBookingLength}
+            />
           </div>
         </div>
         <ConfirmationDialog

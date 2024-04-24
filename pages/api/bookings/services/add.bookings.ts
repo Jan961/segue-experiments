@@ -20,10 +20,10 @@ export class BookingService {
         const {
           DateBlockId,
           VenueId,
-          Date: BookingDate,
-          performanceTimes = [],
-          BookingStatus: StatusCode,
-          PencilNo: PencilNum,
+          BookingDate,
+          Performances,
+          StatusCode,
+          PencilNum,
           Notes,
           isBooking,
           isRehearsal,
@@ -33,22 +33,6 @@ export class BookingService {
         } = bookingData || {};
 
         if (isBooking) {
-          const Performances =
-            performanceTimes.length > 0
-              ? performanceTimes.map((time) => {
-                  const datePart = BookingDate.split('T')[0];
-                  return {
-                    Time: `${datePart}T${time}:00Z`,
-                    Date: BookingDate,
-                  };
-                })
-              : [
-                  {
-                    Time: null,
-                    Date: BookingDate,
-                  },
-                ];
-
           const bookingPromise = createNewBooking(
             {
               DateBlockId,
@@ -115,19 +99,6 @@ export class BookingService {
         counter++;
       }
       counter = 1;
-      // const createdItems = await Promise.allSettled(promises);
-
-      // // Processing created items
-      // for (const item of createdItems) {
-      //   if (item.status === 'fulfilled') {
-      //     bookings.push(bookingMapper(item.value));
-      //     if (item.value.Performance) {
-      //       performances = performances.concat(
-      //         item.value.Performance.map((performance) => performanceMapper(performance)),
-      //       );
-      //     }
-      //   }
-      // }
 
       const createdItems = await Promise.allSettled(promises);
 

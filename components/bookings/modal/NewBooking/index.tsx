@@ -79,7 +79,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
 
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
-    setNewBookingOnStore(null);
+    setBookingOnStore(null);
   };
   const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING_CONFLICTS, bookingConflicts));
@@ -92,14 +92,20 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     dispatch(actionSpreader(Actions.UPDATE_MODAL_TITLE, title));
   };
 
-  const setNewBookingOnStore = (booking: BookingItem[]) => {
+  const setBookingOnStore = (booking: BookingItem[]) => {
+    dispatch(actionSpreader(Actions.SET_BOOKING, booking));
+  };
+
+  const updateBookingOnStore = (booking: BookingItem[]) => {
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
   useEffect(() => {
     if (booking) {
       // Check for run of dates
-      const runOfDates = bookings.filter(({ runTag }) => runTag === booking.runTag);
+      const runOfDates = bookings
+        .filter(({ runTag }) => runTag === booking.runTag)
+        .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
 
       if (runOfDates.length > 1) {
         onFormDataChange({ isRunOfDates: true });
@@ -114,19 +120,21 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           dateBlockId: primaryBlock?.Id,
           dayType: dayTypeOptions.find((option) => option.text === b.dayType)?.value,
           venue: b.venueId,
+          runTag: b.runTag,
           perf: b.dayType === 'Performance',
           bookingStatus: b.status,
           notes: b.note,
           noPerf: b.performanceCount,
           times: b.performanceTimes,
-          pencilNo: b.count,
+          pencilNo: b.pencilNo,
           isBooking: b.dayType === 'Performance',
           isRehearsal: b.dayType === 'Rehearsal',
           isGetInFitUp: b.dayType === 'Get in / Fit Up',
           isRunOfDates: runOfDates.length > 1,
         };
       });
-      dispatch(actionSpreader(Actions.UPDATE_BOOKING, formattedBooking));
+      setBookingOnStore(formattedBooking);
+      updateBookingOnStore(formattedBooking);
     }
   }, [booking]);
 
@@ -154,22 +162,18 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   const updateBooking = async () => {
-    const bookingsToUpdate = state.booking.filter(({ id }) => !Number.isNaN(id));
-    let bookingsToCreate = state.booking.filter(({ id }) => Number.isNaN(id));
-    let result = null;
     try {
-      const { data: updated } = await axios.post('/api/bookings/update', bookingsToUpdate);
-      result = updated;
-      if (!isNullOrEmpty(bookingsToCreate)) {
-        const runTagForRunOfDates = nanoid(8);
-        bookingsToCreate = bookingsToUpdate.map((b) => ({
-          ...b,
-          runTag: runTagForRunOfDates,
-        }));
-        const { data: created } = await axios.post('/api/bookings/add', bookingsToCreate);
-        result = { ...result, created };
-      }
-      onClose(result);
+      const runTag = state.form.isRunOfDates ? state.booking[0].runTag : nanoid(8);
+      const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
+
+      const { data: updated } = await axios.post(
+        `${state.form.isRunOfDates ? '/api/bookings/updateRunOfDates' : '/api/bookings/update'}`,
+        {
+          original: state.booking,
+          updated: bookingsUpdatedWithRunTag,
+        },
+      );
+      onClose(updated);
     } catch (e) {
       console.log('Failed to update booking', e);
     }
@@ -177,6 +181,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
 
   const handleSaveBooking = async () => {
     editBooking ? updateBooking() : saveNewBooking();
+  };
+
+  const handleBarringCheckComplete = () => {
+    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, 'Preview New Booking'));
   };
 
   return (
@@ -195,7 +203,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
             updateBarringConflicts={updateBarringConflicts}
             dayTypeOptions={dayTypeOptions}
             onChange={onFormDataChange}
-            onSubmit={setNewBookingOnStore}
+            onSubmit={setBookingOnStore}
             formData={state.form}
             onClose={onClose}
             productionCode={productionCode}
@@ -206,21 +214,25 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         <NewBookingDetailsView
           isNewBooking={!editBooking}
           formData={state.form}
-          data={state.booking}
+          data={editBooking ? state.bookingUpdates : state.booking}
           production={currentProduction}
           dateBlockId={primaryBlock?.Id}
           dayTypeOptions={dayTypeOptions}
           venueOptions={venueOptions}
-          onSubmit={setNewBookingOnStore}
+          onSubmit={setBookingOnStore}
+          onUpdate={updateBookingOnStore}
           toggleModalOverlay={(overlay) => setHasOverlay(overlay)}
           onClose={onClose}
           onDelete={deleteBooking}
           updateModalTitle={updateModalTitle}
+          onBarringCheckComplete={handleBarringCheckComplete}
+          updateBarringConflicts={updateBarringConflicts}
         />
         <PreviewNewBookingView
           formData={state.form}
           productionCode={productionCode}
-          data={state.booking}
+          originalRows={state.booking}
+          updatedRows={state.bookingUpdates}
           dayTypeOptions={dayTypeOptions}
           onSaveBooking={handleSaveBooking}
           updateModalTitle={updateModalTitle}
@@ -230,7 +242,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isNewBooking={!editBooking}
           formData={state.form}
           productionCode={productionCode}
-          data={state.booking}
+          originalRows={state.booking}
+          updatedRows={state.bookingUpdates}
           dayTypeOptions={dayTypeOptions}
           updateModalTitle={updateModalTitle}
           previousView={state.modalTitle}
@@ -244,6 +257,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
+          nextStep={state.barringNextStep}
         />
         {!editBooking && (
           <GapSuggestionView

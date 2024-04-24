@@ -36,8 +36,9 @@ const Toolbar = ({ onApplyFilters }: ToolbarProps) => {
   const { productions } = productionJump;
   const productionOptions = [
     { text: 'All', value: null },
-    ...(productions?.filter?.((production) => !production.IsArchived).map((x) => ({ text: `${x.ShowCode}${x.Code}`, value: x.Id })) ||
-      []),
+    ...(productions
+      ?.filter?.((production) => !production.IsArchived)
+      .map((x) => ({ text: `${x.ShowCode}${x.Code} ${x.ShowName}`, value: x.Id })) || []),
   ];
   const gotoProduction = (productionId?: number) => {
     const selectedProduction = productions.find((production) => production.Id === productionId);

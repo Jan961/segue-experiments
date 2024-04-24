@@ -1,20 +1,15 @@
 import Layout from 'components/Layout';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { useState } from 'react';
 import ContractDetailsForm from 'components/contracts/contractDetailsForm';
 import ContractListingPanel from 'components/contracts/contractListingPanel';
 import { ProductionContent, getProductionWithContent } from 'services/productionService';
 import GlobalToolbar from 'components/toolbar';
-import { bookingMapper } from 'lib/mappers';
-import { BookingDTO } from 'interfaces';
+import { bookingMapperWithVenue } from 'lib/mappers';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
-interface ContractsProps {
-  bookings: BookingDTO[];
-}
-
-const Index = ({ bookings }: ContractsProps) => {
+const Index = ({ bookings }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [activeContractIndex, setActiveContractIndex] = useState<number | null>(null);
 
   function incrementActiveContractIndex() {
@@ -24,7 +19,7 @@ const Index = ({ bookings }: ContractsProps) => {
   }
 
   return (
-    <Layout title="Contracts | Seque">
+    <Layout title="Contracts | Segue">
       <div className="flex flex-auto flex-col w-full">
         <GlobalToolbar title={'Contracts'} />
         <div className="flex-row flex">
@@ -32,7 +27,7 @@ const Index = ({ bookings }: ContractsProps) => {
             bookings={bookings}
             activeContractIndex={activeContractIndex}
             setActiveContractIndex={setActiveContractIndex}
-          ></ContractListingPanel>
+          />
           {activeContractIndex !== null && (
             <ContractDetailsForm
               incrementActiveContractIndex={incrementActiveContractIndex}
@@ -58,7 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const production: ProductionContent = await getProductionWithContent(ProductionId);
   const bookings = production.DateBlock.map((x) => x.Booking)
     .flat()
-    .map(bookingMapper);
+    .map(bookingMapperWithVenue);
 
   return { props: { bookings, initialState: { global: { productionJump } } } };
 };

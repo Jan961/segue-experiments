@@ -255,7 +255,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                   onClick={handleModalCancel}
                   variant="secondary"
                   text={'Cancel'}
-                ></Button>
+                 />
               </div>
             </div>
           ) : (
@@ -363,12 +363,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             containerWidth="w-[1220px]"
             module="bookings"
             variant="salesSnapshot"
-            primaryBtnTxt="Back"
-            showPrimaryBtn={true}
-            onPrimaryBtnClick={() => setShowSalesSnapshot(false)}
             data={salesSnapData}
-            processing={loading}
-            errorMessage={errorMessage}
           />
 
           <div className="float-right flex flex-row mt-5 py-2">

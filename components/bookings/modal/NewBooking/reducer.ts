@@ -34,6 +34,7 @@ export type BookingItem = {
   isBooking: boolean;
   isRehearsal: boolean;
   isGetInFitUp: boolean;
+  isRunOfDates: boolean;
   runTag?: string;
 };
 
@@ -60,7 +61,9 @@ export type TState = {
   bookingConflicts: BookingWithVenueDTO[];
   barringConflicts: BarredVenue[];
   booking: BookingItem[];
+  bookingUpdates: BookingItem[];
   modalTitle: string;
+  barringNextStep: string;
 };
 
 const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
@@ -81,10 +84,15 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
         ...state,
         bookingConflicts: payload,
       };
-    case Actions.UPDATE_BOOKING:
+    case Actions.SET_BOOKING:
       return {
         ...state,
         booking: payload,
+      };
+    case Actions.UPDATE_BOOKING:
+      return {
+        ...state,
+        bookingUpdates: payload,
       };
     case Actions.UPDATE_BARRED_VENUES:
       return {
@@ -95,6 +103,11 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
       return {
         ...state,
         modalTitle: payload,
+      };
+    case Actions.SET_BARRING_NEXT_STEP:
+      return {
+        ...state,
+        barringNextStep: payload,
       };
     default:
       return state;

@@ -31,9 +31,13 @@ export default function ProductionManagement() {
   ];
   return (
     <Layout title="Production Management | Segue">
-      <div className="mt-4 max-w-5xl mx-auto text-2xl text-primary-navy">
-        <h1 className="mb-8 text-center">Production Management</h1>
-        <ul role="list" className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
+      <div className="mt-20 flex flex-col justify-center items-center text-primary-navy">
+        <h1 className="text-4xl font-bold  text-center">Touring Management</h1>
+        <ul
+          data-testid="touring tiles"
+          role="list"
+          className="grid grid-cols-1 gap-4 w-fit sm:grid-cols-2 md:grid-cols-4 mt-20 mx-auto "
+        >
           {links.map((link) => (
             <SwitchBoardItem key={link.title} link={link} />
           ))}

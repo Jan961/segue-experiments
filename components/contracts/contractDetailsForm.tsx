@@ -2,7 +2,6 @@
 
 import React, { useEffect } from 'react';
 import formatDate from 'utils/formatDate';
-import formatInputDate from 'utils/dateInputFormat';
 import FileUploadButton from 'components/files/FileUploadButton';
 import { IAttachedFile, IBookingDetails, IContractDetails, IFileData } from 'interfaces';
 import SaveChangesWarning from './modal/SaveChangesWarning';
@@ -10,6 +9,7 @@ import { loggingService } from '../../services/loggingService';
 import classNames from 'classnames';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { Spinner } from 'components/global/Spinner';
+import moment from 'moment';
 
 export const Label = (props: any) => {
   return (
@@ -37,27 +37,27 @@ async function updateBooking(bookingId: number, bookingDetails: IBookingDetails)
     console.error('problem updating booking');
   }
 }
-async function updateContract(bookingId: number, contractDetails: IContractDetails) {
-  try {
-    const contractUpdateAddress = () => `/api/contracts/update/contract/${bookingId}`;
-    const response = await fetch(contractUpdateAddress(), {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(contractDetails),
-    });
-    if (response.ok) {
-      loggingService.logAction('Contracts', 'Update Address');
+// async function updateContract(bookingId: number, contractDetails: IContractDetails) {
+//   try {
+//     const contractUpdateAddress = () => `/api/contracts/update/contract/${bookingId}`;
+//     const response = await fetch(contractUpdateAddress(), {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(contractDetails),
+//     });
+//     if (response.ok) {
+//       loggingService.logAction('Contracts', 'Update Address');
 
-      const parsedResponse = await response.json();
-      return { success: true, contractData: parsedResponse };
-    }
-  } catch (error) {
-    loggingService.logError(error);
-    console.error('problem updating contract');
-  }
-}
+//       const parsedResponse = await response.json();
+//       return { success: true, contractData: parsedResponse };
+//     }
+//   } catch (error) {
+//     loggingService.logError(error);
+//     console.error('problem updating contract');
+//   }
+// }
 
 async function createContract(bookingId: number, contractDetails: IContractDetails) {
   try {
@@ -177,23 +177,29 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
   useEffect(() => {
     if (activeContractData.length > 0) {
       const c = activeContractData[0];
+      console.log(moment(c.Contract?.SignedDate).format('DD-MM-YYYY'));
       setBookingDetails({
         ShowDate: c.ShowDate,
-        VenueContractStatus: c.VenueContractStatus,
-        DealType: c.DealType,
-        ContractSignedDate: formatInputDate(c.ContractSignedDate),
-        ContractSignedBy: c.ContractSignedBy,
+        VenueContractStatus: c.Contract?.StatusCode,
+        DealType: c.Contract?.DealType,
+        ContractSignedDate: moment(c.Contract?.SignedDate).format('YYYY-MM-DD'),
+        ContractSignedBy: c.Contract?.SignedBy,
         BankDetailsReceived: c.BankDetailsReceived,
-        RoyaltyPC: c.RoyaltyPC,
+        RoyaltyPC: c.Contract?.RoyalPercentage,
         CrewNotes: c.CrewNotes,
         MarketingDealNotes: c.MarketingDealNotes,
         TicketPriceNotes: c.TicketPriceNotes,
-        BarringExemptions: c.BarringExemptions,
-        ContractNotes: c.ContractNotes,
-        GP: c.GP,
-        ContractReturnDate: formatInputDate(c.ContractReturnDate),
-        ContractReceivedBackDate: formatInputDate(c.ContractReceivedBackDate),
-        ContractCheckedBy: c.ContractCheckedBy,
+        BarringExemptions: c.Contract?.Exceptions,
+        ContractNotes: c.Contract?.ContractNotes,
+        GP: c.Performance?.length * c.Venue?.Seats * 30,
+        ContractReturnDate: moment(c.Contract?.ReturnDate).format('YYYY-MM-DD'),
+        ContractReceivedBackDate: moment(c.Contract?.ReceivedBackDate).format('YYYY-MM-DD'),
+        ContractCheckedBy: c.Contract?.CheckedBy,
+        PreShow: c.Venue.BarringWeeksPre,
+        PostShow: c.Venue.BarringWeeksPost,
+        BarringClause: c.Venue.BarringClause,
+        BarringMiles: c.Venue.BarringMiles,
+        MerchandiseNotes: c.MerchandiseNotes,
       });
       if (contractExists) {
         const firstContract = c.Contract[0];
@@ -282,6 +288,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
   if (loading) return <Spinner size="lg" className="mx-auto mt-20" />;
 
   if (bookingDetails) {
+    console.log(bookingDetails.ContractSignedDate, bookingDetails.ContractReturnDate);
     return (
       <>
         <StyledDialog open={!!saveChangesBookingId} title="Unsaved Changes" onClose={cancelNavigation}>
@@ -308,11 +315,11 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
             </div>
           </div>
           <form>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 mt-2 gap-8">
               <div className="grid grid-cols-2 gap-2">
-                <label htmlFor="status" className="text-primary-pink whitespace-nowrap font-bold">
-                  Run days:{' '}
-                </label>
+                <Label htmlFor="status" className="text-primary-pink whitespace-nowrap font-bold">
+                  Contract Status:{' '}
+                </Label>
                 <select
                   className="border-none rounded-md"
                   value={bookingDetails.VenueContractStatus}
@@ -322,16 +329,13 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   <option value="CRNR">CONTRACT RECEIVED NOT RETURNED</option>
                   <option value="CRQR">CONTRACT RECEIVED QUESTIONS RAISED</option>
                   <option value="CSAR">CONTRACT SIGNED & RETURNED</option>
-                  <option value="CSBP">CONTRACT SIGNED BOTH PARTIES AND UPLOADED</option>
+                  <option value="CSAF">CONTRACT SIGNED BOTH PARTIES AND FILED</option>
                 </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 mt-2 gap-8">
-              <div className="grid grid-cols-2 gap-2">
                 <Label htmlFor="checkedby">Checked By:</Label>
-                <select className="border-none rounded-md">
+                <input value={bookingDetails.ContractCheckedBy} />
+                {/* <select className="border-none rounded-md">
                   <option>Peter Carlyle</option>
-                </select>
+                </select> */}
 
                 <Label htmlFor="checkedby">Returned to Venue: </Label>
                 <input
@@ -371,30 +375,20 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   onChange={(e) => formDataHandler('ContractSignedDate', e.currentTarget.value, '')}
                 />
                 <Label htmlFor="checkedby">Signed By:</Label>
-                <select className="border-none rounded-md">
+                <input type="text" value={bookingDetails.ContractSignedBy} />
+                {/* <select className="border-none rounded-md">
                   <option>Peter Carlyle</option>
-                </select>
-                <Label>Return Note By:</Label>
+                </select> */}
+                {/* <Label>Return Note By:</Label>
                 <select className="border-none rounded-md">
                   <option>-</option>
                   <option>PeterCarlyle</option>
-                </select>
+                </select> */}
                 <Label>Bank Details Sent</Label>
                 <select className="border-none rounded-md">
                   <option>Yes</option>
                   <option>No</option>
                 </select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-8 mt-2">
-              <div>
-                <Label>Artifacts</Label>
-                <div className="mt-2">
-                  {savedFiles && savedFiles.map((file) => convertFileBuffer(file))}
-                  <FileUploadButton disabled fileData={fileData} setFileData={setFileData} />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
                 <Label>Gross Potential: </Label>
                 <input
                   className="w-full border-none rounded-md"
@@ -409,6 +403,15 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   onChange={(e) => formDataHandler('RoyaltyPC', e.currentTarget.value, '')}
                   value={bookingDetails.RoyaltyPC}
                 />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-8 mt-2">
+              <div>
+                <Label>Artifacts</Label>
+                <div className="mt-2">
+                  {savedFiles && savedFiles.map((file) => convertFileBuffer(file))}
+                  <FileUploadButton disabled fileData={fileData} setFileData={setFileData} />
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-1 gap-2 mt-8">
@@ -453,19 +456,6 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   value={bookingDetails.TicketPriceNotes}
                 />
               </div>
-
-              <div className="flex items-center justify-between flex-row">
-                <label htmlFor="date" className="sr-only text-primary-pink font-bold">
-                  Barring clause breaches
-                </label>
-                <textarea
-                  placeholder="Barring clause breaches..."
-                  className="border-gray-300 rounded-md w-full"
-                  onChange={(e) => formDataHandler('BarringClauseBreaches', e.currentTarget.value, 'contract')}
-                  value={contractDetails.BarringClauseBreaches}
-                />
-              </div>
-
               <div>
                 <label htmlFor="date" className="sr-only text-primary-pink font-bold">
                   Exemptions
@@ -476,7 +466,7 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   name="date"
                   className="border-gray-300 rounded-md w-full"
                   onChange={(e) => formDataHandler('BarringExemptions', e.currentTarget.value, '')}
-                  value={bookingDetails.BarringExemptions}
+                  value={bookingDetails.BarringExemptions || 'none'}
                 />
               </div>
 
@@ -493,20 +483,31 @@ const ContractDetailsForm = ({ activeContract, incrementActiveContractIndex }: I
                   value={bookingDetails.ContractNotes}
                 />
               </div>
+              <div className="flex items-center justify-between flex-row">
+                <label htmlFor="date" className="sr-only text-primary-pink font-bold">
+                  Merchandise Notes
+                </label>
+                <textarea
+                  placeholder="Merchandise Notes"
+                  className="border-gray-300 rounded-md w-full"
+                  onChange={(e) => formDataHandler('BarringClauseBreaches', e.currentTarget.value, 'contract')}
+                  value={bookingDetails.MerchandiseNotes}
+                />
+              </div>
             </div>
             <div className="my-8 flex w-full flex-row gap-8">
               <span className="font-medium">Weeks:</span>
               <div>
                 <span className="text-primary-pink underline-offset-2 underline">Pre Show:</span>&nbsp;
-                <span>12</span>
+                <span>{bookingDetails?.PreShow}</span>
               </div>
               <div>
                 <span className="text-primary-pink underline-offset-2 underline">Post Show:</span>&nbsp;
-                <span>12</span>
+                <span>{bookingDetails?.PostShow}</span>
               </div>
               <div>
                 <span className="text-primary-pink underline-offset-2 underline">Miles:</span>&nbsp;
-                <span>30</span>
+                <span>{bookingDetails?.BarringMiles}</span>
               </div>
             </div>
             <div className="flex flex-row">

@@ -11,6 +11,7 @@ import {
   RowSelectedEvent,
 } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import CustomTooltipRenderer from './renderers/CustomTooltipRenderer';
 // import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
@@ -42,6 +43,7 @@ const DEFAULT_COLUMN_DEF = {
   suppressHeaderMenuButton: true,
   suppressHeaderFilterButton: true,
   menuTabs: [],
+  tooltipComponent: CustomTooltipRenderer,
 };
 
 const DEFAULT_GRID_OPTIONS = {
@@ -110,6 +112,8 @@ export default forwardRef(function Table(
       gridHeight < autoHeightLimit && gridApi
         ? gridApi.updateGridOptions({ domLayout: 'autoHeight' })
         : gridApi.updateGridOptions({ domLayout: 'normal' });
+    } else if (rowData?.length === 0 && gridApi) {
+      gridApi.updateGridOptions({ domLayout: 'autoHeight' });
     }
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 

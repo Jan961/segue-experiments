@@ -9,6 +9,8 @@ import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
+import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
+import { objectify } from 'radash';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MarketingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -34,10 +36,24 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const bookings = await getSaleableBookings(productionId);
     const venueRoles = await getRoles();
     const selected = null;
+
     const bookingJump: BookingJump = {
       selected,
       bookings: bookings.map(bookingMapperWithVenue),
     };
+
+    const townList = await getUniqueVenueTownlist();
+
+    const venues = await getAllVenuesMin();
+
+    const venue = objectify(
+      venues,
+      (v) => v.Id,
+      (v: any) => {
+        const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      },
+    );
 
     // See _app.tsx for how this is picked up
     initialState = {
@@ -47,6 +63,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       marketing: {
         bookingJump,
         venueRole: venueRoles.map(venueRoleMapper),
+        towns: townList,
+        venueList: venue,
+        defaultTab: 0,
       },
     };
   } else {

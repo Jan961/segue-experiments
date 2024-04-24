@@ -13,7 +13,7 @@ export default meta;
 
 export const Primary = () => {
   return (
-    <Tabs selectedTabClass="!bg-primary-pink text-white" tabs={tabs}>
+    <Tabs selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy" tabs={tabs}>
       <Tab.Panel className="w-42 h-24 flex justify-center items-center">First Tab</Tab.Panel>
       <Tab.Panel className="w-42 h-24 flex justify-center items-center">Second Tab</Tab.Panel>
       <Tab.Panel className="w-42 h-24 flex justify-center items-center">Third Tab</Tab.Panel>
