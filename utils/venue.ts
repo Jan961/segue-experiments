@@ -1,4 +1,4 @@
-import { Venue, VenueAddress, VenueBarredVenue, VenueContact } from '@prisma/client';
+import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueRole } from '@prisma/client';
 
 export interface PrimaryAddress {
   primaryAddressId?: number;
@@ -72,7 +72,7 @@ export interface UiVenue {
   barredVenues?: UiBarredVenue[];
 }
 
-export const transformVenueContacts = (contacts?: VenueContact): UiVenueContact => {
+export const transformVenueContacts = (contacts?: VenueContact & { VenueRole: VenueRole }): UiVenueContact => {
   const { Id: id, VenueId, FirstName, LastName, Phone, Email, Role, RoleIndex, VenueRoleId, VenueRole } = contacts;
 
   return {
@@ -119,7 +119,7 @@ export const transformVenues = (
   Venues: (Venue & {
     VenueAddress: VenueAddress[];
     VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: VenueBarredVenue[];
-    VenueContact: VenueContact[];
+    VenueContact: (VenueContact & { VenueRole: VenueRole })[];
   })[],
 ): UiTransformedVenue[] => {
   return Venues.map(
