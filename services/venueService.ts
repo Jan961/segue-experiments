@@ -159,7 +159,7 @@ export const createVenue = async (
         // Attempt to find existing role by name or create a new one
         const role = await prisma.venueRole.upsert({
           where: { Name: contact.RoleName },
-          create: { Name: contact.RoleName, IsStandard: true },
+          create: { Name: contact.RoleName, IsStandard: false },
           update: {},
         });
         // Assign the RoleId to the contact data
@@ -208,7 +208,7 @@ export const updateVenue = async (
         // Attempt to find existing role by name or create a new one
         const role = await tx.venueRole.upsert({
           where: { Name: contact.RoleName },
-          create: { Name: contact.RoleName, IsStandard: true },
+          create: { Name: contact.RoleName, IsStandard: false },
           update: {},
         });
         // Assign the RoleId to the contact data
