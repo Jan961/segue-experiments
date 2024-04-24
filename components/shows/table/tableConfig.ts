@@ -186,6 +186,7 @@ export const productionsTableConfig = [
       options: REGIONS_LIST,
       placeholder: 'Select Region(s)',
       isMulti: true,
+      customWidth: '258px',
     },
     cellStyle: {
       overflow: 'visible',

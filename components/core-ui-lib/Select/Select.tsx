@@ -47,14 +47,6 @@ const formatOptionLabel = ({ value, text }, { context }) => {
   return text;
 };
 
-const Menu = (props: MenuProps) => {
-  return (
-    <components.Menu className={`${props.isMulti && '!w-[258px]'}`} {...props}>
-      {props.children}
-    </components.Menu>
-  );
-};
-
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
 
 interface CustMultiValueProps extends MultiValueProps {
@@ -79,6 +71,7 @@ export interface SelectProps extends WithTestId {
   isClearable?: boolean;
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
+  customWidth?: string;
 }
 
 export default forwardRef(function Select(
@@ -98,6 +91,7 @@ export default forwardRef(function Select(
     isClearable = true,
     isMulti = false,
     closeMenuOnSelect = true,
+    customWidth = '258px',
   }: SelectProps,
   ref,
 ) {
@@ -178,6 +172,14 @@ export default forwardRef(function Select(
   useEffect(() => {
     setFilteredOptions(options);
   }, [options]);
+
+  const Menu = (props: MenuProps) => {
+    return (
+      <components.Menu className={`${props.isMulti && `!w-[${customWidth}]`}`} {...props}>
+        {props.children}
+      </components.Menu>
+    );
+  };
 
   const handleOptionSelect = (o: SelectOption) => {
     if (isMulti) {

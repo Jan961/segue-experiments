@@ -12,6 +12,7 @@ interface CustomSelectCelRendererProps extends ICellRendererParams {
   placeholder?: string;
   isMulti?: boolean;
   defaultValue?: string;
+  customWidth?: string;
 }
 
 const CustomSelectCelRenderer = ({
@@ -25,6 +26,7 @@ const CustomSelectCelRenderer = ({
   node,
   colDef,
   data,
+  customWidth = 'auto',
   ...props
 }: CustomSelectCelRendererProps) => {
   const selectRef = useRef(null);
@@ -71,6 +73,7 @@ const CustomSelectCelRenderer = ({
         value={value || defaultValue}
         isMulti={isMulti}
         ref={selectRef}
+        customWidth={customWidth}
         renderOption={(option) => <CustomOption option={option} />}
         {...props}
       />
