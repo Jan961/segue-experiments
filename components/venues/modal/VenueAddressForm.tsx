@@ -26,7 +26,7 @@ const VenueAddressForm = ({
       sanitizedValue = sanitizedValue?.replace(/[^a-zA-Z]/g, '').toUpperCase();
     }
     const updatedFormData = {
-      ...formData,
+      ...venue,
       [field]: sanitizedValue,
     };
     setFormData(updatedFormData);

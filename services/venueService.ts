@@ -1,5 +1,6 @@
-import { Venue, VenueAddress, VenueVenue } from '@prisma/client';
+import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueVenue } from '@prisma/client';
 import prisma from 'lib/prisma';
+import { omit } from 'radash';
 
 export const getAllVenuesMin = async () => {
   return prisma.venue.findMany({
@@ -143,8 +144,32 @@ export const getAllVenueFamilyList = () => {
   });
 };
 
-export const createVenue = async (venue: Partial<Venue>, addresses: Partial<VenueAddress>[]) => {
-  return prisma.venue.create({
+export const createVenue = async (
+  tx = prisma,
+  venue: Partial<Venue>,
+  addresses: Partial<VenueAddress>[],
+  venueContacts?: Partial<VenueContact & { RoleName?: string }>[],
+  barredVenues?: Partial<VenueBarredVenue>[],
+) => {
+  const contacts: Partial<VenueContact>[] = [];
+  if (venueContacts) {
+    for (let contact of venueContacts) {
+      // Check if RoleId is missing and RoleName is provided
+      if (!contact.VenueRoleId && contact.RoleName) {
+        // Attempt to find existing role by name or create a new one
+        const role = await prisma.venueRole.upsert({
+          where: { Name: contact.RoleName },
+          create: { Name: contact.RoleName, IsStandard: true },
+          update: {},
+        });
+        // Assign the RoleId to the contact data
+        contact.VenueRoleId = role.Id;
+      }
+      contact = omit(contact, ['RoleName']);
+      contacts.push(contact);
+    }
+  }
+  return tx.venue.create({
     data: {
       ...venue,
       ...(addresses && {
@@ -152,6 +177,111 @@ export const createVenue = async (venue: Partial<Venue>, addresses: Partial<Venu
           create: addresses,
         },
       }),
+      ...(contacts && {
+        VenueContact: {
+          create: contacts,
+        },
+      }),
+      ...(barredVenues && {
+        VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: {
+          create: barredVenues,
+        },
+      }),
+    },
+  });
+};
+
+export const updateVenue = async (
+  tx = prisma,
+  VenueId: number,
+  updatedVenue: Partial<Venue>,
+  addresses?: Partial<VenueAddress>[],
+  barredVenues?: Partial<VenueBarredVenue>[],
+  venueContacts?: Partial<VenueContact & { RoleName?: string }>[],
+) => {
+  // First handle the venue contacts to ensure roles are set up properly
+  const contacts: Partial<VenueContact>[] = [];
+  if (venueContacts) {
+    for (let contact of venueContacts) {
+      // Check if RoleId is missing and RoleName is provided
+      if (!contact.VenueRoleId && contact.RoleName) {
+        // Attempt to find existing role by name or create a new one
+        const role = await tx.venueRole.upsert({
+          where: { Name: contact.RoleName },
+          create: { Name: contact.RoleName, IsStandard: true },
+          update: {},
+        });
+        // Assign the RoleId to the contact data
+        contact.VenueRoleId = role.Id;
+      }
+      contact = omit(contact, ['RoleName']);
+      contacts.push(contact);
+    }
+  }
+  return tx.venue.update({
+    where: {
+      ...(VenueId && { Id: VenueId }),
+    },
+    data: {
+      ...updatedVenue,
+      ...(addresses && {
+        VenueAddress: {
+          upsert: addresses.map((address) => ({
+            where: {
+              Id: address?.Id || -1,
+            },
+            create: {
+              ...address,
+            },
+            update: {
+              ...address,
+            },
+          })),
+        },
+      }),
+      ...(barredVenues && {
+        VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: {
+          upsert: barredVenues.map(({ Id, BarredVenueId }) => ({
+            where: {
+              Id: Id || -1,
+            },
+            create: {
+              BarredVenueId,
+            },
+            update: {
+              BarredVenueId,
+            },
+          })),
+        },
+      }),
+      ...(contacts.length && {
+        VenueContact: {
+          upsert: contacts.map((contact) => ({
+            where: {
+              Id: contact.Id || -1,
+            },
+            create: {
+              ...contact,
+            },
+            update: {
+              ...contact,
+            },
+          })),
+        },
+      }),
+    },
+    include: {
+      VenueAddress: true,
+      VenueContact: true,
+      VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: true,
+    },
+  });
+};
+
+export const getAllVenueRoles = async () => {
+  return prisma.VenueRole.findMany({
+    where: {
+      IsStandard: true,
     },
   });
 };
