@@ -124,7 +124,6 @@ export default function ActivityModal({
               onChange={(value) => setActDate(value)}
               value={actDate}
               label="Date"
-              inputClass="!border-0 !shadow-none"
               labelClassName="text-primary-input-text"
             />
           </div>
