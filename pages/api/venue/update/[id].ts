@@ -1,6 +1,9 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
+import { updateVenue } from 'services/venueService';
+import { mapVenueContactToPrisma } from 'utils/venue';
+import { all } from 'radash';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -55,6 +58,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       deliveryPostCode,
       deliveryCountry,
       deliveryTown,
+      barredVenues,
+      venueContacts,
     } = req.body;
     const addresses = [];
     if (
@@ -127,31 +132,62 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       AddressStageDoorW3W,
       AddressLoadingW3W,
     };
-    const updatedVenue = await prisma.venue.update({
-      where: {
-        ...(VenueId && { Id: VenueId }),
-      },
-      data: {
-        ...updatedData,
-        VenueAddress: {
-          upsert: addresses.map((address) => ({
-            where: {
-              ...(address?.Id && { Id: address?.Id }),
-              ...(VenueId && { VenueId }),
+    let updatedVenue;
+    const barredVenueIds = barredVenues.map(({ barredVenueId }) => barredVenueId).filter((x: number) => x);
+    const venueContactIds = venueContacts.map(({ id }) => id).filter((x: number) => x);
+    await prisma.$transaction(async (tx) => {
+      const deleteBarredRecordsPromise = tx.VenueBarredVenue.deleteMany({
+        where: {
+          AND: [
+            {
+              VenueId,
             },
-            create: {
-              ...address,
+            {
+              BarredVenueId: {
+                not: {
+                  in: barredVenueIds,
+                },
+              },
             },
-            update: {
-              ...address,
-            },
-          })),
+          ],
         },
-      },
-      include: {
-        VenueAddress: true,
-      },
+      });
+      const deleteVenueContactsPromise = tx.VenueContact.deleteMany({
+        where: {
+          AND: [
+            {
+              VenueId,
+            },
+            {
+              Id: {
+                not: {
+                  in: venueContactIds,
+                },
+              },
+            },
+          ],
+        },
+      });
+      const updateVenuePromise = updateVenue(
+        tx,
+        VenueId,
+        updatedData,
+        addresses,
+        barredVenues.map(({ id: Id, barredVenueId: BarredVenueId }) => ({
+          Id,
+          BarredVenueId,
+        })),
+        venueContacts.map(mapVenueContactToPrisma),
+      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const [_, __, updatedVenueData] = await all([
+        deleteVenueContactsPromise,
+        deleteBarredRecordsPromise,
+        updateVenuePromise,
+      ]);
+      updatedVenue = updatedVenueData;
     });
+
     res.status(200).json(updatedVenue);
   } catch (error) {
     console.error('Error updating Venue:', error);

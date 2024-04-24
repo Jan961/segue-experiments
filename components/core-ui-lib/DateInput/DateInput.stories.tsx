@@ -12,3 +12,9 @@ type Story = StoryObj<typeof DateInput>;
 export const Primary: Story = {
   args: {},
 };
+
+export const DateInputLabel: Story = {
+  args: {
+    label: 'Date',
+  },
+};

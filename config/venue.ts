@@ -170,6 +170,7 @@ export const initialVenueBarringRules = {
   postShow: null,
   preShow: null,
   barringClause: '',
+  barredVenues: [],
 };
 
 export const initialVenueTechnicalDetails = {
@@ -188,6 +189,7 @@ export const initialVenueState = {
   ...initialVenueAddressDetails,
   ...initialVenueBarringRules,
   ...initialVenueTechnicalDetails,
+  venueContacts: [],
   confidentialNotes: '',
 };
 

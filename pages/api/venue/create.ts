@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import prisma from 'lib/prisma';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import { createVenue } from 'services/venueService';
+import { mapVenueContactToPrisma } from 'utils/venue';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -46,6 +48,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       deliveryPostCode,
       deliveryCountry,
       deliveryTown,
+      barredVenues,
+      venueContacts,
     } = req.body;
     const primaryAddress = {
       Line1: primaryAddress1,
@@ -68,39 +72,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     try {
-      const venue = await createVenue(
-        {
-          Code,
-          Name,
-          StatusCode,
-          VATIndicator,
-          CulturallyExempt,
-          FamilyId,
-          CurrencyCode,
-          Seats,
-          TownPopulation,
-          Website,
-          VenueNotes,
-          BarringWeeksPost,
-          BarringWeeksPre,
-          BarringMiles,
-          BarringClause,
-          VenueWarningNotes,
-          LXDesk,
-          LXNotes,
-          SoundDesk,
-          SoundNotes,
-          StageSize,
-          GridHeight,
-          TechSpecsURL,
-          VenueFlags,
-          ExcludeFromChecks,
-          VenueAccountId: accountId,
-          AddressLoadingW3W,
-          AddressStageDoorW3W,
-        },
-        [primaryAddress, deliveryAddress],
-      );
+      const venue = await prisma.$transaction(async (tx) => {
+        return createVenue(
+          tx,
+          {
+            Code,
+            Name,
+            StatusCode,
+            VATIndicator,
+            CulturallyExempt,
+            FamilyId,
+            CurrencyCode,
+            Seats,
+            TownPopulation,
+            Website,
+            VenueNotes,
+            BarringWeeksPost,
+            BarringWeeksPre,
+            BarringMiles,
+            BarringClause,
+            VenueWarningNotes,
+            LXDesk,
+            LXNotes,
+            SoundDesk,
+            SoundNotes,
+            StageSize,
+            GridHeight,
+            TechSpecsURL,
+            VenueFlags,
+            ExcludeFromChecks,
+            VenueAccountId: accountId,
+            AddressLoadingW3W,
+            AddressStageDoorW3W,
+          },
+          [primaryAddress, deliveryAddress],
+          venueContacts.map(mapVenueContactToPrisma),
+          barredVenues.map(({ id: Id, barredVenueId: BarredVenueId }) => ({
+            Id,
+            BarredVenueId,
+          })),
+        );
+      });
       res.status(200).json(venue);
     } catch (error) {
       console.error('Request error', error);

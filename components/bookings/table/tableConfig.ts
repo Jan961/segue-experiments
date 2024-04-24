@@ -392,17 +392,19 @@ export const venueColumnDefs = [
     resizable: false,
   },
 ];
-export const venueContractDefs = [
+
+export const venueContactDefs = (defaultRoles) => [
   {
     headerName: 'Role',
-    field: 'VenueRole',
+    field: 'roleName',
     cellRenderer: DefaultCellRenderer,
-    width: 135,
+    editable: (params) => !defaultRoles.some((role) => role.value === params.data.venueRoleId),
+    width: 150,
     headerClass: 'text-center',
   },
   {
     headerName: 'First Name',
-    field: 'VenueFirstName',
+    field: 'firstName',
     editable: true,
     cellRenderer: DefaultCellRenderer,
     width: 150,
@@ -410,16 +412,15 @@ export const venueContractDefs = [
   },
   {
     headerName: 'Last Name',
-    field: 'VenueLastName',
+    field: 'lastName',
     editable: true,
     cellRenderer: DefaultCellRenderer,
     width: 150,
-
     headerClass: 'text-center',
   },
   {
     headerName: 'Phone',
-    field: 'VenuePhone',
+    field: 'phone',
     editable: true,
     cellRenderer: DefaultCellRenderer,
     width: 120,
@@ -427,13 +428,12 @@ export const venueContractDefs = [
   },
   {
     headerName: 'Email',
-    field: 'VenueEmail',
+    field: 'email',
     editable: true,
     cellRenderer: DefaultCellRenderer,
     flex: 1,
     headerClass: 'text-center',
   },
-
   {
     headerName: '',
     field: 'delete',
@@ -446,18 +446,23 @@ export const venueContractDefs = [
     width: 40,
     headerClass: 'text-center',
     resizable: false,
+    cellStyle: {
+      overflow: 'visible',
+    },
+    cellClassRules: {
+      '!hidden': (params) => defaultRoles.some((role) => role.value === params.data.venueRoleId),
+    },
   },
 ];
 
-export const barredVenues = [
+export const getBarredVenuesColDefs = (venueOptions) => [
   {
     headerName: 'Barred Venues',
-    field: 'venue',
-    // this uses copy of selectBarredVenuesRenderer
+    field: 'barredVenueId',
     cellRenderer: SelectBarredVenuesRenderer,
-    // cellRendererParams: {
-    //   venueOptions,
-    // },
+    cellRendererParams: {
+      venueOptions,
+    },
     flex: 1,
     cellStyle: {
       overflow: 'visible',
@@ -466,7 +471,7 @@ export const barredVenues = [
 
   {
     headerName: '',
-    field: 'info',
+    field: 'delete',
     cellRenderer: IconRenderer,
     cellRendererParams: {
       iconName: 'delete',
