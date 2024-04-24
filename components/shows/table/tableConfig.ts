@@ -6,6 +6,35 @@ import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
 import CustomDateCellRenderer from 'components/core-ui-lib/Table/renderers/CustomDateCellRenderer';
 import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
+import { ICellRendererParams } from 'ag-grid-community';
+import React from 'react';
+
+const generateChildCol = (
+  headerName: string,
+  field: string,
+  dateBlockIndex,
+  startDateField,
+  renderer: (params: ICellRendererParams) => React.ReactElement,
+) => {
+  return {
+    headerName,
+    field,
+    valueGetter: function (params) {
+      return params.data?.DateBlock ? params.data?.DateBlock?.[dateBlockIndex]?.[startDateField] : null;
+    },
+    cellStyle: {
+      paddingRight: '0.1em',
+      overflow: 'visible',
+      paddingLeft: '0.1em',
+    },
+    cellRenderer: renderer,
+    suppressMovable: true,
+    headerClass: 'border-r-[1px] border-white text-center',
+    width: 120,
+    resizable: false,
+    sortable: false,
+  };
+};
 
 export const tableConfig = [
   {
@@ -125,42 +154,8 @@ export const productionsTableConfig = [
     headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
-      {
-        headerName: 'Start',
-        field: 'DateBlock[1].StartDate',
-        valueGetter: function (params) {
-          return params.data?.DateBlock ? params.data?.DateBlock[1]?.StartDate : null;
-        },
-        cellStyle: {
-          paddingRight: '0.1em',
-          paddingLeft: '0.1em',
-          overflow: 'visible',
-        },
-        cellRenderer: CustomDateCellRenderer,
-        suppressMovable: true,
-        headerClass: 'border-r-[1px] border-white text-center',
-        width: 120,
-        resizable: false,
-        sortable: false,
-      },
-      {
-        headerName: 'End',
-        field: 'DateBlock[1].EndDate',
-        valueGetter: function (params) {
-          return params.data?.DateBlock ? params.data?.DateBlock[1]?.EndDate : null;
-        },
-        cellStyle: {
-          paddingRight: '0.1em',
-          paddingLeft: '0.1em',
-          overflow: 'visible',
-        },
-        cellRenderer: CustomDateCellRenderer,
-        suppressMovable: true,
-        headerClass: 'border-r-[1px] border-white text-center',
-        width: 120,
-        resizable: false,
-        sortable: false,
-      },
+      generateChildCol('Start', 'DateBlock[1].StartDate', 1, 'StartDate', CustomDateCellRenderer),
+      generateChildCol('End', 'DateBlock[1].EndDate', 1, 'EndDate', CustomDateCellRenderer),
     ],
   },
   {
@@ -169,42 +164,8 @@ export const productionsTableConfig = [
     headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
-      {
-        headerName: 'Start',
-        field: 'DateBlock[0].StartDate',
-        valueGetter: function (params) {
-          return params.data?.DateBlock ? params.data?.DateBlock[0]?.StartDate : null;
-        },
-        cellStyle: {
-          paddingRight: '0.1em',
-          overflow: 'visible',
-          paddingLeft: '0.1em',
-        },
-        cellRenderer: CustomDateCellRenderer,
-        suppressMovable: true,
-        headerClass: 'border-r-[1px] border-white text-center',
-        width: 120,
-        resizable: false,
-        sortable: false,
-      },
-      {
-        headerName: 'End',
-        field: 'DateBlock[0].EndDate',
-        valueGetter: function (params) {
-          return params.data?.DateBlock ? params.data?.DateBlock[0]?.EndDate : null;
-        },
-        width: 120,
-        cellStyle: {
-          paddingRight: '0.1em',
-          paddingLeft: '0.1em',
-          overflow: 'visible',
-        },
-        cellRenderer: CustomDateCellRenderer,
-        suppressMovable: true,
-        headerClass: 'border-r-[1px] border-white text-center',
-        resizable: false,
-        sortable: false,
-      },
+      generateChildCol('Start', 'DateBlock[0].StartDate', 0, 'StartDate', CustomDateCellRenderer),
+      generateChildCol('End', 'DateBlock[0].EndDate', 0, 'EndDate', CustomDateCellRenderer),
     ],
   },
   {

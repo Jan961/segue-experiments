@@ -109,7 +109,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       setIsLoading(true);
       try {
         const payloadData = getConvertedPayload({ ...e.data, Id: currentProduction?.Id }, true);
-        await axios.put(`/api/shows/productions/${currentProduction?.Id}`, payloadData);
+        await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
           const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;

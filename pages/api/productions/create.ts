@@ -3,7 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
-const mapToPrismaFields = ({
+export const mapToPrismaFields = ({
   code: Code,
   isArchived: IsArchived,
   showId: ShowId,
@@ -11,19 +11,24 @@ const mapToPrismaFields = ({
   salesEmail: SalesEmail,
   regionList: RegionList,
   dateBlockList,
+  id: Id,
 }) => ({
+  Id,
   Code,
   IsArchived,
   SalesEmail,
   SalesFrequency,
   ShowId,
   RegionList,
-  DateBlock: dateBlockList.map(({ name: Name, startDate: StartDate, endDate: EndDate, isPrimary: IsPrimary }) => ({
-    Name,
-    StartDate,
-    EndDate,
-    IsPrimary,
-  })),
+  DateBlock: dateBlockList.map(
+    ({ name: Name, startDate: StartDate, endDate: EndDate, isPrimary: IsPrimary, id: Id }) => ({
+      Name,
+      StartDate,
+      EndDate,
+      IsPrimary,
+      Id,
+    }),
+  ),
 });
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
