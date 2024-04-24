@@ -112,7 +112,7 @@ export default function ActivityModal({
           options={activityTypes}
           value={actType}
           onChange={(value) => setActType(parseInt(value.toString()))}
-          placeholder={'Please select from Venue or Town'}
+          placeholder={'Please select Activity Type'}
           isClearable
           isSearchable
           label="Type"
