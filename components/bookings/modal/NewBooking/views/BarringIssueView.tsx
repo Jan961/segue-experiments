@@ -11,6 +11,7 @@ type BarringIssueViewProps = {
   isNewBooking: boolean;
   barringConflicts?: BarredVenue[];
   updateModalTitle: (title: string) => void;
+  nextStep: '';
 };
 
 const barringGridOptions = {
@@ -20,7 +21,12 @@ const barringGridOptions = {
   },
 };
 
-export default function BarringIssueView({ isNewBooking, barringConflicts, updateModalTitle }: BarringIssueViewProps) {
+export default function BarringIssueView({
+  isNewBooking,
+  barringConflicts,
+  updateModalTitle,
+  nextStep,
+}: BarringIssueViewProps) {
   const { goToStep } = useWizard();
 
   useEffect(() => {
@@ -52,7 +58,11 @@ export default function BarringIssueView({ isNewBooking, barringConflicts, updat
           <Button
             className="ml-3 w-33"
             text="Continue"
-            onClick={() => goToStep(getStepIndex(isNewBooking, 'New Booking Details'))}
+            onClick={() =>
+              goToStep(
+                nextStep ? getStepIndex(isNewBooking, nextStep) : getStepIndex(isNewBooking, 'New Booking Details'),
+              )
+            }
           />
         </div>
       </div>

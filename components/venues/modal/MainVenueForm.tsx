@@ -32,7 +32,7 @@ const MainVenueForm = ({
       sanitizedValue = sanitizedValue?.replace(/[^a-zA-Z]/g, '').toUpperCase();
     }
     const updatedFormData = {
-      ...formData,
+      ...venue,
       [field]: sanitizedValue,
     };
     setFormData(updatedFormData);
@@ -169,7 +169,7 @@ const MainVenueForm = ({
           className="w-full justify-between"
           inputClassName="w-full"
           value={formData.venueWebsite}
-          onChange={(e) => handleInputChange('venueWebsite', parseFloat(e.target.value))}
+          onChange={(e) => handleInputChange('venueWebsite', e.target.value)}
         />
       </label>
       <label

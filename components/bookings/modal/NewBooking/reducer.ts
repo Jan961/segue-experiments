@@ -63,6 +63,7 @@ export type TState = {
   booking: BookingItem[];
   bookingUpdates: BookingItem[];
   modalTitle: string;
+  barringNextStep: string;
 };
 
 const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
@@ -102,6 +103,11 @@ const reducer = (state: TState = INITIAL_STATE, action: TAction) => {
       return {
         ...state,
         modalTitle: payload,
+      };
+    case Actions.SET_BARRING_NEXT_STEP:
+      return {
+        ...state,
+        barringNextStep: payload,
       };
     default:
       return state;
