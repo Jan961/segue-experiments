@@ -130,13 +130,8 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   return (
     <div className={`relative flex rounded-md w-fit ${label ? 'border border-primary-border shadow-sm-shadow' : ''}`}>
       {label && (
-        <div
-          className={classNames(
-            labelClassName,
-            'flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3',
-          )}
-        >
-          <Label text={label} />
+        <div className={classNames('flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3')}>
+          <Label text={label} className={labelClassName} />
         </div>
       )}
       <div className="absolute right-3 top-3 z-10 flex flex-col">
