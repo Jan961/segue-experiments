@@ -13,7 +13,7 @@ import { getStepIndex } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { dateToSimple, formattedDateWithWeekDay, toISO } from 'services/dateService';
-import { ProductionDTO } from 'interfaces';
+import { BookingWithVenueDTO, ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
 import { isNullOrEmpty } from 'utils';
@@ -21,7 +21,7 @@ import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import { Direction } from 'components/bookings/table/AddDeleteRowRenderer';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
-import MoveBooking from '../../MoveBooking';
+import MoveBooking from '../../moveBooking';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -39,6 +39,7 @@ type NewBookingDetailsProps = {
   updateModalTitle: (title: string) => void;
   isNewBooking: boolean;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
+  updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
 };
 
 export default function NewBookingDetailsView({
@@ -57,6 +58,7 @@ export default function NewBookingDetailsView({
   isNewBooking,
   onBarringCheckComplete,
   updateBarringConflicts,
+  updateBookingConflicts,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const venueDict = useRecoilValue(venueState);
@@ -178,33 +180,65 @@ export default function NewBookingDetailsView({
 
   const checkForBarredVenues = async () => {
     const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
-
-    const lastRow = tableRef.current
-      .getApi()
-      .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
-    try {
-      const response = await axios.post('/api/productions/venue/barringCheck', {
-        startDate: firstRow.data.dateAsISOString,
-        endDate: lastRow.data.dateAsISOString,
-        productionId: production.Id,
-        venueId: firstRow.data.venue,
-        seats: 400,
-        barDistance: 25,
-        includeExcluded: false,
-        filterBarredVenues: true,
-      });
-      if (!isNullOrEmpty(response.data)) {
-        onBarringCheckComplete();
-        const formatted = response.data
-          .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
-          .filter((venue: BarredVenue) => venue.hasBarringConflict);
-        updateBarringConflicts(formatted);
-        goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
-      } else {
-        goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+    if (!firstRow.data.venue) {
+      goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+    } else {
+      const lastRow = tableRef.current
+        .getApi()
+        .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
+      try {
+        const response = await axios.post('/api/productions/venue/barringCheck', {
+          startDate: firstRow.data.dateAsISOString,
+          endDate: lastRow.data.dateAsISOString,
+          productionId: production.Id,
+          venueId: firstRow.data.venue,
+          seats: 400,
+          barDistance: 25,
+          includeExcluded: false,
+          filterBarredVenues: true,
+        });
+        if (!isNullOrEmpty(response.data)) {
+          onBarringCheckComplete();
+          const formatted = response.data
+            .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
+            .filter((venue: BarredVenue) => venue.hasBarringConflict);
+          updateBarringConflicts(formatted);
+          goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
+        } else {
+          updateBarringConflicts(null);
+          goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+        }
+      } catch (e) {
+        console.log('Error getting barred venues');
       }
-    } catch (e) {
-      console.log('Error getting barred venues');
+    }
+  };
+
+  const checkForBookingConflicts = async () => {
+    const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
+    if (firstRow.data.venue) {
+      const lastRow = tableRef.current
+        .getApi()
+        .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
+      try {
+        const response = await axios.post('/api/bookings/conflict', {
+          fromDate: firstRow.data.dateAsISOString,
+          toDate: lastRow.data.dateAsISOString,
+          productionId: production.Id,
+        });
+        if (!isNullOrEmpty(response.data)) {
+          updateBookingConflicts(response.data);
+          goToStep(getStepIndex(isNewBooking, 'Booking Conflict'));
+        } else {
+          setchangeBookingLengthConfirmed(true);
+          setchangeBookingLength((prev) => !prev);
+        }
+      } catch (e) {
+        console.log('Error getting barred venues');
+      }
+    } else {
+      setchangeBookingLengthConfirmed(true);
+      setchangeBookingLength((prev) => !prev);
     }
   };
 
@@ -325,15 +359,15 @@ export default function NewBookingDetailsView({
 
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
-      setchangeBookingLengthConfirmed(true);
       storeBookingDetails();
+      checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
       if (bookingData.length === 1) {
         setBookingData((prev) => [{ ...prev[0], isRunOfDates: true }]);
       }
+      setchangeBookingLength((prev) => !prev);
     }
-    setchangeBookingLength((prev) => !prev);
   };
 
   const handleMoveBookingClose = () => {
@@ -409,9 +443,8 @@ export default function NewBookingDetailsView({
           <MoveBooking
             visible={showMoveBookingModal}
             onClose={handleMoveBookingClose}
-            productionCode={productionCode}
-            productionId={production.Id}
             bookings={bookingData}
+            venueOptions={venueOptions}
           />
         )}
         <ConfirmationDialog
