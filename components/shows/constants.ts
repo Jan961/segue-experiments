@@ -1,3 +1,5 @@
+import { convertObjectKeysToCamelCase } from 'utils';
+
 export const SALES_FIG_OPTIONS = [
   {
     value: 'D',
@@ -52,7 +54,7 @@ export const REGIONS_LIST = [
   },
 ];
 
-export const getConvertedPayload = (input, isEdit = false) => {
+export const getProductionsConvertedPayload = (input, isEdit = false) => {
   const camelCaseData = input.DateBlock ? input.DateBlock.map((item) => convertObjectKeysToCamelCase(item)) : [];
 
   const output = {
@@ -67,8 +69,6 @@ export const getConvertedPayload = (input, isEdit = false) => {
   };
 
   if (!isEdit) delete output.id;
-
-  console.log(isEdit);
 
   if (isEdit) {
     if ('DateBlock[0].StartDate' in input) {
@@ -102,25 +102,3 @@ export const getConvertedPayload = (input, isEdit = false) => {
 
   return output;
 };
-
-function capitalCaseToCamelCase(str) {
-  return str
-    .replace(/\s(.)/g, function (match) {
-      return match.toUpperCase();
-    })
-    .replace(/\s/g, '')
-    .replace(/^(.)/, function (match) {
-      return match.toLowerCase();
-    });
-}
-
-function convertObjectKeysToCamelCase(obj) {
-  const newObj = {};
-  for (const key in obj) {
-    if (Object.hasOwnProperty.call(obj, key)) {
-      newObj[capitalCaseToCamelCase(key)] =
-        typeof obj[key] === 'object' ? convertObjectKeysToCamelCase(obj[key]) : obj[key];
-    }
-  }
-  return newObj;
-}

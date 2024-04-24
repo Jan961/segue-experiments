@@ -5,7 +5,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Table from 'components/core-ui-lib/Table';
 import { LoadingOverlay } from 'components/shows/ShowsTable';
-import { getConvertedPayload } from 'components/shows/constants';
+import { getProductionsConvertedPayload } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -108,7 +108,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
       setIsLoading(true);
       try {
-        const payloadData = getConvertedPayload({ ...e.data, Id: currentProduction?.Id }, true);
+        const payloadData = getProductionsConvertedPayload({ ...e.data, Id: currentProduction?.Id }, true);
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
@@ -133,7 +133,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     ) {
       setIsLoading(true);
       try {
-        const payloadData = getConvertedPayload(e.data, false);
+        const payloadData = getProductionsConvertedPayload(e.data, false);
         await axios.post(`/api/productions/create`, payloadData);
       } finally {
         setIsEdited(false);

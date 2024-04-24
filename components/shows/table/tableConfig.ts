@@ -4,10 +4,10 @@ import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRendere
 import TableCheckboxRenderer from './TableCheckboxRenderer';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
-import CustomDateCellRenderer from 'components/core-ui-lib/Table/renderers/CustomDateCellRenderer';
 import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
+import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 
 const generateChildCol = (
   headerName: string,
@@ -154,8 +154,8 @@ export const productionsTableConfig = [
     headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
-      generateChildCol('Start', 'DateBlock[1].StartDate', 1, 'StartDate', CustomDateCellRenderer),
-      generateChildCol('End', 'DateBlock[1].EndDate', 1, 'EndDate', CustomDateCellRenderer),
+      generateChildCol('Start', 'DateBlock[1].StartDate', 1, 'StartDate', DateRenderer),
+      generateChildCol('End', 'DateBlock[1].EndDate', 1, 'EndDate', DateRenderer),
     ],
   },
   {
@@ -164,8 +164,8 @@ export const productionsTableConfig = [
     headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
-      generateChildCol('Start', 'DateBlock[0].StartDate', 0, 'StartDate', CustomDateCellRenderer),
-      generateChildCol('End', 'DateBlock[0].EndDate', 0, 'EndDate', CustomDateCellRenderer),
+      generateChildCol('Start', 'DateBlock[0].StartDate', 0, 'StartDate', DateRenderer),
+      generateChildCol('End', 'DateBlock[0].EndDate', 0, 'EndDate', DateRenderer),
     ],
   },
   {
