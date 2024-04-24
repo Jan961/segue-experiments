@@ -372,6 +372,7 @@ export default function NewBookingDetailsView({
 
   const handleMoveBookingClose = () => {
     setShowMoveBookingsModal(false);
+    onClose();
   };
 
   return (

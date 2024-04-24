@@ -13,6 +13,7 @@ interface BookingConflictsViewProps {
   data?: BookingWithVenueDTO[];
   hasBarringIssues?: boolean;
   updateModalTitle: (title: string) => void;
+  nextStep?: number;
 }
 
 export default function BookingConflictsView({
@@ -20,6 +21,7 @@ export default function BookingConflictsView({
   data,
   hasBarringIssues,
   updateModalTitle,
+  nextStep,
 }: BookingConflictsViewProps) {
   const { goToStep } = useWizard();
 
@@ -53,7 +55,7 @@ export default function BookingConflictsView({
     if (hasBarringIssues) {
       goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
     } else {
-      goToStep(getStepIndex(isNewBooking, 'New Booking Details'));
+      goToStep(nextStep || getStepIndex(isNewBooking, 'New Booking Details'));
     }
   };
 

@@ -6,6 +6,11 @@ import { BookingItem } from '../NewBooking/reducer';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import BookingConflictsView from '../NewBooking/views/BookingConflictsView';
 import BarringIssueView from '../NewBooking/views/BarringIssueView';
+import { BookingWithVenueDTO } from 'interfaces';
+import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
+import { useRecoilValue } from 'recoil';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import ConfirmMoveView from './ConfirmMoveView';
 
 interface MoveBookingProps {
   visible: boolean;
@@ -14,13 +19,37 @@ interface MoveBookingProps {
   venueOptions: SelectOption[];
 }
 
+export type MoveParams = {
+  productionName: string;
+  count: string;
+  venue: string;
+  date: string;
+};
+
+const Header = () => {
+  const currentProduction = useRecoilValue(currentProductionSelector);
+  return (
+    <div className="text-primary-navy text-xl my-2 font-bold">{`${currentProduction?.ShowCode}${currentProduction?.Code}  ${currentProduction?.ShowName}`}</div>
+  );
+};
+
+export const moveBookingSteps = ['MoveBooking', 'Booking Conflict', 'Barring Issue', 'MoveConfirm', 'MoveSuccess'];
+
 const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBookingProps) => {
   const [state, setState] = useState({ barringConflicts: [], bookingConflicts: [], modalTitle: '' });
-  const [hasOverlay, setHasOverlay] = useState<boolean>(false);
+  const [moveParams, setMoveParams] = useState<MoveParams>();
 
   const updateModalTitle = (modalTitle: string) => {
     setState((prev) => ({ ...prev, modalTitle }));
   };
+
+  const updateBookingConflicts = (bookingConflicts: BookingWithVenueDTO[]) => {
+    setState((prev) => ({ ...prev, bookingConflicts }));
+  };
+  const updateBarringConflicts = (barringConflicts: BarredVenue[]) => {
+    setState((prev) => ({ ...prev, barringConflicts }));
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -28,15 +57,23 @@ const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBook
       titleClass="text-xl text-primary-navy text-bold"
       title="Move Booking"
       panelClass="relative"
-      hasOverlay={hasOverlay}
     >
-      <Wizard>
-        <MoveBookingView bookings={bookings} venueOptions={venueOptions} onClose={onClose} />
+      <Wizard header={<Header />}>
+        <MoveBookingView
+          bookings={bookings}
+          venueOptions={venueOptions}
+          onClose={onClose}
+          viewSteps={moveBookingSteps}
+          updateBarringConflicts={updateBarringConflicts}
+          updateBookingConflicts={updateBookingConflicts}
+          updateMoveParams={setMoveParams}
+        />
         <BookingConflictsView
           isNewBooking={false}
           hasBarringIssues={state?.barringConflicts?.length > 0}
           data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}
+          nextStep={moveBookingSteps.indexOf('MoveConfirm')}
         />
         <BarringIssueView
           isNewBooking={false}
@@ -44,6 +81,7 @@ const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBook
           updateModalTitle={updateModalTitle}
           nextStep=""
         />
+        <ConfirmMoveView {...moveParams} onClose={onClose} />
       </Wizard>
     </PopupModal>
   );
