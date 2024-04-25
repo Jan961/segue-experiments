@@ -31,6 +31,7 @@ interface TableProps {
   displayHeader?: boolean;
   getRowStyle?: any;
   rowClassRules?: any;
+  headerHeight?: number;
   getRowHeight?: (params: RowHeightParams) => number;
 }
 
@@ -67,6 +68,7 @@ export default forwardRef(function Table(
     rowClassRules,
     displayHeader = true,
     getRowHeight,
+    headerHeight,
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,
   }: TableProps,
@@ -128,6 +130,8 @@ export default forwardRef(function Table(
     };
   }, []);
 
+  const gridHeaderHeight = headerHeight || HEADER_HEIGHT;
+
   return (
     <>
       <GridStyles {...styleProps} />
@@ -140,7 +144,7 @@ export default forwardRef(function Table(
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          headerHeight={displayHeader ? HEADER_HEIGHT : 0}
+          headerHeight={displayHeader ? gridHeaderHeight : 0}
           rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}

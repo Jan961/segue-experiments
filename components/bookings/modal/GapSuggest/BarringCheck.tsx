@@ -72,7 +72,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
         <Label
           className="py-4 text-responsive-sm text-primary-input-text"
           text={error ? 'Something went wrong.Please try again' : 'A Barring check has found no issues'}
-        ></Label>
+         />
       )}
       {(barredVenues?.length && !loading && (
         <div className="flex flex-col">

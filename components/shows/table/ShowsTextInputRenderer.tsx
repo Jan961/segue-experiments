@@ -2,18 +2,14 @@ import { useEffect, useState } from 'react';
 import { ICellRendererParams } from 'ag-grid-community';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 
-const ShowsTextInputRenderer = (props: ICellRendererParams) => {
-  const { value, setValue, eGridCell, colDef } = props;
+interface ShowsTextInputRendererProps extends ICellRendererParams {
+  placeholder: string;
+}
+
+const ShowsTextInputRenderer = ({ value, setValue, eGridCell, placeholder }: ShowsTextInputRendererProps) => {
   const [inputValue, setInputValue] = useState(value || '');
 
-  const [placeholder, setPlaceholder] = useState<string>('Please enter Show Name');
   const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    if (colDef?.field === 'Code') {
-      setPlaceholder('Show Code');
-    }
-  }, [colDef]);
 
   useEffect(() => {
     if (value) {
