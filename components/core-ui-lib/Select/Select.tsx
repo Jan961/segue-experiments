@@ -38,11 +38,9 @@ const DropdownIndicator = (props: DropdownIndicatorProps) => {
   );
 };
 
-const formatOptionLabel = ({ value, text }, { context }) => {
+const formatOptionLabel = ({ text }, { context }) => {
   if (context === 'value') {
     return text;
-  } else if (value.length > 2) {
-    return `+${value.length} selected`;
   }
   return text;
 };
