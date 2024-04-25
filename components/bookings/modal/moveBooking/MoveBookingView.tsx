@@ -99,8 +99,9 @@ const MoveBookingView = ({
     }
   }, [bookings, venueOptions]);
 
-  const handleProductionChange = ({ productionId }) => {
-    const production = productions.find(({ Id }) => Id === productionId);
+  const handleProductionChange = (value: string | number) => {
+    setSelectedProduction(fomrattedProductions.find(({ value: id }) => id === value));
+    const production = productions.find(({ Id }) => Id === value);
     setBookingDetails((prev) => ({
       ...prev,
       production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
@@ -120,7 +121,7 @@ const MoveBookingView = ({
         const response = await axios.post('/api/productions/venue/barringCheck', {
           startDate: bookingDetails.moveDate,
           endDate: bookingDetails.moveEndDate,
-          productionId,
+          productionId: selectedProduction.value,
           venueId: bookings[0].venue,
           seats: 400,
           barDistance: 25,
@@ -150,7 +151,7 @@ const MoveBookingView = ({
         const response = await axios.post('/api/bookings/conflict', {
           fromDate: bookingDetails.moveDate,
           toDate: bookingDetails.moveEndDate,
-          productionId,
+          productionId: selectedProduction.value,
         });
         if (!isNullOrEmpty(response.data)) {
           updateBookingConflicts(response.data);
@@ -176,43 +177,41 @@ const MoveBookingView = ({
   };
 
   return (
-    <>
-      <div className="w-[485px]">
-        <Label className="text-md my-2" text={`Move ${bookingDetails.count} date booking at ${bookingDetails.venue}`} />
-        <div className="w-[400px] flex flex-col items-end">
-          <Select
-            className="w-full"
-            label="Production"
-            name="production"
-            placeholder="Please select a Production"
-            value={selectedProduction?.value}
-            options={fomrattedProductions}
-            isClearable={false}
-            onChange={(production) => handleProductionChange({ productionId: production })}
-          />
-          <Label className="text-md" text="*Current Production" />
-        </div>
-        <Label
-          text={`Currently scheduled to start on ${
-            bookingDetails.moveDate ? format(parseISO(bookingDetails.moveDate), 'dd/MM/yy') : ''
-          }`}
+    <div className="w-[485px]">
+      <Label className="text-md my-2" text={`Move ${bookingDetails.count} date booking at ${bookingDetails.venue}`} />
+      <div className="w-[400px] flex flex-col items-end">
+        <Select
+          className="w-full"
+          label="Production"
+          name="production"
+          placeholder="Please select a Production"
+          value={selectedProduction?.value}
+          options={fomrattedProductions}
+          isClearable={false}
+          onChange={handleProductionChange}
         />
-        <div className="flex item-center gap-2">
-          <Label text="New start date" />
-          <DateInput
-            label="Date"
-            onChange={handleDateChange}
-            value={bookingDetails.moveDate}
-            minDate={parseISO(scheduleStart)}
-            maxDate={parseISO(scheduleEnd)}
-          />
-        </div>
+        <Label className="text-md" text="*Current Production" />
+      </div>
+      <Label
+        text={`Currently scheduled to start on ${
+          bookingDetails.moveDate ? format(parseISO(bookingDetails.moveDate), 'dd/MM/yy') : ''
+        }`}
+      />
+      <div className="flex item-center gap-2">
+        <Label text="New start date" />
+        <DateInput
+          label="Date"
+          onChange={handleDateChange}
+          value={bookingDetails.moveDate}
+          minDate={parseISO(scheduleStart)}
+          maxDate={parseISO(scheduleEnd)}
+        />
       </div>
       <div className="pt-8 w-full flex justify-end  items-center gap-3">
         <Button className="w-33 " variant="secondary" text="Cancel" onClick={onClose} />
         <Button className="w-33 " variant="primary" text="Move Booking" onClick={handleMoveBooking} />
       </div>
-    </>
+    </div>
   );
 };
 

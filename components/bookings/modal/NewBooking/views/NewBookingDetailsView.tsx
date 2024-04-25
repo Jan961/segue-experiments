@@ -422,7 +422,7 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength || changeBookingLengthConfirmed}
+                  disabled={changeBookingLength || changeBookingLengthConfirmed || isNullOrEmpty(bookingData[0]?.venue)}
                 />
                 <Button
                   className="w-33 px-4"
