@@ -10,11 +10,7 @@ const Index = () => {
   return (
     <Layout title="Global Activites | Segue">
       <div className="flex flex-col px-4 flex-auto">
-        <GlobalToolbar
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-          title={'Global Activities'}
-         />
+        <GlobalToolbar searchFilter={searchFilter} setSearchFilter={setSearchFilter} title={'Global Activities'} />
         <Toolbar />
         {/* <SideMenu></SideMenu> */}
         <GlobalActivites />
