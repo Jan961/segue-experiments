@@ -198,6 +198,7 @@ export default forwardRef(function Select(
       }
     } else {
       setSelectedOption(o);
+      onChange(o ? o.value : null);
     }
   };
 
