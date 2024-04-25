@@ -28,10 +28,6 @@ export const REGIONS_LIST = [
     value: 6,
     text: 'Scandinavia',
   },
-  // {
-  //   value: 'middleEast',
-  //   text: 'Middle East',
-  // },
   {
     value: 2,
     text: 'Asia',
