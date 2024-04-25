@@ -21,7 +21,7 @@ interface AddEditVenueModalProps {
   countryOptions: SelectOption[];
   venueRoleOptionList: SelectOption[];
   venue?: UiTransformedVenue;
-  onClose: () => void;
+  onClose: (isSuccess?: boolean) => void;
 }
 
 export default function AddEditVenueModal({
@@ -49,7 +49,7 @@ export default function AddEditVenueModal({
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
       await axios.post('/api/venue/create', venue);
-      onClose();
+      onClose(true);
     } catch (e) {
       debug('Error creating venue', e);
     }
@@ -58,7 +58,7 @@ export default function AddEditVenueModal({
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
       await axios.post('/api/venue/update/' + venue.id, venue);
-      onClose();
+      onClose(true);
     } catch (e) {
       debug('Error updating venue', e);
     }

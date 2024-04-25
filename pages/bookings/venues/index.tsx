@@ -67,15 +67,32 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
   }, [productionId, town, country, search]);
 
-  const updateFilters = (change) => {
-    setFilters((prevFilters) => ({ ...prevFilters, ...change }));
-  };
+  const refreshTable = useCallback(() => {
+    filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
+  }, [productionId, town, country, search, filterVenues]);
+
+  const updateFilters = useCallback(
+    (change) => {
+      setFilters((prevFilters) => ({ ...prevFilters, ...change }));
+    },
+    [setFilters],
+  );
 
   const onSelectVenue = useCallback(
     (venue: UiTransformedVenue) => {
       setEditVenueContext(venue);
     },
     [setEditVenueContext],
+  );
+
+  const onModalClose = useCallback(
+    (isSuccess?: boolean) => {
+      if (isSuccess) {
+        refreshTable();
+      }
+      setEditVenueContext(null);
+    },
+    [refreshTable, setEditVenueContext],
   );
 
   return (
@@ -102,9 +119,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           countryOptions={venueCountryOptionList}
           venueRoleOptionList={venueRoleOptionList}
           visible={!!editVenueContext}
-          onClose={() => {
-            setEditVenueContext(null);
-          }}
+          onClose={onModalClose}
         />
       )}
     </>

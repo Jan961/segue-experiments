@@ -40,8 +40,8 @@ const confOptions = {
   },
   return: {
     question: 'Are you sure you want to return to home?',
-    warning: ''
-  }
+    warning: '',
+  },
 };
 
 export default function ConfirmationDialog({

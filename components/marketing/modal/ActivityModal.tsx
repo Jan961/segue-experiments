@@ -112,7 +112,7 @@ export default function ActivityModal({
           options={activityTypes}
           value={actType}
           onChange={(value) => setActType(parseInt(value.toString()))}
-          placeholder={'Please select from Venue or Town'}
+          placeholder={'Please select Activity Type'}
           isClearable
           isSearchable
           label="Type"
@@ -124,7 +124,6 @@ export default function ActivityModal({
               onChange={(value) => setActDate(value)}
               value={actDate}
               label="Date"
-              inputClass="!border-0 !shadow-none"
               labelClassName="text-primary-input-text"
             />
           </div>

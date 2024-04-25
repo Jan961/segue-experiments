@@ -98,11 +98,11 @@ export default function Barring({ visible, onClose }: BarringProps) {
             <Form onSubmit={fetchBarredVenues} />
           </div>
           {Array.isArray(rows) && rows.length === 0 && (
-            <Label className="text-md my-2" text="A Barring Check has found no issues."></Label>
+            <Label className="text-md my-2" text="A Barring Check has found no issues." />
           )}
           {(rows !== null && rows?.length > 0 && (
             <div className="block">
-              <Label className="text-md my-2" text="Check the box of venues you wish to remove from this list."></Label>
+              <Label className="text-md my-2" text="Check the box of venues you wish to remove from this list." />
               <div
                 className="w-full overflow-hidden flex flex-col z-[500] min-h-40"
                 style={{ maxHeight: 'calc(100vh - 450px)', minHeight: '110px' }}

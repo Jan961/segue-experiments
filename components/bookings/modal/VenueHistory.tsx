@@ -250,12 +250,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
               <div className="float-right flex flex-row">
                 {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
-                <Button
-                  className="px-8 mt-2 -mb-1"
-                  onClick={handleModalCancel}
-                  variant="secondary"
-                  text={'Cancel'}
-                 />
+                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text={'Cancel'} />
               </div>
             </div>
           ) : (

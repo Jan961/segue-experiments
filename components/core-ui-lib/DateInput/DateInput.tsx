@@ -6,6 +6,7 @@ import moment from 'moment';
 import { convertLocalDateToUTC } from 'services/dateService';
 import { shortDateRegex } from 'utils/regexUtils';
 import Label from '../Label';
+import classNames from 'classnames';
 
 interface DateInputProps {
   value?: string | Date;
@@ -127,18 +128,12 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   };
 
   return (
-    <div
-      className={`relative h-[1.9375rem] flex flex-row rounded-md ${
-        label ? 'border border-primary-border shadow-sm-shadow' : ''
-      }`}
-    >
-      <div className="flex flex-col">
-        {label && (
-          <div className="border-r min-w-fit border-primary-border px-3">
-            <Label className={labelClassName} text={label} />
-          </div>
-        )}
-      </div>
+    <div className={`relative flex rounded-md w-fit ${label ? 'border border-primary-border shadow-sm-shadow' : ''}`}>
+      {label && (
+        <div className={classNames('flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3')}>
+          <Label text={label} className={labelClassName} />
+        </div>
+      )}
       <div className="absolute right-3 top-3 z-10 flex flex-col">
         <DatePicker
           ref={dpRef}
@@ -162,7 +157,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           ref={inputRef}
           value={inputValue}
           iconName="calendar"
-          className={`w-28 h-[1.8375rem] ${inputClass}`}
+          className={classNames('w-28', { '!border-0 !shadow-none': !!label }, `${inputClass}`)}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}

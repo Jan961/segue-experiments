@@ -1,3 +1,3 @@
-import SalesTable from "./SalesTable";
+import SalesTable from './SalesTable';
 
 export default SalesTable;
