@@ -2,9 +2,10 @@ import { ProductionDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { mapToPrismaFields } from '../create';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const dto = req.body as ProductionDTO;
+  const dto: Partial<ProductionDTO> = mapToPrismaFields(req.body);
   const { Id } = dto;
 
   const email = await getEmailFromReq(req);

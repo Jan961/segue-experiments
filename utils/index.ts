@@ -53,3 +53,25 @@ export const transformToOptions = (
     value: listItem?.[valueKey] || valueFn?.(listItem),
   }));
 };
+
+export const capitalCaseToCamelCase = (str: string) => {
+  return str
+    .replace(/\s(.)/g, function (match) {
+      return match.toUpperCase();
+    })
+    .replace(/\s/g, '')
+    .replace(/^(.)/, function (match) {
+      return match.toLowerCase();
+    });
+};
+
+export const convertObjectKeysToCamelCase = (obj: any) => {
+  const newObj = {};
+  for (const key in obj) {
+    if (Object.hasOwnProperty.call(obj, key)) {
+      newObj[capitalCaseToCamelCase(key)] =
+        typeof obj[key] === 'object' ? convertObjectKeysToCamelCase(obj[key]) : obj[key];
+    }
+  }
+  return newObj;
+};

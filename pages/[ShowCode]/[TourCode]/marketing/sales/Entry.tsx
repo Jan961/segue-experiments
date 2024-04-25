@@ -1,22 +1,18 @@
 import Layout from 'components/Layout';
 import Toolbar from 'components/marketing/venue/toolbar';
 import SideMenu from 'components/sideMenu';
-import { Show } from 'interfaces';
 import EmailLoader from 'components/marketing/sales/email-loader';
-import FinalSales from 'components/marketing/sales/final';
+import Entry from 'components/marketing/sales/entry';
 
-type Props = {
-  items: Show[];
-};
 const pagetitle = 'Marketing - Sale Entry';
 
-const Index = ({ items }: Props) => (
+const Index = () => (
   <Layout title={pagetitle + '| Segue'}>
-    <Toolbar title={pagetitle} searchFilter={''}></Toolbar>
+    <Toolbar title={pagetitle} searchFilter={''} />
     <div className="flex flex-auto">
-      <SideMenu></SideMenu>
-      <FinalSales></FinalSales>
-      <EmailLoader></EmailLoader>
+      <SideMenu />
+      <Entry searchFilter={''} />
+      <EmailLoader />
     </div>
   </Layout>
 );

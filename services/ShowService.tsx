@@ -26,7 +26,7 @@ export const getShowPageProps = async (ctx: any) => {
 
 const showInclude = Prisma.validator<Prisma.ShowInclude>()({
   Production: {
-    include: { Show: true, DateBlock: true },
+    include: { Show: true, DateBlock: true, ProductionRegion: true },
   },
 });
 

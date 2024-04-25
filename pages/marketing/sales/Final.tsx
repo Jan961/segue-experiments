@@ -13,7 +13,7 @@ const Index = ({ activeProductions }: Props) => (
   <Layout title={pagetitle + '| Segue'}>
     <div className="flex flex-col px-4 flex-auto">
       <h1 className="text-3xl font-bold text-primary-green ">{pagetitle + ' | Segue'}</h1>
-      <FinalSales productions={activeProductions}></FinalSales>
+      <FinalSales productions={activeProductions} />
     </div>
   </Layout>
 );

@@ -150,6 +150,10 @@ export type ProductionDTO = {
   DateBlock: DateBlockDTO[];
   StartDate?: string;
   EndDate?: string;
+  SalesEmail?: string;
+  SalesFrequency?: string;
+  RegionList?: number[];
+  IsDeleted?: boolean;
 };
 
 export type VenueMinimalDTO = {

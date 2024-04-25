@@ -35,7 +35,7 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
     <Layout title="Tasks | Segue">
       <div className="flex flex-auto w-full">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
-          <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'}></GlobalToolbar>
+          <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'} />
           <Toolbar onApplyFilters={onApplyFilters} />
           {filteredProductions.length > 0 ? (
             filteredProductions.map((production) => (

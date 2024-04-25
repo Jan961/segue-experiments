@@ -7,9 +7,10 @@ import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
 import { tableConfig } from './table/tableConfig';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
+import Productions from './modal/Productions';
 import { useRouter } from 'next/router';
 
-const LoadingOverlay = () => (
+export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
     <Spinner size="lg" />
   </div>
@@ -59,6 +60,7 @@ const ShowsTable = ({
   const [currentShow, setCurrentShow] = useState(intShowData);
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showProductionsModal, setShowProductionsModal] = useState<boolean>(false);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -78,6 +80,9 @@ const ShowsTable = ({
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'Id') {
       setConfirm(true);
+    } else if (e.column.colId === 'productions' && e.data.Id) {
+      setShowProductionsModal(true);
+      setCurrentShow(e.data);
     } else if (
       e.column.colId === 'EditId' &&
       currentShow?.Id &&
@@ -105,7 +110,7 @@ const ShowsTable = ({
       }
     } else if (
       isAddRow &&
-      e.column.colId === 'EditId' &&
+      e.column.colId === 'editId' &&
       currentShow?.Name.length > 2 &&
       currentShow?.Code.length > 1
     ) {
@@ -168,6 +173,14 @@ const ShowsTable = ({
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
+
+      {showProductionsModal && (
+        <Productions
+          visible={showProductionsModal}
+          onClose={() => setShowProductionsModal(false)}
+          showData={currentShow}
+        />
+      )}
       {isError && (
         <p className="text-red-600 absolute right-[4%] top-[21%] w-[9%]">
           This Show Code is already in use.
