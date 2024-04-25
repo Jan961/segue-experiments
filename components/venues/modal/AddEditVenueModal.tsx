@@ -12,12 +12,14 @@ import VenueBarringForm from './VenueBarringForm';
 import axios from 'axios';
 import { UiTransformedVenue } from 'utils/venue';
 import { debug } from 'utils/logging';
+import VenueContactForm from './VenueContactsForm';
 
 interface AddEditVenueModalProps {
   visible: boolean;
   venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   countryOptions: SelectOption[];
+  venueRoleOptionList: SelectOption[];
   venue?: UiTransformedVenue;
   onClose: () => void;
 }
@@ -27,6 +29,7 @@ export default function AddEditVenueModal({
   visible,
   venueCurrencyOptionList,
   venueFamilyOptionList,
+  venueRoleOptionList,
   countryOptions,
   onClose,
 }: AddEditVenueModalProps) {
@@ -117,6 +120,14 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+            />
+          </div>
+          <div className="pt-7">
+            <VenueContactForm
+              venueRoleOptionList={venueRoleOptionList}
+              venue={formData}
+              contactsList={formData.venueContacts}
+              onChange={onChange}
             />
           </div>
           <div className="pt-7">

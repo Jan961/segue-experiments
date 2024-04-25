@@ -21,7 +21,7 @@ const VenueTechnicalDetailsForm = ({
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
-      ...formData,
+      ...venue,
       [field]: value,
     };
     setFormData(updatedFormData);
@@ -30,6 +30,7 @@ const VenueTechnicalDetailsForm = ({
       updateValidationErrrors(field, null);
     }
   };
+
   return (
     <>
       <div className="flex flex-row  justify-between">

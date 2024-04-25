@@ -11,15 +11,17 @@ export default function SelectBarredVenuesRenderer({
   eGridCell,
   value,
   setValue,
+  node,
+  data,
+  colDef,
 }: SelectVenueRendererProps) {
   const handleVenueChange = (venue) => {
     setValue(venue);
+    node.setData({ ...data, [colDef?.field]: value });
   };
 
   return (
     <div className="pl-1 pr-2 mt-1">
-      <div className="mt-1 p-2 border border-primary-border rounded-md w-full h-[1.9375rem] bg-primary-white flex items-center"></div>
-
       <SelectRenderer
         eGridCell={eGridCell}
         options={venueOptions}
@@ -27,6 +29,8 @@ export default function SelectBarredVenuesRenderer({
         inline
         onChange={handleVenueChange}
         isSearchable
+        isClearable={false}
+        label={'Venue'}
       />
     </div>
   );

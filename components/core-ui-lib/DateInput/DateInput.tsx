@@ -5,6 +5,8 @@ import React, { createRef, forwardRef, useEffect, useImperativeHandle, useRef, u
 import moment from 'moment';
 import { convertLocalDateToUTC } from 'services/dateService';
 import { shortDateRegex } from 'utils/regexUtils';
+import Label from '../Label';
+import classNames from 'classnames';
 
 interface DateInputProps {
   value?: string | Date;
@@ -16,6 +18,8 @@ interface DateInputProps {
   placeholder?: string;
   popperClassName?: string;
   className?: string;
+  label?: string;
+  labelClassName?: string;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -33,6 +37,8 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     minDate,
     maxDate,
     placeholder = 'DD/MM/YY',
+    label,
+    labelClassName,
     ...props
   }: DateInputProps,
   ref,
@@ -122,8 +128,13 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   };
 
   return (
-    <div className={`relative h-[1.9375rem]`}>
-      <div className="absolute right-3 top-3 z-10">
+    <div className={`relative flex rounded-md w-fit ${label ? 'border border-primary-border shadow-sm-shadow' : ''}`}>
+      {label && (
+        <div className={classNames('flex items-center min-w-fit h-[1.9375rem] border-r border-primary-border px-3')}>
+          <Label text={label} className={labelClassName} />
+        </div>
+      )}
+      <div className="absolute right-3 top-3 z-10 flex flex-col">
         <DatePicker
           ref={dpRef}
           minDate={minDate}
@@ -146,7 +157,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           ref={inputRef}
           value={inputValue}
           iconName="calendar"
-          className={`w-28 ${inputClass}`}
+          className={classNames('w-28', { '!border-0 !shadow-none': !!label }, `${inputClass}`)}
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}

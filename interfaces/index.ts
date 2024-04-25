@@ -212,15 +212,21 @@ export type VenueContactDTO = {
 };
 
 export type ActivityDTO = {
-  Id: number;
-  Date: string;
+  Id?: number;
+  Date: Date | string;
   Name: string;
   BookingId: number;
   ActivityTypeId: number;
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
+  DueByDate?: Date;
   Notes: string;
+};
+
+export type ActivityTypeDTO = {
+  Name: string;
+  Id: number;
 };
 
 export type BookingContactNoteDTO = {

@@ -27,13 +27,13 @@ import { nanoid } from 'nanoid';
 import { isNullOrEmpty } from 'utils';
 import { BookingRow } from 'types/BookingTypes';
 
-type AddBookingProps = {
+interface AddBookingProps {
   visible: boolean;
   onClose: (bookings?: any) => void;
   startDate?: string;
   endDate?: string;
   booking?: BookingRow;
-};
+}
 
 const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookingProps) => {
   const bookingDict = useRecoilValue(bookingState);
@@ -227,6 +227,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           updateModalTitle={updateModalTitle}
           onBarringCheckComplete={handleBarringCheckComplete}
           updateBarringConflicts={updateBarringConflicts}
+          updateBookingConflicts={updateBookingConflicts}
         />
         <PreviewNewBookingView
           formData={state.form}
@@ -249,6 +250,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           previousView={state.modalTitle}
         />
         <BookingConflictsView
+          isNewBooking={!editBooking}
           hasBarringIssues={state?.barringConflicts?.length > 0}
           data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}

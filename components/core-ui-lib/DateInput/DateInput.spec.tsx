@@ -46,4 +46,18 @@ describe('DateInput Component', () => {
     fireEvent.blur(input);
     expect(handleChange).toHaveBeenCalledWith(null);
   });
+
+  test('renders label when provided', () => {
+    const label = 'Start Date';
+    render(<DateInput onChange={handleChange} label={label} />);
+    const labelText = screen.getByText(label);
+    expect(labelText).toBeInTheDocument();
+  });
+
+  test('applies custom class to label when labelClassName is provided', () => {
+    const labelClassName = 'custom-label-class';
+    render(<DateInput onChange={handleChange} label="Start Date" labelClassName={labelClassName} />);
+    const label = screen.getByText('Start Date');
+    expect(label).toHaveClass(labelClassName);
+  });
 });
