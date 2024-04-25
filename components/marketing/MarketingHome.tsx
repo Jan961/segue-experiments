@@ -17,6 +17,10 @@ import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
 import ActivityModal, { ActivityModalVariant } from './modal/ActivityModal';
 import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
+import { activityColDefs, styleProps } from 'components/marketing/table/tableConfig';
+import Table from 'components/core-ui-lib/Table';
+import formatInputDate from 'utils/dateInputFormat';
+import { reverseDate, hasActivityChanged } from './utils/index';
 
 export type SelectOption = {
   text: string;
@@ -47,7 +51,7 @@ const MarketingHome = () => {
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
-  const [activityTypes, setActivityTypes] = useState<Array<SelectOption>>(null);
+  const [actTypeList, setActTypeList] = useState<Array<SelectOption>>(null);
   const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
   const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
   const [salesTable, setSalesTable] = useState<ReactNode>();
@@ -56,6 +60,10 @@ const MarketingHome = () => {
   const venueDict = useRecoilValue(venueState);
   const [tabSet, setTabSet] = useState<boolean>(false);
   const [tabIndex, setTabIndex] = useRecoilState(tabState);
+  const [actColDefs, setActColDefs] = useState([]);
+  const [actRowData, setActRowData] = useState([]);
+  const [actRow, setActRow] = useState<ActivityDTO>();
+  const [actModalVariant, setActModalVariant] = useState<ActivityModalVariant>();
 
   const router = useRouter();
 
@@ -161,21 +169,126 @@ const MarketingHome = () => {
 
     if (typeof data === 'object') {
       const activityList = data as ActivityList;
-      const actTypes = activityList.activityTypes.map((type) => {
-        return { text: type.Name, value: type.Id };
-      });
 
-      setActivityTypes(actTypes);
+      const actTypes = activityList.activityTypes.map((type) => ({
+        text: type.Name,
+        value: type.Id,
+      }));
+
+      setActTypeList(actTypes);
+
+      setActColDefs(activityColDefs(activityUpdate, '£'));
+
+      const tempRows = activityList.activities.map((act) => ({
+        actName: act.Name,
+        actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+        actDate: formatInputDate(act.Date),
+        followUpCheck: act.FollowUpRequired,
+        followUpDt: act.DueByDate,
+        companyCost: act.CompanyCost,
+        venueCost: act.VenueCost,
+        notes: act.Notes,
+        bookingId: act.BookingId,
+        id: act.Id,
+      }));
+
+      setActRowData(tempRows);
+    }
+  };
+
+  const activityUpdate = async (variant: ActivityModalVariant, data) => {
+    setActModalVariant(variant);
+
+    // we need to do an api call to get a list of activity types
+    // the useState variable with activity type is set after activityUpdate is passed in the col defs
+    const activityData = await fetchData({
+      url: '/api/marketing/activities/' + bookingId,
+      method: 'POST',
+    });
+
+    if (typeof activityData === 'object') {
+      const activityList = activityData as ActivityList;
+      const actTypes = activityList.activityTypes;
+
+      if (variant === 'edit') {
+        const tempAct: ActivityDTO = {
+          ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
+          BookingId: data.bookingId,
+          CompanyCost: data.companyCost,
+          VenueCost: data.venueCost,
+          Date: reverseDate(data.actDate),
+          FollowUpRequired: data.followUpCheck,
+          Name: data.actName,
+          Notes: data.notes,
+          DueByDate: data.followUpCheck ? reverseDate(data.followUpDt) : null,
+          Id: data.id,
+        };
+
+        setActRow(tempAct);
+        setShowActivityModal(true);
+      }
     }
   };
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
-    await fetchData({
-      url: '/api/marketing/activities/create',
-      method: 'POST',
-      data,
-    });
-    setShowActivityModal(false);
+    if (variant === 'add') {
+      await fetchData({
+        url: '/api/marketing/activities/create',
+        method: 'POST',
+        data,
+      });
+
+      const newRow = {
+        actName: data.Name,
+        actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
+        actDate: formatInputDate(data.Date),
+        followUpCheck: data.FollowUpRequired,
+        followUpDt: data.DueByDate,
+        companyCost: data.CompanyCost,
+        venueCost: data.VenueCost,
+        notes: data.Notes,
+        bookingId: data.BookingId,
+      };
+
+      setActRowData([...actRowData, newRow]);
+      setShowActivityModal(false);
+    } else if (variant === 'edit') {
+      if (hasActivityChanged(actRow, data)) {
+        alert('changed');
+        alert(JSON.stringify(data));
+        await fetchData({
+          url: '/api/marketing/activities/update',
+          method: 'POST',
+          data,
+        });
+
+        const updatedRow = {
+          actName: data.Name,
+          actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
+          actDate: formatInputDate(data.Date),
+          followUpCheck: data.FollowUpRequired,
+          followUpDt: data.DueByDate,
+          companyCost: data.CompanyCost,
+          venueCost: data.VenueCost,
+          notes: data.Notes,
+          bookingId: data.BookingId,
+        };
+
+        const rowIndex = actRowData.findIndex((act) => act.id === data.Id);
+        const newRows = [...actRowData];
+        newRows[rowIndex] = updatedRow;
+        setActRowData(newRows);
+
+        setShowActivityModal(false);
+      } else {
+        setShowActivityModal(false);
+      }
+    }
+  };
+
+  const addActivity = () => {
+    setActModalVariant('add');
+    setShowActivityModal(true);
   };
 
   useEffect(() => {
@@ -265,20 +378,34 @@ const MarketingHome = () => {
             </div>
           </Tab.Panel>
 
-          <Tab.Panel className="w-42 h-24 flex justify-center items-center">
-            <div className="flex flex-row gap-4 mb-5">
-              <Button
-                text="Show Activity Modal - Temporary Button"
-                className="w-[400px]"
-                onClick={() => setShowActivityModal(true)}
-              />
+          <Tab.Panel className="h-[650px] overflow-y-hidden">
+            <div className="flex flex-row">checkbox row - SK-103</div>
+            <div className="flex flex-row">
+              <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.15] rounded-xl mb-5 mr-5">
+                marketing costs - SK-103
+              </div>
+              <div className="flex flex-col">
+                <Button
+                  text="Activity Report"
+                  className="w-[160px] mb-[12px]"
+                  disabled={!productionId}
+                  iconProps={{ className: 'h-4 w-3' }}
+                  sufixIconName={'excel'}
+                />
+                <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
+              </div>
+            </div>
+            <div className="w-[1086px] h-[500px]">
+              <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} />
+
               <ActivityModal
                 show={showActivityModal}
                 onCancel={() => setShowActivityModal(false)}
-                variant="add"
-                activityTypes={activityTypes}
+                variant={actModalVariant}
+                activityTypes={actTypeList}
                 onSave={(variant, data) => saveActivity(variant, data)}
                 bookingId={bookingId}
+                data={actRow}
               />
             </div>
           </Tab.Panel>
