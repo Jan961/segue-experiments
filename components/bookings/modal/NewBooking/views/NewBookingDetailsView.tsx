@@ -35,7 +35,7 @@ type NewBookingDetailsProps = {
   toggleModalOverlay: (isVisible: boolean) => void;
   onClose: () => void;
   onDelete: () => void;
-  onBarringCheckComplete: () => void;
+  onBarringCheckComplete: (nextStep: string) => void;
   updateModalTitle: (title: string) => void;
   isNewBooking: boolean;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
@@ -77,6 +77,7 @@ export default function NewBookingDetailsView({
 
   useEffect(() => {
     updateModalTitle(`${isNewBooking ? 'New' : 'Edit'} Booking Details`);
+    onBarringCheckComplete('Preview New Booking');
   }, []);
 
   useEffect(() => {
@@ -196,7 +197,6 @@ export default function NewBookingDetailsView({
         filterBarredVenues: true,
       });
       if (!isNullOrEmpty(response.data)) {
-        onBarringCheckComplete();
         const formatted = response.data
           .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
           .filter((venue: BarredVenue) => venue.hasBarringConflict);

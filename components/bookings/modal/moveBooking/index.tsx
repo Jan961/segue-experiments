@@ -76,7 +76,6 @@ const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBook
           nextStep={moveBookingSteps.indexOf(state?.barringConflicts?.length > 0 ? 'Barring Issue' : 'MoveConfirm')}
         />
         <BarringIssueView
-          isNewBooking={false}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
           previousStep={moveBookingSteps.indexOf('MoveBooking')}

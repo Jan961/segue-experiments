@@ -184,8 +184,8 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     editBooking ? updateBooking() : saveNewBooking();
   };
 
-  const handleBarringCheckComplete = () => {
-    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, 'Preview New Booking'));
+  const handleBarringCheckComplete = (nextStep: string) => {
+    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, nextStep));
   };
 
   const nextStepForConflicts = useMemo(() => {
@@ -215,6 +215,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
             productionCode={productionCode}
             venueOptions={venueOptions}
             updateModalTitle={updateModalTitle}
+            onBarringCheckComplete={handleBarringCheckComplete}
           />
         )}
         <NewBookingDetailsView
