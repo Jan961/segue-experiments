@@ -181,37 +181,33 @@ export default function NewBookingDetailsView({
 
   const checkForBarredVenues = async () => {
     const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
-    if (!firstRow.data.venue) {
-      goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
-    } else {
-      const lastRow = tableRef.current
-        .getApi()
-        .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
-      try {
-        const response = await axios.post('/api/productions/venue/barringCheck', {
-          startDate: firstRow.data.dateAsISOString,
-          endDate: lastRow.data.dateAsISOString,
-          productionId: production.Id,
-          venueId: firstRow.data.venue,
-          seats: 400,
-          barDistance: 25,
-          includeExcluded: false,
-          filterBarredVenues: true,
-        });
-        if (!isNullOrEmpty(response.data)) {
-          onBarringCheckComplete();
-          const formatted = response.data
-            .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
-            .filter((venue: BarredVenue) => venue.hasBarringConflict);
-          updateBarringConflicts(formatted);
-          goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
-        } else {
-          updateBarringConflicts(null);
-          goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
-        }
-      } catch (e) {
-        console.log('Error getting barred venues');
+    const lastRow = tableRef.current
+      .getApi()
+      .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
+    try {
+      const response = await axios.post('/api/productions/venue/barringCheck', {
+        startDate: firstRow.data.dateAsISOString,
+        endDate: lastRow.data.dateAsISOString,
+        productionId: production.Id,
+        venueId: firstRow.data.venue,
+        seats: 400,
+        barDistance: 25,
+        includeExcluded: false,
+        filterBarredVenues: true,
+      });
+      if (!isNullOrEmpty(response.data)) {
+        onBarringCheckComplete();
+        const formatted = response.data
+          .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
+          .filter((venue: BarredVenue) => venue.hasBarringConflict);
+        updateBarringConflicts(formatted);
+        goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
+      } else {
+        updateBarringConflicts(null);
+        goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
       }
+    } catch (e) {
+      console.log('Error getting barred venues');
     }
   };
 
@@ -314,7 +310,12 @@ export default function NewBookingDetailsView({
 
   const handePreviewBookingClick = () => {
     storeBookingDetails();
-    checkForBarredVenues();
+    const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
+    if (firstRow.data.venue && formData.venueId !== firstRow.data.venue) {
+      checkForBarredVenues();
+    } else {
+      goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+    }
   };
 
   const handeCheckMileageClick = () => {
@@ -360,6 +361,7 @@ export default function NewBookingDetailsView({
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
       storeBookingDetails();
+      console.log();
       checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one

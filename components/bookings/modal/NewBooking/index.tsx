@@ -133,6 +133,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isRunOfDates: runOfDates.length > 1,
         };
       });
+      dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, { venueId: formattedBooking[0].venue }));
       setBookingOnStore(formattedBooking);
       updateBookingOnStore(formattedBooking);
     }
@@ -261,7 +262,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           updateModalTitle={updateModalTitle}
         />
         <BarringIssueView
-          isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
           previousStep={getStepIndex(!editBooking, !editBooking ? 'Create New Booking' : 'New Booking Details')}
