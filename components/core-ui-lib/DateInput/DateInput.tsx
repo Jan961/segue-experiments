@@ -19,6 +19,7 @@ interface DateInputProps {
   className?: string;
   label?: string;
   labelClassName?: string;
+  disabled?: boolean;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -38,6 +39,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     placeholder = 'DD/MM/YY',
     label,
     labelClassName,
+    disabled = false,
     ...props
   }: DateInputProps,
   ref,
@@ -100,7 +102,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     if (inputValue && inputValue.match(shortDateRegex)) {
       inputRef?.current?.select();
     }
-  }, [inputValue]);
+  }, [inputValue, inputRef]);
 
   const handleInputFocus = () => {
     inputRef?.current?.select();
@@ -152,6 +154,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           selected={selectedDate}
           openToDate={selectedDate}
           customInput={<div className="cursor-pointer w-4 h-4 " />}
+          disabled={disabled}
           {...props}
         />
       </div>
@@ -166,6 +169,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
+          disabled={disabled}
         />
       </div>
     </div>
