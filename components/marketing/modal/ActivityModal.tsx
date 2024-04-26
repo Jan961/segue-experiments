@@ -12,7 +12,6 @@ import { removeTime } from 'utils';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
-import { startOfDay } from 'date-fns';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
