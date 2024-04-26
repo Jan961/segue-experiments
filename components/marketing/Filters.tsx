@@ -43,10 +43,20 @@ const Filters = () => {
   }, [bookings.bookings]);
 
   useEffect(() => {
-    const futureBookings = bookingOptions.filter(
-      (booking) => reverseDate(booking.date).getTime() >= reverseDate(today).getTime(),
-    );
+    const futureBookings = bookingOptions.filter((booking) => {
+      try {
+        const reversedBookingDate = reverseDate(booking.date);
+        const reversedTodayDate = reverseDate(today);
 
+        if (reversedBookingDate !== '' && reversedTodayDate !== '') {
+          return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+        } else {
+          return false;
+        }
+      } catch (error) {
+        return false;
+      }
+    });
     setFutureBookings({
       hasFutureBooking: futureBookings.length > 0,
       nextBooking: futureBookings.length > 0 ? futureBookings[0] : null,

@@ -223,7 +223,8 @@ const MarketingHome = () => {
           FollowUpRequired: data.followUpCheck,
           Name: data.actName,
           Notes: data.notes,
-          DueByDate: data.followUpCheck ? reverseDate(data.followUpDt) : null,
+          DueByDate:
+            data.followUpDt && reverseDate(data.followUpDt) !== '' ? new Date(reverseDate(data.followUpDt)) : null,
           Id: data.id,
         };
 
