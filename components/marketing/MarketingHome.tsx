@@ -19,7 +19,6 @@ import ActivityModal, { ActivityModalVariant } from './modal/ActivityModal';
 import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 import { activityColDefs, styleProps } from 'components/marketing/table/tableConfig';
 import Table from 'components/core-ui-lib/Table';
-import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate, hasActivityChanged } from './utils';
 
 export type SelectOption = {
@@ -274,7 +273,7 @@ const MarketingHome = () => {
         const updatedRow = {
           actName: data.Name,
           actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
-          actDate: formatInputDate(data.Date),
+          actDate: data.Date,
           followUpCheck: data.FollowUpRequired,
           followUpDt: data.DueByDate,
           companyCost: data.CompanyCost,
@@ -388,11 +387,8 @@ const MarketingHome = () => {
           </Tab.Panel>
 
           <Tab.Panel className="h-[650px] overflow-y-hidden">
-            <div className="flex flex-row">checkbox row - SK-103</div>
             <div className="flex flex-row">
-              <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.15] rounded-xl mb-5 mr-5">
-                marketing costs - SK-103
-              </div>
+              <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.15] rounded-xl mb-5 mr-5" />
               <div className="flex flex-col">
                 <Button
                   text="Activity Report"
