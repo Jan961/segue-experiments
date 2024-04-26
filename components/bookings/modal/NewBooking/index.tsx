@@ -8,7 +8,7 @@ import BarringIssueView from './views/BarringIssueView';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
-import { Actions, INITIAL_STATE, OTHER_DAY_TYPES } from 'config/AddBooking';
+import { Actions, INITIAL_STATE, OTHER_DAY_TYPES, getStepIndex } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
@@ -187,6 +187,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, 'Preview New Booking'));
   };
 
+  const nextStepForConflicts = useMemo(() => {
+    const hasBarringIssues = state?.barringConflicts?.length > 0;
+    return getStepIndex(!editBooking, hasBarringIssues ? 'Barring Issue' : 'New Booking Details');
+  }, [state.barringConflicts, editBooking]);
+
   return (
     <PopupModal
       show={visible}
@@ -251,15 +256,16 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         />
         <BookingConflictsView
           isNewBooking={!editBooking}
-          hasBarringIssues={state?.barringConflicts?.length > 0}
           data={state.bookingConflicts}
+          nextStep={nextStepForConflicts}
           updateModalTitle={updateModalTitle}
         />
         <BarringIssueView
           isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
-          nextStep={state.barringNextStep}
+          previousStep={getStepIndex(!editBooking, !editBooking ? 'Create New Booking' : 'New Booking Details')}
+          nextStep={getStepIndex(!editBooking, state.barringNextStep)}
         />
         {!editBooking && (
           <GapSuggestionView

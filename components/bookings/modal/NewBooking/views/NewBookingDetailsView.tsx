@@ -64,6 +64,7 @@ export default function NewBookingDetailsView({
   const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
+  const [hasBookingChanged, setHasBookingChanged] = useState<boolean>(false);
   const [showMoveBookingModal, setShowMoveBookingsModal] = useState<boolean>(false);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
@@ -274,8 +275,7 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().redrawRows();
       setchangeBookingLength(false);
     } else {
-      const isDirty = tableRef.current.isDirty();
-      if (isDirty) {
+      if (hasBookingChanged) {
         confirmationType.current = 'cancel';
         setShowConfirmation(true);
         toggleModalOverlay(true);
@@ -375,6 +375,12 @@ export default function NewBookingDetailsView({
     onClose();
   };
 
+  const handleCellValueChange = () => {
+    if (!hasBookingChanged) {
+      setHasBookingChanged(true);
+    }
+  };
+
   return (
     <>
       <div className="flex justify-between">
@@ -389,6 +395,7 @@ export default function NewBookingDetailsView({
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
+          onCellValueChange={handleCellValueChange}
         />
         <NotesPopup
           show={showNotesModal}
@@ -422,7 +429,12 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength || changeBookingLengthConfirmed || isNullOrEmpty(bookingData[0]?.venue)}
+                  disabled={
+                    hasBookingChanged ||
+                    changeBookingLength ||
+                    changeBookingLengthConfirmed ||
+                    isNullOrEmpty(bookingData[0]?.venue)
+                  }
                 />
                 <Button
                   className="w-33 px-4"

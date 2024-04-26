@@ -11,7 +11,6 @@ import { toWords } from 'number-to-words';
 import format from 'date-fns/format';
 import { addDays, parseISO } from 'date-fns';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
-import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Button from 'components/core-ui-lib/Button';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
@@ -41,6 +40,11 @@ type BookingDetails = {
   production: string;
 };
 
+type ScheduleDate = {
+  startDate: string;
+  endDate: string;
+};
+
 const MoveBookingView = ({
   venueOptions,
   bookings = [],
@@ -50,9 +54,9 @@ const MoveBookingView = ({
   viewSteps,
   updateMoveParams,
 }: MoveBookingViewProps) => {
-  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const productionId = currentProduction?.Id;
+
   const { goToStep } = useWizard();
   const [bookingDetails, setBookingDetails] = useState<BookingDetails>({
     count: '',
@@ -66,6 +70,7 @@ const MoveBookingView = ({
 
   const [selectedProduction, setSelectedProduction] = useState<SelectOption>(undefined);
   const productionOptions = useRecoilValue(productionOptionsSelector(true));
+  const [scheduleDate, setScheduleDate] = useState<ScheduleDate>({ startDate: '', endDate: '' });
   const { productions } = useRecoilValue(productionJumpState);
   const fomrattedProductions = useMemo(() => {
     if (productionId && productionOptions) {
@@ -96,6 +101,7 @@ const MoveBookingView = ({
         moveEndDate: endDate,
         production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
       });
+      setScheduleDate({ startDate, endDate });
     }
   }, [bookings, venueOptions]);
 
@@ -106,6 +112,7 @@ const MoveBookingView = ({
       ...prev,
       production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
     }));
+    setScheduleDate({ startDate: production.StartDate, endDate: production.EndDate });
   };
 
   const handleDateChange = (value: Date) => {
@@ -166,12 +173,25 @@ const MoveBookingView = ({
     }
   };
 
-  const handleMoveBooking = () => {
+  const handleMoveBooking = async () => {
+    const { data } = await axios.post('/api/dateBlock/read', {
+      productionId: selectedProduction.value,
+      primaryOnly: true,
+    });
+    const dateBlock = data[0];
+    const updatedBookings = bookings.map((b) => ({
+      ...b,
+      date: bookingDetails.moveDate,
+      dateAsISOString: bookingDetails.moveDate,
+      dateBlockId: dateBlock?.Id,
+    }));
+
     updateMoveParams({
       count: bookingDetails.count,
       date: bookingDetails.moveDate,
       productionName: bookingDetails.production,
       venue: bookingDetails.venue,
+      bookings: updatedBookings,
     });
     checkForBookingConflicts();
   };
@@ -203,8 +223,8 @@ const MoveBookingView = ({
           label="Date"
           onChange={handleDateChange}
           value={bookingDetails.moveDate}
-          minDate={parseISO(scheduleStart)}
-          maxDate={parseISO(scheduleEnd)}
+          minDate={parseISO(scheduleDate?.startDate)}
+          maxDate={parseISO(scheduleDate?.endDate)}
         />
       </div>
       <div className="pt-8 w-full flex justify-end  items-center gap-3">

@@ -30,6 +30,7 @@ export interface AddBookingsParams {
 const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
   Venue: true,
   Performance: true,
+  DateBlock: true,
 });
 
 export type BookingsWithPerformances = Prisma.BookingGetPayload<{
@@ -40,8 +41,9 @@ export const updateBooking = async (booking: NewBooking, tx = prisma) => {
   let updatedBooking = null;
   let updatedPerformances = null;
   const payload = {
-    ...omit(booking, ['Id', 'VenueId', 'Performances']),
+    ...omit(booking, ['Id', 'VenueId', 'Performances', 'DateBlockId']),
     ...(booking.VenueId && { Venue: { connect: { Id: booking.VenueId } } }),
+    ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
     Performance: {
       deleteMany: {
         BookingId: booking.Id,
@@ -78,8 +80,9 @@ export const updateBooking = async (booking: NewBooking, tx = prisma) => {
 
 export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
   const payload = {
-    ...omit(booking, ['Id', 'VenueId']),
+    ...omit(booking, ['Id', 'VenueId', 'DateBlockId']),
     ...(booking.VenueId && { Venue: { connect: { Id: booking.VenueId } } }),
+    ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
   };
 
   await tx.getInFitUp.update({
@@ -92,7 +95,8 @@ export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
 
 export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
   await tx.rehearsal.update({
-    data: omit(booking, ['Id']),
+    data: omit(booking, ['Id', 'DateBlockId']),
+    ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
     where: {
       Id: booking.Id,
     },
@@ -101,7 +105,8 @@ export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
 
 export const updateOther = async (booking: Other, tx = prisma) => {
   await tx.other.update({
-    data: omit(booking, ['Id']),
+    data: omit(booking, ['Id', 'DateBlockId']),
+    ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
     where: {
       Id: booking.Id,
     },
