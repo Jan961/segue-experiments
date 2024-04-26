@@ -95,8 +95,10 @@ export const updateGetInFitUp = async (booking: GetInFitUp, tx = prisma) => {
 
 export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
   await tx.rehearsal.update({
-    data: omit(booking, ['Id', 'DateBlockId']),
-    ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
+    data: {
+      ...omit(booking, ['Id', 'DateBlockId']),
+      ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
+    },
     where: {
       Id: booking.Id,
     },
@@ -105,8 +107,10 @@ export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
 
 export const updateOther = async (booking: Other, tx = prisma) => {
   await tx.other.update({
-    data: omit(booking, ['Id', 'DateBlockId']),
-    ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
+    data: {
+      ...omit(booking, ['Id', 'DateBlockId']),
+      ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
+    },
     where: {
       Id: booking.Id,
     },

@@ -33,7 +33,7 @@ type NewBookingDetailsProps = {
   onSubmit: (booking: BookingItem[]) => void;
   onUpdate: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
-  onClose: () => void;
+  onClose: (value?: string) => void;
   onDelete: () => void;
   onBarringCheckComplete: (nextStep: string) => void;
   updateModalTitle: (title: string) => void;
@@ -431,12 +431,7 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={
-                    hasBookingChanged ||
-                    changeBookingLength ||
-                    changeBookingLengthConfirmed ||
-                    isNullOrEmpty(bookingData[0]?.venue)
-                  }
+                  disabled={changeBookingLength || changeBookingLengthConfirmed || isNullOrEmpty(bookingData[0]?.venue)}
                 />
                 <Button
                   className="w-33 px-4"

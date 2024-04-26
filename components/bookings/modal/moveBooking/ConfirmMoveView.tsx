@@ -7,7 +7,7 @@ import { BookingItem } from '../NewBooking/reducer';
 import axios from 'axios';
 
 interface ConfirmMoveViewProps {
-  onClose: () => void;
+  onClose: (value?: string) => void;
   count: string;
   venue: string;
   productionName: string;
@@ -41,7 +41,7 @@ const ConfirmMoveView = ({ bookings, count, venue, productionName, date, onClose
         className="text-md my-2"
         text="Booking Moved. Please review the booking data, activities, tasks, etc and adjust as needed to suit its new schedule."
       />
-      <Button className="w-33 " text="Ok" onClick={onClose} />
+      <Button className="w-33 " text="Ok" onClick={() => onClose('success')} />
     </div>
   ) : (
     <div className="w-[400px] flex flex-col">

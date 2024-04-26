@@ -101,7 +101,7 @@ const MoveBookingView = ({
         moveEndDate: endDate,
         production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
       });
-      setScheduleDate({ startDate, endDate });
+      setScheduleDate({ startDate: production.StartDate, endDate: production.EndDate });
     }
   }, [bookings, venueOptions]);
 
