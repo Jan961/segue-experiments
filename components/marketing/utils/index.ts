@@ -22,6 +22,18 @@ export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: Activi
   return false;
 };
 
-export const reverseDate = (inputDt) => {
-  return new Date(inputDt.split('/').reverse().join('/'));
+export const reverseDate = (inputDt: string) => {
+  if (typeof inputDt !== 'string') {
+    throw new Error("Invalid input: Input must be a string in 'DD/MM/YYYY' format.");
+  }
+
+  const reversedDateStr = inputDt.split('/').reverse().join('/');
+  const date = new Date(reversedDateStr);
+
+  // Validate if the date created is valid
+  if (isNaN(date.getTime())) {
+    throw new Error('Invalid date: The input does not form a valid date.');
+  }
+
+  return date;
 };
