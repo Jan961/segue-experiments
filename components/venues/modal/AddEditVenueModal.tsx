@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { initialVenueState } from 'config/venue';
 import schema from './addEditVenuesValidationSchema';
 import MainVenueForm from './MainVenueForm';
@@ -13,6 +14,8 @@ import axios from 'axios';
 import { UiTransformedVenue } from 'utils/venue';
 import { debug } from 'utils/logging';
 import VenueContactForm from './VenueContactsForm';
+import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import Loader from 'components/core-ui-lib/Loader';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -35,6 +38,10 @@ export default function AddEditVenueModal({
 }: AddEditVenueModalProps) {
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const hasErrors = useMemo(() => Object.values(validationErrors).some((x) => x), [validationErrors]);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -65,10 +72,12 @@ export default function AddEditVenueModal({
   };
 
   const handleSaveAndClose = async () => {
+    setIsSaving(true);
     const isValid = await validateVenue(formData);
     if (isValid) {
       formData.id ? updateVenue(formData) : createVenue(formData);
     }
+    setIsSaving(false);
   };
 
   async function validateVenue(data: UiTransformedVenue) {
@@ -85,12 +94,31 @@ export default function AddEditVenueModal({
       return false;
     }
   }
+
   const onChange = (data = {}) => {
     setFormData((prev) => ({ ...prev, ...data }));
   };
+
   const updateValidationErrors = (key: string, value: string) => {
     setValidationErrors((prev) => ({ ...prev, [key]: value }));
   };
+
+  const toggleDeleteConfirmation = useCallback(() => {
+    setShowDeleteConfirmation((status) => !status);
+  }, [setShowDeleteConfirmation]);
+
+  const deleteVenue = useCallback(async () => {
+    toggleDeleteConfirmation();
+    setIsDeleting(true);
+    try {
+      await axios.post('/api/venue/delete/' + venue.id);
+      onClose(true);
+    } catch (e) {
+      debug('Error updating venue', e);
+    }
+    setIsDeleting(false);
+  }, [onClose, toggleDeleteConfirmation, venue.id]);
+
   return (
     <>
       <PopupModal
@@ -159,11 +187,31 @@ export default function AddEditVenueModal({
             </div>
             <div className="flex gap-4 pt-4 float-right">
               <Button onClick={onClose} variant="secondary" text="Cancel" className="w-32" />
-              <Button variant="tertiary" text="Delete Venue" className="w-32" />
-              <Button text="Save and Close" className="w-32" onClick={handleSaveAndClose} />
+              <Button
+                disabled={!venue?.id}
+                onClick={toggleDeleteConfirmation}
+                variant="tertiary"
+                text={isDeleting ? 'Deleting Venue...' : 'Delete Venue'}
+                className="w-32"
+              >
+                {isDeleting && <Loader />}
+              </Button>
+              <Button text={isSaving ? 'Saving...' : 'Save and Close'} className="w-32" onClick={handleSaveAndClose}>
+                {isSaving && <Loader />}
+              </Button>
             </div>
           </div>
         </form>
+        <div className="flex justify-end float-right block w-full">
+          {hasErrors && <p className="text-primary-red mt-4">Please fill all required fields</p>}
+        </div>
+        <ConfirmationDialog
+          variant={ConfVariant.Delete}
+          show={showDeleteConfirmation}
+          onYesClick={deleteVenue}
+          onNoClick={toggleDeleteConfirmation}
+          hasOverlay={false}
+        />
       </PopupModal>
     </>
   );
