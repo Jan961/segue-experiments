@@ -38,15 +38,6 @@ const DropdownIndicator = (props: DropdownIndicatorProps) => {
   );
 };
 
-const formatOptionLabel = ({ value, text }, { context }) => {
-  if (context === 'value') {
-    return text;
-  } else if (value.length > 2) {
-    return `+${value.length} selected`;
-  }
-  return text;
-};
-
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
 
 interface CustMultiValueProps extends MultiValueProps {
@@ -185,7 +176,7 @@ export default forwardRef(function Select(
     if (isMulti) {
       const latestSelectedOption = o[o.length - 1];
       if (
-        latestSelectedOption.value === 'select_all' ||
+        (latestSelectedOption && latestSelectedOption.value === 'select_all') ||
         (o.length === options.length && latestSelectedOption.value !== 'select_all')
       ) {
         const selectedValues: any = options;
@@ -269,7 +260,6 @@ export default forwardRef(function Select(
         menuShouldBlockScroll={true}
         isClearable={isClearable}
         isMulti={isMulti}
-        formatOptionLabel={formatOptionLabel}
         hideSelectedOptions={false}
       />
     </div>
