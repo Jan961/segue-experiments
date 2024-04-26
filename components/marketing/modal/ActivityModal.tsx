@@ -8,8 +8,9 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { ActivityDTO } from 'interfaces';
+import { removeTime } from 'utils';
 
-export type ActivityModalVariant = 'add' | 'edit';
+export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
 const titleOptions = {
   add: 'Add New Actvity',
@@ -46,6 +47,8 @@ export default function ActivityModal({
   const [companyCost, setCompanyCost] = useState<string>();
   const [venueCost, setVenueCost] = useState<string>();
   const [actNotes, setActNotes] = useState<string>();
+  const [actId, setActId] = useState(null);
+  const [error, setError] = useState<boolean>(false);
 
   useEffect(() => {
     setVisible(show);
@@ -65,33 +68,59 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(new Date(data.Date));
+      setActDate(removeTime(data.Date));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(new Date(data.DueByDate));
+      setFollowUpDt(data.DueByDate === null ? null : removeTime(data.DueByDate));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);
+      setActId(data.Id);
     }
   };
 
   const handleSave = () => {
+    // display error if the activity type is not selected
+    if (actType === null) {
+      setError(true);
+      return;
+    }
+
     let data: ActivityDTO = {
       ActivityTypeId: actType,
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
       VenueCost: parseFloat(venueCost),
-      Date: actDate,
+      Date: removeTime(actDate),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
+      DueByDate: actFollowUp ? removeTime(followUpDt) : null,
     };
 
-    // only add the follow up date if the followUp required checkbox has been checked
-    if (actFollowUp) {
-      data = { ...data, DueByDate: followUpDt };
+    // only add iD if not adding
+    if (variant !== 'add') {
+      data = { ...data, Id: actId };
     }
 
     onSave(variant, data);
+  };
+
+  const setNumbericVal = (type: string, value: string) => {
+    const regexPattern = /^-?\d*(\.\d*)?$/;
+    // validate value with regex
+
+    if (regexPattern.test(value)) {
+      if (type === 'venueCost') {
+        setVenueCost(value);
+      } else if (type === 'companyCost') {
+        setCompanyCost(value);
+      }
+    }
+  };
+
+  const changeActivityType = (value) => {
+    setActType(value);
+    setError(false);
   };
 
   return (
@@ -108,15 +137,17 @@ export default function ActivityModal({
         />
 
         <Select
-          className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+          className={classNames('w-full !border-0 text-primary-input-text', error ? 'mb-2' : 'mb-4')}
           options={activityTypes}
           value={actType}
-          onChange={(value) => setActType(parseInt(value.toString()))}
+          onChange={(value) => changeActivityType(value)}
           placeholder={'Please select Activity Type'}
           isClearable
           isSearchable
           label="Type"
         />
+
+        {error && <div className="text text-base text-primary-red mb-4">Please select an Activity Type</div>}
 
         <div className="flex flex-row mb-4">
           <div className="flex flex-col">
@@ -124,6 +155,7 @@ export default function ActivityModal({
               onChange={(value) => setActDate(value)}
               value={actDate}
               label="Date"
+              inputClass="!border-0 !shadow-none"
               labelClassName="text-primary-input-text"
             />
           </div>
@@ -170,7 +202,7 @@ export default function ActivityModal({
                   placeholder="00.00"
                   id="input"
                   value={companyCost}
-                  onChange={(event) => setCompanyCost(event.target.value)}
+                  onChange={(event) => setNumbericVal('companyCost', event.target.value)}
                 />
               </div>
             </div>
@@ -188,7 +220,7 @@ export default function ActivityModal({
                   placeholder="00.00"
                   id="input"
                   value={venueCost}
-                  onChange={(event) => setVenueCost(event.target.value)}
+                  onChange={(event) => setNumbericVal('venueCost', event.target.value)}
                 />
               </div>
             </div>
