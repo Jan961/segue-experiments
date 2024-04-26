@@ -30,6 +30,7 @@ type AddBookingProps = {
   productionCode: string;
   updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
+  onBarringCheckComplete: (nextStep: string) => void;
   updateModalTitle: (title: string) => void;
   onChange: (change: Partial<TForm>) => void;
   onSubmit: (booking: Partial<BookingItem>[]) => void;
@@ -46,6 +47,7 @@ const NewBookingView = ({
   venueOptions,
   updateBookingConflicts,
   updateBarringConflicts,
+  onBarringCheckComplete,
   updateModalTitle,
 }: AddBookingProps) => {
   const { goToStep } = useWizard();
@@ -60,6 +62,7 @@ const NewBookingView = ({
 
   useEffect(() => {
     updateModalTitle('Create New Booking');
+    onBarringCheckComplete('New Booking Details');
   }, []);
 
   const [minDate, maxDate] = useMemo(() => [scheduleRange?.scheduleStart, scheduleRange?.scheduleEnd], [scheduleRange]);
@@ -265,7 +268,7 @@ const NewBookingView = ({
             disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
             className="px-6"
             text={'Check Mileage'}
-           />
+          />
         </div>
         <Button className="px-8" onClick={onModalClose} variant="secondary" text={'Cancel'} />
         {!fetchingBookingConflicts && (
@@ -280,7 +283,7 @@ const NewBookingView = ({
               onClick={goToNext}
               disabled={(isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate}
               text={'Next'}
-             />
+            />
           </div>
         )}
         {(fetchingBookingConflicts || loading) && <Loader variant={'sm'} />}

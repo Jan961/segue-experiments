@@ -1,18 +1,20 @@
 import prisma from 'lib/prisma';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async function handle(req, res) {
-  const query: number = parseInt(req.query.venueId);
+export default async function handle(req: NextApiRequest, res: NextApiResponse) {
+  const Id: number = parseInt(req.query.venueId as string, 10);
   try {
     await prisma.venue.update({
       where: {
-        VenueId: query,
+        Id,
       },
       data: {
-        deleted: parseInt('1'),
+        IsDeleted: true,
       },
     });
-    res.status(200).end();
+    res.status(200).json({ ok: true });
   } catch (e) {
-    throw e;
+    console.log(e);
+    res.status(500).json({ ok: false });
   }
 }

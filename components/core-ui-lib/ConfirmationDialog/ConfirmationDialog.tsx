@@ -4,6 +4,15 @@ import PopupModal from '../PopupModal';
 
 export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return';
 
+export enum ConfVariant {
+  Close = 'close',
+  Cancel = 'cancel',
+  Delete = 'delete',
+  Logout = 'logout',
+  Leave = 'leave',
+  Return = 'return',
+}
+
 interface ConfirmationDialogProps {
   children?: React.ReactNode;
   show: boolean;
