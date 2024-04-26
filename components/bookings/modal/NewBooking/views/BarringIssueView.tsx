@@ -1,17 +1,16 @@
 import { barringIssueColumnDefs, styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { getStepIndex } from 'config/AddBooking';
 import { BarredVenue } from 'pages/api/productions/venue/barred';
 import { useEffect } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { gridOptions } from '../../GapSuggest';
 
 type BarringIssueViewProps = {
-  isNewBooking: boolean;
   barringConflicts?: BarredVenue[];
   updateModalTitle: (title: string) => void;
-  nextStep: '';
+  nextStep: number;
+  previousStep: number;
 };
 
 const barringGridOptions = {
@@ -22,9 +21,9 @@ const barringGridOptions = {
 };
 
 export default function BarringIssueView({
-  isNewBooking,
   barringConflicts,
   updateModalTitle,
+  previousStep,
   nextStep,
 }: BarringIssueViewProps) {
   const { goToStep } = useWizard();
@@ -32,14 +31,6 @@ export default function BarringIssueView({
   useEffect(() => {
     updateModalTitle('Barring Issue');
   }, []);
-
-  const goToPreviousStep = () => {
-    if (isNewBooking) {
-      goToStep(getStepIndex(isNewBooking, 'Create New Booking'));
-    } else {
-      goToStep(getStepIndex(false, 'New Booking Details'));
-    }
-  };
 
   return (
     <div className="flex flex-col">
@@ -54,16 +45,8 @@ export default function BarringIssueView({
           gridOptions={barringGridOptions}
         />
         <div className="pt-3 w-full flex items-center justify-end">
-          <Button className="w-33" variant="secondary" text="Back" onClick={goToPreviousStep} />
-          <Button
-            className="ml-3 w-33"
-            text="Continue"
-            onClick={() =>
-              goToStep(
-                nextStep ? getStepIndex(isNewBooking, nextStep) : getStepIndex(isNewBooking, 'New Booking Details'),
-              )
-            }
-          />
+          <Button className="w-33" variant="secondary" text="Back" onClick={() => goToStep(previousStep)} />
+          <Button className="ml-3 w-33" text="Continue" onClick={() => goToStep(nextStep)} />
         </div>
       </div>
     </div>

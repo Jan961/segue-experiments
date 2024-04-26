@@ -29,6 +29,8 @@ const formatNonPerformanceType = (booking) => ({
   VenueId: booking.venue,
   PencilNum: Number(booking.pencilNo),
   Notes: booking.notes || '',
+  DateBlockId: booking.dateBlockId,
+  Date: booking.dateAsISOString,
 });
 
 const formatOtherType = (booking) => ({
@@ -37,6 +39,8 @@ const formatOtherType = (booking) => ({
   DateTypeId: booking.dayType,
   PencilNum: Number(booking.pencilNo),
   Notes: booking.notes || '',
+  DateBlockId: booking.dateBlockId,
+  Date: booking.dateAsISOString,
 });
 
 const formatExistingBookingToPrisma = (booking: BookingItem) => {

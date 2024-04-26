@@ -33,9 +33,9 @@ type NewBookingDetailsProps = {
   onSubmit: (booking: BookingItem[]) => void;
   onUpdate: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
-  onClose: () => void;
+  onClose: (value?: string) => void;
   onDelete: () => void;
-  onBarringCheckComplete: () => void;
+  onBarringCheckComplete: (nextStep: string) => void;
   updateModalTitle: (title: string) => void;
   isNewBooking: boolean;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
@@ -64,6 +64,7 @@ export default function NewBookingDetailsView({
   const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
+  const [hasBookingChanged, setHasBookingChanged] = useState<boolean>(false);
   const [showMoveBookingModal, setShowMoveBookingsModal] = useState<boolean>(false);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
@@ -76,6 +77,7 @@ export default function NewBookingDetailsView({
 
   useEffect(() => {
     updateModalTitle(`${isNewBooking ? 'New' : 'Edit'} Booking Details`);
+    onBarringCheckComplete('Preview New Booking');
   }, []);
 
   useEffect(() => {
@@ -180,37 +182,32 @@ export default function NewBookingDetailsView({
 
   const checkForBarredVenues = async () => {
     const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
-    if (!firstRow.data.venue) {
-      goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
-    } else {
-      const lastRow = tableRef.current
-        .getApi()
-        .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
-      try {
-        const response = await axios.post('/api/productions/venue/barringCheck', {
-          startDate: firstRow.data.dateAsISOString,
-          endDate: lastRow.data.dateAsISOString,
-          productionId: production.Id,
-          venueId: firstRow.data.venue,
-          seats: 400,
-          barDistance: 25,
-          includeExcluded: false,
-          filterBarredVenues: true,
-        });
-        if (!isNullOrEmpty(response.data)) {
-          onBarringCheckComplete();
-          const formatted = response.data
-            .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
-            .filter((venue: BarredVenue) => venue.hasBarringConflict);
-          updateBarringConflicts(formatted);
-          goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
-        } else {
-          updateBarringConflicts(null);
-          goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
-        }
-      } catch (e) {
-        console.log('Error getting barred venues');
+    const lastRow = tableRef.current
+      .getApi()
+      .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
+    try {
+      const response = await axios.post('/api/productions/venue/barringCheck', {
+        startDate: firstRow.data.dateAsISOString,
+        endDate: lastRow.data.dateAsISOString,
+        productionId: production.Id,
+        venueId: firstRow.data.venue,
+        seats: 400,
+        barDistance: 25,
+        includeExcluded: false,
+        filterBarredVenues: true,
+      });
+      if (!isNullOrEmpty(response.data)) {
+        const formatted = response.data
+          .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
+          .filter((venue: BarredVenue) => venue.hasBarringConflict);
+        updateBarringConflicts(formatted);
+        goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
+      } else {
+        updateBarringConflicts(null);
+        goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
       }
+    } catch (e) {
+      console.log('Error getting barred venues');
     }
   };
 
@@ -274,8 +271,7 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().redrawRows();
       setchangeBookingLength(false);
     } else {
-      const isDirty = tableRef.current.isDirty();
-      if (isDirty) {
+      if (hasBookingChanged) {
         confirmationType.current = 'cancel';
         setShowConfirmation(true);
         toggleModalOverlay(true);
@@ -314,7 +310,12 @@ export default function NewBookingDetailsView({
 
   const handePreviewBookingClick = () => {
     storeBookingDetails();
-    checkForBarredVenues();
+    const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
+    if (firstRow.data.venue && formData.venueId !== firstRow.data.venue) {
+      checkForBarredVenues();
+    } else {
+      goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+    }
   };
 
   const handeCheckMileageClick = () => {
@@ -360,6 +361,7 @@ export default function NewBookingDetailsView({
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
       storeBookingDetails();
+      console.log();
       checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
@@ -373,6 +375,12 @@ export default function NewBookingDetailsView({
   const handleMoveBookingClose = () => {
     setShowMoveBookingsModal(false);
     onClose();
+  };
+
+  const handleCellValueChange = () => {
+    if (!hasBookingChanged) {
+      setHasBookingChanged(true);
+    }
   };
 
   return (
@@ -389,6 +397,7 @@ export default function NewBookingDetailsView({
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
+          onCellValueChange={handleCellValueChange}
         />
         <NotesPopup
           show={showNotesModal}
@@ -422,7 +431,7 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength || changeBookingLengthConfirmed}
+                  disabled={changeBookingLength || changeBookingLengthConfirmed || isNullOrEmpty(bookingData[0]?.venue)}
                 />
                 <Button
                   className="w-33 px-4"
