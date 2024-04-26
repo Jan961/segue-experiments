@@ -1,4 +1,5 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { startOfDay } from 'date-fns';
 
 export const safeJsonParse = (jsonString: string): any => {
   try {
@@ -76,7 +77,6 @@ export const convertObjectKeysToCamelCase = (obj: any) => {
   return newObj;
 };
 
-export const removeTime = (inputDt: any) => {
-  const dt = new Date(inputDt);
-  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 0, 0, 0, 0);
+export const removeTime = (inputDt: Date | string | number) => {
+  return startOfDay(new Date(inputDt));
 };
