@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import Select, { SelectProps, SelectOption } from './Select';
 
 describe('Select Component', () => {
@@ -44,5 +44,13 @@ describe('Select Component', () => {
     expect(screen.getByText('Label')).toBeInTheDocument();
     const selectedOption = screen.getAllByText('Multiple');
     expect(selectedOption).toHaveLength(2);
+  });
+
+  test('check for options dropdown', () => {
+    renderSelect();
+    fireEvent.mouseDown(screen.getByRole('combobox'));
+    options.forEach((option) => {
+      expect(screen.getByText(option.text)).toBeInTheDocument();
+    });
   });
 });
