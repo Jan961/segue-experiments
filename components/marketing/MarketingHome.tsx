@@ -20,7 +20,7 @@ import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 import { activityColDefs, styleProps } from 'components/marketing/table/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import formatInputDate from 'utils/dateInputFormat';
-import { reverseDate, hasActivityChanged } from './utils/index';
+import { reverseDate, hasActivityChanged } from './utils';
 
 export type SelectOption = {
   text: string;
@@ -179,10 +179,14 @@ const MarketingHome = () => {
 
       setActColDefs(activityColDefs(activityUpdate, '£'));
 
-      const tempRows = activityList.activities.map((act) => ({
+      const sortedActivities = activityList.activities.sort(
+        (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
+      );
+
+      const tempRows = sortedActivities.map((act) => ({
         actName: act.Name,
         actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: formatInputDate(act.Date),
+        actDate: act.Date,
         followUpCheck: act.FollowUpRequired,
         followUpDt: act.DueByDate,
         companyCost: act.CompanyCost,
@@ -216,7 +220,7 @@ const MarketingHome = () => {
           BookingId: data.bookingId,
           CompanyCost: data.companyCost,
           VenueCost: data.venueCost,
-          Date: reverseDate(data.actDate),
+          Date: data.actDate,
           FollowUpRequired: data.followUpCheck,
           Name: data.actName,
           Notes: data.notes,
@@ -241,7 +245,7 @@ const MarketingHome = () => {
       const newRow = {
         actName: data.Name,
         actType: actTypeList.find((type) => type.value === data.ActivityTypeId).text,
-        actDate: formatInputDate(data.Date),
+        actDate: data.Date,
         followUpCheck: data.FollowUpRequired,
         followUpDt: data.DueByDate,
         companyCost: data.CompanyCost,
@@ -250,12 +254,17 @@ const MarketingHome = () => {
         bookingId: data.BookingId,
       };
 
-      setActRowData([...actRowData, newRow]);
+      const activityData = [...actRowData, newRow];
+
+      // re sort the row to ensure the new field is put in the correct place chronologically
+      const sortedActivities = activityData.sort(
+        (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
+      );
+
+      setActRowData(sortedActivities);
       setShowActivityModal(false);
     } else if (variant === 'edit') {
       if (hasActivityChanged(actRow, data)) {
-        alert('changed');
-        alert(JSON.stringify(data));
         await fetchData({
           url: '/api/marketing/activities/update',
           method: 'POST',

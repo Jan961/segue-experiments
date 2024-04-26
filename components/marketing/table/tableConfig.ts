@@ -3,6 +3,7 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
+import formatInputDate from 'utils/dateInputFormat';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -22,7 +23,13 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
   {
     headerName: 'Date',
     field: 'actDate',
-    cellRenderer: DefaultCellRenderer,
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
     width: 90,
   },
   {
@@ -30,7 +37,7 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     field: 'followUpCheck',
     cellRenderer: CheckboxRenderer,
     cellRendererParams: {
-      onChange: () => console.log(),
+      onChange: () => null, // no action required, checkbox fixed in table
     },
     width: 90,
     cellStyle: {
@@ -45,6 +52,10 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     cellRenderer: (params) => {
       return venueCurrency + (params.data.companyCost > 0 ? parseFloat(params.data.companyCost).toFixed(2) : '0.00');
     },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
     width: 100,
   },
   {
@@ -52,6 +63,10 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     field: 'venueCost',
     cellRenderer: (params) => {
       return venueCurrency + (params.data.venueCost > 0 ? parseFloat(params.data.venueCost).toFixed(2) : '0.00');
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
     },
     width: 90,
   },

@@ -1,8 +1,6 @@
 import { ActivityDTO } from 'interfaces';
 
 export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: ActivityDTO): boolean => {
-  console.log(oldActivity);
-  console.log(newActivity);
   // List all keys to be compared
   const keys = Object.keys(oldActivity) as Array<keyof ActivityDTO>;
 
