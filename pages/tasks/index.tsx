@@ -4,8 +4,8 @@ import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import useBookingFilter from 'hooks/useBookingsFilter';
-import BookingsTable from 'components/bookings/BookingsTable';
 import Filters from 'components/tasks2/Filters';
+import TasksTable from 'components/tasks2/TasksTable';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -16,7 +16,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       <div className="mb-8">
         <Filters />
       </div>
-      <BookingsTable rowData={rows} />
+      <TasksTable rowData={rows} />
     </Layout>
   );
 };
