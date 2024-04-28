@@ -3,7 +3,7 @@ import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
 import { useRouter } from 'next/router';
@@ -14,6 +14,7 @@ import axios from 'axios';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -31,7 +32,7 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-
+  const currentProduction = useRecoilValue(currentProductionSelector);
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
@@ -48,11 +49,12 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
     const { data } = e;
     if (!data.Id) {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: e.data.dateTime,
-        endDate: e.data.dateTime,
-      });
+      currentProduction &&
+        setShowAddEditBookingModal({
+          visible: true,
+          startDate: e.data.dateTime,
+          endDate: e.data.dateTime,
+        });
     } else {
       setShowAddEditBookingModal({
         visible: true,
