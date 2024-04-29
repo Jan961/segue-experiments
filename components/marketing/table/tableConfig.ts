@@ -3,6 +3,7 @@ import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultC
 import DefaultTextRenderer from 'components/core-ui-lib/Table/renderers/DefaultTextRenderer';
 import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 import { tileColors } from 'config/global';
+import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 
 export const styleProps = { headerColor: tileColors.marketing };
@@ -97,6 +98,82 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
         {
           name: 'delete',
           onClick: () => updateActivity('delete', params.data),
+        },
+      ],
+    }),
+    width: 90,
+    resizable: false,
+  },
+];
+
+export const contactNoteColDefs = (updateContactNote) => [
+  {
+    headerName: 'Who',
+    field: 'ToBeAdded - db change',
+    cellRenderer: DefaultCellRenderer,
+    width: 300,
+  },
+  {
+    headerName: 'Date',
+    field: 'ContactDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.ContactDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 80,
+  },
+  {
+    headerName: 'Time',
+    field: 'ContactTime',
+    cellRenderer: function (params) {
+      return getTimeFromDateAndTime(params.data.ContactDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 70,
+  },
+  {
+    headerName: 'Actioned By',
+    field: 'CoContactName',
+    cellRenderer: DefaultCellRenderer,
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 120,
+  },
+  {
+    headerName: 'Notes',
+    field: 'Notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    cellStyle: {
+      marginTop: '5px',
+    },
+    width: 423,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'edit',
+          onClick: () => updateContactNote('edit', params.data),
+        },
+        {
+          name: 'delete',
+          onClick: () => updateContactNote('delete', params.data),
         },
       ],
     }),
