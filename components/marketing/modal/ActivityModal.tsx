@@ -168,7 +168,7 @@ export default function ActivityModal({
           <TextInput
             className="w-full mb-4"
             placeholder="Enter Activity Name"
-            id="input"
+            id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
           />
@@ -237,7 +237,7 @@ export default function ActivityModal({
                   <TextInput
                     className="w-full mb-4"
                     placeholder="00.00"
-                    id="input"
+                    id="companyCost"
                     value={companyCost}
                     onChange={(event) => setNumbericVal('companyCost', event.target.value)}
                   />
@@ -255,7 +255,7 @@ export default function ActivityModal({
                   <TextInput
                     className="w-full mb-4"
                     placeholder="00.00"
-                    id="input"
+                    id="venueCost"
                     value={venueCost}
                     onChange={(event) => setNumbericVal('venueCost', event.target.value)}
                   />
