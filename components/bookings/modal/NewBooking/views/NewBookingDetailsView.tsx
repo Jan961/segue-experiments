@@ -155,10 +155,10 @@ export default function NewBookingDetailsView({
       setBookingData(dates);
     }
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates, isNewBooking]);
-  const productionCode = `${production.ShowCode}${production.Code}  ${production?.ShowName}`;
+  const productionCode = `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`;
   const productionItem = useMemo(() => {
     return {
-      production: `${production.ShowCode}${production.Code}`,
+      production: `${production?.ShowCode}${production?.Code}`,
       venue: bookingRow?.venue ? venueDict[bookingRow.venue].Name : '',
       date: bookingRow?.date || null,
       note: bookingRow?.notes || '',
