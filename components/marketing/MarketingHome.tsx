@@ -16,8 +16,8 @@ import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
 import ActivityModal, { ActivityModalVariant } from './modal/ActivityModal';
-import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
-import { activityColDefs, styleProps } from 'components/marketing/table/tableConfig';
+import { ActivityDTO, ActivityTypeDTO, BookingContactNoteDTO } from 'interfaces';
+import { activityColDefs, contactNoteColDefs, styleProps } from 'components/marketing/table/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import { reverseDate, hasActivityChanged } from './utils';
 import DateInput from 'components/core-ui-lib/DateInput';
@@ -28,6 +28,8 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import TextInput from 'components/core-ui-lib/TextInput';
+import { startOfDay } from 'date-fns';
+import ContactNoteModal, { ContactNoteModalVariant } from './modal/ContactNoteModal';
 
 export type SelectOption = {
   text: string;
@@ -100,6 +102,12 @@ const MarketingHome = () => {
   const [totalCost, setTotalCost] = useState<number>(0);
   const [totalVenueCost, setTotalVenueCost] = useState<number>(0);
   const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
+
+  // contact note modal
+  const [showContactNoteModal, setShowContactNoteModal] = useState<boolean>(false);
+  const [contactModalVariant, setContactModalVariant] = useState<ContactNoteModalVariant>();
+  const [contactNoteRows, setContactNoteRows] = useState<Array<BookingContactNoteDTO>>();
+  const [contNoteColDefs, setContNoteColDefs] = useState([]);
 
   const router = useRouter();
 
@@ -237,6 +245,24 @@ const MarketingHome = () => {
     }
   };
 
+  const getContactNotes = async (bookingId: string) => {
+    const data = await fetchData({
+      url: '/api/marketing/contactNotes/' + bookingId,
+      method: 'POST',
+    });
+
+    if (typeof data === 'object') {
+      const contactNoteList = data as Array<BookingContactNoteDTO>;
+
+      const sortedContactNotes = contactNoteList.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContNoteColDefs(contactNoteColDefs(updateContactNote));
+      setContactNoteRows(sortedContactNotes);
+    }
+  };
+
   const activityUpdate = async (variant: ActivityModalVariant, data) => {
     setActModalVariant(variant);
 
@@ -273,6 +299,10 @@ const MarketingHome = () => {
         setShowConfirm(true);
       }
     }
+  };
+
+  const updateContactNote = (variant: ContactNoteModalVariant, data) => {
+    console.log(variant, data);
   };
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
@@ -358,6 +388,10 @@ const MarketingHome = () => {
     }
   };
 
+  const saveContactNote = (variant: ContactNoteModalVariant, data) => {
+    console.log(variant, data);
+  };
+
   const calculateActivityTotals = (tableRows) => {
     const { venueTotal, companyTotal } = tableRows.reduce(
       (acc, row) => {
@@ -380,6 +414,11 @@ const MarketingHome = () => {
     setShowActivityModal(true);
   };
 
+  const addContactNote = () => {
+    setContactModalVariant('add');
+    setShowContactNoteModal(true);
+  };
+
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
@@ -391,6 +430,7 @@ const MarketingHome = () => {
     if (bookingId) {
       getSales(bookingId.toString());
       getActivities(bookingId.toString());
+      getContactNotes(bookingId.toString());
 
       // set checkbox row on activities tab
       const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
@@ -627,7 +667,36 @@ const MarketingHome = () => {
               data={actRow}
             />
           </Tab.Panel>
-          <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
+
+          <Tab.Panel>
+            <div className="flex justify-end">
+              <div className="flex flex-row gap-4 w-[850px] mb-5">
+                <Button
+                  text="Contact Notes Report"
+                  className="w-[203px]"
+                  disabled={!productionId}
+                  iconProps={{ className: 'h-4 w-3' }}
+                  sufixIconName={'excel'}
+                />
+                <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+              </div>
+            </div>
+
+            <div className="flex flex-row">
+              <div className="w-[1086px] h-[500px]">
+                <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+              </div>
+            </div>
+
+            <ContactNoteModal
+              show={showContactNoteModal}
+              onCancel={() => setShowContactNoteModal(false)}
+              variant={contactModalVariant}
+              activityTypes={actTypeList}
+              onSave={(variant, data) => saveContactNote(variant, data)}
+              bookingId={bookingId}
+            />
+          </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
