@@ -108,8 +108,9 @@ export const updateRehearsal = async (booking: Rehearsal, tx = prisma) => {
 export const updateOther = async (booking: Other, tx = prisma) => {
   await tx.other.update({
     data: {
-      ...omit(booking, ['Id', 'DateBlockId']),
+      ...omit(booking, ['Id', 'DateBlockId', 'DateTypeId']),
       ...(booking.DateBlockId && { DateBlock: { connect: { Id: booking.DateBlockId } } }),
+      ...(booking.DateTypeId && { DateType: { connect: { Id: booking.DateTypeId } } }),
     },
     where: {
       Id: booking.Id,

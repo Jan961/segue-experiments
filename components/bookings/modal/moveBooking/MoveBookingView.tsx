@@ -170,6 +170,8 @@ const MoveBookingView = ({
       } catch (e) {
         console.log('Error getting barred venues');
       }
+    } else {
+      goToStep(viewSteps.indexOf('MoveConfirm'));
     }
   };
 
@@ -179,12 +181,15 @@ const MoveBookingView = ({
       primaryOnly: true,
     });
     const dateBlock = data[0];
-    const updatedBookings = bookings.map((b) => ({
-      ...b,
-      date: bookingDetails.moveDate,
-      dateAsISOString: bookingDetails.moveDate,
-      dateBlockId: dateBlock?.Id,
-    }));
+    const updatedBookings = bookings.map((b, i) => {
+      const date = addDays(parseISO(bookingDetails.moveDate), i);
+      return {
+        ...b,
+        date: date.toISOString(),
+        dateAsISOString: date.toISOString(),
+        dateBlockId: dateBlock?.Id,
+      };
+    });
 
     updateMoveParams({
       count: bookingDetails.count,
