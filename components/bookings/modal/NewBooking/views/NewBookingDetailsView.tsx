@@ -361,7 +361,6 @@ export default function NewBookingDetailsView({
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
       storeBookingDetails();
-      console.log();
       checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
@@ -431,7 +430,7 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength || changeBookingLengthConfirmed || isNullOrEmpty(bookingData[0]?.venue)}
+                  disabled={changeBookingLength || changeBookingLengthConfirmed}
                 />
                 <Button
                   className="w-33 px-4"
