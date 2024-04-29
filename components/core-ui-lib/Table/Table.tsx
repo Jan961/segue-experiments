@@ -32,7 +32,7 @@ interface TableProps {
   rowClassRules?: any;
   headerHeight?: number;
   getRowHeight?: (params: RowHeightParams) => number;
-  tableHeightLimit?: number;
+  tableHeight?: number;
 }
 
 const ROW_HEIGHT = 43;
@@ -68,7 +68,7 @@ export default forwardRef(function Table(
     rowClassRules,
     displayHeader = true,
     getRowHeight,
-    tableHeightLimit = 0,
+    tableHeight = 0,
     headerHeight,
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,
@@ -121,9 +121,9 @@ export default forwardRef(function Table(
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
   useEffect(() => {
-    setAutoHeightLimit(tableHeightLimit === 0 ? window.innerHeight - DELTA : tableHeightLimit);
+    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
     const handleResize = () => {
-      setAutoHeightLimit(tableHeightLimit === 0 ? window.innerHeight - DELTA : tableHeightLimit);
+      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
     };
     window.addEventListener('resize', handleResize);
     return () => {
