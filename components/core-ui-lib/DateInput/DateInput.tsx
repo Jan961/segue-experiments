@@ -102,7 +102,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     if (inputValue && inputValue.match(shortDateRegex)) {
       inputRef?.current?.select();
     }
-  }, [inputValue, inputRef]);
+  }, [inputValue]);
 
   const handleInputFocus = () => {
     inputRef?.current?.select();
