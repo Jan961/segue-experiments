@@ -75,3 +75,8 @@ export const convertObjectKeysToCamelCase = (obj: any) => {
   }
   return newObj;
 };
+
+export const removeTime = (inputDt: any) => {
+  const dt = new Date(inputDt);
+  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 0, 0, 0, 0);
+};
