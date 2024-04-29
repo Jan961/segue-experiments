@@ -8,6 +8,7 @@ const useTasksFilter = () => {
   const productions = useRecoilValue(productionState);
   const filters = useRecoilValue(tasksfilterState);
   const [filteredProductions, setFilteredProductions] = useState(productions);
+  console.log(productions, productionState, tasksfilterState)
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const updatedProductions = filterProductionTasksBySearchText(productions, e.target.value);
     setFilteredProductions(updatedProductions);

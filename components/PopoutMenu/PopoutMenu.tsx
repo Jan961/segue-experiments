@@ -87,7 +87,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: tasksIcon,
         labelClass: groupHeader,
         options: [
-          { label: 'Production Task Lists', value: '/tasks/all', labelClass: leve2 },
+          { label: 'Production Task Lists', value: '/tasks', labelClass: leve2 },
           { label: 'Master Task List', value: '/tasks/master', labelClass: leve2 },
         ],
       },

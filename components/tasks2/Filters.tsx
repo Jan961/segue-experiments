@@ -1,72 +1,144 @@
 import Button from 'components/core-ui-lib/Button';
-import GlobalToolbar from 'components/toolbar';
-import Report from 'components/bookings/modal/Report';
 import Select from 'components/core-ui-lib/Select';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { filterState, intialBookingFilterState } from 'state/booking/filterState';
-import { useState } from 'react';
-import { allStatusOptions } from 'config/bookings';
+import { useEffect, useMemo, useState } from 'react';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import TasksButtons from './TasksButtons';
 import DateRange from 'components/core-ui-lib/DateRange';
 import { statusOptions } from 'config/tasks';
+import { tasksfilterState, intialTasksState } from 'state/tasks/tasksFilterState';
+import ProductionOption from 'components/global/nav/ProductionOption';
+import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
+import { userState } from 'state/account/userState';
+import Checkbox from 'components/core-ui-lib/Checkbox';
 
-const Filters = () => {
-  const [filter, setFilter] = useRecoilState(filterState);
+type FilterProps = {
+  onApplyFilters: () => void;
+};
+
+
+const Filters = ({ onApplyFilters }: FilterProps) => {
+  const [filter, setFilter] = useRecoilState(tasksfilterState);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { loading: isMileageLoading } = useMileageCalculator();
-  const [showProductionSummary, setShowProductionSummary] = useState(false);
-  // const todayOnSchedule = useMemo(
-  //   () =>
-  //     schedule.Sections.map((x) => x.Dates)
-  //       .flat()
-  //       .filter((x) => x.Date === todayKey).length > 0,
-  //   [schedule.Sections, todayKey],
-  // );
+  
+
 
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
-  // const gotoToday = () => {
-  //   const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');
-  //   if (todayOnSchedule) {
-  //     setFilter({ ...filter, scrollToDate: dateToScrollTo });
-  //   }
-  // };
 
   const onClearFilters = () => {
     setFilter({
-      ...intialBookingFilterState,
-      startDate: filter.scheduleStartDate,
-      endDate: filter.scheduleEndDate,
-      scheduleStartDate: filter.scheduleStartDate,
-      scheduleEndDate: filter.scheduleEndDate,
+      ...intialTasksState,
+      startDueDate: filter.startDueDate,
+      endDueDate: filter.endDueDate,
     });
   };
 
-  const { startDate, endDate, scheduleStartDate, scheduleEndDate } = filter || {};
+  useEffect(() => {
+    onApplyFilters();
+  }, [filter])
 
+  const { startDueDate, endDueDate } = filter || {};
+
+  const { users } = useRecoilValue(userState);
+
+  const userList = useMemo(
+    () =>
+      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
+      })),
+    [users],
+  );
+
+  const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
+  const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
+
+  const productions = useMemo(() => {
+    const productionOptions = [{ text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false }];
+    for (const production of productionJump.productions) {
+      if (includeArchived) {
+        productionOptions.push({
+          Id: -1,
+          ShowCode: null,
+          Code: null,
+          IsArchived: false,
+          ...production,
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''
+            }`,
+          value: production.Id,
+        });
+      } else if (!production.IsArchived) {
+        productionOptions.push({
+          Id: -1,
+          ShowCode: null,
+          Code: null,
+          IsArchived: false,
+          ...production,
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''
+            }`,
+          value: production.Id,
+        });
+      }
+    }
+    return productionOptions;
+  }, [productionJump, includeArchived]);
+
+  const { selected } = productionJump;
+
+  const gotoTasks = (productionId?: number) => {
+    const selectedProduction = productions.find((production) => production.Id === productionId);
+    if (!selectedProduction) {
+      setProductionJump({ ...productionJump, loading: true, selected: null });
+      // router.push(`/tasks/all`);/
+      return;
+    }
+    const { Id } = selectedProduction;
+    setProductionJump({ ...productionJump, loading: true, selected: Id });
+    // router.push(`/tasks/${ShowCode}/${ProductionCode}`);
+  };
+
+  const onIncludeArchiveChange = (e) => {
+    setProductionJump({ ...productionJump, includeArchived: e.target.value });
+    setIncludeArchived(e.target.value);
+  };
+  
   return (
     <div className="w-full flex items-center justify-between flex-wrap">
       <div className="mx-0">
         <div className="px-4">
-          <GlobalToolbar
-            searchFilter={filter.venueText}
-            setSearchFilter={(venueText) => setFilter({ venueText })}
-            titleClassName="text-primary-yellow"
-            title={'Production Task Lists'}
-          >
-            <div className="flex items-center gap-4">
-              <Report
-                visible={showProductionSummary}
-                onClose={() => setShowProductionSummary(false)}
-                ProductionId={ProductionId}
-              />
+          <div className="py-2 flex flex-row items-center gap-4">
+            <h1 className={`text-4xl font-bold text-primary-yellow`}>Production Task Lists</h1>
+            <div className="bg-white border-primary-border rounded-md border shadow-md">
+              <div className="rounded-l-md">
+                <div className="flex items-center">
+                  <Select
+                    className="border-0 !shadow-none w-[420px]"
+                    value={selected}
+                    label="Production"
+                    placeholder="Please select a Production"
+                    renderOption={(option) => <ProductionOption option={option} />}
+                    customStyles={ARCHIVED_OPTION_STYLES}
+                    options={productions}
+                    onChange={gotoTasks}
+                    isSearchable
+                    isClearable={false}
+                  />
+                  <div className="flex  items-center ml-1 mr-4">
+                    <Checkbox
+                      id="IncludeArchived"
+                      label="Include archived"
+                      checked={includeArchived}
+                      onChange={onIncludeArchiveChange}
+                      className=""
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-          </GlobalToolbar>
+          </div>
         </div>
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
           <Select
@@ -83,9 +155,9 @@ const Filters = () => {
               className="bg-primary-white justify-between"
               label="Date"
               onChange={onChange}
-              value={{ from: startDate, to: endDate }}
-              minDate={scheduleStartDate}
-              maxDate={scheduleEndDate}
+              value={{ from: startDueDate, to: endDueDate }}
+            // minDate={scheduleStartDate}
+            // maxDate={scheduleEndDate}
             />
           </div>
         </div>
@@ -96,15 +168,15 @@ const Filters = () => {
             value={filter.status}
             className="bg-white w-[310px]"
             label="Assigned to"
-            options={allStatusOptions}
+            options={userList}
           />
           <TextInput
-            id={'venueText'}
+            id={'taskText'}
             disabled={!ProductionId}
             placeholder="Search Production Task List..."
             className="w-[310px]"
             iconName="search"
-            value={filter.venueText}
+            value={filter.taskText}
             onChange={onChange}
           />
           <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />

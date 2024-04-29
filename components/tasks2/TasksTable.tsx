@@ -112,8 +112,6 @@ export default function TasksTable({ rowData }: TasksTableProps) {
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
 
-  console.log(showAddEditBookingModal, setRows, handleClose);
-
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">

@@ -2,21 +2,47 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
-import useBookingFilter from 'hooks/useBookingsFilter';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 import Filters from 'components/tasks2/Filters';
 import TasksTable from 'components/tasks2/TasksTable';
+import useTasksFilter from 'hooks/useTasksFilter';
+import { getProductionsAndTasks } from 'services/productionService';
+import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
+import { mapToProductionTaskDTO } from 'lib/mappers';
+import { objectify } from 'radash';
+import { useRecoilState } from 'recoil';
+import { ProductionTaskDTO } from 'interfaces';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const rows = useBookingFilter();
+  const { filteredProductions, onApplyFilters } = useTasksFilter();
+  const [productionTasks, setProductionTasks] = useRecoilState(productionState);
+
+
+  const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
+    const updatedProductionTasks = productionTasks.map((productionTask) => {
+      if (productionTask.Id === productionId) {
+        return { ...productionTask, Tasks: updatedTasks };
+      }
+      return productionTask;
+    });
+    setProductionTasks(updatedProductionTasks);
+  };
 
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <Filters onApplyFilters={onApplyFilters} />
       </div>
-      <TasksTable rowData={rows} />
+      {filteredProductions.map((production) => {
+        return (
+          <div key={production.Id} className="mb-10">
+            <h3 className=" text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
+            <TasksTable
+              rowData={production?.Tasks}
+            />
+          </div>
+        );
+      })}
     </Layout>
   );
 };
@@ -24,28 +50,34 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 export default TasksPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  /*
-    We get the data for the whole booking page here. We pass it to the constructor, then store it in state management.
-    This means we can update a single booking, and the schedule will update without having to redownload all the data.
-    We have effectively cloned the database for this production, and populate it using the results of a single query which includes 'everything we want
-    to display'.
-
-    The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
-  */
   const AccountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
-  const ProductionId = productionJump.selected;
-  // See _app.tsx for how this is picked up
+  const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
+  const productionsWithTasks = await getProductionsAndTasks(AccountId);
+  const users = await getUsers(AccountId);
+
+  const productions: ProductionsWithTasks[] = productionsWithTasks.map((t: any) => ({
+    Id: t.Id,
+    ShowName: t.Show.Name,
+    ShowCode: t.Show.Code,
+    ShowId: t.Show.Id,
+    Code: t.Code,
+    Tasks: t.ProductionTask.map(mapToProductionTaskDTO)
+      .map((task) => ({
+        ...task,
+        StartDate: t.WeekNumToDateMap[task.StartByWeekNum],
+        CompleteDate: t.WeekNumToDateMap[task.CompleteByWeekNum],
+      }))
+      .sort((a, b) => a.StartByWeekNum - b.StartByWeekNum),
+    weekNumToDateMap: t.WeekNumToDateMap,
+  }));
   const initialState: InitialState = {
     global: {
       productionJump,
     },
-  };
-
-  return {
-    props: {
-      ProductionId,
-      initialState,
+    tasks: { productions, bulkSelection: {} },
+    account: {
+      user: { users: objectify(users, (user) => user.Id) },
     },
   };
+  return { props: { initialState } };
 };
