@@ -16,6 +16,7 @@ import { debug } from 'utils/logging';
 import VenueContactForm from './VenueContactsForm';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
+import useAxiosCancelToken from 'hooks/useCancelToken';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -42,6 +43,7 @@ export default function AddEditVenueModal({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
     if (field === 'venueCode') {
@@ -55,7 +57,7 @@ export default function AddEditVenueModal({
 
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
-      await axios.post('/api/venue/create', venue);
+      await axios.post('/api/venue/create', venue, { cancelToken });
       onClose(true);
     } catch (e) {
       debug('Error creating venue', e);
@@ -64,7 +66,7 @@ export default function AddEditVenueModal({
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
-      await axios.post('/api/venue/update/' + venue.id, venue);
+      await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
       onClose(true);
     } catch (e) {
       debug('Error updating venue', e);
@@ -75,7 +77,8 @@ export default function AddEditVenueModal({
     setIsSaving(true);
     const isValid = await validateVenue(formData);
     if (isValid) {
-      formData.id ? updateVenue(formData) : createVenue(formData);
+      const apiPromise = formData.id ? updateVenue(formData) : createVenue(formData);
+      await apiPromise;
     }
     setIsSaving(false);
   };
@@ -111,7 +114,7 @@ export default function AddEditVenueModal({
     toggleDeleteConfirmation();
     setIsDeleting(true);
     try {
-      await axios.post('/api/venue/delete/' + venue.id);
+      await axios.post('/api/venue/delete/' + venue.id, {}, { cancelToken });
       onClose(true);
     } catch (e) {
       debug('Error updating venue', e);
@@ -188,16 +191,21 @@ export default function AddEditVenueModal({
             <div className="flex gap-4 pt-4 float-right">
               <Button onClick={onClose} variant="secondary" text="Cancel" className="w-32" />
               <Button
-                disabled={!venue?.id}
+                disabled={!venue?.id || isDeleting || isSaving}
                 onClick={toggleDeleteConfirmation}
                 variant="tertiary"
                 text={isDeleting ? 'Deleting Venue...' : 'Delete Venue'}
                 className="w-32"
               >
-                {isDeleting && <Loader />}
+                {isDeleting && <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />}
               </Button>
-              <Button text={isSaving ? 'Saving...' : 'Save and Close'} className="w-32" onClick={handleSaveAndClose}>
-                {isSaving && <Loader />}
+              <Button
+                disabled={isSaving || isDeleting}
+                text={isSaving ? 'Saving...' : 'Save and Close'}
+                className="w-32"
+                onClick={handleSaveAndClose}
+              >
+                {isSaving && <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />}
               </Button>
             </div>
           </div>
