@@ -28,9 +28,11 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import TextInput from 'components/core-ui-lib/TextInput';
+import { startOfDay } from 'date-fns';
 
 export type SelectOption = {
   text: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
 };
 
@@ -59,6 +61,7 @@ const approvalStatusList = [
 const MarketingHome = () => {
   // global module variables
   const { selected: productionId } = useRecoilValue(productionJumpState);
+  // global module variables
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -220,7 +223,7 @@ const MarketingHome = () => {
       const tempRows = sortedActivities.map((act) => ({
         actName: act.Name,
         actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: act.Date,
+        actDate: startOfDay(new Date(act.Date)),
         followUpCheck: act.FollowUpRequired,
         followUpDt: act.DueByDate,
         companyCost: act.CompanyCost,
@@ -296,7 +299,7 @@ const MarketingHome = () => {
 
       const activityData = [...actRowData, newRow];
 
-      // re sort the row to ensure the new field is put in the correct place chronologically
+      // re sort the rows to ensure the new field is put in the correct place chronologically
       const sortedActivities = activityData.sort(
         (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
       );
@@ -383,6 +386,7 @@ const MarketingHome = () => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookings[0].selected]);
 
   useEffect(() => {
@@ -400,6 +404,7 @@ const MarketingHome = () => {
 
       setCurrency('£');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
   // using tabSet to ensure this is only run once

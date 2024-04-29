@@ -59,8 +59,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getDayTypes(),
   ]);
 
-  console.log(`Retrieved main content. Production: ${productions}`);
-
   const dateBlock = [];
   const rehearsal = {};
   const booking = {};
