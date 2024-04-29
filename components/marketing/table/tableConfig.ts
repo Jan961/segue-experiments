@@ -79,6 +79,9 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     cellRendererParams: {
       truncate: false,
     },
+    cellStyle: {
+      marginTop: '5px',
+    },
     width: 320,
   },
   {

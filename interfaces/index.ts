@@ -98,6 +98,11 @@ export type BookingDTO = {
   PerformanceIds?: number[];
   RunTag: string;
   LandingPageURL: string;
+  TicketsOnSale: boolean;
+  TicketsOnSaleFromDate: string;
+  MarketingPlanReceived: boolean;
+  PrintReqsReceived: boolean;
+  ContactInfoReceived: boolean;
 };
 
 export type GetInFitUpDTO = {
