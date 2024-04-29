@@ -8,10 +8,10 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import { ActivityDTO } from 'interfaces';
-import { removeTime } from 'utils';
+import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { hasActivityChanged } from '../utils';
+import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -68,9 +68,9 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(removeTime(data.Date));
+      setActDate(startOfDay(new Date(data.Date)));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(data.DueByDate === null ? null : removeTime(data.DueByDate));
+      setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);
@@ -90,11 +90,11 @@ export default function ActivityModal({
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
       VenueCost: parseFloat(venueCost),
-      Date: removeTime(actDate),
+      Date: startOfDay(new Date(actDate)),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? removeTime(followUpDt) : null,
+      DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
     };
 
     // only add iD if not adding
@@ -136,11 +136,11 @@ export default function ActivityModal({
         BookingId: bookingId,
         CompanyCost: parseFloat(companyCost),
         VenueCost: parseFloat(venueCost),
-        Date: removeTime(actDate),
+        Date: startOfDay(new Date(actDate)),
         FollowUpRequired: actFollowUp,
         Name: actName,
         Notes: actNotes,
-        DueByDate: actFollowUp ? removeTime(followUpDt) : null,
+        DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
       };
 
       if (hasActivityChanged(data, changedRow)) {
@@ -157,7 +157,7 @@ export default function ActivityModal({
   useEffect(() => {
     setVisible(show);
     initForm();
-  }, [show, initForm]);
+  }, [show]);
 
   return (
     <div>

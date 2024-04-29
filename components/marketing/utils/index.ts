@@ -5,6 +5,11 @@ export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: Activi
   const keys = Object.keys(oldActivity) as Array<keyof ActivityDTO>;
 
   for (const key of keys) {
+    // if Id skip - we can assume the Id will be the same
+    if (key === 'Id') {
+      return;
+    }
+
     // handle dates differently
     if (key === 'Date' || key === 'DueByDate') {
       // check for change
@@ -22,6 +27,13 @@ export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: Activi
   return false;
 };
 
-export const reverseDate = (inputDt) => {
-  return new Date(inputDt.split('/').reverse().join('/'));
+export const reverseDate = (inputDt: string) => {
+  if (typeof inputDt !== 'string' || inputDt === undefined || inputDt === null) {
+    return '';
+  }
+
+  const reversedDateStr = inputDt.split('/').reverse().join('/');
+  const date = new Date(reversedDateStr);
+
+  return date;
 };

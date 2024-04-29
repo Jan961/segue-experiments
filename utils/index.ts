@@ -1,5 +1,4 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-
 export const safeJsonParse = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
@@ -74,9 +73,4 @@ export const convertObjectKeysToCamelCase = (obj: any) => {
     }
   }
   return newObj;
-};
-
-export const removeTime = (inputDt: any) => {
-  const dt = new Date(inputDt);
-  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 0, 0, 0, 0);
 };
