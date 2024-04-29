@@ -15,6 +15,7 @@ import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -29,10 +30,11 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const [getInFitUps, setGetInFitUps] = useRecoilState(getInFitUpState);
   const [others, setOthers] = useRecoilState(otherState);
   const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
+  const currentProduction = useRecoilValue(currentProductionSelector);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-  const currentProduction = useRecoilValue(currentProductionSelector);
+  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
@@ -47,14 +49,17 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   };
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    if (!currentProduction) {
+      setShowConfirmationModal(true);
+      return;
+    }
     const { data } = e;
     if (!data.Id) {
-      currentProduction &&
-        setShowAddEditBookingModal({
-          visible: true,
-          startDate: e.data.dateTime,
-          endDate: e.data.dateTime,
-        });
+      setShowAddEditBookingModal({
+        visible: true,
+        startDate: e.data.dateTime,
+        endDate: e.data.dateTime,
+      });
     } else {
       setShowAddEditBookingModal({
         visible: true,
@@ -136,6 +141,14 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         onCancel={() => setShowModal(false)}
       />
       {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
+      <ConfirmationDialog
+        labelYes="Ok"
+        labelNo=""
+        show={showConfirmationModal}
+        variant="ok"
+        message="Please select a production to add or edit a booking"
+        onYesClick={() => setShowConfirmationModal(false)}
+      />
     </>
   );
 }
