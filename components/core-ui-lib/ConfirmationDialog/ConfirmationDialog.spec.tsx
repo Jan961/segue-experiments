@@ -66,12 +66,17 @@ describe('ConfirmationDialog Component', () => {
     expect(within(dialog).getByTestId('confirmation-dialog-warning')).toHaveTextContent('');
   });
 
-  test('renders component : variant==ok', async () => {
-    render(<ConfirmationDialog show={true} variant="ok" message="This is the last test" labelNo="" />);
+  test('renders component with custom content', async () => {
+    render(
+      <ConfirmationDialog
+        show={true}
+        content={{ question: 'This is the last test', warning: 'Are you ready?' }}
+        labelNo=""
+      />,
+    );
     const dialog = await screen.findByTestId('confirmation-dialog');
     expect(within(dialog).getByText('This is the last test')).toBeInTheDocument();
+    expect(within(dialog).getByText('Are you ready?')).toBeInTheDocument();
     expect(within(dialog).queryByText('No')).not.toBeInTheDocument();
-    expect(within(dialog).queryByTestId('confirmation-dialog-question')).not.toBeInTheDocument();
-    expect(within(dialog).queryByTestId('confirmation-dialog-warning')).not.toBeInTheDocument();
   });
 });

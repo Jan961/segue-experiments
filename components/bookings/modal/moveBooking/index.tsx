@@ -14,7 +14,7 @@ import ConfirmMoveView from './ConfirmMoveView';
 
 interface MoveBookingProps {
   visible: boolean;
-  onClose: () => void;
+  onClose: (value?: string) => void;
   bookings: BookingItem[];
   venueOptions: SelectOption[];
 }
@@ -54,7 +54,7 @@ const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBook
   return (
     <PopupModal
       show={visible}
-      onClose={() => onClose()}
+      onClose={onClose}
       titleClass="text-xl text-primary-navy text-bold"
       title="Move Booking"
       panelClass="relative"

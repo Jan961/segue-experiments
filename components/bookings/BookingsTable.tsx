@@ -142,11 +142,10 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
       />
       {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
       <ConfirmationDialog
-        labelYes="Ok"
+        labelYes="OK"
         labelNo=""
         show={showConfirmationModal}
-        variant="ok"
-        message="Please select a production to add or edit a booking"
+        content={{ question: 'To Add / Edit Bookings please', warning: 'select a single Production' }}
         onYesClick={() => setShowConfirmationModal(false)}
       />
     </>
