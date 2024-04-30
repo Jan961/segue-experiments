@@ -59,8 +59,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getDayTypes(),
   ]);
 
-  console.log(`Retrieved main content. Production: ${productions}`);
-
   const dateBlock = [];
   const rehearsal = {};
   const booking = {};
@@ -127,7 +125,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       });
     }
   }
-
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {

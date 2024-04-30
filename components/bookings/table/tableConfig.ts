@@ -56,7 +56,11 @@ export const columnDefs = [
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
-    cellRenderer: DefaultCellRenderer,
+    valueFormatter: ({ value, data }) =>
+      value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
+    cellStyle: {
+      paddingLeft: '0.5rem',
+    },
     resizable: true,
     width: 105,
   },
@@ -262,8 +266,8 @@ export const newBookingColumnDefs = (
     cellRendererParams: {
       dayTypeOptions,
     },
-    width: 100,
-    maxWidth: 100,
+    width: 110,
+    maxWidth: 110,
     cellStyle: {
       overflow: 'visible',
     },

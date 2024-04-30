@@ -10,6 +10,7 @@ import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
+import { reverseDate } from './utils';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -42,17 +43,25 @@ const Filters = () => {
   }, [bookings.bookings]);
 
   useEffect(() => {
-    const futureBookings = bookingOptions.filter((booking) => reverseDate(booking.date) >= reverseDate(today));
+    const futureBookings = bookingOptions.filter((booking) => {
+      try {
+        const reversedBookingDate = reverseDate(booking.date);
+        const reversedTodayDate = reverseDate(today);
 
+        if (reversedBookingDate !== '' && reversedTodayDate !== '') {
+          return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+        } else {
+          return false;
+        }
+      } catch (error) {
+        return false;
+      }
+    });
     setFutureBookings({
       hasFutureBooking: futureBookings.length > 0,
       nextBooking: futureBookings.length > 0 ? futureBookings[0] : null,
     });
   }, [bookingOptions, today]);
-
-  const reverseDate = (inputDt) => {
-    return new Date(inputDt.split('/').reverse().join('/')).getTime();
-  };
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {

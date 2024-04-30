@@ -12,7 +12,6 @@ import {
 } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import CustomTooltipRenderer from './renderers/CustomTooltipRenderer';
-// import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
   headerColor?: string;
@@ -33,6 +32,7 @@ interface TableProps {
   rowClassRules?: any;
   headerHeight?: number;
   getRowHeight?: (params: RowHeightParams) => number;
+  tableHeight?: number;
 }
 
 const ROW_HEIGHT = 43;
@@ -68,6 +68,7 @@ export default forwardRef(function Table(
     rowClassRules,
     displayHeader = true,
     getRowHeight,
+    tableHeight = 0,
     headerHeight,
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,
@@ -120,9 +121,9 @@ export default forwardRef(function Table(
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
   useEffect(() => {
-    setAutoHeightLimit(window.innerHeight - DELTA);
+    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
     const handleResize = () => {
-      setAutoHeightLimit(window.innerHeight - DELTA);
+      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
     };
     window.addEventListener('resize', handleResize);
     return () => {
