@@ -27,3 +27,4 @@ export { default as UserSolidIcon } from './UserSolid';
 export { default as BookSolidIcon } from './BookSolid';
 export { default as MinusCircleSolidIcon } from './MinusCircleSolid';
 export { default as PlusCircleSolidIcon } from './PlusCircleSolid';
+export { default as CameraSolidIcon } from './Camera';
