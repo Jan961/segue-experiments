@@ -11,15 +11,13 @@ import { getStepIndex } from 'config/AddBooking';
 interface BookingConflictsViewProps {
   isNewBooking: boolean;
   data?: BookingWithVenueDTO[];
-  hasBarringIssues?: boolean;
   updateModalTitle: (title: string) => void;
-  nextStep?: number;
+  nextStep: number;
 }
 
 export default function BookingConflictsView({
   isNewBooking,
   data,
-  hasBarringIssues,
   updateModalTitle,
   nextStep,
 }: BookingConflictsViewProps) {
@@ -52,11 +50,7 @@ export default function BookingConflictsView({
   };
 
   const handleContinueClick = async () => {
-    if (hasBarringIssues) {
-      goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
-    } else {
-      goToStep(nextStep || getStepIndex(isNewBooking, 'New Booking Details'));
-    }
+    goToStep(nextStep);
   };
 
   return (

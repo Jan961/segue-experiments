@@ -2,9 +2,19 @@ import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
 
-export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return';
+export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return' | 'ok';
 
-interface ConfirmationDialogProps {
+export enum ConfVariant {
+  Close = 'close',
+  Cancel = 'cancel',
+  Delete = 'delete',
+  Logout = 'logout',
+  Leave = 'leave',
+  Return = 'return',
+  Ok = 'ok',
+}
+
+export interface ConfirmationDialogProps {
   children?: React.ReactNode;
   show: boolean;
   onYesClick?: () => void;
@@ -13,11 +23,12 @@ interface ConfirmationDialogProps {
   yesBtnClass: string;
   noBtnClass: string;
   labelYes: string;
-  labelNo: string;
+  labelNo?: string;
   hasOverlay?: boolean;
+  message?: string;
 }
 
-const confOptions = {
+export const confOptions = {
   close: {
     question: 'Are you sure you want to close?',
     warning: 'Any unsaved changes may be lost.',
@@ -52,6 +63,7 @@ export default function ConfirmationDialog({
   labelNo = 'No',
   variant,
   hasOverlay = false,
+  message = '',
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -66,13 +78,27 @@ export default function ConfirmationDialog({
 
   return (
     <PopupModal show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
-      <div className="-mt-5">
+      <div data-testid="confirmation-dialog" className="-mt-5">
         <div className="text-center">
-          <div className="text text-primary-navy font-bold text-xl">{confOptions[variant].question}</div>
-          <div className="text text-primary-navy font-bold text-xl">{confOptions[variant].warning}</div>
+          {variant === 'ok' ? (
+            <div data-testid="confirmation-dialog-message" className="text text-primary-navy font-bold text-xl">
+              {message}
+            </div>
+          ) : (
+            <>
+              <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
+                {confOptions[variant].question}
+              </div>
+              <div data-testid="confirmation-dialog-warning" className="text text-primary-navy font-bold text-xl">
+                {confOptions[variant].warning}
+              </div>
+            </>
+          )}
         </div>
         <div className="w-full mt-4 flex justify-center items-center">
-          <Button className="w-32" variant="secondary" text={labelNo} onClick={() => handleAction(false)} />
+          {labelNo && (
+            <Button className="w-32" variant="secondary" text={labelNo} onClick={() => handleAction(false)} />
+          )}
           <Button
             className="ml-4 w-32"
             variant={variant === 'delete' ? 'tertiary' : 'primary'}

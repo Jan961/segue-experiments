@@ -1,5 +1,4 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-
 export const safeJsonParse = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
