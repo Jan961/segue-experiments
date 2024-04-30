@@ -168,7 +168,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
 
       const { data: updated } = await axios.post(
-        `${state.form.isRunOfDates ? '/api/bookings/updateRunOfDates' : '/api/bookings/update'}`,
+        `${state.form.isRunOfDates ? '/api/bookings/update-run-of-dates' : '/api/bookings/update'}`,
         {
           original: state.booking,
           updated: bookingsUpdatedWithRunTag,
