@@ -69,6 +69,8 @@ export const mapExistingBookingToPrismaFields = (value: BookingItem) => {
     PencilNum: Number(value.pencilNo),
     Notes: value.notes,
     RunTag: value.runTag,
+    DateBlockId: value.dateBlockId,
+    FirstDate: value.dateAsISOString,
   };
 };
 

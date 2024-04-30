@@ -11,6 +11,7 @@ import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
   Show: true,
   DateBlock: true,
+  ProductionRegion: true,
 });
 
 export const getActiveProductions = async (accountId: number) => {
@@ -24,6 +25,10 @@ export const getActiveProductions = async (accountId: number) => {
     include: productionDateBlockInclude,
   });
   return getProductionsByStartDate(productions);
+};
+
+export const getRegionlist = async () => {
+  return await prisma.region.findMany({});
 };
 
 export interface AllProductionPageProps {
@@ -107,6 +112,7 @@ export const getAllProductions = async (AccountId: number) => {
       DateBlock: true,
     },
     where: {
+      IsDeleted: false,
       Show: {
         is: {
           AccountId,

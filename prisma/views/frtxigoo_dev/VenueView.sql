@@ -30,32 +30,42 @@ SELECT
   `MainAddress`.`VenueAddressTown` AS `VenueMainAddressTown`,
   `MainAddress`.`VenueAddressCounty` AS `VenueMainAddressCounty`,
   `MainAddress`.`VenueAddressPostcode` AS `VenueMainAddressPostcode`,
-  `MainAddress`.`VenueAddressCountry` AS `VenueMainAddressCountry`,
+  `MainCountry`.`CountryName` AS `VenueMainAddressCountry`,
   `DeliveryAddress`.`VenueAddress1` AS `VenueDeliveryAddress1`,
   `DeliveryAddress`.`VenueAddress2` AS `VenueDeliveryAddress2`,
   `DeliveryAddress`.`VenueAddress3` AS `VenueDeliveryAddress3`,
   `DeliveryAddress`.`VenueAddressTown` AS `VenueDeliveryAddressTown`,
   `DeliveryAddress`.`VenueAddressCounty` AS `VenueDeliveryAddressCounty`,
   `DeliveryAddress`.`VenueAddressPostcode` AS `VenueDeliveryAddressPostcode`,
-  `DeliveryAddress`.`VenueAddressCountry` AS `VenueDeliveryAddressCountry`,
+  `DeliveryCountry`.`CountryName` AS `VenueDeliveryAddressCountry`,
   `frtxigoo_dev`.`Venue`.`VenueNotes` AS `VenueMainNoteText`,
   `frtxigoo_dev`.`Venue`.`VenueWarningNotes` AS `VenueWarningNoteText`
 FROM
   (
     (
       (
-        `frtxigoo_dev`.`Venue`
-        LEFT JOIN `frtxigoo_dev`.`VenueAddress` `MainAddress` ON(
-          `frtxigoo_dev`.`Venue`.`VenueId` = `MainAddress`.`VenueAddressVenueId`
-          AND `MainAddress`.`VenueAddressTypeName` = 'Main'
+        (
+          (
+            `frtxigoo_dev`.`Venue`
+            LEFT JOIN `frtxigoo_dev`.`VenueAddress` `MainAddress` ON(
+              `frtxigoo_dev`.`Venue`.`VenueId` = `MainAddress`.`VenueAddressVenueId`
+              AND `MainAddress`.`VenueAddressTypeName` = 'Main'
+            )
+          )
+          LEFT JOIN `frtxigoo_dev`.`VenueAddress` `DeliveryAddress` ON(
+            `frtxigoo_dev`.`Venue`.`VenueId` = `DeliveryAddress`.`VenueAddressVenueId`
+            AND `DeliveryAddress`.`VenueAddressTypeName` = 'Delivery'
+          )
+        )
+        LEFT JOIN `frtxigoo_dev`.`VenueFamily` ON(
+          `frtxigoo_dev`.`Venue`.`VenueVenueFamilyId` = `frtxigoo_dev`.`VenueFamily`.`VenueFamilyId`
         )
       )
-      LEFT JOIN `frtxigoo_dev`.`VenueAddress` `DeliveryAddress` ON(
-        `frtxigoo_dev`.`Venue`.`VenueId` = `DeliveryAddress`.`VenueAddressVenueId`
-        AND `DeliveryAddress`.`VenueAddressTypeName` = 'Delivery'
+      LEFT JOIN `frtxigoo_dev`.`Country` `MainCountry` ON(
+        `MainAddress`.`VenueAddressCountryId` = `MainCountry`.`CountryId`
       )
     )
-    LEFT JOIN `frtxigoo_dev`.`VenueFamily` ON(
-      `frtxigoo_dev`.`Venue`.`VenueVenueFamilyId` = `frtxigoo_dev`.`VenueFamily`.`VenueFamilyId`
+    LEFT JOIN `frtxigoo_dev`.`Country` `DeliveryCountry` ON(
+      `DeliveryAddress`.`VenueAddressCountryId` = `DeliveryCountry`.`CountryId`
     )
   )

@@ -1,8 +1,13 @@
+import { getBarredVenuesColDefs, styleProps } from 'components/bookings/table/tableConfig';
+import Button from 'components/core-ui-lib/Button';
+import Table from 'components/core-ui-lib/Table';
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueBarringRules } from 'config/venue';
-import { useState } from 'react';
-import { UiTransformedVenue } from 'utils/venue';
+import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
+import { UiBarredVenue, UiTransformedVenue } from 'utils/venue';
 
 interface VenueBarringFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -13,9 +18,15 @@ interface VenueBarringFormProps {
 
 const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
+  const [barredVenueTableRows, setBarredVenueTableRows] = useState<UiBarredVenue[]>(venue?.barredVenues || []);
+  const venueOptions = useRecoilValue(venueOptionsSelector([]));
+  const [columnDefs, setColumnDefs] = useState([]);
+  useEffect(() => {
+    setColumnDefs(getBarredVenuesColDefs(venueOptions));
+  }, [venueOptions]);
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
-      ...formData,
+      ...venue,
       [field]: value,
     };
     setFormData(updatedFormData);
@@ -24,9 +35,32 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
       updateValidationErrrors(field, null);
     }
   };
-  // const addNewBarredVenue = () => {
-  //   console.log('Adding new venue is in Progress	');
-  // };
+  const addNewBarredVenue = () => {
+    setBarredVenueTableRows((prev) => [...prev, { barredVenueId: null }]);
+  };
+  const onCellClicked = (e) => {
+    const { column, rowIndex } = e;
+    if (column.colId === 'delete') {
+      const updatedBarredVenueTableRows = [
+        ...barredVenueTableRows.slice(0, rowIndex),
+        ...barredVenueTableRows.slice(rowIndex + 1),
+      ];
+      setBarredVenueTableRows(updatedBarredVenueTableRows);
+      const barredVenues = updatedBarredVenueTableRows.filter((x) => !x.barredVenueId);
+      handleInputChange('barredVenues', barredVenues);
+    }
+  };
+  const handleCellValueChange = (e) => {
+    const { column, value, rowIndex } = e;
+    const updatedBarredVenueRows = [...barredVenueTableRows];
+    updatedBarredVenueRows[rowIndex][column.colId] = value;
+    setBarredVenueTableRows(updatedBarredVenueRows);
+    const updatedFormData = {
+      ...venue,
+      barredVenues: updatedBarredVenueRows,
+    };
+    onChange(updatedFormData);
+  };
   return (
     <>
       <label className="grid grid-cols-[100px_minmax(100px,350px)]  gap-10   w-full">
@@ -88,12 +122,18 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
             )}
           </div>
         </div>
-        {/* <div className=" ">
+        <div className=" ">
           <div className="flex justify-end pb-3">
             <Button onClick={addNewBarredVenue} text="Add Barred Venue" className="w-32" />
           </div>
-          <Table styleProps={styleProps} columnDefs={barredVenues} rowData={[]} />
-        </div> */}
+          <Table
+            onCellClicked={onCellClicked}
+            styleProps={styleProps}
+            columnDefs={columnDefs}
+            rowData={barredVenueTableRows}
+            onCellValueChange={handleCellValueChange}
+          />
+        </div>
       </div>
     </>
   );

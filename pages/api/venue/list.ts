@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { country, town, productionId, searchQuery, limit } = req.body;
-  const queryConditions: any = {};
+  const queryConditions: any = { IsDeleted: false };
   if (searchQuery) {
     queryConditions.OR = [
       {
@@ -59,6 +59,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: queryConditions,
       include: {
         VenueAddress: true,
+        VenueContact: {
+          include: {
+            VenueRole: true,
+          },
+        },
+        VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: true,
         Booking: {
           include: {
             DateBlock: true,

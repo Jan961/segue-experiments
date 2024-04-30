@@ -9,12 +9,18 @@ import { BookingWithVenueDTO } from 'interfaces';
 import { getStepIndex } from 'config/AddBooking';
 
 interface BookingConflictsViewProps {
+  isNewBooking: boolean;
   data?: BookingWithVenueDTO[];
-  hasBarringIssues?: boolean;
   updateModalTitle: (title: string) => void;
+  nextStep: number;
 }
 
-export default function BookingConflictsView({ data, hasBarringIssues, updateModalTitle }: BookingConflictsViewProps) {
+export default function BookingConflictsView({
+  isNewBooking,
+  data,
+  updateModalTitle,
+  nextStep,
+}: BookingConflictsViewProps) {
   const { goToStep } = useWizard();
 
   const rows = useMemo(
@@ -44,11 +50,7 @@ export default function BookingConflictsView({ data, hasBarringIssues, updateMod
   };
 
   const handleContinueClick = async () => {
-    if (hasBarringIssues) {
-      goToStep(getStepIndex(true, 'Barring Issue'));
-    } else {
-      goToStep(getStepIndex(true, 'New Booking Details'));
-    }
+    goToStep(nextStep);
   };
 
   return (
@@ -69,7 +71,7 @@ export default function BookingConflictsView({ data, hasBarringIssues, updateMod
           className="w-33"
           variant="secondary"
           text="Back"
-          onClick={() => goToStep(getStepIndex(true, 'Create New Booking'))}
+          onClick={() => goToStep(getStepIndex(isNewBooking, 'Create New Booking'))}
         />
         <Button
           className="ml-3 w-33"

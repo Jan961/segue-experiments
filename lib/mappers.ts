@@ -106,6 +106,11 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   CastRateTicketsNotes: b.CastRateTicketsNotes,
   RunTag: b.RunTag,
   LandingPageURL: b.LandingPageURL,
+  TicketsOnSale: b.TicketsOnSale,
+  TicketsOnSaleFromDate: convertDate(b.TicketsOnSaleFromDate),
+  MarketingPlanReceived: b.MarketingPlanReceived,
+  PrintReqsReceived: b.PrintReqsReceived,
+  ContactInfoReceived: b.ContactInfoReceived,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
@@ -160,6 +165,10 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   ShowCode: t.Show.Code,
   DateBlock: t.DateBlock ? t.DateBlock.map(dateBlockMapper) : [],
   IsArchived: t.IsArchived,
+  SalesEmail: t.SalesEmail,
+  IsDeleted: t.IsDeleted,
+  SalesFrequency: t.SalesFrequency,
+  RegionList: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({

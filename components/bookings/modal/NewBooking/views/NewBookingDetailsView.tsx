@@ -13,7 +13,7 @@ import { getStepIndex } from 'config/AddBooking';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { dateToSimple, formattedDateWithWeekDay, toISO } from 'services/dateService';
-import { ProductionDTO } from 'interfaces';
+import { BookingWithVenueDTO, ProductionDTO } from 'interfaces';
 import { venueState } from 'state/booking/venueState';
 import { useRecoilValue } from 'recoil';
 import { isNullOrEmpty } from 'utils';
@@ -21,6 +21,7 @@ import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import { Direction } from 'components/bookings/table/AddDeleteRowRenderer';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
+import MoveBooking from '../../moveBooking';
 
 type NewBookingDetailsProps = {
   formData: TForm;
@@ -32,12 +33,13 @@ type NewBookingDetailsProps = {
   onSubmit: (booking: BookingItem[]) => void;
   onUpdate: (booking: BookingItem[]) => void;
   toggleModalOverlay: (isVisible: boolean) => void;
-  onClose: () => void;
+  onClose: (value?: string) => void;
   onDelete: () => void;
-  onBarringCheckComplete: () => void;
+  onBarringCheckComplete: (nextStep: string) => void;
   updateModalTitle: (title: string) => void;
   isNewBooking: boolean;
   updateBarringConflicts: (barringConflicts: BarredVenue[]) => void;
+  updateBookingConflicts: (bookingConflicts: BookingWithVenueDTO[]) => void;
 };
 
 export default function NewBookingDetailsView({
@@ -56,11 +58,14 @@ export default function NewBookingDetailsView({
   isNewBooking,
   onBarringCheckComplete,
   updateBarringConflicts,
+  updateBookingConflicts,
 }: NewBookingDetailsProps) {
   const { fromDate, toDate, dateType, venueId, isRunOfDates } = formData;
   const venueDict = useRecoilValue(venueState);
   const [bookingData, setBookingData] = useState<BookingItem[]>([]);
   const [bookingRow, setBookingRow] = useState<BookingItem>(null);
+  const [hasBookingChanged, setHasBookingChanged] = useState<boolean>(false);
+  const [showMoveBookingModal, setShowMoveBookingsModal] = useState<boolean>(false);
   const [showNotesModal, setShowNotesModal] = useState<boolean>(false);
   const [changeBookingLength, setchangeBookingLength] = useState<boolean>(false);
   const [changeBookingLengthConfirmed, setchangeBookingLengthConfirmed] = useState<boolean>(false);
@@ -72,6 +77,7 @@ export default function NewBookingDetailsView({
 
   useEffect(() => {
     updateModalTitle(`${isNewBooking ? 'New' : 'Edit'} Booking Details`);
+    onBarringCheckComplete('Preview New Booking');
   }, []);
 
   useEffect(() => {
@@ -149,10 +155,10 @@ export default function NewBookingDetailsView({
       setBookingData(dates);
     }
   }, [fromDate, toDate, dateType, venueId, dayTypeOptions, venueOptions, dateBlockId, isRunOfDates, isNewBooking]);
-
+  const productionCode = `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`;
   const productionItem = useMemo(() => {
     return {
-      production: `${production.ShowCode}${production.Code}`,
+      production: `${production?.ShowCode}${production?.Code}`,
       venue: bookingRow?.venue ? venueDict[bookingRow.venue].Name : '',
       date: bookingRow?.date || null,
       note: bookingRow?.notes || '',
@@ -176,7 +182,6 @@ export default function NewBookingDetailsView({
 
   const checkForBarredVenues = async () => {
     const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
-
     const lastRow = tableRef.current
       .getApi()
       .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
@@ -192,17 +197,45 @@ export default function NewBookingDetailsView({
         filterBarredVenues: true,
       });
       if (!isNullOrEmpty(response.data)) {
-        onBarringCheckComplete();
         const formatted = response.data
           .map((barredVenue: BarredVenue) => ({ ...barredVenue, date: dateToSimple(barredVenue.date) }))
           .filter((venue: BarredVenue) => venue.hasBarringConflict);
         updateBarringConflicts(formatted);
         goToStep(getStepIndex(isNewBooking, 'Barring Issue'));
       } else {
+        updateBarringConflicts(null);
         goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
       }
     } catch (e) {
       console.log('Error getting barred venues');
+    }
+  };
+
+  const checkForBookingConflicts = async () => {
+    const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
+    if (firstRow.data.venue) {
+      const lastRow = tableRef.current
+        .getApi()
+        .getDisplayedRowAtIndex(tableRef.current.getApi().getDisplayedRowCount() - 1);
+      try {
+        const response = await axios.post('/api/bookings/conflict', {
+          fromDate: firstRow.data.dateAsISOString,
+          toDate: lastRow.data.dateAsISOString,
+          productionId: production.Id,
+        });
+        if (!isNullOrEmpty(response.data)) {
+          updateBookingConflicts(response.data);
+          goToStep(getStepIndex(isNewBooking, 'Booking Conflict'));
+        } else {
+          setchangeBookingLengthConfirmed(true);
+          setchangeBookingLength((prev) => !prev);
+        }
+      } catch (e) {
+        console.log('Error getting barred venues');
+      }
+    } else {
+      setchangeBookingLengthConfirmed(true);
+      setchangeBookingLength((prev) => !prev);
     }
   };
 
@@ -228,7 +261,9 @@ export default function NewBookingDetailsView({
   };
 
   // Placeholder function to be implemented
-  const handleMoveBooking = () => null;
+  const handleMoveBooking = () => {
+    setShowMoveBookingsModal(true);
+  };
 
   const handleCancelButtonClick = () => {
     if (changeBookingLength) {
@@ -236,8 +271,7 @@ export default function NewBookingDetailsView({
       tableRef.current.getApi().redrawRows();
       setchangeBookingLength(false);
     } else {
-      const isDirty = tableRef.current.isDirty();
-      if (isDirty) {
+      if (hasBookingChanged) {
         confirmationType.current = 'cancel';
         setShowConfirmation(true);
         toggleModalOverlay(true);
@@ -276,7 +310,12 @@ export default function NewBookingDetailsView({
 
   const handePreviewBookingClick = () => {
     storeBookingDetails();
-    checkForBarredVenues();
+    const firstRow = tableRef.current.getApi().getDisplayedRowAtIndex(0);
+    if (firstRow.data.venue && formData.venueId !== firstRow.data.venue) {
+      checkForBarredVenues();
+    } else {
+      goToStep(getStepIndex(isNewBooking, 'Preview New Booking'));
+    }
   };
 
   const handeCheckMileageClick = () => {
@@ -321,21 +360,33 @@ export default function NewBookingDetailsView({
 
   const handleChangeOrConfirmBooking = () => {
     if (changeBookingLength) {
-      setchangeBookingLengthConfirmed(true);
       storeBookingDetails();
+      console.log();
+      checkForBookingConflicts();
     } else {
       // The user has opted to change the length of the booking, so we need to make it a run of dates if it is not already one
       if (bookingData.length === 1) {
         setBookingData((prev) => [{ ...prev[0], isRunOfDates: true }]);
       }
+      setchangeBookingLength((prev) => !prev);
     }
-    setchangeBookingLength((prev) => !prev);
+  };
+
+  const handleMoveBookingClose = () => {
+    setShowMoveBookingsModal(false);
+    onClose();
+  };
+
+  const handleCellValueChange = () => {
+    if (!hasBookingChanged) {
+      setHasBookingChanged(true);
+    }
   };
 
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-2 font-bold">{`${production.ShowCode}${production.Code}  ${production?.ShowName}`}</div>
+        <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
         <Table
@@ -346,6 +397,7 @@ export default function NewBookingDetailsView({
           onCellClicked={handleCellClick}
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
+          onCellValueChange={handleCellValueChange}
         />
         <NotesPopup
           show={showNotesModal}
@@ -379,7 +431,7 @@ export default function NewBookingDetailsView({
                   variant="primary"
                   text="Move Booking"
                   onClick={handleMoveBooking}
-                  disabled={changeBookingLength || changeBookingLengthConfirmed}
+                  disabled={changeBookingLength || changeBookingLengthConfirmed || isNullOrEmpty(bookingData[0]?.venue)}
                 />
                 <Button
                   className="w-33 px-4"
@@ -397,6 +449,14 @@ export default function NewBookingDetailsView({
             />
           </div>
         </div>
+        {showMoveBookingModal && (
+          <MoveBooking
+            visible={showMoveBookingModal}
+            onClose={handleMoveBookingClose}
+            bookings={bookingData}
+            venueOptions={venueOptions}
+          />
+        )}
         <ConfirmationDialog
           variant={confirmationType.current}
           show={showConfirmation}

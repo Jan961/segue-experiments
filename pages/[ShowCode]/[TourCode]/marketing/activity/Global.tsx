@@ -5,10 +5,10 @@ import GlobalActivites from 'components/marketing/activity/globa';
 
 const Index = () => (
   <Layout title="Global Activites | Segue">
-    <Toolbar></Toolbar>
+    <Toolbar />
     <div className="flex flex-auto">
-      <SideMenu></SideMenu>
-      <GlobalActivites></GlobalActivites>
+      <SideMenu />
+      <GlobalActivites />
     </div>
   </Layout>
 );

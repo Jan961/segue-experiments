@@ -4,13 +4,19 @@ import VenueFilter from 'components/venues/VenueFilter';
 import VenueTable from 'components/venues/VenueTable';
 import AddEditVenueModal from 'components/venues/modal/AddEditVenueModal';
 
-import { getAllVenueFamilyList, getUniqueVenueCountrylist, getUniqueVenueTownlist } from 'services/venueService';
+import {
+  getAllVenueFamilyList,
+  getAllVenueRoles,
+  getAllVenuesMin,
+  getUniqueVenueCountrylist,
+  getUniqueVenueTownlist,
+} from 'services/venueService';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import axios from 'axios';
 import { defaultVenueFilters } from 'config/bookings';
-import { debounce } from 'radash';
+import { debounce, objectify } from 'radash';
 import { intialState as intialProductionJumpState } from 'state/booking/productionJumpState';
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -31,6 +37,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     venueCountryOptionList = [],
     venueCurrencyOptionList = [],
     venueFamilyOptionList = [],
+    venueRoleOptionList = [],
   } = props;
   const [filters, setFilters] = useState<VenueFilters>(defaultVenueFilters);
   const [venues, setVenues] = useState([]);
@@ -60,15 +67,32 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
   }, [productionId, town, country, search]);
 
-  const updateFilters = (change) => {
-    setFilters((prevFilters) => ({ ...prevFilters, ...change }));
-  };
+  const refreshTable = useCallback(() => {
+    filterVenues({ productionId, town, country, searchQuery: search, limit: productionId ? null : 50 });
+  }, [productionId, town, country, search, filterVenues]);
+
+  const updateFilters = useCallback(
+    (change) => {
+      setFilters((prevFilters) => ({ ...prevFilters, ...change }));
+    },
+    [setFilters],
+  );
 
   const onSelectVenue = useCallback(
     (venue: UiTransformedVenue) => {
       setEditVenueContext(venue);
     },
     [setEditVenueContext],
+  );
+
+  const onModalClose = useCallback(
+    (isSuccess?: boolean) => {
+      if (isSuccess) {
+        refreshTable();
+      }
+      setEditVenueContext(null);
+    },
+    [refreshTable, setEditVenueContext],
   );
 
   return (
@@ -93,10 +117,9 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           venueFamilyOptionList={venueFamilyOptionList}
           venueCurrencyOptionList={venueCurrencyOptionList}
           countryOptions={venueCountryOptionList}
+          venueRoleOptionList={venueRoleOptionList}
           visible={!!editVenueContext}
-          onClose={() => {
-            setEditVenueContext(null);
-          }}
+          onClose={onModalClose}
         />
       )}
     </>
@@ -114,6 +137,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getUniqueVenueCountrylist(),
     getAllCurrencyList(),
     getAllVenueFamilyList(),
+    getAllVenuesMin(),
+    getAllVenueRoles(),
   ]);
 
   const productionJump = results[0].status === 'fulfilled' ? results[0].value : intialProductionJumpState;
@@ -126,9 +151,23 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       : [];
   const venueFamilyOptionList: SelectOption[] =
     results[4].status === 'fulfilled' ? transformToOptions(results[4].value, 'Name', 'Id') : [];
+  const venues = results[5].status === 'fulfilled' ? results[5].value : [];
+  const venue = objectify(
+    venues,
+    (v) => v.Id,
+    (v: any) => {
+      const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+    },
+  );
+  const venueRoleOptionList: SelectOption[] =
+    results[6].status === 'fulfilled' ? transformToOptions(results[6].value, 'Name', 'Id') : [];
   const initialState = {
     global: {
       productionJump,
+    },
+    booking: {
+      venue,
     },
   };
 
@@ -138,6 +177,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       venueCountryOptionList,
       venueCurrencyOptionList,
       venueFamilyOptionList,
+      venueRoleOptionList,
       initialState,
     },
   };
