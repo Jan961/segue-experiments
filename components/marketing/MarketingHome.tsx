@@ -73,6 +73,7 @@ const MarketingHome = () => {
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [currency, setCurrency] = useState('£');
+  const [activeTabName, setActiveTabName] = useState<string>();
 
   // sales
   const [salesTable, setSalesTable] = useState<ReactNode>();
@@ -108,6 +109,7 @@ const MarketingHome = () => {
   const [contactModalVariant, setContactModalVariant] = useState<ContactNoteModalVariant>();
   const [contactNoteRows, setContactNoteRows] = useState<Array<BookingContactNoteDTO>>();
   const [contNoteColDefs, setContNoteColDefs] = useState([]);
+  const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
 
   const router = useRouter();
 
@@ -258,7 +260,7 @@ const MarketingHome = () => {
         (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
       );
 
-      setContNoteColDefs(contactNoteColDefs(updateContactNote));
+      setContNoteColDefs(contactNoteColDefs(contactNoteUpdate));
       setContactNoteRows(sortedContactNotes);
     }
   };
@@ -302,8 +304,15 @@ const MarketingHome = () => {
     }
   };
 
-  const updateContactNote = (variant: ContactNoteModalVariant, data) => {
-    console.log(variant, data);
+  const contactNoteUpdate = (variant: ContactNoteModalVariant, data: BookingContactNoteDTO) => {
+    setContactModalVariant(variant);
+    setContactNoteRow(data);
+
+    if (variant === 'edit') {
+      setShowContactNoteModal(true);
+    } else if (variant === 'delete') {
+      setShowConfirm(true);
+    }
   };
 
   const saveActivity = async (variant: ActivityModalVariant, data: ActivityDTO) => {
@@ -389,8 +398,56 @@ const MarketingHome = () => {
     }
   };
 
-  const saveContactNote = (variant: ContactNoteModalVariant, data) => {
-    console.log(variant, data);
+  const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
+    if (variant === 'add') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/create',
+        data,
+        method: 'POST',
+      });
+
+      const conNoteData = [...contactNoteRows, data];
+
+      // re sort the rows to ensure the new field is put in the correct place chronologically
+      const sortedContactNotes = conNoteData.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContactNoteRows(sortedContactNotes);
+      setShowContactNoteModal(false);
+    } else if (variant === 'edit') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/update',
+        method: 'POST',
+        data,
+      });
+
+      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
+      const newRows = [...contactNoteRows];
+      newRows[rowIndex] = data;
+
+      const sortedContactNotes = newRows.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContactNoteRows(sortedContactNotes);
+      setShowContactNoteModal(false);
+    } else if (variant === 'delete') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/delete',
+        method: 'POST',
+        data,
+      });
+
+      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
+      const newRows = [...contactNoteRows];
+      if (rowIndex !== -1) {
+        newRows.splice(rowIndex, 1);
+      }
+
+      setContactNoteRows(newRows);
+      setShowConfirm(false);
+    }
   };
 
   const calculateActivityTotals = (tableRows) => {
@@ -418,6 +475,20 @@ const MarketingHome = () => {
   const addContactNote = () => {
     setContactModalVariant('add');
     setShowContactNoteModal(true);
+  };
+
+  const deleteMarketingRow = () => {
+    switch (activeTabName) {
+      case 'Activities': {
+        saveActivity('delete', actRow);
+        break;
+      }
+
+      case 'Contact Notes': {
+        saveContactNote('delete', contactNoteRow);
+        break;
+      }
+    }
   };
 
   useEffect(() => {
@@ -453,6 +524,7 @@ const MarketingHome = () => {
     if (currentTab !== undefined) {
       const tabIStr = currentTab.toString();
       setTabIndex(parseInt(tabIStr));
+      setActiveTabName(tabs[parseInt(tabIStr)]);
       setTabSet(true);
     }
   }
@@ -486,6 +558,7 @@ const MarketingHome = () => {
           tabs={tabs}
           disabled={!productionId || !bookingId}
           defaultIndex={tabIndex}
+          onChange={(index) => setActiveTabName(tabs[index])}
         >
           <Tab.Panel className="h-[650px] overflow-y-hidden">{salesTable}</Tab.Panel>
 
@@ -693,7 +766,7 @@ const MarketingHome = () => {
               show={showContactNoteModal}
               onCancel={() => setShowContactNoteModal(false)}
               variant={contactModalVariant}
-              activityTypes={actTypeList}
+              data={contactNoteRow}
               onSave={(variant, data) => saveContactNote(variant, data)}
               bookingId={bookingId}
             />
@@ -706,7 +779,7 @@ const MarketingHome = () => {
       <ConfirmationDialog
         variant={confVariant}
         show={showConfirm}
-        onYesClick={() => saveActivity('delete', actRow)}
+        onYesClick={deleteMarketingRow}
         onNoClick={() => setShowConfirm(false)}
         hasOverlay={false}
       />
