@@ -16,7 +16,7 @@ import { ProductionTaskDTO } from 'interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { filteredProductions, onApplyFilters } = useTasksFilter();
+  const { filteredProductions } = useTasksFilter();
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
   const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
     const updatedProductionTasks = productionTasks.map((productionTask) => {
@@ -32,7 +32,7 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
       <div className="flex flex-auto w-full h-screen">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
           <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'} />
-          <Toolbar onApplyFilters={onApplyFilters} />
+          <Toolbar onApplyFilters={null} />
           {filteredProductions.length > 0 ? (
             filteredProductions.map((production) => {
               return (
