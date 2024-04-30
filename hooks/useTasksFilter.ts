@@ -8,11 +8,12 @@ const useTasksFilter = () => {
   const productions = useRecoilValue(productionState);
   const filters = useRecoilValue(tasksfilterState);
 
+  console.log(filters);
+
   const filteredProductions = useMemo(() => {
     const selectedProductionData = productions.filter((productionItem) => {
       if (filters.production === -1) return productionItem.Tasks
       else if (productionItem.Id === filters.production) return productionItem
-      return productionItem;
     })
 
     const selectedProductions = selectedProductionData.map((productionData) => {
