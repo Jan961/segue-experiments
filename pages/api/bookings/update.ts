@@ -31,6 +31,7 @@ const formatNonPerformanceType = (booking) => ({
   Notes: booking.notes || '',
   DateBlockId: booking.dateBlockId,
   Date: booking.dateAsISOString,
+  RunTag: booking.runTag,
 });
 
 const formatOtherType = (booking) => ({
@@ -41,6 +42,7 @@ const formatOtherType = (booking) => ({
   Notes: booking.notes || '',
   DateBlockId: booking.dateBlockId,
   Date: booking.dateAsISOString,
+  RunTag: booking.runTag,
 });
 
 const formatExistingBookingToPrisma = (booking: BookingItem) => {
@@ -88,7 +90,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // Check if this is a straight forward update or a delete-insert
     const acc: typeof rowsMap = updated.reduce((acc, booking: BookingItem) => {
       const originalBooking = original.find(({ id }) => id === booking.id) as BookingItem;
-      const originalType = getBookngType(originalBooking);
+      const originalType = originalBooking ? getBookngType(originalBooking) : null;
       const updatedType = getBookngType(booking);
 
       if (!booking.id) {
