@@ -15,7 +15,7 @@ export const intialTasksState: TasksFilterType = {
   status: 'all',
   startDueDate: null,
   endDueDate: null,
-  assignee: null,
+  assignee: -1,
 };
 
 export const tasksfilterState = atom({

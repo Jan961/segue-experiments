@@ -11,13 +11,14 @@ import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import NotesPopup from 'components/bookings/NotesPopup';
-import { columnDefs, styleProps } from './tableConfig';
+import { styleProps } from './tableConfig';
 
 interface TasksTableProps {
   rowData?: any;
+  columnDefs?: any
 }
 
-export default function TasksTable({ rowData }: TasksTableProps) {
+export default function TasksTable({ rowData = [], columnDefs = [] }: TasksTableProps) {
   const tableRef = useRef(null);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
@@ -97,13 +98,11 @@ export default function TasksTable({ rowData }: TasksTableProps) {
     }
   }, [filter, setFilter, rowData]);
 
-  //   useEffect(() => {
-  //     if (rowData) {
-  //       let formattedRows = formatRowsForPencilledBookings(rowData);
-  //       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
-  //       setRows(formattedRows);
-  //     }
-  //   }, [rowData]);
+  useEffect(() => {
+    if (rowData) {
+      setRows(rowData);
+    }
+  }, [rowData]);
 
   const handleClose = (bookings = null) => {
     if (bookings) {
@@ -111,6 +110,8 @@ export default function TasksTable({ rowData }: TasksTableProps) {
     }
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
+
+  console.log(showAddEditBookingModal, handleClose)
 
   return (
     <>

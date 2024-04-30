@@ -10,13 +10,32 @@ import { getProductionsAndTasks } from 'services/productionService';
 import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
 import { mapToProductionTaskDTO } from 'lib/mappers';
 import { objectify } from 'radash';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { ProductionTaskDTO } from 'interfaces';
+import { userState } from 'state/account/userState';
+import { useMemo } from 'react';
+import { getColumnDefs } from 'components/tasks2/tableConfig';
 
-const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { filteredProductions, onApplyFilters } = useTasksFilter();
+const TasksPage = () => {
+  const { filteredProductions } = useTasksFilter();
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
 
+  const { users } = useRecoilValue(userState);
+
+  const usersList = useMemo(
+    () =>
+      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
+      })),
+    [users],
+  );
+
+  const exists = usersList.some(item => item.text === 'All');
+ 
+  if(!exists){
+    usersList.unshift({ value: -1, text: 'All' });
+  }
 
   const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
     const updatedProductionTasks = productionTasks.map((productionTask) => {
@@ -28,21 +47,27 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     setProductionTasks(updatedProductionTasks);
   };
 
+  console.log(onTasksChange);
+
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
-        <Filters onApplyFilters={onApplyFilters} />
+        <Filters usersList={usersList} />
       </div>
-      {filteredProductions.map((production) => {
-        return (
-          <div key={production.Id} className="mb-10">
-            <h3 className=" text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
-            <TasksTable
-              rowData={production?.Tasks}
-            />
-          </div>
-        );
-      })}
+      {filteredProductions.length === 0 ? <TasksTable
+        rowData={[]}
+      /> :
+        filteredProductions.map((production) => {
+          const columnDefs = getColumnDefs(usersList, production.ShowName);
+          return (
+            <div key={production.Id} className="mb-10">
+              <TasksTable
+                rowData={production.Tasks}
+                columnDefs={columnDefs}
+              />
+            </div>
+          );
+        })}
     </Layout>
   );
 };

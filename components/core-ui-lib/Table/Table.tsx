@@ -155,6 +155,7 @@ export default forwardRef(function Table(
           getRowStyle={getRowStyle}
           rowClassRules={rowClassRules}
           tooltipHideDelay={5000}
+          domLayout='autoHeight'
           tooltipShowDelay={0}
           gridOptions={{ ...DEFAULT_GRID_OPTIONS, ...gridOptions }}
           getRowHeight={getRowHeight}

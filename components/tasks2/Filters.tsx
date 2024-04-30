@@ -1,8 +1,8 @@
 import Button from 'components/core-ui-lib/Button';
 import Select from 'components/core-ui-lib/Select';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { useEffect, useMemo, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { useMemo, useState } from 'react';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import TasksButtons from './TasksButtons';
 import DateRange from 'components/core-ui-lib/DateRange';
@@ -10,48 +10,34 @@ import { statusOptions } from 'config/tasks';
 import { tasksfilterState, intialTasksState } from 'state/tasks/tasksFilterState';
 import ProductionOption from 'components/global/nav/ProductionOption';
 import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
-import { userState } from 'state/account/userState';
 import Checkbox from 'components/core-ui-lib/Checkbox';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
-type FilterProps = {
-  onApplyFilters: () => void;
+interface FiltersProps {
+  usersList: SelectOption[]
 };
 
+const Filters = ({ usersList }: FiltersProps) => {
 
-const Filters = ({ onApplyFilters }: FilterProps) => {
   const [filter, setFilter] = useRecoilState(tasksfilterState);
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
-  
-
 
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
+    console.log(filter, usersList)
   };
 
   const onClearFilters = () => {
     setFilter({
       ...intialTasksState,
-      startDueDate: filter.startDueDate,
-      endDueDate: filter.endDueDate,
+      startDueDate: null,
+      endDueDate: null,
+      production: null,
+      assignee: -1,
+      status: 'all'
     });
   };
 
-  useEffect(() => {
-    onApplyFilters();
-  }, [filter])
-
   const { startDueDate, endDueDate } = filter || {};
-
-  const { users } = useRecoilValue(userState);
-
-  const userList = useMemo(
-    () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
-    [users],
-  );
 
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
@@ -86,8 +72,6 @@ const Filters = ({ onApplyFilters }: FilterProps) => {
     return productionOptions;
   }, [productionJump, includeArchived]);
 
-  const { selected } = productionJump;
-
   const gotoTasks = (productionId?: number) => {
     const selectedProduction = productions.find((production) => production.Id === productionId);
     if (!selectedProduction) {
@@ -100,11 +84,12 @@ const Filters = ({ onApplyFilters }: FilterProps) => {
     // router.push(`/tasks/${ShowCode}/${ProductionCode}`);
   };
 
+  console.log(gotoTasks)
   const onIncludeArchiveChange = (e) => {
     setProductionJump({ ...productionJump, includeArchived: e.target.value });
     setIncludeArchived(e.target.value);
   };
-  
+
   return (
     <div className="w-full flex items-center justify-between flex-wrap">
       <div className="mx-0">
@@ -116,13 +101,13 @@ const Filters = ({ onApplyFilters }: FilterProps) => {
                 <div className="flex items-center">
                   <Select
                     className="border-0 !shadow-none w-[420px]"
-                    value={selected}
+                    value={filter.production}
                     label="Production"
                     placeholder="Please select a Production"
                     renderOption={(option) => <ProductionOption option={option} />}
                     customStyles={ARCHIVED_OPTION_STYLES}
                     options={productions}
-                    onChange={gotoTasks}
+                    onChange={(value) => onChange({ target: { id: 'production', value } })}
                     isSearchable
                     isClearable={false}
                   />
@@ -143,7 +128,7 @@ const Filters = ({ onApplyFilters }: FilterProps) => {
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
-            disabled={!ProductionId}
+            disabled={!filter.production}
             value={filter.status}
             className="bg-white w-[310px]"
             label="Status"
@@ -151,7 +136,7 @@ const Filters = ({ onApplyFilters }: FilterProps) => {
           />
           <div className="bg-white w-[310px]">
             <DateRange
-              disabled={!ProductionId}
+              disabled={!filter.production}
               className="bg-primary-white justify-between"
               label="Date"
               onChange={onChange}
@@ -163,16 +148,16 @@ const Filters = ({ onApplyFilters }: FilterProps) => {
         </div>
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1 mt-2">
           <Select
-            onChange={(value) => onChange({ target: { id: 'status', value } })}
-            disabled={!ProductionId}
-            value={filter.status}
+            onChange={(value) => onChange({ target: { id: 'assignee', value } })}
+            disabled={!filter.production}
+            value={filter.assignee}
             className="bg-white w-[310px]"
             label="Assigned to"
-            options={userList}
+            options={usersList}
           />
           <TextInput
             id={'taskText'}
-            disabled={!ProductionId}
+            disabled={!filter.production}
             placeholder="Search Production Task List..."
             className="w-[310px]"
             iconName="search"

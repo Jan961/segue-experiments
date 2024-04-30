@@ -18,7 +18,7 @@ import { ProductionTaskDTO } from 'interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { filteredProductions, onApplyFilters } = useTasksFilter();
+  const { filteredProductions } = useTasksFilter();
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
   const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
     const updatedProductionTasks = productionTasks.map((productionTask) => {
