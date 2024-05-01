@@ -11,15 +11,15 @@ export default function getTaskDateStatusColor(date: string, status: string) {
     const differenceInDays = Math.ceil((inputDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
 
     if (differenceInDays <= 7 && differenceInDays >= 0) {
-      return ' bg-amber-300 ';
+      return 'orange';
     } else if (differenceInDays < 0) {
-      return ' bg-red-300 ';
+      return 'red';
     } else {
-      return ' bg-none ';
+      return 'green';
     }
   }
 
-  return ' bg-none ';
+  return 'bg-none';
 }
 
 export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x) => {

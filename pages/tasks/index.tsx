@@ -34,8 +34,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   );
 
   const exists = usersList.some(item => item.text === 'All');
- 
-  if(!exists){
+
+  if (!exists) {
     usersList.unshift({ value: -1, text: 'All' });
   }
 
@@ -63,6 +63,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           return (
             <div key={production.Id} className="mb-10">
               <TasksTable
+                tableHeight={filteredProductions.length > 1}
                 rowData={production.Tasks}
                 columnDefs={columnDefs}
               />

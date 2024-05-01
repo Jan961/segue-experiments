@@ -4,6 +4,7 @@ import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
+import getTaskDateStatusColor from 'utils/getTaskDateStatus';
 import { calculateTaskStatus } from 'utils/tasks';
 
 
@@ -14,8 +15,6 @@ const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
   value: index
 }));
 
-console.log(generatePercentageOptions)
-
 export const getColumnDefs = (usersList = [], productionName = '') => {
   return [
     {
@@ -23,12 +22,11 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       field: 'Code',
       cellRenderer: DefaultCellRenderer,
       width: 72,
-      // cellStyle: function (params) {
-      //   console.log(params.data.DueDate)
-      //   const taskDateStatusColor = getTaskDateStatusColor(params?.data?.DueDate || null, params?.data?.Status);
-      //   console.log(taskDateStatusColor)
-      //   return taskDateStatusColor
-      // }
+      cellStyle: function (params) {
+        const taskDateStatusColor = getTaskDateStatusColor(params?.data?.DueDate, params?.data?.Status);
+        if (taskDateStatusColor === 'bg-none') return null;
+        else return { backgroundColor: taskDateStatusColor, color: 'white' }
+      }
     },
     {
       headerName: 'Task Name',
@@ -38,10 +36,11 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         if (productionName) return `${productionName} Task Name`;
         else return 'Task Name'
       },
-      // cellStyle: function (params) {
-      //   const taskDateStatusColor = getTaskDateStatusColor(params?.data?.DueDate, params?.data?.Status);
-      //   return taskDateStatusColor
-      // },
+      cellStyle: function (params) {
+        const taskDateStatusColor = getTaskDateStatusColor(params?.data?.DueDate, params?.data?.Status);
+        if (taskDateStatusColor === 'bg-none') return null;
+        else return { backgroundColor: taskDateStatusColor, color: 'white' }
+      },
       width: 445,
       flex: 1,
     },
@@ -95,7 +94,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         return params.data?.AssignedToUserId ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text : null;
       }, cellRenderer: DefaultCellRenderer, width: 136
     },
-    { headerName: 'priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
+    { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
     {
       headerName: 'Notes',
       field: 'Notes',

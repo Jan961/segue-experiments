@@ -123,6 +123,15 @@ const Filters = ({ usersList }: FiltersProps) => {
                 </div>
               </div>
             </div>
+            <TextInput
+              id={'taskText'}
+              disabled={!filter.production}
+              placeholder="Search Production Task List..."
+              className="w-[310px]"
+              iconName="search"
+              value={filter.taskText}
+              onChange={onChange}
+            />
           </div>
         </div>
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
@@ -134,7 +143,7 @@ const Filters = ({ usersList }: FiltersProps) => {
             label="Status"
             options={statusOptions}
           />
-          <div className="bg-white w-[310px]">
+          <div className="bg-white w-[420px]">
             <DateRange
               disabled={!filter.production}
               className="bg-primary-white justify-between"
@@ -145,30 +154,27 @@ const Filters = ({ usersList }: FiltersProps) => {
             // maxDate={scheduleEndDate}
             />
           </div>
-        </div>
-        <div className="px-4 flex items-center gap-4 flex-wrap  py-1 mt-2">
           <Select
             onChange={(value) => onChange({ target: { id: 'assignee', value } })}
             disabled={!filter.production}
             value={filter.assignee}
-            className="bg-white w-[310px]"
+            className="bg-white w-[450px]"
             label="Assigned to"
             options={usersList}
           />
-          <TextInput
-            id={'taskText'}
-            disabled={!filter.production}
-            placeholder="Search Production Task List..."
-            className="w-[310px]"
-            iconName="search"
-            value={filter.taskText}
-            onChange={onChange}
-          />
-          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
-      <div className="px-4">
-        <TasksButtons />
+      <div className="px-4 flex items-center gap-4 flex-wrap  py-1 mt-2">
+        <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
+        <Button text="Master Task List" className="w-[155px]" onClick={null} />
+        <Button
+          text="Tasks Reports"
+          className="w-[155px]"
+          iconProps={{ className: 'h-4 w-3' }}
+          sufixIconName={'excel'}
+          onClick={null}
+        />
+        <Button onClick={null} text="Add Task" className="w-[155px]" />
       </div>
     </div>
   );

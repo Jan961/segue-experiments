@@ -16,9 +16,10 @@ import { styleProps } from './tableConfig';
 interface TasksTableProps {
   rowData?: any;
   columnDefs?: any
+  tableHeight?: boolean;
 }
 
-export default function TasksTable({ rowData = [], columnDefs = [] }: TasksTableProps) {
+export default function TasksTable({ rowData = [], columnDefs = [], tableHeight = false }: TasksTableProps) {
   const tableRef = useRef(null);
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
@@ -114,13 +115,20 @@ export default function TasksTable({ rowData = [], columnDefs = [] }: TasksTable
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
-        <Table
+        {tableHeight ? <Table
+          columnDefs={columnDefs}
+          rowData={rows}
+          styleProps={styleProps}
+          tableHeight={234}
+          gridOptions={gridOptions}
+          ref={tableRef}
+        /> : <Table
           columnDefs={columnDefs}
           rowData={rows}
           styleProps={styleProps}
           gridOptions={gridOptions}
           ref={tableRef}
-        />
+        />}
       </div>
       <NotesPopup
         show={showModal}
