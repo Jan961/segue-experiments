@@ -107,6 +107,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             className="h-[200px] bg-gray-300 flex justify-center items-center cursor-pointer relative"
             onClick={() => hiddenFileInput.current?.click()}
             id="image"
+            data-testid="image"
             style={
               selectedImage
                 ? { backgroundImage: `url(${selectedImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
@@ -114,6 +115,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             }
           >
             <input
+              data-testid="hidden-input"
               type="file"
               ref={hiddenFileInput}
               className="hidden"
