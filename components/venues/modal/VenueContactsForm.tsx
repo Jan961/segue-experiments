@@ -55,7 +55,7 @@ const VenueContactForm = ({
     }));
 
     const updatedContacts = [...newContacts, ...contactsList];
-
+    updatedContacts.sort((a, b) => a.roleName.localeCompare(b.roleName));
     setVenueContacts(updatedContacts);
   }, []);
 
@@ -70,6 +70,10 @@ const VenueContactForm = ({
     const { column, value, rowIndex } = e;
     const updatedContacts = [...venueContacts];
     updatedContacts[rowIndex][column.colId] = value;
+
+    // Sort the updated contacts based on the Role column
+    updatedContacts.sort((a, b) => a.roleName?.localeCompare(b.roleName));
+
     setVenueContacts(updatedContacts);
     const updatedFormData = {
       ...venue,
@@ -111,8 +115,8 @@ const VenueContactForm = ({
   };
   return (
     <div className="block mb-4">
-      <div className="flex flex-row items-center justify-between  pb-5">
-        <h2 className="text-xl text-primary-navy font-bold ">Venue Contacts</h2>
+      <div className="flex flex-row items-center justify-between pb-5">
+        <h2 className="text-xl text-primary-navy font-bold">Venue Contacts</h2>
         <Button disabled={createMode} onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
       </div>
       <div className="min-h-52">
@@ -124,18 +128,19 @@ const VenueContactForm = ({
           onCellClicked={onCellClicked}
           onCellValueChange={handleCellValueChange}
         />
+        {showDeleteModal && (
+          <ConfirmationDialog
+            variant={confVariant}
+            show={showDeleteModal}
+            onYesClick={deleteRow}
+            onNoClick={() => {
+              setShowDeleteModal(false);
+              setDeleteIndex(null);
+            }}
+            hasOverlay={false}
+          />
+        )}
       </div>
-
-      <ConfirmationDialog
-        variant={confVariant}
-        show={showDeleteModal}
-        onYesClick={() => deleteRow()}
-        onNoClick={() => {
-          setShowDeleteModal(!showDeleteModal);
-          setDeleteIndex(null);
-        }}
-        hasOverlay={false}
-      />
     </div>
   );
 };
