@@ -56,7 +56,3 @@ Thumbs.db
 *.env
 coverage
 .vscode/
-
-
-components/upload
-pages/api/readS3File
