@@ -1,4 +1,4 @@
-import ContractStatusCellRenderer from 'components/bookings/table/ContractStatusCellRenderer';
+import ContractStatusCellRenderer from 'components/contracts/table/ContractStatusCellRenderer';
 import DefaultCellRenderer from '../bookings/table/DefaultCellRenderer';
 import { tileColors } from 'config/global';
 
