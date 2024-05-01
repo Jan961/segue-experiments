@@ -207,19 +207,21 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   Notes: a.Notes,
 });
 
-export const contractStatusmapper = (status: ContractStatusType) => ({
-  BookingId: status.BookingId,
-  StatusCode: status.StatusCode,
-  SignedDate: convertDate(status.SignedDate),
-  SignedBy: status.BookingId,
-  ReturnDate: convertDate(status.ReturnDate),
-  CheckedBy: status.CheckedBy,
-  RoyalPercentage: convertToString(status.RoyalPercentage),
-  DealType: status.DealType,
-  ContractNotes: status.ContractNotes,
-  ReceivedBackDate: convertDate(status.ReceivedBackDate),
-  Exceptions: status.Exceptions,
-});
+export const contractStatusmapper = (status: ContractStatusType) => {
+  return {
+    BookingId: status.BookingId ? status.BookingId : '',
+    StatusCode: status.StatusCode,
+    SignedDate: convertDate(status.SignedDate),
+    SignedBy: status.SignedBy,
+    ReturnDate: convertDate(status.ReturnDate),
+    CheckedBy: status.CheckedBy,
+    RoyalPercentage: convertToString(status.RoyalPercentage),
+    DealType: status.DealType,
+    ContractNotes: status.ContractNotes,
+    ReceivedBackDate: convertDate(status.ReceivedBackDate),
+    Exceptions: status.Exceptions,
+  };
+};
 
 export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => {
   return {

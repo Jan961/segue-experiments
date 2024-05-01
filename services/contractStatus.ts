@@ -12,3 +12,11 @@ export const getContractStatus = async (ProductionId: number) => {
     },
   });
 };
+
+export const getAllContractStatus = async () => {
+  return prisma.booking.findMany({
+    include: {
+      Contract: true,
+    },
+  });
+};
