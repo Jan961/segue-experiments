@@ -8,9 +8,9 @@ import { contractsFilterState, intialContractsFilterState } from 'state/contract
 import { allStatusOptions } from 'config/contracts';
 import { productionJumpState } from 'state/booking/productionJumpState';
 
-const Filters = () => {
+const ContractFilters = () => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
 
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
@@ -37,8 +37,8 @@ const Filters = () => {
             title={'Venue Contracts'}
           >
             <TextInput
-              id={'contractText'}
-              disabled={!ProductionId}
+              id="contractText"
+              disabled={!productionId}
               placeholder="Search contracts..."
               className="w-[340px]"
               iconName="search"
@@ -52,12 +52,10 @@ const Filters = () => {
           <div className=" text-primary-input-text">Deal Memo Status</div>
           <Select
             onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
-            className="bg-white w-52"
+            className="bg-primary-white w-52"
             value={filter.dealMemoStatusDropDown}
-            disabled={!ProductionId}
+            disabled={!productionId}
             placeholder="Deal Memo Status"
-            // label="Deal Memo Status"
-            // className="bg-white w-[550px]"
             options={allStatusOptions}
             isClearable
             isSearchable
@@ -67,11 +65,8 @@ const Filters = () => {
             onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
             className="bg-white w-52"
             value={filter.contractStatusDropDown}
-            disabled={!ProductionId}
+            disabled={!productionId}
             placeholder="Contract Status"
-            // label="Contract Status"
-
-            // className="bg-white w-[550px]"
             options={allStatusOptions}
             isClearable
             isSearchable
@@ -83,4 +78,4 @@ const Filters = () => {
   );
 };
 
-export default Filters;
+export default ContractFilters;

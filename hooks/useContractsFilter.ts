@@ -48,7 +48,7 @@ const useContractsFilter = () => {
     includeArchived,
     selected,
   ]);
-
+  console.log('filteredRows=', filteredRows);
   return filteredRows;
 };
 

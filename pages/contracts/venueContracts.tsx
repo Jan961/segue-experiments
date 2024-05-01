@@ -4,7 +4,7 @@ import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import useContractsFilter from 'hooks/useContractsFilter';
-import Filters from 'components/contracts/ContractsFilters';
+import ContractFilters from 'components/contracts/ContractsFilters';
 import ContractsTable from 'components/contracts/ContractsTable';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -14,7 +14,7 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <ContractFilters />
       </div>
       <ContractsTable rowData={rows} />
     </Layout>

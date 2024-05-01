@@ -7,7 +7,7 @@ import { contractsDateBlockSelector } from 'state/contracts/selectors/contractsD
 
 export default function ContractsDateFilter() {
   const { scheduleStart, scheduleEnd } = useRecoilValue(contractsDateBlockSelector);
-  const { selected: ProductionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { startDate, endDate, scheduleStartDate, scheduleEndDate } = filter || {};
   const onChange = (change: { from: Date; to: Date }) => {
@@ -16,14 +16,14 @@ export default function ContractsDateFilter() {
   };
 
   useEffect(() => {
-    if (!ProductionId) {
+    if (!productionId) {
       setFilter(intialContractsFilterState);
     } else if (scheduleStart && scheduleEnd) {
       const start = new Date(scheduleStart);
       const end = new Date(scheduleEnd);
       setFilter({ ...filter, scheduleStartDate: start, scheduleEndDate: end, startDate: start, endDate: end });
     }
-  }, [ProductionId, scheduleStart, scheduleEnd]);
+  }, [productionId, scheduleStart, scheduleEnd]);
 
   useEffect(() => {
     if (!startDate && !endDate) {
@@ -34,7 +34,7 @@ export default function ContractsDateFilter() {
   return (
     <div className="bg-white">
       <DateRange
-        disabled={!ProductionId}
+        disabled={!productionId}
         className="bg-primary-white justify-between"
         label="Date"
         onChange={onChange}

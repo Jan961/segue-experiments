@@ -3,7 +3,7 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
-import Filters from 'components/contracts/ContractsFilters';
+import ContractFilters from 'components/contracts/ContractsFilters';
 import ContractsTable from 'components/contracts/ContractsTable';
 import {
   DateTypeMapper,
@@ -29,7 +29,7 @@ const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
   return (
     <Layout title="Contracts | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <ContractFilters />
       </div>
       <ContractsTable rowData={rows} />
     </Layout>

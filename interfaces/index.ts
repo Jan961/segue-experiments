@@ -434,3 +434,27 @@ export type ContractStatusType = {
   ReceivedBackDate: Date;
   Exceptions: string;
 };
+
+export interface ContractTableRowType {
+  [x: string]: any;
+  Id: number | null;
+  bookingStatus: string | null;
+  capacity: number | null;
+  contractStatus: string | null;
+  count: number | null;
+  date: string | null;
+  dateTime: string | null;
+  dayType: string | null;
+  isRehearsal: boolean;
+  note: string | null;
+  pencilNo: number | null;
+  production: string | null;
+  productionId: number | null;
+  productionName: string | null;
+  runTag: number | null;
+  status: string | null;
+  town: string | null;
+  venue: string | null;
+  venueId: number | null;
+  week: number | null;
+}

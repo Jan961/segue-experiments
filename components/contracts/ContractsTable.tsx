@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../bookings/utils';
+import { ContractTableRowType } from 'interfaces';
 
 interface ContractsTableProps {
-  rowData?: any;
+  rowData?: ContractTableRowType;
 }
 
 export default function ContractsTable({ rowData }: ContractsTableProps) {
@@ -44,19 +45,10 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
           columnDefs={contractsColumnDefs}
           rowData={rows}
           styleProps={contractsStyleProps}
-          // onCellClicked={handleCellClick}
-          // onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
         />
       </div>
-      {/* <NotesPopup
-        show={showModal}
-        productionItem={productionItem}
-        onSave={handleSaveNote}
-        onCancel={() => setShowModal(false)}
-      /> */}
-      {/* {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />} */}
     </>
   );
 }
