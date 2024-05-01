@@ -225,7 +225,7 @@ export type ActivityDTO = {
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
-  DueByDate?: Date;
+  DueByDate?: Date | string;
   Notes: string;
 };
 
