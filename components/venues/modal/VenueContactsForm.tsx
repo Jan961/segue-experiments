@@ -55,12 +55,7 @@ const VenueContactForm = ({
     }));
 
     const updatedContacts = [...newContacts, ...contactsList];
-    updatedContacts.sort((a, b) => {
-      if (a.roleName?.toLocaleLowerCase() < b.roleName?.toLocaleLowerCase()) return -1;
-      if (a.roleName?.toLocaleLowerCase() > b.roleName?.toLocaleLowerCase()) return 1;
-      return 0;
-    });
-
+    updatedContacts.sort((a, b) => a.roleName.localeCompare(b.roleName));
     setVenueContacts(updatedContacts);
   }, []);
 
@@ -77,11 +72,7 @@ const VenueContactForm = ({
     updatedContacts[rowIndex][column.colId] = value;
 
     // Sort the updated contacts based on the Role column
-    updatedContacts.sort((a, b) => {
-      if (a.roleName?.toLocaleLowerCase() < b.roleName?.toLocaleLowerCase()) return -1;
-      if (a.roleName?.toLocaleLowerCase() > b.roleName?.toLocaleLowerCase()) return 1;
-      return 0;
-    });
+    updatedContacts.sort((a, b) => a.roleName?.localeCompare(b.roleName));
 
     setVenueContacts(updatedContacts);
     const updatedFormData = {
