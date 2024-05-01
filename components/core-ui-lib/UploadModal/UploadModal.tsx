@@ -74,8 +74,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     // Validate allowed formats
     if (allowedFormats) {
       for (const file of files) {
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
-        if (!allowedFormats.includes(fileExtension)) {
+        if (!allowedFormats.includes(file.type)) {
           hiddenFileInput.current.value = '';
           handleError(`Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`, e);
           return;
