@@ -16,7 +16,7 @@ const useContractsFilter = () => {
     const archivedProductionIds = productions
       .filter((production) => production.IsArchived)
       .map((production) => production.Id);
-    const filteredRowList = rows.filter(({ dateTime, productionId, contractStatus }) => {
+    const filteredRowList = rows.filter(({ dateTime, productionId, contractStatus, venue, town }) => {
       if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
         return false;
       }
@@ -26,7 +26,12 @@ const useContractsFilter = () => {
         (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
         (filter.contractStatusDropDown === 'all' ||
           contractStatus === contractsStatusMap[filter.contractStatusDropDown]) &&
-        (!filter.contractText || contractStatus?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()))
+        (filter.dealMemoStatusDropDown === 'all' ||
+          contractStatus === contractsStatusMap[filter.dealMemoStatusDropDown]) &&
+        (!filter.contractText ||
+          contractStatus?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()) ||
+          venue?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()) ||
+          town?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()))
       );
     });
     return filteredRowList.sort((a, b) => {
@@ -37,9 +42,9 @@ const useContractsFilter = () => {
     rows,
     filter.endDate,
     filter.startDate,
-    filter.status,
     filter.contractText,
     filter.contractStatusDropDown,
+    filter.dealMemoStatusDropDown,
     includeArchived,
     selected,
   ]);

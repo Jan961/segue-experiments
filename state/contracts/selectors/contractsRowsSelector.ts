@@ -13,6 +13,8 @@ import ContractsHelper from 'utils/contracts';
 import { contractsDateBlockState } from '../contractsDateBlockState';
 import { DAY_TYPE_FILTERS } from 'components/bookings/utils';
 import { contractsStatusState } from '../contractsStatusState';
+import { contractRehearsalState } from '../contractRehearsalState';
+import { contractGetInFitUpState } from '../contractGetInFitUpState';
 
 const getProductionName = ({ Id, ShowCode, ShowName }: any) => `${ShowCode}${Id} - ${ShowName}`;
 const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
@@ -20,7 +22,9 @@ const getProductionCode = ({ ShowCode, Code }: any) => `${ShowCode}${Code}`;
 export const contractsRowsSelector = selector({
   key: 'contractsRowsSelector',
   get: ({ get }) => {
+    const rehearsals = get(contractRehearsalState);
     const bookings = get(contractsState);
+    const getInFitUp = get(contractGetInFitUpState);
     const contractStatus = get(contractsStatusState);
     const performanceDict = get(contractsPerformanceState);
     const other = get(contractsOtherState);
@@ -62,10 +66,18 @@ export const contractsRowsSelector = selector({
         bookingStatus: contractsStatusMap[data?.StatusCode] || '',
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
-        contractStatus: contractsStatusMap[contractStatus[rowData.Id].StatusCode],
+        contractStatus: contractStatus[rowData.Id] ? contractsStatusMap[contractStatus[rowData.Id].StatusCode] : '',
       };
       rows.push(row);
     };
+    Object.values(rehearsals).forEach((r) => {
+      bookedDates.push(getKey(r.Date));
+      addRow(r.Date, 'Rehearsal', r, helper.getRehearsalDetails);
+    });
+    Object.values(getInFitUp).forEach((g) => {
+      bookedDates.push(getKey(g.Date));
+      addRow(g.Date, 'Get in / Fit Up', g, helper.getInFitUpDetails);
+    });
     Object.values(bookings).forEach((b) => {
       const performancesGroup = b.PerformanceIds.reduce((performancesByDate, performanceId) => {
         const performance = performanceDict[performanceId];

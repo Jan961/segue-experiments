@@ -36,6 +36,8 @@ import { contractsDateTypeState } from 'state/contracts/contractsDateTypeState';
 import { contractsPerformanceState } from 'state/contracts/contractsPerformanceState';
 import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { contractsStatusState } from 'state/contracts/contractsStatusState';
+import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
+import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -67,6 +69,8 @@ export type InitialState = Partial<{
   };
   contracts?: {
     booking?: Record<number, ContractsDTO>;
+    rehearsal?: Record<number, RehearsalDTO>;
+    getInFitUp?: Record<number, GetInFitUpDTO>;
     other?: OtherState;
     dateBlock?: DateBlockState;
     dateType?: DateTypeState;
@@ -117,6 +121,8 @@ const states: {
   },
   contracts: {
     booking: contractsState,
+    rehearsal: contractRehearsalState,
+    getInFitUp: contractGetInFitUpState,
     other: contractsOtherState,
     dateBlock: contractsDateBlockState,
     dateType: contractsDateTypeState,

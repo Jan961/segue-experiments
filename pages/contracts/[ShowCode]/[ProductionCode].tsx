@@ -5,7 +5,16 @@ import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import Filters from 'components/contracts/ContractsFilters';
 import ContractsTable from 'components/contracts/ContractsTable';
-import { DateTypeMapper, bookingMapper, contractStatusmapper, dateBlockMapper, performanceMapper } from 'lib/mappers';
+import {
+  DateTypeMapper,
+  bookingMapper,
+  dateBlockMapper,
+  getInFitUpMapper,
+  otherMapper,
+  performanceMapper,
+  rehearsalMapper,
+  contractStatusmapper,
+} from 'lib/mappers';
 import useContractsFilter from 'hooks/useContractsFilter';
 import { getAllVenuesMin } from 'services/venueService';
 import { BookingsWithPerformances } from 'services/bookingService';
@@ -13,6 +22,7 @@ import { objectify, all } from 'radash';
 import { getDayTypes } from 'services/dayTypeService';
 import { getProductionsWithContent } from 'services/productionService';
 import { getContractStatus } from 'services/contractStatus';
+import { DateType } from '@prisma/client';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useContractsFilter();
@@ -51,8 +61,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getContractStatus(ProductionId === -1 ? null : ProductionId),
   ]);
   const dateBlock = [];
+  const rehearsal = {};
   const booking = {};
+  const getInFitUp = {};
   const performance = {};
+  const other = {};
   const venue = objectify(
     venues,
     (v) => v.Id,
@@ -61,6 +74,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
     },
   );
+  const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
 
   // Map to DTO. The database can change and we want to control. More info in mappers.ts
   for (const production of productions) {
@@ -70,6 +84,28 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       dateBlock.push({
         ...mappedBlock,
         ProductionId: production?.Id,
+      });
+      db.Other.forEach((o) => {
+        other[o.Id] = {
+          ...otherMapper(o),
+          ProductionId: production?.Id,
+          DayTypeName: dayTypeMap[o.DayTypeId] || 'Other',
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
+      });
+      db.Rehearsal.forEach((r) => {
+        rehearsal[r.Id] = {
+          ...rehearsalMapper(r),
+          ProductionId: production?.Id,
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
+      });
+      db.GetInFitUp.forEach((gifu) => {
+        getInFitUp[gifu.Id] = {
+          ...getInFitUpMapper(gifu),
+          ProductionId: production?.Id,
+          PrimaryDateBlock: dateBlockMapper(PrimaryDateBlock),
+        };
       });
       db.Booking.forEach((b) => {
         booking[b.Id] = {
@@ -102,6 +138,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     },
     contracts: {
       booking,
+      rehearsal,
+      getInFitUp,
+      other,
       dateType: dateTypeRaw.map(DateTypeMapper),
       performance,
       dateBlock: dateBlock.sort((a, b) => {

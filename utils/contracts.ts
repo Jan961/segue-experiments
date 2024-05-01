@@ -1,4 +1,12 @@
-import { ContractsDTO, DateBlockDTO, OtherDTO, PerformanceDTO, ProductionDTO } from 'interfaces';
+import {
+  ContractsDTO,
+  DateBlockDTO,
+  GetInFitUpDTO,
+  OtherDTO,
+  PerformanceDTO,
+  ProductionDTO,
+  RehearsalDTO,
+} from 'interfaces';
 import { ContractsVenueState } from 'state/contracts/contractsVenueState';
 
 type ContractsHelperArgType = {
@@ -17,6 +25,8 @@ class ContractsHelper {
     this.productionDict = productionDict;
     this.getContractsDetails = this.getContractsDetails.bind(this);
     this.getOthersDetails = this.getOthersDetails.bind(this);
+    this.getInFitUpDetails = this.getInFitUpDetails.bind(this);
+    this.getRehearsalDetails = this.getRehearsalDetails.bind(this);
   }
 
   getContractsDetails(booking: ContractsDTO) {
@@ -41,6 +51,44 @@ class ContractsHelper {
       pencilNo: PencilNum,
       isBooking: true,
     };
+  }
+
+  getRehearsalDetails(rehearsal: RehearsalDTO) {
+    const { Id, VenueId, RunTag: runTag, PencilNum, Notes } = rehearsal;
+    const { Name: venue, Town: town, Seats: capacity, Count: count, Id: venueId } = this.venueDict[VenueId] || {};
+    return {
+      Id,
+      town: town || rehearsal.Town,
+      venue,
+      capacity,
+      count,
+      venueId,
+      runTag,
+      pencilNo: PencilNum,
+      note: Notes,
+      isRehearsal: true,
+    };
+  }
+
+  getInFitUpDetails(gifu: GetInFitUpDTO) {
+    const { VenueId, RunTag: runTag, PencilNum, Notes } = gifu;
+    const gifuDetails = {
+      Id: gifu?.Id,
+      pencilNo: PencilNum,
+      note: Notes,
+      runTag,
+      venue: '',
+      town: '',
+      venueId: null,
+      isGetInFitUp: true,
+    };
+    if (VenueId) {
+      const venue = this.venueDict[VenueId];
+      gifuDetails.venue = venue.Name;
+      gifuDetails.town = venue.Town;
+      gifuDetails.venueId = VenueId;
+    }
+    return gifuDetails;
   }
 
   getOthersDetails(others: OtherDTO) {
