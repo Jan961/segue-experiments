@@ -10,7 +10,6 @@ type UploadModalStory = Story<React.ComponentProps<typeof UploadModal>>;
 
 // Default export with component, title, and parameters
 export default {
-  title: 'Components/UploadModal',
   component: UploadModal,
   argTypes: {
     onClose: { action: 'closed' },

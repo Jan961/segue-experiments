@@ -90,18 +90,20 @@ const UploadModal: React.FC<UploadModalProps> = ({
   return (
     <Modal
       show={visible}
-      title={title}
       titleClass="text-primary-navy text-xl"
       onClose={() => {
         clearAll();
         onClose?.();
       }}
     >
-      <div className="grid grid-cols-2 relative right-4 bottom-4">
-        <div className="w-72 px-4 py-5 text-[#617293]">{info}</div>
-        <div className="w-80 h-72">
+      <div className="flex gap-6 font-calibri non-italic">
+        <div className="flex-col gap-2">
+          <div className="text-primary text-xl font-bold">{title}</div>
+          <div className="text-secondary text-sm font-normal">{info}</div>
+        </div>
+        <div className="flex-col w-[300px]">
           <div
-            className="h-56 bg-gray-300 flex justify-center items-center cursor-pointer relative"
+            className="h-[200px] bg-gray-300 flex justify-center items-center cursor-pointer relative"
             onClick={() => hiddenFileInput.current?.click()}
             id="image"
             style={
@@ -124,8 +126,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
               !selectedImage && <Icon iconName={'camera-solid'} fill="#FFF" variant="7xl" />
             )}
           </div>
-          <div className="grid grid-cols-2 gap-6 p-7">
+          <div className="flex items-center justify-center gap-6 mt-5">
             <Button
+              className="w-[132px]"
               variant="secondary"
               onClick={() => {
                 clearAll();
@@ -134,7 +137,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
             >
               Cancel
             </Button>
-            <Button onClick={() => hiddenFileInput.current.click()}>Upload</Button>
+            <Button className="w-[132px]" onClick={() => hiddenFileInput.current.click()}>
+              Upload Image
+            </Button>
           </div>
         </div>
       </div>
