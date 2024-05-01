@@ -1,4 +1,6 @@
 import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
+import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
+import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
@@ -6,6 +8,13 @@ import { calculateTaskStatus } from 'utils/tasks';
 
 
 export const styleProps = { headerColor: tileColors.tasks };
+
+const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
+  text: index,
+  value: index
+}));
+
+console.log(generatePercentageOptions)
 
 export const getColumnDefs = (usersList = [], productionName = '') => {
   return [
@@ -46,13 +55,29 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Start by ',
       field: 'StartDate',
-      cellRenderer: DefaultCellRenderer,
+      cellRenderer: DateRenderer,
       width: 120,
-      minWidth: 120,
+      minWidth: 120, cellStyle: {
+        overflow: 'visible',
+      },
     },
-    { headerName: 'Due (WK)', field: 'CompleteByWeekNum', cellRenderer: DefaultCellRenderer, width: 110, minWidth: 100 },
-    { headerName: 'Due', field: 'CompleteDate', cellRenderer: DefaultCellRenderer, width: 100, minWidth: 100 },
-    { headerName: 'Progress %', field: 'Progress', cellRenderer: DefaultCellRenderer, width: 116 },
+    {
+      headerName: 'Due (WK)', field: 'CompleteByWeekNum', cellRenderer: DefaultCellRenderer, width: 110, minWidth: 100
+    },
+    {
+      headerName: 'Due', field: 'CompleteDate', cellRenderer: DateRenderer, cellStyle: {
+        overflow: 'visible',
+      }, width: 120, minWidth: 120
+    },
+    {
+      headerName: 'Progress %', field: 'Progress', cellRendererParams: {
+        options: generatePercentageOptions,
+        isSearchable: true
+      },
+      cellStyle: {
+        overflow: 'visible',
+      }, cellRenderer: CustomSelectCelRenderer, width: 116
+    },
     {
       headerName: 'Status',
       field: 'Status',

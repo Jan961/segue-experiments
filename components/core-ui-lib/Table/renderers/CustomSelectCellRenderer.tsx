@@ -13,6 +13,7 @@ interface CustomSelectCelRendererProps extends ICellRendererParams {
   isMulti?: boolean;
   defaultValue?: string;
   customWidth?: string;
+  isSearchable?: boolean;
 }
 
 const CustomSelectCelRenderer = ({
@@ -23,6 +24,7 @@ const CustomSelectCelRenderer = ({
   defaultValue = '',
   value,
   isMulti = false,
+  isSearchable = false,
   node,
   colDef,
   data,
@@ -70,10 +72,11 @@ const CustomSelectCelRenderer = ({
         onChange={handleChange}
         className="!shadow-none p-[2.5px]"
         placeholder={placeholder}
-        value={value || defaultValue}
+        value={value}
         isMulti={isMulti}
         ref={selectRef}
         customWidth={customWidth}
+        isSearchable={isSearchable}
         renderOption={(option) => <CustomOption option={option} />}
         {...props}
       />

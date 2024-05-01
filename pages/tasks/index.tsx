@@ -16,11 +16,13 @@ import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
 import { getColumnDefs } from 'components/tasks2/tableConfig';
 
-const TasksPage = () => {
+const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
 
   const { users } = useRecoilValue(userState);
+
+  console.log(props);
 
   const usersList = useMemo(
     () =>
@@ -47,8 +49,6 @@ const TasksPage = () => {
     setProductionTasks(updatedProductionTasks);
   };
 
-  console.log(onTasksChange);
-
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
@@ -59,6 +59,7 @@ const TasksPage = () => {
       /> :
         filteredProductions.map((production) => {
           const columnDefs = getColumnDefs(usersList, production.ShowName);
+          console.log(production.weekNumToDateMap, production.Tasks);
           return (
             <div key={production.Id} className="mb-10">
               <TasksTable

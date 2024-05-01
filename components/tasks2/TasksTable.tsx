@@ -111,8 +111,6 @@ export default function TasksTable({ rowData = [], columnDefs = [] }: TasksTable
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
 
-  console.log(showAddEditBookingModal, handleClose)
-
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
@@ -120,8 +118,6 @@ export default function TasksTable({ rowData = [], columnDefs = [] }: TasksTable
           columnDefs={columnDefs}
           rowData={rows}
           styleProps={styleProps}
-          onCellClicked={handleCellClick}
-          onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
         />

@@ -203,7 +203,8 @@ export default forwardRef(function Select(
         setSelectedOption(selectedValues);
       }
     } else {
-      setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
+      if(value === 0) setSelectedOption(options.find((o) => value === o.value));
+      else setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
     }
   }, [value, options, isMulti]);
 
@@ -257,7 +258,6 @@ export default forwardRef(function Select(
         styles={colourStyles}
         placeholder={placeholder}
         isSearchable={isSearchable}
-        menuShouldBlockScroll={true}
         isClearable={isClearable}
         isMulti={isMulti}
         hideSelectedOptions={false}
