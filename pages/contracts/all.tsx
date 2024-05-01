@@ -52,13 +52,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const ProductionId = -1;
   productionJump.selected = -1;
 
-  // Get in parallel
-  // const [venues, productions, dateTypeRaw, contractStatus] = await all([
-  //   getAllVenuesMin(),
-  //   getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
-  //   getDayTypes(),
-  //   getContractStatus(ProductionId === -1 ? null : ProductionId),
-  // ]);
   const [venues, productions, dateTypeRaw, contractStatus] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(null, false),
@@ -152,7 +145,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       dateBlock: dateBlock.sort((a, b) => {
         return b.StartDate < a.StartDate ? 1 : -1;
       }),
-      // Remove extra info
       venue,
       contractStatus: contractStatusData,
     },
