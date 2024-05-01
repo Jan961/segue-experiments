@@ -89,6 +89,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   return (
     <Modal
+      panelClass="!px-5 !pr-6 !py-6 w-[600px]"
       show={visible}
       titleClass="text-primary-navy text-xl"
       onClose={() => {
@@ -96,8 +97,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
         onClose?.();
       }}
     >
-      <div className="flex gap-6 font-calibri non-italic">
-        <div className="flex-col gap-2">
+      <div className="flex gap-6 font-calibri non-italic pr-3">
+        <div className="flex-col gap-2 grow">
           <div className="text-primary text-xl font-bold">{title}</div>
           <div className="text-secondary text-sm font-normal">{info}</div>
         </div>
