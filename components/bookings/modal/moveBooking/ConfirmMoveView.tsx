@@ -20,7 +20,7 @@ const ConfirmMoveView = ({ bookings, count, venue, productionName, date, onClose
 
   const handleMoveBooking = async () => {
     try {
-      await axios.post('/api/bookings/update', {
+      await axios.post('/api/bookings/update-run-of-dates', {
         original: bookings,
         updated: bookings,
       });

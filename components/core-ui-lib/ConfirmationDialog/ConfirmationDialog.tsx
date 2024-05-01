@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Button from '../Button';
 import PopupModal from '../PopupModal';
 
-export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return' | 'ok';
+export type ConfDialogVariant = 'close' | 'cancel' | 'delete' | 'logout' | 'leave' | 'return';
+
+export type ConfirmationDialogContent = {
+  question: string;
+  warning: string;
+};
 
 export enum ConfVariant {
   Close = 'close',
@@ -11,7 +16,6 @@ export enum ConfVariant {
   Logout = 'logout',
   Leave = 'leave',
   Return = 'return',
-  Ok = 'ok',
 }
 
 export interface ConfirmationDialogProps {
@@ -25,7 +29,7 @@ export interface ConfirmationDialogProps {
   labelYes: string;
   labelNo?: string;
   hasOverlay?: boolean;
-  message?: string;
+  content?: ConfirmationDialogContent;
 }
 
 export const confOptions = {
@@ -63,7 +67,7 @@ export default function ConfirmationDialog({
   labelNo = 'No',
   variant,
   hasOverlay = false,
-  message = '',
+  content,
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -80,20 +84,12 @@ export default function ConfirmationDialog({
     <PopupModal show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
       <div data-testid="confirmation-dialog" className="-mt-5">
         <div className="text-center">
-          {variant === 'ok' ? (
-            <div data-testid="confirmation-dialog-message" className="text text-primary-navy font-bold text-xl">
-              {message}
-            </div>
-          ) : (
-            <>
-              <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
-                {confOptions[variant].question}
-              </div>
-              <div data-testid="confirmation-dialog-warning" className="text text-primary-navy font-bold text-xl">
-                {confOptions[variant].warning}
-              </div>
-            </>
-          )}
+          <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
+            {content ? content.question : confOptions[variant].question}
+          </div>
+          <div data-testid="confirmation-dialog-warning" className="text text-primary-navy font-bold text-xl">
+            {content ? content.warning : confOptions[variant].warning}
+          </div>
         </div>
         <div className="w-full mt-4 flex justify-center items-center">
           {labelNo && (

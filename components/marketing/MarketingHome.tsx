@@ -16,8 +16,8 @@ import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
 import ActivityModal, { ActivityModalVariant } from './modal/ActivityModal';
-import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
-import { activityColDefs, styleProps } from 'components/marketing/table/tableConfig';
+import { ActivityDTO, ActivityTypeDTO, BookingContactNoteDTO } from 'interfaces';
+import { activityColDefs, contactNoteColDefs, styleProps } from 'components/marketing/table/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import { reverseDate, hasActivityChanged } from './utils';
 import DateInput from 'components/core-ui-lib/DateInput';
@@ -29,6 +29,7 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { startOfDay } from 'date-fns';
+import ContactNoteModal, { ContactNoteModalVariant } from './modal/ContactNoteModal';
 
 export type SelectOption = {
   text: string;
@@ -72,6 +73,7 @@ const MarketingHome = () => {
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [currency, setCurrency] = useState('£');
+  const [activeTabName, setActiveTabName] = useState<string>();
 
   // sales
   const [salesTable, setSalesTable] = useState<ReactNode>();
@@ -101,6 +103,13 @@ const MarketingHome = () => {
   const [totalCost, setTotalCost] = useState<number>(0);
   const [totalVenueCost, setTotalVenueCost] = useState<number>(0);
   const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
+
+  // contact note modal
+  const [showContactNoteModal, setShowContactNoteModal] = useState<boolean>(false);
+  const [contactModalVariant, setContactModalVariant] = useState<ContactNoteModalVariant>();
+  const [contactNoteRows, setContactNoteRows] = useState<Array<BookingContactNoteDTO>>();
+  const [contNoteColDefs, setContNoteColDefs] = useState([]);
+  const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
 
   const router = useRouter();
 
@@ -238,6 +247,24 @@ const MarketingHome = () => {
     }
   };
 
+  const getContactNotes = async (bookingId: string) => {
+    const data = await fetchData({
+      url: '/api/marketing/contactNotes/' + bookingId,
+      method: 'POST',
+    });
+
+    if (typeof data === 'object') {
+      const contactNoteList = data as Array<BookingContactNoteDTO>;
+
+      const sortedContactNotes = contactNoteList.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContNoteColDefs(contactNoteColDefs(contactNoteUpdate));
+      setContactNoteRows(sortedContactNotes);
+    }
+  };
+
   const activityUpdate = async (variant: ActivityModalVariant, data) => {
     setActModalVariant(variant);
 
@@ -274,6 +301,17 @@ const MarketingHome = () => {
         setConfVariant('delete');
         setShowConfirm(true);
       }
+    }
+  };
+
+  const contactNoteUpdate = (variant: ContactNoteModalVariant, data: BookingContactNoteDTO) => {
+    setContactModalVariant(variant);
+    setContactNoteRow(data);
+
+    if (variant === 'edit') {
+      setShowContactNoteModal(true);
+    } else if (variant === 'delete') {
+      setShowConfirm(true);
     }
   };
 
@@ -360,6 +398,58 @@ const MarketingHome = () => {
     }
   };
 
+  const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
+    if (variant === 'add') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/create',
+        data,
+        method: 'POST',
+      });
+
+      const conNoteData = [...contactNoteRows, data];
+
+      // re sort the rows to ensure the new field is put in the correct place chronologically
+      const sortedContactNotes = conNoteData.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContactNoteRows(sortedContactNotes);
+      setShowContactNoteModal(false);
+    } else if (variant === 'edit') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/update',
+        method: 'POST',
+        data,
+      });
+
+      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
+      const newRows = [...contactNoteRows];
+      newRows[rowIndex] = data;
+
+      const sortedContactNotes = newRows.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContactNoteRows(sortedContactNotes);
+      setShowContactNoteModal(false);
+    } else if (variant === 'delete') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/delete',
+        method: 'POST',
+        data,
+      });
+
+      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
+      const newRows = [...contactNoteRows];
+      if (rowIndex !== -1) {
+        newRows.splice(rowIndex, 1);
+      }
+
+      setContactNoteRows(newRows);
+      setShowConfirm(false);
+    }
+  };
+
   const calculateActivityTotals = (tableRows) => {
     const { venueTotal, companyTotal } = tableRows.reduce(
       (acc, row) => {
@@ -382,6 +472,25 @@ const MarketingHome = () => {
     setShowActivityModal(true);
   };
 
+  const addContactNote = () => {
+    setContactModalVariant('add');
+    setShowContactNoteModal(true);
+  };
+
+  const deleteMarketingRow = () => {
+    switch (activeTabName) {
+      case 'Activities': {
+        saveActivity('delete', actRow);
+        break;
+      }
+
+      case 'Contact Notes': {
+        saveContactNote('delete', contactNoteRow);
+        break;
+      }
+    }
+  };
+
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
@@ -393,6 +502,7 @@ const MarketingHome = () => {
     if (bookingId) {
       getSales(bookingId.toString());
       getActivities(bookingId.toString());
+      getContactNotes(bookingId.toString());
 
       // set checkbox row on activities tab
       const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
@@ -414,6 +524,7 @@ const MarketingHome = () => {
     if (currentTab !== undefined) {
       const tabIStr = currentTab.toString();
       setTabIndex(parseInt(tabIStr));
+      setActiveTabName(tabs[parseInt(tabIStr)]);
       setTabSet(true);
     }
   }
@@ -447,6 +558,7 @@ const MarketingHome = () => {
           tabs={tabs}
           disabled={!productionId || !bookingId}
           defaultIndex={tabIndex}
+          onChange={(index) => setActiveTabName(tabs[index])}
         >
           <Tab.Panel className="h-[650px] overflow-y-hidden">{salesTable}</Tab.Panel>
 
@@ -629,7 +741,36 @@ const MarketingHome = () => {
               data={actRow}
             />
           </Tab.Panel>
-          <Tab.Panel className="w-42 h-24 flex justify-center items-center">contact notes</Tab.Panel>
+
+          <Tab.Panel>
+            <div className="flex justify-end">
+              <div className="flex flex-row gap-4 w-[850px] mb-5">
+                <Button
+                  text="Contact Notes Report"
+                  className="w-[203px]"
+                  disabled={!productionId}
+                  iconProps={{ className: 'h-4 w-3' }}
+                  sufixIconName={'excel'}
+                />
+                <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+              </div>
+            </div>
+
+            <div className="flex flex-row">
+              <div className="w-[1086px] h-[500px]">
+                <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+              </div>
+            </div>
+
+            <ContactNoteModal
+              show={showContactNoteModal}
+              onCancel={() => setShowContactNoteModal(false)}
+              variant={contactModalVariant}
+              data={contactNoteRow}
+              onSave={(variant, data) => saveContactNote(variant, data)}
+              bookingId={bookingId}
+            />
+          </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
@@ -638,7 +779,7 @@ const MarketingHome = () => {
       <ConfirmationDialog
         variant={confVariant}
         show={showConfirm}
-        onYesClick={() => saveActivity('delete', actRow)}
+        onYesClick={deleteMarketingRow}
         onNoClick={() => setShowConfirm(false)}
         hasOverlay={false}
       />
