@@ -31,6 +31,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 
 export type SelectOption = {
   text: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
 };
 
@@ -59,6 +60,7 @@ const approvalStatusList = [
 const MarketingHome = () => {
   // global module variables
   const { selected: productionId } = useRecoilValue(productionJumpState);
+  // global module variables
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -258,8 +260,7 @@ const MarketingHome = () => {
         FollowUpRequired: data.followUpCheck,
         Name: data.actName,
         Notes: data.notes,
-        DueByDate:
-          data.followUpDt && reverseDate(data.followUpDt) !== '' ? new Date(reverseDate(data.followUpDt)) : null,
+        DueByDate: data.followUpCheck ? reverseDate(data.followUpDt) : null,
         Id: data.id,
       };
 
@@ -296,7 +297,7 @@ const MarketingHome = () => {
 
       const activityData = [...actRowData, newRow];
 
-      // re sort the row to ensure the new field is put in the correct place chronologically
+      // re sort the rows to ensure the new field is put in the correct place chronologically
       const sortedActivities = activityData.sort(
         (a, b) => new Date(a.actDate).getTime() - new Date(b.actDate).getTime(),
       );
@@ -383,6 +384,7 @@ const MarketingHome = () => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookings[0].selected]);
 
   useEffect(() => {
@@ -400,6 +402,7 @@ const MarketingHome = () => {
 
       setCurrency('£');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookingId]);
 
   // using tabSet to ensure this is only run once
@@ -483,7 +486,7 @@ const MarketingHome = () => {
                   id={'On Sale'}
                   name={'On Sale'}
                   checked={onSaleCheck}
-                  onChange={null}
+                  onChange={(e) => setOnSaleCheck(e.target.checked)}
                   className="w-[19px] h-[19px] mt-[2px]"
                   disabled={true}
                 />
@@ -492,7 +495,7 @@ const MarketingHome = () => {
 
               <div className="flex flex-row">
                 <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
-                <DateInput onChange={null} value={onSaleFromDt} disabled={true} />
+                <DateInput onChange={() => null} value={onSaleFromDt} disabled={true} />
               </div>
 
               <div className="flex flex-row mt-1">
