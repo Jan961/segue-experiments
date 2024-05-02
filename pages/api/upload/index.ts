@@ -1,6 +1,9 @@
-import formidable from 'formidable';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { bulkFileUpload, singleFileUpload } from 'services/uploadService';
+import { parseFormData } from 'utils/fileUpload';
+import { getEmailFromReq, getUserId } from 'services/userService';
+import prisma from 'lib/prisma';
+import { FileDTO } from 'interfaces';
 
 export const config = {
   api: {
@@ -10,34 +13,32 @@ export const config = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const form = formidable({ multiples: true });
-    form.parse(req, async (err, _fields, files) => {
-      if (err) {
-        res.status(500).json({ message: 'Error parsing the form data.' });
-        return;
-      }
+    const { fields, files } = await parseFormData(req);
+    const email = await getEmailFromReq(req);
+    const userId = await getUserId(email);
+    if (!files.file) {
+      res.status(400).json({ message: 'File upload error: No file was uploaded.' });
+      return;
+    }
 
-      if (!files.file) {
-        res.status(400).json({ message: 'File upload error: No file was uploaded.' });
-        return;
-      }
+    const file = files.file;
+    let response: { metadataList: FileDTO[] } = { metadataList: [] };
+    const path = fields.path as string;
 
-      const file = files.file;
-      let response = {};
-      const path = _fields.path;
-      try {
-        if (!Array.isArray(file)) {
-          response = await singleFileUpload(path, file);
-        } else {
-          response = await bulkFileUpload(path, file);
-        }
-      } catch (error) {
-        res.status(500).json({ error: 'File uploaded unsuccessful.', message: error.message });
-      }
+    if (!Array.isArray(file)) {
+      response = await singleFileUpload(path, file, userId);
+    } else {
+      response = await bulkFileUpload(path, file, userId);
+    }
 
-      res.status(200).json({ message: 'File uploaded successfully.', response });
+    const fileRecords: FileDTO[] = response.metadataList;
+
+    await prisma.file.createMany({
+      data: fileRecords,
     });
+
+    res.status(200).json({ message: 'File uploaded successfully.', fileRecords });
   } catch (error) {
-    res.status(500).json({ error: 'File uploaded unsuccessful.', message: error.message });
+    res.status(500).json({ error: 'File upload unsuccessful', message: error.message });
   }
 }
