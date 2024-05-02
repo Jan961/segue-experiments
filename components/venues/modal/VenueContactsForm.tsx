@@ -77,7 +77,7 @@ const VenueContactForm = ({
     setVenueContacts(updatedContacts);
     const updatedFormData = {
       ...venue,
-      venueContacts: filterEmptyVenueContacts(updatedContacts),
+      venueContacts: filterEmptyVenueContacts(updatedContacts, venueRoleOptionList),
     };
     onChange(updatedFormData);
     if (createMode) {
@@ -113,6 +113,7 @@ const VenueContactForm = ({
       setCreateMode(false);
     }
   };
+
   return (
     <div className="block mb-4">
       <div className="flex flex-row items-center justify-between pb-5">
