@@ -3,7 +3,7 @@ import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
 import { useEffect, useRef, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import AddBooking from './modal/NewBooking';
 import { useRouter } from 'next/router';
@@ -14,6 +14,8 @@ import axios from 'axios';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -28,10 +30,11 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const [getInFitUps, setGetInFitUps] = useRecoilState(getInFitUpState);
   const [others, setOthers] = useRecoilState(otherState);
   const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
+  const currentProduction = useRecoilValue(currentProductionSelector);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
-
+  const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
@@ -46,6 +49,10 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   };
 
   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    if (!currentProduction) {
+      setShowConfirmationModal(true);
+      return;
+    }
     const { data } = e;
     if (!data.Id) {
       setShowAddEditBookingModal({
@@ -134,6 +141,13 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
         onCancel={() => setShowModal(false)}
       />
       {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />}
+      <ConfirmationDialog
+        labelYes="OK"
+        labelNo=""
+        show={showConfirmationModal}
+        content={{ question: 'To Add / Edit Bookings please', warning: 'select a single Production' }}
+        onYesClick={() => setShowConfirmationModal(false)}
+      />
     </>
   );
 }

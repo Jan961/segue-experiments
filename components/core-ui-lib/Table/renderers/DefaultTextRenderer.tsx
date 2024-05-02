@@ -1,11 +1,12 @@
 import { CustomCellRendererProps } from 'ag-grid-react';
+import classNames from 'classnames';
 import Tooltip, { TooltipProps } from 'components/core-ui-lib/Tooltip/Tooltip';
 
 interface CellRendererParams extends CustomCellRendererProps, TooltipProps {
   tpActive?: boolean;
+  truncate?: boolean;
 }
-
-const DefaultTextRenderer = (props: CellRendererParams) => {
+const DefaultTextRenderer = ({ truncate = true, ...props }: CellRendererParams) => {
   return (
     <div>
       {props.tpActive ? (
@@ -18,14 +19,14 @@ const DefaultTextRenderer = (props: CellRendererParams) => {
             width={props.width}
             bgColorClass={props.bgColorClass}
           >
-            <div className="w-full h-full">
-              <div className="px-2 truncate">{props.value}</div>
+            <div className={classNames('px-2', truncate ? 'truncate' : 'break-keep w-full my-2 leading-[1.125]')}>
+              {props.value}
             </div>
           </Tooltip>
         </div>
       ) : (
-        <div className="w-full h-full">
-          <div className="px-2 truncate">{props.value}</div>
+        <div className={classNames('px-2', truncate ? 'truncate' : 'break-keep w-full my-2 leading-[1.125]')}>
+          {props.value}
         </div>
       )}
     </div>

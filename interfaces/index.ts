@@ -98,6 +98,11 @@ export type BookingDTO = {
   PerformanceIds?: number[];
   RunTag: string;
   LandingPageURL: string;
+  TicketsOnSale: boolean;
+  TicketsOnSaleFromDate: string;
+  MarketingPlanReceived: boolean;
+  PrintReqsReceived: boolean;
+  ContactInfoReceived: boolean;
 };
 
 export type GetInFitUpDTO = {
@@ -150,6 +155,10 @@ export type ProductionDTO = {
   DateBlock: DateBlockDTO[];
   StartDate?: string;
   EndDate?: string;
+  SalesEmail?: string;
+  SalesFrequency?: string;
+  RegionList?: number[];
+  IsDeleted?: boolean;
 };
 
 export type VenueMinimalDTO = {

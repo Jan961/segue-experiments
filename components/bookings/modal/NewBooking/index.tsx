@@ -8,7 +8,7 @@ import BarringIssueView from './views/BarringIssueView';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import reducer, { BookingItem, TForm } from './reducer';
 import { actionSpreader } from 'utils/AddBooking';
-import { Actions, INITIAL_STATE, OTHER_DAY_TYPES } from 'config/AddBooking';
+import { Actions, INITIAL_STATE, OTHER_DAY_TYPES, getStepIndex } from 'config/AddBooking';
 import { BookingWithVenueDTO } from 'interfaces';
 import GapSuggestionView from './views/GapSuggestionView';
 import NewBookingDetailsView from './views/NewBookingDetailsView';
@@ -133,6 +133,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           isRunOfDates: runOfDates.length > 1,
         };
       });
+      dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, { venueId: formattedBooking[0].venue }));
       setBookingOnStore(formattedBooking);
       updateBookingOnStore(formattedBooking);
     }
@@ -167,7 +168,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       const bookingsUpdatedWithRunTag = state.bookingUpdates.map((b) => (!b.runTag ? { ...b, runTag } : b));
 
       const { data: updated } = await axios.post(
-        `${state.form.isRunOfDates ? '/api/bookings/updateRunOfDates' : '/api/bookings/update'}`,
+        `${state.form.isRunOfDates ? '/api/bookings/update-run-of-dates' : '/api/bookings/update'}`,
         {
           original: state.booking,
           updated: bookingsUpdatedWithRunTag,
@@ -183,9 +184,14 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     editBooking ? updateBooking() : saveNewBooking();
   };
 
-  const handleBarringCheckComplete = () => {
-    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, 'Preview New Booking'));
+  const handleBarringCheckComplete = (nextStep: string) => {
+    dispatch(actionSpreader(Actions.SET_BARRING_NEXT_STEP, nextStep));
   };
+
+  const nextStepForConflicts = useMemo(() => {
+    const hasBarringIssues = state?.barringConflicts?.length > 0;
+    return getStepIndex(!editBooking, hasBarringIssues ? 'Barring Issue' : 'New Booking Details');
+  }, [state.barringConflicts, editBooking]);
 
   return (
     <PopupModal
@@ -209,6 +215,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
             productionCode={productionCode}
             venueOptions={venueOptions}
             updateModalTitle={updateModalTitle}
+            onBarringCheckComplete={handleBarringCheckComplete}
           />
         )}
         <NewBookingDetailsView
@@ -251,15 +258,15 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
         />
         <BookingConflictsView
           isNewBooking={!editBooking}
-          hasBarringIssues={state?.barringConflicts?.length > 0}
           data={state.bookingConflicts}
+          nextStep={nextStepForConflicts}
           updateModalTitle={updateModalTitle}
         />
         <BarringIssueView
-          isNewBooking={!editBooking}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
-          nextStep={state.barringNextStep}
+          previousStep={getStepIndex(!editBooking, !editBooking ? 'Create New Booking' : 'New Booking Details')}
+          nextStep={getStepIndex(!editBooking, state.barringNextStep)}
         />
         {!editBooking && (
           <GapSuggestionView

@@ -12,7 +12,6 @@ import {
 } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import CustomTooltipRenderer from './renderers/CustomTooltipRenderer';
-// import TableTooltip from './TableTooltip';
 
 export type StyleProps = {
   headerColor?: string;
@@ -31,7 +30,9 @@ interface TableProps {
   displayHeader?: boolean;
   getRowStyle?: any;
   rowClassRules?: any;
+  headerHeight?: number;
   getRowHeight?: (params: RowHeightParams) => number;
+  tableHeight?: number;
 }
 
 const ROW_HEIGHT = 43;
@@ -67,6 +68,8 @@ export default forwardRef(function Table(
     rowClassRules,
     displayHeader = true,
     getRowHeight,
+    tableHeight = 0,
+    headerHeight,
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,
   }: TableProps,
@@ -118,15 +121,17 @@ export default forwardRef(function Table(
   }, [rowData, gridApi, autoHeightLimit, gridHeight]);
 
   useEffect(() => {
-    setAutoHeightLimit(window.innerHeight - DELTA);
+    setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
     const handleResize = () => {
-      setAutoHeightLimit(window.innerHeight - DELTA);
+      setAutoHeightLimit(tableHeight === 0 ? window.innerHeight - DELTA : tableHeight);
     };
     window.addEventListener('resize', handleResize);
     return () => {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
+
+  const gridHeaderHeight = headerHeight || HEADER_HEIGHT;
 
   return (
     <>
@@ -140,7 +145,7 @@ export default forwardRef(function Table(
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}
-          headerHeight={displayHeader ? HEADER_HEIGHT : 0}
+          headerHeight={displayHeader ? gridHeaderHeight : 0}
           rowHeight={ROW_HEIGHT}
           onCellClicked={onCellClicked}
           onRowClicked={onRowClicked}

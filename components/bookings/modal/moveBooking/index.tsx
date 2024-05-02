@@ -14,12 +14,13 @@ import ConfirmMoveView from './ConfirmMoveView';
 
 interface MoveBookingProps {
   visible: boolean;
-  onClose: () => void;
+  onClose: (value?: string) => void;
   bookings: BookingItem[];
   venueOptions: SelectOption[];
 }
 
 export type MoveParams = {
+  bookings: BookingItem[];
   productionName: string;
   count: string;
   venue: string;
@@ -53,7 +54,7 @@ const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBook
   return (
     <PopupModal
       show={visible}
-      onClose={() => onClose()}
+      onClose={onClose}
       titleClass="text-xl text-primary-navy text-bold"
       title="Move Booking"
       panelClass="relative"
@@ -70,16 +71,15 @@ const MoveBooking = ({ visible, onClose, venueOptions, bookings = [] }: MoveBook
         />
         <BookingConflictsView
           isNewBooking={false}
-          hasBarringIssues={state?.barringConflicts?.length > 0}
           data={state.bookingConflicts}
           updateModalTitle={updateModalTitle}
-          nextStep={moveBookingSteps.indexOf('MoveConfirm')}
+          nextStep={moveBookingSteps.indexOf(state?.barringConflicts?.length > 0 ? 'Barring Issue' : 'MoveConfirm')}
         />
         <BarringIssueView
-          isNewBooking={false}
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
-          nextStep=""
+          previousStep={moveBookingSteps.indexOf('MoveBooking')}
+          nextStep={moveBookingSteps.indexOf('MoveConfirm')}
         />
         <ConfirmMoveView {...moveParams} onClose={onClose} />
       </Wizard>

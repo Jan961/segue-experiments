@@ -89,19 +89,19 @@ model BookingContactNotes {
 }
 
 model Contract {
-  BookingId                Int                    @id @map("ContractBookingId")
-  StatusCode               String?                @map("ContactStatusCode") @db.VarChar(4)
-  SignedDate               DateTime?              @map("ContractSignedDate") @db.Date
-  SignedBy                 String?                @map("ContractSignedBy") @db.VarChar(30)
-  ReturnDate               DateTime?              @map("ContractReturnDate") @db.Date
-  CheckedBy                String?                @map("ContractCheckedBy") @db.VarChar(30)
-  RoyalPercentage          Decimal?               @map("RoyaltyPercentage") @db.Decimal(5, 2)
-  DealType                 String?                @db.VarChar(4)
-  ContractNotes            String?                @db.LongText
-  ReceivedBackDate         DateTime?              @map("ContractReceivedBackDate")@db.Date
-  Exceptions               String?                @map("ContractExceptions")@db.LongText
-  Booking                  Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
-  ContractAttachedFile     ContractAttachedFile[]
+  BookingId            Int                    @id @map("ContractBookingId")
+  StatusCode           String?                @map("ContactStatusCode") @db.VarChar(4)
+  SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
+  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(30)
+  ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
+  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(30)
+  RoyalPercentage      Decimal?               @map("RoyaltyPercentage") @db.Decimal(5, 2)
+  DealType             String?                @db.VarChar(4)
+  ContractNotes        String?                @db.LongText
+  ReceivedBackDate     DateTime?              @map("ContractReceivedBackDate") @db.Date
+  Exceptions           String?                @map("ContractExceptions") @db.LongText
+  Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  ContractAttachedFile ContractAttachedFile[]
 }
 
 model Currency {
@@ -190,6 +190,7 @@ model VenueBarredVenue {
   Venue_VenueBarredVenue_VBVBarredVenueIdToVenue Venue @relation("VenueBarredVenue_VBVBarredVenueIdToVenue", fields: [BarredVenueId], references: [Id], onUpdate: Restrict, map: "Venue_VBV_BV")
   Venue_VenueBarredVenue_VBVVenueIdToVenue       Venue @relation("VenueBarredVenue_VBVVenueIdToVenue", fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VBV_V")
 
+  @@unique([VenueId, BarredVenueId], map: "VenueId_VenueBarredVenueId_idx")
   @@index([VenueId], map: "Venue_VenueBarredVenue_idx")
   @@index([BarredVenueId], map: "Venue_VenueBarredVenue_idx1")
 }
@@ -736,15 +737,15 @@ model ProductionRegion {
   PRProductionId Int
   PRRegionId     Int
   Production     Production @relation(fields: [PRProductionId], references: [Id], onDelete: NoAction, map: "ProductionHasProductionRegion")
-  Region         Region     @relation(fields: [PRRegionId], references: [RegionId], onDelete: NoAction, map: "RegionHasProductionRegion")
+  Region         Region     @relation(fields: [PRRegionId], references: [Id], onDelete: NoAction, map: "RegionHasProductionRegion")
 
   @@id([PRProductionId, PRRegionId])
   @@index([PRRegionId], map: "RegionHasProductionRegion")
 }
 
 model Region {
-  RegionId         Int                @id @default(autoincrement())
-  RegionName       String             @db.VarChar(50)
+  Id               Int                @id @default(autoincrement()) @map("RegionId")
+  Name             String             @map("RegionName") @db.VarChar(50)
   ProductionRegion ProductionRegion[]
 }
 

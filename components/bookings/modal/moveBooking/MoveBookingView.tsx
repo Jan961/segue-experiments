@@ -11,7 +11,6 @@ import { toWords } from 'number-to-words';
 import format from 'date-fns/format';
 import { addDays, parseISO } from 'date-fns';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
-import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import Button from 'components/core-ui-lib/Button';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
@@ -41,6 +40,11 @@ type BookingDetails = {
   production: string;
 };
 
+type ScheduleDate = {
+  startDate: string;
+  endDate: string;
+};
+
 const MoveBookingView = ({
   venueOptions,
   bookings = [],
@@ -50,9 +54,9 @@ const MoveBookingView = ({
   viewSteps,
   updateMoveParams,
 }: MoveBookingViewProps) => {
-  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
   const currentProduction = useRecoilValue(currentProductionSelector);
   const productionId = currentProduction?.Id;
+
   const { goToStep } = useWizard();
   const [bookingDetails, setBookingDetails] = useState<BookingDetails>({
     count: '',
@@ -66,6 +70,7 @@ const MoveBookingView = ({
 
   const [selectedProduction, setSelectedProduction] = useState<SelectOption>(undefined);
   const productionOptions = useRecoilValue(productionOptionsSelector(true));
+  const [scheduleDate, setScheduleDate] = useState<ScheduleDate>({ startDate: '', endDate: '' });
   const { productions } = useRecoilValue(productionJumpState);
   const fomrattedProductions = useMemo(() => {
     if (productionId && productionOptions) {
@@ -96,15 +101,19 @@ const MoveBookingView = ({
         moveEndDate: endDate,
         production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
       });
+
+      setScheduleDate({ startDate: production.StartDate, endDate: production.EndDate });
     }
   }, [bookings, venueOptions]);
 
-  const handleProductionChange = ({ productionId }) => {
-    const production = productions.find(({ Id }) => Id === productionId);
+  const handleProductionChange = (value: string | number) => {
+    setSelectedProduction(fomrattedProductions.find(({ value: id }) => id === value));
+    const production = productions.find(({ Id }) => Id === value);
     setBookingDetails((prev) => ({
       ...prev,
       production: `${production?.ShowCode}${production?.Code}  ${production?.ShowName}`,
     }));
+    setScheduleDate({ startDate: production.StartDate, endDate: production.EndDate });
   };
 
   const handleDateChange = (value: Date) => {
@@ -120,7 +129,7 @@ const MoveBookingView = ({
         const response = await axios.post('/api/productions/venue/barringCheck', {
           startDate: bookingDetails.moveDate,
           endDate: bookingDetails.moveEndDate,
-          productionId,
+          productionId: selectedProduction.value,
           venueId: bookings[0].venue,
           seats: 400,
           barDistance: 25,
@@ -150,7 +159,7 @@ const MoveBookingView = ({
         const response = await axios.post('/api/bookings/conflict', {
           fromDate: bookingDetails.moveDate,
           toDate: bookingDetails.moveEndDate,
-          productionId,
+          productionId: selectedProduction.value,
         });
         if (!isNullOrEmpty(response.data)) {
           updateBookingConflicts(response.data);
@@ -162,57 +171,73 @@ const MoveBookingView = ({
       } catch (e) {
         console.log('Error getting barred venues');
       }
+    } else {
+      goToStep(viewSteps.indexOf('MoveConfirm'));
     }
   };
 
-  const handleMoveBooking = () => {
+  const handleMoveBooking = async () => {
+    const { data } = await axios.post('/api/dateBlock/read', {
+      productionId: selectedProduction.value,
+      primaryOnly: true,
+    });
+    const dateBlock = data[0];
+    const updatedBookings = bookings.map((b, i) => {
+      const date = addDays(parseISO(bookingDetails.moveDate), i);
+      return {
+        ...b,
+        date: date.toISOString(),
+        dateAsISOString: date.toISOString(),
+        dateBlockId: dateBlock?.Id,
+      };
+    });
+
     updateMoveParams({
       count: bookingDetails.count,
       date: bookingDetails.moveDate,
       productionName: bookingDetails.production,
       venue: bookingDetails.venue,
+      bookings: updatedBookings,
     });
     checkForBookingConflicts();
   };
 
   return (
-    <>
-      <div className="w-[485px]">
-        <Label className="text-md my-2" text={`Move ${bookingDetails.count} date booking at ${bookingDetails.venue}`} />
-        <div className="w-[400px] flex flex-col items-end">
-          <Select
-            className="w-full"
-            label="Production"
-            name="production"
-            placeholder="Please select a Production"
-            value={selectedProduction?.value}
-            options={fomrattedProductions}
-            isClearable={false}
-            onChange={(production) => handleProductionChange({ productionId: production })}
-          />
-          <Label className="text-md" text="*Current Production" />
-        </div>
-        <Label
-          text={`Currently scheduled to start on ${
-            bookingDetails.moveDate ? format(parseISO(bookingDetails.moveDate), 'dd/MM/yy') : ''
-          }`}
+    <div className="w-[485px]">
+      <Label className="text-md my-2" text={`Move ${bookingDetails.count} date booking at ${bookingDetails.venue}`} />
+      <div className="w-[400px] flex flex-col items-end">
+        <Select
+          className="w-full"
+          label="Production"
+          name="production"
+          placeholder="Please select a Production"
+          value={selectedProduction?.value}
+          options={fomrattedProductions}
+          isClearable={false}
+          onChange={handleProductionChange}
         />
-        <div className="flex item-center gap-2">
-          <Label text="New start date" />
-          <DateInput
-            label="Date"
-            onChange={handleDateChange}
-            value={bookingDetails.moveDate}
-            minDate={parseISO(scheduleStart)}
-            maxDate={parseISO(scheduleEnd)}
-          />
-        </div>
+        <Label className="text-md" text="*Current Production" />
+      </div>
+      <Label
+        text={`Currently scheduled to start on ${
+          bookingDetails.moveDate ? format(parseISO(bookingDetails.moveDate), 'dd/MM/yy') : ''
+        }`}
+      />
+      <div className="flex item-center gap-2">
+        <Label text="New start date" />
+        <DateInput
+          label="Date"
+          onChange={handleDateChange}
+          value={bookingDetails.moveDate}
+          minDate={parseISO(scheduleDate?.startDate)}
+          maxDate={parseISO(scheduleDate?.endDate)}
+        />
       </div>
       <div className="pt-8 w-full flex justify-end  items-center gap-3">
         <Button className="w-33 " variant="secondary" text="Cancel" onClick={onClose} />
         <Button className="w-33 " variant="primary" text="Move Booking" onClick={handleMoveBooking} />
       </div>
-    </>
+    </div>
   );
 };
 

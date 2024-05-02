@@ -1,5 +1,4 @@
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-
 export const safeJsonParse = (jsonString: string): any => {
   try {
     return JSON.parse(jsonString);
@@ -52,4 +51,26 @@ export const transformToOptions = (
     text: listItem?.[textKey] || textFn?.(listItem),
     value: listItem?.[valueKey] || valueFn?.(listItem),
   }));
+};
+
+export const capitalCaseToCamelCase = (str: string) => {
+  return str
+    .replace(/\s(.)/g, function (match) {
+      return match.toUpperCase();
+    })
+    .replace(/\s/g, '')
+    .replace(/^(.)/, function (match) {
+      return match.toLowerCase();
+    });
+};
+
+export const convertObjectKeysToCamelCase = (obj: any) => {
+  const newObj = {};
+  for (const key in obj) {
+    if (Object.hasOwnProperty.call(obj, key)) {
+      newObj[capitalCaseToCamelCase(key)] =
+        typeof obj[key] === 'object' ? convertObjectKeysToCamelCase(obj[key]) : obj[key];
+    }
+  }
+  return newObj;
 };
