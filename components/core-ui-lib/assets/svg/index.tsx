@@ -28,3 +28,4 @@ export { default as BookSolidIcon } from './BookSolid';
 export { default as MinusCircleSolidIcon } from './MinusCircleSolid';
 export { default as PlusCircleSolidIcon } from './PlusCircleSolid';
 export { default as CameraSolidIcon } from './Camera';
+export { default as DocumentSolidIcon } from './Document';

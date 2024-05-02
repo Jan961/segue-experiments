@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import Modal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
@@ -11,8 +11,9 @@ interface UploadModalProps {
   isMultiple?: boolean;
   maxFiles?: number;
   maxFileSize?: number;
-  allowedFormats?: string[];
+  allowedFormats: string[];
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSave?: () => void;
 }
 
 const UploadModal: React.FC<UploadModalProps> = ({
@@ -25,14 +26,19 @@ const UploadModal: React.FC<UploadModalProps> = ({
   maxFileSize,
   allowedFormats,
   onChange,
+  onSave,
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<(string | null)[]>([]);
+
+  const isImage = useMemo(() => {
+    return ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'].includes(allowedFormats[0]);
+  }, [allowedFormats]);
 
   const clearAll = () => {
     setError('');
-    setSelectedImage(null);
+    setSelectedImages([]);
     if (hiddenFileInput.current) {
       hiddenFileInput.current.value = ''; // Clear the input value
     }
@@ -42,14 +48,36 @@ const UploadModal: React.FC<UploadModalProps> = ({
     if (errorText !== '') {
       setError(errorText);
     }
-    setSelectedImage(null);
+    setSelectedImages([]);
     onChange?.(e);
+  };
+
+  const renderInfo = () => {
+    const noOfImages = selectedImages?.length;
+    if (noOfImages === 1) {
+      return (
+        <>
+          <p>You have uploaded the following image.</p>
+          <p className="pt-2">Do you wish to save this image?</p>
+        </>
+      );
+    } else if (noOfImages > 1) {
+      return (
+        <>
+          <p>You have uploaded the {noOfImages} images.</p>
+
+          <p className="pt-2">Do you wish to save these images?</p>
+        </>
+      );
+    } else {
+      return info;
+    }
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files?.length === 0) {
-      handleError('', e);
+      handleError('No file selected', e);
       return;
     }
 
@@ -83,7 +111,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
 
     setError('');
-    setSelectedImage(URL.createObjectURL(files[0]));
+    if (isImage) {
+      setSelectedImages(Array.from(files).map((file) => URL.createObjectURL(file)));
+    }
     onChange?.(e); // Call the provided onChange handler
   };
 
@@ -100,35 +130,58 @@ const UploadModal: React.FC<UploadModalProps> = ({
       <div className="flex gap-6 font-calibri non-italic pr-3">
         <div className="flex-col gap-2 grow">
           <div className="text-primary text-xl font-bold">{title}</div>
-          <div className="text-secondary text-sm font-normal">{info}</div>
+          <div className="text-secondary text-sm font-normal">
+            {/* {info} */}
+            {renderInfo()}
+          </div>
         </div>
         <div className="flex-col w-[300px]">
-          <div
-            className="h-[200px] bg-gray-300 flex justify-center items-center cursor-pointer relative"
-            onClick={() => hiddenFileInput.current?.click()}
-            id="image"
-            data-testid="image"
-            style={
-              selectedImage
-                ? { backgroundImage: `url(${selectedImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-                : {}
-            }
-          >
-            <input
-              data-testid="hidden-input"
-              type="file"
-              ref={hiddenFileInput}
-              className="hidden"
-              accept={allowedFormats.join(',') || '*'}
-              multiple={isMultiple}
-              onChange={handleFileInput}
-            />
-            {error ? (
-              <p className="text-lg text-center text-red-500 font-semibold px-5">{error}</p>
-            ) : (
-              !selectedImage && <Icon iconName={'camera-solid'} fill="#FFF" variant="7xl" />
-            )}
-          </div>
+          <input
+            data-testid="hidden-input"
+            type="file"
+            ref={hiddenFileInput}
+            className="hidden"
+            accept={allowedFormats.join(',') || '*'}
+            multiple={isMultiple}
+            onChange={handleFileInput}
+          />
+          {selectedImages?.length > 0 && isImage && (
+            <div
+              className={`grid grid-cols-${selectedImages.length === 1 ? 1 : 2} gap-2 h-[200px]`}
+              onClick={() => hiddenFileInput.current?.click()}
+              id="image"
+              data-testid="image"
+            >
+              {selectedImages.map((image, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-300 flex justify-center items-center"
+                  style={{
+                    backgroundImage: image ? `url(${image})` : 'none',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                 />
+              ))}
+            </div>
+          )}
+          {!(selectedImages?.length > 0) && (
+            <div
+              className="h-[200px] bg-gray-300 flex justify-center items-center cursor-pointer relative"
+              onClick={() => hiddenFileInput.current?.click()}
+              id="image"
+              data-testid="image"
+            >
+              {error ? (
+                <p className="text-lg text-center text-red-500 font-semibold px-5">{error}</p>
+              ) : isImage ? (
+                <Icon iconName={'camera-solid'} fill="#FFF" variant="7xl" />
+              ) : (
+                <Icon iconName={'document-solid'} fill="#FFF" variant="7xl" />
+              )}
+            </div>
+          )}
+
           <div className="flex items-center justify-center gap-6 mt-5">
             <Button
               className="w-[132px]"
@@ -140,9 +193,15 @@ const UploadModal: React.FC<UploadModalProps> = ({
             >
               Cancel
             </Button>
-            <Button className="w-[132px]" onClick={() => hiddenFileInput.current.click()}>
-              Upload Image
-            </Button>
+            {selectedImages?.length === 0 ? (
+              <Button className="w-[132px]" onClick={() => hiddenFileInput.current?.click()}>
+                Upload Image
+              </Button>
+            ) : (
+              <Button className="w-[132px]" onClick={() => onSave()}>
+                Save
+              </Button>
+            )}
           </div>
         </div>
       </div>

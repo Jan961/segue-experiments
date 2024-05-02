@@ -5,7 +5,8 @@ describe('UploadModal Component', () => {
   const mockOnClose = jest.fn();
   const mockOnChange = jest.fn();
 
-  const mockFile = (size: number, type: string) => new File([''], 'test-file', { type, size });
+  const mockFile = (size: number, type: string) =>
+    new File([new Blob(['1'.repeat(size + 1)], { type })], 'testfile');
   const allowedFormats = ['image/jpeg', 'image/png'];
   afterEach(() => {
     jest.clearAllMocks();
@@ -49,20 +50,20 @@ describe('UploadModal Component', () => {
     expect(input).toBeInTheDocument();
   });
 
-  //   test('validates no file selected', () => {
-  //     render(
-  //       <UploadModal
-  //         allowedFormats={allowedFormats}
-  //         visible={true}
-  //         title="Upload"
-  //         info="Select a file"
-  //         onChange={mockOnChange}
-  //       />,
-  //     );
-  //     const input = screen.getByTestId('hidden-input');
-  //     fireEvent.change(input, { target: { files: [] } });
-  //     expect(screen.getByText('No file selected')).toBeInTheDocument();
-  //   });
+  test('validates no file selected', () => {
+    render(
+      <UploadModal
+        allowedFormats={allowedFormats}
+        visible={true}
+        title="Upload"
+        info="Select a file"
+        onChange={mockOnChange}
+      />,
+    );
+    const input = screen.getByTestId('hidden-input');
+    fireEvent.change(input, { target: { files: [] } });
+    expect(screen.getByText('No file selected')).toBeInTheDocument();
+  });
 
   test('validates maximum number of files', () => {
     render(
@@ -82,21 +83,21 @@ describe('UploadModal Component', () => {
     expect(screen.getByText('You can upload up to 1 files.')).toBeInTheDocument();
   });
 
-  //   test('validates file size', () => {
-  //     render(
-  //       <UploadModal
-  //         allowedFormats={allowedFormats}
-  //         title="Upload"
-  //         info="Select a file"
-  //         visible={true}
-  //         maxFileSize={500}
-  //         onChange={mockOnChange}
-  //       />,
-  //     );
-  //     const input = screen.getByTestId('hidden-input');
-  //     fireEvent.change(input, { target: { files: [mockFile(1024, 'image/jpeg')] } });
-  //     expect(screen.getByText('This image is too big. Please upload a smaller image.')).toBeInTheDocument();
-  //   });
+  test('validates file size', () => {
+    render(
+      <UploadModal
+        allowedFormats={allowedFormats}
+        title="Upload"
+        info="Select a file"
+        visible={true}
+        maxFileSize={500}
+        onChange={mockOnChange}
+      />,
+    );
+    const input = screen.getByTestId('hidden-input');
+    fireEvent.change(input, { target: { files: [mockFile(1024, 'image/jpeg')] } });
+    expect(screen.getByText('This image is too big. Please upload a smaller image.')).toBeInTheDocument();
+  });
 
   test('validates allowed formats', () => {
     const allowedFormats = ['image/jpeg', 'image/png'];
