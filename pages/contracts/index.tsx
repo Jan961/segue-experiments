@@ -5,7 +5,7 @@ export default function index() {
   const links = [
     {
       title: 'Venue Contracts',
-      route: '/contracts/all',
+      route: '/contracts/venueContracts',
       color: 'bg-primary-blue',
     },
     {

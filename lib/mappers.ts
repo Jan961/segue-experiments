@@ -30,6 +30,7 @@ import {
   UserDto,
   VenueContactDTO,
   VenueRoleDTO,
+  ContractStatusType,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
@@ -54,6 +55,11 @@ We also have full control of types here so we can get type safety to child objec
 // This is so we can change the implimentation if needed. We had some issues with timezone.
 const convertDate = (date: Date) => {
   if (date) return toISO(date);
+  return '';
+};
+
+const convertToString = (data: any) => {
+  if (data) return data.toString();
   return '';
 };
 
@@ -200,6 +206,22 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
   ActionByDate: convertDate(a.ActionByDate),
   Notes: a.Notes,
 });
+
+export const contractStatusmapper = (status: ContractStatusType) => {
+  return {
+    BookingId: status.BookingId ? status.BookingId : '',
+    StatusCode: status.StatusCode,
+    SignedDate: convertDate(status.SignedDate),
+    SignedBy: status.SignedBy,
+    ReturnDate: convertDate(status.ReturnDate),
+    CheckedBy: status.CheckedBy,
+    RoyalPercentage: convertToString(status.RoyalPercentage),
+    DealType: status.DealType,
+    ContractNotes: status.ContractNotes,
+    ReceivedBackDate: convertDate(status.ReceivedBackDate),
+    Exceptions: status.Exceptions,
+  };
+};
 
 export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => {
   return {
