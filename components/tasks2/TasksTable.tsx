@@ -10,8 +10,8 @@ import axios from 'axios';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
-import NotesPopup from 'components/bookings/NotesPopup';
 import { styleProps } from './tableConfig';
+import NotesPopup from './NotesPopup';
 
 interface TasksTableProps {
   rowData?: any;
@@ -39,7 +39,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
   };
 
   const handleCellClick = (e) => {
-    if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
+    if (e.column.colId === 'Notes') {
       setProductionItem(e.data);
       setShowModal(true);
     }
@@ -121,12 +121,14 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
           styleProps={styleProps}
           tableHeight={234}
           gridOptions={gridOptions}
+          onCellClicked={handleCellClick}
           ref={tableRef}
         /> : <Table
           columnDefs={columnDefs}
           rowData={rows}
           styleProps={styleProps}
           gridOptions={gridOptions}
+          onCellClicked={handleCellClick}
           ref={tableRef}
         />}
       </div>

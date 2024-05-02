@@ -2,8 +2,10 @@ import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
 import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
+import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
+import { format } from 'date-fns';
 import getTaskDateStatusColor from 'utils/getTaskDateStatus';
 import { calculateTaskStatus } from 'utils/tasks';
 
@@ -47,35 +49,70 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Start by (WK)',
       field: 'StartByWeekNum',
-      cellRenderer: DefaultCellRenderer,
+      cellRenderer: CustomSelectCelRenderer,
+      cellStyle: {
+        overflow: 'visible',
+      },
+      cellRendererParams: function (params) {
+        return {
+          options: params.data.weekOptions,
+          isSearchable: true
+        }
+      },
       width: 120,
       minWidth: 120,
     },
     {
       headerName: 'Start by ',
       field: 'StartDate',
-      cellRenderer: DateRenderer,
+      cellRenderer: DefaultCellRenderer,
+      valueGetter: function(params){
+        return format(params.data.StartDate, 'dd/MM/yy');
+      },
       width: 120,
-      minWidth: 120, cellStyle: {
+      minWidth: 120,
+      cellStyle: {
         overflow: 'visible',
       },
     },
     {
-      headerName: 'Due (WK)', field: 'CompleteByWeekNum', cellRenderer: DefaultCellRenderer, width: 110, minWidth: 100
-    },
-    {
-      headerName: 'Due', field: 'CompleteDate', cellRenderer: DateRenderer, cellStyle: {
+      headerName: 'Due (WK)',
+      field: 'CompleteByWeekNum',
+      cellRenderer: CustomSelectCelRenderer,
+      cellStyle: {
         overflow: 'visible',
-      }, width: 120, minWidth: 120
+      },
+      cellRendererParams: function (params) {
+        return {
+          options: params.data.weekOptions,
+          isSearchable: true
+        }
+      },
+      width: 110,
+      minWidth: 100
     },
     {
-      headerName: 'Progress %', field: 'Progress', cellRendererParams: {
+      headerName: 'Due',
+      field: 'CompleteDate',
+      cellRenderer: DefaultCellRenderer,
+      cellStyle: {
+        overflow: 'visible',
+      },
+      valueGetter: function(params){
+        return format(params.data.CompleteDate, 'dd/MM/yy');
+      },
+      width: 120, minWidth: 120
+    },
+    {
+      headerName: 'Progress %', field: 'Progress',
+      cellRendererParams: {
         options: generatePercentageOptions,
         isSearchable: true
       },
       cellStyle: {
         overflow: 'visible',
-      }, cellRenderer: CustomSelectCelRenderer, width: 116
+      }, 
+      cellRenderer: CustomSelectCelRenderer, width: 116
     },
     {
       headerName: 'Status',
@@ -98,7 +135,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Notes',
       field: 'Notes',
-      cellRenderer: NoteColumnRenderer,
+      cellRenderer: NotesRenderer,
       cellRendererParams: {
         tpActive: true,
       },
