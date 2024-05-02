@@ -19,41 +19,43 @@ model ActivityType {
 }
 
 model Booking {
-  Id                      Int                   @id @default(autoincrement()) @map("BookingId")
-  DateBlockId             Int                   @map("BookingDateBlockId")
-  VenueId                 Int                   @map("BookingVenueId")
-  FirstDate               DateTime              @map("BookingFirstDate") @db.Date
-  StatusCode              String                @default("U") @map("BookingStatusCode") @db.Char(1)
-  PencilNum               Int?                  @map("BookingPencilNum")
-  LandingPageURL          String?               @map("BookingLandingPageURL") @db.VarChar(255)
-  TicketsOnSaleFromDate   DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
-  TicketsOnSale           Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
-  IsOnSale                Boolean               @default(dbgenerated("(b'0')")) @map("BookingIsOnSale") @db.Bit(1)
-  OnSaleDate              DateTime?             @map("BookingOnSaleDate") @db.Date
-  MarketingPlanReceived   Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
-  ContactInfoReceived     Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
-  PrintReqsReceived       Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
-  Notes                   String?               @map("BookingNotes") @db.LongText
-  DealNotes               String?               @map("BookingDealNotes") @db.LongText
-  TicketPriceNotes        String?               @map("BookingTicketPriceNotes") @db.LongText
-  MarketingDealNotes      String?               @map("BookingMarketingDealNotes") @db.LongText
-  CrewNotes               String?               @map("BookingCrewNotes") @db.LongText
-  SalesNotes              String?               @map("BookingSalesNotes") @db.LongText
-  HoldNotes               String?               @map("BookingHoldNotes") @db.LongText
-  CompNotes               String?               @map("BookingCompNotes") @db.LongText
-  MerchandiseNotes        String?               @map("BookingMerchandiseNotes") @db.LongText
-  CastRateTicketNotes     String?               @map("BookingCastRateTicketNotes") @db.LongText
-  CastRateTicketsArranged Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
-  CastRateTicketsNotes    String?               @map("BookingCastRateTicketsNotes") @db.Text
-  RunTag                  String                @map("BookingRunTag") @db.Char(8)
-  BookedVenueHistory      BookedVenueHistory[]
-  DateBlock               DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
-  Venue                   Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
-  BookingActivity         BookingActivity[]
-  BookingAttachedFile     BookingAttachedFile[]
-  Contract                Contract?
-  Performance             Performance[]
-  SalesSet                SalesSet[]
+  Id                                Int                   @id @default(autoincrement()) @map("BookingId")
+  DateBlockId                       Int                   @map("BookingDateBlockId")
+  VenueId                           Int                   @map("BookingVenueId")
+  FirstDate                         DateTime              @map("BookingFirstDate") @db.Date
+  StatusCode                        String                @default("U") @map("BookingStatusCode") @db.Char(1)
+  PencilNum                         Int?                  @map("BookingPencilNum")
+  LandingPageURL                    String?               @map("BookingLandingPageURL") @db.VarChar(255)
+  TicketsOnSaleFromDate             DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
+  TicketsOnSale                     Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
+  MarketingPlanReceived             Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
+  ContactInfoReceived               Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
+  PrintReqsReceived                 Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
+  Notes                             String?               @map("BookingNotes") @db.LongText
+  DealNotes                         String?               @map("BookingDealNotes") @db.LongText
+  TicketPriceNotes                  String?               @map("BookingTicketPriceNotes") @db.LongText
+  MarketingDealNotes                String?               @map("BookingMarketingDealNotes") @db.LongText
+  CrewNotes                         String?               @map("BookingCrewNotes") @db.LongText
+  SalesNotes                        String?               @map("BookingSalesNotes") @db.LongText
+  HoldNotes                         String?               @map("BookingHoldNotes") @db.LongText
+  CompNotes                         String?               @map("BookingCompNotes") @db.LongText
+  MerchandiseNotes                  String?               @map("BookingMerchandiseNotes") @db.LongText
+  CastRateTicketNotes               String?               @map("BookingCastRateTicketNotes") @db.LongText
+  CastRateTicketsArranged           Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
+  CastRateTicketsNotes              String?               @map("BookingCastRateTicketsNotes") @db.Text
+  RunTag                            String                @map("BookingRunTag") @db.Char(8)
+  MarketingCostsStatus              String?               @map("BookingMarketingCostsStatus") @db.Char(1)
+  MarketingCostsApprovalDate        DateTime?             @map("BookingMarketingCostsApprovalDate") @db.Date
+  MarketingCostsNotes               String?               @map("BookingMarketingCostsNotes") @db.LongText
+  BookedVenueHistory                BookedVenueHistory[]
+  DateBlock                         DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
+  Venue                             Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
+  BookingActivity                   BookingActivity[]
+  BookingAttachedFile               BookingAttachedFile[]
+  Contract                          Contract?
+  DealMemo                          DealMemo?
+  Performance                       Performance[]
+  SalesSet                          SalesSet[]
 
   @@unique([DateBlockId, VenueId, FirstDate, StatusCode], map: "SECONDARY")
   @@index([DateBlockId], map: "DateBlock_Booking_idx")
@@ -89,25 +91,25 @@ model BookingContactNotes {
 }
 
 model Contract {
-  BookingId            Int                    @id @map("ContractBookingId")
-  StatusCode           String?                @map("ContactStatusCode") @db.VarChar(4)
-  SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
-  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(30)
-  ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
-  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(30)
-  RoyalPercentage      Decimal?               @map("RoyaltyPercentage") @db.Decimal(5, 2)
-  DealType             String?                @db.VarChar(4)
-  ContractNotes        String?                @db.LongText
-  ReceivedBackDate     DateTime?              @map("ContractReceivedBackDate") @db.Date
-  Exceptions           String?                @map("ContractExceptions") @db.LongText
-  Booking              Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
-  ContractAttachedFile ContractAttachedFile[]
+  BookingId                 Int                    @id @map("ContractBookingId")
+  StatusCode                String?                @map("ContractStatusCode") @db.VarChar(4)
+  SignedDate                DateTime?              @map("ContractSignedDate") @db.Date
+  SignedBy                  String?                @map("ContractSignedBy") @db.VarChar(30)
+  ReturnDate                DateTime?              @map("ContractReturnDate") @db.Date
+  CheckedBy                 String?                @map("ContractCheckedBy") @db.VarChar(30)
+  RoyaltyPercentage         Decimal?               @map("ContractRoyaltyPercentage") @db.Decimal(5, 2)
+  DealType                  String?                @map("ContractDealType") @db.VarChar(4)
+  Notes                     String?                @map("ContractNotes") @db.LongText
+  ReceivedBackDate          DateTime?              @map("ContractReceivedBackDate") @db.Date
+  Exceptions                String?                @map("ContractExceptions") @db.LongText
+  Booking                   Booking                @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Contract")
+  ContractAttachedFile      ContractAttachedFile[]
 }
 
 model Currency {
   Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
   Name                                                               String           @map("CurrencyName") @db.VarChar(30)
-  SymbolUnicode                                                      Int?             @map("CurrencySymbolUnicode")
+  SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Venue                                                              Venue[]
@@ -137,7 +139,7 @@ model Show {
 
 model Venue {
   Id                                                        Int                  @id @default(autoincrement()) @map("VenueId")
-  Code                                                      String               @map("VenueCode") @db.VarChar(6)
+  Code                                                      String               @unique(map: "VenueVenueCodeUnique") @map("VenueCode") @db.VarChar(6)
   Name                                                      String               @map("VenueName") @db.VarChar(255)
   StatusCode                                                String               @default("O") @map("VenueStatusCode") @db.VarChar(1)
   Website                                                   String?              @map("VenueWebsite") @db.VarChar(255)
@@ -196,17 +198,19 @@ model VenueBarredVenue {
 }
 
 model VenueContact {
-  Id          Int       @id @default(autoincrement()) @map("ContactId")
-  VenueId     Int       @map("ContactVenueId")
-  FirstName   String?   @map("ContactFirstName") @db.VarChar(50)
-  LastName    String?   @map("ContactLastName") @db.VarChar(50)
-  Phone       String?   @map("ContactPhone") @db.VarChar(30)
-  Email       String?   @map("ContactEmail") @db.VarChar(80)
-  Role        String?   @map("ContactRole") @db.VarChar(30)
-  RoleIndex   String    @default("") @map("ContactRoleIndex") @db.VarChar(1)
-  VenueRoleId Int       @map("ContactVenueRoleId")
-  VenueRole   VenueRole @relation(fields: [VenueRoleId], references: [Id], onUpdate: Restrict, map: "VenueRole_VenueContact")
-  Venue       Venue     @relation(fields: [VenueId], references: [Id], onUpdate: Restrict, map: "Venue_VenueContact")
+  Id                                                     Int        @id @default(autoincrement()) @map("ContactId")
+  VenueId                                                Int        @map("ContactVenueId")
+  FirstName                                              String?    @map("ContactFirstName") @db.VarChar(50)
+  LastName                                               String?    @map("ContactLastName") @db.VarChar(50)
+  Phone                                                  String?    @map("ContactPhone") @db.VarChar(30)
+  Email                                                  String?    @map("ContactEmail") @db.VarChar(80)
+  Role                                                   String?    @map("ContactRole") @db.VarChar(30)
+  RoleIndex                                              String     @default("") @map("ContactRoleIndex") @db.VarChar(1)
+  VenueRoleId                                            Int        @map("ContactVenueRoleId")
+  DealMemo_DealMemo_DeMoBOMVenueContactIdToVenueContact  DealMemo[] @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact")
+  DealMemo_DealMemo_DeMoTechVenueContactIdToVenueContact DealMemo[] @relation("DealMemo_DeMoTechVenueContactIdToVenueContact")
+  VenueRole                                              VenueRole  @relation(fields: [VenueRoleId], references: [Id], onUpdate: Restrict, map: "VenueRole_VenueContact")
+  Venue                                                  Venue      @relation(fields: [VenueId], references: [Id], onUpdate: Restrict, map: "Venue_VenueContact")
 
   @@index([VenueRoleId], map: "VenueRole_VenueContact")
   @@index([VenueId], map: "Venue_Contact_idx")
@@ -536,6 +540,7 @@ model User {
   LastName       String?          @map("UserLastName") @db.VarChar(50)
   AccountId      Int?             @map("UserAccountId")
   AccountUser    AccountUser[]
+  File           File[]
   MasterTask     MasterTask[]
   ProductionTask ProductionTask[]
   TaskWatcher    TaskWatcher[]
@@ -652,20 +657,22 @@ model AccountUserProduction {
 }
 
 model Production {
-  Id                    Int                     @id @default(autoincrement()) @map("ProductionId")
-  ShowId                Int                     @map("ProductionShowId")
-  Code                  String                  @map("ProductionCode") @db.VarChar(10)
-  SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
-  IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
-  IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  Logo                  Bytes?                  @map("ProductionLogo")
-  SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
-  AccountUserProduction AccountUserProduction[]
-  ConversionRate        ConversionRate[]
-  DateBlock             DateBlock[]
-  Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
-  ProductionRegion      ProductionRegion[]
-  ProductionTask        ProductionTask[]
+  Id                        Int                     @id @default(autoincrement()) @map("ProductionId")
+  ShowId                    Int                     @map("ProductionShowId")
+  Code                      String                  @map("ProductionCode") @db.VarChar(10)
+  SalesEmail                String?                 @map("ProductionSalesEmail") @db.VarChar(80)
+  IsArchived                Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
+  IsDeleted                 Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
+  Logo                      Bytes?                  @map("ProductionLogo")
+  SalesFrequency            String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
+  RunningTime               DateTime?               @map("ProductionRunningTime")@db.Time(0)
+  RunningTimeNote           String?                 @map("ProductionRunningTimeNote")@db.VarChar(80)
+  AccountUserProduction     AccountUserProduction[]
+  ConversionRate            ConversionRate[]
+  DateBlock                 DateBlock[]
+  Show                      Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
+  ProductionRegion          ProductionRegion[]
+  ProductionTask            ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ShowId], map: "ShowMayHaveProduction")
@@ -698,13 +705,14 @@ model ProductionTask {
 }
 
 model AccountContact {
-  AccContId        Int     @id @default(autoincrement())
+  AccContId        Int        @id @default(autoincrement())
   AccContAccountId Int
-  AccContFirstName String  @db.VarChar(50)
-  AccContLastName  String? @db.VarChar(50)
-  AccContPhone     String? @db.VarChar(40)
-  AccContMainEmail String? @db.VarChar(120)
-  Account          Account @relation(fields: [AccContId], references: [AccountId], onDelete: Cascade, map: "Account_AccountContact")
+  AccContFirstName String     @db.VarChar(50)
+  AccContLastName  String?    @db.VarChar(50)
+  AccContPhone     String?    @db.VarChar(40)
+  AccContMainEmail String?    @db.VarChar(120)
+  Account          Account    @relation(fields: [AccContId], references: [AccountId], onDelete: Cascade, map: "Account_AccountContact")
+  DealMemo         DealMemo[]
 }
 
 model Country {
@@ -761,6 +769,139 @@ model VenueFamily {
   Id    Int     @id @default(autoincrement()) @map("VenueFamilyId")
   Name  String  @map("VenueFamilyName") @db.VarChar(50)
   Venue Venue[]
+}
+
+model DealMemo {
+  DeMoId                                                     Int                     @id @default(autoincrement())
+  DeMoBookingId                                              Int                     @unique(map: "DealMemoBooking")
+  DeMoAgreementDate                                          DateTime?               @db.Date
+  DeMoAccContId                                              Int?
+  DeMoRunningTime                                            DateTime?               @db.Time(0)
+  DeMoRunningTimeNotes                                       String?                 @db.VarChar(80)
+  DeMoPrePostShowEvents                                      String?                 @db.LongText
+  DeMoVenueCurfewTime                                        DateTime?               @db.Time(0)
+  DeMoPerformanceNotes                                       DateTime?               @db.Time(0)
+  DeMoProgrammerVenueContactId                               Int?
+  DeMoROTTPercentage                                         Decimal?                @db.Decimal(5, 2)
+  DeMoPRSPercentage                                          Decimal?                @db.Decimal(5, 2)
+  DeMoGuarantee                                              Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoGuaranteeAmount                                        Decimal?                @db.Decimal(10, 2)
+  DeMoHasCalls                                               Boolean                 @default(false)
+  DeMoPromoterSplitPercentage                                Decimal?                @db.Decimal(5, 2)
+  DeMoVenueSplitPercentage                                   Decimal?                @db.Decimal(5, 2)
+  DeMoVenueRental                                            Decimal?                @db.Decimal(10, 2)
+  DeMoVenueRentalNotes                                       String?                 @db.VarChar(80)
+  DeMoStaffingContra                                         Decimal?                @db.Decimal(10, 2)
+  DeMoStaffingContraNotes                                    String?                 @db.VarChar(80)
+  DeMoAgreedContraItems                                      Decimal?                @db.Decimal(10, 2)
+  DeMoAgreedContraItemsNotes                                 String?                 @db.VarChar(80)
+  DeMoBOMVenueContactId                                      Int?
+  DeMoOnSaleDate                                             DateTime?               @db.Date
+  DeMoSettlementVenueContactId                               Int?
+  DeMoSellableSeats                                          Float?
+  DeMoMixerDeskPosition                                      String?                 @db.VarChar(80)
+  DeMoStandardSeatKills                                      String?                 @db.VarChar(80)
+  DeMoRestorationLevy                                        Decimal?                @db.Decimal(10, 2)
+  DeMoBookingFees                                            Decimal?                @db.Decimal(10, 2)
+  DeMoCCCommissionPercent                                    Decimal?                @db.Decimal(5, 2)
+  DeMoTxnChargeOption                                        String?                 @db.Char(3)
+  DeMoTxnChargeAmount                                        Decimal?                @db.Decimal(10, 2)
+  DeMoAgreedDiscounts                                        String?                 @db.VarChar(80)
+  DeMoMaxTAAlloc                                             String?                 @db.VarChar(80)
+  DeMoTAAlloc                                                String?                 @db.VarChar(80)
+  DeMoTicketCopy                                             String?                 @db.VarChar(80)
+  DeMoProducerCompCount                                      Int?                    @db.TinyInt
+  DeMoOtherHolds                                             String?                 @db.VarChar(80)
+  DeMoAgeNotes                                               String?                 @db.VarChar(80)
+  DeMoSalesDayNum                                            Int?                    @db.TinyInt
+  DeMoMMVenueContactId                                       Int?
+  DeMoBrochureDeadline                                       DateTime?               @db.Date
+  DeMoFinalProofBy                                           DateTime?               @db.Date
+  DeMoPrintReqs                                              String?                 @db.LongText
+  DeMoLocalMarketingBudget                                   Decimal?                @db.Decimal(10, 2)
+  DeMoLocalMarketingContra                                   Decimal?                @db.Decimal(10, 2)
+  DeMoSellWho                                                String?                 @db.Char(1)
+  DeMoSellProgrammes                                         Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoSellMerch                                              Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoSellNotes                                              String?                 @db.LongText
+  DeMoSellProgCommPercent                                    Decimal?                @db.Decimal(5, 2)
+  DeMoSellMerchCommPercent                                   Decimal?                @db.Decimal(5, 2)
+  DeMoSellPitchFee                                           Decimal?                @db.Decimal(10, 2)
+  DeMoTechVenueContactId                                     Int?
+  DeMoTechArrivalDate                                        DateTime?               @db.Date
+  DeMoTechArrivalTime                                        DateTime?               @db.Time(0)
+  DeMoNumDressingRooms                                       Int?                    @db.TinyInt
+  DeMoNumFacilitiesLaundry                                   Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoNumFacilitiesDrier                                     Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoNumFacilitiesLaundryRoom                               Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoNumFacilitiesNotes                                     String?                 @db.VarChar(80)
+  DeMoNumCateringNotes                                       String?                 @db.VarChar(80)
+  DeMoBarringClause                                          String?                 @db.VarChar(80)
+  DeMoAdvancePaymentRequired                                 Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  DeMoAdvancePaymentAmount                                   Decimal?                @db.Decimal(10, 2)
+  DeMoAdvancePaymentDueBy                                    DateTime?               @db.Date
+  DeMoSettlementDays                                         Int?                    @db.TinyInt
+  DeMoContractClause                                         String?                 @db.LongText
+  AccountContact                                             AccountContact?         @relation(fields: [DeMoAccContId], references: [AccContId], onDelete: Cascade, map: "AccountContactDealMemo")
+  Booking                                                    Booking                 @relation(fields: [DeMoBookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
+  VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?           @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [DeMoBOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
+  VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact VenueContact?           @relation("DealMemo_DeMoTechVenueContactIdToVenueContact", fields: [DeMoTechVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoTech")
+  DealMemoCall                                               DealMemoCall[]
+  DealMemoPrice                                              DealMemoPrice[]
+  DealMemoTechProvision                                      DealMemoTechProvision[]
+
+  @@index([DeMoAccContId], map: "AccountContactDealMemo")
+  @@index([DeMoBOMVenueContactId], map: "VenueContactDealMemoBOM")
+  @@index([DeMoTechVenueContactId], map: "VenueContactDealMemoTech")
+}
+
+model DealMemoCall {
+  DMCId              Int      @id @default(autoincrement())
+  DMCDeMoId          Int
+  DMCCallNum         Int      @db.TinyInt
+  DMCPromoterOrVenue String   @db.Char(1)
+  DMCType            String   @db.Char(1)
+  DMCValue           Decimal? @db.Decimal(10, 2)
+  DealMemo           DealMemo @relation(fields: [DMCDeMoId], references: [DeMoId], onDelete: Cascade, map: "DealMemoDealMemoCall")
+
+  @@unique([DMCDeMoId, DMCCallNum], map: "DealMemoCallNum")
+}
+
+model DealMemoPrice {
+  DMPId          Int      @id @default(autoincrement())
+  DMPDeMoId      Int
+  DMPTicketName  String   @db.VarChar(50)
+  DMPNumTickets  Int?
+  DMPTicketPrice Decimal? @db.Decimal(10, 2)
+  DMPNotes       String?  @db.VarChar(80)
+  DealMemo       DealMemo @relation(fields: [DMPDeMoId], references: [DeMoId], onDelete: Cascade, map: "DealMemoDealMemoPrice")
+
+  @@index([DMPDeMoId], map: "DealMemoDealMemoPrice")
+}
+
+model DealMemoTechProvision {
+  DMTechId      Int      @id @default(autoincrement())
+  DMTechDeMoId  Int
+  DMTechName    String   @db.VarChar(30)
+  DMTechVenue   String?  @db.VarChar(80)
+  DMTechCompany String?  @db.VarChar(80)
+  DealMemo      DealMemo @relation(fields: [DMTechDeMoId], references: [DeMoId], onDelete: Cascade, map: "DealMemoDealMemoTechProvision")
+
+  @@unique([DMTechDeMoId, DMTechName], map: "ProvisionName")
+}
+
+model File {
+  Id                   Int      @map("FileId")@id @default(autoincrement())
+  Entity               String   @map("FileEntity")@db.VarChar(40)
+  EntityId             Int      @map("FileEntityId")
+  OriginalFilename     String   @map("FileOriginalFilename")@db.VarChar(200)
+  MediaType            String?  @map("FileMediaType")@db.VarChar(20)
+  Location             String   @map("FileLocation")@db.VarChar(512)
+  UploadDateTime       DateTime @map("FileUploadDateTime")@db.DateTime(0)
+  UploadUserId         Int      @map("FileUploadUserId")
+  User                 User     @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
+
+  @@index([UploadUserId], map: "UserAttachedFile")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
