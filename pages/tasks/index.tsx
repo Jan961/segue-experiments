@@ -16,13 +16,12 @@ import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
 import { getColumnDefs } from 'components/tasks2/tableConfig';
 
+
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
 
   const { users } = useRecoilValue(userState);
-
-  console.log(props);
 
   const usersList = useMemo(
     () =>
@@ -48,6 +47,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     });
     setProductionTasks(updatedProductionTasks);
   };
+
+
 
   return (
     <Layout title="Tasks | Segue" flush>

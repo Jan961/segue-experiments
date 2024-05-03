@@ -7,13 +7,22 @@ import { SelectOption } from 'components/global/forms/FormInputSelect';
 
 const generateOptions = (weekData: any) => {
   const optionsData: SelectOption[] = [];
-  for(let key in weekData){
+  for (let key in weekData) {
     optionsData.push({
       text: key,
       value: parseInt(key)
     })
   }
   return optionsData;
+}
+
+const getStatusBool = (taskStatus, filterStatus, taskDueDate ) => {
+  if (filterStatus === 'inProgressandtodo') {
+    if (taskStatus === 'todo' || taskStatus === 'inProgress') return true
+    return false;
+  }else if(filterStatus === 'overdue'){
+    console.log(taskDueDate, filterStatus, taskStatus)
+  }
 }
 
 const useTasksFilter = () => {
@@ -27,17 +36,19 @@ const useTasksFilter = () => {
     })
 
     const selectedProductions = selectedProductionData.map((productionData) => {
-      const filteredTasks = productionData.Tasks.filter(({ Name, TaskName, Progress, DueDate, AssignedToUserId, Notes }) => {
+      const filteredTasks = productionData.Tasks.filter(({ Name, TaskName, Progress, AssignedToUserId, Notes, CompleteByWeekNum , DueDate}) => {
+        const taskDueDate = productionData.weekNumToDateMap?.[CompleteByWeekNum];
         const Status = calculateTaskStatus(Progress || 0);
         return (
-          (!filters.endDueDate || new Date(DueDate) <= filters.endDueDate) &&
-          (!filters.startDueDate || new Date(DueDate) >= filters.startDueDate) &&
-          (filters.status === 'all' || Status === filters.status) &&
+          (!filters.endDueDate || new Date(taskDueDate) > new Date(filters.endDueDate)) &&
+          (!filters.startDueDate || new Date(taskDueDate) < new Date(filters.startDueDate)) &&
+          (filters.status === 'all' || Status === filters.status || getStatusBool(Status, filters.status, taskDueDate)) &&
           (filters.assignee === -1 || AssignedToUserId === filters.assignee) &&
           (!filters.taskText ||
             Name?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
             TaskName?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
             Notes?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()))
+            
         );
       }).map(task => ({
         ...task,

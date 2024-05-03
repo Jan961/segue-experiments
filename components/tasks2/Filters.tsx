@@ -4,7 +4,6 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { useRecoilState } from 'recoil';
 import { useMemo, useState } from 'react';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import TasksButtons from './TasksButtons';
 import DateRange from 'components/core-ui-lib/DateRange';
 import { statusOptions } from 'config/tasks';
 import { tasksfilterState, intialTasksState } from 'state/tasks/tasksFilterState';
@@ -37,9 +36,9 @@ const Filters = ({ usersList }: FiltersProps) => {
       ...intialTasksState,
       startDueDate: null,
       endDueDate: null,
-      production: null,
       assignee: -1,
-      status: 'all'
+      status: 'inProgressandtodo',
+      production: filter.production
     });
   };
 
@@ -171,7 +170,7 @@ const Filters = ({ usersList }: FiltersProps) => {
             />
           </div>
         </div>
-        <div className="pl-8 flex items-center gap-4 flex-wrap  py-1 mt-2 flex-[15%]">
+        <div className="pl-20 flex items-center gap-4 flex-wrap  py-1 mt-2 flex-[15%]">
           <Button className="text-sm leading-8 w-[132px]" text="Clear Filters" onClick={onClearFilters} />
           <Button text="Master Task List" className="w-[132px]" onClick={null} />
           <Button

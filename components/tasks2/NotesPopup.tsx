@@ -13,17 +13,16 @@ interface NotesPopupProps {
 }
 
 export default function NotesPopup({ show, onSave, onCancel, productionItem }: NotesPopupProps) {
-    console.log(show, productionItem);
     const [note, setNote] = useState<string>('');
     const [confirm, setConfirm] = useState<boolean>(false);
     const [confVariant, setVariant] = useState<ConfDialogVariant>('close');
 
     useEffect(() => {
-        setNote(productionItem?.note || '');
-    }, [productionItem?.note]);
+        setNote(productionItem?.Note || '');
+    }, [productionItem?.Note]);
 
     const showConfModal = (mode: ConfDialogVariant) => {
-        if (productionItem?.note !== note) {
+        if (productionItem?.Note !== note) {
             setVariant(mode);
             setConfirm(true);
         } else {
@@ -33,7 +32,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
 
     const handleCancel = () => {
         setConfirm(false);
-        setNote(productionItem?.note);
+        setNote(productionItem?.Note);
         onCancel();
     };
 
@@ -47,7 +46,7 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
                 hasOverlay={confirm}
             >
                 <div>
-                    <h3 className="text-responsive-lg font-bold text-primary-navy">{productionItem?.Code} | ${productionItem?.Name}
+                    <h3 className="text-responsive-lg font-bold text-primary-navy">{productionItem?.Code} | {productionItem?.Name}
                     </h3>
                     <TextArea
                         className={'mt-2 h-[237px] w-full min-w-[508px]'}

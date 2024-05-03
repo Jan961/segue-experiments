@@ -1,6 +1,7 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 
 export default function getTaskDateStatusColor(date: string, status: string) {
+  console.log(date, status)
   if (status && status.toLowerCase() === 'done') {
     return 'bg-none';
   }
