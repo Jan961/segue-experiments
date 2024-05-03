@@ -13,6 +13,7 @@ interface BookingConflictsViewProps {
   data?: BookingWithVenueDTO[];
   updateModalTitle: (title: string) => void;
   nextStep: number;
+  onResetBooking?: () => void;
 }
 
 export default function BookingConflictsView({
@@ -20,6 +21,7 @@ export default function BookingConflictsView({
   data,
   updateModalTitle,
   nextStep,
+  onResetBooking,
 }: BookingConflictsViewProps) {
   const { goToStep } = useWizard();
 
@@ -53,6 +55,11 @@ export default function BookingConflictsView({
     goToStep(nextStep);
   };
 
+  const handleBackClick = () => {
+    onResetBooking && onResetBooking();
+    goToStep(getStepIndex(isNewBooking, 'Create New Booking'));
+  };
+
   return (
     <div className="flex flex-col">
       <span className="pb-2 text-responsive-sm text-primary-input-text">{`This booking would conflict with ${
@@ -67,12 +74,7 @@ export default function BookingConflictsView({
         />
       </div>
       <div className="pt-3 w-full flex items-center justify-end">
-        <Button
-          className="w-33"
-          variant="secondary"
-          text="Back"
-          onClick={() => goToStep(getStepIndex(isNewBooking, 'Create New Booking'))}
-        />
+        <Button className="w-33" variant="secondary" text="Back" onClick={handleBackClick} />
         <Button
           className="ml-3 w-33"
           text="Continue"
