@@ -217,7 +217,7 @@ export const contractStatusmapper = (status: ContractStatusType) => {
     CheckedBy: status.CheckedBy,
     RoyalPercentage: convertToString(status.RoyalPercentage),
     DealType: status.DealType,
-    ContractNotes: status.ContractNotes,
+    ContractNotes: status.Notes,
     ReceivedBackDate: convertDate(status.ReceivedBackDate),
     Exceptions: status.Exceptions,
   };
