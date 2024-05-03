@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { authMiddleware } from '@clerk/nextjs';
 import prismaAccelerate from 'lib/prismaAccelerate';
 
-const publicPaths = ['/auth/sign-in*', '/sign-up*', '/access-denied'];
+const publicPaths = ['/auth/sign-in*', '/sign-in*', '/sign-up*', '/access-denied'];
 
 const clerk = Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
 
