@@ -1,4 +1,5 @@
 import { Venue, VenueAddress, VenueBarredVenue, VenueContact, VenueRole } from '@prisma/client';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 export interface PrimaryAddress {
   primaryAddressId?: number;
@@ -221,5 +222,14 @@ export const mapVenueContactToPrisma = ({
   };
 };
 
-export const filterEmptyVenueContacts = (venueContacts: UiVenueContact[]): UiVenueContact[] =>
-  venueContacts.filter(({ firstName, lastName, email, phone }) => firstName || lastName || email || phone);
+export const filterEmptyVenueContacts = (
+  venueContacts: UiVenueContact[],
+  standardRoles: SelectOption[],
+): UiVenueContact[] => {
+  return venueContacts.filter(({ firstName, lastName, email, phone, roleName }) => {
+    const isStandardRole = standardRoles.some((rolesOption) => rolesOption.text === roleName);
+    const hasNonEmptyContactInfo = firstName || lastName || email || phone;
+
+    return (isStandardRole && hasNonEmptyContactInfo) || !isStandardRole;
+  });
+};

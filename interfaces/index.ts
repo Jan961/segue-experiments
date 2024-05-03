@@ -458,3 +458,13 @@ export interface ContractTableRowType {
   venueId: number | null;
   week: number | null;
 }
+
+export interface FileDTO {
+  OriginalFilename: string;
+  MediaType: string;
+  Location: string;
+  UploadUserId: number;
+  UploadDateTime: string;
+  Entity: string;
+  EntityId: number;
+}
