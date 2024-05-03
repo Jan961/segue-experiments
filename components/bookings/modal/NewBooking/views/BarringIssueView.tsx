@@ -11,6 +11,7 @@ type BarringIssueViewProps = {
   updateModalTitle: (title: string) => void;
   nextStep: number;
   previousStep: number;
+  onResetBooking?: () => void;
 };
 
 const barringGridOptions = {
@@ -25,12 +26,18 @@ export default function BarringIssueView({
   updateModalTitle,
   previousStep,
   nextStep,
+  onResetBooking,
 }: BarringIssueViewProps) {
   const { goToStep } = useWizard();
 
   useEffect(() => {
     updateModalTitle('Barring Issue');
   }, []);
+
+  const handleBackClick = () => {
+    onResetBooking && onResetBooking();
+    goToStep(previousStep);
+  };
 
   return (
     <div className="flex flex-col">
@@ -45,7 +52,7 @@ export default function BarringIssueView({
           gridOptions={barringGridOptions}
         />
         <div className="pt-3 w-full flex items-center justify-end">
-          <Button className="w-33" variant="secondary" text="Back" onClick={() => goToStep(previousStep)} />
+          <Button className="w-33" variant="secondary" text="Back" onClick={handleBackClick} />
           <Button className="ml-3 w-33" text="Continue" onClick={() => goToStep(nextStep)} />
         </div>
       </div>
