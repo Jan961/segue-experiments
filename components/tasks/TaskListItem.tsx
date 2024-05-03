@@ -1,5 +1,4 @@
 import { ProductionTaskDTO } from 'interfaces';
-import getTaskDateStatusColor from 'utils/getTaskDateStatus';
 import { Table } from 'components/global/table/Table';
 import React, { useMemo } from 'react';
 import TaskEditor from './editors/TaskEditor';
@@ -30,7 +29,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   //   const { id, value } = e.target;
   //   onTaskChange?.({...task, [id]:parseInt(value,10)})
   // };
-  const taskDateStatusColor = getTaskDateStatusColor(task.DueDate, task.Status);
+  const taskDateStatusColor = 'ng-none';
   const progressBarWidth = task.Progress + '%';
   return (
     <>
@@ -61,7 +60,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
             <span
               className="rounded-lg bg-progress-teal absolute block h-full top-0 left-0"
               style={{ width: progressBarWidth, zIndex: 1 }}
-            ></span>
+             />
             <span className="z-10 relative">{task.Progress}</span>
           </div>
         </Table.Cell>
