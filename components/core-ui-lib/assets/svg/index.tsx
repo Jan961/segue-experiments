@@ -29,3 +29,4 @@ export { default as MinusCircleSolidIcon } from './MinusCircleSolid';
 export { default as PlusCircleSolidIcon } from './PlusCircleSolid';
 export { default as CameraSolidIcon } from './Camera';
 export { default as DocumentSolidIcon } from './Document';
+export { default as EyeIcon } from './Eye';
