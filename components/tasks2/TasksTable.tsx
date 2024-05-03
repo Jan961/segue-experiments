@@ -1,11 +1,8 @@
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useRef, useState } from 'react';
-import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
+import { bookingState } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
-import { useRouter } from 'next/router';
-import { isNullOrEmpty } from 'utils';
-import { RowDoubleClickedEvent } from 'ag-grid-community';
 import axios from 'axios';
 import { rehearsalState } from 'state/booking/rehearsalState';
 import { getInFitUpState } from 'state/booking/getInFitUpState';
@@ -15,19 +12,17 @@ import NotesPopup from './NotesPopup';
 
 interface TasksTableProps {
   rowData?: any;
-  columnDefs?: any
+  columnDefs?: any;
   tableHeight?: boolean;
 }
 
 export default function TasksTable({ rowData = [], columnDefs = [], tableHeight = false }: TasksTableProps) {
   const tableRef = useRef(null);
-  const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookings, setBookings] = useRecoilState(bookingState);
   const [rehearsals, setRehearsals] = useRecoilState(rehearsalState);
   const [getInFitUps, setGetInFitUps] = useRecoilState(getInFitUpState);
   const [others, setOthers] = useRecoilState(otherState);
-  const [showAddEditBookingModal, setShowAddEditBookingModal] = useRecoilState(addEditBookingState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
@@ -42,24 +37,6 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
     if (e.column.colId === 'Notes') {
       setProductionItem(e.data);
       setShowModal(true);
-    }
-  };
-
-  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
-    const { data } = e;
-    if (!data.Id) {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: e.data.dateTime,
-        endDate: e.data.dateTime,
-      });
-    } else {
-      setShowAddEditBookingModal({
-        visible: true,
-        startDate: data.dateTime,
-        endDate: data.dateTime,
-        booking: data,
-      });
     }
   };
 
@@ -105,32 +82,18 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
     }
   }, [rowData]);
 
-  const handleClose = (bookings = null) => {
-    if (bookings) {
-      router.replace(router.asPath);
-    }
-    setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
-  };
-
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
-        {tableHeight ? <Table
+        <Table
           columnDefs={columnDefs}
           rowData={rows}
           styleProps={styleProps}
-          tableHeight={234}
+          tableHeight={tableHeight ? 234 : 0}
           gridOptions={gridOptions}
           onCellClicked={handleCellClick}
           ref={tableRef}
-        /> : <Table
-          columnDefs={columnDefs}
-          rowData={rows}
-          styleProps={styleProps}
-          gridOptions={gridOptions}
-          onCellClicked={handleCellClick}
-          ref={tableRef}
-        />}
+        />
       </div>
       <NotesPopup
         show={showModal}

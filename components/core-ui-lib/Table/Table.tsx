@@ -129,7 +129,7 @@ export default forwardRef(function Table(
     return () => {
       window.removeEventListener('resize', handleResize);
     };
-  }, []);
+  }, [tableHeight]);
 
   const gridHeaderHeight = headerHeight || HEADER_HEIGHT;
 
@@ -156,7 +156,7 @@ export default forwardRef(function Table(
           getRowStyle={getRowStyle}
           rowClassRules={rowClassRules}
           tooltipHideDelay={5000}
-          domLayout='autoHeight'
+          domLayout="autoHeight"
           tooltipShowDelay={0}
           gridOptions={{ ...DEFAULT_GRID_OPTIONS, ...gridOptions }}
           getRowHeight={getRowHeight}
