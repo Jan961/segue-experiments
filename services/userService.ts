@@ -48,3 +48,16 @@ export const getAccountIdFromReq = async (req: any) => {
 export const checkAccess = async (email: string, items: AccessCheck = null): Promise<boolean> => {
   return checkAccessDirect(email, items);
 };
+
+export const getUserId = async (email: string) => {
+  const { Id } = await prisma.user.findUnique({
+    where: {
+      Email: email,
+    },
+    select: {
+      Id: true,
+    },
+  });
+
+  return Id;
+};

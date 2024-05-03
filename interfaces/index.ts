@@ -430,7 +430,7 @@ export type ContractStatusType = {
   CheckedBy: string;
   RoyalPercentage: string;
   DealType: string;
-  ContractNotes: string;
+  Notes: string;
   ReceivedBackDate: Date;
   Exceptions: string;
 };
@@ -457,4 +457,14 @@ export interface ContractTableRowType {
   venue: string | null;
   venueId: number | null;
   week: number | null;
+}
+
+export interface FileDTO {
+  OriginalFilename: string;
+  MediaType: string;
+  Location: string;
+  UploadUserId: number;
+  UploadDateTime: string;
+  Entity: string;
+  EntityId: number;
 }
