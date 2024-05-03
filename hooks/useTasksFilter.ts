@@ -4,61 +4,80 @@ import { tasksfilterState } from 'state/tasks/tasksFilterState';
 import { productionState } from 'state/tasks/productionState';
 import { calculateTaskStatus } from 'utils/tasks';
 import { SelectOption } from 'components/global/forms/FormInputSelect';
+import { isThisWeek } from 'date-fns';
 
 const generateOptions = (weekData: any) => {
   const optionsData: SelectOption[] = [];
-  for (let key in weekData) {
+  for (const key in weekData) {
     optionsData.push({
       text: key,
-      value: parseInt(key)
-    })
+      value: parseInt(key),
+    });
   }
   return optionsData;
-}
+};
 
-const getStatusBool = (taskStatus, filterStatus, taskDueDate ) => {
+const getStatusBool = (taskStatus, filterStatus, taskDueDate) => {
+  const dueDate = new Date(taskDueDate);
+  const today = new Date();
   if (filterStatus === 'inProgressandtodo') {
-    if (taskStatus === 'todo' || taskStatus === 'inProgress') return true
+    if (taskStatus === 'todo' || taskStatus === 'inProgress') return true;
     return false;
-  }else if(filterStatus === 'overdue'){
-    console.log(taskDueDate, filterStatus, taskStatus)
+  } else if (filterStatus === 'dueThisWeek') {
+    return isThisWeek(dueDate);
+  } else if (filterStatus === 'overdue') {
+    return dueDate < today;
+  } else if (filterStatus === 'overdueanddueThisWeek') {
+    return isThisWeek(dueDate) || dueDate < today;
   }
-}
+};
 
 const useTasksFilter = () => {
   const productions = useRecoilValue(productionState);
   const filters = useRecoilValue(tasksfilterState);
 
-  const filteredProductions = useMemo(() => {
-    const selectedProductionData = productions.filter((productionItem) => {
-      if (filters.production === -1) return productionItem.Tasks
-      else if (productionItem.Id === filters.production) return productionItem
-    })
+  const filteredProductions =
+    useMemo(() => {
+      const selectedProductionData = productions.filter((productionItem) => {
+        if (filters.production === -1) return productionItem.Tasks;
+        return productionItem.Id === filters.production;
+      });
 
-    const selectedProductions = selectedProductionData.map((productionData) => {
-      const filteredTasks = productionData.Tasks.filter(({ Name, TaskName, Progress, AssignedToUserId, Notes, CompleteByWeekNum , DueDate}) => {
-        const taskDueDate = productionData.weekNumToDateMap?.[CompleteByWeekNum];
-        const Status = calculateTaskStatus(Progress || 0);
-        return (
-          (!filters.endDueDate || new Date(taskDueDate) > new Date(filters.endDueDate)) &&
-          (!filters.startDueDate || new Date(taskDueDate) < new Date(filters.startDueDate)) &&
-          (filters.status === 'all' || Status === filters.status || getStatusBool(Status, filters.status, taskDueDate)) &&
-          (filters.assignee === -1 || AssignedToUserId === filters.assignee) &&
-          (!filters.taskText ||
-            Name?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
-            TaskName?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
-            Notes?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()))
-            
-        );
-      }).map(task => ({
-        ...task,
-        Status: calculateTaskStatus(task.Progress || 0),
-        weekOptions: generateOptions(productionData.weekNumToDateMap)
-      }));
-      return { ...productionData, Tasks: [...filteredTasks] }
-    })
-    return selectedProductions;
-  }, [productions, filters.production, filters.assignee, filters.endDueDate, filters.startDueDate, filters.status, filters.taskText]) || [];
+      const selectedProductions = selectedProductionData.map((productionData) => {
+        const filteredTasks = productionData.Tasks.filter(
+          ({ Name, TaskName, Progress, AssignedToUserId, Notes, CompleteByWeekNum, CompleteDate }) => {
+            const taskDueDate = productionData.weekNumToDateMap?.[CompleteByWeekNum];
+            const Status = calculateTaskStatus(Progress || 0);
+            return (
+              (!filters.endDueDate || new Date(taskDueDate) > new Date(filters.endDueDate)) &&
+              (!filters.startDueDate || new Date(taskDueDate) < new Date(filters.startDueDate)) &&
+              (filters.status === 'all' ||
+                Status === filters.status ||
+                getStatusBool(Status, filters.status, CompleteDate)) &&
+              (filters.assignee === -1 || AssignedToUserId === filters.assignee) &&
+              (!filters.taskText ||
+                Name?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
+                TaskName?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
+                Notes?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()))
+            );
+          },
+        ).map((task) => ({
+          ...task,
+          Status: calculateTaskStatus(task.Progress || 0),
+          weekOptions: generateOptions(productionData.weekNumToDateMap),
+        }));
+        return { ...productionData, Tasks: [...filteredTasks] };
+      });
+      return selectedProductions;
+    }, [
+      productions,
+      filters.production,
+      filters.assignee,
+      filters.endDueDate,
+      filters.startDueDate,
+      filters.status,
+      filters.taskText,
+    ]) || [];
 
   return { filteredProductions };
 };

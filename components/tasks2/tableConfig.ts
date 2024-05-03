@@ -1,6 +1,4 @@
-import NoteColumnRenderer from 'components/bookings/table/NoteColumnRenderer';
 import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
-import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
 import { tileColors } from 'config/global';
@@ -9,12 +7,11 @@ import { format } from 'date-fns';
 import getTaskDateStatusColor from 'utils/getTaskDateStatus';
 import { calculateTaskStatus } from 'utils/tasks';
 
-
 export const styleProps = { headerColor: tileColors.tasks };
 
 const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
   text: index,
-  value: index
+  value: index,
 }));
 
 export const getColumnDefs = (usersList = [], productionName = '') => {
@@ -25,10 +22,11 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       cellRenderer: DefaultCellRenderer,
       width: 72,
       cellStyle: function (params) {
-        const taskDateStatusColor = getTaskDateStatusColor(params?.data?.DueDate, params?.data?.Status);
+        const { CompleteDate, Progress } = params.data;
+        const taskDateStatusColor = getTaskDateStatusColor(CompleteDate, Progress);
         if (taskDateStatusColor === 'bg-none') return null;
-        else return { backgroundColor: taskDateStatusColor, color: 'white' }
-      }
+        else return { backgroundColor: taskDateStatusColor, color: 'white' };
+      },
     },
     {
       headerName: 'Task Name',
@@ -36,12 +34,13 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       cellRenderer: DefaultCellRenderer,
       headerValueGetter: function () {
         if (productionName) return `${productionName} Task Name`;
-        else return 'Task Name'
+        else return 'Task Name';
       },
       cellStyle: function (params) {
-        const taskDateStatusColor = getTaskDateStatusColor(params?.data?.DueDate, params?.data?.Status);
+        const { CompleteDate, Progress } = params.data;
+        const taskDateStatusColor = getTaskDateStatusColor(CompleteDate, Progress);
         if (taskDateStatusColor === 'bg-none') return null;
-        else return { backgroundColor: taskDateStatusColor, color: 'white' }
+        else return { backgroundColor: taskDateStatusColor, color: 'white' };
       },
       width: 445,
       flex: 1,
@@ -56,8 +55,8 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       cellRendererParams: function (params) {
         return {
           options: params.data.weekOptions,
-          isSearchable: true
-        }
+          isSearchable: true,
+        };
       },
       width: 120,
       minWidth: 120,
@@ -66,7 +65,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       headerName: 'Start by ',
       field: 'StartDate',
       cellRenderer: DefaultCellRenderer,
-      valueGetter: function(params){
+      valueGetter: function (params) {
         return format(params.data.StartDate, 'dd/MM/yy');
       },
       width: 120,
@@ -85,11 +84,11 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       cellRendererParams: function (params) {
         return {
           options: params.data.weekOptions,
-          isSearchable: true
-        }
+          isSearchable: true,
+        };
       },
       width: 110,
-      minWidth: 100
+      minWidth: 100,
     },
     {
       headerName: 'Due',
@@ -98,21 +97,24 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       cellStyle: {
         overflow: 'visible',
       },
-      valueGetter: function(params){
+      valueGetter: function (params) {
         return format(params.data.CompleteDate, 'dd/MM/yy');
       },
-      width: 120, minWidth: 120
+      width: 120,
+      minWidth: 120,
     },
     {
-      headerName: 'Progress %', field: 'Progress',
+      headerName: 'Progress %',
+      field: 'Progress',
       cellRendererParams: {
         options: generatePercentageOptions,
-        isSearchable: true
+        isSearchable: true,
       },
       cellStyle: {
         overflow: 'visible',
-      }, 
-      cellRenderer: CustomSelectCelRenderer, width: 116
+      },
+      cellRenderer: CustomSelectCelRenderer,
+      width: 116,
     },
     {
       headerName: 'Status',
@@ -126,10 +128,15 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       width: 105,
     },
     {
-      headerName: 'Assigned to', field: 'AssignedToUserId',
+      headerName: 'Assigned to',
+      field: 'AssignedToUserId',
       valueGetter: function (params) {
-        return params.data?.AssignedToUserId ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text : null;
-      }, cellRenderer: DefaultCellRenderer, width: 136
+        return params.data?.AssignedToUserId
+          ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text
+          : null;
+      },
+      cellRenderer: DefaultCellRenderer,
+      width: 136,
     },
     { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
     {
@@ -149,5 +156,4 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       },
     },
   ];
-}
-
+};
