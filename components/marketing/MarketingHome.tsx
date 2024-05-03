@@ -4,25 +4,25 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
 import Icon from 'components/core-ui-lib/Icon';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import useAxios from 'hooks/useAxios';
-import Button from 'components/core-ui-lib/Button';
 import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
-import { contactNoteColDefs, styleProps } from 'components/marketing/table/tableConfig';
-import Table from 'components/core-ui-lib/Table';
-import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import ContactNoteModal, { ContactNoteModalVariant } from './modal/ContactNoteModal';
 import SalesTab from './tabs/SalesTab';
 import ActivitiesTab from './tabs/ActivitiesTab';
-import { BookingContactNoteDTO } from 'interfaces';
+import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 import { ArchivedSalesTab } from './tabs/ArchivedSalesTab';
+import ContactNotesTab from './tabs/ContactNotesTab';
 
 export type SelectOption = {
   text: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
+};
+
+export type ActivityList = {
+  activities: Array<ActivityDTO>;
+  activityTypes: Array<ActivityTypeDTO>;
 };
 
 export type DataList = {
@@ -44,13 +44,6 @@ const MarketingHome = () => {
   const [bookingId, setBookingId] = useState(null);
   const [tabSet, setTabSet] = useState<boolean>(false);
   const [tabIndex, setTabIndex] = useRecoilState(tabState);
-  const [showConfirm, setShowConfirm] = useState<boolean>(false);
-
-  const [showContactNoteModal, setShowContactNoteModal] = useState<boolean>(false);
-  const [contactModalVariant, setContactModalVariant] = useState<ContactNoteModalVariant>();
-  const [contactNoteRows, setContactNoteRows] = useState<Array<BookingContactNoteDTO>>();
-  const [contNoteColDefs, setContNoteColDefs] = useState([]);
-  const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
 
   const router = useRouter();
 
@@ -64,107 +57,12 @@ const MarketingHome = () => {
     'Attachments',
   ];
 
-  const { fetchData } = useAxios();
-
-  const getContactNotes = async (bookingId: string) => {
-    const data = await fetchData({
-      url: '/api/marketing/contactNotes/' + bookingId,
-      method: 'POST',
-    });
-
-    if (typeof data === 'object') {
-      const contactNoteList = data as Array<BookingContactNoteDTO>;
-
-      const sortedContactNotes = contactNoteList.sort(
-        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
-      );
-
-      setContNoteColDefs(contactNoteColDefs(contactNoteUpdate));
-      setContactNoteRows(sortedContactNotes);
-    }
-  };
-
-  const contactNoteUpdate = (variant: ContactNoteModalVariant, data: BookingContactNoteDTO) => {
-    setContactModalVariant(variant);
-    setContactNoteRow(data);
-
-    if (variant === 'edit') {
-      setShowContactNoteModal(true);
-    } else if (variant === 'delete') {
-      setShowConfirm(true);
-    }
-  };
-
-  const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
-    if (variant === 'add') {
-      await fetchData({
-        url: '/api/marketing/contactNotes/create',
-        data,
-        method: 'POST',
-      });
-
-      const conNoteData = [...contactNoteRows, data];
-
-      // re sort the rows to ensure the new field is put in the correct place chronologically
-      const sortedContactNotes = conNoteData.sort(
-        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
-      );
-
-      setContactNoteRows(sortedContactNotes);
-      setShowContactNoteModal(false);
-    } else if (variant === 'edit') {
-      await fetchData({
-        url: '/api/marketing/contactNotes/update',
-        method: 'POST',
-        data,
-      });
-
-      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
-      const newRows = [...contactNoteRows];
-      newRows[rowIndex] = data;
-
-      const sortedContactNotes = newRows.sort(
-        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
-      );
-
-      setContactNoteRows(sortedContactNotes);
-      setShowContactNoteModal(false);
-    } else if (variant === 'delete') {
-      await fetchData({
-        url: '/api/marketing/contactNotes/delete',
-        method: 'POST',
-        data,
-      });
-
-      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
-      const newRows = [...contactNoteRows];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
-      }
-
-      setContactNoteRows(newRows);
-      setShowConfirm(false);
-    }
-  };
-
-  const addContactNote = () => {
-    setContactModalVariant('add');
-    setShowContactNoteModal(true);
-  };
-
   useEffect(() => {
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookings[0].selected]);
-
-  useEffect(() => {
-    if (bookingId !== undefined && bookingId !== null) {
-      getContactNotes(bookingId.toString());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bookingId]);
 
   // using tabSet to ensure this is only run once
   // when a production is selected this code was re-run as a result the tabIndex was set to 0
@@ -220,46 +118,13 @@ const MarketingHome = () => {
           </Tab.Panel>
 
           <Tab.Panel>
-            <div className="flex justify-end">
-              <div className="flex flex-row gap-4 w-[850px] mb-5">
-                <Button
-                  text="Contact Notes Report"
-                  className="w-[203px]"
-                  disabled={!productionId}
-                  iconProps={{ className: 'h-4 w-3' }}
-                  sufixIconName={'excel'}
-                />
-                <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
-              </div>
-            </div>
-
-            <div className="flex flex-row">
-              <div className="w-[1086px] h-[500px]">
-                <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
-              </div>
-            </div>
-
-            <ContactNoteModal
-              show={showContactNoteModal}
-              onCancel={() => setShowContactNoteModal(false)}
-              variant={contactModalVariant}
-              data={contactNoteRow}
-              onSave={(variant, data) => saveContactNote(variant, data)}
-              bookingId={bookingId}
-            />
+            <ContactNotesTab bookingId={bookingId} />
           </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">venue contacts</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
         </Tabs>
       </div>
-      <ConfirmationDialog
-        variant={'delete'}
-        show={showConfirm}
-        onYesClick={() => saveContactNote('delete', contactNoteRow)}
-        onNoClick={() => setShowConfirm(false)}
-        hasOverlay={false}
-      />
     </div>
   );
 };

@@ -1,29 +1,23 @@
 import { useEffect, useState } from 'react';
-import Table from 'components/core-ui-lib/Table';
-import { SelectOption } from '../MarketingHome';
-import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
+import { ActivityList, SelectOption } from '../MarketingHome';
+import { ActivityDTO } from 'interfaces';
 import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
 import useAxios from 'hooks/useAxios';
 import { startOfDay } from 'date-fns';
 import { activityColDefs, styleProps } from '../table/tableConfig';
 import { hasActivityChanged, reverseDate } from '../utils';
-import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import TextInput from 'components/core-ui-lib/TextInput';
-import Button from 'components/core-ui-lib/Button';
-import TextArea from 'components/core-ui-lib/TextArea/TextArea';
-import DateInput from 'components/core-ui-lib/DateInput';
-import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import Checkbox from 'components/core-ui-lib/Checkbox';
-import Select from 'components/core-ui-lib/Select';
-import classNames from 'classnames';
+import ConfirmationDialog, { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-
-type ActivityList = {
-  activities: Array<ActivityDTO>;
-  activityTypes: Array<ActivityTypeDTO>;
-};
+import Checkbox from 'components/core-ui-lib/Checkbox';
+import DateInput from 'components/core-ui-lib/DateInput';
+import Select from 'components/core-ui-lib/Select';
+import classNames from 'classnames';
+import TextArea from 'components/core-ui-lib/TextArea/TextArea';
+import Button from 'components/core-ui-lib/Button';
+import Table from 'components/core-ui-lib/Table';
+import TextInput from 'components/core-ui-lib/TextInput';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -57,23 +51,25 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
+  const bookings = useRecoilState(bookingJumpState);
 
   const { selected: productionId } = useRecoilValue(productionJumpState);
-  const bookings = useRecoilState(bookingJumpState);
 
   const { fetchData } = useAxios();
 
   const getActivities = async (bookingId: string) => {
-    alert(bookingId);
-    const data = await fetchData({
-      url: '/api/marketing/activities/' + bookingId,
-      method: 'POST',
-    });
+    try {
+      const data = await fetchData({
+        url: '/api/marketing/activities/' + bookingId,
+        method: 'POST',
+      });
 
-    if (typeof data === 'object') {
-      const activityList = data as ActivityList;
+      if (typeof data !== 'object') {
+        return;
+      }
 
-      const actTypes = activityList.activityTypes.map((type) => ({
+      const activityData = data as ActivityList;
+      const actTypes = activityData.activityTypes.map((type) => ({
         text: type.Name,
         value: type.Id,
       }));
@@ -82,7 +78,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
 
       setActColDefs(activityColDefs(activityUpdate, currency));
 
-      const sortedActivities = activityList.activities.sort(
+      const sortedActivities = activityData.activities.sort(
         (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
       );
 
@@ -101,6 +97,8 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
 
       calculateActivityTotals(tempRows);
       setActRowData(tempRows);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -129,39 +127,38 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
   const activityUpdate = async (variant: ActivityModalVariant, data) => {
     setActModalVariant(variant);
 
-    // we need to do an api call to get a list of activity types
-    // the useState variable with activity type is set after activityUpdate is passed in the col defs
-    const activityData = await fetchData({
-      url: '/api/marketing/activities/' + bookingIdVal,
+    const actData = await fetchData({
+      url: '/api/marketing/activities/' + bookingId,
       method: 'POST',
     });
 
-    if (typeof activityData === 'object') {
-      const activityList = activityData as ActivityList;
-      const actTypes = activityList.activityTypes;
+    if (typeof actData !== 'object') {
+      return;
+    }
 
-      const tempAct: ActivityDTO = {
-        ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
-        BookingId: data.bookingId,
-        CompanyCost: data.companyCost,
-        VenueCost: data.venueCost,
-        Date: data.actDate,
-        FollowUpRequired: data.followUpCheck,
-        Name: data.actName,
-        Notes: data.notes,
-        DueByDate:
-          data.followUpDt && reverseDate(data.followUpDt) !== '' ? new Date(reverseDate(data.followUpDt)) : null,
-        Id: data.id,
-      };
+    const activityData = data as ActivityList;
+    const actTypes = activityData.activityTypes;
 
-      setActRow(tempAct);
+    const tempAct: ActivityDTO = {
+      ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
+      BookingId: data.bookingId,
+      CompanyCost: data.companyCost,
+      VenueCost: data.venueCost,
+      Date: data.actDate,
+      FollowUpRequired: data.followUpCheck,
+      Name: data.actName,
+      Notes: data.notes,
+      DueByDate: data.followUpDt && reverseDate(data.followUpDt) !== '' ? new Date(reverseDate(data.followUpDt)) : null,
+      Id: data.id,
+    };
 
-      if (variant === 'edit') {
-        setShowActivityModal(true);
-      } else if (variant === 'delete') {
-        setConfVariant('delete');
-        setShowConfirm(true);
-      }
+    setActRow(tempAct);
+
+    if (variant === 'edit') {
+      setShowActivityModal(true);
+    } else if (variant === 'delete') {
+      setConfVariant('delete');
+      setShowConfirm(true);
     }
   };
 
@@ -249,10 +246,11 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
   };
 
   useEffect(() => {
-    if (bookingId !== null && bookingId !== undefined) {
+    if (bookingId) {
       setCurrency('£');
       setBookingIdVal(bookingId);
       getActivities(bookingId.toString());
+
       // set checkbox row on activities tab
       const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
       setOnSaleCheck(booking.TicketsOnSale);
@@ -359,7 +357,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
         </div>
       </div>
       <div className="w-[1086px] h-[500px]">
-        <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} />
+        <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
 
         <div className="flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right">
           <div className="flex flex-row gap-4">
