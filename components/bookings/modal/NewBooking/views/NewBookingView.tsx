@@ -160,7 +160,7 @@ const NewBookingView = ({
   };
   return (
     <div className="w-[385px]">
-      <div className="text-primary-navy text-xl my-2 font-bold">{productionCode} 12345</div>
+      <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
           label="Date"
