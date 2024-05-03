@@ -97,7 +97,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         icon: contractsIcon,
         labelClass: groupHeader,
         options: [
-          { label: 'Venue Contracts', value: '/contracts/all', labelClass: leve2 },
+          { label: 'Venue Contracts', value: '/contracts/VenueContracts', labelClass: leve2 },
           { label: 'Artiste Contracts', value: '', labelClass: leve2 },
           { label: 'Creative Contracts', value: '', labelClass: leve2 },
           { label: 'SM / Tech / Crew Contracts', value: '', labelClass: leve2 },
