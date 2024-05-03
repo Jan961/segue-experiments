@@ -5,6 +5,7 @@ import { productionState } from 'state/tasks/productionState';
 import { calculateTaskStatus } from 'utils/tasks';
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { isThisWeek } from 'date-fns';
+import { userState } from 'state/account/userState';
 
 const generateOptions = (weekData: any) => {
   const optionsData: SelectOption[] = [];
@@ -32,9 +33,25 @@ const getStatusBool = (taskStatus, filterStatus, taskDueDate) => {
   }
 };
 
+const getFilteredUsers = (usersList, userId, filterText) => {
+  const user = usersList.find(({ value }) => value === userId);
+  if (user && user.text) return user?.text?.toLowerCase?.().includes?.(filterText.toLowerCase());
+};
+
 const useTasksFilter = () => {
   const productions = useRecoilValue(productionState);
   const filters = useRecoilValue(tasksfilterState);
+
+  const { users } = useRecoilValue(userState);
+
+  const usersList = useMemo(
+    () =>
+      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
+      })),
+    [users],
+  );
 
   const filteredProductions =
     useMemo(() => {
@@ -58,7 +75,8 @@ const useTasksFilter = () => {
               (!filters.taskText ||
                 Name?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
                 TaskName?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
-                Notes?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()))
+                Notes?.toLowerCase?.().includes?.(filters.taskText?.toLowerCase()) ||
+                getFilteredUsers(usersList, AssignedToUserId, filters.taskText))
             );
           },
         ).map((task) => ({
