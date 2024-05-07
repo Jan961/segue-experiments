@@ -36,8 +36,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Id: BookingId,
       },
       select: {
-        IsOnSale: true,
-        OnSaleDate: true,
+        TicketsOnSale: true,
+        TicketsOnSaleFromDate: true,
         MarketingPlanReceived: true,
         ContactInfoReceived: true,
         PrintReqsReceived: true,
