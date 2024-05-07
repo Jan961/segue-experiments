@@ -105,6 +105,26 @@ export type BookingDTO = {
   ContactInfoReceived: boolean;
 };
 
+export type ContractsDTO = {
+  ProductionId?: number;
+  Id: number;
+  Date: string;
+  VenueId: number;
+  VenueName?: string;
+  StatusCode: StatusCode;
+  PencilNum: number;
+  DealNotes?: string;
+  Notes?: string;
+  MarketingDealNotes?: string;
+  HoldNotes?: string;
+  CompNotes?: string;
+  CastRateTicketsArranged?: boolean;
+  CastRateTicketsNotes?: string;
+  PerformanceIds?: number[];
+  RunTag: string;
+  LandingPageURL: string;
+};
+
 export type GetInFitUpDTO = {
   Id: number;
   VenueId?: number; // check field name
@@ -399,4 +419,52 @@ export interface IFileData {
   originalFilename: string;
   fileDT: Date;
   fileContent: any;
+}
+
+export type ContractStatusType = {
+  BookingId: number;
+  StatusCode: string;
+  SignedDate: Date;
+  SignedBy: string;
+  ReturnDate: Date;
+  CheckedBy: string;
+  RoyalPercentage: string;
+  DealType: string;
+  ContractNotes: string;
+  ReceivedBackDate: Date;
+  Exceptions: string;
+};
+
+export interface ContractTableRowType {
+  [x: string]: any;
+  Id: number | null;
+  bookingStatus: string | null;
+  capacity: number | null;
+  contractStatus: string | null;
+  count: number | null;
+  date: string | null;
+  dateTime: string | null;
+  dayType: string | null;
+  isRehearsal: boolean;
+  note: string | null;
+  pencilNo: number | null;
+  production: string | null;
+  productionId: number | null;
+  productionName: string | null;
+  runTag: number | null;
+  status: string | null;
+  town: string | null;
+  venue: string | null;
+  venueId: number | null;
+  week: number | null;
+}
+
+export interface FileDTO {
+  OriginalFilename: string;
+  MediaType: string;
+  Location: string;
+  UploadUserId: number;
+  UploadDateTime: string;
+  Entity: string;
+  EntityId: number;
 }

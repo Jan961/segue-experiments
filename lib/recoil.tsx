@@ -1,5 +1,13 @@
 import React from 'react';
-import { BookingDTO, RehearsalDTO, GetInFitUpDTO, VenueMinimalDTO, PerformanceDTO } from 'interfaces';
+import {
+  BookingDTO,
+  RehearsalDTO,
+  GetInFitUpDTO,
+  VenueMinimalDTO,
+  PerformanceDTO,
+  ContractsDTO,
+  ContractStatusType,
+} from 'interfaces';
 import { RecoilState, useRecoilCallback } from 'recoil';
 import { bookingState } from 'state/booking/bookingState';
 import { DateBlockState, dateBlockState } from 'state/booking/dateBlockState';
@@ -21,6 +29,15 @@ import { tasksfilterState, TasksFilterType } from 'state/tasks/tasksFilterState'
 import { GlobalStateType, globalState } from 'state/global/globalState';
 import { townState } from 'state/marketing/townState';
 import { tabState } from 'state/marketing/tabState';
+import { contractsState } from 'state/contracts/contractsState';
+import { contractsOtherState } from 'state/contracts/contractsOtherState';
+import { contractsDateBlockState } from 'state/contracts/contractsDateBlockState';
+import { contractsDateTypeState } from 'state/contracts/contractsDateTypeState';
+import { contractsPerformanceState } from 'state/contracts/contractsPerformanceState';
+import { contractsVenueState } from 'state/contracts/contractsVenueState';
+import { contractsStatusState } from 'state/contracts/contractsStatusState';
+import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
+import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -50,6 +67,17 @@ export type InitialState = Partial<{
     distance?: DistanceState;
     venue?: Record<number, VenueMinimalDTO>;
   };
+  contracts?: {
+    booking?: Record<number, ContractsDTO>;
+    rehearsal?: Record<number, RehearsalDTO>;
+    getInFitUp?: Record<number, GetInFitUpDTO>;
+    other?: OtherState;
+    dateBlock?: DateBlockState;
+    dateType?: DateTypeState;
+    performance?: Record<number, PerformanceDTO>;
+    venue?: Record<number, VenueMinimalDTO>;
+    contractStatus?: Record<number, ContractStatusType>;
+  };
   marketing?: {
     bookingJump?: BookingJump;
     venueRole?: VenueRole;
@@ -66,6 +94,7 @@ const states: {
   global: Record<keyof InitialState['global'], RecoilState<any>>;
   tasks: Record<keyof InitialState['tasks'], RecoilState<any>>;
   booking: Record<keyof InitialState['booking'], RecoilState<any>>;
+  contracts: Record<keyof InitialState['contracts'], RecoilState<any>>;
   marketing: Record<keyof InitialState['marketing'], RecoilState<any>>;
   account: Record<keyof InitialState['account'], RecoilState<any>>;
 } = {
@@ -89,6 +118,17 @@ const states: {
     distance: distanceState,
     dateBlock: dateBlockState,
     performance: performanceState,
+  },
+  contracts: {
+    booking: contractsState,
+    rehearsal: contractRehearsalState,
+    getInFitUp: contractGetInFitUpState,
+    other: contractsOtherState,
+    dateBlock: contractsDateBlockState,
+    dateType: contractsDateTypeState,
+    performance: contractsPerformanceState,
+    venue: contractsVenueState,
+    contractStatus: contractsStatusState,
   },
   marketing: {
     bookingJump: bookingJumpState,

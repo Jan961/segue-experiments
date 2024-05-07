@@ -5,6 +5,11 @@ export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: Activi
   const keys = Object.keys(oldActivity) as Array<keyof ActivityDTO>;
 
   for (const key of keys) {
+    // if Id skip - we can assume the Id will be the same
+    if (key === 'Id') {
+      return;
+    }
+
     // handle dates differently
     if (key === 'Date' || key === 'DueByDate') {
       // check for change
