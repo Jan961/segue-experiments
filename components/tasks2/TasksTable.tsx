@@ -1,14 +1,12 @@
 import Table from 'components/core-ui-lib/Table';
 import { useEffect, useRef, useState } from 'react';
-import { bookingState } from 'state/booking/bookingState';
 import { useRecoilState } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import axios from 'axios';
-import { rehearsalState } from 'state/booking/rehearsalState';
-import { getInFitUpState } from 'state/booking/getInFitUpState';
-import { otherState } from 'state/booking/otherState';
 import { styleProps } from './tableConfig';
 import NotesPopup from './NotesPopup';
+import { Spinner } from 'components/global/Spinner';
+import { loggingService } from 'services/loggingService';
 
 interface TasksTableProps {
   rowData?: any;
@@ -19,51 +17,46 @@ interface TasksTableProps {
 export default function TasksTable({ rowData = [], columnDefs = [], tableHeight = false }: TasksTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(filterState);
-  const [bookings, setBookings] = useRecoilState(bookingState);
-  const [rehearsals, setRehearsals] = useRecoilState(rehearsalState);
-  const [getInFitUps, setGetInFitUps] = useRecoilState(getInFitUpState);
-  const [others, setOthers] = useRecoilState(otherState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [productionItem, setProductionItem] = useState(null);
-
-  const gridOptions = {
-    getRowStyle: (params) => {
-      return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
-    },
-  };
+  const [currentTask, setCurrentTask] = useState(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleCellClick = (e) => {
     if (e.column.colId === 'Notes') {
-      setProductionItem(e.data);
+      setCurrentTask(e.data);
+      console.log(e.data);
       setShowModal(true);
     }
   };
 
+  const handleUpdateTask = async (task: any) => {
+    setIsLoading(true);
+    try {
+      await axios.post('/api/tasks/update', task);
+      const updatedRowData = rowData.map((row) => {
+        if (row.Id === task.Id) {
+          row.Notes = task.Notes;
+        }
+        return row;
+      });
+      setRows(updatedRowData);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      loggingService.logError(error);
+      console.error(error);
+    }
+  };
+
+  const onCellValueChange = (e) => {
+    handleUpdateTask(e.data);
+  };
+
   const handleSaveNote = async (value: string) => {
     setShowModal(false);
-    const { data } = await axios.post('/api/bookings/note/update', {
-      ...productionItem,
-      note: value,
-    });
-
-    if (productionItem.isBooking) {
-      const rowItem = bookings[data.Id];
-      const replacement = { ...bookings, [data.Id]: { ...rowItem, Notes: value } };
-      setBookings(replacement);
-    } else if (productionItem.isRehearsal) {
-      const rowItem = rehearsals[data.Id];
-      const replacement = { ...rehearsals, [data.Id]: { ...rowItem, Notes: value } };
-      setRehearsals(replacement);
-    } else if (productionItem.isGetInFitUp) {
-      const rowItem = getInFitUps[data.Id];
-      const replacement = { ...getInFitUps, [data.Id]: { ...rowItem, Notes: value } };
-      setGetInFitUps(replacement);
-    } else {
-      const rowItem = others[data.Id];
-      const replacement = { ...others, [data.Id]: { ...rowItem, Notes: value } };
-      setOthers(replacement);
-    }
+    const updatedTask = { ...currentTask, Notes: value };
+    handleUpdateTask(updatedTask);
   };
 
   useEffect(() => {
@@ -90,17 +83,19 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
           rowData={rows}
           styleProps={styleProps}
           tableHeight={tableHeight ? 234 : 0}
-          gridOptions={gridOptions}
+          onCellValueChange={onCellValueChange}
           onCellClicked={handleCellClick}
           ref={tableRef}
         />
       </div>
       <NotesPopup
         show={showModal}
-        productionItem={productionItem}
+        currentTask={currentTask}
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
+      {isLoading && <Spinner size={'sm'} />}
+
       {/* {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />} */}
     </>
   );
