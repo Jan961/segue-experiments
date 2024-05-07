@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PasswordInput from 'components/core-ui-lib/PasswordInput';
-import { EMAIL_NOT_FOUND, PASSWORD_INCORRECT, errorsMap } from './utils';
+import { EMAIL_NOT_FOUND, PASSWORD_INCORRECT, errorsMap } from 'utils/authUtils';
 import Loader from 'components/core-ui-lib/Loader';
 
 const LoginError = ({ error }: { error: string }) => {
