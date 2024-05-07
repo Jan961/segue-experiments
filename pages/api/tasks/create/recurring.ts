@@ -126,7 +126,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               Progress: parseInt(progress),
               Assignee: assignee ? parseInt(req.body.assignee) : undefined,
               AssignedBy: assignedBy ? parseInt(assignedBy) : undefined,
-              Interval: interval,
               Production: {
                 connect: {
                   Id: parseInt(productionId),
