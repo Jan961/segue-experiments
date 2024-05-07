@@ -94,6 +94,7 @@
     "nodemailer": "^6.9.0",
     "number-to-words": "^1.2.4",
     "numeral": "^2.0.6",
+    "pdfmake": "^0.2.10",
     "prop-types": "^15.7.2",
     "radash": "^10.8.1",
     "react": "^18.2.0",

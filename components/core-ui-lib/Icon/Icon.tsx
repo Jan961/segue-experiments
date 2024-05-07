@@ -31,7 +31,8 @@ export type IconName =
   | 'minus-circle-solid'
   | 'plus-circle-solid'
   | 'camera-solid'
-  | 'document-solid';
+  | 'document-solid'
+  | 'upload-to-cloud';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -65,9 +66,10 @@ const IconNameMap = new Map([
   ['plus-circle-solid', 'PlusCircleSolidIcon'],
   ['camera-solid', 'CameraSolidIcon'],
   ['document-solid', 'DocumentSolidIcon'],
+  ['upload-to-cloud', 'UploadToCloudIcon'],
 ]);
 
-type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '5xl' | '7xl';
+type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '5xl' | '7xl';
 
 export interface IconProps {
   iconName: IconName | string;
@@ -99,7 +101,17 @@ export default function Icon({
   const IconComp = getIcon(IconNameMap.get(iconName) as any);
 
   const getSizeForVariant = (v) =>
-    ({ xs: '15px', sm: '18px', md: '20px', lg: '22px', xl: '24px', '2xl': '26px', '5xl': '50px', '7xl': '80px' })[v];
+    ({
+      xs: '15px',
+      sm: '18px',
+      md: '20px',
+      lg: '22px',
+      xl: '24px',
+      '2xl': '26px',
+      '3xl': '30px',
+      '5xl': '50px',
+      '7xl': '80px',
+    })[v];
 
   return (
     <IconComp

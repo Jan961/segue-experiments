@@ -13,6 +13,7 @@ interface PopupModalProps {
   showCloseIcon?: boolean;
   panelClass?: string;
   hasOverlay?: boolean;
+  closeOnOverlayClick?: boolean; // New prop to close on overlay click
 }
 
 export default function PopupModal({
@@ -24,6 +25,7 @@ export default function PopupModal({
   showCloseIcon = true,
   panelClass,
   hasOverlay = false,
+  closeOnOverlayClick = false, // Default to false
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
 
@@ -31,9 +33,15 @@ export default function PopupModal({
     setOverlay(hasOverlay);
   }, [hasOverlay]);
 
+  const handleOverlayClick = () => {
+    if (closeOnOverlayClick) {
+      onClose();
+    }
+  };
+
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="relative z-150" onClose={() => null}>
+      <Dialog as="div" className="relative z-150" onClick={handleOverlayClick} onClose={() => null}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
