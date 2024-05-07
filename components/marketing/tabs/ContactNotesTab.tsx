@@ -1,90 +1,162 @@
-import axios from 'axios';
+import Button from 'components/core-ui-lib/Button';
+import Table from 'components/core-ui-lib/Table';
+import ContactNoteModal, { ContactNoteModalVariant } from '../modal/ContactNoteModal';
+import { useEffect, useState } from 'react';
 import { BookingContactNoteDTO } from 'interfaces';
-import React from 'react';
+import useAxios from 'hooks/useAxios';
+import { contactNoteColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilValue } from 'recoil';
-import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { Table } from 'components/global/table/Table';
-import { LoadingTab } from './LoadingTab';
-import { NoDataWarning } from '../NoDataWarning';
-import { ContactNotesEditor } from '../editors/ContactNotesEditor';
-import { dateToSimple } from 'services/dateService';
-import { ToolbarButton } from 'components/bookings/ToolbarButton';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 
-export const ContactNotesTab = () => {
-  const { selected, bookings } = useRecoilValue(bookingJumpState);
-  const [contactNotes, setContactNotes] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [editing, setEditing] = React.useState(undefined);
+interface ContactNotesTabProps {
+  bookingId: string;
+}
 
-  const search = async () => {
-    setLoading(true);
-    setContactNotes([]);
+export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
+  const { fetchData } = useAxios();
 
-    const { data } = await axios.get(`/api/marketing/contactNotes/${selected}`);
-    setContactNotes(data);
-    setLoading(false);
+  const [showContactNoteModal, setShowContactNoteModal] = useState<boolean>(false);
+  const [contactModalVariant, setContactModalVariant] = useState<ContactNoteModalVariant>();
+  const [contactNoteRows, setContactNoteRows] = useState<Array<BookingContactNoteDTO>>();
+  const [contNoteColDefs, setContNoteColDefs] = useState([]);
+  const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
+
+  const getContactNotes = async (bookingId: string) => {
+    try {
+      const data = await fetchData({
+        url: '/api/marketing/contactNotes/' + bookingId,
+        method: 'POST',
+      });
+
+      if (typeof data === 'object') {
+        const contactNoteList = data as Array<BookingContactNoteDTO>;
+
+        const sortedContactNotes = contactNoteList.sort(
+          (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+        );
+
+        setContNoteColDefs(contactNoteColDefs(contactNoteUpdate));
+        setContactNoteRows(sortedContactNotes);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const create = () => {
-    setEditing(undefined);
-    setModalOpen(true);
+  const contactNoteUpdate = (variant: ContactNoteModalVariant, data: BookingContactNoteDTO) => {
+    setContactModalVariant(variant);
+    setContactNoteRow(data);
+
+    if (variant === 'edit') {
+      setShowContactNoteModal(true);
+    } else if (variant === 'delete') {
+      setShowConfirm(true);
+    }
   };
 
-  const edit = (bcn: BookingContactNoteDTO) => {
-    setEditing(bcn);
-    setModalOpen(true);
+  const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
+    if (variant === 'add') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/create',
+        data,
+        method: 'POST',
+      });
+
+      const conNoteData = [...contactNoteRows, data];
+
+      // re sort the rows to ensure the new field is put in the correct place chronologically
+      const sortedContactNotes = conNoteData.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContactNoteRows(sortedContactNotes);
+      setShowContactNoteModal(false);
+    } else if (variant === 'edit') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/update',
+        method: 'POST',
+        data,
+      });
+
+      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
+      const newRows = [...contactNoteRows];
+      newRows[rowIndex] = data;
+
+      const sortedContactNotes = newRows.sort(
+        (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
+      );
+
+      setContactNoteRows(sortedContactNotes);
+      setShowContactNoteModal(false);
+    } else if (variant === 'delete') {
+      await fetchData({
+        url: '/api/marketing/contactNotes/delete',
+        method: 'POST',
+        data,
+      });
+
+      const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
+      const newRows = [...contactNoteRows];
+      if (rowIndex !== -1) {
+        newRows.splice(rowIndex, 1);
+      }
+
+      setContactNoteRows(newRows);
+      setShowConfirm(false);
+    }
   };
 
-  React.useEffect(() => {
-    search();
-  }, [selected, bookings]);
-
-  const triggerClose = async (refresh: boolean) => {
-    if (refresh) await search();
-    setModalOpen(false);
+  const addContactNote = () => {
+    setContactModalVariant('add');
+    setShowContactNoteModal(true);
   };
 
-  if (loading) return <LoadingTab />;
+  useEffect(() => {
+    if (bookingId !== null && bookingId !== undefined) {
+      getContactNotes(bookingId.toString());
+    }
+  }, [bookingId]);
 
   return (
     <>
-      <div className="text-right pb-4">
-        {modalOpen && (
-          <ContactNotesEditor
-            open={modalOpen}
-            triggerClose={triggerClose}
-            bookingId={selected}
-            bookingContactNote={editing}
+      <div className="flex justify-end">
+        <div className="flex flex-row gap-4 w-[850px] mb-5">
+          <Button
+            text="Contact Notes Report"
+            className="w-[203px]"
+            disabled={!productionId}
+            iconProps={{ className: 'h-4 w-3' }}
+            sufixIconName={'excel'}
           />
-        )}
+          <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+        </div>
       </div>
-      {contactNotes.length === 0 && <NoDataWarning />}
-      {contactNotes.length > 0 && (
-        <Table className="table-auto !min-w-0">
-          <Table.HeaderRow className="rounded-t-lg">
-            <Table.HeaderCell className="rounded-tl-lg">Who</Table.HeaderCell>
-            <Table.HeaderCell>Date</Table.HeaderCell>
-            <Table.HeaderCell>Action By</Table.HeaderCell>
-            <Table.HeaderCell className="w-3/4 rounded-tr-lg">Notes</Table.HeaderCell>
-          </Table.HeaderRow>
-          <Table.Body>
-            {contactNotes.map((bcn: BookingContactNoteDTO) => (
-              <Table.Row key={bcn.Id} hover onClick={() => edit(bcn)}>
-                <Table.Cell>{bcn.CoContactName}</Table.Cell>
-                <Table.Cell>{dateToSimple(bcn.ContactDate)}</Table.Cell>
-                <Table.Cell>{dateToSimple(bcn.ActionByDate)}</Table.Cell>
-                <Table.Cell>{bcn.Notes}</Table.Cell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-        </Table>
-      )}
-      <div className="mt-4">
-        <ToolbarButton onClick={create} className="!text-primary-green">
-          Add New Note
-        </ToolbarButton>
+
+      <div className="flex flex-row">
+        <div className="w-[1086px] h-[500px]">
+          <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+        </div>
       </div>
+
+      <ContactNoteModal
+        show={showContactNoteModal}
+        onCancel={() => setShowContactNoteModal(false)}
+        variant={contactModalVariant}
+        data={contactNoteRow}
+        onSave={(variant, data) => saveContactNote(variant, data)}
+        bookingId={bookingId}
+      />
+
+      <ConfirmationDialog
+        variant={'delete'}
+        show={showConfirm}
+        onYesClick={() => saveContactNote('delete', contactNoteRow)}
+        onNoClick={() => setShowConfirm(false)}
+        hasOverlay={false}
+      />
     </>
   );
-};
+}
