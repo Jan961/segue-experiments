@@ -37,7 +37,7 @@ export default function ActivityModal({
   variant,
   onSave,
   activityTypes,
-  venueCurrency = 'Â£',
+  venueCurrency = '£',
   bookingId,
   data,
 }: Partial<ActivityModalProps>) {
