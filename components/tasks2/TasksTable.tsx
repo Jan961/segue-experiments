@@ -25,7 +25,6 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
   const handleCellClick = (e) => {
     if (e.column.colId === 'Notes') {
       setCurrentTask(e.data);
-      console.log(e.data);
       setShowModal(true);
     }
   };
@@ -45,7 +44,6 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
     } catch (error) {
       setIsLoading(false);
       loggingService.logError(error);
-      console.error(error);
     }
   };
 

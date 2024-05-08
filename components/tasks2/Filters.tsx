@@ -13,17 +13,14 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 interface FiltersProps {
-  usersList: SelectOption[]
-};
+  usersList: SelectOption[];
+}
 
 const Filters = ({ usersList }: FiltersProps) => {
-
   const [filter, setFilter] = useRecoilState(tasksfilterState);
 
   const onChange = (e: any) => {
-    console.log(e.target)
     setFilter({ ...filter, [e.target.id]: e.target.value });
-    console.log(filter, usersList)
   };
 
   const onDateChange = (change: { from: Date; to: Date }) => {
@@ -38,7 +35,7 @@ const Filters = ({ usersList }: FiltersProps) => {
       endDueDate: null,
       assignee: -1,
       status: 'inProgressandtodo',
-      production: filter.production
+      production: filter.production,
     });
   };
 
@@ -48,7 +45,9 @@ const Filters = ({ usersList }: FiltersProps) => {
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
 
   const productions = useMemo(() => {
-    const productionOptions = [{ text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false }];
+    const productionOptions = [
+      { text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false },
+    ];
     for (const production of productionJump.productions) {
       if (includeArchived) {
         productionOptions.push({
@@ -57,8 +56,9 @@ const Filters = ({ usersList }: FiltersProps) => {
           Code: null,
           IsArchived: false,
           ...production,
-          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''
-            }`,
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
+          }`,
           value: production.Id,
         });
       } else if (!production.IsArchived) {
@@ -68,8 +68,9 @@ const Filters = ({ usersList }: FiltersProps) => {
           Code: null,
           IsArchived: false,
           ...production,
-          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''
-            }`,
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
+          }`,
           value: production.Id,
         });
       }
@@ -77,19 +78,6 @@ const Filters = ({ usersList }: FiltersProps) => {
     return productionOptions;
   }, [productionJump, includeArchived]);
 
-  const gotoTasks = (productionId?: number) => {
-    const selectedProduction = productions.find((production) => production.Id === productionId);
-    if (!selectedProduction) {
-      setProductionJump({ ...productionJump, loading: true, selected: null });
-      // router.push(`/tasks/all`);/
-      return;
-    }
-    const { Id } = selectedProduction;
-    setProductionJump({ ...productionJump, loading: true, selected: Id });
-    // router.push(`/tasks/${ShowCode}/${ProductionCode}`);
-  };
-
-  console.log(gotoTasks)
   const onIncludeArchiveChange = (e) => {
     setProductionJump({ ...productionJump, includeArchived: e.target.value });
     setIncludeArchived(e.target.value);
@@ -98,7 +86,7 @@ const Filters = ({ usersList }: FiltersProps) => {
   return (
     <div className="w-full flex items-center justify-between flex-wrap">
       <div className="mx-0 flex">
-        <div className='flex flex-col flex-[70%]'>
+        <div className="flex flex-col flex-[70%]">
           <div className="px-4">
             <div className="py-2 flex flex-row items-center gap-4">
               <h1 className={`text-4xl font-bold text-primary-yellow`}>Production Task Lists</h1>
@@ -156,8 +144,8 @@ const Filters = ({ usersList }: FiltersProps) => {
                 label="Date"
                 onChange={onDateChange}
                 value={{ from: startDueDate, to: endDueDate }}
-              // minDate={scheduleStartDate}
-              // maxDate={scheduleEndDate}
+                // minDate={scheduleStartDate}
+                // maxDate={scheduleEndDate}
               />
             </div>
             <Select
@@ -183,7 +171,6 @@ const Filters = ({ usersList }: FiltersProps) => {
           <Button onClick={null} text="Add Task" className="w-[132px]" />
         </div>
       </div>
-
     </div>
   );
 };

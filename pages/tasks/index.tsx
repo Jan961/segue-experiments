@@ -1,4 +1,4 @@
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -7,19 +7,16 @@ import Filters from 'components/tasks2/Filters';
 import TasksTable from 'components/tasks2/TasksTable';
 import useTasksFilter from 'hooks/useTasksFilter';
 import { getProductionsAndTasks } from 'services/productionService';
-import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
+import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { mapToProductionTaskDTO } from 'lib/mappers';
 import { objectify } from 'radash';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import { ProductionTaskDTO } from 'interfaces';
+import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
 import { getColumnDefs } from 'components/tasks2/tableConfig';
 
-
-const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const TasksPage = () => {
   const { filteredProductions } = useTasksFilter();
-  const [productionTasks, setProductionTasks] = useRecoilState(productionState);
 
   const { users } = useRecoilValue(userState);
 
@@ -32,35 +29,22 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     [users],
   );
 
-  const exists = usersList.some(item => item.text === 'All');
+  const exists = usersList.some((item) => item.text === 'All');
 
   if (!exists) {
     usersList.unshift({ value: -1, text: 'All' });
   }
-
-  const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
-    const updatedProductionTasks = productionTasks.map((productionTask) => {
-      if (productionTask.Id === productionId) {
-        return { ...productionTask, Tasks: updatedTasks };
-      }
-      return productionTask;
-    });
-    setProductionTasks(updatedProductionTasks);
-  };
-
-
 
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
         <Filters usersList={usersList} />
       </div>
-      {filteredProductions.length === 0 ? <TasksTable
-        rowData={[]}
-      /> :
+      {filteredProductions.length === 0 ? (
+        <TasksTable rowData={[]} />
+      ) : (
         filteredProductions.map((production) => {
           const columnDefs = getColumnDefs(usersList, production.ShowName);
-          console.log(production.weekNumToDateMap, production.Tasks);
           return (
             <div key={production.Id} className="mb-10">
               <TasksTable
@@ -70,7 +54,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
               />
             </div>
           );
-        })}
+        })
+      )}
     </Layout>
   );
 };
