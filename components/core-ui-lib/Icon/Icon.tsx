@@ -32,7 +32,8 @@ export type IconName =
   | 'plus-circle-solid'
   | 'camera-solid'
   | 'document-solid'
-  | 'upload-to-cloud';
+  | 'upload-to-cloud'
+  | 'show-password';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -67,6 +68,8 @@ const IconNameMap = new Map([
   ['camera-solid', 'CameraSolidIcon'],
   ['document-solid', 'DocumentSolidIcon'],
   ['upload-to-cloud', 'UploadToCloudIcon'],
+  ['document-solid', 'DocumentSolidIcon'],
+  ['show-password', 'EyeIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '5xl' | '7xl';

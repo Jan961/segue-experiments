@@ -30,3 +30,4 @@ export { default as PlusCircleSolidIcon } from './PlusCircleSolid';
 export { default as CameraSolidIcon } from './Camera';
 export { default as DocumentSolidIcon } from './Document';
 export { default as UploadToCloudIcon } from './UploadToCloud';
+export { default as EyeIcon } from './Eye';

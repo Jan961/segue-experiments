@@ -27,6 +27,7 @@ interface SalesTableProps {
   cellRenderParams;
   productions;
   booking?;
+  tableHeight?: number;
 }
 
 export default function SalesTable({
@@ -40,6 +41,7 @@ export default function SalesTable({
   cellRenderParams,
   productions,
   booking,
+  tableHeight = 0,
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -175,10 +177,10 @@ export default function SalesTable({
     );
   };
 
-  const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update: any) => {
+  const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update) => {
     axios
       .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
-      .catch((error: any) => console.log('failed to update sale', error));
+      .catch((error) => console.log('failed to update sale', error));
   };
 
   const exec = async (variant: string, data) => {
@@ -222,6 +224,7 @@ export default function SalesTable({
         styleProps={styleProps}
         onCellClicked={onCellClick}
         onCellValueChange={onCellValChange}
+        tableHeight={tableHeight}
       />
     </div>
   );

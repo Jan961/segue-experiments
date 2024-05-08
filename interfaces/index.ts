@@ -430,7 +430,7 @@ export type ContractStatusType = {
   CheckedBy: string;
   RoyalPercentage: string;
   DealType: string;
-  ContractNotes: string;
+  Notes: string;
   ReceivedBackDate: Date;
   Exceptions: string;
 };
