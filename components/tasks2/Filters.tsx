@@ -144,8 +144,6 @@ const Filters = ({ usersList }: FiltersProps) => {
                 label="Date"
                 onChange={onDateChange}
                 value={{ from: startDueDate, to: endDueDate }}
-                // minDate={scheduleStartDate}
-                // maxDate={scheduleEndDate}
               />
             </div>
             <Select

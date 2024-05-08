@@ -93,8 +93,6 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
         onCancel={() => setShowModal(false)}
       />
       {isLoading && <Spinner size={'sm'} />}
-
-      {/* {showAddEditBookingModal.visible && <AddBooking {...showAddEditBookingModal} onClose={handleClose} />} */}
     </>
   );
 }
