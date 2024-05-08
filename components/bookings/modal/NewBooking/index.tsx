@@ -100,6 +100,10 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     dispatch(actionSpreader(Actions.UPDATE_BOOKING, booking));
   };
 
+  const resetBooking = () => {
+    updateBookingOnStore(state.booking);
+  };
+
   useEffect(() => {
     if (booking) {
       // Check for run of dates
@@ -261,12 +265,14 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
           data={state.bookingConflicts}
           nextStep={nextStepForConflicts}
           updateModalTitle={updateModalTitle}
+          onResetBooking={resetBooking}
         />
         <BarringIssueView
           barringConflicts={state.barringConflicts}
           updateModalTitle={updateModalTitle}
           previousStep={getStepIndex(!editBooking, !editBooking ? 'Create New Booking' : 'New Booking Details')}
           nextStep={getStepIndex(!editBooking, state.barringNextStep)}
+          onResetBooking={resetBooking}
         />
         {!editBooking && (
           <GapSuggestionView

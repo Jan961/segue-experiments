@@ -262,6 +262,7 @@ export default function NewBookingDetailsView({
 
   // Placeholder function to be implemented
   const handleMoveBooking = () => {
+    toggleModalOverlay(true);
     setShowMoveBookingsModal(true);
   };
 
@@ -373,6 +374,7 @@ export default function NewBookingDetailsView({
 
   const handleMoveBookingClose = (value: string) => {
     setShowMoveBookingsModal(false);
+    toggleModalOverlay(false);
     onClose(value);
   };
 

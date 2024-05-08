@@ -34,6 +34,7 @@ export const Primary: Story = {
         <Icon iconName="excel" fill="#7B568D" {...args} />
         <Icon iconName="cross" {...args} />
         <Icon iconName="info-circle-solid" {...args} />
+        <Icon iconName="show-password" {...args} />
       </div>
     );
   },
