@@ -100,8 +100,25 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   }, [isAddRow, tableRef]);
 
+  const handleSave = async (currentProd: any) => {
+    if ('DateBlock[0].StartDate' in currentProd && 'DateBlock[0].EndDate' in currentProd) {
+      setIsLoading(true);
+      try {
+        const payloadData = getProductionsConvertedPayload(currentProd, false);
+        await axios.post(`/api/productions/create`, payloadData);
+      } finally {
+        setIsEdited(false);
+        setCurrentProduction(intProduction);
+        addNewRow();
+        router.replace(router.asPath);
+        setIsLoading(false);
+      }
+    }
+  };
+
   const handleCellClick = async (e) => {
     setProductionId(e.data.Id);
+    setCurrentProduction(e.data);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'deleteId') {
       setConfirm(true);
@@ -131,18 +148,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       'DateBlock[0].StartDate' in e.data &&
       'DateBlock[0].EndDate' in e.data
     ) {
-      setIsLoading(true);
-      try {
-        const payloadData = getProductionsConvertedPayload(e.data, false);
-        await axios.post(`/api/productions/create`, payloadData);
-      } finally {
-        setIsEdited(false);
-        setCurrentProduction(intProduction);
-        addNewRow();
-        router.replace(router.asPath);
-        setIsLoading(false);
-      }
+      handleSave(e.data);
     }
+  };
+
+  const handleSaveAndClose = () => {
+    handleSave(currentProduction);
   };
 
   const handleCellChanges = (e) => {
@@ -202,7 +213,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         <div />
         <div className="flex gap-3">
           <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" />
-          <Button className=" w-33" text="Save and Close" />
+          <Button className=" w-33" text="Save and Close" onClick={handleSaveAndClose} />
         </div>
       </div>
       <ConfirmationDialog

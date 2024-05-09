@@ -29,7 +29,6 @@ const generateChildCol = (
     },
     cellRenderer: renderer,
     suppressMovable: true,
-    headerClass: 'border-r-[1px] border-white text-center',
     width: 120,
     resizable: false,
     sortable: false,
@@ -150,8 +149,6 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Rehearsals',
-    headerGroupComponent: 'AGGridHeaderGroupComponent',
-    headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
       generateChildCol('Start', 'DateBlock[1].StartDate', 1, 'StartDate', DateRenderer),
@@ -160,8 +157,6 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Production Dates',
-    headerGroupComponent: 'AGGridHeaderGroupComponent',
-    headerClass: 'justify-center font-bold text-base border-r-[1px]',
     marryChildren: true,
     children: [
       generateChildCol('Start', 'DateBlock[0].StartDate', 0, 'StartDate', DateRenderer),
