@@ -1,32 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Modal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
 import FileCard from './UploadFileCard';
-import { fileSizeFormatter } from './util';
-
-interface SelectedFileProps {
-  size: number;
-  name: string;
-  status: 'selected' | 'uploading' | 'uploaded';
-  progress: number;
-  error?: string;
-  file: File;
-}
-
-interface UploadModalProps {
-  title: string;
-  visible: boolean;
-  onClose?: () => void;
-  info: string;
-  isMultiple?: boolean;
-  maxFiles: number;
-  maxFileSize: number;
-  allowedFormats: string[];
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSave?: (selectedFiles: SelectedFileProps[]) => void;
-  onProgress: { [key: string]: number };
-}
+import { fileSizeFormatter } from 'utils/index';
+import { FileProps, UploadModalProps } from './interface';
 
 const UploadModal: React.FC<UploadModalProps> = ({
   visible,
@@ -39,31 +17,36 @@ const UploadModal: React.FC<UploadModalProps> = ({
   allowedFormats,
   onChange,
   onSave,
-  onProgress,
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
-  const [selectedFiles, setSelectedFiles] = useState<SelectedFileProps[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<FileProps[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [errorMessages, setErrorMessages] = useState<Record<string, string>>({});
+  const isUploadDisabled =
+    selectedFiles?.length === 0 ||
+    selectedFiles.some((file) => file.error) ||
+    isUploading ||
+    Object.keys(errorMessages).length > 0;
 
-  useEffect(() => {
-    if (onProgress) {
-      setSelectedFiles((prevFiles) =>
-        prevFiles.map((file) => ({
-          ...file,
-          progress: onProgress[file.name] !== undefined ? onProgress[file.name] : file.progress,
-        })),
-      );
-    }
-  }, [onProgress]);
+  const onProgress = (file: File, uploadProgress: number) => {
+    setProgress((prev) => ({ ...prev, [file.name]: uploadProgress }));
+  };
+
+  const onError = (file: File, errorMessage: string) => {
+    setErrorMessages((prev) => ({ ...prev, [file.name]: errorMessage }));
+  };
 
   const clearAll = () => {
     setError('');
     setSelectedFiles([]);
     setIsUploading(false);
     if (hiddenFileInput.current) {
-      hiddenFileInput.current.value = ''; // Clear the input value
+      hiddenFileInput.current.value = '';
     }
+    setProgress({});
+    setErrorMessages({});
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,75 +54,41 @@ const UploadModal: React.FC<UploadModalProps> = ({
     if (!files || files?.length === 0) {
       setError('No file selected');
       setSelectedFiles([]);
-      onChange?.(e);
+      onChange?.([]);
       return;
     }
 
-    // Validate maxFiles
     if (maxFiles && files.length > maxFiles) {
       setError(`You can upload up to ${maxFiles} files.`);
       setSelectedFiles([]);
-      onChange?.(e);
+      onChange?.([]);
       return;
     }
 
-    // Validate file size and allowed formats
-    const invalidFiles: { file: File; error: string }[] = [];
     for (const file of Array.from(files)) {
       if (maxFileSize && file.size > maxFileSize) {
-        invalidFiles.push({ file, error: 'This file is too big. Please upload a smaller file.' });
+        errorMessages[file.name] = 'This file is too big. Please upload a smaller file.';
       }
       if (allowedFormats && !allowedFormats.includes(file.type)) {
-        invalidFiles.push({ file, error: `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.` });
+        errorMessages[file.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
-    }
-
-    if (invalidFiles.length > 0) {
-      setError('');
-      setSelectedFiles(
-        Array.from(files).map((file) => {
-          const invalidFile = invalidFiles.find((f) => f.file.name === file.name);
-          return {
-            name: file.name,
-            status: 'selected',
-            progress: 0,
-            size: file.size,
-            file,
-            error: invalidFile?.error,
-          };
-        }),
-      );
-      onChange?.(e);
-      return;
     }
 
     setError('');
     setSelectedFiles(
       Array.from(files).map((file) => ({
         name: file.name,
-        status: 'selected',
-        progress: 0,
         size: file.size,
         file,
       })),
     );
-    onChange?.(e); // Call the provided onChange handler
+    onChange?.(selectedFiles);
   };
 
   const handleUpload = () => {
-    const filesWithErrors = selectedFiles.filter((file) => file.error);
-
-    if (filesWithErrors.length > 0) {
-      setSelectedFiles((prevFiles) =>
-        prevFiles.map((file) => {
-          const fileWithError = filesWithErrors.find((f) => f.name === file.name);
-          return fileWithError || file;
-        }),
-      );
-    } else {
+    if (Object.keys(errorMessages).length === 0) {
       setIsUploading(true);
-      onSave?.(selectedFiles);
-      // setSelectedFiles((prevFiles) => prevFiles.map((file) => ({ ...file, status: 'uploaded', progress: 100 })));
+      onSave?.(selectedFiles, onProgress, onError);
     }
   };
 
@@ -177,13 +126,19 @@ const UploadModal: React.FC<UploadModalProps> = ({
             onChange={handleFileInput}
           />
         </div>
-        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+        {error && (
+          <div data-testid="error" className="text-red-500 text-sm text-center">
+            {error}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto border-black">
           {selectedFiles.map((file, index) => (
             <FileCard
               key={index}
               file={file}
               index={index}
+              progress={progress[file.name]}
+              errorMessage={errorMessages[file.name]}
               onDelete={(idx) => setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== idx))}
             />
           ))}
@@ -199,11 +154,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           >
             Cancel
           </Button>
-          <Button
-            className="w-[132px]"
-            disabled={selectedFiles?.length === 0 || selectedFiles.some((file) => file.error) || isUploading}
-            onClick={handleUpload}
-          >
+          <Button className="w-[132px]" disabled={isUploadDisabled} onClick={handleUpload}>
             Upload
           </Button>
         </div>

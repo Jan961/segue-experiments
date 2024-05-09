@@ -1,27 +1,22 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { pdfStandardColors } from 'config/global';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const exportToExcel = (tableRef) => {
   tableRef.current?.getApi?.()?.exportDataAsExcel?.();
 };
 
-/**
- * This function iterates over all of the columns to create a row of header cells
- */
 const getHeaderToExport = (gridApi) => {
   const columns = gridApi.getAllDisplayedColumns();
 
   return columns.map((column) => {
     const { field } = column.getColDef();
     const sort = column.getSort();
-    // Enables export when row grouping
     const headerName = column.getColDef().headerName ?? field;
     const headerNameUppercase = headerName[0].toUpperCase() + headerName.slice(1);
     const headerCell = {
       text: headerNameUppercase + (sort ? ` (${sort})` : ''),
-
-      // styles
       bold: true,
       margin: [0, 12, 0, 0],
     };
@@ -29,18 +24,11 @@ const getHeaderToExport = (gridApi) => {
   });
 };
 
-/**
- * This function iterates over all of the rows and columns to create
- * a matrix of cells when pivoting is enabled
- */
-
 const getRowsToExportPivot = (gridApi) => {
   const columns = gridApi.getAllDisplayedColumns();
 
   const getCellToExport = (column, node) => ({
     text: gridApi.getValue(column, node) ?? '',
-
-    // styles
     ...column.getColDef().cellStyle,
     color: 'white',
   });
@@ -57,13 +45,15 @@ const getRowsToExportPivot = (gridApi) => {
 };
 
 const createLayout = (numberOfHeaderRows, styles) => {
-  // Row colors
-  const HEADER_ROW_COLOR = styles.headerRowColor ? styles.headerRowColor : '#EC6255';
-  const EVEN_ROW_COLOR = styles.evenRowColor ? styles.evenRowColor : '#fcfcfc';
-  const ODD_ROW_COLOR = styles.oddRowColor ? styles.oddRowColor : '#fff';
-
-  const PDF_INNER_BORDER_COLOR = styles.innerLineBorderColor ? styles.innerLineBorder : '#dde2eb';
-  const PDF_OUTER_BORDER_COLOR = styles.outerLineBorderColor ? styles.outerLineBorder : '#babfc7';
+  const HEADER_ROW_COLOR = styles.headerRowColor ? styles.headerRowColor : pdfStandardColors.HEADER_ROW_COLOR;
+  const EVEN_ROW_COLOR = styles.evenRowColor ? styles.evenRowColor : pdfStandardColors.EVEN_ROW_COLOR;
+  const ODD_ROW_COLOR = styles.oddRowColor ? styles.oddRowColor : pdfStandardColors.ODD_ROW_COLOR;
+  const PDF_INNER_BORDER_COLOR = styles.innerLineBorderColor
+    ? styles.innerLineBorder
+    : pdfStandardColors.PDF_INNER_BORDER_COLOR;
+  const PDF_OUTER_BORDER_COLOR = styles.outerLineBorderColor
+    ? styles.outerLineBorder
+    : pdfStandardColors.PDF_OUTER_BORDER_COLOR;
 
   return {
     fillColor: (rowIndex) => {
@@ -72,7 +62,6 @@ const createLayout = (numberOfHeaderRows, styles) => {
       }
       return rowIndex % 2 === 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR;
     },
-    // vLineHeight not used here.
     vLineWidth: (rowIndex, node) => (rowIndex === 0 || rowIndex === node.table.widths.length ? 1 : 0),
     hLineColor: (rowIndex, node) =>
       rowIndex === 0 || rowIndex === node.table.body.length ? PDF_OUTER_BORDER_COLOR : PDF_INNER_BORDER_COLOR,
@@ -81,20 +70,14 @@ const createLayout = (numberOfHeaderRows, styles) => {
   };
 };
 
-/**
- * This function iterates over all of the rows and columns to create
- * a matrix of cells
- */
 const getRowsToExport = (gridApi) => {
-  // Enables export when pivoting
   if (gridApi.isPivotMode()) {
     return getRowsToExportPivot(gridApi);
   }
-  const columns = gridApi.getAllDisplayedColumns();
 
+  const columns = gridApi.getAllDisplayedColumns();
   const getCellToExport = (column, node) => ({
     text: gridApi.getValue(column, node) ?? '',
-    // styles
     ...column.getColDef().cellStyle,
   });
 
@@ -107,18 +90,11 @@ const getRowsToExport = (gridApi) => {
   return rowsToExport;
 };
 
-/**
- * Returns a pdfMake shaped config for export, for more information
- * regarding pdfMake configuration, please see the pdfMake documentation.
- */
 const getDocument = (gridApi, styles) => {
   const columns = gridApi.getAllDisplayedColumns();
-
   const headerRow = getHeaderToExport(gridApi);
   const rows = getRowsToExport(gridApi);
-
   const widths = styles.widths && styles.widths?.length === columns.length ? styles.widths : `${100 / columns.length}%`;
-
   const headerHeight = styles.headerHeight ? styles.headerHeight : 40;
   const rowHeight = styles.rowHeight ? styles.rowHeight : 15;
 
@@ -127,17 +103,10 @@ const getDocument = (gridApi, styles) => {
     content: [
       {
         table: {
-          // the number of header rows
           headerRows: 1,
-
-          // the width of each column, can be an array of widths
           widths,
-
-          // all the rows to display, including the header rows
           body: [headerRow, ...rows],
-
-          // Header row is 40px, other rows are 15px
-          heights: (rowIndex) => (rowIndex === 0 ? headerHeight : rowHeight),
+          heights: (rowIndex: number) => (rowIndex === 0 ? headerHeight : rowHeight),
         },
         layout: createLayout(1, styles),
       },
@@ -148,7 +117,6 @@ const getDocument = (gridApi, styles) => {
 
 export const exportToPDF = (tableRef, styles = {}) => {
   const gridApi = tableRef.current?.getApi();
-
   const doc = getDocument(gridApi, styles);
   pdfMake.createPdf(doc).download();
 };

@@ -25,10 +25,6 @@ const exportList = [
   { key: 'PDF', iconName: pdfIcon.iconName, iconProps: pdfIcon.iconProps },
 ];
 
-const pdfStyles = {
-  // Your PDF styles object
-};
-
 export const Example: Story = {
   render: () => {
     return (
@@ -38,7 +34,6 @@ export const Example: Story = {
           onClose={() => console.log('Close modal')}
           ExportList={exportList}
           tableRef="yourTableRef"
-          pdfStyles={pdfStyles}
         />
       </div>
     );

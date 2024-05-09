@@ -51,3 +51,11 @@ export const systemAdminIcon = {
   default: { iconName: 'system-admin', stroke: '', fill: '#21345B' },
   active: { iconName: 'system-admin', stroke: '#E94580', fill: '#21345B' },
 };
+
+export const pdfStandardColors = {
+  HEADER_ROW_COLOR: '#EC6255',
+  EVEN_ROW_COLOR: '#fcfcfc',
+  ODD_ROW_COLOR: '#fff',
+  PDF_INNER_BORDER_COLOR: '#dde2eb',
+  PDF_OUTER_BORDER_COLOR: '#babfc7',
+};

@@ -13,7 +13,7 @@ export interface PdfStyles {
   headerRowColor?: string;
   evenRowColor?: string;
   oddRowColor?: string;
-  widths?: string[]; // array of percentages
+  widths?: string[]; // array of widths in percentages and should also match with number of cols Ex: ['20%','80%']
   outerLineBorderColor?: string;
   innerLineBorderColor?: string;
 }
