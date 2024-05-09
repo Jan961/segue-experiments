@@ -3,16 +3,16 @@ import { isThisWeek } from 'date-fns';
 
 export default function getTaskDateStatusColor(date: string, progress: number) {
   if (progress === 100) {
-    return 'green';
+    return '#10841C';
   }
 
   if (date) {
     const dueDate = new Date(date);
     const today = new Date();
     if (isThisWeek(dueDate)) {
-      return 'orange';
+      return '#EA8439';
     } else if (dueDate < today) {
-      return 'red';
+      return '#D41818';
     }
   }
 

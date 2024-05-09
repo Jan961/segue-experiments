@@ -15,7 +15,7 @@ export default function NotesRenderer({ value, tpActive }: CellRendererParams) {
         {tpActive ? (
           <Tooltip body={tpValue} position="left">
             {value ? (
-              <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="FFF" />
+              <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="#FFF" />
             ) : (
               <Icon iconName="note-filled" variant="lg" fill="#FFF" stroke="#617293" />
             )}
@@ -23,7 +23,7 @@ export default function NotesRenderer({ value, tpActive }: CellRendererParams) {
         ) : (
           <div>
             {value ? (
-              <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="FFF" />
+              <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="#FFF" />
             ) : (
               <Icon iconName="note-filled" variant="lg" fill="#FFF" stroke="#617293" />
             )}

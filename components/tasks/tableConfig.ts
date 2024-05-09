@@ -1,6 +1,6 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import NotesRenderer from 'components/tasks/NotesRenderer';
-import SelectCelRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
@@ -25,7 +25,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         const { CompleteDate, Progress } = params.data;
         const taskDateStatusColor = getTaskDateStatusColor(CompleteDate, Progress);
         if (taskDateStatusColor === 'bg-none') return null;
-        else return { backgroundColor: taskDateStatusColor, color: 'white' };
+        else return { backgroundColor: taskDateStatusColor, color: '#FFF' };
       },
     },
     {
@@ -40,7 +40,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         const { CompleteDate, Progress } = params.data;
         const taskDateStatusColor = getTaskDateStatusColor(CompleteDate, Progress);
         if (taskDateStatusColor === 'bg-none') return null;
-        else return { backgroundColor: taskDateStatusColor, color: 'white' };
+        else return { backgroundColor: taskDateStatusColor, color: '#FFF' };
       },
       width: 445,
       flex: 1,
@@ -48,7 +48,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Start by (WK)',
       field: 'StartByWeekNum',
-      cellRenderer: SelectCelRenderer,
+      cellRenderer: SelectCellRenderer,
       cellStyle: {
         overflow: 'visible',
       },
@@ -77,7 +77,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Due (WK)',
       field: 'CompleteByWeekNum',
-      cellRenderer: SelectCelRenderer,
+      cellRenderer: SelectCellRenderer,
       cellStyle: {
         overflow: 'visible',
       },
@@ -116,7 +116,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       cellStyle: {
         overflow: 'visible',
       },
-      cellRenderer: SelectCelRenderer,
+      cellRenderer: SelectCellRenderer,
       width: 116,
     },
     {

@@ -7,7 +7,7 @@ import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
-import SelectCelRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 
 const generateChildCol = (
   headerName: string,
@@ -181,7 +181,7 @@ export const productionsTableConfig = [
   {
     headerName: 'Region',
     field: 'RegionList',
-    cellRenderer: SelectCelRenderer,
+    cellRenderer: SelectCellRenderer,
     cellRendererParams: {
       options: REGIONS_LIST,
       placeholder: 'Select Region(s)',
@@ -208,7 +208,7 @@ export const productionsTableConfig = [
     headerName: 'Input Freq of Sales Figs',
     field: 'SalesFrequency',
     width: 130,
-    cellRenderer: SelectCelRenderer,
+    cellRenderer: SelectCellRenderer,
     cellRendererParams: {
       options: SALES_FIG_OPTIONS,
       defaultValue: 'W',

@@ -59,7 +59,7 @@ const Filters = ({ usersList }: FiltersProps) => {
           <div className="px-4">
             <div className="py-2 flex flex-row items-center gap-4">
               <h1 className={`text-4xl font-bold text-primary-yellow`}>Production Task Lists</h1>
-              <div className="bg-white border-primary-border rounded-md border shadow-md">
+              <div className="bg-primary-white border-primary-border rounded-md border shadow-md">
                 <div className="rounded-l-md">
                   <div className="flex items-center">
                     <Select
@@ -80,7 +80,6 @@ const Filters = ({ usersList }: FiltersProps) => {
                         label="Include archived"
                         checked={includeArchived}
                         onChange={onIncludeArchiveChange}
-                        className=""
                       />
                     </div>
                   </div>
@@ -102,11 +101,11 @@ const Filters = ({ usersList }: FiltersProps) => {
               onChange={(value) => onChange({ target: { id: 'status', value } })}
               disabled={!filter.production}
               value={filter.status}
-              className="bg-white w-[310px]"
+              className="bg-primary-white w-[310px]"
               label="Status"
               options={statusOptions}
             />
-            <div className="bg-white w-[420px]">
+            <div className="bg-primary-white w-[420px]">
               <DateRange
                 disabled={!filter.production}
                 className="bg-primary-white justify-between"
@@ -119,7 +118,7 @@ const Filters = ({ usersList }: FiltersProps) => {
               onChange={(value) => onChange({ target: { id: 'assignee', value } })}
               disabled={!filter.production}
               value={filter.assignee}
-              className="bg-white w-[450px]"
+              className="bg-primary-white w-[450px]"
               label="Assigned to"
               options={usersList}
             />

@@ -5,8 +5,9 @@ import { filterState } from 'state/booking/filterState';
 import axios from 'axios';
 import { styleProps } from './tableConfig';
 import NotesPopup from './NotesPopup';
-import { Spinner } from 'components/global/Spinner';
 import { loggingService } from 'services/loggingService';
+import Loader from 'components/core-ui-lib/Loader';
+import { ProductionTaskDTO } from 'interfaces';
 
 interface TasksTableProps {
   rowData?: any;
@@ -14,11 +15,9 @@ interface TasksTableProps {
   tableHeight?: boolean;
 }
 
-const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
-    <Spinner size="md" />
-  </div>
-);
+export interface ProductionTaskDTOWithStringProgress extends Omit<ProductionTaskDTO, 'Progress'> {
+  Progress: string;
+}
 
 export default function TasksTable({ rowData = [], columnDefs = [], tableHeight = false }: TasksTableProps) {
   const tableRef = useRef(null);
@@ -35,7 +34,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
     }
   };
 
-  const handleUpdateTask = async (task: any) => {
+  const handleUpdateTask = async (task: ProductionTaskDTOWithStringProgress) => {
     setIsLoading(true);
     try {
       const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
@@ -97,7 +96,11 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
-      {isLoading && <LoadingOverlay />}
+      {isLoading && (
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+          <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
+        </div>
+      )}
     </>
   );
 }

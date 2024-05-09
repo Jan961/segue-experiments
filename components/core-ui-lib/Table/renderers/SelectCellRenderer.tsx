@@ -6,7 +6,7 @@ import BaseCellRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRen
 import { useRef } from 'react';
 import { components, OptionProps } from 'react-windowed-select';
 
-interface SelectCelRendererProps extends ICellRendererParams {
+interface SelectCellRendererProps extends ICellRendererParams {
   options?: SelectOption[];
   eGridCell: HTMLElement;
   placeholder?: string;
@@ -15,7 +15,7 @@ interface SelectCelRendererProps extends ICellRendererParams {
   isSearchable?: boolean;
 }
 
-const SelectCelRenderer = ({
+const SelectCellRenderer = ({
   options = [],
   setValue,
   eGridCell,
@@ -28,7 +28,7 @@ const SelectCelRenderer = ({
   data,
   customWidth = 'auto',
   ...props
-}: SelectCelRendererProps) => {
+}: SelectCellRendererProps) => {
   const selectRef = useRef(null);
 
   const handleOnFocus = () => {
@@ -82,4 +82,4 @@ const SelectCelRenderer = ({
   );
 };
 
-export default SelectCelRenderer;
+export default SelectCellRenderer;
