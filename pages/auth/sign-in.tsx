@@ -36,8 +36,6 @@ const SignIn = () => {
     return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(emailAddress);
   }, [emailAddress]);
 
-  const handleSignUp = () => null;
-
   const handleSignIn = async () => {
     if (!signInLoaded) {
       return;
@@ -90,11 +88,11 @@ const SignIn = () => {
           {error === PASSWORD_INCORRECT && <LoginError error={error} />}
           <div className="w-full flex justify-end">
             <Link href="/auth/reset-password" passHref>
-              <Label text="Forgot Password?" />
+              <Label text="Forgot Password" />
             </Link>
           </div>
           <div className="w-full flex items-center gap-2 justify-end mt-3">
-            <Button text="Sign Up" variant="secondary" onClick={handleSignUp} className="w-32" />
+            <Button text="Sign Up" variant="secondary" onClick={() => router.push('/auth/sign-up')} className="w-32" />
             <Button text="Sign In" onClick={handleSignIn} className="w-32" disabled={!isValidEmail || !password} />
           </div>
         </div>
