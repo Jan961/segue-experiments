@@ -64,7 +64,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     setIsAddRow(!isAddRow);
   };
 
-  const [isArchived, setIsArchived] = useState<boolean>(false);
+  const [isArchived, setIsArchived] = useState<boolean>(true);
 
   const unArchivedList = useMemo(() => {
     return showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted);
@@ -169,11 +169,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-3 font-bold">{showName}</div>
+        <div className="text-primary-navy text-xl mb-3 mt-1 font-bold">{showName}</div>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             <Checkbox
-              className="flex flex-row-reverse"
+              className="flex flex-row-reverse mr-2"
               checked={isArchived}
               label="Include archived"
               id={''}
@@ -200,7 +200,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       </div>
       <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
         <div />
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" />
           <Button className=" w-33" text="Save and Close" />
         </div>
