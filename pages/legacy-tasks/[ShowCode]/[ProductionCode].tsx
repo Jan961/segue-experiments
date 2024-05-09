@@ -1,23 +1,27 @@
 import Layout from 'components/Layout';
-import Toolbar from 'components/tasks/toolbar';
-import Tasklist from 'components/tasks/TaskList';
+// import { useState } from 'react';
+import Toolbar from 'components/legacy-tasks/toolbar';
+import Tasklist from 'components/legacy-tasks/TaskList';
+// import TaskButtons from 'components/tasks/TaskButtons';
 import GlobalToolbar from 'components/toolbar';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionsAndTasks } from 'services/productionService';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
 import { InitialState } from 'lib/recoil';
 import { mapToProductionTaskDTO } from 'lib/mappers';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import { objectify } from 'radash';
+import { productionJumpState } from 'state/booking/productionJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
+import { objectify } from 'radash';
 import useTasksFilter from 'hooks/useTasksFilter';
-import { useRecoilState } from 'recoil';
 import { ProductionTaskDTO } from 'interfaces';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { filteredProductions } = useTasksFilter();
+  const { selected } = useRecoilValue(productionJumpState);
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
+  const { filteredProductions } = useTasksFilter();
   const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
     const updatedProductionTasks = productionTasks.map((productionTask) => {
       if (productionTask.Id === productionId) {
@@ -29,38 +33,32 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
   };
   return (
     <Layout title="Tasks | Segue">
-      <div className="flex flex-auto w-full h-screen">
+      <div className="flex flex-auto w-full">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
           <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'} />
           <Toolbar onApplyFilters={null} />
           {filteredProductions.length > 0 ? (
-            filteredProductions.map((production) => {
-              return (
-                <div key={production.Id} className="mb-10">
-                  <h3 className=" text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
-                  <Tasklist
-                    onTasksChange={(change) => onTasksChange(change, production.Id)}
-                    tasks={production?.Tasks}
-                  />
-                </div>
-              );
-            })
+            filteredProductions.map((production) => (
+              <div
+                key={production.Id}
+                className={selected === undefined || selected === production.Id ? 'mb-10' : 'hidden'}
+              >
+                <h3 className="text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
+                <Tasklist
+                  className="max-h-[70vh]"
+                  tasks={production?.Tasks}
+                  onTasksChange={(change) => onTasksChange(change, production.Id)}
+                />
+              </div>
+            ))
           ) : (
             <div className="text-center font-bold text-lg">
               <p>No Tasks Found</p>
             </div>
           )}
-          {/* <TaskButtons openBulkModal={openBulkModal} /> */}
         </div>
       </div>
-      {/*
-        <BulkActionForm
-          userAccountId={0}
-          closeModal={console.log}
-          taskIdArray={isSelectedArray}
-          bulkActionField={bulkActionField}
-        />
-        */}
+      <div className="flex w-full justify-end px-12 pb-12">{/* <TaskButtons openBulkModal={openBulkModal} /> */}</div>
     </Layout>
   );
 };
@@ -68,9 +66,11 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
-  const productionsWithTasks = await getProductionsAndTasks(AccountId);
+  const ProductionId = productionJump.selected;
+  // ProductionJumpState is checking if it's valid to access by accountId
+  if (!ProductionId) return { notFound: true };
+  const productionsWithTasks = await getProductionsAndTasks(AccountId, ProductionId);
   const users = await getUsers(AccountId);
-
   const productions: ProductionsWithTasks[] = productionsWithTasks.map((t: any) => ({
     Id: t.Id,
     ShowName: t.Show.Name,
@@ -91,9 +91,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       productionJump,
     },
     tasks: { productions, bulkSelection: {} },
-    account: {
-      user: { users: objectify(users, (user) => user.Id) },
-    },
+    account: { user: { users: objectify(users, (user) => user.Id) } },
   };
   return { props: { initialState } };
 };

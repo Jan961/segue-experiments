@@ -1,6 +1,6 @@
-import CustomSelectCelRenderer from 'components/core-ui-lib/Table/renderers/CustomSelectCellRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
-import NotesRenderer from 'components/core-ui-lib/Table/renderers/NotesRenderer';
+import NotesRenderer from 'components/tasks/NotesRenderer';
+import SelectCelRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
@@ -11,7 +11,7 @@ export const styleProps = { headerColor: tileColors.tasks };
 
 const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
   text: index,
-  value: index,
+  value: index.toString(),
 }));
 
 export const getColumnDefs = (usersList = [], productionName = '') => {
@@ -48,7 +48,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Start by (WK)',
       field: 'StartByWeekNum',
-      cellRenderer: CustomSelectCelRenderer,
+      cellRenderer: SelectCelRenderer,
       cellStyle: {
         overflow: 'visible',
       },
@@ -77,7 +77,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
     {
       headerName: 'Due (WK)',
       field: 'CompleteByWeekNum',
-      cellRenderer: CustomSelectCelRenderer,
+      cellRenderer: SelectCelRenderer,
       cellStyle: {
         overflow: 'visible',
       },
@@ -110,10 +110,13 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         options: generatePercentageOptions,
         isSearchable: true,
       },
+      valueGetter: function (params) {
+        return params.data?.Progress.toString();
+      },
       cellStyle: {
         overflow: 'visible',
       },
-      cellRenderer: CustomSelectCelRenderer,
+      cellRenderer: SelectCelRenderer,
       width: 116,
     },
     {

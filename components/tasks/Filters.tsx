@@ -2,7 +2,7 @@ import Button from 'components/core-ui-lib/Button';
 import Select from 'components/core-ui-lib/Select';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { useRecoilState } from 'recoil';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import DateRange from 'components/core-ui-lib/DateRange';
 import { statusOptions } from 'config/tasks';
@@ -11,6 +11,7 @@ import ProductionOption from 'components/global/nav/ProductionOption';
 import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import useProductionOptions from 'hooks/useProductionOptions';
 
 interface FiltersProps {
   usersList: SelectOption[];
@@ -44,39 +45,7 @@ const Filters = ({ usersList }: FiltersProps) => {
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
 
-  const productions = useMemo(() => {
-    const productionOptions = [
-      { text: 'All Productions', value: -1, Id: -1, ShowCode: null, Code: null, IsArchived: false },
-    ];
-    for (const production of productionJump.productions) {
-      if (includeArchived) {
-        productionOptions.push({
-          Id: -1,
-          ShowCode: null,
-          Code: null,
-          IsArchived: false,
-          ...production,
-          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
-            production.IsArchived ? ' (A)' : ''
-          }`,
-          value: production.Id,
-        });
-      } else if (!production.IsArchived) {
-        productionOptions.push({
-          Id: -1,
-          ShowCode: null,
-          Code: null,
-          IsArchived: false,
-          ...production,
-          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
-            production.IsArchived ? ' (A)' : ''
-          }`,
-          value: production.Id,
-        });
-      }
-    }
-    return productionOptions;
-  }, [productionJump, includeArchived]);
+  const { productions } = useProductionOptions(includeArchived);
 
   const onIncludeArchiveChange = (e) => {
     setProductionJump({ ...productionJump, includeArchived: e.target.value });

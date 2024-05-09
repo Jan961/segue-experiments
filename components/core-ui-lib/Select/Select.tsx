@@ -203,8 +203,7 @@ export default forwardRef(function Select(
         setSelectedOption(selectedValues);
       }
     } else {
-      if(value === 0) setSelectedOption(options.find((o) => value === o.value));
-      else setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
+      setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
     }
   }, [value, options, isMulti]);
 

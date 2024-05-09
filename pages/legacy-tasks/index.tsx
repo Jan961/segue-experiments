@@ -1,8 +1,6 @@
 import Layout from 'components/Layout';
-// import { useState } from 'react';
-import Toolbar from 'components/tasks/toolbar';
-import Tasklist from 'components/tasks/TaskList';
-// import TaskButtons from 'components/tasks/TaskButtons';
+import Toolbar from 'components/legacy-tasks/toolbar';
+import Tasklist from 'components/legacy-tasks/TaskList';
 import GlobalToolbar from 'components/toolbar';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionsAndTasks } from 'services/productionService';

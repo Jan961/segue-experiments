@@ -60,7 +60,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
             <span
               className="rounded-lg bg-progress-teal absolute block h-full top-0 left-0"
               style={{ width: progressBarWidth, zIndex: 1 }}
-             />
+            />
             <span className="z-10 relative">{task.Progress}</span>
           </div>
         </Table.Cell>

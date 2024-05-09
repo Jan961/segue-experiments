@@ -14,6 +14,12 @@ interface TasksTableProps {
   tableHeight?: boolean;
 }
 
+const LoadingOverlay = () => (
+  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
+    <Spinner size="md" />
+  </div>
+);
+
 export default function TasksTable({ rowData = [], columnDefs = [], tableHeight = false }: TasksTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(filterState);
@@ -32,11 +38,10 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
   const handleUpdateTask = async (task: any) => {
     setIsLoading(true);
     try {
-      await axios.post('/api/tasks/update', task);
+      const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
+      await axios.post('/api/tasks/update', updatedTask);
       const updatedRowData = rowData.map((row) => {
-        if (row.Id === task.Id) {
-          row.Notes = task.Notes;
-        }
+        if (row.Id === task.Id) return updatedTask;
         return row;
       });
       setRows(updatedRowData);
@@ -92,7 +97,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
         onSave={handleSaveNote}
         onCancel={() => setShowModal(false)}
       />
-      {isLoading && <Spinner size={'sm'} />}
+      {isLoading && <LoadingOverlay />}
     </>
   );
 }

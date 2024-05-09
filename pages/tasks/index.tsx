@@ -3,8 +3,8 @@ import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
-import Filters from 'components/tasks2/Filters';
-import TasksTable from 'components/tasks2/TasksTable';
+import Filters from 'components/tasks/Filters';
+import TasksTable from 'components/tasks/TasksTable';
 import useTasksFilter from 'hooks/useTasksFilter';
 import { getProductionsAndTasks } from 'services/productionService';
 import { ProductionsWithTasks } from 'state/tasks/productionState';
@@ -13,7 +13,7 @@ import { objectify } from 'radash';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
-import { getColumnDefs } from 'components/tasks2/tableConfig';
+import { getColumnDefs } from 'components/tasks/tableConfig';
 
 const TasksPage = () => {
   const { filteredProductions } = useTasksFilter();
