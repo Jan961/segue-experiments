@@ -109,7 +109,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
         <div className="text-primary text-xl font-bold">{title}</div>
         <div className="text-secondary w-full md:w-[533px] text-[15px] font-normal">{info}</div>
         <div
-          className="h-[200px] w-full md:w-[535px] bg-[#D9D9D9] flex flex-col justify-center items-center cursor-pointer relative"
+          className="h-[200px] w-full md:w-[535px] bg-silver-gray-100 flex flex-col justify-center items-center cursor-pointer relative"
           onClick={() => hiddenFileInput.current?.click()}
           id="image"
           data-testid="image"

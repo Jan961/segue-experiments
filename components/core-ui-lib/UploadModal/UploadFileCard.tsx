@@ -9,7 +9,7 @@ const FileCard = ({ file, index, onDelete, progress, errorMessage }: FileCardPro
   const status = useMemo(() => getStatusFromProgress(progress), [progress]);
 
   return (
-    <div className="flex w-full md:w-[535px] flex-col justify-between pl-4 rounded-lg border border-primary-border bg-white shadow-md">
+    <div className="flex w-full md:w-[535px] flex-col justify-between pl-4 rounded-lg border border-silver-gray-100 bg-white shadow-md">
       <div className="flex w-full gap-4 py-2">
         <div className="flex items-center">
           <Icon iconName={'document-solid'} fill="#617293" variant="3xl" />
