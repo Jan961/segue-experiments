@@ -145,9 +145,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         setIsLoading(false);
       }
     } else if (e.column.colId === 'IsArchived') {
-      console.log(e);
-      console.log('rowsData', rowsData);
-
       setIsUploadModalOpen(true);
     }
   };

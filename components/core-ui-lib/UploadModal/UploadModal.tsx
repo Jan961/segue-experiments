@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Modal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
@@ -38,6 +38,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
     setErrorMessages((prev) => ({ ...prev, [file.name]: errorMessage }));
   };
 
+  useEffect(() => {
+    onChange?.(selectedFiles);
+  }, [selectedFiles]);
+
   const clearAll = () => {
     setError('');
     setSelectedFiles([]);
@@ -74,15 +78,14 @@ const UploadModal: React.FC<UploadModalProps> = ({
       }
     }
 
+    const filesList = Array.from(files).map((file) => ({
+      name: file.name,
+      size: file.size,
+      file,
+    }));
     setError('');
-    setSelectedFiles(
-      Array.from(files).map((file) => ({
-        name: file.name,
-        size: file.size,
-        file,
-      })),
-    );
-    onChange?.(selectedFiles);
+    setSelectedFiles(filesList);
+    onChange?.(filesList);
   };
 
   const handleUpload = () => {
@@ -113,8 +116,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
         >
           <Icon iconName={'upload-to-cloud'} variant="7xl" />
           <p className="text-secondary max-w-[222px] text-[15px] text-center font-normal mt-2">
-            <span className=" font-bold text-primary">Browse computer</span> or drag and drop (Max File Size:{' '}
-            {fileSizeFormatter(maxFileSize)})
+            <span className=" font-bold text-primary">Browse computer</span> or drag and drop
+            {maxFileSize && `(Max File Size: ${fileSizeFormatter(maxFileSize)})`}
           </p>
           <input
             data-testid="hidden-input"
@@ -127,11 +130,11 @@ const UploadModal: React.FC<UploadModalProps> = ({
           />
         </div>
         {error && (
-          <div data-testid="error" className="text-red-500 text-sm text-center">
+          <div data-testid="error" className="text-primary-red text-sm text-center">
             {error}
           </div>
         )}
-        <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto border-black">
+        <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto">
           {selectedFiles.map((file, index) => (
             <FileCard
               key={index}

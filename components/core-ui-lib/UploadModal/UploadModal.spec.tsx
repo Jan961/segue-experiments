@@ -37,6 +37,14 @@ describe('UploadModal and FileCard Component', () => {
     expect(screen.getByText('No file selected')).toBeInTheDocument();
   });
 
+  test('clicking on close button unmounts the component', () => {
+    const mockOnClose = jest.fn();
+    render(<UploadModal {...mockProps} onClose={mockOnClose} />);
+    const closeButton = screen.getByRole('button', { name: 'Cancel' });
+    fireEvent.click(closeButton);
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
   test('displays error message for exceeding max files', () => {
     render(<UploadModal {...mockProps} />);
     const files = [createMockBlobFile('file1.jpg'), createMockBlobFile('file2.jpg'), createMockBlobFile('file3.jpg')];
