@@ -6,6 +6,7 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextInput from 'components/core-ui-lib/TextInput';
+import { allStatusOptions } from 'config/contracts';
 
 const EditVenueContractModal = () => {
   return (
@@ -20,12 +21,14 @@ const EditVenueContractModal = () => {
           <div className=" text-primary-input-text font-bold text-lg">Deal Memo</div>
           <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
           <Select
-            // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+            onChange={() => {
+              return null;
+            }}
             className="bg-primary-white w-52"
             // value={filter.dealMemoStatusDropDown}
             // disabled={!productionId}
             placeholder="Deal Memo Status"
-            // options={allStatusOptions}
+            options={allStatusOptions}
             isClearable
             isSearchable
             // label="hhj"
@@ -33,12 +36,14 @@ const EditVenueContractModal = () => {
 
           <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
           <Select
-            // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+            onChange={() => {
+              return null;
+            }}
             className="bg-primary-white w-52"
             // value={filter.dealMemoStatusDropDown}
             // disabled={!productionId}
             placeholder="Deal Memo Status"
-            // options={allStatusOptions}
+            options={allStatusOptions}
             isClearable
             isSearchable
             // label="hhj"
@@ -46,23 +51,33 @@ const EditVenueContractModal = () => {
 
           <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
           <Select
-            // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+            onChange={() => {
+              return null;
+            }}
             className="bg-primary-white w-52"
             // value={filter.dealMemoStatusDropDown}
             // disabled={!productionId}
             placeholder="Deal Memo Status"
-            // options={allStatusOptions}
+            options={allStatusOptions}
             isClearable
             isSearchable
             // label="hhj"
           />
           <div className="flex mt-2.5 items-center mt-6">
             <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
-            <DateInput />
+            <DateInput
+              onChange={() => {
+                return null;
+              }}
+            />
 
             <div className=" text-primary-input-text font-bold text-sm">Date Returned</div>
 
-            <DateInput />
+            <DateInput
+              onChange={() => {
+                return null;
+              }}
+            />
           </div>
 
           <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
@@ -103,12 +118,14 @@ const EditVenueContractModal = () => {
             </div>
             <div className="w-4/5 flex">
               <Select
-                // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+                onChange={() => {
+                  return null;
+                }}
                 className="bg-primary-white w-52"
                 // value={filter.dealMemoStatusDropDown}
                 // disabled={!productionId}
                 placeholder="Deal Memo Status"
-                // options={allStatusOptions}
+                options={allStatusOptions}
                 isClearable
                 isSearchable
                 // label="hhj"
@@ -121,12 +138,14 @@ const EditVenueContractModal = () => {
             </div>
             <div className="w-4/5 flex justify-between">
               <Select
-                // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+                onChange={() => {
+                  return null;
+                }}
                 className="bg-primary-white w-52"
                 // value={filter.dealMemoStatusDropDown}
                 // disabled={!productionId}
                 placeholder="User Name Dropdown"
-                // options={allStatusOptions}
+                options={allStatusOptions}
                 isClearable
                 isSearchable
                 // label="hhj"
@@ -135,7 +154,11 @@ const EditVenueContractModal = () => {
               <div className="flex items-center">
                 <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
 
-                <DateInput />
+                <DateInput
+                  onChange={() => {
+                    return null;
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -145,12 +168,14 @@ const EditVenueContractModal = () => {
             </div>
             <div className="w-4/5 flex justify-between">
               <Select
-                // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+                onChange={() => {
+                  return null;
+                }}
                 className="bg-primary-white w-52"
                 // value={filter.dealMemoStatusDropDown}
                 // disabled={!productionId}
                 placeholder="User Name Dropdown"
-                // options={allStatusOptions}
+                options={allStatusOptions}
                 isClearable
                 isSearchable
                 // label="hhj"
@@ -158,7 +183,11 @@ const EditVenueContractModal = () => {
               <div className="flex items-center">
                 <div className=" text-primary-input-text font-bold text-sm mr-2">Returned from Venue</div>
 
-                <DateInput />
+                <DateInput
+                  onChange={() => {
+                    return null;
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -173,6 +202,9 @@ const EditVenueContractModal = () => {
                 // name="includeExcludedVenues"
                 // checked={includeExcluded}
                 // onChange={(e) => handleOnChange({ includeExcluded: e.target.checked })}
+                onChange={() => {
+                  return null;
+                }}
               />
             </div>
             <div className="flex flex-1 items-center justify-center">
@@ -185,6 +217,9 @@ const EditVenueContractModal = () => {
                 // name="includeExcludedVenues"
                 // checked={includeExcluded}
                 // onChange={(e) => handleOnChange({ includeExcluded: e.target.checked })}
+                onChange={() => {
+                  return null;
+                }}
               />
             </div>
             <div className="flex flex-1 items-center justify-end">
@@ -197,6 +232,9 @@ const EditVenueContractModal = () => {
                 // name="includeExcludedVenues"
                 // checked={includeExcluded}
                 // onChange={(e) => handleOnChange({ includeExcluded: e.target.checked })}
+                onChange={() => {
+                  return null;
+                }}
               />
             </div>
           </div>
@@ -206,12 +244,12 @@ const EditVenueContractModal = () => {
             </div>
             <div className="w-4/5">
             <Select
-              // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+              onChange={() => {return null}}
               className="bg-primary-white w-52"
               // value={filter.dealMemoStatusDropDown}
               // disabled={!productionId}
               placeholder="Deal Type Dropdown"
-              // options={allStatusOptions}
+              options={allStatusOptions}
               isClearable
               isSearchable
             // label="hhj"
@@ -225,12 +263,14 @@ const EditVenueContractModal = () => {
             </div>
             <div className="w-4/5 flex">
               <Select
-                // onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
+                onChange={() => {
+                  return null;
+                }}
                 className="bg-primary-white w-52"
                 // value={filter.dealMemoStatusDropDown}
                 // disabled={!productionId}
                 placeholder="Deal Type DropDown"
-                // options={allStatusOptions}
+                options={allStatusOptions}
                 isClearable
                 isSearchable
                 // label="hhj"
