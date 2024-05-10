@@ -25,8 +25,8 @@ export interface UploadModalProps {
   onClose?: () => void;
   info: string;
   isMultiple?: boolean;
-  maxFiles: number;
-  maxFileSize: number;
+  maxFiles?: number;
+  maxFileSize?: number;
   allowedFormats: string[];
   onChange?: (selectedFiles: FileProps[]) => void;
   onSave?: (

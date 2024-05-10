@@ -16,6 +16,7 @@ export const availableLocales = [
 export const tileColors = {
   bookings: '#EC6255',
   marketing: '#41A29A',
+  tasks: '#FFBE43',
   contracts: '#0093C0',
 };
 

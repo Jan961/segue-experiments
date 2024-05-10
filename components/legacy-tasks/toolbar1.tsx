@@ -2,12 +2,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnglesDown } from '@fortawesome/free-solid-svg-icons';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
-
 const Toolbar = () => (
   <div>
     <div className="columns-3 mt-3">
       <div className="col-auto">
-        <div className="flex flex-row"></div>
+        <div className="flex flex-row" />
         <div className="flex flex-row">
           <h1 className="text-2xl font-normal">Tasks</h1>
         </div>
@@ -48,7 +47,7 @@ const Toolbar = () => (
         </button>
       </div>
 
-      <div></div>
+      <div />
     </div>
   </div>
 );

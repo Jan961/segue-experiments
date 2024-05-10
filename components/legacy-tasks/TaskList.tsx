@@ -40,7 +40,7 @@ const Tasklist = ({ tasks = [], onTasksChange, className }: TaskListProps) => {
         </Table.HeaderRow>
         <Table.Body className="!bg-transparent">
           {tasks.map((task) => (
-            <TaskListItem onTaskChange={onTaskChange} task={task} key={task.Id}></TaskListItem>
+            <TaskListItem onTaskChange={onTaskChange} task={task} key={task.Id} />
           ))}
         </Table.Body>
       </Table>

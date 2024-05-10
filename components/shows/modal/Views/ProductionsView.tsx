@@ -10,6 +10,7 @@ import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
+import UploadModal from 'components/core-ui-lib/UploadModal';
 
 interface ProductionsViewProps {
   showData: any;
@@ -53,6 +54,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -142,6 +144,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         router.replace(router.asPath);
         setIsLoading(false);
       }
+    } else if (e.column.colId === 'IsArchived') {
+      console.log(e);
+      console.log('rowsData', rowsData);
+
+      setIsUploadModalOpen(true);
     }
   };
 
@@ -211,6 +218,14 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
+      />
+      <UploadModal
+        visible={isUploadModalOpen}
+        title="Production Image"
+        info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
+        allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
+        onClose={() => setIsUploadModalOpen(false)}
+        maxFileSize={500 * 1024} // 500kb
       />
     </>
   );

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { loggingService } from '../../services/loggingService';
 
-type Props={
-  taskIdArray:any[];
-  bulkActionField:string;
-  closeModal:()=>void;
-}
+type Props = {
+  taskIdArray: any[];
+  bulkActionField: string;
+  closeModal: () => void;
+};
 
-function BulkActionForm({ taskIdArray, bulkActionField, closeModal }:Props) {
+function BulkActionForm({ taskIdArray, bulkActionField, closeModal }: Props) {
   const [updateValue, setUpdateValue] = useState({});
 
   const handleChange = (event) => {
@@ -64,8 +64,12 @@ function BulkActionForm({ taskIdArray, bulkActionField, closeModal }:Props) {
         return (
           <select name="assignee" onChange={(e) => handleChange(e)}>
             <option value={0}>Assign a User</option>
-            {[].map((usr,i) => {
-              return <option key={i} value={usr.UserId}>{usr.UserName}</option>;
+            {[].map((usr, i) => {
+              return (
+                <option key={i} value={usr.UserId}>
+                  {usr.UserName}
+                </option>
+              );
             })}
           </select>
         );

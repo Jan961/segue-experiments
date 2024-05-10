@@ -4,21 +4,21 @@ export type TasksFilterType = {
   production?: number;
   taskText?: string;
   status?: string;
-  startDueDate?: string;
-  endDueDate?: string;
+  startDueDate?: Date;
+  endDueDate?: Date;
   assignee?: number;
 };
 
-const intialState: TasksFilterType = {
-  production:null,
+export const intialTasksState: TasksFilterType = {
+  production: null,
   taskText: '',
-  status: null,
-  startDueDate: '',
-  endDueDate: '',
-  assignee: null,
+  status: 'inProgressandtodo',
+  startDueDate: null,
+  endDueDate: null,
+  assignee: -1,
 };
 
 export const tasksfilterState = atom({
   key: 'tasksFilterState',
-  default: intialState,
+  default: intialTasksState,
 });

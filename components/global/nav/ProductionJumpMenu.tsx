@@ -6,7 +6,7 @@ import { useRecoilState } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ProductionOption from './ProductionOption';
 
-const ARCHIVED_OPTION_STYLES = {
+export const ARCHIVED_OPTION_STYLES = {
   option: (styles, { isDisabled, isSelected, isFocused, data }) => {
     return {
       ...styles,
