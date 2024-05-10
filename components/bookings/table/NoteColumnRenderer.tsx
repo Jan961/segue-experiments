@@ -18,7 +18,7 @@ export default function NoteColumnRenderer({ value, data, api, tpActive }: CellR
           {tpActive ? (
             <Tooltip body={tpValue} position="left">
               {value ? (
-                <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="FFF" />
+                <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="#FFF" />
               ) : (
                 <Icon iconName="note-filled" variant="lg" fill="#FFF" stroke="#617293" />
               )}
@@ -26,7 +26,7 @@ export default function NoteColumnRenderer({ value, data, api, tpActive }: CellR
           ) : (
             <div>
               {value ? (
-                <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="FFF" />
+                <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="#FFF" />
               ) : (
                 <Icon iconName="note-filled" variant="lg" fill="#FFF" stroke="#617293" />
               )}

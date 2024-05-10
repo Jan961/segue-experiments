@@ -161,7 +161,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
-                 />
+                />
               ))}
             </div>
           )}

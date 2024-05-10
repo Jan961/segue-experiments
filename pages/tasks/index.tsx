@@ -1,69 +1,66 @@
+import { GetServerSideProps } from 'next';
 import Layout from 'components/Layout';
-import Toolbar from 'components/tasks/toolbar';
-import Tasklist from 'components/tasks/TaskList';
-import GlobalToolbar from 'components/toolbar';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import { getProductionsAndTasks } from 'services/productionService';
-import { ProductionsWithTasks, productionState } from 'state/tasks/productionState';
 import { InitialState } from 'lib/recoil';
-import { mapToProductionTaskDTO } from 'lib/mappers';
-import { getAccountIdFromReq, getUsers } from 'services/userService';
-import { objectify } from 'radash';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
+import Filters from 'components/tasks/Filters';
+import TasksTable from 'components/tasks/TasksTable';
 import useTasksFilter from 'hooks/useTasksFilter';
-import { useRecoilState } from 'recoil';
-import { ProductionTaskDTO } from 'interfaces';
+import { getProductionsAndTasks } from 'services/productionService';
+import { ProductionsWithTasks } from 'state/tasks/productionState';
+import { mapToProductionTaskDTO } from 'lib/mappers';
+import { objectify } from 'radash';
+import { useRecoilValue } from 'recoil';
+import { userState } from 'state/account/userState';
+import { useMemo } from 'react';
+import { getColumnDefs } from 'components/tasks/tableConfig';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { filteredProductions, onApplyFilters } = useTasksFilter();
-  const [productionTasks, setProductionTasks] = useRecoilState(productionState);
-  const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
-    const updatedProductionTasks = productionTasks.map((productionTask) => {
-      if (productionTask.Id === productionId) {
-        return { ...productionTask, Tasks: updatedTasks };
-      }
-      return productionTask;
-    });
-    setProductionTasks(updatedProductionTasks);
-  };
+const TasksPage = () => {
+  const { filteredProductions } = useTasksFilter();
+
+  const { users } = useRecoilValue(userState);
+
+  const usersList = useMemo(
+    () =>
+      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
+      })),
+    [users],
+  );
+
+  const exists = usersList.some((item) => item.text === 'All');
+
+  if (!exists) {
+    usersList.unshift({ value: -1, text: 'All' });
+  }
+
   return (
-    <Layout title="Tasks | Segue">
-      <div className="flex flex-auto w-full h-screen">
-        <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
-          <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'} />
-          <Toolbar onApplyFilters={onApplyFilters} />
-          {filteredProductions.length > 0 ? (
-            filteredProductions.map((production) => {
-              return (
-                <div key={production.Id} className="mb-10">
-                  <h3 className=" text-xl font-bold py-4 !text-purple-900">{production.ShowName}</h3>
-                  <Tasklist
-                    onTasksChange={(change) => onTasksChange(change, production.Id)}
-                    tasks={production?.Tasks}
-                  />
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center font-bold text-lg">
-              <p>No Tasks Found</p>
-            </div>
-          )}
-          {/* <TaskButtons openBulkModal={openBulkModal} /> */}
-        </div>
+    <Layout title="Tasks | Segue" flush>
+      <div className="mb-8">
+        <Filters usersList={usersList} />
       </div>
-      {/*
-        <BulkActionForm
-          userAccountId={0}
-          closeModal={console.log}
-          taskIdArray={isSelectedArray}
-          bulkActionField={bulkActionField}
-        />
-        */}
+      {filteredProductions.length === 0 ? (
+        <TasksTable rowData={[]} />
+      ) : (
+        filteredProductions.map((production) => {
+          const columnDefs = getColumnDefs(usersList, production.ShowName);
+          return (
+            <div key={production.Id} className="mb-10">
+              <TasksTable
+                tableHeight={filteredProductions.length > 1}
+                rowData={production.Tasks}
+                columnDefs={columnDefs}
+              />
+            </div>
+          );
+        })
+      )}
     </Layout>
   );
 };
+
+export default TasksPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
@@ -97,5 +94,3 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   };
   return { props: { initialState } };
 };
-
-export default Index;

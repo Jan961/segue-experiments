@@ -24,7 +24,6 @@ const DEFAULT_TASK: ProductionTaskDTO = {
   ProductionId: 0,
   Code: 0,
   Name: '',
-  Interval: 'once',
   CompleteByIsPostProduction: false,
   StartByIsPostProduction: false,
   StartByWeekNum: -52,

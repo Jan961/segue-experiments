@@ -5,8 +5,7 @@ describe('UploadModal Component', () => {
   const mockOnClose = jest.fn();
   const mockOnChange = jest.fn();
 
-  const mockFile = (size: number, type: string) =>
-    new File([new Blob(['1'.repeat(size + 1)], { type })], 'testfile');
+  const mockFile = (size: number, type: string) => new File([new Blob(['1'.repeat(size + 1)], { type })], 'testfile');
   const allowedFormats = ['image/jpeg', 'image/png'];
   afterEach(() => {
     jest.clearAllMocks();

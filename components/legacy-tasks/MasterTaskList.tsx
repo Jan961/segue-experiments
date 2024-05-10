@@ -62,7 +62,7 @@ const Tasklist = () => {
         <Table.Body className="!bg-transparent">
           {' '}
           {filteredTasks.map((masterTask) => (
-            <MasterTaskListItem task={masterTask} key={masterTask.Id}></MasterTaskListItem>
+            <MasterTaskListItem task={masterTask} key={masterTask.Id} />
           ))}
         </Table.Body>
       </Table>

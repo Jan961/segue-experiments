@@ -1,7 +1,7 @@
 import Layout from 'components/Layout';
 // import { useState } from 'react';
-import Toolbar from 'components/tasks/toolbar';
-import Tasklist from 'components/tasks/TaskList';
+import Toolbar from 'components/legacy-tasks/toolbar';
+import Tasklist from 'components/legacy-tasks/TaskList';
 // import TaskButtons from 'components/tasks/TaskButtons';
 import GlobalToolbar from 'components/toolbar';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -21,7 +21,7 @@ import { ProductionTaskDTO } from 'interfaces';
 const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { selected } = useRecoilValue(productionJumpState);
   const [productionTasks, setProductionTasks] = useRecoilState(productionState);
-  const { filteredProductions, onApplyFilters } = useTasksFilter();
+  const { filteredProductions } = useTasksFilter();
   const onTasksChange = (updatedTasks: ProductionTaskDTO[], productionId: number) => {
     const updatedProductionTasks = productionTasks.map((productionTask) => {
       if (productionTask.Id === productionId) {
@@ -36,7 +36,7 @@ const Index = (props: InferGetServerSidePropsType<typeof getServerSideProps>) =>
       <div className="flex flex-auto w-full">
         <div className="flex-col px-12 w-full flex" style={{ minHeight: '60vh' }}>
           <GlobalToolbar productionJump={false} title={'Tasks'} color={'!text-purple-900'} />
-          <Toolbar onApplyFilters={onApplyFilters} />
+          <Toolbar onApplyFilters={null} />
           {filteredProductions.length > 0 ? (
             filteredProductions.map((production) => (
               <div
