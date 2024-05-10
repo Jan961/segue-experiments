@@ -6,7 +6,6 @@ import WindowedSelect, {
   OptionProps,
   DropdownIndicatorProps,
   IndicatorsContainerProps,
-  MenuProps,
   MultiValueProps,
 } from 'react-windowed-select';
 import { WithTestId } from 'types';
@@ -62,7 +61,6 @@ export interface SelectProps extends WithTestId {
   isClearable?: boolean;
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
-  customWidth?: string;
 }
 
 export default forwardRef(function Select(
@@ -82,7 +80,6 @@ export default forwardRef(function Select(
     isClearable = true,
     isMulti = false,
     closeMenuOnSelect = true,
-    customWidth = '258px',
   }: SelectProps,
   ref,
 ) {
@@ -164,14 +161,6 @@ export default forwardRef(function Select(
     setFilteredOptions(options);
   }, [options]);
 
-  const Menu = (props: MenuProps) => {
-    return (
-      <components.Menu className={`${props.isMulti && `!w-[${customWidth}]`}`} {...props}>
-        {props.children}
-      </components.Menu>
-    );
-  };
-
   const handleOptionSelect = (o: SelectOption) => {
     if (isMulti) {
       const latestSelectedOption = o[o.length - 1];
@@ -221,7 +210,6 @@ export default forwardRef(function Select(
     IndicatorsContainer,
     MultiValueRemove,
     DropdownIndicator,
-    Menu,
     MultiValue,
   };
 

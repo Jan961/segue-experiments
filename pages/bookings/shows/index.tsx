@@ -13,7 +13,6 @@ import { getRegionlist } from 'services/productionService';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { showsList = [] } = props;
-  console.log(showsList);
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
