@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start",
     "cp-start": "NODE_ENV=production node server.js",
-    "test": "jest --config jest.config.js --no-cache",
+    "test": "jest --config jest.config.js --no-cache --coverage",
     "test:ci": "jest --ci",
     "type-check": "tsc",
     "postinstall": "prisma generate",
