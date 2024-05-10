@@ -247,6 +247,7 @@ module.exports = {
       colors: colorsConfig,
       backgroundOpacity: {
         65: '0.65',
+        15: '0.15',
       },
       width: {
         5.5: '1.375rem',

@@ -60,6 +60,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getDayTypes(),
     getContractStatus(ProductionId === -1 ? null : ProductionId),
   ]);
+
   const dateBlock = [];
   const rehearsal = {};
   const booking = {};
