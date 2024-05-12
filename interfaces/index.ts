@@ -459,11 +459,11 @@ export interface ContractTableRowType {
 }
 
 export interface FileDTO {
-  OriginalFilename: string;
-  MediaType: string;
-  Location: string;
-  UploadUserId: number;
-  UploadDateTime: string;
-  Entity: string;
-  EntityId: number;
+  originalFilename: string;
+  mediaType: string;
+  location: string;
+  uploadUserId: number;
+  uploadDateTime: string;
+  entity: string;
+  entityId: number;
 }

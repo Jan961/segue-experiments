@@ -10,10 +10,10 @@ const ProgressBar = ({ backgroundColor, fillColor, progress }: ProgressBarProps)
       <div className={`w-full rounded-full h-3 ${backgroundColor ? `bg-[${backgroundColor}]` : 'bg-gray-300'}`}>
         <div
           className={`${
-            fillColor ? `bg-[${fillColor}]` : 'bg-primary-navy'
+            fillColor ? `bg-${fillColor}` : 'bg-primary-navy'
           }  transition-all duration-300 ease-in-out rounded-full h-3`}
           style={{ width: `${progress}%` }}
-         />
+        />
       </div>
     </div>
   );

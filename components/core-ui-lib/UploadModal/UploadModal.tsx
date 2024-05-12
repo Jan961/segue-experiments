@@ -39,6 +39,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   useEffect(() => {
+    const fileerrors = Object.fromEntries(
+      Object.entries(errorMessages).filter(([filename]) => selectedFiles.some((file) => file.file.name === filename)),
+    );
+    setErrorMessages(fileerrors);
     onChange?.(selectedFiles);
   }, [selectedFiles]);
 
@@ -127,6 +131,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             accept={allowedFormats.join(',') || '*'}
             multiple={isMultiple}
             onChange={handleFileInput}
+            disabled={isUploading}
           />
         </div>
         {error && (

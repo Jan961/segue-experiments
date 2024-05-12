@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { bulkFileUpload, singleFileUpload } from 'services/uploadService';
+import { bulkFileUpload, singleFileUpload, transformForPrisma } from 'services/uploadService';
 import { parseFormData } from 'utils/fileUpload';
 import { getEmailFromReq, getUserId } from 'services/userService';
 import prisma from 'lib/prisma';
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const file = files.file;
-    let response: { metadataList: FileDTO[] } = { metadataList: [] };
+    let response: FileDTO[] | FileDTO;
     const path = fields.path as string;
 
     if (!Array.isArray(file)) {
@@ -31,13 +31,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       response = await bulkFileUpload(path, file, userId);
     }
 
-    const fileRecords: FileDTO[] = response.metadataList;
+    const fileRecords = transformForPrisma(response);
 
     await prisma.file.createMany({
       data: fileRecords,
     });
 
-    res.status(200).json({ message: 'File uploaded successfully.', fileRecords });
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ error: 'File upload unsuccessful', message: error.message });
   }

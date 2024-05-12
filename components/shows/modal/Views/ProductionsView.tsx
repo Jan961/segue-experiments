@@ -102,6 +102,47 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   }, [isAddRow, tableRef]);
 
+  const onSave = (file, onProgress, onError) => {
+    const formData = new FormData();
+    formData.append('file', file[0].file);
+    formData.append('path', 'prod');
+
+    let progress = 0; // to track overall progress
+    let slowProgressInterval; // interval for slow progress simulation
+
+    axios
+      .post('/api/upload', formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          if (percentCompleted <= 50) {
+            progress = percentCompleted;
+          } else if (percentCompleted === 100) {
+            progress = 50;
+            clearInterval(slowProgressInterval);
+            slowProgressInterval = setInterval(() => {
+              if (progress < 95) {
+                progress += 0.5;
+                onProgress(file[0].file, progress);
+              } else {
+                clearInterval(slowProgressInterval);
+              }
+            }, 100);
+          }
+
+          onProgress(file[0].file, progress);
+        },
+      }) // eslint-disable-next-line
+      .then((response) => {
+        progress = 100;
+        onProgress(file[0].file, progress);
+        clearInterval(slowProgressInterval);
+      }) // eslint-disable-next-line
+      .catch((error) => {
+        onError(file[0].file, 'Error uploading file. Please try again.');
+        clearInterval(slowProgressInterval);
+      });
+  };
+
   const handleCellClick = async (e) => {
     setProductionId(e.data.Id);
     setRowIndex(e.rowIndex);
@@ -223,6 +264,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
         onClose={() => setIsUploadModalOpen(false)}
         maxFileSize={500 * 1024} // 500kb
+        onSave={onSave}
       />
     </>
   );

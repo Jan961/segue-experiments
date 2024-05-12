@@ -4,7 +4,7 @@ import { pdfStandardColors } from 'config/global';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const exportToExcel = (tableRef) => {
-  tableRef.current?.getApi?.()?.exportDataAsExcel?.();
+  tableRef?.current?.getApi?.()?.exportDataAsExcel?.();
 };
 
 const getHeaderToExport = (gridApi) => {
@@ -116,7 +116,7 @@ const getDocument = (gridApi, styles) => {
 };
 
 export const exportToPDF = (tableRef, styles = {}) => {
-  const gridApi = tableRef.current?.getApi();
+  const gridApi = tableRef?.current?.getApi();
   const doc = getDocument(gridApi, styles);
   pdfMake.createPdf(doc).download();
 };
