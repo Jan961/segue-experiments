@@ -5,6 +5,7 @@ import { useRecoilState } from 'recoil';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../bookings/utils';
 import { ContractTableRowType } from 'interfaces';
+import EditVenueContractModal from './modal/EditVenueContractModal';
 
 interface ContractsTableProps {
   rowData?: ContractTableRowType;
@@ -12,6 +13,7 @@ interface ContractsTableProps {
 
 export default function ContractsTable({ rowData }: ContractsTableProps) {
   const tableRef = useRef(null);
+  const [editContractForm, setEditContractForm] = useState(false);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const [rows, setRows] = useState([]);
   const gridOptions = {
@@ -38,6 +40,10 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     }
   }, [rowData]);
 
+  const handleRowDoubleClicked = () => {
+    setEditContractForm(true);
+  };
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
@@ -47,8 +53,10 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
           styleProps={contractsStyleProps}
           gridOptions={gridOptions}
           ref={tableRef}
+          onRowDoubleClicked={handleRowDoubleClicked}
         />
       </div>
+      {editContractForm && <EditVenueContractModal />}
     </>
   );
 }
