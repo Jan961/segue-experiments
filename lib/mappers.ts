@@ -31,6 +31,7 @@ import {
   VenueContactDTO,
   VenueRoleDTO,
   ContractStatusType,
+  ContractBookingStatusType,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
@@ -220,6 +221,38 @@ export const contractStatusmapper = (status: ContractStatusType) => {
     ContractNotes: status.Notes,
     ReceivedBackDate: convertDate(status.ReceivedBackDate),
     Exceptions: status.Exceptions,
+  };
+};
+
+export const contractBookingStatusmapper = (status: ContractBookingStatusType) => {
+  return {
+    DateBlockId: status.DateBlockId,
+    VenueId: status.VenueId,
+    FirstDate: convertDate(status.FirstDate),
+    StatusCode: status.StatusCode,
+    PencilNum: status.PencilNum,
+    LandingPageURL: status.LandingPageURL,
+    TicketsOnSaleFromDate: convertDate(status.TicketsOnSaleFromDate),
+    TicketsOnSale: status.TicketsOnSale,
+    MarketingPlanReceived: status.MarketingPlanReceived,
+    ContactInfoReceived: status.ContactInfoReceived,
+    PrintReqsReceived: status.PrintReqsReceived,
+    Notes: status.Notes,
+    DealNotes: status.DealNotes,
+    TicketPriceNotes: status.TicketPriceNotes,
+    MarketingDealNotes: status.MarketingDealNotes,
+    CrewNotes: status.CrewNotes,
+    SalesNotes: status.SalesNotes,
+    HoldNotes: status.HoldNotes,
+    CompNotes: status.CompNotes,
+    MerchandiseNotes: status.MerchandiseNotes,
+    CastRateTicketNotes: status.CastRateTicketNotes,
+    CastRateTicketsArranged: status.CastRateTicketsArranged,
+    CastRateTicketsNotes: status.CastRateTicketsNotes,
+    RunTag: status.RunTag,
+    MarketingCostsStatus: status.MarketingCostsStatus,
+    MarketingCostsApprovalDate: convertDate(status.MarketingCostsApprovalDate),
+    MarketingCostsNotes: status.MarketingCostsNotes,
   };
 };
 

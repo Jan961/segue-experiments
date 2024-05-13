@@ -12,7 +12,7 @@ import { contractsPerformanceState } from '../contractsPerformanceState';
 import ContractsHelper from 'utils/contracts';
 import { contractsDateBlockState } from '../contractsDateBlockState';
 import { DAY_TYPE_FILTERS } from 'components/bookings/utils';
-import { contractsStatusState } from '../contractsStatusState';
+import { contractsBookingStatusState, contractsStatusState } from '../contractsStatusState';
 import { contractRehearsalState } from '../contractRehearsalState';
 import { contractGetInFitUpState } from '../contractGetInFitUpState';
 
@@ -25,7 +25,8 @@ export const contractsRowsSelector = selector({
     const rehearsals = get(contractRehearsalState);
     const bookings = get(contractsState);
     const getInFitUp = get(contractGetInFitUpState);
-    const contractStatus = get(contractsStatusState);
+    const contractData = get(contractsStatusState);
+    const contractBookingData = get(contractsBookingStatusState);
     const performanceDict = get(contractsPerformanceState);
     const other = get(contractsOtherState);
     const venueDict = get(contractsVenueState);
@@ -35,7 +36,6 @@ export const contractsRowsSelector = selector({
     const dateBlocks = get(contractsDateBlockState);
     const helper = new ContractsHelper({ performanceDict, venueDict, productionDict });
     const { start, end } = helper.getRangeFromDateBlocks(dateBlocks);
-
     const rows: any = [];
     const bookedDates: string[] = [];
     const addRow = (date: string, type: string, data: any, transformer) => {
@@ -53,9 +53,11 @@ export const contractsRowsSelector = selector({
         }
         return value;
       };
+      // const contractBookingDataMapper = contractBookingData
 
       const row = {
         ...rowData,
+        // ...contractBookingDataMapper[rowData.Id],
         week,
         dateTime: date,
         date: date ? moment(date).format('ddd DD/MM/YY') : '',
@@ -66,8 +68,57 @@ export const contractsRowsSelector = selector({
         bookingStatus: contractsStatusMap[data?.StatusCode] || '',
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
-        contractStatus: contractStatus[rowData.Id] ? contractsStatusMap[contractStatus[rowData.Id].StatusCode] : '',
+        contractStatus: contractData[rowData.Id] ? contractsStatusMap[contractData[rowData.Id].StatusCode] : '',
+        SignedDate: contractData[rowData.Id] ? contractData[rowData.Id].SignedDate : '',
+        SignedBy: contractData[rowData.Id] ? contractData[rowData.Id].SignedBy : '',
+        ReturnDate: contractData[rowData.Id] ? contractData[rowData.Id].ReturnDate : '',
+        CheckedBy: contractData[rowData.Id] ? contractData[rowData.Id].CheckedBy : '',
+        RoyaltyPercentage: contractData[rowData.Id] ? contractData[rowData.Id].RoyalPercentage : '',
+        DealType: contractData[rowData.Id] ? contractData[rowData.Id].DealType : '',
+        Notes: contractData[rowData.Id] ? contractData[rowData.Id].ContractNotes : '',
+        ReceivedBackDate: contractData[rowData.Id] ? contractData[rowData.Id].ReceivedBackDate : '',
+        Exceptions: contractData[rowData.Id] ? contractData[rowData.Id].Exceptions : '',
+        DateBlockId: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].DateBlockId : '',
+        VenueId: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].VenueId : '',
+        FirstDate: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].FirstDate : '',
+        StatusCode: contractData[rowData.Id] ? contractData[rowData.Id].StatusCode : '',
+        PencilNum: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].PencilNum : '',
+        LandingPageURL: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].LandingPageURL : '',
+        TicketsOnSaleFromDate: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].TicketsOnSaleFromDate
+          : '',
+        TicketsOnSale: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].TicketsOnSale : '',
+        MarketingPlanReceived: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].MarketingPlanReceived
+          : '',
+        ContactInfoReceived: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].ContactInfoReceived : '',
+        PrintReqsReceived: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].PrintReqsReceived : '',
+        bookingNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].Notes : '',
+        DealNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].DealNotes : '',
+        TicketPriceNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].TicketPriceNotes : '',
+        MarketingDealNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].MarketingDealNotes : '',
+        CrewNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].CrewNotes : '',
+        SalesNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].SalesNotes : '',
+        HoldNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].HoldNotes : '',
+        CompNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].CompNotes : '',
+        MerchandiseNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].MerchandiseNotes : '',
+        CastRateTicketNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].CastRateTicketNotes : '',
+        CastRateTicketsArranged: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].CastRateTicketsArranged
+          : '',
+        CastRateTicketsNotes: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].CastRateTicketsNotes
+          : '',
+        RunTag: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].RunTag : '',
+        MarketingCostsStatus: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].MarketingCostsStatus
+          : '',
+        MarketingCostsApprovalDate: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].MarketingCostsApprovalDate
+          : '',
+        MarketingCostsNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].MarketingCostsNotes : '',
       };
+
       rows.push(row);
     };
     Object.values(rehearsals).forEach((r) => {

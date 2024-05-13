@@ -7,14 +7,14 @@ export type AddEditContractsState = {
   visible: boolean;
   startDate?: string;
   endDate?: string;
-  booking?: any;
+  contract?: any;
 };
 
 export const ADD_EDIT_MODAL_DEFAULT_STATE = {
   visible: false,
   startDate: null,
   endDate: null,
-  booking: null,
+  contract: null,
 };
 
 export const contractsState = atom({
@@ -22,7 +22,7 @@ export const contractsState = atom({
   default: {} as ContractsState,
 });
 
-export const addEditcontractsState = atom({
+export const addEditContractsState = atom({
   key: 'addEditcontractsState',
   default: ADD_EDIT_MODAL_DEFAULT_STATE as AddEditContractsState,
 });
