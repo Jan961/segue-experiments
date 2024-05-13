@@ -102,6 +102,9 @@ export type BookingDTO = {
   MarketingPlanReceived: boolean;
   PrintReqsReceived: boolean;
   ContactInfoReceived: boolean;
+  MarketingCostsStatus: string;
+  MarketingCostsApprovalDate: string;
+  MarketingCostsNotes: string;
 };
 
 export type ContractsDTO = {
