@@ -22,7 +22,8 @@ import { userState } from 'state/account/userState';
 import { useMemo, useState } from 'react';
 import { SaveContractBookingFormState, SaveContractFormState, VenueContractFormData } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-const convert = (data: string): string => {
+import { convertDate } from 'services/dateService';
+const convert = (data: Date): string => {
   const dateObj = new Date(data);
   if (isNaN(dateObj.getTime())) {
     throw new Error('Invalid date format');
@@ -39,7 +40,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
-  const modalTitle = `${productionJumpState.Code} | ${productionJumpState.ShowName} | ${selectedTableCell.contract.venue} | ${selectedTableCell.contract.date}`;
+  const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
+    selectedTableCell.contract.venue
+  } | ${convertDate(productionJumpState.StartDate)} - ${convertDate(productionJumpState.EndDate)}`;
   const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
@@ -131,7 +134,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               options={allStatusOptions}
               className="bg-primary-white w-52"
               placeholder="Deal Memo Status"
-              onChange={(value) => editContractModalData('dealMemoStatus', value)}
+              onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
               value={contractsKeyStatusMap[formData.StatusCode]}
               // disabled={!productionId}
               isClearable
@@ -405,7 +408,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     // placeholder="Search bookings..."
                     className="w-[100px]"
                     // iconName="search"
-                    value={formData.RoyaltyPercentage}
+                    value={formData.RoyalPercentage}
                     // onChange={onChange}
                   />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>

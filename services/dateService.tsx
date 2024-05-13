@@ -44,6 +44,16 @@ export const dateToSimple = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-GB', options);
 };
 
+export const convertDate = (dateString) => {
+  const dateObj = new Date(dateString);
+
+  const day = dateObj.getUTCDate().toString().padStart(2, '0');
+  const month = (dateObj.getUTCMonth() + 1).toString().padStart(2, '0');
+  const year = dateObj.getUTCFullYear().toString().slice(-2);
+
+  return `${day}/${month}/${year}`;
+};
+
 export const dateToPicker = (dateToFormat: Date | string) => {
   if (!dateToFormat) return '';
 

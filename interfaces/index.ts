@@ -518,6 +518,11 @@ export interface VenueContractFormData {
   Exceptions: string;
   Notes: string;
   MerchandiseNotes: string;
+  RoyalPercentage: string;
+  performanceTimes: string;
+  performanceCount: string;
+  DealNotes: string;
+  status: string;
 }
 
 export interface SaveContractFormState {

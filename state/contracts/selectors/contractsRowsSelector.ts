@@ -73,7 +73,7 @@ export const contractsRowsSelector = selector({
         SignedBy: contractData[rowData.Id] ? contractData[rowData.Id].SignedBy : '',
         ReturnDate: contractData[rowData.Id] ? contractData[rowData.Id].ReturnDate : '',
         CheckedBy: contractData[rowData.Id] ? contractData[rowData.Id].CheckedBy : '',
-        RoyaltyPercentage: contractData[rowData.Id] ? contractData[rowData.Id].RoyalPercentage : '',
+        RoyalPercentage: contractData[rowData.Id] ? contractData[rowData.Id].RoyalPercentage : '',
         DealType: contractData[rowData.Id] ? contractData[rowData.Id].DealType : '',
         Notes: contractData[rowData.Id] ? contractData[rowData.Id].ContractNotes : '',
         ReceivedBackDate: contractData[rowData.Id] ? contractData[rowData.Id].ReceivedBackDate : '',
