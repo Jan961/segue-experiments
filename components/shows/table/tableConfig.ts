@@ -8,6 +8,7 @@ import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import UploadRenderer from 'components/bookings/table/UploadRenderer';
 
 const generateChildCol = (
   headerName: string,
@@ -172,7 +173,7 @@ export const productionsTableConfig = [
     headerName: 'Prod Image',
     field: 'IsArchived',
     width: 80,
-    cellRenderer: ButtonRenderer,
+    cellRenderer: UploadRenderer,
     cellRendererParams: {
       buttonText: 'Upload',
     },

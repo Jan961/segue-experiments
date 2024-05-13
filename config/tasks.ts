@@ -9,7 +9,6 @@ export const statusOptions: SelectOption[] = [
   { text: 'Overdue', value: 'overdue' },
   { text: 'Due this week', value: 'dueThisWeek' },
   { text: 'Overdue and Due this Week', value: 'overdueanddueThisWeek' },
-
 ];
 
 export const TaskStatusLabelMap = {

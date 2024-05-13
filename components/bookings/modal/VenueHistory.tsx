@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 import { bookingState } from 'state/booking/bookingState';
@@ -15,6 +15,7 @@ import { Spinner } from 'components/global/Spinner';
 import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/MarketingTypes';
 import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import ExportModal from 'components/core-ui-lib/ExportModal';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -49,6 +50,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [salesSnapData, setSalesSnapData] = useState<Array<SalesSnapshot>>();
   const [errorMessage, setErrorMessage] = useState('');
   const { productions } = useRecoilValue(productionJumpState);
+  const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const salesTableRef = useRef(null);
 
   const { fetchData } = useAxios();
 
@@ -281,6 +284,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
           {showCompSelectModal && (
             <SalesTable
+              salesTableRef={salesTableRef}
               key={JSON.stringify(selectedBookings)}
               containerHeight="h-auto"
               containerWidth="w-[920px]"
@@ -316,6 +320,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
           {showResultsModal && (
             <SalesTable
+              salesTableRef={salesTableRef}
               containerHeight="h-auto"
               containerWidth="w-auto"
               module="bookings"
@@ -332,7 +337,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             <Button className="w-32" variant="secondary" text="Back" onClick={() => handleBtnBack('salesComparison')} />
             <Button
               className="ml-4 w-32"
-              onClick={() => alert('Export to Excel - SK-129')}
+              onClick={() => setIsExportModalOpen(true)}
               variant="primary"
               text="Export"
               iconProps={{ className: 'h-4 w-3' }}
@@ -342,6 +347,23 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           </div>
         </TableWrapper>
       </PopupModal>
+      <ExportModal
+        tableRef={salesTableRef}
+        visible={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        ExportList={[
+          {
+            key: 'Excel',
+            iconName: 'excel',
+            iconProps: { fill: '#1D6F42', variant: '7xl' },
+          },
+          {
+            key: 'PDF',
+            iconName: 'document-solid',
+            iconProps: { fill: 'red', variant: '7xl' },
+          },
+        ]}
+      />
 
       <PopupModal
         show={showSalesSnapshot}
@@ -354,6 +376,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           <SalesTable
+            salesTableRef={salesTableRef}
             containerHeight="h-auto"
             containerWidth="w-[1220px]"
             module="bookings"
