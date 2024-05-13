@@ -53,7 +53,6 @@ export type ProductionTaskDTO = {
   FollowUp?: string;
   CreatedDate?: string;
   Status?: string;
-  Interval?: string;
   AssignedBy?: string;
   AssignedTo?: string;
   StartByWeekNum?: number;
@@ -245,7 +244,7 @@ export type ActivityDTO = {
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
-  DueByDate?: Date;
+  DueByDate?: Date | string;
   Notes: string;
 };
 
@@ -460,11 +459,11 @@ export interface ContractTableRowType {
 }
 
 export interface FileDTO {
-  OriginalFilename: string;
-  MediaType: string;
-  Location: string;
-  UploadUserId: number;
-  UploadDateTime: string;
-  Entity: string;
-  EntityId: number;
+  originalFilename: string;
+  mediaType: string;
+  location: string;
+  uploadUserId: number;
+  uploadDateTime: string;
+  entity: string;
+  entityId: number;
 }

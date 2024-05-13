@@ -1,6 +1,8 @@
-import React from 'react';
+interface MonthlyIntervalSelectorProps {
+  onDayOfMonthChange: (day: number) => void;
+}
 
-function MonthlyIntervalSelector({ onDayOfMonthChange }) {
+function MonthlyIntervalSelector({ onDayOfMonthChange }: MonthlyIntervalSelectorProps) {
   const handleDayOfMonthChange = (e) => {
     onDayOfMonthChange(e.target.value);
   };

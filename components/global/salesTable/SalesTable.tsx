@@ -28,6 +28,7 @@ interface SalesTableProps {
   productions;
   booking?;
   tableHeight?: number;
+  salesTableRef?: any;
 }
 
 export default function SalesTable({
@@ -42,6 +43,7 @@ export default function SalesTable({
   productions,
   booking,
   tableHeight = 0,
+  salesTableRef,
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -219,6 +221,7 @@ export default function SalesTable({
   return (
     <div className={classNames(width, height)}>
       <Table
+        ref={salesTableRef}
         columnDefs={columnDefs}
         rowData={rowData}
         styleProps={styleProps}
