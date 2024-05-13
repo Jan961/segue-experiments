@@ -111,6 +111,9 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   MarketingPlanReceived: b.MarketingPlanReceived,
   PrintReqsReceived: b.PrintReqsReceived,
   ContactInfoReceived: b.ContactInfoReceived,
+  MarketingCostsStatus: b.MarketingCostsStatus,
+  MarketingCostsApprovalDate: convertDate(b.MarketingCostsApprovalDate),
+  MarketingCostsNotes: b.MarketingCostsNotes,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
@@ -195,6 +198,7 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   CompanyCost: Number(a.CompanyCost),
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
+  DueByDate: convertDate(a.DueByDate),
   Notes: a.ActivityNotes,
 });
 

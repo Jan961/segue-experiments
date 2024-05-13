@@ -5,6 +5,14 @@ import { checkAccess, getEmailFromReq } from 'services/userService';
 const mapToPrisma = (fields) => {
   return {
     LandingPageURL: fields.landingPageUrl,
+    TicketsOnSale: fields.ticketsOnSale,
+    TicketsOnSaleFromDate: fields.ticketsOnSaleFromDate,
+    MarketingPlanReceived: fields.marketingPlanReceived,
+    PrintReqsReceived: fields.printReqsReceived,
+    ContactInfoReceived: fields.contactInfoReceived,
+    MarketingCostsStatus: fields.marketingCostsStatus,
+    MarketingCostsApprovalDate: fields.marketingCostsApprovalDate,
+    MarketingCostsNotes: fields.marketingCostsNotes,
   };
 };
 
