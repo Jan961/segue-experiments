@@ -105,7 +105,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const onSave = (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', 'prod');
+    formData.append('path', 'production/');
 
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation

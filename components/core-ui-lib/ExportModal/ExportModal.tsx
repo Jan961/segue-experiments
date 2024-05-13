@@ -28,7 +28,7 @@ const ExportModal = ({ visible, onClose, ExportList, tableRef, pdfStyles }: Expo
               onClick={() => handleClick(type.key)}
             >
               <Icon iconName={type.iconName} variant="7xl" {...type.iconProps} />
-              <div className="text-center mt-2">{type.key}</div>
+              <div className="text-center mt-2 font-bold">{type.key}</div>
             </div>
           ))}
         </div>

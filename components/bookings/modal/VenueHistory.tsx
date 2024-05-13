@@ -355,7 +355,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           {
             key: 'Excel',
             iconName: 'excel',
-            iconProps: { fill: 'green', variant: '7xl' },
+            iconProps: { fill: '#1D6F42', variant: '7xl' },
           },
           {
             key: 'PDF',
