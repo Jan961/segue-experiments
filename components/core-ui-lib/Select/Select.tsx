@@ -257,7 +257,6 @@ export default forwardRef(function Select(
         styles={colourStyles}
         placeholder={placeholder}
         isSearchable={isSearchable}
-        menuShouldBlockScroll={true}
         isClearable={isClearable}
         isMulti={isMulti}
         hideSelectedOptions={false}

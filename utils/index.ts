@@ -74,3 +74,31 @@ export const convertObjectKeysToCamelCase = (obj: any) => {
   }
   return newObj;
 };
+
+export const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+export function fileSizeFormatter(bytes: number) {
+  if (bytes < 1024) {
+    return `${bytes} bytes`;
+  } else if (bytes < 1048576) {
+    return `${(bytes / 1024).toFixed(2)} KB`;
+  } else if (bytes < 1073741824) {
+    return `${(bytes / 1048576).toFixed(2)} MB`;
+  } else {
+    return `${(bytes / 1073741824).toFixed(2)} GB`;
+  }
+}
+
+export const getStatusFromProgress = (progress?: number) => {
+  if (!progress) return;
+
+  if (progress > 0 && progress < 100) {
+    return 'Uploading';
+  } else if (progress === 100) {
+    return 'Uploaded';
+  }
+
+  
+};
