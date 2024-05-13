@@ -5,12 +5,17 @@ import Table from 'components/core-ui-lib/Table';
 import { useCallback, useState, useEffect } from 'react';
 import { UiTransformedVenue, UiVenueContact, filterEmptyVenueContacts } from 'utils/venue';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import { StyleProps } from 'components/core-ui-lib/Table/Table';
 
 interface VenueContactDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
   contactsList?: UiVenueContact[];
   onChange: (data: any) => void;
   venueRoleOptionList: SelectOption[];
+  tableStyleProps?: StyleProps;
+  tableHeight?: number;
+  title?: string;
+  module?: string;
 }
 
 const VenueContactForm = ({
@@ -18,6 +23,10 @@ const VenueContactForm = ({
   venue,
   venueRoleOptionList,
   contactsList = [],
+  tableStyleProps = styleProps,
+  tableHeight = 0, // 0 uses default sizing
+  title = 'Venue Contacts',
+  module = 'bookings',
 }: VenueContactDetailsFormProps) => {
   const [venueContacts, setVenueContacts] = useState<UiVenueContact[]>(contactsList);
   const confVariant = 'delete';
@@ -28,7 +37,7 @@ const VenueContactForm = ({
   const getRowStyle = useCallback(
     (params) => {
       if (params.node.rowIndex === 0 && createMode) {
-        return { background: '#fad0cc' };
+        return { background: module === 'bookings' ? '#fad0cc' : '#c1e0db' };
       }
       return null;
     },
@@ -79,12 +88,15 @@ const VenueContactForm = ({
       ...venue,
       venueContacts: filterEmptyVenueContacts(updatedContacts, venueRoleOptionList),
     };
-    onChange(updatedFormData);
+
     if (createMode) {
+      onChange({ mode: 'create', updatedFormData });
       const { roleName, firstName, lastName, phone, email } = updatedContacts[0];
       if (roleName || firstName || lastName || phone || email) {
         setCreateMode(false);
       }
+    } else {
+      onChange({ mode: 'update', updatedFormData, updatedRow: updatedFormData.venueContacts[rowIndex] });
     }
   };
 
@@ -97,10 +109,12 @@ const VenueContactForm = ({
   };
 
   const deleteRow = () => {
+    const rowToDel = venueContacts[deleteIndex];
     const updatedContactVenueTableRows = [
       ...venueContacts.slice(0, deleteIndex),
       ...venueContacts.slice(deleteIndex + 1),
     ];
+
     setVenueContacts(updatedContactVenueTableRows);
     setDeleteIndex(null);
     setShowDeleteModal(!showDeleteModal);
@@ -108,7 +122,7 @@ const VenueContactForm = ({
       ...venue,
       venueContacts: updatedContactVenueTableRows,
     };
-    onChange(updatedFormData);
+    onChange({ rowToDel, mode: 'delete', ...updatedFormData });
     if (createMode && deleteIndex === 0) {
       setCreateMode(false);
     }
@@ -116,18 +130,19 @@ const VenueContactForm = ({
 
   return (
     <div className="block mb-4">
-      <div className="flex flex-row items-center justify-between pb-5">
-        <h2 className="text-xl text-primary-navy font-bold">Venue Contacts</h2>
+      <div className="flex flex-row items-center justify-between  pb-5">
+        <h2 className="text-xl text-primary-navy font-bold ">{title}</h2>
         <Button disabled={createMode} onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
       </div>
       <div className="min-h-52">
         <Table
           columnDefs={venueContactDefs(venueRoleOptionList)}
           rowData={venueContacts}
-          styleProps={styleProps}
+          styleProps={tableStyleProps}
           getRowStyle={getRowStyle}
           onCellClicked={onCellClicked}
           onCellValueChange={handleCellValueChange}
+          tableHeight={tableHeight}
         />
         {showDeleteModal && (
           <ConfirmationDialog

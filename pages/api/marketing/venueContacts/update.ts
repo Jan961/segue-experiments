@@ -6,7 +6,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const vc = req.body as VenueContactDTO;
-
     await prisma.venueContact.update({
       where: {
         Id: vc.Id,
@@ -18,7 +17,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Phone: vc.Phone,
         VenueRole: {
           connect: {
-            Id: vc.RoleId,
+            Id: vc.VenueRoleId,
           },
         },
       },
