@@ -5,6 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 // `ANALYZE=true npm run build`
 
 module.exports = withBundleAnalyzer({
+  basePath: process.env.BASE_PATH || '',
   reactStrictMode: true,
   i18n: {
     locales: ['en-US', 'fr', 'es'],

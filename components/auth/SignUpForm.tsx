@@ -2,9 +2,13 @@ import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { useSignUp } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { useMemo, useState } from 'react';
+
+import React, { useMemo, useState } from 'react';
 import PasswordInput from 'components/core-ui-lib/PasswordInput';
+import { useWizard } from 'react-use-wizard';
+import AuthError from './AuthError';
+
+import axios from 'axios';
 
 type UserDetails = {
   firstName: string;
@@ -23,8 +27,8 @@ const DEFAULT_USER_DETAILS = {
   confirmPassword: '',
   companyName: '',
 };
-const SignUpForm = () => {
-  const router = useRouter();
+const SignUpForm = ({ basePath }: { basePath: string }) => {
+  const { previousStep } = useWizard();
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [error, setError] = useState<string>('');
   const { signUp } = useSignUp();
@@ -48,15 +52,26 @@ const SignUpForm = () => {
 
   const handleSignUp = async () => {
     setError('');
-    // Start the sign-up process using the email and password provided
     try {
+      // Start the sign-up process using the email and password provided
       await signUp.create({
         emailAddress: userDetails.emailAddress,
         password: userDetails.password,
       });
 
+      // Create a row in the User table
+      await axios.post(`/api/user`, {
+        FirstName: userDetails.firstName,
+        LastName: userDetails.lastName,
+        Email: userDetails.emailAddress,
+        AccountId: 1,
+      });
+
       // Send the user an email with the verification code
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      await signUp.prepareEmailAddressVerification({
+        strategy: 'email_link',
+        redirectUrl: `${basePath}/auth/sign-in`,
+      });
     } catch (err: any) {
       setError(err.errors[0].code);
       console.error('error', err.errors[0].longMessage);
@@ -122,6 +137,7 @@ const SignUpForm = () => {
             value={userDetails.emailAddress}
             onChange={handleValueChange}
           />
+          {error && !isValidEmail && <AuthError error={error} />}
         </div>
         <div className="mt-3">
           <Label text="Create Password" />
@@ -145,7 +161,7 @@ const SignUpForm = () => {
         </div>
 
         <div className="w-full flex items-center gap-2 justify-end mt-3">
-          <Button text="Sign In" variant="secondary" onClick={() => router.push('/auth/sign-in')} className="w-32" />
+          <Button text="Back" variant="secondary" onClick={previousStep} className="w-32" />
           <Button text="Sign Up" onClick={handleSignUp} className="w-32" disabled={!isFormValid} />
         </div>
       </div>
