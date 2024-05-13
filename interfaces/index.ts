@@ -231,7 +231,7 @@ export type VenueContactDTO = {
   LastName: string;
   Phone: string;
   Email: string;
-  RoleId: number;
+  VenueRoleId: number;
   VenueId?: number;
 };
 
@@ -278,6 +278,7 @@ export type AllocatedHoldDTO = {
 export type VenueRoleDTO = {
   Id: number;
   Name: string;
+  Standard: boolean;
 };
 
 export type UserDto = {

@@ -183,7 +183,7 @@ export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
   LastName: vc.LastName,
   Phone: vc.Phone,
   Email: vc.Email,
-  RoleId: vc.VenueRoleId,
+  VenueRoleId: vc.VenueRoleId,
 });
 
 export const activityMapper = (a: BookingActivity): ActivityDTO => ({
@@ -232,6 +232,7 @@ export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => 
 export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Id: vr.Id,
   Name: vr.Name,
+  Standard: vr.IsStandard,
 });
 
 export const userMapper = (user: User): UserDto => ({
