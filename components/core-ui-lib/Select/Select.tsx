@@ -232,7 +232,7 @@ export default forwardRef(function Select(
         ref={ref}
         className="w-full"
         onInputChange={(inputValue) => {
-          setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
+          if (inputValue) setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
         }}
         onChange={handleOptionSelect}
         value={selectedOption}
