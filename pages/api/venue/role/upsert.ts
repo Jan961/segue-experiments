@@ -2,15 +2,16 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const mapToPrismaFields = ({ id: Id, name: Name, isStandard: IsStandard = false }) => ({ Id, Name, IsStandard });
-const handler = (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const role = mapToPrismaFields(req.body);
     if (!role.Name) {
       res.status(404).json({ ok: false, message: 'name is required' });
     }
-    const updatedRole = prisma.VenueRole.upsert({
+    const updatedRole = await prisma.VenueRole.upsert({
       where: {
-        Id: role.Id || -1,
+        ...(role.Id && { Id: role.Id }),
+        ...(role.Name && { Name: role.Name }),
       },
       create: { ...role },
       update: { ...role },

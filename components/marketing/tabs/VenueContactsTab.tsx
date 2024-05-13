@@ -17,12 +17,11 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
 
   const bookings = useRecoilState(bookingJumpState);
   const venueRoles = useRecoilValue(venueRoleState);
-  const [venueContactRows, setVenueContactRows] = useState<Array<UiVenueContact>>();
+  const [venueContactsTable, setVenueContactsTable] = useState(<div />);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const venueStandardRoleList = [
     ...venueRoles.filter((vr) => vr.Standard === true).map((vr) => vr.Standard && { text: vr.Name, value: vr.Id }),
   ];
-  const [contactsAvail, setContactsAvail] = useState(false);
 
   const placeholder: UiVenueContact = {
     email: 'Enter Email Address',
@@ -36,13 +35,15 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
     const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
     const variant = data.mode;
 
+    // create venue contact
     if (variant === 'create') {
       const newContact = data.updatedFormData.venueContacts.find((contact) => contact.venueRoleId === null);
       const roleIndex = venueStandardRoleList.findIndex((role) => role.text === newContact.roleName);
-      let roleId = null;
+      let venueRole = null;
 
+      // create a new role if it doesn't exist in the standard list - the api also does this check
       if (roleIndex === -1) {
-        roleId = await fetchData({
+        venueRole = await fetchData({
           url: '/api/venue/role/upsert',
           method: 'POST',
           data: {
@@ -58,7 +59,7 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
         LastName: newContact.lastName === placeholder.lastName ? null : newContact.lastName,
         Phone: newContact.phone === placeholder.phone ? null : newContact.phone,
         Email: newContact.email === placeholder.email ? null : newContact.email,
-        RoleId: roleId,
+        VenueRoleId: venueRole.Id,
         VenueId: booking.VenueId,
       };
 
@@ -67,17 +68,21 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
         method: 'POST',
         data: newVc,
       });
+
+      getVenueContacts(booking.venueId.toString());
+
+      // update fields
     } else if (variant === 'update') {
       const updatedRow = mapVenueContactToPrisma(data.updatedRow);
-      console.log(updatedRow);
       await fetchData({
         url: '/api/marketing/venueContacts/update',
         method: 'POST',
         data: updatedRow,
       });
+
+      // delete venue contact
     } else if (variant === 'delete') {
       const updatedRow = mapVenueContactToPrisma(data.rowToDel);
-      alert(JSON.stringify(updatedRow));
       await fetchData({
         url: '/api/marketing/venueContacts/delete',
         method: 'POST',
@@ -88,7 +93,7 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
 
   const getVenueContacts = async (venueId: string) => {
     try {
-      setVenueContactRows([]);
+      setVenueContactsTable(<div />);
 
       const data = await fetchData({
         url: '/api/marketing/venueContacts/' + venueId,
@@ -114,8 +119,18 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
           venueContactUiList.push(tempVenueContactUi);
         });
 
-        setVenueContactRows(venueContactUiList);
-        setContactsAvail(true);
+        setVenueContactsTable(
+          <VenueContactForm
+            venueRoleOptionList={venueStandardRoleList}
+            venue={selectedVenue}
+            contactsList={venueContactUiList}
+            onChange={(newData) => saveVenueContact(newData)}
+            tableStyleProps={styleProps}
+            tableHeight={585}
+            title={''}
+            module="marketing"
+          />,
+        );
       }
     } catch (error) {
       console.log(error);
@@ -128,20 +143,5 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
     getVenueContacts(booking.VenueId.toString());
   }, [bookingId]);
 
-  return (
-    <>
-      {contactsAvail && (
-        <VenueContactForm
-          venueRoleOptionList={venueStandardRoleList}
-          venue={selectedVenue}
-          contactsList={venueContactRows}
-          onChange={(newData) => saveVenueContact(newData)}
-          tableStyleProps={styleProps}
-          tableHeight={585}
-          title={''}
-          module="marketing"
-        />
-      )}
-    </>
-  );
+  return <>{venueContactsTable}</>;
 }

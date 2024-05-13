@@ -96,7 +96,7 @@ const VenueContactForm = ({
         setCreateMode(false);
       }
     } else {
-      onChange({ mode: 'update', updatedFormData, updatedRow: updatedFormData.venueContacts[rowIndex] });
+      onChange({ mode: 'update', updatedFormData, updatedRow: e.data });
     }
   };
 
