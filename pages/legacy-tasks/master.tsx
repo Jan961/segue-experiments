@@ -4,9 +4,9 @@ import { getAccountIdFromReq, getUsers } from 'services/userService';
 import { getMasterTasksList } from 'services/TaskService';
 import { MasterTask } from '@prisma/client';
 import { InitialState } from 'lib/recoil';
-import MasterTaskButtons from 'components/tasks/MasterTaskButtons';
+import MasterTaskButtons from 'components/legacy-tasks/MasterTaskButtons';
 import { objectify } from 'radash';
-import MasterTaskList from 'components/tasks/MasterTaskList';
+import MasterTaskList from 'components/legacy-tasks/MasterTaskList';
 
 const MasterTasks = () => {
   return (

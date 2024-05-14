@@ -1,20 +1,10 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Modal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
-
-interface UploadModalProps {
-  title: string;
-  visible: boolean;
-  onClose?: () => void;
-  info: string;
-  isMultiple?: boolean;
-  maxFiles?: number;
-  maxFileSize?: number;
-  allowedFormats: string[];
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onSave?: () => void;
-}
+import FileCard from './UploadFileCard';
+import { fileSizeFormatter } from 'utils/index';
+import { FileProps, UploadModalProps } from './interface';
 
 const UploadModal: React.FC<UploadModalProps> = ({
   visible,
@@ -30,96 +20,88 @@ const UploadModal: React.FC<UploadModalProps> = ({
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
-  const [selectedImages, setSelectedImages] = useState<(string | null)[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<FileProps[]>([]);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [errorMessages, setErrorMessages] = useState<Record<string, string>>({});
+  const isUploadDisabled =
+    selectedFiles?.length === 0 ||
+    selectedFiles.some((file) => file.error) ||
+    isUploading ||
+    Object.keys(errorMessages).length > 0;
 
-  const isImage = useMemo(() => {
-    return ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'].includes(allowedFormats[0]);
-  }, [allowedFormats]);
+  const onProgress = (file: File, uploadProgress: number) => {
+    setProgress((prev) => ({ ...prev, [file.name]: uploadProgress }));
+  };
+
+  const onError = (file: File, errorMessage: string) => {
+    setErrorMessages((prev) => ({ ...prev, [file.name]: errorMessage }));
+  };
+
+  useEffect(() => {
+    const fileerrors = Object.fromEntries(
+      Object.entries(errorMessages).filter(([filename]) => selectedFiles.some((file) => file.file.name === filename)),
+    );
+    setErrorMessages(fileerrors);
+    onChange?.(selectedFiles);
+  }, [selectedFiles]);
 
   const clearAll = () => {
     setError('');
-    setSelectedImages([]);
+    setSelectedFiles([]);
+    setIsUploading(false);
     if (hiddenFileInput.current) {
-      hiddenFileInput.current.value = ''; // Clear the input value
+      hiddenFileInput.current.value = '';
     }
-  };
-
-  const handleError = (errorText = '', e: React.ChangeEvent<HTMLInputElement>) => {
-    if (errorText !== '') {
-      setError(errorText);
-    }
-    setSelectedImages([]);
-    onChange?.(e);
-  };
-
-  const renderInfo = () => {
-    const noOfImages = selectedImages?.length;
-    if (noOfImages === 1) {
-      return (
-        <>
-          <p>You have uploaded the following image.</p>
-          <p className="pt-2">Do you wish to save this image?</p>
-        </>
-      );
-    } else if (noOfImages > 1) {
-      return (
-        <>
-          <p>You have uploaded the {noOfImages} images.</p>
-
-          <p className="pt-2">Do you wish to save these images?</p>
-        </>
-      );
-    } else {
-      return info;
-    }
+    setProgress({});
+    setErrorMessages({});
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files?.length === 0) {
-      handleError('No file selected', e);
+      setError('No file selected');
+      setSelectedFiles([]);
+      onChange?.([]);
       return;
     }
 
-    // Validate maxFiles
     if (maxFiles && files.length > maxFiles) {
-      handleError(`You can upload up to ${maxFiles} files.`, e);
+      setError(`You can upload up to ${maxFiles} files.`);
+      setSelectedFiles([]);
+      onChange?.([]);
       return;
     }
 
-    // Validate file size
-    if (maxFileSize) {
-      for (const file of files) {
-        const fileSize = file.size;
-        if (fileSize > maxFileSize) {
-          handleError('This image is too big. Please upload a smaller image.', e);
-          hiddenFileInput.current.value = '';
-          return;
-        }
+    for (const file of Array.from(files)) {
+      if (maxFileSize && file.size > maxFileSize) {
+        errorMessages[file.name] = 'This file is too big. Please upload a smaller file.';
+      }
+      if (allowedFormats && !allowedFormats.includes(file.type)) {
+        errorMessages[file.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
     }
 
-    // Validate allowed formats
-    if (allowedFormats) {
-      for (const file of files) {
-        if (!allowedFormats.includes(file.type)) {
-          hiddenFileInput.current.value = '';
-          handleError(`Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`, e);
-          return;
-        }
-      }
-    }
-
+    const filesList = Array.from(files).map((file) => ({
+      name: file.name,
+      size: file.size,
+      file,
+    }));
     setError('');
-    if (isImage) {
-      setSelectedImages(Array.from(files).map((file) => URL.createObjectURL(file)));
+    setSelectedFiles(filesList);
+    onChange?.(filesList);
+  };
+
+  const handleUpload = () => {
+    if (Object.keys(errorMessages).length === 0) {
+      setIsUploading(true);
+      onSave?.(selectedFiles, onProgress, onError);
     }
-    onChange?.(e); // Call the provided onChange handler
   };
 
   return (
     <Modal
-      panelClass="!px-5 !pr-6 !py-6 w-[600px]"
+      panelClass="w-full md:w-[592px]"
       show={visible}
       titleClass="text-primary-navy text-xl"
       onClose={() => {
@@ -127,15 +109,20 @@ const UploadModal: React.FC<UploadModalProps> = ({
         onClose?.();
       }}
     >
-      <div className="flex gap-6 font-calibri non-italic pr-3">
-        <div className="flex-col gap-2 grow">
-          <div className="text-primary text-xl font-bold">{title}</div>
-          <div className="text-secondary text-sm font-normal">
-            {/* {info} */}
-            {renderInfo()}
-          </div>
-        </div>
-        <div className="flex-col w-[300px]">
+      <div className="flex flex-col gap-2 w-full md:w-[592px] font-calibri non-italic pr-3">
+        <div className="text-primary text-xl font-bold">{title}</div>
+        <div className="text-secondary w-full md:w-[533px] text-[15px] font-normal">{info}</div>
+        <div
+          className="h-[200px] w-full md:w-[535px] bg-silver-gray-100 flex flex-col justify-center items-center cursor-pointer relative"
+          onClick={() => hiddenFileInput.current?.click()}
+          id="image"
+          data-testid="image"
+        >
+          <Icon iconName={'upload-to-cloud'} variant="7xl" />
+          <p className="text-secondary max-w-[222px] text-[15px] text-center font-normal mt-2">
+            <span className=" font-bold text-primary">Browse computer</span> or drag and drop
+            {maxFileSize && `(Max File Size: ${fileSizeFormatter(maxFileSize)})`}
+          </p>
           <input
             data-testid="hidden-input"
             type="file"
@@ -144,65 +131,40 @@ const UploadModal: React.FC<UploadModalProps> = ({
             accept={allowedFormats.join(',') || '*'}
             multiple={isMultiple}
             onChange={handleFileInput}
+            disabled={isUploading}
           />
-          {selectedImages?.length > 0 && isImage && (
-            <div
-              className={`grid grid-cols-${selectedImages.length === 1 ? 1 : 2} gap-2 h-[200px]`}
-              onClick={() => hiddenFileInput.current?.click()}
-              id="image"
-              data-testid="image"
-            >
-              {selectedImages.map((image, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-300 flex justify-center items-center"
-                  style={{
-                    backgroundImage: image ? `url(${image})` : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
-                 />
-              ))}
-            </div>
-          )}
-          {!(selectedImages?.length > 0) && (
-            <div
-              className="h-[200px] bg-gray-300 flex justify-center items-center cursor-pointer relative"
-              onClick={() => hiddenFileInput.current?.click()}
-              id="image"
-              data-testid="image"
-            >
-              {error ? (
-                <p className="text-lg text-center text-red-500 font-semibold px-5">{error}</p>
-              ) : isImage ? (
-                <Icon iconName={'camera-solid'} fill="#FFF" variant="7xl" />
-              ) : (
-                <Icon iconName={'document-solid'} fill="#FFF" variant="7xl" />
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center justify-center gap-6 mt-5">
-            <Button
-              className="w-[132px]"
-              variant="secondary"
-              onClick={() => {
-                clearAll();
-                onClose?.();
-              }}
-            >
-              Cancel
-            </Button>
-            {selectedImages?.length === 0 ? (
-              <Button className="w-[132px]" onClick={() => hiddenFileInput.current?.click()}>
-                Upload Image
-              </Button>
-            ) : (
-              <Button className="w-[132px]" onClick={() => onSave()}>
-                Save
-              </Button>
-            )}
+        </div>
+        {error && (
+          <div data-testid="error" className="text-primary-red text-sm text-center">
+            {error}
           </div>
+        )}
+        <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto">
+          {selectedFiles.map((file, index) => (
+            <FileCard
+              key={index}
+              file={file}
+              index={index}
+              progress={progress[file.name]}
+              errorMessage={errorMessages[file.name]}
+              onDelete={(idx) => setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== idx))}
+            />
+          ))}
+        </div>
+        <div className="flex w-full md:w-[535px] items-center justify-end gap-6 mt-5">
+          <Button
+            className="w-[132px]"
+            variant="secondary"
+            onClick={() => {
+              clearAll();
+              onClose?.();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button className="w-[132px]" disabled={isUploadDisabled} onClick={handleUpload}>
+            Upload
+          </Button>
         </div>
       </div>
     </Modal>

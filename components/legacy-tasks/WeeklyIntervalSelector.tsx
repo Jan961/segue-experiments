@@ -1,6 +1,8 @@
-import React from 'react';
+interface WeeklyIntervalSelectorProps {
+  onDayOfWeekChange: (dayIndex: number) => void;
+}
 
-function WeeklyIntervalSelector({ onDayOfWeekChange }) {
+function WeeklyIntervalSelector({ onDayOfWeekChange }: WeeklyIntervalSelectorProps) {
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   const handleDayOfWeekChange = (e) => {

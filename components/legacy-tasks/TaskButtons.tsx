@@ -51,7 +51,7 @@ function TaskButtons({ openBulkModal }: props) {
                 role="menuitem"
                 id="menu-item-0"
               >
-                <i className="fa-solid fa-handshake-angle"></i>
+                <i className="fa-solid fa-handshake-angle" />
                 Re-assign
               </button>
               <button
@@ -60,7 +60,7 @@ function TaskButtons({ openBulkModal }: props) {
                 role="menuitem"
                 id="menu-item-1"
               >
-                <i className="fa-solid fa-certificate"></i>
+                <i className="fa-solid fa-certificate" />
                 Set Status
               </button>
             </div>
@@ -71,7 +71,7 @@ function TaskButtons({ openBulkModal }: props) {
                 role="menuitem"
                 id="menu-item-2"
               >
-                <i className="fa-solid fa-sort"></i>
+                <i className="fa-solid fa-sort" />
                 Priority
               </button>
               <button
@@ -80,7 +80,7 @@ function TaskButtons({ openBulkModal }: props) {
                 role="menuitem"
                 id="menu-item-3"
               >
-                <i className="fa-solid fa-bars-progress"></i>
+                <i className="fa-solid fa-bars-progress" />
                 Progress
               </button>
             </div>
@@ -91,7 +91,7 @@ function TaskButtons({ openBulkModal }: props) {
                 role="menuitem"
                 id="menu-item-4"
               >
-                <i className="fa-solid fa-check-double"></i>
+                <i className="fa-solid fa-check-double" />
                 Follow-up
               </button>
             </div>

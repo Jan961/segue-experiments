@@ -1,25 +1,22 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
+import { isThisWeek } from 'date-fns';
 
-export default function getTaskDateStatusColor(date: string, status: string) {
-  if (status && status.toLowerCase() === 'done') {
-    return 'bg-none';
+export default function getTaskDateStatusColor(date: string, progress: number) {
+  if (progress === 100) {
+    return '#10841C';
   }
 
   if (date) {
-    const inputDate = new Date(date);
+    const dueDate = new Date(date);
     const today = new Date();
-    const differenceInDays = Math.ceil((inputDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
-
-    if (differenceInDays <= 7 && differenceInDays >= 0) {
-      return ' bg-amber-300 ';
-    } else if (differenceInDays < 0) {
-      return ' bg-red-300 ';
-    } else {
-      return ' bg-none ';
+    if (isThisWeek(dueDate)) {
+      return '#EA8439';
+    } else if (dueDate < today) {
+      return '#D41818';
     }
   }
 
-  return ' bg-none ';
+  return 'bg-none';
 }
 
 export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x) => {

@@ -35,6 +35,7 @@ const colorsConfig = {
   'secondary-green': '#10841C',
   'secondary-yellow': '#FFE606',
   'secondary-red': '#ED1111',
+  'silver-gray-100': '#d9d9d9',
   primary: '#082B4B',
   secondary: '#617293',
 };

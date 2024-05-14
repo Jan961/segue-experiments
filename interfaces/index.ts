@@ -53,7 +53,6 @@ export type ProductionTaskDTO = {
   FollowUp?: string;
   CreatedDate?: string;
   Status?: string;
-  Interval?: string;
   AssignedBy?: string;
   AssignedTo?: string;
   StartByWeekNum?: number;
@@ -103,6 +102,9 @@ export type BookingDTO = {
   MarketingPlanReceived: boolean;
   PrintReqsReceived: boolean;
   ContactInfoReceived: boolean;
+  MarketingCostsStatus: string;
+  MarketingCostsApprovalDate: string;
+  MarketingCostsNotes: string;
 };
 
 export type ContractsDTO = {
@@ -237,7 +239,7 @@ export type VenueContactDTO = {
   LastName: string;
   Phone: string;
   Email: string;
-  RoleId: number;
+  VenueRoleId: number;
   VenueId?: number;
 };
 
@@ -250,7 +252,7 @@ export type ActivityDTO = {
   CompanyCost: number;
   VenueCost: number;
   FollowUpRequired: boolean;
-  DueByDate?: Date;
+  DueByDate?: Date | string;
   Notes: string;
 };
 
@@ -284,6 +286,7 @@ export type AllocatedHoldDTO = {
 export type VenueRoleDTO = {
   Id: number;
   Name: string;
+  Standard: boolean;
 };
 
 export type UserDto = {
@@ -496,13 +499,13 @@ export interface ContractTableRowType {
 }
 
 export interface FileDTO {
-  OriginalFilename: string;
-  MediaType: string;
-  Location: string;
-  UploadUserId: number;
-  UploadDateTime: string;
-  Entity: string;
-  EntityId: number;
+  originalFilename: string;
+  mediaType: string;
+  location: string;
+  uploadUserId: number;
+  uploadDateTime: string;
+  entity: string;
+  entityId: number;
 }
 
 export interface VenueContractFormData {

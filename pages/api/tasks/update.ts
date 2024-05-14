@@ -21,7 +21,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Priority: task.Priority,
           Notes: task.Notes,
           Progress: task.Progress,
-          Interval: 'once',
           StartByWeekNum: task.StartByWeekNum,
           CompleteByWeekNum: task.CompleteByWeekNum,
           StartByIsPostProduction: task.StartByIsPostProduction,
