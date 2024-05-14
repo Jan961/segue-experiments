@@ -10,6 +10,7 @@ import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
+import UploadModal from 'components/core-ui-lib/UploadModal';
 
 interface ProductionsViewProps {
   showData: any;
@@ -53,6 +54,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -116,6 +118,47 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   };
 
+  const onSave = (file, onProgress, onError) => {
+    const formData = new FormData();
+    formData.append('file', file[0].file);
+    formData.append('path', 'production/');
+
+    let progress = 0; // to track overall progress
+    let slowProgressInterval; // interval for slow progress simulation
+
+    axios
+      .post('/api/upload', formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          if (percentCompleted <= 50) {
+            progress = percentCompleted;
+          } else if (percentCompleted === 100) {
+            progress = 50;
+            clearInterval(slowProgressInterval);
+            slowProgressInterval = setInterval(() => {
+              if (progress < 95) {
+                progress += 0.5;
+                onProgress(file[0].file, progress);
+              } else {
+                clearInterval(slowProgressInterval);
+              }
+            }, 100);
+          }
+
+          onProgress(file[0].file, progress);
+        },
+      }) // eslint-disable-next-line
+      .then((response) => {
+        progress = 100;
+        onProgress(file[0].file, progress);
+        clearInterval(slowProgressInterval);
+      }) // eslint-disable-next-line
+      .catch((error) => {
+        onError(file[0].file, 'Error uploading file. Please try again.');
+        clearInterval(slowProgressInterval);
+      });
+  };
+
   const handleCellClick = async (e) => {
     setProductionId(e.data.Id);
     setCurrentProduction(e.data);
@@ -149,6 +192,19 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       'DateBlock[0].EndDate' in e.data
     ) {
       handleSave(e.data);
+      setIsLoading(true);
+      try {
+        const payloadData = getProductionsConvertedPayload(e.data, false);
+        await axios.post(`/api/productions/create`, payloadData);
+      } finally {
+        setIsEdited(false);
+        setCurrentProduction(intProduction);
+        addNewRow();
+        router.replace(router.asPath);
+        setIsLoading(false);
+      }
+    } else if (e.column.colId === 'IsArchived') {
+      setIsUploadModalOpen(true);
     }
   };
 
@@ -222,6 +278,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
+      />
+      <UploadModal
+        visible={isUploadModalOpen}
+        title="Production Image"
+        info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
+        allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
+        onClose={() => setIsUploadModalOpen(false)}
+        maxFileSize={500 * 1024} // 500kb
+        onSave={onSave}
       />
     </>
   );

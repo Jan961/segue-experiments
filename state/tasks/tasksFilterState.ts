@@ -10,7 +10,7 @@ export type TasksFilterType = {
 };
 
 export const intialTasksState: TasksFilterType = {
-  production:null,
+  production: null,
   taskText: '',
   status: 'inProgressandtodo',
   startDueDate: null,
