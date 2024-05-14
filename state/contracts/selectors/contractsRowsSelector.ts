@@ -53,11 +53,8 @@ export const contractsRowsSelector = selector({
         }
         return value;
       };
-      // const contractBookingDataMapper = contractBookingData
-
       const row = {
         ...rowData,
-        // ...contractBookingDataMapper[rowData.Id],
         week,
         dateTime: date,
         date: date ? moment(date).format('ddd DD/MM/YY') : '',
@@ -73,7 +70,7 @@ export const contractsRowsSelector = selector({
         SignedBy: contractData[rowData.Id] ? contractData[rowData.Id].SignedBy : '',
         ReturnDate: contractData[rowData.Id] ? contractData[rowData.Id].ReturnDate : '',
         CheckedBy: contractData[rowData.Id] ? contractData[rowData.Id].CheckedBy : '',
-        RoyalPercentage: contractData[rowData.Id] ? contractData[rowData.Id].RoyalPercentage : '',
+        RoyaltyPercentage: contractData[rowData.Id] ? contractData[rowData.Id].RoyaltyPercentage : '',
         DealType: contractData[rowData.Id] ? contractData[rowData.Id].DealType : '',
         Notes: contractData[rowData.Id] ? contractData[rowData.Id].ContractNotes : '',
         ReceivedBackDate: contractData[rowData.Id] ? contractData[rowData.Id].ReceivedBackDate : '',

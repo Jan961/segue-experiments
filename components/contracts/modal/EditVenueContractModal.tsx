@@ -61,10 +61,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       [key]: value,
     };
 
-    // const savedFormData = {
-    //   ...saveFormData,
-    //   [key]: value,
-    // };
     setFormData(updatedFormData);
     if (type === 'booking') {
       setSaveBookingFormData({ ...saveBookingFormData, [key]: value });
@@ -72,15 +68,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     if (type === 'contract') {
       setSaveContractFormData({ ...saveContractFormData, [key]: value });
     }
-    // setSaveFormData(savedFormData)
-    // const data = await fetchData({
-    //   url: `/api/contracts/update/venueContract/${selectedTableCell.contract.Id}`,
-    //   method: 'PATCH',
-    //   data: { StatusCode: value },
-    // });
-
-    // router.replace(router.asPath);
-    // setSaveContractFormData,setSaveBookingFormData
   };
 
   const handleFormData = async () => {
@@ -136,10 +123,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               placeholder="Deal Memo Status"
               onChange={(value) => editContractModalData('dealMemoStatus', value, 'booking')}
               value={contractsKeyStatusMap[formData.StatusCode]}
-              // disabled={!productionId}
               isClearable
               isSearchable
-              // label="hhj"
             />
 
             <div className=" text-primary-input-text font-bold text-sm mt-6">Completed By</div>
@@ -148,14 +133,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 return null;
               }}
               className="bg-primary-white w-52"
-              // value={formData.}
-              // disabled={!productionId}
-              // placeholder="User Name Dropdown"
-              // options={allStatusOptions}
+             
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
-              // label="hhj"
             />
 
             <div className=" text-primary-input-text font-bold text-sm mt-6">Approved By</div>
@@ -164,14 +145,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 return null;
               }}
               className="bg-primary-white w-52"
-              // value={formData.}
-              // disabled={!productionId}
-              // placeholder="User Name Dropdown"
-              // options={allStatusOptions}
+              
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
-              // label="hhj"
             />
             <div className="flex items-center mt-6">
               <div className=" text-primary-input-text font-bold text-sm">Date Issued</div>
@@ -196,8 +173,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
             <TextArea
               className={'h-[580px] w-[400px]'}
               value={formData.DealNotes}
-              // placeholder="Notes Field"
-              // onChange={(e) => setChangeNotes(e.target.value)}
+              
             />
             <div className="flex mt-4 items-center">
               <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" />
@@ -237,12 +213,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(value) => editContractModalData('StatusCode', value, 'contract')}
                   className="bg-primary-white w-52"
                   value={formData.StatusCode}
-                  // disabled={!productionId}
                   placeholder="Contract Status"
                   options={allStatusOptions}
                   isClearable
                   isSearchable
-                  // label="hhj"
                 />
               </div>
             </div>
@@ -256,14 +230,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     return null;
                   }}
                   className="bg-primary-white w-52"
-                  // value={formData.}
-                  // disabled={!productionId}
+                 
                   placeholder="User Name Dropdown"
-                  // options={allStatusOptions}
                   options={[{ text: 'Select Assignee', value: null }, ...userList]}
                   isClearable
                   isSearchable
-                  // label="hhj"
                 />
 
                 <div className="flex items-center">
@@ -307,11 +278,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <Checkbox
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
-                  // label="Include Excluded Venues"
                   id="includeExcludedVenues"
-                  // name="includeExcludedVenues"
-                  // checked={includeExcluded}
-                  // onChange={(e) => handleOnChange({ includeExcluded: e.target.checked })}
+                  
                   onChange={() => {
                     return null;
                   }}
@@ -322,11 +290,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <Checkbox
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
-                  // label="Include Excluded Venues"
                   id="includeExcludedVenues"
-                  // name="includeExcludedVenues"
-                  // checked={includeExcluded}
-                  // onChange={(e) => handleOnChange({ includeExcluded: e.target.checked })}
+                 
                   onChange={() => {
                     return null;
                   }}
@@ -337,11 +302,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                 <Checkbox
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
-                  // label="Include Excluded Venues"
                   id="includeExcludedVenues"
-                  // name="includeExcludedVenues"
-                  // checked={includeExcluded}
-                  // onChange={(e) => handleOnChange({ includeExcluded: e.target.checked })}
+                  
                   onChange={() => {
                     return null;
                   }}
@@ -358,12 +320,10 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(value) => editContractModalData('DealType', value, 'contract')}
                   className="bg-primary-white w-52"
                   value={formData.DealType ? formData.DealType : 'NULL'}
-                  // disabled={!productionId}
                   placeholder="Deal Type"
                   options={dealTypeOptions}
                   isClearable
                   isSearchable
-                  // label="hhj"
                 />
               </div>
             </div>
@@ -378,8 +338,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.bookingNotes}
                   onChange={(value) => editContractModalData('bookingNotes', value.target.value, 'booking')}
 
-                  // placeholder="Notes Field"
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>
@@ -392,24 +351,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-1">£</div>
                   <TextInput
                     id={'venueText'}
-                    // disabled={!ProductionId}
-                    // placeholder="Search bookings..."
+                    
                     className="w-[100px]"
-                    // iconName="search"
-                    // value={filter.venueText}
-                    // onChange={onChange}
+                    
                   />
                 </div>
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
                   <TextInput
                     id={'venueText'}
-                    // disabled={!ProductionId}
-                    // placeholder="Search bookings..."
+                    
                     className="w-[100px]"
-                    // iconName="search"
-                    value={formData.RoyalPercentage}
-                    // onChange={onChange}
+                    value={formData.RoyaltyPercentage}
+                    
+                    onChange={(value) => editContractModalData('RoyaltyPercentage', value.target.value, 'contract')}
                   />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
@@ -418,12 +373,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
                   <TextInput
                     id={'venueText'}
-                    // disabled={!ProductionId}
-                    // placeholder="Search bookings..."
+                    
                     className="w-[100px]"
-                    // iconName="search"
-                    // value={filter.venueText}
-                    // onChange={onChange}
+                    
                   />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
@@ -439,7 +391,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.TicketPriceNotes}
                   onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
                   placeholder="Ticket Pricing Notes"
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>
@@ -453,7 +405,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.MarketingDealNotes}
                   onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
                   placeholder="Marketing Deal"
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>
@@ -467,7 +419,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.CrewNotes}
                   onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
                   placeholder="Crew Notes"
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>
@@ -504,7 +456,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.Exceptions}
                   onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
 
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>
@@ -518,7 +470,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.Notes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
 
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>
@@ -532,7 +484,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   value={formData.MerchandiseNotes}
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
 
-                  // onChange={(e) => setChangeNotes(e.target.value)}
+                  
                 />
               </div>
             </div>

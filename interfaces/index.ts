@@ -437,7 +437,7 @@ export type ContractStatusType = {
   SignedBy: string;
   ReturnDate: Date;
   CheckedBy: string;
-  RoyalPercentage: string;
+  RoyaltyPercentage: string;
   DealType: string;
   Notes: string;
   ReceivedBackDate: Date;
@@ -521,7 +521,7 @@ export interface VenueContractFormData {
   Exceptions: string;
   Notes: string;
   MerchandiseNotes: string;
-  RoyalPercentage: string;
+  RoyaltyPercentage: string;
   performanceTimes: string;
   performanceCount: string;
   DealNotes: string;
