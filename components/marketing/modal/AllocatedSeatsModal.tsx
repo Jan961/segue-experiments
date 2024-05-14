@@ -288,9 +288,7 @@ export default function AllocatedSeatsModal({
 
           <div className="place-content-center flex flex-row mt-5 pb-5">
             <Button className="w-32" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
-
             <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
-
             <Button className="ml-4 w-32" variant="primary" text="Save and Close" onClick={null} />
           </div>
         </div>
