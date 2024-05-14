@@ -22,14 +22,8 @@ import { userState } from 'state/account/userState';
 import { useMemo, useState } from 'react';
 import { SaveContractBookingFormState, SaveContractFormState, VenueContractFormData } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { convertDate } from 'services/dateService';
-const convert = (data: Date): string => {
-  const dateObj = new Date(data);
-  if (isNaN(dateObj.getTime())) {
-    throw new Error('Invalid date format');
-  }
-  return dateObj.toISOString();
-};
+import { formattedDateWithDay, toISO } from 'services/dateService';
+
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
   const selectedTableCell = useRecoilValue(addEditContractsState);
@@ -42,7 +36,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   });
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
-  } | ${convertDate(productionJumpState.StartDate)} - ${convertDate(productionJumpState.EndDate)}`;
+  } | ${formattedDateWithDay(productionJumpState.StartDate)} - ${formattedDateWithDay(productionJumpState.EndDate)}`;
   const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
@@ -104,7 +98,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       onClose();
     }
   };
-
+console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
   return (
     <PopupModal
       show={visible}
@@ -241,7 +235,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
                   <DateInput
                     onChange={(value) =>
-                      formData.SignedDate.toString() !== convert(value) && editContractModalData('SignedDate', value, 'contract')
+                      formData.SignedDate.toString() !== toISO(value) && editContractModalData('SignedDate', value, 'contract')
                     }
                     value={formData.SignedDate}
                   />
@@ -255,7 +249,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex justify-between">
                 <DateInput
                   onChange={(value) => {
-                    formData.ReturnDate.toString() !== convert(value) && editContractModalData('ReturnDate', value, 'contract');
+                    formData.ReturnDate.toString() !== toISO(value) && editContractModalData('ReturnDate', value, 'contract');
                   }}
                   value={formData.ReturnDate}
                 />
@@ -264,7 +258,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                   <DateInput
                     onChange={(value) =>
-                      formData.ReceivedBackDate.toString() !== convert(value) &&
+                      formData.ReceivedBackDate.toString() !== toISO(value) &&
                       editContractModalData('ReceivedBackDate', value, 'contract')
                     }
                     value={formData.ReceivedBackDate}
