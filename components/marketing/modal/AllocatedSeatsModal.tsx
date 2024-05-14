@@ -25,9 +25,8 @@ export default function AllocatedSeatsModal({
   show = false,
   onCancel,
   // onSave,
-  bookingId,
-} // data,
-: Partial<AllocatedModalProps>) {
+  bookingId, // data,
+}: Partial<AllocatedModalProps>) {
   const { fetchData } = useAxios();
 
   const [visible, setVisible] = useState<boolean>(show);
@@ -45,7 +44,7 @@ export default function AllocatedSeatsModal({
   const [arrangedBy, setArrangedBy] = useState('');
   const [venueConfNotes, setVenueConfNotes] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
-  const [confVariant, setConfVariant] = useState<ConfDialogVariant>();
+  const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
 
   //   const initForm = () => {
   //     if (variant === 'add') {
@@ -116,21 +115,25 @@ export default function AllocatedSeatsModal({
   };
 
   const getPerformanceList = async (bookingId) => {
-    const data = await fetchData({
-      url: '/api/performances/read/' + bookingId,
-      method: 'POST',
-    });
-
-    if (typeof data === 'object') {
-      const perfList = data as Array<PerformanceDTO>;
-      const optionList = [];
-      perfList.forEach((perf) => {
-        optionList.push({
-          text: formatInputDate(perf.Date) + ' | ' + perf.Time.substring(0, 5),
-          value: perf.Id,
-        });
+    try {
+      const data = await fetchData({
+        url: '/api/performances/read/' + bookingId,
+        method: 'POST',
       });
-      setPerfList(optionList);
+
+      if (typeof data === 'object') {
+        const perfList = data as Array<PerformanceDTO>;
+        const optionList = [];
+        perfList.forEach((perf) => {
+          optionList.push({
+            text: formatInputDate(perf.Date) + ' | ' + perf.Time.substring(0, 5),
+            value: perf.Id,
+          });
+        });
+        setPerfList(optionList);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
