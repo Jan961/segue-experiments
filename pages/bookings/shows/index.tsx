@@ -79,7 +79,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const regionsList = await getRegionlist();
 
   const showsList = shows.map((show) => {
-    console.log(show);
     return {
       ...showMapper(show),
       productions: showProductionMapper(show),
