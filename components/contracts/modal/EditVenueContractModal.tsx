@@ -270,7 +270,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
                   <DateInput
                     onChange={(value) =>
-                      formData.SignedDate !== convert(value) && editContractModalData('SignedDate', value, 'contract')
+                      formData.SignedDate.toString() !== convert(value) && editContractModalData('SignedDate', value, 'contract')
                     }
                     value={formData.SignedDate}
                   />
@@ -284,7 +284,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex justify-between">
                 <DateInput
                   onChange={(value) => {
-                    formData.ReturnDate !== convert(value) && editContractModalData('ReturnDate', value, 'contract');
+                    formData.ReturnDate.toString() !== convert(value) && editContractModalData('ReturnDate', value, 'contract');
                   }}
                   value={formData.ReturnDate}
                 />
@@ -293,7 +293,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                   <DateInput
                     onChange={(value) =>
-                      formData.ReceivedBackDate !== convert(value) &&
+                      formData.ReceivedBackDate.toString() !== convert(value) &&
                       editContractModalData('ReceivedBackDate', value, 'contract')
                     }
                     value={formData.ReceivedBackDate}
