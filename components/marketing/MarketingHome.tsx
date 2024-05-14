@@ -14,6 +14,7 @@ import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 import { ArchivedSalesTab } from './tabs/ArchivedSalesTab';
 import ContactNotesTab from './tabs/ContactNotesTab';
 import VenueContactsTab from './tabs/VenueContactsTab';
+import PromotorHoldsTab from './tabs/PromotorHoldsTab';
 
 export type SelectOption = {
   text: string;
@@ -125,7 +126,10 @@ const MarketingHome = () => {
           <Tab.Panel>
             <VenueContactsTab bookingId={bookingId} />
           </Tab.Panel>
-          <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
+
+          <Tab.Panel>
+            <PromotorHoldsTab bookingId={bookingId} />
+          </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">attachments</Tab.Panel>
         </Tabs>
       </div>
