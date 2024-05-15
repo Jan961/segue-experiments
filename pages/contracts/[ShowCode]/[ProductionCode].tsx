@@ -2,7 +2,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import Layout from 'components/Layout';
 import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountIdFromReq } from 'services/userService';
+import { getAccountIdFromReq, getUsers } from 'services/userService';
 import ContractFilters from 'components/contracts/ContractsFilters';
 import ContractsTable from 'components/contracts/ContractsTable';
 import {
@@ -14,6 +14,7 @@ import {
   performanceMapper,
   rehearsalMapper,
   contractStatusmapper,
+  contractBookingStatusmapper,
 } from 'lib/mappers';
 import useContractsFilter from 'hooks/useContractsFilter';
 import { getAllVenuesMin } from 'services/venueService';
@@ -48,6 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
   const AccountId = await getAccountIdFromReq(ctx.req);
+  const users = await getUsers(AccountId);
   const productionJump = await getProductionJumpState(ctx, 'contracts', AccountId);
   const ProductionId = productionJump.selected;
   // ProductionJumpState is checking if it's valid to access by accountId
@@ -60,7 +62,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     getDayTypes(),
     getContractStatus(ProductionId === -1 ? null : ProductionId),
   ]);
-
   const dateBlock = [];
   const rehearsal = {};
   const booking = {};
@@ -128,10 +129,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   }
 
   const contractStatusData = {};
+  const contractBookingStatusData = {};
   contractStatus.forEach((contractData) => {
     contractStatusData[contractData.Id] = contractStatusmapper(contractData.Contract);
+    contractBookingStatusData[contractData.Id] = contractBookingStatusmapper(contractData);
   });
-
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
@@ -150,6 +152,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       // Remove extra info
       venue,
       contractStatus: contractStatusData,
+      contractBookingStatus: contractBookingStatusData,
+    },
+    account: {
+      user: { users: objectify(users, (u) => u.Id) },
     },
   };
 

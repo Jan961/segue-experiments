@@ -31,6 +31,7 @@ import {
   VenueContactDTO,
   VenueRoleDTO,
   ContractStatusType,
+  ContractBookingStatusType,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
@@ -111,6 +112,9 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   MarketingPlanReceived: b.MarketingPlanReceived,
   PrintReqsReceived: b.PrintReqsReceived,
   ContactInfoReceived: b.ContactInfoReceived,
+  MarketingCostsStatus: b.MarketingCostsStatus,
+  MarketingCostsApprovalDate: convertDate(b.MarketingCostsApprovalDate),
+  MarketingCostsNotes: b.MarketingCostsNotes,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
@@ -183,7 +187,7 @@ export const venueContactMapper = (vc: VenueContact): VenueContactDTO => ({
   LastName: vc.LastName,
   Phone: vc.Phone,
   Email: vc.Email,
-  RoleId: vc.VenueRoleId,
+  VenueRoleId: vc.VenueRoleId,
 });
 
 export const activityMapper = (a: BookingActivity): ActivityDTO => ({
@@ -195,6 +199,7 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   CompanyCost: Number(a.CompanyCost),
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
+  DueByDate: convertDate(a.DueByDate),
   Notes: a.ActivityNotes,
 });
 
@@ -215,11 +220,43 @@ export const contractStatusmapper = (status: ContractStatusType) => {
     SignedBy: status.SignedBy,
     ReturnDate: convertDate(status.ReturnDate),
     CheckedBy: status.CheckedBy,
-    RoyalPercentage: convertToString(status.RoyalPercentage),
+    RoyaltyPercentage: convertToString(status.RoyaltyPercentage),
     DealType: status.DealType,
     ContractNotes: status.Notes,
     ReceivedBackDate: convertDate(status.ReceivedBackDate),
     Exceptions: status.Exceptions,
+  };
+};
+
+export const contractBookingStatusmapper = (status: ContractBookingStatusType) => {
+  return {
+    DateBlockId: status.DateBlockId,
+    VenueId: status.VenueId,
+    FirstDate: convertDate(status.FirstDate),
+    StatusCode: status.StatusCode,
+    PencilNum: status.PencilNum,
+    LandingPageURL: status.LandingPageURL,
+    TicketsOnSaleFromDate: convertDate(status.TicketsOnSaleFromDate),
+    TicketsOnSale: status.TicketsOnSale,
+    MarketingPlanReceived: status.MarketingPlanReceived,
+    ContactInfoReceived: status.ContactInfoReceived,
+    PrintReqsReceived: status.PrintReqsReceived,
+    Notes: status.Notes,
+    DealNotes: status.DealNotes,
+    TicketPriceNotes: status.TicketPriceNotes,
+    MarketingDealNotes: status.MarketingDealNotes,
+    CrewNotes: status.CrewNotes,
+    SalesNotes: status.SalesNotes,
+    HoldNotes: status.HoldNotes,
+    CompNotes: status.CompNotes,
+    MerchandiseNotes: status.MerchandiseNotes,
+    CastRateTicketNotes: status.CastRateTicketNotes,
+    CastRateTicketsArranged: status.CastRateTicketsArranged,
+    CastRateTicketsNotes: status.CastRateTicketsNotes,
+    RunTag: status.RunTag,
+    MarketingCostsStatus: status.MarketingCostsStatus,
+    MarketingCostsApprovalDate: convertDate(status.MarketingCostsApprovalDate),
+    MarketingCostsNotes: status.MarketingCostsNotes,
   };
 };
 
@@ -232,6 +269,7 @@ export const mapToProductionTaskDTO = (t: ProductionTask): ProductionTaskDTO => 
 export const venueRoleMapper = (vr: any): VenueRoleDTO => ({
   Id: vr.Id,
   Name: vr.Name,
+  Standard: vr.IsStandard,
 });
 
 export const userMapper = (user: User): UserDto => ({

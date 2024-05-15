@@ -62,6 +62,13 @@ const SelectCellRenderer = ({
     );
   };
 
+  const customStyles = {
+    menu: (provided) => ({
+      ...provided,
+      width: isMulti ? customWidth : '100%',
+    }),
+  };
+
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
       <Select
@@ -72,8 +79,8 @@ const SelectCellRenderer = ({
         placeholder={placeholder}
         value={value}
         isMulti={isMulti}
+        customStyles={customStyles}
         ref={selectRef}
-        customWidth={customWidth}
         isSearchable={isSearchable}
         renderOption={(option) => <CustomOption option={option} />}
         {...props}
