@@ -28,6 +28,9 @@ const showInclude = Prisma.validator<Prisma.ShowInclude>()({
   Production: {
     include: { Show: true, DateBlock: true, ProductionRegion: true },
   },
+  Account: {
+    include: { ProductionCompany: true },
+  },
 });
 
 export type ShowWithProductions = Prisma.ShowGetPayload<{

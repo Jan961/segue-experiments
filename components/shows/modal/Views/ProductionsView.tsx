@@ -66,7 +66,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     setIsAddRow(!isAddRow);
   };
 
-  const [isArchived, setIsArchived] = useState<boolean>(false);
+  const [isArchived, setIsArchived] = useState<boolean>(true);
 
   const unArchivedList = useMemo(() => {
     return showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted);
@@ -101,6 +101,22 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       });
     }
   }, [isAddRow, tableRef]);
+
+  const handleSave = async (currentProd: any) => {
+    if ('DateBlock[0].StartDate' in currentProd && 'DateBlock[0].EndDate' in currentProd) {
+      setIsLoading(true);
+      try {
+        const payloadData = getProductionsConvertedPayload(currentProd, false);
+        await axios.post(`/api/productions/create`, payloadData);
+      } finally {
+        setIsEdited(false);
+        setCurrentProduction(intProduction);
+        addNewRow();
+        router.replace(router.asPath);
+        setIsLoading(false);
+      }
+    }
+  };
 
   const onSave = (file, onProgress, onError) => {
     const formData = new FormData();
@@ -145,6 +161,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
 
   const handleCellClick = async (e) => {
     setProductionId(e.data.Id);
+    setCurrentProduction(e.data);
     setRowIndex(e.rowIndex);
     if (e.column.colId === 'deleteId') {
       setConfirm(true);
@@ -174,6 +191,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       'DateBlock[0].StartDate' in e.data &&
       'DateBlock[0].EndDate' in e.data
     ) {
+      handleSave(e.data);
       setIsLoading(true);
       try {
         const payloadData = getProductionsConvertedPayload(e.data, false);
@@ -188,6 +206,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (e.column.colId === 'IsArchived') {
       setIsUploadModalOpen(true);
     }
+  };
+
+  const handleSaveAndClose = () => {
+    handleSave(currentProduction);
   };
 
   const handleCellChanges = (e) => {
@@ -214,11 +236,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl my-3 font-bold">{showName}</div>
+        <div className="text-primary-navy text-xl mb-3 mt-1 font-bold">{showName}</div>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             <Checkbox
-              className="flex flex-row-reverse"
+              className="flex flex-row-reverse mr-2"
               checked={isArchived}
               label="Include archived"
               id={''}
@@ -245,9 +267,9 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       </div>
       <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
         <div />
-        <div className="flex gap-4">
+        <div className="flex gap-3">
           <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" />
-          <Button className=" w-33" text="Save and Close" />
+          <Button className=" w-33" text="Save and Close" onClick={handleSaveAndClose} />
         </div>
       </div>
       <ConfirmationDialog
