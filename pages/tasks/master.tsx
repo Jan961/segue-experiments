@@ -6,20 +6,23 @@ import { MasterTask } from '@prisma/client';
 import Filters from 'components/tasks/Master/Filters';
 import { getMasterTasksColumnDefs, styleProps } from 'components/tasks/tableConfig';
 import Table from 'components/core-ui-lib/Table';
+import useMasterTasksFilter from 'hooks/useMasterTaskFilter';
 
 const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { masterTask = [], usersList } = props;
 
   const columnDefs = getMasterTasksColumnDefs(usersList);
 
-  console.log(masterTask);
+  const { filteredTasks = [] } = useMasterTasksFilter(masterTask);
+
+  console.log(filteredTasks);
 
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
         <Filters />
       </div>
-      <Table columnDefs={columnDefs} rowData={masterTask} styleProps={styleProps} />
+      <Table columnDefs={columnDefs} rowData={filteredTasks} styleProps={styleProps} />
     </Layout>
   );
 };
