@@ -6,6 +6,8 @@ import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../bookings/utils';
 import { ContractTableRowType } from 'interfaces';
 import EditVenueContractModal from './modal/EditVenueContractModal';
+import { addEditContractsState } from '../../state/contracts/contractsState';
+import { RowDoubleClickedEvent } from 'ag-grid-community';
 
 interface ContractsTableProps {
   rowData?: ContractTableRowType;
@@ -13,8 +15,8 @@ interface ContractsTableProps {
 
 export default function ContractsTable({ rowData }: ContractsTableProps) {
   const tableRef = useRef(null);
-  const [editContractForm, setEditContractForm] = useState(false);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
+  const [editContractData, setEditContractData] = useRecoilState(addEditContractsState);
   const [rows, setRows] = useState([]);
   const gridOptions = {
     getRowStyle: (params) => {
@@ -40,8 +42,17 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     }
   }, [rowData]);
 
-  const handleRowDoubleClicked = () => {
-    setEditContractForm(true);
+  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    setEditContractData({
+      visible: true,
+      contract: e.data,
+    });
+  };
+
+  const handleClose = () => {
+    setEditContractData({
+      visible: false,
+    });
   };
 
   return (
@@ -56,7 +67,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
           onRowDoubleClicked={handleRowDoubleClicked}
         />
       </div>
-      {editContractForm && <EditVenueContractModal />}
+      {editContractData.visible && <EditVenueContractModal {...editContractData} onClose={handleClose} />}
     </>
   );
 }
