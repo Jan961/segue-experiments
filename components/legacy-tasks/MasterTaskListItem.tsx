@@ -2,14 +2,14 @@ import { Table } from 'components/global/table/Table';
 // import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 import React, { useMemo } from 'react';
 // import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { MasterTask } from '@prisma/client';
 import MasterTaskEditor from './editors/MasterTaskEditor';
 import { userState } from 'state/account/userState';
 import { MenuButton } from 'components/global/MenuButton';
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
 import axios from 'axios';
-import { masterTaskState } from 'state/tasks/masterTaskState';
+// import { masterTaskState } from 'state/tasks/masterTaskState';
 import { omit } from 'radash';
 import { loggingService } from 'services/loggingService';
 import { Spinner } from 'components/global/Spinner';
@@ -24,7 +24,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   // const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
+  // const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
   const { users = {} } = useRecoilValue(userState);
   const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
@@ -49,15 +49,13 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
     setLoading(true);
     try {
       const endpoint = '/api/tasks/master/create';
-      const {
-        data: { Code, Id },
-      } = (await axios.post(endpoint, omit(task, ['Id', 'Code']))) || { data: {} };
-      const taskIndex = masterTasks.findIndex((masterTask) => masterTask.Id === task.Id);
-      setMasterTasks([
-        ...masterTasks.slice(0, taskIndex),
-        { ...omit(task, ['Id']), Id, Code },
-        ...masterTasks.slice(taskIndex),
-      ]);
+      await axios.post(endpoint, omit(task, ['Id', 'Code']));
+      // const taskIndex = masterTasks.findIndex((masterTask) => masterTask.Id === task.Id);
+      // setMasterTasks([
+      //   ...masterTasks.slice(0, taskIndex),
+      //   { ...omit(task, ['Id']), Id, Code },
+      //   ...masterTasks.slice(taskIndex),
+      // ]);
     } catch (error) {
       loggingService.logError(error);
       console.error(error);
@@ -70,8 +68,8 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
       .delete(`/api/tasks/master/delete/${task.Id}`)
       .then(() => {
         setShowDeleteConfirmation(false);
-        const updatedTasks = masterTasks.filter((masterTask) => masterTask.Id !== task.Id);
-        setMasterTasks(updatedTasks);
+        // const updatedTasks = masterTasks.filter((masterTask) => masterTask.Id !== task.Id);
+        // setMasterTasks(updatedTasks);
       })
       .catch((error) => {
         console.error(error);
@@ -83,28 +81,28 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const handleOnChange = (e: any) => {
     e?.stopPropagation?.();
     let { id, value } = e.target;
-    const oldTask = { ...task };
+    // const oldTask = { ...task };
     value = parseInt(value, 10);
     const updatedTask = { ...task, [id]: value };
-    const updatedTasks = masterTasks.map((masterTask) => {
-      if (masterTask.Id === task.Id) {
-        return updatedTask;
-      }
-      return masterTask;
-    });
-    setMasterTasks(updatedTasks);
+    // const updatedTasks = masterTasks.map((masterTask) => {
+    //   if (masterTask.Id === task.Id) {
+    //     return updatedTask;
+    //   }
+    //   return masterTask;
+    // });
+    // setMasterTasks(updatedTasks);
     setLoading(true);
     axios
       .post('/api/tasks/master/update', updatedTask)
       .catch((error) => {
-        setMasterTasks(
-          masterTasks.map((masterTask) => {
-            if (masterTask.Id === task.Id) {
-              return oldTask;
-            }
-            return masterTask;
-          }),
-        );
+        // setMasterTasks(
+        //   masterTasks.map((masterTask) => {
+        //     if (masterTask.Id === task.Id) {
+        //       return oldTask;
+        //     }
+        //     return masterTask;
+        //   }),
+        // );
         loggingService.logError(error);
         console.error(error);
       })

@@ -1,25 +1,19 @@
-import {
-  // useRecoilState,
-  useRecoilValue,
-} from 'recoil';
+// import {
+//   // useRecoilState,
+//   useRecoilValue,
+// } from 'recoil';
 import { Table } from 'components/global/table/Table';
 // import { FormInputCheckbox } from 'components/global/forms/FormInputCheckbox';
 // import { bulkSelectionState } from 'state/tasks/bulkSelectionState';
-import { masterTaskState } from 'state/tasks/masterTaskState';
+// import { masterTaskState } from 'state/tasks/masterTaskState';
 import MasterTaskListItem from './MasterTaskListItem';
-import { useMemo } from 'react';
-import { filterState } from 'state/booking/filterState';
+// import { filterState } from 'state/booking/filterState';
 
 const Tasklist = () => {
   // const [bulkSelection, setBulkSelection] = useRecoilState(bulkSelectionState);
-  const masterTasks = useRecoilValue(masterTaskState);
-  const filter = useRecoilValue(filterState);
-  const filteredTasks = useMemo(
-    () =>
-      masterTasks?.filter?.((task) => task?.Name?.toLowerCase?.()?.includes?.(filter?.masterTaskText?.toLowerCase?.())),
-    [filter?.masterTaskText, masterTasks],
-  );
-  if (!filteredTasks.length) return null;
+  // const masterTasks = useRecoilValue(masterTaskState);
+  // const filter = useRecoilValue(filterState);
+  const filteredTasks = [];
 
   // const countSelected = filteredTasks.filter((x) => bulkSelection[x.Id]).length;
   // const allSelected = countSelected === filteredTasks.length;
