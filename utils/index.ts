@@ -99,6 +99,4 @@ export const getStatusFromProgress = (progress?: number) => {
   } else if (progress === 100) {
     return 'Uploaded';
   }
-
-  
 };

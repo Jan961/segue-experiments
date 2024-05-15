@@ -13,6 +13,19 @@ export const getContractStatus = async (ProductionId: number) => {
   });
 };
 
+export const getContractDealMemo = async (ProductionId: number) => {
+  return prisma.booking.findMany({
+    where: {
+      DateBlock: {
+        ProductionId,
+      },
+    },
+    include: {
+      DealMemo: true,
+    },
+  });
+};
+
 export const getAllContractStatus = async () => {
   return prisma.booking.findMany({
     include: {

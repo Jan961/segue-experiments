@@ -121,10 +121,15 @@ export type ContractsDTO = {
   HoldNotes?: string;
   CompNotes?: string;
   CastRateTicketsArranged?: boolean;
-  CastRateTicketsNotes?: string;
   PerformanceIds?: number[];
   RunTag: string;
   LandingPageURL: string;
+  CastRateTicketsNotes?: string;
+  TicketsOnSale: boolean;
+  TicketsOnSaleFromDate: string;
+  MarketingPlanReceived: boolean;
+  PrintReqsReceived: boolean;
+  ContactInfoReceived: boolean;
 };
 
 export type GetInFitUpDTO = {
@@ -425,17 +430,48 @@ export interface IFileData {
 }
 
 export type ContractStatusType = {
+  ContractNotes: string;
   BookingId: number;
   StatusCode: string;
   SignedDate: Date;
   SignedBy: string;
   ReturnDate: Date;
   CheckedBy: string;
-  RoyalPercentage: string;
+  RoyaltyPercentage: string;
   DealType: string;
   Notes: string;
   ReceivedBackDate: Date;
   Exceptions: string;
+};
+
+export type ContractBookingStatusType = {
+  DateBlockId: number;
+  VenueId: number;
+  FirstDate: Date;
+  StatusCode: string;
+  PencilNum: number;
+  LandingPageURL: string;
+  TicketsOnSaleFromDate: Date;
+  TicketsOnSale: boolean;
+  MarketingPlanReceived: boolean;
+  ContactInfoReceived: boolean;
+  PrintReqsReceived: boolean;
+  Notes: string;
+  DealNotes: string;
+  TicketPriceNotes: string;
+  MarketingDealNotes: string;
+  CrewNotes: string;
+  SalesNotes: string;
+  HoldNotes: string;
+  CompNotes: string;
+  MerchandiseNotes: string;
+  CastRateTicketNotes: string;
+  CastRateTicketsArranged: boolean;
+  CastRateTicketsNotes: string;
+  RunTag: string;
+  MarketingCostsStatus: string;
+  MarketingCostsApprovalDate: Date;
+  MarketingCostsNotes: string;
 };
 
 export interface ContractTableRowType {
@@ -470,4 +506,42 @@ export interface FileDTO {
   uploadDateTime: string;
   entity: string;
   entityId: number;
+}
+
+export interface VenueContractFormData {
+  StatusCode: string;
+  SignedDate: Date;
+  ReturnDate: Date;
+  ReceivedBackDate: Date;
+  DealType: string;
+  bookingNotes: string;
+  TicketPriceNotes: string;
+  MarketingDealNotes: string;
+  CrewNotes: string;
+  Exceptions: string;
+  Notes: string;
+  MerchandiseNotes: string;
+  RoyaltyPercentage: string;
+  performanceTimes: string;
+  performanceCount: string;
+  DealNotes: string;
+  status: string;
+}
+
+export interface SaveContractFormState {
+  StatusCode?: string;
+  SignedDate?: Date;
+  ReturnDate?: Date;
+  ReceivedBackDate?: Date;
+  DealType?: string;
+  bookingNotes?: string;
+  Exceptions?: string;
+  Notes?: string;
+}
+
+export interface SaveContractBookingFormState {
+  MerchandiseNotes?: string;
+  CrewNotes?: string;
+  MarketingDealNotes?: string;
+  TicketPriceNotes?: string;
 }
