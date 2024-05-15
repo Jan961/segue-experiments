@@ -7,6 +7,15 @@ export const statusOptions: SelectOption[] = [
   { text: 'Countersigned and Filed', value: 'CSAF' },
   { text: 'None', value: 'NONE' },
 ];
+
+export const dealTypeOptions: SelectOption[] = [
+  { text: 'None', value: 'NULL' },
+  { text: 'Split', value: 'SPLT' },
+  { text: 'Guarantee', value: 'GUA' },
+  { text: 'Call Single', value: 'CS' },
+  { text: 'Call multiple', value: 'CM' },
+  { text: 'First Call Against Split', value: 'FCAS' },
+];
 export const allStatusOptions: SelectOption[] = [{ text: 'All', value: 'all' }, ...statusOptions];
 
 export const contractsStatusMap = {
@@ -15,6 +24,23 @@ export const contractsStatusMap = {
   X: 'Producer Signed, Returned to Venue',
   CSAF: 'Countersigned and Filed',
   NONE: 'None',
+};
+
+export const contractsKeyStatusMap = {
+  'Received Not Returned': 'CSAR',
+  'Received, Questions Raised': 'U',
+  'Producer Signed, Returned to Venue': 'X',
+  'Countersigned and Filed': 'CSAF',
+  None: 'NONE',
+};
+
+export const contractDealTypeMap = {
+  NULL: 'None',
+  SPLT: 'Split',
+  GUA: 'Guarantee',
+  CS: 'Call Single',
+  CM: 'Call Multiple',
+  FCAS: 'First Call Against Split',
 };
 
 export const contractsRow = {
@@ -43,4 +69,19 @@ export const defaultVenueFilters = {
   country: null,
   productionId: null,
   search: '',
+};
+
+export const initialEditContractFormData = {
+  StatusCode: '',
+  SignedDate: null,
+  ReturnDate: null,
+  ReceivedBackDate: null,
+  DealType: '',
+  bookingNotes: '',
+  TicketPriceNotes: '',
+  MarketingDealNotes: '',
+  CrewNotes: '',
+  Exceptions: '',
+  Notes: '',
+  MerchandiseNotes: '',
 };

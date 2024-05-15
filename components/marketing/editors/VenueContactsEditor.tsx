@@ -89,7 +89,7 @@ export const VenueContactsEditor = ({ venueContact, open, triggerClose, venueId 
         <FormInputSelect
           name="RoleId"
           label="Role"
-          value={inputs.RoleId}
+          value={inputs.VenueRoleId}
           onChange={handleOnChange}
           options={roleList}
         />

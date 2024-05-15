@@ -13,7 +13,7 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     headerName: 'Activity Name',
     field: 'actName',
     cellRenderer: DefaultCellRenderer,
-    width: 100,
+    width: 188,
   },
   {
     headerName: 'Type',
@@ -37,10 +37,11 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     headerName: 'Follow Up Req.',
     field: 'followUpCheck',
     cellRenderer: CheckboxRenderer,
-    cellRendererParams: {
+    cellRendererParams: (params) => ({
       onChange: () => null, // no action required, checkbox fixed in table
-    },
-    width: 90,
+      checked: params.data.followUpCheck,
+    }),
+    width: 85,
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -84,6 +85,15 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
       marginTop: '5px',
     },
     width: 320,
+  },
+  {
+    headerName: 'Due By Date',
+    field: 'followUpDt',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.followUpDt);
+    },
+    width: 100,
+    hide: true,
   },
   {
     headerName: '',
