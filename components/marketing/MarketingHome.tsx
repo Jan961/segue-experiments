@@ -122,7 +122,7 @@ const MarketingHome = () => {
             <ContactNotesTab bookingId={bookingId} />
           </Tab.Panel>
 
-          <Tab.Panel>
+          <Tab.Panel className="w-[1085px]">
             <VenueContactsTab bookingId={bookingId} />
           </Tab.Panel>
           <Tab.Panel className="w-42 h-24 flex justify-center items-center">promoter holds</Tab.Panel>
