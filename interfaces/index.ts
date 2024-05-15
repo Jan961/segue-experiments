@@ -466,4 +466,5 @@ export interface FileDTO {
   uploadDateTime: string;
   entity: string;
   entityId: number;
+  imageUrl?: string;
 }

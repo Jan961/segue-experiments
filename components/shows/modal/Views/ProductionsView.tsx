@@ -105,7 +105,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const onSave = (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', 'production/');
+    formData.append('path', `images/production/${currentProduction.Id}/`);
 
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation
@@ -185,7 +185,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         router.replace(router.asPath);
         setIsLoading(false);
       }
-    } else if (e.column.colId === 'IsArchived') {
+    } else if (e.column.colId === 'ImageUrl') {
       setIsUploadModalOpen(true);
     }
   };

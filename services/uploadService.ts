@@ -2,6 +2,7 @@ import s3 from 'lib/s3';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { FileDTO } from 'interfaces';
+import config from 'config';
 
 const bulkFileUpload = async (path, files, userId) => {
   const metadataList: FileDTO[] = [];
@@ -13,11 +14,13 @@ const bulkFileUpload = async (path, files, userId) => {
       Bucket: process.env.S3_BUCKET_NAME,
       Key: `${path || ''}/${uniqueFileName}`,
       Body: buffer,
+      ContentDisposition: 'inline',
     };
     const response = await s3.upload(params).promise();
     const data: FileDTO = {
       originalFilename: file.originalFilename,
       location: response?.Key,
+      imageUrl: `${config.cloudFrontDomain}/${response?.Key}`,
       mediaType: file.mimetype,
       uploadUserId: userId,
       entity: '',
@@ -38,12 +41,14 @@ const singleFileUpload = async (path, file, userId) => {
     Bucket: process.env.S3_BUCKET_NAME,
     Key: `${path || ''}/${uniqueFileName}`,
     Body: buffer,
+    ContentDisposition: 'inline',
   };
 
   const response = await s3.upload(params).promise();
   const data: FileDTO = {
     originalFilename: file.originalFilename,
     location: response?.Key,
+    imageUrl: `${config.cloudFrontDomain}/${response?.Key}`,
     mediaType: file.mimetype,
     uploadUserId: userId,
     entity: '',
