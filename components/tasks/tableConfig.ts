@@ -4,7 +4,7 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
-import getTaskDateStatusColor from 'utils/getTaskDateStatus';
+import getTaskDateStatusColor, { getWeekOptions } from 'utils/getTaskDateStatus';
 import { calculateTaskStatus } from 'utils/tasks';
 
 export const styleProps = { headerColor: tileColors.tasks };
@@ -146,6 +146,102 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       headerName: 'Notes',
       field: 'Notes',
       cellRenderer: NotesRenderer,
+      cellRendererParams: {
+        tpActive: true,
+      },
+      resizable: false,
+      width: 78,
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'visible',
+      },
+    },
+  ];
+};
+
+const weekOptions = getWeekOptions('');
+
+export const getMasterTasksColumnDefs = (usersList = []) => {
+  return [
+    {
+      headerName: 'Code',
+      field: 'Code',
+      cellRenderer: DefaultCellRenderer,
+      width: 72,
+    },
+    {
+      headerName: 'Task Name',
+      field: 'Name',
+      cellRenderer: DefaultCellRenderer,
+      width: 445,
+      flex: 1,
+    },
+    {
+      headerName: 'Start by (WK)',
+      field: 'StartByWeekNum',
+      cellRenderer: SelectCellRenderer,
+      cellStyle: {
+        overflow: 'visible',
+      },
+      cellRendererParams: function () {
+        return {
+          options: weekOptions,
+          isSearchable: true,
+        };
+      },
+      width: 120,
+      minWidth: 120,
+    },
+    {
+      headerName: 'Complete by (WK)',
+      field: 'CompleteByWeekNum',
+      cellRenderer: SelectCellRenderer,
+      cellStyle: {
+        overflow: 'visible',
+      },
+      cellRendererParams: function () {
+        return {
+          options: weekOptions,
+          isSearchable: true,
+        };
+      },
+      width: 110,
+      minWidth: 100,
+    },
+    { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
+    {
+      headerName: 'Assigned to',
+      field: 'AssignedToUserId',
+      valueGetter: function (params) {
+        return params.data?.AssignedToUserId
+          ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text
+          : null;
+      },
+      cellRenderer: DefaultCellRenderer,
+      width: 136,
+    },
+    {
+      headerName: 'Notes',
+      field: 'Notes',
+      cellRenderer: NotesRenderer,
+      cellRendererParams: {
+        tpActive: true,
+      },
+      resizable: false,
+      width: 78,
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'visible',
+      },
+    },
+    {
+      headerName: '',
+      field: '',
+      cellRenderer: DefaultCellRenderer,
       cellRendererParams: {
         tpActive: true,
       },
