@@ -252,7 +252,7 @@ export const allocSeatsColDefs = [
     cellRendererParams: {
       truncate: false,
     },
-    width: 240,
+    width: 235,
     resizable: false,
   },
 ];

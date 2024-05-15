@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import AllocatedSeatsModal from '../modal/AllocatedSeatsModal';
 import AvailableSeatsModal from '../modal/AvailableSeatsModal';
@@ -9,6 +9,7 @@ import { allocSeatsColDefs, styleProps } from '../table/tableConfig';
 import { AllocatedHoldDTO } from 'interfaces';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import formatInputDate from 'utils/dateInputFormat';
+import Icon from 'components/core-ui-lib/Icon';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -22,44 +23,37 @@ interface PromoterData {
 export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
   const [showAllocSeatsModal, setShowAllocSeatsModal] = useState<boolean>(false);
   const [showAvailSeatsModal, setShowAvailSeatModal] = useState<boolean>(false);
-  const [availableSeats, setAvailableSeats] = useState<number>(0);
-  const [allocatedSeats, setAllocatedSeats] = useState<number>(0);
+  const [availData, setAvailData] = useState<any>(null);
   const [castRateArranged, setCastRateArranged] = useState<boolean>(false);
   const [allocRows, setAllocRows] = useState(null);
   const [castRateNotes, setCastRateNotes] = useState('');
   const [availSeatsCont, setAvailSeatsCont] = useState(null);
+  const [holdList, setHoldList] = useState(null);
 
   const { fetchData } = useAxios();
 
-  //   const retrieveSalesData = async (bookingId: string) => {
-  //     const data = await fetchData({
-  //       url: '/api/marketing/sales/read/' + bookingId,
-  //       method: 'POST',
-  //     });
+  const editAvailSeats = (holdRec) => {
+    setAvailData(holdRec);
+    setShowAvailSeatModal(true);
+  };
 
-  //     if (Array.isArray(data) && data.length > 0) {
-  //       const tempSales = data as Array<SalesSnapshot>;
-  //       setSalesTable(
-  //         <SalesTable
-  //           containerHeight="h-auto"
-  //           containerWidth="w-[1465px]"
-  //           module="marketing"
-  //           variant="salesSnapshot"
-  //           data={tempSales}
-  //           booking={bookingId}
-  //         />,
-  //       );
-  //     }
-  //   };
+  const saveAvailSeats = async (data) => {
+    try {
+      await fetchData({
+        url: '/api/marketing/availableSeats/update',
+        method: 'POST',
+        data,
+      });
 
-  //   useEffect(() => {
-  //     setSalesTable(<div />);
-  //     if (bookingId !== null && bookingId !== undefined) {
-  //       retrieveSalesData(bookingId.toString());
-  //     }
-  //   }, [bookingId])]
+      getPromoterHoldData(bookingId.toString());
+      setShowAvailSeatModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getPromoterHoldData = async (bookingId) => {
+    setAvailSeatsCont([]);
     try {
       const data = await fetchData({
         url: '/api/marketing/promoterHolds/' + bookingId,
@@ -68,17 +62,36 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
 
       if (typeof data === 'object') {
         const promData = data as PromoterData;
+        setHoldList(promData.holds);
         setAllocRows(promData.allocations);
         const tempAvailSeats = [];
         promData.holds.forEach((holdRec) => {
-          console.log(holdRec.note);
+          const splitNotes = holdRec.note.split('\r\n');
           tempAvailSeats.push(
-            <div className="w-[1064.92px] h-[65px] bg-white mb-5 rounded-md">
-              <div className="text-base text-primary-navy font-bold ml-2">
-                {formatInputDate(holdRec.info.Date)} | {holdRec.info.Date.substring(0, 5)} | Seats Allocated:{' '}
-                {holdRec.totalAllocated} / {holdRec.totalAvailable}
+            <div>
+              <Icon color="#fff" className="float-right mt-3" iconName="edit" onClick={() => editAvailSeats(holdRec)} />
+              <div className="w-[1045px] h-[65px] bg-white mb-5 rounded-md border border-primary-border">
+                <div className="text-base text-primary-navy font-bold ml-2">
+                  {formatInputDate(holdRec.info.Date)} | {holdRec.info.Time.substring(0, 5)} | Seats Allocated:{' '}
+                  {holdRec.totalAllocated > holdRec.totalAvailable ? (
+                    <span className="text-primary-red">
+                      {holdRec.totalAllocated} / {holdRec.totalAvailable}
+                    </span>
+                  ) : (
+                    <span>
+                      {holdRec.totalAllocated} / {holdRec.totalAvailable}
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm text-primary-navy mb-4 ml-2 max-h-8 overflow-y-auto">
+                  {splitNotes.map((line, index) => (
+                    <React.Fragment key={index}>
+                      {line}
+                      {index < splitNotes.length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </div>
               </div>
-              <div className="text-sm text-primary-navy mb-4 ml-2">{holdRec.note}</div>
             </div>,
           );
         });
@@ -90,11 +103,23 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
     }
   };
 
-  useEffect(() => {
-    setAllocatedSeats(0);
-    setAvailableSeats(0);
+  const saveAllocatedSeats = async (data, perfId) => {
+    const holdRec = holdList.find((hold) => hold.info.Id === perfId);
+    const newRecDate = { AvailableCompId: holdRec.availableCompId, ...data };
 
-    getPromoterHoldData(bookingId.toString());
+    console.log(newRecDate);
+
+    await fetchData({
+      url: '/api/marketing/allocatedSeats/create',
+      method: 'POST',
+      data: newRecDate,
+    });
+  };
+
+  useEffect(() => {
+    if (bookingId !== null && bookingId !== undefined) {
+      getPromoterHoldData(bookingId.toString());
+    }
   }, [bookingId]);
 
   return (
@@ -145,13 +170,14 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
         show={showAllocSeatsModal}
         bookingId={bookingId}
         onCancel={() => setShowAllocSeatsModal(false)}
+        onSave={(data, perfId) => saveAllocatedSeats(data, perfId)}
       />
 
       <AvailableSeatsModal
-        currAllocated={allocatedSeats}
-        currAvailable={availableSeats}
+        data={availData}
         show={showAvailSeatsModal}
         onCancel={() => setShowAvailSeatModal(false)}
+        onSave={(data) => saveAvailSeats(data)}
       />
     </>
   );

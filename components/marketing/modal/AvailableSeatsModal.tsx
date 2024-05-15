@@ -6,13 +6,14 @@ import Button from 'components/core-ui-lib/Button';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
+import { UpdateAvailableSeatsParams } from 'pages/api/marketing/availableSeats/update';
+import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 
 interface AvailableSeatsModalProps {
   show: boolean;
   onCancel: () => void;
-  onSave: () => void;
-  currAllocated: number;
-  currAvailable: number;
+  onSave: (data) => void;
+  data: any;
 }
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -20,62 +21,50 @@ const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 export default function AvailableSeatsModal({
   show = false,
   onCancel,
-  currAllocated,
-  currAvailable, // data,
-} // onSave,
-: Partial<AvailableSeatsModalProps>) {
+  onSave,
+  data,
+}: Partial<AvailableSeatsModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
   const [dayName, setDayName] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
-  const [seatsNum, setSeatsNum] = useState('');
   const [notes, setNotes] = useState('');
   const [allocated, setAllocated] = useState(0);
-  const [available, setAvailable] = useState(0);
+  const [available, setAvailable] = useState('');
+  const [id, setId] = useState(0);
+  const [perfId, setPerfId] = useState(0);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [confVariant, setConfVariant] = useState<ConfDialogVariant>('close');
 
   const initForm = () => {
-    const today = new Date();
-    setTime(getTimeFromDateAndTime(today));
-    setDate(formatInputDate(today));
-    setAllocated(currAllocated);
-    setAvailable(currAvailable);
-    setDayName(days[today.getDay()]);
+    const dt = data.info.Date !== null ? new Date(data.info.Date) : new Date();
+    setTime(getTimeFromDateAndTime(dt));
+    setDate(formatInputDate(dt));
+    setAllocated(data.totalAllocated);
+    setAvailable(data.totalAvailable.toString());
+    setDayName(days[dt.getDay()]);
+    setId(data.availableCompId);
+    setPerfId(data.info.Id);
+    setNotes(data.note);
   };
 
-  //   const handleSave = () => {
-  //     // display error if the activity type is not selected
-  //     if (actType === null) {
-  //       setError(true);
-  //       return;
-  //     }
+  const handleSave = () => {
+    const data: UpdateAvailableSeatsParams = {
+      Id: id,
+      Note: notes,
+      PerformanceId: perfId,
+      Seats: parseInt(available),
+    };
 
-  //     let data: ActivityDTO = {
-  //       ActivityTypeId: actType,
-  //       BookingId: bookingId,
-  //       CompanyCost: parseFloat(companyCost),
-  //       VenueCost: parseFloat(venueCost),
-  //       Date: startOfDay(new Date(actDate)),
-  //       FollowUpRequired: actFollowUp,
-  //       Name: actName,
-  //       Notes: actNotes,
-  //       DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
-  //     };
-
-  //     // only add iD if not adding
-  //     if (variant !== 'add') {
-  //       data = { ...data, Id: actId };
-  //     }
-
-  //     onSave(variant, data);
-  //   };
+    onSave(data);
+  };
 
   const setNumericVal = (value: string) => {
     const regexPattern = /^-?\d*(\.\d*)?$/;
     // validate value with regex
     if (regexPattern.test(value)) {
-      setSeatsNum(value);
+      setAvailable(value);
     }
   };
 
@@ -84,13 +73,20 @@ export default function AvailableSeatsModal({
     onCancel();
   };
 
-  const handleConfirm = () => {
-    onCancel();
+  const handleConfirm = (variant: ConfDialogVariant) => {
+    if (notes !== data.note || available !== data.totalAvailable.toString()) {
+      setConfVariant(variant);
+      setShowConfirm(true);
+    } else {
+      onCancel();
+    }
   };
 
   useEffect(() => {
-    initForm();
-  });
+    if (data !== undefined && data !== null) {
+      initForm();
+    }
+  }, [data]);
 
   useEffect(() => {
     setVisible(show);
@@ -98,7 +94,7 @@ export default function AvailableSeatsModal({
 
   return (
     <div>
-      <PopupModal show={visible} onClose={() => handleConfirm()} showCloseIcon={true} hasOverlay={showConfirm}>
+      <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
         <div className="h-[446px] w-[325px]">
           <div className="text-xl text-primary-navy font-bold mb-4">Available Seats</div>
 
@@ -124,7 +120,7 @@ export default function AvailableSeatsModal({
                 className="w-[103px]"
                 placeholder="Enter Number"
                 id="seatsNo"
-                value={seatsNum}
+                value={available.toString()}
                 onChange={(event) => setNumericVal(event.target.value)}
               />
             </div>
@@ -152,14 +148,14 @@ export default function AvailableSeatsModal({
           </div>
 
           <div className="place-content-center flex flex-row mt-5 pb-5">
-            <Button className="w-132" variant="secondary" text="Cancel" onClick={() => handleConfirm()} />
-            <Button className="ml-4 w-132" variant="primary" text="Save and Close" onClick={null} />
+            <Button className="w-132" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
+            <Button className="ml-4 w-132" variant="primary" text="Save and Close" onClick={handleSave} />
           </div>
         </div>
       </PopupModal>
 
       <ConfirmationDialog
-        variant={'cancel'}
+        variant={confVariant}
         show={showConfirm}
         onYesClick={handleConfCancel}
         onNoClick={() => setShowConfirm(false)}

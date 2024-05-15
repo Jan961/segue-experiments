@@ -16,7 +16,7 @@ import formatInputDate from 'utils/dateInputFormat';
 interface AllocatedModalProps {
   show: boolean;
   onCancel: () => void;
-  onSave: () => void;
+  onSave: (data, perfId) => void;
   bookingId;
   data?: ActivityDTO;
 }
@@ -24,7 +24,7 @@ interface AllocatedModalProps {
 export default function AllocatedSeatsModal({
   show = false,
   onCancel,
-  // onSave,
+  onSave,
   bookingId, // data,
 }: Partial<AllocatedModalProps>) {
   const { fetchData } = useAxios();
@@ -33,7 +33,6 @@ export default function AllocatedSeatsModal({
   const [perfList, setPerfList] = useState([]);
   const [userList, setUserList] = useState([]);
   const users = useRecoilValue(userState);
-
   const [perfSelected, setPerfSelected] = useState('');
   const [custName, setCustName] = useState('');
   const [email, setEmail] = useState('');
@@ -46,55 +45,23 @@ export default function AllocatedSeatsModal({
   const [showConfirm, setShowConfirm] = useState(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
 
-  //   const initForm = () => {
-  //     if (variant === 'add') {
-  //       setActName('');
-  //       setActType(null);
-  //       setActDate(null);
-  //       setActFollowUp(false);
-  //       setFollowUpDt(null);
-  //       setCompanyCost('');
-  //       setVenueCost('');
-  //       setActNotes('');
-  //     } else if (variant === 'edit') {
-  //       setActName(data.Name);
-  //       setActType(data.ActivityTypeId);
-  //       setActDate(startOfDay(new Date(data.Date)));
-  //       setActFollowUp(data.FollowUpRequired);
-  //       setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
-  //       setCompanyCost(data.CompanyCost.toString());
-  //       setVenueCost(data.VenueCost.toString());
-  //       setActNotes(data.Notes);
-  //       setActId(data.Id);
-  //     }
-  //   };
+  const handleSave = () => {
+    const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
+    const data = {
+      ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
+      Comments: comments,
+      RequestedBy: requestedBy,
+      Seats: parseInt(numSeatsReq),
+      SeatsAllocated: seatNumList,
+      TicketHolderEmail: email,
+      TicketHolderName: custName,
+      VenueConfirmationNotes: venueConfNotes,
+      date: perf.date,
+      time: perf.time,
+    };
 
-  //   const handleSave = () => {
-  //     // display error if the activity type is not selected
-  //     if (actType === null) {
-  //       setError(true);
-  //       return;
-  //     }
-
-  //     let data: ActivityDTO = {
-  //       ActivityTypeId: actType,
-  //       BookingId: bookingId,
-  //       CompanyCost: parseFloat(companyCost),
-  //       VenueCost: parseFloat(venueCost),
-  //       Date: startOfDay(new Date(actDate)),
-  //       FollowUpRequired: actFollowUp,
-  //       Name: actName,
-  //       Notes: actNotes,
-  //       DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
-  //     };
-
-  //     // only add iD if not adding
-  //     if (variant !== 'add') {
-  //       data = { ...data, Id: actId };
-  //     }
-
-  //     onSave(variant, data);
-  //   };
+    onSave(data, parseInt(perfSelected));
+  };
 
   const setNumericVal = (value: string) => {
     const regexPattern = /^-?\d*(\.\d*)?$/;
@@ -110,8 +77,22 @@ export default function AllocatedSeatsModal({
   };
 
   const handleConfirm = (type: ConfDialogVariant) => {
-    setConfVariant(type);
-    onCancel();
+    if (
+      perfSelected !== '' ||
+      custName !== '' ||
+      email === '' ||
+      numSeatsReq !== '' ||
+      seatNumList !== '' ||
+      requestedBy !== '' ||
+      comments !== '' ||
+      arrangedBy !== '' ||
+      venueConfNotes !== ''
+    ) {
+      setConfVariant(type);
+      setShowConfirm(true);
+    } else {
+      onCancel();
+    }
   };
 
   const getPerformanceList = async (bookingId) => {
@@ -128,6 +109,8 @@ export default function AllocatedSeatsModal({
           optionList.push({
             text: formatInputDate(perf.Date) + ' | ' + perf.Time.substring(0, 5),
             value: perf.Id,
+            date: perf.Date,
+            time: perf.Time.substring(0, 5),
           });
         });
         setPerfList(optionList);
@@ -138,14 +121,16 @@ export default function AllocatedSeatsModal({
   };
 
   useEffect(() => {
-    getPerformanceList(bookingId.toString());
+    if (bookingId !== null && bookingId !== undefined) {
+      getPerformanceList(bookingId.toString());
 
-    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-      value: Id,
-      text: `${FirstName || ''} ${LastName || ''}`,
-    }));
+      const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
+      }));
 
-    setUserList(userTempList);
+      setUserList(userTempList);
+    }
   }, [bookingId]);
 
   useEffect(() => {
@@ -289,7 +274,7 @@ export default function AllocatedSeatsModal({
           <div className="place-content-center flex flex-row mt-5 pb-5">
             <Button className="w-32" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
             <Button className="ml-4 w-32" onClick={() => handleConfirm('delete')} variant="tertiary" text="Delete" />
-            <Button className="ml-4 w-32" variant="primary" text="Save and Close" onClick={null} />
+            <Button className="ml-4 w-32" variant="primary" text="Save and Close" onClick={handleSave} />
           </div>
         </div>
       </PopupModal>
