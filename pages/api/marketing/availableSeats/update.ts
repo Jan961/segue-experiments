@@ -3,7 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
-interface UpdateAvailableSeatsParams {
+export interface UpdateAvailableSeatsParams {
   Id: number;
   PerformanceId: number;
   Seats: number;

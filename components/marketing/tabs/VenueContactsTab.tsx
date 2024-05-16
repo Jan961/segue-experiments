@@ -23,14 +23,6 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
     ...venueRoles.filter((vr) => vr.Standard === true).map((vr) => vr.Standard && { text: vr.Name, value: vr.Id }),
   ];
 
-  const placeholder: UiVenueContact = {
-    email: 'Enter Email Address',
-    firstName: 'Enter First Name',
-    lastName: 'Enter Last Name',
-    phone: 'Enter Phone No.',
-    roleName: 'Enter Job Title',
-  };
-
   const saveVenueContact = async (data) => {
     const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
     const variant = data.mode;
@@ -55,10 +47,10 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
 
       const newVc = {
         ...data,
-        FirstName: newContact.firstName === placeholder.firstName ? null : newContact.firstName,
-        LastName: newContact.lastName === placeholder.lastName ? null : newContact.lastName,
-        Phone: newContact.phone === placeholder.phone ? null : newContact.phone,
-        Email: newContact.email === placeholder.email ? null : newContact.email,
+        FirstName: newContact.firstName,
+        LastName: newContact.lastName,
+        Phone: newContact.phone,
+        Email: newContact.email,
         VenueRoleId: venueRole.Id,
         VenueId: booking.VenueId,
       };
@@ -102,7 +94,7 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
 
       if (typeof data === 'object') {
         const venueContactList = data as Array<VenueContactDTO>;
-        const venueContactUiList: Array<UiVenueContact> = [placeholder];
+        const venueContactUiList: Array<UiVenueContact> = [];
 
         venueContactList.forEach((vc) => {
           const role = venueRoles.find((v) => v.Id === vc.VenueRoleId);
