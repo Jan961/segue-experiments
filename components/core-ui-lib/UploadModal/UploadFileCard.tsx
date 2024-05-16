@@ -5,7 +5,7 @@ import { fileSizeFormatter, getStatusFromProgress } from 'utils/index';
 import { FileCardProps } from './interface';
 import { useMemo } from 'react';
 
-const FileCard = ({ file, index, onDelete, progress, errorMessage }: FileCardProps) => {
+const FileCard = ({ file, onDelete, progress, errorMessage }: FileCardProps) => {
   const status = useMemo(() => getStatusFromProgress(progress), [progress]);
 
   return (
@@ -35,13 +35,7 @@ const FileCard = ({ file, index, onDelete, progress, errorMessage }: FileCardPro
           </div>
         </div>
         <div className="relative bottom-1 right-1">
-          <Icon
-            iconName={'cross'}
-            fill="#21345B"
-            variant="sm"
-            className="cursor-pointer"
-            onClick={() => onDelete(index)}
-          />
+          <Icon iconName={'cross'} fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
         </div>
       </div>
     </div>
