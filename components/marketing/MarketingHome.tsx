@@ -110,7 +110,7 @@ const MarketingHome = () => {
             <SalesTab bookingId={bookingId} />
           </Tab.Panel>
 
-          <Tab.Panel>
+          <Tab.Panel className="w-[1085px]">
             <ArchivedSalesTab />
           </Tab.Panel>
 

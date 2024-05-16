@@ -89,11 +89,7 @@ export const Summary = () => {
     { id: 9, label: 'Currency:', data: info.VenueCurrencyCode || '-' },
   ];
 
-  const notesInfo = [
-    { id: 1, label: 'Booking Deal Notes:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' },
-    { id: 2, label: 'Hold Notes:', data: notes.HoldNotes ? notes.HoldNotes : 'None' },
-    { id: 3, label: 'Comp Notes:', data: notes.CompNotes ? notes.CompNotes : 'None' },
-  ];
+  const notesInfo = [{ id: 1, label: 'Booking Deal:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' }];
 
   return (
     <div className="text-sm mb-2">
