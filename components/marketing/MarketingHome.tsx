@@ -123,7 +123,7 @@ const MarketingHome = () => {
             <ContactNotesTab bookingId={bookingId} />
           </Tab.Panel>
 
-          <Tab.Panel>
+          <Tab.Panel className="w-[1085px]">
             <VenueContactsTab bookingId={bookingId} />
           </Tab.Panel>
 
