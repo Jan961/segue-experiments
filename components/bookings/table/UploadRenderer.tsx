@@ -7,6 +7,7 @@ interface UploadRendererProps {
   buttonClassName?: string;
   variant?: ButtonVariant;
   buttonText?: string;
+  value?: string;
 }
 
 const UploadRenderer = ({ imageUrl, buttonClassName, variant = 'secondary', buttonText }: UploadRendererProps) => {

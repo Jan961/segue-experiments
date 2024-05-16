@@ -132,10 +132,22 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           onProgress(file[0].file, progress);
         },
       }) // eslint-disable-next-line
-      .then((response) => {
+      .then((response: any) => {
         progress = 100;
         onProgress(file[0].file, progress);
         clearInterval(slowProgressInterval);
+        const gridApi = tableRef.current.getApi();
+        const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
+        const transaction = {
+          update: [
+            {
+              ...rowDataToUpdate,
+              ImageUrl: response.imageUrl,
+              ProductionImage: response,
+            },
+          ],
+        };
+        applyTransactionToGrid(tableRef, transaction);
       }) // eslint-disable-next-line
       .catch((error) => {
         onError(file[0].file, 'Error uploading file. Please try again.');
@@ -187,6 +199,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       }
     } else if (e.column.colId === 'ImageUrl') {
       setIsUploadModalOpen(true);
+      setCurrentProduction(e.data);
     }
   };
 
