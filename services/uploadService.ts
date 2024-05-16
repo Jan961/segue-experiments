@@ -59,6 +59,14 @@ const singleFileUpload = async (path, file, userId) => {
   return data;
 };
 
+export const deleteFile = async (location: string) => {
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: location,
+  };
+  return s3.deleteObject(params).promise();
+};
+
 const transformForPrisma = (data: FileDTO | FileDTO[]) => {
   const transformedData = Array.isArray(data)
     ? data.map((item) => ({
