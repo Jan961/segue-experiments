@@ -1,5 +1,3 @@
-import { File } from '@prisma/client';
-
 export type StatusCode = 'C' | 'U' | 'X';
 
 export type Currency = {
@@ -166,6 +164,16 @@ export type DateBlockDTO = {
   ProductionId?: number;
 };
 
+export interface FileDTO {
+  id?: number;
+  originalFilename: string;
+  mediaType: string;
+  location: string;
+  uploadUserId: number;
+  uploadDateTime: string;
+  imageUrl?: string;
+}
+
 export type ProductionDTO = {
   Id?: number;
   ShowId: number;
@@ -181,7 +189,7 @@ export type ProductionDTO = {
   RegionList?: number[];
   IsDeleted?: boolean;
   ImageUrl?: string;
-  Image?: File;
+  Image?: Partial<FileDTO>;
 };
 
 export type VenueMinimalDTO = {
@@ -460,15 +468,4 @@ export interface ContractTableRowType {
   venue: string | null;
   venueId: number | null;
   week: number | null;
-}
-
-export interface FileDTO {
-  originalFilename: string;
-  mediaType: string;
-  location: string;
-  uploadUserId: number;
-  uploadDateTime: string;
-  entity: string;
-  entityId: number;
-  imageUrl?: string;
 }

@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import UploadModal from 'components/core-ui-lib/UploadModal';
+import { FileDTO } from 'interfaces';
 
 interface ProductionsViewProps {
   showData: any;
@@ -55,6 +56,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [productionUploadMap, setProductionUploadMap] = useState<Record<string, FileDTO>>(() => {
+    return showData.productions.reduce((prodImageMap, production) => {
+      prodImageMap[production.Id] = production.Image;
+      return prodImageMap;
+    }, {});
+  });
 
   const gridOptions = {
     getRowId: (params) => {
@@ -138,12 +145,13 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         clearInterval(slowProgressInterval);
         const gridApi = tableRef.current.getApi();
         const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
+        setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response.data }));
         const transaction = {
           update: [
             {
               ...rowDataToUpdate,
-              ImageUrl: response.data.imageUrl,
-              ProductionImage: response,
+              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.Location}`,
+              Image: response,
             },
           ],
         };
@@ -163,7 +171,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload({ ...e.data, Id: currentProduction?.Id }, true);
+        const payloadData = getProductionsConvertedPayload(
+          { ...e.data, Id: currentProduction?.Id, Image: productionUploadMap[e.data.Id] },
+          true,
+        );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();

@@ -3,6 +3,7 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import { FileDTO } from 'interfaces';
 import config from 'config';
+import { File } from '@prisma/client';
 
 const bulkFileUpload = async (path, files, userId) => {
   const metadataList: FileDTO[] = [];
@@ -23,8 +24,6 @@ const bulkFileUpload = async (path, files, userId) => {
       imageUrl: `${config.cloudFrontDomain}/${response?.Key}`,
       mediaType: file.mimetype,
       uploadUserId: userId,
-      entity: '',
-      entityId: 1234,
       uploadDateTime: new Date().toISOString(),
     };
 
@@ -51,8 +50,6 @@ const singleFileUpload = async (path, file, userId) => {
     imageUrl: `${config.cloudFrontDomain}/${response?.Key}`,
     mediaType: file.mimetype,
     uploadUserId: userId,
-    entity: '',
-    entityId: 1234,
     uploadDateTime: new Date().toISOString(),
   };
 
@@ -67,28 +64,14 @@ export const deleteFile = async (location: string) => {
   return s3.deleteObject(params).promise();
 };
 
-const transformForPrisma = (data: FileDTO | FileDTO[]) => {
-  const transformedData = Array.isArray(data)
-    ? data.map((item) => ({
-        OriginalFilename: item.originalFilename,
-        MediaType: item.mediaType,
-        Location: item.location,
-        UploadUserId: item.uploadUserId,
-        UploadDateTime: item.uploadDateTime,
-        Entity: item.entity,
-        EntityId: item.entityId,
-      }))
-    : {
-        OriginalFilename: data.originalFilename,
-        MediaType: data.mediaType,
-        Location: data.location,
-        UploadUserId: data.uploadUserId,
-        UploadDateTime: data.uploadDateTime,
-        Entity: data.entity,
-        EntityId: data.entityId,
-      };
-
-  return transformedData;
+const transformForPrisma = (data: FileDTO): Partial<File> => {
+  return {
+    Id: data.id,
+    OriginalFilename: data.originalFilename,
+    MediaType: data.mediaType,
+    Location: data.location,
+    UploadUserId: data.uploadUserId,
+  };
 };
 
 export { bulkFileUpload, singleFileUpload, transformForPrisma };

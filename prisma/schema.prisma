@@ -83,17 +83,17 @@ model BookingActivity {
 }
 
 model BookingContactNotes {
-  ContactNoteId                  Int          @id @default(autoincrement())
-  ContactNoteBookingId           Int
-  ContactNoteContactName         String?      @db.VarChar(30)
-  ContactNoteDateTime            DateTime?    @db.DateTime(0)
-  ContactNoteActionAccountUserId Int?
-  ContactNoteNotes               String?      @db.LongText
-  AccountUser                    AccountUser? @relation(fields: [ContactNoteActionAccountUserId], references: [UserId], onDelete: NoAction, map: "AccountUserBookingContactNotes")
-  Booking                        Booking      @relation(fields: [ContactNoteBookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
+  Id                             Int          @id @default(autoincrement()) @map("ContactNoteId")
+  BookingId                      Int          @map("ContactNoteBookingId")
+  ContactName                    String?      @map("ContactNoteContactName") @db.VarChar(30)
+  DateTime                       DateTime?    @map("ContactNoteDateTime") @db.DateTime(0)
+  ActionAccountUserId            Int?         @map("ContactNoteActionAccountUserId")
+  Notes                          String?      @map("ContactNoteNotes") @db.LongText
+  AccountUser                    AccountUser? @relation(fields: [ActionAccountUserId], references: [UserId], onDelete: NoAction, map: "AccountUserBookingContactNotes")
+  Booking                        Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
-  @@index([ContactNoteActionAccountUserId], map: "AccountUserBookingContactNotes")
-  @@index([ContactNoteBookingId], map: "BookingBookingContactNotes")
+  @@index([ActionAccountUserId], map: "AccountUserBookingContactNotes")
+  @@index([BookingId], map: "BookingBookingContactNotes")
 }
 
 model Contract {

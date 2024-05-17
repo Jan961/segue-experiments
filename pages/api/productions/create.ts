@@ -12,6 +12,7 @@ export const mapToPrismaFields = ({
   regionList: RegionList,
   dateBlockList,
   id: Id,
+  image: Image,
 }) => ({
   Id,
   Code,
@@ -20,6 +21,7 @@ export const mapToPrismaFields = ({
   SalesFrequency,
   ShowId,
   RegionList,
+  Image,
   DateBlock: dateBlockList.map(
     ({ name: Name, startDate: StartDate, endDate: EndDate, isPrimary: IsPrimary, id: Id }) => ({
       Name,
@@ -33,7 +35,7 @@ export const mapToPrismaFields = ({
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const production: Partial<ProductionDTO> = mapToPrismaFields(req.body);
-  const { ShowId } = production;
+  const { ShowId, Image } = production;
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
@@ -52,6 +54,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             PRRegionId: regionId,
           })),
         },
+        ...(Image?.id && {
+          File: {
+            connect: {
+              Id: Image?.id,
+            },
+          },
+        }),
 
         DateBlock: {
           create: production.DateBlock.map((dateBlock) => ({

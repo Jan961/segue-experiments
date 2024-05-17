@@ -11,6 +11,7 @@ import {
   BookingContactNotes,
   ProductionTask,
   User,
+  File,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -31,6 +32,7 @@ import {
   VenueContactDTO,
   VenueRoleDTO,
   ContractStatusType,
+  FileDTO,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
@@ -158,6 +160,16 @@ export const getInFitUpMapper = (gifu: GetInFitUp): GetInFitUpDTO => ({
   RunTag: gifu.RunTag,
 });
 
+export const FileMapper = (file: File & { ImageUrl?: string }): FileDTO => ({
+  id: file.Id,
+  originalFilename: file.OriginalFilename,
+  mediaType: file.MediaType,
+  location: file.Location,
+  uploadUserId: file.UploadUserId,
+  imageUrl: file?.Location ? getFileUrlFromLocation(file.Location) : null,
+  uploadDateTime: file.UploadDateTime.toISOString(),
+});
+
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
   Id: t.Id,
   ShowId: t.Show.Id,
@@ -171,7 +183,7 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   SalesFrequency: t.SalesFrequency,
   RegionList: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
   ImageUrl: t?.File?.Location ? getFileUrlFromLocation(t.File.Location) : null,
-  Image: t?.File,
+  Image: t?.File ? FileMapper(t?.File) : null,
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({
@@ -204,9 +216,9 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({
   Id: a.Id,
   BookingId: a.BookingId,
-  CoContactName: a.CoContactName,
-  ContactDate: convertDate(a.ContactDate),
-  ActionByDate: convertDate(a.ActionByDate),
+  CoContactName: a.ContactName,
+  ContactDate: convertDate(a.DateTime),
+  ActionByDate: convertDate(a.DateTime),
   Notes: a.Notes,
 });
 

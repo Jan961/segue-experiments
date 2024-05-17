@@ -22,22 +22,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const file = files.file;
-    let response: FileDTO[] | FileDTO;
+    let fileRecords;
     const path = fields.path as string;
 
     if (!Array.isArray(file)) {
-      response = await singleFileUpload(path, file, userId);
+      const uploadedFile = await singleFileUpload(path, file, userId);
+      fileRecords = await prisma.file.create({
+        data: transformForPrisma(uploadedFile),
+      });
     } else {
-      response = await bulkFileUpload(path, file, userId);
+      const uploadedData: FileDTO[] = await bulkFileUpload(path, file, userId);
+      await prisma.file.createMany({
+        data: uploadedData.map((file) => transformForPrisma(file)),
+      });
+      const fileLocations = uploadedData.map((file) => file.location);
+      fileRecords = await prisma.file.findMany({
+        where: { Location: { in: fileLocations } },
+      });
     }
 
-    const fileRecords = transformForPrisma(response);
-
-    await prisma.file.createMany({
-      data: fileRecords,
-    });
-
-    res.status(200).json(response);
+    res.status(200).json(fileRecords);
   } catch (error) {
     console.log('Error uploading file: ', error);
     res.status(500).json({ error: 'File upload unsuccessful', message: error.message });
