@@ -24,9 +24,9 @@ const Filters = () => {
     <div className="w-full flex items-center justify-between flex-wrap">
       <div className="px-4">
         <div className="py-2 flex flex-row items-center gap-4">
-          <h1 className={`text-4xl font-bold text-primary-yellow`}>Master Task Lists</h1>
+          <h1 className="text-4xl font-bold text-primary-yellow">Master Task Lists</h1>
           <TextInput
-            id={'taskText'}
+            id="taskText"
             placeholder="Search Master Task List..."
             className="w-[410px]"
             iconName="search"
@@ -38,13 +38,7 @@ const Filters = () => {
       </div>
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
         <Button text="Production Task List" className="w-[132px]" onClick={() => router.push('/tasks')} />
-        <Button
-          text="Export"
-          className="w-[132px]"
-          iconProps={{ className: 'h-4 w-3' }}
-          sufixIconName={'excel'}
-          onClick={null}
-        />
+        <Button text="Export" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
         <Button onClick={null} text="Add Task" className="w-[132px]" />
       </div>
     </div>
