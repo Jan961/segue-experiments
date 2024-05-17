@@ -17,7 +17,6 @@ import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import TextInput from 'components/core-ui-lib/TextInput';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -56,6 +55,8 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
   const { selected: productionId } = useRecoilValue(productionJumpState);
 
   const { fetchData } = useAxios();
+
+  const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset !border-primary-border`;
 
   const getActivities = async (bookingId: string) => {
     try {
@@ -406,35 +407,35 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
           <div className="flex flex-row gap-4">
             <div className="flex flex-col text-center">
               <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-              <TextInput
-                className="w-[146px]"
-                placeholder="0.00"
-                id="input"
-                value={currency + totalCost.toFixed(2)}
-                disabled={true}
+              <input
+                type="text"
+                className={classNames(baseClass, 'w-[146px]')}
                 onChange={null}
+                placeholder={''}
+                disabled={true}
+                value={currency + totalCost.toFixed(2)}
               />
             </div>
             <div className="flex flex-col text-center">
               <div className="text-base font-bold text-primary-input-text">Company</div>
-              <TextInput
-                className="w-[146px]"
-                placeholder="0.00"
-                id="input"
-                value={currency + totalCompanyCost.toFixed(2)}
-                disabled={true}
+              <input
+                type="text"
+                className={classNames(baseClass, 'w-[146px]')}
                 onChange={null}
+                placeholder={''}
+                disabled={true}
+                value={currency + totalCompanyCost.toFixed(2)}
               />
             </div>
             <div className="flex flex-col text-center">
               <div className="text-base font-bold text-primary-input-text">Venue</div>
-              <TextInput
-                className="w-[146px]"
-                placeholder="0.00"
-                id="input"
-                value={currency + totalVenueCost.toFixed(2)}
-                disabled={true}
+              <input
+                type="text"
+                className={classNames(baseClass, 'w-[146px]')}
                 onChange={null}
+                placeholder={''}
+                disabled={true}
+                value={currency + totalVenueCost.toFixed(2)}
               />
             </div>
           </div>
