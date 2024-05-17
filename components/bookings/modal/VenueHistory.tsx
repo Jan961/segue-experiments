@@ -6,7 +6,6 @@ import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
 import Button from 'components/core-ui-lib/Button';
-import { useRouter } from 'next/router';
 import SalesTable from 'components/global/salesTable';
 import { SalesTableVariant } from 'components/global/salesTable/SalesTable';
 import useAxios from 'hooks/useAxios';
@@ -33,8 +32,6 @@ const TableWrapper = styled.div<TableWrapperProps>`
 `;
 
 export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) => {
-  const router = useRouter();
-
   const [showVenueSelectModal, setShowVenueSelect] = useState<boolean>(visible);
   const [showCompSelectModal, setShowCompSelect] = useState<boolean>(false);
   const [showResultsModal, setShowResults] = useState<boolean>(false);
@@ -111,7 +108,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         data: {
           salesByType: 'venue',
           venueCode: venue.Code,
-          showCode: router.query.ShowCode.toString(),
         },
       });
 
