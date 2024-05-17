@@ -12,6 +12,7 @@ import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import useProductionOptions from 'hooks/useProductionOptions';
+import { useRouter } from 'next/router';
 
 interface FiltersProps {
   usersList: SelectOption[];
@@ -51,6 +52,8 @@ const Filters = ({ usersList }: FiltersProps) => {
     setProductionJump({ ...productionJump, includeArchived: e.target.value });
     setIncludeArchived(e.target.value);
   };
+
+  const router = useRouter();
 
   return (
     <div className="w-full flex items-center justify-between flex-wrap">
@@ -126,14 +129,8 @@ const Filters = ({ usersList }: FiltersProps) => {
         </div>
         <div className="pl-20 flex items-center gap-4 flex-wrap  py-1 mt-2 flex-[15%]">
           <Button className="text-sm leading-8 w-[132px]" text="Clear Filters" onClick={onClearFilters} />
-          <Button text="Master Task List" className="w-[132px]" onClick={null} />
-          <Button
-            text="Tasks Reports"
-            className="w-[132px]"
-            iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName={'excel'}
-            onClick={null}
-          />
+          <Button text="Master Task List" className="w-[132px]" onClick={() => router.push('/tasks/master')} />
+          <Button text="Tasks Reports" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
           <Button onClick={null} text="Add Task" className="w-[132px]" />
         </div>
       </div>
