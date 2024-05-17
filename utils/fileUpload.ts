@@ -1,3 +1,4 @@
+import config from 'config';
 import formidable, { IncomingForm, Fields, Files } from 'formidable';
 import { NextApiRequest } from 'next';
 
@@ -14,3 +15,7 @@ export async function parseFormData(req: NextApiRequest): Promise<{ fields: Fiel
     });
   });
 }
+
+export const getFileUrlFromLocation = (location: string) => {
+  return `${config.cloudFrontDomain}/${location}`;
+};

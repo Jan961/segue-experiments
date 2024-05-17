@@ -30,6 +30,7 @@ const showInclude = Prisma.validator<Prisma.ShowInclude>()({
       Show: true,
       DateBlock: true,
       ProductionRegion: true,
+      File: true,
     },
   },
 });
