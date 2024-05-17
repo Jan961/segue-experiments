@@ -142,7 +142,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           update: [
             {
               ...rowDataToUpdate,
-              ImageUrl: response.imageUrl,
+              ImageUrl: response.data.imageUrl,
               ProductionImage: response,
             },
           ],

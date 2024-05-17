@@ -1,20 +1,19 @@
 import Button from 'components/core-ui-lib/Button';
-import Icon from 'components/core-ui-lib/Icon';
 import { ButtonVariant } from 'components/core-ui-lib/Button/Button';
+import Image from 'next/image';
 
 interface UploadRendererProps {
-  imageUrl?: string;
   buttonClassName?: string;
   variant?: ButtonVariant;
   buttonText?: string;
   value?: string;
 }
 
-const UploadRenderer = ({ imageUrl, buttonClassName, variant = 'secondary', buttonText }: UploadRendererProps) => {
-  return imageUrl ? (
+const UploadRenderer = ({ buttonClassName, variant = 'secondary', buttonText, value }: UploadRendererProps) => {
+  return value ? (
     <div className="p-2">
-      <div className="flex bg-gray-300 justify-center items-center">
-        <Icon iconName="camera-solid" variant="xl" />
+      <div className="flex justify-center items-center">
+        <Image width={50} height={30} alt="Prod Image" src={value} />
       </div>
     </div>
   ) : (
