@@ -1,3 +1,5 @@
+import { File } from '@prisma/client';
+
 export type StatusCode = 'C' | 'U' | 'X';
 
 export type Currency = {
@@ -178,6 +180,8 @@ export type ProductionDTO = {
   SalesFrequency?: string;
   RegionList?: number[];
   IsDeleted?: boolean;
+  ImageUrl?: string;
+  Image?: File;
 };
 
 export type VenueMinimalDTO = {

@@ -12,6 +12,7 @@ const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
   Show: true,
   DateBlock: true,
   ProductionRegion: true,
+  File: true,
 });
 
 export const getActiveProductions = async (accountId: number) => {

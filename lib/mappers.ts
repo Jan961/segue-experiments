@@ -36,6 +36,7 @@ import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { toISO } from 'services/dateService';
+import { getFileUrlFromLocation } from 'utils/fileUpload';
 
 /*
 
@@ -169,6 +170,8 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   IsDeleted: t.IsDeleted,
   SalesFrequency: t.SalesFrequency,
   RegionList: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
+  ImageUrl: t?.File?.Location ? getFileUrlFromLocation(t.File.Location) : null,
+  Image: t?.File,
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({
