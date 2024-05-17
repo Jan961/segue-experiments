@@ -15,8 +15,6 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const { filteredTasks = [] } = useMasterTasksFilter(masterTask);
 
-  console.log(filteredTasks);
-
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">

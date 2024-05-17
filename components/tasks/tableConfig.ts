@@ -6,6 +6,8 @@ import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
 import getTaskDateStatusColor, { getWeekOptions } from 'utils/getTaskDateStatus';
 import { calculateTaskStatus } from 'utils/tasks';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import IconRenderer from 'components/bookings/table/IconRenderer';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
@@ -191,8 +193,8 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
           isSearchable: true,
         };
       },
-      width: 120,
-      minWidth: 120,
+      width: 100,
+      minWidth: 100,
     },
     {
       headerName: 'Complete by (WK)',
@@ -229,7 +231,6 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       cellRendererParams: {
         tpActive: true,
       },
-      resizable: false,
       width: 78,
       cellStyle: {
         display: 'flex',
@@ -240,19 +241,36 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     },
     {
       headerName: '',
-      field: '',
-      cellRenderer: DefaultCellRenderer,
+      field: 'clone',
+      cellRenderer: ButtonRenderer,
       cellRendererParams: {
-        tpActive: true,
+        buttonText: 'Clone',
       },
       resizable: false,
-      width: 78,
-      cellStyle: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        overflow: 'visible',
+      width: 80,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: '',
+      field: 'edit',
+      cellRenderer: IconRenderer,
+      cellRendererParams: {
+        iconName: 'edit',
       },
+      width: 20,
+      resizable: false,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: '',
+      field: 'delete',
+      cellRenderer: IconRenderer,
+      cellRendererParams: {
+        iconName: 'delete',
+      },
+      width: 20,
+      resizable: false,
+      headerClass: 'text-center',
     },
   ];
 };
