@@ -5,6 +5,7 @@ import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRende
 import { tileColors } from 'config/global';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
+import TwoLineRenderer from './TwoLineRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -13,7 +14,7 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     headerName: 'Activity Name',
     field: 'actName',
     cellRenderer: DefaultCellRenderer,
-    width: 100,
+    width: 188,
   },
   {
     headerName: 'Type',
@@ -37,10 +38,11 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     headerName: 'Follow Up Req.',
     field: 'followUpCheck',
     cellRenderer: CheckboxRenderer,
-    cellRendererParams: {
+    cellRendererParams: (params) => ({
       onChange: () => null, // no action required, checkbox fixed in table
-    },
-    width: 90,
+      checked: params.data.followUpCheck,
+    }),
+    width: 85,
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -84,6 +86,15 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
       marginTop: '5px',
     },
     width: 320,
+  },
+  {
+    headerName: 'Due By Date',
+    field: 'followUpDt',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.followUpDt);
+    },
+    width: 100,
+    hide: true,
   },
   {
     headerName: '',
@@ -178,6 +189,70 @@ export const contactNoteColDefs = (updateContactNote) => [
       ],
     }),
     width: 90,
+    resizable: false,
+  },
+];
+
+export const allocSeatsColDefs = [
+  {
+    headerName: 'Perf Date',
+    field: 'date',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+  },
+  {
+    headerName: 'Perf Time',
+    field: 'time',
+    cellRenderer: DefaultCellRenderer,
+    width: 100,
+  },
+  {
+    headerName: 'Name / Email of Person Receiving Tickets',
+    field: 'name_email',
+    cellRenderer: TwoLineRenderer,
+    cellRendererParams: (params) => {
+      return {
+        value: params.data.TicketHolderName + '\n' + params.data.TicketHolderEmail,
+      };
+    },
+    wrapText: true,
+    autoHeight: true,
+    width: 200,
+  },
+  {
+    headerName: 'Arranged by',
+    field: 'ArrangedBy',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Comments',
+    field: 'Comments',
+    cellRenderer: DefaultTextRenderer,
+    width: 150,
+  },
+  {
+    headerName: 'Seats',
+    field: 'Seats',
+    cellRenderer: DefaultTextRenderer,
+    width: 70,
+  },
+  {
+    headerName: 'Allocated',
+    field: 'SeatsAllocated',
+    cellRenderer: DefaultTextRenderer,
+    width: 95,
+  },
+  {
+    headerName: 'Venue Confirmation Notes',
+    field: 'VenueConfirmationNotes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    width: 235,
     resizable: false,
   },
 ];

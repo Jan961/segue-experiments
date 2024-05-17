@@ -33,6 +33,9 @@ const showInclude = Prisma.validator<Prisma.ShowInclude>()({
       File: true,
     },
   },
+  Account: {
+    include: { ProductionCompany: true },
+  },
 });
 
 export type ShowWithProductions = Prisma.ShowGetPayload<{

@@ -39,7 +39,6 @@ export interface AllProductionPageProps {
 export const getAllProductionPageProps = async (ctx: any) => {
   const email = await getEmailFromReq(ctx.req);
   const AccountId = await getAccountId(email);
-  // console.log("====", prisma)
   const productionsRaw = await prisma.Production.findMany({
     where: {
       Show: {

@@ -5,7 +5,7 @@ import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
 import useAxios from 'hooks/useAxios';
 import { startOfDay } from 'date-fns';
 import { activityColDefs, styleProps } from '../table/tableConfig';
-import { hasActivityChanged, reverseDate } from '../utils';
+import { hasActivityChanged } from '../utils';
 import ConfirmationDialog, { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -17,7 +17,6 @@ import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import TextInput from 'components/core-ui-lib/TextInput';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -57,6 +56,8 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
 
   const { fetchData } = useAxios();
 
+  const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset !border-primary-border`;
+
   const getActivities = async (bookingId: string) => {
     try {
       const data = await fetchData({
@@ -87,7 +88,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
         actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
         actDate: startOfDay(new Date(act.Date)),
         followUpCheck: act.FollowUpRequired,
-        followUpDt: act.DueByDate,
+        followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
         companyCost: act.CompanyCost,
         venueCost: act.VenueCost,
         notes: act.Notes,
@@ -127,38 +128,42 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
   const activityUpdate = async (variant: ActivityModalVariant, data) => {
     setActModalVariant(variant);
 
-    const actData = await fetchData({
-      url: '/api/marketing/activities/' + bookingId,
-      method: 'POST',
-    });
+    try {
+      const actData = await fetchData({
+        url: '/api/marketing/activities/' + bookingId,
+        method: 'POST',
+      });
 
-    if (typeof actData !== 'object') {
-      return;
-    }
+      if (typeof actData !== 'object') {
+        return;
+      }
 
-    const activityData = data as ActivityList;
-    const actTypes = activityData.activityTypes;
+      const activityData = actData as ActivityList;
+      const actTypes = activityData.activityTypes;
 
-    const tempAct: ActivityDTO = {
-      ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
-      BookingId: data.bookingId,
-      CompanyCost: data.companyCost,
-      VenueCost: data.venueCost,
-      Date: data.actDate,
-      FollowUpRequired: data.followUpCheck,
-      Name: data.actName,
-      Notes: data.notes,
-      DueByDate: data.followUpDt && reverseDate(data.followUpDt) !== '' ? new Date(reverseDate(data.followUpDt)) : null,
-      Id: data.id,
-    };
+      const tempAct: ActivityDTO = {
+        ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
+        BookingId: data.bookingId,
+        CompanyCost: data.companyCost,
+        VenueCost: data.venueCost,
+        Date: data.actDate,
+        FollowUpRequired: data.followUpCheck,
+        Name: data.actName,
+        Notes: data.notes,
+        DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+        Id: data.id,
+      };
 
-    setActRow(tempAct);
+      setActRow(tempAct);
 
-    if (variant === 'edit') {
-      setShowActivityModal(true);
-    } else if (variant === 'delete') {
-      setConfVariant('delete');
-      setShowConfirm(true);
+      if (variant === 'edit') {
+        setShowActivityModal(true);
+      } else if (variant === 'delete') {
+        setConfVariant('delete');
+        setShowConfirm(true);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -245,6 +250,45 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
     }
   };
 
+  const editBooking = async (field: string, value: any) => {
+    const updObj = { [field]: value };
+
+    // update locally first
+    switch (field) {
+      case 'ticketsOnSale':
+        setOnSaleCheck(value);
+        break;
+      case 'marketingPlanReceived':
+        setMarketingPlansCheck(value);
+        break;
+      case 'printReqsReceived':
+        setPrintReqCheck(value);
+        break;
+      case 'contactInfoReceived':
+        setContactInfoCheck(value);
+        break;
+      case 'ticketsOnSaleFromDate':
+        setOnSaleFromDt(value);
+        break;
+      case 'marketingCostsNotes':
+        setChangeNotes(value);
+        break;
+      case 'marketingCostsApprovalDate':
+        setChangeDate(value);
+        break;
+      case 'marketingCostsStatus':
+        setApprovalStatus(value);
+        break;
+    }
+
+    // update in the database
+    await fetchData({
+      url: '/api/bookings/update/' + bookingId.toString(),
+      method: 'POST',
+      data: updObj,
+    });
+  };
+
   useEffect(() => {
     if (bookingId) {
       setCurrency('£');
@@ -258,6 +302,9 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
       setPrintReqCheck(booking.PrintReqsReceived);
       setContactInfoCheck(booking.ContactInfoReceived);
       setOnSaleFromDt(booking.TicketsOnSaleFromDate);
+      setChangeDate(booking.MarketingCostsApprovalDate);
+      setApprovalStatus(booking.MarketingCostsStatus);
+      setChangeNotes(booking.MarketingCostsNotes);
     }
   }, [bookingId]);
 
@@ -269,16 +316,15 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
             id={'On Sale'}
             name={'On Sale'}
             checked={onSaleCheck}
-            onChange={null}
+            onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
             className="w-[19px] h-[19px] mt-[2px]"
-            disabled={true}
           />
           <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
         </div>
 
         <div className="flex flex-row">
           <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
-          <DateInput onChange={null} value={onSaleFromDt} disabled={true} />
+          <DateInput onChange={(value) => editBooking('ticketsOnSaleFromDate', value)} value={onSaleFromDt} />
         </div>
 
         <div className="flex flex-row mt-1">
@@ -286,8 +332,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
             id={'Marketing Plans Received'}
             name={'Marketing Plans Received'}
             checked={marketingPlansCheck}
-            onChange={null}
-            disabled={true}
+            onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
             className="w-[19px] h-[19px] mt-[2px]"
           />
           <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
@@ -298,8 +343,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
             id={'Print Requirements Received'}
             name={'Print Requirements Received'}
             checked={printReqCheck}
-            onChange={null}
-            disabled={true}
+            onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
             className="w-[19px] h-[19px] mt-[2px]"
           />
           <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
@@ -310,8 +354,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
             id={'Contact Info Received'}
             name={'Contact Info Received'}
             checked={contactInfoCheck}
-            onChange={null}
-            disabled={true}
+            onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
             className="w-[19px] h-[19px] mt-[2px]"
           />
           <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
@@ -327,19 +370,20 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
                 className={classNames('w-72 !border-0 text-primary-navy mt-1')}
                 options={approvalStatusList}
                 value={approvalStatus}
-                onChange={(value) => setApprovalStatus(value.toString())}
+                onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
                 placeholder={'Select Approval Status'}
                 isClearable={false}
               />
             </div>
             <div className="flex flex-col mt-8 ml-8">
-              <DateInput onChange={(value) => setChangeDate(value)} value={changeDate} />
+              <DateInput onChange={(value) => editBooking('marketingCostsApprovalDate', value)} value={changeDate} />
             </div>
             <div className="flex flex-col ml-8 mt-1">
               <TextArea
                 className={'mt-2 h-[52px] w-[425px]'}
                 value={changeNotes}
                 placeholder="Notes Field"
+                onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
                 onChange={(e) => setChangeNotes(e.target.value)}
               />
             </div>
@@ -363,35 +407,35 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
           <div className="flex flex-row gap-4">
             <div className="flex flex-col text-center">
               <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-              <TextInput
-                className="w-[146px]"
-                placeholder="0.00"
-                id="input"
-                value={currency + totalCost.toFixed(2)}
-                disabled={true}
+              <input
+                type="text"
+                className={classNames(baseClass, 'w-[146px]')}
                 onChange={null}
+                placeholder={''}
+                disabled={true}
+                value={currency + totalCost.toFixed(2)}
               />
             </div>
             <div className="flex flex-col text-center">
               <div className="text-base font-bold text-primary-input-text">Company</div>
-              <TextInput
-                className="w-[146px]"
-                placeholder="0.00"
-                id="input"
-                value={currency + totalCompanyCost.toFixed(2)}
-                disabled={true}
+              <input
+                type="text"
+                className={classNames(baseClass, 'w-[146px]')}
                 onChange={null}
+                placeholder={''}
+                disabled={true}
+                value={currency + totalCompanyCost.toFixed(2)}
               />
             </div>
             <div className="flex flex-col text-center">
               <div className="text-base font-bold text-primary-input-text">Venue</div>
-              <TextInput
-                className="w-[146px]"
-                placeholder="0.00"
-                id="input"
-                value={currency + totalVenueCost.toFixed(2)}
-                disabled={true}
+              <input
+                type="text"
+                className={classNames(baseClass, 'w-[146px]')}
                 onChange={null}
+                placeholder={''}
+                disabled={true}
+                value={currency + totalVenueCost.toFixed(2)}
               />
             </div>
           </div>

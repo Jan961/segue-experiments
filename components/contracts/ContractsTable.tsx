@@ -5,6 +5,9 @@ import { useRecoilState } from 'recoil';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../bookings/utils';
 import { ContractTableRowType } from 'interfaces';
+import EditVenueContractModal from './modal/EditVenueContractModal';
+import { addEditContractsState } from '../../state/contracts/contractsState';
+import { RowDoubleClickedEvent } from 'ag-grid-community';
 
 interface ContractsTableProps {
   rowData?: ContractTableRowType;
@@ -13,6 +16,7 @@ interface ContractsTableProps {
 export default function ContractsTable({ rowData }: ContractsTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(contractsFilterState);
+  const [editContractData, setEditContractData] = useRecoilState(addEditContractsState);
   const [rows, setRows] = useState([]);
   const gridOptions = {
     getRowStyle: (params) => {
@@ -38,6 +42,19 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     }
   }, [rowData]);
 
+  const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
+    setEditContractData({
+      visible: true,
+      contract: e.data,
+    });
+  };
+
+  const handleClose = () => {
+    setEditContractData({
+      visible: false,
+    });
+  };
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
@@ -47,8 +64,10 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
           styleProps={contractsStyleProps}
           gridOptions={gridOptions}
           ref={tableRef}
+          onRowDoubleClicked={handleRowDoubleClicked}
         />
       </div>
+      {editContractData.visible && <EditVenueContractModal {...editContractData} onClose={handleClose} />}
     </>
   );
 }

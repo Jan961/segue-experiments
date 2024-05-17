@@ -105,7 +105,7 @@ export default function ActivityModal({
     onSave(variant, data);
   };
 
-  const setNumbericVal = (type: string, value: string) => {
+  const setNumericVal = (type: string, value: string) => {
     const regexPattern = /^-?\d*(\.\d*)?$/;
     // validate value with regex
 
@@ -239,7 +239,7 @@ export default function ActivityModal({
                     placeholder="00.00"
                     id="companyCost"
                     value={companyCost}
-                    onChange={(event) => setNumbericVal('companyCost', event.target.value)}
+                    onChange={(event) => setNumericVal('companyCost', event.target.value)}
                   />
                 </div>
               </div>
@@ -257,7 +257,7 @@ export default function ActivityModal({
                     placeholder="00.00"
                     id="venueCost"
                     value={venueCost}
-                    onChange={(event) => setNumbericVal('venueCost', event.target.value)}
+                    onChange={(event) => setNumericVal('venueCost', event.target.value)}
                   />
                 </div>
               </div>
