@@ -47,12 +47,7 @@ export default function BookingsButtons() {
         sufixIconName={'excel'}
         onClick={() => setShowBookingReportsModal(true)}
       />
-      <Button
-        onClick={() => setShowVenueHistory(true)}
-        disabled={disabled}
-        text="Venue History"
-        className="w-[155px]"
-      />
+      <Button onClick={() => setShowVenueHistory(true)} text="Venue History" className="w-[155px]" />
 
       <Button
         disabled={disabled}

@@ -2,7 +2,6 @@ import { Prisma } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { unique } from 'radash';
-import { lookupShowCode } from 'services/ShowService';
 import { checkAccess, getAccountId, getEmailFromReq } from 'services/userService';
 import { BookingSelection } from 'types/MarketingTypes';
 
@@ -11,19 +10,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (req.method !== 'POST') {
       return res.status(404);
     }
-    const { venueCode, salesByType, showCode } = req.body || {};
-    if (!venueCode || !salesByType || !showCode) {
+    const { venueCode, salesByType } = req.body || {};
+    if (!venueCode || !salesByType) {
       throw new Error('Params are missing');
     }
 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
-    const ShowId = await lookupShowCode(showCode, AccountId);
-    const access = await checkAccess(email, { ShowId });
+    const access = await checkAccess(email, { AccountId });
     if (!access) return res.status(401).end();
 
     const conditions: Prisma.Sql[] = [];
-    // conditions.push(Prisma.sql`FullProductionCode Like ${showCode + '%'}`)
     if (salesByType === 'venue') {
       conditions.push(Prisma.sql`VenueCode = ${venueCode}`);
     }
