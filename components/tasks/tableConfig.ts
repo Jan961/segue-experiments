@@ -4,8 +4,10 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
-import getTaskDateStatusColor from 'utils/getTaskDateStatus';
+import getTaskDateStatusColor, { getWeekOptions } from 'utils/getTaskDateStatus';
 import { calculateTaskStatus } from 'utils/tasks';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import IconRenderer from 'components/bookings/table/IconRenderer';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
@@ -157,6 +159,118 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         alignItems: 'center',
         overflow: 'visible',
       },
+    },
+  ];
+};
+
+const weekOptions = getWeekOptions('');
+
+export const getMasterTasksColumnDefs = (usersList = []) => {
+  return [
+    {
+      headerName: 'Code',
+      field: 'Code',
+      cellRenderer: DefaultCellRenderer,
+      width: 72,
+    },
+    {
+      headerName: 'Task Name',
+      field: 'Name',
+      cellRenderer: DefaultCellRenderer,
+      width: 445,
+      flex: 1,
+    },
+    {
+      headerName: 'Start by (WK)',
+      field: 'StartByWeekNum',
+      cellRenderer: SelectCellRenderer,
+      cellStyle: {
+        overflow: 'visible',
+      },
+      cellRendererParams: function () {
+        return {
+          options: weekOptions,
+          isSearchable: true,
+        };
+      },
+      width: 100,
+      minWidth: 100,
+    },
+    {
+      headerName: 'Complete by (WK)',
+      field: 'CompleteByWeekNum',
+      cellRenderer: SelectCellRenderer,
+      cellStyle: {
+        overflow: 'visible',
+      },
+      cellRendererParams: function () {
+        return {
+          options: weekOptions,
+          isSearchable: true,
+        };
+      },
+      width: 110,
+      minWidth: 100,
+    },
+    { headerName: 'Priority', field: 'Priority', cellRenderer: DefaultCellRenderer, width: 100 },
+    {
+      headerName: 'Assigned to',
+      field: 'AssignedToUserId',
+      valueGetter: function (params) {
+        return params.data?.AssignedToUserId
+          ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text
+          : null;
+      },
+      cellRenderer: DefaultCellRenderer,
+      width: 136,
+    },
+    {
+      headerName: 'Notes',
+      field: 'Notes',
+      cellRenderer: NotesRenderer,
+      cellRendererParams: {
+        tpActive: true,
+      },
+      width: 78,
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'visible',
+      },
+    },
+    {
+      headerName: '',
+      field: 'clone',
+      cellRenderer: ButtonRenderer,
+      cellRendererParams: {
+        buttonText: 'Clone',
+      },
+      resizable: false,
+      width: 80,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: '',
+      field: 'edit',
+      cellRenderer: IconRenderer,
+      cellRendererParams: {
+        iconName: 'edit',
+      },
+      width: 20,
+      resizable: false,
+      headerClass: 'text-center',
+    },
+    {
+      headerName: '',
+      field: 'delete',
+      cellRenderer: IconRenderer,
+      cellRendererParams: {
+        iconName: 'delete',
+      },
+      width: 20,
+      resizable: false,
+      headerClass: 'text-center',
     },
   ];
 };
