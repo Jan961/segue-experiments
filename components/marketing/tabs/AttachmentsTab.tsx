@@ -22,7 +22,7 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
   const [attachIndex, setAttachIndex] = useState(-1);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
-  const onSave = (file, onProgress, onError) => {
+  const onSave = async (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', 'marketing/');
@@ -30,8 +30,8 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation
 
-    axios
-      .post('/api/upload', formData, {
+    try {
+      const response = await axios.post('/api/upload', formData, {
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           if (percentCompleted <= 50) {
@@ -48,42 +48,40 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
               }
             }, 100);
           }
-
           onProgress(file[0].file, progress);
         },
-      }) // eslint-disable-next-line
-      .then(async (response) => {
-        progress = 100;
-        onProgress(file[0].file, progress);
-        clearInterval(slowProgressInterval);
-
-        const fileRec = {
-          FileBookingBookingId: parseInt(bookingId),
-          FileDateTime: new Date(),
-          FileDescription: attachType,
-          FileOriginalFilename: response.data.originalFilename,
-          FileUrl: 'https://d1e9vbizioozy0.cloudfront.net/' + response.data.location,
-          FileUploadedDateTime: new Date(),
-        };
-
-        // update in the database
-        await fetchData({
-          url: '/api/marketing/attachments/create',
-          method: 'POST',
-          data: fileRec,
-        });
-
-        // append to table to prevent the need for an API call to get new data
-        if (attachType === 'Production') {
-          setProdAttachRows([...prodAttachRows, fileRec]);
-        } else if (attachType === 'Venue') {
-          setVenueAttachRows([...venueAttachRows, fileRec]);
-        }
-      }) // eslint-disable-next-line
-      .catch((error) => {
-        onError(file[0].file, 'Error uploading file. Please try again.');
-        clearInterval(slowProgressInterval);
       });
+
+      progress = 100;
+      onProgress(file[0].file, progress);
+      clearInterval(slowProgressInterval);
+
+      const fileRec = {
+        FileBookingBookingId: parseInt(bookingId),
+        FileDateTime: new Date(),
+        FileDescription: attachType,
+        FileOriginalFilename: response.data.originalFilename,
+        FileUrl: 'https://d1e9vbizioozy0.cloudfront.net/' + response.data.location,
+        FileUploadedDateTime: new Date(),
+      };
+
+      // update in the database
+      await fetchData({
+        url: '/api/marketing/attachments/create',
+        method: 'POST',
+        data: fileRec,
+      });
+
+      // append to table to prevent the need for an API call to get new data
+      if (attachType === 'Production') {
+        setProdAttachRows([...prodAttachRows, fileRec]);
+      } else if (attachType === 'Venue') {
+        setVenueAttachRows([...venueAttachRows, fileRec]);
+      }
+    } catch (error) {
+      onError(file[0].file, 'Error uploading file. Please try again.');
+      clearInterval(slowProgressInterval);
+    }
   };
 
   const getAttachments = async (bookingId) => {

@@ -15,8 +15,6 @@ export type BookingAttachedFile = {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log(req.body);
-
     const data = req.body as BookingAttachedFile;
 
     const email = await getEmailFromReq(req);
