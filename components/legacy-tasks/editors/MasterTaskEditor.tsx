@@ -3,12 +3,9 @@ import React, { useMemo } from 'react';
 import { StyledDialog } from 'components/global/StyledDialog';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
-import { loggingService } from 'services/loggingService';
-import axios from 'axios';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/getTaskDateStatus';
-import { masterTaskState } from 'state/tasks/masterTaskState';
 import { Spinner } from 'components/global/Spinner';
 import { priorityOptions } from 'utils/tasks';
 
@@ -36,7 +33,6 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> = {
 
 const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
   const { users = {} } = useRecoilValue(userState);
-  const [masterTasks, setMasterTasks] = useRecoilState(masterTaskState);
   const [alert, setAlert] = React.useState<string>('');
   const [loading, setLoading] = React.useState<boolean>(false);
   const [inputs, setInputs] = React.useState<Partial<MasterTask>>(task || DEFAULT_MASTER_TASK);
@@ -68,31 +64,31 @@ const MasterTaskEditor = ({ task, triggerClose, open }: NewTaskFormProps) => {
   const handleOnSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-    try {
-      if (inputs.Id) {
-        await axios.post('/api/tasks/master/update', inputs);
-        const updatedTasks = masterTasks.map((masterTask) => {
-          if (masterTask.Id === task.Id) {
-            return { ...task, ...inputs };
-          }
-          return masterTask;
-        });
-        setMasterTasks(updatedTasks);
-      } else {
-        const endpoint = '/api/tasks/master/create';
-        const {
-          data: { Code, Id },
-        } = (await axios.post(endpoint, inputs)) || { data: {} };
-        const updatedTasks = [{ ...inputs, Id, Code }, ...masterTasks];
-        setMasterTasks(updatedTasks);
-      }
-    } catch (error) {
-      loggingService.logError(error);
-      console.error(error);
-      setAlert(inputs.Id ? 'Error updating the task' : 'Error creating the task');
-    }
-    setLoading(false);
-    triggerClose();
+    // try {
+    //   if (inputs.Id) {
+    //     await axios.post('/api/tasks/master/update', inputs);
+    //     const updatedTasks = masterTasks.map((masterTask) => {
+    //       if (masterTask.Id === task.Id) {
+    //         return { ...task, ...inputs };
+    //       }
+    //       return masterTask;
+    //     });
+    //     setMasterTasks(updatedTasks);
+    //   } else {
+    //     const endpoint = '/api/tasks/master/create';
+    //     const {
+    //       data: { Code, Id },
+    //     } = (await axios.post(endpoint, inputs)) || { data: {} };
+    //     const updatedTasks = [{ ...inputs, Id, Code }, ...masterTasks];
+    //     setMasterTasks(updatedTasks);
+    //   }
+    // } catch (error) {
+    //   loggingService.logError(error);
+    //   console.error(error);
+    setAlert('Error updating the task');
+    // }
+    // setLoading(false);
+    // triggerClose();
   };
   return (
     <StyledDialog title={creating ? 'Create Master Task' : 'Edit Master Task'} open={open} onClose={triggerClose}>

@@ -90,7 +90,7 @@ const useTasksFilter = () => {
   return { filteredProductions };
 };
 
-const getFilteredUsers = (usersList, userId, filterText) => {
+export const getFilteredUsers = (usersList, userId, filterText) => {
   const user = usersList.find(({ value }) => value === userId);
   if (user && user.text) return user?.text?.toLowerCase?.().includes?.(filterText.toLowerCase());
 };
