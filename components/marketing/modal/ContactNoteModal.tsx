@@ -9,6 +9,10 @@ import { getTimeFromDateAndTime, toISO } from 'services/dateService';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { hasContactNoteChanged } from '../utils';
+import { useRecoilValue } from 'recoil';
+import { userState } from 'state/account/userState';
+import classNames from 'classnames';
+import Select from 'components/core-ui-lib/Select';
 
 export type ContactNoteModalVariant = 'add' | 'edit' | 'delete';
 
@@ -38,15 +42,23 @@ export default function ContactNoteModal({
   const [personContacted, setPersonContacted] = useState<string>(null);
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState<string>();
-  const [actionedBy, setActionedBy] = useState<string>();
+  const [actionedBy, setActionedBy] = useState<number>();
   const [notes, setNotes] = useState<string>();
   const [id, setId] = useState(null);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('close');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [userList, setUserList] = useState([]);
+  const users = useRecoilValue(userState);
 
   useEffect(() => {
     setVisible(show);
     initForm();
+
+    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+    setUserList(userTempList);
   }, [show]);
 
   const initForm = () => {
@@ -54,13 +66,13 @@ export default function ContactNoteModal({
       setPersonContacted('');
       setDate(new Date());
       setTime(getTimeFromDateAndTime(new Date()));
-      setActionedBy('');
+      setActionedBy(null);
       setNotes('');
     } else if (variant === 'edit') {
-      setPersonContacted(''); // to be added after DB change
+      setPersonContacted(data.CoContactName);
       setDate(new Date(data.ContactDate));
       setTime(getTimeFromDateAndTime(new Date(data.ContactDate)));
-      setActionedBy(data.CoContactName);
+      setActionedBy(data.UserId);
       setNotes(data.Notes);
       setId(data.Id);
     }
@@ -71,8 +83,8 @@ export default function ContactNoteModal({
     if (variant === 'edit') {
       const newRow: BookingContactNoteDTO = {
         BookingId: bookingId,
-        ActionByDate: toISO(new Date()), // this will likely get dropped
-        CoContactName: actionedBy,
+        UserId: actionedBy,
+        CoContactName: personContacted,
         ContactDate: toISO(date),
         Notes: notes,
       };
@@ -91,8 +103,8 @@ export default function ContactNoteModal({
   const handleSave = () => {
     let data: BookingContactNoteDTO = {
       BookingId: bookingId,
-      ActionByDate: toISO(new Date()), // this will likely get dropped as part of the db update
-      CoContactName: actionedBy,
+      UserId: actionedBy,
+      CoContactName: personContacted,
       ContactDate: toISO(date),
       Notes: notes,
     };
@@ -141,12 +153,14 @@ export default function ContactNoteModal({
           </div>
 
           <div className="text-base font-bold text-primary-input-text">Actioned By</div>
-          <TextInput
-            className="w-full mb-4"
-            placeholder="Enter Name"
-            id="input"
+          <Select
+            className={classNames('w-full !border-0 text-primary-input-text mb-4')}
+            options={userList}
             value={actionedBy}
-            onChange={(event) => setActionedBy(event.target.value)}
+            onChange={(value) => setActionedBy(parseInt(value.toString()))}
+            placeholder={'Select User'}
+            isClearable
+            isSearchable
           />
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>

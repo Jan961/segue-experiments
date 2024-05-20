@@ -40,12 +40,13 @@ model Booking {
   HoldNotes                  String?               @map("BookingHoldNotes") @db.LongText
   CompNotes                  String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes           String?               @map("BookingMerchandiseNotes") @db.LongText
-  CastRateTicketNotes        String?               @map("BookingCastRateTicketsNotes") @db.LongText
   CastRateTicketsArranged    Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
+  CastRateTicketNotes        String?               @map("BookingCastRateTicketsNotes") @db.LongText
   RunTag                     String                @map("BookingRunTag") @db.Char(8)
   MarketingCostsStatus       String?               @map("BookingMarketingCostsStatus") @db.Char(1)
   MarketingCostsApprovalDate DateTime?             @map("BookingMarketingCostsApprovalDate") @db.Date
   MarketingCostsNotes        String?               @map("BookingMarketingCostsNotes") @db.LongText
+  BookingCastRateArranged    Boolean               @default(dbgenerated("(b'0')")) @db.Bit(1)
   BookedVenueHistory         BookedVenueHistory[]
   DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
@@ -338,8 +339,6 @@ model Account {
   AccountLogo            Bytes?
   AccountMainEmail       String?             @db.VarChar(120)
   AccountNumPeople       Int?                @db.TinyInt
-  AccountOrganisationId  String?             @db.VarChar(100)
-  AccountDBUrl           String?             @db.VarChar(10000)
   AccountContact         AccountContact?
   AccountUser            AccountUser[]
   MasterTask             MasterTask[]

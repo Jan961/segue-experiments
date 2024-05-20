@@ -278,8 +278,8 @@ export type BookingContactNoteDTO = {
   BookingId: number;
   CoContactName: string;
   ContactDate: string;
-  ActionByDate: string;
   Notes: string;
+  UserId: number;
 };
 
 export type AllocatedHoldDTO = {

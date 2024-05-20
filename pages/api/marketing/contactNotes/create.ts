@@ -18,8 +18,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         BookingId: bcn.BookingId,
         Notes: bcn.Notes,
         ContactDate: bcn.ContactDate ? new Date(bcn.ContactDate) : null,
-        ActionByDate: bcn.ActionByDate ? new Date(bcn.ActionByDate) : null,
         CoContactName: bcn.CoContactName,
+        UserId: bcn.UserId,
       },
     });
     res.status(200).json({});

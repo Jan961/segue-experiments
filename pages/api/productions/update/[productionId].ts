@@ -23,7 +23,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           Code: dto.Code,
           IsArchived: dto.IsArchived,
-          // ProductionImage: Image?.Id,
+          // ProductionImageFileId: Image?.Id,
           ...(Image?.id && {
             File: {
               connect: {

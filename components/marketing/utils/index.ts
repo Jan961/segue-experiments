@@ -41,7 +41,7 @@ export const hasContactNoteChanged = (
     }
 
     // handle dates differently
-    if (key === 'CoContactName' || key === 'ActionByDate') {
+    if (key === 'ContactDate') {
       // check for change
       if (new Date(oldConNote[key]).getTime() !== new Date(newConNote[key]).getTime()) {
         return true;
