@@ -22,7 +22,7 @@ export default function NotesPopup({ show, onSave, onCancel, currentTask }: Note
   }, [currentTask?.Notes]);
 
   const showConfModal = (mode: ConfDialogVariant) => {
-    if (currentTask?.Notes !== note) {
+    if ((currentTask?.Notes || note) && currentTask?.Notes !== note) {
       setVariant(mode);
       setConfirm(true);
     } else {

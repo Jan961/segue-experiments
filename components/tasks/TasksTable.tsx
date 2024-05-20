@@ -8,6 +8,7 @@ import NotesPopup from './NotesPopup';
 import { loggingService } from 'services/loggingService';
 import Loader from 'components/core-ui-lib/Loader';
 import { ProductionTaskDTO } from 'interfaces';
+import { useRouter } from 'next/router';
 
 interface TasksTableProps {
   rowData?: any;
@@ -26,6 +27,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleCellClick = (e) => {
     if (e.column.colId === 'Notes') {
@@ -45,6 +47,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
       });
       setRows(updatedRowData);
       setIsLoading(false);
+      router.replace(router.asPath);
     } catch (error) {
       setIsLoading(false);
       loggingService.logError(error);
@@ -69,7 +72,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
         setFilter({ ...filter, scrollToDate: '' });
       }
     }
-  }, [filter, setFilter, rowData]);
+  }, [filter, rowData]);
 
   useEffect(() => {
     if (rowData) {

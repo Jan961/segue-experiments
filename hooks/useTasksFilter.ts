@@ -14,18 +14,23 @@ const generateOptions = (weekData) => {
   }));
 };
 
-export const getStatusBool = (taskStatus, filterStatus, taskDueDate) => {
+export const getStatusBool = (taskStatus: string, filterStatus: string, taskDueDate: string) => {
   const dueDate = new Date(taskDueDate);
   const today = new Date();
+  console.log(filterStatus, taskStatus);
   switch (filterStatus) {
+    case 'inProgress':
+    case 'complete':
+    case 'todo':
+      return taskStatus === filterStatus;
     case 'inProgressandtodo':
       return taskStatus === 'todo' || taskStatus === 'inProgress';
     case 'dueThisWeek':
       return isThisWeek(dueDate);
     case 'overdue':
-      return dueDate < today;
+      return dueDate < today && taskStatus !== 'complete';
     case 'overdueanddueThisWeek':
-      return isThisWeek(dueDate) || dueDate < today;
+      return isThisWeek(dueDate) || (dueDate < today && taskStatus !== 'complete');
     default:
       return true;
   }
@@ -57,7 +62,7 @@ const useTasksFilter = () => {
             return (
               (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
               (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
-              (!filters.status || filters.status === 'all' || Status === filters.status) &&
+              (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
               (filters.assignee === -1 || AssignedToUserId === filters.assignee) &&
               (!filters.taskText ||
                 [Name, TaskName, Notes]
