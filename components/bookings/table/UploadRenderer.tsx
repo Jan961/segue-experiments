@@ -1,6 +1,5 @@
 import Button from 'components/core-ui-lib/Button';
 import { ButtonVariant } from 'components/core-ui-lib/Button/Button';
-import Image from 'next/image';
 
 interface UploadRendererProps {
   buttonClassName?: string;
@@ -13,7 +12,7 @@ const UploadRenderer = ({ buttonClassName, variant = 'secondary', buttonText, va
   return value ? (
     <div className="p-2">
       <div className="flex justify-center items-center">
-        <Image width={50} height={30} alt="Prod Image" src={value} />
+        <img alt="Prod Image" src={value} />
       </div>
     </div>
   ) : (

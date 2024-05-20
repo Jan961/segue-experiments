@@ -71,6 +71,7 @@ const transformForPrisma = (data: FileDTO): Partial<File> => {
     MediaType: data.mediaType,
     Location: data.location,
     UploadUserId: data.uploadUserId,
+    UploadDateTime: new Date(data.uploadDateTime),
   };
 };
 

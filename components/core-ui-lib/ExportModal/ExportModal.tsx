@@ -19,7 +19,7 @@ const ExportModal = ({ visible, onClose, ExportList, tableRef, pdfStyles }: Expo
 
   return (
     <>
-      <Modal show={visible} showCloseIcon={false} panelClass="rounded-lg" closeOnOverlayClick={true} onClose={onClose}>
+      <Modal show={visible} panelClass="rounded-lg" closeOnOverlayClick={true} onClose={onClose}>
         <div className="flex flex-wrap max-w-md justify-center items-center gap-8 mt-5">
           {ExportList?.map((type) => (
             <div
