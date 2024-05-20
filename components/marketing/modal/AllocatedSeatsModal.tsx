@@ -5,27 +5,31 @@ import Select from 'components/core-ui-lib/Select/Select';
 import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
-import { ActivityDTO, PerformanceDTO } from 'interfaces';
+import { PerformanceDTO } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import useAxios from 'hooks/useAxios';
 import formatInputDate from 'utils/dateInputFormat';
+import { getTimeFromDateAndTime } from 'services/dateService';
 
 interface AllocatedModalProps {
   show: boolean;
   onCancel: () => void;
   onSave: (data, perfId) => void;
   bookingId;
-  data?: ActivityDTO;
+  data?: any;
+  type: string;
 }
 
 export default function AllocatedSeatsModal({
   show = false,
   onCancel,
   onSave,
-  bookingId, // data,
+  bookingId,
+  data,
+  type,
 }: Partial<AllocatedModalProps>) {
   const { fetchData } = useAxios();
 
@@ -44,6 +48,41 @@ export default function AllocatedSeatsModal({
   const [venueConfNotes, setVenueConfNotes] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
+
+  const initForm = () => {
+    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+
+    setUserList(userTempList);
+
+    if (type === 'edit') {
+      const perf = perfList.find(
+        (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
+      );
+      const user = userTempList.find((user) => user.text === data.ArrangedBy).value;
+      setPerfSelected(perf.value);
+      setCustName(data.TicketHolderName);
+      setEmail(data.TicketHolderEmail);
+      setNumSeatsReq(data.Seats);
+      setSeatNumList(data.SeatsAllocated);
+      setRequestedBy(data.RequestedBy);
+      setComments(data.Comments);
+      setArrangedBy(user || null);
+      setVenueConfNotes(data.VenueConfirmationNotes);
+    } else if (type === 'new') {
+      setPerfSelected(null);
+      setCustName('');
+      setEmail('');
+      setNumSeatsReq('');
+      setSeatNumList('');
+      setRequestedBy('');
+      setComments('');
+      setArrangedBy('');
+      setVenueConfNotes('');
+    }
+  };
 
   const handleSave = () => {
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
@@ -123,17 +162,13 @@ export default function AllocatedSeatsModal({
   useEffect(() => {
     if (bookingId !== null && bookingId !== undefined) {
       getPerformanceList(bookingId.toString());
-
-      const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      }));
-
-      setUserList(userTempList);
     }
   }, [bookingId]);
 
   useEffect(() => {
+    if (show) {
+      initForm();
+    }
     setVisible(show);
   }, [show]);
 
