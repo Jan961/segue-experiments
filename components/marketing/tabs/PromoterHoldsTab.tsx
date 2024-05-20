@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import AllocatedSeatsModal from '../modal/AllocatedSeatsModal';
 import AvailableSeatsModal from '../modal/AvailableSeatsModal';
@@ -29,6 +29,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
   const [castRateNotes, setCastRateNotes] = useState('');
   const [availSeatsCont, setAvailSeatsCont] = useState(null);
   const [holdList, setHoldList] = useState(null);
+  const textAreaRef = useRef(null);
 
   const { fetchData } = useAxios();
 
@@ -122,6 +123,15 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
     }
   }, [bookingId]);
 
+  useEffect(() => {
+    if (textAreaRef.current) {
+      // Reset the height to auto to shrink if necessary
+      textAreaRef.current.style.height = 'auto';
+      // Set the height based on the scroll height
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+    }
+  }, [castRateNotes]);
+
   return (
     <>
       <div className="flex flex-row">
@@ -139,13 +149,15 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
       </div>
 
       <div className="flex flex-row">
-        <TextArea
-          className="w-[1071px] h-[103px]"
-          value={castRateNotes}
-          placeholder="Notes Field"
-          onChange={(e) => setCastRateNotes(e.target.value)}
-          disabled={!castRateArranged}
-        />
+        {castRateArranged && (
+          <TextArea
+            className="w-[1071px] h-auto resize-none overflow-hidden"
+            value={castRateNotes}
+            placeholder="Notes Field"
+            onChange={(e) => setCastRateNotes(e.target.value)}
+            ref={textAreaRef}
+          />
+        )}
       </div>
 
       <div className="text-xl text-primary-navy font-bold mb-4">Available Seats</div>
