@@ -144,6 +144,8 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
       }
       setProdAttachRows(newRows);
     }
+
+    setShowConfirm(false);
   };
 
   const handleCellValueChange = async (event) => {
