@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import UploadModal from 'components/core-ui-lib/UploadModal';
+import { FileDTO } from 'interfaces';
 
 interface ProductionsViewProps {
   showData: any;
@@ -55,6 +56,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [productionUploadMap, setProductionUploadMap] = useState<Record<string, FileDTO>>(() => {
+    return showData.productions.reduce((prodImageMap, production) => {
+      prodImageMap[production.Id] = production.Image;
+      return prodImageMap;
+    }, {});
+  });
 
   const gridOptions = {
     getRowId: (params) => {
@@ -121,7 +128,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const onSave = (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', 'production/');
+    formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
 
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation
@@ -148,10 +155,23 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           onProgress(file[0].file, progress);
         },
       }) // eslint-disable-next-line
-      .then((response) => {
+      .then((response: any) => {
         progress = 100;
         onProgress(file[0].file, progress);
         clearInterval(slowProgressInterval);
+        const gridApi = tableRef.current.getApi();
+        const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
+        setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response.data }));
+        const transaction = {
+          update: [
+            {
+              ...rowDataToUpdate,
+              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.Location}`,
+              Image: response,
+            },
+          ],
+        };
+        applyTransactionToGrid(tableRef, transaction);
       }) // eslint-disable-next-line
       .catch((error) => {
         onError(file[0].file, 'Error uploading file. Please try again.');
@@ -168,7 +188,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload({ ...e.data, Id: currentProduction?.Id }, true);
+        const payloadData = getProductionsConvertedPayload(
+          { ...e.data, Id: currentProduction?.Id, Image: productionUploadMap[e.data.Id] },
+          true,
+        );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
@@ -203,8 +226,9 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         router.replace(router.asPath);
         setIsLoading(false);
       }
-    } else if (e.column.colId === 'IsArchived') {
+    } else if (e.column.colId === 'ImageUrl') {
       setIsUploadModalOpen(true);
+      setCurrentProduction(e.data);
     }
   };
 
