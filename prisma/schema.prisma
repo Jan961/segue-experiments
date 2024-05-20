@@ -41,12 +41,11 @@ model Booking {
   CompNotes                  String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes           String?               @map("BookingMerchandiseNotes") @db.LongText
   CastRateTicketsArranged    Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
-  CastRateTicketNotes        String?               @map("BookingCastRateTicketsNotes") @db.LongText
+  CastRateTicketsNotes       String?               @map("BookingCastRateTicketsNotes") @db.LongText
   RunTag                     String                @map("BookingRunTag") @db.Char(8)
   MarketingCostsStatus       String?               @map("BookingMarketingCostsStatus") @db.Char(1)
   MarketingCostsApprovalDate DateTime?             @map("BookingMarketingCostsApprovalDate") @db.Date
   MarketingCostsNotes        String?               @map("BookingMarketingCostsNotes") @db.LongText
-  BookingCastRateArranged    Boolean               @default(dbgenerated("(b'0')")) @db.Bit(1)
   BookedVenueHistory         BookedVenueHistory[]
   DateBlock                  DateBlock             @relation(fields: [DateBlockId], references: [Id], onUpdate: Restrict, map: "DateBlock_Booking")
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
@@ -734,8 +733,8 @@ model Country {
 }
 
 model CountryInRegion {
-  CountryId Int
-  RegionId  Int
+  CountryId Int               @map("CIRCountryId")
+  RegionId  Int               @map("CIRRegionId")
 
   @@id([CountryId, RegionId])
 }
