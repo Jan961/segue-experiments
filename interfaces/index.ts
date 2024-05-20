@@ -172,6 +172,16 @@ export type DateBlockDTO = {
   ProductionId?: number;
 };
 
+export interface FileDTO {
+  id?: number;
+  originalFilename: string;
+  mediaType: string;
+  location: string;
+  uploadUserId: number;
+  uploadDateTime: string;
+  imageUrl?: string;
+}
+
 export type ProductionDTO = {
   Id?: number;
   ShowId: number;
@@ -186,6 +196,8 @@ export type ProductionDTO = {
   SalesFrequency?: string;
   RegionList?: number[];
   IsDeleted?: boolean;
+  ImageUrl?: string;
+  Image?: Partial<FileDTO>;
 };
 
 export type VenueMinimalDTO = {
@@ -266,8 +278,8 @@ export type BookingContactNoteDTO = {
   BookingId: number;
   CoContactName: string;
   ContactDate: string;
-  ActionByDate: string;
   Notes: string;
+  UserId: number;
 };
 
 export type AllocatedHoldDTO = {
@@ -497,17 +509,6 @@ export interface ContractTableRowType {
   venueId: number | null;
   week: number | null;
 }
-
-export interface FileDTO {
-  originalFilename: string;
-  mediaType: string;
-  location: string;
-  uploadUserId: number;
-  uploadDateTime: string;
-  entity: string;
-  entityId: number;
-}
-
 export interface VenueContractFormData {
   StatusCode: string;
   SignedDate: Date;

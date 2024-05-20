@@ -98,7 +98,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       onClose();
     }
   };
-console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
+  console.log('formData.SignedDate.toString()', formData.SignedDate.toString());
   return (
     <PopupModal
       show={visible}
@@ -127,7 +127,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                 return null;
               }}
               className="bg-primary-white w-52"
-             
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
@@ -139,7 +138,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                 return null;
               }}
               className="bg-primary-white w-52"
-              
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
@@ -164,11 +162,7 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
             </div>
 
             <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-            <TextArea
-              className={'h-[580px] w-[400px]'}
-              value={formData.DealNotes}
-              
-            />
+            <TextArea className={'h-[580px] w-[400px]'} value={formData.DealNotes} />
             <div className="flex mt-4 items-center">
               <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" />
               <Button className="ml-3 w-36" variant="primary" text="View as PDF" />
@@ -224,7 +218,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                     return null;
                   }}
                   className="bg-primary-white w-52"
-                 
                   placeholder="User Name Dropdown"
                   options={[{ text: 'Select Assignee', value: null }, ...userList]}
                   isClearable
@@ -235,7 +228,8 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Signed On</div>
                   <DateInput
                     onChange={(value) =>
-                      formData.SignedDate.toString() !== toISO(value) && editContractModalData('SignedDate', value, 'contract')
+                      formData.SignedDate.toString() !== toISO(value) &&
+                      editContractModalData('SignedDate', value, 'contract')
                     }
                     value={formData.SignedDate}
                   />
@@ -249,7 +243,8 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
               <div className="w-4/5 flex justify-between">
                 <DateInput
                   onChange={(value) => {
-                    formData.ReturnDate.toString() !== toISO(value) && editContractModalData('ReturnDate', value, 'contract');
+                    formData.ReturnDate.toString() !== toISO(value) &&
+                      editContractModalData('ReturnDate', value, 'contract');
                   }}
                   value={formData.ReturnDate}
                 />
@@ -273,7 +268,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
                   id="includeExcludedVenues"
-                  
                   onChange={() => {
                     return null;
                   }}
@@ -285,7 +279,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
                   id="includeExcludedVenues"
-                 
                   onChange={() => {
                     return null;
                   }}
@@ -297,7 +290,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className="flex flex-row-reverse"
                   labelClassName="!text-base"
                   id="includeExcludedVenues"
-                  
                   onChange={() => {
                     return null;
                   }}
@@ -331,8 +323,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className={'mt-2.5 h-[58px] w-[498px]'}
                   value={formData.bookingNotes}
                   onChange={(value) => editContractModalData('bookingNotes', value.target.value, 'booking')}
-
-                  
                 />
               </div>
             </div>
@@ -343,21 +333,14 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
               <div className="w-4/5 flex items-center justify-between">
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">£</div>
-                  <TextInput
-                    id={'venueText'}
-                    
-                    className="w-[100px]"
-                    
-                  />
+                  <TextInput id={'venueText'} className="w-[100px]" />
                 </div>
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
                   <TextInput
                     id={'venueText'}
-                    
                     className="w-[100px]"
                     value={formData.RoyaltyPercentage}
-                    
                     onChange={(value) => editContractModalData('RoyaltyPercentage', value.target.value, 'contract')}
                   />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
@@ -365,12 +348,7 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
 
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
-                  <TextInput
-                    id={'venueText'}
-                    
-                    className="w-[100px]"
-                    
-                  />
+                  <TextInput id={'venueText'} className="w-[100px]" />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
               </div>
@@ -385,7 +363,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   value={formData.TicketPriceNotes}
                   onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
                   placeholder="Ticket Pricing Notes"
-                  
                 />
               </div>
             </div>
@@ -399,7 +376,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   value={formData.MarketingDealNotes}
                   onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
                   placeholder="Marketing Deal"
-                  
                 />
               </div>
             </div>
@@ -413,7 +389,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   value={formData.CrewNotes}
                   onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
                   placeholder="Crew Notes"
-                  
                 />
               </div>
             </div>
@@ -449,8 +424,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className={'mt-2.5 h-[58px] w-[498px]'}
                   value={formData.Exceptions}
                   onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
-
-                  
                 />
               </div>
             </div>
@@ -463,8 +436,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className={'mt-2.5 h-[58px] w-[498px]'}
                   value={formData.Notes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
-
-                  
                 />
               </div>
             </div>
@@ -477,8 +448,6 @@ console.log("formData.SignedDate.toString()",formData.SignedDate.toString())
                   className={'mt-2.5 h-[58px] w-[498px]'}
                   value={formData.MerchandiseNotes}
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
-
-                  
                 />
               </div>
             </div>

@@ -118,10 +118,10 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
   },
 ];
 
-export const contactNoteColDefs = (updateContactNote) => [
+export const contactNoteColDefs = (updateContactNote, userList) => [
   {
     headerName: 'Who',
-    field: 'ToBeAdded - db change',
+    field: 'CoContactName',
     cellRenderer: DefaultCellRenderer,
     width: 300,
   },
@@ -151,8 +151,15 @@ export const contactNoteColDefs = (updateContactNote) => [
   },
   {
     headerName: 'Actioned By',
-    field: 'CoContactName',
-    cellRenderer: DefaultCellRenderer,
+    field: 'UserId',
+    cellRenderer: function (params) {
+      if (params.data.UserId === null) {
+        return '';
+      } else {
+        const actByName = userList.find((user) => user.value === parseInt(params.data.UserId)).text;
+        return actByName;
+      }
+    },
     cellStyle: {
       paddingLeft: '8px',
       paddingRight: '8px',
