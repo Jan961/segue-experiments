@@ -6,6 +6,7 @@ import { tileColors } from 'config/global';
 import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
+import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -253,6 +254,57 @@ export const allocSeatsColDefs = [
       truncate: false,
     },
     width: 235,
+    resizable: false,
+  },
+];
+
+export const attachmentsColDefs = [
+  {
+    headerName: 'Title',
+    field: 'FileOriginalFilename',
+    editable: true,
+    cellRenderer: DefaultTextRenderer,
+    width: 600,
+  },
+  {
+    headerName: 'Date Uploaded',
+    field: 'FileUploadedDateTime',
+    cellRenderer: function (params) {
+      const updDate = new Date(params.data.FileUploadedDateTime);
+      return formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate);
+    },
+    width: 150,
+  },
+  {
+    headerName: 'Date File Created',
+    field: 'FileDateTime',
+    cellRenderer: function (params) {
+      const fileDt = new Date(params.data.FileDateTime);
+      return formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt);
+    },
+    width: 150,
+  },
+  {
+    headerName: 'View',
+    field: 'ViewBtn',
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: {
+      buttonText: 'View',
+    },
+    width: 100,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: {
+      iconList: [
+        {
+          name: 'delete',
+        },
+      ],
+    },
+    width: 80,
     resizable: false,
   },
 ];
