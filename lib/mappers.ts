@@ -221,10 +221,10 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({
   Id: a.Id,
   BookingId: a.BookingId,
-  CoContactName: a.ContactName,
-  ContactDate: convertDate(a.DateTime),
-  ActionByDate: convertDate(a.DateTime),
+  CoContactName: a.CoContactName,
+  ContactDate: convertDate(a.ContactDate),
   Notes: a.Notes,
+  UserId: a.UserId,
 });
 
 export const contractStatusmapper = (status: ContractStatusType) => {
