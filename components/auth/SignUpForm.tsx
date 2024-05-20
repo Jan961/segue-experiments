@@ -1,41 +1,42 @@
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { useSignUp } from '@clerk/nextjs';
 
 import React, { useMemo, useState } from 'react';
 import PasswordInput from 'components/core-ui-lib/PasswordInput';
 import { useWizard } from 'react-use-wizard';
 import AuthError from './AuthError';
-
 import axios from 'axios';
+import Select from 'components/core-ui-lib/Select';
 
 type UserDetails = {
   firstName: string;
   lastName: string;
-  emailAddress: string;
+  email: string;
   password: string;
   confirmPassword: string;
   companyName: string;
+  currency: string;
 };
 
 const DEFAULT_USER_DETAILS = {
   firstName: '',
   lastName: '',
-  emailAddress: '',
+  email: '',
   password: '',
   confirmPassword: '',
   companyName: '',
+  currency: 'GBP',
 };
-const SignUpForm = ({ basePath }: { basePath: string }) => {
-  const { previousStep } = useWizard();
+
+const SignUpForm = () => {
+  const { previousStep, nextStep } = useWizard();
   const [userDetails, setUserDetails] = useState<UserDetails>(DEFAULT_USER_DETAILS);
   const [error, setError] = useState<string>('');
-  const { signUp } = useSignUp();
 
   const isValidEmail = useMemo(() => {
-    return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(userDetails.emailAddress);
-  }, [userDetails.emailAddress]);
+    return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(userDetails.email);
+  }, [userDetails.email]);
 
   const isFormValid = useMemo(() => {
     return (
@@ -53,34 +54,17 @@ const SignUpForm = ({ basePath }: { basePath: string }) => {
   const handleSignUp = async () => {
     setError('');
     try {
-      // Start the sign-up process using the email and password provided
-      await signUp.create({
-        emailAddress: userDetails.emailAddress,
-        password: userDetails.password,
-      });
-
-      // Create a row in the User table
-      await axios.post(`/api/user`, {
-        FirstName: userDetails.firstName,
-        LastName: userDetails.lastName,
-        Email: userDetails.emailAddress,
-        AccountId: 1,
-      });
-
-      // Send the user an email with the verification code
-      await signUp.prepareEmailAddressVerification({
-        strategy: 'email_link',
-        redirectUrl: `${basePath}/auth/sign-in`,
-      });
+      // Create a new account in the DB with an organisation id
+      await axios.post(`/api/account/create`, userDetails);
+      nextStep();
     } catch (err: any) {
-      setError(err.errors[0].code);
-      console.error('error', err.errors[0].longMessage);
+      console.error('error', err);
     }
   };
   return (
     <div className="flex flex-col items-center mx-auto w-[34.75rem]">
       <div className="flex flex-col items-center text-primary-input-text text-center leading-[1.0625]">
-        <h1 className="text-responsive-lg leading-[2.5625rem] mb-2 font-bold">Create New Account</h1>
+        <h1 className="text-2xl font-bold text-center text-primary-input-text mb-4">Administrator Account</h1>
         <Label
           className="leading-[1.125]"
           text="If you are joining an existing company account do not create a new account."
@@ -119,7 +103,7 @@ const SignUpForm = ({ basePath }: { basePath: string }) => {
           />
         </div>
         <div className="mt-3">
-          <Label text="Company Name (if applicable)" />
+          <Label text="Company" />
           <TextInput
             name="companyName"
             placeholder="Enter Company Name"
@@ -129,12 +113,22 @@ const SignUpForm = ({ basePath }: { basePath: string }) => {
           />
         </div>
         <div className="mt-3">
+          <Label text="Currency" />
+          <Select
+            name="currency"
+            options={[{ value: 'GBP', text: 'GBP' }]}
+            value="GBP"
+            className="w-full"
+            onChange={(value) => setUserDetails({ ...userDetails, currency: value.toString() })}
+          />
+        </div>
+        <div className="mt-3">
           <Label text="System Administrator Email Address" />
           <TextInput
-            name="emailAddress"
+            name="email"
             placeholder="Enter Email Address"
             className="w-full"
-            value={userDetails.emailAddress}
+            value={userDetails.email}
             onChange={handleValueChange}
           />
           {error && !isValidEmail && <AuthError error={error} />}

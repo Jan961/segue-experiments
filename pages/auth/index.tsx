@@ -8,14 +8,16 @@ import { useRouter } from 'next/router';
 import { Wizard } from 'react-use-wizard';
 import SignInForm from 'components/auth/SignInForm';
 import SignUpForm from 'components/auth/SignUpForm';
+import SubscriptionPlans, { Plan } from 'components/auth/SubscriptionPlans';
+import CompanyDetailsForm, { Company } from 'components/auth/CompanyDetailsForm';
+import PaymentDetailsForm from 'components/auth/PaymentDetailsForm';
+import { useState } from 'react';
 
-export async function getServerSideProps() {
-  const basePath = process.env.BASE_URL;
-  return {
-    props: { basePath },
-  };
-}
-const SignIn = ({ basePath }: { basePath: string }) => {
+const SignIn = () => {
+  const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
+  const [companyDetails, setCompanyDetails] = useState<Company>(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
+
   const router = useRouter();
   const { isSignedIn } = useAuth();
   if (isSignedIn) {
@@ -31,7 +33,10 @@ const SignIn = ({ basePath }: { basePath: string }) => {
       <Image className="mx-auto mb-2" height={160} width={310} src="/segue/segue_logo_full.png" alt="Segue" />
       <Wizard>
         <SignInForm />
-        <SignUpForm basePath={basePath} />
+        <CompanyDetailsForm onSubmit={setCompanyDetails} />
+        <SubscriptionPlans onSubmit={seSubscriptionDetails} />
+        <PaymentDetailsForm plan={subcriptionDetails} onSubmit={setPaymentDetails} />
+        <SignUpForm />
       </Wizard>
     </div>
   );

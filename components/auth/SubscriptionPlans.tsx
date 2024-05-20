@@ -2,8 +2,9 @@ import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import { useState } from 'react';
+import { useWizard } from 'react-use-wizard';
 
-interface Plan {
+export interface Plan {
   name: string;
   production: number | string;
   users: number;
@@ -68,20 +69,29 @@ const planData: Plan[] = [
     ],
   },
 ];
-const SubscriptionPlans = () => {
-  const [showDetails, setShowDetails] = useState<{ [key: number]: boolean }>({});
 
+interface SubscriptionPlansProps {
+  onSubmit: (data: Plan) => void;
+}
+const SubscriptionPlans = ({ onSubmit }: SubscriptionPlansProps) => {
+  const [showDetails, setShowDetails] = useState<{ [key: number]: boolean }>({});
+  const { previousStep, nextStep } = useWizard();
   const toggleDetails = (index: number) => {
     setShowDetails((prevState) => ({
       ...prevState,
       [index]: !prevState[index],
     }));
   };
+
+  const handleNexClick = (plan) => {
+    onSubmit(plan);
+    nextStep();
+  };
   return (
-    <div className="flex  justify-center items-center w-full pt-8 pb-5">
-      <div className="text-primary-input-text">
-        <h1 className="text-responsive-2xl font-bold text-center ">Select Plan</h1>
-        <div className="grid grid-cols-3 divide-x-[3px] gap-4 ">
+    <div className="mx-auto w-[700px]">
+      <h1 className="text-2xl font-bold text-center text-primary-input-text mb-4">Select Plan</h1>
+      <div className="flex  justify-center items-center w-full pt-8 pb-5">
+        <div className="grid grid-cols-3 divide-x-[3px] gap-4 text-primary-input-text">
           {planData.map((plan, index) => {
             return (
               <div key={index} className=" px-4 flex flex-col gap-y-2 min-w-[240px] max-w-[200px]">
@@ -153,7 +163,7 @@ const SubscriptionPlans = () => {
                     {plan.price_per_year} per year
                   </p>
                 </div>
-                <Button text={`Choose ${plan.name}`} className="w-full" />
+                <Button text={`Choose ${plan.name}`} className="w-full" onClick={() => handleNexClick(plan)} />
                 <Button
                   text={showDetails[index] ? 'Hide Plan Details' : 'Show Plan Details'}
                   onClick={() => toggleDetails(index)}
@@ -181,6 +191,9 @@ const SubscriptionPlans = () => {
             );
           })}
         </div>
+      </div>
+      <div className="w-full flex items-center justify-end mt-5">
+        <Button text="Back" variant="secondary" onClick={previousStep} className="w-32 mr-3" />
       </div>
     </div>
   );

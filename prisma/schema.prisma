@@ -342,6 +342,8 @@ model Account {
   AccountLogo            Bytes?
   AccountMainEmail       String?             @db.VarChar(120)
   AccountNumPeople       Int?                @db.TinyInt
+  AccountOrganisationId  String?             @db.VarChar(100)
+  AccountDBUrl           String?             @db.VarChar(10000)
   AccountContact         AccountContact?
   AccountUser            AccountUser[]
   MasterTask             MasterTask[]
