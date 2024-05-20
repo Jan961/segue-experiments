@@ -496,7 +496,8 @@ model BookingAttachedFile {
   FileOriginalFilename String   @db.VarChar(100)
   FileDateTime         DateTime @db.DateTime(0)
   FileUploadedDateTime DateTime @db.DateTime(0)
-  FileContent          Bytes
+  FileContent          Bytes?
+  FileUrl              String?  @db.VarChar(255)
   Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
 
   @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
