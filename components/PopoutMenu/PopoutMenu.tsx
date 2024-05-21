@@ -46,7 +46,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
       },
       {
         label: getStrings('global.bookings'),
-        value: noTourSelected ? '/bookings' : `/bookings/${path}`,
+        value: '/bookings',
         icon: bookingsIcon,
         labelClass: groupHeader,
         options: [
@@ -57,13 +57,13 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
       },
       {
         label: getStrings('global.marketing'),
-        value: noTourSelected ? '/marketing' : `/marketing/${path}`,
+        value: '/marketing',
         icon: marketingIcon,
         labelClass: groupHeader,
         options: [
           {
             label: 'Marketing Home',
-            value: noTourSelected ? '/marketing' : `/marketing/${path}`,
+            value: '/marketing',
             labelClass: leve2,
             options: [
               { label: 'Sales', value: '/marketing?tabIndex=0', labelClass: level3 },
@@ -93,7 +93,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
       },
       {
         label: getStrings('global.contracts'),
-        value: noTourSelected ? '/contracts' : `/contracts/${path}`,
+        value: '/contracts',
         icon: contractsIcon,
         labelClass: groupHeader,
         options: [
