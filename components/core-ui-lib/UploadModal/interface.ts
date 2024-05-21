@@ -16,6 +16,7 @@ export interface FileCardProps {
   onDelete: () => void;
   progress?: number;
   errorMessage?: string;
+  imageUrl?: string;
 }
 
 export interface UploadModalProps {
@@ -32,5 +33,6 @@ export interface UploadModalProps {
     selectedFiles: FileProps[],
     onProgress: (file: File, uploadProgress: number) => void,
     onError: (file: File, errorMessage: string) => void,
+    onUploadingImage: (file: File, imageUrl: string) => void,
   ) => void;
 }

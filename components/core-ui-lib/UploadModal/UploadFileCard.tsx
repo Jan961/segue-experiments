@@ -5,7 +5,7 @@ import { fileSizeFormatter, getStatusFromProgress } from 'utils/index';
 import { FileCardProps } from './interface';
 import { useMemo } from 'react';
 
-const FileCard = ({ file, onDelete, progress, errorMessage }: FileCardProps) => {
+const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCardProps) => {
   const status = useMemo(() => getStatusFromProgress(progress), [progress]);
 
   return (
@@ -27,7 +27,12 @@ const FileCard = ({ file, onDelete, progress, errorMessage }: FileCardProps) => 
               </div>
               <div className="flex flex-row md:w-[180px] sm:w-[100px] justify-between items-center float-right">
                 <p className="text-secondary text-sm">Size: {fileSizeFormatter(file.size)}</p>
-                {progress > 0 && <p className="text-secondary text-sm">{progress}%</p>}
+                {progress > 0 &&
+                  (imageUrl ? (
+                    <img className="h-10 w-14 pb-2" src={imageUrl} />
+                  ) : (
+                    <p className="text-secondary text-sm">{progress}%</p>
+                  ))}
               </div>
             </div>
             {progress > 0 && <ProgressBar progress={progress} />}
