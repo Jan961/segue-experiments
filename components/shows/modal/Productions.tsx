@@ -7,7 +7,7 @@ interface ProductionsProps {
   showData: any;
 }
 
-const Prodcutions = ({ visible, onClose, showData }: ProductionsProps) => {
+const Productions = ({ visible, onClose, showData }: ProductionsProps) => {
   return (
     <PopupModal
       show={visible}
@@ -22,4 +22,4 @@ const Prodcutions = ({ visible, onClose, showData }: ProductionsProps) => {
   );
 };
 
-export default Prodcutions;
+export default Productions;

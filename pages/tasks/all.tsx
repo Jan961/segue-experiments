@@ -66,8 +66,9 @@ export default TasksPage;
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
-  const productionsWithTasks = await getProductionsAndTasks(AccountId);
+  productionJump.selected = -1;
   const users = await getUsers(AccountId);
+  const productionsWithTasks = await getProductionsAndTasks(AccountId);
 
   const productions: ProductionsWithTasks[] = mapToProductionTasksDTO(productionsWithTasks);
   const initialState: InitialState = {

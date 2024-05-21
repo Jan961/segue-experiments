@@ -6,7 +6,7 @@ import { mapToPrismaFields } from '../create';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const dto: Partial<ProductionDTO> = mapToPrismaFields(req.body);
-  const { Id } = dto;
+  const { Id, Image } = dto;
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: Id });
@@ -15,7 +15,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const existingDateBlockIds = dto.DateBlock.filter((db) => db.Id).map((db) => db.Id);
   const existingDateBlocks = dto.DateBlock.filter((db) => db.Id);
   const newDateBlocks = dto.DateBlock.filter((db) => !db.Id);
-
   // No checking about losing events yet. That depends on booking structure.
   try {
     await prisma.$transaction([
@@ -24,6 +23,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           Code: dto.Code,
           IsArchived: dto.IsArchived,
+          // ProductionImageFileId: Image?.Id,
+          ...(Image?.id && {
+            File: {
+              connect: {
+                Id: Image?.id,
+              },
+            },
+          }),
           DateBlock: {
             // Remove DateBlocks not in the DTO
             deleteMany: {

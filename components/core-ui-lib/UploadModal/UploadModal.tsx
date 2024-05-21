@@ -57,8 +57,21 @@ const UploadModal: React.FC<UploadModalProps> = ({
     setErrorMessages({});
   };
 
+  const handleFileDelete = (fileName) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+
+    const newProgress = { ...progress };
+    delete newProgress[fileName];
+    setProgress(newProgress);
+
+    const newErrors = { ...errorMessages };
+    delete newErrors[fileName];
+    setErrorMessages(newErrors);
+  };
+
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    setIsUploading(false);
     if (!files || files?.length === 0) {
       setError('No file selected');
       setSelectedFiles([]);
@@ -81,7 +94,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
         errorMessages[file.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
     }
-
     const filesList = Array.from(files).map((file) => ({
       name: file.name,
       size: file.size,
@@ -90,6 +102,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     setError('');
     setSelectedFiles(filesList);
     onChange?.(filesList);
+    hiddenFileInput.current.value = '';
   };
 
   const handleUpload = () => {
@@ -131,7 +144,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
             accept={allowedFormats.join(',') || '*'}
             multiple={isMultiple}
             onChange={handleFileInput}
-            disabled={isUploading}
           />
         </div>
         {error && (
@@ -144,10 +156,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
             <FileCard
               key={index}
               file={file}
-              index={index}
               progress={progress[file.name]}
               errorMessage={errorMessages[file.name]}
-              onDelete={(idx) => setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== idx))}
+              onDelete={() => handleFileDelete(file.name)}
             />
           ))}
         </div>
