@@ -110,15 +110,46 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
     }
   };
 
-  const saveAllocatedSeats = async (data, perfId) => {
+  const saveAllocatedSeats = async (data, perfId, type) => {
     const holdRec = holdList.find((hold) => hold.info.Id === perfId);
-    const newRecDate = { AvailableCompId: holdRec.availableCompId, ...data };
+    const recData = { AvailableCompId: holdRec.availableCompId, ...data };
 
-    await fetchData({
-      url: '/api/marketing/allocatedSeats/create',
-      method: 'POST',
-      data: newRecDate,
-    });
+    if (type === 'new') {
+      await fetchData({
+        url: '/api/marketing/allocatedSeats/create',
+        method: 'POST',
+        data: recData,
+      });
+
+      setAllocRows([...allocRows, recData]);
+      setShowAllocSeatsModal(false);
+    } else if (type === 'edit') {
+      await fetchData({
+        url: '/api/marketing/allocatedSeats/update',
+        method: 'POST',
+        data: recData,
+      });
+
+      const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
+      const newRows = [...allocRows];
+      newRows[rowIndex] = recData;
+      setAllocRows(newRows);
+    } else if (type === 'delete') {
+      await fetchData({
+        url: '/api/marketing/allocatedSeats/delete',
+        method: 'POST',
+        data: recData,
+      });
+
+      const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
+      const newRows = [...allocRows];
+      if (rowIndex !== -1) {
+        newRows.splice(rowIndex, 1);
+      }
+      setAllocRows(newRows);
+    }
+
+    setShowAllocSeatsModal(false);
   };
 
   const updateBooking = async (type: string, value: any) => {
@@ -226,7 +257,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
         show={showAllocSeatsModal}
         bookingId={bookingId}
         onCancel={() => setShowAllocSeatsModal(false)}
-        onSave={(data, perfId) => saveAllocatedSeats(data, perfId)}
+        onSave={(data, perfId, type) => saveAllocatedSeats(data, perfId, type)}
         data={allocatedRow}
         type={allocType}
       />

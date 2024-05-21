@@ -13,11 +13,12 @@ import { userState } from 'state/account/userState';
 import useAxios from 'hooks/useAxios';
 import formatInputDate from 'utils/dateInputFormat';
 import { getTimeFromDateAndTime } from 'services/dateService';
+import { hasAllocSeatsChanged } from '../utils';
 
 interface AllocatedModalProps {
   show: boolean;
   onCancel: () => void;
-  onSave: (data, perfId) => void;
+  onSave: (data, perfId, type) => void;
   bookingId;
   data?: any;
   type: string;
@@ -48,6 +49,7 @@ export default function AllocatedSeatsModal({
   const [venueConfNotes, setVenueConfNotes] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('cancel');
+  const [allocId, setAllocId] = useState(null);
 
   const initForm = () => {
     const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -61,7 +63,7 @@ export default function AllocatedSeatsModal({
       const perf = perfList.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
-      const user = userTempList.find((user) => user.text === data.ArrangedBy).value;
+      const user = userTempList.find((user) => user.text === data.ArrangedBy);
       setPerfSelected(perf.value);
       setCustName(data.TicketHolderName);
       setEmail(data.TicketHolderEmail);
@@ -69,8 +71,14 @@ export default function AllocatedSeatsModal({
       setSeatNumList(data.SeatsAllocated);
       setRequestedBy(data.RequestedBy);
       setComments(data.Comments);
-      setArrangedBy(user || null);
       setVenueConfNotes(data.VenueConfirmationNotes);
+      setAllocId(data.Id);
+
+      if (user === undefined) {
+        setArrangedBy(null);
+      } else {
+        setArrangedBy(user.value);
+      }
     } else if (type === 'new') {
       setPerfSelected(null);
       setCustName('');
@@ -86,7 +94,7 @@ export default function AllocatedSeatsModal({
 
   const handleSave = () => {
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
-    const data = {
+    let data = {
       ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
       Comments: comments,
       RequestedBy: requestedBy,
@@ -95,11 +103,16 @@ export default function AllocatedSeatsModal({
       TicketHolderEmail: email,
       TicketHolderName: custName,
       VenueConfirmationNotes: venueConfNotes,
-      date: perf.date,
+      date: formatInputDate(perf.date),
       time: perf.time,
+      Id: null,
     };
 
-    onSave(data, parseInt(perfSelected));
+    if (type === 'edit') {
+      data = { ...data, Id: allocId };
+    }
+
+    onSave(data, parseInt(perfSelected), type);
   };
 
   const setNumericVal = (value: string) => {
@@ -111,26 +124,75 @@ export default function AllocatedSeatsModal({
   };
 
   const handleConfCancel = () => {
-    setShowConfirm(false);
-    onCancel();
+    if (confVariant === 'delete') {
+      const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
+      const data = {
+        ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
+        Comments: comments,
+        RequestedBy: requestedBy,
+        Seats: parseInt(numSeatsReq),
+        SeatsAllocated: seatNumList,
+        TicketHolderEmail: email,
+        TicketHolderName: custName,
+        VenueConfirmationNotes: venueConfNotes,
+        date: formatInputDate(perf.date),
+        time: perf.time,
+        Id: allocId,
+      };
+
+      setShowConfirm(false);
+      onSave(data, parseInt(perfSelected), 'delete');
+    } else {
+      setShowConfirm(false);
+      onCancel();
+    }
   };
 
-  const handleConfirm = (type: ConfDialogVariant) => {
-    if (
-      perfSelected !== '' ||
-      custName !== '' ||
-      email === '' ||
-      numSeatsReq !== '' ||
-      seatNumList !== '' ||
-      requestedBy !== '' ||
-      comments !== '' ||
-      arrangedBy !== '' ||
-      venueConfNotes !== ''
-    ) {
-      setConfVariant(type);
-      setShowConfirm(true);
-    } else {
-      onCancel();
+  const handleConfirm = (confType: ConfDialogVariant) => {
+    if (type === 'new') {
+      if (
+        perfSelected !== '' ||
+        custName !== '' ||
+        email === '' ||
+        numSeatsReq !== '' ||
+        seatNumList !== '' ||
+        requestedBy !== '' ||
+        comments !== '' ||
+        arrangedBy !== '' ||
+        venueConfNotes !== ''
+      ) {
+        setConfVariant(confType);
+        setShowConfirm(true);
+      } else {
+        onCancel();
+      }
+    } else if (type === 'edit') {
+      const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
+      const updatedRec = {
+        ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
+        Comments: comments,
+        RequestedBy: requestedBy,
+        Seats: parseInt(numSeatsReq),
+        SeatsAllocated: seatNumList,
+        TicketHolderEmail: email,
+        TicketHolderName: custName,
+        VenueConfirmationNotes: venueConfNotes,
+        date: formatInputDate(perf.date),
+        time: perf.time,
+      };
+
+      // check for deletion first before dismissing the modal
+      if (confType === 'delete') {
+        setConfVariant(confType);
+        setShowConfirm(true);
+      } else {
+        if (hasAllocSeatsChanged(data, updatedRec)) {
+          setConfVariant(confType);
+          setShowConfirm(true);
+        } else {
+          onCancel();
+        }
+      }
     }
   };
 
