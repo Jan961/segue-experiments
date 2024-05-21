@@ -14,7 +14,11 @@ import moment from 'moment';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
 
-const Filters = () => {
+interface FiltersProps {
+  onExportClick?: () => void;
+}
+
+const Filters = ({ onExportClick }: FiltersProps) => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
@@ -105,7 +109,7 @@ const Filters = () => {
           <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
-      <BookingsButtons />
+      <BookingsButtons onExportClick={onExportClick} />
     </div>
   );
 };

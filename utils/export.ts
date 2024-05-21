@@ -14,7 +14,7 @@ const getHeaderToExport = (gridApi) => {
     const { field } = column.getColDef();
     const sort = column.getSort();
     const headerName = column.getColDef().headerName ?? field;
-    const headerNameUppercase = headerName[0].toUpperCase() + headerName.slice(1);
+    const headerNameUppercase = `${headerName[0]?.toUpperCase() || ''}` + headerName.slice(1);
     const headerCell = {
       text: headerNameUppercase + (sort ? ` (${sort})` : ''),
       bold: true,

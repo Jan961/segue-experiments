@@ -21,16 +21,43 @@ import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
 import { DateType } from '@prisma/client';
+import { useRef, useState } from 'react';
+import ExportModal from 'components/core-ui-lib/ExportModal';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useBookingFilter();
+  const tableRef = useRef(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const onExportClick = () => {
+    setIsExportModalOpen(true);
+  };
+
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <Filters onExportClick={onExportClick} />
       </div>
-      <BookingsTable rowData={rows} />
+      <BookingsTable tableRef={tableRef} rowData={rows} />
+      {tableRef && (
+        <ExportModal
+          tableRef={tableRef}
+          visible={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          ExportList={[
+            {
+              key: 'Excel',
+              iconName: 'excel',
+              iconProps: { fill: '#1D6F42', variant: '7xl' },
+            },
+            {
+              key: 'PDF',
+              iconName: 'document-solid',
+              iconProps: { fill: 'red', variant: '7xl' },
+            },
+          ]}
+        />
+      )}
     </Layout>
   );
 };

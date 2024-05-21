@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -19,10 +19,10 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 
 interface BookingsTableProps {
   rowData?: any;
+  tableRef?: any;
 }
 
-export default function BookingsTable({ rowData }: BookingsTableProps) {
-  const tableRef = useRef(null);
+export default function BookingsTable({ rowData, tableRef }: BookingsTableProps) {
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookings, setBookings] = useRecoilState(bookingState);
