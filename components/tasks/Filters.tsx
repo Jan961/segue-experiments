@@ -65,14 +65,14 @@ const Filters = ({ usersList }: FiltersProps) => {
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             disabled={!selected}
             value={filter.status}
-            className="bg-white w-[308px]"
+            className="bg-primary-white w-[308px]"
             label="Status"
             options={statusOptions}
           />
-          <div className="bg-white">
+          <div className="bg-primary-white">
             <DateRange
               disabled={!selected}
-              className="bg-white justify-between"
+              className="bg-primary-white justify-between"
               label="Date"
               onChange={onDateChange}
               value={{ from: startDueDate, to: endDueDate }}
@@ -82,7 +82,7 @@ const Filters = ({ usersList }: FiltersProps) => {
             onChange={(value) => onChange({ target: { id: 'assignee', value } })}
             disabled={!selected}
             value={filter.assignee}
-            className="bg-white w-[380px]"
+            className="bg-primary-white w-[380px]"
             label="Assigned to"
             options={usersList}
           />
