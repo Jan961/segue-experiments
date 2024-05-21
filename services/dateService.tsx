@@ -44,7 +44,7 @@ export const dateToSimple = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-GB', options);
 };
 
-export const formattedDateWithDay = (dateString:Date | string) => {
+export const formattedDateWithDay = (dateString: Date | string) => {
   if (!dateString) return '';
   const format = 'DD/MM/YY';
   return moment(dateString).format(format);

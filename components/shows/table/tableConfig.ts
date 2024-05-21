@@ -169,7 +169,7 @@ export const productionsTableConfig = [
   },
   {
     headerName: 'Prod Image',
-    field: 'IsArchived',
+    field: 'ImageUrl',
     width: 80,
     cellRenderer: UploadRenderer,
     cellRendererParams: {

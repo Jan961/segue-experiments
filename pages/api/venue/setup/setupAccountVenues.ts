@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -14,7 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     const newVenues = masterVenues.map((venue) => {
-      const clone = (({ VenueId, ...o }) => o)(venue);
+      const clone = omit(venue, ['VenueId']);
       return {
         ...clone,
         MasterVenueId: venue.VenueId,

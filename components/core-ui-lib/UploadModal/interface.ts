@@ -13,8 +13,7 @@ export interface FileProps {
 
 export interface FileCardProps {
   file: FileProps;
-  index: number;
-  onDelete: (index: number) => void;
+  onDelete: () => void;
   progress?: number;
   errorMessage?: string;
 }

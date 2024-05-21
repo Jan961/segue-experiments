@@ -8,6 +8,7 @@ import { contactNoteColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import { userState } from 'state/account/userState';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -23,8 +24,9 @@ export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
   const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
+  const users = useRecoilValue(userState);
 
-  const getContactNotes = async (bookingId: string) => {
+  const getContactNotes = async (bookingId: string, users) => {
     try {
       const data = await fetchData({
         url: '/api/marketing/contactNotes/' + bookingId,
@@ -38,7 +40,7 @@ export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
           (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
         );
 
-        setContNoteColDefs(contactNoteColDefs(contactNoteUpdate));
+        setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
         setContactNoteRows(sortedContactNotes);
       }
     } catch (error) {
@@ -115,15 +117,20 @@ export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
   };
 
   useEffect(() => {
+    const userTempList = Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+
     if (bookingId !== null && bookingId !== undefined) {
-      getContactNotes(bookingId.toString());
+      getContactNotes(bookingId.toString(), userTempList);
     }
   }, [bookingId]);
 
   return (
     <>
       <div className="flex justify-end">
-        <div className="flex flex-row gap-4 w-[850px] mb-5">
+        <div className="flex flex-row items-center justify-between pb-5 gap-4">
           <Button
             text="Contact Notes Report"
             className="w-[203px]"

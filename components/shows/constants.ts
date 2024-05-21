@@ -62,6 +62,7 @@ export const getProductionsConvertedPayload = (input, isEdit = false) => {
     regionList: input.RegionList.filter((o) => o !== 'select_all'),
     dateBlockList: camelCaseData,
     id: input.Id,
+    image: input.Image,
   };
 
   if (!isEdit) delete output.id;

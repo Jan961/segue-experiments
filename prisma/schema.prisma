@@ -40,9 +40,8 @@ model Booking {
   HoldNotes                  String?               @map("BookingHoldNotes") @db.LongText
   CompNotes                  String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes           String?               @map("BookingMerchandiseNotes") @db.LongText
-  CastRateTicketNotes        String?               @map("BookingCastRateTicketNotes") @db.LongText
   CastRateTicketsArranged    Boolean               @default(dbgenerated("(b'0')")) @map("BookingCastRateTicketsArranged") @db.Bit(1)
-  CastRateTicketsNotes       String?               @map("BookingCastRateTicketsNotes") @db.Text
+  CastRateTicketsNotes       String?               @map("BookingCastRateTicketsNotes") @db.LongText
   RunTag                     String                @map("BookingRunTag") @db.Char(8)
   MarketingCostsStatus       String?               @map("BookingMarketingCostsStatus") @db.Char(1)
   MarketingCostsApprovalDate DateTime?             @map("BookingMarketingCostsApprovalDate") @db.Date
@@ -52,6 +51,7 @@ model Booking {
   Venue                      Venue                 @relation(fields: [VenueId], references: [Id], map: "Venue_Booking")
   BookingActivity            BookingActivity[]
   BookingAttachedFile        BookingAttachedFile[]
+  BookingContactNotes        BookingContactNotes[]
   Contract                   Contract?
   DealMemo                   DealMemo?
   Performance                Performance[]
@@ -82,12 +82,17 @@ model BookingActivity {
 }
 
 model BookingContactNotes {
-  Id            Int       @id @default(autoincrement()) @map("BookingContactId")
-  BookingId     Int
-  CoContactName String?   @db.VarChar(30)
-  ContactDate   DateTime? @db.DateTime(0)
-  ActionByDate  DateTime? @db.DateTime(0)
-  Notes         String?   @db.VarChar(500)
+  Id            Int          @id @default(autoincrement()) @map("ContactNoteId")
+  BookingId     Int          @map("ContactNoteBookingId")
+  CoContactName String?      @map("ContactNoteContactName") @db.VarChar(30)
+  ContactDate   DateTime?    @map("ContactNoteDateTime") @db.DateTime(0)
+  UserId        Int?         @map("ContactNoteActionAccountUserId")
+  Notes         String?      @map("ContactNoteNotes") @db.LongText
+  AccountUser   AccountUser? @relation(fields: [UserId], references: [UserId], onDelete: NoAction, map: "AccountUserBookingContactNotes")
+  Booking       Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
+
+  @@index([UserId], map: "AccountUserBookingContactNotes")
+  @@index([BookingId], map: "BookingBookingContactNotes")
 }
 
 model Contract {
@@ -497,7 +502,7 @@ model BookingAttachedFile {
   FileDateTime         DateTime @db.DateTime(0)
   FileUploadedDateTime DateTime @db.DateTime(0)
   FileContent          Bytes?
-  FileUrl              String?  @db.VarChar(255)
+  FileURL              String?  @db.VarChar(255)
   Booking              Booking  @relation(fields: [FileBookingBookingId], references: [Id], onDelete: Cascade, map: "Booking_BookingAttachedFile")
 
   @@index([FileBookingBookingId], map: "Booking_BookingAttachedFile")
@@ -535,12 +540,12 @@ model VenueAddress {
 }
 
 model User {
-  Id             Int              @id @default(autoincrement()) @map("UserId")
+  Id             Int              @id @unique(map: "UserIdUnique") @default(autoincrement()) @map("UserId")
   Email          String           @unique(map: "UserEmail_uk") @map("UserEmail") @db.VarChar(120)
   FirstName      String           @map("UserFirstName") @db.VarChar(50)
   LastName       String?          @map("UserLastName") @db.VarChar(50)
   AccountId      Int?             @map("UserAccountId")
-  AccountUser    AccountUser[]
+  AccountUser    AccountUser?
   File           File[]
   MasterTask     MasterTask[]
   ProductionTask ProductionTask[]
@@ -549,16 +554,16 @@ model User {
 
 model AccountUser {
   Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @map("AccUserUserId")
+  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
   AccountUserPermission AccountUserPermission[]
   AccountUserProduction AccountUserProduction[]
+  BookingContactNotes   BookingContactNotes[]
 
   @@index([AccountId], map: "Account_AccountUser")
-  @@index([UserId], map: "User_AccountUser")
 }
 
 model AccountUserPermission {
@@ -668,15 +673,18 @@ model Production {
   SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
   RunningTime           DateTime?               @map("ProductionRunningTime") @db.Time(0)
   RunningTimeNote       String?                 @map("ProductionRunningTimeNote") @db.VarChar(80)
+  ProductionImageFileId Int?
   AccountUserProduction AccountUserProduction[]
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
+  File                  File?                   @relation(fields: [ProductionImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ShowId], map: "ShowMayHaveProduction")
+  @@index([ProductionImageFileId], map: "Production_File")
 }
 
 model ProductionTask {
@@ -725,8 +733,8 @@ model Country {
 }
 
 model CountryInRegion {
-  CountryId Int
-  RegionId  Int
+  CountryId Int               @map("CIRCountryId")
+  RegionId  Int               @map("CIRRegionId")
 
   @@id([CountryId, RegionId])
 }
@@ -892,15 +900,14 @@ model DealMemoTechProvision {
 }
 
 model File {
-  Id               Int      @id @default(autoincrement()) @map("FileId")
-  Entity           String   @map("FileEntity") @db.VarChar(40)
-  EntityId         Int      @map("FileEntityId")
-  OriginalFilename String   @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?  @map("FileMediaType") @db.VarChar(20)
-  Location         String   @map("FileLocation") @db.VarChar(512)
-  UploadDateTime   DateTime @map("FileUploadDateTime") @db.DateTime(0)
-  UploadUserId     Int      @map("FileUploadUserId")
-  User             User     @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
+  Id               Int          @id @default(autoincrement()) @map("FileId")
+  OriginalFilename String       @map("FileOriginalFilename") @db.VarChar(200)
+  MediaType        String?      @map("FileMediaType") @db.VarChar(20)
+  Location         String       @map("FileLocation") @db.VarChar(512)
+  UploadDateTime   DateTime     @map("FileUploadDateTime") @db.DateTime(0)
+  UploadUserId     Int          @map("FileUploadUserId")
+  User             User         @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
+  Production       Production[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
 }
