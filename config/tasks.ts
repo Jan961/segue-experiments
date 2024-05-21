@@ -12,7 +12,7 @@ export const statusOptions: SelectOption[] = [
 ];
 
 export const TaskStatusLabelMap = {
-  todo: 'ToDo',
+  todo: 'To Do',
   inProgress: 'In Progress',
   complete: 'Complete',
 };
