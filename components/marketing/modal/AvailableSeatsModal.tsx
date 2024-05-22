@@ -95,8 +95,8 @@ export default function AvailableSeatsModal({
   return (
     <div>
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
-        <div className="h-[446px] w-[325px]">
-          <div className="text-xl text-primary-navy font-bold mb-4">Available Seats</div>
+        <div className="h-[450x] w-[325px]">
+          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Available Seats</div>
 
           <div className="flex flex-row mb-2">
             <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">Day</div>
@@ -147,7 +147,7 @@ export default function AvailableSeatsModal({
             </div>
           </div>
 
-          <div className="place-content-center flex flex-row mt-5 pb-5">
+          <div className="place-content-center flex flex-row mt-5">
             <Button className="w-132" variant="secondary" text="Cancel" onClick={() => handleConfirm('cancel')} />
             <Button className="ml-4 w-132" variant="primary" text="Save and Close" onClick={handleSave} />
           </div>
