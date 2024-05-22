@@ -125,7 +125,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   };
 
-  const onSave = (file, onProgress, onError) => {
+  const onSave = (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
@@ -158,6 +158,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       .then((response: any) => {
         progress = 100;
         onProgress(file[0].file, progress);
+        onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
         clearInterval(slowProgressInterval);
         const gridApi = tableRef.current.getApi();
         const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
@@ -166,7 +167,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           update: [
             {
               ...rowDataToUpdate,
-              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.Location}`,
+              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`,
               Image: response,
             },
           ],
@@ -214,10 +215,13 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       'DateBlock[0].StartDate' in e.data &&
       'DateBlock[0].EndDate' in e.data
     ) {
-      handleSave(e.data);
+      // handleSave(e.data);
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload(e.data, false);
+        const payloadData = getProductionsConvertedPayload(
+          { ...e.data, Id: currentProduction?.Id, Image: productionUploadMap[e.data.Id] },
+          false,
+        );
         await axios.post(`/api/productions/create`, payloadData);
       } finally {
         setIsEdited(false);

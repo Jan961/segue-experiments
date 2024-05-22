@@ -208,7 +208,7 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
           'text/plain',
         ]}
         onClose={() => setShowUploadModal(false)}
-        maxFileSize={500 * 1024} // 500kb
+        maxFileSize={5120 * 1024} // 5MB
         onSave={onSave}
       />
 

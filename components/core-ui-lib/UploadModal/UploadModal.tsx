@@ -24,6 +24,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [errorMessages, setErrorMessages] = useState<Record<string, string>>({});
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<Record<string, string>>({});
+
   const isUploadDisabled =
     selectedFiles?.length === 0 ||
     selectedFiles.some((file) => file.error) ||
@@ -36,6 +38,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const onError = (file: File, errorMessage: string) => {
     setErrorMessages((prev) => ({ ...prev, [file.name]: errorMessage }));
+  };
+
+  const onUploadingImage = (file: File, imageUrl: string) => {
+    setUploadedImageUrls((prev) => ({ ...prev, [file.name]: imageUrl }));
   };
 
   useEffect(() => {
@@ -55,6 +61,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
     setProgress({});
     setErrorMessages({});
+    setUploadedImageUrls({});
   };
 
   const handleFileDelete = (fileName) => {
@@ -67,6 +74,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
     const newErrors = { ...errorMessages };
     delete newErrors[fileName];
     setErrorMessages(newErrors);
+
+    const newUploadUrls = { ...uploadedImageUrls };
+    delete uploadedImageUrls[fileName];
+    setUploadedImageUrls(newUploadUrls);
   };
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +119,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   const handleUpload = () => {
     if (Object.keys(errorMessages).length === 0) {
       setIsUploading(true);
-      onSave?.(selectedFiles, onProgress, onError);
+      onSave?.(selectedFiles, onProgress, onError, onUploadingImage);
     }
   };
 
@@ -159,6 +170,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               progress={progress[file.name]}
               errorMessage={errorMessages[file.name]}
               onDelete={() => handleFileDelete(file.name)}
+              imageUrl={uploadedImageUrls[file.name]}
             />
           ))}
         </div>

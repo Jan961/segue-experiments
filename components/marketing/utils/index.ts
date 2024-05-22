@@ -57,6 +57,24 @@ export const hasContactNoteChanged = (
   return false;
 };
 
+export const hasAllocSeatsChanged = (oldAllocSeat: any, newAllocSeat: any): boolean => {
+  // Remove the 'Id, AvailableCompId' key if it exists
+  delete oldAllocSeat.AvailableCompId;
+  delete newAllocSeat.AvailableCompId;
+  delete oldAllocSeat.Id;
+  delete newAllocSeat.Id;
+
+  // List all keys to be compared
+  const keys = Object.keys(oldAllocSeat) as Array<keyof typeof oldAllocSeat>;
+
+  // Check if any key values (other than 'Id') do not match
+  const hasChanged = keys.some((key) => {
+    return oldAllocSeat[key] !== newAllocSeat[key];
+  });
+
+  return hasChanged;
+};
+
 export const reverseDate = (inputDt: string) => {
   if (typeof inputDt !== 'string' || inputDt === undefined || inputDt === null) {
     return '';

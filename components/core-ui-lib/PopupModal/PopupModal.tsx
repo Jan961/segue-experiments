@@ -60,6 +60,7 @@ export default function PopupModal({
             'font-calibri fixed inset-0 overflow-y-auto z-50',
             overlay ? '' : 'bg-black/75',
           )}
+          data-testid="overlay"
         >
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <Transition.Child

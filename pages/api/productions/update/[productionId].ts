@@ -23,7 +23,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           Code: dto.Code,
           IsArchived: dto.IsArchived,
-          // ProductionImageFileId: Image?.Id,
           ...(Image?.id && {
             File: {
               connect: {
@@ -57,7 +56,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }),
     ]);
 
-    res.status(200).end();
+    res.status(200).json({ ok: true });
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred while saving production.' });
