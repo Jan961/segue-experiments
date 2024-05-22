@@ -137,6 +137,7 @@ describe('UploadModal and FileCard Component', () => {
       ]),
       expect.any(Function),
       expect.any(Function),
+      expect.any(Function),
     );
   });
 });
