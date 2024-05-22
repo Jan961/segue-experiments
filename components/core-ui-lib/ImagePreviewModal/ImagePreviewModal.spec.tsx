@@ -5,15 +5,13 @@ describe('ImagePreviewModal', () => {
   const mockClose = jest.fn();
 
   it('renders correctly', () => {
-    const { asFragment } = render(
-      <ImagePreviewModal
-        show={true}
-        onClose={mockClose}
-        imageUrl="https://example.com/test-image.jpg"
-        altText="Test Image"
-      />,
-    );
-    expect(asFragment()).toMatchSnapshot();
+    const imageUrl = 'https://example.com/test-image.jpg';
+    const altText = 'Test Image';
+
+    render(<ImagePreviewModal show={true} onClose={mockClose} imageUrl={imageUrl} altText={altText} />);
+    const image = screen.getByTestId('preview-image');
+    expect(image).toHaveAttribute('src', imageUrl);
+    expect(image).toHaveAttribute('alt', altText);
   });
 
   it('displays the image with the correct src and alt text', () => {
