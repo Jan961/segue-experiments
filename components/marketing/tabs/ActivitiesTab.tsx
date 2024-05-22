@@ -423,7 +423,12 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
           <div className="w-[1086px] h-[500px]">
             <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
 
-            <div className="flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right">
+            <div
+              className={classNames(
+                'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
+                actRowData.length === 0 ? '-mt-[400px]' : '',
+              )}
+            >
               <div className="flex flex-row gap-4">
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Total Cost</div>

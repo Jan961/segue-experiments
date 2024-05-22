@@ -35,14 +35,6 @@ const Filters = () => {
   }, [bookings]);
 
   useEffect(() => {
-    if (bookings.selected !== null && bookings.selected !== undefined) {
-      changeBooking(bookings.selected.toString());
-    } else {
-      changeBooking(null);
-    }
-  }, [bookings.bookings]);
-
-  useEffect(() => {
     const futureBookings = bookingOptions.filter((booking) => {
       try {
         const reversedBookingDate = reverseDate(booking.date);

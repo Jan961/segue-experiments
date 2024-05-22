@@ -25,6 +25,9 @@ const salesComparison = async (data: SalesComp) => {
     cellRenderer: DefaultCellRenderer,
     suppressMovable: true,
     headerClass: 'custom-sm-pinned-header',
+    cellStyle: {
+      borderRight: '1px solid black',
+    },
     pinned: 'left',
     lockPinned: true,
     width: 80,
@@ -59,7 +62,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_date',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'header-child',
+              headerClass: 'group-header-child',
               width: 100,
               resizable: false,
               sortable: false,
@@ -69,7 +72,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_seats',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'header-child',
+              headerClass: 'group-header-child',
               width: 80,
               resizable: false,
               sortable: false,
@@ -79,7 +82,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_saleValue',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'header-child',
+              headerClass: 'group-header-child',
               width: 122,
               resizable: false,
               sortable: false,
@@ -117,6 +120,9 @@ const salesComparison = async (data: SalesComp) => {
       })(sale.data),
     });
   });
+
+  // set final week number to the word Final
+  tempRowData[tempRowData.length - 1].week = 'Final';
 
   // return the column definations and the rowData to be displayed
   return { columnDef: tempColDef, rowData: tempRowData };
