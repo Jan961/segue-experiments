@@ -78,6 +78,9 @@ export default function SalesTable({
       setHeight(containerHeight);
     }
 
+    // set final week of sales to final
+    data[data.length - 1].week = 'Final';
+
     setColumnDefs(colDefs);
     setRowData(data);
   };

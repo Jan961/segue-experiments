@@ -1,5 +1,5 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { venueRoleState } from 'state/marketing/venueRoleState';
 import VenueContactForm from 'components/venues/modal/VenueContactsForm';
 import { styleProps } from '../table/tableConfig';
@@ -12,19 +12,30 @@ interface VenueContactsProps {
   bookingId: string;
 }
 
-export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
-  const { fetchData } = useAxios();
+export interface VenueContactTabRef {
+  resetData: () => void;
+}
 
+const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((props, ref) => {
   const bookings = useRecoilState(bookingJumpState);
   const venueRoles = useRecoilValue(venueRoleState);
   const [venueContactsTable, setVenueContactsTable] = useState(<div />);
   const [selectedVenue, setSelectedVenue] = useState(null);
+  const [dataAvail, setDataAvail] = useState<boolean>(false);
   const venueStandardRoleList = [
     ...venueRoles.filter((vr) => vr.Standard === true).map((vr) => vr.Standard && { text: vr.Name, value: vr.Id }),
   ];
 
+  const { fetchData } = useAxios();
+
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setDataAvail(false);
+    },
+  }));
+
   const saveVenueContact = async (data) => {
-    const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
+    const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
     const variant = data.mode;
 
     // create venue contact
@@ -130,10 +141,16 @@ export default function VenueContactsTab({ bookingId }: VenueContactsProps) {
   };
 
   useEffect(() => {
-    const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
-    setSelectedVenue(booking.Venue);
-    getVenueContacts(booking.VenueId.toString());
-  }, [bookingId]);
+    if (props.bookingId !== undefined && props.bookingId !== null) {
+      const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
+      setSelectedVenue(booking.Venue);
+      getVenueContacts(booking.VenueId.toString());
+      setDataAvail(true);
+    }
+  }, [props.bookingId]);
 
-  return <>{venueContactsTable}</>;
-}
+  return <div>{dataAvail && <div>{venueContactsTable}</div>}</div>;
+});
+
+VenueContactsTab.displayName = 'VenueContactsTab';
+export default VenueContactsTab;

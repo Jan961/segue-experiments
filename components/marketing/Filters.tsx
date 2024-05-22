@@ -80,6 +80,7 @@ const Filters = () => {
     } else {
       setSelectedIndex(-1);
       setSelectedValue(null);
+      setBooking({ ...bookings, selected: undefined });
     }
   };
 
