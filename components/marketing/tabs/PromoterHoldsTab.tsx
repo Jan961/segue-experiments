@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import AllocatedSeatsModal from '../modal/AllocatedSeatsModal';
 import AvailableSeatsModal from '../modal/AvailableSeatsModal';
@@ -10,6 +10,8 @@ import { AllocatedHoldDTO } from 'interfaces';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import formatInputDate from 'utils/dateInputFormat';
 import Icon from 'components/core-ui-lib/Icon';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import { useRecoilState } from 'recoil';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -29,6 +31,11 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
   const [castRateNotes, setCastRateNotes] = useState('');
   const [availSeatsCont, setAvailSeatsCont] = useState(null);
   const [holdList, setHoldList] = useState(null);
+  const [bookingIdVal, setBookingIdVal] = useState(null);
+  const [allocatedRow, setAllocatedRow] = useState(null);
+  const [allocType, setAllocType] = useState('new');
+  const textAreaRef = useRef(null);
+  const bookings = useRecoilState(bookingJumpState);
 
   const { fetchData } = useAxios();
 
@@ -70,7 +77,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
           tempAvailSeats.push(
             <div>
               <Icon color="#fff" className="float-right mt-3" iconName="edit" onClick={() => editAvailSeats(holdRec)} />
-              <div className="w-[1045px] h-[65px] bg-white mb-5 rounded-md border border-primary-border">
+              <div className="w-[1045px] bg-white mb-1 rounded-md border border-primary-border">
                 <div className="text-base text-primary-navy font-bold ml-2">
                   {formatInputDate(holdRec.info.Date)} | {holdRec.info.Time.substring(0, 5)} | Seats Allocated:{' '}
                   {holdRec.totalAllocated > holdRec.totalAvailable ? (
@@ -83,7 +90,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
                     </span>
                   )}
                 </div>
-                <div className="text-sm text-primary-navy mb-4 ml-2 max-h-8 overflow-y-auto">
+                <div className="text-sm text-primary-navy ml-2 overflow-y-auto">
                   {splitNotes.map((line, index) => (
                     <React.Fragment key={index}>
                       {line}
@@ -103,34 +110,104 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
     }
   };
 
-  const saveAllocatedSeats = async (data, perfId) => {
+  const saveAllocatedSeats = async (data, perfId, type) => {
     const holdRec = holdList.find((hold) => hold.info.Id === perfId);
-    const newRecDate = { AvailableCompId: holdRec.availableCompId, ...data };
+    const recData = { AvailableCompId: holdRec.availableCompId, ...data };
 
-    console.log(newRecDate);
+    if (type === 'new') {
+      await fetchData({
+        url: '/api/marketing/allocatedSeats/create',
+        method: 'POST',
+        data: recData,
+      });
 
+      setAllocRows([...allocRows, recData]);
+      setShowAllocSeatsModal(false);
+    } else if (type === 'edit') {
+      await fetchData({
+        url: '/api/marketing/allocatedSeats/update',
+        method: 'POST',
+        data: recData,
+      });
+
+      const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
+      const newRows = [...allocRows];
+      newRows[rowIndex] = recData;
+      setAllocRows(newRows);
+    } else if (type === 'delete') {
+      await fetchData({
+        url: '/api/marketing/allocatedSeats/delete',
+        method: 'POST',
+        data: recData,
+      });
+
+      const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
+      const newRows = [...allocRows];
+      if (rowIndex !== -1) {
+        newRows.splice(rowIndex, 1);
+      }
+      setAllocRows(newRows);
+    }
+
+    setShowAllocSeatsModal(false);
+  };
+
+  const updateBooking = async (type: string, value: any) => {
+    const updObj = { [type]: value };
+
+    // update checkbox if changed
+    if (type === 'castRateTicketsArranged') {
+      setCastRateArranged(value);
+    }
+
+    // update in the database
     await fetchData({
-      url: '/api/marketing/allocatedSeats/create',
+      url: '/api/bookings/update/' + bookingIdVal,
       method: 'POST',
-      data: newRecDate,
+      data: updObj,
     });
+  };
+
+  const triggerEdit = (e) => {
+    setAllocatedRow(e.data);
+    setAllocType('edit');
+    setShowAllocSeatsModal(true);
+  };
+
+  const newAllocatedSeats = () => {
+    setAllocType('new');
+    setShowAllocSeatsModal(true);
   };
 
   useEffect(() => {
     if (bookingId !== null && bookingId !== undefined) {
       getPromoterHoldData(bookingId.toString());
+      setBookingIdVal(bookingId.toString());
+
+      const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
+      setCastRateArranged(booking.CastRateTicketsArranged);
+      setCastRateNotes(booking.CastRateTicketsNotes);
     }
   }, [bookingId]);
+
+  useEffect(() => {
+    if (textAreaRef.current) {
+      // Reset the height to auto to shrink if necessary
+      textAreaRef.current.style.height = 'auto';
+      // Set the height based on the scroll height
+      textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight}px`;
+    }
+  }, [castRateNotes]);
 
   return (
     <>
       <div className="flex flex-row">
-        <div className="flex flex-col mr-3">
+        <div className="flex flex-col mr-3 mb-5">
           <Checkbox
             id={'Cast Rate Arranged'}
             name={'Cast Rate Arra'}
             checked={castRateArranged}
-            onChange={(e) => setCastRateArranged(e.target.checked)}
+            onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
             className="w-[19px] h-[19px] mt-[2px]"
           />
         </div>
@@ -139,18 +216,21 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
       </div>
 
       <div className="flex flex-row">
-        <TextArea
-          className="w-[1071px] h-[103px]"
-          value={castRateNotes}
-          placeholder="Notes Field"
-          onChange={(e) => setCastRateNotes(e.target.value)}
-          disabled={!castRateArranged}
-        />
+        {castRateArranged && (
+          <TextArea
+            className="w-[1071px] h-auto resize-none overflow-hidden"
+            value={castRateNotes}
+            placeholder="Notes Field"
+            onChange={(e) => setCastRateNotes(e.target.value)}
+            ref={textAreaRef}
+            onBlur={(e) => updateBooking('castRateTicketsNotes', e.target.value)}
+          />
+        )}
       </div>
 
-      <div className="text-xl text-primary-navy font-bold mb-4">Available Seats</div>
+      <div className="text-xl text-primary-navy font-bold -mb-4 mt-2">Available Seats</div>
 
-      <div className="h-40 overflow-auto my-5">{availSeatsCont}</div>
+      <div className="my-5">{availSeatsCont}</div>
 
       <div className="flex flex-row justify-between items-center mb-4">
         <div className="text-xl text-primary-navy font-bold">Allocated Seats</div>
@@ -161,16 +241,25 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
             iconProps={{ className: 'h-4 w-3' }}
             sufixIconName={'excel'}
           />
-          <Button text="Add New" className="w-[160px]" onClick={() => setShowAllocSeatsModal(true)} />
+          <Button text="Add New" className="w-[160px]" onClick={() => newAllocatedSeats()} />
         </div>
       </div>
 
-      <Table columnDefs={allocSeatsColDefs} rowData={allocRows} styleProps={styleProps} tableHeight={230} />
+      <Table
+        columnDefs={allocSeatsColDefs}
+        rowData={allocRows}
+        styleProps={styleProps}
+        tableHeight={230}
+        onRowDoubleClicked={triggerEdit}
+      />
+
       <AllocatedSeatsModal
         show={showAllocSeatsModal}
         bookingId={bookingId}
         onCancel={() => setShowAllocSeatsModal(false)}
-        onSave={(data, perfId) => saveAllocatedSeats(data, perfId)}
+        onSave={(data, perfId, type) => saveAllocatedSeats(data, perfId, type)}
+        data={allocatedRow}
+        type={allocType}
       />
 
       <AvailableSeatsModal

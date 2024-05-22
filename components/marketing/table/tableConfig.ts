@@ -203,6 +203,13 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
 
 export const allocSeatsColDefs = [
   {
+    headerName: 'Id',
+    field: 'Id',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
     headerName: 'Perf Date',
     field: 'date',
     cellRenderer: DefaultCellRenderer,
