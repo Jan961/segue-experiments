@@ -1,6 +1,7 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import { SalesComparison } from 'types/MarketingTypes';
 import formatInputDate from 'utils/dateInputFormat';
+import { tileColors } from 'config/global';
 
 export type SelectedBooking = {
   bookingId: string;
@@ -18,13 +19,27 @@ export interface SalesComp {
 const salesComparison = async (data: SalesComp) => {
   const tempRowData = [];
   const tempColDef = [];
-
+  const excelStyles = [
+    {
+      id: 'headerStyles',
+      interior: {
+        color: tileColors.bookings,
+        pattern: 'Solid',
+      },
+      font: {
+        color: '#FFFFFF',
+      },
+      alignment: {
+        horizontal: 'center',
+      },
+    },
+  ];
   const weekColumn = {
     headerName: 'Wk',
     field: 'week',
     cellRenderer: DefaultCellRenderer,
     suppressMovable: true,
-    headerClass: 'custom-sm-pinned-header',
+    headerClass: ['custom-sm-pinned-header', 'headerStyles'],
     pinned: 'left',
     lockPinned: true,
     width: 80,
@@ -46,12 +61,12 @@ const salesComparison = async (data: SalesComp) => {
     const mainColGroup = {
       headerName: booking.prodName + ' ' + booking.prodCode,
       headerGroupComponent: 'AGGridHeaderGroupComponent',
-      headerClass: 'justify-center font-bold text-base ' + borderClasses,
+      headerClass: ['justify-center', 'font-bold', 'text-base', borderClasses, 'headerStyles'],
       sortable: false,
       children: [
         {
           headerName: 'No. of Performances: ' + booking.numPerfs,
-          headerClass: 'justify-center font-bold text-base ' + borderClasses,
+          headerClass: ['justify-center', 'font-bold', 'text-base', borderClasses, 'headerStyles'],
           marryChildren: true,
           children: [
             {
@@ -59,7 +74,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_date',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'header-child',
+              headerClass: ['header-child', 'headerStyles'],
               width: 100,
               resizable: false,
               sortable: false,
@@ -69,7 +84,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_seats',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'header-child',
+              headerClass: ['header-child', 'headerStyles'],
               width: 80,
               resizable: false,
               sortable: false,
@@ -79,7 +94,7 @@ const salesComparison = async (data: SalesComp) => {
               field: booking.prodCode + '_saleValue',
               cellRenderer: DefaultCellRenderer,
               suppressMovable: true,
-              headerClass: 'header-child',
+              headerClass: ['header-child', 'headerStyles'],
               width: 122,
               resizable: false,
               sortable: false,
@@ -119,7 +134,7 @@ const salesComparison = async (data: SalesComp) => {
   });
 
   // return the column definations and the rowData to be displayed
-  return { columnDef: tempColDef, rowData: tempRowData };
+  return { columnDef: tempColDef, rowData: tempRowData, excelStyles };
 };
 
 export default salesComparison;

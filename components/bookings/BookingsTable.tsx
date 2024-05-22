@@ -1,5 +1,5 @@
 import Table from 'components/core-ui-lib/Table';
-import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
+import { styleProps, columnDefs, columnDefsExportStyles } from 'components/bookings/table/tableConfig';
 import { useEffect, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
@@ -132,6 +132,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
           onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
+          excelStyles={columnDefsExportStyles}
         />
       </div>
       <NotesPopup

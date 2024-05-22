@@ -21,8 +21,10 @@ import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
 import { DateType } from '@prisma/client';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import ExportModal from 'components/core-ui-lib/ExportModal';
+import { useRecoilValue } from 'recoil';
+import { filterState } from 'state/booking/filterState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -32,6 +34,42 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
   const onExportClick = () => {
     setIsExportModalOpen(true);
   };
+
+  const appliedFilters = useRecoilValue(filterState);
+
+  const excelExportExtraContents = useMemo(() => {
+    return {
+      prependContent: [
+        { cells: [] },
+        { cells: [{ data: { value: 'Filter(s) applied', type: 'String' } }] },
+        {
+          cells: [
+            { data: { value: 'Start Date', type: 'String' } },
+            { data: { value: appliedFilters?.startDate, type: 'Date' } },
+          ],
+        },
+        {
+          cells: [
+            { data: { value: 'End Date', type: 'String' } },
+            { data: { value: appliedFilters?.endDate, type: 'Date' } },
+          ],
+        },
+        {
+          cells: [
+            { data: { value: 'Venue Search Text', type: 'String' } },
+            { data: { value: appliedFilters?.venueText, type: 'String' } },
+          ],
+        },
+        {
+          cells: [
+            { data: { value: 'Booking Status', type: 'String' } },
+            { data: { value: appliedFilters?.status, type: 'String' } },
+          ],
+        },
+        { cells: [] },
+      ],
+    };
+  }, [appliedFilters]);
 
   return (
     <Layout title="Booking | Segue" flush>
@@ -56,6 +94,7 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
               iconProps: { fill: 'red', variant: '7xl' },
             },
           ]}
+          extraContent={excelExportExtraContents}
         />
       )}
     </Layout>

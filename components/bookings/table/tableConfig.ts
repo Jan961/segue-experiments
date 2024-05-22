@@ -41,6 +41,7 @@ export const columnDefs = [
     field: 'production',
     cellRenderer: DefaultCellRenderer,
     width: 106,
+    headerClass: ['headerCells'],
   },
   {
     headerName: 'Date',
@@ -48,11 +49,57 @@ export const columnDefs = [
     cellRenderer: DateColumnRenderer,
     width: 120,
     minWidth: 120,
+    headerClass: ['headerCells'],
+    cellClassRules: {
+      isMonday: (params) => params.value.includes('Mon'),
+    },
   },
-  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 6, flex: 2 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
-  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
+  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55, headerClass: ['headerCells'] },
+  {
+    headerName: 'Venue Details',
+    field: 'venue',
+    cellRenderer: VenueColumnRenderer,
+    minWidth: 6,
+    flex: 2,
+    headerClass: ['headerCells'],
+    cellClassRules: {
+      dayTypeNotPerformance: (params) => {
+        const { dayType } = params.data;
+        return dayType !== 'Performance' && params.value !== '';
+      },
+      cancelledBooking: (params) => {
+        const { bookingStatus } = params.data;
+        return bookingStatus === 'Cancelled' && params.value !== '';
+      },
+      suspendedBooking: (params) => {
+        const { bookingStatus } = params.data;
+        return bookingStatus === 'Suspended' && params.value !== '';
+      },
+      pencilledBooking: (params) => {
+        const { bookingStatus, multipleVenuesOnSameDate } = params.data;
+        return bookingStatus === 'Pencilled' && multipleVenuesOnSameDate && params.value !== '';
+      },
+      multipleBookings: (params) => {
+        const { dayType, venueHasMultipleBookings } = params.data;
+        return dayType === 'Performance' && venueHasMultipleBookings && params.value !== '';
+      },
+    },
+  },
+  {
+    headerName: 'Town',
+    field: 'town',
+    cellRenderer: DefaultCellRenderer,
+    minWidth: 100,
+    flex: 1,
+    headerClass: ['headerCells'],
+  },
+  {
+    headerName: 'Day Type',
+    field: 'dayType',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    headerClass: ['headerCells'],
+  },
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
@@ -63,16 +110,37 @@ export const columnDefs = [
     },
     resizable: true,
     width: 105,
+    headerClass: ['headerCells'],
   },
-  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 70 },
-  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
+  {
+    headerName: 'Capacity',
+    field: 'capacity',
+    cellRenderer: DefaultCellRenderer,
+    width: 90,
+    headerClass: ['headerCells'],
+  },
+  {
+    headerName: 'No. Perfs',
+    field: 'performanceCount',
+    cellRenderer: DefaultCellRenderer,
+    width: 70,
+    headerClass: ['headerCells'],
+  },
+  {
+    headerName: 'Perf Times',
+    field: 'performanceTimes',
+    cellRenderer: DefaultCellRenderer,
+    width: 90,
+    minWidth: 90,
+    headerClass: ['headerCells'],
+  },
   {
     headerName: 'Miles',
     field: 'miles',
     valueFormatter: milesFormatter,
     cellStyle: milesCellStyle,
     width: 80,
+    headerClass: ['headerCells'],
   },
   {
     headerName: 'Travel Time',
@@ -80,6 +148,7 @@ export const columnDefs = [
     width: 90,
     valueFormatter: travelTimeFormatter,
     cellStyle: milesCellStyle,
+    headerClass: ['headerCells'],
   },
   {
     headerName: '',
@@ -95,6 +164,77 @@ export const columnDefs = [
       justifyContent: 'center',
       alignItems: 'center',
       overflow: 'visible',
+    },
+  },
+];
+
+export const columnDefsExportStyles = [
+  {
+    id: 'headerCells',
+    interior: {
+      color: tileColors.bookings,
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF',
+    },
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  {
+    id: 'dayTypeNotPerformance',
+    interior: {
+      color: '#D41818', // bg-primary-red
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FDCE74', // text-primary-yellow
+      italic: true,
+    },
+  },
+  {
+    id: 'cancelledBooking',
+    interior: {
+      color: '#111827', // bg-primary-black
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF', // text-primary-white
+    },
+  },
+  {
+    id: 'suspendedBooking',
+    interior: {
+      color: '#8B5CF6', // bg-secondary-purple
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF', // text-primary-white
+    },
+  },
+  {
+    id: 'pencilledBooking',
+    interior: {
+      color: '#3B82F6', // bg-primary-blue
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF', // text-primary-white
+    },
+  },
+  {
+    id: 'multipleBookings',
+    font: {
+      color: '#D41818', // text-primary-red
+      bold: 'bold',
+    },
+  },
+  {
+    id: 'isMonday',
+    interior: {
+      color: '#FDCE74',
+      pattern: 'Solid',
     },
   },
 ];

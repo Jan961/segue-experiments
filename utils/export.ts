@@ -1,11 +1,19 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { pdfStandardColors } from 'config/global';
+import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export const exportToExcel = (tableRef) => {
-  tableRef?.current?.getApi?.()?.exportDataAsExcel?.();
+export const exportToExcel = (tableRef, extraContent) => {
+  tableRef?.current?.getApi?.()?.exportDataAsExcel?.(getParams(extraContent));
 };
+
+const getParams: (extraContent) => ExcelExportParams = (extraContent) => ({
+  prependContent: extraContent?.prependContent ? getRows(extraContent?.prependContent) : null,
+  appendContent: extraContent?.appendContent ? getRows(extraContent?.appendContent) : null,
+});
+
+const getRows: (content: any[]) => ExcelRow[] = (content = []) => [...content];
 
 const getHeaderToExport = (gridApi) => {
   const columns = gridApi.getAllDisplayedColumns();

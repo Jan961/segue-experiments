@@ -3,11 +3,11 @@ import { exportToExcel, exportToPDF } from 'utils/export';
 import Icon from '../Icon/Icon';
 import { ExportModalProps } from './interface';
 
-const ExportModal = ({ visible, onClose, ExportList, tableRef, pdfStyles }: ExportModalProps) => {
+const ExportModal = ({ visible, onClose, ExportList, tableRef, pdfStyles, extraContent }: ExportModalProps) => {
   const handleClick = (key: string) => {
     switch (key?.toLowerCase()) {
       case 'excel':
-        exportToExcel(tableRef);
+        exportToExcel(tableRef, extraContent);
         break;
       case 'pdf':
         exportToPDF(tableRef, pdfStyles);

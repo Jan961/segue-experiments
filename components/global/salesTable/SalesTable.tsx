@@ -50,6 +50,7 @@ export default function SalesTable({
   const [currency, setCurrency] = useState('£');
   const [height, setHeight] = useState(containerHeight);
   const [width, setWidth] = useState(containerWidth);
+  const [excelStyles, setExcelStyles] = useState([]);
 
   // To be discussed and reviewed by Arun on his return - this is causing more issues than fixes just now
   // const prodColDefs = useMemo(() => {
@@ -193,6 +194,7 @@ export default function SalesTable({
         setWidth('w-[' + widthInt.toString() + 'px]');
         setColumnDefs(tableData.columnDef);
         setRowData(tableData.rowData);
+        setExcelStyles(tableData.excelStyles);
         break;
       }
 
@@ -228,6 +230,7 @@ export default function SalesTable({
         onCellClicked={onCellClick}
         onCellValueChange={onCellValChange}
         tableHeight={tableHeight}
+        excelStyles={excelStyles}
       />
     </div>
   );
