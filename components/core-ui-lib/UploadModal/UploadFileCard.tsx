@@ -3,16 +3,25 @@ import ProgressBar from '../ProgressBar';
 import Tooltip from '../Tooltip';
 import { fileSizeFormatter, getStatusFromProgress } from 'utils/index';
 import { FileCardProps } from './interface';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import ImagePreviewModal from '../ImagePreviewModal';
 
-const FileCard = ({ file, onDelete, progress, errorMessage }: FileCardProps) => {
+const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCardProps) => {
   const status = useMemo(() => getStatusFromProgress(progress), [progress]);
+  const [showImagePreviewModal, setShowImagePreviewModal] = useState(false);
+  const toggleImagePreviewModal = useCallback(() => {
+    setShowImagePreviewModal((prev) => !prev);
+  }, [setShowImagePreviewModal]);
 
   return (
     <div className="flex w-full md:w-[535px] flex-col justify-between pl-4 rounded-lg border border-silver-gray-100 bg-white shadow-md">
       <div className="flex w-full gap-4 py-2">
         <div className="flex items-center">
-          <Icon iconName={'document-solid'} fill="#617293" variant="3xl" />
+          {imageUrl ? (
+            <img onClick={toggleImagePreviewModal} className="h-10 w-14 pb-2" src={imageUrl} />
+          ) : (
+            <Icon iconName={'document-solid'} fill="#617293" variant="3xl" />
+          )}
         </div>
         <div id="filedetails" className="flex w-full flex-row items-center">
           <div className="w-full">
@@ -38,6 +47,9 @@ const FileCard = ({ file, onDelete, progress, errorMessage }: FileCardProps) => 
           <Icon iconName={'cross'} fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
         </div>
       </div>
+      {showImagePreviewModal && (
+        <ImagePreviewModal show={showImagePreviewModal} onClose={toggleImagePreviewModal} imageUrl={imageUrl} />
+      )}
     </div>
   );
 };
