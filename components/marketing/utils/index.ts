@@ -69,11 +69,7 @@ export const hasAllocSeatsChanged = (oldAllocSeat: any, newAllocSeat: any): bool
 
   // Check if any key values (other than 'Id') do not match
   const hasChanged = keys.some((key) => {
-    if (oldAllocSeat[key] !== newAllocSeat[key]) {
-      return true;
-    }
-
-    return false;
+    return oldAllocSeat[key] !== newAllocSeat[key];
   });
 
   return hasChanged;

@@ -28,8 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!access) return res.status(401).end();
     const BookingId = parseInt(req.query.id as string, 10);
     const bookingUpdate = mapToPrisma(req.body);
-    console.log(bookingUpdate);
-    console.log(BookingId);
+
     const updatedBooking = await prisma.booking.update({
       where: {
         ...(BookingId && { Id: BookingId }),
