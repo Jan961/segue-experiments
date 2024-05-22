@@ -54,14 +54,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             PRRegionId: regionId,
           })),
         },
-        ProductionImageFileId: Image?.id,
-        // ...(Image.Id && {
-        //   File: {
-        //     connect: {
-        //       Id: Image.Id,
-        //     },
-        //   },
-        // }),
+        ProductionImageFileId: Image.id,
         DateBlock: {
           create: production.DateBlock.map((dateBlock) => ({
             Name: dateBlock.Name,

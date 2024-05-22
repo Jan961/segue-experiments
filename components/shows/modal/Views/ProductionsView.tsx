@@ -158,7 +158,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       .then((response: any) => {
         progress = 100;
         onProgress(file[0].file, progress);
-        onUploadingImage(file[0].file, process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN + response.data.location);
+        onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
         clearInterval(slowProgressInterval);
         const gridApi = tableRef.current.getApi();
         const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
@@ -167,7 +167,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           update: [
             {
               ...rowDataToUpdate,
-              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}${response.data.location}`,
+              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`,
               Image: response,
             },
           ],
