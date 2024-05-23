@@ -10,7 +10,7 @@ import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { weekOptions } from 'utils/getTaskDateStatus';
@@ -18,6 +18,7 @@ import { priorityOptions } from 'utils/tasks';
 
 interface AddTaskProps {
   visible: boolean;
+  isMasterTask?: boolean;
   onClose: () => void;
   task?: Partial<MasterTask>;
 }
@@ -61,12 +62,17 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   DueDate: '',
 };
 
-const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
+const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps) => {
   const { users = {} } = useRecoilValue(userState);
 
   const [inputs, setInputs] = useState<Partial<MasterTask> & { Progress?: number; DueDate?: string }>(
     task || DEFAULT_MASTER_TASK,
   );
+
+  useEffect(() => {
+    setInputs(task);
+  }, [task]);
+
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -106,9 +112,20 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
     setLoading(true);
     try {
       if (inputs.Id) {
+        if (isMasterTask) {
+          delete inputs.Progress;
+          delete inputs.DueDate;
+        }
         await axios.post('/api/tasks/master/update', inputs);
+        setLoading(false);
+        onClose();
+        setInputs(DEFAULT_MASTER_TASK);
       } else {
         const endpoint = '/api/tasks/master/create';
+        if (isMasterTask) {
+          delete inputs.Progress;
+          delete inputs.DueDate;
+        }
         await axios.post(endpoint, inputs);
         setLoading(false);
         onClose();
@@ -123,8 +140,13 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
 
   const repeatInterval: boolean = inputs.RepeatInterval === 'once';
 
+  const handleClose = () => {
+    onClose();
+    setInputs(DEFAULT_MASTER_TASK);
+  };
+
   return (
-    <PopupModal show={visible} onClose={onClose} title="Create New Task" titleClass="text-primary-navy">
+    <PopupModal show={visible} onClose={handleClose} title="Create New Task" titleClass="text-primary-navy">
       <form className="flex flex-col gap-4">
         {loading && <LoadingOverlay />}
         <div className="col-span-2 col-start-4 flex items-center justify-between">
@@ -141,10 +163,11 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
           <Label className="!text-secondary pr-6 " text="Task Code" />
           <TextInput
             id="Code"
+            disabled
             className="w-128 placeholder-secondary"
             placeholder="Enter Task Code"
             onChange={handleOnChange}
-            value={inputs.Code.toString()}
+            value={inputs?.Code?.toString()}
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center">
@@ -180,6 +203,7 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Progress" />
             <Select
+              disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
               value={inputs.Progress}
               className="w-20"
@@ -255,6 +279,7 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
             <Checkbox
               id="occurence"
               value={inputs.RepeatInterval}
+              disabled={isMasterTask}
               onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
             />
           </div>

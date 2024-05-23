@@ -11,9 +11,10 @@ import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { objectify } from 'radash';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
+import AddTask from 'components/tasks/Modals/AddTask';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -36,6 +37,12 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     usersList.unshift({ value: -1, text: 'All' });
   }
 
+  const [showAddTask, setShowAddTask] = useState<boolean>(false);
+
+  const handleShowTask = () => {
+    setShowAddTask(!showAddTask);
+  };
+
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
@@ -57,6 +64,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           );
         })
       )}
+      <AddTask visible={showAddTask} onClose={handleShowTask} />
     </Layout>
   );
 };

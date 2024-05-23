@@ -13,6 +13,7 @@ import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import Loader from 'components/core-ui-lib/Loader';
 import AddTask from 'components/tasks/Modals/AddTask';
+import { useRouter } from 'next/router';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -24,7 +25,11 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   const { masterTask = [], usersList } = props;
   const tableRef = useRef(null);
 
+  const router = useRouter();
+
   const [taskId, setTaskId] = useState<number>(-1);
+
+  const [currentTask, setCurrentTask] = useState({});
 
   const columnDefs = getMasterTasksColumnDefs(usersList);
 
@@ -42,6 +47,13 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     setTaskId(e.data.Id);
     if (e.column.colId === 'delete') {
       setConfirm(true);
+    } else if (e.column.colId === 'clone') {
+      delete e.data.Id;
+      setShowAddTask(!showAddTask);
+      setCurrentTask(e.data);
+    } else if (e.column.colId === 'edit') {
+      setShowAddTask(!showAddTask);
+      setCurrentTask(e.data);
     }
   };
 
@@ -63,6 +75,9 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
+    if (showAddTask) {
+      router.replace(router.asPath);
+    }
   };
 
   return (
@@ -85,7 +100,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
-      <AddTask visible={showAddTask} onClose={handleShowTask} />
+      <AddTask visible={showAddTask} isMasterTask onClose={handleShowTask} task={currentTask} />
     </Layout>
   );
 };
