@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
@@ -26,11 +26,18 @@ const UploadModal: React.FC<UploadModalProps> = ({
   const [errorMessages, setErrorMessages] = useState<Record<string, string>>({});
   const [uploadedImageUrls, setUploadedImageUrls] = useState<Record<string, string>>({});
 
-  const isUploadDisabled =
-    selectedFiles?.length === 0 ||
-    selectedFiles.some((file) => file.error) ||
-    isUploading ||
-    Object.keys(errorMessages).length > 0;
+  const isUploadDisabled = useMemo(
+    () =>
+      selectedFiles?.length === 0 ||
+      selectedFiles.some((file) => file.error) ||
+      isUploading ||
+      Object.keys(errorMessages).length > 0,
+    [selectedFiles, isUploading, errorMessages],
+  );
+
+  const isUploadComplete = useMemo(() => {
+    return selectedFiles.every((file) => progress[file.name] === 100);
+  }, [selectedFiles, progress]);
 
   const onProgress = (file: File, uploadProgress: number) => {
     setProgress((prev) => ({ ...prev, [file.name]: uploadProgress }));
@@ -117,6 +124,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleUpload = () => {
+    if (isUploadComplete) {
+      return onClose();
+    }
     if (Object.keys(errorMessages).length === 0) {
       setIsUploading(true);
       onSave?.(selectedFiles, onProgress, onError, onUploadingImage);
@@ -185,8 +195,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
           >
             Cancel
           </Button>
-          <Button className="w-[132px]" disabled={isUploadDisabled} onClick={handleUpload}>
-            Upload
+          <Button className="w-[132px]" disabled={isUploadDisabled && !isUploadComplete} onClick={handleUpload}>
+            {isUploadComplete ? 'Ok' : 'Upload'}
           </Button>
         </div>
       </div>
