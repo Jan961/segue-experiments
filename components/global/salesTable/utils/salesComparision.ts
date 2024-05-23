@@ -26,7 +26,7 @@ const salesComparison = async (data: SalesComp) => {
     suppressMovable: true,
     headerClass: 'custom-sm-pinned-header',
     cellStyle: {
-      borderRight: '1px solid black',
+      borderRight: '1px solid',
     },
     pinned: 'left',
     lockPinned: true,

@@ -236,7 +236,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           ...getCellColor(params.data, false, schoolDataAvail),
           textAlign: 'center',
           overflow: 'visible',
-          borderRight: '1px solid black',
+          borderRight: '1px solid',
         };
       },
       suppressMovable: true,

@@ -67,8 +67,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const { fetchData } = useAxios();
 
-  const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset !border-primary-border`;
-
   const getActivities = async (bookingId: string) => {
     try {
       const data = await fetchData({
@@ -432,36 +430,29 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
               <div className="flex flex-row gap-4">
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-                  <input
-                    type="text"
-                    className={classNames(baseClass, 'w-[146px]')}
-                    onChange={null}
-                    placeholder={''}
-                    disabled={true}
-                    value={currency + totalCost.toFixed(2)}
-                  />
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {currency + totalCost.toFixed(2)}
+                    </div>
+                  </div>
                 </div>
+
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Company</div>
-                  <input
-                    type="text"
-                    className={classNames(baseClass, 'w-[146px]')}
-                    onChange={null}
-                    placeholder={''}
-                    disabled={true}
-                    value={currency + totalCompanyCost.toFixed(2)}
-                  />
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {currency + totalCompanyCost.toFixed(2)}
+                    </div>
+                  </div>
                 </div>
+
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Venue</div>
-                  <input
-                    type="text"
-                    className={classNames(baseClass, 'w-[146px]')}
-                    onChange={null}
-                    placeholder={''}
-                    disabled={true}
-                    value={currency + totalVenueCost.toFixed(2)}
-                  />
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {currency + totalVenueCost.toFixed(2)}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
