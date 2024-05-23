@@ -91,6 +91,37 @@ export const Summary = () => {
 
   const notesInfo = [{ id: 1, label: 'Booking Deal:', data: notes.BookingDealNotes ? notes.BookingDealNotes : 'None' }];
 
+  const getPerformances = () => {
+    const result = [];
+
+    const groupedAndSorted = Object.entries(
+      summary.Performances.reduce((acc, obj) => {
+        (acc[obj.Date] = acc[obj.Date] || []).push(obj);
+        return acc;
+      }, {}),
+    );
+
+    const processed = [];
+    groupedAndSorted.forEach((x) => {
+      const times: any = x[1];
+      const data = {
+        date: x[0],
+        time: times.map((item) => getTimeFromDateAndTime(item.Time)),
+      };
+      processed.push(data);
+    });
+
+    processed.forEach((element) => {
+      result.push(
+        <p>
+          {dateToSimple(element.date)} {element.time.join('; ')}{' '}
+        </p>,
+      );
+    });
+
+    return result;
+  };
+
   return (
     <div className="text-sm mb-2">
       {summaryAvail && (
@@ -102,11 +133,7 @@ export const Summary = () => {
           ))}
 
           <SummaryRow label="Performance Time(s):" data={''} />
-          <div className={normalText}>
-            {summary.Performances?.map?.((x, i) => (
-              <p key={i}>{`${dateToSimple(x.Date)} ${x.Time ? getTimeFromDateAndTime(x.Time) : ''}`}</p>
-            )) || 'N/A'}
-          </div>
+          <div className={normalText}>{getPerformances()}</div>
 
           <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
           {salesSummary.map((item) => (

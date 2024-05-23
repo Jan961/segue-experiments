@@ -38,6 +38,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [allocatedRow, setAllocatedRow] = useState(null);
   const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [tableHeight, setTableHeight] = useState(100);
   const [allocType, setAllocType] = useState('new');
   const textAreaRef = useRef(null);
   const bookings = useRecoilState(bookingJumpState);
@@ -83,6 +84,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         setHoldList(promData.holds);
         setAllocRows(promData.allocations);
 
+        setTableHeight(120 * promData.allocations.length);
         const tempAvailSeats = [];
         promData.holds.forEach((holdRec) => {
           const splitNotes = holdRec.note.split('\r\n');
@@ -265,7 +267,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
             rowData={allocRows}
             styleProps={styleProps}
             columnDefs={allocSeatsColDefs}
-            tableHeight={230}
+            tableHeight={tableHeight}
             onRowDoubleClicked={triggerEdit}
           />
 
