@@ -33,6 +33,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
   const [holdList, setHoldList] = useState(null);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [allocatedRow, setAllocatedRow] = useState(null);
+  const [tableHeight, setTableHeight] = useState(100);
   const [allocType, setAllocType] = useState('new');
   const textAreaRef = useRef(null);
   const bookings = useRecoilState(bookingJumpState);
@@ -71,6 +72,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
         const promData = data as PromoterData;
         setHoldList(promData.holds);
         setAllocRows(promData.allocations);
+        setTableHeight(120 * promData.allocations.length);
         const tempAvailSeats = [];
         promData.holds.forEach((holdRec) => {
           const splitNotes = holdRec.note.split('\r\n');
@@ -205,7 +207,7 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
         <div className="flex flex-col mr-3 mb-5">
           <Checkbox
             id={'Cast Rate Arranged'}
-            name={'Cast Rate Arra'}
+            name={'Cast Rate Arranged'}
             checked={castRateArranged}
             onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
             className="w-[19px] h-[19px] mt-[2px]"
@@ -245,13 +247,15 @@ export default function PromotorHoldsTab({ bookingId }: PromotorHoldsTabProps) {
         </div>
       </div>
 
-      <Table
-        columnDefs={allocSeatsColDefs}
-        rowData={allocRows}
-        styleProps={styleProps}
-        tableHeight={230}
-        onRowDoubleClicked={triggerEdit}
-      />
+      <div className="h-auto mb-5">
+        <Table
+          columnDefs={allocSeatsColDefs}
+          rowData={allocRows}
+          styleProps={styleProps}
+          onRowDoubleClicked={triggerEdit}
+          tableHeight={tableHeight}
+        />
+      </div>
 
       <AllocatedSeatsModal
         show={showAllocSeatsModal}
