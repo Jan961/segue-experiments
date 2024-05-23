@@ -25,6 +25,9 @@ import { useMemo, useRef, useState } from 'react';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { exportToExcel, exportToPDF } from 'utils/export';
+import { getExportExtraContent } from 'components/bookings/table/tableConfig';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -36,40 +39,29 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
   };
 
   const appliedFilters = useRecoilValue(filterState);
+  const productionsList = useRecoilValue(productionJumpState);
+
+  const getSelectedProduction = () => {
+    const productions = productionsList.productions;
+    const selectedId = productionsList.selected;
+    return productions.find((production) => production.Id === selectedId);
+  };
 
   const excelExportExtraContents = useMemo(() => {
-    return {
-      prependContent: [
-        { cells: [] },
-        { cells: [{ data: { value: 'Filter(s) applied', type: 'String' } }] },
-        {
-          cells: [
-            { data: { value: 'Start Date', type: 'String' } },
-            { data: { value: appliedFilters?.startDate, type: 'Date' } },
-          ],
-        },
-        {
-          cells: [
-            { data: { value: 'End Date', type: 'String' } },
-            { data: { value: appliedFilters?.endDate, type: 'Date' } },
-          ],
-        },
-        {
-          cells: [
-            { data: { value: 'Venue Search Text', type: 'String' } },
-            { data: { value: appliedFilters?.venueText, type: 'String' } },
-          ],
-        },
-        {
-          cells: [
-            { data: { value: 'Booking Status', type: 'String' } },
-            { data: { value: appliedFilters?.status, type: 'String' } },
-          ],
-        },
-        { cells: [] },
-      ],
-    };
+    const showName = getSelectedProduction()?.ShowName;
+    const code = getSelectedProduction()?.Code;
+    const showCode = getSelectedProduction()?.ShowCode;
+
+    return getExportExtraContent(showName, showCode, code, appliedFilters);
   }, [appliedFilters]);
+
+  const exportTable = (key: string) => {
+    if (key === 'Excel') {
+      exportToExcel(tableRef, excelExportExtraContents);
+    } else if (key === 'PDF') {
+      exportToPDF(tableRef);
+    }
+  };
 
   return (
     <Layout title="Booking | Segue" flush>
@@ -82,6 +74,7 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
           tableRef={tableRef}
           visible={isExportModalOpen}
           onClose={() => setIsExportModalOpen(false)}
+          onItemClick={exportTable}
           ExportList={[
             {
               key: 'Excel',
@@ -94,7 +87,6 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
               iconProps: { fill: 'red', variant: '7xl' },
             },
           ]}
-          extraContent={excelExportExtraContents}
         />
       )}
     </Layout>

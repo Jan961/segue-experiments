@@ -16,6 +16,7 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
 import AddDeleteRowRenderer from './AddDeleteRowRenderer';
+import { dateToReadableFormat } from 'utils/export';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -40,28 +41,29 @@ export const columnDefs = [
     headerName: 'Production',
     field: 'production',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 106,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Date',
     field: 'date',
     cellRenderer: DateColumnRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 120,
     minWidth: 120,
-    headerClass: ['headerCells'],
     cellClassRules: {
       isMonday: (params) => params.value.includes('Mon'),
     },
   },
-  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55, headerClass: ['headerCells'] },
+  { headerName: 'Wk', field: 'week', headerClass: ['bgOrangeTextWhite'], cellRenderer: DefaultCellRenderer, width: 55 },
   {
     headerName: 'Venue Details',
     field: 'venue',
     cellRenderer: VenueColumnRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     minWidth: 6,
     flex: 2,
-    headerClass: ['headerCells'],
+
     cellClassRules: {
       dayTypeNotPerformance: (params) => {
         const { dayType } = params.data;
@@ -89,71 +91,72 @@ export const columnDefs = [
     headerName: 'Town',
     field: 'town',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     minWidth: 100,
     flex: 1,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Day Type',
     field: 'dayType',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 95,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
     valueFormatter: ({ value, data }) =>
       value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
+    headerClass: ['bgOrangeTextWhite'],
     cellStyle: {
       paddingLeft: '0.5rem',
     },
     resizable: true,
     width: 105,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Capacity',
     field: 'capacity',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 90,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'No. Perfs',
     field: 'performanceCount',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 70,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Perf Times',
     field: 'performanceTimes',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 90,
     minWidth: 90,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Miles',
     field: 'miles',
     valueFormatter: milesFormatter,
+    headerClass: ['bgOrangeTextWhite'],
     cellStyle: milesCellStyle,
     width: 80,
-    headerClass: ['headerCells'],
   },
   {
     headerName: 'Travel Time',
     field: 'travelTime',
     width: 90,
     valueFormatter: travelTimeFormatter,
+    headerClass: ['bgOrangeTextWhite'],
     cellStyle: milesCellStyle,
-    headerClass: ['headerCells'],
   },
   {
     headerName: '',
     field: 'note',
     cellRenderer: NoteColumnRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
     },
@@ -168,9 +171,64 @@ export const columnDefs = [
   },
 ];
 
+export const getExportExtraContent = (showName, showCode, code, appliedFilters) => {
+  return {
+    prependContent: [
+      { cells: [] },
+      {
+        cells: [{}, {}, {}, { data: { value: showName, type: 'String' }, styleId: 'selectedProductionName' }],
+        height: 70,
+        width: 500,
+      },
+      { cells: [] },
+      { cells: [{ data: { value: 'Filter(s) applied', type: 'String' } }] },
+      {
+        cells: [
+          { data: { value: 'Start Date', type: 'String' } },
+          { data: { value: dateToReadableFormat(appliedFilters?.startDate), type: 'Date' } },
+        ],
+      },
+      {
+        cells: [
+          { data: { value: 'End Date', type: 'String' } },
+          { data: { value: dateToReadableFormat(appliedFilters?.endDate), type: 'Date' } },
+        ],
+      },
+      {
+        cells: [
+          { data: { value: 'Search', type: 'String' } },
+          { data: { value: appliedFilters?.venueText, type: 'String' } },
+        ],
+      },
+      {
+        cells: [
+          { data: { value: 'Booking Status', type: 'String' } },
+          { data: { value: appliedFilters?.status, type: 'String' } },
+        ],
+      },
+      { cells: [] },
+    ],
+    fileName: `Tour Schedule for ${showCode + code}`,
+    columnKeys: [
+      'production',
+      'date',
+      'week',
+      'venue',
+      'town',
+      'dayType',
+      'bookingStatus',
+      'capacity',
+      'performanceCount',
+      'performanceTimes',
+      'miles',
+      'travelTime',
+    ],
+  };
+};
+
 export const columnDefsExportStyles = [
   {
-    id: 'headerCells',
+    id: 'bgOrangeTextWhite',
     interior: {
       color: tileColors.bookings,
       pattern: 'Solid',
@@ -235,6 +293,22 @@ export const columnDefsExportStyles = [
     interior: {
       color: '#FDCE74',
       pattern: 'Solid',
+    },
+  },
+  {
+    id: 'selectedProductionName',
+    interior: {
+      color: tileColors.bookings,
+      pattern: 'Solid',
+    },
+    font: {
+      bold: true,
+      color: '#FFFFFF',
+      size: 15,
+    },
+    alignment: {
+      horizontal: 'Center',
+      vertical: 'Center',
     },
   },
 ];

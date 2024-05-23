@@ -18,25 +18,11 @@ export interface PdfStyles {
   innerLineBorderColor?: string;
 }
 
-interface CellData {
-  value?: any;
-  type?: string;
-}
-
-interface Cell {
-  data?: CellData;
-}
-interface ExtraContentProps {
-  cells: Cell[];
-}
 export interface ExportModalProps {
   visible: boolean;
   ExportList: ExportType[];
   onClose: () => void;
   tableRef: any;
   pdfStyles?: PdfStyles;
-  extraContent?: {
-    prependContent?: ExtraContentProps[];
-    appendContent?: ExtraContentProps[];
-  };
+  onItemClick?: (key: string) => void;
 }

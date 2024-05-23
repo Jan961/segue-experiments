@@ -35,6 +35,8 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const [bookingColumDefs, setBookingColumnDefs] = useState([]);
+  useEffect(() => setBookingColumnDefs(columnDefs), []);
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
@@ -125,7 +127,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
-          columnDefs={columnDefs}
+          columnDefs={bookingColumDefs}
           rowData={rows}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
