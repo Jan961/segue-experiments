@@ -77,7 +77,14 @@ export const lookupShowCode = async (Code: string, AccountId: number) => {
 
 export const getShowsByAccountId = async (AccountId: number) => {
   const shows = await prisma.show.findMany({
-    where: { AccountId },
+    where: {
+      AccountId,
+      Production: {
+        some: {
+          IsDeleted: false,
+        },
+      },
+    },
     include: showInclude,
   });
 
