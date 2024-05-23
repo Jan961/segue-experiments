@@ -115,6 +115,7 @@ export default function TasksTable({
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
+
       <AddTask visible={showAddTask} onClose={handleShowTask} task={{ ProductionId: productionId }} />
     </>
   );
