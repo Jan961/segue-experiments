@@ -22,6 +22,21 @@ interface AddTaskProps {
   task?: Partial<MasterTask>;
 }
 
+const RepeatOptions = [
+  {
+    text: 'Weekly',
+    value: 'weekly',
+  },
+  {
+    text: 'Every 2 Weeks',
+    value: 'biweekly',
+  },
+  {
+    text: 'Monthly',
+    value: 'monthly',
+  },
+];
+
 const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
     <Loader className="ml-2" iconProps={{ stroke: '#FFF' }} />
@@ -75,9 +90,13 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
   );
 
   const handleOnChange = (e: any) => {
-    let { id, value } = e.target;
+    let { id, value, checked } = e.target;
     if (['AssignedToUserId', 'StartByWeekNum', 'CompleteByWeekNum', 'Priority'].includes(id))
       value = parseInt(value, 10);
+    if (id === 'RepeatInterval' && checked) {
+      value = 'once';
+    }
+    if (id === 'Progress') value = parseInt(value);
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
     setStatus({ ...status, submitted: false });
@@ -93,13 +112,16 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
         await axios.post(endpoint, inputs);
         setLoading(false);
         onClose();
+        setInputs(DEFAULT_MASTER_TASK);
       }
     } catch (error) {
-      console.error(error);
       setLoading(false);
       onClose();
+      setInputs(DEFAULT_MASTER_TASK);
     }
   };
+
+  const repeatInterval: boolean = inputs.RepeatInterval === 'once';
 
   return (
     <PopupModal show={visible} onClose={onClose} title="Create New Task" titleClass="text-primary-navy">
@@ -176,32 +198,39 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
         <div className="col-span-2 col-start-4 flex items-center">
           <div className="flex">
             <Label className="!text-secondary pr-2" text="Only Once" />
-            <Checkbox id="occurence" value={inputs.RepeatInterval} onChange={handleOnChange} />
+            <Checkbox
+              id="RepeatInterval"
+              checked={repeatInterval}
+              onChange={(event) => handleOnChange({ target: { id: 'RepeatInterval', checked: event.target.checked } })}
+            />
           </div>
           <div className="flex">
             <Label className="!text-secondary px-2" text="Repeat" />
             <Select
-              onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
-              value={inputs.Priority}
+              onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
+              value={inputs.RepeatInterval}
               className="w-32"
-              options={priorityOptionList}
+              options={RepeatOptions}
+              disabled={repeatInterval}
             />
           </div>
           <div className="flex ml-2">
             <Label className="!text-secondary pr-2" text="From" />
             <Select
-              onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
-              value={inputs.StartByWeekNum}
+              onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
+              value={inputs.TaskRepeatFromWeekNum}
               options={weekOptions}
               className="w-32"
+              disabled={repeatInterval}
             />
           </div>
           <div className="flex ml-2">
             <Label className="!text-secondary pr-2" text="To" />
             <Select
-              onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
-              value={inputs.CompleteByWeekNum}
+              onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
+              value={inputs.TaskRepeatToWeekNum}
               options={weekOptions}
+              disabled={repeatInterval}
               className="w-32"
             />
           </div>
@@ -223,7 +252,11 @@ const AddTask = ({ visible, onClose, task }: AddTaskProps) => {
           <div />
           <div className="flex">
             <Label className="!text-secondary pr-2" text="Add to Master Task List" />
-            <Checkbox id="occurence" value={inputs.RepeatInterval} onChange={handleOnChange} />
+            <Checkbox
+              id="occurence"
+              value={inputs.RepeatInterval}
+              onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
+            />
           </div>
         </div>
         <div className="flex justify-between">
