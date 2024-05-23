@@ -4,7 +4,11 @@ import { useRouter } from 'next/router';
 import { useRecoilState } from 'recoil';
 import { masterTaskState } from 'state/tasks/masterTaskState';
 
-const Filters = () => {
+interface FiltersProps {
+  setShowAddTask: () => void;
+}
+
+const Filters = ({ setShowAddTask }: FiltersProps) => {
   const [filter, setFilter] = useRecoilState(masterTaskState);
 
   const onChange = (e: any) => {
@@ -39,7 +43,7 @@ const Filters = () => {
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
         <Button text="Production Task List" className="w-[132px]" onClick={() => router.push('/tasks')} />
         <Button text="Export" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
-        <Button onClick={null} text="Add Task" className="w-[132px]" />
+        <Button onClick={setShowAddTask} text="Add Task" className="w-[132px]" />
       </div>
     </div>
   );

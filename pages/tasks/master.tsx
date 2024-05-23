@@ -12,6 +12,7 @@ import { useRef, useState } from 'react';
 import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import Loader from 'components/core-ui-lib/Loader';
+import AddTask from 'components/tasks/Modals/AddTask';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -33,6 +34,8 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
+
+  const [showAddTask, setShowAddTask] = useState<boolean>(false);
 
   const handleCellClick = async (e) => {
     setRowIndex(e.rowIndex);
@@ -57,10 +60,15 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
       setIsLoading(false);
     }
   };
+
+  const handleShowTask = () => {
+    setShowAddTask(!showAddTask);
+  };
+
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <Filters setShowAddTask={handleShowTask} />
       </div>
       <Table
         ref={tableRef}
@@ -77,6 +85,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
+      <AddTask visible={showAddTask} onClose={handleShowTask} />
     </Layout>
   );
 };
