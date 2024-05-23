@@ -5,10 +5,10 @@ import { useRecoilState } from 'recoil';
 import { masterTaskState } from 'state/tasks/masterTaskState';
 
 interface FiltersProps {
-  setShowAddTask: () => void;
+  handleShowTask: () => void;
 }
 
-const Filters = ({ setShowAddTask }: FiltersProps) => {
+const Filters = ({ handleShowTask }: FiltersProps) => {
   const [filter, setFilter] = useRecoilState(masterTaskState);
 
   const onChange = (e: any) => {
@@ -43,7 +43,7 @@ const Filters = ({ setShowAddTask }: FiltersProps) => {
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
         <Button text="Production Task List" className="w-[132px]" onClick={() => router.push('/tasks')} />
         <Button text="Export" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
-        <Button onClick={setShowAddTask} text="Add Task" className="w-[132px]" />
+        <Button onClick={handleShowTask} text="Add Task" className="w-[132px]" />
       </div>
     </div>
   );

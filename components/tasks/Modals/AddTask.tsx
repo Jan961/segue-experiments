@@ -20,7 +20,7 @@ interface AddTaskProps {
   visible: boolean;
   isMasterTask?: boolean;
   onClose: () => void;
-  task?: Partial<MasterTask>;
+  task?: Partial<MasterTask> & { ProductionId?: number };
 }
 
 const RepeatOptions = [
@@ -44,7 +44,7 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: string } = {
+const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number } = {
   Id: undefined,
   Code: 0,
   Name: '',
@@ -60,14 +60,13 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   TaskCompleteByIsPostProduction: false,
   Progress: 0,
   DueDate: '',
+  ProductionId: 0,
 };
 
 const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps) => {
-  const { users = {} } = useRecoilValue(userState);
-
-  const [inputs, setInputs] = useState<Partial<MasterTask> & { Progress?: number; DueDate?: string }>(
-    task || DEFAULT_MASTER_TASK,
-  );
+  const [inputs, setInputs] = useState<
+    Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number }
+  >(task || DEFAULT_MASTER_TASK);
 
   useEffect(() => {
     setInputs(task);
@@ -86,59 +85,94 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     value: index.toString(),
   }));
 
-  const userOptions = useMemo(
+  const { users } = useRecoilValue(userState);
+
+  const usersList = useMemo(
     () =>
-      Object.values(users).map((user) => ({
-        text: `${user.FirstName} ${user.LastName} (${user.Email})`,
-        value: user?.Id,
+      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+        value: Id,
+        text: `${FirstName || ''} ${LastName || ''}`,
       })),
     [users],
   );
 
   const handleOnChange = (e: any) => {
     let { id, value, checked } = e.target;
-    if (['AssignedToUserId', 'StartByWeekNum', 'CompleteByWeekNum', 'Priority'].includes(id))
+    if (
+      [
+        'AssignedToUserId',
+        'StartByWeekNum',
+        'CompleteByWeekNum',
+        'Priority',
+        'Progress',
+        'ProductionId',
+        'Code',
+      ].includes(id)
+    )
       value = parseInt(value, 10);
+
     if (id === 'RepeatInterval' && checked) {
       value = 'once';
     }
-    if (id === 'Progress') value = parseInt(value);
+
     const newInputs = { ...inputs, [id]: value };
     setInputs(newInputs);
     setStatus({ ...status, submitted: false });
   };
 
+  const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
+
   const handleOnSubmit = async () => {
     setLoading(true);
-    try {
-      if (inputs.Id) {
-        if (isMasterTask) {
-          delete inputs.Progress;
-          delete inputs.DueDate;
+    if (isMasterTask) {
+      try {
+        const keysToDelete = ['DueDate', 'Progress', 'ProductionId'];
+        for (const key of keysToDelete) {
+          delete inputs[key];
         }
-        await axios.post('/api/tasks/master/update', inputs);
-        setLoading(false);
-        onClose();
-        setInputs(DEFAULT_MASTER_TASK);
-      } else {
-        const endpoint = '/api/tasks/master/create';
-        if (isMasterTask) {
-          delete inputs.Progress;
-          delete inputs.DueDate;
+        if (inputs.Id) {
+          await axios.post('/api/tasks/master/update', inputs);
+          setLoading(false);
+          onClose();
+          setInputs(DEFAULT_MASTER_TASK);
+        } else {
+          const endpoint = '/api/tasks/master/create';
+          await axios.post(endpoint, inputs);
+          setLoading(false);
+          onClose();
+          setInputs(DEFAULT_MASTER_TASK);
         }
-        await axios.post(endpoint, inputs);
+      } catch (error) {
         setLoading(false);
         onClose();
         setInputs(DEFAULT_MASTER_TASK);
       }
-    } catch (error) {
-      setLoading(false);
-      onClose();
-      setInputs(DEFAULT_MASTER_TASK);
+    } else {
+      const keysToDelete = ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction'];
+      for (const key of keysToDelete) {
+        delete inputs[key];
+      }
+      if (inputs.Id) {
+        try {
+          await axios.post('/api/tasks/update', inputs);
+          setLoading(false);
+          onClose();
+        } catch (error) {
+          setLoading(false);
+        }
+      } else {
+        try {
+          const endpoint = '/api/tasks/create/single/';
+          await axios.post(endpoint, inputs);
+          setLoading(false);
+          onClose();
+        } catch (error) {
+          setLoading(false);
+          console.error(error);
+        }
+      }
     }
   };
-
-  const repeatInterval: boolean = inputs.RepeatInterval === 'once';
 
   const handleClose = () => {
     onClose();
@@ -146,7 +180,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   };
 
   return (
-    <PopupModal show={visible} onClose={handleClose} title="Create New Task" titleClass="text-primary-navy">
+    <PopupModal
+      show={visible}
+      onClose={handleClose}
+      title={inputs.Id ? 'Edit Task' : 'Create New Task'}
+      titleClass="text-primary-navy"
+    >
       <form className="flex flex-col gap-4">
         {loading && <LoadingOverlay />}
         <div className="col-span-2 col-start-4 flex items-center justify-between">
@@ -156,14 +195,14 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             placeholder="Enter Task Name"
             id="Name"
             onChange={handleOnChange}
-            value={inputs.Name}
+            value={inputs?.Name}
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center justify-between">
           <Label className="!text-secondary pr-6 " text="Task Code" />
           <TextInput
             id="Code"
-            disabled
+            disabled={isMasterTask}
             className="w-128 placeholder-secondary"
             placeholder="Enter Task Code"
             onChange={handleOnChange}
@@ -174,7 +213,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex">
             <Label className="!text-secondary pr-6 mr-4" text="Start By" />
             <Select
-              value={inputs.StartByWeekNum}
+              value={inputs?.StartByWeekNum}
               options={weekOptions}
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
               className="w-32"
@@ -184,7 +223,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-6 " text="Complete By" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
-              value={inputs.CompleteByWeekNum}
+              value={inputs?.CompleteByWeekNum}
               options={weekOptions}
               className="w-32"
             />
@@ -195,7 +234,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-6 mr-4" text="Priority" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'Priority', value } })}
-              value={inputs.Priority}
+              value={inputs?.Priority}
               className="w-32"
               options={priorityOptionList}
             />
@@ -205,7 +244,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
-              value={inputs.Progress}
+              value={inputs?.Progress}
               className="w-20"
               options={generatePercentageOptions}
             />
@@ -213,7 +252,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
-              value={inputs.DueDate}
+              value={inputs?.DueDate}
               onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
             />
           </div>
@@ -232,7 +271,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary px-2" text="Repeat" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
-              value={inputs.RepeatInterval}
+              value={inputs?.RepeatInterval}
               className="w-32"
               options={RepeatOptions}
               disabled={repeatInterval}
@@ -242,7 +281,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-2" text="From" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
-              value={inputs.TaskRepeatFromWeekNum}
+              value={inputs?.TaskRepeatFromWeekNum}
               options={weekOptions}
               className="w-32"
               disabled={repeatInterval}
@@ -252,7 +291,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-2" text="To" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
-              value={inputs.TaskRepeatToWeekNum}
+              value={inputs?.TaskRepeatToWeekNum}
               options={weekOptions}
               disabled={repeatInterval}
               className="w-32"
@@ -263,14 +302,14 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <Label className="!text-secondary pr-6 mr-4" text="Assigned to" />
           <Select
             onChange={(value) => handleOnChange({ target: { id: 'AssignedToUserId', value } })}
-            value={inputs.AssignedToUserId}
-            options={userOptions}
+            value={inputs?.AssignedToUserId}
+            options={usersList}
             className="w-64"
           />
         </div>
         <div>
           <Label className="!text-secondary pr-6 mr-4" text="Notes" />
-          <TextArea onChange={handleOnChange} value={inputs.Notes} className="w-full !h-32" id="Notes" />
+          <TextArea onChange={handleOnChange} value={inputs?.Notes} className="w-full !h-32" id="Notes" />
         </div>
         <div className="flex justify-between">
           <div />
@@ -278,7 +317,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-2" text="Add to Master Task List" />
             <Checkbox
               id="occurence"
-              value={inputs.RepeatInterval}
+              value={inputs?.RepeatInterval}
               disabled={isMasterTask}
               onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
             />
@@ -288,7 +327,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div />
           <div className="flex">
             <Button variant="secondary" onClick={onClose} className="mr-4" text="Cancel" />
-            <Button variant="primary" onClick={handleOnSubmit} text="Create New Task" />
+            <Button variant="primary" onClick={handleOnSubmit} text={inputs.Id ? 'Edit Task' : 'Create New Task'} />
           </div>
         </div>
       </form>
