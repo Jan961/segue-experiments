@@ -11,6 +11,25 @@ const useBookingFilter = () => {
   const { selected, includeArchived, productions } = useRecoilValue(productionJumpState);
   const { rows } = useRecoilValue(rowsSelector);
 
+  const filterVenueInput = (inputFields, searchTerm) => {
+    //    Regex to remove punctuation and then splits by spaces
+    const formatStrings = (inputText) => {
+      return inputText
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .split(' ')
+        .filter((str) => str !== '');
+    };
+    //    Joins the fields. In this case, joining the Venue name and the Town
+    const venueNameSplit = formatStrings(inputFields.join(' '));
+    const filterNameSplit = formatStrings(searchTerm);
+
+    //    For each of the String arrays compare if they have matches
+    return filterNameSplit.every((filterElement) => {
+      return venueNameSplit.some((venueElement) => venueElement.includes(filterElement));
+    });
+  };
+
   const filteredRows = useMemo(() => {
     const archivedProductionIds = productions
       .filter((production) => production.IsArchived)
@@ -24,9 +43,7 @@ const useBookingFilter = () => {
         (!filter.endDate || new Date(dateTime) <= filter.endDate) &&
         (!filter.startDate || new Date(dateTime) >= filter.startDate) &&
         (filter.status === 'all' || status === filter.status) &&
-        (!filter.venueText ||
-          venue?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase()) ||
-          town?.toLowerCase?.().includes?.(filter.venueText?.toLowerCase()))
+        (!filter.venueText || filterVenueInput([venue, town], filter.venueText))
       );
     });
     return filteredRowList.sort((a, b) => {
