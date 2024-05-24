@@ -221,7 +221,7 @@ export const getNextMondayDateString = (date: string) => {
  * @param {string} inputDate - The input date and time string.
  * @returns {string} The formatted time string in 'HH:mm' format, or an empty string if the input is invalid.
  */
-export const getTimeFromDateAndTime = (inputDate: string): string => {
+export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
   const date = new Date(inputDate);
 
   // Check if the date is valid
