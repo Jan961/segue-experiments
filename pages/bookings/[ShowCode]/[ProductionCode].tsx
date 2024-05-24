@@ -25,35 +25,28 @@ import { useMemo, useRef, useState } from 'react';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
-import { productionJumpState } from 'state/booking/productionJumpState';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import { getExportExtraContent } from 'components/bookings/table/tableConfig';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useBookingFilter();
   const tableRef = useRef(null);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
-  const onExportClick = () => {
-    setIsExportModalOpen(true);
-  };
-
+  const currentProduction = useRecoilValue(currentProductionSelector);
   const appliedFilters = useRecoilValue(filterState);
-  const productionsList = useRecoilValue(productionJumpState);
-
-  const getSelectedProduction = () => {
-    const productions = productionsList.productions;
-    const selectedId = productionsList.selected;
-    return productions.find((production) => production.Id === selectedId);
-  };
-
   const excelExportExtraContents = useMemo(() => {
-    const showName = getSelectedProduction()?.ShowName;
-    const code = getSelectedProduction()?.Code;
-    const showCode = getSelectedProduction()?.ShowCode;
+    const showName = currentProduction?.ShowName;
+    const code = currentProduction?.Code;
+    const showCode = currentProduction?.ShowCode;
 
     return getExportExtraContent(showName, showCode, code, appliedFilters);
   }, [appliedFilters]);
+
+  const onExportClick = () => {
+    setIsExportModalOpen(true);
+  };
 
   const exportTable = (key: string) => {
     if (key === 'Excel') {

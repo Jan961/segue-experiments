@@ -17,6 +17,7 @@ import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
 import AddDeleteRowRenderer from './AddDeleteRowRenderer';
 import { dateToReadableFormat } from 'utils/export';
+import { FilterState } from 'state/booking/filterState';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -171,14 +172,29 @@ export const columnDefs = [
   },
 ];
 
-export const getExportExtraContent = (showName, showCode, code, appliedFilters) => {
+export const getExportExtraContent = (
+  showName: string,
+  showCode: string,
+  code: string,
+  appliedFilters: FilterState,
+) => {
   return {
     prependContent: [
       { cells: [] },
       {
-        cells: [{}, {}, {}, { data: { value: showName, type: 'String' }, styleId: 'selectedProductionName' }],
+        cells: [
+          {
+            data: { value: `${showCode}${code} - ${showName}`, type: 'String', mergeCells: true },
+            styleId: 'selectedProductionName',
+            mergeCells: true,
+          },
+          {},
+          {},
+          {},
+        ],
         height: 70,
         width: 500,
+        mergeCells: true,
       },
       { cells: [] },
       { cells: [{ data: { value: 'Filter(s) applied', type: 'String' } }] },

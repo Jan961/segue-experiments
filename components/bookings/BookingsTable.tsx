@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
 import { styleProps, columnDefs, columnDefsExportStyles } from 'components/bookings/table/tableConfig';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -16,6 +16,7 @@ import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import useComponentMountStatus from 'hooks/useComponentMountStatus';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -35,8 +36,8 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
-  const [bookingColumDefs, setBookingColumnDefs] = useState([]);
-  useEffect(() => setBookingColumnDefs(columnDefs), []);
+  const isMounted = useComponentMountStatus();
+  const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
