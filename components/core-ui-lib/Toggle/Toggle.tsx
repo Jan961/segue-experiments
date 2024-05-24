@@ -29,7 +29,7 @@ const Toggle = ({ label, onChange, name, checked, className }: ToggleProps) => {
       onChange={onToggle}
       className={classNames(
         className,
-        'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white/75 w-7 h-[18px] bg-disabled-button',
+        'relative inline-flex shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white/75 w-7 h-[18px] bg-disabled-button flex-col flex',
       )}
     >
       <span className="sr-only">{label}</span>
