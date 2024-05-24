@@ -1,14 +1,24 @@
 import { SalesSnapshot } from 'types/MarketingTypes';
 import useAxios from 'hooks/useAxios';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SalesTable from '../../global/salesTable/SalesTable';
 
 interface SalesTabProps {
   bookingId: string;
 }
 
-export default function SalesTab({ bookingId }: SalesTabProps) {
+export interface SalesTabRef {
+  resetData: () => void;
+}
+
+const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [salesTable, setSalesTable] = useState(<div />);
+
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setSalesTable(<div />);
+    },
+  }));
 
   const { fetchData } = useAxios();
 
@@ -35,10 +45,13 @@ export default function SalesTab({ bookingId }: SalesTabProps) {
 
   useEffect(() => {
     setSalesTable(<div />);
-    if (bookingId !== null && bookingId !== undefined) {
-      retrieveSalesData(bookingId.toString());
+    if (props.bookingId !== null && props.bookingId !== undefined) {
+      retrieveSalesData(props.bookingId.toString());
     }
-  }, [bookingId]);
+  }, [props.bookingId]);
 
   return <>{salesTable}</>;
-}
+});
+
+SalesTab.displayName = 'SalesTab';
+export default SalesTab;
