@@ -58,4 +58,10 @@ describe('getTimeFromDateAndTime', () => {
     const expectedTime = '';
     expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
   });
+
+  test('should return an empty string if inputDate is undefined', () => {
+    const inputDt = undefined;
+    const expectedTime = '';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
 });

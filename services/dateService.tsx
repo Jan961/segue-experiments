@@ -218,11 +218,11 @@ export const getNextMondayDateString = (date: string) => {
 /**
  * Extracts the time (hours and minutes) from a given date and time string in UTC format.
  *
- * @param {string} inputDt - The input date and time string.
+ * @param {string} inputDate - The input date and time string.
  * @returns {string} The formatted time string in 'HH:mm' format, or an empty string if the input is invalid.
  */
-export const getTimeFromDateAndTime = (inputDt) => {
-  const date = new Date(inputDt);
+export const getTimeFromDateAndTime = (inputDate: string): string => {
+  const date = new Date(inputDate);
 
   // Check if the date is valid
   if (isNaN(date.getTime())) {
