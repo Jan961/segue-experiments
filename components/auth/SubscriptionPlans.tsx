@@ -4,17 +4,16 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 import { useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 
-export interface Plan {
-  name: string;
-  production: number | string;
-  users: number;
-  body: string;
-  price_per_month: number;
-  price_per_year: number;
-  currency: string;
-  detail_point: string[];
+export type Plan = {
+  planId: number;
+  planName: string;
+  planDescription: string;
+  planPrice: number;
+  planFrequency: number;
+  planPriceId: string;
+  planCurrency: string;
   color?: string;
-}
+};
 
 const planData: Plan[] = [
   {
@@ -71,9 +70,10 @@ const planData: Plan[] = [
 ];
 
 interface SubscriptionPlansProps {
+  plans: Plan[];
   onSubmit: (data: Plan) => void;
 }
-const SubscriptionPlans = ({ onSubmit }: SubscriptionPlansProps) => {
+const SubscriptionPlans = ({ plans = [], onSubmit }: SubscriptionPlansProps) => {
   const [showDetails, setShowDetails] = useState<{ [key: number]: boolean }>({});
   const { previousStep, nextStep } = useWizard();
   const toggleDetails = (index: number) => {
@@ -92,9 +92,9 @@ const SubscriptionPlans = ({ onSubmit }: SubscriptionPlansProps) => {
       <h1 className="text-2xl font-bold text-center text-primary-input-text mb-4">Select Plan</h1>
       <div className="flex  justify-center items-center w-full pt-8 pb-5">
         <div className="grid grid-cols-3 divide-x-[3px] gap-4 text-primary-input-text">
-          {planData.map((plan, index) => {
+          {plans.map((plan, index) => {
             return (
-              <div key={index} className=" px-4 flex flex-col gap-y-2 min-w-[240px] max-w-[200px]">
+              <div key={plan.planId} className=" px-4 flex flex-col gap-y-2 min-w-[240px] max-w-[200px]">
                 <svg
                   width="122"
                   height="122"
@@ -143,27 +143,20 @@ const SubscriptionPlans = ({ onSubmit }: SubscriptionPlansProps) => {
                   </defs>
                 </svg>
                 <div className="flex gap-2  justify-center items-center">
-                  <h2 className="font-bold text-center text-responsive-2xl">{plan.name}</h2>
+                  <h2 className="font-bold text-center text-responsive-2xl">{plan.planName}</h2>
                   <Icon iconName="info-circle-solid" />
                   <Tooltip body="amsn" />
                 </div>
                 <div className="flex flex-col">
-                  <p className="text-center font-bold">{plan.production} Production</p>
-                  <p className="text-center font-bold">{plan.users} Users</p>
+                  <p className="text-center font-bold">{plan.planDescription}</p>
                 </div>
-                <p className="max-w-[150px] text-center mx-auto">{plan.body}</p>
+                <p className="max-w-[150px] text-center mx-auto">Some more description</p>
 
                 <div>
-                  <p className="text-center">
-                    {plan.currency}
-                    {plan.price_per_month} per month
-                  </p>
-                  <p className="text-center">
-                    {plan.currency}
-                    {plan.price_per_year} per year
-                  </p>
+                  <p className="text-center">{`${plan.planCurrency} ${plan.planPrice} per month`}</p>
+                  <p className="text-center">{`${plan.planCurrency} ${plan.planPrice * 12} per year`}</p>
                 </div>
-                <Button text={`Choose ${plan.name}`} className="w-full" onClick={() => handleNexClick(plan)} />
+                <Button text={`Choose ${plan.planName}`} className="w-full" onClick={() => handleNexClick(plan)} />
                 <Button
                   text={showDetails[index] ? 'Hide Plan Details' : 'Show Plan Details'}
                   onClick={() => toggleDetails(index)}
@@ -172,7 +165,7 @@ const SubscriptionPlans = ({ onSubmit }: SubscriptionPlansProps) => {
                 />
                 {showDetails[index] && (
                   <ul className="mx-auto pt-3">
-                    {plan.detail_point.map((point, pointIndex) => (
+                    {[plan.planDescription].map((point, pointIndex) => (
                       <li key={pointIndex} className="flex flex-row gap-2 items-center">
                         {/* SVG icon */}
                         <svg width="15" height="16" viewBox="0 0 15 16" fill="none" xmlns="http://www.w3.org/2000/svg">

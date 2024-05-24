@@ -342,8 +342,6 @@ model Account {
   AccountLogo            Bytes?
   AccountMainEmail       String?             @db.VarChar(120)
   AccountNumPeople       Int?                @db.TinyInt
-  AccountOrganisationId  String?             @db.VarChar(100)
-  AccountDBUrl           String?             @db.VarChar(10000)
   AccountContact         AccountContact?
   AccountUser            AccountUser[]
   MasterTask             MasterTask[]
@@ -738,11 +736,16 @@ model Country {
   Code            String            @map("CountryCode") @db.VarChar(3)
   Name            String            @map("CountryName") @db.VarChar(40)
   CurrencyCode    String?           @map("CountryCurrencyCode") @db.VarChar(3)
+<<<<<<< HEAD
   Currency        Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Country_Currency")
   CountryInRegion CountryInRegion[]
   VenueAddress    VenueAddress[]
 
   @@index([CurrencyCode], map: "Country_Currency")
+=======
+  CountryInRegion CountryInRegion[]
+  VenueAddress    VenueAddress[]
+>>>>>>> 0c14eedd (WIP)
 }
 
 model CountryInRegion {
@@ -929,6 +932,16 @@ model File {
   Production       Production[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
+}
+
+model SubscriptionPlan {
+  PlanId          Int     @id @default(autoincrement())
+  PlanName        String  @db.VarChar(1000)
+  PlanDescription String? @db.VarChar(3000)
+  PlanPrice       Float   @db.Float
+  PlanFrequency   Int
+  PlanPriceId     String? @db.VarChar(100)
+  PlanCurrency    String  @db.VarChar(3)
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

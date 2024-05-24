@@ -3,7 +3,16 @@ import { NextResponse } from 'next/server';
 import { authMiddleware } from '@clerk/nextjs';
 import prisma from 'lib/prisma';
 
-const publicPaths = ['/api/user*', '/api/account*', '/auth*', '/sign-in*', '/sign-up*', '/access-denied'];
+const publicPaths = [
+  '/api/user*',
+  '/api/account*',
+  '/api/subscription-plans*',
+  '/api/payment*',
+  '/auth*',
+  '/sign-in*',
+  '/account/sign-up',
+  '/access-denied',
+];
 
 const clerk = Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
 

@@ -4,21 +4,32 @@ import Tooltip from 'components/core-ui-lib/Tooltip';
 import { useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { Plan } from './SubscriptionPlans';
+import PaymentProcessor from 'components/PaymentProcessor';
+
+type Payee = {
+  email: string;
+};
 
 interface PaymentDetailsFormProps {
+  payee: Payee;
   plan: Plan;
   onSubmit: (data) => void;
 }
-const PaymentDetailsForm = ({ plan, onSubmit }: PaymentDetailsFormProps) => {
+const PaymentDetailsForm = ({ plan, payee, onSubmit }: PaymentDetailsFormProps) => {
   const [isPaymentSuccessful, setIsPaymentSuccessful] = useState<boolean>(false);
   const { previousStep, nextStep } = useWizard();
 
+  const handlePaymentSuccess = () => {
+    setIsPaymentSuccessful(true);
+  };
+
   return (
-    <div className="mx-auto w-96">
+    <div className="mx-auto">
       <div className="w-full flex flex-col gap-4">
         <h1 className="text-2xl font-bold text-center text-primary-input-text">Payment Details</h1>
-        <div className="w-full flex justify-between mt-4">
-          <section className="dlex flex-col items-center rounded-md bg-primary-white p-4 shadow-sm-shadow text-primary-input-text">
+
+        <div className="w-full flex justify-between mt-4 gap-5">
+          <section className="max-h-96 w-60 flex flex-col items-center rounded-md p-4 bg-primary-white shadow-sm-shadow text-primary-input-text">
             <svg
               width="122"
               height="122"
@@ -67,23 +78,21 @@ const PaymentDetailsForm = ({ plan, onSubmit }: PaymentDetailsFormProps) => {
               </defs>
             </svg>
             <div className="flex gap-2  justify-center items-center">
-              <h2 className="font-bold text-center text-responsive-2xl">{plan.name}</h2>
+              <h2 className="font-bold text-center text-responsive-2xl">{plan.planName}</h2>
               <Icon iconName="info-circle-solid" />
               <Tooltip body="amsn" />
             </div>
             <div className="flex flex-col">
-              <p className="text-center font-bold">{plan.production} Production</p>
-              <p className="text-center font-bold">{plan.users} Users</p>
+              <p className="text-center font-bold">{plan.planDescription}</p>
             </div>
-            <p className="max-w-[150px] text-center mx-auto">{plan.body}</p>
+            <p className="my-8 max-w-[150px] text-center mx-auto">Listed attributes of the plan</p>
+            <Button text="Change Plan" onClick={previousStep} className="w-32" />
           </section>
-          <section />
-          <section />
+          <PaymentProcessor email={payee.email} priceId={plan.planPriceId} onSuccess={handlePaymentSuccess} />
         </div>
       </div>
       <div className="w-full flex gap-2  items-center justify-end mt-5">
-        <Button text="Back" variant="secondary" onClick={previousStep} className="w-32" />
-        <Button text="Next" onClick={nextStep} className="w-32" disabled={!isPaymentSuccessful} />
+        <Button text="Pay Now" onClick={nextStep} className="w-32" />
       </div>
     </div>
   );

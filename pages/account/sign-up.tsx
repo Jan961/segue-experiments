@@ -1,6 +1,4 @@
 import { calibri } from 'lib/fonts';
-import { useAuth } from '@clerk/nextjs';
-
 import Image from 'next/image';
 
 import Loader from 'components/core-ui-lib/Loader';
@@ -26,6 +24,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   };
 };
 const SignIn = ({ plans }: { plans: Plan[] }) => {
+  console.log(plans);
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
 
   const [companyDetails, setCompanyDetails] = useState<Company>(null);
@@ -37,7 +36,7 @@ const SignIn = ({ plans }: { plans: Plan[] }) => {
       <Wizard>
         <CompanyDetailsForm onSubmit={setCompanyDetails} />
         <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />
-        <PaymentDetailsForm plan={subcriptionDetails} onSubmit={setPaymentDetails} />
+        <PaymentDetailsForm payee={companyDetails} plan={subcriptionDetails} onSubmit={setPaymentDetails} />
         <SignUpForm />
       </Wizard>
     </div>
