@@ -2,14 +2,15 @@ import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 import { useState } from 'react';
-import { NewProductionTaskOptions } from './constants';
+import { AddTaskOptions } from './constants';
 
-interface EmptyProductionTaskProps {
+interface NewProductionTaskProps {
   visible: boolean;
   onClose: () => void;
+  handleNewProductionTaskSubmit: (val: string) => void;
 }
 
-const EmptyProductionTask = ({ visible, onClose }: EmptyProductionTaskProps) => {
+const NewProductionTask = ({ visible, onClose, handleNewProductionTaskSubmit }: NewProductionTaskProps) => {
   const [newProductionTask, setNewProductionTask] = useState('master');
 
   const handleOnChange = (value: string) => {
@@ -20,34 +21,30 @@ const EmptyProductionTask = ({ visible, onClose }: EmptyProductionTaskProps) => 
     onClose();
   };
 
+  const handleSubmit = () => {
+    handleNewProductionTaskSubmit(newProductionTask);
+    setNewProductionTask('master');
+  };
+
   return (
-    <PopupModal
-      show={visible}
-      onClose={handleClose}
-      title={'New Production Task List'}
-      titleClass="text-primary-navy text-xl mb-4"
-    >
+    <PopupModal show={visible} onClose={handleClose} title={'Add Task'} titleClass="text-primary-navy text-xl mb-4">
       <form className="flex flex-col gap-4">
-        <p>
-          The selected production has no tasks.
-          <br />
-          Would you like to...
-        </p>
+        <p>Would you like to...</p>
         <Select
           onChange={handleOnChange}
           value={newProductionTask}
-          options={NewProductionTaskOptions}
+          options={AddTaskOptions}
           placeholder="Select Assignee"
           className="w-64"
           isClearable={false}
         />
         <div className="flex">
           <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
-          <Button variant="primary" className="w-[132px]" onClick={null} text={'Ok'} />
+          <Button variant="primary" className="w-[132px]" onClick={handleSubmit} text={'Ok'} />
         </div>
       </form>
     </PopupModal>
   );
 };
 
-export default EmptyProductionTask;
+export default NewProductionTask;
