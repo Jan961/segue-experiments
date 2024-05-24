@@ -6,6 +6,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { formatUrl } from 'utils/formatUrl';
 import useAxios from 'hooks/useAxios';
+import { MarketingReports } from './modal/MarketingReportsModal';
 
 type MarketingBtnProps = {
   venueName: string;
@@ -16,6 +17,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookingJump, setBookingJump] = useRecoilState(bookingJumpState);
   const [showEditUrlModal, setShowEditUrl] = useState<boolean>(false);
+  const [showMarketingReportsModal, setShowMarketingReportsModal] = useState<boolean>(false);
   const [website, setWebsite] = useState('');
   const [landingUrl, setLandingURL] = useState('');
 
@@ -74,6 +76,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
         disabled={!productionId}
         iconProps={{ className: 'h-4 w-3' }}
         sufixIconName={'excel'}
+        onClick={() => setShowMarketingReportsModal(true)}
       />
 
       <Button
@@ -95,6 +98,8 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
         inputLabel="Landing Page"
         inputValue={landingUrl}
       />
+
+      <MarketingReports visible={showMarketingReportsModal} onClose={() => setShowMarketingReportsModal(false)} />
     </div>
   );
 };

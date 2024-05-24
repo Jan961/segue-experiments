@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { Summary } from './Summary';
@@ -8,14 +8,14 @@ import Tabs from 'components/core-ui-lib/Tabs';
 import { Tab } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
-import SalesTab from './tabs/SalesTab';
-import ActivitiesTab from './tabs/ActivitiesTab';
+import SalesTab, { SalesTabRef } from './tabs/SalesTab';
+import ActivitiesTab, { ActivityTabRef } from './tabs/ActivitiesTab';
 import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
-import { ArchivedSalesTab } from './tabs/ArchivedSalesTab';
-import ContactNotesTab from './tabs/ContactNotesTab';
-import VenueContactsTab from './tabs/VenueContactsTab';
-import PromotorHoldsTab from './tabs/PromoterHoldsTab';
-import AttachmentsTab from './tabs/AttachmentsTab';
+import ArchivedSalesTab, { ArchSalesTabRef } from './tabs/ArchivedSalesTab';
+import ContactNotesTab, { ContactNoteTabRef } from './tabs/ContactNotesTab';
+import VenueContactsTab, { VenueContactTabRef } from './tabs/VenueContactsTab';
+import PromotorHoldsTab, { PromoterHoldTabRef } from './tabs/PromoterHoldsTab';
+import AttachmentsTab, { AttachmentsTabRef } from './tabs/AttachmentsTab';
 
 export type SelectOption = {
   text: string;
@@ -47,6 +47,13 @@ const MarketingHome = () => {
   const [bookingId, setBookingId] = useState(null);
   const [tabSet, setTabSet] = useState<boolean>(false);
   const [tabIndex, setTabIndex] = useRecoilState(tabState);
+  const salesTabRef = useRef<SalesTabRef>();
+  const archSalesRef = useRef<ArchSalesTabRef>();
+  const activityTabRef = useRef<ActivityTabRef>();
+  const contactNoteTabRef = useRef<ContactNoteTabRef>();
+  const venueContactTabRef = useRef<VenueContactTabRef>();
+  const promoterHoldTabRef = useRef<PromoterHoldTabRef>();
+  const attachmentsTabRef = useRef<AttachmentsTabRef>();
 
   const router = useRouter();
 
@@ -61,6 +68,7 @@ const MarketingHome = () => {
   ];
 
   useEffect(() => {
+    resetData();
     if (bookings[0].selected !== bookingId) {
       setBookingId(bookings[0].selected);
     }
@@ -77,6 +85,16 @@ const MarketingHome = () => {
       setTabSet(true);
     }
   }
+
+  const resetData = () => {
+    salesTabRef.current && salesTabRef.current.resetData();
+    archSalesRef.current && archSalesRef.current.resetData();
+    activityTabRef.current && activityTabRef.current.resetData();
+    contactNoteTabRef.current && contactNoteTabRef.current.resetData();
+    venueContactTabRef.current && venueContactTabRef.current.resetData();
+    promoterHoldTabRef.current && promoterHoldTabRef.current.resetData();
+    attachmentsTabRef.current && attachmentsTabRef.current.resetData();
+  };
 
   return (
     <div className="flex w-full h-full">
@@ -109,31 +127,31 @@ const MarketingHome = () => {
           defaultIndex={tabIndex}
         >
           <Tab.Panel className="h-[650px] overflow-y-hidden">
-            <SalesTab bookingId={bookingId} />
+            <SalesTab bookingId={bookingId} ref={salesTabRef} />
           </Tab.Panel>
 
           <Tab.Panel className="w-[1085px]">
-            <ArchivedSalesTab />
+            <ArchivedSalesTab ref={archSalesRef} />
           </Tab.Panel>
 
           <Tab.Panel className="h-[650px]">
-            <ActivitiesTab bookingId={bookingId} />
+            <ActivitiesTab bookingId={bookingId} ref={activityTabRef} />
           </Tab.Panel>
 
           <Tab.Panel className="w-[1085px]">
-            <ContactNotesTab bookingId={bookingId} />
+            <ContactNotesTab bookingId={bookingId} ref={contactNoteTabRef} />
           </Tab.Panel>
 
           <Tab.Panel className="w-[1085px]">
-            <VenueContactsTab bookingId={bookingId} />
+            <VenueContactsTab bookingId={bookingId} ref={venueContactTabRef} />
           </Tab.Panel>
 
           <Tab.Panel className="w-[1085px]">
-            <PromotorHoldsTab bookingId={bookingId} />
+            <PromotorHoldsTab bookingId={bookingId} ref={promoterHoldTabRef} />
           </Tab.Panel>
 
           <Tab.Panel className="w-[1085px]">
-            <AttachmentsTab bookingId={bookingId} />
+            <AttachmentsTab bookingId={bookingId} ref={attachmentsTabRef} />
           </Tab.Panel>
         </Tabs>
       </div>

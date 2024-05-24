@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { bulkFileUpload, singleFileUpload, transformForPrisma } from 'services/uploadService';
+import { bulkFileUpload, singleFileUpload, transformForPrisma, transformForUi } from 'services/uploadService';
 import { parseFormData } from 'utils/fileUpload';
 import { getEmailFromReq, getUserId } from 'services/userService';
 import prisma from 'lib/prisma';
@@ -40,8 +40,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         where: { Location: { in: fileLocations } },
       });
     }
+    let uiResponse;
+    if (Array.isArray(fileRecords)) {
+      uiResponse = fileRecords?.map((record) => transformForUi(record));
+    } else {
+      uiResponse = transformForUi(fileRecords);
+    }
 
-    res.status(200).json(fileRecords);
+    res.status(200).json(uiResponse);
   } catch (error) {
     console.log('Error uploading file: ', error);
     res.status(500).json({ error: 'File upload unsuccessful', message: error.message });

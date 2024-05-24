@@ -13,6 +13,8 @@ const mapToPrisma = (fields) => {
     MarketingCostsStatus: fields.marketingCostsStatus,
     MarketingCostsApprovalDate: fields.marketingCostsApprovalDate,
     MarketingCostsNotes: fields.marketingCostsNotes,
+    CastRateTicketsArranged: fields.castRateTicketsArranged,
+    CastRateTicketsNotes: fields.castRateTicketsNotes,
   };
 };
 
@@ -26,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!access) return res.status(401).end();
     const BookingId = parseInt(req.query.id as string, 10);
     const bookingUpdate = mapToPrisma(req.body);
+
     const updatedBooking = await prisma.booking.update({
       where: {
         ...(BookingId && { Id: BookingId }),
