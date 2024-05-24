@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import useAxios from 'hooks/useAxios';
 import { attachmentsColDefs, styleProps } from '../table/tableConfig';
 import UploadModal from 'components/core-ui-lib/UploadModal';
@@ -11,7 +11,11 @@ interface AttachmentsTabProps {
   bookingId: string;
 }
 
-export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
+export interface AttachmentsTabRef {
+  resetData: () => void;
+}
+
+const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props, ref) => {
   const { fetchData } = useAxios();
 
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
@@ -21,6 +25,14 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
   const [attachRow, setAttachRow] = useState(null);
   const [attachIndex, setAttachIndex] = useState(-1);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [bookingIdVal, setBookingIdVal] = useState(null);
+  const [dataAvail, setDataAvail] = useState<boolean>(false);
+
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setDataAvail(false);
+    },
+  }));
 
   const onSave = async (file, onProgress, onError) => {
     const formData = new FormData();
@@ -57,7 +69,7 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
       clearInterval(slowProgressInterval);
 
       const fileRec = {
-        FileBookingBookingId: parseInt(bookingId),
+        FileBookingBookingId: parseInt(bookingIdVal),
         FileDateTime: new Date(),
         FileDescription: attachType,
         FileOriginalFilename: response.data.originalFilename,
@@ -157,68 +169,79 @@ export default function AttachmentsTab({ bookingId }: AttachmentsTabProps) {
   };
 
   useEffect(() => {
-    getAttachments(bookingId.toString());
-  }, [bookingId]);
+    if (props.bookingId !== undefined && props.bookingId !== null) {
+      setBookingIdVal(props.bookingId.toString());
+      getAttachments(props.bookingId.toString());
+      setDataAvail(true);
+    }
+  }, [props.bookingId]);
 
   return (
     <>
-      <div className="flex flex-row justify-between items-center mb-4">
-        <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
-        <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Venue')} />
-      </div>
+      {dataAvail && (
+        <div>
+          <div className="flex flex-row justify-between items-center mb-4">
+            <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
+            <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Venue')} />
+          </div>
 
-      <div className="mb-5">
-        <Table
-          columnDefs={attachmentsColDefs}
-          rowData={venueAttachRows}
-          styleProps={styleProps}
-          tableHeight={250}
-          onCellClicked={(e) => handleCellClicked(e)}
-          onCellValueChange={handleCellValueChange}
-        />
-      </div>
+          <div className="mb-5">
+            <Table
+              columnDefs={attachmentsColDefs}
+              rowData={venueAttachRows}
+              styleProps={styleProps}
+              tableHeight={250}
+              onCellClicked={(e) => handleCellClicked(e)}
+              onCellValueChange={handleCellValueChange}
+            />
+          </div>
 
-      <div className="flex flex-row justify-between items-center mb-4">
-        <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
-        <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Production')} />
-      </div>
+          <div className="flex flex-row justify-between items-center mb-4">
+            <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
+            <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Production')} />
+          </div>
 
-      <Table
-        columnDefs={attachmentsColDefs}
-        rowData={prodAttachRows}
-        styleProps={styleProps}
-        tableHeight={250}
-        onCellClicked={(e) => handleCellClicked(e)}
-        onCellValueChange={handleCellValueChange}
-      />
+          <Table
+            columnDefs={attachmentsColDefs}
+            rowData={prodAttachRows}
+            styleProps={styleProps}
+            tableHeight={250}
+            onCellClicked={(e) => handleCellClicked(e)}
+            onCellValueChange={handleCellValueChange}
+          />
 
-      <UploadModal
-        visible={showUploadModal}
-        title={attachType + ' Attachment'}
-        info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-        allowedFormats={[
-          'application/pdf',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'image/jpeg',
-          'image/png',
-          'image/gif',
-          'image/bmp',
-          'image/webp',
-          'text/plain',
-        ]}
-        onClose={() => setShowUploadModal(false)}
-        maxFileSize={5120 * 1024} // 5MB
-        onSave={onSave}
-      />
+          <UploadModal
+            visible={showUploadModal}
+            title={attachType + ' Attachment'}
+            info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+            allowedFormats={[
+              'application/pdf',
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+              'image/jpeg',
+              'image/png',
+              'image/gif',
+              'image/bmp',
+              'image/webp',
+              'text/plain',
+            ]}
+            onClose={() => setShowUploadModal(false)}
+            maxFileSize={5120 * 1024} // 5MB
+            onSave={onSave}
+          />
 
-      <ConfirmationDialog
-        variant={'delete'}
-        show={showConfirm}
-        onYesClick={() => deleteAttachment(attachRow, attachIndex)}
-        onNoClick={() => setShowConfirm(false)}
-        hasOverlay={false}
-      />
+          <ConfirmationDialog
+            variant={'delete'}
+            show={showConfirm}
+            onYesClick={() => deleteAttachment(attachRow, attachIndex)}
+            onNoClick={() => setShowConfirm(false)}
+            hasOverlay={false}
+          />
+        </div>
+      )}
     </>
   );
-}
+});
+
+AttachmentsTab.displayName = 'AttachmentsTab';
+export default AttachmentsTab;

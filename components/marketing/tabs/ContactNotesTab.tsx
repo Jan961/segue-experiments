@@ -1,7 +1,7 @@
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import ContactNoteModal, { ContactNoteModalVariant } from '../modal/ContactNoteModal';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { BookingContactNoteDTO } from 'interfaces';
 import useAxios from 'hooks/useAxios';
 import { contactNoteColDefs, styleProps } from '../table/tableConfig';
@@ -14,7 +14,11 @@ interface ContactNotesTabProps {
   bookingId: string;
 }
 
-export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
+export interface ContactNoteTabRef {
+  resetData: () => void;
+}
+
+const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((props, ref) => {
   const { fetchData } = useAxios();
 
   const [showContactNoteModal, setShowContactNoteModal] = useState<boolean>(false);
@@ -23,8 +27,17 @@ export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
   const [contNoteColDefs, setContNoteColDefs] = useState([]);
   const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [bookingIdVal, setBookingIdVal] = useState(null);
+  const [dataAvail, setDataAvail] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const users = useRecoilValue(userState);
+  const [contactNoteTable, setContactNoteTable] = useState(<div />);
+
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setDataAvail(false);
+    },
+  }));
 
   const getContactNotes = async (bookingId: string, users) => {
     try {
@@ -42,6 +55,13 @@ export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
 
         setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
         setContactNoteRows(sortedContactNotes);
+        setContactNoteTable(
+          <div className="flex flex-row">
+            <div className="w-[1086px] h-[500px]">
+              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+            </div>
+          </div>,
+        );
       }
     } catch (error) {
       console.log(error);
@@ -122,48 +142,54 @@ export default function ContactNotesTab({ bookingId }: ContactNotesTabProps) {
       text: `${FirstName || ''} ${LastName || ''}`,
     }));
 
-    if (bookingId !== null && bookingId !== undefined) {
-      getContactNotes(bookingId.toString(), userTempList);
+    if (props.bookingId !== null && props.bookingId !== undefined) {
+      getContactNotes(props.bookingId.toString(), userTempList);
+      setBookingIdVal(props.bookingId);
+
+      setDataAvail(true);
     }
-  }, [bookingId]);
+  }, [props.bookingId]);
 
   return (
     <>
-      <div className="flex justify-end">
-        <div className="flex flex-row items-center justify-between pb-5 gap-4">
-          <Button
-            text="Contact Notes Report"
-            className="w-[203px]"
-            disabled={!productionId}
-            iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName={'excel'}
+      {dataAvail && (
+        <div>
+          <div className="flex justify-end">
+            <div className="flex flex-row items-center justify-between pb-5 gap-4">
+              <Button
+                text="Contact Notes Report"
+                className="w-[203px]"
+                disabled={!productionId}
+                iconProps={{ className: 'h-4 w-3' }}
+                sufixIconName={'excel'}
+              />
+              <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+            </div>
+          </div>
+
+          {contactNoteTable}
+
+          <ContactNoteModal
+            show={showContactNoteModal}
+            onCancel={() => setShowContactNoteModal(false)}
+            variant={contactModalVariant}
+            data={contactNoteRow}
+            onSave={(variant, data) => saveContactNote(variant, data)}
+            bookingId={bookingIdVal}
           />
-          <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+
+          <ConfirmationDialog
+            variant={'delete'}
+            show={showConfirm}
+            onYesClick={() => saveContactNote('delete', contactNoteRow)}
+            onNoClick={() => setShowConfirm(false)}
+            hasOverlay={false}
+          />
         </div>
-      </div>
-
-      <div className="flex flex-row">
-        <div className="w-[1086px] h-[500px]">
-          <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
-        </div>
-      </div>
-
-      <ContactNoteModal
-        show={showContactNoteModal}
-        onCancel={() => setShowContactNoteModal(false)}
-        variant={contactModalVariant}
-        data={contactNoteRow}
-        onSave={(variant, data) => saveContactNote(variant, data)}
-        bookingId={bookingId}
-      />
-
-      <ConfirmationDialog
-        variant={'delete'}
-        show={showConfirm}
-        onYesClick={() => saveContactNote('delete', contactNoteRow)}
-        onNoClick={() => setShowConfirm(false)}
-        hasOverlay={false}
-      />
+      )}
     </>
   );
-}
+});
+
+ContactNotesTab.displayName = 'ContactNotesTab';
+export default ContactNotesTab;

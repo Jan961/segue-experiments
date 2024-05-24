@@ -32,6 +32,7 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
     height: `${scaledHeight}px`,
     transformOrigin: 'top left',
     visibility: isLoading ? 'hidden' : 'visible',
+    pointerEvents: 'none',
   };
   const formattedUrl = formatUrl(src);
 
@@ -41,7 +42,10 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
   }
 
   return (
-    <div className={classNames(`${baseClass} overflow-hidden relative ${className}`)}>
+    <div
+      className={classNames(`${baseClass} overflow-hidden relative ${className}`)}
+      onClick={() => window.open(formattedUrl, '_blank')}
+    >
       {isLoading && (
         <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">
           <Spinner size="sm" />
@@ -53,7 +57,6 @@ const Iframe = ({ src, variant = 'sm', className = '' }: IframeProps) => {
         allowFullScreen
         className="absolute"
         onLoad={() => setIsLoading(false)}
-        onClick={() => window.open(formattedUrl, '_blank')}
       />
     </div>
   );

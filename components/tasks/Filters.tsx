@@ -12,9 +12,10 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 
 interface FiltersProps {
   usersList: SelectOption[];
+  handleShowTask?: () => void;
 }
 
-const Filters = ({ usersList }: FiltersProps) => {
+const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
   const [filter, setFilter] = useRecoilState(tasksfilterState);
   const { selected } = useRecoilValue(productionJumpState);
   const onChange = (e: any) => {
@@ -92,7 +93,12 @@ const Filters = ({ usersList }: FiltersProps) => {
         <Button className="text-sm leading-8 w-[132px]" text="Clear Filters" onClick={onClearFilters} />
         <Button text="Master Task List" className="w-[132px]" onClick={() => router.push('/tasks/master')} />
         <Button text="Tasks Reports" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
-        <Button onClick={null} text="Add Task" className="w-[132px]" />
+        <Button
+          onClick={handleShowTask}
+          disabled={!selected || selected === -1}
+          text="Add Task"
+          className="w-[132px]"
+        />
       </div>
     </div>
   );
