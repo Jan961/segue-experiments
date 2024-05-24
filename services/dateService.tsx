@@ -218,7 +218,7 @@ export const getNextMondayDateString = (date: string) => {
 /**
  * Extracts the time (hours and minutes) from a given date and time string in UTC format.
  *
- * @param {string} inputDate - The input date and time string.
+ * @param {string | Date} inputDate - The input date and time string.
  * @returns {string} The formatted time string in 'HH:mm' format, or an empty string if the input is invalid.
  */
 export const getTimeFromDateAndTime = (inputDate: string | Date): string => {
