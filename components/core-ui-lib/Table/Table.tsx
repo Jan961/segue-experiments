@@ -33,6 +33,7 @@ interface TableProps {
   headerHeight?: number;
   getRowHeight?: (params: RowHeightParams) => number;
   tableHeight?: number;
+  excelStyles?: any[];
 }
 
 const ROW_HEIGHT = 43;
@@ -72,6 +73,7 @@ export default forwardRef(function Table(
     headerHeight,
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,
+    excelStyles = [],
   }: TableProps,
   ref,
 ) {
@@ -164,6 +166,7 @@ export default forwardRef(function Table(
           defaultColDef={DEFAULT_COLUMN_DEF}
           suppressScrollOnNewData
           suppressContextMenu
+          excelStyles={excelStyles}
         />
       </div>
     </>

@@ -24,4 +24,5 @@ export interface ExportModalProps {
   onClose: () => void;
   tableRef: any;
   pdfStyles?: PdfStyles;
+  onItemClick?: (key: string) => void;
 }

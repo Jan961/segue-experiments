@@ -15,6 +15,7 @@ import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/Marketin
 import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
+import { exportToExcel, exportToPDF } from 'utils/export';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -72,6 +73,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   useEffect(() => {
     setShowVenueSelect(visible);
   }, [visible]);
+
+  const exportTable = (key: string) => {
+    if (key === 'Excel') {
+      exportToExcel(salesTableRef);
+    } else if (key === 'PDF') {
+      exportToPDF(salesTableRef);
+    }
+  };
 
   const toggleModal = (type: SalesTableVariant) => {
     setLoading(false);
@@ -347,6 +356,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         tableRef={salesTableRef}
         visible={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+        onItemClick={exportTable}
         ExportList={[
           {
             key: 'Excel',

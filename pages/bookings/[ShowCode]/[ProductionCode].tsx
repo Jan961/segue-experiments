@@ -21,16 +21,67 @@ import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
 import { DateType } from '@prisma/client';
+import { useMemo, useRef, useState } from 'react';
+import ExportModal from 'components/core-ui-lib/ExportModal';
+import { useRecoilValue } from 'recoil';
+import { filterState } from 'state/booking/filterState';
+import { exportToExcel, exportToPDF } from 'utils/export';
+import { getExportExtraContent } from 'components/bookings/table/tableConfig';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useBookingFilter();
+  const tableRef = useRef(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const currentProduction = useRecoilValue(currentProductionSelector);
+  const appliedFilters = useRecoilValue(filterState);
+  const excelExportExtraContents = useMemo(() => {
+    const showName = currentProduction?.ShowName;
+    const code = currentProduction?.Code;
+    const showCode = currentProduction?.ShowCode;
+
+    return getExportExtraContent(showName, showCode, code, appliedFilters);
+  }, [appliedFilters]);
+
+  const onExportClick = () => {
+    setIsExportModalOpen(true);
+  };
+
+  const exportTable = (key: string) => {
+    if (key === 'Excel') {
+      exportToExcel(tableRef, excelExportExtraContents);
+    } else if (key === 'PDF') {
+      exportToPDF(tableRef);
+    }
+  };
+
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <Filters onExportClick={onExportClick} />
       </div>
-      <BookingsTable rowData={rows} />
+      <BookingsTable tableRef={tableRef} rowData={rows} />
+      {tableRef && (
+        <ExportModal
+          tableRef={tableRef}
+          visible={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          onItemClick={exportTable}
+          ExportList={[
+            {
+              key: 'Excel',
+              iconName: 'excel',
+              iconProps: { fill: '#1D6F42', variant: '7xl' },
+            },
+            {
+              key: 'PDF',
+              iconName: 'document-solid',
+              iconProps: { fill: 'red', variant: '7xl' },
+            },
+          ]}
+        />
+      )}
     </Layout>
   );
 };
