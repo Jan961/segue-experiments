@@ -240,7 +240,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         };
       },
       suppressMovable: true,
-      headerClass: 'group-header-normal',
+      headerClass: 'custom-pinned-header',
       pinned: 'left',
       lockPinned: true,
       width: 120,

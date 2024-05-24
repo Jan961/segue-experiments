@@ -13,10 +13,11 @@ export interface SalesTabRef {
 
 const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [salesTable, setSalesTable] = useState(<div />);
+  const [dataAvail, setDataAvail] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setSalesTable(<div />);
+      setDataAvail(false);
     },
   }));
 
@@ -38,8 +39,11 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
           variant="salesSnapshot"
           data={tempSales}
           booking={bookingId}
+          tableHeight={640}
         />,
       );
+
+      setDataAvail(true);
     }
   };
 
@@ -50,7 +54,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     }
   }, [props.bookingId]);
 
-  return <>{salesTable}</>;
+  return <>{dataAvail && <div>{salesTable}</div>}</>;
 });
 
 SalesTab.displayName = 'SalesTab';

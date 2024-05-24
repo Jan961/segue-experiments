@@ -76,14 +76,16 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
       const result = { tableData: salesComp, bookingIds: selection };
 
       setArchivedSalesTable(
-        <SalesTable
-          containerHeight="h-[1000px]"
-          containerWidth="w-auto"
-          module="marketing"
-          variant="salesComparison"
-          data={result}
-          tableHeight={560}
-        />,
+        <div className="w-[1200px] overflow-x-auto pb-5">
+          <SalesTable
+            containerHeight="h-[1000px]"
+            containerWidth="w-auto"
+            module="marketing"
+            variant="salesComparison"
+            data={result}
+            tableHeight={580}
+          />
+        </div>,
       );
       setArchivedDataAvail(true);
       setShowArchSalesModal(false);
@@ -110,7 +112,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
               text="Export Displayed Sales Data"
               className="w-[232px]"
               iconProps={{ className: 'h-4 w-3 ml-5' }}
-              sufixIconName={'excel'}
+              sufixIconName="excel"
               disabled={!archivedDataAvail}
             />
 
@@ -123,7 +125,10 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
               error={errorMessage}
             />
           </div>
-          {archivedSalesTable}
+
+          <div className="flex flex-row">{archivedSalesTable}</div>
+
+          <div className="flex flex-row w-full h-32" />
         </div>
       )}
     </>

@@ -101,7 +101,7 @@ const Filters = () => {
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
           titleClassName="text-primary-green"
-          title={'Marketing'}
+          title="Marketing"
         />
 
         <div className="flex items-center gap-4 mt-1">

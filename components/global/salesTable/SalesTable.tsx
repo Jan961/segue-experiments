@@ -189,7 +189,8 @@ export default function SalesTable({
         return schoolSales ? containerWidth : '1085px';
 
       case 'salesComparison': {
-        const widthInt = numBookings * 340;
+        const scalar = numBookings === 2 ? 340 : 328;
+        const widthInt = numBookings * scalar - numBookings * 12;
         return `${widthInt}px`;
       }
 
@@ -240,6 +241,7 @@ export default function SalesTable({
         onCellClicked={onCellClick}
         onCellValueChange={onCellValChange}
         tableHeight={tableHeight}
+        gridOptions={{ suppressHorizontalScroll: true }}
       />
     </div>
   );
