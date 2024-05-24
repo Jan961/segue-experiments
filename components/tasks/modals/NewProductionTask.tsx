@@ -2,7 +2,7 @@ import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
 import { useState } from 'react';
-import { AddTaskOptions } from './constants';
+import { ADD_TASK_OPTIONS } from './constants';
 
 interface NewProductionTaskProps {
   visible: boolean;
@@ -27,20 +27,20 @@ const NewProductionTask = ({ visible, onClose, handleNewProductionTaskSubmit }: 
   };
 
   return (
-    <PopupModal show={visible} onClose={handleClose} title={'Add Task'} titleClass="text-primary-navy text-xl mb-4">
-      <form className="flex flex-col gap-4">
+    <PopupModal show={visible} onClose={handleClose} title={'Add Task'} titleClass="text-primary-navy text-xl mb-2">
+      <form className="flex flex-col gap-2">
         <p>Would you like to...</p>
         <Select
           onChange={handleOnChange}
           value={newProductionTask}
-          options={AddTaskOptions}
+          options={ADD_TASK_OPTIONS}
           placeholder="Select Assignee"
           className="w-64"
           isClearable={false}
         />
-        <div className="flex">
+        <div className="flex mt-2">
           <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
-          <Button variant="primary" className="w-[132px]" onClick={handleSubmit} text={'Ok'} />
+          <Button variant="primary" className="w-[132px]" onClick={handleSubmit} text="OK" />
         </div>
       </form>
     </PopupModal>
