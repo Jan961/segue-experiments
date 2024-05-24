@@ -49,15 +49,9 @@ export default function SalesTable({
   const [rowData, setRowData] = useState([]);
   const [currency, setCurrency] = useState('£');
   const [height, setHeight] = useState(containerHeight);
-  const [width, setWidth] = useState(containerWidth);
-
-  // To be discussed and reviewed by Arun on his return - this is causing more issues than fixes just now
-  // const prodColDefs = useMemo(() => {
-  //   if (variant === 'prodComparision' && Array.isArray(data)) {
-  //     return prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected);
-  //   }
-  //   return [];
-  // }, [data, onCellValChange, cellRenderParams, variant]);
+  const [schoolSales, setSchoolSales] = useState<boolean>(false);
+  const [numBookings, setNumBookings] = useState<number>(0);
+  const [tableWidth, setTableWidth] = useState(containerWidth);
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
@@ -71,12 +65,16 @@ export default function SalesTable({
         data.schReservations !== '' || data.schReserved !== '' || data.schSeatsSold !== '' || data.schTotalValue !== '',
     );
 
+    setSchoolSales(Boolean(found));
+
     let colDefs = salesColDefs(currency, Boolean(found), module !== 'bookings', booking, setSalesActivity);
     if (!found) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
-      setWidth('w-[1085px]');
       setHeight(containerHeight);
     }
+
+    // set final week of sales to final
+    data[data.length - 1].week = 'Final';
 
     setColumnDefs(colDefs);
     setRowData(data);
@@ -185,12 +183,29 @@ export default function SalesTable({
       .catch((error) => console.log('failed to update sale', error));
   };
 
+  const calculateWidth = () => {
+    switch (variant) {
+      case 'salesSnapshot':
+        return schoolSales ? containerWidth : '1085px';
+
+      case 'salesComparison': {
+        const widthInt = numBookings * 340;
+        return `${widthInt}px`;
+      }
+
+      case 'prodComparision':
+        return containerWidth;
+
+      case 'prodCompArch':
+        return containerWidth;
+    }
+  };
+
   const exec = async (variant: string, data) => {
     switch (variant) {
       case 'salesComparison': {
         const tableData = await salesComparison(data);
-        const widthInt = data.bookingIds.length * 340;
-        setWidth('w-[' + widthInt.toString() + 'px]');
+        setNumBookings(data.bookingIds.length);
         setColumnDefs(tableData.columnDef);
         setRowData(tableData.rowData);
         break;
@@ -201,11 +216,7 @@ export default function SalesTable({
         break;
       }
 
-      case 'prodComparision': {
-        productionComparision(data);
-        break;
-      }
-
+      case 'prodComparision':
       case 'prodCompArch': {
         productionComparision(data);
         break;
@@ -215,11 +226,12 @@ export default function SalesTable({
 
   useEffect(() => {
     exec(variant, data);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [variant]);
+    const newWidth = calculateWidth();
+    setTableWidth(newWidth);
+  }, [variant, data, numBookings, schoolSales, containerWidth]);
 
   return (
-    <div className={classNames(width, height)}>
+    <div className={classNames('table-container')} style={{ width: tableWidth, height }}>
       <Table
         ref={salesTableRef}
         columnDefs={columnDefs}
