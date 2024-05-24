@@ -1,6 +1,5 @@
 import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid } from 'date-fns';
 import moment from 'moment';
-import { formatInTimeZone } from 'date-fns-tz';
 
 export const safeDate = (date: Date | string) => {
   if (typeof date === 'string') return new Date(date);
@@ -216,12 +215,13 @@ export const getNextMondayDateString = (date: string) => {
   return nextMondayDateStr;
 };
 
-export const getTimeFromDateAndTime = (date) => {
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const zonedTime = formatInTimeZone(date, timeZone, 'HH:mm');
+export const getTimeFromDateAndTime = (inputDt) => {
+  const date = new Date(inputDt);
 
-  // Format the time to 'HH:mm'
-  return zonedTime;
+  const hours = String(date.getUTCHours()).padStart(2, '0');
+  const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+  return `${hours}:${minutes}`;
 };
 
 export const toSql = (date: string) => {

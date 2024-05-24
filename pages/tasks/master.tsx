@@ -3,7 +3,6 @@ import Layout from 'components/Layout';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
 import { getMasterTasksList } from 'services/TaskService';
 import { MasterTask } from '@prisma/client';
-import Filters from 'components/tasks/Master/Filters';
 import { getMasterTasksColumnDefs, styleProps } from 'components/tasks/tableConfig';
 import Table from 'components/core-ui-lib/Table';
 import useMasterTasksFilter from 'hooks/useMasterTaskFilter';
@@ -12,6 +11,9 @@ import { useRef, useState } from 'react';
 import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import Loader from 'components/core-ui-lib/Loader';
+import { useRouter } from 'next/router';
+import AddTask from 'components/tasks/modals/AddTask';
+import Filters from 'components/tasks/master/Filters';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -23,7 +25,11 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   const { masterTask = [], usersList } = props;
   const tableRef = useRef(null);
 
+  const router = useRouter();
+
   const [taskId, setTaskId] = useState<number>(-1);
+
+  const [currentTask, setCurrentTask] = useState({});
 
   const columnDefs = getMasterTasksColumnDefs(usersList);
 
@@ -34,11 +40,20 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
 
+  const [showAddTask, setShowAddTask] = useState<boolean>(false);
+
   const handleCellClick = async (e) => {
     setRowIndex(e.rowIndex);
     setTaskId(e.data.Id);
     if (e.column.colId === 'delete') {
       setConfirm(true);
+    } else if (e.column.colId === 'clone') {
+      delete e.data.Id;
+      setShowAddTask(!showAddTask);
+      setCurrentTask(e.data);
+    } else if (e.column.colId === 'edit') {
+      setShowAddTask(!showAddTask);
+      setCurrentTask(e.data);
     }
   };
 
@@ -57,10 +72,18 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
       setIsLoading(false);
     }
   };
+
+  const handleShowTask = () => {
+    setShowAddTask(!showAddTask);
+    if (showAddTask) {
+      router.replace(router.asPath);
+    }
+  };
+
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <Filters handleShowTask={handleShowTask} />
       </div>
       <Table
         ref={tableRef}
@@ -77,6 +100,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
+      <AddTask visible={showAddTask} isMasterTask onClose={handleShowTask} task={currentTask} />
     </Layout>
   );
 };

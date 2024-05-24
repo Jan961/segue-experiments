@@ -13,7 +13,7 @@ const bulkFileUpload = async (path, files, userId) => {
     const buffer = await fs.promises.readFile(file.filepath);
     const params = {
       Bucket: process.env.S3_BUCKET_NAME,
-      Key: `${path || ''}/${uniqueFileName}`,
+      Key: `${path + '/' || ''}${uniqueFileName}`,
       Body: buffer,
       ContentDisposition: 'inline',
     };
@@ -38,7 +38,7 @@ const singleFileUpload = async (path, file, userId) => {
   const buffer = await fs.promises.readFile(file.filepath);
   const params = {
     Bucket: process.env.S3_BUCKET_NAME,
-    Key: `${path || ''}/${uniqueFileName}`,
+    Key: `${path + '/' || ''}${uniqueFileName}`,
     Body: buffer,
     ContentDisposition: 'inline',
   };
@@ -75,4 +75,15 @@ const transformForPrisma = (data: FileDTO): Partial<File> => {
   };
 };
 
-export { bulkFileUpload, singleFileUpload, transformForPrisma };
+const transformForUi = (data: File): Partial<FileDTO> => {
+  return {
+    id: data.Id,
+    originalFilename: data.OriginalFilename,
+    mediaType: data.MediaType,
+    location: data.Location,
+    uploadUserId: data.UploadUserId,
+    uploadDateTime: data.UploadDateTime.toDateString(),
+  };
+};
+
+export { bulkFileUpload, singleFileUpload, transformForPrisma, transformForUi };

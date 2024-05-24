@@ -203,6 +203,13 @@ export const contactNoteColDefs = (updateContactNote, userList) => [
 
 export const allocSeatsColDefs = [
   {
+    headerName: 'Id',
+    field: 'Id',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
     headerName: 'Perf Date',
     field: 'date',
     cellRenderer: DefaultCellRenderer,
@@ -276,18 +283,24 @@ export const attachmentsColDefs = [
   {
     headerName: 'Date Uploaded',
     field: 'FileUploadedDateTime',
-    cellRenderer: function (params) {
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: function (params) {
       const updDate = new Date(params.data.FileUploadedDateTime);
-      return formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate);
+      return {
+        value: formatInputDate(updDate) + ' ' + getTimeFromDateAndTime(updDate),
+      };
     },
     width: 150,
   },
   {
     headerName: 'Date File Created',
     field: 'FileDateTime',
-    cellRenderer: function (params) {
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: function (params) {
       const fileDt = new Date(params.data.FileDateTime);
-      return formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt);
+      return {
+        value: formatInputDate(fileDt) + ' ' + getTimeFromDateAndTime(fileDt),
+      };
     },
     width: 150,
   },

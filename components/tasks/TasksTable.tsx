@@ -8,24 +8,37 @@ import NotesPopup from './NotesPopup';
 import { loggingService } from 'services/loggingService';
 import Loader from 'components/core-ui-lib/Loader';
 import { ProductionTaskDTO } from 'interfaces';
+import { useRouter } from 'next/router';
+import AddTask from './modals/AddTask';
 
 interface TasksTableProps {
   rowData?: any;
   columnDefs?: any;
   tableHeight?: boolean;
+  showAddTask?: boolean;
+  handleShowTask?: () => void;
+  productionId?: number;
 }
 
 export interface ProductionTaskDTOWithStringProgress extends Omit<ProductionTaskDTO, 'Progress'> {
   Progress: string;
 }
 
-export default function TasksTable({ rowData = [], columnDefs = [], tableHeight = false }: TasksTableProps) {
+export default function TasksTable({
+  rowData = [],
+  columnDefs = [],
+  tableHeight = false,
+  showAddTask,
+  handleShowTask,
+  productionId,
+}: TasksTableProps) {
   const tableRef = useRef(null);
   const [filter, setFilter] = useRecoilState(filterState);
   const [rows, setRows] = useState([]);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleCellClick = (e) => {
     if (e.column.colId === 'Notes') {
@@ -45,6 +58,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
       });
       setRows(updatedRowData);
       setIsLoading(false);
+      router.replace(router.asPath);
     } catch (error) {
       setIsLoading(false);
       loggingService.logError(error);
@@ -69,7 +83,7 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
         setFilter({ ...filter, scrollToDate: '' });
       }
     }
-  }, [filter, setFilter, rowData]);
+  }, [filter, rowData]);
 
   useEffect(() => {
     if (rowData) {
@@ -101,6 +115,8 @@ export default function TasksTable({ rowData = [], columnDefs = [], tableHeight 
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
+
+      <AddTask visible={showAddTask} onClose={handleShowTask} task={{ ProductionId: productionId }} />
     </>
   );
 }

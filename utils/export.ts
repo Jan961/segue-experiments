@@ -4,7 +4,7 @@ import { pdfStandardColors } from 'config/global';
 import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export const exportToExcel = (tableRef, extraContent) => {
+export const exportToExcel = (tableRef, extraContent = {}) => {
   tableRef?.current?.getApi?.()?.exportDataAsExcel?.(getParams(extraContent));
 };
 
