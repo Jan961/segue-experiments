@@ -62,7 +62,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             searchFilter={filter.venueText}
             setSearchFilter={(venueText) => setFilter({ venueText })}
             titleClassName="text-primary-orange"
-            title={'Bookings'}
+            title="Bookings"
           >
             <div className="flex items-center gap-4">
               <Button
@@ -98,7 +98,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
           />
           <BookingFilter />
           <TextInput
-            id={'venueText'}
+            id="venueText"
             disabled={!ProductionId}
             placeholder="Search bookings..."
             className="w-[310px]"

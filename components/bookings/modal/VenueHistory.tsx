@@ -252,13 +252,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 isSearchable
                 value={venueID}
                 onChange={(value) => getBookingSelection(value)}
-                placeholder={'Please select a venue'}
+                placeholder="Please select a venue"
                 label="Venue"
               />
 
               <div className="float-right flex flex-row">
                 {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
-                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text={'Cancel'} />
+                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text="Cancel" />
               </div>
             </div>
           ) : (
@@ -269,7 +269,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               </div>
 
               <div className="float-right flex flex-row mt-5">
-                <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text={'Back'} />
+                <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text="Back" />
                 <Button className="ml-4 w-32" variant="secondary" text="Cancel" onClick={handleModalCancel} />
               </div>
             </div>

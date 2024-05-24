@@ -48,7 +48,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         text="Booking Reports"
         className="w-[155px]"
         iconProps={{ className: 'h-4 w-3' }}
-        sufixIconName={'excel'}
+        sufixIconName="excel"
         onClick={() => setShowBookingReportsModal(true)}
       />
       <Button onClick={() => setShowVenueHistory(true)} text="Venue History" className="w-[155px]" />

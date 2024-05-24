@@ -29,30 +29,30 @@ export const BookingReports = ({ visible = false, onClose, onExportClick }: Book
           text="Tour Schedule"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
           onClick={onExportClick}
-         />
+        />
 
         <Button
           text="Travel Summary"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
-         />
+          sufixIconName="excel"
+        />
 
         <Button
           text="All Productions Masterplan"
           className="w-[230px] mb-3 pl-5"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
-         />
+          sufixIconName="excel"
+        />
 
         <Button
           text="Multiple Pencil Report"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
-         />
+          sufixIconName="excel"
+        />
       </div>
     </PopupModal>
   );
