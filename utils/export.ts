@@ -1,11 +1,21 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { pdfStandardColors } from 'config/global';
+import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-export const exportToExcel = (tableRef) => {
-  tableRef?.current?.getApi?.()?.exportDataAsExcel?.();
+export const exportToExcel = (tableRef, extraContent = {}) => {
+  tableRef?.current?.getApi?.()?.exportDataAsExcel?.(getParams(extraContent));
 };
+
+const getParams: (extraContent) => ExcelExportParams = (extraContent) => ({
+  prependContent: extraContent?.prependContent ? getRows(extraContent?.prependContent) : null,
+  appendContent: extraContent?.appendContent ? getRows(extraContent?.appendContent) : null,
+  fileName: extraContent?.fileName || 'Excel',
+  columnKeys: extraContent?.columnKeys,
+});
+
+const getRows: (content) => ExcelRow[] = (content = []) => [...content];
 
 const getHeaderToExport = (gridApi) => {
   const columns = gridApi.getAllDisplayedColumns();
@@ -14,7 +24,7 @@ const getHeaderToExport = (gridApi) => {
     const { field } = column.getColDef();
     const sort = column.getSort();
     const headerName = column.getColDef().headerName ?? field;
-    const headerNameUppercase = headerName[0].toUpperCase() + headerName.slice(1);
+    const headerNameUppercase = `${headerName[0]?.toUpperCase() || ''}` + headerName.slice(1);
     const headerCell = {
       text: headerNameUppercase + (sort ? ` (${sort})` : ''),
       bold: true,
@@ -119,4 +129,25 @@ export const exportToPDF = (tableRef, styles = {}) => {
   const gridApi = tableRef?.current?.getApi();
   const doc = getDocument(gridApi, styles);
   pdfMake.createPdf(doc).download();
+};
+
+export const dateToReadableFormat = (isoDate) => {
+  const date = new Date(isoDate);
+  const options: any = { day: 'numeric', month: 'long', year: 'numeric' };
+  const formattedDate = date.toLocaleDateString('en-GB', options);
+
+  const day = date.getDate();
+  const suffix =
+    day === 1 || day === 21 || day === 31
+      ? 'st'
+      : day === 2 || day === 22
+      ? 'nd'
+      : day === 3 || day === 23
+      ? 'rd'
+      : 'th';
+  const formattedDay = `${day}${suffix}`;
+
+  const readableDate = formattedDay + ' ' + formattedDate.slice(formattedDate.indexOf(' ') + 1);
+
+  return readableDate;
 };

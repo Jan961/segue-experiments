@@ -11,10 +11,12 @@ import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { objectify } from 'radash';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
 import { useRouter } from 'next/router';
+import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
+import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -40,16 +42,51 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   }
 
   const [showAddTask, setShowAddTask] = useState<boolean>(false);
+  const [showEmptyProductionModal, setShowEmptyProductionModal] = useState<boolean>(false);
+  const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
+  const [isProductionEmpty, setIsProductionEmpty] = useState<boolean>(false);
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
     router.replace(router.asPath);
   };
 
+  useEffect(() => {
+    if (filteredProductions.length === 1) {
+      filteredProductions.forEach((production) => {
+        if (production.Tasks.length === 0) {
+          setShowEmptyProductionModal(true);
+          setIsProductionEmpty(true);
+        }
+      });
+    }
+  }, [filteredProductions]);
+
+  const handleShowEmptyProduction = () => {
+    setShowEmptyProductionModal(!showEmptyProductionModal);
+  };
+
+  const handleNewProductionTaskModal = () => {
+    setShowNewProduction(!showNewProduction);
+  };
+
+  const handleModalConditions = () => {
+    if (isProductionEmpty) {
+      setShowNewProduction(true);
+    } else {
+      setShowAddTask(true);
+    }
+  };
+
+  const handleNewProductionTaskSubmit = (val: string) => {
+    handleNewProductionTaskModal();
+    if (val === 'taskManual') setShowAddTask(true);
+  };
+
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
-        <Filters usersList={usersList} handleShowTask={handleShowTask} />
+        <Filters usersList={usersList} handleShowTask={handleModalConditions} />
       </div>
       {filteredProductions.length === 0 ? (
         <TasksTable rowData={[]} />
@@ -70,6 +107,12 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           );
         })
       )}
+      <NewProductionEmpty visible={showEmptyProductionModal} onClose={handleShowEmptyProduction} />
+      <NewProductionTask
+        visible={showNewProduction}
+        onClose={handleNewProductionTaskModal}
+        handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
+      />
     </Layout>
   );
 };

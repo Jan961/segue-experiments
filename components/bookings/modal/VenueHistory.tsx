@@ -15,6 +15,7 @@ import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/Marketin
 import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
+import { exportToExcel, exportToPDF } from 'utils/export';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -72,6 +73,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   useEffect(() => {
     setShowVenueSelect(visible);
   }, [visible]);
+
+  const exportTable = (key: string) => {
+    if (key === 'Excel') {
+      exportToExcel(salesTableRef);
+    } else if (key === 'PDF') {
+      exportToPDF(salesTableRef);
+    }
+  };
 
   const toggleModal = (type: SalesTableVariant) => {
     setLoading(false);
@@ -243,13 +252,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 isSearchable
                 value={venueID}
                 onChange={(value) => getBookingSelection(value)}
-                placeholder={'Please select a venue'}
+                placeholder="Please select a venue"
                 label="Venue"
               />
 
               <div className="float-right flex flex-row">
                 {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
-                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text={'Cancel'} />
+                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text="Cancel" />
               </div>
             </div>
           ) : (
@@ -260,7 +269,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               </div>
 
               <div className="float-right flex flex-row mt-5">
-                <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text={'Back'} />
+                <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text="Back" />
                 <Button className="ml-4 w-32" variant="secondary" text="Cancel" onClick={handleModalCancel} />
               </div>
             </div>
@@ -347,6 +356,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         tableRef={salesTableRef}
         visible={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+        onItemClick={exportTable}
         ExportList={[
           {
             key: 'Excel',

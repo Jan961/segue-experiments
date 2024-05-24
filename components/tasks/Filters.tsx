@@ -9,6 +9,8 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { useRouter } from 'next/router';
 import GlobalToolbar from 'components/toolbar';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import TaskReports from './modals/TaskReports';
+import { useState } from 'react';
 
 interface FiltersProps {
   usersList: SelectOption[];
@@ -40,6 +42,12 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
   const { startDueDate, endDueDate } = filter || {};
   const router = useRouter();
 
+  const [showReports, setShowReports] = useState<boolean>(false);
+
+  const handleShowReports = () => {
+    setShowReports(!showReports);
+  };
+
   return (
     <div className="w-full flex justify-between">
       <div className="mx-0">
@@ -48,10 +56,10 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
             searchFilter={filter.taskText}
             setSearchFilter={(taskText) => setFilter({ taskText })}
             titleClassName="text-primary-yellow"
-            title={'Production Task Lists'}
+            title="Production Task Lists"
           >
             <TextInput
-              id={'taskText'}
+              id="taskText"
               disabled={!selected}
               placeholder="Search Production Task List..."
               className="w-[240px]"
@@ -92,7 +100,7 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
       <div className="grid grid-cols-2 grid-rows-2 gap-4 max-w-[280px] py-2">
         <Button className="text-sm leading-8 w-[132px]" text="Clear Filters" onClick={onClearFilters} />
         <Button text="Master Task List" className="w-[132px]" onClick={() => router.push('/tasks/master')} />
-        <Button text="Tasks Reports" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
+        <Button text="Tasks Reports" className="w-[132px]" sufixIconName="excel" onClick={handleShowReports} />
         <Button
           onClick={handleShowTask}
           disabled={!selected || selected === -1}
@@ -100,6 +108,7 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
           className="w-[132px]"
         />
       </div>
+      <TaskReports visible={showReports} onClose={handleShowReports} />
     </div>
   );
 };
