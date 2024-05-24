@@ -9,7 +9,7 @@ import { loggingService } from 'services/loggingService';
 import Loader from 'components/core-ui-lib/Loader';
 import { ProductionTaskDTO } from 'interfaces';
 import { useRouter } from 'next/router';
-import AddTask from './modals/AddTask';
+import AddTask from './Modals/AddTask';
 
 interface TasksTableProps {
   rowData?: any;
