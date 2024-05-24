@@ -10,7 +10,6 @@ import Loader from 'components/core-ui-lib/Loader';
 import { ProductionTaskDTO } from 'interfaces';
 import { useRouter } from 'next/router';
 import AddTask from './modals/AddTask';
-import EmptyProductionTask from './modals/EmptyProductionTask';
 
 interface TasksTableProps {
   rowData?: any;
@@ -39,8 +38,6 @@ export default function TasksTable({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [showEmptyProductionModal, setShowEmptyProductionModal] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -78,10 +75,6 @@ export default function TasksTable({
     const updatedTask = { ...currentTask, Notes: value };
     handleUpdateTask(updatedTask);
   };
-  
-  useEffect(()=>{
-    if(rowData.length === 0) setShowEmptyProductionModal(true);
-  });
 
   useEffect(() => {
     if (tableRef && tableRef.current && filter?.scrollToDate) {
@@ -98,10 +91,6 @@ export default function TasksTable({
       setRows(rowData);
     }
   }, [rowData]);
-
-  const handleShowEmptyProduction = () => {
-    setShowEmptyProductionModal(!showEmptyProductionModal);
-  }
 
   return (
     <>
@@ -127,7 +116,6 @@ export default function TasksTable({
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
-      <EmptyProductionTask visible={showEmptyProductionModal} onClose={handleShowEmptyProduction} />
       <AddTask visible={showAddTask} onClose={handleShowTask} task={{ ProductionId: productionId }} />
     </>
   );

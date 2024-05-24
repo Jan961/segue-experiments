@@ -17,18 +17,16 @@ interface EmptyProductionTaskProps {
 }
 
 const EmptyProductionTask = ({ visible, onClose }: EmptyProductionTaskProps) => {
-
   const [loading, setLoading] = useState<boolean>(false);
 
   const [newProductionTask, setNewProductionTask] = useState('master');
 
-  const handleOnChange = (e: any) => {
-    let { id, value } = e.target;
+  const handleOnChange = (value: string) => {
+    setNewProductionTask(value);
   };
 
   const handleOnSubmit = async () => {
     setLoading(true);
-
   };
 
   const handleClose = () => {
@@ -45,26 +43,22 @@ const EmptyProductionTask = ({ visible, onClose }: EmptyProductionTaskProps) => 
       <form className="flex flex-col gap-4">
         {loading && <LoadingOverlay />}
         <p>
-          The selected production has no tasks.<br/>
+          The selected production has no tasks.
+          <br />
           Would you like to...
         </p>
         <Select
-          onChange={(value) => handleOnChange({ target: { id: 'AssignedToUserId', value } })}
+          onChange={handleOnChange}
           value={newProductionTask}
           options={NewProductionTaskOptions}
           placeholder="Select Assignee"
           className="w-64"
           isClearable={false}
         />
-          <div className="flex">
-            <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
-            <Button
-              variant="primary"
-              className="w-[132px]"
-              onClick={handleOnSubmit}
-              text={'Ok'}
-            />
-          </div>
+        <div className="flex">
+          <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
+          <Button variant="primary" className="w-[132px]" onClick={handleOnSubmit} text={'Ok'} />
+        </div>
       </form>
     </PopupModal>
   );
