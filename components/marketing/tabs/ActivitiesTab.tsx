@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { ActivityList, SelectOption } from '../MarketingHome';
 import { ActivityDTO } from 'interfaces';
 import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
@@ -22,13 +22,17 @@ interface ActivitiesTabProps {
   bookingId: string;
 }
 
+export interface ActivityTabRef {
+  resetData: () => void;
+}
+
 const approvalStatusList = [
   { text: 'Pending Approval', value: 'P' },
   { text: 'Approved', value: 'A' },
   { text: 'Not Approved', value: 'N' },
 ];
 
-export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
+const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref) => {
   const [actTypeList, setActTypeList] = useState<Array<SelectOption>>(null);
   const [actColDefs, setActColDefs] = useState([]);
   const [actRowData, setActRowData] = useState([]);
@@ -47,6 +51,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
   const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
   const [currency, setCurrency] = useState('£');
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
+  const [dataAvail, setDataAvail] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
@@ -54,9 +59,13 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
 
   const { selected: productionId } = useRecoilValue(productionJumpState);
 
-  const { fetchData } = useAxios();
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setDataAvail(false);
+    },
+  }));
 
-  const baseClass = `block w-fit-content pl-2 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset !border-primary-border`;
+  const { fetchData } = useAxios();
 
   const getActivities = async (bookingId: string) => {
     try {
@@ -130,7 +139,7 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
 
     try {
       const actData = await fetchData({
-        url: '/api/marketing/activities/' + bookingId,
+        url: '/api/marketing/activities/' + bookingIdVal,
         method: 'POST',
       });
 
@@ -283,20 +292,20 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
 
     // update in the database
     await fetchData({
-      url: '/api/bookings/update/' + bookingId.toString(),
+      url: '/api/bookings/update/' + bookingIdVal.toString(),
       method: 'POST',
       data: updObj,
     });
   };
 
   useEffect(() => {
-    if (bookingId) {
+    if (props.bookingId) {
       setCurrency('£');
-      setBookingIdVal(bookingId);
-      getActivities(bookingId.toString());
+      setBookingIdVal(props.bookingId);
+      getActivities(props.bookingId.toString());
 
       // set checkbox row on activities tab
-      const booking = bookings[0].bookings.find((booking) => booking.Id === bookingId);
+      const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
@@ -305,160 +314,172 @@ export default function ActivitiesTab({ bookingId }: ActivitiesTabProps) {
       setChangeDate(booking.MarketingCostsApprovalDate);
       setApprovalStatus(booking.MarketingCostsStatus);
       setChangeNotes(booking.MarketingCostsNotes);
+
+      setDataAvail(true);
     }
-  }, [bookingId]);
+  }, [props.bookingId]);
 
   return (
     <>
-      <div className="flex flex-row mb-5 gap-[45px]">
-        <div className="flex flex-row mt-1">
-          <Checkbox
-            id={'On Sale'}
-            name={'On Sale'}
-            checked={onSaleCheck}
-            onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
-            className="w-[19px] h-[19px] mt-[2px]"
-          />
-          <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
-        </div>
+      {dataAvail && (
+        <div>
+          <div className="flex flex-row mb-5 gap-[45px]">
+            <div className="flex flex-row mt-1">
+              <Checkbox
+                id={'On Sale'}
+                name={'On Sale'}
+                checked={onSaleCheck}
+                onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
+                className="w-[19px] h-[19px] mt-[2px]"
+              />
+              <div className="text-base text-primary-input-text font-bold ml-2">On Sale</div>
+            </div>
 
-        <div className="flex flex-row">
-          <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
-          <DateInput onChange={(value) => editBooking('ticketsOnSaleFromDate', value)} value={onSaleFromDt} />
-        </div>
+            <div className="flex flex-row">
+              <div className="text-base text-primary-input-text font-bold mt-1 mr-2">Due to go On Sale</div>
+              <DateInput onChange={(value) => editBooking('ticketsOnSaleFromDate', value)} value={onSaleFromDt} />
+            </div>
 
-        <div className="flex flex-row mt-1">
-          <Checkbox
-            id={'Marketing Plans Received'}
-            name={'Marketing Plans Received'}
-            checked={marketingPlansCheck}
-            onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
-            className="w-[19px] h-[19px] mt-[2px]"
-          />
-          <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
-        </div>
+            <div className="flex flex-row mt-1">
+              <Checkbox
+                id={'Marketing Plans Received'}
+                name={'Marketing Plans Received'}
+                checked={marketingPlansCheck}
+                onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
+                className="w-[19px] h-[19px] mt-[2px]"
+              />
+              <div className="text-base text-primary-input-text font-bold ml-2">Marketing Plans Received</div>
+            </div>
 
-        <div className="flex flex-row mt-1">
-          <Checkbox
-            id={'Print Requirements Received'}
-            name={'Print Requirements Received'}
-            checked={printReqCheck}
-            onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
-            className="w-[19px] h-[19px] mt-[2px]"
-          />
-          <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
-        </div>
+            <div className="flex flex-row mt-1">
+              <Checkbox
+                id={'Print Requirements Received'}
+                name={'Print Requirements Received'}
+                checked={printReqCheck}
+                onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
+                className="w-[19px] h-[19px] mt-[2px]"
+              />
+              <div className="text-base text-primary-input-text font-bold ml-2">Print Requirements Received</div>
+            </div>
 
-        <div className="flex flex-row mt-1">
-          <Checkbox
-            id={'Contact Info Received'}
-            name={'Contact Info Received'}
-            checked={contactInfoCheck}
-            onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
-            className="w-[19px] h-[19px] mt-[2px]"
-          />
-          <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
-        </div>
-      </div>
-      <div className="flex flex-row">
-        <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.30] rounded-xl mb-5 mr-5 px-2">
+            <div className="flex flex-row mt-1">
+              <Checkbox
+                id={'Contact Info Received'}
+                name={'Contact Info Received'}
+                checked={contactInfoCheck}
+                onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
+                className="w-[19px] h-[19px] mt-[2px]"
+              />
+              <div className="text-base text-primary-input-text font-bold ml-2">Contact Info Received</div>
+            </div>
+          </div>
           <div className="flex flex-row">
+            <div className="flex flex-col w-[906px] h-[75px] bg-primary-green/[0.30] rounded-xl mb-5 mr-5 px-2">
+              <div className="flex flex-row">
+                <div className="flex flex-col">
+                  <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">
+                    Marketing Costs
+                  </div>
+
+                  <Select
+                    className={classNames('w-72 !border-0 text-primary-navy mt-1')}
+                    options={approvalStatusList}
+                    value={approvalStatus}
+                    onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
+                    placeholder={'Select Approval Status'}
+                    isClearable={false}
+                  />
+                </div>
+                <div className="flex flex-col mt-8 ml-8">
+                  <DateInput
+                    onChange={(value) => editBooking('marketingCostsApprovalDate', value)}
+                    value={changeDate}
+                  />
+                </div>
+                <div className="flex flex-col ml-8 mt-1">
+                  <TextArea
+                    className={'mt-2 h-[52px] w-[425px]'}
+                    value={changeNotes}
+                    placeholder="Notes Field"
+                    onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
+                    onChange={(e) => setChangeNotes(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
             <div className="flex flex-col">
-              <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">Marketing Costs</div>
-
-              <Select
-                className={classNames('w-72 !border-0 text-primary-navy mt-1')}
-                options={approvalStatusList}
-                value={approvalStatus}
-                onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
-                placeholder={'Select Approval Status'}
-                isClearable={false}
+              <Button
+                text="Activity Report"
+                className="w-[160px] mb-[12px]"
+                disabled={!productionId}
+                iconProps={{ className: 'h-4 w-3' }}
+                sufixIconName={'excel'}
               />
-            </div>
-            <div className="flex flex-col mt-8 ml-8">
-              <DateInput onChange={(value) => editBooking('marketingCostsApprovalDate', value)} value={changeDate} />
-            </div>
-            <div className="flex flex-col ml-8 mt-1">
-              <TextArea
-                className={'mt-2 h-[52px] w-[425px]'}
-                value={changeNotes}
-                placeholder="Notes Field"
-                onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
-                onChange={(e) => setChangeNotes(e.target.value)}
-              />
+              <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
             </div>
           </div>
-        </div>
-        <div className="flex flex-col">
-          <Button
-            text="Activity Report"
-            className="w-[160px] mb-[12px]"
-            disabled={!productionId}
-            iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName={'excel'}
+          <div className="w-[1086px] h-[500px]">
+            <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
+
+            <div
+              className={classNames(
+                'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
+                actRowData.length === 0 ? '-mt-[400px]' : '',
+              )}
+            >
+              <div className="flex flex-row gap-4">
+                <div className="flex flex-col text-center">
+                  <div className="text-base font-bold text-primary-input-text">Total Cost</div>
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {currency + totalCost.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col text-center">
+                  <div className="text-base font-bold text-primary-input-text">Company</div>
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {currency + totalCompanyCost.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col text-center">
+                  <div className="text-base font-bold text-primary-input-text">Venue</div>
+                  <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                    <div className="text text-base text-left pl-2 text-primary-input-text">
+                      {currency + totalVenueCost.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ActivityModal
+            show={showActivityModal}
+            onCancel={() => setShowActivityModal(false)}
+            variant={actModalVariant}
+            activityTypes={actTypeList}
+            onSave={(variant, data) => saveActivity(variant, data)}
+            bookingId={bookingIdVal}
+            data={actRow}
           />
-          <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
+
+          <ConfirmationDialog
+            variant={confVariant}
+            show={showConfirm}
+            onYesClick={() => saveActivity('delete', actRow)}
+            onNoClick={() => setShowConfirm(false)}
+            hasOverlay={false}
+          />
         </div>
-      </div>
-      <div className="w-[1086px] h-[500px]">
-        <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
-
-        <div className="flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right">
-          <div className="flex flex-row gap-4">
-            <div className="flex flex-col text-center">
-              <div className="text-base font-bold text-primary-input-text">Total Cost</div>
-              <input
-                type="text"
-                className={classNames(baseClass, 'w-[146px]')}
-                onChange={null}
-                placeholder={''}
-                disabled={true}
-                value={currency + totalCost.toFixed(2)}
-              />
-            </div>
-            <div className="flex flex-col text-center">
-              <div className="text-base font-bold text-primary-input-text">Company</div>
-              <input
-                type="text"
-                className={classNames(baseClass, 'w-[146px]')}
-                onChange={null}
-                placeholder={''}
-                disabled={true}
-                value={currency + totalCompanyCost.toFixed(2)}
-              />
-            </div>
-            <div className="flex flex-col text-center">
-              <div className="text-base font-bold text-primary-input-text">Venue</div>
-              <input
-                type="text"
-                className={classNames(baseClass, 'w-[146px]')}
-                onChange={null}
-                placeholder={''}
-                disabled={true}
-                value={currency + totalVenueCost.toFixed(2)}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <ActivityModal
-        show={showActivityModal}
-        onCancel={() => setShowActivityModal(false)}
-        variant={actModalVariant}
-        activityTypes={actTypeList}
-        onSave={(variant, data) => saveActivity(variant, data)}
-        bookingId={bookingIdVal}
-        data={actRow}
-      />
-
-      <ConfirmationDialog
-        variant={confVariant}
-        show={showConfirm}
-        onYesClick={() => saveActivity('delete', actRow)}
-        onNoClick={() => setShowConfirm(false)}
-        hasOverlay={false}
-      />
+      )}
     </>
   );
-}
+});
+
+ActivitiesTab.displayName = 'ActivitiesTab';
+export default ActivitiesTab;

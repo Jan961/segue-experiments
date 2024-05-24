@@ -238,7 +238,7 @@ export default function AllocatedSeatsModal({
     <div>
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
         <div className="h-[552px] w-[448px]">
-          <div className="text-xl text-primary-navy font-bold mb-4">Allocated Seats</div>
+          <div className="text-xl text-primary-navy font-bold mb-4 -mt-3">Allocated Seats</div>
 
           <div className="flex flex-row">
             <div className="text-base text-primary-input-text flex flex-col text-left w-1/3">For Performance</div>
