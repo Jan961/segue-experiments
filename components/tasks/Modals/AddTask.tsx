@@ -184,7 +184,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
       show={visible}
       onClose={handleClose}
       title={inputs.Id ? 'Edit Task' : 'Create New Task'}
-      titleClass="text-primary-navy"
+      titleClass="text-primary-navy text-xl mb-4"
     >
       <form className="flex flex-col gap-4">
         {loading && <LoadingOverlay />}
@@ -204,7 +204,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             id="Code"
             disabled={isMasterTask}
             className="w-128 placeholder-secondary"
-            placeholder="Enter Task Code"
+            placeholder="Code is assigned when task is created"
             onChange={handleOnChange}
             value={inputs?.Code?.toString()}
           />
@@ -215,6 +215,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               value={inputs?.StartByWeekNum}
               options={weekOptions}
+              placeholder="Week No."
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
               className="w-32"
             />
@@ -225,6 +226,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
               options={weekOptions}
+              placeholder="Week No."
               className="w-32"
             />
           </div>
@@ -236,6 +238,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               onChange={(value) => handleOnChange({ target: { id: 'Priority', value } })}
               value={inputs?.Priority}
               className="w-32"
+              placeholder="Priority"
               options={priorityOptionList}
             />
           </div>
@@ -245,6 +248,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
               value={inputs?.Progress}
+              placeholder="Progress"
               className="w-20"
               options={generatePercentageOptions}
             />
@@ -252,12 +256,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
+              disabled={isMasterTask}
               value={inputs?.DueDate}
               onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
             />
           </div>
         </div>
-        <h3 className="font-bold text-xl mt-4">Occurence</h3>
+        <h3 className="font-bold text-xl mt-4">Occurrence</h3>
         <div className="col-span-2 col-start-4 flex items-center">
           <div className="flex">
             <Label className="!text-secondary pr-2" text="Only Once" />
@@ -274,6 +279,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               value={inputs?.RepeatInterval}
               className="w-32"
               options={RepeatOptions}
+              placeholder="Week No."
               disabled={repeatInterval}
             />
           </div>
@@ -284,6 +290,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               value={inputs?.TaskRepeatFromWeekNum}
               options={weekOptions}
               className="w-32"
+              placeholder="Week No."
               disabled={repeatInterval}
             />
           </div>
@@ -294,6 +301,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               value={inputs?.TaskRepeatToWeekNum}
               options={weekOptions}
               disabled={repeatInterval}
+              placeholder="Week No."
               className="w-32"
             />
           </div>
@@ -304,12 +312,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             onChange={(value) => handleOnChange({ target: { id: 'AssignedToUserId', value } })}
             value={inputs?.AssignedToUserId}
             options={usersList}
+            placeholder="Select Assignee"
             className="w-64"
           />
         </div>
         <div>
           <Label className="!text-secondary pr-6 mr-4" text="Notes" />
-          <TextArea onChange={handleOnChange} value={inputs?.Notes} className="w-full !h-32" id="Notes" />
+          <TextArea onChange={handleOnChange} value={inputs?.Notes} className="w-full min-h-2" id="Notes" />
         </div>
         <div className="flex justify-between">
           <div />
@@ -318,6 +327,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Checkbox
               id="occurence"
               value={inputs?.RepeatInterval}
+              checked={isMasterTask}
               disabled={isMasterTask}
               onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
             />
@@ -326,8 +336,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
         <div className="flex justify-between">
           <div />
           <div className="flex">
-            <Button variant="secondary" onClick={onClose} className="mr-4" text="Cancel" />
-            <Button variant="primary" onClick={handleOnSubmit} text={inputs.Id ? 'Edit Task' : 'Create New Task'} />
+            <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
+            <Button
+              variant="primary"
+              className="w-[132px]"
+              onClick={handleOnSubmit}
+              text={inputs.Id ? 'Edit Task' : 'Create New Task'}
+            />
           </div>
         </div>
       </form>
