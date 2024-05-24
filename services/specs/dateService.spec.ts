@@ -1,5 +1,6 @@
-import { getNextMondayDateString } from '../dateService';
+import { getNextMondayDateString, getTimeFromDateAndTime } from '../dateService';
 
+// ----------------- getNextMondayDateString -----------------
 describe('getNextMondayDateString Utility Function', () => {
   // Test Case 1: Testing with a date that is before Monday
   test('getNextMondayDateString - Before Monday', () => {
@@ -24,4 +25,43 @@ describe('getNextMondayDateString Utility Function', () => {
     const result = getNextMondayDateString('invalid-date');
     expect(result).toEqual('');
   }); */
+});
+
+// ----------------- getTimeFromDateAndTime -----------------
+describe('getTimeFromDateAndTime', () => {
+  test('should return the correct time for a valid date string', () => {
+    const inputDt = '2023-05-23T14:30:00Z';
+    const expectedTime = '14:30';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
+
+  test('should pad single digit hours and minutes with leading zeros', () => {
+    const inputDt = '2023-05-23T04:05:00Z';
+    const expectedTime = '04:05';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
+
+  test('should return "00:00" for midnight UTC', () => {
+    const inputDt = '2023-05-23T00:00:00Z';
+    const expectedTime = '00:00';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
+
+  test('should handle date strings without explicit time', () => {
+    const inputDt = '2023-05-23';
+    const expectedTime = '00:00';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
+
+  test('should return an empty string for invalid date strings', () => {
+    const inputDt = 'invalid-date';
+    const expectedTime = '';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
+
+  test('should return an empty string if inputDate is undefined', () => {
+    const inputDt = undefined;
+    const expectedTime = '';
+    expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
 });
