@@ -12,7 +12,7 @@ const useBookingFilter = () => {
   const { rows } = useRecoilValue(rowsSelector);
 
   const filterVenueInput = (inputFields, searchTerm) => {
-    //    Regex to remove punctuation and then splits by spaces
+    //    Regex to remove punctuation and then splits by spaces.
     const formatStrings = (inputText) => {
       return inputText
         .toLowerCase()
