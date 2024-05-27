@@ -554,7 +554,7 @@ export interface DealMemoContractFormData {
   DeMoRunningTimeNotes?: string;
   DeMoPrePostShowEvents?: string;
   DeMoVenueCurfewTime?: Date;
-  DeMoPerformanceNotes?: Date;
+  DeMoPerformanceNotes?: string;
   DeMoProgrammerVenueContactId?: number;
   DeMoROTTPercentage?: number;
   DeMoPRSPercentage?: number;

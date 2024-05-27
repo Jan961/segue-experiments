@@ -19,8 +19,13 @@ import { addEditContractsState } from 'state/contracts/contractsState';
 import useAxios from 'hooks/useAxios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
-import { useMemo, useState } from 'react';
-import { SaveContractBookingFormState, SaveContractFormState, VenueContractFormData } from 'interfaces';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  DealMemoContractFormData,
+  SaveContractBookingFormState,
+  SaveContractFormState,
+  VenueContractFormData,
+} from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
@@ -36,13 +41,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
+  const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
   } | ${formattedDateWithDay(productionJumpState.StartDate)} - ${formattedDateWithDay(productionJumpState.EndDate)}`;
   const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
-  console.log('users--->', users, formData);
   const userList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -52,18 +57,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     [users],
   );
 
-  // useEffect(() => {
-  //   const callDealMemoData = async () =>{
-  //     let data = await fetchData({
-  //       url: `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
-  //       method: 'GET',
-  //       // data: saveContractFormData,
-  //     });
-  //     return data
-  //   }
-  //   let f = callDealMemoData()
-  //   console.log("fff==>",f)
-  // },[])
+  useEffect(() => {
+    const callDealMemoData = async () => {
+      const demoModalData = await fetchData({
+        url: `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
+        method: 'GET',
+        // data: saveContractFormData,
+      });
+      if (typeof demoModalData === 'object') {
+        setDemoModalData(demoModalData as unknown as DealMemoContractFormData);
+      }
+    };
+    callDealMemoData();
+  }, []);
 
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
@@ -496,6 +502,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           onCloseDemoForm={() => setEditDealMemoModal(false)}
           productionJumpState={productionJumpState}
           selectedTableCell={selectedTableCell}
+          demoModalData={demoModalData}
         />
       )}
     </PopupModal>
