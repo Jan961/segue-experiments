@@ -99,12 +99,11 @@ export const contractsRowsSelector = selector({
         HoldNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].HoldNotes : '',
         CompNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].CompNotes : '',
         MerchandiseNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].MerchandiseNotes : '',
-        CastRateTicketNotes: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].CastRateTicketNotes : '',
-        CastRateTicketsArranged: contractBookingData[rowData.Id]
-          ? contractBookingData[rowData.Id].CastRateTicketsArranged
-          : '',
         CastRateTicketsNotes: contractBookingData[rowData.Id]
           ? contractBookingData[rowData.Id].CastRateTicketsNotes
+          : '',
+        CastRateTicketsArranged: contractBookingData[rowData.Id]
+          ? contractBookingData[rowData.Id].CastRateTicketsArranged
           : '',
         RunTag: contractBookingData[rowData.Id] ? contractBookingData[rowData.Id].RunTag : '',
         MarketingCostsStatus: contractBookingData[rowData.Id]

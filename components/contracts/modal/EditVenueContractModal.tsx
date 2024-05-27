@@ -23,6 +23,7 @@ import { useMemo, useState } from 'react';
 import { SaveContractBookingFormState, SaveContractFormState, VenueContractFormData } from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
+import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -30,6 +31,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [saveContractFormData, setSaveContractFormData] = useState<Partial<SaveContractFormState>>({});
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
   const [cancelModal, setCancelModal] = useState<boolean>(false);
+  const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
@@ -40,6 +42,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const { fetchData } = useAxios();
   const router = useRouter();
   const { users } = useRecoilValue(userState);
+  console.log('users--->', users, formData);
   const userList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -48,6 +51,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       })),
     [users],
   );
+
+  // useEffect(() => {
+  //   const callDealMemoData = async () =>{
+  //     let data = await fetchData({
+  //       url: `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
+  //       method: 'GET',
+  //       // data: saveContractFormData,
+  //     });
+  //     return data
+  //   }
+  //   let f = callDealMemoData()
+  //   console.log("fff==>",f)
+  // },[])
 
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
@@ -98,7 +114,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       onClose();
     }
   };
-  console.log('formData.SignedDate.toString()', formData.SignedDate.toString());
+
+  const handleEditDealMemo = () => {
+    setEditDealMemoModal(true);
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -106,7 +126,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
     >
-      <div className="h-[80vh] w-auto overflow-scroll flex">
+      <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px]   flex">
           <div className="w-[423px] h-[1008px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
             <div className=" text-primary-input-text font-bold text-lg">Deal Memo</div>
@@ -164,7 +184,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
             <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
             <TextArea className={'h-[580px] w-[400px]'} value={formData.DealNotes} />
             <div className="flex mt-4 items-center">
-              <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" />
+              <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" onClick={handleEditDealMemo} />
               <Button className="ml-3 w-36" variant="primary" text="View as PDF" />
             </div>
           </div>
@@ -470,6 +490,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         onNoClick={() => setCancelModal(false)}
         onYesClick={() => handleCancelForm(true)}
       />
+      {editDealMemoModal && (
+        <EditDealMemoContractModal
+          visible={editDealMemoModal}
+          onCloseDemoForm={() => setEditDealMemoModal(false)}
+          productionJumpState={productionJumpState}
+          selectedTableCell={selectedTableCell}
+        />
+      )}
     </PopupModal>
   );
 };
