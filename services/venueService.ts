@@ -52,7 +52,11 @@ export const getUniqueVenueCountrylist = async () => {
 };
 
 export const getCountryRegions = async () =>{
-  return await prisma.CountryInRegion.findMany({});
+  return await prisma.CountryInRegion.findMany({
+    orderBy:{
+    CountryId: 'asc'
+    }
+  });
 }
 
 

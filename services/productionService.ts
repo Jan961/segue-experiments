@@ -236,5 +236,9 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
 
 
 export const getAllProductionRegions = async () => {
-  return prisma.ProductionRegion.findMany({});
+  return prisma.ProductionRegion.findMany({
+    orderBy:{
+      PRProductionId: 'asc'
+    }
+  });
 }
