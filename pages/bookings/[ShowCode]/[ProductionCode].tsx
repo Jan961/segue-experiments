@@ -28,6 +28,7 @@ import { filterState } from 'state/booking/filterState';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import { getExportExtraContent } from 'components/bookings/table/tableConfig';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
+import {pick} from 'radash';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -121,7 +122,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      const CountryId = v.VenueAddress.find((address:any) => address.TypeName ==='Main').CountryId;
+      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, CountryId: CountryId, };
     },
   );
 
