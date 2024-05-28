@@ -12,6 +12,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import { FileDTO } from 'interfaces';
+import useComponentMountStatus from 'hooks/useComponentMountStatus';
+import { sortByProductionStartDate } from './util';
 
 interface ProductionsViewProps {
   showData: any;
@@ -62,6 +64,9 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       return prodImageMap;
     }, {});
   });
+  const [editedOrAddedRecords, setEditedOrAddedRecords] = useState([]);
+  const isMounted = useComponentMountStatus();
+  const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -76,11 +81,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [isArchived, setIsArchived] = useState<boolean>(true);
 
   const unArchivedList = useMemo(() => {
-    return showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted);
+    return sortByProductionStartDate(showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted));
   }, [showData, isArchived]);
 
   const archivedList = useMemo(() => {
-    return showData.productions.filter((item) => item.IsArchived && !item.IsDeleted);
+    return sortByProductionStartDate(showData.productions.filter((item) => item.IsArchived && !item.IsDeleted));
   }, [showData, isArchived]);
 
   const rowsData = useMemo(() => {
@@ -198,6 +203,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           };
           applyTransactionToGrid(tableRef, transaction);
         }
+        const excludeUpdatedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+        setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
         console.log('Error updating production', error);
       } finally {
@@ -219,6 +226,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           false,
         );
         await axios.post(`/api/productions/create`, payloadData);
+        const excludeSavedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+        setEditedOrAddedRecords(excludeSavedRecords);
       } catch (error) {
         console.log('Error updating production', error);
       } finally {
@@ -261,6 +270,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const handleCellChanges = (e) => {
+    const excludeEditedRow = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+    setEditedOrAddedRecords([...excludeEditedRow, getProductionsConvertedPayload(e.data)]);
     setCurrentProduction(e.data);
     setIsEdited(true);
   };
@@ -284,14 +295,14 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl mb-3 mt-1 font-bold">{showName}</div>
+        <div className="text-primary-navy text-xl relative bottom-2 font-bold">{showName}</div>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             <Checkbox
               className="flex flex-row-reverse mr-2"
               checked={isArchived}
               label="Include archived"
-              id={''}
+              id=""
               onChange={handleArchive}
             />
             <Button disabled={isAddRow} onClick={addNewRow} text="Add New Production" />
@@ -301,7 +312,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       <div className=" w-[750px] lg:w-[1568px] h-full flex flex-col ">
         <Table
           ref={tableRef}
-          columnDefs={productionsTableConfig}
+          columnDefs={productionColumDefs}
           rowData={rowsData}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
@@ -313,7 +324,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
 
         {isLoading && <LoadingOverlay />}
       </div>
-      <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
+      <div className="pt-4 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
         <div />
         <div className="flex gap-3">
           <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" />
@@ -321,7 +332,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         </div>
       </div>
       <ConfirmationDialog
-        variant={'delete'}
+        variant="delete"
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
