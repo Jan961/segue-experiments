@@ -233,3 +233,8 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
   });
   return getProductionsByStartDate(productionsWithTasks);
 };
+
+
+export const getAllProductionRegions = async () => {
+  return prisma.ProductionRegion.findMany({});
+}
