@@ -16,6 +16,7 @@ export const getAllVenuesMin = async () => {
         select: {
           Town: true,
           TypeName: true,
+          CountryId: true,
         },
       },
     },

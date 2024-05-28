@@ -70,7 +70,8 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      const CountryId = v.VenueAddress.find((address:any) => address.TypeName ==='Main').CountryId;
+      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, CountryId: CountryId, };
     },
   );
   const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
@@ -125,6 +126,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       });
     }
   }
+  console.log(venue);
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
