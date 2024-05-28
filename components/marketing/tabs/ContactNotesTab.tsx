@@ -31,7 +31,6 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const [dataAvail, setDataAvail] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const users = useRecoilValue(userState);
-  const [contactNoteTable, setContactNoteTable] = useState(<div />);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -55,13 +54,6 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
         setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
         setContactNoteRows(sortedContactNotes);
-        setContactNoteTable(
-          <div className="flex flex-row">
-            <div className="w-[1086px] h-[500px]">
-              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
-            </div>
-          </div>,
-        );
       }
     } catch (error) {
       console.log(error);
@@ -161,13 +153,17 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
                 className="w-[203px]"
                 disabled={!productionId}
                 iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName={'excel'}
+                sufixIconName="excel"
               />
               <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
             </div>
           </div>
 
-          {contactNoteTable}
+          <div className="flex flex-row">
+            <div className="w-[1086px] h-[500px]">
+              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+            </div>
+          </div>
 
           <ContactNoteModal
             show={showContactNoteModal}
@@ -179,7 +175,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
           />
 
           <ConfirmationDialog
-            variant={'delete'}
+            variant="delete"
             show={showConfirm}
             onYesClick={() => saveContactNote('delete', contactNoteRow)}
             onNoClick={() => setShowConfirm(false)}
