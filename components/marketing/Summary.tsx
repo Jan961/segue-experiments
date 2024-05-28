@@ -56,12 +56,10 @@ export const Summary = () => {
 
   if (!summary) return null;
 
-  let weekNo;
-  if (summary?.ProductionInfo?.StartDate === '-' || summary?.ProductionInfo?.Date === '-') {
-    weekNo = 0;
-  } else {
-    weekNo = calculateWeekNumber(new Date(summary?.ProductionInfo?.StartDate), new Date(summary?.ProductionInfo?.Date));
-  }
+  const weekNo = calculateWeekNumber(
+    new Date(summary?.ProductionInfo?.StartDate),
+    new Date(summary?.ProductionInfo?.Date),
+  );
 
   if (!summary?.Info) return null;
 
