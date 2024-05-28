@@ -79,7 +79,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="minFromLastVenue"
-            value={minFromLastVenue as string}
+            value={minFromLastVenue as unknown as string}
             onChange={handleOnChange}
           />
         </div>
@@ -88,7 +88,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="maxFromLastVenue"
-            value={maxFromLastVenue as string}
+            value={maxFromLastVenue as unknown as string}
             onChange={handleOnChange}
           />
         </div>
@@ -107,7 +107,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="minToNextVenue"
-            value={minToNextVenue as string}
+            value={minToNextVenue as unknown as string}
             onChange={handleOnChange}
           />
         </div>
@@ -116,7 +116,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="maxToNextVenue"
-            value={maxToNextVenue as string}
+            value={maxToNextVenue as unknown as string}
             onChange={handleOnChange}
           />
         </div>
@@ -135,7 +135,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Seats"
             id="minSeats"
-            value={minSeats as string}
+            value={minSeats as unknown as string}
             onChange={handleOnChange}
           />
         </div>
