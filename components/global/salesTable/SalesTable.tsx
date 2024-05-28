@@ -52,6 +52,7 @@ export default function SalesTable({
   const [schoolSales, setSchoolSales] = useState<boolean>(false);
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
+  const [excelStyles, setExcelStyles] = useState([]);
 
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
@@ -209,6 +210,7 @@ export default function SalesTable({
         setNumBookings(data.bookingIds.length);
         setColumnDefs(tableData.columnDef);
         setRowData(tableData.rowData);
+        setExcelStyles(tableData.excelStyles);
         break;
       }
 
@@ -242,6 +244,7 @@ export default function SalesTable({
         onCellValueChange={onCellValChange}
         tableHeight={tableHeight}
         gridOptions={{ suppressHorizontalScroll: true }}
+        excelStyles={excelStyles}
       />
     </div>
   );
