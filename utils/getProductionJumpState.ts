@@ -12,7 +12,6 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
   const { ProductionCode, ShowCode } = (ctx.params || {}) as Params;
   const productionsRaw = await getAllProductions(AccountId);
   const allProductionRegions : any = await getAllProductionRegions();
-  console.log(allProductionRegions);
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
   );
