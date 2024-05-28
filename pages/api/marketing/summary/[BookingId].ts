@@ -4,6 +4,7 @@ import { PerformanceDTO } from 'interfaces';
 import { calculateWeekNumber } from 'services/dateService';
 import { group } from 'radash';
 import { checkAccess, getEmailFromReq } from 'services/userService';
+import { loggingService } from 'services/loggingService';
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[];
@@ -67,6 +68,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Date: 'asc',
       },
     });
+
     const NumberOfPerformances: number = performances.length;
 
     const salesSummary = await prisma.salesSetTotalsView.findFirst({
@@ -132,6 +134,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
+
     const {
       DealNotes: BookingDealNotes,
       Notes: BookingNotes,
@@ -139,20 +142,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       HoldNotes,
       CompNotes,
     } = booking || {};
+
     const { Seats: Capacity, CurrencyCode } = booking?.Venue || {};
     const { SymbolUnicode } = booking?.Venue?.Currency || {};
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
-    const AvgTicketPrice = salesSummary && salesSummary.Value / salesSummary.Seats;
+    const AvgTicketPrice = salesSummary === null ? 0 : salesSummary?.Value / salesSummary?.Seats;
     const TotalSeats = Capacity * NumberOfPerformances;
-    const GrossProfit = AvgTicketPrice && AvgTicketPrice * TotalSeats;
-    const seatsSalePercentage = salesSummary && (salesSummary.Seats / TotalSeats) * 100;
+    const GrossProfit = AvgTicketPrice === 0 ? 0 : AvgTicketPrice * TotalSeats;
+    const seatsSalePercentage = salesSummary === null ? 0 : (salesSummary?.Seats / TotalSeats) * 100;
     const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        SeatsSold: salesSummary.Seats,
+        SeatsSold: salesSummary?.Seats === undefined ? 0 : salesSummary?.Seats,
         Seats: TotalSeats,
-        SalesValue: salesSummary?.Value,
+        SalesValue: salesSummary?.Value === undefined ? 0 : salesSummary?.Value,
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
@@ -180,38 +184,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     res.status(200).json(result);
   } catch (err) {
-    // no summary data therefore send defaults
-    const result: SummaryResponseDTO = {
-      Performances: [],
-      Info: {
-        SeatsSold: 0,
-        Seats: 0,
-        SalesValue: 0,
-        AvgTicketPrice: 0,
-        GrossPotential: 0,
-        VenueCurrencyCode: '',
-        VenueCurrencySymbol: '-',
-        seatsSalePercentage: 0,
-        ConversionRate: 0,
-        Capacity: 0,
-      },
-      ProductionInfo: {
-        StartDate: '-',
-        Date: '-',
-        salesFigureDate: '-',
-        week: 0,
-        lastDate: '-',
-        numberOfDays: 0,
-      },
-      Notes: {
-        BookingDealNotes: 'None',
-        BookingNotes: 'None',
-        MarketingDealNotes: 'None',
-        HoldNotes: 'None',
-        CompNotes: 'None',
-      },
-    };
-
-    res.status(200).json(result);
+    await loggingService.logError('Performance Issue' + err);
+    console.log(err);
+    res.status(500).json({ err: 'Error occurred while generating search results.' + err });
   }
 }

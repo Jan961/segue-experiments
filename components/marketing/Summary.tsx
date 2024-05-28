@@ -117,7 +117,7 @@ export const Summary = () => {
       const times: any = x[1];
       const data = {
         date: x[0],
-        time: times.map((item) => getTimeFromDateAndTime(item.Time)),
+        time: times.map((item) => (item.Time === null ? 'TBC' : getTimeFromDateAndTime(item.Time))),
       };
       processed.push(data);
     });
