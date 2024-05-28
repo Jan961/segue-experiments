@@ -62,9 +62,8 @@ const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProp
         <Filters onExportClick={onExportClick} />
       </div>
       <BookingsTable tableRef={tableRef} rowData={rows} />
-      {tableRef && (
+      {isExportModalOpen && (
         <ExportModal
-          tableRef={tableRef}
           visible={isExportModalOpen}
           onClose={() => setIsExportModalOpen(false)}
           onItemClick={exportTable}
