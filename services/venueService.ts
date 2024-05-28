@@ -51,6 +51,11 @@ export const getUniqueVenueCountrylist = async () => {
   return await prisma.Country.findMany({});
 };
 
+export const getCountryRegions = async () =>{
+  return await prisma.CountryInRegion.findMany({});
+}
+
+
 export interface DistanceStop {
   Date: string;
   Ids: number[];

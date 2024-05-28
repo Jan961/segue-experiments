@@ -9,7 +9,7 @@ import {
   performanceMapper,
   rehearsalMapper,
 } from 'lib/mappers';
-import { getAllVenuesMin } from 'services/venueService';
+import { getAllVenuesMin, getCountryRegions } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
@@ -53,10 +53,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   productionJump.selected = -1;
 
   // Get in parallel
-  const [venues, productions, dateTypeRaw] = await all([
+  const [venues, productions, dateTypeRaw, countryRegions] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(null, false),
     getDayTypes(),
+    getCountryRegions(),
   ]);
 
   const dateBlock = [];
@@ -71,9 +72,15 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
       const CountryId = v.VenueAddress.find((address:any) => address.TypeName ==='Main').CountryId;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, CountryId: CountryId, };
+      const RegionId :any |null = countryRegions.find((keyPair: any) => keyPair?.CountryId === CountryId)?? null;
+      if(RegionId !== null){
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, RegionId: RegionId.RegionId, };}
+      else{
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, RegionId: null, };
+        }
     },
   );
+
   const dayTypeMap = objectify(dateTypeRaw, (type: DateType) => type.Id);
   let distance = {};
   // Map to DTO. The database can change and we want to control. More info in mappers.ts

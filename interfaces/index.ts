@@ -207,7 +207,7 @@ export type VenueMinimalDTO = {
   Town?: string;
   Seats?: string;
   Count?: number;
-  CountryId: number;
+  RegionId?: number;
 };
 
 export type OtherDTO = {
