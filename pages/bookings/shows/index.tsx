@@ -87,7 +87,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       productions: showProductionMapper(show),
     };
   });
-  console.log(showsList);
   const initialState: InitialState = {
     global: {
       productionJump,

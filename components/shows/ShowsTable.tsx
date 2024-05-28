@@ -36,6 +36,8 @@ const intShowData = {
   Name: '',
   Type: 'P',
   IsArchived: false,
+  productions: [],
+  ShowProdCoId: null,
 };
 const ShowsTable = ({
   rowsData,
