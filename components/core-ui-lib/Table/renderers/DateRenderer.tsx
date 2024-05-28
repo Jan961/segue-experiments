@@ -2,7 +2,20 @@ import { ICellRendererParams } from 'ag-grid-community';
 import DateInput from 'components/core-ui-lib/DateInput';
 import { useRef, useState } from 'react';
 
-const DateRenderer = ({ data, colDef, value, setValue, node }: ICellRendererParams) => {
+interface CustomDateCellRendererParams extends ICellRendererParams {
+  hideEmptyDeleteError?: boolean;
+  notSetMinDate?: boolean;
+}
+
+const DateRenderer = ({
+  data,
+  colDef,
+  value,
+  setValue,
+  node,
+  hideEmptyDeleteError,
+  notSetMinDate,
+}: CustomDateCellRendererParams) => {
   const fromInputRef = useRef(null);
   const [error, setError] = useState<string>('');
 
@@ -16,7 +29,7 @@ const DateRenderer = ({ data, colDef, value, setValue, node }: ICellRendererPara
       ...data,
       [colDef?.field]: dateVal,
     });
-    if (!dateVal) {
+    if (!hideEmptyDeleteError && !dateVal) {
       setError('error');
     }
   };
@@ -26,10 +39,10 @@ const DateRenderer = ({ data, colDef, value, setValue, node }: ICellRendererPara
       <DateInput
         ref={fromInputRef}
         popperClassName="ag-custom-component-popup !z-50 rounded"
-        inputClass={`!shadow-none !border-primary-white`}
+        inputClass="!shadow-none !border-primary-white"
         value={date}
         onChange={handleDateFromChange}
-        minDate={new Date()}
+        minDate={notSetMinDate ? null : new Date()}
         error={error}
       />
     </div>
