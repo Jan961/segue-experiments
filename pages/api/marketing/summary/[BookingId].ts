@@ -1,4 +1,3 @@
-import { loggingService } from 'services/loggingService';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PerformanceDTO } from 'interfaces';
@@ -181,8 +180,38 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     res.status(200).json(result);
   } catch (err) {
-    await loggingService.logError('Performance Issue' + err);
-    console.log(err);
-    res.status(500).json({ err: 'Error occurred while generating search results.' + err });
+    // no summary data therefore send defaults
+    const result: SummaryResponseDTO = {
+      Performances: [],
+      Info: {
+        SeatsSold: 0,
+        Seats: 0,
+        SalesValue: 0,
+        AvgTicketPrice: 0,
+        GrossPotential: 0,
+        VenueCurrencyCode: '',
+        VenueCurrencySymbol: '-',
+        seatsSalePercentage: 0,
+        ConversionRate: 0,
+        Capacity: 0,
+      },
+      ProductionInfo: {
+        StartDate: '-',
+        Date: '-',
+        salesFigureDate: '-',
+        week: 0,
+        lastDate: '-',
+        numberOfDays: 0,
+      },
+      Notes: {
+        BookingDealNotes: 'None',
+        BookingNotes: 'None',
+        MarketingDealNotes: 'None',
+        HoldNotes: 'None',
+        CompNotes: 'None',
+      },
+    };
+
+    res.status(200).json(result);
   }
 }
