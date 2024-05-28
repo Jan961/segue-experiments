@@ -71,12 +71,12 @@ export const Summary = () => {
     {
       id: 1,
       label: 'First Date:',
-      data: summary?.ProductionInfo?.Date === '-' ? '-' : dateToSimple(summary?.ProductionInfo?.Date),
+      data: dateToSimple(summary?.ProductionInfo?.Date),
     },
     {
       id: 2,
       label: 'Last Date:',
-      data: summary?.ProductionInfo?.lastDate === '-' ? '-' : dateToSimple(summary?.ProductionInfo?.lastDate),
+      data: dateToSimple(summary?.ProductionInfo?.lastDate),
     },
     { id: 3, label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
     { id: 4, label: 'Production Week No:', data: weekNo.toString() },
