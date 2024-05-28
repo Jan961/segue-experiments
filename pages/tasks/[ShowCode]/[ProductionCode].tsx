@@ -19,12 +19,15 @@ import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
+import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
 
   const { users } = useRecoilValue(userState);
+
+  const filter = useRecoilValue(tasksfilterState);
 
   const router = useRouter();
 
@@ -57,10 +60,22 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     router.replace(router.asPath);
   };
 
+  const isFilterMatchingInitialState = () => {
+    const { assignee, endDueDate, startDueDate, status, taskText } = filter;
+
+    return (
+      assignee === intialTasksState.assignee &&
+      endDueDate === intialTasksState.endDueDate &&
+      startDueDate === intialTasksState.startDueDate &&
+      status === intialTasksState.status &&
+      taskText === intialTasksState.taskText
+    );
+  };
+
   useEffect(() => {
     if (filteredProductions.length === 1) {
       filteredProductions.forEach((production) => {
-        if (production.Tasks.length === 0) {
+        if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
           setShowEmptyProductionModal(true);
           setIsProductionEmpty(true);
         }
