@@ -6,16 +6,28 @@ import { getAccountId, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const task = req.body as MasterTask;
+    const tasks = req.body as MasterTask[];
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
+
+    // Get the maximum task code once
     const { Code } = await getMaxTaskCode();
-    const createResult = await prisma.MasterTask.create({
-      data: { ...task, AccountId, Code: Code + 1 },
+
+    // Map the tasks to include the AccountId and incremented Code
+    const tasksWithAccountAndCode = tasks.map((task, index) => ({
+      ...task,
+      AccountId,
+      Code: Code + 1 + index, // Increment code for each task
+    }));
+
+    // Use createMany to insert all tasks at once
+    const createResults = await prisma.MasterTask.createMany({
+      data: tasksWithAccountAndCode,
     });
-    res.json(createResult);
+
+    res.json(createResults);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error creating Master Task' });
+    res.status(500).json({ error: 'Error creating Master Tasks' });
   }
 }
