@@ -55,6 +55,7 @@ export const Summary = () => {
   if (loading) return <LoadingTab />;
 
   if (!summary) return null;
+
   const weekNo = calculateWeekNumber(
     new Date(summary?.ProductionInfo?.StartDate),
     new Date(summary?.ProductionInfo?.Date),
@@ -67,8 +68,16 @@ export const Summary = () => {
   const notes = summary?.Notes;
 
   const generalInfo = [
-    { id: 1, label: 'First Date:', data: dateToSimple(summary?.ProductionInfo?.Date) },
-    { id: 2, label: 'Last Date:', data: dateToSimple(summary?.ProductionInfo?.lastDate) },
+    {
+      id: 1,
+      label: 'First Date:',
+      data: dateToSimple(summary?.ProductionInfo?.Date),
+    },
+    {
+      id: 2,
+      label: 'Last Date:',
+      data: dateToSimple(summary?.ProductionInfo?.lastDate),
+    },
     { id: 3, label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
     { id: 4, label: 'Production Week No:', data: weekNo.toString() },
   ];
@@ -106,20 +115,24 @@ export const Summary = () => {
       const times: any = x[1];
       const data = {
         date: x[0],
-        time: times.map((item) => getTimeFromDateAndTime(item.Time)),
+        time: times.map((item) => (item.Time === null ? 'TBC' : getTimeFromDateAndTime(item.Time))),
       };
       processed.push(data);
     });
 
-    processed.forEach((element) => {
-      result.push(
-        <p>
-          {dateToSimple(element.date)} {element.time.join('; ')}{' '}
-        </p>,
-      );
-    });
+    if (processed.length === 0) {
+      return '-';
+    } else {
+      processed.forEach((element) => {
+        result.push(
+          <p>
+            {dateToSimple(element.date)} {element.time.join('; ')}{' '}
+          </p>,
+        );
+      });
 
-    return result;
+      return result;
+    }
   };
 
   return (
@@ -132,7 +145,7 @@ export const Summary = () => {
             <SummaryRow key={item.id} label={item.label} data={item.data} />
           ))}
 
-          <SummaryRow label="Performance Time(s):" data={''} />
+          <SummaryRow label="Performance Time(s):" data="" />
           <div className={normalText}>{getPerformances()}</div>
 
           <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
@@ -144,9 +157,13 @@ export const Summary = () => {
             <>
               <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
               <div className={classNames(boldText, 'mr-1')}>Marketing Deal:</div>
-              <div className={normalText}>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</div>
+              <div className={normalText}>
+                {notes.MarketingDealNotes || notes.MarketingDealNotes === 'None' ? notes.MarketingDealNotes : 'None'}
+              </div>
               <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
-              <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
+              <div className={normalText}>
+                {notes.BookingNotes || notes.BookingNotes === 'None' ? notes.BookingNotes : 'None'}
+              </div>
 
               {notesInfo.map((item) => (
                 <SummaryRow key={item.id} label={item.label} data={item.data} />
