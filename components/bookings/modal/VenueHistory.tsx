@@ -195,7 +195,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      getSalesSnapshot(e.data.bookingId);
+      if(e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
     }
   };
 

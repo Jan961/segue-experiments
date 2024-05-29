@@ -97,6 +97,7 @@ export default function SalesTable({
         numPerfs: booking.PerformanceCount,
         prodWks: booking.ProductionLengthWeeks,
         prodCode: booking.FullProductionCode,
+        hasSalesData: booking.HasSalesData
       });
     });
 
