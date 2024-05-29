@@ -140,8 +140,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const getProdComparision = async () => {
     setErrorMessage('');
-    if (selectedBookings.length < 2) {
-      setErrorMessage('Please select at least 2 venues for comparison.');
+    if (selectedBookings.length < 1) {
+      setErrorMessage('Please select at least 1 venue for comparison.');
       return;
     }
 
