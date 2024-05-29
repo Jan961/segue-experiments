@@ -34,7 +34,7 @@ export const onScheduleReport = async (ProductionId: number) => {
 };
 
 export const exportBookingSchedule = async (ProductionId: number) => {
-  return fetch('/api/reports/bookingSchedule', { method: 'POST', body: JSON.stringify({ ProductionId }) })
+  return fetch('/api/reports/booking-schedule', { method: 'POST', body: JSON.stringify({ ProductionId }) })
     .then(async (response) => {
       if (response.status >= 200 && response.status < 300) {
         const productionName = `${ProductionId}`;
