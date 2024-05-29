@@ -5,7 +5,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Table from 'components/core-ui-lib/Table';
 import { LoadingOverlay } from 'components/shows/ShowsTable';
-import { getProductionsConvertedPayload } from 'components/shows/constants';
+import { getProductionsConvertedPayload , ToastMessages } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -14,6 +14,7 @@ import UploadModal from 'components/core-ui-lib/UploadModal';
 import { FileDTO } from 'interfaces';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
 import { sortByProductionStartDate } from './util';
+import toast from 'react-hot-toast';
 
 interface ProductionsViewProps {
   showData: any;
@@ -164,6 +165,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       .then((response: any) => {
         progress = 100;
         onProgress(file[0].file, progress);
+        toast.success(ToastMessages.imageUploadSuccess);
         onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
         clearInterval(slowProgressInterval);
         const gridApi = tableRef.current.getApi();
@@ -181,6 +183,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         applyTransactionToGrid(tableRef, transaction);
       }) // eslint-disable-next-line
       .catch((error) => {
+        toast.error(ToastMessages.imageUploadFailure);
         onError(file[0].file, 'Error uploading file. Please try again.');
         clearInterval(slowProgressInterval);
       });
@@ -195,6 +198,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           true,
         );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
+        toast.success(ToastMessages.updateProductionSuccess);
         if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
           const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
@@ -206,6 +210,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         const excludeUpdatedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
         setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
+        toast.error(ToastMessages.updateProductionFailure);
         console.log('Error updating production', error);
       } finally {
         setIsLoading(false);
@@ -226,9 +231,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           false,
         );
         await axios.post(`/api/productions/create`, payloadData);
+        toast.success(ToastMessages.createNewProductionSuccess);
         const excludeSavedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
         setEditedOrAddedRecords(excludeSavedRecords);
       } catch (error) {
+        toast.error(ToastMessages.createNewProductionFailure);
         console.log('Error updating production', error);
       } finally {
         setIsEdited(false);
@@ -281,12 +288,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     setIsLoading(true);
     try {
       await axios.delete(`/api/productions/delete/${productionId}`);
+      toast.success(ToastMessages.deleteProductionSuccess);
       const gridApi = tableRef.current.getApi();
       const rowDataToRemove = gridApi.getDisplayedRowAtIndex(rowIndex).data;
       const transaction = {
         remove: [rowDataToRemove],
       };
       applyTransactionToGrid(tableRef, transaction);
+    } catch (error) {
+      toast.error(ToastMessages.deleteProductionFailure);
     } finally {
       setIsLoading(false);
     }
