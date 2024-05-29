@@ -43,12 +43,12 @@ const Form = ({ onSave }: FormProps) => {
   };
   const getSuggestions = () => {
     const data: Partial<GapSuggestionUnbalancedProps> = {
-      MinFromMiles: formData.minFromLastVenue,
-      MaxFromMiles: formData.maxFromLastVenue,
-      MinToMiles: formData.minToNextVenue,
-      MaxToMiles: formData.maxToNextVenue,
+      MinFromMiles: parseInt(formData.minFromLastVenue),
+      MaxFromMiles: parseInt(formData.maxFromLastVenue),
+      MinToMiles: parseInt(formData.minToNextVenue),
+      MaxToMiles: parseInt(formData.maxToNextVenue),
       IncludeExcludedVenues: formData.includeExcludedVenues,
-      MinSeats: formData.minSeats,
+      MinSeats: parseInt(formData.minSeats),
       MaxFromTime: getTimeInMins(formData.maxTravelTimeFromLastVenue),
       MaxToTime: getTimeInMins(formData.maxTravelTimeToNextVenue),
     };
@@ -79,7 +79,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="minFromLastVenue"
-            value={minFromLastVenue as unknown as string}
+            value={minFromLastVenue as string}
             onChange={handleOnChange}
           />
         </div>
@@ -88,7 +88,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="maxFromLastVenue"
-            value={maxFromLastVenue as unknown as string}
+            value={maxFromLastVenue as string}
             onChange={handleOnChange}
           />
         </div>
@@ -107,7 +107,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="minToNextVenue"
-            value={minToNextVenue as unknown as string}
+            value={minToNextVenue as string}
             onChange={handleOnChange}
           />
         </div>
@@ -116,7 +116,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Miles"
             id="maxToNextVenue"
-            value={maxToNextVenue as unknown as string}
+            value={maxToNextVenue as string}
             onChange={handleOnChange}
           />
         </div>
@@ -135,7 +135,7 @@ const Form = ({ onSave }: FormProps) => {
             className="w-full"
             placeholder="Enter Seats"
             id="minSeats"
-            value={minSeats as unknown as string}
+            value={minSeats as string}
             onChange={handleOnChange}
           />
         </div>

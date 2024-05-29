@@ -81,13 +81,13 @@ export const OTHER_DAY_TYPES = [
 ];
 
 export const DEFAULT_GAP_SUGGEST_FORM_STATE = {
-  minFromLastVenue: 25,
-  maxFromLastVenue: 125,
+  minFromLastVenue: '25',
+  maxFromLastVenue: '125',
   maxTravelTimeFromLastVenue: '3',
-  minToNextVenue: 25,
-  maxToNextVenue: 125,
+  minToNextVenue: '25',
+  maxToNextVenue: '125',
   maxTravelTimeToNextVenue: '3',
-  minSeats: 400,
+  minSeats: '400',
   includeExcludedVenues: false,
 };
 export const DayTypeEdit = {};
