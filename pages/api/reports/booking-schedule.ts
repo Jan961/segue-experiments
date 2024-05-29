@@ -11,6 +11,7 @@ import {
   topAndBottomBorder,
 } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
+import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -266,6 +267,8 @@ const handler = async (req, res) => {
     styleHeader({ worksheet, row, numberOfColumns });
   }
 
+  makeRowTextBoldAndAllignLeft({ worksheet, row: 3, numberOfColumns: 7 });
+  makeRowTextBoldAndAllignLeft({ worksheet, row: 4, numberOfColumns: 7 });
   addWidthAsPerContent({
     worksheet,
     fromColNumber: 2,
