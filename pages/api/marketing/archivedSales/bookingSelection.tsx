@@ -24,6 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (salesByType === 'venue') {
       conditions.push(Prisma.sql`VenueCode = ${venueCode}`);
     }
+
     if (salesByType === 'town') {
       const venue = await prisma.$queryRaw`Select * from VenueView where VenueCode=${venueCode}`;
       if (venue.length) {
@@ -48,6 +49,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
+
+    if(data.length) {
+      const venueId = data[0].VenueId;
+      const performancesNoSales = await prisma.$queryRaw
+        `SELECT BookingsForVenue
+         FROM (SELECT BookingId AS BookingsForVenue
+               FROM frtxigoo_dev.Booking
+               WHERE BookingVenueId = ${venueId}) AS VenueBooking
+         WHERE BookingsForVenue NOT IN (SELECT DISTINCT SetBookingId
+                                        FROM frtxigoo_dev.SalesSet)
+         ORDER BY BookingsForVenue ASC;`
+    }
 
     const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
       acc[curr.BookingId] = curr._count?.Id;
