@@ -1,4 +1,3 @@
-import DefaultCellRenderer from 'components/bookings/table/DefaultCellRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
@@ -9,6 +8,7 @@ import React from 'react';
 import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import UploadRenderer from 'components/bookings/table/UploadRenderer';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 const generateChildCol = (
   headerName: string,
@@ -37,7 +37,7 @@ const generateChildCol = (
   };
 };
 
-export const tableConfig = [
+export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
   {
     headerName: 'Show Name',
     field: 'Name',
@@ -65,8 +65,14 @@ export const tableConfig = [
   },
   {
     headerName: 'Company',
-    field: '',
-    cellRenderer: DefaultCellRenderer,
+    field: 'ShowProdCoId',
+    cellRenderer: SelectCellRenderer,
+    cellRendererParams: {
+      options: prodCompanyOptions,
+    },
+    cellStyle: {
+      overflow: 'visible',
+    },
     width: 270,
     headerClass: 'text-center',
     headerTooltip: 'Please select the Company Name or “Special Purpose Vehicle” that is presenting this production.',

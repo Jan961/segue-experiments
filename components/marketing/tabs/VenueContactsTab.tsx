@@ -21,7 +21,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
   const venueRoles = useRecoilValue(venueRoleState);
   const [venueContactsTable, setVenueContactsTable] = useState(<div />);
   const [selectedVenue, setSelectedVenue] = useState(null);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const venueStandardRoleList = [
     ...venueRoles.filter((vr) => vr.Standard === true).map((vr) => vr.Standard && { text: vr.Name, value: vr.Id }),
   ];
@@ -30,7 +30,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -130,7 +130,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
             onChange={(newData) => saveVenueContact(newData)}
             tableStyleProps={styleProps}
             tableHeight={585}
-            title={''}
+            title=""
             module="marketing"
           />,
         );
@@ -145,11 +145,11 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
       setSelectedVenue(booking.Venue);
       getVenueContacts(booking.VenueId.toString());
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
-  return <div>{dataAvail && <div>{venueContactsTable}</div>}</div>;
+  return <div>{dataAvailable && <div>{venueContactsTable}</div>}</div>;
 });
 
 VenueContactsTab.displayName = 'VenueContactsTab';
