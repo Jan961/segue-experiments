@@ -27,6 +27,7 @@ export enum COLOR_HEXCODE {
   CREAM = 'ffedb150',
   DARK_BLUE = 'ff2f75b5',
   LIGHT_GREY = 'ffc8c8c8',
+  DARK_ORANGE = 'ffec6255',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`;
@@ -690,7 +691,15 @@ export const applyFormattingToRange = ({
   }
 };
 
-export const alignColumnTextHorizontally = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align:string }) => {
+export const alignColumnTextHorizontally = ({
+  worksheet,
+  colAsChar,
+  align,
+}: {
+  worksheet: any;
+  colAsChar: string;
+  align: string;
+}) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: align };
   });

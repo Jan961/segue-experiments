@@ -43,10 +43,12 @@ export const makeRowTextBoldAndAllignLeft = ({
   worksheet,
   row,
   numberOfColumns,
+  bgColor = COLOR_HEXCODE.DARK_ORANGE,
 }: {
   worksheet: any;
   row: number;
   numberOfColumns: number;
+  bgColor?: COLOR_HEXCODE;
 }) => {
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col);
@@ -55,7 +57,7 @@ export const makeRowTextBoldAndAllignLeft = ({
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: COLOR_HEXCODE.BLUE },
+      fgColor: { argb: bgColor },
     };
     // cell.border = {
     //   top: { style: 'double', color: { argb: COLOR_HEXCODE.WHITE } },
