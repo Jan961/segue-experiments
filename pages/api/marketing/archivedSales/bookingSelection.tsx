@@ -19,7 +19,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const AccountId = await getAccountId(email);
     const access = await checkAccess(email, { AccountId });
     if (!access) return res.status(401).end();
-
     const conditions: Prisma.Sql[] = [];
     if (salesByType === 'venue') {
       conditions.push(Prisma.sql`VenueCode = ${venueCode}`);
@@ -50,17 +49,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    if(data.length) {
-      const venueId = data[0].VenueId;
-      const performancesNoSales = await prisma.$queryRaw
+    const performancesNoSales : any | null = data.length ? await prisma.$queryRaw
         `SELECT BookingsForVenue
          FROM (SELECT BookingId AS BookingsForVenue
                FROM frtxigoo_dev.Booking
-               WHERE BookingVenueId = ${venueId}) AS VenueBooking
+               WHERE BookingVenueId = ${data[0].VenueId}) AS VenueBooking
          WHERE BookingsForVenue NOT IN (SELECT DISTINCT SetBookingId
                                         FROM frtxigoo_dev.SalesSet)
-         ORDER BY BookingsForVenue ASC;`
-    }
+         ORDER BY BookingsForVenue ASC;` : null
+
 
     const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
       acc[curr.BookingId] = curr._count?.Id;
@@ -70,6 +67,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     data.forEach((selection) => {
       if (!uniqueIds[selection.ProductionId]) {
         uniqueIds[selection.ProductionId] = true; // Mark this id as seen
+        console.log(performancesNoSales);
+        console.log(selection.BookingId)
+        selection['HasSalesData'] = !performancesNoSales.some((bookingDict) => selection.BookingId == bookingDict.BookingsForVenue)
         results.push(selection); // Push the unique item to the result array
       }
     });
