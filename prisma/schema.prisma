@@ -373,19 +373,21 @@ model BookedVenueHistory {
 }
 
 model CompAllocation {
-  Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
-  AvailableCompId        Int           @map("CompAllocationAvailableCompId")
-  TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
-  Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
-  RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
-  ArrangedBy             String?       @map("CompAllocationArrangedBy") @db.VarChar(50)
-  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
-  TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
-  SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
-  AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
+  Id                         Int           @id @default(autoincrement()) @map("CompAllocationId")
+  AvailableCompId            Int           @map("CompAllocationAvailableCompId")
+  TicketHolderName           String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
+  Seats                      Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Comments                   String?       @map("CompAllocationComments") @db.VarChar(100)
+  RequestedBy                String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
+  ArrangedById               Int           @map("CompAllocationArrangedById")
+  VenueConfirmationNotes     String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  TicketHolderEmail          String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
+  SeatsAllocated             String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AccountUser                AccountUser   @relation(fields: [CompAllocationArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
+  AvailableComp              AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
+  @@index([CompAllocationArrangedById], map: "AccountUser_CompAllocation")
 }
 
 model CompType {
@@ -566,6 +568,7 @@ model AccountUser {
   AccountUserPermission AccountUserPermission[]
   AccountUserProduction AccountUserProduction[]
   BookingContactNotes   BookingContactNotes[]
+  CompAllocation        CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
 }
@@ -701,7 +704,7 @@ model ProductionTask {
   AssignedToUserId           Int?          @map("TaskAssignedToUserId")
   CompleteByIsPostProduction Boolean       @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostProduction") @db.Bit(1)
   RepeatInterval             String?       @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
-  RepeatCount                Bytes?        @map("TaskRepeatCount") @db.TinyBlob
+  TaskRepeatCount            Bytes?        @db.TinyBlob
   StartByWeekNum             Int?          @map("TaskStartByWeekNum") @db.SmallInt
   StartByIsPostProduction    Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostProduction") @db.Bit(1)
   CompleteByWeekNum          Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
@@ -750,13 +753,14 @@ model CountryInRegion {
 }
 
 model ProductionCompany {
-  Id              Int     @id @map("ProdCoId") @default(autoincrement())
-  AccountId       Int     @map("ProdCoAccountId")
-  Name            String  @map("ProdCoName")@db.VarChar(50)
-  WebSite         String? @map("ProdCoWebSite")@db.VarChar(80)
-  Logo            Bytes?  @map("ProdCoLogo")
-  Account         Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
-  Show            Show[]
+  Id                  Int     @id @default(autoincrement()) @map("ProdCoId")
+  AccountId           Int     @map("ProdCoAccountId")
+  Name                String  @map("ProdCoName") @db.VarChar(50)
+  WebSite             String? @map("ProdCoWebSite") @db.VarChar(80)
+  Logo                Bytes?  @map("ProdCoLogo")
+  SaleStartWeek       Int?    @map("ProdCoSaleStartWeek") @db.SmallInt
+  Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  Show                Show[]
 
   @@index([AccountId], map: "Account_ProductionCompany")
 }
@@ -1161,29 +1165,6 @@ view BookingHoldCompsView {
   Seats              Decimal? @db.Decimal(32, 0)
   SoldSeats          Decimal? @db.Decimal(27, 0)
   ReservedSeats      Decimal? @db.Decimal(27, 0)
-
-  @@ignore
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view PromoterHoldsView {
-  ProductionId                         Int       @default(0)
-  FullProductionCode                   String?   @db.VarChar(20)
-  VenueCode                            String    @db.VarChar(6)
-  VenueName                            String    @db.VarChar(255)
-  BookingId                            Int       @default(0)
-  PerformanceDate                      DateTime? @db.Date
-  PerformanceTime                      DateTime? @db.Time(0)
-  AvailableCompSeats                   Int?      @default(1) @db.TinyInt
-  AvailableCompNotes                   String?   @db.LongText
-  CompAllocationSeats                  Int?      @default(1) @db.TinyInt
-  CompAllocationTicketHolderName       String?   @db.VarChar(50)
-  CompAllocationSeatsAllocated         String?   @db.VarChar(50)
-  CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
-  CompAllocationComments               String?   @db.VarChar(100)
-  CompAllocationRequestedBy            String?   @db.VarChar(50)
-  CompAllocationArrangedBy             String?   @db.VarChar(50)
-  CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
 
   @@ignore
 }
