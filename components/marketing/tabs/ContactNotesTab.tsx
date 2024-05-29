@@ -28,13 +28,13 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const users = useRecoilValue(userState);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -138,13 +138,13 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       getContactNotes(props.bookingId.toString(), userTempList);
       setBookingIdVal(props.bookingId);
 
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
   return (
     <>
-      {dataAvail && (
+      {dataAvailable && (
         <div>
           <div className="flex justify-end">
             <div className="flex flex-row items-center justify-between pb-5 gap-4">

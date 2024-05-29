@@ -13,11 +13,11 @@ export interface SalesTabRef {
 
 const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [salesTable, setSalesTable] = useState(<div />);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -43,7 +43,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
         />,
       );
 
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   };
 
@@ -54,7 +54,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     }
   }, [props.bookingId]);
 
-  return <>{dataAvail && <div>{salesTable}</div>}</>;
+  return <>{dataAvailable && <div>{salesTable}</div>}</>;
 });
 
 SalesTab.displayName = 'SalesTab';

@@ -51,7 +51,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
   const [currency, setCurrency] = useState('£');
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
@@ -61,7 +61,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -315,19 +315,19 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setApprovalStatus(booking.MarketingCostsStatus);
       setChangeNotes(booking.MarketingCostsNotes);
 
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
   return (
     <>
-      {dataAvail && (
+      {dataAvailable && (
         <div>
           <div className="flex flex-row mb-5 gap-[45px]">
             <div className="flex flex-row mt-1">
               <Checkbox
-                id={'On Sale'}
-                name={'On Sale'}
+                id="On Sale"
+                name="On Sale"
                 checked={onSaleCheck}
                 onChange={(e) => editBooking('ticketsOnSale', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
@@ -342,8 +342,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
             <div className="flex flex-row mt-1">
               <Checkbox
-                id={'Marketing Plans Received'}
-                name={'Marketing Plans Received'}
+                id="Marketing Plans Received"
+                name="Marketing Plans Received"
                 checked={marketingPlansCheck}
                 onChange={(e) => editBooking('marketingPlanReceived', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
@@ -353,8 +353,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
             <div className="flex flex-row mt-1">
               <Checkbox
-                id={'Print Requirements Received'}
-                name={'Print Requirements Received'}
+                id="Print Requirements Received"
+                name="Print Requirements Received"
                 checked={printReqCheck}
                 onChange={(e) => editBooking('printReqsReceived', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
@@ -364,8 +364,8 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
             <div className="flex flex-row mt-1">
               <Checkbox
-                id={'Contact Info Received'}
-                name={'Contact Info Received'}
+                id="Contact Info Received"
+                name="Contact Info Received"
                 checked={contactInfoCheck}
                 onChange={(e) => editBooking('contactInfoReceived', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
@@ -386,7 +386,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                     options={approvalStatusList}
                     value={approvalStatus}
                     onChange={(value) => editBooking('marketingCostsStatus', value.toString())}
-                    placeholder={'Select Approval Status'}
+                    placeholder="Select Approval Status"
                     isClearable={false}
                   />
                 </div>
@@ -398,7 +398,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 </div>
                 <div className="flex flex-col ml-8 mt-1">
                   <TextArea
-                    className={'mt-2 h-[52px] w-[425px]'}
+                    className="mt-2 h-[52px] w-[425px]"
                     value={changeNotes}
                     placeholder="Notes Field"
                     onBlur={(e) => editBooking('marketingCostsNotes', e.target.value)}
@@ -413,7 +413,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 className="w-[160px] mb-[12px]"
                 disabled={!productionId}
                 iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName={'excel'}
+                sufixIconName="excel"
               />
               <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
             </div>
