@@ -114,10 +114,12 @@ const handler = async (req, res) => {
     return;
   }
   const { ShowName, FullProductionCode } = data[0];
-  worksheet.addRow([`${ShowName} (${FullProductionCode}) Travel Summary`]);
+  const title = `${FullProductionCode} ${ShowName} Travel Summary - ${moment().format('DD.MM.YY')}`;
+  worksheet.addRow([title]);
   worksheet.addRow([]);
   worksheet.addRow(['Production', '', '', '', '', 'Onward Travel']);
-  worksheet.addRow(['Week', 'Day', 'Date', 'Town', 'Venue', 'Time', 'Miles']);
+  worksheet.addRow(['Day', 'Date', 'Week', 'Venue', 'Town', 'Time', 'Miles']);
+  // Day, Date, Week, Venue, Town, Time, Miles
   worksheet.addRow([]);
   const map: { [key: string]: SCHEDULE_VIEW } = formattedData.reduce((acc, x) => ({ ...acc, [getKey(x)]: x }), {});
   const daysDiff = moment(toDate).diff(moment(fromDate), 'days');
@@ -134,15 +136,15 @@ const handler = async (req, res) => {
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
-    const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
+    const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day'));
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
     const value: SCHEDULE_VIEW = map[key];
     if (!value) {
-      worksheet.addRow([`Week ${prevProductionWeekNum}`, weekDay, dateInIncomingFormat]);
+      worksheet.addRow([weekDay.substring(0, 3), dateInIncomingFormat.format('DD/MM/YY'), `${prevProductionWeekNum}`]);
       colorTextAndBGCell({
         worksheet,
         row: rowNo + 1,
-        col: 5,
+        col: 4,
         textColor: COLOR_HEXCODE.WHITE,
         cellColor: COLOR_HEXCODE.BLACK,
       });
@@ -154,13 +156,13 @@ const handler = async (req, res) => {
       prevProductionWeekNum = ProductionWeekNum ? String(ProductionWeekNum) : prevProductionWeekNum;
       // localhost:8002/api/v1/dummy
       worksheet.addRow([
-        `Week ${ProductionWeekNum}`,
         weekDay.substring(0, 3),
-        dateInIncomingFormat,
-        Location || '',
+        dateInIncomingFormat.format('DD/MM/YY'),
+        `${ProductionWeekNum}`,
         EntryName || '',
+        Location || '',
         formattedTime,
-        Mileage || '',
+        Number(Mileage) || '',
       ]);
     }
     rowNo++;
@@ -178,7 +180,7 @@ const handler = async (req, res) => {
       colorTextAndBGAndItalicCell({
         worksheet,
         row: rowNo,
-        col: 5,
+        col: 4,
         textColor: COLOR_HEXCODE.YELLOW,
         cellColor: COLOR_HEXCODE.RED,
       });
@@ -274,7 +276,7 @@ const handler = async (req, res) => {
     rowsToIgnore: 4,
     maxColWidth: Infinity,
   });
-  const filename = 'Booking Report.xlsx';
+  const filename = `${title}.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   workbook.xlsx.write(res).then(() => {
