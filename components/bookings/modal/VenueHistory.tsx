@@ -391,6 +391,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
+            <Button
+              className="ml-4 mr-10 w-32"
+              onClick={() => setIsExportModalOpen(true)}
+              variant="primary"
+              text="Export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+            />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
         </div>
