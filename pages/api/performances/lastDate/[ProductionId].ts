@@ -6,7 +6,7 @@ export default async function handle(req, res) {
     const ProductionId = parseInt(req.query.ProductionId, 10);
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
     const lastDates =
