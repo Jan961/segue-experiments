@@ -153,7 +153,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           id="image"
           data-testid="image"
         >
-          <Icon iconName={'upload-to-cloud'} variant="7xl" />
+          <Icon iconName="upload-to-cloud" variant="7xl" />
           <p className="text-secondary max-w-[222px] text-[15px] text-center font-normal mt-2">
             <span className=" font-bold text-primary">Browse computer</span> or drag and drop
             {maxFileSize && `(Max File Size: ${fileSizeFormatter(maxFileSize)})`}
@@ -197,7 +197,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
             Cancel
           </Button>
           <Button className="w-[132px]" disabled={isUploadDisabled && !isUploadComplete} onClick={handleUpload}>
-            {isUploadComplete ? 'Ok' : 'Upload'}
+            {isUploadComplete ? 'OK' : 'Upload'}
           </Button>
         </div>
       </div>

@@ -20,7 +20,7 @@ const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCard
           {imageUrl ? (
             <img onClick={toggleImagePreviewModal} className="h-10 w-14 pb-2" src={imageUrl} />
           ) : (
-            <Icon iconName={'document-solid'} fill="#617293" variant="3xl" />
+            <Icon iconName="document-solid" fill="#617293" variant="3xl" />
           )}
         </div>
         <div id="filedetails" className="flex w-full flex-row items-center">
@@ -29,7 +29,7 @@ const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCard
             <div className="flex flex-row w-full justify-between items-center">
               <div className="float-left">
                 <Tooltip title={file.name} body={file.name.length > 30 ? file.name : ''}>
-                  <p className={`text-secondary text-sm`}>
+                  <p className="text-secondary text-sm">
                     {file.name.length > 30 ? file.name.slice(0, 30) + '...' : file.name}
                   </p>
                 </Tooltip>
@@ -44,7 +44,7 @@ const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCard
           </div>
         </div>
         <div className="relative bottom-1 right-1">
-          <Icon iconName={'cross'} fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
+          <Icon iconName="cross" fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
         </div>
       </div>
       {showImagePreviewModal && (
