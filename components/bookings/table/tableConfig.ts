@@ -531,7 +531,6 @@ export const gapSuggestColumnDefs = [
     width: 90,
     headerClass: 'text-center',
   },
-   { headerName: 'Miles', field: 'Miles', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
   {
     headerName: 'Barring Check',
     field: 'barringCheck',
