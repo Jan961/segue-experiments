@@ -126,7 +126,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionCode} />
+      <MasterTaskList
+        visible={isMasterTaskList}
+        onClose={handleMasterListClose}
+        productionId={ProductionCode.toString()}
+      />
     </Layout>
   );
 };
