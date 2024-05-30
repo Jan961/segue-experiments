@@ -3,8 +3,8 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import { useRef, useState } from 'react';
 
 interface CustomDateCellRendererParams extends ICellRendererParams {
-  hideEmptyDeleteError?: boolean;
-  notSetMinDate?: boolean;
+  disableAnimations?: boolean;
+  defaultMinDateToToday?: boolean;
 }
 
 const DateRenderer = ({
@@ -13,8 +13,8 @@ const DateRenderer = ({
   value,
   setValue,
   node,
-  hideEmptyDeleteError,
-  notSetMinDate,
+  disableAnimations,
+  defaultMinDateToToday = true,
 }: CustomDateCellRendererParams) => {
   const fromInputRef = useRef(null);
   const [error, setError] = useState<string>('');
@@ -29,7 +29,7 @@ const DateRenderer = ({
       ...data,
       [colDef?.field]: dateVal,
     });
-    if (!hideEmptyDeleteError && !dateVal) {
+    if (!disableAnimations && !dateVal) {
       setError('error');
     }
   };
@@ -42,7 +42,7 @@ const DateRenderer = ({
         inputClass="!shadow-none !border-primary-white"
         value={date}
         onChange={handleDateFromChange}
-        minDate={notSetMinDate ? null : new Date()}
+        minDate={defaultMinDateToToday ? new Date() : null}
         error={error}
       />
     </div>

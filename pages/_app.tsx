@@ -13,7 +13,7 @@ import { useRouter } from 'next/router';
 import TanstackProvider from 'components/providers/TanstackProvider';
 import ReferenceDataLoader from 'components/ReferenceDataLoader';
 import { LicenseManager } from 'ag-grid-enterprise';
-import { Toaster } from 'react-hot-toast';
+import Notifications from 'components/core-ui-lib/Notifications';
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -38,7 +38,7 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
             <ReferenceDataLoader />
           </SignedIn>
           <Component {...pageProps} />
-          <Toaster />
+          <Notifications />
         </RecoilRoot>
       </ClerkProvider>
     </TanstackProvider>
