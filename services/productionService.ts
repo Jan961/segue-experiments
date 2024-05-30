@@ -239,10 +239,12 @@ export const getAllProductionRegions = async () => {
   try{
   return prisma.ProductionRegion.findMany({
     orderBy:{
-      PRProductionId: 'asc'
+        PRProductionId: 'asc'
     }
-  });}
+    });
+  }
   catch (Exception){
+    console.log(Exception);
     return []
   }
 }
