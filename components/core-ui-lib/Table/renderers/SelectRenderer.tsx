@@ -15,17 +15,17 @@ const SelectRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
     selectRef.current.focus();
   };
 
-  const hasSalesData = !(props["data"]?.hasSalesData===false);
+  const hasSalesData: boolean = !(props['data']?.hasSalesData === false);
 
   return (
     <div className="pl-1 pr-2 mt-1">
-      {hasSalesData ?
-      <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
-        <Select ref={selectRef} {...props} />
-      </BaseCellRenderer>
-        :
-      "No Sales Data"
-      }
+      {hasSalesData ? (
+        <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
+          <Select ref={selectRef} {...props} />
+        </BaseCellRenderer>
+      ) : (
+        'No Sales Data'
+      )}
     </div>
   );
 };

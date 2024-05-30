@@ -48,21 +48,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-    let performancesNoSales:any[] = [];
+    let performancesNoSales: any[] = [];
     try {
-      performancesNoSales = data.length ? await prisma.$queryRaw
-        `SELECT BookingsForVenue
+      performancesNoSales = data.length
+        ? await prisma.$queryRaw`SELECT BookingsForVenue
          FROM (SELECT BookingId AS BookingsForVenue
                FROM frtxigoo_dev.Booking
                WHERE BookingVenueId = ${data[0].VenueId}) AS VenueBooking
          WHERE BookingsForVenue NOT IN (SELECT DISTINCT SetBookingId
                                         FROM frtxigoo_dev.SalesSet)
-         ORDER BY BookingsForVenue ASC;` : null
+         ORDER BY BookingsForVenue ASC;`
+        : null;
+    } catch (Exception) {
+      console.log('Query Failed', Exception);
     }
-    catch(Exception){
-      console.log("Query Failed", Exception)
-    }
-
 
     const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
       acc[curr.BookingId] = curr._count?.Id;
@@ -72,9 +71,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     data.forEach((selection) => {
       if (!uniqueIds[selection.ProductionId]) {
         uniqueIds[selection.ProductionId] = true; // Mark this id as seen
-        console.log(performancesNoSales);
-        console.log(selection.BookingId)
-        selection['HasSalesData'] = !performancesNoSales.some((bookingDict) => selection.BookingId == bookingDict.BookingsForVenue)
+        selection['HasSalesData'] = !performancesNoSales.some(
+          (bookingDict) => selection.BookingId == bookingDict.BookingsForVenue,
+        );
         results.push(selection); // Push the unique item to the result array
       }
     });
