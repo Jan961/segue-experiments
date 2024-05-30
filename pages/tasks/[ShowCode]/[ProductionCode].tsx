@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
+import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -48,6 +49,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showEmptyProductionModal, setShowEmptyProductionModal] = useState<boolean>(false);
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isProductionEmpty, setIsProductionEmpty] = useState<boolean>(false);
+  const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
@@ -96,6 +98,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const handleNewProductionTaskSubmit = (val: string) => {
     handleNewProductionTaskModal();
     if (val === 'taskManual') setShowAddTask(true);
+    else if (val === 'master') setIsMasterTaskList(true);
+  };
+
+  const handleMasterListClose = () => {
+    setIsMasterTaskList(!isMasterTaskList);
   };
 
   return (
@@ -122,12 +129,17 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           );
         })
       )}
-      <NewProductionEmpty visible={showEmptyProductionModal} onClose={handleShowEmptyProduction} />
+      <NewProductionEmpty
+        visible={showEmptyProductionModal}
+        onClose={handleShowEmptyProduction}
+        handleSubmit={handleNewProductionTaskSubmit}
+      />
       <NewProductionTask
         visible={showNewProduction}
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} />
     </Layout>
   );
 };
