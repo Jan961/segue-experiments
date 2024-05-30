@@ -37,7 +37,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       const response = await axios.get(`/api/tasks/master/list`);
       setRowData(response.data || []);
       setLoading(false);
-      onClose();
     } catch (error) {
       setLoading(false);
       console.error(error);
@@ -47,6 +46,12 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
   useEffect(() => {
     handleFetchTasks();
   }, []);
+
+  console.log(
+    rowData.filter((item) => {
+      return item.Notes !== null;
+    }),
+  );
 
   const usersList = useMemo(() => {
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({

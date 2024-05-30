@@ -2,7 +2,7 @@ import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Table from 'components/core-ui-lib/Table';
 import { getMasterTasksColumnDefs } from './tableConfig';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
@@ -10,6 +10,11 @@ import axios from 'axios';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { MasterTask } from '@prisma/client';
 import Loader from 'components/core-ui-lib/Loader';
+import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import Select from 'components/core-ui-lib/Select';
+import ProductionOption from 'components/global/nav/ProductionOption';
+import Checkbox from 'components/core-ui-lib/Checkbox';
 
 interface ProductionTaskListProps {
   visible: boolean;
@@ -31,22 +36,41 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
   const [confirm, setConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleFetchTasks = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`/api/tasks/master/list`);
-      setRowData(response.data || []);
-      setLoading(false);
-      onClose();
-    } catch (error) {
-      setLoading(false);
-      console.error(error);
-    }
-  };
+  const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
+  const [selected, setSelected] = useState(null);
+  const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
 
-  useEffect(() => {
-    handleFetchTasks();
-  }, []);
+  const productionsData = useMemo(() => {
+    const productionOptions = [];
+    for (const production of productionJump.productions) {
+      if (includeArchived) {
+        productionOptions.push({
+          Id: -1,
+          ShowCode: null,
+          Code: null,
+          IsArchived: false,
+          ...production,
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
+          }`,
+          value: production.Id,
+        });
+      } else if (!production.IsArchived) {
+        productionOptions.push({
+          Id: -1,
+          ShowCode: null,
+          Code: null,
+          IsArchived: false,
+          ...production,
+          text: `${production.ShowCode}${production.Code} ${production.ShowName} ${
+            production.IsArchived ? ' (A)' : ''
+          }`,
+          value: production.Id,
+        });
+      }
+    }
+    return productionOptions;
+  }, [productionJump.productions, includeArchived]);
 
   const usersList = useMemo(() => {
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -62,16 +86,30 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
   const onSelectionChanged = (event) => {
     const selectedNodes = event.api.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
-    console.log(selectedData);
     setSelectedRows(selectedData);
   };
+
+  const handleFetchTasks = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/tasks/list/${selected}`);
+      setRowData(response.data[0].Tasks || []);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (selected) handleFetchTasks();
+  }, [selected]);
 
   const handleClose = () => {
     onClose();
   };
 
   const handleCancel = () => {
-    console.log(selectedRows);
     if (selectedRows.length > 0) {
       setConfirm(true);
     } else {
@@ -107,6 +145,15 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
     }
   };
 
+  const handleChange = (val: number) => {
+    setSelected(val);
+  };
+
+  const onIncludeArchiveChange = (e) => {
+    setProductionJump({ ...productionJump, includeArchived: e.target.value });
+    setIncludeArchived(e.target.value);
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -114,7 +161,30 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
       title="Add from Production Task List"
       titleClass="text-primary-navy text-xl mb-2"
     >
-      <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">
+      <div className="bg-white border-primary-border rounded-md border shadow-md flex items-center w-[566px]">
+        <Select
+          className="border-0 !shadow-none w-[420px]"
+          value={selected}
+          label="Production"
+          placeholder="Please select a Production"
+          renderOption={(option) => <ProductionOption option={option} />}
+          customStyles={ARCHIVED_OPTION_STYLES}
+          options={productionsData}
+          onChange={handleChange}
+          isSearchable
+          isClearable={false}
+        />
+        <div className="flex  items-center ml-1 mr-4">
+          <Checkbox
+            id="IncludeArchived"
+            label="Include archived"
+            checked={includeArchived}
+            onChange={onIncludeArchiveChange}
+            className=""
+          />
+        </div>
+      </div>
+      <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col mt-4">
         {loading && <LoadingOverlay />}
         <Table
           columnDefs={columnDefs}
