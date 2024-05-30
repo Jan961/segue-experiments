@@ -15,6 +15,7 @@ const generateChildCol = (
   field: string,
   dateBlockIndex,
   startDateField,
+  cellRendererParams = {},
   renderer: (params: ICellRendererParams) => React.ReactElement,
 ) => {
   return {
@@ -30,6 +31,7 @@ const generateChildCol = (
     },
     headerClass: 'header-child',
     cellRenderer: renderer,
+    cellRendererParams: { ...cellRendererParams },
     suppressMovable: true,
     width: 120,
     resizable: false,
@@ -160,8 +162,22 @@ export const productionsTableConfig = [
     marryChildren: true,
     headerClass: 'justify-center font-bold text-base',
     children: [
-      generateChildCol('Start', 'DateBlock[1].StartDate', 1, 'StartDate', DateRenderer),
-      generateChildCol('End', 'DateBlock[1].EndDate', 1, 'EndDate', DateRenderer),
+      generateChildCol(
+        'Start',
+        'DateBlock[1].StartDate',
+        1,
+        'StartDate',
+        { disableAnimations: true, defaultMinDateToToday: false },
+        DateRenderer,
+      ),
+      generateChildCol(
+        'End',
+        'DateBlock[1].EndDate',
+        1,
+        'EndDate',
+        { disableAnimations: true, defaultMinDateToToday: false },
+        DateRenderer,
+      ),
     ],
   },
   {
@@ -169,8 +185,22 @@ export const productionsTableConfig = [
     marryChildren: true,
     headerClass: 'justify-center font-bold text-base',
     children: [
-      generateChildCol('Start', 'DateBlock[0].StartDate', 0, 'StartDate', DateRenderer),
-      generateChildCol('End', 'DateBlock[0].EndDate', 0, 'EndDate', DateRenderer),
+      generateChildCol(
+        'Start',
+        'DateBlock[0].StartDate',
+        0,
+        'StartDate',
+        { disableAnimations: true, defaultMinDateToToday: false },
+        DateRenderer,
+      ),
+      generateChildCol(
+        'End',
+        'DateBlock[0].EndDate',
+        0,
+        'EndDate',
+        { disableAnimations: true, defaultMinDateToToday: false },
+        DateRenderer,
+      ),
     ],
   },
   {
