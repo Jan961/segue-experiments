@@ -54,6 +54,11 @@ export default function SalesTable({
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
 
+  // constants
+  const ARCH_MULTI_WIDTH = 328;
+  const ARCH_LESS_2_WIDTH = 340;
+  const ARCH_SPACE_SCALER = 12;
+
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
@@ -190,7 +195,8 @@ export default function SalesTable({
         return schoolSales ? containerWidth : '1085px';
 
       case 'salesComparison': {
-        const widthInt = numBookings * 340;
+        const scalar = numBookings === 2 ? ARCH_LESS_2_WIDTH : ARCH_MULTI_WIDTH;
+        const widthInt = numBookings * scalar - numBookings * ARCH_SPACE_SCALER;
         return `${widthInt}px`;
       }
 
@@ -242,6 +248,7 @@ export default function SalesTable({
         onCellClicked={onCellClick}
         onCellValueChange={onCellValChange}
         tableHeight={tableHeight}
+        gridOptions={{ suppressHorizontalScroll: true }}
         excelStyles={excelStyles}
       />
     </div>

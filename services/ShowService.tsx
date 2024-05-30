@@ -92,3 +92,11 @@ export const getShowsByAccountId = async (AccountId: number) => {
     return a.Name.localeCompare(b.Name);
   });
 };
+
+export const getAllProductionCompanyList = () => {
+  return prisma.ProductionCompany.findMany({
+    orderBy: {
+      Name: 'asc',
+    },
+  });
+};

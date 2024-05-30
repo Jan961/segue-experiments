@@ -1,13 +1,19 @@
 import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
-import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { useRecoilValue } from 'recoil';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import numeral from 'numeral';
 import { LoadingTab } from './tabs/LoadingTab';
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
 import classNames from 'classnames';
 import SummaryRow from './SummaryRow';
+
+export interface SummaryRef {
+  resetData: () => void;
+}
+
+export interface SummaryProps {
+  bookingId: string;
+}
 
 export const formatCurrency = (amount: number, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
@@ -19,8 +25,7 @@ export const formatCurrency = (amount: number, currency: string) => {
   return formatter.format(amount);
 };
 
-export const Summary = () => {
-  const { selected } = useRecoilValue(bookingJumpState);
+const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   const [summary, setSummary] = useState<Partial<SummaryResponseDTO>>({});
   const [loading, setLoading] = useState(false);
   const [summaryAvail, setSummaryAvail] = useState(false);
@@ -28,16 +33,19 @@ export const Summary = () => {
   const boldText = 'text-base font-bold text-primary-input-text';
   const normalText = 'text-base font-normal text-primary-input-text';
 
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setSummaryAvail(false);
+    },
+  }));
+
   useEffect(() => {
     const search = async () => {
       try {
-        setSummaryAvail(true);
         setLoading(true);
-        if (selected === undefined) {
-          return;
-        }
-        const { data } = await axios.get(`/api/marketing/summary/${selected}`);
+        const { data } = await axios.get(`/api/marketing/summary/${props.bookingId}`);
         setSummary(data);
+        setSummaryAvail(true);
       } catch (error) {
         console.error(error);
       } finally {
@@ -45,16 +53,17 @@ export const Summary = () => {
       }
     };
 
-    if (selected !== null) {
+    if (props.bookingId !== null) {
       search();
     } else {
       setSummaryAvail(false);
     }
-  }, [selected]);
+  }, [props.bookingId]);
 
   if (loading) return <LoadingTab />;
 
   if (!summary) return null;
+
   const weekNo = calculateWeekNumber(
     new Date(summary?.ProductionInfo?.StartDate),
     new Date(summary?.ProductionInfo?.Date),
@@ -67,8 +76,16 @@ export const Summary = () => {
   const notes = summary?.Notes;
 
   const generalInfo = [
-    { id: 1, label: 'First Date:', data: dateToSimple(summary?.ProductionInfo?.Date) },
-    { id: 2, label: 'Last Date:', data: dateToSimple(summary?.ProductionInfo?.lastDate) },
+    {
+      id: 1,
+      label: 'First Date:',
+      data: dateToSimple(summary?.ProductionInfo?.Date),
+    },
+    {
+      id: 2,
+      label: 'Last Date:',
+      data: dateToSimple(summary?.ProductionInfo?.lastDate),
+    },
     { id: 3, label: 'Number of Day(s):', data: summary?.ProductionInfo?.numberOfDays.toString() },
     { id: 4, label: 'Production Week No:', data: weekNo.toString() },
   ];
@@ -106,20 +123,24 @@ export const Summary = () => {
       const times: any = x[1];
       const data = {
         date: x[0],
-        time: times.map((item) => getTimeFromDateAndTime(item.Time)),
+        time: times.map((item) => (item.Time === null ? 'TBC' : getTimeFromDateAndTime(item.Time))),
       };
       processed.push(data);
     });
 
-    processed.forEach((element) => {
-      result.push(
-        <p>
-          {dateToSimple(element.date)} {element.time.join('; ')}{' '}
-        </p>,
-      );
-    });
+    if (processed.length === 0) {
+      return '-';
+    } else {
+      processed.forEach((element) => {
+        result.push(
+          <p>
+            {dateToSimple(element.date)} {element.time.join('; ')}{' '}
+          </p>,
+        );
+      });
 
-    return result;
+      return result;
+    }
   };
 
   return (
@@ -132,7 +153,7 @@ export const Summary = () => {
             <SummaryRow key={item.id} label={item.label} data={item.data} />
           ))}
 
-          <SummaryRow label="Performance Time(s):" data={''} />
+          <SummaryRow label="Performance Time(s):" data="" />
           <div className={normalText}>{getPerformances()}</div>
 
           <div className={classNames(boldText, 'text-lg')}>Sales Summary</div>
@@ -144,9 +165,13 @@ export const Summary = () => {
             <>
               <div className={classNames(boldText, 'text-lg mt-2')}>Notes</div>
               <div className={classNames(boldText, 'mr-1')}>Marketing Deal:</div>
-              <div className={normalText}>{notes.MarketingDealNotes ? notes.MarketingDealNotes : 'None'}</div>
+              <div className={normalText}>
+                {notes.MarketingDealNotes || notes.MarketingDealNotes === 'None' ? notes.MarketingDealNotes : 'None'}
+              </div>
               <div className={classNames(boldText, 'mr-1')}>Booking Notes:</div>
-              <div className={normalText}>{notes.BookingNotes ? notes.BookingNotes : 'None'}</div>
+              <div className={normalText}>
+                {notes.BookingNotes || notes.BookingNotes === 'None' ? notes.BookingNotes : 'None'}
+              </div>
 
               {notesInfo.map((item) => (
                 <SummaryRow key={item.id} label={item.label} data={item.data} />
@@ -157,4 +182,7 @@ export const Summary = () => {
       )}
     </div>
   );
-};
+});
+
+Summary.displayName = 'Summary';
+export default Summary;

@@ -1,10 +1,10 @@
-import { loggingService } from 'services/loggingService';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PerformanceDTO } from 'interfaces';
 import { calculateWeekNumber } from 'services/dateService';
 import { group } from 'radash';
 import { checkAccess, getEmailFromReq } from 'services/userService';
+import { loggingService } from 'services/loggingService';
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[];
@@ -68,6 +68,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Date: 'asc',
       },
     });
+
     const NumberOfPerformances: number = performances.length;
 
     const salesSummary = await prisma.salesSetTotalsView.findFirst({
@@ -133,6 +134,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
+
     const {
       DealNotes: BookingDealNotes,
       Notes: BookingNotes,
@@ -140,20 +142,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       HoldNotes,
       CompNotes,
     } = booking || {};
+
     const { Seats: Capacity, CurrencyCode } = booking?.Venue || {};
     const { SymbolUnicode } = booking?.Venue?.Currency || {};
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
-    const AvgTicketPrice = salesSummary && salesSummary.Value / salesSummary.Seats;
+    const AvgTicketPrice = salesSummary === null ? 0 : salesSummary?.Value / salesSummary?.Seats;
     const TotalSeats = Capacity * NumberOfPerformances;
-    const GrossProfit = AvgTicketPrice && AvgTicketPrice * TotalSeats;
-    const seatsSalePercentage = salesSummary && (salesSummary.Seats / TotalSeats) * 100;
+    const GrossProfit = AvgTicketPrice === 0 ? 0 : AvgTicketPrice * TotalSeats;
+    const seatsSalePercentage = salesSummary === null ? 0 : (salesSummary?.Seats / TotalSeats) * 100;
     const currentProductionWeekNum = calculateWeekNumber(new Date(), new Date(booking.FirstDate));
     const result: SummaryResponseDTO = {
       Performances: performances,
       Info: {
-        SeatsSold: salesSummary.Seats,
+        SeatsSold: salesSummary?.Seats === undefined ? 0 : salesSummary?.Seats,
         Seats: TotalSeats,
-        SalesValue: salesSummary?.Value,
+        SalesValue: salesSummary?.Value === undefined ? 0 : salesSummary?.Value,
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
         VenueCurrencyCode: CurrencyCode,
