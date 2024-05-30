@@ -4,15 +4,17 @@ export enum FileStatusVals {
   Uploaded = 'uploaded',
 }
 
-export interface FileProps {
+export interface UploadedFile {
   size: number;
   name: string;
   error?: string;
-  file: File;
+  file?: File;
+  imageUrl?: string;
 }
 
 export interface FileCardProps {
-  file: FileProps;
+  fileName: string;
+  fileSize?: number;
   onDelete: () => void;
   progress?: number;
   errorMessage?: string;
@@ -28,11 +30,12 @@ export interface UploadModalProps {
   maxFiles?: number;
   maxFileSize?: number;
   allowedFormats: string[];
-  onChange?: (selectedFiles: FileProps[]) => void;
+  onChange?: (selectedFiles: UploadedFile[]) => void;
   onSave?: (
-    selectedFiles: FileProps[],
+    selectedFiles: UploadedFile[],
     onProgress: (file: File, uploadProgress: number) => void,
     onError: (file: File, errorMessage: string) => void,
     onUploadingImage: (file: File, imageUrl: string) => void,
   ) => void;
+  value?: UploadedFile[] | UploadedFile;
 }
