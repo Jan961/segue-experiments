@@ -2,11 +2,7 @@ import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Table from 'components/core-ui-lib/Table';
 import { getMasterTasksColumnDefs } from './tableConfig';
-<<<<<<< HEAD
 import { useRecoilState, useRecoilValue } from 'recoil';
-=======
-import { useRecoilValue } from 'recoil';
->>>>>>> 258c9e97 (feat: production tasks)
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
@@ -14,14 +10,11 @@ import axios from 'axios';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { MasterTask } from '@prisma/client';
 import Loader from 'components/core-ui-lib/Loader';
-<<<<<<< HEAD
 import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Select from 'components/core-ui-lib/Select';
 import ProductionOption from 'components/global/nav/ProductionOption';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-=======
->>>>>>> 258c9e97 (feat: production tasks)
 
 interface ProductionTaskListProps {
   visible: boolean;
@@ -43,7 +36,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
   const [confirm, setConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-<<<<<<< HEAD
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [selected, setSelected] = useState(null);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
@@ -79,24 +71,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
     }
     return productionOptions;
   }, [productionJump.productions, includeArchived]);
-=======
-  const handleFetchTasks = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get(`/api/tasks/master/list`);
-      setRowData(response.data || []);
-      setLoading(false);
-      onClose();
-    } catch (error) {
-      setLoading(false);
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    handleFetchTasks();
-  }, []);
->>>>>>> 258c9e97 (feat: production tasks)
 
   const usersList = useMemo(() => {
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -112,7 +86,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
   const onSelectionChanged = (event) => {
     const selectedNodes = event.api.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
-<<<<<<< HEAD
     setSelectedRows(selectedData);
   };
 
@@ -132,21 +105,11 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
     if (selected) handleFetchTasks();
   }, [selected]);
 
-=======
-    console.log(selectedData);
-    setSelectedRows(selectedData);
-  };
-
->>>>>>> 258c9e97 (feat: production tasks)
   const handleClose = () => {
     onClose();
   };
 
   const handleCancel = () => {
-<<<<<<< HEAD
-=======
-    console.log(selectedRows);
->>>>>>> 258c9e97 (feat: production tasks)
     if (selectedRows.length > 0) {
       setConfirm(true);
     } else {
@@ -182,7 +145,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
     }
   };
 
-<<<<<<< HEAD
   const handleChange = (val: number) => {
     setSelected(val);
   };
@@ -192,8 +154,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
     setIncludeArchived(e.target.value);
   };
 
-=======
->>>>>>> 258c9e97 (feat: production tasks)
   return (
     <PopupModal
       show={visible}
@@ -201,7 +161,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
       title="Add from Production Task List"
       titleClass="text-primary-navy text-xl mb-2"
     >
-<<<<<<< HEAD
       <div className="bg-white border-primary-border rounded-md border shadow-md flex items-center w-[566px]">
         <Select
           className="border-0 !shadow-none w-[420px]"
@@ -226,9 +185,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
         </div>
       </div>
       <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col mt-4">
-=======
-      <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">
->>>>>>> 258c9e97 (feat: production tasks)
         {loading && <LoadingOverlay />}
         <Table
           columnDefs={columnDefs}
