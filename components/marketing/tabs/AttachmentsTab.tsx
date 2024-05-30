@@ -26,11 +26,11 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
   const [attachIndex, setAttachIndex] = useState(-1);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -172,13 +172,13 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     if (props.bookingId !== undefined && props.bookingId !== null) {
       setBookingIdVal(props.bookingId.toString());
       getAttachments(props.bookingId.toString());
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
   return (
     <>
-      {dataAvail && (
+      {dataAvailable && (
         <div>
           <div className="flex flex-row justify-between items-center mb-4">
             <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
@@ -231,7 +231,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
           />
 
           <ConfirmationDialog
-            variant={'delete'}
+            variant="delete"
             show={showConfirm}
             onYesClick={() => deleteAttachment(attachRow, attachIndex)}
             onNoClick={() => setShowConfirm(false)}

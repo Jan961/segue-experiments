@@ -43,12 +43,12 @@ const Form = ({ onSave }: FormProps) => {
   };
   const getSuggestions = () => {
     const data: Partial<GapSuggestionUnbalancedProps> = {
-      MinFromMiles: formData.minFromLastVenue,
-      MaxFromMiles: formData.maxFromLastVenue,
-      MinToMiles: formData.minToNextVenue,
-      MaxToMiles: formData.maxToNextVenue,
+      MinFromMiles: parseInt(formData.minFromLastVenue),
+      MaxFromMiles: parseInt(formData.maxFromLastVenue),
+      MinToMiles: parseInt(formData.minToNextVenue),
+      MaxToMiles: parseInt(formData.maxToNextVenue),
       IncludeExcludedVenues: formData.includeExcludedVenues,
-      MinSeats: formData.minSeats,
+      MinSeats: parseInt(formData.minSeats),
       MaxFromTime: getTimeInMins(formData.maxTravelTimeFromLastVenue),
       MaxToTime: getTimeInMins(formData.maxTravelTimeToNextVenue),
     };
