@@ -42,7 +42,6 @@ const useBookingFilter = () => {
         .search(filter.venueText)
         .map((item) => item.item)
         .reverse();
-      console.log(filteredRowList);
     }
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
