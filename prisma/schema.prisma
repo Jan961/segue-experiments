@@ -139,7 +139,7 @@ model Show {
   ShowProdCoId      Int
   Production        Production[]
   Account           Account           @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
-  ProductionCompany ProductionCompany @relation(fields: [ShowProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Show")
+  ProductionCompany ProductionCompany @relation(fields: [ShowProdCoId], references: [ProdCoId], onDelete: NoAction, map: "ProductionCompany_Show")
 
   @@unique([AccountId, Code], map: "SECONDARY")
   @@index([AccountId], map: "Account_Show_idx")
@@ -383,11 +383,11 @@ model CompAllocation {
   VenueConfirmationNotes     String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
   TicketHolderEmail          String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
   SeatsAllocated             String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
-  AccountUser                AccountUser   @relation(fields: [CompAllocationArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
+  AccountUser                AccountUser   @relation(fields: [ArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
   AvailableComp              AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
-  @@index([CompAllocationArrangedById], map: "AccountUser_CompAllocation")
+  @@index([ArrangedById], map: "AccountUser_CompAllocation")
 }
 
 model CompType {
@@ -551,7 +551,7 @@ model User {
   FirstName      String           @map("UserFirstName") @db.VarChar(50)
   LastName       String?          @map("UserLastName") @db.VarChar(50)
   AccountId      Int?             @map("UserAccountId")
-  AccountUser    AccountUser?
+  AccountUser    AccountUser[]
   File           File[]
   MasterTask     MasterTask[]
   ProductionTask ProductionTask[]
@@ -559,8 +559,8 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
+  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
@@ -571,6 +571,7 @@ model AccountUser {
   CompAllocation        CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
+  @@index([UserId], map: "User_AccountUser")
 }
 
 model AccountUserPermission {
@@ -704,7 +705,7 @@ model ProductionTask {
   AssignedToUserId           Int?          @map("TaskAssignedToUserId")
   CompleteByIsPostProduction Boolean       @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostProduction") @db.Bit(1)
   RepeatInterval             String?       @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
-  TaskRepeatCount            Bytes?        @db.TinyBlob
+  RepeatCount                Bytes?        @map("TaskRepeatCount") @db.TinyBlob
   StartByWeekNum             Int?          @map("TaskStartByWeekNum") @db.SmallInt
   StartByIsPostProduction    Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostProduction") @db.Bit(1)
   CompleteByWeekNum          Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
@@ -735,11 +736,11 @@ model Country {
   Code            String            @map("CountryCode") @db.VarChar(3)
   Name            String            @map("CountryName") @db.VarChar(40)
   CurrencyCode    String?           @map("CountryCurrencyCode") @db.VarChar(3)
-  Currency        Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Country")
+  Currency        Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Country_Currency")
   CountryInRegion CountryInRegion[]
   VenueAddress    VenueAddress[]
 
-  @@index([CurrencyCode], map: "Currency_Country")
+  @@index([CurrencyCode], map: "Country_Currency")
 }
 
 model CountryInRegion {
@@ -1165,6 +1166,29 @@ view BookingHoldCompsView {
   Seats              Decimal? @db.Decimal(32, 0)
   SoldSeats          Decimal? @db.Decimal(27, 0)
   ReservedSeats      Decimal? @db.Decimal(27, 0)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view PromoterHoldsView {
+  ProductionId                         Int       @default(0)
+  FullProductionCode                   String?   @db.VarChar(20)
+  VenueCode                            String    @db.VarChar(6)
+  VenueName                            String    @db.VarChar(255)
+  BookingId                            Int       @default(0)
+  PerformanceDate                      DateTime? @db.Date
+  PerformanceTime                      DateTime? @db.Time(0)
+  AvailableCompSeats                   Int?      @default(1) @db.TinyInt
+  AvailableCompNotes                   String?   @db.LongText
+  CompAllocationSeats                  Int?      @default(1) @db.TinyInt
+  CompAllocationTicketHolderName       String?   @db.VarChar(50)
+  CompAllocationSeatsAllocated         String?   @db.VarChar(50)
+  CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
+  CompAllocationComments               String?   @db.VarChar(100)
+  CompAllocationRequestedBy            String?   @db.VarChar(50)
+  CompAllocationArrangedBy             String?   @db.VarChar(101)
+  CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
 
   @@ignore
 }
