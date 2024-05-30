@@ -61,15 +61,14 @@ export default function SalesTable({
     setCurrency('£');
 
     // check for school data
-    const found = data.find(
+    const schoolSalesFound = data.find(
       (data) =>
         data.schReservations !== '' || data.schReserved !== '' || data.schSeatsSold !== '' || data.schTotalValue !== '',
     );
+    setSchoolSales(Boolean(schoolSalesFound));
 
-    setSchoolSales(Boolean(found));
-
-    let colDefs = salesColDefs(currency, Boolean(found), module !== 'bookings', booking, setSalesActivity);
-    if (!found) {
+    let colDefs = salesColDefs(currency, Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
+    if (!schoolSalesFound) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setHeight(containerHeight);
     }
@@ -188,7 +187,14 @@ export default function SalesTable({
   const calculateWidth = () => {
     switch (variant) {
       case 'salesSnapshot':
-        return schoolSales ? containerWidth : '1085px';
+        const isMarketing = module !== 'bookings';
+
+        let newContainerWidth = parseInt(containerWidth.slice(3,containerWidth.length-3));
+        !isMarketing ? newContainerWidth =- 225: null;
+        !schoolSales ? newContainerWidth =- 135: null;
+        containerWidth = "w-[" +newContainerWidth.toString() + "px]";
+
+        return containerWidth;
 
       case 'salesComparison': {
         const widthInt = numBookings * 340;
