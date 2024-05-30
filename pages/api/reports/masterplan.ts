@@ -47,7 +47,7 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: COLOR_HEXCODE.BLUE },
+      fgColor: { argb: COLOR_HEXCODE.DARK_ORANGE },
     };
   }
 };
