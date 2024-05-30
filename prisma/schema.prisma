@@ -551,7 +551,7 @@ model User {
   FirstName      String           @map("UserFirstName") @db.VarChar(50)
   LastName       String?          @map("UserLastName") @db.VarChar(50)
   AccountId      Int?             @map("UserAccountId")
-  AccountUser    AccountUser[]
+  AccountUser    AccountUser?
   File           File[]
   MasterTask     MasterTask[]
   ProductionTask ProductionTask[]
@@ -559,8 +559,8 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
+  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
@@ -571,7 +571,6 @@ model AccountUser {
   CompAllocation        CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
-  @@index([UserId], map: "User_AccountUser")
 }
 
 model AccountUserPermission {
@@ -606,7 +605,7 @@ model TaskWatcher {
 }
 
 model PerformanceReport {
-  Id                  Int         @id @map("PRId")
+  Id                  Int         @id @default(autoincrement()) @map("PRId")
   PerformanceId       Int         @map("PRPerformanceId")
   Act1UpTime          DateTime?   @map("PRAct1UpTime") @db.Time(0)
   Act1DownTime        DateTime?   @map("PRAct1DownTime") @db.Time(0)
@@ -645,6 +644,7 @@ model MasterTask {
   Notes                          String? @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?    @map("TaskAssignedToUserId")
   RepeatInterval                 String? @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
+  TaskRepeatCount                Bytes?  @db.TinyBlob
   StartByWeekNum                 Int?    @map("TaskStartByWeekNum") @db.SmallInt
   TaskStartByIsPostProduction    Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?    @map("TaskCompleteByWeekNum") @db.SmallInt

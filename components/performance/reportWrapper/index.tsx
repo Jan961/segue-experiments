@@ -61,7 +61,7 @@ function ReportWrapper({ children }: ReportWrapperProps) {
       town: '',
       performanceDate: '',
       performanceTime: '',
-      cms: '',
+      csm: '',
       lighting: '',
       asm: '',
     };

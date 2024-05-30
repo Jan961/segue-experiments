@@ -1,24 +1,24 @@
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { GetServerSideProps } from 'next';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getReportsList } from 'services/performanceReports';
 import Layout from 'components/Layout';
 
-interface Report {
-  id: string;
-  reportNumber: string;
-  venue: string;
-  performanceId: string;
-  performanceDate: string;
-  performanceTime: string;
-  createdAt: string;
-  showName: string;
-}
+// interface Report {
+//   id: string;
+//   reportNumber: string;
+//   venue: string;
+//   performanceId: string;
+//   performanceDate: string;
+//   performanceTime: string;
+//   createdAt: string;
+//   showName: string;
+// }
 
-export default function Reports({ reports }: { reports: Report[] }) {
+export default function Reports({ reports }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <Layout title="Performance Reports | Segue">
-      <div className="max-w-screen-xl m-auto">
+      <div className="max-w-screen-xl mx-auto">
         <nav className="flex gap-4 items-center py-4">
           <div>
             <Link href="/performance/reports" className="text-gray-900  font-bold hover:text-gray-600 ">
@@ -103,7 +103,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
           response?.map?.((report: any) => ({
             id: report?.Id,
             reportNumber: report?.Id,
-            createdAt: report?.CreatedAt?.toISOString?.(),
+            createdAt: report?.CreatedAt?.toISOString?.() || null,
             performanceId: report?.Performance?.Id,
             performanceDate: report?.Performance?.Date?.toISOString?.(),
             performanceTime: report?.Performance?.Time?.toISOString?.(),
