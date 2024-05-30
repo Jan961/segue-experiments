@@ -1,10 +1,14 @@
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Select from 'components/core-ui-lib/Select';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ProductionOption from './ProductionOption';
+
+type ProductionJumpMenuProps = {
+  showArchivedCheck?: boolean;
+};
 
 export const ARCHIVED_OPTION_STYLES = {
   option: (styles, { isDisabled, isSelected, isFocused, data }) => {
@@ -40,7 +44,7 @@ export const ARCHIVED_OPTION_STYLES = {
   },
 };
 
-export default function ProductionJumpMenu() {
+export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArchivedCheck = true }) => {
   const router = useRouter();
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [includeArchived, setIncludeArchived] = useState<boolean>(productionJump?.includeArchived || false);
@@ -109,15 +113,17 @@ export default function ProductionJumpMenu() {
         isSearchable
         isClearable={false}
       />
-      <div className="flex  items-center ml-1 mr-4">
-        <Checkbox
-          id="IncludeArchived"
-          label="Include archived"
-          checked={includeArchived}
-          onChange={onIncludeArchiveChange}
-          className=""
-        />
-      </div>
+      {showArchivedCheck && (
+        <div className="flex  items-center ml-1 mr-4">
+          <Checkbox
+            id="IncludeArchived"
+            label="Include archived"
+            checked={includeArchived}
+            onChange={onIncludeArchiveChange}
+            className=""
+          />
+        </div>
+      )}
     </>
   );
-}
+};

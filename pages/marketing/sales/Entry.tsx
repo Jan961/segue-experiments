@@ -1,43 +1,82 @@
-import Layout from '../../../components/Layout';
-import { useState } from 'react';
-import Entry from '../../../components/marketing/sales/entry';
+import Layout from 'components/Layout';
+import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
+import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
+import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
-import { getAccountId, getEmailFromReq } from 'services/userService';
-import { getActiveProductions } from 'services/productionService';
+import { objectify } from 'radash';
+import { getSaleableBookings } from 'services/bookingService';
+import { getRoles } from 'services/contactService';
+import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
+import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
+import { BookingJump } from 'state/marketing/bookingJumpState';
+import { getProductionJumpState } from 'utils/getProductionJumpState';
 
-type Props = {
-  activeProductions: any[];
-};
-const pagetitle = 'Marketing - Sale Entry';
-
-const Index = ({ activeProductions }: Props) => {
-  const [searchFilter] = useState('');
-
+const Index = () => {
   return (
-    <Layout title={pagetitle + '| Segue'}>
-      <div className="flex flex-col flex-auto">
-        <h1 className="mb-4 text-3xl font-bold text-primary-green ">{pagetitle + ' | Segue'}</h1>
-        <Entry productions={activeProductions} searchFilter={searchFilter} />
-      </div>
-    </Layout>
+    <div>
+      <Layout title="Marketing | Segue">
+        <div className="mb-8">
+          <SalesEntryFilters />
+        </div>
+      </Layout>
+    </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
-  const productionsRaw = await getActiveProductions(AccountId);
-  return {
-    props: {
-      activeProductions: productionsRaw.map((t: any) => ({
-        Id: t.Id,
-        Code: t.Code,
-        IsArchived: t.IsArchived,
-        ShowCode: t.Show.Code,
-        ShowName: t.Show.Name,
-      })),
-    },
-  };
+  const accountId = await getAccountId(email);
+
+  const productionJump = await getProductionJumpState(ctx, '/marketing/sales/entry', accountId);
+
+  const productionId = productionJump.selected;
+  const users = await getUsers(accountId);
+
+  let initialState: InitialState = null;
+
+  if (productionId !== null) {
+    const bookings = await getSaleableBookings(productionId);
+    const venueRoles = await getRoles();
+    const selected = null;
+    const bookingJump: BookingJump = {
+      selected,
+      bookings: bookings.map(bookingMapperWithVenue),
+    };
+    const townList = await getUniqueVenueTownlist();
+    const venues = await getAllVenuesMin();
+
+    const venue = objectify(
+      venues,
+      (v) => v.Id,
+      (v: any) => {
+        const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      },
+    );
+
+    // See _app.tsx for how this is picked up
+    initialState = {
+      global: {
+        productionJump,
+      },
+      marketing: {
+        bookingJump,
+        venueRole: venueRoles.map(venueRoleMapper),
+        towns: townList,
+        venueList: venue,
+        defaultTab: 0,
+        users,
+      },
+    };
+  } else {
+    initialState = {
+      global: {
+        productionJump,
+      },
+    };
+  }
+
+  return { props: { initialState } };
 };
 
 export default Index;
