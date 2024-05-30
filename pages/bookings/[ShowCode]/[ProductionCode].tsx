@@ -123,7 +123,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      const countryId = v.VenueAddress.find((address:any) => address.TypeName ==='Main').CountryId ?? null;
+      const countryId = v.VenueAddress.find((address:any) => address.TypeName ==='Main')?.CountryId
 
       const region = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId)?? null;
 

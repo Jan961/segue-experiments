@@ -13,7 +13,7 @@ export const venueOptionsSelector = selectorFamily({
       const options = [];
       for (const venue of Object.values(venueDict)) {
         //Pushes options without regions
-        if(venue.RegionId == -1){options.push({
+        if(venue.RegionId === -1){options.push({
           text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
           value: venue?.Id,
         });
