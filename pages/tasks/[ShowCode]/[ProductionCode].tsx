@@ -27,6 +27,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const router = useRouter();
 
+  const { ProductionCode } = router.query;
+
   const usersList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -124,7 +126,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} />
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionCode} />
     </Layout>
   );
 };
