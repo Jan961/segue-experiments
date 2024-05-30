@@ -18,6 +18,7 @@ import { useRouter } from 'next/router';
 import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
+import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -49,6 +50,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isProductionEmpty, setIsProductionEmpty] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
+  const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
@@ -86,11 +88,15 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     handleNewProductionTaskModal();
     if (val === 'taskManual') setShowAddTask(true);
     else if (val === 'master') setIsMasterTaskList(true);
+    else setIsProductionTaskList(true);
   };
 
   const handleMasterListClose = () => {
-    setIsMasterTaskList(!isMasterTaskList);
-    router.replace(router.asPath);
+    setIsMasterTaskList(false);
+  };
+
+  const handleProductionListClose = () => {
+    setIsProductionTaskList(false);
   };
 
   return (
@@ -130,6 +136,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       <MasterTaskList
         visible={isMasterTaskList}
         onClose={handleMasterListClose}
+        productionId={ProductionCode.toString()}
+      />
+      <ProductionTaskList
+        visible={isProductionTaskList}
+        onClose={handleProductionListClose}
         productionId={ProductionCode.toString()}
       />
     </Layout>
