@@ -17,6 +17,7 @@ import { mapToProductionTasksDTO } from 'mappers/tasks';
 import { useRouter } from 'next/router';
 import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
+import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -25,6 +26,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { users } = useRecoilValue(userState);
 
   const router = useRouter();
+
+  const { ProductionCode } = router.query;
 
   const usersList = useMemo(
     () =>
@@ -45,6 +48,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showEmptyProductionModal, setShowEmptyProductionModal] = useState<boolean>(false);
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isProductionEmpty, setIsProductionEmpty] = useState<boolean>(false);
+  const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
@@ -81,6 +85,12 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const handleNewProductionTaskSubmit = (val: string) => {
     handleNewProductionTaskModal();
     if (val === 'taskManual') setShowAddTask(true);
+    else if (val === 'master') setIsMasterTaskList(true);
+  };
+
+  const handleMasterListClose = () => {
+    setIsMasterTaskList(!isMasterTaskList);
+    router.replace(router.asPath);
   };
 
   return (
@@ -107,11 +117,20 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
           );
         })
       )}
-      <NewProductionEmpty visible={showEmptyProductionModal} onClose={handleShowEmptyProduction} />
+      <NewProductionEmpty
+        visible={showEmptyProductionModal}
+        onClose={handleShowEmptyProduction}
+        handleSubmit={handleNewProductionTaskSubmit}
+      />
       <NewProductionTask
         visible={showNewProduction}
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
+      />
+      <MasterTaskList
+        visible={isMasterTaskList}
+        onClose={handleMasterListClose}
+        productionId={ProductionCode.toString()}
       />
     </Layout>
   );

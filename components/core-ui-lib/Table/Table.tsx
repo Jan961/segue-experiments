@@ -9,6 +9,7 @@ import {
   RowDoubleClickedEvent,
   RowHeightParams,
   RowSelectedEvent,
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import CustomTooltipRenderer from './renderers/CustomTooltipRenderer';
@@ -34,6 +35,8 @@ interface TableProps {
   getRowHeight?: (params: RowHeightParams) => number;
   tableHeight?: number;
   excelStyles?: any[];
+  rowSelection?: string;
+  onSelectionChanged?: (event: SelectionChangedEvent) => void;
 }
 
 const ROW_HEIGHT = 43;
@@ -46,14 +49,6 @@ const DEFAULT_COLUMN_DEF = {
   suppressHeaderFilterButton: true,
   menuTabs: [],
   tooltipComponent: CustomTooltipRenderer,
-};
-
-const DEFAULT_GRID_OPTIONS = {
-  rowSelection: 'single',
-  autoSizeStrategy: {
-    type: 'fitGridWidth',
-    defaultMinWidth: 50,
-  },
 };
 
 export default forwardRef(function Table(
@@ -74,6 +69,8 @@ export default forwardRef(function Table(
     onRowSelected = () => null,
     onRowDoubleClicked = () => null,
     excelStyles = [],
+    rowSelection = 'single',
+    onSelectionChanged,
   }: TableProps,
   ref,
 ) {
@@ -95,6 +92,14 @@ export default forwardRef(function Table(
   const handleCellValueChange = (e) => {
     isDirty.current = true;
     onCellValueChange(e);
+  };
+
+  const DEFAULT_GRID_OPTIONS = {
+    rowSelection,
+    autoSizeStrategy: {
+      type: 'fitGridWidth',
+      defaultMinWidth: 50,
+    },
   };
 
   const onGridReady = (params: GridReadyEvent) => {
@@ -167,6 +172,7 @@ export default forwardRef(function Table(
           suppressScrollOnNewData
           suppressContextMenu
           excelStyles={excelStyles}
+          onSelectionChanged={onSelectionChanged}
         />
       </div>
     </>
