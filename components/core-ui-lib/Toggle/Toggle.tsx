@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import { useEffect, useState } from 'react';
 
 export interface ToggleProps {
-  onChange: (e: any) => void;
+  onChange: (e: boolean) => void;
   checked: boolean;
   label?: string;
   name?: string;

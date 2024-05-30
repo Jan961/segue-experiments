@@ -1,34 +1,43 @@
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
-
+import { loadStripe } from '@stripe/stripe-js';
 import Loader from 'components/core-ui-lib/Loader';
 import { useRouter } from 'next/router';
 import { Wizard } from 'react-use-wizard';
 import SignUpForm from 'components/auth/SignUpForm';
 import SubscriptionPlans, { Plan } from 'components/auth/SubscriptionPlans';
-import CompanyDetailsForm, { Company } from 'components/auth/CompanyDetailsForm';
+import CompanyDetailsForm, { Company, Contact } from 'components/auth/CompanyDetailsForm';
 import PaymentDetailsForm from 'components/auth/PaymentDetailsForm';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GetServerSideProps } from 'next';
 import getAllPlans from 'services/subscriptionPlans';
 import { convertObjectKeysToCamelCase } from 'utils';
+import { CustomCheckoutProvider, Elements } from '@stripe/react-stripe-js';
+import axios from 'axios';
+import AccountConfirmation from 'components/auth/AccountConfirmation';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
   const plans = await getAllPlans();
-  console.log(plans);
+
   return {
     props: {
       plans: plans.map((p, i) => ({ ...convertObjectKeysToCamelCase(p), color: planColors[i] })),
     },
   };
 };
-const SignIn = ({ plans }: { plans: Plan[] }) => {
-  console.log(plans);
+const SignIn = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
+  const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
 
-  const [companyDetails, setCompanyDetails] = useState<Company>(null);
+  const [accountDetails, setAccountDetails] = useState<Company & Contact>(null);
   const [paymentDetails, setPaymentDetails] = useState(null);
+
+  const handleSaveAccountDetails = useCallback(async () => {
+    const { data } = await axios.post('/api/account', accountDetails);
+    return data;
+  }, [accountDetails]);
 
   return (
     <div className={`${calibri.variable} font-calibri background-gradient flex flex-col py-20  px-6`}>
@@ -36,8 +45,10 @@ const SignIn = ({ plans }: { plans: Plan[] }) => {
       <Wizard>
         <CompanyDetailsForm onSubmit={setCompanyDetails} />
         <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />
-        <PaymentDetailsForm payee={companyDetails} plan={subcriptionDetails} onSubmit={setPaymentDetails} />
-        <SignUpForm />
+        <Elements stripe={stripe}>
+          <PaymentDetailsForm payee={companyDetails} plan={subcriptionDetails} onSubmit={setPaymentDetails} />
+        </Elements>
+        <AccountConfirmation />
       </Wizard>
     </div>
   );

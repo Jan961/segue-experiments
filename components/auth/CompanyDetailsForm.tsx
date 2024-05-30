@@ -6,6 +6,7 @@ import { useWizard } from 'react-use-wizard';
 import Select from 'components/core-ui-lib/Select';
 
 export type Company = {
+  companyId?: number;
   companyName: string;
   addressLine1: string;
   addressLine2: string;
@@ -13,12 +14,28 @@ export type Company = {
   town: string;
   country: string;
   postcode: string;
-  emailAddress: string;
-  password: string;
+  email: string;
   vatNumber: string;
 };
 
+export type Contact = {
+  contactId?: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+};
+
+const DEFAULT_CONTACT_DETAILS = {
+  contactId: null,
+  firstName: '',
+  lastName: '',
+  email: '',
+  phoneNumber: '',
+};
+
 const DEFAULT_COMPANY_DETAILS = {
+  companyId: null,
   companyName: '',
   addressLine1: '',
   addressLine2: '',
@@ -26,29 +43,46 @@ const DEFAULT_COMPANY_DETAILS = {
   town: '',
   country: '',
   postcode: '',
-  emailAddress: '',
-  password: '',
+  email: '',
   vatNumber: '',
 };
 
 interface CompanyDetailsFormProps {
-  onSubmit: (data: Company) => void;
+  data: Company & Contact;
+  onSubmit: (data: Company & Contact) => void;
 }
 const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
   const [companyDetails, setCompanyDetails] = useState<Company>(DEFAULT_COMPANY_DETAILS);
+  const [contactDetails, setContactDetails] = useState<Contact>(DEFAULT_CONTACT_DETAILS);
 
-  const { previousStep, nextStep } = useWizard();
+  const { nextStep } = useWizard();
 
   const isValidEmail = useMemo(() => {
-    return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(companyDetails.emailAddress);
-  }, [companyDetails.emailAddress]);
+    return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(companyDetails.email);
+  }, [companyDetails.email]);
 
-  const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const canProceedToNextStep =
+    isValidEmail &&
+    companyDetails.companyName &&
+    contactDetails.firstName &&
+    contactDetails.lastName &&
+    contactDetails.phoneNumber &&
+    companyDetails.email &&
+    companyDetails.postcode;
+
+  const handleCompanyDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCompanyDetails({ ...companyDetails, [e.target.name]: e.target.value });
   };
 
+  const handleContactDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setContactDetails({ ...contactDetails, [e.target.name]: e.target.value });
+  };
+
+  const handleSaveCompanyDetails = async () => {
+    onSubmit({ ...companyDetails, ...contactDetails });
+  };
+
   const handleNextClick = () => {
-    onSubmit(companyDetails);
     nextStep();
   };
 
@@ -57,13 +91,43 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
       <div className="w-full flex flex-col gap-4">
         <h1 className="text-2xl font-bold text-center text-primary-input-text">Company Details</h1>
         <div>
+          <Label text="First Name" />
+          <TextInput
+            name="firstName"
+            placeholder="Enter first name"
+            className="w-full"
+            value={contactDetails.firstName}
+            onChange={handleContactDetailsChange}
+          />
+        </div>
+        <div>
+          <Label text="Last Name" />
+          <TextInput
+            name="lastName"
+            placeholder="Enter last name"
+            className="w-full"
+            value={contactDetails.lastName}
+            onChange={handleContactDetailsChange}
+          />
+        </div>
+        <div>
           <Label text="Company" />
           <TextInput
             name="companyName"
             placeholder="Enter name of main company"
             className="w-full"
             value={companyDetails.companyName}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
+          />
+        </div>
+        <div>
+          <Label text="Phone Number" />
+          <TextInput
+            name="phoneNumber"
+            placeholder="Enter phone number"
+            className="w-full"
+            value={contactDetails.phoneNumber}
+            onChange={handleContactDetailsChange}
           />
         </div>
         <div>
@@ -73,7 +137,7 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
             placeholder="Enter address line 1"
             className="w-full"
             value={companyDetails.addressLine1}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
         <div>
@@ -83,7 +147,7 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
             placeholder="Enter address line 2"
             className="w-full"
             value={companyDetails.addressLine2}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
         <div>
@@ -93,7 +157,7 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
             placeholder="Enter address line 3"
             className="w-full"
             value={companyDetails.addressLine3}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
         <div>
@@ -103,7 +167,7 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
             placeholder="Enter town"
             className="w-full"
             value={companyDetails.town}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
         <div>
@@ -113,7 +177,7 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
             placeholder="Enter postcode"
             className="w-full"
             value={companyDetails.postcode}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
         <div>
@@ -131,11 +195,11 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
         <div>
           <Label text="Company Email Address" />
           <TextInput
-            name="emailAddress"
+            name="email"
             placeholder="EnterCompany Email Addressr"
             className="w-full"
-            value={companyDetails.emailAddress}
-            onChange={handleValueChange}
+            value={companyDetails.email}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
         <div>
@@ -145,13 +209,13 @@ const CompanyDetailsForm = ({ onSubmit }: CompanyDetailsFormProps) => {
             placeholder="Enter VAT Number"
             className="w-full"
             value={companyDetails.vatNumber}
-            onChange={handleValueChange}
+            onChange={handleCompanyDetailsChange}
           />
         </div>
       </div>
       <div className="w-full flex gap-2  items-center justify-end mt-5">
-        <Button text="Back" variant="secondary" onClick={previousStep} className="w-32" />
-        <Button text="Next" onClick={handleNextClick} className="w-32" disabled={!isValidEmail} />
+        <Button text="Save" onClick={handleSaveCompanyDetails} className="w-32" />
+        <Button text="Next" onClick={handleNextClick} className="w-32" disabled={!canProceedToNextStep} />
       </div>
     </div>
   );
