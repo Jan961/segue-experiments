@@ -8,7 +8,6 @@ import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import { format, parseISO } from 'date-fns';
 import axios from 'axios';
-import container from 'parchment/src/blot/abstract/container';
 
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
@@ -97,7 +96,7 @@ export default function SalesTable({
         numPerfs: booking.PerformanceCount,
         prodWks: booking.ProductionLengthWeeks,
         prodCode: booking.FullProductionCode,
-        hasSalesData: booking.HasSalesData
+        hasSalesData: booking.HasSalesData,
       });
     });
 
@@ -195,11 +194,11 @@ export default function SalesTable({
         //Regex to extract integers
         let baseContainerWidth = 1220;
 
-        baseContainerWidth -= schoolSales ? 0: SCHOOLS_TAB_WIDTH;
+        baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;
 
         containerWidth = baseContainerWidth.toString() + 'px';
-        console.log(containerWidth)
+        console.log(containerWidth);
         return containerWidth;
 
       case 'salesComparison': {
