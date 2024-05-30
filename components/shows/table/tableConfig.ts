@@ -167,7 +167,7 @@ export const productionsTableConfig = [
         'DateBlock[1].StartDate',
         1,
         'StartDate',
-        { hideEmptyDeleteError: true, notSetMinDate: true },
+        { disableAnimations: true, defaultMinDateToToday: false },
         DateRenderer,
       ),
       generateChildCol(
@@ -175,13 +175,10 @@ export const productionsTableConfig = [
         'DateBlock[1].EndDate',
         1,
         'EndDate',
-        { hideEmptyDeleteError: true, notSetMinDate: true },
+        { disableAnimations: true, defaultMinDateToToday: false },
         DateRenderer,
       ),
     ],
-    cellRendererParams: {
-      hideEmptyDeleteError: true,
-    },
   },
   {
     headerName: 'Production Dates',
@@ -193,7 +190,7 @@ export const productionsTableConfig = [
         'DateBlock[0].StartDate',
         0,
         'StartDate',
-        { hideEmptyDeleteError: true, notSetMinDate: true },
+        { disableAnimations: true, defaultMinDateToToday: false },
         DateRenderer,
       ),
       generateChildCol(
@@ -201,13 +198,10 @@ export const productionsTableConfig = [
         'DateBlock[0].EndDate',
         0,
         'EndDate',
-        { hideEmptyDeleteError: true, notSetMinDate: true },
+        { disableAnimations: true, defaultMinDateToToday: false },
         DateRenderer,
       ),
     ],
-    cellRendererParams: {
-      hideEmptyDeleteError: true,
-    },
   },
   {
     headerName: 'Prod Image',
