@@ -48,8 +48,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-
-    const performancesNoSales : any | null = data.length ? await prisma.$queryRaw
+    let performancesNoSales:any[] = [];
+    try {
+      performancesNoSales = data.length ? await prisma.$queryRaw
         `SELECT BookingsForVenue
          FROM (SELECT BookingId AS BookingsForVenue
                FROM frtxigoo_dev.Booking
@@ -57,6 +58,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
          WHERE BookingsForVenue NOT IN (SELECT DISTINCT SetBookingId
                                         FROM frtxigoo_dev.SalesSet)
          ORDER BY BookingsForVenue ASC;` : null
+    }
+    catch(Exception){
+      console.log("Query Failed", Exception)
+    }
 
 
     const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
