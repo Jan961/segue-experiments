@@ -373,18 +373,18 @@ model BookedVenueHistory {
 }
 
 model CompAllocation {
-  Id                         Int           @id @default(autoincrement()) @map("CompAllocationId")
-  AvailableCompId            Int           @map("CompAllocationAvailableCompId")
-  TicketHolderName           String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                      Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
-  Comments                   String?       @map("CompAllocationComments") @db.VarChar(100)
-  RequestedBy                String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
-  ArrangedById               Int           @map("CompAllocationArrangedById")
-  VenueConfirmationNotes     String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
-  TicketHolderEmail          String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
-  SeatsAllocated             String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
-  AccountUser                AccountUser   @relation(fields: [ArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
-  AvailableComp              AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
+  Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
+  AvailableCompId        Int           @map("CompAllocationAvailableCompId")
+  TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
+  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
+  RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
+  ArrangedById           Int           @map("CompAllocationArrangedById")
+  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
+  SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AccountUser            AccountUser   @relation(fields: [ArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
+  AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
   @@index([ArrangedById], map: "AccountUser_CompAllocation")
@@ -559,8 +559,8 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @map("AccUserUserId")
+  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
@@ -754,16 +754,16 @@ model CountryInRegion {
 }
 
 model ProductionCompany {
-  Id                  Int     @id @default(autoincrement()) @map("ProdCoId")
-  AccountId           Int     @map("ProdCoAccountId")
-  Name                String  @map("ProdCoName") @db.VarChar(50)
-  WebSite             String? @map("ProdCoWebSite") @db.VarChar(80)
-  Logo                Bytes?  @map("ProdCoLogo")
-  SaleStartWeek       Int?    @map("ProdCoSaleStartWeek") @db.SmallInt
-  Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  ProdCoId            Int     @id @default(autoincrement())
+  ProdCoAccountId     Int
+  ProdCoName          String  @db.VarChar(50)
+  ProdCoWebSite       String? @db.VarChar(80)
+  ProdCoLogo          Bytes?
+  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
+  Account             Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
   Show                Show[]
 
-  @@index([AccountId], map: "Account_ProductionCompany")
+  @@index([ProdCoAccountId], map: "Account_ProductionCompany")
 }
 
 model ProductionRegion {
