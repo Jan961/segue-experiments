@@ -8,22 +8,40 @@ import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import { MasterTask } from '@prisma/client';
+import Loader from 'components/core-ui-lib/Loader';
 
 interface MasterTaskListProps {
   visible: boolean;
   onClose: () => void;
+  productionId: string;
 }
 
-const MasterTaskList = ({ visible, onClose }: MasterTaskListProps) => {
+const LoadingOverlay = () => (
+  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
+    <Loader className="ml-2" iconProps={{ stroke: '#FFF' }} />
+  </div>
+);
+
+const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps) => {
   const { users } = useRecoilValue(userState);
 
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [confirm, setConfirm] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleFetchTasks = async () => {
-    const response = await axios.get(`/api/tasks/master/list`);
-    setRowData(response.data || []);
+    setLoading(true);
+    try {
+      const response = await axios.get(`/api/tasks/master/list`);
+      setRowData(response.data || []);
+      setLoading(false);
+      onClose();
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -62,9 +80,37 @@ const MasterTaskList = ({ visible, onClose }: MasterTaskListProps) => {
     }
   };
 
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const endpoint = '/api/tasks/create/multiple/';
+      const tasksData = selectedRows.map((task: MasterTask) => {
+        return {
+          ProductionId: productionId,
+          Code: task.Code,
+          Name: task.Name,
+          CompleteByIsPostProduction: false,
+          StartByIsPostProduction: false,
+          StartByWeekNum: task.StartByWeekNum,
+          CompleteByWeekNum: task.CompleteByWeekNum,
+          AssignedToUserId: task.AssignedToUserId,
+          Progress: 0,
+          Priority: task.Priority,
+        };
+      });
+      await axios.post(endpoint, tasksData);
+      setLoading(false);
+      onClose();
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
+  };
+
   return (
     <PopupModal show={visible} onClose={onClose} title="Add Master Task" titleClass="text-primary-navy text-xl mb-2">
-      <div className=" w-[750px] lg:w-[1386px] h-full flex flex-col ">
+      <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">
+        {loading && <LoadingOverlay />}
         <Table
           columnDefs={columnDefs}
           rowData={rowData}
@@ -75,7 +121,7 @@ const MasterTaskList = ({ visible, onClose }: MasterTaskListProps) => {
       </div>
       <div className="flex mt-4 justify-end">
         <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={handleCancel} />
-        <Button text="Add" className="w-[132px]" onClick={null} />
+        <Button text="Add" className="w-[132px]" onClick={handleSubmit} disabled={selectedRows.length === 0} />
       </div>
       <ConfirmationDialog
         variant="delete"
