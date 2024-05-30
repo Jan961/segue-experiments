@@ -48,40 +48,52 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-    let performancesNoSales: any[] = [];
+
+    const venueId = data[0].VenueId;
     try {
-      performancesNoSales = data.length
-        ? await prisma.$queryRaw`SELECT BookingsForVenue
-         FROM (SELECT BookingId AS BookingsForVenue
-               FROM frtxigoo_dev.Booking
-               WHERE BookingVenueId = ${data[0].VenueId}) AS VenueBooking
-         WHERE BookingsForVenue NOT IN (SELECT DISTINCT SetBookingId
-                                        FROM frtxigoo_dev.SalesSet)
-         ORDER BY BookingsForVenue ASC;`
-        : null;
-    } catch (Exception) {
-      console.log('Query Failed', Exception);
+      const bookingsForVenue: number[] = (
+        await prisma.Booking.findMany({
+          where: {
+            VenueId: venueId,
+          },
+          select: {
+            Id: true,
+          },
+        })
+      ).map((booking) => booking.Id);
+
+      const salesSetBookingIds: number[] = (
+        await prisma.SalesSet.findMany({
+          distinct: ['SetBookingId'],
+          select: {
+            SetBookingId: true,
+          },
+        })
+      ).map((saleSet) => saleSet.SetBookingId);
+
+      const performancesNoSales: number[] = bookingsForVenue.filter(
+        (bookingId) => !salesSetBookingIds.includes(bookingId),
+      );
+      const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
+        acc[curr.BookingId] = curr._count?.Id;
+        return acc;
+      }, {});
+
+      data.forEach((selection) => {
+        if (!uniqueIds[selection.ProductionId]) {
+          uniqueIds[selection.ProductionId] = true; // Mark this id as seen
+          selection['HasSalesData'] = !performancesNoSales.includes(selection.BookingId);
+          results.push(selection); // Push the unique item to the result array
+        }
+      });
+      res.send(
+        results
+          .map((booking) => ({ ...booking, PerformanceCount: bookingPerformanceCountMap[booking.BookingId] }))
+          .sort((a, b) => a.BookingId - b.BookingId),
+      );
+    } catch (exception) {
+      console.log('Query Failed', exception);
     }
-
-    const bookingPerformanceCountMap: Record<number, number> = performances.reduce((acc, curr) => {
-      acc[curr.BookingId] = curr._count?.Id;
-      return acc;
-    }, {});
-
-    data.forEach((selection) => {
-      if (!uniqueIds[selection.ProductionId]) {
-        uniqueIds[selection.ProductionId] = true; // Mark this id as seen
-        selection['HasSalesData'] = !performancesNoSales.some(
-          (bookingDict) => selection.BookingId == bookingDict.BookingsForVenue,
-        );
-        results.push(selection); // Push the unique item to the result array
-      }
-    });
-    res.send(
-      results
-        .map((booking) => ({ ...booking, PerformanceCount: bookingPerformanceCountMap[booking.BookingId] }))
-        .sort((a, b) => a.BookingId - b.BookingId),
-    );
   } catch (error) {
     console.log('Error:', error);
     res.status(500).send({ ok: false, message: error?.message });

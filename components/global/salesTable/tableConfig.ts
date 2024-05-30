@@ -1,5 +1,6 @@
 import getNumericalOptions from 'utils/getNumericalOptions';
 import SelectOrderRenderer from './renderers/SelectOrderRenderer';
+import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
 import SelectRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
@@ -133,7 +134,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
       buttonText: 'Sales Data',
       className: 'w-24',
     },
-    cellRenderer: ButtonRenderer,
+    cellRenderer: ButtonSalesRenderer,
     width: 125,
     cellStyle: {
       textAlign: 'center',
