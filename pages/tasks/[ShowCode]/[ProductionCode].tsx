@@ -113,7 +113,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const handleProductionListClose = () => {
     setIsProductionTaskList(false);
     setIsMasterTaskList(!isMasterTaskList);
-    router.replace(router.asPath);
   };
 
   return (
