@@ -16,11 +16,11 @@ const DEFAULT_SHOW: ShowDTO = {
   Name: '',
   Type: '',
   IsArchived: false,
+  ShowProdCoId: null,
 };
 
 const Create = () => {
   const router = useRouter();
-  const { path } = router.query;
 
   const [status, setStatus] = useState({
     submitted: false,
@@ -38,8 +38,11 @@ const Create = () => {
         info: { error: false, msg },
       });
     } else {
-      // @ts-ignore
-      setStatus(false);
+      setStatus({
+        submitted: false,
+        submitting: false,
+        info: { error: true, msg: null },
+      });
     }
   };
 
@@ -66,7 +69,7 @@ const Create = () => {
       url: '/api/shows/create',
       data: inputs,
     })
-      .then((response) => {
+      .then(() => {
         loggingService.logAction('Show', 'Show Created');
         handleServerResponse(true, 'Thank you, your message has been submitted.');
         router.push('/account/shows');

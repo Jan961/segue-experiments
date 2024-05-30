@@ -1,6 +1,7 @@
 import { ShowDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { omit } from 'radash';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -15,7 +16,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         Id: show.Id,
       },
-      data: show,
+      data: omit(show, ['Id']),
     });
     res.status(200).end();
   } catch (e) {

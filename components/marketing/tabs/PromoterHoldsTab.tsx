@@ -37,7 +37,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const [holdList, setHoldList] = useState(null);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [allocatedRow, setAllocatedRow] = useState(null);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [tableHeight, setTableHeight] = useState(100);
   const [allocType, setAllocType] = useState('new');
   const textAreaRef = useRef(null);
@@ -45,7 +45,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -202,7 +202,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       setCastRateArranged(booking.CastRateTicketsArranged);
       setCastRateNotes(booking.CastRateTicketsNotes);
 
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
@@ -217,13 +217,13 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   return (
     <>
-      {dataAvail && (
+      {dataAvailable && (
         <div>
           <div className="flex flex-row">
             <div className="flex flex-col mr-3 mb-5">
               <Checkbox
-                id={'Cast Rate Arranged'}
-                name={'Cast Rate Arra'}
+                id="Cast Rate Arranged"
+                name="Cast Rate Arra"
                 checked={castRateArranged}
                 onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
@@ -257,7 +257,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 text="Export Allocated Seats"
                 className="w-[203px]"
                 iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName={'excel'}
+                sufixIconName="excel"
               />
               <Button text="Add New" className="w-[160px]" onClick={() => newAllocatedSeats()} />
             </div>
