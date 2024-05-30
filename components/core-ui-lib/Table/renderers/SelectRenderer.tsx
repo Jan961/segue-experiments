@@ -15,7 +15,8 @@ const SelectRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
     selectRef.current.focus();
   };
 
-  const hasSalesData = props["data"].hasSalesData;
+  //const hasSalesData = props["data"].hasSalesData;
+  const hasSalesData = props["data"]?.hasSalesData;
 
   return (
     <div className="pl-1 pr-2 mt-1">
