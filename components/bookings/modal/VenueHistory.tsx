@@ -87,13 +87,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     switch (type) {
       case 'prodComparision':
         setSelBookings([]);
-        setShowVenueSelect(false);
         setShowCompSelect(true);
+        setShowVenueSelect(false);
         break;
 
       case 'salesComparison':
-        setShowCompSelect(false);
         setShowResults(true);
+        setShowCompSelect(false);
         break;
 
       case 'salesSnapshot':
@@ -141,10 +141,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getProdComparision = async () => {
     setErrorMessage('');
     if (selectedBookings.length < 1) {
-      setErrorMessage('Please select at least 1 venue for comparison.');
+      setErrorMessage('Please select at least 1 venue.');
       return;
     }
-
     setLoading(true);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
