@@ -1,5 +1,6 @@
 import getNumericalOptions from 'utils/getNumericalOptions';
-import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
+import SelectOrderRenderer from './renderers/SelectOrderRenderer';
+import SelectRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
@@ -44,7 +45,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
-    cellRenderer: SelectRenderer,
+    cellRenderer: SelectOrderRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
         optionsLength,
