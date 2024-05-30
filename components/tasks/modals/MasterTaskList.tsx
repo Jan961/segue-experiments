@@ -47,12 +47,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
     handleFetchTasks();
   }, []);
 
-  console.log(
-    rowData.filter((item) => {
-      return item.Notes !== null;
-    }),
-  );
-
   const usersList = useMemo(() => {
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
       value: Id,
