@@ -38,6 +38,7 @@ export type ShowDTO = {
   Name: string;
   Type: string;
   IsArchived: boolean;
+  ShowProdCoId: number;
 };
 
 export type ProductionTaskDTO = {

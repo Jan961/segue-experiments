@@ -7,9 +7,10 @@ import { NEW_PRODUCTIONS_OPTIONS } from './constants';
 interface NewProductionEmptyProps {
   visible: boolean;
   onClose: () => void;
+  handleSubmit: (val) => void;
 }
 
-const NewProductionEmpty = ({ visible, onClose }: NewProductionEmptyProps) => {
+const NewProductionEmpty = ({ visible, onClose, handleSubmit }: NewProductionEmptyProps) => {
   const [newProductionTask, setNewProductionTask] = useState('master');
 
   const handleOnChange = (value: string) => {
@@ -18,13 +19,14 @@ const NewProductionEmpty = ({ visible, onClose }: NewProductionEmptyProps) => {
 
   const handleClose = () => {
     onClose();
+    handleSubmit(newProductionTask);
   };
 
   return (
     <PopupModal
       show={visible}
       onClose={handleClose}
-      title={'New Production Task List'}
+      title="New Production Task List"
       titleClass="text-primary-navy text-xl mb-2"
     >
       <form className="flex flex-col gap-2">

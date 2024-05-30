@@ -28,14 +28,13 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const [contactNoteRow, setContactNoteRow] = useState<BookingContactNoteDTO>();
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
-  const [dataAvail, setDataAvail] = useState<boolean>(false);
+  const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const users = useRecoilValue(userState);
-  const [contactNoteTable, setContactNoteTable] = useState(<div />);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setDataAvail(false);
+      setDataAvailable(false);
     },
   }));
 
@@ -55,13 +54,6 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
         setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
         setContactNoteRows(sortedContactNotes);
-        setContactNoteTable(
-          <div className="flex flex-row">
-            <div className="w-[1086px] h-[500px]">
-              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
-            </div>
-          </div>,
-        );
       }
     } catch (error) {
       console.log(error);
@@ -146,13 +138,13 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       getContactNotes(props.bookingId.toString(), userTempList);
       setBookingIdVal(props.bookingId);
 
-      setDataAvail(true);
+      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
   return (
     <>
-      {dataAvail && (
+      {dataAvailable && (
         <div>
           <div className="flex justify-end">
             <div className="flex flex-row items-center justify-between pb-5 gap-4">
@@ -161,13 +153,17 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
                 className="w-[203px]"
                 disabled={!productionId}
                 iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName={'excel'}
+                sufixIconName="excel"
               />
               <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
             </div>
           </div>
 
-          {contactNoteTable}
+          <div className="flex flex-row">
+            <div className="w-[1086px] h-[500px]">
+              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+            </div>
+          </div>
 
           <ContactNoteModal
             show={showContactNoteModal}
@@ -179,7 +175,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
           />
 
           <ConfirmationDialog
-            variant={'delete'}
+            variant="delete"
             show={showConfirm}
             onYesClick={() => saveContactNote('delete', contactNoteRow)}
             onNoClick={() => setShowConfirm(false)}
