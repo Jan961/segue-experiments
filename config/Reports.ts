@@ -13,3 +13,6 @@ export const getWeekOptions = (start: number, end: number): SelectOption[] => {
   }
   return options;
 };
+
+export const MIN_WEEK = 2;
+export const MAX_WEEK = 99;

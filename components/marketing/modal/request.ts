@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { downloadFromContent } from 'components/bookings/modal/request';
 import moment from 'moment';
 
 type ProductionWeek = {
@@ -20,41 +21,37 @@ export const exportSalesSummaryReport = async ({ production, productionWeek, num
     .subtract(numberOfWeeks - 1, 'weeks')
     .toISOString()
     ?.split('T')?.[0];
-  fetch('/api/reports/sales-summary-simple', {
-    method: 'POST',
-    body: JSON.stringify({
-      ProductionId: parseInt(production, 10),
-      fromWeek,
-      toWeek,
-    }),
-  })
-    .then(async (response) => {
-      if (response.status >= 200 && response.status < 300) {
-        const productionName = 'Sales Summary';
-        let suggestedName: string | any[] = response.headers.get('Content-Disposition');
-        if (suggestedName) {
-          suggestedName = suggestedName.match(/filename="(.+)"/);
-          suggestedName = suggestedName.length > 0 ? suggestedName[1] : null;
-        }
-        if (!suggestedName) {
-          suggestedName = `${productionName}.xlsx`;
-        }
-        const content = await response.blob();
-        if (content) {
-          const anchor: any = document.createElement('a');
-          anchor.download = suggestedName;
-          const url = (window.webkitURL || window.URL).createObjectURL(content);
-          anchor.href = url;
-          anchor.dataset.downloadurl = [
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            anchor.download,
-            anchor.href,
-          ].join(':');
-          anchor.click();
+  const payload = {
+    ProductionId: parseInt(production, 10),
+    fromWeek,
+    toWeek,
+  };
+
+  try {
+    const response = await axios.post('/api/reports/sales-summary-simple', payload, { responseType: 'blob' });
+
+    if (response.status >= 200 && response.status < 300) {
+      const productionName = 'Sales Summary';
+      let suggestedName: string | null = null;
+
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match && match[1]) {
+          suggestedName = match[1];
         }
       }
-    })
-    .catch((error) => {
-      console.log('Error downloading report', error);
-    });
+
+      if (!suggestedName) {
+        suggestedName = `${productionName}.xlsx`;
+      }
+
+      const content = response.data;
+      if (content) {
+        downloadFromContent(content, suggestedName);
+      }
+    }
+  } catch (error) {
+    console.log('Error downloading report', error);
+  }
 };

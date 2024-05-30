@@ -8,7 +8,7 @@ import { exportSalesSummaryReport, fetchProductionWeek } from './request';
 import { transformToOptions } from 'utils';
 import { dateToSimple } from 'services/dateService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { getWeekOptions, salesSummarySortOptions } from 'config/Reports';
+import { MAX_WEEK, MIN_WEEK, getWeekOptions, salesSummarySortOptions } from 'config/Reports';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import { getCurrentMondayDate } from 'services/reportsService';
@@ -30,11 +30,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
   const { production, productionWeek, numberOfWeeks, order } = formData;
-  const {
-    data: weeks = [],
-    // isLoading: loading,
-    // error: weeksFetchError,
-  } = useQuery({
+  const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => fetchProductionWeek(production),
   });
@@ -54,7 +50,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
     const currentWeekMonday = getCurrentMondayDate();
     setFormData((data) => ({ ...data, productionWeek: currentWeekMonday }));
   }, [weeks]);
-  const weekOptions = useMemo(() => getWeekOptions(2, 99), []);
+  const weekOptions = useMemo(() => getWeekOptions(MIN_WEEK, MAX_WEEK), []);
 
   const productionsOptions = useMemo(
     () =>

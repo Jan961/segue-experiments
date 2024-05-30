@@ -78,7 +78,7 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 // const formatDate = (date) => moment(date).format('DD/MM/YY')
 
 const handler = async (req, res) => {
-  const { ProductionId } = JSON.parse(req.body) || {};
+  const { ProductionId } = req.body || {};
 
   // const formatedFromDate = formatDate(fromDate)
   // const formatedToDate = formatDate(toDate)

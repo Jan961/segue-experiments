@@ -47,10 +47,11 @@ export const makeRowTextBoldAndAllignLeft = ({
 }: {
   worksheet: any;
   row: number;
-  numberOfColumns: number;
+  numberOfColumns?: number;
   bgColor?: COLOR_HEXCODE;
 }) => {
-  for (let col = 1; col <= numberOfColumns; col++) {
+  const totalColumns = numberOfColumns ?? worksheet.columnCount;
+  for (let col = 1; col <= totalColumns; col++) {
     const cell = worksheet.getCell(row, col);
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
     cell.alignment = { horizontal: 'left' };
