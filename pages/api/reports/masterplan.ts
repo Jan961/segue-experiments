@@ -39,15 +39,26 @@ const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsCha
   });
 };
 
-const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row: number; numberOfColumns: number }) => {
-  for (let col = 1; col <= numberOfColumns; col++) {
+export const styleHeader = ({
+  worksheet,
+  row,
+  numberOfColumns,
+  bgColor = COLOR_HEXCODE.DARK_ORANGE,
+}: {
+  worksheet: any;
+  row: number;
+  numberOfColumns?: number;
+  bgColor?: COLOR_HEXCODE;
+}) => {
+  const totalColumns = numberOfColumns ?? worksheet.columnCount;
+  for (let col = 1; col <= totalColumns; col++) {
     const cell = worksheet.getCell(row, col);
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
     cell.alignment = { horizontal: ALIGNMENT.CENTER };
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: COLOR_HEXCODE.BLUE },
+      fgColor: { argb: bgColor },
     };
   }
 };
@@ -71,7 +82,7 @@ const formatDate = (date) => moment(date).format('DD/MM/YY');
 const getShowAndProductionKey = ({ FullProductionCode, ShowName }) => `${FullProductionCode} - ${ShowName}`;
 
 const handler = async (req, res) => {
-  const { fromDate, toDate } = JSON.parse(req.body) || {};
+  const { fromDate, toDate } = req.body || {};
 
   const formatedFromDate = formatDate(fromDate);
   const formatedToDate = formatDate(toDate);

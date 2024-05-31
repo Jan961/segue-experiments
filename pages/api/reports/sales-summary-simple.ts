@@ -51,13 +51,14 @@ import {
 import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { styleHeader } from './masterplan';
 
 // TODO
 // Decimal upto 2 places fix
 // Production row height fix
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { productionId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = JSON.parse(req.body) || {};
+  const { productionId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = req.body || {};
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
@@ -145,12 +146,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     );
 
   // Logic for headers
-  const uniqueProductionColumns: UniqueHeadersObject[] = getUniqueAndSortedHeaderProductionColumns(finalFormattedValues);
+  const uniqueProductionColumns: UniqueHeadersObject[] =
+    getUniqueAndSortedHeaderProductionColumns(finalFormattedValues);
   const headerWeekNums: string[] = uniqueProductionColumns.map((x) => x.FormattedSetProductionWeekNum);
   const headerWeekDates: string[] = uniqueProductionColumns.map((x) => x.SetProductionWeekDate);
 
   // Adding Heading
-  worksheet.addRow([salesReportName({ productionId, isWeeklyReport, isSeatsDataRequired, data })]);
+  worksheet.addRow([salesReportName({ isWeeklyReport, isSeatsDataRequired, data })]);
   // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullProductionCode + ')' : 'Dummy Report'
   worksheet.addRow([]);
 
@@ -431,7 +433,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       })
     : [];
   const weekWiseDataInPound = headerWeekNums.map((weekNum) =>
-    getCurrencyWiseTotal({ totalForWeeks, setProductionWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND }),
+    getCurrencyWiseTotal({
+      totalForWeeks,
+      setProductionWeekNum: weekNum,
+      currencySymbol: VENUE_CURRENCY_SYMBOLS.POUND,
+    }),
   );
   worksheet.addRow([
     '',
@@ -443,6 +449,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     getChangeVsLastWeekValue(weekWiseDataInPound),
     ...seatsDataForPound,
   ]);
+  styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
   applyFormattingToRange({
     worksheet,
     startRow: row,

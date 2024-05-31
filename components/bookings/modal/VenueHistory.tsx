@@ -352,7 +352,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </TableWrapper>
       </PopupModal>
       <ExportModal
-        tableRef={salesTableRef}
         visible={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onItemClick={exportTable}
