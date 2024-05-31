@@ -9,7 +9,7 @@ import {
   performanceMapper,
   rehearsalMapper,
 } from 'lib/mappers';
-import { getAllVenuesMin } from 'services/venueService';
+import { getAllVenuesMin, getCountryRegions } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
@@ -104,10 +104,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
-  const [venues, productions, dateTypeRaw] = await all([
+  const [venues, productions, dateTypeRaw, countryRegions] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
     getDayTypes(),
+    getCountryRegions(),
   ]);
 
   const dateBlock = [];
@@ -121,7 +122,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      const countryId = v.VenueAddress.find((address: any) => address.TypeName === 'Main')?.CountryId;
+
+      const region = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId) ?? null;
+
+      return {
+        Id: v.Id,
+        Code: v.Code,
+        Name: v.Name,
+        Town,
+        Seats: v.Seats,
+        Count: 0,
+        RegionId: region ? region.RegionId : -1,
+      };
     },
   );
 
