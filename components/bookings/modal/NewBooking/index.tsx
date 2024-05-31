@@ -110,7 +110,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
       const runOfDates = bookings
         .filter(({ runTag }) => runTag === booking.runTag)
         .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
-      console.log('bookings', runOfDates, bookings);
       if (runOfDates.length > 1) {
         onFormDataChange({ isRunOfDates: true });
       }
