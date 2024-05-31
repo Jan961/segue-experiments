@@ -14,6 +14,7 @@ export const venueOptionsSelector = selectorFamily({
       console.log('Current Production ', currentProduction);
       for (const venue of Object.values(venueDict)) {
         console.log('Venue Region ID', venue.RegionId);
+        console.log(venue);
         //  Pushes options without regions
         if (venue.RegionId === -1) {
           options.push({
@@ -23,12 +24,15 @@ export const venueOptionsSelector = selectorFamily({
           continue;
         }
         console.log('Show Region ID', currentProduction.ShowRegionId);
+        console.log(excludedVenueIds.includes(venue.Id));
         if (excludedVenueIds.includes(venue.Id) || venue.RegionId !== currentProduction.ShowRegionId) continue;
         options.push({
           text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
           value: venue?.Id,
         });
       }
+      console.log('returning');
+      console.log(options.sort((a, b) => a.text.localeCompare(b.text)));
       return options.sort((a, b) => a.text.localeCompare(b.text));
     },
 });
