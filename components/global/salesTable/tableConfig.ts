@@ -1,6 +1,6 @@
 import getNumericalOptions from 'utils/getNumericalOptions';
-import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
-import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import SelectOrderRenderer from './renderers/SelectOrderRenderer';
+import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
@@ -44,7 +44,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
-    cellRenderer: SelectRenderer,
+    cellRenderer: SelectOrderRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
         optionsLength,
@@ -132,7 +132,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
       buttonText: 'Sales Data',
       className: 'w-24',
     },
-    cellRenderer: ButtonRenderer,
+    cellRenderer: ButtonSalesRenderer,
     width: 125,
     cellStyle: {
       textAlign: 'center',
@@ -147,7 +147,7 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
-    cellRenderer: SelectRenderer,
+    cellRenderer: SelectOrderRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
         optionsLength,

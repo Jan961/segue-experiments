@@ -65,7 +65,7 @@ const Filters = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [bookings, lastDates]);
+  }, [bookings.bookings, lastDates]);
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {
@@ -84,7 +84,6 @@ const Filters = () => {
     } else {
       setSelectedIndex(-1);
       setSelectedValue(null);
-      setBooking({ ...bookings, selected: undefined });
     }
   };
 
@@ -106,24 +105,24 @@ const Filters = () => {
     changeBooking(nextBooking.value);
   };
 
+  const fetchLastDates = async () => {
+    try {
+      const data = await fetchData({
+        url: '/api/performances/lastDate/' + productionId,
+        method: 'POST',
+      });
+
+      if (typeof data === 'object') {
+        const lastDates = data as Array<LastPerfDate>;
+        setLastDates(lastDates);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     changeBooking(null);
-    const fetchLastDates = async () => {
-      try {
-        const data = await fetchData({
-          url: '/api/performances/lastDate/' + productionId,
-          method: 'POST',
-        });
-
-        if (typeof data === 'object') {
-          const lastDates = data as Array<LastPerfDate>;
-          setLastDates(lastDates);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
     fetchLastDates();
   }, [productionId]);
 

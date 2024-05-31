@@ -19,6 +19,7 @@ import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
+import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -29,8 +30,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const filter = useRecoilValue(tasksfilterState);
 
   const router = useRouter();
-
-  const { ProductionCode } = router.query;
 
   const usersList = useMemo(
     () =>
@@ -52,6 +51,9 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isProductionEmpty, setIsProductionEmpty] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
+  const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
+
+  const [productionId, setProductionId] = useState<number>(null);
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
@@ -76,21 +78,26 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
           setShowEmptyProductionModal(true);
           setIsProductionEmpty(true);
+          setProductionId(production.Id);
+        } else {
+          setShowEmptyProductionModal(false);
+          setIsProductionEmpty(false);
+          setProductionId(null);
         }
       });
     }
   }, [filteredProductions]);
 
   const handleShowEmptyProduction = () => {
-    setShowEmptyProductionModal(!showEmptyProductionModal);
+    setShowEmptyProductionModal(false);
   };
 
   const handleNewProductionTaskModal = () => {
-    setShowNewProduction(!showNewProduction);
+    setShowNewProduction(false);
   };
 
   const handleModalConditions = () => {
-    if (isProductionEmpty) {
+    if (isProductionEmpty && isFilterMatchingInitialState()) {
       setShowNewProduction(true);
     } else {
       setShowAddTask(true);
@@ -101,10 +108,22 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     handleNewProductionTaskModal();
     if (val === 'taskManual') setShowAddTask(true);
     else if (val === 'master') setIsMasterTaskList(true);
+    else setIsProductionTaskList(true);
   };
 
-  const handleMasterListClose = () => {
-    setIsMasterTaskList(!isMasterTaskList);
+  const handleMasterListClose = (val: string) => {
+    setIsMasterTaskList(false);
+    if (val === 'data-added') {
+      router.replace(router.asPath);
+    }
+  };
+
+  const handleProductionListClose = (val: string) => {
+    setIsProductionTaskList(false);
+    setIsMasterTaskList(false);
+    if (val === 'data-added') {
+      router.replace(router.asPath);
+    }
   };
 
   return (
@@ -141,10 +160,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList
-        visible={isMasterTaskList}
-        onClose={handleMasterListClose}
-        productionId={ProductionCode.toString()}
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={productionId} />
+      <ProductionTaskList
+        visible={isProductionTaskList}
+        onClose={handleProductionListClose}
+        productionId={productionId}
       />
     </Layout>
   );

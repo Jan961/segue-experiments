@@ -99,6 +99,7 @@ export type BookingSelection = {
   FullProductionCode: string;
   ProductionLengthWeeks: number;
   PerformanceCount: number;
+  HasSalesData: boolean;
 };
 
 export type SalesTabs =

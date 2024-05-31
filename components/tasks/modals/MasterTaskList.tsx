@@ -13,8 +13,8 @@ import Loader from 'components/core-ui-lib/Loader';
 
 interface MasterTaskListProps {
   visible: boolean;
-  onClose: () => void;
-  productionId: string;
+  onClose: (val?: string) => void;
+  productionId: number;
 }
 
 const LoadingOverlay = () => (
@@ -37,7 +37,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       const response = await axios.get(`/api/tasks/master/list`);
       setRowData(response.data || []);
       setLoading(false);
-      onClose();
     } catch (error) {
       setLoading(false);
       console.error(error);
@@ -62,7 +61,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
   const onSelectionChanged = (event) => {
     const selectedNodes = event.api.getSelectedNodes();
     const selectedData = selectedNodes.map((node) => node.data);
-    console.log(selectedData);
     setSelectedRows(selectedData);
   };
 
@@ -100,7 +98,7 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       });
       await axios.post(endpoint, tasksData);
       setLoading(false);
-      onClose();
+      onClose('data-added');
     } catch (error) {
       setLoading(false);
       console.error(error);

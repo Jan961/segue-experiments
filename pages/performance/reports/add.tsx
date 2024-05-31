@@ -13,7 +13,7 @@ type Props = {
 export default function Reports({ productions = [] }: Props) {
   return (
     <Layout title="Performance Reports | Add Report | Segue">
-      <ReportWrapper>
+      <ReportWrapper productions={productions}>
         {productions.map(({ Id, ShowName }) => (
           <option key={Id} value={Id}>
             {ShowName}

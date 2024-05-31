@@ -13,6 +13,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { isNullOrEmpty } from 'utils';
 import { weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 
@@ -86,14 +87,16 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const { users } = useRecoilValue(userState);
 
-  const usersList = useMemo(
-    () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
-    [users],
-  );
+  const usersList = useMemo(() => {
+    if (isNullOrEmpty(users)) {
+      return [];
+    }
+
+    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+  }, [users]);
 
   const handleOnChange = (e: any) => {
     let { id, value, checked } = e.target;
