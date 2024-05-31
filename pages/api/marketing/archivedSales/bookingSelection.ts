@@ -82,7 +82,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       data.forEach((selection) => {
         if (!uniqueIds[selection.ProductionId]) {
           uniqueIds[selection.ProductionId] = true; // Mark this id as seen
-          selection['HasSalesData'] = !performancesNoSales.includes(selection.BookingId);
+          selection.HasSalesData = !performancesNoSales.includes(selection.BookingId);
           results.push(selection); // Push the unique item to the result array
         }
       });
