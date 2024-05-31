@@ -104,6 +104,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     updateBookingOnStore(state.booking);
   };
 
+  console.log('bookings', bookings);
   useEffect(() => {
     if (booking) {
       // Check for run of dates
