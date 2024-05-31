@@ -21,14 +21,16 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const { users } = useRecoilValue(userState);
 
-  const usersList = useMemo(
-    () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
-    [users],
-  );
+  const usersList = useMemo(() => {
+    if (users === undefined || users === null) {
+      return [];
+    }
+
+    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+  }, [users]);
 
   const exists = usersList.some((item) => item.text === 'All');
 
