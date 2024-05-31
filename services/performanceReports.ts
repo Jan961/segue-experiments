@@ -5,7 +5,7 @@ export const getReportsList = async () => {
   return prisma.PerformanceReport.findMany({
     select: {
       Id: true,
-      CreatedAt: true,
+      // CreatedAt: true,
       Performance: {
         select: {
           Id: true,
@@ -69,11 +69,11 @@ export const getPerformanceReportById = async (Id: number) => {
       AudienceNotes: true,
       MerchandiseNotes: true,
       GeneralRemarks: true,
-      CSM: true,
-      Lighting: true,
-      ASM: true,
-      CreatedAt: true,
-      UpdatedAt: true,
+      // CSM: true,
+      // Lighting: true,
+      // ASM: true,
+      // CreatedAt: true,
+      // UpdatedAt: true,
       Performance: {
         select: {
           Id: true,
@@ -117,11 +117,11 @@ export const extractTime = (dateTime: Date | null | undefined): string | undefin
     return dateTime.toISOString().slice(11, 16);
   }
   return undefined;
-}
+};
 
 export const transformPerformanceReport = (report: any): any => {
-  const actOneUpTime = extractTime( report?.Act1UpTime) || report?.Act1UpTime?.toISOString?.() || '';
-  const actOneDownTime = extractTime( report?.Act1DownTime) || report?.Act1DownTime?.toISOString?.() || '';
+  const actOneUpTime = extractTime(report?.Act1UpTime) || report?.Act1UpTime?.toISOString?.() || '';
+  const actOneDownTime = extractTime(report?.Act1DownTime) || report?.Act1DownTime?.toISOString?.() || '';
   const actTwoUpTime = extractTime(report?.Act2DownTime) || report?.Act2UpTime?.toISOString?.() || '';
   const actTwoDownTime = extractTime(report?.Act2DownTime) || report?.Act2DownTime?.toISOString?.() || '';
   const intervalUpTime = extractTime(report?.Interval1UpTime) || report?.Interval1UpTime?.toISOString?.() || '';
@@ -131,7 +131,7 @@ export const transformPerformanceReport = (report: any): any => {
   const getOutDownTime = extractTime(report?.GetOutDownTime) || report?.GetOutDownTime?.toISOString?.() || '';
   const createdAt = report?.CreatedAt?.toISOString?.() || '';
   const performanceDate = report?.Performance?.Date?.toISOString?.() || '';
-  const performanceTime =  report?.Performance?.Time?.toISOString?.() || '';
+  const performanceTime = report?.Performance?.Time?.toISOString?.() || '';
   return {
     id: report?.Id,
     reportNumber: report?.Id,
@@ -153,13 +153,13 @@ export const transformPerformanceReport = (report: any): any => {
     distributionList: report?.DistributionList || [],
     venue: report?.Performance?.Booking?.Venue?.Name,
     town: report?.Performance?.Booking?.Venue?.Code,
-    lighting: report?.Lighting,
+    lighting: report?.Lighting || '',
     actTwoDuration: getDuration(actTwoUpTime, actTwoDownTime),
     actOneDuration: getDuration(actOneUpTime, actOneDownTime),
     intervalDuration: getDuration(intervalUpTime, intervalDownTime),
     getOutDuration: getDuration(getOutUpTime, getOutDownTime),
-    asm: report?.ASM,
-    cms: report?.CSM,
+    asm: report?.ASM || '',
+    cms: report?.CSM || '',
     reportImageUrl: report?.ReportImageUrl || '',
     performanceTime,
     performanceDate,

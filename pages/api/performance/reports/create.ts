@@ -1,57 +1,59 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 import { dateStringToPerformancePair } from 'services/dateService';
-import { performanceMapper } from 'lib/mappers';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { Report } from 'types/report';
 import moment from 'moment';
 
-
-const getDateTime = (date:Date, time:string)=>{
+const getDateTime = (date: Date, time: string) => {
   const [hours, minutes] = time.split(':');
-  return moment.utc(date).set({hour:parseInt(hours, 10),minute:parseInt(minutes, 10)}).toDate()
-}
+  return moment
+    .utc(date)
+    .set({ hour: parseInt(hours, 10), minute: parseInt(minutes, 10) })
+    .toDate();
+};
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const report = req.body as Report;
-    const { actOneDownTime,
-      actOneDuration,
+    const {
+      actOneDownTime,
+      // actOneDuration,
       actOneUpTime,
       actTwoDownTime,
-      actTwoDuration,
-      asm,
+      // actTwoDuration,
+      // asm,
       audienceNote,
       bookingId,
       castCrewAbsence,
       castCrewInjury,
-      cms,
-      distributionList,
-      dutyTechnician,
+      // csm,
+      // distributionList,
+      // dutyTechnician,
       generalRemarks,
-      getOutDuration,
+      // getOutDuration,
       getOutTime,
       intervalDownTime,
-      intervalDuration,
-      lighting,
+      // intervalDuration,
+      // lighting,
       merchandiseNote,
       performanceDate,
       performanceId,
       performanceNote,
-      performanceTime,
-      reportImageUrl,
+      // performanceTime,
+      // reportImageUrl,
       setPropCustumeNote,
       technicalNote,
-      town,
-      venue,
-     } = report;
+      // town,
+      // venue,
+    } = report;
 
-    const { Date:date } = dateStringToPerformancePair(performanceDate);
+    const { Date: date } = dateStringToPerformancePair(performanceDate);
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId: parseInt(bookingId,10) });
+    const access = await checkAccess(email, { BookingId: parseInt(bookingId, 10) });
     if (!access) return res.status(401).end();
-    console.log(getDateTime(date, actOneUpTime), actOneUpTime, )
+    console.log(getDateTime(date, actOneUpTime), actOneUpTime);
     const result = await prisma.PerformanceReport.create({
       data: {
         PerformanceId: parseInt(performanceId, 10),
@@ -72,13 +74,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AudienceNotes: audienceNote,
         MerchandiseNotes: merchandiseNote,
         GeneralRemarks: generalRemarks,
-        CSM: cms, 
-        Lighting: lighting,
-        ASM: asm, 
+        // CSM: csm,
+        // Lighting: lighting,
+        // ASM: asm,
       },
     });
     console.log(`Created Performance Report: ${result.PRId}`);
-    res.status(200).json({ok:true, report:result});
+    res.status(200).json({ ok: true, report: result });
   } catch (e) {
     console.log(e);
     res.status(500).json({ err: 'Error Creating Performance Report' });
