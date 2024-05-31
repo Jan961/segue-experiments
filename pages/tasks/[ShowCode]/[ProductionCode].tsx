@@ -74,25 +74,29 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   useEffect(() => {
     if (filteredProductions.length === 1) {
+      console.log();
       filteredProductions.forEach((production) => {
         if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
           setShowEmptyProductionModal(true);
           setIsProductionEmpty(true);
+        } else {
+          setShowEmptyProductionModal(false);
+          setIsProductionEmpty(false);
         }
       });
     }
   }, [filteredProductions]);
 
   const handleShowEmptyProduction = () => {
-    setShowEmptyProductionModal(!showEmptyProductionModal);
+    setShowEmptyProductionModal(false);
   };
 
   const handleNewProductionTaskModal = () => {
-    setShowNewProduction(!showNewProduction);
+    setShowNewProduction(false);
   };
 
   const handleModalConditions = () => {
-    if (isProductionEmpty) {
+    if (isProductionEmpty && isFilterMatchingInitialState()) {
       setShowNewProduction(true);
     } else {
       setShowAddTask(true);
@@ -106,13 +110,19 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     else setIsProductionTaskList(true);
   };
 
-  const handleMasterListClose = () => {
+  const handleMasterListClose = (val: string) => {
     setIsMasterTaskList(false);
+    if (val === 'data-added') {
+      router.replace(router.asPath);
+    }
   };
 
-  const handleProductionListClose = () => {
+  const handleProductionListClose = (val: string) => {
     setIsProductionTaskList(false);
-    setIsMasterTaskList(!isMasterTaskList);
+    setIsMasterTaskList(false);
+    if (val === 'data-added') {
+      router.replace(router.asPath);
+    }
   };
 
   return (

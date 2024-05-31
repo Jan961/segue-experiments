@@ -7,7 +7,6 @@ import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
-import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { MasterTask } from '@prisma/client';
 import Loader from 'components/core-ui-lib/Loader';
 import { ARCHIVED_OPTION_STYLES } from 'components/global/nav/ProductionJumpMenu';
@@ -18,7 +17,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 
 interface ProductionTaskListProps {
   visible: boolean;
-  onClose: () => void;
+  onClose: (val?: string) => void;
   productionId: string;
 }
 
@@ -33,7 +32,6 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
 
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
-  const [confirm, setConfirm] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
@@ -105,26 +103,13 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
     if (selected) handleFetchTasks();
   }, [selected]);
 
-  const handleClose = () => {
-    onClose();
-  };
-
-  const handleCancel = () => {
-    if (selectedRows.length > 0) {
-      setConfirm(true);
-    } else {
-      setConfirm(false);
-      onClose();
-    }
-  };
-
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const endpoint = '/api/tasks/create/multiple/';
       const tasksData = selectedRows.map((task: MasterTask) => {
         return {
-          ProductionId: productionId,
+          ProductionId: parseInt(productionId),
           Code: task.Code,
           Name: task.Name,
           CompleteByIsPostProduction: false,
@@ -138,7 +123,7 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
       });
       await axios.post(endpoint, tasksData);
       setLoading(false);
-      onClose();
+      onClose('data-added');
     } catch (error) {
       setLoading(false);
       console.error(error);
@@ -195,17 +180,9 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
         />
       </div>
       <div className="flex mt-4 justify-end">
-        <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={handleCancel} />
+        <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={onClose} />
         <Button text="Add" className="w-[132px]" onClick={handleSubmit} disabled={selectedRows.length === 0} />
       </div>
-      <ConfirmationDialog
-        variant="delete"
-        show={confirm}
-        onYesClick={handleClose}
-        content={{ question: 'Are you sure ?', warning: '' }}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
-      />
     </PopupModal>
   );
 };

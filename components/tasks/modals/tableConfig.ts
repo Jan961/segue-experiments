@@ -5,7 +5,7 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerCheckboxSelection: true,
       checkboxSelection: true,
-      width: 50,
+      width: 60,
       suppressMenu: true,
       headerName: '',
       cellStyle: {
