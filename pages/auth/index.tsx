@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import { Wizard } from 'react-use-wizard';
 import SignUpForm from 'components/auth/SignUpForm';
 import SubscriptionPlans, { Plan } from 'components/auth/SubscriptionPlans';
-import CompanyDetailsForm, { Company } from 'components/auth/CompanyDetailsForm';
+import CompanyDetailsForm, { Company } from 'components/auth/AccountDetailsForm';
 import PaymentDetailsForm from 'components/auth/PaymentDetailsForm';
 import { useState } from 'react';
 import { GetServerSideProps } from 'next';

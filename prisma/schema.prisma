@@ -117,7 +117,6 @@ model Currency {
   SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
-  Country                                                            Country[]
   Venue                                                              Venue[]
 }
 
@@ -143,7 +142,6 @@ model Show {
 
   @@unique([AccountId, Code], map: "SECONDARY")
   @@index([AccountId], map: "Account_Show_idx")
-  @@index([ShowProdCoId], map: "ProductionCompany_Show")
 }
 
 model Venue {
@@ -327,7 +325,7 @@ model Rehearsal {
 }
 
 model Account {
-  AccountId              Int                 @id @default(autoincrement())
+  AccountId              Int                 @id @unique @default(autoincrement())
   AccountName            String              @db.VarChar(50)
   AccountAddress1        String?             @db.VarChar(50)
   AccountAddress2        String?             @db.VarChar(50)
@@ -373,21 +371,19 @@ model BookedVenueHistory {
 }
 
 model CompAllocation {
-  Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
-  AvailableCompId        Int           @map("CompAllocationAvailableCompId")
-  TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
-  Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
-  RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
-  ArrangedById           Int           @map("CompAllocationArrangedById")
-  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
-  TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
-  SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
-  AccountUser            AccountUser   @relation(fields: [ArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
-  AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
+  Id                       Int           @id @default(autoincrement()) @map("CompAllocationId")
+  AvailableCompId          Int           @map("CompAllocationAvailableCompId")
+  TicketHolderName         String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
+  Seats                    Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Comments                 String?       @map("CompAllocationComments") @db.VarChar(100)
+  RequestedBy              String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
+  CompAllocationArrangedBy String?       @db.VarChar(50)
+  VenueConfirmationNotes   String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  TicketHolderEmail        String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
+  SeatsAllocated           String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AvailableComp            AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
-  @@index([ArrangedById], map: "AccountUser_CompAllocation")
 }
 
 model CompType {
@@ -568,7 +564,6 @@ model AccountUser {
   AccountUserPermission AccountUserPermission[]
   AccountUserProduction AccountUserProduction[]
   BookingContactNotes   BookingContactNotes[]
-  CompAllocation        CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
 }
@@ -736,16 +731,8 @@ model Country {
   Code            String            @map("CountryCode") @db.VarChar(3)
   Name            String            @map("CountryName") @db.VarChar(40)
   CurrencyCode    String?           @map("CountryCurrencyCode") @db.VarChar(3)
-<<<<<<< HEAD
-  Currency        Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Country_Currency")
   CountryInRegion CountryInRegion[]
   VenueAddress    VenueAddress[]
-
-  @@index([CurrencyCode], map: "Country_Currency")
-=======
-  CountryInRegion CountryInRegion[]
-  VenueAddress    VenueAddress[]
->>>>>>> 0c14eedd (WIP)
 }
 
 model CountryInRegion {
@@ -1202,7 +1189,7 @@ view PromoterHoldsView {
   CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
   CompAllocationComments               String?   @db.VarChar(100)
   CompAllocationRequestedBy            String?   @db.VarChar(50)
-  CompAllocationArrangedBy             String?   @db.VarChar(101)
+  CompAllocationArrangedBy             String?   @db.VarChar(50)
   CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
 
   @@ignore
