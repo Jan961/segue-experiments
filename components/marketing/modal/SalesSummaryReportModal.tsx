@@ -34,6 +34,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
   const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => {
+      if (!production) return;
       const productionWeekPromise = fetchProductionWeek(production);
       notify.promise(productionWeekPromise, {
         loading: 'fetching production weeks',
