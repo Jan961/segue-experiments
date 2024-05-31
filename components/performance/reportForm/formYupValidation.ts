@@ -29,12 +29,12 @@ export const formSchema = Yup.object({
       const { intervalDownTime } = this.parent as { intervalDownTime: string };
       return isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${intervalDownTime}`));
     }),
-  getOutTime: Yup.string()
-    .required('Get out time cannot be empty')
-    .test('is-greater', 'Get out time should be greater than Act two DOWN time', function (value) {
-      const { actTwoDownTime } = this.parent as { actTwoDownTime: string };
-      return isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${actTwoDownTime}`));
-    }),
+  // getOutTime: Yup.string()
+  //   .required('Get out time cannot be empty')
+  //   .test('is-greater', 'Get out time should be greater than Act two DOWN time', function (value) {
+  //     const { actTwoDownTime } = this.parent as { actTwoDownTime: string };
+  //     return isAfter(new Date(`2023-01-01 ${value ?? '00:00'}`), new Date(`2023-01-01 ${actTwoDownTime}`));
+  // }),
   // dutyTechnician: Yup.string().required('Duty Technician cannot be empty'),
   castCrewInjury: Yup.string(),
   castCrewAbsence: Yup.string(),

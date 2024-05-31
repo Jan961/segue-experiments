@@ -3,6 +3,8 @@ import { format } from 'date-fns';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getReportsList } from 'services/performanceReports';
 import Layout from 'components/Layout';
+import { useCallback, useState } from 'react';
+import axios from 'axios';
 
 // interface Report {
 //   id: string;
@@ -16,6 +18,18 @@ import Layout from 'components/Layout';
 // }
 
 export default function Reports({ reports }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [rows, setRows] = useState(reports);
+  const deleteReport = useCallback(
+    async (id) => {
+      setRows((prevRows) => prevRows.filter((row) => row.id !== id));
+      try {
+        await axios.delete(`/api/performance/reports/delete/${id}`);
+      } catch (error) {
+        console.log('error deleting Report');
+      }
+    },
+    [setRows],
+  );
   return (
     <Layout title="Performance Reports | Segue">
       <div className="max-w-screen-xl mx-auto">
@@ -45,7 +59,7 @@ export default function Reports({ reports }: InferGetServerSidePropsType<typeof 
             <thead>
               <tr className="bg-gray-200">
                 <th className="px-4 py-2 border text-left">Report N°</th>
-                <th className="px-4 py-2 border text-left">Report date</th>
+                {/* <th className="px-4 py-2 border text-left">Report date</th> */}
                 <th className="px-4 py-2 border text-left">Show</th>
                 <th className="px-4 py-2 border text-left">Venue</th>
                 <th className="px-4 py-2 border text-left">Performance N°</th>
@@ -54,38 +68,40 @@ export default function Reports({ reports }: InferGetServerSidePropsType<typeof 
               </tr>
             </thead>
             <tbody>
-              {reports?.map(
-                ({ id, reportNumber, venue, performanceId, performanceDate, performanceTime, createdAt, showName }) => (
-                  <tr key={id} className="border-b border-gray-200 hover:bg-gray-100">
-                    <td className="px-4 py-2 border">{reportNumber}</td>
-                    <td className="px-4 py-2 border">{format(new Date(createdAt), 'dd/MM/yyyy HH:mm')}</td>
-                    <td className="px-4 py-2 border">{showName}</td>
-                    <td className="px-4 py-2 border">{venue}</td>
-                    <td className="px-4 py-2 border">{performanceId}</td>
-                    <td className="px-4 py-2 border">
-                      {format(new Date(performanceDate), 'eee dd/MM/yyyy')} at{' '}
-                      {format(new Date(performanceTime), 'HH:mm')}
-                    </td>
-                    <td className="px-4 py-2 border">
-                      <div className="flex gap-1">
-                        <Link href={`/performance/reports/${id}`} className="text-blue-600">
-                          View
-                        </Link>
-                        <span>|</span>
-                        <a
-                          href={`/api/performance/reports/${id}/report-pdf`}
-                          target="_blank"
-                          rel="noreferrer"
-                          download
-                          className="text-blue-600"
-                        >
-                          Download
-                        </a>
+              {rows?.map(({ id, reportNumber, venue, performanceId, performanceDate, performanceTime, showName }) => (
+                <tr key={id} className="border-b border-gray-200 hover:bg-gray-100">
+                  <td className="px-4 py-2 border">{reportNumber}</td>
+                  {/* <td className="px-4 py-2 border">{format(new Date(createdAt), 'dd/MM/yyyy HH:mm')}</td> */}
+                  <td className="px-4 py-2 border">{showName}</td>
+                  <td className="px-4 py-2 border">{venue}</td>
+                  <td className="px-4 py-2 border">{performanceId}</td>
+                  <td className="px-4 py-2 border">
+                    {format(new Date(performanceDate), 'eee dd/MM/yyyy')} at{' '}
+                    {format(new Date(performanceTime), 'HH:mm')}
+                  </td>
+                  <td className="px-4 py-2 border">
+                    <div className="flex gap-1">
+                      <Link href={`/performance/reports/${id}`} className="text-blue-600">
+                        View
+                      </Link>
+                      <span>|</span>
+                      <a
+                        href={`/api/performance/reports/${id}/report-pdf`}
+                        target="_blank"
+                        rel="noreferrer"
+                        download
+                        className="text-blue-600"
+                      >
+                        Download
+                      </a>
+                      <span>|</span>
+                      <div className="text-primary-red cursor-pointer" onClick={() => deleteReport(id)}>
+                        Delete
                       </div>
-                    </td>
-                  </tr>
-                ),
-              )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
