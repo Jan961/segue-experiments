@@ -17,6 +17,7 @@ import { mapToProductionTasksDTO } from 'mappers/tasks';
 import { useRouter } from 'next/router';
 import NewProductionEmpty from 'components/tasks/modals/NewProductionEmpty';
 import NewProductionTask from 'components/tasks/modals/NewProductionTask';
+import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
 import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
