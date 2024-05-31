@@ -27,6 +27,8 @@ export enum COLOR_HEXCODE {
   CREAM = 'ffedb150',
   DARK_BLUE = 'ff2f75b5',
   LIGHT_GREY = 'ffc8c8c8',
+  DARK_ORANGE = 'ffec6255',
+  DARK_GREEN = 'ff41a29a',
 }
 
 export const formatWeek = (num: number): string => `Week ${num}`;
@@ -637,19 +639,20 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
   });
 };
 
-export const salesReportName = ({ productionId, isWeeklyReport, isSeatsDataRequired, data }): string => {
+export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): string => {
   if (data.length) {
-    return data[0].ShowName + ' (' + data[0].FullProductionCode + ')';
+    const { ShowName, FullProductionCode } = data[0];
+    return `${FullProductionCode} ${ShowName} Sales Summary - ${moment().format('DD.MM.YY')}`;
   }
 
   if (isWeeklyReport) {
-    return productionId ? `Sales Summary Weekly - Production ${productionId},` : 'Sales Summary Weekly';
+    return `Sales Summary Weekly - ${moment().format('DD.MM.YY')}`;
   }
 
   if (isSeatsDataRequired) {
-    return productionId ? `Sales Vs Capacity - Production ${productionId},` : 'Sales Vs Capacity';
+    return `Sales Vs Capacity - ${moment().format('DD.MM.YY')}`;
   }
-  return productionId ? `Sales Summary -Production  ${productionId},` : 'Sales Summary';
+  return `Sales Summary - ${moment().format('DD.MM.YY')}`;
 };
 
 export const applyFormattingToRange = ({
@@ -690,7 +693,15 @@ export const applyFormattingToRange = ({
   }
 };
 
-export const alignColumnTextHorizontally = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align:string }) => {
+export const alignColumnTextHorizontally = ({
+  worksheet,
+  colAsChar,
+  align,
+}: {
+  worksheet: any;
+  colAsChar: string;
+  align: string;
+}) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: align };
   });
