@@ -5,6 +5,9 @@ export const getMasterTasksList = async (AccountId: number) => {
     where: {
       AccountId,
     },
+    orderBy: {
+      StartByWeekNum: 'desc',
+    },
   });
 };
 
