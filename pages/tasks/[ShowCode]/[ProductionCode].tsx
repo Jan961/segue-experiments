@@ -20,7 +20,6 @@ import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
-import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
