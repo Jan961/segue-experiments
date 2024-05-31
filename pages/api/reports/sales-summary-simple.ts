@@ -10,7 +10,6 @@ import {
   colorCell,
   getChangeVsLastWeekValue,
   getCurrencyWiseTotal,
-  getFileName,
   getMapKeyForValue,
   getValuesFromObject,
   getWeekWiseGrandTotalInPound,
@@ -152,7 +151,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const headerWeekDates: string[] = uniqueProductionColumns.map((x) => x.SetProductionWeekDate);
 
   // Adding Heading
-  worksheet.addRow([salesReportName({ isWeeklyReport, isSeatsDataRequired, data })]);
+  const title = salesReportName({ isWeeklyReport, isSeatsDataRequired, data });
+  worksheet.addRow([title]);
   // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullProductionCode + ')' : 'Dummy Report'
   worksheet.addRow([]);
 
@@ -554,12 +554,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   makeRowTextBoldAndALignCenter({ worksheet, row: 3 });
   makeRowTextBoldAndALignCenter({ worksheet, row: 4 });
 
-  const filename = getFileName(worksheet);
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader(
-    'Content-Disposition',
-    `attachment; filename="Sales Summary ${isWeeklyReport ? 'plus Weekly ' : ''} for ${filename}"`,
-  );
+  res.setHeader('Content-Disposition', `attachment; filename="${title}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();
