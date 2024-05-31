@@ -14,7 +14,7 @@ import Loader from 'components/core-ui-lib/Loader';
 interface MasterTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
-  productionId: string;
+  productionId: number;
 }
 
 const LoadingOverlay = () => (
@@ -84,7 +84,7 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
       const endpoint = '/api/tasks/create/multiple/';
       const tasksData = selectedRows.map((task: MasterTask) => {
         return {
-          ProductionId: parseInt(productionId),
+          ProductionId: productionId,
           Code: task.Code,
           Name: task.Name,
           CompleteByIsPostProduction: false,
