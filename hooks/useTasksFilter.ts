@@ -6,6 +6,7 @@ import { calculateTaskStatus } from 'utils/tasks';
 import { isThisWeek } from 'date-fns';
 import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { isNullOrEmpty } from 'utils';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -43,6 +44,10 @@ const useTasksFilter = () => {
   const { users } = useRecoilValue(userState);
 
   const usersList = useMemo(() => {
+    if (isNullOrEmpty(users)) {
+      return {};
+    }
+
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
       value: Id,
       text: `${FirstName || ''} ${LastName || ''}`,
