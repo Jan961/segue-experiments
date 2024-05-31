@@ -12,6 +12,7 @@ import { MAX_WEEK, MIN_WEEK, getWeekOptions, salesSummarySortOptions } from 'con
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import { getCurrentMondayDate } from 'services/reportsService';
+import { notify } from 'components/core-ui-lib/Notifications';
 
 interface SalesSummaryReportModalProps {
   visible: boolean;
@@ -32,7 +33,15 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
   const { production, productionWeek, numberOfWeeks, order } = formData;
   const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
-    queryFn: () => fetchProductionWeek(production),
+    queryFn: () => {
+      const productionWeekPromise = fetchProductionWeek(production);
+      notify.promise(productionWeekPromise, {
+        loading: 'fetching production weeks',
+        success: 'Production weeks fetched successfully',
+        error: 'Error fetching production weeks',
+      });
+      return productionWeekPromise;
+    },
   });
 
   const prodweekOptions: SelectOption[] = useMemo(
@@ -63,16 +72,20 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
 
   const onChange = useCallback(
     (key: string, value: string | number) => {
-      console.log('====', key, value);
       setFormData((data) => ({ ...data, [key]: value }));
     },
     [setFormData],
   );
 
   const onExport = useCallback(() => {
-    exportSalesSummaryReport(formData)
-      .then(() => onClose())
-      .catch(() => console.log('Error exporting report'));
+    notify.promise(
+      exportSalesSummaryReport(formData).then(() => onClose()),
+      {
+        loading: 'Generating Sales summary report',
+        success: 'Sales summary report downloaded successfully',
+        error: 'Error generating Sales summary report',
+      },
+    );
   }, [formData, onClose]);
 
   return (
