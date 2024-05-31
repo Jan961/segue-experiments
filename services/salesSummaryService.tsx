@@ -579,7 +579,9 @@ export const colorTextAndBGCell = ({
   cellColor: COLOR_HEXCODE;
 }) => {
   const cell = worksheet.getCell(row, col);
-  cell.font = { color: { argb: textColor } };
+  if (textColor) {
+    cell.font = { color: { argb: textColor } };
+  }
   cell.fill = {
     type: 'pattern',
     pattern: 'solid',
