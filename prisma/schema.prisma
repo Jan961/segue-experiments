@@ -740,7 +740,7 @@ model Country {
   CountryInRegion CountryInRegion[]
   VenueAddress    VenueAddress[]
 
-  @@index([CurrencyCode], map: "Currency_Country")
+  @@index([CurrencyCode], map: "Country_Currency")
 }
 
 model CountryInRegion {
@@ -754,14 +754,14 @@ model CountryInRegion {
 }
 
 model ProductionCompany {
-  Id                  Int     @id @map("ProdCoId") @default(autoincrement())
-  AccountId           Int     @map("ProdCoAccountId")
-  Name                String  @map("ProdCoName")@db.VarChar(50)
-  WebSite             String? @map("ProdCoWebSite")@db.VarChar(80)
-  Logo                Bytes?  @map("ProdCoLogo")
-  SaleStartWeek       Int?    @map("ProdCoSaleStartWeek")@default(-50) @db.SmallInt
-  Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
-  Show                Show[]
+  Id            Int     @id @default(autoincrement()) @map("ProdCoId")
+  AccountId     Int     @map("ProdCoAccountId")
+  Name          String  @map("ProdCoName") @db.VarChar(50)
+  WebSite       String? @map("ProdCoWebSite") @db.VarChar(80)
+  Logo          Bytes?  @map("ProdCoLogo")
+  SaleStartWeek Int?    @default(-50) @map("ProdCoSaleStartWeek") @db.SmallInt
+  Account       Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  Show          Show[]
 
   @@index([AccountId], map: "Account_ProductionCompany")
 }
