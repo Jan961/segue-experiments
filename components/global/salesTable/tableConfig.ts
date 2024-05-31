@@ -1,8 +1,6 @@
 import getNumericalOptions from 'utils/getNumericalOptions';
 import SelectOrderRenderer from './renderers/SelectOrderRenderer';
 import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
-import SelectRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRenderer';
-import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
@@ -149,7 +147,7 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
-    cellRenderer: SelectRenderer,
+    cellRenderer: SelectOrderRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
         optionsLength,
