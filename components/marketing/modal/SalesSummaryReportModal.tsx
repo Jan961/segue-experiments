@@ -61,9 +61,13 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
     [productionJump],
   );
 
-  const onChange = useCallback((key: string, value: string | number) => {
-    setFormData((data) => ({ ...data, [key]: value }));
-  }, []);
+  const onChange = useCallback(
+    (key: string, value: string | number) => {
+      console.log('====', key, value);
+      setFormData((data) => ({ ...data, [key]: value }));
+    },
+    [setFormData],
+  );
 
   const onExport = useCallback(() => {
     exportSalesSummaryReport(formData)
