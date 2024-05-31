@@ -14,6 +14,7 @@ import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
+import { isNullOrEmpty } from 'utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -22,7 +23,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { users } = useRecoilValue(userState);
 
   const usersList = useMemo(() => {
-    if (users === undefined || users === null) {
+    if (isNullOrEmpty(users)) {
       return [];
     }
 

@@ -13,6 +13,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { isNullOrEmpty } from 'utils';
 import { weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 
@@ -87,7 +88,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   const { users } = useRecoilValue(userState);
 
   const usersList = useMemo(() => {
-    if (users === undefined || users === null) {
+    if (isNullOrEmpty(users)) {
       return [];
     }
 
