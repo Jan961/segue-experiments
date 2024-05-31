@@ -29,12 +29,7 @@ export const Example: Story = {
   render: () => {
     return (
       <div className="w-[800px] h-vh bg-primary-dark-blue text-primary-white">
-        <ExportModal
-          visible={true}
-          onClose={() => console.log('Close modal')}
-          ExportList={exportList}
-          tableRef="yourTableRef"
-        />
+        <ExportModal visible={true} onClose={() => console.log('Close modal')} ExportList={exportList} />
       </div>
     );
   },
