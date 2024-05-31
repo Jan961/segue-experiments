@@ -1,5 +1,6 @@
 import prisma from 'lib/prisma';
 import { getDuration } from './dateService';
+import { getFileUrlFromLocation } from 'utils/fileUpload';
 
 export const getReportsList = async () => {
   return prisma.PerformanceReport.findMany({
@@ -93,6 +94,13 @@ export const getPerformanceReportById = async (Id: number) => {
                 select: {
                   Production: {
                     select: {
+                      File: {
+                        select: {
+                          Id: true,
+                          OriginalFilename: true,
+                          Location: true,
+                        },
+                      },
                       Show: {
                         select: {
                           Id: true,
@@ -132,6 +140,8 @@ export const transformPerformanceReport = (report: any): any => {
   const createdAt = report?.CreatedAt?.toISOString?.() || '';
   const performanceDate = report?.Performance?.Date?.toISOString?.() || '';
   const performanceTime = report?.Performance?.Time?.toISOString?.() || '';
+  const productionImage = report?.Performance?.Booking?.DateBlock?.Production?.File;
+  const imageUrl = productionImage?.Location ? getFileUrlFromLocation(productionImage?.Location) : '';
   return {
     id: report?.Id,
     reportNumber: report?.Id,
@@ -160,7 +170,7 @@ export const transformPerformanceReport = (report: any): any => {
     getOutDuration: getDuration(getOutUpTime, getOutDownTime),
     asm: report?.ASM || '',
     cms: report?.CSM || '',
-    reportImageUrl: report?.ReportImageUrl || '',
+    reportImageUrl: imageUrl || '',
     performanceTime,
     performanceDate,
     performanceId: report?.Performance?.Id,

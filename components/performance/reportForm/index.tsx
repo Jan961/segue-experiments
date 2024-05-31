@@ -231,9 +231,9 @@ const ReportForm = ({
             }
             disabled
           />
-          <TextField label="CSM" value={csm ?? ''} disabled />
-          <TextField label="Lighting" value={lighting ?? ''} disabled />
-          <TextField label="ASM" value={asm ?? ''} disabled />
+          <TextField label="CSM" value={csm ?? ''} />
+          <TextField label="Lighting" value={lighting ?? ''} />
+          <TextField label="ASM" value={asm ?? ''} />
           {/* DUTY TECHNICIAN */}
           <div>
             <TextField {...register('dutyTechnician')} label="Duty Technician" disabled={!editable} />
