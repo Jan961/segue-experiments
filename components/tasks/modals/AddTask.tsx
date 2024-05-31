@@ -86,14 +86,16 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const { users } = useRecoilValue(userState);
 
-  const usersList = useMemo(
-    () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
-    [users],
-  );
+  const usersList = useMemo(() => {
+    if (users === undefined || users === null) {
+      return [];
+    }
+
+    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+  }, [users]);
 
   const handleOnChange = (e: any) => {
     let { id, value, checked } = e.target;
