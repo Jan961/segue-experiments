@@ -436,8 +436,8 @@ model Sale {
   SaleId         Int       @id @default(autoincrement())
   SaleSaleTypeId Int?
   SaleSetId      Int?
-  SaleSeats      Int?      @db.SmallInt
-  SaleValue      Decimal?  @db.Decimal(8, 2)
+  SaleSeats      Int?
+  SaleValue      Decimal?  @db.Decimal(10, 2)
   SalesSet       SalesSet? @relation(fields: [SaleSetId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
   SaleType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Cascade, map: "SaleType_Sale")
 
@@ -551,7 +551,7 @@ model User {
   FirstName      String           @map("UserFirstName") @db.VarChar(50)
   LastName       String?          @map("UserLastName") @db.VarChar(50)
   AccountId      Int?             @map("UserAccountId")
-  AccountUser    AccountUser[]
+  AccountUser    AccountUser?
   File           File[]
   MasterTask     MasterTask[]
   ProductionTask ProductionTask[]
@@ -571,7 +571,6 @@ model AccountUser {
   CompAllocation        CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
-  @@index([UserId], map: "User_AccountUser")
 }
 
 model AccountUserPermission {
@@ -740,7 +739,7 @@ model Country {
   CountryInRegion CountryInRegion[]
   VenueAddress    VenueAddress[]
 
-  @@index([CurrencyCode], map: "Country_Currency")
+  @@index([CurrencyCode], map: "Currency_Country")
 }
 
 model CountryInRegion {
@@ -759,7 +758,7 @@ model ProductionCompany {
   ProdCoName          String  @db.VarChar(50)
   ProdCoWebSite       String? @db.VarChar(80)
   ProdCoLogo          Bytes?
-  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
+  ProdCoSaleStartWeek Int?    @db.SmallInt
   Account             Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
   Show                Show[]
 
@@ -938,8 +937,8 @@ view SalesFiguresView {
   SaleTypeId          Int      @default(0)
   SaleTypeName        String   @db.VarChar(45)
   SaleId              Int?     @default(0)
-  SaleSeats           Int?     @db.SmallInt
-  SaleValue           Decimal? @db.Decimal(8, 2)
+  SaleSeats           Int?
+  SaleValue           Decimal? @db.Decimal(10, 2)
 
   @@ignore
 }
@@ -1122,17 +1121,17 @@ view SalesView {
   SetBrochureReleased      Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SaleTypeName             String?   @db.VarChar(45)
-  Seats                    Decimal?  @db.Decimal(27, 0)
-  Value                    Decimal?  @db.Decimal(30, 2)
+  Seats                    Decimal?  @db.Decimal(32, 0)
+  Value                    Decimal?  @db.Decimal(32, 2)
   TotalCapacity            Float?
   FinalFiguresDate         DateTime? @db.Date
-  FinalFiguresSeats        Decimal?  @db.Decimal(27, 0)
-  FinalFiguresValue        Decimal?  @db.Decimal(30, 2)
+  FinalFiguresSeats        Decimal?  @db.Decimal(32, 0)
+  FinalFiguresValue        Decimal?  @db.Decimal(32, 2)
   NotOnSaleDate            DateTime? @db.Date
   TotalHoldSeats           Decimal?  @db.Decimal(32, 0)
   LastFiguresDate          DateTime? @db.Date
-  LastFiguresSeats         Decimal?  @db.Decimal(27, 0)
-  LastFiguresValue         Decimal?  @db.Decimal(30, 2)
+  LastFiguresSeats         Decimal?  @db.Decimal(32, 0)
+  LastFiguresValue         Decimal?  @db.Decimal(32, 2)
 
   @@ignore
 }
@@ -1164,8 +1163,8 @@ view BookingHoldCompsView {
   Code               String   @default("") @db.VarChar(5)
   Name               String   @default("") @db.VarChar(30)
   Seats              Decimal? @db.Decimal(32, 0)
-  SoldSeats          Decimal? @db.Decimal(27, 0)
-  ReservedSeats      Decimal? @db.Decimal(27, 0)
+  SoldSeats          Decimal? @db.Decimal(32, 0)
+  ReservedSeats      Decimal? @db.Decimal(32, 0)
 
   @@ignore
 }
@@ -1215,8 +1214,8 @@ view SalesSetTotalsView {
   SetSalesFiguresDate DateTime @db.Date
   SetIsFinalFigures   Boolean  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SaleTypeName        String   @db.VarChar(45)
-  Seats               Decimal? @db.Decimal(27, 0)
-  Value               Decimal? @db.Decimal(30, 2)
+  Seats               Decimal? @db.Decimal(32, 0)
+  Value               Decimal? @db.Decimal(32, 2)
 
   @@unique([SetBookingId, SetSalesFiguresDate])
 }
@@ -1235,7 +1234,7 @@ view SalesSummaryView {
   EntryName                String?   @db.VarChar(255)
   EntryType                String?   @db.VarChar(30)
   EntryStatusCode          String    @default("") @db.Char(1)
-  Value                    Decimal?  @db.Decimal(30, 2)
+  Value                    Decimal?  @db.Decimal(32, 2)
   VenueCurrencyCode        String?   @db.VarChar(3)
   ConversionRate           Decimal?  @db.Decimal(8, 4)
   ConversionToCurrencyCode String?   @db.VarChar(3)
