@@ -166,11 +166,13 @@ export default function NewBookingDetailsView({
   }, [production, bookingRow, venueDict]);
 
   useEffect(() => {
-    if (data !== null && data.length > 0) {
-      setColumnDefs(
-        newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable, changeBookingLength),
-      );
-      setBookingData(data);
+    if (data !== null) {
+      if (data.length > 0) {
+        setColumnDefs(
+          newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable, changeBookingLength),
+        );
+        setBookingData(data);
+      }
     }
   }, [data, dayTypeOptions, venueOptions, changeBookingLength]);
 

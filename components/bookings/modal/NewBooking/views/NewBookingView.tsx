@@ -90,6 +90,7 @@ const NewBookingView = ({
             .filter((venue: BarredVenue) => venue.hasBarringConflict),
         );
         if (skipRedirect) return;
+        console.log('This is data that might be weird', data);
         if (data?.length > 0) {
           goToStep(getStepIndex(true, 'Barring Issue'));
         } else {
@@ -214,13 +215,13 @@ const NewBookingView = ({
         {isDateTypeOnly && (
           <>
             <Select
-              className={'my-2 w-full !border-0'}
+              className="my-2 w-full !border-0"
               options={dayTypeOptions}
               disabled={stage !== 0}
               onChange={(value) => onChange({ dateType: parseInt(value as string, 10) })}
               value={dateType}
               isSearchable
-              placeholder={'Please select a Day Type'}
+              placeholder="Please select a Day Type"
             />
           </>
         )}
@@ -233,7 +234,7 @@ const NewBookingView = ({
               onChange={(value) => onChange({ venueId: parseInt(value as string, 10) })}
               value={venueId}
               isSearchable
-              placeholder={'Please select a venue'}
+              placeholder="Please select a venue"
             />
             <Checkbox
               id="shouldFilterVenues"
@@ -267,10 +268,10 @@ const NewBookingView = ({
             onClick={handleCheckMileageClick}
             disabled={!venueId || !fromDate || !toDate || isDateTypeOnly}
             className="px-6"
-            text={'Check Mileage'}
+            text="Check Mileage"
           />
         </div>
-        <Button className="px-8" onClick={onModalClose} variant="secondary" text={'Cancel'} />
+        <Button className="px-8" onClick={onModalClose} variant="secondary" text="Cancel" />
         {!fetchingBookingConflicts && (
           <div
             className={classNames({
@@ -282,11 +283,11 @@ const NewBookingView = ({
               className="px-9"
               onClick={goToNext}
               disabled={(isDateTypeOnly && !dateType) || (!isDateTypeOnly && !venueId) || !fromDate || !toDate}
-              text={'Next'}
+              text="Next"
             />
           </div>
         )}
-        {(fetchingBookingConflicts || loading) && <Loader variant={'sm'} />}
+        {(fetchingBookingConflicts || loading) && <Loader variant="sm" />}
       </div>
     </div>
   );
