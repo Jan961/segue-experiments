@@ -31,8 +31,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const router = useRouter();
 
-  const { ProductionCode } = router.query;
-
   const usersList = useMemo(
     () =>
       Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -55,6 +53,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
 
+  const [productionId, setProductionId] = useState<number>(null);
+
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
     router.replace(router.asPath);
@@ -74,14 +74,15 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   useEffect(() => {
     if (filteredProductions.length === 1) {
-      console.log();
       filteredProductions.forEach((production) => {
         if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
           setShowEmptyProductionModal(true);
           setIsProductionEmpty(true);
+          setProductionId(production.Id);
         } else {
           setShowEmptyProductionModal(false);
           setIsProductionEmpty(false);
+          setProductionId(null);
         }
       });
     }
@@ -159,15 +160,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList
-        visible={isMasterTaskList}
-        onClose={handleMasterListClose}
-        productionId={ProductionCode.toString()}
-      />
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={productionId} />
       <ProductionTaskList
         visible={isProductionTaskList}
         onClose={handleProductionListClose}
-        productionId={ProductionCode.toString()}
+        productionId={productionId}
       />
     </Layout>
   );

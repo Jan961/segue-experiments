@@ -18,7 +18,7 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 interface ProductionTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
-  productionId: string;
+  productionId: number;
 }
 
 const LoadingOverlay = () => (
@@ -109,7 +109,7 @@ const ProductionTaskList = ({ visible, onClose, productionId }: ProductionTaskLi
       const endpoint = '/api/tasks/create/multiple/';
       const tasksData = selectedRows.map((task: MasterTask) => {
         return {
-          ProductionId: parseInt(productionId),
+          ProductionId: productionId,
           Code: task.Code,
           Name: task.Name,
           CompleteByIsPostProduction: false,
