@@ -104,14 +104,13 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     updateBookingOnStore(state.booking);
   };
 
-  console.log('bookings', bookings);
   useEffect(() => {
     if (booking) {
       // Check for run of dates
       const runOfDates = bookings
         .filter(({ runTag }) => runTag === booking.runTag)
         .sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
-
+      console.log('bookings', runOfDates, bookings);
       if (runOfDates.length > 1) {
         onFormDataChange({ isRunOfDates: true });
       }
