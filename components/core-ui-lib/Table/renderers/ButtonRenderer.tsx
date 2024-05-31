@@ -10,6 +10,7 @@ interface ButtonRendererProps extends ICellRendererParams {
 
 export default function ButtonRenderer(props: ButtonRendererProps) {
   const { variant = 'secondary', buttonText, className } = props;
+
   return (
     <div className="w-full h-full flex justify-center items-center">
       <Button className={className} variant={variant} text={buttonText} />

@@ -199,6 +199,7 @@ export type ProductionDTO = {
   IsDeleted?: boolean;
   ImageUrl?: string;
   Image?: Partial<FileDTO>;
+  ShowRegionId?: number;
 };
 
 export type VenueMinimalDTO = {
@@ -208,6 +209,7 @@ export type VenueMinimalDTO = {
   Town?: string;
   Seats?: string;
   Count?: number;
+  RegionId?: number;
 };
 
 export type OtherDTO = {

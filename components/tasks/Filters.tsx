@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import GlobalToolbar from 'components/toolbar';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import TaskReports from './modals/TaskReports';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface FiltersProps {
   usersList: SelectOption[];
@@ -39,6 +39,13 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
       production: selected,
     });
   };
+
+  useEffect(() => {
+    if (selected !== filter.production) {
+      onClearFilters();
+    }
+  }, [selected]);
+
   const { startDueDate, endDueDate } = filter || {};
   const router = useRouter();
 

@@ -22,7 +22,5 @@ export interface ExportModalProps {
   visible: boolean;
   ExportList: ExportType[];
   onClose: () => void;
-  tableRef: any;
-  pdfStyles?: PdfStyles;
   onItemClick?: (key: string) => void;
 }

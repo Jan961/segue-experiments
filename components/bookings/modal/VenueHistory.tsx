@@ -87,13 +87,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     switch (type) {
       case 'prodComparision':
         setSelBookings([]);
-        setShowVenueSelect(false);
         setShowCompSelect(true);
+        setShowVenueSelect(false);
         break;
 
       case 'salesComparison':
-        setShowCompSelect(false);
         setShowResults(true);
+        setShowCompSelect(false);
         break;
 
       case 'salesSnapshot':
@@ -140,11 +140,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const getProdComparision = async () => {
     setErrorMessage('');
-    if (selectedBookings.length < 2) {
-      setErrorMessage('Please select at least 2 venues for comparison.');
+    if (selectedBookings.length < 1) {
+      setErrorMessage('Please select at least 1 venue.');
       return;
     }
-
     setLoading(true);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -195,7 +194,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      getSalesSnapshot(e.data.bookingId);
+      if(e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
     }
   };
 
@@ -353,7 +352,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </TableWrapper>
       </PopupModal>
       <ExportModal
-        tableRef={salesTableRef}
         visible={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         onItemClick={exportTable}
@@ -391,6 +389,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
+            <Button
+              className="ml-4 mr-10 w-32"
+              onClick={() => setIsExportModalOpen(true)}
+              variant="primary"
+              text="Export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+            />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
         </div>
