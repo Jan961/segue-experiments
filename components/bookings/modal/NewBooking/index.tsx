@@ -199,7 +199,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     const hasBarringIssues = state?.barringConflicts?.length > 0;
     return getStepIndex(!editBooking, hasBarringIssues ? 'Barring Issue' : 'New Booking Details');
   }, [state.barringConflicts, editBooking]);
-
+  console.log('Edit Booking', editBooking);
   return (
     <PopupModal
       show={visible}
