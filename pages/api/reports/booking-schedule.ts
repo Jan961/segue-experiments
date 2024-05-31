@@ -146,8 +146,8 @@ const handler = async (req, res) => {
         worksheet,
         row: rowNo + 1,
         col: 4,
-        textColor: COLOR_HEXCODE.WHITE,
-        cellColor: COLOR_HEXCODE.BLACK,
+        textColor: COLOR_HEXCODE.BLACK,
+        cellColor: null,
       });
     } else {
       const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage } = value;
