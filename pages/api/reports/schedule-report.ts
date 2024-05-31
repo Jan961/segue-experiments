@@ -84,7 +84,7 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 // const formatDate = (date) => moment(date).format('DD/MM/YY')
 
 const handler = async (req, res) => {
-  const { ProductionId, from, to } = JSON.parse(req.body) || {};
+  const { ProductionId, from, to } = req.body;
 
   //   const formatedFromDate = formatDate(from)
   //   const formatedToDate = formatDate(to)
@@ -119,7 +119,7 @@ const handler = async (req, res) => {
 
     bookingIdPerformanceMap[BookingId].push({
       performanceId: Id,
-      performanceTime: Time ? moment.utc(Time).format('HH:mm'): null,
+      performanceTime: Time ? moment.utc(Time).format('HH:mm') : null,
       performanceDate: Date ? Date.toISOString() : null,
     });
   });
@@ -145,18 +145,19 @@ const handler = async (req, res) => {
     return;
   }
   const { ShowName, FullProductionCode } = data[0];
-  worksheet.addRow([`SCHEDULE FOR ${FullProductionCode} ${ShowName}`]);
+  const title = `${FullProductionCode} ${ShowName} Tour Schedule - ${moment().format('DD.MM.YY')}`;
+  worksheet.addRow([title]);
   worksheet.addRow([`Exported: ${moment().format('DD/MM/YY [at] HH:mm')} - Layout: Standard`]);
-  worksheet.addRow(['', '', 'SHOW ', '', '', '', '', 'PRODUCTION', 'PERFS', 'PERF1', 'PERF2', 'TRAVEL']);
+  worksheet.addRow(['', '', '', '', '', '', '', '', 'PERFS', 'PERF1', 'PERF2', '']);
   worksheet.addRow([
-    'Production',
+    'PROD',
     'DAY',
     'DATE',
     'WEEK',
     'VENUE/DETAILS',
     'TOWN',
     'PENCIL',
-    'SEATS',
+    'CAPACITY',
     '/DAY',
     'TIME',
     'TIME',
@@ -181,8 +182,8 @@ const handler = async (req, res) => {
   for (let i = 1; i <= daysDiff; i++) {
     lastWeekMetaInfo = { ...lastWeekMetaInfo, weekTotalPrinted: false };
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
-    const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
+    const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day'));
+    const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat.format('YYYY-MM-DD') });
     const value: SCHEDULE_VIEW = map[key];
     const isOtherDay = [
       'Day Off',
@@ -192,9 +193,14 @@ const handler = async (req, res) => {
       'Rehearsal Day',
       'Declared Holiday',
     ].includes(value?.EntryName);
-    const isCancelled = value?.EntryStatusCode === 'X'
+    const isCancelled = value?.EntryStatusCode === 'X';
     if (!value) {
-      worksheet.addRow([FullProductionCode, weekDay.substring(0, 3), dateInIncomingFormat, prevProductionWeekNum]);
+      worksheet.addRow([
+        FullProductionCode,
+        weekDay.substring(0, 3),
+        dateInIncomingFormat.format('DD/MM/YY'),
+        prevProductionWeekNum,
+      ]);
       colorTextAndBGCell({
         worksheet,
         row: rowNo + 1,
@@ -206,7 +212,9 @@ const handler = async (req, res) => {
       const { ProductionWeekNum, Location, EntryName, TimeMins, Mileage, VenueSeats, EntryId, PencilNum } = value;
       const formattedTime = TimeMins ? minutesInHHmmFormat(Number(TimeMins)) : '';
       const performances = bookingIdPerformanceMap[EntryId];
-      const performancesOnThisDay = performances?.filter?.(performance=>moment(performance.performanceDate).isSame(moment(dateInIncomingFormat,'YYYY-MM-DD'),'day'))
+      const performancesOnThisDay = performances?.filter?.((performance) =>
+        moment(performance.performanceDate).isSame(dateInIncomingFormat, 'day'),
+      );
       time.push(formattedTime || '00:00');
       mileage.push(Number(Mileage) || 0);
       seats.push(Number(VenueSeats) || 0);
@@ -215,19 +223,20 @@ const handler = async (req, res) => {
       worksheet.addRow([
         FullProductionCode,
         weekDay.substring(0, 3),
-        dateInIncomingFormat,
+        dateInIncomingFormat.format('DD/MM/YY'),
         ProductionWeekNum,
         EntryName || '',
-        ...((!isOtherDay && !isCancelled && [
-          Location || '',
-          PencilNum,
-          VenueSeats,
-          performancesOnThisDay?.length,
-          performancesOnThisDay?.[0]?.performanceTime || '',
-          performancesOnThisDay?.[1]?.performanceTime || '',
-          Mileage || '',
-          formattedTime,
-        ]) ||
+        ...((!isOtherDay &&
+          !isCancelled && [
+            Location || '',
+            PencilNum,
+            VenueSeats,
+            performancesOnThisDay?.length,
+            performancesOnThisDay?.[0]?.performanceTime || '',
+            performancesOnThisDay?.[1]?.performanceTime || '',
+            Number(Mileage) || '',
+            formattedTime,
+          ]) ||
           []),
       ]);
     }
@@ -304,7 +313,7 @@ const handler = async (req, res) => {
   }
   addWidthAsPerContent({
     worksheet,
-    fromColNumber: 1 ,
+    fromColNumber: 1,
     toColNumber: numberOfColumns,
     startingColAsCharWIthCapsOn: 'B',
     minColWidth: 10,
@@ -322,7 +331,7 @@ const handler = async (req, res) => {
   worksheet.getColumn('K').width = 7;
   worksheet.getColumn('L').width = 7;
   worksheet.getColumn('M').width = 7;
-  const filename = 'Schedule Report.xlsx';
+  const filename = `${title}.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   workbook.xlsx.write(res).then(() => {
