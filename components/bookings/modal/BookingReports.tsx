@@ -4,6 +4,7 @@ import Button from 'components/core-ui-lib/Button';
 import { exportBookingSchedule, exportMasterplanReport, onScheduleReport } from './request';
 import { useRecoilValue } from 'recoil';
 import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import { notify } from 'components/core-ui-lib/Notifications';
 
 interface BookingReportProps {
   visible: boolean;
@@ -23,13 +24,25 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
   const onExport = async (key: string): Promise<void> => {
     switch (key) {
       case 'tourSchedule':
-        await onScheduleReport(productionId);
+        notify.promise(onScheduleReport(productionId), {
+          loading: 'Generating tour schedule report',
+          success: 'Tour schedule report downloaded successfully',
+          error: 'Error generating tour schedule report',
+        });
         break;
       case 'tourSummary':
-        await exportBookingSchedule(productionId);
+        notify.promise(exportBookingSchedule(productionId), {
+          loading: 'Generating tour summary report',
+          success: 'Tour summary report downloaded successfully',
+          error: 'Error generating tour summary report',
+        });
         break;
       case 'masterPlan':
-        await exportMasterplanReport(scheduleStart, scheduleEnd);
+        notify.promise(exportMasterplanReport(scheduleStart, scheduleEnd), {
+          loading: 'Generating master plan report',
+          success: 'Master plan report downloaded successfully',
+          error: 'Error generating master plan report',
+        });
     }
   };
 
