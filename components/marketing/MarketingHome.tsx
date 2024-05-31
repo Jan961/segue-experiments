@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import { Summary } from './Summary';
+import Summary, { SummaryRef } from './Summary';
 import Icon from 'components/core-ui-lib/Icon';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import Tabs from 'components/core-ui-lib/Tabs';
@@ -40,9 +40,7 @@ export type VenueDetail = {
 };
 
 const MarketingHome = () => {
-  // global module variables
   const { selected: productionId } = useRecoilValue(productionJumpState);
-  // global module variables
   const bookings = useRecoilState(bookingJumpState);
   const [bookingId, setBookingId] = useState(null);
   const [tabSet, setTabSet] = useState<boolean>(false);
@@ -54,6 +52,8 @@ const MarketingHome = () => {
   const venueContactTabRef = useRef<VenueContactTabRef>();
   const promoterHoldTabRef = useRef<PromoterHoldTabRef>();
   const attachmentsTabRef = useRef<AttachmentsTabRef>();
+  const summaryRef = useRef<SummaryRef>();
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
   const router = useRouter();
 
@@ -69,8 +69,12 @@ const MarketingHome = () => {
 
   useEffect(() => {
     resetData();
-    if (bookings[0].selected !== bookingId) {
-      setBookingId(bookings[0].selected);
+    if (!firstLoad) {
+      if (bookings[0].selected !== bookingId) {
+        setBookingId(bookings[0].selected);
+      }
+    } else {
+      setFirstLoad(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookings[0].selected]);
@@ -94,6 +98,7 @@ const MarketingHome = () => {
     venueContactTabRef.current && venueContactTabRef.current.resetData();
     promoterHoldTabRef.current && promoterHoldTabRef.current.resetData();
     attachmentsTabRef.current && attachmentsTabRef.current.resetData();
+    summaryRef.current && summaryRef.current.resetData();
   };
 
   return (
@@ -101,19 +106,19 @@ const MarketingHome = () => {
       {/* Green Box */}
       <div className="bg-primary-green/[0.15] w-[291px] h-[690PX] rounded-xl p-4 mr-5 flex flex-col justify-between mb-5 -mt-5">
         <div className="flex-grow overflow-y-auto">
-          <Summary />
+          <Summary bookingId={bookingId} ref={summaryRef} />
         </div>
         <div className="flex flex-col border-y-2 border-t-primary-input-text border-b-0 py-4 -mb-3.5">
           <div className="flex items-center text-primary-navy">
-            <Icon iconName={'user-solid'} variant="sm" />
+            <Icon iconName="user-solid" variant="sm" />
             <div className="ml-4 bg-secondary-green text-primary-white px-1">Down to single seats</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
-            <Icon iconName={'book-solid'} variant="sm" />
+            <Icon iconName="book-solid" variant="sm" />
             <div className="ml-4 bg-secondary-yellow text-primary-navy px-1">Brochure released</div>
           </div>
           <div className="flex items-center text-primary-navy mt-2">
-            <Icon iconName={'square-cross'} variant="sm" />
+            <Icon iconName="square-cross" variant="sm" />
             <div className="ml-4 bg-secondary-red text-primary-white px-1">Not on sale</div>
           </div>
         </div>

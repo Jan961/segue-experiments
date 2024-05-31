@@ -1,16 +1,25 @@
 import { VenueMinimalDTO } from 'interfaces';
-import { selectorFamily } from 'recoil';
+import { selectorFamily, useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
+import { currentProductionSelector } from './currentProductionSelector';
 
 export const venueOptionsSelector = selectorFamily({
   key: 'venueOptionsSelector',
   get:
     (excludedVenueIds: number[] = []) =>
     ({ get }) => {
+      const currentProduction = useRecoilValue(currentProductionSelector);
       const venueDict: Record<number, VenueMinimalDTO> = get(venueState);
       const options = [];
       for (const venue of Object.values(venueDict)) {
-        if (excludedVenueIds.includes(venue.Id)) continue;
+        //Pushes options without regions
+        if(venue.RegionId === -1){options.push({
+          text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
+          value: venue?.Id,
+        });
+        continue;}
+
+        if (excludedVenueIds.includes(venue.Id) || venue.RegionId != currentProduction.ShowRegionId) continue;
         options.push({
           text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
           value: venue?.Id,

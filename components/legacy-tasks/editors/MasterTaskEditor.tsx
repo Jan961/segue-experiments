@@ -24,7 +24,6 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> = {
   Priority: 0,
   AccountId: 0,
   RepeatInterval: '',
-  RepeatCount: null,
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,

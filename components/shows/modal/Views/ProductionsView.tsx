@@ -12,7 +12,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import { FileDTO } from 'interfaces';
-
+import useComponentMountStatus from 'hooks/useComponentMountStatus';
+import { sortByProductionStartDate } from './util';
+import { notify } from 'components/core-ui-lib/Notifications';
+import { ToastMessages } from 'config/shows';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -55,13 +58,16 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
+  const [uploadModalContext, setUploadModalContext] = useState<any>(false);
   const [productionUploadMap, setProductionUploadMap] = useState<Record<string, FileDTO>>(() => {
     return showData.productions.reduce((prodImageMap, production) => {
       prodImageMap[production.Id] = production.Image;
       return prodImageMap;
     }, {});
   });
+  const [editedOrAddedRecords, setEditedOrAddedRecords] = useState([]);
+  const isMounted = useComponentMountStatus();
+  const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -76,11 +82,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [isArchived, setIsArchived] = useState<boolean>(true);
 
   const unArchivedList = useMemo(() => {
-    return showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted);
+    return sortByProductionStartDate(showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted));
   }, [showData, isArchived]);
 
   const archivedList = useMemo(() => {
-    return showData.productions.filter((item) => item.IsArchived && !item.IsDeleted);
+    return sortByProductionStartDate(showData.productions.filter((item) => item.IsArchived && !item.IsDeleted));
   }, [showData, isArchived]);
 
   const rowsData = useMemo(() => {
@@ -159,6 +165,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       .then((response: any) => {
         progress = 100;
         onProgress(file[0].file, progress);
+        notify.success(ToastMessages.imageUploadSuccess);
         onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
         clearInterval(slowProgressInterval);
         const gridApi = tableRef.current.getApi();
@@ -176,6 +183,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         applyTransactionToGrid(tableRef, transaction);
       }) // eslint-disable-next-line
       .catch((error) => {
+        notify.error(ToastMessages.imageUploadFailure);
         onError(file[0].file, 'Error uploading file. Please try again.');
         clearInterval(slowProgressInterval);
       });
@@ -190,6 +198,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           true,
         );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
+        notify.success(ToastMessages.updateProductionSuccess);
         if (payloadData.isArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
           const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
@@ -198,7 +207,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           };
           applyTransactionToGrid(tableRef, transaction);
         }
+        const excludeUpdatedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+        setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
+        notify.error(ToastMessages.updateProductionFailure);
         console.log('Error updating production', error);
       } finally {
         setIsLoading(false);
@@ -219,7 +231,11 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           false,
         );
         await axios.post(`/api/productions/create`, payloadData);
+        notify.success(ToastMessages.createNewProductionSuccess);
+        const excludeSavedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+        setEditedOrAddedRecords(excludeSavedRecords);
       } catch (error) {
+        notify.error(ToastMessages.createNewProductionFailure);
         console.log('Error updating production', error);
       } finally {
         setIsEdited(false);
@@ -250,7 +266,18 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       // handleSave(e.data);
       await createNewProduction(e);
     } else if (e.column.colId === 'ImageUrl') {
-      setIsUploadModalOpen(true);
+      console.log(e.data);
+      const { imageUrl, originalFilename: name, id } = e.data.Image || {};
+      setUploadModalContext({
+        value: e.data.Image
+          ? {
+              imageUrl,
+              name,
+              id,
+            }
+          : null,
+        visibility: true,
+      });
       setCurrentProduction(e.data);
     }
   };
@@ -261,6 +288,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const handleCellChanges = (e) => {
+    const excludeEditedRow = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+    setEditedOrAddedRecords([...excludeEditedRow, getProductionsConvertedPayload(e.data)]);
     setCurrentProduction(e.data);
     setIsEdited(true);
   };
@@ -270,12 +299,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     setIsLoading(true);
     try {
       await axios.delete(`/api/productions/delete/${productionId}`);
+      notify.success(ToastMessages.deleteProductionSuccess);
       const gridApi = tableRef.current.getApi();
       const rowDataToRemove = gridApi.getDisplayedRowAtIndex(rowIndex).data;
       const transaction = {
         remove: [rowDataToRemove],
       };
       applyTransactionToGrid(tableRef, transaction);
+    } catch (error) {
+      notify.error(ToastMessages.deleteProductionFailure);
     } finally {
       setIsLoading(false);
     }
@@ -284,14 +316,14 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   return (
     <>
       <div className="flex justify-between">
-        <div className="text-primary-navy text-xl mb-3 mt-1 font-bold">{showName}</div>
+        <div className="text-primary-navy text-xl relative bottom-2 font-bold">{showName}</div>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
             <Checkbox
               className="flex flex-row-reverse mr-2"
               checked={isArchived}
               label="Include archived"
-              id={''}
+              id=""
               onChange={handleArchive}
             />
             <Button disabled={isAddRow} onClick={addNewRow} text="Add New Production" />
@@ -301,7 +333,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       <div className=" w-[750px] lg:w-[1568px] h-full flex flex-col ">
         <Table
           ref={tableRef}
-          columnDefs={productionsTableConfig}
+          columnDefs={productionColumDefs}
           rowData={rowsData}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
@@ -313,7 +345,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
 
         {isLoading && <LoadingOverlay />}
       </div>
-      <div className="pt-8 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
+      <div className="pt-4 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
         <div />
         <div className="flex gap-3">
           <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" />
@@ -321,21 +353,24 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         </div>
       </div>
       <ConfirmationDialog
-        variant={'delete'}
+        variant="delete"
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
       />
-      <UploadModal
-        visible={isUploadModalOpen}
-        title="Production Image"
-        info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
-        allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
-        onClose={() => setIsUploadModalOpen(false)}
-        maxFileSize={500 * 1024} // 500kb
-        onSave={onSave}
-      />
+      {uploadModalContext?.visibility && (
+        <UploadModal
+          visible={uploadModalContext?.visibility}
+          title="Production Image"
+          info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
+          allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
+          onClose={() => setUploadModalContext(null)}
+          maxFileSize={500 * 1024} // 500kb
+          onSave={onSave}
+          value={uploadModalContext?.value}
+        />
+      )}
     </>
   );
 };

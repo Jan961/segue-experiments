@@ -6,7 +6,7 @@ import { FileCardProps } from './interface';
 import { useCallback, useMemo, useState } from 'react';
 import ImagePreviewModal from '../ImagePreviewModal';
 
-const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCardProps) => {
+const FileCard = ({ fileName, fileSize, onDelete, progress, errorMessage, imageUrl }: FileCardProps) => {
   const status = useMemo(() => getStatusFromProgress(progress), [progress]);
   const [showImagePreviewModal, setShowImagePreviewModal] = useState(false);
   const toggleImagePreviewModal = useCallback(() => {
@@ -20,7 +20,7 @@ const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCard
           {imageUrl ? (
             <img onClick={toggleImagePreviewModal} className="h-10 w-14 pb-2" src={imageUrl} />
           ) : (
-            <Icon iconName={'document-solid'} fill="#617293" variant="3xl" />
+            <Icon iconName="document-solid" fill="#617293" variant="3xl" />
           )}
         </div>
         <div id="filedetails" className="flex w-full flex-row items-center">
@@ -28,14 +28,14 @@ const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCard
             <p className="text-primary-navy font-bold text-[15px] flex justify-between items-center">{status}</p>
             <div className="flex flex-row w-full justify-between items-center">
               <div className="float-left">
-                <Tooltip title={file.name} body={file.name.length > 30 ? file.name : ''}>
-                  <p className={`text-secondary text-sm`}>
-                    {file.name.length > 30 ? file.name.slice(0, 30) + '...' : file.name}
+                <Tooltip title={fileName} body={fileName?.length > 30 ? fileName : ''}>
+                  <p className="text-secondary text-sm">
+                    {fileName?.length > 30 ? fileName?.slice(0, 30) + '...' : fileName}
                   </p>
                 </Tooltip>
               </div>
               <div className="flex flex-row md:w-[180px] sm:w-[100px] justify-between items-center float-right">
-                <p className="text-secondary text-sm">Size: {fileSizeFormatter(file.size)}</p>
+                {fileSize && <p className="text-secondary text-sm">Size: {fileSizeFormatter(fileSize)}</p>}
                 {progress > 0 && <p className="text-secondary text-sm">{progress}%</p>}
               </div>
             </div>
@@ -44,7 +44,7 @@ const FileCard = ({ file, onDelete, progress, errorMessage, imageUrl }: FileCard
           </div>
         </div>
         <div className="relative bottom-1 right-1">
-          <Icon iconName={'cross'} fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
+          <Icon iconName="cross" fill="#21345B" variant="sm" className="cursor-pointer" onClick={() => onDelete()} />
         </div>
       </div>
       {showImagePreviewModal && (

@@ -3,16 +3,17 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import { InitialState } from 'lib/recoil';
-import { getShowsByAccountId } from 'services/ShowService';
+import { getAllProductionCompanyList, getShowsByAccountId } from 'services/ShowService';
 import ShowsTable from 'components/shows/ShowsTable';
 import { showMapper, showProductionMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
 import { useMemo, useState } from 'react';
 import { getRegionlist } from 'services/productionService';
+import { transformToOptions } from 'utils';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { showsList = [] } = props;
+  const { showsList = [], productionCompanyOptions = [] } = props;
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
@@ -52,7 +53,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
               className="flex flex-row-reverse"
               checked={isArchived}
               label="Include archived"
-              id={''}
+              id=""
               disabled={isEdited}
               onChange={handleArchive}
             />
@@ -60,6 +61,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           </div>
         </div>
         <ShowsTable
+          productionCompanyOptions={productionCompanyOptions}
           handleEdit={handleEdit}
           isEdited={isEdited}
           isArchived={isArchived}
@@ -77,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
   const shows = (await getShowsByAccountId(AccountId)) || [];
   const regionsList = await getRegionlist();
+  const productionCompanyList = await getAllProductionCompanyList();
 
   const showsList = shows.map((show) => {
     return {
@@ -94,6 +97,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       showsList,
       initialState,
       regionsList,
+      productionCompanyOptions: transformToOptions(productionCompanyList, 'Name', 'Id'),
     },
   };
 };

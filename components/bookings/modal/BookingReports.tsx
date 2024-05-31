@@ -71,6 +71,12 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
         />
+        <Button
+          text="Export to MyTrBk"
+          className="w-[230px] mb-3 pl-6"
+          iconProps={{ className: 'h-4 w-3 ml-5' }}
+          sufixIconName="excel"
+        />
       </div>
     </PopupModal>
   );
