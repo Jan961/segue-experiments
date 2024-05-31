@@ -25,7 +25,7 @@ const NewProductionEmpty = ({ visible, onClose, handleSubmit }: NewProductionEmp
   return (
     <PopupModal
       show={visible}
-      onClose={handleClose}
+      onClose={onClose}
       title="New Production Task List"
       titleClass="text-primary-navy text-xl mb-2"
     >
