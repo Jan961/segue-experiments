@@ -125,7 +125,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       const countryId = v.VenueAddress.find((address: any) => address.TypeName === 'Main')?.CountryId;
 
       const region = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId) ?? null;
-      const currencyCode = venueCurrencies.find((currencyPair: any) => currencyPair?.Id === v.Id) ?? null;
+      const currencyCode = venueCurrencies[v.Id] ?? null;
 
       return {
         Id: v.Id,
@@ -135,7 +135,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         Seats: v.Seats,
         Count: 0,
         RegionId: region ? region.RegionId : -1,
-        CurrencyCode: currencyCode ? currencyCode.unicode : null,
+        CurrencyCode: currencyCode || null,
       };
     },
   );
