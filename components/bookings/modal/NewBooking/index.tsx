@@ -73,6 +73,7 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     () => Object.values(bookingDict).map((booking) => booking.VenueId),
     [bookingDict],
   );
+
   const venueOptions = useRecoilValue(
     venueOptionsSelector(state.form.shouldFilterVenues ? currentProductionVenues : []),
   );
@@ -195,7 +196,6 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     const hasBarringIssues = state?.barringConflicts?.length > 0;
     return getStepIndex(!editBooking, hasBarringIssues ? 'Barring Issue' : 'New Booking Details');
   }, [state.barringConflicts, editBooking]);
-
   return (
     <PopupModal
       show={visible}
