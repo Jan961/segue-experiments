@@ -191,6 +191,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
+
+      const currencyCode = await fetchData({
+        url: '/api/bookings/services/currency',
+        method: 'POST',
+        data: { BookingId: bookingId },
+      });
+      console.log('Currency Code', currencyCode);
       setSalesSnapData(salesData);
       toggleModal('salesSnapshot');
     } else {
