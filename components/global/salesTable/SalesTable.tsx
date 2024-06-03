@@ -201,7 +201,7 @@ export default function SalesTable({
         const MARKETING_TAB_WIDTH = 195;
         const SCHOOLS_TAB_WIDTH = 135;
 
-        // Regex to extract integers
+
         let baseContainerWidth = 1220;
         baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;

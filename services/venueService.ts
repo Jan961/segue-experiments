@@ -51,14 +51,32 @@ export const getUniqueVenueCountrylist = async () => {
   return await prisma.Country.findMany({});
 };
 
-export const getCountryRegions = async () =>{
+export const getCountryRegions = async () => {
   return await prisma.CountryInRegion.findMany({
-    orderBy:{
-    CountryId: 'asc'
-    }
+    orderBy: {
+      CountryId: 'asc',
+    },
   });
-}
+};
 
+export const getVenueCurrencies = async () => {
+  const venueCurrency = await prisma.Venue.findMany({
+    select: {
+      Id: true,
+      VenueCurrencyCode: true,
+    },
+  });
+  const currencyCodeToUnicode = await prisma.Currency.findMany({
+    select: { CurrencyCode: true, CurrencySymbolUnicode: true },
+  });
+
+  const venueWithCurrencyCode = venueCurrency.map((venue) => {
+    return { Id: venue.Id, unicode: currencyCodeToUnicode[venue.VenueCurrencyCode] };
+  });
+
+  console.log(venueWithCurrencyCode);
+  return venueWithCurrencyCode;
+};
 
 export interface DistanceStop {
   Date: string;
