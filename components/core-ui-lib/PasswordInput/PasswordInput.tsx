@@ -16,11 +16,11 @@ const PasswordInput = (props: TextInputProps) => {
   };
 
   return (
-    <div className={`w-full flex items-center relative`}>
+    <div className="w-full flex items-center relative">
       <TextInput data-testid="password-input" type="password" ref={inputRef} {...props} />
       <div className="input-icon absolute inset-y-0 right-0 flex items-center pr-2">
         <Icon
-          testId="password-input"
+          testId="password-input-icon"
           aria-hidden="true"
           iconName={isVisible ? 'hide-password' : 'show-password'}
           onClick={togglePasswordVisibility}

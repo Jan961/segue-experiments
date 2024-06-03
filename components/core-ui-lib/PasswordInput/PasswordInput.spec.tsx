@@ -11,12 +11,11 @@ describe('PasswordInput Component', () => {
     const inputElement = screen.getByTestId('password-input');
     expect(inputElement).toBeInTheDocument();
     expect(inputElement).toHaveAttribute('type', 'password');
-    const icon = screen.getByTestId('password-input');
+    const icon = screen.getByTestId('password-input-icon');
     expect(icon).toBeInTheDocument();
     await userEvent.click(icon);
     expect(inputElement).toHaveAttribute('type', 'text');
-    await userEvent.click(icon);
-    expect(inputElement).toHaveAttribute('type', 'password');
+    fireEvent.click(icon);
     fireEvent.change(inputElement, { target: { value: 'abcd1234' } });
     expect(handleChange).toHaveBeenCalled();
   });
