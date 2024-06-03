@@ -16,6 +16,7 @@ export const getAllVenuesMin = async () => {
         select: {
           Town: true,
           TypeName: true,
+          CountryId: true,
         },
       },
     },
@@ -48,6 +49,14 @@ export const getUniqueVenueTownlist = async () => {
 
 export const getUniqueVenueCountrylist = async () => {
   return await prisma.Country.findMany({});
+};
+
+export const getCountryRegions = async () => {
+  return await prisma.CountryInRegion.findMany({
+    orderBy: {
+      CountryId: 'asc',
+    },
+  });
 };
 
 export interface DistanceStop {

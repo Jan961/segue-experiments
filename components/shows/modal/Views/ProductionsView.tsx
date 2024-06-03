@@ -58,7 +58,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState<any>(false);
+  const [uploadModalContext, setUploadModalContext] = useState<any>(false);
   const [productionUploadMap, setProductionUploadMap] = useState<Record<string, FileDTO>>(() => {
     return showData.productions.reduce((prodImageMap, production) => {
       prodImageMap[production.Id] = production.Image;
@@ -268,10 +268,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     } else if (e.column.colId === 'ImageUrl') {
       console.log(e.data);
       const { imageUrl, originalFilename: name, id } = e.data.Image || {};
-      setIsUploadModalOpen({
-        imageUrl,
-        name,
-        id,
+      setUploadModalContext({
+        value: e.data.Image
+          ? {
+              imageUrl,
+              name,
+              id,
+            }
+          : null,
+        visibility: true,
       });
       setCurrentProduction(e.data);
     }
@@ -354,16 +359,16 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         onNoClick={() => setConfirm(false)}
         hasOverlay={false}
       />
-      {!!isUploadModalOpen && (
+      {uploadModalContext?.visibility && (
         <UploadModal
-          visible={!!isUploadModalOpen}
+          visible={uploadModalContext?.visibility}
           title="Production Image"
           info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
           allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
-          onClose={() => setIsUploadModalOpen(false)}
+          onClose={() => setUploadModalContext(null)}
           maxFileSize={500 * 1024} // 500kb
           onSave={onSave}
-          value={isUploadModalOpen}
+          value={uploadModalContext?.value}
         />
       )}
     </>

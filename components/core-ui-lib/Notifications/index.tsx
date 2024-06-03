@@ -19,4 +19,7 @@ export const notify = {
       ...options,
     });
   },
+  promise: (promise, options) => {
+    toast.promise(promise, options);
+  },
 };

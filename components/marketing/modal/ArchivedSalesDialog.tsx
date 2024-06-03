@@ -109,8 +109,8 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
   };
 
   const submitSelection = () => {
-    if (selectedBookings.length < 2) {
-      setErrorMessage('Please select at least 2 venues for comparison.');
+    if (selectedBookings.length < 1) {
+      setErrorMessage('Please select at least 1 venue for comparison.');
     } else {
       onSubmit(selectedBookings);
     }
@@ -192,7 +192,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
               options={bothOptions}
               value={conditionType}
               onChange={(value) => setConditionType(value?.toString() || null)}
-              placeholder={'Please select from Venue or Town'}
+              placeholder="Please select from Venue or Town"
               isClearable={false}
               isSearchable={false}
             />
@@ -248,7 +248,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
         <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
 
         <div className="float-right flex flex-row mt-5 py-2">
-          <Button className="w-32" variant="secondary" text={'Cancel'} onClick={onCancel} />
+          <Button className="w-32" variant="secondary" text="Cancel" onClick={onCancel} />
 
           <Button className="ml-4 w-32" variant="primary" text="Accept" onClick={() => submitSelection()} />
         </div>

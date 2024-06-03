@@ -8,10 +8,10 @@ type props = {
 };
 
 const BookingSchedule = ({ ProductionId }: props) => {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const onBookingSchedule = () => {
-    setIsLoading(true)
-    fetch('/api/reports/bookingSchedule', { method: 'POST', body: JSON.stringify({ ProductionId }) })
+    setIsLoading(true);
+    fetch('/api/reports/booking-schedule', { method: 'POST', body: JSON.stringify({ ProductionId }) })
       .then(async (response) => {
         if (response.status >= 200 && response.status < 300) {
           const productionName = `${ProductionId}`;
@@ -40,14 +40,16 @@ const BookingSchedule = ({ ProductionId }: props) => {
       .catch((error) => {
         console.error(error);
       })
-      .finally(()=>{
-        setIsLoading(false)
+      .finally(() => {
+        setIsLoading(false);
       });
   };
-  return <ToolbarButton onClick={onBookingSchedule}  className='flex items-center gap-1'>
-    <ExcelIcon height={18} width={18}  />
-    {isLoading ? <Spinner className='mr-2' size="sm" />: "Travel Summary"}
-    </ToolbarButton>;
+  return (
+    <ToolbarButton onClick={onBookingSchedule} className="flex items-center gap-1">
+      <ExcelIcon height={18} width={18} />
+      {isLoading ? <Spinner className="mr-2" size="sm" /> : 'Travel Summary'}
+    </ToolbarButton>
+  );
 };
 
 export default BookingSchedule;

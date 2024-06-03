@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
+import SalesSummaryReportModal from './SalesSummaryReportModal';
 
 interface MarketingReportsProps {
   visible: boolean;
@@ -8,78 +9,82 @@ interface MarketingReportsProps {
 }
 
 export const MarketingReports = ({ visible = false, onClose }: MarketingReportsProps) => {
-  const [open, setOpen] = useState<boolean>(visible);
+  const [activeModal, setActiveModal] = useState<string>(null);
 
-  const handleModalClose = () => onClose?.();
+  const onExportClick = useCallback((key: string) => {
+    setActiveModal(key);
+  }, []);
 
-  useEffect(() => {
-    setOpen(visible);
-  }, [visible]);
+  const closeActiveModal = useCallback(() => setActiveModal(null), [setActiveModal]);
 
   return (
     <PopupModal
-      show={open}
+      show={visible}
       title="Marketing Reports"
       titleClass="text-xl text-primary-navy text-bold mb-4 -mt-2"
-      onClose={handleModalClose}
+      onClose={onClose}
     >
       <div className="-mb-1">
         <Button
           text="Sales Summary"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
+          onClick={() => onExportClick('salesSummary')}
         />
 
         <Button
           text="Sales Summary + Weekly Totals"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
 
         <Button
           text="Sales vs Capacity %"
           className="w-[262px] mb-3 pl-5"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
 
         <Button
           text="Total Gross Sales"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
 
         <Button
           text="Sales Graphs"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
 
         <Button
           text="Selected Venues"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
 
         <Button
           text="Promoter Holds"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
 
         <Button
           text="Holds + Comps"
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
-          sufixIconName={'excel'}
+          sufixIconName="excel"
         />
       </div>
+      {activeModal === 'salesSummary' && (
+        <SalesSummaryReportModal visible={activeModal === 'salesSummary'} onClose={closeActiveModal} />
+      )}
     </PopupModal>
   );
 };

@@ -15,7 +15,7 @@ import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
 
 interface FiltersProps {
-  onExportClick?: () => void;
+  onExportClick?: (key: string) => void;
 }
 
 const Filters = ({ onExportClick }: FiltersProps) => {

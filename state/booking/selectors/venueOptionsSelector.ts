@@ -9,6 +9,7 @@ export const venueOptionsSelector = selectorFamily({
     ({ get }) => {
       const venueDict: Record<number, VenueMinimalDTO> = get(venueState);
       const options = [];
+
       for (const venue of Object.values(venueDict)) {
         if (excludedVenueIds.includes(venue.Id)) continue;
         options.push({
