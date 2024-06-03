@@ -10,12 +10,7 @@ export interface VenueSelectorProps {
   disabled?: boolean;
 }
 export const VenueSelector = ({ venueId, onChange, disabled = false }: VenueSelectorProps) => {
-  console.log('About to load the recoil value for VenueSelector');
-
   const venueOptions = useRecoilValue(venueOptionsSelector([]));
-  console.log(venueOptions);
-  console.log('I passed');
-
   return (
     <>
       <FormTypeahead
