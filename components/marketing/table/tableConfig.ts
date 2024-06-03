@@ -7,6 +7,7 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -328,3 +329,41 @@ export const attachmentsColDefs = [
     resizable: false,
   },
 ];
+
+export const salesEntryColDefs = (type: string, handleUpdate) => {
+  return [
+    {
+      headerName: type,
+      field: 'name',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+    },
+    {
+      headerName: 'Seats',
+      field: 'seats',
+      cellRenderer: TextInputRenderer,
+      cellRendererParams: function (params) {
+        return {
+          value: params.data.seats.toString(),
+          className: 'w-[100px] ml-1 mt-1',
+          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'seats'),
+        };
+      },
+      width: 112,
+    },
+    {
+      headerName: 'Value',
+      field: 'value',
+      cellRenderer: TextInputRenderer,
+      cellRendererParams: function (params) {
+        return {
+          value: params.data.value.toString(),
+          className: 'w-[100px] ml-1 mt-1',
+          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'value'),
+        };
+      },
+      width: 112,
+      resizable: false,
+    },
+  ];
+};
