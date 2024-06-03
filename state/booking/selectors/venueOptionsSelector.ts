@@ -15,7 +15,7 @@ export const venueOptionsSelector = selectorFamily({
         // Pushes options without regions
         if (excludedVenueIds.includes(venue.Id) || venue.RegionId !== currentProduction.ShowRegionId) continue;
 
-        if (venue.RegionId === -1 || venue.RegionId === currentProduction.ShowRegionId) {
+        if (venue.RegionId === -1) {
           options.push({
             text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
 
