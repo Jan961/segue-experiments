@@ -8,7 +8,6 @@ import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import { format, parseISO } from 'date-fns';
 import axios from 'axios';
-
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
 export type ProdComp = {
@@ -63,6 +62,9 @@ export default function SalesTable({
   const styleProps = { headerColor: tileColors[module] };
 
   const salesSnapshot = (data: Array<SalesSnapshot>) => {
+    console.log(booking);
+    console.log(salesTableRef);
+
     setCurrency('£');
 
     // check for school data
@@ -238,6 +240,7 @@ export default function SalesTable({
       }
 
       case 'salesSnapshot': {
+        console.log(data);
         salesSnapshot(data);
         break;
       }

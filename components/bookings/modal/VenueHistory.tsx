@@ -171,6 +171,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
+
+      const currencyCode = await fetchData({
+        url: '/api/bookings/services/currency',
+        method: 'POST',
+        data: { BookingId: bookingId },
+      });
+      console.log('Currency Code', currencyCode);
       setSalesSnapData(salesData);
       toggleModal('salesSnapshot');
     } else {
@@ -194,7 +201,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      if(e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
+      if (e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
     }
   };
 
