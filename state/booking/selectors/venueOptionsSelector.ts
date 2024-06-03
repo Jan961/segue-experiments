@@ -8,7 +8,9 @@ export const venueOptionsSelector = selectorFamily({
   get:
     (excludedVenueIds: number[] = []) =>
     ({ get }) => {
-      const currentProduction = useRecoilValue(currentProductionSelector);
+      //const currentProduction = useRecoilValue(currentProductionSelector);
+      const currentProduction = { ShowRegionId: 8 };
+
       const venueDict: Record<number, VenueMinimalDTO> = get(venueState);
       const options = [];
       console.log('Current Production ', currentProduction);
