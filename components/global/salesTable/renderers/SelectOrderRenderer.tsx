@@ -6,6 +6,7 @@ import { SelectProps } from 'components/core-ui-lib/Select/Select';
 interface SelectRendererProps extends SelectProps {
   id?: string;
   eGridCell: HTMLElement;
+  hasSalesData: boolean;
 }
 
 const SelectOrderRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
@@ -14,7 +15,8 @@ const SelectOrderRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
   const handleOnFocus = () => {
     selectRef.current.focus();
   };
-  const hasSalesData = !(props.data?.hasSalesData === false);
+
+  const hasSalesData = !(props?.hasSalesData === false);
 
   return (
     <div className="pl-1 pr-2 mt-1">
@@ -28,4 +30,5 @@ const SelectOrderRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
     </div>
   );
 };
+
 export default SelectOrderRenderer;
