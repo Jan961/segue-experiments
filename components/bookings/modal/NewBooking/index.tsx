@@ -73,9 +73,12 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
     () => Object.values(bookingDict).map((booking) => booking.VenueId),
     [bookingDict],
   );
+  console.log('About to load');
   const venueOptions = useRecoilValue(
     venueOptionsSelector(state.form.shouldFilterVenues ? currentProductionVenues : []),
   );
+  console.log(venueOptions);
+  console.log('Venue options above');
 
   const onFormDataChange = (change: Partial<TForm>) => {
     dispatch(actionSpreader(Actions.UPDATE_FORM_DATA, change));
@@ -192,10 +195,11 @@ const AddBooking = ({ visible, onClose, startDate, endDate, booking }: AddBookin
   };
 
   const nextStepForConflicts = useMemo(() => {
+    console.log('Checking state barring conflicts', state?.barringConflicts);
     const hasBarringIssues = state?.barringConflicts?.length > 0;
     return getStepIndex(!editBooking, hasBarringIssues ? 'Barring Issue' : 'New Booking Details');
   }, [state.barringConflicts, editBooking]);
-
+  console.log('Edit Booking', editBooking);
   return (
     <PopupModal
       show={visible}

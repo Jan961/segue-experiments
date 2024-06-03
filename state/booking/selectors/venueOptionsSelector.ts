@@ -23,7 +23,6 @@ export const venueOptionsSelector = selectorFamily({
           });
         }
       }
-
       return options.sort((a, b) => a.text.localeCompare(b.text));
     },
 });
