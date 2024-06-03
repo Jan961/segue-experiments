@@ -191,20 +191,20 @@ export default function SalesTable({
 
   const calculateWidth = () => {
     switch (variant) {
-      case 'salesSnapshot':
-        const isMarketing = module !== 'bookings';
+      case 'salesSnapshot': {
+        const isMarketing: boolean = module !== 'bookings';
         const MARKETING_TAB_WIDTH = 195;
         const SCHOOLS_TAB_WIDTH = 135;
 
-        //Regex to extract integers
+        // Regex to extract integers
         let baseContainerWidth = 1220;
 
         baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;
 
         containerWidth = baseContainerWidth.toString() + 'px';
-        console.log(containerWidth);
         return containerWidth;
+      }
 
       case 'salesComparison': {
         const scalar = numBookings === 2 ? ARCH_LESS_2_WIDTH : ARCH_MULTI_WIDTH;
