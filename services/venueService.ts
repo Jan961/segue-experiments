@@ -63,19 +63,17 @@ export const getVenueCurrencies = async () => {
   const venueCurrency = await prisma.Venue.findMany({
     select: {
       Id: true,
-      VenueCurrencyCode: true,
+      Currency: {
+        select: { SymbolUnicode: true },
+      },
     },
   });
-  const currencyCodeToUnicode = await prisma.Currency.findMany({
-    select: { CurrencyCode: true, CurrencySymbolUnicode: true },
+  const attempt = venueCurrency.reduce((dict, item) => {
+    dict[item.Id] = item.Currency.SymbolUnicode;
+    return dict;
   });
 
-  const venueWithCurrencyCode = venueCurrency.map((venue) => {
-    return { Id: venue.Id, unicode: currencyCodeToUnicode[venue.VenueCurrencyCode] };
-  });
-
-  console.log(venueWithCurrencyCode);
-  return venueWithCurrencyCode;
+  return attempt;
 };
 
 export interface DistanceStop {
