@@ -19,10 +19,7 @@ interface VenueBarringFormProps {
 const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationErrrors }: VenueBarringFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueBarringRules, ...venue });
   const [barredVenueTableRows, setBarredVenueTableRows] = useState<UiBarredVenue[]>(venue?.barredVenues || []);
-  console.log('About to load the recoil value for VenueSelector');
   const venueOptions = useRecoilValue(venueOptionsSelector([]));
-  console.log(venueOptions);
-  console.log('I passed');
   const [columnDefs, setColumnDefs] = useState([]);
   useEffect(() => {
     setColumnDefs(getBarredVenuesColDefs(venueOptions));

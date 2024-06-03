@@ -164,15 +164,12 @@ export default function NewBookingDetailsView({
       note: bookingRow?.notes || '',
     };
   }, [production, bookingRow, venueDict]);
-  console.log('Data above the nested if', data);
   useEffect(() => {
-    if (data !== null) {
-      if (data.length > 0) {
-        setColumnDefs(
-          newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable, changeBookingLength),
-        );
-        setBookingData(data);
-      }
+    if (data !== null && data.length > 0) {
+      setColumnDefs(
+        newBookingColumnDefs(dayTypeOptions, venueOptions, addRowToTable, removeRowFromTable, changeBookingLength),
+      );
+      setBookingData(data);
     }
   }, [data, dayTypeOptions, venueOptions, changeBookingLength]);
 

@@ -90,7 +90,6 @@ const NewBookingView = ({
             .filter((venue: BarredVenue) => venue.hasBarringConflict),
         );
         if (skipRedirect) return;
-        console.log('This is data that might be weird', data);
         if (data?.length > 0) {
           goToStep(getStepIndex(true, 'Barring Issue'));
         } else {

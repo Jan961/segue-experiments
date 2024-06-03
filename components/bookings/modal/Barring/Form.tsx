@@ -25,10 +25,7 @@ const INITIAL_FORM_STATE = {
 const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
   const { productions } = useRecoilValue(productionJumpState);
   const currentProduction = useRecoilValue(currentProductionSelector);
-  console.log('About to load the recoil value for VenueSelector');
   const venueOptions = useRecoilValue(venueOptionsSelector([]));
-  console.log(venueOptions);
-  console.log('I passed');
   const [formData, setFormData] = useState({ ...INITIAL_FORM_STATE, productionId: currentProduction?.Id });
   const { productionId, venueId, barDistance = '', includeExcluded, seats = '', fromDate, toDate } = formData;
   const formRef = useRef(null);

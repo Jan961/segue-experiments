@@ -162,7 +162,6 @@ export default forwardRef(function Select(
   }, [options]);
 
   const handleOptionSelect = (o: SelectOption) => {
-    console.log('o', o);
     if (isMulti) {
       const latestSelectedOption = o[o.length - 1];
       if (
