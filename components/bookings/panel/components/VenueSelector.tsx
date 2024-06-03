@@ -24,7 +24,7 @@ export const VenueSelector = ({ venueId, onChange, disabled = false }: VenueSele
       />
       <div className="columns-2 mb-4">
         <VenueInfo venueId={venueId} />
-        <ViewBookingHistory venueId={venueId}></ViewBookingHistory>
+        <ViewBookingHistory venueId={venueId} />
       </div>
     </>
   );
