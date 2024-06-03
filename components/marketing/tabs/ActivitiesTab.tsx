@@ -17,6 +17,7 @@ import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
+import { isNullOrEmpty } from 'utils';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -299,7 +300,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   useEffect(() => {
-    if (props.bookingId) {
+    if (!isNullOrEmpty(props.bookingId)) {
       setCurrency('£');
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString());
