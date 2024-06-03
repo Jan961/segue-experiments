@@ -34,7 +34,8 @@ export type IconName =
   | 'document-solid'
   | 'upload-to-cloud'
   | 'show-password'
-  | 'hide-password';
+  | 'hide-password'
+  | 'price-plan';
 
 const IconNameMap = new Map([
   ['search', 'SearchIcon'],
@@ -71,6 +72,7 @@ const IconNameMap = new Map([
   ['document-solid', 'DocumentSolidIcon'],
   ['show-password', 'EyeIcon'],
   ['hide-password', 'ClosedEyeIcon'],
+  ['price-plan', 'PricePlanIcon'],
 ]);
 
 type variant = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '5xl' | '7xl';

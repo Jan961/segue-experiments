@@ -42,3 +42,14 @@ export const mapToAccountContactPrismaFields = (account: any) => {
     AccContMainEmail: account.email,
   };
 };
+
+export const mapAccountContactFromPrismaFields = (accountContact: any) => {
+  return {
+    contactId: accountContact.AccContId,
+    accountId: accountContact.AccContAccountId,
+    firstName: accountContact.AccContFirstName,
+    lastName: accountContact.AccContLastName,
+    phoneNumber: accountContact.AccContPhone,
+    email: accountContact.AccContMainEmail,
+  };
+};

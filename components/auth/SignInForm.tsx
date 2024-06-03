@@ -9,8 +9,6 @@ import { useSignIn } from '@clerk/nextjs';
 import { EMAIL_NOT_FOUND, PASSWORD_INCORRECT } from 'utils/authUtils';
 import { useWizard } from 'react-use-wizard';
 import AuthError from './AuthError';
-import axios from 'axios';
-import { PrismaInstance } from 'lib/prisma';
 
 const SignInForm = () => {
   const { isLoaded: signInLoaded, signIn, setActive } = useSignIn();
@@ -37,10 +35,6 @@ const SignInForm = () => {
       if (result.status !== 'complete') {
         setError(result.status);
       } else {
-        const { data } = await axios('/api/account/fetch?id=2');
-
-        // PrismaInstance.getInstance().setUrl(data.AccountDBUrl);
-        // console.log('url', PrismaInstance.getInstance().url);
         await setActive({ session: result.createdSessionId });
         router.push('/');
       }

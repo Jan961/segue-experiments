@@ -32,3 +32,4 @@ export { default as DocumentSolidIcon } from './Document';
 export { default as UploadToCloudIcon } from './UploadToCloud';
 export { default as EyeIcon } from './Eye';
 export { default as ClosedEyeIcon } from './ClosedEye';
+export { default as PricePlanIcon } from './PricePlan';

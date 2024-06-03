@@ -28,6 +28,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 };
 
 const DEFAULT_ACCOUNT_DETAILS = {
+  accountId: null,
   contactId: null,
   firstName: '',
   lastName: '',
@@ -44,6 +45,8 @@ const DEFAULT_ACCOUNT_DETAILS = {
   vatNumber: '',
   currency: 'GBP',
 };
+export type AccountDetails = typeof DEFAULT_ACCOUNT_DETAILS;
+
 const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
@@ -66,7 +69,7 @@ const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
         />
         <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />
         <Elements stripe={stripe}>
-          <PaymentDetailsForm payee={accountDetails} plan={subcriptionDetails} />
+          <PaymentDetailsForm accountDetails={accountDetails} plan={subcriptionDetails} />
         </Elements>
         <AccountConfirmation />
       </Wizard>
