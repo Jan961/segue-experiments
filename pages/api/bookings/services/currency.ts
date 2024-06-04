@@ -9,25 +9,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const { BookingId } = req.body as CurrencyLookupParams;
 
-    const venueId: number = prisma.Booking.findFirst({
+    const venueIdQuery: any | null = await prisma.Booking.findFirst({
       where: {
         Id: BookingId,
       },
-      select: { BookingVenueId: true },
+      select: { VenueId: true },
     });
+    const venueId: number | null = venueIdQuery ? venueIdQuery?.VenueId : null;
 
-    const currencyCode: string = prisma.Venue.findFirst({
+    const currencyCodeQuery: any | null = await prisma.Venue.findFirst({
       where: {
-        Id: venueId,
+        Id: { equals: venueId },
       },
       select: {
-        Id: true,
         Currency: {
           select: { SymbolUnicode: true },
         },
       },
     });
-
+    const currencyCode: string | null = currencyCodeQuery ? currencyCodeQuery.Currency.SymbolUnicode : null;
     return res.status(200).json({ currencyCode });
   } catch (exception) {
     console.log(exception);
