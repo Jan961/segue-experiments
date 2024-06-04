@@ -68,7 +68,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       field: 'StartDate',
       cellRenderer: DefaultCellRenderer,
       valueGetter: function (params) {
-        return format(params.data.StartDate, 'dd/MM/yy');
+        return params?.data?.StartDate && format(params?.data?.StartDate, 'dd/MM/yy');
       },
       width: 120,
       minWidth: 120,
@@ -100,7 +100,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
         overflow: 'visible',
       },
       valueGetter: function (params) {
-        return format(params.data.CompleteDate, 'dd/MM/yy');
+        return params?.data?.CompleteDate && format(params.data.CompleteDate, 'dd/MM/yy');
       },
       width: 120,
       minWidth: 120,

@@ -3,12 +3,12 @@ import React, { useMemo, useState } from 'react';
 import swr from 'swr';
 import axios from 'axios';
 import ReportForm from '../reportForm';
-import Image from 'next/image';
 import { PerformanceInfo } from 'types/performanceInfo';
 import { CustomSelect } from './CustomSelect';
 import { dateToSimple } from 'services/dateService';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { Production } from '@prisma/client';
 
 const fetcher = async (url: string): Promise<any> => await axios(url).then((res) => res.data);
 
@@ -20,13 +20,17 @@ const swrOptions = {
 
 interface ReportWrapperProps {
   children: React.ReactNode;
+  productions?: any & Production[];
 }
 
-function ReportWrapper({ children }: ReportWrapperProps) {
+function ReportWrapper({ children, productions }: ReportWrapperProps) {
   const [productionId, setProductionId] = useState('');
   const [bookingId, setBookingId] = useState('');
   const [performanceId, setPerformanceId] = useState('');
-
+  const imageUrl = useMemo(() => {
+    const production = productions.find((production) => production?.Id === parseInt(productionId));
+    return production?.ImageUrl || '';
+  }, [productionId, productions]);
   /**
    * Whenever the user selects a production from the production dropdown, we fetch
    * the booking options to populate the 'Set Booking' dropdown.
@@ -61,7 +65,7 @@ function ReportWrapper({ children }: ReportWrapperProps) {
       town: '',
       performanceDate: '',
       performanceTime: '',
-      cms: '',
+      csm: '',
       lighting: '',
       asm: '',
     };
@@ -99,14 +103,15 @@ function ReportWrapper({ children }: ReportWrapperProps) {
       </nav>
       <main className="p-2 pb-20">
         <h1 className="my-2 font-bold text-6xl text-center text-sky-400">Show Report</h1>
-        <div className="md:flex  mx-auto gap-8 items-end mt-16 shadow-md rounded-md overflow-hidden p-6 bg-white">
+        <div className="md:flex  mx-auto gap-8 items-end mt-8 shadow-md rounded-md overflow-hidden p-6 bg-white">
           <div className="border w-52">
-            <Image src={reportImageUrl} alt="show" width={206} height={150} priority />
+            <img src={imageUrl} alt="show" width={206} height={150} />
           </div>
 
           <div className="flex-1 mt-8 md:mt-0">
             <CustomSelect
               label="Set Production:"
+              placeholder="Select Production"
               value={productionId}
               onChange={(e) => {
                 setProductionId(e.target.value);
@@ -118,7 +123,8 @@ function ReportWrapper({ children }: ReportWrapperProps) {
               isLoading={false}
             />
             <CustomSelect
-              label="Set Booking:"
+              label="Set Venue:"
+              placeholder="Select Venue"
               value={bookingId}
               onChange={(e) => {
                 setBookingId(e.target.value);
@@ -135,6 +141,7 @@ function ReportWrapper({ children }: ReportWrapperProps) {
 
             <CustomSelect
               label="Set Performance:"
+              placeholder="Select Performance"
               value={performanceId}
               onChange={(e) => setPerformanceId(e.target.value)}
               disabled={bookingId === ''}
@@ -148,7 +155,7 @@ function ReportWrapper({ children }: ReportWrapperProps) {
           </div>
         </div>
 
-        <div className="mt-16 shadow-md rounded-md overflow-hidden p-5">
+        <div className="mt-8 shadow-md rounded-md overflow-hidden p-5">
           <ReportForm
             bookingId={bookingId}
             performanceId={performanceId}

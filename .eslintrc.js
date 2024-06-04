@@ -52,5 +52,6 @@ module.exports = {
         html: true,
       },
     ],
+    'react/jsx-curly-brace-presence': ['error', { props: 'never', children: 'ignore' }],
   },
 };

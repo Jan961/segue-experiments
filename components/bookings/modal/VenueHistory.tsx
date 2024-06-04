@@ -15,6 +15,7 @@ import { BookingSelection, SalesComparison, SalesSnapshot } from 'types/Marketin
 import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/salesComparision';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
+import { exportToExcel, exportToPDF } from 'utils/export';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -73,18 +74,26 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     setShowVenueSelect(visible);
   }, [visible]);
 
+  const exportTable = (key: string) => {
+    if (key === 'Excel') {
+      exportToExcel(salesTableRef);
+    } else if (key === 'PDF') {
+      exportToPDF(salesTableRef);
+    }
+  };
+
   const toggleModal = (type: SalesTableVariant) => {
     setLoading(false);
     switch (type) {
       case 'prodComparision':
         setSelBookings([]);
-        setShowVenueSelect(false);
         setShowCompSelect(true);
+        setShowVenueSelect(false);
         break;
 
       case 'salesComparison':
-        setShowCompSelect(false);
         setShowResults(true);
+        setShowCompSelect(false);
         break;
 
       case 'salesSnapshot':
@@ -131,11 +140,10 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const getProdComparision = async () => {
     setErrorMessage('');
-    if (selectedBookings.length < 2) {
-      setErrorMessage('Please select at least 2 venues for comparison.');
+    if (selectedBookings.length < 1) {
+      setErrorMessage('Please select at least 1 venue.');
       return;
     }
-
     setLoading(true);
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -186,7 +194,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      getSalesSnapshot(e.data.bookingId);
+      if(e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
     }
   };
 
@@ -243,13 +251,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 isSearchable
                 value={venueID}
                 onChange={(value) => getBookingSelection(value)}
-                placeholder={'Please select a venue'}
+                placeholder="Please select a venue"
                 label="Venue"
               />
 
               <div className="float-right flex flex-row">
                 {loading && <Spinner size="sm" className="mt-2 mr-3 -mb-1" />}
-                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text={'Cancel'} />
+                <Button className="px-8 mt-2 -mb-1" onClick={handleModalCancel} variant="secondary" text="Cancel" />
               </div>
             </div>
           ) : (
@@ -260,7 +268,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               </div>
 
               <div className="float-right flex flex-row mt-5">
-                <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text={'Back'} />
+                <Button className="w-32" onClick={() => handleBtnBack('venue')} variant="secondary" text="Back" />
                 <Button className="ml-4 w-32" variant="secondary" text="Cancel" onClick={handleModalCancel} />
               </div>
             </div>
@@ -344,9 +352,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         </TableWrapper>
       </PopupModal>
       <ExportModal
-        tableRef={salesTableRef}
         visible={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+        onItemClick={exportTable}
         ExportList={[
           {
             key: 'Excel',
@@ -381,6 +389,14 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
+            <Button
+              className="ml-4 mr-10 w-32"
+              onClick={() => setIsExportModalOpen(true)}
+              variant="primary"
+              text="Export"
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+            />
             <Button className="w-32" variant="primary" text="Close" onClick={() => setShowSalesSnapshot(false)} />
           </div>
         </div>

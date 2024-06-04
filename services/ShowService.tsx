@@ -77,11 +77,26 @@ export const lookupShowCode = async (Code: string, AccountId: number) => {
 
 export const getShowsByAccountId = async (AccountId: number) => {
   const shows = await prisma.show.findMany({
-    where: { AccountId },
+    where: {
+      AccountId,
+      Production: {
+        some: {
+          IsDeleted: false,
+        },
+      },
+    },
     include: showInclude,
   });
 
   return shows.slice().sort((a, b) => {
     return a.Name.localeCompare(b.Name);
+  });
+};
+
+export const getAllProductionCompanyList = () => {
+  return prisma.ProductionCompany.findMany({
+    orderBy: {
+      Name: 'asc',
+    },
   });
 };

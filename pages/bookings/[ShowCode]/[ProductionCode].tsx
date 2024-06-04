@@ -9,7 +9,7 @@ import {
   performanceMapper,
   rehearsalMapper,
 } from 'lib/mappers';
-import { getAllVenuesMin } from 'services/venueService';
+import { getAllVenuesMin, getCountryRegions } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
@@ -21,16 +21,66 @@ import Filters from 'components/bookings/Filters';
 import { getProductionsWithContent } from 'services/productionService';
 import BookingsTable from 'components/bookings/BookingsTable';
 import { DateType } from '@prisma/client';
+import { useMemo, useRef, useState } from 'react';
+import ExportModal from 'components/core-ui-lib/ExportModal';
+import { useRecoilValue } from 'recoil';
+import { filterState } from 'state/booking/filterState';
+import { exportToExcel, exportToPDF } from 'utils/export';
+import { getExportExtraContent } from 'components/bookings/table/tableConfig';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BookingPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const rows = useBookingFilter();
+  const tableRef = useRef(null);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const currentProduction = useRecoilValue(currentProductionSelector);
+  const appliedFilters = useRecoilValue(filterState);
+  const excelExportExtraContents = useMemo(() => {
+    const showName = currentProduction?.ShowName;
+    const code = currentProduction?.Code;
+    const showCode = currentProduction?.ShowCode;
+
+    return getExportExtraContent(showName, showCode, code, appliedFilters);
+  }, [appliedFilters]);
+
+  const onExportClick = () => {
+    setIsExportModalOpen(true);
+  };
+
+  const exportTable = (key: string) => {
+    if (key === 'Excel') {
+      exportToExcel(tableRef, excelExportExtraContents);
+    } else if (key === 'PDF') {
+      exportToPDF(tableRef);
+    }
+  };
+
   return (
     <Layout title="Booking | Segue" flush>
       <div className="mb-8">
-        <Filters />
+        <Filters onExportClick={onExportClick} />
       </div>
-      <BookingsTable rowData={rows} />
+      <BookingsTable tableRef={tableRef} rowData={rows} />
+      {isExportModalOpen && (
+        <ExportModal
+          visible={isExportModalOpen}
+          onClose={() => setIsExportModalOpen(false)}
+          onItemClick={exportTable}
+          ExportList={[
+            {
+              key: 'Excel',
+              iconName: 'excel',
+              iconProps: { fill: '#1D6F42', variant: '7xl' },
+            },
+            {
+              key: 'PDF',
+              iconName: 'document-solid',
+              iconProps: { fill: 'red', variant: '7xl' },
+            },
+          ]}
+        />
+      )}
     </Layout>
   );
 };
@@ -53,10 +103,11 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   if (!ProductionId) return { notFound: true };
 
   // Get in parallel
-  const [venues, productions, dateTypeRaw] = await all([
+  const [venues, productions, dateTypeRaw, countryRegions] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(ProductionId === -1 ? null : ProductionId, !productionJump.includeArchived),
     getDayTypes(),
+    getCountryRegions(),
   ]);
 
   const dateBlock = [];
@@ -70,7 +121,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      const countryId = v.VenueAddress.find((address: any) => address.TypeName === 'Main')?.CountryId;
+
+      const region = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId) ?? null;
+
+      return {
+        Id: v.Id,
+        Code: v.Code,
+        Name: v.Name,
+        Town,
+        Seats: v.Seats,
+        Count: 0,
+        RegionId: region ? region.RegionId : -1,
+      };
     },
   );
 

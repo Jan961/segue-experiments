@@ -16,6 +16,8 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 import SelectBarredVenuesRenderer from './SelectBarredVenuesRenderer';
 import { formatMinutes } from 'utils/booking';
 import AddDeleteRowRenderer from './AddDeleteRowRenderer';
+import { dateToReadableFormat } from 'utils/export';
+import { FilterState } from 'state/booking/filterState';
 
 export const styleProps = { headerColor: tileColors.bookings };
 
@@ -40,37 +42,106 @@ export const columnDefs = [
     headerName: 'Production',
     field: 'production',
     cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 106,
   },
   {
     headerName: 'Date',
     field: 'date',
     cellRenderer: DateColumnRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     width: 120,
     minWidth: 120,
+    cellClassRules: {
+      isMonday: (params) => params.value.includes('Mon'),
+    },
   },
-  { headerName: 'Wk', field: 'week', cellRenderer: DefaultCellRenderer, width: 55 },
-  { headerName: 'Venue Details', field: 'venue', cellRenderer: VenueColumnRenderer, minWidth: 6, flex: 2 },
-  { headerName: 'Town', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
-  { headerName: 'Day Type', field: 'dayType', cellRenderer: DefaultCellRenderer, width: 95 },
+  { headerName: 'Wk', field: 'week', headerClass: ['bgOrangeTextWhite'], cellRenderer: DefaultCellRenderer, width: 55 },
+  {
+    headerName: 'Venue Details',
+    field: 'venue',
+    cellRenderer: VenueColumnRenderer,
+    headerClass: ['bgOrangeTextWhite'],
+    minWidth: 6,
+    flex: 2,
+
+    cellClassRules: {
+      dayTypeNotPerformance: (params) => {
+        const { dayType } = params.data;
+        return dayType !== 'Performance' && params.value !== '';
+      },
+      cancelledBooking: (params) => {
+        const { bookingStatus } = params.data;
+        return bookingStatus === 'Cancelled' && params.value !== '';
+      },
+      suspendedBooking: (params) => {
+        const { bookingStatus } = params.data;
+        return bookingStatus === 'Suspended' && params.value !== '';
+      },
+      pencilledBooking: (params) => {
+        const { bookingStatus, multipleVenuesOnSameDate } = params.data;
+        return bookingStatus === 'Pencilled' && multipleVenuesOnSameDate && params.value !== '';
+      },
+      multipleBookings: (params) => {
+        const { dayType, venueHasMultipleBookings } = params.data;
+        return dayType === 'Performance' && venueHasMultipleBookings && params.value !== '';
+      },
+    },
+  },
+  {
+    headerName: 'Town',
+    field: 'town',
+    cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
+    minWidth: 100,
+    flex: 1,
+  },
+  {
+    headerName: 'Day Type',
+    field: 'dayType',
+    cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
+    width: 95,
+  },
   {
     headerName: 'Booking Status',
     field: 'bookingStatus',
     valueFormatter: ({ value, data }) =>
       value === 'Pencilled' && data.pencilNo ? `${value} (${data.pencilNo})` : value,
+    headerClass: ['bgOrangeTextWhite'],
     cellStyle: {
       paddingLeft: '0.5rem',
     },
     resizable: true,
     width: 105,
   },
-  { headerName: 'Capacity', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
-  { headerName: 'No. Perfs', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 70 },
-  { headerName: 'Perf Times', field: 'performanceTimes', cellRenderer: DefaultCellRenderer, width: 90, minWidth: 90 },
+  {
+    headerName: 'Capacity',
+    field: 'capacity',
+    cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
+    width: 90,
+  },
+  {
+    headerName: 'No. Perfs',
+    field: 'performanceCount',
+    cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
+    width: 70,
+  },
+  {
+    headerName: 'Perf Times',
+    field: 'performanceTimes',
+    cellRenderer: DefaultCellRenderer,
+    headerClass: ['bgOrangeTextWhite'],
+    width: 90,
+    minWidth: 90,
+  },
   {
     headerName: 'Miles',
     field: 'miles',
     valueFormatter: milesFormatter,
+    headerClass: ['bgOrangeTextWhite'],
     cellStyle: milesCellStyle,
     width: 80,
   },
@@ -79,12 +150,14 @@ export const columnDefs = [
     field: 'travelTime',
     width: 90,
     valueFormatter: travelTimeFormatter,
+    headerClass: ['bgOrangeTextWhite'],
     cellStyle: milesCellStyle,
   },
   {
     headerName: '',
     field: 'note',
     cellRenderer: NoteColumnRenderer,
+    headerClass: ['bgOrangeTextWhite'],
     cellRendererParams: {
       tpActive: true,
     },
@@ -95,6 +168,163 @@ export const columnDefs = [
       justifyContent: 'center',
       alignItems: 'center',
       overflow: 'visible',
+    },
+  },
+];
+
+export const getExportExtraContent = (
+  showName: string,
+  showCode: string,
+  code: string,
+  appliedFilters: FilterState,
+) => {
+  return {
+    prependContent: [
+      { cells: [] },
+      {
+        cells: [
+          {
+            data: { value: `${showCode}${code} - ${showName}`, type: 'String', mergeCells: true },
+            styleId: 'selectedProductionName',
+            mergeCells: true,
+          },
+          {},
+          {},
+          {},
+        ],
+        height: 70,
+        width: 500,
+        mergeCells: true,
+      },
+      { cells: [] },
+      { cells: [{ data: { value: 'Filter(s) applied', type: 'String' } }] },
+      {
+        cells: [
+          { data: { value: 'Start Date', type: 'String' } },
+          { data: { value: dateToReadableFormat(appliedFilters?.startDate), type: 'Date' } },
+        ],
+      },
+      {
+        cells: [
+          { data: { value: 'End Date', type: 'String' } },
+          { data: { value: dateToReadableFormat(appliedFilters?.endDate), type: 'Date' } },
+        ],
+      },
+      {
+        cells: [
+          { data: { value: 'Search', type: 'String' } },
+          { data: { value: appliedFilters?.venueText, type: 'String' } },
+        ],
+      },
+      {
+        cells: [
+          { data: { value: 'Booking Status', type: 'String' } },
+          { data: { value: appliedFilters?.status, type: 'String' } },
+        ],
+      },
+      { cells: [] },
+    ],
+    fileName: `Tour Schedule for ${showCode + code}`,
+    columnKeys: [
+      'production',
+      'date',
+      'week',
+      'venue',
+      'town',
+      'dayType',
+      'bookingStatus',
+      'capacity',
+      'performanceCount',
+      'performanceTimes',
+      'miles',
+      'travelTime',
+    ],
+  };
+};
+
+export const columnDefsExportStyles = [
+  {
+    id: 'bgOrangeTextWhite',
+    interior: {
+      color: tileColors.bookings,
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF',
+    },
+    alignment: {
+      horizontal: 'center',
+    },
+  },
+  {
+    id: 'dayTypeNotPerformance',
+    interior: {
+      color: '#D41818', // bg-primary-red
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FDCE74', // text-primary-yellow
+      italic: true,
+    },
+  },
+  {
+    id: 'cancelledBooking',
+    interior: {
+      color: '#111827', // bg-primary-black
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF', // text-primary-white
+    },
+  },
+  {
+    id: 'suspendedBooking',
+    interior: {
+      color: '#8B5CF6', // bg-secondary-purple
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF', // text-primary-white
+    },
+  },
+  {
+    id: 'pencilledBooking',
+    interior: {
+      color: '#3B82F6', // bg-primary-blue
+      pattern: 'Solid',
+    },
+    font: {
+      color: '#FFFFFF', // text-primary-white
+    },
+  },
+  {
+    id: 'multipleBookings',
+    font: {
+      color: '#D41818', // text-primary-red
+      bold: 'bold',
+    },
+  },
+  {
+    id: 'isMonday',
+    interior: {
+      color: '#FDCE74',
+      pattern: 'Solid',
+    },
+  },
+  {
+    id: 'selectedProductionName',
+    interior: {
+      color: tileColors.bookings,
+      pattern: 'Solid',
+    },
+    font: {
+      bold: true,
+      color: '#FFFFFF',
+      size: 15,
+    },
+    alignment: {
+      horizontal: 'Center',
+      vertical: 'Center',
     },
   },
 ];
@@ -301,6 +531,7 @@ export const gapSuggestColumnDefs = [
     width: 90,
     headerClass: 'text-center',
   },
+  { headerName: 'Miles', field: 'Miles', cellRenderer: DefaultCellRenderer, width: 75, headerClass: 'text-center' },
   {
     headerName: 'Barring Check',
     field: 'barringCheck',

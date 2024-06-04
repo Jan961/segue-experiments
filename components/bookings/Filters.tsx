@@ -14,7 +14,11 @@ import moment from 'moment';
 import useMileageCalculator from 'hooks/useBookingMileageCalculator';
 import BookingsButtons from './BookingsButton';
 
-const Filters = () => {
+interface FiltersProps {
+  onExportClick?: (key: string) => void;
+}
+
+const Filters = ({ onExportClick }: FiltersProps) => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
   const schedule = useRecoilValue(filteredScheduleSelector);
@@ -58,7 +62,7 @@ const Filters = () => {
             searchFilter={filter.venueText}
             setSearchFilter={(venueText) => setFilter({ venueText })}
             titleClassName="text-primary-orange"
-            title={'Bookings'}
+            title="Bookings"
           >
             <div className="flex items-center gap-4">
               <Button
@@ -94,7 +98,7 @@ const Filters = () => {
           />
           <BookingFilter />
           <TextInput
-            id={'venueText'}
+            id="venueText"
             disabled={!ProductionId}
             placeholder="Search bookings..."
             className="w-[310px]"
@@ -105,7 +109,7 @@ const Filters = () => {
           <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
-      <BookingsButtons />
+      <BookingsButtons onExportClick={onExportClick} />
     </div>
   );
 };

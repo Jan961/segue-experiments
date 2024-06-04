@@ -129,6 +129,11 @@ const GridStyles = createGlobalStyle<StyleProps>`
   border-right: 3px solid;
 }
 
+.custom-pinned-header {
+    border-top: 50px solid white !important;
+    border-right: 3px solid white !important;
+  }
+
 `;
 
 interface TableTooltipProps {

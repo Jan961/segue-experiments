@@ -59,7 +59,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
           <div className="col-span-2 col-start-4 flex items-center justify-between pl-6">
-            <Label className="!text-primary" text="Bar Distance"></Label>
+            <Label className="!text-primary" text="Bar Distance" />
             <TextInput
               className="w-24 placeholder-primary"
               id="barDistance"
@@ -82,7 +82,7 @@ const Form = ({ onSubmit }: { onSubmit: (data: any) => void }) => {
             />
           </div>
           <div className="col-span-2 col-start-4 row-start-2 flex items-center justify-between pl-6">
-            <Label className="!text-primary" text="Minimum Seats"></Label>
+            <Label className="!text-primary" text="Minimum Seats" />
             <TextInput
               id="Seats"
               className="w-24 placeholder-primary"

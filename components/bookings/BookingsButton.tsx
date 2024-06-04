@@ -9,7 +9,11 @@ import { BookingReports } from './modal/BookingReports';
 import { VenueHistory } from './modal/VenueHistory';
 import { addEditBookingState } from 'state/booking/bookingState';
 
-export default function BookingsButtons() {
+interface BookingsButtonProps {
+  onExportClick: (key: string) => void;
+}
+
+export default function BookingsButtons({ onExportClick }: BookingsButtonProps) {
   const [showBarringModal, setShowBarringModal] = useState<boolean>(false);
   const [bookingsDisabled, setBookingsDisabled] = useState<boolean>(false);
   const [showBookingReportsModal, setShowBookingReportsModal] = useState<boolean>();
@@ -44,7 +48,7 @@ export default function BookingsButtons() {
         text="Booking Reports"
         className="w-[155px]"
         iconProps={{ className: 'h-4 w-3' }}
-        sufixIconName={'excel'}
+        sufixIconName="excel"
         onClick={() => setShowBookingReportsModal(true)}
       />
       <Button onClick={() => setShowVenueHistory(true)} text="Venue History" className="w-[155px]" />
@@ -59,7 +63,12 @@ export default function BookingsButtons() {
       {showBarringModal && <Barring visible={showBarringModal} onClose={() => setShowBarringModal(false)} />}
 
       {showBookingReportsModal && (
-        <BookingReports visible={showBookingReportsModal} onClose={() => setShowBookingReportsModal(false)} />
+        <BookingReports
+          productionId={ProductionId}
+          onExportClick={onExportClick}
+          visible={showBookingReportsModal}
+          onClose={() => setShowBookingReportsModal(false)}
+        />
       )}
       {showVenueHistory && <VenueHistory visible={showVenueHistory} onCancel={() => setShowVenueHistory(false)} />}
     </div>

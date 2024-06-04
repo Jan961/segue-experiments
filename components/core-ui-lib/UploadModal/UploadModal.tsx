@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
 import Icon from 'components/core-ui-lib/Icon';
 import FileCard from './UploadFileCard';
 import { fileSizeFormatter } from 'utils/index';
-import { FileProps, UploadModalProps } from './interface';
+import { UploadedFile, UploadModalProps } from './interface';
 
 const UploadModal: React.FC<UploadModalProps> = ({
   visible,
@@ -17,36 +17,54 @@ const UploadModal: React.FC<UploadModalProps> = ({
   allowedFormats,
   onChange,
   onSave,
+  value,
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
-  const [selectedFiles, setSelectedFiles] = useState<FileProps[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<UploadedFile[]>(() => {
+    if (Array.isArray(value)) return value;
+    return value ? [value] : [];
+  });
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [progress, setProgress] = useState<Record<string, number>>({});
   const [errorMessages, setErrorMessages] = useState<Record<string, string>>({});
-  const [uploadedImageUrls, setUploadedImageUrls] = useState<Record<string, string>>({});
+  const [uploadedImageUrls, setUploadedImageUrls] = useState<Record<string, string>>(() => {
+    if (!value) return {};
+    return (Array.isArray(value) ? value : [value]).reduce((urlMap, upload) => {
+      urlMap[upload.name] = upload.imageUrl;
+      return urlMap;
+    }, {});
+  });
 
-  const isUploadDisabled =
-    selectedFiles?.length === 0 ||
-    selectedFiles.some((file) => file.error) ||
-    isUploading ||
-    Object.keys(errorMessages).length > 0;
+  const isUploadDisabled = useMemo(
+    () =>
+      selectedFiles?.length === 0 ||
+      selectedFiles.some((file) => file?.error) ||
+      isUploading ||
+      Object.keys(errorMessages).length > 0,
+    [selectedFiles, isUploading, errorMessages],
+  );
+
+  const isUploadComplete = useMemo(() => {
+    if (selectedFiles.length === 0) return false;
+    return selectedFiles.every((file) => progress[file?.name] === 100);
+  }, [selectedFiles, progress]);
 
   const onProgress = (file: File, uploadProgress: number) => {
-    setProgress((prev) => ({ ...prev, [file.name]: uploadProgress }));
+    setProgress((prev) => ({ ...prev, [file?.name]: uploadProgress }));
   };
 
   const onError = (file: File, errorMessage: string) => {
-    setErrorMessages((prev) => ({ ...prev, [file.name]: errorMessage }));
+    setErrorMessages((prev) => ({ ...prev, [file?.name]: errorMessage }));
   };
 
   const onUploadingImage = (file: File, imageUrl: string) => {
-    setUploadedImageUrls((prev) => ({ ...prev, [file.name]: imageUrl }));
+    setUploadedImageUrls((prev) => ({ ...prev, [file?.name]: imageUrl }));
   };
 
   useEffect(() => {
     const fileerrors = Object.fromEntries(
-      Object.entries(errorMessages).filter(([filename]) => selectedFiles.some((file) => file.file.name === filename)),
+      Object.entries(errorMessages).filter(([filename]) => selectedFiles.some((file) => file?.file?.name === filename)),
     );
     setErrorMessages(fileerrors);
     onChange?.(selectedFiles);
@@ -65,7 +83,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleFileDelete = (fileName) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
+    setSelectedFiles((prevFiles) => prevFiles.filter((file) => file?.name !== fileName));
 
     const newProgress = { ...progress };
     delete newProgress[fileName];
@@ -98,16 +116,16 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }
 
     for (const file of Array.from(files)) {
-      if (maxFileSize && file.size > maxFileSize) {
-        errorMessages[file.name] = 'This file is too big. Please upload a smaller file.';
+      if (maxFileSize && file?.size > maxFileSize) {
+        errorMessages[file?.name] = 'This file is too big. Please upload a smaller file.';
       }
-      if (allowedFormats && !allowedFormats.includes(file.type)) {
-        errorMessages[file.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
+      if (allowedFormats && !allowedFormats.includes(file?.type)) {
+        errorMessages[file?.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
     }
     const filesList = Array.from(files).map((file) => ({
-      name: file.name,
-      size: file.size,
+      name: file?.name,
+      size: file?.size,
       file,
     }));
     setError('');
@@ -117,6 +135,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleUpload = () => {
+    if (isUploadComplete) {
+      return onClose();
+    }
     if (Object.keys(errorMessages).length === 0) {
       setIsUploading(true);
       onSave?.(selectedFiles, onProgress, onError, onUploadingImage);
@@ -142,7 +163,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
           id="image"
           data-testid="image"
         >
-          <Icon iconName={'upload-to-cloud'} variant="7xl" />
+          <Icon iconName="upload-to-cloud" variant="7xl" />
           <p className="text-secondary max-w-[222px] text-[15px] text-center font-normal mt-2">
             <span className=" font-bold text-primary">Browse computer</span> or drag and drop
             {maxFileSize && `(Max File Size: ${fileSizeFormatter(maxFileSize)})`}
@@ -163,14 +184,15 @@ const UploadModal: React.FC<UploadModalProps> = ({
           </div>
         )}
         <div className="grid grid-cols-1 gap-4 mt-3 max-h-60 overflow-y-auto">
-          {selectedFiles.map((file, index) => (
+          {selectedFiles?.map((file, index) => (
             <FileCard
               key={index}
-              file={file}
-              progress={progress[file.name]}
-              errorMessage={errorMessages[file.name]}
-              onDelete={() => handleFileDelete(file.name)}
-              imageUrl={uploadedImageUrls[file.name]}
+              fileName={file?.name}
+              fileSize={file?.size}
+              progress={progress[file?.name]}
+              errorMessage={errorMessages[file?.name]}
+              onDelete={() => handleFileDelete(file?.name)}
+              imageUrl={uploadedImageUrls[file?.name]}
             />
           ))}
         </div>
@@ -185,8 +207,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
           >
             Cancel
           </Button>
-          <Button className="w-[132px]" disabled={isUploadDisabled} onClick={handleUpload}>
-            Upload
+          <Button className="w-[132px]" disabled={isUploadDisabled && !isUploadComplete} onClick={handleUpload}>
+            {isUploadComplete ? 'OK' : 'Upload'}
           </Button>
         </div>
       </div>

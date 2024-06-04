@@ -1,6 +1,6 @@
 import Table from 'components/core-ui-lib/Table';
-import { styleProps, columnDefs } from 'components/bookings/table/tableConfig';
-import { useEffect, useRef, useState } from 'react';
+import { styleProps, columnDefs, columnDefsExportStyles } from 'components/bookings/table/tableConfig';
+import { useEffect, useMemo, useState } from 'react';
 import NotesPopup from './NotesPopup';
 import { bookingState, addEditBookingState, ADD_EDIT_MODAL_DEFAULT_STATE } from 'state/booking/bookingState';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -16,13 +16,14 @@ import { getInFitUpState } from 'state/booking/getInFitUpState';
 import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
+import useComponentMountStatus from 'hooks/useComponentMountStatus';
 
 interface BookingsTableProps {
   rowData?: any;
+  tableRef?: any;
 }
 
-export default function BookingsTable({ rowData }: BookingsTableProps) {
-  const tableRef = useRef(null);
+export default function BookingsTable({ rowData, tableRef }: BookingsTableProps) {
   const router = useRouter();
   const [filter, setFilter] = useRecoilState(filterState);
   const [bookings, setBookings] = useRecoilState(bookingState);
@@ -35,7 +36,10 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [productionItem, setProductionItem] = useState(null);
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
+  const isMounted = useComponentMountStatus();
+  const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
   const gridOptions = {
+    suppressColumnVirtualisation: false,
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
@@ -125,13 +129,14 @@ export default function BookingsTable({ rowData }: BookingsTableProps) {
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
-          columnDefs={columnDefs}
+          columnDefs={bookingColumDefs}
           rowData={rows}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
           onRowDoubleClicked={handleRowDoubleClicked}
           gridOptions={gridOptions}
           ref={tableRef}
+          excelStyles={columnDefsExportStyles}
         />
       </div>
       <NotesPopup
