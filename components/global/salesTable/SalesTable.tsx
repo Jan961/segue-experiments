@@ -247,7 +247,6 @@ export default function SalesTable({
     }
   };
 
-  console.log('before exec', currencyCode);
   useEffect(() => {
     exec(variant, data, currencyCode);
     const newWidth = calculateWidth();
