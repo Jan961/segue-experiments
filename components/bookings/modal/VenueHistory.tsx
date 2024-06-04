@@ -49,13 +49,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [errorMessage, setErrorMessage] = useState('');
   const { productions } = useRecoilValue(productionJumpState);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [currencyCode, setCurrencyCode] = useState<string>('None');
   const salesTableRef = useRef(null);
 
   const { fetchData } = useAxios();
 
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
-
   const venueOptions = useMemo(() => {
     const options = [];
     for (const venueId in venueDict) {
@@ -145,6 +145,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       return;
     }
     setLoading(true);
+
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
       method: 'POST',
@@ -164,6 +165,21 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getSalesSnapshot = async (bookingId: string) => {
     setErrorMessage('');
     setLoading(true);
+    const currencyCodeData = await fetchData({
+      url: '/api/bookings/services/currency',
+      method: 'POST',
+      data: { BookingId: bookingId },
+    }).then((outputData) => {
+      console.log(outputData.currencyCode);
+      return outputData.currencyCode;
+    });
+
+    // setCurrencyCode(currencyCodeData !== null ? currencyCodeData.currencyCode?.fromCharCode : 'None');
+
+    console.log('Currency Code', currencyCodeData);
+    console.log(String.fromCharCode(currencyCodeData));
+    setCurrencyCode(String.fromCharCode('0x' + currencyCodeData));
+
     const data = await fetchData({
       url: '/api/marketing/sales/read/' + bookingId,
       method: 'POST',
@@ -172,12 +188,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
 
-      const currencyCode = await fetchData({
-        url: '/api/bookings/services/currency',
-        method: 'POST',
-        data: { BookingId: bookingId },
-      });
-      console.log('Currency Code', currencyCode);
       setSalesSnapData(salesData);
       toggleModal('salesSnapshot');
     } else {
@@ -237,12 +247,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       }
     }
   };
-
+  console.log('Venue History', currencyCode);
   return (
     <div>
       <PopupModal
         show={showVenueSelectModal}
-        title="Venue History"
+        title="Venue History 4"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
       >
@@ -285,7 +295,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
       <PopupModal
         show={showCompSelectModal}
-        title="Venue History"
+        title="Venue History 3"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={showSalesSnapshot}
@@ -306,6 +316,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               data={prodCompData}
               cellRenderParams={{ selected: selectedBookings }}
               productions={productions}
+              currencyCode={currencyCode}
             />
           )}
 
@@ -322,7 +333,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
       <PopupModal
         show={showResultsModal}
-        title="Venue History"
+        title="Venue History 2"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
       >
@@ -337,6 +348,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               module="bookings"
               variant="salesComparison"
               data={salesCompData}
+              currencyCode={currencyCode}
             />
           )}
 
@@ -378,7 +390,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
       <PopupModal
         show={showSalesSnapshot}
-        title="Venue History"
+        title="Venue History 1"
         titleClass="text-xl text-primary-navy font-bold -mt-2"
         onClose={handleModalCancel}
         hasOverlay={false}
@@ -393,6 +405,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             module="bookings"
             variant="salesSnapshot"
             data={salesSnapData}
+            currencyCode={currencyCode}
           />
 
           <div className="float-right flex flex-row mt-5 py-2">

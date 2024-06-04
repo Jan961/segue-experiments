@@ -28,6 +28,7 @@ interface SalesTableProps {
   booking?;
   tableHeight?: number;
   salesTableRef?: any;
+  currencyCode?: string;
 }
 
 export default function SalesTable({
@@ -43,30 +44,23 @@ export default function SalesTable({
   booking,
   tableHeight = 0,
   salesTableRef,
+  currencyCode,
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
-  const [currency, setCurrency] = useState('£');
   const [height, setHeight] = useState(containerHeight);
   const [schoolSales, setSchoolSales] = useState<boolean>(false);
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
-
   // constants
   const ARCH_MULTI_WIDTH = 328;
   const ARCH_LESS_2_WIDTH = 340;
   const ARCH_SPACE_SCALER = 12;
-
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
-  const salesSnapshot = (data: Array<SalesSnapshot>) => {
-    console.log(booking);
-    console.log(salesTableRef);
-
-    setCurrency('£');
-
+  const salesSnapshot = (data: Array<SalesSnapshot>, currencyCode: string) => {
     // check for school data
     const schoolSalesFound = data.find(
       (data) =>
@@ -74,7 +68,13 @@ export default function SalesTable({
     );
     setSchoolSales(Boolean(schoolSalesFound));
 
-    let colDefs = salesColDefs(currency, Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
+    let colDefs = salesColDefs(
+      currencyCode,
+      Boolean(schoolSalesFound),
+      module !== 'bookings',
+      booking,
+      setSalesActivity,
+    );
     if (!schoolSalesFound) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setHeight(containerHeight);
@@ -228,7 +228,7 @@ export default function SalesTable({
     }
   };
 
-  const exec = async (variant: string, data) => {
+  const exec = async (variant: string, data, currencyCode: string) => {
     switch (variant) {
       case 'salesComparison': {
         const tableData = await salesComparison(data);
@@ -240,8 +240,7 @@ export default function SalesTable({
       }
 
       case 'salesSnapshot': {
-        console.log(data);
-        salesSnapshot(data);
+        salesSnapshot(data, currencyCode);
         break;
       }
 
@@ -253,11 +252,12 @@ export default function SalesTable({
     }
   };
 
+  console.log('before exec', currencyCode);
   useEffect(() => {
-    exec(variant, data);
+    exec(variant, data, currencyCode);
     const newWidth = calculateWidth();
     setTableWidth(newWidth);
-  }, [variant, data, numBookings, schoolSales, containerWidth]);
+  }, [variant, data, numBookings, schoolSales, containerWidth, currencyCode]);
 
   return (
     <div className={classNames('table-container')} style={{ width: tableWidth, height }}>
