@@ -69,7 +69,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
       method: 'POST',
       data: { bookingIds: selectedBookings },
     });
-    const currencyCodeData = await fetchData({
+    const currencyCodeData: any = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
       data: { BookingId: selectedBookings[0] },
