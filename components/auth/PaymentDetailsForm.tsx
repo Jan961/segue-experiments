@@ -5,7 +5,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import { Plan } from './SubscriptionPlans';
 
-import { CardCvcElement, CardExpiryElement, CardNumberElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { CardCvcElement, CardExpiryElement, CardNumberElement } from '@stripe/react-stripe-js';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Label from 'components/core-ui-lib/Label';
 import classNames from 'classnames';
@@ -13,6 +13,7 @@ import axios from 'axios';
 import Toggle from 'components/core-ui-lib/Toggle';
 import { AccountDetails } from 'pages/account/sign-up';
 import { add } from 'date-fns';
+import useProcessPayment from 'hooks/useProcessPayment';
 
 const baseClass = `w-full block bg-primary-white p-1.5 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset border-primary-border`;
 
@@ -29,11 +30,10 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
     paymentFrequency: 1,
     email: accountDetails.email,
   });
+  const { processCardPayment, isPaymentSuccess, paymentError } = useProcessPayment();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { previousStep, nextStep } = useWizard();
-  const stripe = useStripe();
-  const elements = useElements();
 
   const handleFormChange = (e) => {
     setPaymentDetails({ ...paymentDetails, [e.target.name]: e.target.value });
@@ -45,63 +45,46 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
     setPaymentDetails({ ...paymentDetails, paymentFrequency, amount });
   };
 
+  const createSubscription = async () => {
+    // Create a subscription in the DB
+    const today = new Date();
+    await axios.post('/api/subscription/create', {
+      planId: plan.planId,
+      accountId: accountDetails.accountId,
+      startDate: today.toISOString(),
+      endDate: add(today, { months: paymentDetails.paymentFrequency }).toISOString(),
+      isActive: true,
+    });
+    setLoading(false);
+    nextStep();
+  };
+
   const handleError = (error) => {
     setLoading(false);
     setErrorMessage(error.message);
   };
+
+  useEffect(() => {
+    handleError(paymentError);
+  }, [paymentError]);
+
+  useEffect(() => {
+    if (isPaymentSuccess) {
+      createSubscription();
+    }
+  }, [isPaymentSuccess]);
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
-    if (!stripe || !elements) {
-      return;
-    }
-    setLoading(true);
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      handleError(submitError);
-      return;
-    }
-    // Create the PaymentIntent and obtain clientSecret
-    const res = await axios.post('/api/payment/stripe/create', {
-      amount: paymentDetails.amount * 100, // stripe expects amount in cents/pence
-      currency: paymentDetails.currency,
-    });
-    const { client_secret: clientSecret } = await res.data;
-    // Confirm the PaymentIntent using the details collected by the Payment Element
-    const { error } = await stripe.confirmCardPayment(
-      clientSecret,
-      {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
-          billing_details: {
-            name: paymentDetails.cardHolderName,
-            address: {
-              postal_code: paymentDetails.postcode,
-            },
-          },
-        },
-        receipt_email: accountDetails.email,
-      },
-      {
-        handleActions: false,
-      },
-    );
 
-    if (error) {
-      // This point is only reached if there's an immediate error when confirming the payment.
-      handleError(error);
-    } else {
-      // Create a subscription in the DB
-      const today = new Date();
-      await axios.post('/api/subscription/create', {
-        planId: plan.planId,
-        accountId: accountDetails.accountId,
-        startDate: today.toISOString(),
-        endDate: add(today, { months: paymentDetails.paymentFrequency }).toISOString(),
-        isActive: true,
-      });
-      nextStep();
-    }
+    setLoading(true);
+    await processCardPayment(
+      plan.planPrice * 100,
+      plan.planCurrency,
+      paymentDetails.cardHolderName,
+      paymentDetails.postcode,
+      paymentDetails.email,
+    );
   };
 
   useEffect(() => {

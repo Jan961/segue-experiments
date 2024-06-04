@@ -28,7 +28,6 @@ export default authMiddleware({
     const { userId } = auth;
 
     if (!userId) {
-      console.log('User Id not found');
       // redirect the users to /pages/sign-in/[[...index]].ts
       const signInUrl = new URL('/sign-in', request.url);
       return NextResponse.redirect(signInUrl);
