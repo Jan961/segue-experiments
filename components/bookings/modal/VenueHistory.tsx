@@ -49,7 +49,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [errorMessage, setErrorMessage] = useState('');
   const { productions } = useRecoilValue(productionJumpState);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
-  const [currencyCode, setCurrencyCode] = useState<string>('None');
+  const [currencySymbol, setCurrencySymbol] = useState<string>('£');
   const salesTableRef = useRef(null);
 
   const { fetchData } = useAxios();
@@ -147,15 +147,21 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     setLoading(true);
 
     if (venueDict[venueID].CurrencyCode) {
-      setCurrencyCode(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
+      setCurrencySymbol(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
     } else {
-      const currencyCodeData: any = await fetchData({
+      const currencySymbol: string = await fetchData({
         url: '/api/marketing/sales/currency/currency',
         method: 'POST',
         data: { BookingId: selectedBookings[0].bookingId },
+      }).then((outputData: any) => {
+        if (outputData.currencyCode) {
+          return String.fromCharCode(Number('0x' + outputData.currencyCode));
+        } else {
+          return '£';
+        }
       });
 
-      setCurrencyCode(String.fromCharCode(Number('0x' + currencyCodeData.currencyCode)));
+      setCurrencySymbol(currencySymbol);
     }
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
@@ -176,7 +182,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getSalesSnapshot = async (bookingId: string) => {
     setErrorMessage('');
     setLoading(true);
-    setCurrencyCode(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
+    setCurrencySymbol(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
 
     const data = await fetchData({
       url: '/api/marketing/sales/read/' + bookingId,
@@ -312,7 +318,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               data={prodCompData}
               cellRenderParams={{ selected: selectedBookings }}
               productions={productions}
-              currencyCode={currencyCode}
+              currencySymbol={currencySymbol}
             />
           )}
 
@@ -344,7 +350,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               module="bookings"
               variant="salesComparison"
               data={salesCompData}
-              currencyCode={currencyCode}
+              currencySymbol={currencySymbol}
             />
           )}
 
@@ -401,7 +407,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             module="bookings"
             variant="salesSnapshot"
             data={salesSnapData}
-            currencyCode={currencyCode}
+            currencySymbol={currencySymbol}
           />
 
           <div className="float-right flex flex-row mt-5 py-2">

@@ -203,7 +203,6 @@ export type ProductionDTO = {
 };
 
 export type VenueMinimalDTO = {
-  CurrencyCode: any;
   Id: number;
   Name: string;
   Code: string;

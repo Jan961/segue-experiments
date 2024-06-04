@@ -16,7 +16,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       select: { VenueId: true },
     });
     const venueId: number | null = venueIdQuery ? venueIdQuery?.VenueId : null;
-    console.log('VenueId', venueId);
     const currencyCodeQuery: any | null = await prisma.Venue.findFirst({
       where: {
         Id: { equals: venueId },
@@ -28,7 +27,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
     const currencyCode: string | null = currencyCodeQuery ? currencyCodeQuery.Currency.SymbolUnicode : null;
-    console.log(currencyCode);
     return res.status(200).json({ currencyCode });
   } catch (exception) {
     console.log(exception);
