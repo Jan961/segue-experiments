@@ -7,7 +7,7 @@ import { checkAccess, getEmailFromReq } from 'services/userService';
 // param.VenueCurrencySymbol to be added back in using unicode value
 const getSeatsRelatedInfo = (param: TSalesView): SeatsInfo => ({
   Seats: param.Seats,
-  ValueWithCurrencySymbol: param.Value ? `${'£' + numeral(param.Value).format('0,0.00')}` : '',
+  ValueWithCurrencySymbol: param.Value ? `${numeral(param.Value).format('0,0.00')}` : '',
   BookingId: param.BookingId,
   DataFound: true,
   SetSalesFiguresDate: param.SetSalesFiguresDate,

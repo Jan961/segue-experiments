@@ -16,7 +16,7 @@ export interface SalesComp {
   bookingIds: Array<SelectedBooking>;
 }
 
-const salesComparison = async (data: SalesComp) => {
+const salesComparison = async (data: SalesComp, currencyCode = ' ') => {
   const tempRowData = [];
   const tempColDef = [];
   const excelStyles = [
@@ -110,7 +110,6 @@ const salesComparison = async (data: SalesComp) => {
     // Push the main column group onto the tempColDef array
     tempColDef.push(mainColGroup);
   });
-
   // Processing the row data
   data.tableData.forEach((sale) => {
     tempRowData.push({
@@ -122,7 +121,8 @@ const salesComparison = async (data: SalesComp) => {
             (booking) => parseInt(booking.bookingId) === bookSale.BookingId,
           ).prodCode;
           const seats = bookSale.Seats === null ? 0 : bookSale.Seats;
-          const value = bookSale.ValueWithCurrencySymbol === '' ? 'No Sales' : bookSale.ValueWithCurrencySymbol;
+          const value =
+            bookSale.ValueWithCurrencySymbol === '' ? 'No Sales' : currencyCode + bookSale.ValueWithCurrencySymbol;
           const date = bookSale.SetSalesFiguresDate === '' ? '-' : formatInputDate(bookSale.SetSalesFiguresDate);
           obj = {
             ...obj,
