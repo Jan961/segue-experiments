@@ -300,7 +300,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const getCurrencySymbol = async (BookingId) => {
-    const currencyCodeData = await fetchData({
+    const currencyCodeData: any = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
       data: { BookingId },
