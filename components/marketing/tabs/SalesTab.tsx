@@ -28,7 +28,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
       url: '/api/marketing/sales/read/' + bookingId,
       method: 'POST',
     });
-    const currencyCodeData = await fetchData({
+    const currencyCodeData: any = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
       data: { BookingId: parseInt(bookingId) },
