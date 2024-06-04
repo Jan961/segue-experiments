@@ -225,7 +225,8 @@ export default function SalesTable({
   const exec = async (variant: string, data, currencyCode: string) => {
     switch (variant) {
       case 'salesComparison': {
-        const tableData = await salesComparison(data);
+        console.log(currencyCode);
+        const tableData = await salesComparison(data, currencyCode);
         setNumBookings(data.bookingIds.length);
         setColumnDefs(tableData.columnDef);
         setRowData(tableData.rowData);

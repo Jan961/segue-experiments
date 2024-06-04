@@ -68,7 +68,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const { fetchData } = useAxios();
 
-  const getActivities = async (bookingId: string) => {
+  const getActivities = async (bookingId: string, currency: string) => {
     try {
       const data = await fetchData({
         url: '/api/marketing/activities/' + bookingId,
@@ -299,11 +299,22 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     });
   };
 
+  const getCurrencySymbol = async (BookingId) => {
+    const currencyCodeData = await fetchData({
+      url: '/api/marketing/sales/currency/currency',
+      method: 'POST',
+      data: { BookingId },
+    });
+
+    const currencyCode = String.fromCharCode(Number('0x' + currencyCodeData.currencyCode));
+    setCurrency(currencyCode);
+  };
+
   useEffect(() => {
     if (!isNullOrEmpty(props.bookingId)) {
-      setCurrency('£');
+      getCurrencySymbol(props.bookingId);
       setBookingIdVal(props.bookingId);
-      getActivities(props.bookingId.toString());
+      getActivities(props.bookingId.toString(), currency);
 
       // set checkbox row on activities tab
       const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
@@ -318,7 +329,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       setDataAvailable(true);
     }
-  }, [props.bookingId]);
+  }, [props.bookingId, currency]);
 
   return (
     <>
