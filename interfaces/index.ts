@@ -545,6 +545,17 @@ export interface SaveContractBookingFormState {
   MarketingDealNotes?: string;
   TicketPriceNotes?: string;
 }
+
+export interface ContactDemoFormData {
+  phone: string;
+  email: string;
+}
+
+export interface ContactDemoFormData1 {
+  // phone: string;
+  Email: string;
+  AccountUser: string;
+}
 export interface DealMemoContractFormData {
   DeMoId?: number;
   DeMoBookingId?: number;

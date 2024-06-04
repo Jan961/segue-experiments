@@ -20,6 +20,7 @@ import useAxios from 'hooks/useAxios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
+import { Venue } from '@prisma/client';
 import {
   DealMemoContractFormData,
   SaveContractBookingFormState,
@@ -37,6 +38,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
+  const [venue, setVenue] = useState<Venue>(undefined);
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
@@ -64,8 +66,19 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         method: 'GET',
         // data: saveContractFormData,
       });
+      const venueData = await fetchData({
+        url: `/api/venue/${selectedTableCell.contract.venueId}`,
+        method: 'GET',
+        // data: saveContractFormData,
+      });
+      if (typeof venueData === 'object') {
+        setVenue(venueData as unknown as Venue);
+      }
+
       if (typeof demoModalData === 'object') {
+        // if(!Object.prototype.hasOwnProperty.call(demoModalData, 'error')){
         setDemoModalData(demoModalData as unknown as DealMemoContractFormData);
+        // }
       }
     };
     callDealMemoData();
@@ -503,6 +516,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           productionJumpState={productionJumpState}
           selectedTableCell={selectedTableCell}
           demoModalData={demoModalData}
+          venueData={venue}
         />
       )}
     </PopupModal>
