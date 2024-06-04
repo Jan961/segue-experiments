@@ -7,10 +7,13 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
+import { getWeekDayShort } from 'services/dateService';
+import formatInputDate from 'utils/dateInputFormat';
+import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 
 type TourResponse = {
   data: Array<SelectOption>;
-  salesFreqency: string;
+  frequency: string;
 };
 
 const SalesEntryFilters = () => {
@@ -20,11 +23,36 @@ const SalesEntryFilters = () => {
   const [tourWeeks, setTourWeeks] = useState([]);
   const [selectedTourWeek, setSelectedTourWeek] = useState(null);
   const [tourLabel, setTourLabel] = useState('');
+  const [lastDates, setLastDates] = useState([]);
+  const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
+
   const bookingOptions = useMemo(() => {
-    const options = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
-    options.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    return options;
-  }, [bookings]);
+    try {
+      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+      const optWithRun = initialOptions.map((option) => {
+        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
+        if (lastDate !== undefined) {
+          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
+          if (option.date === endDateStr) {
+            return option;
+          } else {
+            return {
+              ...option,
+              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            };
+          }
+        } else {
+          return option;
+        }
+      });
+
+      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return optWithRun;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [bookings.bookings, lastDates]);
 
   const { fetchData } = useAxios();
 
@@ -37,31 +65,13 @@ const SalesEntryFilters = () => {
     if (typeof data === 'object') {
       const tourData = data as TourResponse;
       setTourWeeks(tourData.data);
-      if (tourData.salesFreqency === 'W') {
+      if (tourData.frequency === 'W') {
         setTourLabel('Sales Week');
-      } else if (tourData.salesFreqency === 'D') {
+      } else if (tourData.frequency === 'D') {
         setTourLabel('Sales Date');
       }
     }
   };
-
-  useEffect(() => {
-    if (productionId !== null && productionId !== undefined) {
-      getTourWeeks(productionId);
-    }
-  }, [productionId]);
-
-  useEffect(() => {
-    setSelectedTourWeek(null);
-    try {
-      const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
-      if (selectedTourIndex !== -1) {
-        setSelectedTourWeek(tourWeeks[selectedTourIndex].value);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [tourWeeks]);
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {
@@ -76,6 +86,42 @@ const SalesEntryFilters = () => {
       setBooking({ ...bookings, selected: undefined });
     }
   };
+
+  const fetchLastDates = async () => {
+    try {
+      const data = await fetchData({
+        url: '/api/performances/lastDate/' + productionId,
+        method: 'POST',
+      });
+
+      if (typeof data === 'object') {
+        const lastDates = data as Array<LastPerfDate>;
+        setLastDates(lastDates);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    changeBooking(null);
+    if (productionId !== null && productionId !== undefined) {
+      getTourWeeks(productionId);
+      fetchLastDates();
+    }
+  }, [productionId]);
+
+  useEffect(() => {
+    setSelectedTourWeek(null);
+    try {
+      const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
+      if (selectedTourIndex !== -1) {
+        setSelectedTourWeek(tourWeeks[selectedTourIndex].value);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [tourWeeks]);
 
   return (
     <div>
@@ -105,8 +151,6 @@ const SalesEntryFilters = () => {
             />
           </div>
         </div>
-
-        <div className="flex flex-col" />
       </div>
 
       <div className="flex flex-row items-center gap-4 mt-1">

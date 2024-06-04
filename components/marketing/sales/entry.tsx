@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react';
 import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
 import useAxios from 'hooks/useAxios';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
+import { useRecoilValue } from 'recoil';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
+// import { productionJumpState } from 'state/booking/productionJumpState';
+// import { SelectOption } from '../MarketingHome';
+
+// type TourResponse = {
+//   data: Array<SelectOption>;
+//   frequency: string;
+// };
 
 interface HoldType {
   name: string;
@@ -18,17 +27,43 @@ export default function Entry() {
   const [schSeatsSoldVal, setSchSeatsSoldVal] = useState('');
   const [schSeatsReserved, setSchSeatsReserved] = useState('');
   const [schSeatsReservedVal, setSchSeatsReservedVal] = useState('');
-  // const [currency, setCurrency] = useState('£');
+  const [currency, setCurrency] = useState('£');
   const [schoolSalesNotRequired, setSchoolSalesNotRequired] = useState(false);
   const [bookingSaleNotes, setBookingSaleNotes] = useState('');
   const [holdData, setHoldData] = useState([]);
+  const [holdNotes, setHoldNotes] = useState('');
   const [compData, setCompData] = useState([]);
+  const [compNotes, setCompNotes] = useState('');
   const [formReady, setFormReady] = useState(false);
+  // const [salesDate, setSalesDate] = useState(null);
+  const bookings = useRecoilValue(bookingJumpState);
+  // const { selected: productionId } = useRecoilValue(productionJumpState);
 
   const { fetchData } = useAxios();
 
-  const handleUpdate = () => {
-    console.log('update');
+  const handleUpdate = async () => {
+    const data = {
+      bookingId: bookings.selected,
+      // salesDate: salesDate,
+      schools: {
+        seatsSold: parseInt(schSeatsSold),
+        seatsSoldVal: parseFloat(schSeatsSoldVal),
+        seatsReserved: parseInt(schSeatsReserved),
+        seatsReservedVal: parseFloat(schSeatsReservedVal),
+      },
+      general: {
+        seatsSold: parseInt(genSeatsSold),
+        seatsSoldVal: parseFloat(genSeatsSoldVal),
+        seatsReserved: parseInt(genSeatsReserved),
+        seatsReservedVal: parseFloat(genSeatsReservedVal),
+      },
+    };
+
+    await fetchData({
+      url: '/api/marketing/sales/process/entry/sales',
+      method: 'POST',
+      data,
+    });
   };
 
   const handleTableUpdate = (value, data, type, field) => {
@@ -52,7 +87,35 @@ export default function Entry() {
     console.log('cancel');
   };
 
+  const setNumericVal = (setFunction: (value) => void, value: string) => {
+    if (value === '') {
+      setFunction(0);
+    } else {
+      const regexPattern = /^-?\d*(\.\d*)?$/;
+
+      if (regexPattern.test(value)) {
+        setFunction(value);
+      }
+    }
+  };
+
+  // const getSalesDate = async () => {
+  //   const data = await fetchData({
+  //     url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+  //     method: 'POST',
+  //   });
+
+  //   if (typeof data === 'object') {
+  //     const tourData = data as TourResponse;
+  //     const salesDate = tourData.frequency === 'W' ? getMonday(new Date()) : new Date();
+  //     setSalesDate(salesDate);
+
+  //     return salesDate;
+  //   }
+  // };
+
   useEffect(() => {
+    // const salesFiguresDate = getSalesDate();
     const initForm = async () => {
       try {
         const data = await fetchData({
@@ -77,6 +140,7 @@ export default function Entry() {
 
     if (!formReady) {
       initForm();
+      setCurrency('£');
       setFormReady(true);
     }
   }, [formReady, fetchData]);
@@ -98,7 +162,7 @@ export default function Entry() {
                   placeholder="Enter Seats"
                   id="genSeatsSold"
                   value={genSeatsSold}
-                  onChange={(event) => setGenSeatsSold(event.target.value)}
+                  onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
                 />
               </div>
 
@@ -111,7 +175,7 @@ export default function Entry() {
                   placeholder="Enter Seats"
                   id="genSeatsReserved"
                   value={genSeatsReserved}
-                  onChange={(event) => setGenSeatsReserved(event.target.value)}
+                  onChange={(event) => setNumericVal(setGenSeatsReserved, event.target.value)}
                 />
               </div>
             </div>
@@ -126,7 +190,7 @@ export default function Entry() {
                   placeholder="Enter Value"
                   id="genSeatsSoldVal"
                   value={genSeatsSoldVal}
-                  onChange={(event) => setGenSeatsSoldVal(event.target.value)}
+                  onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
                 />
               </div>
 
@@ -139,7 +203,7 @@ export default function Entry() {
                   placeholder="Enter Value"
                   id="genSeatsReservedVal"
                   value={genSeatsReservedVal}
-                  onChange={(event) => setGenSeatsReservedVal(event.target.value)}
+                  onChange={(event) => setNumericVal(setGenSeatsReservedVal, event.target.value)}
                 />
               </div>
             </div>
@@ -175,7 +239,7 @@ export default function Entry() {
                   placeholder="Enter Seats"
                   id="schSeatsSold"
                   value={schSeatsSold}
-                  onChange={(event) => setSchSeatsSold(event.target.value)}
+                  onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
                 />
               </div>
 
@@ -188,7 +252,7 @@ export default function Entry() {
                   placeholder="Enter Seats"
                   id="schSeatsReserved"
                   value={schSeatsReserved}
-                  onChange={(event) => setSchSeatsReserved(event.target.value)}
+                  onChange={(event) => setNumericVal(setSchSeatsReserved, event.target.value)}
                 />
               </div>
             </div>
@@ -203,7 +267,7 @@ export default function Entry() {
                   placeholder="Enter Value"
                   id="schSeatsSoldVal"
                   value={schSeatsSoldVal}
-                  onChange={(event) => setSchSeatsSoldVal(event.target.value)}
+                  onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
                 />
               </div>
 
@@ -216,7 +280,7 @@ export default function Entry() {
                   placeholder="Enter Value"
                   id="schSeatsReservedVal"
                   value={schSeatsReservedVal}
-                  onChange={(event) => setSchSeatsReservedVal(event.target.value)}
+                  onChange={(event) => setNumericVal(setSchSeatsReservedVal, event.target.value)}
                 />
               </div>
             </div>
@@ -247,17 +311,33 @@ export default function Entry() {
         <div className="flex flex-row w-[849px] gap-6 mt-5">
           <div className="flex flex-col w-[415px]">
             <Table
-              columnDefs={salesEntryColDefs('Holds', handleTableUpdate)}
+              columnDefs={salesEntryColDefs('Holds', currency, handleTableUpdate)}
               rowData={holdData}
               styleProps={styleProps}
+            />
+
+            <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Holds Notes</div>
+            <TextArea
+              className="mt-2 h-[105px] w-[416px] mb-10"
+              value={holdNotes}
+              placeholder="Notes Field"
+              onChange={(e) => setHoldNotes(e.target.value)}
             />
           </div>
 
           <div className="flex flex-col w-[415px]">
             <Table
-              columnDefs={salesEntryColDefs('Comps', handleTableUpdate)}
+              columnDefs={salesEntryColDefs('Comps', currency, handleTableUpdate)}
               rowData={compData}
               styleProps={styleProps}
+            />
+
+            <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Comp Notes</div>
+            <TextArea
+              className="mt-2 h-[105px] w-[416px] mb-10"
+              value={compNotes}
+              placeholder="Notes Field"
+              onChange={(e) => setCompNotes(e.target.value)}
             />
           </div>
         </div>
@@ -265,9 +345,8 @@ export default function Entry() {
 
       <div className="flex flex-col">
         <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Booking Sales Notes</div>
-
         <TextArea
-          className="mt-2 h-[963px] w-[473px]"
+          className="mt-2 h-[1030px] w-[514px] mb-10"
           value={bookingSaleNotes}
           placeholder="Notes Field"
           onChange={(e) => setBookingSaleNotes(e.target.value)}

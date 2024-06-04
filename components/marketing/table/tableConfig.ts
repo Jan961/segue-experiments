@@ -8,6 +8,7 @@ import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
+import SalesValueInputRenderer from './SalesValueInputRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -330,7 +331,7 @@ export const attachmentsColDefs = [
   },
 ];
 
-export const salesEntryColDefs = (type: string, handleUpdate) => {
+export const salesEntryColDefs = (type: string, currency: string, handleUpdate) => {
   return [
     {
       headerName: type,
@@ -354,13 +355,17 @@ export const salesEntryColDefs = (type: string, handleUpdate) => {
     {
       headerName: 'Value',
       field: 'value',
-      cellRenderer: TextInputRenderer,
+      cellRenderer: SalesValueInputRenderer,
       cellRendererParams: function (params) {
         return {
           value: params.data.value.toString(),
-          className: 'w-[100px] ml-1 mt-1',
+          className: 'w-[90px] ml-1 mt-1',
           onChange: (e) => handleUpdate(e.target.value, params.data, type, 'value'),
+          currencySymbol: currency,
         };
+      },
+      cellStyle: {
+        marginLeft: '4px',
       },
       width: 112,
       resizable: false,
