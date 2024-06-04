@@ -149,7 +149,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     if (venueDict[venueID].CurrencyCode) {
       setCurrencyCode(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
     } else {
-      const currencyCodeData = await fetchData({
+      const currencyCodeData: any = await fetchData({
         url: '/api/marketing/sales/currency/currency',
         method: 'POST',
         data: { BookingId: selectedBookings[0].bookingId },
