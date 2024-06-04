@@ -28,7 +28,7 @@ interface SalesTableProps {
   booking?;
   tableHeight?: number;
   salesTableRef?: any;
-  currencyCode?: string;
+  currencySymbol?: string;
 }
 
 export default function SalesTable({
@@ -44,7 +44,7 @@ export default function SalesTable({
   booking,
   tableHeight = 0,
   salesTableRef,
-  currencyCode,
+  currencySymbol,
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
@@ -60,7 +60,7 @@ export default function SalesTable({
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
-  const salesSnapshot = (data: Array<SalesSnapshot>, currencyCode: string) => {
+  const salesSnapshot = (data: Array<SalesSnapshot>, currencySymbol: string) => {
     // check for school data
     const schoolSalesFound = data.find(
       (data) =>
@@ -69,7 +69,7 @@ export default function SalesTable({
     setSchoolSales(Boolean(schoolSalesFound));
 
     let colDefs = salesColDefs(
-      currencyCode,
+      currencySymbol,
       Boolean(schoolSalesFound),
       module !== 'bookings',
       booking,
@@ -254,10 +254,10 @@ export default function SalesTable({
   };
 
   useEffect(() => {
-    exec(variant, data, currencyCode);
+    exec(variant, data, currencySymbol);
     const newWidth = calculateWidth();
     setTableWidth(newWidth);
-  }, [variant, data, numBookings, schoolSales, containerWidth, currencyCode]);
+  }, [variant, data, numBookings, schoolSales, containerWidth, currencySymbol]);
 
   return (
     <div className={classNames('table-container')} style={{ width: tableWidth, height }}>

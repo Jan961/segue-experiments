@@ -69,13 +69,18 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
       method: 'POST',
       data: { bookingIds: selectedBookings },
     });
-    const currencyCodeData: any = await fetchData({
+
+    const currencySymbol: string = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
       data: { BookingId: selectedBookings[0] },
+    }).then((outputData: any) => {
+      if (outputData.currencyCode) {
+        return String.fromCharCode(Number('0x' + outputData.currencyCode));
+      } else {
+        return '£';
+      }
     });
-
-    const currencyCode = String.fromCharCode(Number('0x' + currencyCodeData.currencyCode));
 
     if (Array.isArray(data) && data.length !== 0) {
       const salesComp = data as Array<SalesComparison>;
@@ -90,7 +95,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
             variant="salesComparison"
             data={result}
             tableHeight={580}
-            currencyCode={currencyCode}
+            currencySymbol={currencySymbol}
           />
         </div>,
       );

@@ -28,13 +28,18 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
       url: '/api/marketing/sales/read/' + bookingId,
       method: 'POST',
     });
-    const currencyCodeData: any = await fetchData({
+    const currencySymbol: string = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
       data: { BookingId: parseInt(bookingId) },
+    }).then((outputData: any) => {
+      if (outputData.currencyCode) {
+        return String.fromCharCode(Number('0x' + outputData.currencyCode));
+      } else {
+        return '£';
+      }
     });
 
-    const currencyCode = String.fromCharCode(Number('0x' + currencyCodeData.currencyCode));
     if (Array.isArray(data) && data.length > 0) {
       const tempSales = data as Array<SalesSnapshot>;
       setSalesTable(
@@ -46,7 +51,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
           data={tempSales}
           booking={bookingId}
           tableHeight={640}
-          currencyCode={currencyCode}
+          currencySymbol={currencySymbol}
         />,
       );
 
