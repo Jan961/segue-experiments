@@ -44,7 +44,7 @@ export default function SalesTable({
   booking,
   tableHeight = 0,
   salesTableRef,
-  currencySymbol,
+  currencySymbol = '£',
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
