@@ -53,6 +53,7 @@ export default function SalesTable({
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
+  const [currency, setCurrency] = useState<string>('£');
   // constants
   const ARCH_MULTI_WIDTH = 328;
   const ARCH_LESS_2_WIDTH = 340;
@@ -60,7 +61,7 @@ export default function SalesTable({
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
-  const salesSnapshot = (data: Array<SalesSnapshot>, currencySymbol: string) => {
+  const salesSnapshot = (data: Array<SalesSnapshot>) => {
     // check for school data
     const schoolSalesFound = data.find(
       (data) =>
@@ -68,13 +69,7 @@ export default function SalesTable({
     );
     setSchoolSales(Boolean(schoolSalesFound));
 
-    let colDefs = salesColDefs(
-      currencySymbol,
-      Boolean(schoolSalesFound),
-      module !== 'bookings',
-      booking,
-      setSalesActivity,
-    );
+    let colDefs = salesColDefs(currency, Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
     if (!schoolSalesFound) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setHeight(containerHeight);
@@ -227,10 +222,10 @@ export default function SalesTable({
     }
   };
 
-  const exec = async (variant: string, data, currencyCode: string) => {
+  const exec = async (variant: string, data) => {
     switch (variant) {
       case 'salesComparison': {
-        const tableData = await salesComparison(data, currencyCode);
+        const tableData = await salesComparison(data, currency);
         setNumBookings(data.bookingIds.length);
         setColumnDefs(tableData.columnDef);
         setRowData(tableData.rowData);
@@ -239,7 +234,7 @@ export default function SalesTable({
       }
 
       case 'salesSnapshot': {
-        salesSnapshot(data, currencyCode);
+        salesSnapshot(data);
         break;
       }
 
@@ -252,7 +247,8 @@ export default function SalesTable({
   };
 
   useEffect(() => {
-    exec(variant, data, currencySymbol);
+    setCurrency(currencySymbol);
+    exec(variant, data);
     const newWidth = calculateWidth();
     setTableWidth(newWidth);
   }, [variant, data, numBookings, schoolSales, containerWidth, currencySymbol]);

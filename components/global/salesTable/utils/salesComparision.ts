@@ -16,7 +16,7 @@ export interface SalesComp {
   bookingIds: Array<SelectedBooking>;
 }
 
-const salesComparison = async (data: SalesComp, currencyCode = ' ') => {
+const salesComparison = async (data: SalesComp, currencyCode = '£') => {
   const tempRowData = [];
   const tempColDef = [];
   const excelStyles = [
