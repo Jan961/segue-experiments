@@ -10,8 +10,6 @@ import PaymentDetailsForm from 'components/auth/PaymentDetailsForm';
 import { useState } from 'react';
 import { GetServerSideProps } from 'next';
 import getAllPlans from 'services/subscriptionPlans';
-import { convertObjectKeysToCamelCase } from 'utils';
-
 import AccountConfirmation from 'components/auth/AccountConfirmation';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
@@ -19,10 +17,25 @@ import axios from 'axios';
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
   const plans = await getAllPlans();
-
+  let subscriptionPlans = [];
+  if (plans) {
+    const formattedPlans = plans.map((p, i) => {
+      return {
+        planId: p.PlanId,
+        planName: p.PlanName,
+        planDescription: p.PlanDescription,
+        planPrice: p.PlanPrice.toNumber(),
+        planFrequency: p.PlanFrequency,
+        planPriceId: p.PlanPriceId,
+        planCurrency: p.PlanCurrency,
+        color: planColors[i % planColors.length],
+      };
+    });
+    subscriptionPlans = formattedPlans;
+  }
   return {
     props: {
-      plans: plans.map((p, i) => ({ ...convertObjectKeysToCamelCase(p), color: planColors[i] })),
+      plans: subscriptionPlans,
     },
   };
 };

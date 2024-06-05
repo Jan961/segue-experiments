@@ -27,13 +27,13 @@ SELECT
 FROM
   (
     (
-      `frtxigoo_Sachin`.`ProductionView`
-      JOIN `frtxigoo_Sachin`.`DateBlock` ON(
-        `frtxigoo_Sachin`.`DateBlock`.`DateBlockProductionId` = `ProductionView`.`ProductionId`
+      `frtxigoo_dev`.`ProductionView`
+      JOIN `frtxigoo_dev`.`DateBlock` ON(
+        `frtxigoo_dev`.`DateBlock`.`DateBlockProductionId` = `ProductionView`.`ProductionId`
       )
     )
-    JOIN `frtxigoo_Sachin`.`DateBlockDatesView` ON(
-      `frtxigoo_Sachin`.`DateBlock`.`DateBlockId` = `DateBlockDatesView`.`DateBlockId`
+    JOIN `frtxigoo_dev`.`DateBlockDatesView` ON(
+      `frtxigoo_dev`.`DateBlock`.`DateBlockId` = `DateBlockDatesView`.`DateBlockId`
     )
   )
 ORDER BY

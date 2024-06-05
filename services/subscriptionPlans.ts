@@ -4,7 +4,7 @@ export default async function getAllPlans() {
     const response = await prisma.subscriptionPlan.findMany();
     return response;
   } catch (err) {
-    console.log(err);
+    console.log('Error fetching plans', err);
     return [];
   }
 }

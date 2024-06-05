@@ -6,13 +6,13 @@ SELECT
 FROM
   (
     (
-      `frtxigoo_Sachin`.`BookingDateDiffView` `BDDV`
-      LEFT JOIN `frtxigoo_Sachin`.`VenueVenue` `VV1` ON(
+      `frtxigoo_dev`.`BookingDateDiffView` `BDDV`
+      LEFT JOIN `frtxigoo_dev`.`VenueVenue` `VV1` ON(
         `BDDV`.`FromVenueId` = `VV1`.`VVVenue1Id`
         AND `BDDV`.`ToVenueId` = `VV1`.`VVVenue2Id`
       )
     )
-    LEFT JOIN `frtxigoo_Sachin`.`VenueVenue` `VV2` ON(
+    LEFT JOIN `frtxigoo_dev`.`VenueVenue` `VV2` ON(
       `BDDV`.`FromVenueId` = `VV2`.`VVVenue2Id`
       AND `BDDV`.`ToVenueId` = `VV2`.`VVVenue1Id`
     )
@@ -22,7 +22,7 @@ WHERE
     SELECT
       min(`BDDV2`.`DaysDifference`)
     FROM
-      `frtxigoo_Sachin`.`BookingDateDiffView` `BDDV2`
+      `frtxigoo_dev`.`BookingDateDiffView` `BDDV2`
     WHERE
       `BDDV`.`FromBookingId` = `BDDV2`.`FromBookingId`
   )
