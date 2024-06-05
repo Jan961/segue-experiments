@@ -182,7 +182,23 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getSalesSnapshot = async (bookingId: string) => {
     setErrorMessage('');
     setLoading(true);
-    setCurrencySymbol(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
+    if (venueDict[venueID].CurrencyCode) {
+      setCurrencySymbol(String.fromCharCode(Number('0x' + venueDict[venueID].CurrencyCode)));
+    } else {
+      const currencySymbol: string = await fetchData({
+        url: '/api/marketing/sales/currency/currency',
+        method: 'POST',
+        data: { BookingId: selectedBookings[0].bookingId },
+      }).then((outputData: any) => {
+        if (outputData.currencyCode) {
+          return String.fromCharCode(Number('0x' + outputData.currencyCode));
+        } else {
+          return '£';
+        }
+      });
+
+      setCurrencySymbol(currencySymbol);
+    }
 
     const data = await fetchData({
       url: '/api/marketing/sales/read/' + bookingId,
@@ -191,13 +207,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
     if (Array.isArray(data) && data.length > 0) {
       const salesData = data as Array<SalesSnapshot>;
-
-      const currencyCode = await fetchData({
-        url: '/api/bookings/services/currency',
-        method: 'POST',
-        data: { BookingId: bookingId },
-      });
-      console.log('Currency Code', currencyCode);
       setSalesSnapData(salesData);
       toggleModal('salesSnapshot');
     } else {
