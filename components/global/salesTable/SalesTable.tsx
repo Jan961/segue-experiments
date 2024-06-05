@@ -53,10 +53,12 @@ export default function SalesTable({
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
+
   // constants
   const ARCH_MULTI_WIDTH = 328;
   const ARCH_LESS_2_WIDTH = 340;
   const ARCH_SPACE_SCALER = 12;
+
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
