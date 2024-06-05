@@ -181,6 +181,7 @@ model Venue {
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
+  Rehearsal                                                 Rehearsal[]
   Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
   VenueFamily                                               VenueFamily?         @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
@@ -321,28 +322,31 @@ model Rehearsal {
   RunTag      String            @map("RehearsalRunTag") @db.Char(8)
   DateBlock   DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
   DateType    RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
+  Venue       Venue?            @relation(fields: [VenueId], references: [Id], onDelete: NoAction, map: "Venue_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
+  @@index([VenueId], map: "Venue_Rehearsal")
 }
 
 model Account {
-  AccountId              Int                 @id @default(autoincrement())
-  AccountName            String              @db.VarChar(50)
-  AccountAddress1        String?             @db.VarChar(50)
-  AccountAddress2        String?             @db.VarChar(50)
-  AccountAddress3        String?             @db.VarChar(50)
-  AccountAddressTown     String?             @db.VarChar(50)
-  AccountAddressCounty   String?             @db.VarChar(50)
-  AccountAddressPostcode String?             @db.VarChar(20)
-  AccountAddressCountry  String?             @db.VarChar(30)
-  AccountVATNumber       String?             @db.VarChar(20)
-  AccountCurrencyCode    String              @db.VarChar(3)
-  AccountCompanyNumber   String?             @db.VarChar(20)
+  AccountId              Int                   @id @default(autoincrement())
+  AccountName            String                @db.VarChar(50)
+  AccountAddress1        String?               @db.VarChar(50)
+  AccountAddress2        String?               @db.VarChar(50)
+  AccountAddress3        String?               @db.VarChar(50)
+  AccountAddressTown     String?               @db.VarChar(50)
+  AccountAddressCounty   String?               @db.VarChar(50)
+  AccountAddressPostcode String?               @db.VarChar(20)
+  AccountAddressCountry  String?               @db.VarChar(30)
+  AccountVATNumber       String?               @db.VarChar(20)
+  AccountCurrencyCode    String                @db.VarChar(3)
+  AccountCompanyNumber   String?               @db.VarChar(20)
   AccountLogo            Bytes?
-  AccountMainEmail       String?             @db.VarChar(120)
-  AccountNumPeople       Int?                @db.TinyInt
+  AccountMainEmail       String?               @db.VarChar(120)
+  AccountNumPeople       Int?                  @db.TinyInt
   AccountContact         AccountContact?
+  AccountSubscription    AccountSubscription[]
   AccountUser            AccountUser[]
   MasterTask             MasterTask[]
   ProductionCompany      ProductionCompany[]
@@ -927,6 +931,31 @@ model File {
   Production       Production[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
+}
+
+model AccountSubscription {
+  AccSubId         Int              @id @default(autoincrement())
+  AccSubAccountId  Int
+  AccSubPlanId     Int
+  AccSubStartDate  DateTime         @db.DateTime(0)
+  AccSubEndDate    DateTime?        @db.DateTime(0)
+  AccSubIsActive   Boolean?         @db.Bit(1)
+  Account          Account          @relation(fields: [AccSubAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountSubscription")
+  SubscriptionPlan SubscriptionPlan @relation(fields: [AccSubPlanId], references: [PlanId], onDelete: Cascade, map: "SubscriptionPlan_AccountSubscription")
+
+  @@index([AccSubAccountId], map: "Account_AccountSubscription")
+  @@index([AccSubPlanId], map: "SubscriptionPlan_AccountSubscription")
+}
+
+model SubscriptionPlan {
+  PlanId              Int                   @id @default(autoincrement())
+  PlanName            String                @db.VarChar(100)
+  PlanDescription     String?               @db.LongText
+  PlanPrice           Decimal               @db.Decimal(10, 2)
+  PlanFrequency       Int
+  PlanPriceId         String?               @db.VarChar(100)
+  PlanCurrency        String                @db.VarChar(3)
+  AccountSubscription AccountSubscription[]
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
