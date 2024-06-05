@@ -181,6 +181,7 @@ model Venue {
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
+  Rehearsal                                                 Rehearsal[]
   Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
   VenueFamily                                               VenueFamily?         @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
@@ -321,9 +322,11 @@ model Rehearsal {
   RunTag      String            @map("RehearsalRunTag") @db.Char(8)
   DateBlock   DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
   DateType    RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
+  Venue       Venue?            @relation(fields: [VenueId], references: [Id], onDelete: NoAction, map: "Venue_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
+  @@index([VenueId], map: "Venue_Rehearsal")
 }
 
 model Account {
@@ -390,7 +393,6 @@ model CompAllocation {
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
   @@index([ArrangedById], map: "AccountUser_CompAllocation")
 }
-
 
 model CompType {
   CompTypeId    Int       @id @default(autoincrement())
@@ -1160,6 +1162,7 @@ view SalesView {
   LastFiguresDate          DateTime? @db.Date
   LastFiguresSeats         Decimal?  @db.Decimal(32, 0)
   LastFiguresValue         Decimal?  @db.Decimal(32, 2)
+  LastSaleTYpeName         String?   @db.VarChar(45)
 
   @@ignore
 }
