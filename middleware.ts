@@ -1,7 +1,7 @@
 import { Clerk } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 import { authMiddleware } from '@clerk/nextjs';
-import prisma from 'lib/prisma';
+import prisma from 'lib/prismaAccelerate';
 
 const publicPaths = [
   '/api/user*',
