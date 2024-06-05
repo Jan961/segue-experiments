@@ -105,6 +105,7 @@ const SalesEntryFilters = () => {
 
   useEffect(() => {
     changeBooking(null);
+    setSelectedTourWeek(null);
     if (productionId !== null && productionId !== undefined) {
       getTourWeeks(productionId);
       fetchLastDates();
@@ -112,7 +113,6 @@ const SalesEntryFilters = () => {
   }, [productionId]);
 
   useEffect(() => {
-    setSelectedTourWeek(null);
     try {
       const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
       if (selectedTourIndex !== -1) {

@@ -23,7 +23,7 @@ const Index = () => {
           <SalesEntryFilters />
         </div>
 
-        {bookings.selected !== undefined && bookings.selected !== null && <Entry searchFilter="" />}
+        {bookings.selected !== undefined && bookings.selected !== null && <Entry />}
       </Layout>
     </div>
   );

@@ -4,13 +4,14 @@ import useAxios from 'hooks/useAxios';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-// import { productionJumpState } from 'state/booking/productionJumpState';
-// import { SelectOption } from '../MarketingHome';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { SelectOption } from '../MarketingHome';
+import { getMonday } from 'services/dateService';
 
-// type TourResponse = {
-//   data: Array<SelectOption>;
-//   frequency: string;
-// };
+type TourResponse = {
+  data: Array<SelectOption>;
+  frequency: string;
+};
 
 interface HoldType {
   name: string;
@@ -34,17 +35,16 @@ export default function Entry() {
   const [holdNotes, setHoldNotes] = useState('');
   const [compData, setCompData] = useState([]);
   const [compNotes, setCompNotes] = useState('');
-  const [formReady, setFormReady] = useState(false);
-  // const [salesDate, setSalesDate] = useState(null);
+  const [salesDate, setSalesDate] = useState(null);
   const bookings = useRecoilValue(bookingJumpState);
-  // const { selected: productionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
 
   const { fetchData } = useAxios();
 
   const handleUpdate = async () => {
     const data = {
       bookingId: bookings.selected,
-      // salesDate: salesDate,
+      salesDate,
       schools: {
         seatsSold: parseInt(schSeatsSold),
         seatsSoldVal: parseFloat(schSeatsSoldVal),
@@ -99,32 +99,53 @@ export default function Entry() {
     }
   };
 
-  // const getSalesDate = async () => {
-  //   const data = await fetchData({
-  //     url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-  //     method: 'POST',
-  //   });
+  const getSalesDate = async () => {
+    const data = await fetchData({
+      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+      method: 'POST',
+    });
 
-  //   if (typeof data === 'object') {
-  //     const tourData = data as TourResponse;
-  //     const salesDate = tourData.frequency === 'W' ? getMonday(new Date()) : new Date();
-  //     setSalesDate(salesDate);
+    if (typeof data === 'object') {
+      const tourData = data as TourResponse;
+      if (tourData.frequency === undefined) {
+        return;
+      }
+      const salesDate = tourData.frequency === 'W' ? getMonday(new Date()) : new Date();
+      setSalesDate(salesDate);
 
-  //     return salesDate;
-  //   }
-  // };
+      return { date: salesDate, frequency: tourData.frequency };
+    }
+  };
 
   useEffect(() => {
-    // const salesFiguresDate = getSalesDate();
     const initForm = async () => {
+      const saleParams = await getSalesDate();
+      if (saleParams === undefined) {
+        return;
+      }
+
       try {
-        const data = await fetchData({
+        // get the salesFigures for the selected date/week if they exist
+        const sales = await fetchData({
+          url: '/api/marketing/sales/read/currentDay',
+          method: 'POST',
+          data: {
+            bookingId: bookings.selected,
+            salesDate: saleParams.date,
+            frequency: saleParams.frequency,
+          },
+        });
+
+        console.log(sales);
+
+        // get the holdTypes
+        const types = await fetchData({
           url: '/api/marketing/holdType/read',
           method: 'POST',
         });
 
-        if (typeof data === 'object') {
-          const holdTypes = data as Array<HoldType>;
+        if (typeof types === 'object') {
+          const holdTypes = types as Array<HoldType>;
           const tempData = holdTypes.map((hold) => ({
             name: hold.name,
             seats: 0,
@@ -138,12 +159,9 @@ export default function Entry() {
       }
     };
 
-    if (!formReady) {
-      initForm();
-      setCurrency('£');
-      setFormReady(true);
-    }
-  }, [formReady, fetchData]);
+    initForm();
+    setCurrency('£');
+  }, [fetchData, bookings.selected]);
 
   return (
     <div className="flex flex-row w-full gap-8">
