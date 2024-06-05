@@ -16,6 +16,8 @@ import useComponentMountStatus from 'hooks/useComponentMountStatus';
 import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
+import { debug } from 'utils/logging';
+import { all } from 'radash';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -115,20 +117,25 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   }, [isAddRow, tableRef]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSave = async (currentProd: any) => {
-    if ('DateBlock[0].StartDate' in currentProd && 'DateBlock[0].EndDate' in currentProd) {
-      setIsLoading(true);
-      try {
-        const payloadData = getProductionsConvertedPayload(currentProd, false);
-        await axios.post(`/api/productions/create`, payloadData);
-      } finally {
-        setIsEdited(false);
-        setCurrentProduction(intProduction);
-        addNewRow();
-        router.replace(router.asPath);
-        setIsLoading(false);
-      }
+  const handleSaveAndClose = async () => {
+    try {
+      const gridApi = tableRef.current.getApi();
+      const editedRecords = [];
+      const newRecords = [];
+      gridApi.forEachNode((rowNode) => {
+        if (!rowNode.data.Id) {
+          newRecords.push(rowNode.data);
+        } else if (editedOrAddedRecords.includes(rowNode.data.Id)) {
+          editedRecords.push(rowNode.data);
+        }
+      });
+      await all([
+        ...newRecords.map((record) => createNewProduction(record)),
+        ...editedRecords.map((record) => updateCurrentProduction(record)),
+      ]);
+      onClose();
+    } catch (error) {
+      console.log('Error Saving Records');
     }
   };
 
@@ -190,24 +197,25 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const updateCurrentProduction = useCallback(
-    async (e) => {
+    async (data) => {
       setIsLoading(true);
       try {
         const payloadData = getProductionsConvertedPayload(
-          { ...e.data, Id: currentProduction?.Id, Image: productionUploadMap[e.data.Id] },
+          { ...data, Id: currentProduction?.Id, Image: productionUploadMap[data.Id] },
           true,
         );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         notify.success(ToastMessages.updateProductionSuccess);
-        if (payloadData.isArchived && !isArchived) {
-          const gridApi = tableRef.current.getApi();
-          const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
-          const transaction = {
-            remove: [rowDataToRemove],
-          };
-          applyTransactionToGrid(tableRef, transaction);
-        }
-        const excludeUpdatedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
+        // if (payloadData.isArchived && !isArchived) {
+        //   const gridApi = tableRef.current.getApi();
+        //   const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
+        //   const transaction = {
+        //     remove: [rowDataToRemove],
+        //   };
+        //   applyTransactionToGrid(tableRef, transaction);
+        // }
+        setEditedOrAddedRecords((prev) => prev.filter((id) => id !== data.Id));
+        const excludeUpdatedRecords = editedOrAddedRecords?.filter((id) => id !== data.Id);
         setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
         notify.error(ToastMessages.updateProductionFailure);
@@ -223,20 +231,18 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   );
 
   const createNewProduction = useCallback(
-    async (e) => {
+    async (data) => {
       setIsLoading(true);
       try {
         const payloadData = getProductionsConvertedPayload(
-          { ...e.data, Id: currentProduction?.Id, Image: productionUploadMap[e.data.Id] },
+          { ...data, Id: currentProduction?.Id, Image: productionUploadMap[data.Id] },
           false,
         );
         await axios.post(`/api/productions/create`, payloadData);
         notify.success(ToastMessages.createNewProductionSuccess);
-        const excludeSavedRecords = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
-        setEditedOrAddedRecords(excludeSavedRecords);
       } catch (error) {
         notify.error(ToastMessages.createNewProductionFailure);
-        console.log('Error updating production', error);
+        console.log('Error creating production', error);
       } finally {
         setIsEdited(false);
         setCurrentProduction(intProduction);
@@ -255,7 +261,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     if (e.column.colId === 'deleteId') {
       setConfirm(true);
     } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
-      await updateCurrentProduction(e);
+      await updateCurrentProduction(e.data);
     } else if (
       isAddRow &&
       e.column.colId === 'editId' &&
@@ -264,9 +270,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       'DateBlock[0].EndDate' in e.data
     ) {
       // handleSave(e.data);
-      await createNewProduction(e);
+      await createNewProduction(e.data);
     } else if (e.column.colId === 'ImageUrl') {
-      console.log(e.data);
       const { imageUrl, originalFilename: name, id } = e.data.Image || {};
       setUploadModalContext({
         value: e.data.Image
@@ -282,14 +287,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   };
 
-  const handleSaveAndClose = () => {
-    // handleSave(currentProduction);
-    onClose();
-  };
-
   const handleCellChanges = (e) => {
-    const excludeEditedRow = editedOrAddedRecords?.filter((row) => row.showId !== e.data.ShowId);
-    setEditedOrAddedRecords([...excludeEditedRow, getProductionsConvertedPayload(e.data)]);
+    if (e.oldValue === e.newValue) return;
+    debug('handleCellChanges', e);
+    setEditedOrAddedRecords((prev) => [...prev, e.data.Id]);
     setCurrentProduction(e.data);
     setIsEdited(true);
   };
@@ -298,13 +299,17 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     setConfirm(false);
     setIsLoading(true);
     try {
-      await axios.delete(`/api/productions/delete/${productionId}`);
+      if (productionId) {
+        await axios.delete(`/api/productions/delete/${productionId}`);
+        router.replace(router.asPath);
+      }
       notify.success(ToastMessages.deleteProductionSuccess);
       const gridApi = tableRef.current.getApi();
       const rowDataToRemove = gridApi.getDisplayedRowAtIndex(rowIndex).data;
       const transaction = {
         remove: [rowDataToRemove],
       };
+      setEditedOrAddedRecords((prev) => prev.filter((id) => id !== rowDataToRemove.Id));
       applyTransactionToGrid(tableRef, transaction);
     } catch (error) {
       notify.error(ToastMessages.deleteProductionFailure);
