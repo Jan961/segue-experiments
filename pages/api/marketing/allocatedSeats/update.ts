@@ -28,7 +28,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Seats: data.Seats,
         Comments: data.Comments,
         RequestedBy: data.RequestedBy,
-        ArrangedBy: data.ArrangedById,
+        ArrangedBy: data.CompAllocationArrangedById,
         VenueConfirmationNotes: data.VenueConfirmationNotes,
         TicketHolderEmail: data.TicketHolderEmail,
         SeatsAllocated: data.SeatsAllocated,
