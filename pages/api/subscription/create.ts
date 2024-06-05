@@ -1,14 +1,15 @@
+import { AccountSubscription } from '@prisma/client';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createSubscription } from 'services/subscriptionService';
 
-export const mapToAccountSubscriptionPrismaFields = (subscriptionDetails: any) => {
+export const mapToAccountSubscriptionPrismaFields = (subscriptionDetails: any): AccountSubscription => {
   return {
-    AccountSubscriptionId: subscriptionDetails.id || null,
-    AccountSubscriptionAccountId: subscriptionDetails.accountId,
-    AccountSubscriptionPlanId: subscriptionDetails.planId,
-    AccountSubscriptionStartDate: subscriptionDetails.startDate,
-    AccountSubscriptionEndDate: subscriptionDetails.endDate,
-    AccountSubscriptionIsActive: subscriptionDetails.isActive,
+    AccSubId: subscriptionDetails.id || null,
+    AccSubAccountId: subscriptionDetails.accountId,
+    AccSubPlanId: subscriptionDetails.planId,
+    AccSubStartDate: subscriptionDetails.startDate,
+    AccSubEndDate: subscriptionDetails.endDate,
+    AccSubIsActive: subscriptionDetails.isActive,
   };
 };
 
