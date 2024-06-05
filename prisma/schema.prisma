@@ -374,22 +374,23 @@ model BookedVenueHistory {
 }
 
 model CompAllocation {
-  Id                         Int           @id @default(autoincrement()) @map("CompAllocationId")
-  AvailableCompId            Int           @map("CompAllocationAvailableCompId")
-  TicketHolderName           String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
-  Seats                      Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
-  Comments                   String?       @map("CompAllocationComments") @db.VarChar(100)
-  RequestedBy                String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
-  CompAllocationArrangedById Int
-  VenueConfirmationNotes     String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
-  TicketHolderEmail          String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
-  SeatsAllocated             String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
-  AccountUser                AccountUser   @relation(fields: [CompAllocationArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
-  AvailableComp              AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
+  Id                     Int           @id @default(autoincrement()) @map("CompAllocationId")
+  AvailableCompId        Int           @map("CompAllocationAvailableCompId")
+  TicketHolderName       String        @map("CompAllocationTicketHolderName") @db.VarChar(50)
+  Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
+  Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
+  RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
+  ArrangedById           Int           @map("CompAllocationArrangedById")
+  VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
+  TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
+  SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AccountUser            AccountUser   @relation(fields: [ArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
+  AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
-  @@index([CompAllocationArrangedById], map: "AccountUser_CompAllocation")
+  @@index([ArrangedById], map: "AccountUser_CompAllocation")
 }
+
 
 model CompType {
   CompTypeId    Int       @id @default(autoincrement())
