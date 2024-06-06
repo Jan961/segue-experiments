@@ -232,7 +232,6 @@ export default forwardRef(function Select(
       .reverse();
     return filteredRowList;
   };
-  // console.log(filteredOptions);
   return (
     <div
       className={classNames(
@@ -273,6 +272,7 @@ export default forwardRef(function Select(
         isClearable={isClearable}
         isMulti={isMulti}
         hideSelectedOptions={false}
+        filterOption={null}
       />
     </div>
   );
