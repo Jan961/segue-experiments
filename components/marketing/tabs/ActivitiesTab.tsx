@@ -299,11 +299,11 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     });
   };
 
-  const getCurrencySymbol = async (BookingId) => {
+  const getCurrencySymbol = async (VenueId) => {
     const currencySymbol: string = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
-      data: { BookingId },
+      data: { searchValue: VenueId, inputType: 'venueId' },
     }).then((outputData: any) => {
       if (outputData.currencyCode) {
         return String.fromCharCode(Number('0x' + outputData.currencyCode));
@@ -317,12 +317,12 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   useEffect(() => {
     if (!isNullOrEmpty(props.bookingId)) {
-      getCurrencySymbol(props.bookingId);
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString(), currency);
 
       // set checkbox row on activities tab
       const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
+      getCurrencySymbol(booking.VenueId);
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
