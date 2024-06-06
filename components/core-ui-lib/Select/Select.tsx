@@ -1,5 +1,4 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { matchSorter } from 'match-sorter';
 import WindowedSelect, {
   components,
   StylesConfig,
@@ -12,6 +11,7 @@ import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
+import Fuse from 'fuse.js';
 
 const Option = (props: OptionProps) => {
   return <components.Option className="w-full" {...props} />;
@@ -213,6 +213,29 @@ export default forwardRef(function Select(
     MultiValue,
   };
 
+  const filteredResults: (searchTerm: string, options: SelectOption[]) => any = (searchTerm, options) => {
+    console.log(searchTerm);
+    let filteredRowList = options;
+    const fuseOptions = {
+      includeScore: true,
+      includeMatches: true,
+      isCaseSensitive: false,
+      shouldSort: true,
+      useExtendedSearch: true,
+      threshold: 0.3,
+      keys: ['text'],
+    };
+
+    const fuse = new Fuse(options, fuseOptions);
+    filteredRowList = fuse
+      .search(searchTerm)
+      .map((item) => item.item)
+      .reverse();
+
+    console.log(filteredRowList);
+    return filteredRowList;
+  };
+  console.log(filteredOptions);
   return (
     <div
       className={classNames(
@@ -232,7 +255,9 @@ export default forwardRef(function Select(
         ref={ref}
         className="w-full"
         onInputChange={(inputValue) => {
-          if (inputValue) setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
+          if (inputValue) {
+            setFilteredOptions(filteredResults(inputValue, options));
+          }
         }}
         onChange={handleOptionSelect}
         value={selectedOption}
