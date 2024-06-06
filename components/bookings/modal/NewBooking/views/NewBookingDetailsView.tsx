@@ -164,7 +164,6 @@ export default function NewBookingDetailsView({
       note: bookingRow?.notes || '',
     };
   }, [production, bookingRow, venueDict]);
-
   useEffect(() => {
     if (data !== null && data.length > 0) {
       setColumnDefs(

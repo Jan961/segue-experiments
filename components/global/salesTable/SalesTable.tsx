@@ -133,7 +133,7 @@ export default function SalesTable({
     }
   };
 
-  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
+  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
     updateSaleSet('updateNotOnSale', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -151,7 +151,7 @@ export default function SalesTable({
     );
   };
 
-  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
+  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
     updateSaleSet('updateSingleSeats', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -169,7 +169,7 @@ export default function SalesTable({
     );
   };
 
-  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
+  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
     updateSaleSet('update', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -183,9 +183,14 @@ export default function SalesTable({
     );
   };
 
-  const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update) => {
+  const updateSaleSet = (type: string, BookingId: string, SalesFigureDate: string, update) => {
+    const data = {
+      BookingId: parseInt(BookingId),
+      SalesFigureDate,
+      ...update,
+    };
     axios
-      .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
+      .put(`/api/marketing/sales/salesSet/${type}`, data)
       .catch((error) => console.log('failed to update sale', error));
   };
 
@@ -198,11 +203,10 @@ export default function SalesTable({
 
         // Regex to extract integers
         let baseContainerWidth = 1220;
-
         baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;
-
         containerWidth = baseContainerWidth.toString() + 'px';
+
         return containerWidth;
       }
 
@@ -212,11 +216,13 @@ export default function SalesTable({
         return `${widthInt}px`;
       }
 
-      case 'prodComparision':
+      case 'prodComparision': {
         return containerWidth;
+      }
 
-      case 'prodCompArch':
+      case 'prodCompArch': {
         return containerWidth;
+      }
     }
   };
 
