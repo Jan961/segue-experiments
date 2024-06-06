@@ -43,6 +43,7 @@ const useTasksFilter = () => {
   const { selected } = useRecoilValue(productionJumpState);
   const filters = useRecoilValue(tasksfilterState);
   const { users } = useRecoilValue(userState);
+
   const fuseOptions = {
     includeScore: true,
     includeMatches: true,
@@ -50,11 +51,12 @@ const useTasksFilter = () => {
     shouldSort: true,
     useExtendedSearch: true,
     threshold: 0.3,
-    keys: ['Name', 'Notes'],
+    keys: [],
+    // keys: ['Name', 'Notes'],
   };
   const usersList = useMemo(() => {
     if (isNullOrEmpty(users)) {
-      return {};
+      return [];
     }
 
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -63,6 +65,11 @@ const useTasksFilter = () => {
     }));
   }, [users]);
 
+  const userIdToNameMap = usersList.reduce((acc, user) => {
+    acc[user.value] = user.text;
+    return acc;
+  }, {});
+
   const filteredProductions = useMemo(() => {
     return productions
       .filter((productionItem) => {
@@ -70,26 +77,32 @@ const useTasksFilter = () => {
         return productionItem.Id === selected;
       })
       .map((productionData) => {
+        fuseOptions.keys = ['Name', 'Notes', 'userName'];
         const productionTasks = filters.taskText
-          ? new Fuse(productionData.Tasks, fuseOptions).search(filters.taskText).map((item) => item.item)
+          ? new Fuse(
+              productionData.Tasks.map((task) => {
+                return {
+                  ...task,
+                  userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : '',
+                };
+              }),
+              fuseOptions,
+            )
+              .search(filters.taskText)
+              .map((item) => item.item)
           : productionData.Tasks;
-
         return {
           ...productionData,
 
           Tasks: productionTasks
             .filter(({ AssignedToUserId, CompleteDate, Status }) => {
-              console.log(getFilteredUsers(usersList, AssignedToUserId, filters.taskText));
-              console.log('filter ', filters.assignee);
-              console.log('assigned', AssignedToUserId);
-
               return (
                 (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
                 (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
-                (filters.assignee === -1 ||
-                  AssignedToUserId === filters.assignee ||
-                  getFilteredUsers(usersList, AssignedToUserId, filters.taskText))
+                (filters.assignee === -1 || AssignedToUserId === filters.assignee || filters.taskText
+                  ? getFilteredUsers(usersList, AssignedToUserId, filters.taskText)
+                  : false)
               );
             })
             .map((task) => ({
@@ -118,6 +131,7 @@ const useTasksFilter = () => {
   //   filteredTemp[0].Tasks = fuseOutput.map((item) => item.item);
   // }
   // return filteredValues.search(filters.taskText);
+  console.log('filtered ', filteredProductions);
   return { filteredProductions };
 };
 
