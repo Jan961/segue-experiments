@@ -17,6 +17,8 @@ import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
+import { Button } from 'components/core-ui-lib';
+import { sendEmail } from 'lib/emailManager';
 
 interface BookingsTableProps {
   rowData?: any;
@@ -127,6 +129,13 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
 
   return (
     <>
+      <Button
+        onClick={() =>
+          sendEmail({ to: 'sachiechan11@gmail.com', from: 'infor@segue.com', subject: 'test', text: 'test' })
+        }
+      >
+        Email Me!
+      </Button>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
           columnDefs={bookingColumDefs}
