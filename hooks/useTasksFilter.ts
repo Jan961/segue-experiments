@@ -83,7 +83,7 @@ const useTasksFilter = () => {
               productionData.Tasks.map((task) => {
                 return {
                   ...task,
-                  userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : '',
+                  userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
                 };
               }),
               fuseOptions,
@@ -100,9 +100,7 @@ const useTasksFilter = () => {
                 (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
                 (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
                 (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
-                (filters.assignee === -1 || AssignedToUserId === filters.assignee || filters.taskText
-                  ? getFilteredUsers(usersList, AssignedToUserId, filters.taskText)
-                  : false)
+                (filters.assignee === -1 || AssignedToUserId === filters.assignee)
               );
             })
             .map((task) => ({
