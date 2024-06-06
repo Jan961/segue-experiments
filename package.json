@@ -116,7 +116,6 @@
     "serverless-mysql": "^1.5.4",
     "stripe": "^15.7.0",
     "styled-components": "^6.1.8",
-    "swagger-ui-react": "^5.17.3",
     "tailwindcss": "^3.1.8",
     "tempfile": "^4.0.0",
     "tls": "file:./src/mock/tls",
