@@ -46,7 +46,6 @@ const useMasterTasksFilter = (tasks = []) => {
           .map((item) => item.item)
       : tasks;
   }, [tasks, filters.taskText]);
-  console.log(filteredTasks);
   return { filteredTasks };
 };
 
