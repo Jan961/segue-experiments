@@ -31,7 +31,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     const currencySymbol: string = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
-      data: { BookingId: parseInt(bookingId) },
+      data: { searchValue: parseInt(bookingId), inputType: 'bookingId' },
     }).then((outputData: any) => {
       if (outputData.currencyCode) {
         return String.fromCharCode(Number('0x' + outputData.currencyCode));

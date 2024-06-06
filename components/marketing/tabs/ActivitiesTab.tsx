@@ -483,6 +483,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
             onSave={(variant, data) => saveActivity(variant, data)}
             bookingId={bookingIdVal}
             data={actRow}
+            venueCurrency={currency}
           />
 
           <ConfirmationDialog
