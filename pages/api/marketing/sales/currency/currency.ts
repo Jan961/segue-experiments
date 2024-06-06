@@ -34,21 +34,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
       case 'venueId': {
         venueId = searchValue;
+        const currencyCodeQuery: any | null = await prisma.Venue.findFirst({
+          where: {
+            Id: { equals: venueId },
+          },
+          select: {
+            Currency: {
+              select: { SymbolUnicode: true },
+            },
+          },
+        });
+        const currencyCode: string | null = currencyCodeQuery ? currencyCodeQuery.Currency.SymbolUnicode : null;
+        return res.status(200).json({ currencyCode });
       }
     }
-
-    const currencyCodeQuery: any | null = await prisma.Venue.findFirst({
-      where: {
-        Id: { equals: venueId },
-      },
-      select: {
-        Currency: {
-          select: { SymbolUnicode: true },
-        },
-      },
-    });
-    const currencyCode: string | null = currencyCodeQuery ? currencyCodeQuery.Currency.SymbolUnicode : null;
-    return res.status(200).json({ currencyCode });
   } catch (exception) {
     console.log(exception);
     return res.status(403);

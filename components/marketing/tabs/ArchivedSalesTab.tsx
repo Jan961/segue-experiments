@@ -73,7 +73,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
     const currencySymbol: string = await fetchData({
       url: '/api/marketing/sales/currency/currency',
       method: 'POST',
-      data: { BookingId: selectedBookings[0] },
+      data: { searchValue: selectedBookings[0], inputType: 'bookingId' },
     }).then((outputData: any) => {
       if (outputData.currencyCode) {
         return String.fromCharCode(Number('0x' + outputData.currencyCode));
