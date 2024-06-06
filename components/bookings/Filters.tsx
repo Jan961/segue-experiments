@@ -36,6 +36,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
 
   const onChange = (e: any) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
+    console.log(filter);
   };
   const gotoToday = () => {
     const dateToScrollTo = moment(new Date()).format('ddd DD/MM/YY');

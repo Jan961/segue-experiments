@@ -12,7 +12,6 @@ import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
 import Fuse from 'fuse.js';
-
 const Option = (props: OptionProps) => {
   return <components.Option className="w-full" {...props} />;
 };
@@ -214,7 +213,7 @@ export default forwardRef(function Select(
   };
 
   const filteredResults: (searchTerm: string, options: SelectOption[]) => any = (searchTerm, options) => {
-    console.log(searchTerm);
+    // console.log(searchTerm);
     let filteredRowList = options;
     const fuseOptions = {
       includeScore: true,
@@ -231,11 +230,9 @@ export default forwardRef(function Select(
       .search(searchTerm)
       .map((item) => item.item)
       .reverse();
-
-    console.log(filteredRowList);
     return filteredRowList;
   };
-  console.log(filteredOptions);
+  // console.log(filteredOptions);
   return (
     <div
       className={classNames(
@@ -257,6 +254,9 @@ export default forwardRef(function Select(
         onInputChange={(inputValue) => {
           if (inputValue) {
             setFilteredOptions(filteredResults(inputValue, options));
+            // console.log(matchSorter(options, inputValue, { keys: ['text'] }));
+            // console.log(filteredResults(inputValue, options));
+            // setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
           }
         }}
         onChange={handleOptionSelect}

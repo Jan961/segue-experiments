@@ -7,6 +7,7 @@ import { isThisWeek } from 'date-fns';
 import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
+import Fuse from 'fuse.js';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -42,7 +43,15 @@ const useTasksFilter = () => {
   const { selected } = useRecoilValue(productionJumpState);
   const filters = useRecoilValue(tasksfilterState);
   const { users } = useRecoilValue(userState);
-
+  const fuseOptions = {
+    includeScore: true,
+    includeMatches: true,
+    isCaseSensitive: false,
+    shouldSort: true,
+    useExtendedSearch: true,
+    threshold: 0.3,
+    keys: ['Name', 'Notes'],
+  };
   const usersList = useMemo(() => {
     if (isNullOrEmpty(users)) {
       return {};
@@ -61,25 +70,33 @@ const useTasksFilter = () => {
         return productionItem.Id === selected;
       })
       .map((productionData) => {
+        const productionTasks = filters.taskText
+          ? new Fuse(productionData.Tasks, fuseOptions).search(filters.taskText).map((item) => item.item)
+          : productionData.Tasks;
+
         return {
           ...productionData,
-          Tasks: productionData.Tasks.filter(({ Name, TaskName, AssignedToUserId, Notes, CompleteDate, Status }) => {
-            return (
-              (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
-              (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
-              (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
-              (filters.assignee === -1 || AssignedToUserId === filters.assignee) &&
-              (!filters.taskText ||
-                [Name, TaskName, Notes]
-                  .map((text) => text?.toLowerCase?.())
-                  .some((text) => text?.includes?.(filters.taskText.toLowerCase())) ||
-                getFilteredUsers(usersList, AssignedToUserId, filters.taskText))
-            );
-          }).map((task) => ({
-            ...task,
-            Status: calculateTaskStatus(task.Progress || 0),
-            weekOptions: generateOptions(productionData.weekNumToDateMap),
-          })),
+
+          Tasks: productionTasks
+            .filter(({ AssignedToUserId, CompleteDate, Status }) => {
+              console.log(getFilteredUsers(usersList, AssignedToUserId, filters.taskText));
+              console.log('filter ', filters.assignee);
+              console.log('assigned', AssignedToUserId);
+
+              return (
+                (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
+                (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
+                (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
+                (filters.assignee === -1 ||
+                  AssignedToUserId === filters.assignee ||
+                  getFilteredUsers(usersList, AssignedToUserId, filters.taskText))
+              );
+            })
+            .map((task) => ({
+              ...task,
+              Status: calculateTaskStatus(task.Progress || 0),
+              weekOptions: generateOptions(productionData.weekNumToDateMap),
+            })),
         };
       });
   }, [
@@ -93,6 +110,14 @@ const useTasksFilter = () => {
     usersList,
   ]);
 
+  //  Text fuzzy search
+  // let filteredTemp = filteredProductions;
+  // const filteredValues = new Fuse(filteredTemp[0].Tasks, fuseOptions);
+  // if (filters.taskText) {
+  //   const fuseOutput = filteredValues.search(filters.taskText);
+  //   filteredTemp[0].Tasks = fuseOutput.map((item) => item.item);
+  // }
+  // return filteredValues.search(filters.taskText);
   return { filteredProductions };
 };
 
