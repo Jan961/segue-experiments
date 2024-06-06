@@ -26,12 +26,10 @@ const useMasterTasksFilter = (tasks = []) => {
     shouldSort: true,
     useExtendedSearch: true,
     threshold: 0.3,
-    keys: [],
-    // keys: ['Name', 'Notes'],
+    keys: ['Name', 'userName'],
   };
 
   const filteredTasks = useMemo(() => {
-    fuseOptions.keys = ['Name', 'userName'];
     return filters.taskText
       ? new Fuse(
           tasks.map((task) => {
