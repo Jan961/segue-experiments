@@ -37,8 +37,8 @@ export const Productions = ({ code, productions = [], name }: Props) => {
       </div>
       <BreadCrumb>
         <BreadCrumb.Item href="/">Home</BreadCrumb.Item>
-        <BreadCrumb.Item href={'/account'}>Account</BreadCrumb.Item>
-        <BreadCrumb.Item href={'/account/shows/'}>Shows</BreadCrumb.Item>
+        <BreadCrumb.Item href="/account">Account</BreadCrumb.Item>
+        <BreadCrumb.Item href="/account/shows/">Shows</BreadCrumb.Item>
         <BreadCrumb.Item>{name}</BreadCrumb.Item>
       </BreadCrumb>
       <Tab.Group className="max-w-screen-md mx-auto" as="div">
