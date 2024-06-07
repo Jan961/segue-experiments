@@ -1,9 +1,7 @@
 import { calibri } from 'lib/fonts';
 import Image from 'next/image';
 import { loadStripe } from '@stripe/stripe-js';
-
 import { Wizard } from 'react-use-wizard';
-
 import SubscriptionPlans, { Plan } from 'components/auth/SubscriptionPlans';
 import AccountDetailsForm, { Account } from 'components/auth/AccountDetailsForm';
 import PaymentDetailsForm from 'components/auth/PaymentDetailsForm';
@@ -13,6 +11,7 @@ import getAllPlans from 'services/subscriptionPlans';
 import AccountConfirmation from 'components/auth/AccountConfirmation';
 import { Elements } from '@stripe/react-stripe-js';
 import axios from 'axios';
+import { notify } from 'components/core-ui-lib';
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const planColors = ['#41a29a', '#0093c0', '#7b568d'];
@@ -59,7 +58,7 @@ const DEFAULT_ACCOUNT_DETAILS = {
   currency: 'GBP',
 };
 export type AccountDetails = typeof DEFAULT_ACCOUNT_DETAILS;
-
+const ACCOUNT_CREATION_FAILED_ERROR = 'Error creating new account';
 const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
   const stripe = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
   const [accountDetails, setAccountDetails] = useState<Account>(DEFAULT_ACCOUNT_DETAILS);
@@ -67,8 +66,16 @@ const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
   const [subcriptionDetails, seSubscriptionDetails] = useState<Plan>(null);
 
   const handleSaveAccountDetails = async () => {
-    const { data } = await axios.post(`/api/account/${accountDetails.accountId ? 'update' : 'create'}`, accountDetails);
-    setAccountDetails(data);
+    try {
+      const { data } = await axios.post(
+        `/api/account/${accountDetails.accountId ? 'update' : 'create'}`,
+        accountDetails,
+      );
+      setAccountDetails(data);
+    } catch (error) {
+      console.error(error);
+      notify.error(ACCOUNT_CREATION_FAILED_ERROR);
+    }
   };
 
   return (

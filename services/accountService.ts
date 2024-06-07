@@ -21,7 +21,6 @@ export const updateAccount = async (account: Partial<Account>, tx = prisma) => {
 };
 
 export const createAccountContact = async (accountContact: Partial<AccountContact>, tx = prisma) => {
-  console.log(accountContact);
   const newAccountContact = await tx.accountContact.create({
     data: {
       ...omit(accountContact, ['AccContId']),

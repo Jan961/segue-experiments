@@ -5,9 +5,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const user = req.body;
-
-    console.log(user);
-
     const newUser = await prisma.user.create({
       data: {
         FirstName: user.FirstName,

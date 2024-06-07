@@ -14,8 +14,12 @@ import Toggle from 'components/core-ui-lib/Toggle';
 import { AccountDetails } from 'pages/account/sign-up';
 import { add } from 'date-fns';
 import useProcessPayment from 'hooks/useProcessPayment';
+import { notify } from 'components/core-ui-lib/Notifications';
 
 const baseClass = `w-full block bg-primary-white p-1.5 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset border-primary-border`;
+
+const PAYMENT_FAILED_ERROR = 'Error submitting payment';
+const SUBSCRIPTION_FAILED_ERROR = 'Error creating subscription';
 
 interface PaymentDetailsFormProps {
   accountDetails: Partial<AccountDetails>;
@@ -46,17 +50,22 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
   };
 
   const createSubscription = async () => {
-    // Create a subscription in the DB
-    const today = new Date();
-    await axios.post('/api/subscription/create', {
-      planId: plan.planId,
-      accountId: accountDetails.accountId,
-      startDate: today.toISOString(),
-      endDate: add(today, { months: paymentDetails.paymentFrequency }).toISOString(),
-      isActive: true,
-    });
-    setLoading(false);
-    nextStep();
+    try {
+      // Create a subscription in the DB
+      const today = new Date();
+      await axios.post('/api/subscription/create', {
+        planId: plan.planId,
+        accountId: accountDetails.accountId,
+        startDate: today.toISOString(),
+        endDate: add(today, { months: paymentDetails.paymentFrequency }).toISOString(),
+        isActive: true,
+      });
+      setLoading(false);
+      nextStep();
+    } catch (error) {
+      notify.error(SUBSCRIPTION_FAILED_ERROR);
+      console.error(error);
+    }
   };
 
   const handleError = (error) => {
@@ -76,15 +85,19 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
-
     setLoading(true);
-    await processCardPayment(
-      plan.planPrice * 100,
-      plan.planCurrency,
-      paymentDetails.cardHolderName,
-      paymentDetails.postcode,
-      paymentDetails.email,
-    );
+    try {
+      await processCardPayment(
+        plan.planPrice * 100,
+        plan.planCurrency,
+        paymentDetails.cardHolderName,
+        paymentDetails.postcode,
+        paymentDetails.email,
+      );
+    } catch (error) {
+      handleError(error);
+      notify.error(PAYMENT_FAILED_ERROR);
+    }
   };
 
   useEffect(() => {

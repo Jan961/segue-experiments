@@ -35,22 +35,21 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
     return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(accountDetails.email);
   }, [accountDetails.email]);
 
-  const canProceedToNextStep =
-    isValidEmail &&
-    accountDetails.accountId &&
-    accountDetails.companyName &&
-    accountDetails.firstName &&
-    accountDetails.lastName &&
-    accountDetails.phoneNumber &&
-    accountDetails.email &&
-    accountDetails.postcode;
+  const canProceedToNextStep = useMemo(() => {
+    return (
+      isValidEmail &&
+      accountDetails.accountId &&
+      accountDetails.companyName &&
+      accountDetails.firstName &&
+      accountDetails.lastName &&
+      accountDetails.phoneNumber &&
+      accountDetails.email &&
+      accountDetails.postcode
+    );
+  }, [accountDetails, isValidEmail]);
 
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
-  };
-
-  const handleNextClick = () => {
-    nextStep();
   };
 
   return (
@@ -194,7 +193,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
       </div>
       <div className="w-full flex gap-2  items-center justify-end mt-5">
         <Button text="Save" onClick={onSave} className="w-32" />
-        <Button text="Next" onClick={handleNextClick} className="w-32" disabled={!canProceedToNextStep} />
+        <Button text="Next" onClick={nextStep} className="w-32" disabled={!canProceedToNextStep} />
       </div>
     </div>
   );
