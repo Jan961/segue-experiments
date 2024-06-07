@@ -223,7 +223,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         }
 
         // if length of tempBookings is >= 2, errorMessage can be removed
-        if (tempBookings.length >= 2) {
+        if (tempBookings.length >= 1) {
           setErrorMessage('');
         }
         setSelBookings(tempBookings);

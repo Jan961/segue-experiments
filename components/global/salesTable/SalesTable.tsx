@@ -103,9 +103,25 @@ export default function SalesTable({
     setRowData(processedBookings);
 
     if (variant === 'prodComparision') {
-      setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
+      setColumnDefs(
+        prodComparisionColDefs(
+          data.filter((item) => {
+            return item.HasSalesData;
+          }).length,
+          onCellValChange,
+          cellRenderParams.selected,
+        ),
+      );
     } else {
-      setColumnDefs(prodCompArchColDefs(data.length, onCellValChange, cellRenderParams.selected));
+      setColumnDefs(
+        prodCompArchColDefs(
+          data.filter((item) => {
+            return item.HasSalesData;
+          }).length,
+          onCellValChange,
+          cellRenderParams.selected,
+        ),
+      );
     }
   };
 
@@ -185,20 +201,16 @@ export default function SalesTable({
   };
 
   const calculateWidth = () => {
+    const isMarketing = module !== 'bookings';
+    const MARKETING_TAB_WIDTH = 195;
+    const SCHOOLS_TAB_WIDTH = 135;
+    let baseContainerWidth = 1220;
     switch (variant) {
       case 'salesSnapshot':
-        const isMarketing = module !== 'bookings';
-        const MARKETING_TAB_WIDTH = 195;
-        const SCHOOLS_TAB_WIDTH = 135;
-
-        //Regex to extract integers
-        let baseContainerWidth = 1220;
-
         baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;
 
         containerWidth = baseContainerWidth.toString() + 'px';
-        console.log(containerWidth);
         return containerWidth;
 
       case 'salesComparison': {
