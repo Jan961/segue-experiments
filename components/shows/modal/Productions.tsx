@@ -13,7 +13,7 @@ const Productions = ({ visible, onClose, showData }: ProductionsProps) => {
       show={visible}
       onClose={() => onClose()}
       titleClass="text-xl text-primary-navy text-bold"
-      title={'Productions'}
+      title="Productions"
       panelClass="relative"
       hasOverlay={false}
     >

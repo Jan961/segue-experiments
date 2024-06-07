@@ -57,7 +57,8 @@ SELECT
   ) AS `TotalHoldSeats`,
   `LatestTotals`.`SetSalesFiguresDate` AS `LastFiguresDate`,
   `LatestTotals`.`Seats` AS `LastFiguresSeats`,
-  `LatestTotals`.`Value` AS `LastFiguresValue`
+  `LatestTotals`.`Value` AS `LastFiguresValue`,
+  `LatestTotals`.`SaleTypeName` AS `LastSaleTYpeName`
 FROM
   (
     (
@@ -127,6 +128,7 @@ FROM
           `LatestTotal`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
           AND `LatestTotal`.`Seats` > 0
       )
+      AND `LatestTotals`.`SaleTypeName` = `SalesSetTotalsView`.`SaleTypeName`
     )
   )
 WHERE

@@ -142,7 +142,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       });
     }
   }
-
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {

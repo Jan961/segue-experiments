@@ -287,7 +287,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 isClearable
                 isSearchable
                 value={venueID}
-                onChange={(value) => getBookingSelection(value)}
+                onChange={(value) => getBookingSelection(value as number)}
                 placeholder="Please select a venue"
                 label="Venue"
               />
