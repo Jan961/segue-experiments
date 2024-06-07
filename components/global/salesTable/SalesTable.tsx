@@ -214,7 +214,9 @@ export default function SalesTable({
         return containerWidth;
 
       case 'salesComparison': {
-        const widthInt = numBookings * 340;
+        //  80px is the width of the week column which is for the whole row, not for each production.
+        //  302px is the sum of the widths of the other columns
+        const widthInt = numBookings * 302 + 80;
         return `${widthInt}px`;
       }
 
