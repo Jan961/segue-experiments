@@ -9,6 +9,7 @@ import useAxios from 'hooks/useAxios';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -62,9 +63,6 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
   };
 
   const showArchivedSales = async (selection) => {
-    const charCodeToCurrency = (charCode: string) => {
-      return String.fromCharCode(Number('0x' + charCode));
-    };
     let data, currencySymbolData, selectedBookings;
 
     setArchivedSalesTable(<div />);

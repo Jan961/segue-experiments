@@ -16,6 +16,7 @@ import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/s
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
+import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -99,10 +100,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       case 'salesSnapshot':
         setShowSalesSnapshot(true);
     }
-  };
-
-  const charCodeToCurrency = (charCode: string) => {
-    return String.fromCharCode(Number('0x' + charCode));
   };
 
   const getBookingSelection = async (venueID: string | number) => {

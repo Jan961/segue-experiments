@@ -2,6 +2,7 @@ import { SalesSnapshot } from 'types/MarketingTypes';
 import useAxios from 'hooks/useAxios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SalesTable from '../../global/salesTable/SalesTable';
+import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 interface SalesTabProps {
   bookingId: string;
@@ -14,10 +15,6 @@ export interface SalesTabRef {
 const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [salesTable, setSalesTable] = useState(<div />);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
-
-  const charCodeToCurrency = (charCode: string) => {
-    return String.fromCharCode(Number('0x' + charCode));
-  };
 
   useImperativeHandle(ref, () => ({
     resetData: () => {

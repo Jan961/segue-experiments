@@ -18,6 +18,7 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { isNullOrEmpty } from 'utils';
+import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -300,9 +301,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const getCurrencySymbol = async (VenueId) => {
-    const charCodeToCurrency = (charCode: string) => {
-      return String.fromCharCode(Number('0x' + charCode));
-    };
     let currencySymbolData: any;
     try {
       currencySymbolData = await fetchData({
