@@ -194,7 +194,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      if(e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
+      if (e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
     }
   };
 
@@ -347,7 +347,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
             />
-            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={() => setShowResults(false)} />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
           </div>
         </TableWrapper>
       </PopupModal>
