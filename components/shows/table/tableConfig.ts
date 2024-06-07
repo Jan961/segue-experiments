@@ -29,7 +29,7 @@ const generateChildCol = (
       overflow: 'visible',
       paddingLeft: '0.1em',
     },
-    headerClass: 'header-child',
+    headerClass: 'group-header-child',
     cellRenderer: renderer,
     cellRendererParams: { ...cellRendererParams },
     suppressMovable: true,
@@ -155,12 +155,13 @@ export const productionsTableConfig = [
     field: 'Code',
     cellRenderer: ShowsTextInputRenderer,
     width: 72,
-    headerClass: 'text-center',
+    headerClass: 'right-border-full',
+    resizable: false,
   },
   {
     headerName: 'Rehearsals',
     marryChildren: true,
-    headerClass: 'justify-center font-bold text-base',
+    headerClass: 'thin-group-header-parent right-border-full',
     children: [
       generateChildCol(
         'Start',
@@ -183,7 +184,7 @@ export const productionsTableConfig = [
   {
     headerName: 'Production Dates',
     marryChildren: true,
-    headerClass: 'justify-center font-bold text-base',
+    headerClass: 'thin-group-header-parent right-border-full',
     children: [
       generateChildCol(
         'Start',
