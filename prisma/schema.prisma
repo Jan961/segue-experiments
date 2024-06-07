@@ -758,14 +758,14 @@ model CountryInRegion {
 }
 
 model ProductionCompany {
-  Id            Int     @id @default(autoincrement()) @map("ProdCoId")
-  AccountId     Int     @map("ProdCoAccountId")
-  Name          String  @map("ProdCoName") @db.VarChar(50)
-  WebSite       String? @map("ProdCoWebSite") @db.VarChar(80)
-  Logo          Bytes?  @map("ProdCoLogo")
-  SaleStartWeek Int?    @default(-50) @map("ProdCoSaleStartWeek") @db.SmallInt
-  Account       Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
-  Show          Show[]
+  Id                  Int     @id @default(autoincrement()) @map("ProdCoId")
+  AccountId           Int     @map("ProdCoAccountId")
+  Name                String  @map("ProdCoName") @db.VarChar(50)
+  WebSite             String? @map("ProdCoWebSite") @db.VarChar(80)
+  Logo                Bytes?  @map("ProdCoLogo")
+  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
+  Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  Show                Show[]
 
   @@index([AccountId], map: "Account_ProductionCompany")
 }
@@ -933,6 +933,17 @@ model File {
   @@index([UploadUserId], map: "UserAttachedFile")
 }
 
+model SubscriptionPlan {
+  PlanId              Int                   @id @default(autoincrement())
+  PlanName            String                @db.VarChar(100)
+  PlanDescription     String?               @db.LongText
+  PlanPrice           Decimal               @db.Decimal(10, 2)
+  PlanFrequency       Int
+  PlanPriceId         String?               @db.VarChar(100)
+  PlanCurrency        String                @db.VarChar(3)
+  AccountSubscription AccountSubscription[]
+}
+
 model AccountSubscription {
   AccSubId         Int              @id @default(autoincrement())
   AccSubAccountId  Int
@@ -945,17 +956,6 @@ model AccountSubscription {
 
   @@index([AccSubAccountId], map: "Account_AccountSubscription")
   @@index([AccSubPlanId], map: "SubscriptionPlan_AccountSubscription")
-}
-
-model SubscriptionPlan {
-  PlanId              Int                   @id @default(autoincrement())
-  PlanName            String                @db.VarChar(100)
-  PlanDescription     String?               @db.LongText
-  PlanPrice           Decimal               @db.Decimal(10, 2)
-  PlanFrequency       Int
-  PlanPriceId         String?               @db.VarChar(100)
-  PlanCurrency        String                @db.VarChar(3)
-  AccountSubscription AccountSubscription[]
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1162,6 +1162,7 @@ view SalesView {
   LastFiguresDate          DateTime? @db.Date
   LastFiguresSeats         Decimal?  @db.Decimal(32, 0)
   LastFiguresValue         Decimal?  @db.Decimal(32, 2)
+  LastSaleTYpeName         String?   @db.VarChar(45)
 
   @@ignore
 }

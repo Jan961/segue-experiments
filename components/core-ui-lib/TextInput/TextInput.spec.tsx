@@ -29,7 +29,7 @@ describe('TextInput Component', () => {
   test('renders with custom props', () => {
     const handleChange = jest.fn();
     const placeholder = 'Enter value';
-    render(<TextInput id="testInput" value="test value" onChange={handleChange} placeHolder={placeholder} />);
+    render(<TextInput id="testInput" value="test value" onChange={handleChange} placeholder={placeholder} />);
     const inputElement = screen.getByRole('textbox');
     expect(inputElement).toBeInTheDocument();
     expect(inputElement).toHaveAttribute('id', 'testInput');
