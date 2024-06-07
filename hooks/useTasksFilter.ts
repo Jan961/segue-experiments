@@ -7,7 +7,7 @@ import { isThisWeek } from 'date-fns';
 import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
-import Fuse from 'fuse.js';
+import fuseFilter from '../utils/fuseFilter';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -19,7 +19,6 @@ const generateOptions = (weekData) => {
 export const getStatusBool = (taskStatus: string, filterStatus: string, taskDueDate: string) => {
   const dueDate = new Date(taskDueDate);
   const today = new Date();
-  console.log(filterStatus, taskStatus);
   switch (filterStatus) {
     case 'inProgress':
     case 'complete':
@@ -44,16 +43,6 @@ const useTasksFilter = () => {
   const filters = useRecoilValue(tasksfilterState);
   const { users } = useRecoilValue(userState);
 
-  const fuseOptions = {
-    includeScore: true,
-    includeMatches: true,
-    isCaseSensitive: false,
-    shouldSort: true,
-    useExtendedSearch: true,
-    threshold: 0.3,
-    keys: [],
-    // keys: ['Name', 'Notes'],
-  };
   const usersList = useMemo(() => {
     if (isNullOrEmpty(users)) {
       return [];
@@ -77,19 +66,15 @@ const useTasksFilter = () => {
         return productionItem.Id === selected;
       })
       .map((productionData) => {
-        fuseOptions.keys = ['Name', 'Notes', 'userName'];
+        const tasksFilteredByAssignedUser = productionData.Tasks.map((task) => {
+          return {
+            ...task,
+            userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
+          };
+        });
+
         const productionTasks = filters.taskText
-          ? new Fuse(
-              productionData.Tasks.map((task) => {
-                return {
-                  ...task,
-                  userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
-                };
-              }),
-              fuseOptions,
-            )
-              .search(filters.taskText)
-              .map((item) => item.item)
+          ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, ['Name', 'Notes', 'userName'])
           : productionData.Tasks;
         return {
           ...productionData,
@@ -120,16 +105,6 @@ const useTasksFilter = () => {
     filters.taskText,
     usersList,
   ]);
-
-  //  Text fuzzy search
-  // let filteredTemp = filteredProductions;
-  // const filteredValues = new Fuse(filteredTemp[0].Tasks, fuseOptions);
-  // if (filters.taskText) {
-  //   const fuseOutput = filteredValues.search(filters.taskText);
-  //   filteredTemp[0].Tasks = fuseOutput.map((item) => item.item);
-  // }
-  // return filteredValues.search(filters.taskText);
-  console.log('filtered ', filteredProductions);
   return { filteredProductions };
 };
 

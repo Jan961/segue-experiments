@@ -4,7 +4,7 @@ import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { contractsRowsSelector } from 'state/contracts/selectors/contractsRowsSelector';
 import { contractsStatusMap } from 'config/contracts';
-import Fuse from 'fuse.js';
+import fuseFilter from '../utils/fuseFilter';
 /*
  * Hook responsible for returning filtered and sorted Bookings
  */
@@ -13,15 +13,6 @@ const useContractsFilter = () => {
 
   const { selected, includeArchived, productions } = useRecoilValue(productionJumpState);
   const { rows } = useRecoilValue(contractsRowsSelector);
-  const fuseOptions = {
-    includeScore: true,
-    includeMatches: true,
-    isCaseSensitive: false,
-    shouldSort: true,
-    useExtendedSearch: true,
-    threshold: 0.3,
-    keys: [],
-  };
 
   const filteredRows = useMemo(() => {
     const archivedProductionIds = productions
@@ -42,11 +33,8 @@ const useContractsFilter = () => {
         !filter.contractText
       );
     });
-    if (filter.contractText) {
-      fuseOptions.keys = ['contractStatus', 'venue', 'town'];
-      const fuse = new Fuse(filteredRowList, fuseOptions);
-      filteredRowList = fuse.search(filter.contractText).map((item) => item.item);
-    }
+    if (filter.contractText)
+      filteredRowList = fuseFilter(filteredRowList, filter.contractText, ['contractStatus', 'venue', 'town']);
 
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();

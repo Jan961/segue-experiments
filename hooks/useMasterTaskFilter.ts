@@ -2,8 +2,7 @@ import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { masterTaskState } from 'state/tasks/masterTaskState';
 import { userState } from 'state/account/userState';
-import Fuse from 'fuse.js';
-
+import fuseFilter from '../utils/fuseFilter';
 const useMasterTasksFilter = (tasks = []) => {
   const filters = useRecoilValue(masterTaskState);
   const { users } = useRecoilValue(userState);
@@ -19,30 +18,15 @@ const useMasterTasksFilter = (tasks = []) => {
     return acc;
   }, {});
 
-  const fuseOptions = {
-    includeScore: true,
-    includeMatches: true,
-    isCaseSensitive: false,
-    shouldSort: true,
-    useExtendedSearch: true,
-    threshold: 0.3,
-    keys: ['Name', 'userName'],
-  };
-
   const filteredTasks = useMemo(() => {
-    return filters.taskText
-      ? new Fuse(
-          tasks.map((task) => {
-            return {
-              ...task,
-              userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
-            };
-          }),
-          fuseOptions,
-        )
-          .search(filters.taskText)
-          .map((item) => item.item)
-      : tasks;
+    const tasksFilteredByAssignedUser = tasks.map((task) => {
+      return {
+        ...task,
+        userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
+      };
+    });
+
+    return filters.taskText ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, ['Name', 'userName']) : tasks;
   }, [tasks, filters.taskText]);
   return { filteredTasks };
 };

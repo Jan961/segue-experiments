@@ -11,7 +11,7 @@ import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
-import Fuse from 'fuse.js';
+import fuseFilter from '../../../utils/fuseFilter';
 const Option = (props: OptionProps) => {
   return <components.Option className="w-full" {...props} />;
 };
@@ -212,26 +212,6 @@ export default forwardRef(function Select(
     MultiValue,
   };
 
-  const filteredResults: (searchTerm: string, options: SelectOption[]) => any = (searchTerm, options) => {
-    // console.log(searchTerm);
-    let filteredRowList = options;
-    const fuseOptions = {
-      includeScore: true,
-      includeMatches: true,
-      isCaseSensitive: false,
-      shouldSort: true,
-      useExtendedSearch: true,
-      threshold: 0.3,
-      keys: ['text'],
-    };
-
-    const fuse = new Fuse(options, fuseOptions);
-    filteredRowList = fuse
-      .search(searchTerm)
-      .map((item) => item.item)
-      .reverse();
-    return filteredRowList;
-  };
   return (
     <div
       className={classNames(
@@ -252,10 +232,7 @@ export default forwardRef(function Select(
         className="w-full"
         onInputChange={(inputValue) => {
           if (inputValue) {
-            setFilteredOptions(filteredResults(inputValue, options));
-            // console.log(matchSorter(options, inputValue, { keys: ['text'] }));
-            // console.log(filteredResults(inputValue, options));
-            // setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
+            setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
           }
         }}
         onChange={handleOptionSelect}
