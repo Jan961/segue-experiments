@@ -15,6 +15,10 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [salesTable, setSalesTable] = useState(<div />);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
 
+  const charCodeToCurrency = (charCode: string) => {
+    return String.fromCharCode(Number('0x' + charCode));
+  };
+
   useImperativeHandle(ref, () => ({
     resetData: () => {
       setDataAvailable(false);
@@ -24,21 +28,29 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const { fetchData } = useAxios();
 
   const retrieveSalesData = async (bookingId: string) => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/' + bookingId,
-      method: 'POST',
-    });
-    const currencySymbol: string = await fetchData({
-      url: '/api/marketing/sales/currency/currency',
-      method: 'POST',
-      data: { searchValue: parseInt(bookingId), inputType: 'bookingId' },
-    }).then((outputData: any) => {
-      if (outputData.currencyCode) {
-        return String.fromCharCode(Number('0x' + outputData.currencyCode));
-      } else {
-        return '£';
-      }
-    });
+    let data, currencySymbolData: any;
+    try {
+      data = await fetchData({
+        url: '/api/marketing/sales/read/' + bookingId,
+        method: 'POST',
+      });
+    } catch (exception) {
+      console.log(exception);
+      data = [];
+    }
+    try {
+      currencySymbolData = await fetchData({
+        url: '/api/marketing/sales/currency/currency',
+        method: 'POST',
+        data: { searchValue: parseInt(bookingId), inputType: 'bookingId' },
+      });
+    } catch (exception) {
+      console.log(exception);
+    }
+
+    const currencySymbol: string = currencySymbolData.currencyCode
+      ? charCodeToCurrency(currencySymbolData.currencyCode)
+      : '';
 
     if (Array.isArray(data) && data.length > 0) {
       const tempSales = data as Array<SalesSnapshot>;

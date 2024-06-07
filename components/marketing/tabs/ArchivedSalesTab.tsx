@@ -62,26 +62,38 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
   };
 
   const showArchivedSales = async (selection) => {
+    const charCodeToCurrency = (charCode: string) => {
+      return String.fromCharCode(Number('0x' + charCode));
+    };
+    let data, currencySymbolData, selectedBookings;
+
     setArchivedSalesTable(<div />);
-    const selectedBookings = selection.map((obj) => obj.bookingId);
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/archived',
-      method: 'POST',
-      data: { bookingIds: selectedBookings },
-    });
 
-    const currencySymbol: string = await fetchData({
-      url: '/api/marketing/sales/currency/currency',
-      method: 'POST',
-      data: { searchValue: selectedBookings[0], inputType: 'bookingId' },
-    }).then((outputData: any) => {
-      if (outputData.currencyCode) {
-        return String.fromCharCode(Number('0x' + outputData.currencyCode));
-      } else {
-        return '£';
-      }
-    });
+    try {
+      selectedBookings = selection.map((obj) => obj.bookingId);
+      data = await fetchData({
+        url: '/api/marketing/sales/read/archived',
+        method: 'POST',
+        data: { bookingIds: selectedBookings },
+      });
+    } catch (exception) {
+      console.log(exception);
+      data = [];
+    }
 
+    try {
+      currencySymbolData = await fetchData({
+        url: '/api/marketing/sales/currency/currency',
+        method: 'POST',
+        data: { searchValue: selectedBookings[0], inputType: 'bookingId' },
+      });
+    } catch (exception) {
+      console.log(exception);
+    }
+
+    const currencySymbol: string = currencySymbolData.currencyCode
+      ? charCodeToCurrency(currencySymbolData.currencyCode)
+      : '';
     if (Array.isArray(data) && data.length !== 0) {
       const salesComp = data as Array<SalesComparison>;
       const result = { tableData: salesComp, bookingIds: selection };

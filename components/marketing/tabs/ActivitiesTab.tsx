@@ -50,7 +50,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [totalCost, setTotalCost] = useState<number>(0);
   const [totalVenueCost, setTotalVenueCost] = useState<number>(0);
   const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
-  const [currency, setCurrency] = useState('£');
+  const [currency, setCurrency] = useState('');
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
@@ -300,19 +300,23 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const getCurrencySymbol = async (VenueId) => {
-    const currencySymbol: string = await fetchData({
-      url: '/api/marketing/sales/currency/currency',
-      method: 'POST',
-      data: { searchValue: VenueId, inputType: 'venueId' },
-    }).then((outputData: any) => {
-      if (outputData.currencyCode) {
-        return String.fromCharCode(Number('0x' + outputData.currencyCode));
-      } else {
-        return '£';
-      }
-    });
+    const charCodeToCurrency = (charCode: string) => {
+      return String.fromCharCode(Number('0x' + charCode));
+    };
+    let currencySymbolData: any;
+    try {
+      currencySymbolData = await fetchData({
+        url: '/api/marketing/sales/currency/currency',
+        method: 'POST',
+        data: { searchValue: VenueId, inputType: 'venueId' },
+      });
+    } catch (exception) {
+      console.log(exception);
+    }
 
-    setCurrency(currencySymbol);
+    currencySymbolData.currencyCode
+      ? setCurrency(charCodeToCurrency(currencySymbolData.currencyCode))
+      : setCurrency('');
   };
 
   useEffect(() => {
