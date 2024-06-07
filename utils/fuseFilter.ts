@@ -1,7 +1,10 @@
 import Fuse from 'fuse.js';
 
-export const fuseFilter: any = (options: any, searchTerm: string, keys: string[], fuseParams = null) => {
-  const fuseOptions = fuseParams || {
+export const fuseFilter: any = (options: any, searchTerm: string, keys: string[], fuseCustomParams = null) => {
+  if (!searchTerm) return options;
+
+  if (fuseCustomParams) fuseCustomParams.keys = keys;
+  const fuseParams = fuseCustomParams || {
     includeScore: true,
     includeMatches: true,
     isCaseSensitive: false,
@@ -11,7 +14,7 @@ export const fuseFilter: any = (options: any, searchTerm: string, keys: string[]
     keys,
   };
 
-  const filterObject = new Fuse(options, fuseOptions);
+  const filterObject = new Fuse(options, fuseParams);
   return filterObject.search(searchTerm).map((item) => item.item);
 };
 export default fuseFilter;
