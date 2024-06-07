@@ -194,7 +194,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleTableCellClick = (e) => {
     if (typeof e.column === 'object' && e.column.colId === 'salesBtn') {
-      if(e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
+      if (e.data.hasSalesData) getSalesSnapshot(e.data.bookingId);
     }
   };
 
@@ -250,7 +250,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 isClearable
                 isSearchable
                 value={venueID}
-                onChange={(value) => getBookingSelection(value)}
+                onChange={(value) => getBookingSelection(value as number)}
                 placeholder="Please select a venue"
                 label="Venue"
               />

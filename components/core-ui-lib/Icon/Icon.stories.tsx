@@ -35,6 +35,7 @@ export const Primary: Story = {
         <Icon iconName="cross" {...args} />
         <Icon iconName="info-circle-solid" {...args} />
         <Icon iconName="show-password" {...args} />
+        <Icon iconName="hide-password" {...args} />
       </div>
     );
   },

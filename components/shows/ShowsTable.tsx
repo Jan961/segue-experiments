@@ -11,6 +11,7 @@ import Productions from './modal/Productions';
 import { useRouter } from 'next/router';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { omit } from 'radash';
+import { ProductionDTO } from 'interfaces';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -31,7 +32,7 @@ const rowClassRules = {
 };
 
 const intShowData = {
-  Id: '',
+  Id: null,
   Code: '',
   Name: '',
   Type: 'P',
@@ -48,7 +49,7 @@ const ShowsTable = ({
   isArchived = false,
   productionCompanyOptions,
 }: {
-  rowsData: Show[];
+  rowsData: (Show & { productions: ProductionDTO[] })[];
   isAddRow: boolean;
   addNewRow: () => void;
   isArchived: boolean;
@@ -81,6 +82,15 @@ const ShowsTable = ({
       applyTransactionToGrid(tableRef, { add: [{ highlightRow: true }], addIndex: 0 });
     }
   }, [isAddRow, tableRef]);
+
+  useEffect(() => {
+    if (showProductionsModal) {
+      const current = rowsData.find((row) => row.Id === currentShow.Id);
+      if (current) {
+        setCurrentShow(current);
+      }
+    }
+  }, [rowsData]);
 
   const handleCellClick = async (e) => {
     setShowId(e.data.Id);

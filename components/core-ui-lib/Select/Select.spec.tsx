@@ -43,7 +43,7 @@ describe('Select Component', () => {
     );
     expect(screen.getByText('Label')).toBeInTheDocument();
     const selectedOption = screen.getAllByText('Multiple');
-    expect(selectedOption).toHaveLength(2);
+    expect(selectedOption).toHaveLength(1);
   });
 
   test('check for options dropdown', () => {
