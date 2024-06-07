@@ -178,12 +178,13 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         const gridApi = tableRef.current.getApi();
         const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
         setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response.data }));
+        setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
         const transaction = {
           update: [
             {
               ...rowDataToUpdate,
               ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`,
-              Image: response,
+              Image: response.data,
             },
           ],
         };
@@ -272,11 +273,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       // handleSave(e.data);
       await createNewProduction(e.data);
     } else if (e.column.colId === 'ImageUrl') {
-      const { imageUrl, originalFilename: name, id } = e.data.Image || {};
+      const { originalFilename: name, id } = e.data.Image || {};
+      console.log('====', e.data);
       setUploadModalContext({
         value: e.data.Image
           ? {
-              imageUrl,
+              imageUrl: e.data.ImageUrl,
               name,
               id,
             }
