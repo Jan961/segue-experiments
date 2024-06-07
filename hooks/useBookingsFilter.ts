@@ -16,7 +16,7 @@ const useBookingFilter = () => {
     const archivedProductionIds = productions
       .filter((production) => production.IsArchived)
       .map((production) => production.Id);
-    let filteredRowList = rows.filter(({ dateTime, status, productionId, venue, town }) => {
+    let filteredRowList = rows.filter(({ dateTime, status, productionId }) => {
       if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
         return false;
       }
@@ -38,10 +38,7 @@ const useBookingFilter = () => {
     };
     if (filter.venueText !== '') {
       const fuse = new Fuse(filteredRowList, fuseOptions);
-      filteredRowList = fuse
-        .search(filter.venueText)
-        .map((item) => item.item)
-        .reverse();
+      filteredRowList = fuse.search(filter.venueText).map((item) => item.item);
     }
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
