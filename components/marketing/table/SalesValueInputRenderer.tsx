@@ -5,7 +5,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 
 interface SalesValueRendererProps extends TextInputProps {
   eGridCell: HTMLElement;
-  currencySymbol: string;
+  currency: string;
 }
 
 const SalesValueInputRenderer = ({ eGridCell, error, ...props }: SalesValueRendererProps) => {
@@ -18,7 +18,7 @@ const SalesValueInputRenderer = ({ eGridCell, error, ...props }: SalesValueRende
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
       <div className="flex flex-row">
-        <div className="text-primary-input-text font-bold">{props.currencySymbol}</div>
+        <div className="text-primary-input-text font-bold">{props.currency}</div>
         <TextInput error={error} ref={inputRef} {...props} />
       </div>
     </BaseCellRenderer>

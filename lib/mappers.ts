@@ -119,6 +119,9 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   MarketingCostsStatus: b.MarketingCostsStatus,
   MarketingCostsApprovalDate: convertDate(b.MarketingCostsApprovalDate),
   MarketingCostsNotes: b.MarketingCostsNotes,
+  BookingCompNotes: b.CompNotes,
+  BookingHoldNotes: b.HoldNotes,
+  BookingSalesNotes: b.SalesNotes,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({

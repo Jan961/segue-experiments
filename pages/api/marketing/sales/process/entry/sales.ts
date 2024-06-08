@@ -6,7 +6,7 @@ export default async function handle(req, res) {
       data: {
         SetBookingId: parseInt(req.body.bookingId),
         SetPerformanceId: parseInt(req),
-        SetSalesFiguresDate: new Date(),
+        SetSalesFiguresDate: req.body.salesDate,
         SetBrochureReleased: false,
         SetSingleSeats: false,
         SetNotOnSale: false,

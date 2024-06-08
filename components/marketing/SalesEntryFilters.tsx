@@ -52,7 +52,7 @@ const SalesEntryFilters = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [bookings.bookings, lastDates]);
+  }, [selectedTourWeek]);
 
   const { fetchData } = useAxios();
 
