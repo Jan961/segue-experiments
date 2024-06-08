@@ -4,6 +4,7 @@ interface LabelProps {
   text: string;
   variant?: variant;
   className?: string;
+  htmlFor?: string;
 }
 
 const labelClassMap = {
@@ -12,7 +13,11 @@ const labelClassMap = {
   md: 'text-base',
   lg: 'text-lg',
 };
-export default function Label({ text, variant = 'sm', className = '' }: LabelProps) {
+export default function Label({ text, variant = 'sm', className = '', htmlFor }: LabelProps) {
   const basClass = `text-primary-label font-calibri ${labelClassMap[variant]}`;
-  return <span className={`${basClass} ${className}`}>{text}</span>;
+  return (
+    <label htmlFor={htmlFor} className={`${basClass} ${className}`}>
+      {text}
+    </label>
+  );
 }
