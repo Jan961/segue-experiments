@@ -12,7 +12,7 @@ export default function CompanyInformation() {
     <Layout title="Company Details | Segue" flush>
       <h1 className="text-4xl font-bold">Company Details</h1>
       <div className="flex justify-center">
-        <Tabs tabs={tabs} selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy">
+        <Tabs tabs={tabs} selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy" buttonWidth="w-[244px]">
           <Tab.Panel className="h-[650px] overflow-y-hidden">
             <CompanyDetailsTab />
           </Tab.Panel>
