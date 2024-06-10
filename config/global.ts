@@ -18,6 +18,7 @@ export const tileColors = {
   marketing: '#41A29A',
   tasks: '#FFBE43',
   contracts: '#0093C0',
+  systemAdmin: '#E94580',
 };
 
 export const homeIcon = {
