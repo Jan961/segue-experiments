@@ -1,10 +1,10 @@
 SELECT
   `ProductionView`.`FullProductionCode` AS `FullProductionCode`,
-  `frtxigoo_dev`.`Venue`.`VenueCode` AS `VenueCode`,
-  `frtxigoo_dev`.`Venue`.`VenueName` AS `VenueName`,
-  `frtxigoo_dev`.`Venue`.`VenueSeats` AS `VenueSeats`,
-  `frtxigoo_dev`.`Booking`.`BookingFirstDate` AS `BookingFirstDate`,
-  `frtxigoo_dev`.`Booking`.`BookingStatusCode` AS `BookingStatusCode`,
+  `frtxigoo_dev2`.`Venue`.`VenueCode` AS `VenueCode`,
+  `frtxigoo_dev2`.`Venue`.`VenueName` AS `VenueName`,
+  `frtxigoo_dev2`.`Venue`.`VenueSeats` AS `VenueSeats`,
+  `frtxigoo_dev2`.`Booking`.`BookingFirstDate` AS `BookingFirstDate`,
+  `frtxigoo_dev2`.`Booking`.`BookingStatusCode` AS `BookingStatusCode`,
   `BookingHoldCompUnionView`.`HoldOrComp` AS `HoldOrComp`,
   `BookingHoldCompUnionView`.`Code` AS `Code`,
   `BookingHoldCompUnionView`.`Name` AS `Name`,
@@ -13,15 +13,15 @@ SELECT
     SELECT
       `SalesSetTotalsView`.`Seats`
     FROM
-      `frtxigoo_dev`.`SalesSetTotalsView`
+      `frtxigoo_dev2`.`SalesSetTotalsView`
     WHERE
-      `SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
+      `SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev2`.`Booking`.`BookingId`
       AND `SalesSetTotalsView`.`SaleTypeName` = 'General Sales'
       AND `SalesSetTotalsView`.`SetSalesFiguresDate` = (
         SELECT
           max(`SS1`.`SetSalesFiguresDate`)
         FROM
-          `frtxigoo_dev`.`SalesSet` `SS1`
+          `frtxigoo_dev2`.`SalesSet` `SS1`
         WHERE
           `SS1`.`SetBookingId` = `SalesSetTotalsView`.`SetBookingId`
       )
@@ -30,15 +30,15 @@ SELECT
     SELECT
       `SalesSetTotalsView`.`Seats`
     FROM
-      `frtxigoo_dev`.`SalesSetTotalsView`
+      `frtxigoo_dev2`.`SalesSetTotalsView`
     WHERE
-      `SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
+      `SalesSetTotalsView`.`SetBookingId` = `frtxigoo_dev2`.`Booking`.`BookingId`
       AND `SalesSetTotalsView`.`SaleTypeName` = 'General Reserved'
       AND `SalesSetTotalsView`.`SetSalesFiguresDate` = (
         SELECT
           max(`SS1`.`SetSalesFiguresDate`)
         FROM
-          `frtxigoo_dev`.`SalesSet` `SS1`
+          `frtxigoo_dev2`.`SalesSet` `SS1`
         WHERE
           `SS1`.`SetBookingId` = `SalesSetTotalsView`.`SetBookingId`
       )
@@ -48,26 +48,26 @@ FROM
     (
       (
         (
-          `frtxigoo_dev`.`ProductionView`
-          JOIN `frtxigoo_dev`.`DateBlock` ON(
-            `ProductionView`.`ProductionId` = `frtxigoo_dev`.`DateBlock`.`DateBlockProductionId`
+          `frtxigoo_dev2`.`ProductionView`
+          JOIN `frtxigoo_dev2`.`DateBlock` ON(
+            `ProductionView`.`ProductionId` = `frtxigoo_dev2`.`DateBlock`.`DateBlockProductionId`
           )
         )
-        JOIN `frtxigoo_dev`.`Booking` ON(
-          `frtxigoo_dev`.`DateBlock`.`DateBlockId` = `frtxigoo_dev`.`Booking`.`BookingDateBlockId`
+        JOIN `frtxigoo_dev2`.`Booking` ON(
+          `frtxigoo_dev2`.`DateBlock`.`DateBlockId` = `frtxigoo_dev2`.`Booking`.`BookingDateBlockId`
         )
       )
-      JOIN `frtxigoo_dev`.`Venue` ON(
-        `frtxigoo_dev`.`Booking`.`BookingVenueId` = `frtxigoo_dev`.`Venue`.`VenueId`
+      JOIN `frtxigoo_dev2`.`Venue` ON(
+        `frtxigoo_dev2`.`Booking`.`BookingVenueId` = `frtxigoo_dev2`.`Venue`.`VenueId`
       )
     )
-    JOIN `frtxigoo_dev`.`BookingHoldCompUnionView` ON(
-      `BookingHoldCompUnionView`.`SetBookingId` = `frtxigoo_dev`.`Booking`.`BookingId`
+    JOIN `frtxigoo_dev2`.`BookingHoldCompUnionView` ON(
+      `BookingHoldCompUnionView`.`SetBookingId` = `frtxigoo_dev2`.`Booking`.`BookingId`
       AND `BookingHoldCompUnionView`.`SetSalesFiguresDate` = (
         SELECT
           max(`SS2`.`SetSalesFiguresDate`)
         FROM
-          `frtxigoo_dev`.`SalesSet` `SS2`
+          `frtxigoo_dev2`.`SalesSet` `SS2`
         WHERE
           `SS2`.`SetBookingId` = `BookingHoldCompUnionView`.`SetBookingId`
       )
@@ -75,10 +75,10 @@ FROM
   )
 GROUP BY
   `ProductionView`.`FullProductionCode`,
-  `frtxigoo_dev`.`Venue`.`VenueCode`,
-  `frtxigoo_dev`.`Venue`.`VenueName`,
-  `frtxigoo_dev`.`Venue`.`VenueSeats`,
-  `frtxigoo_dev`.`Booking`.`BookingFirstDate`,
+  `frtxigoo_dev2`.`Venue`.`VenueCode`,
+  `frtxigoo_dev2`.`Venue`.`VenueName`,
+  `frtxigoo_dev2`.`Venue`.`VenueSeats`,
+  `frtxigoo_dev2`.`Booking`.`BookingFirstDate`,
   `BookingHoldCompUnionView`.`HoldOrComp`,
   `BookingHoldCompUnionView`.`Code`,
   `BookingHoldCompUnionView`.`Name`
