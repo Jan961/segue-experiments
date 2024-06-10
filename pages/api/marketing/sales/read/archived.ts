@@ -3,11 +3,12 @@ import prisma from 'lib/prisma';
 import { SeatsInfo, TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
 import { checkAccess, getEmailFromReq } from 'services/userService';
+import { getCurrencyFromBookingId } from '../../../../../services/venueCurrencyService';
 
 // param.VenueCurrencySymbol to be added back in using unicode value
-const getSeatsRelatedInfo = (param: TSalesView): SeatsInfo => ({
+const getSeatsRelatedInfo = (param: TSalesView, currencySymbol: string): SeatsInfo => ({
   Seats: param.Seats,
-  ValueWithCurrencySymbol: param.Value ? `${numeral(param.Value).format('0,0.00')}` : '',
+  ValueWithCurrencySymbol: param.Value ? `${currencySymbol} ${numeral(param.Value).format('0,0.00')}` : '',
   BookingId: param.BookingId,
   DataFound: true,
   SetSalesFiguresDate: param.SetSalesFiguresDate,
@@ -21,13 +22,21 @@ const getSeatsRelatedInfoAsNull = (bookingId: number): SeatsInfo => ({
   SetSalesFiguresDate: '',
 });
 
-const rearrangeArray = ({ arr, bookingIds }: { arr: TSalesView[]; bookingIds: number[] }): SeatsInfo[] => {
+const rearrangeArray = ({
+  arr,
+  bookingIds,
+  currencySymbol,
+}: {
+  arr: TSalesView[];
+  bookingIds: number[];
+  currencySymbol: string;
+}): SeatsInfo[] => {
   const arrangedArray: SeatsInfo[] = [];
   const totalBookings = bookingIds.length;
   for (let i = 0; i < totalBookings; i++) {
     for (let j = 0; j < arr.length; j++) {
       if (arr[j].BookingId === bookingIds[i]) {
-        arrangedArray.push(getSeatsRelatedInfo(arr[j]));
+        arrangedArray.push(getSeatsRelatedInfo(arr[j], currencySymbol));
         break;
       }
 
@@ -70,7 +79,9 @@ export default async function handle(req, res) {
       const t2 = Number(b.SetBookingWeekNum);
       return t1 - t2;
     });
-
+    console.log(bookingIds[0]);
+    const currencySymbol = (await getCurrencyFromBookingId(bookingIds[0])) || '';
+    console.log(currencySymbol);
     const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
       formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
     );
@@ -82,7 +93,7 @@ export default async function handle(req, res) {
           SetBookingWeekNum: x.SetBookingWeekNum,
           SetProductionWeekDate: x.SetProductionWeekDate,
           SetIsFinalFigures: x.SetIsFinalFigures,
-          data: rearrangeArray({ arr: result[idx], bookingIds }),
+          data: rearrangeArray({ arr: result[idx], bookingIds, currencySymbol }),
         },
       ],
       [],
