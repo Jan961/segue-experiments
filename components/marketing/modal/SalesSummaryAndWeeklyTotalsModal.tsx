@@ -17,6 +17,7 @@ import { notify } from 'components/core-ui-lib/Notifications';
 interface SalesSummaryReportModalProps {
   visible: boolean;
   onClose: () => void;
+  activeModal: string;
 }
 
 const defaultFormData = {
@@ -27,7 +28,7 @@ const defaultFormData = {
   productionStartDate: null,
   productionEndDate: null,
 };
-const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalProps) => {
+const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummaryReportModalProps) => {
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
   const { production, productionWeek, numberOfWeeks, order } = formData;
@@ -89,8 +90,24 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
     );
   }, [formData, onClose]);
 
+  const returnModalTitle = (): string => {
+    switch (activeModal) {
+      case 'salesSummary':
+        return 'Sales Summary';
+      case 'salesSummaryAndWeeklyTotals':
+        return 'Sales Summary and Weekly Totals';
+      case 'salesVsCapacity':
+        return 'Sales vs Capacity %';
+    }
+  };
+
   return (
-    <PopupModal titleClass="text-xl text-primary-navy text-bold" title="Sales Summary" show={visible} onClose={onClose}>
+    <PopupModal
+      titleClass="text-xl text-primary-navy text-bold"
+      title={returnModalTitle()}
+      show={visible}
+      onClose={onClose}
+    >
       <form className="flex flex-col gap-4 w-[383px] mt-4">
         <Select
           label="Production"
@@ -117,15 +134,17 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
             />
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Label text="Order" />
-          <Select
-            className="w-full"
-            onChange={(value) => onChange('order', value as string)}
-            options={salesSummarySortOptions}
-            value={order}
-          />
-        </div>
+        {activeModal === 'salesSummary' && (
+          <div className="flex items-center gap-2">
+            <Label text="Order" />
+            <Select
+              className="w-full"
+              onChange={(value) => onChange('order', value)}
+              options={salesSummarySortOptions}
+              value={order}
+            />
+          </div>
+        )}
         <div className="pt-3 w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
           <Button
