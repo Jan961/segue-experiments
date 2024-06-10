@@ -11,9 +11,7 @@ export const getCurrencyFromBookingId = async (bookingId: number) => {
       },
       select: { VenueId: true },
     });
-    console.log(venueIdQuery);
     const venueId = venueIdQuery ? venueIdQuery?.VenueId : null;
-    console.log(venueId);
     const currencyCodeQuery: any | null = await prisma.Venue.findFirst({
       where: {
         Id: { equals: venueId },
@@ -24,7 +22,6 @@ export const getCurrencyFromBookingId = async (bookingId: number) => {
         },
       },
     });
-    console.log(currencyCodeQuery);
     return currencyCodeQuery ? charCodeToCurrency(currencyCodeQuery.Currency.SymbolUnicode) : null;
   } catch (exception) {
     console.log(exception);

@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { TSalesView } from 'types/MarketingTypes';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { getCurrencyFromBookingId } from '../../../../../services/venueCurrencyService';
 
 const getMapKey = ({
   FullProductionCode,
@@ -34,6 +35,10 @@ export default async function handle(req, res) {
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
 
+    console.log(BookingId);
+    const currencySymbol = (await getCurrencyFromBookingId(BookingId[0])) || '';
+    console.log(currencySymbol);
+
     const data =
       await prisma.$queryRaw`select * from SalesView where BookingId=${BookingId} order by BookingFirstDate, SetSalesFiguresDate`;
     const groupedData = data.reduce((acc, sale) => {
@@ -47,20 +52,20 @@ export default async function handle(req, res) {
             ...(sale.SaleTypeName === 'General Sales' && {
               genSeatsSold: sale.Seats,
               venueCurrencySymbol: sale.VenueCurrencySymbol,
-              genTotalValue: sale.Value,
+              genTotalValue: currencySymbol + sale.Value,
             }),
             ...(sale.SaleTypeName === 'General Reservations' && {
               genReserved: sale.Seats,
-              genReservations: sale.Value,
+              genReservations: currencySymbol + sale.Value,
             }),
             ...(sale.SaleTypeName === 'School Sales' && {
               schSeatsSold: sale.Seats,
               venueCurrencySymbol: sale.VenueCurrencySymbol,
-              schTotalValue: sale.Value,
+              schTotalValue: currencySymbol + sale.Value,
             }),
             ...(sale.SaleTypeName === 'School Reservations' && {
               schReserved: sale.Seats,
-              schReservations: sale.Value,
+              schReservations: currencySymbol + sale.Value,
             }),
           },
         };
@@ -93,20 +98,20 @@ export default async function handle(req, res) {
           notOnSaleDate: sale.NotOnSaleDate,
           ...(sale.SaleTypeName === 'General Sales' && {
             genSeatsSold: sale.Seats,
-            genTotalValue: sale.Value,
+            genTotalValue: currencySymbol + sale.Value,
           }),
           ...(sale.SaleTypeName === 'General Reservations' && {
             genReserved: sale.Seats,
-            genReservations: sale.Value,
+            genReservations: currencySymbol + sale.Value,
           }),
           ...(sale.SaleTypeName === 'School Sales' && {
             schSeatsSold: sale.Seats,
             venueCurrencySymbol: sale.VenueCurrencySymbol,
-            schTotalValue: sale.Value,
+            schTotalValue: currencySymbol + sale.Value,
           }),
           ...(sale.SaleTypeName === 'School Reservations' && {
             schReserved: sale.Seats,
-            schReservations: sale.Value,
+            schReservations: currencySymbol + sale.Value,
           }),
         },
       };

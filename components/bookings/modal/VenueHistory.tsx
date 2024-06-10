@@ -16,7 +16,6 @@ import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/s
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
-import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -50,7 +49,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [errorMessage, setErrorMessage] = useState('');
   const { productions } = useRecoilValue(productionJumpState);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
-  const [currencySymbol, setCurrencySymbol] = useState<string>('');
   const salesTableRef = useRef(null);
 
   const { fetchData } = useAxios();
@@ -147,19 +145,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     }
     setLoading(true);
 
-    if (venueDict[venueID].CurrencyCode) {
-      setCurrencySymbol(charCodeToCurrency(venueDict[venueID].CurrencyCode));
-    } else {
-      const currencySymbol: any = await fetchData({
-        url: '/api/marketing/sales/currency/currency',
-        method: 'POST',
-        data: { searchValue: selectedBookings[0].bookingId, inputType: 'bookingId' },
-      });
-
-      currencySymbol.currencyCode
-        ? setCurrencySymbol(charCodeToCurrency(currencySymbol.currencyCode))
-        : setCurrencySymbol('');
-    }
     const data = await fetchData({
       url: '/api/marketing/sales/read/archived',
       method: 'POST',
@@ -179,23 +164,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getSalesSnapshot = async (bookingId: string) => {
     setErrorMessage('');
     setLoading(true);
-    let currencySymbolData: any;
-    if (venueDict[venueID].CurrencyCode) {
-      setCurrencySymbol(charCodeToCurrency(venueDict[venueID].CurrencyCode));
-    } else {
-      try {
-        currencySymbolData = await fetchData({
-          url: '/api/marketing/sales/currency/currency',
-          method: 'POST',
-          data: { searchValue: selectedBookings[0].bookingId, inputType: 'bookingId' },
-        });
-      } catch (exception) {
-        console.log(exception);
-      }
-      currencySymbolData.currencyCode
-        ? setCurrencySymbol(charCodeToCurrency(currencySymbolData.currencyCode))
-        : setCurrencySymbol('');
-    }
     let data;
     try {
       data = await fetchData({
@@ -336,7 +304,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               data={prodCompData}
               cellRenderParams={{ selected: selectedBookings }}
               productions={productions}
-              currencySymbol={currencySymbol}
             />
           )}
 
@@ -368,7 +335,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               module="bookings"
               variant="salesComparison"
               data={salesCompData}
-              currencySymbol={currencySymbol}
             />
           )}
 
@@ -425,7 +391,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
             module="bookings"
             variant="salesSnapshot"
             data={salesSnapData}
-            currencySymbol={currencySymbol}
           />
 
           <div className="float-right flex flex-row mt-5 py-2">
