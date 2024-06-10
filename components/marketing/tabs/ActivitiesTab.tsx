@@ -18,7 +18,6 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { isNullOrEmpty } from 'utils';
-import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -48,10 +47,9 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [marketingPlansCheck, setMarketingPlansCheck] = useState<boolean>(false);
   const [printReqCheck, setPrintReqCheck] = useState<boolean>(false);
   const [contactInfoCheck, setContactInfoCheck] = useState<boolean>(false);
-  const [totalCost, setTotalCost] = useState<number>(0);
-  const [totalVenueCost, setTotalVenueCost] = useState<number>(0);
-  const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
-  const [currency, setCurrency] = useState('');
+  const [totalCost, setTotalCost] = useState<string>(' ');
+  const [totalVenueCost, setTotalVenueCost] = useState<string>(' ');
+  const [totalCompanyCost, setTotalCompanyCost] = useState<string>(' ');
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
@@ -69,7 +67,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const { fetchData } = useAxios();
 
-  const getActivities = async (bookingId: string, currency: string) => {
+  const getActivities = async (bookingId: string) => {
     try {
       const data = await fetchData({
         url: '/api/marketing/activities/' + bookingId,
@@ -88,7 +86,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       setActTypeList(actTypes);
 
-      setActColDefs(activityColDefs(activityUpdate, currency));
+      setActColDefs(activityColDefs(activityUpdate));
 
       const sortedActivities = activityData.activities.sort(
         (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
@@ -117,17 +115,19 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const calculateActivityTotals = (tableRows) => {
     const { venueTotal, companyTotal } = tableRows.reduce(
       (acc, row) => {
-        acc.venueTotal += row.venueCost;
-        acc.companyTotal += row.companyCost;
+        console.log(row.venueCost.substring(1));
+        console.log(row.venueCost);
+        acc.venueTotal += parseFloat(row.venueCost.substring(1));
+        acc.companyTotal += parseFloat(row.companyCost.substring(1));
         return acc;
       },
       { venueTotal: 0, companyTotal: 0 },
     );
+    console.log('some value i made up ', tableRows[0].companyCost.charAt(0));
+    const totalCost = tableRows[0].companyCost.charAt(0) + (venueTotal + companyTotal);
 
-    const totalCost = venueTotal + companyTotal;
-
-    setTotalCompanyCost(companyTotal);
-    setTotalVenueCost(venueTotal);
+    setTotalCompanyCost(tableRows[0].companyCost.charAt(0) + companyTotal.toString());
+    setTotalVenueCost(tableRows[0].companyCost.charAt(0) + venueTotal.toString());
     setTotalCost(totalCost);
   };
 
@@ -299,32 +299,13 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       data: updObj,
     });
   };
-
-  const getCurrencySymbol = async (VenueId) => {
-    let currencySymbolData: any;
-    try {
-      currencySymbolData = await fetchData({
-        url: '/api/marketing/sales/currency/currency',
-        method: 'POST',
-        data: { searchValue: VenueId, inputType: 'venueId' },
-      });
-    } catch (exception) {
-      console.log(exception);
-    }
-
-    currencySymbolData.currencyCode
-      ? setCurrency(charCodeToCurrency(currencySymbolData.currencyCode))
-      : setCurrency('');
-  };
-
   useEffect(() => {
     if (!isNullOrEmpty(props.bookingId)) {
       setBookingIdVal(props.bookingId);
-      getActivities(props.bookingId.toString(), currency);
+      getActivities(props.bookingId.toString());
 
       // set checkbox row on activities tab
       const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
-      getCurrencySymbol(booking.VenueId);
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
@@ -336,7 +317,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       setDataAvailable(true);
     }
-  }, [props.bookingId, currency]);
+  }, [props.bookingId]);
 
   return (
     <>
@@ -451,7 +432,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
                     <div className="text text-base text-left pl-2 text-primary-input-text">
-                      {currency + totalCost.toFixed(2)}
+                      {totalCost.charAt(0) + parseFloat(totalCost.substring(1)).toFixed(2)}
                     </div>
                   </div>
                 </div>
@@ -460,7 +441,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   <div className="text-base font-bold text-primary-input-text">Company</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
                     <div className="text text-base text-left pl-2 text-primary-input-text">
-                      {currency + totalCompanyCost.toFixed(2)}
+                      {totalCompanyCost.charAt(0) + parseFloat(totalCompanyCost.substring(1)).toFixed(2)}
                     </div>
                   </div>
                 </div>
@@ -468,9 +449,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="flex flex-col text-center">
                   <div className="text-base font-bold text-primary-input-text">Venue</div>
                   <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
-                    <div className="text text-base text-left pl-2 text-primary-input-text">
-                      {currency + totalVenueCost.toFixed(2)}
-                    </div>
+                    <div className="text text-base text-left pl-2 text-primary-input-text">{totalVenueCost}</div>
                   </div>
                 </div>
               </div>
@@ -485,7 +464,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
             onSave={(variant, data) => saveActivity(variant, data)}
             bookingId={bookingIdVal}
             data={actRow}
-            venueCurrency={currency}
           />
 
           <ConfirmationDialog

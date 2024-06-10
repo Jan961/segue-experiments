@@ -10,7 +10,7 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 
 export const styleProps = { headerColor: tileColors.marketing };
 
-export const activityColDefs = (updateActivity, venueCurrency) => [
+export const activityColDefs = (updateActivity) => [
   {
     headerName: 'Activity Name',
     field: 'actName',
@@ -54,7 +54,7 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     headerName: 'Company Cost',
     field: 'companyCost',
     cellRenderer: (params) => {
-      return venueCurrency + (params.data.companyCost > 0 ? parseFloat(params.data.companyCost).toFixed(2) : '0.00');
+      return params.data.venueCost.charAt(0) + parseFloat(params.data.companyCost.substring(1)).toFixed(2);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -66,7 +66,7 @@ export const activityColDefs = (updateActivity, venueCurrency) => [
     headerName: 'Venue Cost',
     field: 'venueCost',
     cellRenderer: (params) => {
-      return venueCurrency + (params.data.venueCost > 0 ? parseFloat(params.data.venueCost).toFixed(2) : '0.00');
+      return params.data.venueCost.charAt(0) + parseFloat(params.data.venueCost.substring(1)).toFixed(2);
     },
     cellStyle: {
       paddingLeft: '8px',

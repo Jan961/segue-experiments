@@ -35,8 +35,8 @@ export default async function handle(req, res) {
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
 
-    console.log(BookingId);
-    const currencySymbol = (await getCurrencyFromBookingId(BookingId[0])) || '';
+    console.log('tjis is the booking id', BookingId);
+    const currencySymbol = (await getCurrencyFromBookingId(BookingId)) || '';
     console.log(currencySymbol);
 
     const data =

@@ -9,7 +9,6 @@ import useAxios from 'hooks/useAxios';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import charCodeToCurrency from '../../../utils/charCodeToCurrency';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -63,7 +62,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
   };
 
   const showArchivedSales = async (selection) => {
-    let data, currencySymbolData, selectedBookings;
+    let data, selectedBookings;
 
     setArchivedSalesTable(<div />);
 
@@ -79,19 +78,6 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
       data = [];
     }
 
-    try {
-      currencySymbolData = await fetchData({
-        url: '/api/marketing/sales/currency/currency',
-        method: 'POST',
-        data: { searchValue: selectedBookings[0], inputType: 'bookingId' },
-      });
-    } catch (exception) {
-      console.log(exception);
-    }
-
-    const currencySymbol: string = currencySymbolData.currencyCode
-      ? charCodeToCurrency(currencySymbolData.currencyCode)
-      : '';
     if (Array.isArray(data) && data.length !== 0) {
       const salesComp = data as Array<SalesComparison>;
       const result = { tableData: salesComp, bookingIds: selection };
@@ -105,7 +91,6 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
             variant="salesComparison"
             data={result}
             tableHeight={580}
-            currencySymbol={currencySymbol}
           />
         </div>,
       );
