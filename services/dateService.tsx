@@ -301,3 +301,23 @@ export const getArrayOfDatesBetween = (start: string, end: string) => {
   }
   return arr.map(getKey);
 };
+
+/**
+ *
+ * @param {Date} inputDate // the date to add/subtract from
+ * @param {number} duration // number of days to add/subtract
+ * @param {boolean} add // controls whether days are added or subtracted - if true days are added
+ * @returns
+ *
+ * This function is used to add / subtract days from thr supplied starting date
+ *
+ */
+export function addDurationToDate(inputDate: Date, duration: number, add: boolean) {
+  const startingDate = new Date(inputDate.getTime());
+  if (add) {
+    startingDate.setDate(startingDate.getDate() + duration);
+  } else {
+    startingDate.setDate(startingDate.getDate() - duration);
+  }
+  return startingDate;
+}

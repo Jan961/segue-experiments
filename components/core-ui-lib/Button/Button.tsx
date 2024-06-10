@@ -15,6 +15,7 @@ export interface ButtonProps {
   prefixIconName?: IconName | string;
   sufixIconName?: IconName | string;
   iconProps?: Partial<IconProps>;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 const baseClass =
@@ -42,6 +43,7 @@ export default function Button({
   sufixIconName,
   iconProps,
   children,
+  type = 'button',
 }: PropsWithChildren<ButtonProps>) {
   const variantClass = ClassMap.get(variant);
   const disabledClass = disabled
@@ -52,7 +54,7 @@ export default function Button({
   return (
     <button
       id={id}
-      type="button"
+      type={type}
       className={classNames(
         endClass,
         { 'items-center gap-1 grid grid-cols-12': prefixIconName || sufixIconName },

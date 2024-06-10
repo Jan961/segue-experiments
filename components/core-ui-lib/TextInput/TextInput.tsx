@@ -4,6 +4,7 @@ import { IconName } from '../Icon/Icon';
 import classNames from 'classnames';
 export interface TextInputProps {
   id?: string;
+  name?: string;
   value?: string;
   disabled?: boolean;
   className?: string;
@@ -26,7 +27,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       value = '',
       className = '',
       disabled = false,
-      onChange,
+      onChange = () => null,
       placeholder = '',
       onClick,
       iconName,

@@ -17,6 +17,7 @@ import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
+import { isNullOrEmpty } from 'utils';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -139,7 +140,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
     try {
       const actData = await fetchData({
-        url: '/api/marketing/activities/' + bookingIdVal,
+        url: '/api/marketing/activities/' + props.bookingId.toString(),
         method: 'POST',
       });
 
@@ -292,14 +293,14 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
     // update in the database
     await fetchData({
-      url: '/api/bookings/update/' + bookingIdVal.toString(),
+      url: '/api/bookings/update/' + props.bookingId.toString(),
       method: 'POST',
       data: updObj,
     });
   };
 
   useEffect(() => {
-    if (props.bookingId) {
+    if (!isNullOrEmpty(props.bookingId)) {
       setCurrency('£');
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString());

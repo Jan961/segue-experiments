@@ -7,6 +7,9 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
+import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
+import SalesValueInputRenderer from './SalesValueInputRenderer';
+import { isNullOrEmpty } from 'utils';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -328,3 +331,54 @@ export const attachmentsColDefs = [
     resizable: false,
   },
 ];
+
+export const salesEntryColDefs = (type: string, currency: string, handleUpdate) => {
+  const colDefs = [
+    {
+      headerName: type,
+      field: 'name',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+      cellStyle: {},
+      resizable: true,
+    },
+    {
+      headerName: 'Seats',
+      field: 'seats',
+      cellRenderer: TextInputRenderer,
+      cellRendererParams: function (params) {
+        return {
+          value: isNullOrEmpty(params.data.seats) ? '0' : params.data.seats.toString(),
+          className: 'w-[100px] ml-1 mt-1',
+          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'seats'),
+        };
+      },
+      width: 112,
+      cellStyle: {},
+      resizable: type === 'Holds',
+    },
+  ];
+
+  if (type === 'Holds') {
+    colDefs.push({
+      headerName: 'Value',
+      field: 'value',
+      cellRenderer: SalesValueInputRenderer,
+      cellRendererParams: function (params) {
+        return {
+          value: isNullOrEmpty(params.data.value) ? '0' : params.data.value.toString(),
+          className: 'w-[90px] ml-1 mt-1',
+          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'value'),
+          currency,
+        };
+      },
+      cellStyle: {
+        marginLeft: '4px',
+      },
+      width: 120,
+      resizable: false,
+    });
+  }
+
+  return colDefs;
+};
