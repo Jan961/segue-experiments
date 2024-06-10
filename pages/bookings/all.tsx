@@ -71,10 +71,19 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     (v) => v.Id,
     (v: any) => {
       const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
-      const countryId = v.VenueAddress.find((address:any) => address.TypeName ==='Main').CountryId;
-      const region :any |null = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId)?? null;
+      const countryId = v.VenueAddress.find((address: any) => address.TypeName === 'Main')?.CountryId;
 
-      return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0, RegionId: region?.RegionId, };
+      const region = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId) ?? null;
+
+      return {
+        Id: v.Id,
+        Code: v.Code,
+        Name: v.Name,
+        Town,
+        Seats: v.Seats,
+        Count: 0,
+        RegionId: region ? region.RegionId : -1,
+      };
     },
   );
 
@@ -130,7 +139,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       });
     }
   }
-
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {
