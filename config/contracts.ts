@@ -23,6 +23,42 @@ export const booleanOptions = [
   { text: 'NO', value: 2 },
 ];
 
+export const callOptions = [
+  { text: 'PROMOTER', value: 'p' },
+  { text: 'VENUE', value: 'v' },
+];
+
+export const callValueOptions = [
+  { text: 'PERCENTAGE', value: 'p' },
+  { text: 'VALUE', value: 'v' },
+];
+
+export const calls = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+
+export const saleFrequency = [
+  { text: 'Weekly', value: 'W' },
+  { text: 'Daily', value: 'D' },
+];
+
+export const saleFrequencyDay = [
+  { text: 'Monday', value: 1 },
+  { text: 'Tuesday', value: 2 },
+  { text: 'Wednesday', value: 3 },
+  { text: 'Thursday', value: 4 },
+  { text: 'Friday', value: 5 },
+  { text: 'Saturday', value: 6 },
+];
+
+export const transactionOptions = [
+  { text: 'Per Ticket', value: 'preTicket' },
+  { text: 'Per Transaction', value: 'perTransaction' },
+];
+
+export const sellerOptions = [
+  { text: 'PRODUCTION', value: 'production' },
+  { text: 'VENUE', value: 'venue' },
+];
+
 export const contractsStatusMap = {
   CSAR: 'Received Not Returned',
   U: 'Received, Questions Raised',

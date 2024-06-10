@@ -9,18 +9,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-    const getDealMemo = await prisma.dealMemo.findFirst({
+    const data = req.body;
+    const updateDealMemoPrice = await prisma.dealMemoCall.delete({
       where: {
-        DeMoBookingId: BookingId,
-      },
-      include: {
-        DealMemoPrice: true,
-        DealMemoTechProvision: true,
-        DealMemoCall: true,
+        DMPDeMoId: data.DMPDeMoId,
+        DMPId: data.DMPId,
       },
     });
 
-    await res.json(getDealMemo);
+    await res.json(updateDealMemoPrice);
   } catch (err) {
     console.log(err);
     res.status(403).json({ err: 'Error occurred while generating search results.' });

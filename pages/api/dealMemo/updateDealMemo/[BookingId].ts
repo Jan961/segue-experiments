@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { getDealMemoCall, getPrice, getTechProvision } from '../utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -10,16 +11,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
     const data = req.body;
-    console.log('data==>', data);
     // const updatedData = req.body;
     delete data.error;
+    delete data.DeMoId;
+    delete data.DeMoBookingId;
+    delete data.DeMoAccContId;
+    delete data.DeMoBOMVenueContactId;
+    delete data.DeMoTechVenueContactId;
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
         DeMoBookingId: BookingId,
       },
     });
-    let updateCreateDealMemo;
 
+    let updateCreateDealMemo;
+    const priceData = getPrice(data.DealMemoPrice);
+    const techProvisionData = getTechProvision(data.DealMemoTechProvision);
+
+    const dealMemoCallData = getDealMemoCall(data.DealMemoCall);
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
@@ -27,6 +36,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
         data: {
           ...data,
+          DealMemoPrice: {
+            updateMany: priceData[0],
+            create: priceData[1],
+          },
+          DealMemoTechProvision: {
+            updateMany: techProvisionData[0],
+            create: techProvisionData[1],
+          },
+          DealMemoCall: {
+            updateMany: dealMemoCallData[0],
+            create: dealMemoCallData[1],
+          },
           Booking: {
             connect: { Id: BookingId },
           },
@@ -36,6 +57,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       updateCreateDealMemo = await prisma.dealMemo.create({
         data: {
           ...data,
+          DealMemoPrice: {
+            create: priceData[1],
+          },
+          DealMemoTechProvision: {
+            create: data.DealMemoTechProvision,
+          },
+          DealMemoCall: {
+            create: data.DealMemoCall,
+          },
           Booking: {
             connect: { Id: BookingId },
           },

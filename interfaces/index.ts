@@ -1,3 +1,5 @@
+import { DealMemoPrice, DealMemoTechProvision } from '@prisma/client';
+
 export type StatusCode = 'C' | 'U' | 'X';
 
 export type Currency = {
@@ -557,7 +559,16 @@ export interface ContactDemoFormData {
 export interface ContactDemoFormData1 {
   // phone: string;
   Email: string;
-  AccountUser: string;
+  AccountUser: any;
+}
+
+export interface DealMemoCall {
+  DMCId?: number;
+  DMCDeMoId?: number;
+  DMCCallNum?: number;
+  DMCPromoterOrVenue?: string;
+  DMCType?: string;
+  DMCValue?: number;
 }
 export interface DealMemoContractFormData {
   DeMoId?: number;
@@ -630,4 +641,15 @@ export interface DealMemoContractFormData {
   DeMoAdvancePaymentDueBy?: Date;
   DeMoSettlementDays?: number;
   DeMoContractClause?: string;
+  DealMemoPrice?: DealMemoPrice[];
+  DealMemoTechProvision?: DealMemoTechProvision[];
+  DealMemoCall?: any;
+}
+
+export interface DealMemoPriceState {
+  DMPTicketName?: string;
+  DMPTicketPrice: number;
+  DMPNumTickets: number;
+  DMPDeMoId: number;
+  DMPNotes: string;
 }
