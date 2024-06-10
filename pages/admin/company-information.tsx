@@ -7,12 +7,11 @@ import StaffDetailsTab from './tabs/StaffDetailsTab';
 import CompanyDetailsTab from './tabs/CompanyDetailsTab';
 export default function CompanyInformation() {
   const tabs = ['Company Details', 'Staff Details', 'System Administrator Details', 'Production Companies'];
-
   return (
     <Layout title="Company Details | Segue" flush>
-      <h1 className="text-4xl font-bold">Company Details</h1>
+      <h1 className="text-4xl font-bold text-primary-pink">Company Details</h1>
       <div className="flex justify-center">
-        <Tabs tabs={tabs} selectedTabClass="!bg-primary-green/[0.30] !text-primary-navy" buttonWidth="w-[244px]">
+        <Tabs tabs={tabs} selectedTabClass="!bg-primary-pink/[0.50] !text-primary-navy" buttonWidth="w-[244px]">
           <Tab.Panel className="h-[650px] overflow-y-hidden">
             <CompanyDetailsTab />
           </Tab.Panel>
