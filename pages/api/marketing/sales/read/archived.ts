@@ -3,7 +3,7 @@ import prisma from 'lib/prisma';
 import { SeatsInfo, TSalesView } from 'types/MarketingTypes';
 import numeral from 'numeral';
 import { checkAccess, getEmailFromReq } from 'services/userService';
-import { getCurrencyFromBookingId } from '../../../../../services/venueCurrencyService';
+import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 
 // param.VenueCurrencySymbol to be added back in using unicode value
 const getSeatsRelatedInfo = (param: TSalesView, currencySymbol: string): SeatsInfo => ({

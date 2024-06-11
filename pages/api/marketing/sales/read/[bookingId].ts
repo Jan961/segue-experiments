@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { TSalesView } from 'types/MarketingTypes';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getCurrencyFromBookingId } from '../../../../../services/venueCurrencyService';
+import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 
 const getMapKey = ({
   FullProductionCode,
