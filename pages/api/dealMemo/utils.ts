@@ -1,4 +1,6 @@
 export const getPrice = (dealMemoPrice) => {
+  console.log('priceData==>', dealMemoPrice);
+
   const updatePrice = [];
   const createPrice = [];
   dealMemoPrice.forEach((priceData) => {

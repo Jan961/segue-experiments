@@ -559,10 +559,15 @@ export interface ContactDemoFormData {
   email: string;
 }
 
-export interface ContactDemoFormData1 {
+export interface ContactDemoFormAccountData {
   // phone: string;
-  Email: string;
-  AccountUser: any;
+  Email?: string;
+  AccountUser?: any;
+  companyContact?: string;
+}
+
+export interface ContactsFormData {
+  data: ContactDemoFormAccountData;
 }
 
 export interface DealMemoCall {

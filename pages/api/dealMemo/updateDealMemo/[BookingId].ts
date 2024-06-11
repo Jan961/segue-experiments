@@ -10,7 +10,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-    const data = req.body;
+    const data = req.body.formData;
     // const updatedData = req.body;
     delete data.error;
     delete data.DeMoId;

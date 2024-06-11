@@ -6,10 +6,15 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
-import { ContactDemoFormData, ContactDemoFormData1, DealMemoContractFormData, ProductionDTO } from 'interfaces';
+import {
+  ContactDemoFormAccountData,
+  ContactDemoFormData,
+  ContactsFormData,
+  DealMemoContractFormData,
+  ProductionDTO,
+} from 'interfaces';
 import { AddEditContractsState } from 'state/contracts/contractsState';
 import { useEffect, useMemo, useState } from 'react';
-import useAxios from 'hooks/useAxios';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import {
@@ -41,11 +46,10 @@ export const EditDealMemoContractModal = ({
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
 }) => {
-  const { fetchData } = useAxios();
   const [formData, setFormData] = useState<Partial<DealMemoContractFormData>>({
     ...demoModalData,
   });
-  const [contactsFormData, setContactsFormData] = useState<any>({});
+  const [contactsFormData, setContactsFormData] = useState<ContactDemoFormAccountData>({});
   const [contractCheckBox, setContractCheckBox] = useState<boolean>(false);
   const [dealMemoPriceFormData, setdealMemoPriceFormData] = useState({});
 
@@ -97,8 +101,8 @@ export const EditDealMemoContractModal = ({
   }, [dealMemoCustomPriceFormData, dealMemoPriceFormData]);
 
   useEffect(() => {
-    const data = [...dealMemoTechProvision];
-    formData.DealMemoTechProvision = data;
+    // const data = [...dealMemoTechProvision];
+    formData.DealMemoTechProvision = [];
   }, [dealMemoTechProvision]);
 
   useEffect(() => {
@@ -130,29 +134,24 @@ export const EditDealMemoContractModal = ({
   };
 
   const saveDemoModalData = async () => {
-    await fetchData({
-      url: `/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`,
-      method: 'POST',
-      data: formData,
+    axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
+      formData,
     });
   };
 
   const handleContactsSection = async (value, key) => {
     const updatedFormData = {
-      ...formData,
+      ...contactsFormData,
       [key]: value,
     };
     setContactsFormData({ ...updatedFormData });
-
-    const userData = (await fetchData({
-      url: `/api/dealMemo/getContacts/${selectedTableCell.contract.Id}/${value}`,
-      method: 'GET',
-      data: formData,
-    })) as unknown as ContactDemoFormData1;
-    if (userData !== null) {
+    const userData = (await axios.get(
+      `/api/dealMemo/getContacts/${selectedTableCell.contract.Id}/${value}`,
+    )) as ContactsFormData;
+    if (userData.data !== null) {
       const data = {
-        email: userData?.Email,
-        phone: userData?.AccountUser.Account.AccountContact.AccContPhone,
+        email: userData.data?.Email,
+        phone: userData.data?.AccountUser.Account.AccountContact.AccContPhone,
       };
       setContactsData(data);
     }
@@ -280,7 +279,7 @@ export const EditDealMemoContractModal = ({
             />
           </div>
         </div>
-        <div className="text-primary-input-text mt-4 font-calibri">
+        <div className="text-primary-input-text mt-4">
           Please read this carefully to ensure it reflects the terms as agreed between {`Jendagi Productions Limited`}{' '}
           and {`${selectedTableCell.contract.venue}`}.
           <br />
@@ -302,7 +301,7 @@ export const EditDealMemoContractModal = ({
             ASAP
           </span>
         </div>
-        <div className="text-primary-input-text mt-4 font-calibri">
+        <div className="text-primary-input-text mt-4">
           If we have requested anything that incurs a cost, it must be agreed with {`Jendagi Productions Limited`} prior
           to our arrival. No extras will be paid without a pre-authorisation
           {`(this includes internal access).`} Unless otherwise agreed, all staff calls will be scheduled within the

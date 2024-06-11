@@ -21,7 +21,6 @@ export const useFetchDealMemoData = (selectedTableCell) => {
         setDemoModalData(data as DealMemoContractFormData);
       } catch (error) {
         console.error('Error fetching deal memo data:', error);
-        // Handle errors (optional: display an error message to the user)
       }
     };
 
