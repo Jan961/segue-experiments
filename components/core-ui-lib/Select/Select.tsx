@@ -7,6 +7,7 @@ import WindowedSelect, {
   DropdownIndicatorProps,
   IndicatorsContainerProps,
   MultiValueProps,
+  ActionMeta,
 } from 'react-windowed-select';
 import { WithTestId } from 'types';
 import Icon from '../Icon';
@@ -47,7 +48,7 @@ const COMP_HEIGHT = '1.9375rem';
 
 export interface SelectProps extends WithTestId {
   value?: string | number | any[] | undefined | boolean;
-  onChange: (value: string | number) => void;
+  onChange: (value: string | number | (string | number)[]) => void;
   renderOption?: (option: OptionProps) => React.ReactElement;
   customStyles?: Partial<StylesConfig>;
   options: SelectOption[];
@@ -155,27 +156,29 @@ export default forwardRef(function Select(
   );
 
   const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>([]);
-  const [selectedOption, setSelectedOption] = useState<SelectOption>({ text: '', value: '' });
+  const [selectedOption, setSelectedOption] = useState<SelectOption | SelectOption[]>({ text: '', value: '' });
 
   useEffect(() => {
     setFilteredOptions(options);
   }, [options]);
 
-  const handleOptionSelect = (o: SelectOption) => {
+  const handleOptionSelect = (o: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
+    const { action, option } = actionMeta;
     if (isMulti) {
-      const latestSelectedOption = o[o.length - 1];
-      if (
-        (latestSelectedOption && latestSelectedOption.value === 'select_all') ||
-        (o.length === options.length && latestSelectedOption.value !== 'select_all')
-      ) {
-        const selectedValues: any = options;
-        setSelectedOption(selectedValues);
-        onChange(selectedValues.map((option) => option.value));
-      } else {
-        const selectedValues = o.filter((item) => item.value !== 'select_all');
-        setSelectedOption(selectedValues);
-        onChange(selectedValues.map((option) => option.value));
+      if (action === 'deselect-option' && option.value === 'select_all') {
+        setSelectedOption([]);
+        onChange([]);
+        return;
       }
+
+      if (action === 'select-option' && option.value === 'select_all') {
+        setSelectedOption(options);
+        onChange(options.map((option) => option.value));
+        return;
+      }
+      const selectedValues = o.filter((item) => item.value !== 'select_all');
+      setSelectedOption(selectedValues);
+      onChange(selectedValues.map((option) => option.value));
     } else {
       setSelectedOption(o);
       onChange(o ? o.value : null);
@@ -197,8 +200,11 @@ export default forwardRef(function Select(
   }, [value, options, isMulti]);
 
   const MultiValue = (props: CustMultiValueProps) => {
-    const { data } = props;
-    if (Array.isArray(selectedOption) && selectedOption.length > 1) {
+    const { data, index } = props;
+    if (isMulti && index > 0) {
+      return null;
+    }
+    if (isMulti && selectedOption.length > 1) {
       return <components.MultiValue {...props}>Multiple</components.MultiValue>;
     }
     return <components.MultiValue {...props}>{data.text}</components.MultiValue>;

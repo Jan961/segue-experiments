@@ -108,6 +108,9 @@ export type BookingDTO = {
   MarketingCostsStatus: string;
   MarketingCostsApprovalDate: string;
   MarketingCostsNotes: string;
+  BookingSalesNotes: string;
+  BookingCompNotes: string;
+  BookingHoldNotes: string;
 };
 
 export type ContractsDTO = {

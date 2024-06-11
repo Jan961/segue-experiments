@@ -1,61 +1,85 @@
 import Layout from 'components/Layout';
-import { useState } from 'react';
-import GlobalToolbar from 'components/toolbar';
+import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
 import Entry from 'components/marketing/sales/entry';
-import { GetServerSideProps } from 'next';
-import { InitialState } from 'lib/recoil';
-import { getSaleableBookings } from 'services/bookingService';
-import { BookingJump } from 'state/marketing/bookingJumpState';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
+import { InitialState } from 'lib/recoil';
+import { GetServerSideProps } from 'next';
+import { objectify } from 'radash';
+import { useRecoilValue } from 'recoil';
+import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
+import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
+import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
+import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
-import { getAccountId, getEmailFromReq } from 'services/userService';
 
 const Index = () => {
-  const [searchFilter, setSearchFilter] = useState('');
+  const bookings = useRecoilValue(bookingJumpState);
 
   return (
-    <Layout title="Marketing | Segue">
-      <div className="flex flex-col px-4 flex-auto">
-        <GlobalToolbar
-          searchFilter={searchFilter}
-          setSearchFilter={setSearchFilter}
-          page={'/sales/entry'}
-          title={'Marketing'}
-        />
-        <Entry searchFilter={searchFilter} />
-      </div>
-    </Layout>
+    <div>
+      <Layout title="Marketing | Segue">
+        <div className="mb-8">
+          <SalesEntryFilters />
+        </div>
+
+        {bookings.selected !== undefined && bookings.selected !== null && <Entry />}
+      </Layout>
+    </div>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
-  const AccountId = await getAccountId(email);
+  const accountId = await getAccountId(email);
+  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/entry', accountId);
 
-  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/entry', AccountId);
+  const productionId = productionJump.selected;
+  const users = await getUsers(accountId);
 
-  const ProductionId = productionJump.selected;
-  // ProductionJumpState is checking if it's valid to access by accountId
-  if (!ProductionId) return { notFound: true };
+  let initialState: InitialState = null;
 
-  const bookings = await getSaleableBookings(ProductionId);
-  const venueRoles = await getRoles();
+  if (productionId !== null) {
+    const bookings = await getSaleableBookings(productionId);
+    const venueRoles = await getRoles();
+    const selected = null;
+    const bookingJump: BookingJump = {
+      selected,
+      bookings: bookings.map(bookingMapperWithVenue),
+    };
+    const townList = await getUniqueVenueTownlist();
+    const venues = await getAllVenuesMin();
 
-  const bookingJump: BookingJump = {
-    selected: bookings[0] ? bookings[0].Id : undefined,
-    bookings: bookings.map(bookingMapperWithVenue),
-  };
+    const venue = objectify(
+      venues,
+      (v) => v.Id,
+      (v: any) => {
+        const Town: string | null = v.VenueAddress.find((address: any) => address?.TypeName === 'Main')?.Town ?? null;
+        return { Id: v.Id, Code: v.Code, Name: v.Name, Town, Seats: v.Seats, Count: 0 };
+      },
+    );
 
-  const initialState: InitialState = {
-    global: {
-      productionJump,
-    },
-    marketing: {
-      bookingJump,
-      venueRole: venueRoles.map(venueRoleMapper),
-    },
-  };
+    // See _app.tsx for how this is picked up
+    initialState = {
+      global: {
+        productionJump,
+      },
+      marketing: {
+        bookingJump,
+        venueRole: venueRoles.map(venueRoleMapper),
+        towns: townList,
+        venueList: venue,
+        defaultTab: 0,
+        users,
+      },
+    };
+  } else {
+    initialState = {
+      global: {
+        productionJump,
+      },
+    };
+  }
 
   return { props: { initialState } };
 };
