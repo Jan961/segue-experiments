@@ -41,7 +41,7 @@ const Filters = ({ handleShowTask }: FiltersProps) => {
         </div>
       </div>
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
-        <Button text="Production Task List" className="w-[132px]" onClick={() => router.push('/tasks')} />
+        <Button text="Production Task List" className="w-[158px]" onClick={() => router.push('/tasks')} />
         <Button text="Export" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
         <Button onClick={handleShowTask} text="Add Task" className="w-[132px]" />
       </div>
