@@ -62,19 +62,22 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     [users],
   );
 
+  const callDealMemoApi = async () => {
+    const demoModalData = await axios.get<DealMemoContractFormData>(
+      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
+    );
+    if (demoModalData.data && demoModalData.data.DeMoBookingId) {
+      setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
+      if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
+        const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
+        setVenue(venueData.data as unknown as Venue);
+      }
+    }
+  };
   useEffect(() => {
     const callDealMemoData = async () => {
       setIsLoading(true);
-      const demoModalData = await axios.get<DealMemoContractFormData>(
-        `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
-      );
-      if (demoModalData.data && demoModalData.data.DeMoBookingId) {
-        setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
-        if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
-          const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-          setVenue(venueData.data as unknown as Venue);
-        }
-      }
+      callDealMemoApi();
       setIsLoading(false);
     };
     callDealMemoData();
@@ -132,6 +135,11 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
   const handleEditDealMemo = () => {
     setEditDealMemoModal(true);
+  };
+
+  const handleDemoFormClose = () => {
+    setEditDealMemoModal(false);
+    callDealMemoApi();
   };
 
   return (
@@ -508,7 +516,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       {editDealMemoModal && (
         <EditDealMemoContractModal
           visible={editDealMemoModal}
-          onCloseDemoForm={() => setEditDealMemoModal(false)}
+          onCloseDemoForm={() => handleDemoFormClose()}
           productionJumpState={productionJumpState}
           selectedTableCell={selectedTableCell}
           demoModalData={demoModalData}

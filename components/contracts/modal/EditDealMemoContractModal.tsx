@@ -15,7 +15,7 @@ import {
 } from 'interfaces';
 import { AddEditContractsState } from 'state/contracts/contractsState';
 import { useEffect, useMemo, useState } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import {
   booleanOptions,
@@ -30,6 +30,8 @@ import { Icon, TimeInput } from 'components/core-ui-lib';
 import axios from 'axios';
 import { defaultDemoCall, filterPrice, filterTechProvision } from '../utils';
 import { DealMemoTechProvision } from '@prisma/client';
+import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
+import { LoadingOverlay } from 'components/shows/ShowsTable';
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -46,13 +48,15 @@ export const EditDealMemoContractModal = ({
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
 }) => {
-  const [formData, setFormData] = useState<Partial<DealMemoContractFormData>>({
-    ...demoModalData,
-  });
+  // const [formData, setFormData] = useState<Partial<DealMemoContractFormData>>({
+  //   ...demoModalData,
+  // });
+  const [formData, setFormData] = useRecoilState(dealMemoInitialState);
+
   const [contactsFormData, setContactsFormData] = useState<ContactDemoFormAccountData>({});
   const [contractCheckBox, setContractCheckBox] = useState<boolean>(false);
   const [dealMemoPriceFormData, setdealMemoPriceFormData] = useState({});
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [dealCall, setDealCall] = useState([]);
 
   const [dealMemoCustomPriceFormData, setDealMemoCustomPriceFormData] = useState<any>([]);
@@ -71,6 +75,7 @@ export const EditDealMemoContractModal = ({
   );
 
   useEffect(() => {
+    setFormData({ ...demoModalData });
     const priceData = filterPrice(demoModalData.DealMemoPrice);
     setdealMemoPriceFormData(priceData[0]);
     setDealMemoCustomPriceFormData(priceData[1]);
@@ -97,17 +102,29 @@ export const EditDealMemoContractModal = ({
 
   useEffect(() => {
     const data = [...Object.values(dealMemoPriceFormData), ...dealMemoCustomPriceFormData];
-    formData.DealMemoPrice = data;
+    setFormData((prevDealMemo) => ({
+      ...prevDealMemo,
+      DealMemoPrice: data,
+    }));
+    // formData.DealMemoPrice = data;
   }, [dealMemoCustomPriceFormData, dealMemoPriceFormData]);
 
   useEffect(() => {
     // const data = [...dealMemoTechProvision];
-    formData.DealMemoTechProvision = [];
+    setFormData((prevDealMemo) => ({
+      ...prevDealMemo,
+      DealMemoTechProvision: [],
+    }));
+    // formData.DealMemoTechProvision = [];
   }, [dealMemoTechProvision]);
 
   useEffect(() => {
     const data = [...dealCall];
-    formData.DealMemoCall = data;
+    setFormData((prevDealMemo) => ({
+      ...prevDealMemo,
+      DealMemoCall: data,
+    }));
+    // formData.DealMemoCall = data;
   }, [dealCall]);
 
   const editDemoModalData = async (key: string, value, type: string) => {
@@ -134,9 +151,13 @@ export const EditDealMemoContractModal = ({
   };
 
   const saveDemoModalData = async () => {
-    axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
+    await axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
       formData,
     });
+    setIsLoading(true);
+
+    onCloseDemoForm();
+    setIsLoading(false);
   };
 
   const handleContactsSection = async (value, key) => {
@@ -1029,7 +1050,13 @@ export const EditDealMemoContractModal = ({
                   id="venueText"
                   className="w-full"
                   value={formData[inputData[1]]}
-                  onChange={(value) => editDemoModalData(inputData[1], value.target.value, 'dealMemo')}
+                  onChange={(value) =>
+                    editDemoModalData(
+                      inputData[1],
+                      inputData[1] === 'DeMoProducerCompCount' ? parseInt(value.target.value) : value.target.value,
+                      'dealMemo',
+                    )
+                  }
                 />
               </div>
             </div>
@@ -1571,6 +1598,7 @@ export const EditDealMemoContractModal = ({
 
         <Button onClick={() => saveDemoModalData()} className="ml-4 w-33" variant="primary" text="Save and Close" />
       </div>
+      {isLoading && <LoadingOverlay />}
     </PopupModal>
   );
 };
