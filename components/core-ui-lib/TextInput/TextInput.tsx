@@ -5,7 +5,7 @@ import classNames from 'classnames';
 export interface TextInputProps {
   id?: string;
   name?: string;
-  value?: string;
+  value?: string | number;
   disabled?: boolean;
   className?: string;
   maxlength?: number;
