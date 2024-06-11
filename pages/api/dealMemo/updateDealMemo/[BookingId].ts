@@ -2,6 +2,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getDealMemoCall, getPrice, getTechProvision } from '../utils';
+import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,13 +12,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
     const data = req.body.formData;
-    // const updatedData = req.body;
-    delete data.error;
-    delete data.DeMoId;
-    delete data.DeMoBookingId;
-    delete data.DeMoAccContId;
-    delete data.DeMoBOMVenueContactId;
-    delete data.DeMoTechVenueContactId;
+    omit(data, [
+      'error',
+      'DeMoId',
+      'DeMoBookingId',
+      'DeMoAccContId',
+      'DeMoBOMVenueContactId',
+      'DeMoTechVenueContactId',
+    ]);
     const existingDealMemo = await prisma.dealMemo.findFirst({
       where: {
         DeMoBookingId: BookingId,
@@ -75,6 +77,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     await res.json(updateCreateDealMemo);
   } catch (err) {
     console.log(err);
-    res.status(403).json({ err: 'Error occurred while generating search results.' });
+    res.status(403).json({ err: 'Error occurred while updating DealMemo' });
   }
 }

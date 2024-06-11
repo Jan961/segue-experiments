@@ -20,6 +20,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     await res.json(updateDealMemoPrice);
   } catch (err) {
     console.log(err);
-    res.status(403).json({ err: 'Error occurred while generating search results.' });
+    res.status(403).json({ err: 'Error occurred while updating Deal Memo Price.' });
   }
 }

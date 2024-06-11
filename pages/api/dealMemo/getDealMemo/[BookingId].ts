@@ -9,7 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-    const getDealMemo = await prisma.dealMemo.findFirst({
+    const dealMemo = await prisma.dealMemo.findFirst({
       where: {
         DeMoBookingId: BookingId,
       },
@@ -20,9 +20,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    await res.json(getDealMemo);
+    await res.json(dealMemo);
   } catch (err) {
     console.log(err);
-    res.status(403).json({ err: 'Error occurred while generating search results.' });
+    res.status(403).json({ err: 'Error occurred while getting data for Deal Memo' });
   }
 }
