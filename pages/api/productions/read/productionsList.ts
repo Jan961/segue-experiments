@@ -15,6 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         IsArchived: t.IsArchived,
         ShowCode: t.Show.Code,
         ShowName: t.Show.Name,
+        SalesFrequency: t.SalesFrequency,
       })),
     };
     return res.status(200).json(values);

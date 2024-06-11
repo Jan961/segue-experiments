@@ -69,6 +69,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
           numPerfs: params.data.numPerfs,
         });
       },
+      hasSalesData: params.data.hasSalesData,
     }),
     width: 120,
     cellStyle: {
@@ -172,6 +173,7 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
           numPerfs: params.data.numPerfs,
         });
       },
+      hasSalesData: params.data.hasSalesData,
     }),
     width: 120,
     cellStyle: {
