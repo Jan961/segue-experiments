@@ -60,20 +60,24 @@ export const getCountryRegions = async () => {
 };
 
 export const getVenueCurrencies = async () => {
-  const venueCurrency = await prisma.Venue.findMany({
-    select: {
-      Id: true,
-      Currency: {
-        select: { SymbolUnicode: true },
+  try {
+    const venueCurrency = await prisma.Venue.findMany({
+      select: {
+        Id: true,
+        Currency: {
+          select: { SymbolUnicode: true },
+        },
       },
-    },
-  });
-  const attempt = venueCurrency.reduce((dict, item) => {
-    dict[item.Id] = item.Currency.SymbolUnicode;
-    return dict;
-  });
+    });
+    const attempt = venueCurrency.reduce((dict, item) => {
+      dict[item.Id] = item.Currency.SymbolUnicode;
+      return dict;
+    });
 
-  return attempt;
+    return attempt;
+  } catch (exception) {
+    return '';
+  }
 };
 
 export interface DistanceStop {
