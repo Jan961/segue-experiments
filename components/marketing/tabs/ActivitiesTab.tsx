@@ -115,15 +115,12 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const calculateActivityTotals = (tableRows) => {
     const { venueTotal, companyTotal } = tableRows.reduce(
       (acc, row) => {
-        console.log(row.venueCost.substring(1));
-        console.log(row.venueCost);
         acc.venueTotal += parseFloat(row.venueCost.substring(1));
         acc.companyTotal += parseFloat(row.companyCost.substring(1));
         return acc;
       },
       { venueTotal: 0, companyTotal: 0 },
     );
-    console.log('some value i made up ', tableRows[0].companyCost.charAt(0));
     const totalCost = tableRows[0].companyCost.charAt(0) + (venueTotal + companyTotal);
 
     setTotalCompanyCost(tableRows[0].companyCost.charAt(0) + companyTotal.toString());

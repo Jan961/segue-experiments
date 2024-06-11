@@ -34,10 +34,7 @@ export default async function handle(req, res) {
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-
-    console.log('tjis is the booking id', BookingId);
     const currencySymbol = (await getCurrencyFromBookingId(BookingId)) || '';
-    console.log(currencySymbol);
 
     const data =
       await prisma.$queryRaw`select * from SalesView where BookingId=${BookingId} order by BookingFirstDate, SetSalesFiguresDate`;

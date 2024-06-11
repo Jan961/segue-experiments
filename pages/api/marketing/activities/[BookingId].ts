@@ -19,7 +19,6 @@ export type ActivitiesResponse = {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId = parseInt(req.query.BookingId as string);
-    console.log('inside some func', BookingId);
     const currencySymbol = await getCurrencyFromBookingId(BookingId);
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
@@ -59,7 +58,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         OnSaleDate: info.OnSaleDate ? info.OnSaleDate.toISOString() : '',
       },
     };
-    console.log(result.activityTypes);
     result.activities = result.activities.map((activity) => ({
       ...activity,
       CompanyCost: `${currencySymbol}${activity.CompanyCost}`,

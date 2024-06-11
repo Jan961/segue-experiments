@@ -79,9 +79,7 @@ export default async function handle(req, res) {
       const t2 = Number(b.SetBookingWeekNum);
       return t1 - t2;
     });
-    console.log(bookingIds[0]);
     const currencySymbol = (await getCurrencyFromBookingId(bookingIds[0])) || '';
-    console.log(currencySymbol);
     const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
       formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
     );
