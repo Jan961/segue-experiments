@@ -4,6 +4,7 @@ import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
+import { isNullOrEmpty } from '../../../utils';
 
 const reverseDate = (inputDt) => {
   return new Date(inputDt.split('/').reverse().join('/')).getTime();
@@ -376,11 +377,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           headerName: 'Seats Sold ',
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
-            if (
-              params.data.schTotalValue === '' ||
-              params.data.schTotalValue === undefined ||
-              params.data.schTotalValue === null
-            ) {
+            if (isNullOrEmpty(params.data.schTotalValue)) {
               const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schTotalValue;
               return prevTotal === '' || prevTotal === undefined ? '-' : stripSymbolAndRound(prevTotal.toString());
             } else {
