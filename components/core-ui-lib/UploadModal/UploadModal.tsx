@@ -46,7 +46,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   );
 
   const isUploadComplete = useMemo(() => {
-    if (selectedFiles.length === 0) return false;
+    if (selectedFiles.length === 0) return true;
     return selectedFiles.every((file) => progress[file?.name] === 100);
   }, [selectedFiles, progress]);
 
@@ -83,8 +83,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleFileDelete = (fileName) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((file) => file?.name !== fileName));
-
+    const filesList = selectedFiles.filter((file) => file?.name !== fileName);
+    setSelectedFiles(filesList);
+    onChange?.(filesList);
     const newProgress = { ...progress };
     delete newProgress[fileName];
     setProgress(newProgress);

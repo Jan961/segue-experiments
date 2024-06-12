@@ -96,6 +96,13 @@ const GridStyles = createGlobalStyle<StyleProps>`
     }
 }
 
+.no-right-border.ag-cell {
+        &:not(:last-child):after {
+            border-right: none !important;
+        }
+}
+
+
 .ag-header-cell {
     text-wrap: wrap;
 }
