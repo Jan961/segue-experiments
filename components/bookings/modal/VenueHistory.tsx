@@ -15,7 +15,7 @@ import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/s
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
-import { venueOptionsSelector } from '../../../state/booking/selectors/venueOptionsSelector';
+import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
