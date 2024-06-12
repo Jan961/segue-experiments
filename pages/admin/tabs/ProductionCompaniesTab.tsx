@@ -1,13 +1,10 @@
-import Table from '../../../components/core-ui-lib/Table';
-import {
-  productionCompaniesColDefs,
-  styleProps,
-} from '../../../components/system-admin/productionCompanies/tableConfig';
+import { productionCompaniesColDefs, styleProps } from 'components/system-admin/productionCompanies/tableConfig';
 import { useEffect, useState } from 'react';
-import Button from '../../../components/core-ui-lib/Button';
+import Button from 'components/core-ui-lib/Button';
+import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
 export default function ProductionCompaniesTab() {
-  const [createMode, setCreateMode] = useState<boolean>();
-  const [productionCompanies, setProductionCompanies] = useState<any>();
+  //  const [createMode, setCreateMode] = useState<boolean>();
+  const [productionCompanies, setProductionCompanies] = useState<any[]>();
 
   useEffect(() => {
     const getProdCompanies = async () => {
@@ -20,21 +17,43 @@ export default function ProductionCompaniesTab() {
     getProdCompanies();
   }, []);
   console.log(productionCompanies);
-  const onAddNewVenueContact = () => {
-    if (createMode) return;
-    const emptyData = { Name: '', WebSite: '', Logo: '' };
+  const onAddNewVenueContact = async () => {
+    const emptyData = { Name: '', WebSite: '', Logo: '', existsInDB: false };
     setProductionCompanies((prev) => [emptyData, ...prev]);
-    setCreateMode(true);
+    // setCreateMode(true);
   };
 
-  // const tempData = [{ Name: 'Jendagi Productions Limited', WebSite: 'www.robertckelly.co.uk', Logo: null }];
-  // setProductionCompanies(tempData);
-  // const productionCompanies = await response.json();
-  // console.log(productionCompanies);
+  const onCellUpdate = async (e) => {
+    const { rowIndex } = e;
+    const productions = productionCompanies;
+    productions[rowIndex] = { ...e.data, existsInDB: productions[rowIndex].existsInDB };
+    setProductionCompanies(productions);
+    if (productions[rowIndex].existsInDB) {
+      // create
+    } else {
+      // update
+      if (e.data.Name.length > 0) {
+        const data = e.data;
+        const response = await fetch('/api/productionCompanies/insert', {
+          method: 'POST',
+          headers: {},
+          body: JSON.stringify(data),
+        });
+        console.log(data);
+        console.log(response);
+      }
+    }
+  };
+
   return (
     <div>
-      <Button disabled={createMode} onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
-      <Table columnDefs={productionCompaniesColDefs} rowData={productionCompanies} styleProps={styleProps} />{' '}
+      <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
+      <ProductionCompaniesTable
+        columnDefs={productionCompaniesColDefs}
+        rowData={productionCompanies}
+        styleProps={styleProps}
+        onChange={onCellUpdate}
+      />
     </div>
   );
 }
