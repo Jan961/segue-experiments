@@ -4,7 +4,7 @@ import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
-import { isNullOrEmpty } from '../../../utils';
+import { isNullOrEmpty } from 'utils';
 
 const reverseDate = (inputDt) => {
   return new Date(inputDt.split('/').reverse().join('/')).getTime();
