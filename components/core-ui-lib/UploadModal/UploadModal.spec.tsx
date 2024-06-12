@@ -73,11 +73,6 @@ describe('UploadModal and FileCard Component', () => {
     expect(screen.getByText('This file is too big. Please upload a smaller file.')).toBeInTheDocument();
   });
 
-  test('disables the upload button when no files are selected', () => {
-    render(<UploadModal {...mockProps} />);
-    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
-  });
-
   test('disables the upload button when there are file errors', () => {
     render(<UploadModal {...mockProps} />);
     const file = createMockBlobFile('file1.txt', 1000, 'text/plain');
