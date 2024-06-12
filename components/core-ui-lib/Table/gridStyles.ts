@@ -33,6 +33,14 @@ const GridStyles = createGlobalStyle<StyleProps>`
     border-right: 4px solid white;
 }
 
+.thin-group-header-parent {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    justify-content: center;
+    border-bottom: 2px solid white;
+}
+
 /* used for other headers in a header group that are not children */
 .group-header-normal {
   border-top: 50px solid white !important;
@@ -45,7 +53,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
 }
 
 .right-border-full {
-    border-right: 1px solid white !important;
+    border-right: 2px solid white !important;
 }
 
 .ag-body-viewport {

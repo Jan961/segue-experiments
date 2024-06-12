@@ -13,15 +13,11 @@ import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
 import useAxios from 'hooks/useAxios';
 import { getWeekDayShort } from 'services/dateService';
+import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
   nextBooking: any;
-};
-
-type LastPerfDate = {
-  BookingId: number;
-  LastPerformanaceDate: string;
 };
 
 const Filters = () => {

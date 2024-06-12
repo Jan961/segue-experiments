@@ -94,7 +94,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
       <form className="flex flex-col gap-4 w-[383px] mt-4">
         <Select
           label="Production"
-          onChange={(value) => onChange('production', value)}
+          onChange={(value) => onChange('production', value as number)}
           options={productionsOptions}
           value={production}
         />
@@ -103,7 +103,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
             <Label text="Tour Week" />
             <Select
               className=""
-              onChange={(value) => onChange('productionWeek', value)}
+              onChange={(value) => onChange('productionWeek', value as number)}
               options={prodweekOptions}
               value={productionWeek}
             />
@@ -111,7 +111,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
           <div className="flex items-center gap-2">
             <Label text="No. Weeks" />
             <Select
-              onChange={(value) => onChange('numberOfWeeks', value)}
+              onChange={(value) => onChange('numberOfWeeks', value as number)}
               options={weekOptions}
               value={numberOfWeeks}
             />
@@ -121,7 +121,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
           <Label text="Order" />
           <Select
             className="w-full"
-            onChange={(value) => onChange('order', value)}
+            onChange={(value) => onChange('order', value as string)}
             options={salesSummarySortOptions}
             value={order}
           />

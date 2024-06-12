@@ -10,7 +10,7 @@ interface ButtonRendererProps extends ICellRendererParams {
 
 export default function ButtonSalesRenderer(props: ButtonRendererProps) {
   const { variant = 'secondary', buttonText, className } = props;
-  const hasSalesData = props['data'].hasSalesData;
+  const hasSalesData = props.data.hasSalesData;
 
   return (
     <div className="w-full h-full flex justify-center items-center">

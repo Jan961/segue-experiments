@@ -1,597 +1,444 @@
-import { useEffect, useState, useMemo } from 'react';
-import { dateToSimple } from 'services/dateService';
-import axios from 'axios';
-import { getSales } from './Api';
-import schema from './validation';
-import FormTypeahead from 'components/global/forms/FormTypeahead';
+import { useEffect, useState } from 'react';
+import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
+import useAxios from 'hooks/useAxios';
+import { salesEntryColDefs, styleProps } from '../table/tableConfig';
+import { useRecoilValue } from 'recoil';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { SelectOption } from '../MarketingHome';
+import { addDurationToDate, getMonday } from 'services/dateService';
+import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 
-interface props {
-  searchFilter: string;
-  productions?: any[];
+type TourResponse = {
+  data: Array<SelectOption>;
+  frequency: string;
+};
+
+interface HoldComp {
+  name: number;
+  seats: number;
+  value?: number;
 }
-export default function Entry({ productions = [] }: props) {
-  const [isLoading, setLoading] = useState(false);
-  const [salesWeeks, SetSalesWeeks] = useState([]);
-  const [salesWeeksVenues, SetSalesWeeksVenues] = useState([]);
-  const [previousSaleWeek, setPreviousSaleWeek] = useState(null);
-  const [options, setOptions] = useState<any>(null);
-  const [holds, setHolds] = useState<any>({});
-  const [comps, setComps] = useState<any>({});
-  const [inputs, setInputs] = useState<any>({});
-  const [sale, setSale] = useState<any>({});
-  const [previousSale, setPreviousSale] = useState<any>({});
-  const [notes, setNotes] = useState<any>({});
-  const [validationErrors, setValidationErrors] = useState<any>({});
-  // const [openWarningsDialog, setOpenWarningsDialog] = useState<boolean>(false);
-  const fetchProductionWeeks = (productionId) => {
-    if (productionId) {
-      setLoading(true);
-      axios
-        .get(`/api/reports/productionWeek/${productionId}`)
-        .then((data: any) => SetSalesWeeks(data.data || []))
-        .finally(() => setLoading(false));
-    }
-  };
-  const fetchVenues = (productionId) => {
-    if (productionId) {
-      setLoading(true);
-      axios
-        .get(`/api/productions/read/venues/${productionId}`)
-        .then((data) => data.data)
-        .then((data) => {
-          SetSalesWeeksVenues(data);
-        })
-        .finally(() => setLoading(false));
-    }
-  };
 
-  const handleSalesResponse = (data) => {
-    const { Notes, SetHold, SetComp, Sale } = data || {};
-    const { SalesNotes: BookingSaleNotes, CompNotes, HoldNotes } = Notes || {};
-    const holdValues = SetHold?.reduce?.((holds, hold) => {
-      holds[hold.HoldTypeId] = { seats: hold.HoldSeats, value: hold.HoldValue };
-      return holds;
-    }, {});
-    const compValues = SetComp?.reduce?.((comps, comp) => {
-      comps[comp.CompTypeId] = comp.CompSeats;
-      return comps;
-    }, {});
-    return {
-      holds: holdValues,
-      comps: compValues,
-      notes: {
-        BookingSaleNotes,
-        CompNotes,
-        HoldNotes,
+interface HoldCompSet {
+  comps: Array<HoldComp>;
+  holds: Array<HoldComp>;
+}
+
+interface SalesFigure {
+  seatsReserved: string;
+  seatsReservedVal: string;
+  seatsSold: string;
+  seatsSoldVal: string;
+}
+
+interface SalesFigureSet {
+  general: SalesFigure;
+  schools: SalesFigure;
+}
+
+export default function Entry() {
+  const [genSeatsSold, setGenSeatsSold] = useState('');
+  const [genSeatsSoldVal, setGenSeatsSoldVal] = useState('');
+  const [genSeatsReserved, setGenSeatsReserved] = useState('');
+  const [genSeatsReservedVal, setGenSeatsReservedVal] = useState('');
+  const [schSeatsSold, setSchSeatsSold] = useState('');
+  const [schSeatsSoldVal, setSchSeatsSoldVal] = useState('');
+  const [schSeatsReserved, setSchSeatsReserved] = useState('');
+  const [schSeatsReservedVal, setSchSeatsReservedVal] = useState('');
+  const [currency, setCurrency] = useState('£');
+  const [schoolSalesNotRequired, setSchoolSalesNotRequired] = useState<boolean>(false);
+  const [bookingSaleNotes, setBookingSaleNotes] = useState('');
+  const [holdData, setHoldData] = useState([]);
+  const [holdNotes, setHoldNotes] = useState('');
+  const [compData, setCompData] = useState([]);
+  const [compNotes, setCompNotes] = useState('');
+  const [salesDate, setSalesDate] = useState(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const bookings = useRecoilValue(bookingJumpState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
+
+  const { fetchData } = useAxios();
+
+  const handleUpdate = async () => {
+    const data = {
+      bookingId: bookings.selected,
+      salesDate,
+      schools: {
+        seatsSold: parseInt(schSeatsSold),
+        seatsSoldVal: parseFloat(schSeatsSoldVal),
+        seatsReserved: parseInt(schSeatsReserved),
+        seatsReservedVal: parseFloat(schSeatsReservedVal),
       },
-      sale: Sale,
+      general: {
+        seatsSold: parseInt(genSeatsSold),
+        seatsSoldVal: parseFloat(genSeatsSoldVal),
+        seatsReserved: parseInt(genSeatsReserved),
+        seatsReservedVal: parseFloat(genSeatsReservedVal),
+      },
     };
-  };
-  const fetchSales = async (SetSalesFiguresDate, SetBookingId) => {
-    setLoading(true);
-    const data = await getSales({ SetSalesFiguresDate, SetBookingId });
-    setLoading(false);
-    return handleSalesResponse(data);
-  };
-  const fetchOptionTypes = () => {
-    axios
-      .get('/api/marketing/sales/options')
-      .then((data) => {
-        setOptions(data.data);
-      })
-      .catch((error) => console.log(error));
-  };
-  useEffect(() => {
-    fetchProductionWeeks(inputs.SetProduction);
-    fetchVenues(inputs.SetProduction);
-  }, [inputs.SetProduction]);
-  useEffect(() => {
-    if (!options) {
-      fetchOptionTypes();
-    }
-  }, []);
-  useEffect(() => {
-    if (inputs.SaleWeek && inputs.Venue) {
-      setHolds({});
-      setComps({});
-      setNotes({});
-      setSale({});
-      setLoading(false);
-      fetchSales(inputs.SaleWeek, parseInt(inputs.Venue, 10))
-        .then(({ holds = [], comps = [], notes, sale = {} }) => {
-          setHolds(holds);
-          setComps(comps);
-          setNotes(notes);
-          setSale(sale || {});
-        })
-        .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
-    }
-  }, [inputs.SaleWeek, inputs.Venue]);
-  useEffect(() => {
-    if (inputs.Venue && previousSaleWeek) {
-      fetchSales(previousSaleWeek, parseInt(inputs.Venue, 10))
-        .then(({ sale }) => {
-          setPreviousSale(sale || {});
-        })
-        .catch((error) => console.log(error));
-    }
-  }, [inputs.Venue, previousSaleWeek]);
 
-  const handleOnChange = (e) => {
-    e.persist?.();
-    setValidationErrors({});
-    if (e.target.id === 'SetProduction') {
-      setInputs({ [e.target.id]: e.target.value });
-      setSale({});
-      return;
+    await fetchData({
+      url: '/api/marketing/sales/process/entry/sales',
+      method: 'POST',
+      data,
+    });
+  };
+
+  const handleTableUpdate = (value, data, type, field) => {
+    if (type === 'Holds') {
+      const holdRecIndex = holdData.findIndex((rec) => rec.name === data.name);
+      const tempHoldRecs = [...holdData];
+
+      if (holdRecIndex !== -1) {
+        tempHoldRecs[holdRecIndex] = { ...tempHoldRecs[holdRecIndex], [field]: value };
+      }
+
+      setHoldData(tempHoldRecs);
     }
-    if (e.target.id === 'SaleWeek') {
-      const index = salesWeeks.findIndex((week) => week.mondayDate === e.target.value);
-      if (index <= 0) {
-        setPreviousSaleWeek(null);
-        setPreviousSale(null);
-      } else {
-        setPreviousSaleWeek(salesWeeks[index - 1]?.mondayDate);
+  };
+
+  const handleCancel = () => {
+    console.log('cancel');
+  };
+
+  const setNumericVal = (setFunction: (value) => void, value: string) => {
+    if (value === '') {
+      setFunction(0);
+    } else {
+      const regexPattern = /^-?\d*(\.\d*)?$/;
+
+      if (regexPattern.test(value)) {
+        setFunction(value);
       }
     }
-    setInputs((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
   };
 
-  const handleOnSaleChange = (e) => {
-    e.persist?.();
-    setValidationErrors({});
-    setSale((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
+  const getSalesDate = async () => {
+    const data = await fetchData({
+      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+      method: 'POST',
+    });
 
-  const handleOnNotesChange = (e) => {
-    e.persist?.();
-    setNotes((prev) => ({
-      ...prev,
-      [e.target.id]: e.target.value,
-    }));
-  };
-  function validateSale(sale, previousSale) {
-    return schema
-      .validate(
-        {
-          ...sale,
-          ...{
-            PreviousSeats: previousSale?.Seats,
-            PreviousValue: previousSale?.Value,
-            PreviousReservedSeats: previousSale?.ReservedSeats,
-            PreviousReservedValue: previousSale?.ReservedValue,
-          },
-        },
-        { abortEarly: false },
-      )
-      .then(() => {
-        return true;
-      })
-      .catch((validationErrors) => {
-        const errors = {};
-        const warnings = {};
-        validationErrors.inner.forEach((error) => {
-          if (error.path.startsWith('warning')) {
-            warnings[error.path] = error.message;
-          } else {
-            errors[error.path] = error.message;
-          }
-        });
-        setValidationErrors(errors);
-        return false;
-      });
-  }
-
-  async function onSubmit(e: any) {
-    e?.preventDefault?.();
-    const Holds = Object.keys(holds).map((SetHoldHoldTypeId) => ({
-      SetHoldHoldTypeId: parseInt(SetHoldHoldTypeId),
-      SetHoldSeats: parseInt(holds[SetHoldHoldTypeId].seats, 10),
-      SetHoldValue: parseFloat(holds[SetHoldHoldTypeId].value),
-    }));
-    const Comps = Object.keys(comps).map((SetCompCompTypeId) => ({
-      SetCompCompTypeId: parseInt(SetCompCompTypeId, 10),
-      SetCompSeats: parseInt(comps[SetCompCompTypeId], 10),
-    }));
-    const ignoreValidation = Object.values(validationErrors).length > 0;
-    if (!ignoreValidation) {
-      const valid = await validateSale(sale, previousSale);
-      if (!valid) {
-        // setOpenWarningsDialog(true);
+    if (typeof data === 'object') {
+      const tourData = data as TourResponse;
+      if (tourData.frequency === undefined) {
         return;
       }
+      const salesDate = tourData.frequency === 'W' ? getMonday(new Date()) : new Date();
+      setSalesDate(salesDate);
+
+      return { date: salesDate, frequency: tourData.frequency };
     }
-    const Sales = [
-      {
-        SaleSaleTypeId: 1,
-        SaleSeats: parseInt(sale?.Seats, 10),
-        SaleValue: parseFloat(sale?.Value),
-      },
-      {
-        SaleSaleTypeId: 2,
-        SaleSeats: parseInt(sale?.ReservedSeats, 10),
-        SaleValue: parseFloat(sale?.ReservedValue),
-      },
-    ];
-    // const validateSales
+  };
+
+  const setSalesFigures = async (previous: boolean) => {
     setLoading(true);
-    await axios
-      .post('/api/marketing/sales/upsert', {
-        Holds,
-        Comps,
-        Sales,
-        SetBookingId: parseInt(inputs.Venue, 10),
-        SetSalesFiguresDate: inputs.SaleWeek,
-      })
-      .then((res) => {
-        console.log('Updated Sales', res);
-        // setOpenWarningsDialog(false);
-        setValidationErrors({});
-      })
-      .catch((error) => {
-        console.log('Error updating Sales', error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const saleParams = await getSalesDate();
+    if (saleParams === undefined) {
+      return;
+    }
 
-    // Reserved SeatsValue
-    // BookingID, date, NumSeatsSold, SeatsSoldValue, ReservedSeatsSold, ReservedSeatsValue, finalFigures
+    let salesDate = new Date();
+    const duration = saleParams.frequency === 'W' ? 7 : 1;
+    if (previous) {
+      salesDate = addDurationToDate(saleParams.date, duration, false);
+    } else {
+      salesDate = saleParams.date;
+    }
 
-    // BookingSaleHold
-    // BookingSaleID, HoldId, Seats, Value
+    // get the salesFigures for the selected date/week if they exist
+    const sales = await fetchData({
+      url: '/api/marketing/sales/read/currentDay',
+      method: 'POST',
+      data: {
+        bookingId: bookings.selected,
+        salesDate,
+        frequency: saleParams.frequency,
+      },
+    });
 
-    // BookingSaleComp
-    // BookingSaleID, CompId, Seats
+    if (typeof sales === 'object') {
+      const salesFigures = sales as SalesFigureSet;
 
-    // BookingSaleNotes
-    // BookingSaleId, HoldNotes, CompNotes, BookingSaleNotes
-  }
-  const handleOnHoldsChange = (e, key) => {
-    e.persist?.();
-    setHolds((prev) => ({
-      ...prev,
-      [e.target.id]: { ...(prev?.[e.target.id] || {}), [key]: e.target.value },
-    }));
+      // set the sales figures, if available
+      setGenSeatsReserved(validateSale(salesFigures.general?.seatsReserved));
+      setGenSeatsReservedVal(validateSale(salesFigures.general?.seatsReservedVal));
+      setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
+      setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
+      setSchSeatsReserved(validateSale(salesFigures.schools?.seatsReserved));
+      setSchSeatsReservedVal(validateSale(salesFigures.schools?.seatsReservedVal));
+      setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
+      setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
+    }
+
+    // holds and comps
+    const holdCompList = await fetchData({
+      url: '/api/marketing/sales/read/holdComp',
+      method: 'POST',
+      data: {
+        bookingId: bookings.selected,
+        salesDate,
+      },
+    });
+
+    if (typeof holdCompList === 'object') {
+      const holdCompData = holdCompList as HoldCompSet;
+
+      setHoldData(holdCompData.holds);
+      setCompData(holdCompData.comps);
+    }
+
+    // get the booking details to set the notes fields
+    const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+    setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
+    setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
+    setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
+
+    setLoading(false);
   };
-  const handleOnCompsChange = (e) => {
-    e.persist?.();
-    setComps((prev) => ({ ...prev, [e.target.id]: e.target.value }));
-  };
-  const copyLastWeekSalesData = () => {
-    if (previousSale) {
-      setSale(previousSale || {});
+
+  const validateSale = (saleFigure) => {
+    if (isNullOrEmpty(saleFigure)) {
+      return '';
+    } else {
+      return saleFigure;
     }
   };
 
-  const typeaheadOptions = useMemo(() => {
-    return salesWeeksVenues.map((venue) => ({
-      name: `${venue.Code} ${venue.Name}, ${venue.Town} ${dateToSimple(venue.booking.FirstDate)}`,
-      value: String(venue.BookingId),
-    }));
-  }, [salesWeeksVenues]);
+  useEffect(() => {
+    const initForm = async () => {
+      try {
+        // set the current days sales figues if available
+        setSalesFigures(false);
+      } catch (error) {
+        console.log('error is: ' + error);
+      }
+    };
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-full absolute left-0 top-0 bg-white flex items-center opacity-80">
-        <Spinner className="w-full" size="lg" />
-      </div>
-    );
-  }
+    initForm();
+    setCurrency('£');
+  }, [fetchData, bookings.selected]);
 
   return (
-    <div className="flex flex-row w-full">
-      <div className={'flex bg-transparent w-5/8'}>
-        <div className="flex-auto mx-4 mt-0overflow-hidden  ring-black ring-opacity-5 sm:-mx-6 md:mx-0 md:rounded-lg">
-          <div className={'mb-1'}></div>
-          <form onSubmit={onSubmit}>
-            <div>
-              <div className="bg-soft-primary-green p-4 rounded-md mb-4">
-                <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                  {/* Set Production */}
-                  <div className="row-start-1 flex flex-row items-center">
-                    <label htmlFor="SetProduction" className="w-48 mr-6 text-sm font-medium text-gray-700">
-                      Set Production
-                    </label>
-                    <select
-                      id="SetProduction"
-                      name="SetProduction"
-                      value={inputs.SetProduction}
-                      onChange={handleOnChange}
-                      className="ml-1 block w-full rounded-md drop-shadow-md max-w-lg border-gray-300  focus:border-primary-green focus:ring-primary-green text-sm"
-                    >
-                      <option value={0}>Select A Production</option>
-                      {productions
-                        ?.filter?.((production) => !production.IsArchived)
-                        ?.map?.((production) => (
-                          <option key={production.Id} value={production.Id}>
-                            {`${production.ShowName} ${production.ShowCode}${production.Code} ${production.IsArchived ? ' | (Archived)' : ''}`}
-                          </option>
-                        ))}
-                    </select>
+    <div>
+      {loading ? (
+        <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
+      ) : (
+        <div className="flex flex-row w-full gap-8">
+          <div className="flex flex-col">
+            <div className="w-[849px] h-[275px] bg-primary-green/[0.30] rounded-xl mt-5 p-4">
+              <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">General</div>
+
+              <div className="flex flex-row justify-between">
+                <div className="flex flex-col mr-[20px]">
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
+                    </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Seats"
+                      id="genSeatsSold"
+                      value={genSeatsSold}
+                      onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
+                    />
                   </div>
-                  {/* Production Sale Week */}
-                  <div className="row-start-2 flex flex-row items-center">
-                    <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
-                      Production Sale Week
-                    </label>
-                    <select
-                      id="SaleWeek"
-                      name="SaleWeek"
-                      value={inputs.SaleWeek}
-                      className="ml-1 block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green text-sm"
-                      onChange={handleOnChange}
-                    >
-                      <option value={0}>Select Production Week</option>
-                      {salesWeeks
-                        ?.sort?.((a, b) => new Date(a.mondayDate).valueOf() - new Date(b.mondayDate).valueOf())
-                        ?.map?.((week) => (
-                          <option key={week.mondayDate} value={week.mondayDate}>
-                            {`Wk ${week.productionWeekNum} | Monday ${dateToSimple(new Date(week.mondayDate))}`}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                  {/* Venue/Date */}
-                  <div className="row-start-3 row-span-2 flex flex-row items-center relative">
-                    <label htmlFor="SaleWeek" className="w-48 mr-6 text-sm font-medium text-gray-700">
-                      Venue/Date
-                    </label>
-                    <FormTypeahead
-                      placeholder="Venue/Date"
-                      name="Venue"
-                      className="ml-1 block w-full max-w-lg rounded-md"
-                      value={inputs.Venue}
-                      options={typeaheadOptions}
-                      onChange={(selectedOption) =>
-                        handleOnChange({
-                          target: {
-                            id: 'Venue',
-                            value: selectedOption, // Ensure this is a string or number
-                          },
-                        })
-                      }
+
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
+                    </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Seats"
+                      id="genSeatsReserved"
+                      value={genSeatsReserved}
+                      onChange={(event) => setNumericVal(setGenSeatsReserved, event.target.value)}
                     />
                   </div>
                 </div>
 
-                <div className="grid lg:grid-cols-2 gap-4 sm:grid-cols-1">
-                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                    <label htmlFor="Value" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                      Sold Seat Value
-                    </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0">
-                      <input
-                        type="text"
-                        name="Value"
-                        id="Value"
-                        value={sale?.Value}
-                        onChange={handleOnSaleChange}
-                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                      />
-                      {validationErrors?.Value && <p className="text-primary-orange">{validationErrors.Value}</p>}
+                <div className="flex flex-col">
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
                     </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Value"
+                      id="genSeatsSoldVal"
+                      value={genSeatsSoldVal}
+                      onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
+                    />
                   </div>
-                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:pt-5">
-                    <label htmlFor="Seats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                      Seats Sold
-                    </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0">
-                      <input
-                        type="text"
-                        name="Seats"
-                        id="Seats"
-                        autoComplete="Seats"
-                        value={sale.Seats}
-                        onChange={handleOnSaleChange}
-                        className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                      />
-                      {validationErrors.Seats && <p className="text-primary-orange">{validationErrors.Seats}</p>}
+
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
                     </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Value"
+                      id="genSeatsReservedVal"
+                      value={genSeatsReservedVal}
+                      onChange={(event) => setNumericVal(setGenSeatsReservedVal, event.target.value)}
+                    />
                   </div>
-                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4   sm:pt-5">
-                    <label htmlFor="ReservedValue" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                      Reserved Seats Value
-                    </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0">
-                      <input
-                        type="text"
-                        name="ReservedValue"
-                        id="ReservedValue"
-                        autoComplete="ReservedValue"
-                        value={sale.ReservedValue}
-                        onChange={handleOnSaleChange}
-                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                      />
-                      {validationErrors?.ReservedValue && (
-                        <p className="text-primary-orange">{validationErrors.ReservedValue}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4  sm:pt-5">
-                    <label htmlFor="ReservedSeats" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                      Reserved Seats
-                    </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0">
-                      <input
-                        type="text"
-                        name="ReservedSeats"
-                        id="ReservedSeats"
-                        autoComplete="ReservedSeats"
-                        value={sale.ReservedSeats}
-                        onChange={handleOnSaleChange}
-                        className="block w-full max-w-lg rounded-md border-none drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                      />
-                      {validationErrors.ReservedSeats && (
-                        <p className="text-primary-orange">{validationErrors.ReservedSeats}</p>
-                      )}
-                    </div>
+                </div>
+
+                <div className="flex flex-col mt-4 justify-end">
+                  <div className="flex flex-col items-end">
+                    <Button
+                      className="w-[132px] flex flex-row mb-2"
+                      variant="primary"
+                      text="Update"
+                      onClick={handleUpdate}
+                    />
+                    <Button
+                      className="w-[211px] flex flex-row"
+                      variant="primary"
+                      text="Copy Previous Week's Sales"
+                      onClick={() => setSalesFigures(true)}
+                    />
                   </div>
                 </div>
               </div>
 
-              <div className="grid-cols-2 grid gap-4  md:gap-6 pt-4">
-                <div className="sm:col-span-1">
-                  <div className={'flex flex-col'}>
-                    <div className=" bg-dark-primary-green text-white rounded-t-md px-2 sm:grid sm:grid-cols-3 sm:items-start sm:gap-2 sm:border-t sm:border-gray-200 sm:py-2">
-                      <span className=" sm:col-span-1 sm:mt-0">Holds</span>
-                      <span className=" sm:col-span-1 text-center sm:mt-0">Seats</span>
-                      <span className=" sm:col-span-1 text-center sm:mt-0">Value</span>
+              <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
+
+              <div className="flex flex-row justify-between">
+                <div className="flex flex-col mr-[20px]">
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
                     </div>
-                    {options?.holdTypes.map((hold, i) => (
-                      <div
-                        key={i}
-                        className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5"
-                      >
-                        <label
-                          htmlFor={hold.HoldTypeId}
-                          className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                        >
-                          {hold.HoldTypeName}
-                        </label>
-                        <div className="mt-1 sm:col-span-1 sm:mt-0">
-                          <input
-                            type="text"
-                            name={hold.HoldTypeId}
-                            id={hold.HoldTypeId}
-                            autoComplete="PressHoldsSeats"
-                            value={holds?.[hold.HoldTypeId]?.seats}
-                            onChange={(e) => handleOnHoldsChange(e, 'seats')}
-                            className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                          />
-                        </div>
-                        <div className="mt-1 sm:col-span-1 sm:mt-0">
-                          <input
-                            type="text"
-                            name={hold.HoldTypeId}
-                            id={hold.HoldTypeId}
-                            autoComplete="PressHoldsValue"
-                            value={holds?.[hold.HoldTypeId]?.value}
-                            onChange={(e) => handleOnHoldsChange(e, 'value')}
-                            className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Seats"
+                      id="schSeatsSold"
+                      value={schSeatsSold}
+                      onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
+                    />
+                  </div>
+
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
+                    </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Seats"
+                      id="schSeatsReserved"
+                      value={schSeatsReserved}
+                      onChange={(event) => setNumericVal(setSchSeatsReserved, event.target.value)}
+                    />
                   </div>
                 </div>
-                <div className={'col-span-1'}>
-                  <div className="sm:grid bg-dark-primary-green text-white sm:grid-cols-3 px-2 sm:items-start sm:gap-4 rounded-t-md sm:border-none sm:border-gray-200 py-2">
-                    <span className="sm:col-span-1">Comps</span>
-                    <span className="text-center sm:col-span-2 ">Seats</span>
+
+                <div className="flex flex-col">
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
+                    </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Value"
+                      id="schSeatsSoldVal"
+                      value={schSeatsSoldVal}
+                      onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
+                    />
                   </div>
-                  {options?.compTypes?.map((comp, j) => (
-                    <div
-                      key={j}
-                      className="sm:grid sm:grid-cols-3 px-2 sm:items-start sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5"
-                    >
-                      <label
-                        htmlFor={comp.CompTypeId}
-                        className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
-                      >
-                        {comp.CompTypeName}
-                      </label>
-                      <div className="mt-1 sm:col-span-2 sm:mt-0">
-                        <input
-                          type="text"
-                          name={comp.CompTypeId}
-                          id={comp.CompTypeId}
-                          autoComplete="PressSeats"
-                          value={comps?.[comp.CompTypeId]}
-                          onChange={handleOnCompsChange}
-                          className="block w-full max-w-lg rounded-md border-gray-300 drop-shadow-md focus:border-primary-green focus:ring-primary-green sm:text-sm"
+
+                  <div className="flex flex-row mt-4">
+                    <div className="flex flex-col">
+                      <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
+                    </div>
+                    <TextInput
+                      className="w-[137px] h-[31px] flex flex-col -mt-1"
+                      placeholder="Enter Value"
+                      id="schSeatsReservedVal"
+                      value={schSeatsReservedVal}
+                      onChange={(event) => setNumericVal(setSchSeatsReservedVal, event.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col mt-4 justify-end">
+                  <div className="flex flex-col items-end">
+                    <div className="flex flex-row mb-5">
+                      <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
+                        School Sales not required
+                      </div>
+                      <div className="flex flex-col">
+                        <Checkbox
+                          id="Marketing Plans Received"
+                          name="Marketing Plans Received"
+                          checked={schoolSalesNotRequired}
+                          onChange={(e) => setSchoolSalesNotRequired(e.target.checked)}
+                          className="w-[19px] h-[19px]"
                         />
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div className={'columns-1'}>
-                <div className="sm:grid sm:grid-cols-2 px-2 sm:gap-4 sm:border-none sm:border-gray-200 sm:pt-5">
-                  <div className="flex flex-col w-full col-span-1 cursor-not-allowed">
-                    <label htmlFor="HoldNotes" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                      Hold Notes
-                    </label>
-                    <div className="mt-1 sm:col-span-2 sm:mt-0 cursor-not-allowed">
-                      <textarea
-                        className="w-full cursor-not-allowed"
-                        onChange={handleOnNotesChange}
-                        name={'HoldNotes'}
-                        id={'HoldNotes'}
-                        value={notes.HoldNotes}
-                        disabled
-                      ></textarea>
-                    </div>
+
+                    <Button
+                      className="w-[132px] flex flex-row"
+                      variant="secondary"
+                      text="Cancel"
+                      onClick={handleCancel}
+                    />
                   </div>
-                  <div className={'col-span-1'}>
-                    <div className="flex flex-col px-2 sm:border-none sm:border-gray-200 w-full cursor-not-allowed">
-                      <label htmlFor="CompNotes" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                        Comp Notes
-                      </label>
-                      <div className="mt-1 sm:mt-0">
-                        <textarea
-                          onChange={handleOnNotesChange}
-                          name={'CompNotes'}
-                          id={'CompNotes'}
-                          value={notes.CompNotes}
-                          className="w-full cursor-not-allowed"
-                          disabled
-                        ></textarea>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className={'flex flex-col'}>
-                <label htmlFor="BookingSaleNotes" className="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                  Booking Sale Notes
-                </label>
-                <div className="mt-1 sm:mt-0 w-full">
-                  <textarea
-                    onChange={handleOnNotesChange}
-                    name={'BookingSaleNotes'}
-                    id={'BookingSaleNotes'}
-                    value={notes.BookingSaleNotes}
-                    className="w-full cursor-not-allowed"
-                    disabled
-                  ></textarea>
                 </div>
               </div>
             </div>
-          </form>
+
+            <div className="flex flex-row w-[849px] gap-6 mt-5">
+              <div className="flex flex-col w-[415px]">
+                <Table
+                  columnDefs={salesEntryColDefs('Holds', currency, handleTableUpdate)}
+                  rowData={holdData}
+                  styleProps={styleProps}
+                />
+
+                <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Holds Notes</div>
+                <TextArea
+                  className="mt-2 h-[105px] w-[416px] mb-10"
+                  value={holdNotes}
+                  placeholder="Notes Field"
+                  onChange={(e) => setHoldNotes(e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col w-[300px]">
+                <Table
+                  columnDefs={salesEntryColDefs('Comps', currency, handleTableUpdate)}
+                  rowData={compData}
+                  styleProps={styleProps}
+                />
+
+                <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Comp Notes</div>
+                <TextArea
+                  className="mt-2 h-[105px] w-[416px] mb-10"
+                  value={compNotes}
+                  placeholder="Notes Field"
+                  onChange={(e) => setCompNotes(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col">
+            <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Booking Sales Notes</div>
+            <TextArea
+              className="mt-2 h-[1030px] w-[514px] mb-10"
+              value={bookingSaleNotes}
+              placeholder="Notes Field"
+              onChange={(e) => setBookingSaleNotes(e.target.value)}
+            />
+          </div>
         </div>
-      </div>
-      <div className={'ml-4 flex bg-transparent flex flex-col w-1/3'}>
-        <div className="grid grid-cols-2 gap-1 mb-4">
-          <button
-            type={'submit'}
-            onClick={onSubmit}
-            className={
-              ' rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2'
-            }
-          >
-            {Object.values(validationErrors).length ? 'Update anyway' : 'Add Sales Data'}
-          </button>
-          <button
-            disabled={!previousSaleWeek}
-            onClick={copyLastWeekSalesData}
-            className=" rounded border border-gray-300 bg-primary-green w-100 h-16 text-white px-2.5 py-1.5 drop-shadow-md hover:bg-dark-primary-green focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-offset-2"
-          >
-            Copy Last Week Sales Data
-          </button>
-        </div>
-        <div className="flex-auto mx-4 mt-0 overflow-hidden max-h-screen border-primary-green border ring-opacity-5 sm:-mx-6 md:mx-0 ">
-          <div className={'mb-1'}></div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
