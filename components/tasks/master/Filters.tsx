@@ -28,7 +28,7 @@ const Filters = ({ handleShowTask }: FiltersProps) => {
     <div className="w-full flex items-center justify-between flex-wrap">
       <div className="px-4">
         <div className="py-2 flex flex-row items-center gap-4">
-          <h1 className="text-4xl font-bold text-primary-yellow">Master Task Lists</h1>
+          <h1 className="text-4xl font-bold text-primary-yellow">Master Task List</h1>
           <TextInput
             id="taskText"
             placeholder="Search Master Task List..."
@@ -41,8 +41,8 @@ const Filters = ({ handleShowTask }: FiltersProps) => {
         </div>
       </div>
       <div className="pl-20 flex items-center gap-4 flex-wrap  py-1">
-        <Button text="Production Task List" className="w-[158px]" onClick={() => router.push('/tasks')} />
-        <Button text="Export" className="w-[132px]" sufixIconName={'excel'} onClick={null} />
+        <Button text="Production Task Lists" className="w-[158px]" onClick={() => router.push('/tasks')} />
+        <Button text="Export" className="w-[132px]" sufixIconName="excel" onClick={null} />
         <Button onClick={handleShowTask} text="Add Task" className="w-[132px]" />
       </div>
     </div>
