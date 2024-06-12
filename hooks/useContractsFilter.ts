@@ -29,8 +29,7 @@ const useContractsFilter = () => {
         (filter.contractStatusDropDown === 'all' ||
           contractStatus === contractsStatusMap[filter.contractStatusDropDown]) &&
         (filter.dealMemoStatusDropDown === 'all' ||
-          contractStatus === contractsStatusMap[filter.dealMemoStatusDropDown]) &&
-        !filter.contractText
+          contractStatus === contractsStatusMap[filter.dealMemoStatusDropDown])
       );
     });
     if (filter.contractText)
