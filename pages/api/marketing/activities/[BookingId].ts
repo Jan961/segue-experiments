@@ -3,7 +3,7 @@ import { activityMapper } from 'lib/mappers';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getCurrencyFromBookingId } from '../../../../services/venueCurrencyService';
+import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 export type ActivitiesResponse = {
   info: {
     IsOnSale: boolean;
