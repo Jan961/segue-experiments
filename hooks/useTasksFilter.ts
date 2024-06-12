@@ -74,7 +74,13 @@ const useTasksFilter = () => {
         });
 
         const productionTasks = filters.taskText
-          ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, ['Name', 'Notes', 'userName'])
+          ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, [
+              'Name',
+              'Notes',
+              'userName',
+              'StartByWeekNum',
+              'CompleteByWeekNum',
+            ])
           : productionData.Tasks;
         return {
           ...productionData,
