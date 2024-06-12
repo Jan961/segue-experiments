@@ -8,7 +8,7 @@ import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import { RecoilRoot } from 'recoil';
 import { ClientStateSetter, setInitialStateServer } from 'lib/recoil';
-import { ClerkProvider, SignedIn } from '@clerk/nextjs';
+import { ClerkProvider } from '@clerk/nextjs';
 import { useRouter } from 'next/router';
 import TanstackProvider from 'components/providers/TanstackProvider';
 import ReferenceDataLoader from 'components/ReferenceDataLoader';
@@ -34,9 +34,7 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <ClerkProvider {...pageProps} navigate={(to) => router.push(to)}>
         <RecoilRoot initializeState={(snapshot) => setInitialStateServer(snapshot, initialState)}>
           <ClientStateSetter intitialState={initialState} />
-          <SignedIn>
-            <ReferenceDataLoader />
-          </SignedIn>
+          <ReferenceDataLoader />
           <Component {...pageProps} />
           <Notifications />
         </RecoilRoot>

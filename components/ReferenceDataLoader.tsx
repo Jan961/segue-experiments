@@ -7,7 +7,7 @@ export default function ReferenceDataLoader() {
   const setState = useSetRecoilState(globalState);
   const getReferenceData = async () => {
     try {
-      const { data } = await axios.get(`/api/email/templates/list`);
+      const { data } = await axios(`/api/email/templates/list`);
       setState((prev) => ({ ...prev, emailTemplates: data }));
     } catch (error) {
       console.error(error);
