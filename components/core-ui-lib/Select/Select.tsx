@@ -12,7 +12,7 @@ import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
-import fuseFilter from '../../../utils/fuseFilter';
+import fuseFilter from 'utils/fuseFilter';
 const Option = (props: OptionProps) => {
   return <components.Option className="w-full" {...props} />;
 };

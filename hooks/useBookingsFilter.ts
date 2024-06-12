@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import fuseFilter from '../utils/fuseFilter';
+import fuseFilter from 'utils/fuseFilter';
 /*
  * Hook responsible for returning filtered and sorted Bookings
  */

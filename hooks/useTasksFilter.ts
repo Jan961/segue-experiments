@@ -7,7 +7,7 @@ import { isThisWeek } from 'date-fns';
 import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
-import fuseFilter from '../utils/fuseFilter';
+import fuseFilter from 'utils/fuseFilter';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
