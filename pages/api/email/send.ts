@@ -13,6 +13,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       dynamicTemplateData: data,
     };
     await sgMail.send(msg);
+    return res.status(200).json({ success: true });
   } catch (e) {
     console.log(e);
     res.status(500).json({ err: 'Error sending email' });
