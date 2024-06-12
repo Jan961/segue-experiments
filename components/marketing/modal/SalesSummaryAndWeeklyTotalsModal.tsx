@@ -81,14 +81,16 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
 
   const onExport = useCallback(() => {
     notify.promise(
-      exportSalesSummaryReport(formData).then(() => onClose()),
+      exportSalesSummaryReport({ ...formData, isWeeklyReport: activeModal === 'salesSummaryAndWeeklyTotals' }).then(
+        () => onClose(),
+      ),
       {
         loading: 'Generating Sales summary report',
         success: 'Sales summary report downloaded successfully',
         error: 'Error generating Sales summary report',
       },
     );
-  }, [formData, onClose]);
+  }, [formData, onClose, activeModal]);
 
   const returnModalTitle = (): string => {
     switch (activeModal) {
@@ -139,7 +141,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
             <Label text="Order" />
             <Select
               className="w-full"
-              onChange={(value) => onChange('order', value)}
+              onChange={(value) => onChange('order', value as string)}
               options={salesSummarySortOptions}
               value={order}
             />

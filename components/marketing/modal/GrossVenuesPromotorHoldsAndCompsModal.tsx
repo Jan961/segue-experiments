@@ -7,6 +7,11 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import DateRange from 'components/core-ui-lib/DateRange';
+import { exportPromoterHoldsReport, fetchProductionVenues } from './request';
+import { notify } from 'components/core-ui-lib';
+import { useQuery } from '@tanstack/react-query';
+import { transformToOptions } from 'utils';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
 
 interface GrossVenuesPromotorHoldsAndCompsModalProps {
   visible: boolean;
@@ -30,7 +35,6 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const [formData, setFormData] = useState(defaultFormData);
   const { production, selection, fromDate, toDate, venue } = formData;
   const selectionOptions = [];
-  const venueOptions = [];
   const productionsOptions = useMemo(
     () =>
       productionJump.productions.map((production) => ({
@@ -39,10 +43,47 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       })),
     [productionJump],
   );
+  const { data: venues = [] } = useQuery({
+    queryKey: ['productionWeeks' + production],
+    queryFn: () => {
+      if (!production) return;
+      const productionVenuesPromise = fetchProductionVenues(production);
+      notify.promise(productionVenuesPromise, {
+        loading: 'fetching production venues',
+        success: 'Production venues fetched successfully',
+        error: 'Error fetching production venues',
+      });
+      return productionVenuesPromise;
+    },
+  });
+
+  const prodVenuesOptions: SelectOption[] = useMemo(
+    () =>
+      transformToOptions(
+        venues,
+        'Name',
+        'Id',
+        // (week) => ` Wk ${week.productionWeekNum} | ${dateToSimple(week?.mondayDate)}`,
+      ),
+    [venues],
+  );
 
   const onChange = useCallback((key: string, value: string | number) => {
     setFormData((data) => ({ ...data, [key]: value }));
   }, []);
+
+  const onExport = useCallback(() => {
+    const selectedProduction = productionJump.productions?.find((prod) => prod.Id === parseInt(production));
+    const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
+    notify.promise(
+      exportPromoterHoldsReport({ ...formData, productionCode }).then(() => onClose()),
+      {
+        loading: 'Generating report',
+        success: 'Report downloaded successfully',
+        error: 'Error generating report',
+      },
+    );
+  }, [formData, onClose, production, productionJump.productions]);
 
   const returnModalTitle = (): string => {
     switch (activeModal) {
@@ -67,7 +108,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       <form className="flex flex-col gap-2 w-[383px] mt-4">
         <Select
           label="Production"
-          onChange={(value) => onChange('production', value)}
+          onChange={(value) => onChange('production', value as number)}
           options={productionsOptions}
           value={production}
         />
@@ -87,8 +128,8 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
         {['holdsAndComps', 'promotorHolds'].includes(activeModal) && (
           <Select
             label="Venue"
-            onChange={(value) => onChange('venue', value)}
-            options={venueOptions}
+            onChange={(value) => onChange('venue', value as number)}
+            options={prodVenuesOptions}
             value={venue}
             placeholder="Please select a venue"
           />
@@ -99,7 +140,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             <Label text="Selection" />
             <Select
               className="w-full"
-              onChange={(value) => onChange('selection', value)}
+              onChange={(value) => onChange('selection', value as string)}
               options={selectionOptions}
               value={selection}
             />
@@ -114,6 +155,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             sufixIconName="excel"
             iconProps={{ className: 'h-4 w-3' }}
             text="Create Report"
+            onClick={onExport}
           />
         </div>
       </form>
