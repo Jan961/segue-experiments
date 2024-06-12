@@ -1,7 +1,7 @@
 import { SalesSnapshot } from 'types/MarketingTypes';
-import useAxios from 'hooks/useAxios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SalesTable from '../../global/salesTable/SalesTable';
+import axios from 'axios';
 
 interface SalesTabProps {
   bookingId: string;
@@ -21,15 +21,11 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     },
   }));
 
-  const { fetchData } = useAxios();
-
   const retrieveSalesData = async (bookingId: string) => {
     let data: any;
     try {
-      data = await fetchData({
-        url: '/api/marketing/sales/read/' + bookingId,
-        method: 'POST',
-      });
+      data = await axios.post('/api/marketing/sales/read/' + bookingId);
+      data = data?.data;
     } catch (exception) {
       console.log(exception);
       data = [];

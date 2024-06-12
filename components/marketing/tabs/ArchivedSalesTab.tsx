@@ -5,10 +5,10 @@ import { DataList, VenueDetail } from '../MarketingHome';
 import SalesTable from 'components/global/salesTable';
 import { SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import useAxios from 'hooks/useAxios';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import axios from 'axios';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -30,8 +30,6 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
       setArchivedSalesTable(<div />);
     },
   }));
-
-  const { fetchData } = useAxios();
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
@@ -68,11 +66,8 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
 
     try {
       selectedBookings = selection.map((obj) => obj.bookingId);
-      data = await fetchData({
-        url: '/api/marketing/sales/read/archived',
-        method: 'POST',
-        data: { bookingIds: selectedBookings },
-      });
+      data = await axios.post('/api/marketing/sales/read/archived', { bookingIds: selectedBookings });
+      data = data?.data;
     } catch (exception) {
       console.log(exception);
       data = [];

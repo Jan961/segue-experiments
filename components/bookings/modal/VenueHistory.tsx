@@ -16,6 +16,7 @@ import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/s
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
+import axios from 'axios';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -145,11 +146,11 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     }
     setLoading(true);
 
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/archived',
-      method: 'POST',
-      data: { bookingIds: selectedBookings.map((obj) => obj.bookingId) },
-    });
+    const data = (
+      await axios.post('/api/marketing/sales/read/archived', {
+        bookingIds: selectedBookings.map((obj) => obj.bookingId),
+      })
+    )?.data;
 
     if (Array.isArray(data) && data.length !== 0) {
       const salesComp = data as Array<SalesComparison>;
@@ -166,10 +167,8 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
     setLoading(true);
     let data;
     try {
-      data = await fetchData({
-        url: '/api/marketing/sales/read/' + bookingId,
-        method: 'POST',
-      });
+      data = await axios.post('/api/marketing/sales/read/' + bookingId);
+      data = data?.data;
     } catch (exception) {
       console.log(exception);
       data = [];
