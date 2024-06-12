@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { bookingState } from 'state/booking/bookingState';
 import { useRecoilValue } from 'recoil';
 import { venueState } from 'state/booking/venueState';
 import classNames from 'classnames';
@@ -16,6 +15,7 @@ import { SalesComp, SelectedBooking } from 'components/global/salesTable/utils/s
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
+import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -40,7 +40,6 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const [venueSelectView, setVenueSelectView] = useState<string>('select');
   const [showSalesSnapshot, setShowSalesSnapshot] = useState<boolean>(false);
   const [venueID, setVenueID] = useState(null);
-  const bookingDict = useRecoilValue(bookingState);
   const venueDict = useRecoilValue(venueState);
   const [loading, setLoading] = useState<boolean>(false);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>();
@@ -56,19 +55,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const handleModalCancel = () => onCancel?.();
   const [venueDesc, setVenueDesc] = useState<string>('');
 
-  const venueOptions = useMemo(() => {
-    const options = [];
-    for (const venueId in venueDict) {
-      const venue = venueDict[venueId];
-      const option = {
-        text: `${venue.Code} ${venue?.Name} ${venue?.Town}`,
-        value: venue?.Id,
-      };
-      options.push(option);
-    }
-    options.sort((a, b) => a.text.localeCompare(b.text));
-    return options;
-  }, [venueDict, bookingDict]);
+  const venueOptions = useRecoilValue(venueOptionsSelector([]));
 
   useEffect(() => {
     setShowVenueSelect(visible);
