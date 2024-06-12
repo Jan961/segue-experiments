@@ -48,7 +48,7 @@ describe('TextInput Component', () => {
 
   // Test icon presence
   test('renders with icon', () => {
-    render(<TextInput iconName={'search'} />);
+    render(<TextInput iconName="search" />);
     const iconElement = screen.getByRole('img');
     expect(iconElement).toBeInTheDocument();
   });

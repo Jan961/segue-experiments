@@ -47,7 +47,7 @@ interface CustMultiValueProps extends MultiValueProps {
 const COMP_HEIGHT = '1.9375rem';
 
 export interface SelectProps extends WithTestId {
-  value?: string | number | any[] | undefined;
+  value?: string | number | any[] | undefined | boolean;
   onChange: (value: string | number | (string | number)[]) => void;
   renderOption?: (option: OptionProps) => React.ReactElement;
   customStyles?: Partial<StylesConfig>;

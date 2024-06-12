@@ -102,6 +102,9 @@ export const getAllProductions = async (AccountId: number) => {
     select: {
       Id: true,
       Code: true,
+      RunningTime: true,
+      RunningTimeNote: true,
+      SalesFrequency: true,
       IsArchived: true,
       Show: {
         select: {
