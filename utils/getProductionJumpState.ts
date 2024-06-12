@@ -15,6 +15,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
   const selectedProduction = productionsRaw.find(
     (production: any) => production.Code === ProductionCode && production.Show.Code === ShowCode,
   );
+
   return {
     productions: productionsRaw
       .map((t: any) => {
@@ -33,6 +34,9 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           ShowRegionId: allProductionRegions
             ? allProductionRegions.find((pair: any) => pair.PRProductionId === t.Id)?.PRRegionId
             : null,
+          RunningTime: t.RunningTime,
+          RunningTimeNote: t.RunningTimeNote,
+          SalesFrequency: t.SalesFrequency,
         };
       })
       .sort((a, b) => {
