@@ -33,7 +33,7 @@ const intProduction = {
   IsArchived: false,
   StartDate: '',
   EndDate: '',
-  SalesFrequency: '',
+  SalesFrequency: 'W',
   SalesEmail: '',
   RegionList: [],
 };
@@ -140,6 +140,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const onSave = (file, onProgress, onError, onUploadingImage) => {
+    console.log('==onSave==', file);
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
@@ -240,6 +241,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           false,
         );
         await axios.post(`/api/productions/create`, payloadData);
+        const transaction = {
+          update: [
+            {
+              ...data,
+              highlightRow: false,
+            },
+          ],
+        };
+        applyTransactionToGrid(tableRef, transaction);
         notify.success(ToastMessages.createNewProductionSuccess);
       } catch (error) {
         notify.error(ToastMessages.createNewProductionFailure);
@@ -270,7 +280,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       'DateBlock[0].StartDate' in e.data &&
       'DateBlock[0].EndDate' in e.data
     ) {
-      // handleSave(e.data);
       await createNewProduction(e.data);
     } else if (e.column.colId === 'ImageUrl') {
       const { originalFilename: name, id } = e.data.Image || {};
