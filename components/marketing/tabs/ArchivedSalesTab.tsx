@@ -60,39 +60,35 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
   };
 
   const showArchivedSales = async (selection) => {
-    let data, selectedBookings;
-
     setArchivedSalesTable(<div />);
 
     try {
-      selectedBookings = selection.map((obj) => obj.bookingId);
-      data = await axios.post('/api/marketing/sales/read/archived', { bookingIds: selectedBookings });
-      data = data?.data;
+      const selectedBookings = selection.map((obj) => obj.bookingId);
+      const { data } = await axios.post('/api/marketing/sales/read/archived', { bookingIds: selectedBookings });
+
+      if (Array.isArray(data) && data.length !== 0) {
+        const salesComp = data as Array<SalesComparison>;
+        const result = { tableData: salesComp, bookingIds: selection };
+
+        setArchivedSalesTable(
+          <div className="w-[1200px] overflow-x-auto pb-5">
+            <SalesTable
+              containerHeight="h-[1000px]"
+              containerWidth="w-auto"
+              module="marketing"
+              variant="salesComparison"
+              data={result}
+              tableHeight={580}
+            />
+          </div>,
+        );
+        setArchivedDataAvail(true);
+        setShowArchSalesModal(false);
+      } else {
+        setErrorMessage('There are no sales data available for this particular selection.');
+      }
     } catch (exception) {
       console.log(exception);
-      data = [];
-    }
-
-    if (Array.isArray(data) && data.length !== 0) {
-      const salesComp = data as Array<SalesComparison>;
-      const result = { tableData: salesComp, bookingIds: selection };
-
-      setArchivedSalesTable(
-        <div className="w-[1200px] overflow-x-auto pb-5">
-          <SalesTable
-            containerHeight="h-[1000px]"
-            containerWidth="w-auto"
-            module="marketing"
-            variant="salesComparison"
-            data={result}
-            tableHeight={580}
-          />
-        </div>,
-      );
-      setArchivedDataAvail(true);
-      setShowArchSalesModal(false);
-    } else {
-      setErrorMessage('There are no sales data available for this particular selection.');
     }
   };
 

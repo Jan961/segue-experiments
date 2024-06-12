@@ -22,30 +22,27 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   }));
 
   const retrieveSalesData = async (bookingId: string) => {
-    let data: any;
     try {
-      data = await axios.post('/api/marketing/sales/read/' + bookingId);
-      data = data?.data;
+      const { data } = await axios.post('/api/marketing/sales/read/' + bookingId);
+
+      if (Array.isArray(data) && data.length > 0) {
+        const tempSales = data as Array<SalesSnapshot>;
+        setSalesTable(
+          <SalesTable
+            containerHeight="h-auto"
+            containerWidth="w-[1465px]"
+            module="marketing"
+            variant="salesSnapshot"
+            data={tempSales}
+            booking={bookingId}
+            tableHeight={640}
+          />,
+        );
+
+        setDataAvailable(true);
+      }
     } catch (exception) {
       console.log(exception);
-      data = [];
-    }
-
-    if (Array.isArray(data) && data.length > 0) {
-      const tempSales = data as Array<SalesSnapshot>;
-      setSalesTable(
-        <SalesTable
-          containerHeight="h-auto"
-          containerWidth="w-[1465px]"
-          module="marketing"
-          variant="salesSnapshot"
-          data={tempSales}
-          booking={bookingId}
-          tableHeight={640}
-        />,
-      );
-
-      setDataAvailable(true);
     }
   };
 

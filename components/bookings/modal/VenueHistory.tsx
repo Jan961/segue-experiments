@@ -153,22 +153,20 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getSalesSnapshot = async (bookingId: string) => {
     setErrorMessage('');
     setLoading(true);
-    let data;
+
     try {
-      data = await axios.post('/api/marketing/sales/read/' + bookingId);
-      data = data?.data;
+      const { data } = await axios.post('/api/marketing/sales/read/' + bookingId);
+
+      if (Array.isArray(data) && data.length > 0) {
+        const salesData = data as Array<SalesSnapshot>;
+        setSalesSnapData(salesData);
+        toggleModal('salesSnapshot');
+      } else {
+        setLoading(false);
+        setErrorMessage('No sales to show for this production');
+      }
     } catch (exception) {
       console.log(exception);
-      data = [];
-    }
-
-    if (Array.isArray(data) && data.length > 0) {
-      const salesData = data as Array<SalesSnapshot>;
-      setSalesSnapData(salesData);
-      toggleModal('salesSnapshot');
-    } else {
-      setLoading(false);
-      setErrorMessage('No sales to show for this production');
     }
   };
 

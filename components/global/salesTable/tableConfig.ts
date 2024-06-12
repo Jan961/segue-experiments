@@ -55,7 +55,7 @@ const valueWithCurrency = (inputText: string) => {
 };
 
 const seatsTotalFormatter: (inputSeats: string) => number = (inputSeats: string) => {
-  return inputSeats === '' || inputSeats === null ? 0 : isNaN(parseInt(inputSeats)) ? 0 : parseInt(inputSeats);
+  return parseInt(inputSeats) || 0;
 };
 
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
@@ -299,8 +299,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           cellRenderer: function (params) {
             if (params.data.genTotalValue === 0 || params.data.genTotalValue === '') {
               const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genTotalValue;
-              if (prevTotal)
-                return prevTotal === '' || prevTotal === undefined ? '-' : stripSymbolAndRound(prevTotal.toString());
+              if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
             } else {
               return valueWithCurrency(params.data.genTotalValue);
             }
@@ -379,7 +378,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           cellRenderer: function (params) {
             if (isNullOrEmpty(params.data.schTotalValue)) {
               const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schTotalValue;
-              return prevTotal === '' || prevTotal === undefined ? '-' : stripSymbolAndRound(prevTotal.toString());
+              if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
             } else {
               return valueWithCurrency(params.data.schTotalValue);
             }
@@ -416,9 +415,7 @@ export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActi
           cellRenderer: function (params) {
             if (params.data.schReservations === '') {
               const previousRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schReservations;
-              return previousRev === undefined || previousRev === ''
-                ? '-'
-                : stripSymbolAndRound(previousRev.toString());
+              if (previousRev) return !previousRev ? '-' : stripSymbolAndRound(previousRev.toString());
             } else {
               return params.data.schReservations === ''
                 ? valueWithCurrency('00.00')

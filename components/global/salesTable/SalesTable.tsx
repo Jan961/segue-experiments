@@ -191,7 +191,7 @@ export default function SalesTable({
   const calculateWidth = () => {
     switch (variant) {
       case 'salesSnapshot': {
-        const isMarketing: boolean = module !== 'bookings';
+        const isMarketing = module !== 'bookings';
         const MARKETING_TAB_WIDTH = 195;
         const SCHOOLS_TAB_WIDTH = 135;
 
