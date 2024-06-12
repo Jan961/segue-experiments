@@ -26,7 +26,14 @@ const useMasterTasksFilter = (tasks = []) => {
       };
     });
 
-    return filters.taskText ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, ['Name', 'userName']) : tasks;
+    return filters.taskText
+      ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, [
+          'Name',
+          'userName',
+          'StartByWeekNum',
+          'CompleteByWeekNum',
+        ])
+      : tasks;
   }, [tasks, filters.taskText]);
   return { filteredTasks };
 };

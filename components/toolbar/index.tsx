@@ -1,5 +1,5 @@
 import * as React from 'react';
-import ProductionJumpMenu from '../global/nav/ProductionJumpMenu';
+import { ProductionJumpMenu } from '../global/nav/ProductionJumpMenu';
 
 // This needs to be passed from the template
 // let show = "ST1";
@@ -14,6 +14,7 @@ interface props {
   filterComponent?: any;
   page?: string;
   titleClassName?: string;
+  showArchivedCheck?: boolean;
 }
 
 const GlobalToolbar = ({
@@ -23,6 +24,7 @@ const GlobalToolbar = ({
   filterComponent,
   children,
   titleClassName,
+  showArchivedCheck = true,
 }: React.PropsWithChildren<props>) => {
   const [filtersOpen, setFiltersOpen] = React.useState(false);
 
@@ -57,7 +59,7 @@ const GlobalToolbar = ({
         <div className="bg-white border-primary-border rounded-md border shadow-md">
           <div className="rounded-l-md">
             <div className="flex items-center">
-              <ProductionJumpMenu />
+              <ProductionJumpMenu showArchivedCheck={showArchivedCheck} />
             </div>
           </div>
         </div>

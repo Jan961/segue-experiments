@@ -8,6 +8,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         Id,
       },
+      include: {
+        VenueContact: {
+          include: {
+            VenueRole: true, // Include related VenueRole data within VenueContact
+          },
+        }, // Include related VenueContact data
+      },
     });
     res.status(200).json(venue);
   } catch (e) {

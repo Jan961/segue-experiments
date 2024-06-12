@@ -17,12 +17,21 @@ import { useRouter } from 'next/router';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { addEditContractsState } from 'state/contracts/contractsState';
 import useAxios from 'hooks/useAxios';
+import axios from 'axios';
 import { bookingStatusMap } from 'config/bookings';
 import { userState } from 'state/account/userState';
-import { useMemo, useState } from 'react';
-import { SaveContractBookingFormState, SaveContractFormState, VenueContractFormData } from 'interfaces';
+import { useEffect, useMemo, useState } from 'react';
+import { Venue } from '@prisma/client';
+import {
+  DealMemoContractFormData,
+  SaveContractBookingFormState,
+  SaveContractFormState,
+  VenueContractFormData,
+} from 'interfaces';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
+import { EditDealMemoContractModal } from './EditDealMemoContractModal';
+import { LoadingOverlay } from 'components/shows/ShowsTable';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -30,10 +39,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [saveContractFormData, setSaveContractFormData] = useState<Partial<SaveContractFormState>>({});
   const [saveBookingFormData, setSaveBookingFormData] = useState<Partial<SaveContractBookingFormState>>({});
   const [cancelModal, setCancelModal] = useState<boolean>(false);
+  const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [venue, setVenue] = useState<Partial<Venue>>(undefined);
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
   });
+  const [demoModalData, setDemoModalData] = useState<Partial<DealMemoContractFormData>>({});
   const modalTitle = `${productionJumpState.ShowCode + productionJumpState.Code} | ${productionJumpState.ShowName} | ${
     selectedTableCell.contract.venue
   } | ${formattedDateWithDay(productionJumpState.StartDate)} - ${formattedDateWithDay(productionJumpState.EndDate)}`;
@@ -48,6 +61,27 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       })),
     [users],
   );
+
+  const callDealMemoApi = async () => {
+    const demoModalData = await axios.get<DealMemoContractFormData>(
+      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
+    );
+    if (demoModalData.data && demoModalData.data.DeMoBookingId) {
+      setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
+      if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
+        const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
+        setVenue(venueData.data as unknown as Venue);
+      }
+    }
+  };
+  useEffect(() => {
+    const callDealMemoData = async () => {
+      setIsLoading(true);
+      callDealMemoApi();
+      setIsLoading(false);
+    };
+    callDealMemoData();
+  }, []);
 
   const editContractModalData = async (key: string, value, type: string) => {
     const updatedFormData = {
@@ -98,7 +132,16 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       onClose();
     }
   };
-  console.log('formData.SignedDate.toString()', formData.SignedDate.toString());
+
+  const handleEditDealMemo = () => {
+    setEditDealMemoModal(true);
+  };
+
+  const handleDemoFormClose = () => {
+    setEditDealMemoModal(false);
+    callDealMemoApi();
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -106,7 +149,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
     >
-      <div className="h-[80vh] w-auto overflow-scroll flex">
+      <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px]   flex">
           <div className="w-[423px] h-[1008px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
             <div className=" text-primary-input-text font-bold text-lg">Deal Memo</div>
@@ -162,9 +205,9 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
             </div>
 
             <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
-            <TextArea className={'h-[580px] w-[400px]'} value={formData.DealNotes} />
+            <TextArea className="h-[580px] w-[400px]" value={formData.DealNotes} />
             <div className="flex mt-4 items-center">
-              <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" />
+              <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" onClick={handleEditDealMemo} />
               <Button className="ml-3 w-36" variant="primary" text="View as PDF" />
             </div>
           </div>
@@ -320,7 +363,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.bookingNotes}
                   onChange={(value) => editContractModalData('bookingNotes', value.target.value, 'booking')}
                 />
@@ -333,12 +376,12 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex items-center justify-between">
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">£</div>
-                  <TextInput id={'venueText'} className="w-[100px]" />
+                  <TextInput id="venueText" className="w-[100px]" />
                 </div>
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Royalty</div>
                   <TextInput
-                    id={'venueText'}
+                    id="venueText"
                     className="w-[100px]"
                     value={formData.RoyaltyPercentage}
                     onChange={(value) => editContractModalData('RoyaltyPercentage', value.target.value, 'contract')}
@@ -348,7 +391,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
                 <div className="flex  items-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-1">Promoter</div>
-                  <TextInput id={'venueText'} className="w-[100px]" />
+                  <TextInput id="venueText" className="w-[100px]" />
                   <div className=" text-primary-input-text font-bold text-sm ml-1">%</div>
                 </div>
               </div>
@@ -359,7 +402,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.TicketPriceNotes}
                   onChange={(value) => editContractModalData('TicketPriceNotes', value.target.value, 'booking')}
                   placeholder="Ticket Pricing Notes"
@@ -372,7 +415,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.MarketingDealNotes}
                   onChange={(value) => editContractModalData('MarketingDealNotes', value.target.value, 'booking')}
                   placeholder="Marketing Deal"
@@ -385,7 +428,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.CrewNotes}
                   onChange={(value) => editContractModalData('CrewNotes', value.target.value, 'booking')}
                   placeholder="Crew Notes"
@@ -421,7 +464,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.Exceptions}
                   onChange={(value) => editContractModalData('Exceptions', value.target.value, 'contract')}
                 />
@@ -433,7 +476,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.Notes}
                   onChange={(value) => editContractModalData('Notes', value.target.value, 'contract')}
                 />
@@ -445,7 +488,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5">
                 <TextArea
-                  className={'mt-2.5 h-[58px] w-[498px]'}
+                  className="mt-2.5 h-[58px] w-[498px]"
                   value={formData.MerchandiseNotes}
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
                 />
@@ -470,6 +513,17 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
         onNoClick={() => setCancelModal(false)}
         onYesClick={() => handleCancelForm(true)}
       />
+      {editDealMemoModal && (
+        <EditDealMemoContractModal
+          visible={editDealMemoModal}
+          onCloseDemoForm={() => handleDemoFormClose()}
+          productionJumpState={productionJumpState}
+          selectedTableCell={selectedTableCell}
+          demoModalData={demoModalData}
+          venueData={venue}
+        />
+      )}
+      {isLoading && <LoadingOverlay />}
     </PopupModal>
   );
 };

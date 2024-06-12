@@ -1,29 +1,23 @@
 import Layout from 'components/Layout';
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
-import Entry from 'components/marketing/sales/entry';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
 import { objectify } from 'radash';
-import { useRecoilValue } from 'recoil';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
-import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
+import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
-  const bookings = useRecoilValue(bookingJumpState);
-
   return (
     <div>
       <Layout title="Marketing | Segue">
         <div className="mb-8">
           <SalesEntryFilters />
         </div>
-
-        {bookings.selected !== undefined && bookings.selected !== null && <Entry />}
       </Layout>
     </div>
   );
@@ -32,6 +26,7 @@ const Index = () => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
   const accountId = await getAccountId(email);
+
   const productionJump = await getProductionJumpState(ctx, 'marketing/sales/entry', accountId);
 
   const productionId = productionJump.selected;
