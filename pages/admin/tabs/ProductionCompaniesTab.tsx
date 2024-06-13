@@ -2,10 +2,13 @@ import { productionCompaniesColDefs, styleProps } from 'components/system-admin/
 import { useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
+import { DeleteConfirmation } from '../../../components/global/DeleteConfirmation';
 export default function ProductionCompaniesTab() {
   //  const [createMode, setCreateMode] = useState<boolean>();
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
   // const [showErrorModal, setShowErrorModal] = useState<boolean>();
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>();
+  const [selectedProdCompany, setSelectedProdCompany] = useState();
   const fetchProductionCompanies = async () => {
     const response = await fetch('/api/productionCompanies/read', {
       method: 'POST',
@@ -40,17 +43,24 @@ export default function ProductionCompaniesTab() {
       if (productionCompanies.length <= 1) {
         console.log('You cannot delete this row');
       } else {
-        const Id = productionCompanies[rowIndex].Id;
-        console.log('some data', Id);
-        const response = await fetch('/api/productionCompanies/delete', {
-          method: 'POST',
-          headers: {},
-          body: JSON.stringify({ Id }),
-        });
-        if (response.ok) {
-          await fetchProductionCompanies();
-        }
+        setSelectedProdCompany(productionCompanies[rowIndex].Id);
+        setShowDeleteModal(true);
       }
+    }
+  };
+  const deleteProductionCompany = async () => {
+    console.log('im in delete');
+    if (selectedProdCompany != null) {
+      const response = await fetch('/api/productionCompanies/delete', {
+        method: 'POST',
+        headers: {},
+        body: JSON.stringify({ Id: selectedProdCompany }),
+      });
+      if (response.ok) {
+        await fetchProductionCompanies();
+      }
+      setSelectedProdCompany(null);
+      setShowDeleteModal(false);
     }
   };
 
@@ -88,17 +98,33 @@ export default function ProductionCompaniesTab() {
       }
     }
   };
-
+  console.log(showDeleteModal);
   return (
     <div>
-      <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
-      <ProductionCompaniesTable
-        columnDefs={productionCompaniesColDefs}
-        rowData={productionCompanies}
-        styleProps={styleProps}
-        onChange={onCellUpdate}
-        onCellClicked={onCellClicked}
-      />
+      <div>
+        <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
+        <ProductionCompaniesTable
+          columnDefs={productionCompaniesColDefs}
+          rowData={productionCompanies}
+          styleProps={styleProps}
+          onChange={onCellUpdate}
+          onCellClicked={onCellClicked}
+        />
+      </div>
+      <div>
+        {showDeleteModal && (
+          <DeleteConfirmation
+            title="Delete Booking"
+            onCancel={() => {
+              setShowDeleteModal(false);
+              setSelectedProdCompany(null);
+            }}
+            onConfirm={deleteProductionCompany}
+          >
+            <p>This will the delete the booking and related performances</p>
+          </DeleteConfirmation>
+        )}
+      </div>
     </div>
   );
 }
