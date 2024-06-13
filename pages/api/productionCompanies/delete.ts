@@ -7,14 +7,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const AccountId = await getAccountId(email);
   const { Id } = JSON.parse(req.body);
   console.log('company info var', JSON.parse(req.body));
-
-  const deletedRecord = await prisma.ProductionCompany.delete({
-    where: {
-      Id,
-      AccountId,
-    },
+  const prodCompanyWithShows = await prisma.Show.count({
+    where: { ShowProdCoId: Id },
   });
-  console.log(deletedRecord);
+  console.log('Shows', prodCompanyWithShows);
+  if (prodCompanyWithShows === 0) {
+    const deletedRecord = await prisma.ProductionCompany.delete({
+      where: {
+        Id,
+        AccountId,
+      },
+    });
+    console.log(deletedRecord);
 
-  res.status(200).json(deletedRecord);
+    res.status(200).json(deletedRecord);
+  } else {
+    console.log('Shows associated cannot delete');
+  }
 }

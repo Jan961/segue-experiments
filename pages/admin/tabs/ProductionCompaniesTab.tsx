@@ -5,21 +5,24 @@ import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable'
 export default function ProductionCompaniesTab() {
   //  const [createMode, setCreateMode] = useState<boolean>();
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
+  // const [showErrorModal, setShowErrorModal] = useState<boolean>();
+  const fetchProductionCompanies = async () => {
+    const response = await fetch('/api/productionCompanies/read', {
+      method: 'POST',
+      headers: {},
+    });
+    setProductionCompanies(
+      (await response.json()).map((item) => {
+        item.existsInDB = true;
+        return item;
+      }),
+    );
+  };
 
   useEffect(() => {
-    const getProdCompanies = async () => {
-      const response = await fetch('/api/productionCompanies/read', {
-        method: 'POST',
-        headers: {},
-      });
-      setProductionCompanies(
-        (await response.json()).map((item) => {
-          item.existsInDB = true;
-          return item;
-        }),
-      );
-    };
-    getProdCompanies();
+    (async () => {
+      await fetchProductionCompanies();
+    })();
   }, []);
   console.log(productionCompanies);
   const onAddNewVenueContact = async () => {
@@ -45,11 +48,7 @@ export default function ProductionCompaniesTab() {
           body: JSON.stringify({ Id }),
         });
         if (response.ok) {
-          const tempProdCompanies = productionCompanies;
-          tempProdCompanies.splice(rowIndex, 1);
-          console.log(tempProdCompanies);
-          setProductionCompanies(tempProdCompanies);
-          this.forceUpdate();
+          await fetchProductionCompanies();
         }
       }
     }
