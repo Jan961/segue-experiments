@@ -106,7 +106,7 @@ export default function ProductionCompaniesTab() {
     <div>
       <div>
         <div className="flex justify-between items-center pt-8">
-          <h1 className="primary-navy text-2xl font-semibold">Production Companies / Special Purpose Vehicles</h1>
+          <h1 className="text-primary-navy text-2xl font-semibold">Production Companies / Special Purpose Vehicles</h1>
           <div className="pb-4">
             <Button onClick={onAddNewVenueContact} variant="secondary" text="Add New Company" />
           </div>

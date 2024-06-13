@@ -22,7 +22,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             AccountId,
           },
         });
-        console.log(deletedRecord);
 
         res.status(200).json(deletedRecord);
       } else {
