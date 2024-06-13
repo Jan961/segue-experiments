@@ -6,6 +6,7 @@ import prisma from 'lib/prismaAccelerate';
 const publicPaths = [
   '/api/user*',
   '/api/account*',
+  '/api/email*',
   '/api/subscription-plans*',
   '/api/subscription*',
   '/api/payment*',
