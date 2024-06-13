@@ -130,7 +130,7 @@ export const transformVenues = (
       Code,
       StatusCode,
       Website,
-      CurrencyCode,
+      VenueCurrencyCode: CurrencyCode,
       VATIndicator,
       TechSpecsURL,
       Seats,
