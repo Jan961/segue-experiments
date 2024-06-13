@@ -95,7 +95,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         />
       </div>
       <ConfirmationDialog
-        variant={'delete'}
+        variant="delete"
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
