@@ -10,9 +10,10 @@ import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { isNullOrEmpty } from 'utils';
 import { weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 
@@ -53,7 +54,6 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   Priority: 0,
   AccountId: 0,
   RepeatInterval: '',
-  RepeatCount: null,
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,
@@ -74,11 +74,29 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
+  const [isCloned, setIsCloned] = useState<boolean>(false);
 
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
   );
+
+  useEffect(() => {
+    if (isCloned) {
+      const updatedInputs = { ...inputs };
+      delete updatedInputs.Id;
+      setInputs(updatedInputs);
+    }
+  }, [isCloned]);
+
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [inputs.Notes]);
 
   const generatePercentageOptions: SelectOption[] = Array.from({ length: 101 }, (_, index) => ({
     text: index.toString(), // Ensure text is a string
@@ -87,14 +105,16 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const { users } = useRecoilValue(userState);
 
-  const usersList = useMemo(
-    () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
-    [users],
-  );
+  const usersList = useMemo(() => {
+    if (isNullOrEmpty(users)) {
+      return [];
+    }
+
+    return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
+      value: Id,
+      text: `${FirstName || ''} ${LastName || ''}`,
+    }));
+  }, [users]);
 
   const handleOnChange = (e: any) => {
     let { id, value, checked } = e.target;
@@ -177,6 +197,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   const handleClose = () => {
     onClose();
     setInputs(DEFAULT_MASTER_TASK);
+  };
+
+  const handleClone = () => {
+    setIsCloned(true);
   };
 
   return (
@@ -318,25 +342,36 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
         </div>
         <div>
           <Label className="!text-secondary pr-6 mr-4" text="Notes" />
-          <TextArea onChange={handleOnChange} value={inputs?.Notes} className="w-full min-h-2" id="Notes" />
+          <TextArea
+            ref={textareaRef}
+            onChange={handleOnChange}
+            value={inputs?.Notes}
+            className="w-full min-h-14"
+            id="Notes"
+          />
         </div>
-        <div className="flex justify-between">
-          <div />
-          <div className="flex">
-            <Label className="!text-secondary pr-2" text="Add to Master Task List" />
-            <Checkbox
-              id="occurence"
-              value={inputs?.RepeatInterval}
-              checked={isMasterTask}
-              disabled={isMasterTask}
-              onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
-            />
+        {!inputs.Id && (
+          <div className="flex justify-between">
+            <div />
+            <div className="flex">
+              <Label className="!text-secondary pr-2" text="Add to Master Task List" />
+              <Checkbox
+                id="occurence"
+                value={inputs?.RepeatInterval}
+                checked={isMasterTask}
+                disabled={isMasterTask}
+                onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
+              />
+            </div>
           </div>
-        </div>
+        )}
         <div className="flex justify-between">
           <div />
           <div className="flex">
             <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
+            {inputs.Id && (
+              <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+            )}
             <Button
               variant="primary"
               className="w-[132px]"

@@ -73,6 +73,7 @@ export const showMapper = (show: Show): ShowDTO => ({
   Type: show.Type,
   Code: show.Code,
   IsArchived: show.IsArchived,
+  ShowProdCoId: show.ShowProdCoId,
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
@@ -118,6 +119,9 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   MarketingCostsStatus: b.MarketingCostsStatus,
   MarketingCostsApprovalDate: convertDate(b.MarketingCostsApprovalDate),
   MarketingCostsNotes: b.MarketingCostsNotes,
+  BookingCompNotes: b.CompNotes,
+  BookingHoldNotes: b.HoldNotes,
+  BookingSalesNotes: b.SalesNotes,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
@@ -265,9 +269,8 @@ export const contractBookingStatusmapper = (status: ContractBookingStatusType) =
     HoldNotes: status.HoldNotes,
     CompNotes: status.CompNotes,
     MerchandiseNotes: status.MerchandiseNotes,
-    CastRateTicketNotes: status.CastRateTicketNotes,
-    CastRateTicketsArranged: status.CastRateTicketsArranged,
     CastRateTicketsNotes: status.CastRateTicketsNotes,
+    CastRateTicketsArranged: status.CastRateTicketsArranged,
     RunTag: status.RunTag,
     MarketingCostsStatus: status.MarketingCostsStatus,
     MarketingCostsApprovalDate: convertDate(status.MarketingCostsApprovalDate),

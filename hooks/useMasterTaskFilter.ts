@@ -16,13 +16,15 @@ const useMasterTasksFilter = (tasks = []) => {
   }, [users]);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter(({ Name, TaskName, AssignedToUserId, Notes }) => {
+    return tasks.filter(({ Name, TaskName, AssignedToUserId, Notes, StartByWeekNum, CompleteByWeekNum }) => {
       return (
         !filters.taskText ||
-        [Name, TaskName, Notes]
+        [Name, TaskName, Notes, StartByWeekNum, CompleteByWeekNum]
           .map((text) => text?.toLowerCase?.())
           .some((text) => text?.includes?.(filters.taskText.toLowerCase())) ||
-        getFilteredUsers(usersList, AssignedToUserId, filters.taskText)
+        getFilteredUsers(usersList, AssignedToUserId, filters.taskText) ||
+        StartByWeekNum.toString() === filters.taskText ||
+        CompleteByWeekNum.toString() === filters.taskText
       );
     });
   }, [tasks, filters.taskText, usersList]);

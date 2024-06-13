@@ -1,8 +1,6 @@
 import getNumericalOptions from 'utils/getNumericalOptions';
 import SelectOrderRenderer from './renderers/SelectOrderRenderer';
 import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
-import SelectRenderer from 'components/core-ui-lib/Table/renderers/BaseCellRenderer';
-import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
@@ -67,6 +65,7 @@ export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, s
           numPerfs: params.data.numPerfs,
         });
       },
+      hasSalesData: params.data.hasSalesData,
     }),
     width: 120,
     cellStyle: {
@@ -149,7 +148,7 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
   {
     headerName: 'Order for Comparison',
     field: 'compOrder',
-    cellRenderer: SelectRenderer,
+    cellRenderer: SelectOrderRenderer,
     cellRendererParams: (params) => ({
       options: getNumericalOptions(
         optionsLength,
@@ -170,6 +169,7 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
           numPerfs: params.data.numPerfs,
         });
       },
+      hasSalesData: params.data.hasSalesData,
     }),
     width: 120,
     cellStyle: {
@@ -242,7 +242,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
         };
       },
       suppressMovable: true,
-      headerClass: 'group-header-normal',
+      headerClass: 'custom-pinned-header',
       pinned: 'left',
       lockPinned: true,
       width: 120,

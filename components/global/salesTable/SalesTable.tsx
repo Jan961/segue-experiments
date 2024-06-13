@@ -54,6 +54,11 @@ export default function SalesTable({
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
 
+  // constants
+  const ARCH_MULTI_WIDTH = 328;
+  const ARCH_LESS_2_WIDTH = 340;
+  const ARCH_SPACE_SCALER = 12;
+
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
@@ -103,25 +108,9 @@ export default function SalesTable({
     setRowData(processedBookings);
 
     if (variant === 'prodComparision') {
-      setColumnDefs(
-        prodComparisionColDefs(
-          data.filter((item) => {
-            return item.HasSalesData;
-          }).length,
-          onCellValChange,
-          cellRenderParams.selected,
-        ),
-      );
+      setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
     } else {
-      setColumnDefs(
-        prodCompArchColDefs(
-          data.filter((item) => {
-            return item.HasSalesData;
-          }).length,
-          onCellValChange,
-          cellRenderParams.selected,
-        ),
-      );
+      setColumnDefs(prodCompArchColDefs(data.length, onCellValChange, cellRenderParams.selected));
     }
   };
 
@@ -144,7 +133,7 @@ export default function SalesTable({
     }
   };
 
-  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
+  const onIsNotOnSaleChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
     updateSaleSet('updateNotOnSale', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -162,7 +151,7 @@ export default function SalesTable({
     );
   };
 
-  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
+  const onSingleSeatChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
     updateSaleSet('updateSingleSeats', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -180,7 +169,7 @@ export default function SalesTable({
     );
   };
 
-  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: number) => {
+  const onBrochureReleasedChange = (key: string, value: boolean, sale: SalesSnapshot, selected: string) => {
     updateSaleSet('update', selected, sale.weekOf ? format(parseISO(sale.weekOf), 'yyyy-MM-dd') : null, {
       [key.replace('is', 'Set')]: value,
     });
@@ -194,37 +183,46 @@ export default function SalesTable({
     );
   };
 
-  const updateSaleSet = (type: string, BookingId: number, SalesFigureDate: string, update) => {
+  const updateSaleSet = (type: string, BookingId: string, SalesFigureDate: string, update) => {
+    const data = {
+      BookingId: parseInt(BookingId),
+      SalesFigureDate,
+      ...update,
+    };
     axios
-      .put(`/api/marketing/sales/salesSet/${type}`, { BookingId, SalesFigureDate, ...update })
+      .put(`/api/marketing/sales/salesSet/${type}`, data)
       .catch((error) => console.log('failed to update sale', error));
   };
 
   const calculateWidth = () => {
-    const isMarketing = module !== 'bookings';
-    const MARKETING_TAB_WIDTH = 195;
-    const SCHOOLS_TAB_WIDTH = 135;
-    let baseContainerWidth = 1220;
     switch (variant) {
-      case 'salesSnapshot':
+      case 'salesSnapshot': {
+        const isMarketing = module !== 'bookings';
+        const MARKETING_TAB_WIDTH = 195;
+        const SCHOOLS_TAB_WIDTH = 135;
+
+        // Regex to extract integers
+        let baseContainerWidth = 1220;
         baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;
-
         containerWidth = baseContainerWidth.toString() + 'px';
+
         return containerWidth;
+      }
 
       case 'salesComparison': {
-        //  80px is the width of the week column which is for the whole row, not for each production.
-        //  302px is the sum of the widths of the other columns
-        const widthInt = numBookings * 302 + 80;
+        const scalar = numBookings === 2 ? ARCH_LESS_2_WIDTH : ARCH_MULTI_WIDTH;
+        const widthInt = numBookings * scalar - numBookings * ARCH_SPACE_SCALER;
         return `${widthInt}px`;
       }
 
-      case 'prodComparision':
+      case 'prodComparision': {
         return containerWidth;
+      }
 
-      case 'prodCompArch':
+      case 'prodCompArch': {
         return containerWidth;
+      }
     }
   };
 
@@ -268,6 +266,7 @@ export default function SalesTable({
         onCellClicked={onCellClick}
         onCellValueChange={onCellValChange}
         tableHeight={tableHeight}
+        gridOptions={{ suppressHorizontalScroll: true }}
         excelStyles={excelStyles}
       />
     </div>

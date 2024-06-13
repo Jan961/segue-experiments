@@ -1,14 +1,17 @@
 import { Show } from '@prisma/client';
 import Table from 'components/core-ui-lib/Table';
 import { styleProps } from '../bookings/table/tableConfig';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
 import { Spinner } from 'components/global/Spinner';
-import { tableConfig } from './table/tableConfig';
+import { getShowsTableConfig } from './table/tableConfig';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import Productions from './modal/Productions';
 import { useRouter } from 'next/router';
+import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { omit } from 'radash';
+import { ProductionDTO } from 'interfaces';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -29,11 +32,13 @@ const rowClassRules = {
 };
 
 const intShowData = {
-  Id: '',
+  Id: null,
   Code: '',
   Name: '',
   Type: 'P',
   IsArchived: false,
+  productions: [],
+  ShowProdCoId: null,
 };
 const ShowsTable = ({
   rowsData,
@@ -42,13 +47,15 @@ const ShowsTable = ({
   isEdited = false,
   handleEdit,
   isArchived = false,
+  productionCompanyOptions,
 }: {
-  rowsData: Show[];
+  rowsData: (Show & { productions: ProductionDTO[] })[];
   isAddRow: boolean;
   addNewRow: () => void;
   isArchived: boolean;
   isEdited: boolean;
   handleEdit: () => void;
+  productionCompanyOptions: SelectOption[];
 }) => {
   const tableRef = useRef(null);
   const router = useRouter();
@@ -61,6 +68,7 @@ const ShowsTable = ({
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showProductionsModal, setShowProductionsModal] = useState<boolean>(false);
+  const columnDefs = useMemo(() => getShowsTableConfig(productionCompanyOptions), [productionCompanyOptions]);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -74,6 +82,15 @@ const ShowsTable = ({
       applyTransactionToGrid(tableRef, { add: [{ highlightRow: true }], addIndex: 0 });
     }
   }, [isAddRow, tableRef]);
+
+  useEffect(() => {
+    if (showProductionsModal) {
+      const current = rowsData.find((row) => row.Id === currentShow.Id);
+      if (current) {
+        setCurrentShow(current);
+      }
+    }
+  }, [rowsData]);
 
   const handleCellClick = async (e) => {
     setShowId(e.data.Id);
@@ -93,7 +110,7 @@ const ShowsTable = ({
       setIsLoading(true);
       try {
         const payloadData = { ...currentShow, IsArchived: e.data.IsArchived };
-        await axios.put(`/api/shows/update/${currentShow?.Id}`, payloadData);
+        await axios.put(`/api/shows/update/${currentShow?.Id}`, omit(payloadData, ['productions']));
         if (payloadData.IsArchived && !isArchived) {
           const gridApi = tableRef.current.getApi();
           const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
@@ -156,7 +173,7 @@ const ShowsTable = ({
   return (
     <>
       <Table
-        columnDefs={tableConfig}
+        columnDefs={columnDefs}
         ref={tableRef}
         rowData={rowsData}
         styleProps={styleProps}
@@ -166,7 +183,7 @@ const ShowsTable = ({
         rowClassRules={rowClassRules}
       />
       <ConfirmationDialog
-        variant={'delete'}
+        variant="delete"
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}

@@ -117,6 +117,7 @@ model Currency {
   SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
+  Country                                                            Country[]
   Venue                                                              Venue[]
 }
 
@@ -129,17 +130,20 @@ model DateType {
 }
 
 model Show {
-  Id         Int          @id @default(autoincrement()) @map("ShowId")
-  AccountId  Int          @map("ShowAccountId")
-  Code       String       @map("ShowCode") @db.VarChar(10)
-  Name       String       @map("ShowName") @db.VarChar(80)
-  Type       String?      @map("ShowType") @db.VarChar(1)
-  IsArchived Boolean      @default(dbgenerated("(b'0')")) @map("ShowIsArchived") @db.Bit(1)
-  Production Production[]
-  Account    Account      @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
+  Id                Int               @id @default(autoincrement()) @map("ShowId")
+  AccountId         Int               @map("ShowAccountId")
+  Code              String            @map("ShowCode") @db.VarChar(10)
+  Name              String            @map("ShowName") @db.VarChar(80)
+  Type              String?           @map("ShowType") @db.VarChar(1)
+  IsArchived        Boolean           @default(dbgenerated("(b'0')")) @map("ShowIsArchived") @db.Bit(1)
+  ShowProdCoId      Int
+  Production        Production[]
+  Account           Account           @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
+  ProductionCompany ProductionCompany @relation(fields: [ShowProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Show")
 
   @@unique([AccountId, Code], map: "SECONDARY")
   @@index([AccountId], map: "Account_Show_idx")
+  @@index([ShowProdCoId], map: "ProductionCompany_Show")
 }
 
 model Venue {
@@ -177,6 +181,7 @@ model Venue {
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
+  Rehearsal                                                 Rehearsal[]
   Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
   VenueFamily                                               VenueFamily?         @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
@@ -317,28 +322,31 @@ model Rehearsal {
   RunTag      String            @map("RehearsalRunTag") @db.Char(8)
   DateBlock   DateBlock         @relation(fields: [DateBlockId], references: [Id], onDelete: Cascade, map: "DateBlock_Rehearsal")
   DateType    RehearsalDateType @relation(fields: [DateTypeId], references: [RehearsalDateTypeId], onDelete: NoAction, map: "DateType_Rehearsal")
+  Venue       Venue?            @relation(fields: [VenueId], references: [Id], onDelete: NoAction, map: "Venue_Rehearsal")
 
   @@index([DateBlockId], map: "DateBlock_Rehearsal_idx")
   @@index([DateTypeId], map: "DateType_Rehearsal_idx")
+  @@index([VenueId], map: "Venue_Rehearsal")
 }
 
 model Account {
-  AccountId              Int                 @id @default(autoincrement())
-  AccountName            String              @db.VarChar(50)
-  AccountAddress1        String?             @db.VarChar(50)
-  AccountAddress2        String?             @db.VarChar(50)
-  AccountAddress3        String?             @db.VarChar(50)
-  AccountAddressTown     String?             @db.VarChar(50)
-  AccountAddressCounty   String?             @db.VarChar(50)
-  AccountAddressPostcode String?             @db.VarChar(20)
-  AccountAddressCountry  String?             @db.VarChar(30)
-  AccountVATNumber       String?             @db.VarChar(20)
-  AccountCurrencyCode    String              @db.VarChar(3)
-  AccountCompanyNumber   String?             @db.VarChar(20)
+  AccountId              Int                   @id @default(autoincrement())
+  AccountName            String                @db.VarChar(50)
+  AccountAddress1        String?               @db.VarChar(50)
+  AccountAddress2        String?               @db.VarChar(50)
+  AccountAddress3        String?               @db.VarChar(50)
+  AccountAddressTown     String?               @db.VarChar(50)
+  AccountAddressCounty   String?               @db.VarChar(50)
+  AccountAddressPostcode String?               @db.VarChar(20)
+  AccountAddressCountry  String?               @db.VarChar(30)
+  AccountVATNumber       String?               @db.VarChar(20)
+  AccountCurrencyCode    String                @db.VarChar(3)
+  AccountCompanyNumber   String?               @db.VarChar(20)
   AccountLogo            Bytes?
-  AccountMainEmail       String?             @db.VarChar(120)
-  AccountNumPeople       Int?                @db.TinyInt
+  AccountMainEmail       String?               @db.VarChar(120)
+  AccountNumPeople       Int?                  @db.TinyInt
   AccountContact         AccountContact?
+  AccountSubscription    AccountSubscription[]
   AccountUser            AccountUser[]
   MasterTask             MasterTask[]
   ProductionCompany      ProductionCompany[]
@@ -375,13 +383,15 @@ model CompAllocation {
   Seats                  Int           @default(1) @map("CompAllocationSeats") @db.TinyInt
   Comments               String?       @map("CompAllocationComments") @db.VarChar(100)
   RequestedBy            String?       @map("CompAllocationRequestedBy") @db.VarChar(50)
-  ArrangedBy             String?       @map("CompAllocationArrangedBy") @db.VarChar(50)
+  ArrangedById           Int           @map("CompAllocationArrangedById")
   VenueConfirmationNotes String?       @map("CompAllocationVenueConfirmationNotes") @db.VarChar(100)
   TicketHolderEmail      String?       @map("CompAllocationTicketHolderEmail") @db.VarChar(80)
   SeatsAllocated         String?       @map("CompAllocationSeatsAllocated") @db.VarChar(50)
+  AccountUser            AccountUser   @relation(fields: [ArrangedById], references: [Id], onDelete: NoAction, map: "AccountUser_CompAllocation")
   AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
+  @@index([ArrangedById], map: "AccountUser_CompAllocation")
 }
 
 model CompType {
@@ -430,8 +440,8 @@ model Sale {
   SaleId         Int       @id @default(autoincrement())
   SaleSaleTypeId Int?
   SaleSetId      Int?
-  SaleSeats      Int?      @db.SmallInt
-  SaleValue      Decimal?  @db.Decimal(8, 2)
+  SaleSeats      Int?
+  SaleValue      Decimal?  @db.Decimal(10, 2)
   SalesSet       SalesSet? @relation(fields: [SaleSetId], references: [SetId], onDelete: Restrict, onUpdate: Restrict, map: "SaleSet_Sale")
   SaleType       SaleType? @relation(fields: [SaleSaleTypeId], references: [SaleTypeId], onDelete: Cascade, map: "SaleType_Sale")
 
@@ -553,8 +563,8 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
+  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
@@ -562,6 +572,7 @@ model AccountUser {
   AccountUserPermission AccountUserPermission[]
   AccountUserProduction AccountUserProduction[]
   BookingContactNotes   BookingContactNotes[]
+  CompAllocation        CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
 }
@@ -574,7 +585,7 @@ model AccountUserPermission {
   Permission   Permission  @relation(fields: [PermissionId], references: [Id], onDelete: Cascade, map: "PermissionAccountUserPermission")
 
   @@index([AccUserId], map: "AccountUser_AccountUserPermission")
-  @@index([PermissionId], map: "PermissionAccountUserPermission")
+  @@index([PermissionId], map: "Permission_AccountUserPermission")
 }
 
 model Permission {
@@ -598,7 +609,7 @@ model TaskWatcher {
 }
 
 model PerformanceReport {
-  Id                  Int         @id @map("PRId")
+  Id                  Int         @id @default(autoincrement()) @map("PRId")
   PerformanceId       Int         @map("PRPerformanceId")
   Act1UpTime          DateTime?   @map("PRAct1UpTime") @db.Time(0)
   Act1DownTime        DateTime?   @map("PRAct1DownTime") @db.Time(0)
@@ -637,7 +648,7 @@ model MasterTask {
   Notes                          String? @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?    @map("TaskAssignedToUserId")
   RepeatInterval                 String? @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
-  RepeatCount                    Bytes?  @map("TaskRepeatCount") @db.TinyBlob
+  TaskRepeatCount                Bytes?  @db.TinyBlob
   StartByWeekNum                 Int?    @map("TaskStartByWeekNum") @db.SmallInt
   TaskStartByIsPostProduction    Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?    @map("TaskCompleteByWeekNum") @db.SmallInt
@@ -678,13 +689,13 @@ model Production {
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
   File                  File?                   @relation(fields: [ProductionImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
-  Show                  Show                    @relation(fields: [ShowId], references: [Id], map: "ShowMayHaveProduction")
+  Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
-  @@index([ShowId], map: "ShowMayHaveProduction")
   @@index([ProductionImageFileId], map: "Production_File")
+  @@index([ShowId], map: "Show_Production")
 }
 
 model ProductionTask {
@@ -725,29 +736,38 @@ model AccountContact {
 }
 
 model Country {
-  Id           Int            @id @default(autoincrement()) @map("CountryId")
-  Code         String         @map("CountryCode") @db.VarChar(3)
-  Name         String         @map("CountryName") @db.VarChar(40)
-  CurrencyCode String?        @map("CountryCurrencyCode") @db.VarChar(3)
-  VenueAddress VenueAddress[]
+  Id              Int               @id @default(autoincrement()) @map("CountryId")
+  Code            String            @map("CountryCode") @db.VarChar(3)
+  Name            String            @map("CountryName") @db.VarChar(40)
+  CurrencyCode    String?           @map("CountryCurrencyCode") @db.VarChar(3)
+  Currency        Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Country_Currency")
+  CountryInRegion CountryInRegion[]
+  VenueAddress    VenueAddress[]
+
+  @@index([CurrencyCode], map: "Country_Currency")
 }
 
 model CountryInRegion {
-  CountryId Int               @map("CIRCountryId")
-  RegionId  Int               @map("CIRRegionId")
+  CountryId Int     @map("CIRCountryId")
+  RegionId  Int     @map("CIRRegionId")
+  Country   Country @relation(fields: [CountryId], references: [Id], onDelete: Cascade, map: "Country_CountryInRegion")
+  Region    Region  @relation(fields: [RegionId], references: [Id], onDelete: NoAction, map: "Region_CountryInRegion")
 
   @@id([CountryId, RegionId])
+  @@index([RegionId], map: "Region_CountryInRegion")
 }
 
 model ProductionCompany {
-  ProdCoId        Int     @id @default(autoincrement())
-  ProdCoAccountId Int
-  ProdCoName      String  @db.VarChar(50)
-  ProdCoWebSite   String? @db.VarChar(80)
-  ProdCoLogo      Bytes?
-  Account         Account @relation(fields: [ProdCoAccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  Id                  Int     @id @default(autoincrement()) @map("ProdCoId")
+  AccountId           Int     @map("ProdCoAccountId")
+  Name                String  @map("ProdCoName") @db.VarChar(50)
+  WebSite             String? @map("ProdCoWebSite") @db.VarChar(80)
+  Logo                Bytes?  @map("ProdCoLogo")
+  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
+  Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  Show                Show[]
 
-  @@index([ProdCoAccountId], map: "Account_ProductionCompany")
+  @@index([AccountId], map: "Account_ProductionCompany")
 }
 
 model ProductionRegion {
@@ -763,6 +783,7 @@ model ProductionRegion {
 model Region {
   Id               Int                @id @default(autoincrement()) @map("RegionId")
   Name             String             @map("RegionName") @db.VarChar(50)
+  CountryInRegion  CountryInRegion[]
   ProductionRegion ProductionRegion[]
 }
 
@@ -912,6 +933,31 @@ model File {
   @@index([UploadUserId], map: "UserAttachedFile")
 }
 
+model SubscriptionPlan {
+  PlanId              Int                   @id @default(autoincrement())
+  PlanName            String                @db.VarChar(100)
+  PlanDescription     String?               @db.LongText
+  PlanPrice           Decimal               @db.Decimal(10, 2)
+  PlanFrequency       Int
+  PlanPriceId         String?               @db.VarChar(100)
+  PlanCurrency        String                @db.VarChar(3)
+  AccountSubscription AccountSubscription[]
+}
+
+model AccountSubscription {
+  AccSubId         Int              @id @default(autoincrement())
+  AccSubAccountId  Int
+  AccSubPlanId     Int
+  AccSubStartDate  DateTime         @db.DateTime(0)
+  AccSubEndDate    DateTime?        @db.DateTime(0)
+  AccSubIsActive   Boolean?         @db.Bit(1)
+  Account          Account          @relation(fields: [AccSubAccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountSubscription")
+  SubscriptionPlan SubscriptionPlan @relation(fields: [AccSubPlanId], references: [PlanId], onDelete: Cascade, map: "SubscriptionPlan_AccountSubscription")
+
+  @@index([AccSubAccountId], map: "Account_AccountSubscription")
+  @@index([AccSubPlanId], map: "SubscriptionPlan_AccountSubscription")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {
   SetId               Int      @default(0)
@@ -921,8 +967,8 @@ view SalesFiguresView {
   SaleTypeId          Int      @default(0)
   SaleTypeName        String   @db.VarChar(45)
   SaleId              Int?     @default(0)
-  SaleSeats           Int?     @db.SmallInt
-  SaleValue           Decimal? @db.Decimal(8, 2)
+  SaleSeats           Int?
+  SaleValue           Decimal? @db.Decimal(10, 2)
 
   @@ignore
 }
@@ -1105,17 +1151,18 @@ view SalesView {
   SetBrochureReleased      Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsCopy                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SaleTypeName             String?   @db.VarChar(45)
-  Seats                    Decimal?  @db.Decimal(27, 0)
-  Value                    Decimal?  @db.Decimal(30, 2)
+  Seats                    Decimal?  @db.Decimal(32, 0)
+  Value                    Decimal?  @db.Decimal(32, 2)
   TotalCapacity            Float?
   FinalFiguresDate         DateTime? @db.Date
-  FinalFiguresSeats        Decimal?  @db.Decimal(27, 0)
-  FinalFiguresValue        Decimal?  @db.Decimal(30, 2)
+  FinalFiguresSeats        Decimal?  @db.Decimal(32, 0)
+  FinalFiguresValue        Decimal?  @db.Decimal(32, 2)
   NotOnSaleDate            DateTime? @db.Date
   TotalHoldSeats           Decimal?  @db.Decimal(32, 0)
   LastFiguresDate          DateTime? @db.Date
-  LastFiguresSeats         Decimal?  @db.Decimal(27, 0)
-  LastFiguresValue         Decimal?  @db.Decimal(30, 2)
+  LastFiguresSeats         Decimal?  @db.Decimal(32, 0)
+  LastFiguresValue         Decimal?  @db.Decimal(32, 2)
+  LastSaleTYpeName         String?   @db.VarChar(45)
 
   @@ignore
 }
@@ -1147,8 +1194,8 @@ view BookingHoldCompsView {
   Code               String   @default("") @db.VarChar(5)
   Name               String   @default("") @db.VarChar(30)
   Seats              Decimal? @db.Decimal(32, 0)
-  SoldSeats          Decimal? @db.Decimal(27, 0)
-  ReservedSeats      Decimal? @db.Decimal(27, 0)
+  SoldSeats          Decimal? @db.Decimal(32, 0)
+  ReservedSeats      Decimal? @db.Decimal(32, 0)
 
   @@ignore
 }
@@ -1170,7 +1217,7 @@ view PromoterHoldsView {
   CompAllocationTicketHolderEmail      String?   @db.VarChar(80)
   CompAllocationComments               String?   @db.VarChar(100)
   CompAllocationRequestedBy            String?   @db.VarChar(50)
-  CompAllocationArrangedBy             String?   @db.VarChar(50)
+  CompAllocationArrangedBy             String?   @db.VarChar(101)
   CompAllocationVenueConfirmationNotes String?   @db.VarChar(100)
 
   @@ignore
@@ -1198,8 +1245,8 @@ view SalesSetTotalsView {
   SetSalesFiguresDate DateTime @db.Date
   SetIsFinalFigures   Boolean  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SaleTypeName        String   @db.VarChar(45)
-  Seats               Decimal? @db.Decimal(27, 0)
-  Value               Decimal? @db.Decimal(30, 2)
+  Seats               Decimal? @db.Decimal(32, 0)
+  Value               Decimal? @db.Decimal(32, 2)
 
   @@unique([SetBookingId, SetSalesFiguresDate])
 }
@@ -1218,7 +1265,7 @@ view SalesSummaryView {
   EntryName                String?   @db.VarChar(255)
   EntryType                String?   @db.VarChar(30)
   EntryStatusCode          String    @default("") @db.Char(1)
-  Value                    Decimal?  @db.Decimal(30, 2)
+  Value                    Decimal?  @db.Decimal(32, 2)
   VenueCurrencyCode        String?   @db.VarChar(3)
   ConversionRate           Decimal?  @db.Decimal(8, 4)
   ConversionToCurrencyCode String?   @db.VarChar(3)

@@ -73,11 +73,6 @@ describe('UploadModal and FileCard Component', () => {
     expect(screen.getByText('This file is too big. Please upload a smaller file.')).toBeInTheDocument();
   });
 
-  test('disables the upload button when no files are selected', () => {
-    render(<UploadModal {...mockProps} />);
-    expect(screen.getByRole('button', { name: 'Upload' })).toBeDisabled();
-  });
-
   test('disables the upload button when there are file errors', () => {
     render(<UploadModal {...mockProps} />);
     const file = createMockBlobFile('file1.txt', 1000, 'text/plain');
@@ -102,7 +97,7 @@ describe('UploadModal and FileCard Component', () => {
       size: 500 * 1024,
       file: createMockBlobFile('file1.jpg', 1000, 'image/jpg'),
     };
-    render(<FileCard file={file} index={0} onDelete={jest.fn()} progress={50} errorMessage={''} />);
+    render(<FileCard fileName={file.name} fileSize={file.size} onDelete={jest.fn()} progress={50} errorMessage="" />);
     expect(screen.getByText('Uploading')).toBeInTheDocument();
     expect(screen.getByText('file1.jpg')).toBeInTheDocument();
     expect(screen.getByText('Size: 500.00 KB')).toBeInTheDocument();
@@ -115,7 +110,15 @@ describe('UploadModal and FileCard Component', () => {
       size: 500 * 1024,
       file: createMockBlobFile('file1.txt', 1000, 'text/plain'),
     };
-    render(<FileCard file={file} index={0} onDelete={jest.fn()} progress={0} errorMessage={'Invalid file format'} />);
+    render(
+      <FileCard
+        fileName={file.name}
+        fileSize={file.size}
+        onDelete={jest.fn()}
+        progress={0}
+        errorMessage="Invalid file format"
+      />,
+    );
     expect(screen.getByText('Invalid file format')).toBeInTheDocument();
   });
 

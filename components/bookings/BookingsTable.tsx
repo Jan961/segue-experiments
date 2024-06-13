@@ -39,6 +39,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const isMounted = useComponentMountStatus();
   const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
   const gridOptions = {
+    suppressColumnVirtualisation: false,
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },

@@ -1,3 +1,5 @@
+import { DealMemoPrice, DealMemoTechProvision } from '@prisma/client';
+
 export type StatusCode = 'C' | 'U' | 'X';
 
 export type Currency = {
@@ -38,6 +40,7 @@ export type ShowDTO = {
   Name: string;
   Type: string;
   IsArchived: boolean;
+  ShowProdCoId: number;
 };
 
 export type ProductionTaskDTO = {
@@ -105,6 +108,9 @@ export type BookingDTO = {
   MarketingCostsStatus: string;
   MarketingCostsApprovalDate: string;
   MarketingCostsNotes: string;
+  BookingSalesNotes: string;
+  BookingCompNotes: string;
+  BookingHoldNotes: string;
 };
 
 export type ContractsDTO = {
@@ -198,6 +204,7 @@ export type ProductionDTO = {
   IsDeleted?: boolean;
   ImageUrl?: string;
   Image?: Partial<FileDTO>;
+  ShowRegionId?: number;
 };
 
 export type VenueMinimalDTO = {
@@ -207,6 +214,7 @@ export type VenueMinimalDTO = {
   Town?: string;
   Seats?: string;
   Count?: number;
+  RegionId?: number;
 };
 
 export type OtherDTO = {
@@ -477,7 +485,6 @@ export type ContractBookingStatusType = {
   HoldNotes: string;
   CompNotes: string;
   MerchandiseNotes: string;
-  CastRateTicketNotes: string;
   CastRateTicketsArranged: boolean;
   CastRateTicketsNotes: string;
   RunTag: string;
@@ -545,4 +552,112 @@ export interface SaveContractBookingFormState {
   CrewNotes?: string;
   MarketingDealNotes?: string;
   TicketPriceNotes?: string;
+}
+
+export interface ContactDemoFormData {
+  phone: string;
+  email: string;
+}
+
+export interface ContactDemoFormAccountData {
+  // phone: string;
+  Email?: string;
+  AccountUser?: any;
+  companyContact?: string;
+}
+
+export interface ContactsFormData {
+  data: ContactDemoFormAccountData;
+}
+
+export interface DealMemoCall {
+  DMCId?: number;
+  DMCDeMoId?: number;
+  DMCCallNum?: number;
+  DMCPromoterOrVenue?: string;
+  DMCType?: string;
+  DMCValue?: number;
+}
+export interface DealMemoContractFormData {
+  DeMoId?: number;
+  DeMoBookingId?: number;
+  DeMoAgreementDate?: Date;
+  DeMoAccContId?: number;
+  DeMoRunningTime?: Date;
+  DeMoRunningTimeNotes?: string;
+  DeMoPrePostShowEvents?: string;
+  DeMoVenueCurfewTime?: Date;
+  DeMoPerformanceNotes?: string;
+  DeMoProgrammerVenueContactId?: number;
+  DeMoROTTPercentage?: number;
+  DeMoPRSPercentage?: number;
+  DeMoGuarantee?: boolean;
+  DeMoGuaranteeAmount?: number;
+  DeMoHasCalls?: boolean;
+  DeMoPromoterSplitPercentage?: number;
+  DeMoVenueSplitPercentage?: number;
+  DeMoVenueRental?: number;
+  DeMoVenueRentalNotes?: string;
+  DeMoStaffingContra?: number;
+  DeMoStaffingContraNotes?: string;
+  DeMoAgreedContraItems?: number;
+  DeMoAgreedContraItemsNotes?: string;
+  DeMoBOMVenueContactId?: number;
+  DeMoOnSaleDate?: Date;
+  DeMoSettlementVenueContactId?: number;
+  DeMoSellableSeats?: number;
+  DeMoMixerDeskPosition?: string;
+  DeMoStandardSeatKills?: string;
+  DeMoRestorationLevy?: number;
+  DeMoBookingFees?: number;
+  DeMoCCCommissionPercent?: number;
+  DeMoTxnChargeOption?: string;
+  DeMoTxnChargeAmount?: number;
+  DeMoAgreedDiscounts?: string;
+  DeMoMaxTAAlloc?: string;
+  DeMoTAAlloc?: string;
+  DeMoTicketCopy?: string;
+  DeMoProducerCompCount?: number;
+  DeMoOtherHolds?: string;
+  DeMoAgeNotes?: string;
+  DeMoSalesDayNum?: number;
+  DeMoMMVenueContactId?: number;
+  DeMoBrochureDeadline?: Date;
+  DeMoFinalProofBy?: Date;
+  DeMoPrintReqs?: string;
+  DeMoLocalMarketingBudget?: number;
+  DeMoLocalMarketingContra?: number;
+  DeMoSellWho?: string;
+  DeMoSellProgrammes?: boolean;
+  DeMoSellMerch?: boolean;
+  DeMoSellNotes?: string;
+  DeMoSellProgCommPercent?: number;
+  DeMoSellMerchCommPercent?: number;
+  DeMoSellPitchFee?: number;
+  DeMoTechVenueContactId?: number;
+  DeMoTechArrivalDate?: Date;
+  DeMoTechArrivalTime?: Date;
+  DeMoNumDressingRooms?: number;
+  DeMoNumFacilitiesLaundry?: boolean;
+  DeMoNumFacilitiesDrier?: boolean;
+  DeMoNumFacilitiesLaundryRoom?: boolean;
+  DeMoNumFacilitiesNotes?: string;
+  DeMoNumCateringNotes?: string;
+  DeMoBarringClause?: string;
+  DeMoAdvancePaymentRequired?: boolean;
+  DeMoAdvancePaymentAmount?: number;
+  DeMoAdvancePaymentDueBy?: Date;
+  DeMoSettlementDays?: number;
+  DeMoContractClause?: string;
+  DealMemoPrice?: DealMemoPrice[];
+  DealMemoTechProvision?: DealMemoTechProvision[];
+  DealMemoCall?: any;
+}
+
+export interface DealMemoPriceState {
+  DMPTicketName?: string;
+  DMPTicketPrice: number;
+  DMPNumTickets: number;
+  DMPDeMoId: number;
+  DMPNotes: string;
 }

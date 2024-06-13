@@ -10,7 +10,7 @@ import { VenueHistory } from './modal/VenueHistory';
 import { addEditBookingState } from 'state/booking/bookingState';
 
 interface BookingsButtonProps {
-  onExportClick: () => void;
+  onExportClick: (key: string) => void;
 }
 
 export default function BookingsButtons({ onExportClick }: BookingsButtonProps) {
@@ -64,6 +64,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
 
       {showBookingReportsModal && (
         <BookingReports
+          productionId={ProductionId}
           onExportClick={onExportClick}
           visible={showBookingReportsModal}
           onClose={() => setShowBookingReportsModal(false)}

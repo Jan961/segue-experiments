@@ -102,6 +102,9 @@ export const getAllProductions = async (AccountId: number) => {
     select: {
       Id: true,
       Code: true,
+      RunningTime: true,
+      RunningTimeNote: true,
+      SalesFrequency: true,
       IsArchived: true,
       Show: {
         select: {
@@ -232,4 +235,17 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
     return { ...production, WeekNumToDateMap };
   });
   return getProductionsByStartDate(productionsWithTasks);
+};
+
+export const getAllProductionRegions = async () => {
+  try {
+    return prisma.ProductionRegion.findMany({
+      orderBy: {
+        PRProductionId: 'asc',
+      },
+    });
+  } catch (Exception) {
+    console.log(Exception);
+    return [];
+  }
 };

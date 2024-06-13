@@ -1,13 +1,19 @@
 import { calculateWeekNumber, dateToSimple, getTimeFromDateAndTime } from 'services/dateService';
-import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { useRecoilValue } from 'recoil';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import numeral from 'numeral';
 import { LoadingTab } from './tabs/LoadingTab';
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
 import classNames from 'classnames';
 import SummaryRow from './SummaryRow';
+
+export interface SummaryRef {
+  resetData: () => void;
+}
+
+export interface SummaryProps {
+  bookingId: string;
+}
 
 export const formatCurrency = (amount: number, currency: string) => {
   const formatter = new Intl.NumberFormat('en-GB', {
@@ -19,8 +25,7 @@ export const formatCurrency = (amount: number, currency: string) => {
   return formatter.format(amount);
 };
 
-export const Summary = () => {
-  const { selected } = useRecoilValue(bookingJumpState);
+const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   const [summary, setSummary] = useState<Partial<SummaryResponseDTO>>({});
   const [loading, setLoading] = useState(false);
   const [summaryAvail, setSummaryAvail] = useState(false);
@@ -28,16 +33,19 @@ export const Summary = () => {
   const boldText = 'text-base font-bold text-primary-input-text';
   const normalText = 'text-base font-normal text-primary-input-text';
 
+  useImperativeHandle(ref, () => ({
+    resetData: () => {
+      setSummaryAvail(false);
+    },
+  }));
+
   useEffect(() => {
     const search = async () => {
       try {
-        setSummaryAvail(true);
         setLoading(true);
-        if (selected === undefined) {
-          return;
-        }
-        const { data } = await axios.get(`/api/marketing/summary/${selected}`);
+        const { data } = await axios.get(`/api/marketing/summary/${props.bookingId}`);
         setSummary(data);
+        setSummaryAvail(true);
       } catch (error) {
         console.error(error);
       } finally {
@@ -45,12 +53,12 @@ export const Summary = () => {
       }
     };
 
-    if (selected !== null) {
+    if (props.bookingId !== null) {
       search();
     } else {
       setSummaryAvail(false);
     }
-  }, [selected]);
+  }, [props.bookingId]);
 
   if (loading) return <LoadingTab />;
 
@@ -174,4 +182,7 @@ export const Summary = () => {
       )}
     </div>
   );
-};
+});
+
+Summary.displayName = 'Summary';
+export default Summary;

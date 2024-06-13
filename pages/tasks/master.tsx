@@ -82,18 +82,20 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   return (
     <Layout title="Tasks | Segue" flush>
-      <div className="mb-8">
+      <div className="mb-3">
         <Filters handleShowTask={handleShowTask} />
       </div>
-      <Table
-        ref={tableRef}
-        onCellClicked={handleCellClick}
-        columnDefs={columnDefs}
-        rowData={filteredTasks}
-        styleProps={styleProps}
-      />
+      <div className="mb-10">
+        <Table
+          ref={tableRef}
+          onCellClicked={handleCellClick}
+          columnDefs={columnDefs}
+          rowData={filteredTasks}
+          styleProps={styleProps}
+        />
+      </div>
       <ConfirmationDialog
-        variant={'delete'}
+        variant="delete"
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}

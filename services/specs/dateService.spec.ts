@@ -1,4 +1,4 @@
-import { getNextMondayDateString, getTimeFromDateAndTime } from '../dateService';
+import { getNextMondayDateString, getTimeFromDateAndTime, addDurationToDate } from '../dateService';
 
 // ----------------- getNextMondayDateString -----------------
 describe('getNextMondayDateString Utility Function', () => {
@@ -63,5 +63,67 @@ describe('getTimeFromDateAndTime', () => {
     const inputDt = undefined;
     const expectedTime = '';
     expect(getTimeFromDateAndTime(inputDt)).toBe(expectedTime);
+  });
+});
+
+// ----------------- addDurationToDate -----------------
+describe('addDurationToDate', () => {
+  test('adds duration to the date when add is true', () => {
+    const startingDate = new Date('2024-05-30');
+    const duration = 10;
+    const result = addDurationToDate(startingDate, duration, true);
+    const expectedDate = new Date('2024-06-09');
+
+    expect(result.getFullYear()).toBe(expectedDate.getFullYear());
+    expect(result.getMonth()).toBe(expectedDate.getMonth());
+    expect(result.getDate()).toBe(expectedDate.getDate());
+  });
+
+  test('subtracts duration from the date when add is false', () => {
+    const startingDate = new Date('2024-05-30');
+    const duration = 10;
+    const result = addDurationToDate(startingDate, duration, false);
+    const expectedDate = new Date('2024-05-20');
+
+    expect(result.getFullYear()).toBe(expectedDate.getFullYear());
+    expect(result.getMonth()).toBe(expectedDate.getMonth());
+    expect(result.getDate()).toBe(expectedDate.getDate());
+  });
+
+  test('returns the same date when duration is 0', () => {
+    const startingDate = new Date('2024-05-30');
+    const duration = 0;
+    const resultAdd = addDurationToDate(startingDate, duration, true);
+    const resultSubtract = addDurationToDate(startingDate, duration, false);
+
+    expect(resultAdd.getFullYear()).toBe(startingDate.getFullYear());
+    expect(resultAdd.getMonth()).toBe(startingDate.getMonth());
+    expect(resultAdd.getDate()).toBe(startingDate.getDate());
+
+    expect(resultSubtract.getFullYear()).toBe(startingDate.getFullYear());
+    expect(resultSubtract.getMonth()).toBe(startingDate.getMonth());
+    expect(resultSubtract.getDate()).toBe(startingDate.getDate());
+  });
+
+  test('handles crossing month boundaries correctly', () => {
+    const startingDate = new Date('2024-01-30');
+    const duration = 5;
+    const result = addDurationToDate(startingDate, duration, true);
+    const expectedDate = new Date('2024-02-04');
+
+    expect(result.getFullYear()).toBe(expectedDate.getFullYear());
+    expect(result.getMonth()).toBe(expectedDate.getMonth());
+    expect(result.getDate()).toBe(expectedDate.getDate());
+  });
+
+  test('handles crossing year boundaries correctly', () => {
+    const startingDate = new Date('2024-12-25');
+    const duration = 10;
+    const result = addDurationToDate(startingDate, duration, true);
+    const expectedDate = new Date('2025-01-04');
+
+    expect(result.getFullYear()).toBe(expectedDate.getFullYear());
+    expect(result.getMonth()).toBe(expectedDate.getMonth());
+    expect(result.getDate()).toBe(expectedDate.getDate());
   });
 });

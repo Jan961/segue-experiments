@@ -11,6 +11,9 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
+import useAxios from 'hooks/useAxios';
+import { getWeekDayShort } from 'services/dateService';
+import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -18,6 +21,7 @@ type FutureBooking = {
 };
 
 const Filters = () => {
+  const { fetchData } = useAxios();
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
@@ -28,37 +32,41 @@ const Filters = () => {
   const [venueId, setVenueId] = useState(0);
   const [landingURL, setLandingURL] = useState('');
   const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
+  const [lastDates, setLastDates] = useState([]);
+  const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
+
   const bookingOptions = useMemo(() => {
-    const options = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
-    options.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    return options;
-  }, [bookings]);
-
-  useEffect(() => {
-    const futureBookings = bookingOptions.filter((booking) => {
-      try {
-        const reversedBookingDate = reverseDate(booking.date);
-        const reversedTodayDate = reverseDate(today);
-
-        if (reversedBookingDate !== '' && reversedTodayDate !== '') {
-          return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+    try {
+      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+      const optWithRun = initialOptions.map((option) => {
+        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
+        if (lastDate !== undefined) {
+          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
+          if (option.date === endDateStr) {
+            return option;
+          } else {
+            return {
+              ...option,
+              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            };
+          }
         } else {
-          return false;
+          return option;
         }
-      } catch (error) {
-        return false;
-      }
-    });
-    setFutureBookings({
-      hasFutureBooking: futureBookings.length > 0,
-      nextBooking: futureBookings.length > 0 ? futureBookings[0] : null,
-    });
-  }, [bookingOptions, today]);
+      });
+
+      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return optWithRun;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [bookings.bookings, lastDates]);
 
   const changeBooking = (value: string | number) => {
     if (value !== null) {
-      const selectedBooking = bookingOptions.find((booking) => booking.value === value);
-      setSelectedIndex(bookingOptions.findIndex((booking) => booking.value === value));
+      const selectedBooking = bookingOptions?.find((booking) => booking.value === value);
+      setSelectedIndex(bookingOptions?.findIndex((booking) => booking.value === value));
       setSelectedValue(selectedBooking.value.toString());
 
       const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
@@ -72,7 +80,6 @@ const Filters = () => {
     } else {
       setSelectedIndex(-1);
       setSelectedValue(null);
-      setBooking({ ...bookings, selected: undefined });
     }
   };
 
@@ -94,6 +101,48 @@ const Filters = () => {
     changeBooking(nextBooking.value);
   };
 
+  const fetchLastDates = async () => {
+    try {
+      const data = await fetchData({
+        url: '/api/performances/lastDate/' + productionId,
+        method: 'POST',
+      });
+
+      if (typeof data === 'object') {
+        const lastDates = data as Array<LastPerfDate>;
+        setLastDates(lastDates);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    changeBooking(null);
+    fetchLastDates();
+  }, [productionId]);
+
+  useEffect(() => {
+    const futureBookings = bookingOptions?.filter((booking) => {
+      try {
+        const reversedBookingDate = reverseDate(booking.date);
+        const reversedTodayDate = reverseDate(today);
+
+        if (reversedBookingDate !== '' && reversedTodayDate !== '') {
+          return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+        } else {
+          return false;
+        }
+      } catch (error) {
+        return false;
+      }
+    });
+    setFutureBookings({
+      hasFutureBooking: futureBookings?.length > 0,
+      nextBooking: futureBookings?.length > 0 ? futureBookings[0] : null,
+    });
+  }, [bookingOptions, today]);
+
   return (
     <div className="w-full flex items-end justify-between flex-wrap">
       <div className="flex flex-col mb-4">
@@ -101,7 +150,7 @@ const Filters = () => {
           searchFilter={filter.venueText}
           setSearchFilter={(venueText) => setFilter({ venueText })}
           titleClassName="text-primary-green"
-          title={'Marketing'}
+          title="Marketing"
         />
 
         <div className="flex items-center gap-4 mt-1">
@@ -130,7 +179,7 @@ const Filters = () => {
           />
           <Button
             text="Next Date"
-            disabled={selectedIndex === bookingOptions.length - 1 || !productionId}
+            disabled={selectedIndex === bookingOptions?.length - 1 || !productionId}
             className="text-sm leading-8 w-[132px]"
             onClick={goToNext}
           />
