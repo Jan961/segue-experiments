@@ -37,5 +37,6 @@ export const productionCompaniesColDefs = [
       tooltipPosition: 'left',
       popover: true,
     },
+    width: 50,
   },
 ];
