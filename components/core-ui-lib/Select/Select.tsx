@@ -154,12 +154,8 @@ export default forwardRef(function Select(
     [customStyles],
   );
 
-  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>([]);
+  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(options);
   const [selectedOption, setSelectedOption] = useState<SelectOption | SelectOption[]>({ text: '', value: '' });
-
-  useEffect(() => {
-    setFilteredOptions(options);
-  }, [options]);
 
   const handleOptionSelect = (o: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
     const { action, option } = actionMeta;
@@ -183,10 +179,6 @@ export default forwardRef(function Select(
       onChange(o ? o.value : null);
     }
   };
-
-  // const customFuseFilter = (option, _inputValue) => {
-  //   return filteredOptions.map((item) => item.value).includes(option.value);
-  // };
 
   useEffect(() => {
     if (isMulti && Array.isArray(value)) {
@@ -252,14 +244,16 @@ export default forwardRef(function Select(
         windowThreshold={50}
         isDisabled={disabled}
         closeMenuOnSelect={closeMenuOnSelect}
-        options={filteredOptions}
+        options={options}
         styles={colourStyles}
         placeholder={placeholder}
         isSearchable={isSearchable}
         isClearable={isClearable}
         isMulti={isMulti}
         hideSelectedOptions={false}
-        filterOption={null}
+        filterOption={(option, _inputValue) => {
+          return filteredOptions.map((item) => item.value).includes(option.value);
+        }}
       />
     </div>
   );
