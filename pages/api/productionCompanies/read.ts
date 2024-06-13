@@ -16,20 +16,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         WebSite: true,
         Logo: true,
       },
+      orderBy: [
+        {
+          Name: 'asc',
+        },
+      ],
     });
-    const prodCoIdList = productionCompanyList.map((item) => item.Id);
-    const prodCompanyWithShows = await prisma.Show.findMany({
-      where: { ShowProdCoId: { in: prodCoIdList } },
-    });
-    console.log(prodCompanyWithShows);
-
-    // find the production companies and if they have ties to productions
-    // make upsert
-    // make delete
-    // make logo and integrate with Aruns stuff
     return res.status(200).json(productionCompanyList);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ err: 'Error occurred while deleting the user.' });
+    res
+      .status(409)
+      .json({ errorMessage: 'An error occurred while retrieving your Production Companies. Please try again.' });
   }
 }

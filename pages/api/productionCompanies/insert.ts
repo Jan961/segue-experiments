@@ -3,19 +3,23 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const email = await getEmailFromReq(req);
-  const AccountId = await getAccountId(email);
-  const { Name, WebSite } = JSON.parse(req.body);
-  console.log('company info var', JSON.parse(req.body));
+  try {
+    const email = await getEmailFromReq(req);
+    const AccountId = await getAccountId(email);
+    const { Name, WebSite } = JSON.parse(req.body);
 
-  const newProdCompany = await prisma.ProductionCompany.create({
-    data: {
-      AccountId,
-      WebSite,
-      Name,
-    },
-  });
-  console.log(newProdCompany);
+    const newProdCompany = await prisma.ProductionCompany.create({
+      data: {
+        AccountId,
+        WebSite,
+        Name,
+      },
+    });
 
-  res.status(200).json(newProdCompany);
+    res.status(200).json(newProdCompany);
+  } catch (exception) {
+    res
+      .status(409)
+      .json({ errorMessage: 'An error occurred while creating your Production Company. Please try again.' });
+  }
 }

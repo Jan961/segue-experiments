@@ -5,7 +5,6 @@ import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable'
 import { DeleteConfirmation } from '../../../components/global/DeleteConfirmation';
 import { PopupModal } from '../../../components/core-ui-lib';
 export default function ProductionCompaniesTab() {
-  //  const [createMode, setCreateMode] = useState<boolean>();
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
   const [showErrorModal, setShowErrorModal] = useState<boolean>();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>();
@@ -29,7 +28,6 @@ export default function ProductionCompaniesTab() {
       await fetchProductionCompanies();
     })();
   }, []);
-  console.log(productionCompanies);
   const onAddNewVenueContact = async () => {
     const emptyData = { Name: '', WebSite: '', Logo: '', existsInDB: false, Id: null };
     setProductionCompanies((prev) => [emptyData, ...prev]);
@@ -71,7 +69,6 @@ export default function ProductionCompaniesTab() {
     const { rowIndex } = e;
     const productions = productionCompanies;
     productions[rowIndex] = { ...e.data, Id: productions[rowIndex].Id, existsInDB: productions[rowIndex].existsInDB };
-    console.log(e);
     setProductionCompanies(productions);
     if (productions[rowIndex].existsInDB) {
       const data = e.data;
@@ -80,9 +77,11 @@ export default function ProductionCompaniesTab() {
         headers: {},
         body: JSON.stringify({ ...data, Id: productions[rowIndex].Id }),
       });
-      console.log(response);
+      if (!response.ok) {
+        setErrorMessage((await response.json())?.errorMessage);
+        setShowErrorModal(true);
+      }
     } else {
-      // create
       if (e.data.Name.length > 0) {
         const data = e.data;
         const response = await fetch('/api/productionCompanies/insert', {
@@ -91,9 +90,8 @@ export default function ProductionCompaniesTab() {
           body: JSON.stringify(data),
         });
         const tempProd = productions;
-        tempProd[rowIndex].existsInDB = true;
         const jsonOutput = await response.json();
-        tempProd[rowIndex].Id = jsonOutput?.Id;
+        tempProd[rowIndex] = { ...tempProd[rowIndex], existsInDB: true, Id: jsonOutput?.Id };
         setProductionCompanies(tempProd);
       }
     }
@@ -104,7 +102,6 @@ export default function ProductionCompaniesTab() {
     }
     return null;
   }, []);
-  console.log(showDeleteModal);
   return (
     <div>
       <div>
