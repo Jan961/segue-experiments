@@ -82,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             VATIndicator,
             CulturallyExempt,
             FamilyId,
-            VenueCurrencyCode: CurrencyCode,
+            CurrencyCode,
             Seats,
             TownPopulation,
             Website,

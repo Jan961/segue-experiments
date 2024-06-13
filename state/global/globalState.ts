@@ -17,6 +17,6 @@ const intialState: GlobalStateType = {
 };
 
 export const globalState = atom({
-  key: 'appGlobalState',
+  key: 'globalState',
   default: intialState,
 });

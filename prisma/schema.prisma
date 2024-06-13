@@ -152,7 +152,7 @@ model Venue {
   Name                                                      String               @map("VenueName") @db.VarChar(255)
   StatusCode                                                String               @default("O") @map("VenueStatusCode") @db.VarChar(1)
   Website                                                   String?              @map("VenueWebsite") @db.VarChar(255)
-  VenueCurrencyCode                                         String               @db.VarChar(3)
+  CurrencyCode                                              String               @map("VenueCurrencyCode") @db.VarChar(3)
   VATIndicator                                              Boolean              @default(dbgenerated("(b'0')")) @map("VenueVATIndicator") @db.Bit(1)
   TechSpecsURL                                              String?              @map("VenueTechSpecsURL") @db.VarChar(255)
   Seats                                                     Float?               @map("VenueSeats")
@@ -182,7 +182,7 @@ model Venue {
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
   Rehearsal                                                 Rehearsal[]
-  Currency                                                  Currency             @relation(fields: [VenueCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
+  Currency                                                  Currency             @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
   VenueFamily                                               VenueFamily?         @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]   @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
@@ -192,7 +192,7 @@ model Venue {
   VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([FamilyId], map: "Venue_VenueFamily")
-  @@index([VenueCurrencyCode], map: "Currency_Venue")
+  @@index([CurrencyCode], map: "Currency_Venue")
 }
 
 model VenueBarredVenue {
