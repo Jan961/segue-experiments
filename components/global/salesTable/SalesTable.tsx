@@ -8,6 +8,7 @@ import salesComparison, { SalesComp } from './utils/salesComparision';
 import { SalesSnapshot, BookingSelection } from 'types/MarketingTypes';
 import { format, parseISO } from 'date-fns';
 import axios from 'axios';
+
 export type SalesTableVariant = 'prodComparision' | 'salesSnapshot' | 'salesComparison' | 'venue' | 'prodCompArch';
 
 export type ProdComp = {
@@ -51,10 +52,7 @@ export default function SalesTable({
   const [numBookings, setNumBookings] = useState<number>(0);
   const [tableWidth, setTableWidth] = useState(containerWidth);
   const [excelStyles, setExcelStyles] = useState([]);
-  // constants
-  const ARCH_MULTI_WIDTH = 328;
-  const ARCH_LESS_2_WIDTH = 340;
-  const ARCH_SPACE_SCALER = 12;
+
   // set table style props based on module
   const styleProps = { headerColor: tileColors[module] };
 
@@ -102,9 +100,25 @@ export default function SalesTable({
     setRowData(processedBookings);
 
     if (variant === 'prodComparision') {
-      setColumnDefs(prodComparisionColDefs(data.length, onCellValChange, cellRenderParams.selected));
+      setColumnDefs(
+        prodComparisionColDefs(
+          data.filter((item) => {
+            return item.HasSalesData;
+          }).length,
+          onCellValChange,
+          cellRenderParams.selected,
+        ),
+      );
     } else {
-      setColumnDefs(prodCompArchColDefs(data.length, onCellValChange, cellRenderParams.selected));
+      setColumnDefs(
+        prodCompArchColDefs(
+          data.filter((item) => {
+            return item.HasSalesData;
+          }).length,
+          onCellValChange,
+          cellRenderParams.selected,
+        ),
+      );
     }
   };
 
@@ -204,8 +218,9 @@ export default function SalesTable({
       }
 
       case 'salesComparison': {
-        const scalar = numBookings === 2 ? ARCH_LESS_2_WIDTH : ARCH_MULTI_WIDTH;
-        const widthInt = numBookings * scalar - numBookings * ARCH_SPACE_SCALER;
+        const PER_PERFORMANCE_WIDTH = 302;
+        const WEEK_COLUMN_WIDTH = 80;
+        const widthInt = numBookings * PER_PERFORMANCE_WIDTH + WEEK_COLUMN_WIDTH;
         return `${widthInt}px`;
       }
 
