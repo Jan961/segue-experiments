@@ -6,7 +6,8 @@ interface ProductionCompaniesTableProps {
   onCellClicked: (value: any) => void;
   columnDefs: any[]; // Adjust the type according to your actual data structure
   rowData: any[]; // Adjust the type according to your actual data structure
-  styleProps: Record<string, any>; // Adjust the type according to your actual data structure
+  styleProps: Record<string, any>;
+  getRowStyle: (value: any) => void; // Adjust the type according to your actual data structure
 }
 const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
   onChange,
@@ -14,6 +15,7 @@ const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
   columnDefs,
   rowData,
   styleProps,
+  getRowStyle,
 }) => {
   return (
     <Table
@@ -22,6 +24,7 @@ const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
       styleProps={styleProps}
       onCellClicked={onCellClicked}
       onCellValueChange={onChange}
+      getRowStyle={getRowStyle}
     />
   );
 };

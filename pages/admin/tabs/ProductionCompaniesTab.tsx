@@ -1,14 +1,16 @@
 import { productionCompaniesColDefs, styleProps } from 'components/system-admin/productionCompanies/tableConfig';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
 import { DeleteConfirmation } from '../../../components/global/DeleteConfirmation';
+import { PopupModal } from '../../../components/core-ui-lib';
 export default function ProductionCompaniesTab() {
   //  const [createMode, setCreateMode] = useState<boolean>();
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
-  // const [showErrorModal, setShowErrorModal] = useState<boolean>();
+  const [showErrorModal, setShowErrorModal] = useState<boolean>();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>();
   const [selectedProdCompany, setSelectedProdCompany] = useState();
+  const [errorMessage, setErrorMessage] = useState<string>();
   const fetchProductionCompanies = async () => {
     const response = await fetch('/api/productionCompanies/read', {
       method: 'POST',
@@ -36,20 +38,19 @@ export default function ProductionCompaniesTab() {
   const onCellClicked = async (e) => {
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
-      console.log('delete column');
-      console.log(productionCompanies);
-      console.log(rowIndex);
-
       if (productionCompanies.length <= 1) {
-        console.log('You cannot delete this row');
+        setErrorMessage('Deletion is not permitted as this list must have at least one entry.');
+        setShowErrorModal(true);
       } else {
+        if (productionCompanies[rowIndex].Id === null) {
+          await fetchProductionCompanies();
+        }
         setSelectedProdCompany(productionCompanies[rowIndex].Id);
         setShowDeleteModal(true);
       }
     }
   };
   const deleteProductionCompany = async () => {
-    console.log('im in delete');
     if (selectedProdCompany != null) {
       const response = await fetch('/api/productionCompanies/delete', {
         method: 'POST',
@@ -58,6 +59,9 @@ export default function ProductionCompaniesTab() {
       });
       if (response.ok) {
         await fetchProductionCompanies();
+      } else {
+        setErrorMessage((await response.json())?.errorMessage);
+        setShowErrorModal(true);
       }
       setSelectedProdCompany(null);
       setShowDeleteModal(false);
@@ -70,9 +74,6 @@ export default function ProductionCompaniesTab() {
     productions[rowIndex] = { ...e.data, existsInDB: productions[rowIndex].existsInDB };
     setProductionCompanies(productions);
     if (productions[rowIndex].existsInDB) {
-      // update
-      // const prodCompId = e.data.id;
-      console.log('updating ', e.data);
       const data = e.data;
       const response = await fetch('/api/productionCompanies/update', {
         method: 'POST',
@@ -94,25 +95,31 @@ export default function ProductionCompaniesTab() {
         const jsonOutput = await response.json();
         tempProd[rowIndex].Id = jsonOutput?.Id;
         setProductionCompanies(tempProd);
-        console.log(productionCompanies);
       }
     }
   };
+  const getRowStyle = useCallback((params) => {
+    if (params.data.existsInDB === false) {
+      return { background: '#E9458033' };
+    }
+    return null;
+  }, []);
   console.log(showDeleteModal);
   return (
     <div>
       <div>
-        <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
+        <Button onClick={onAddNewVenueContact} variant="primary" text="Add New Company" />
         <ProductionCompaniesTable
           columnDefs={productionCompaniesColDefs}
           rowData={productionCompanies}
           styleProps={styleProps}
           onChange={onCellUpdate}
           onCellClicked={onCellClicked}
+          getRowStyle={getRowStyle}
         />
       </div>
-      <div>
-        {showDeleteModal && (
+      {showDeleteModal && (
+        <div>
           <DeleteConfirmation
             title="Delete Booking"
             onCancel={() => {
@@ -123,8 +130,20 @@ export default function ProductionCompaniesTab() {
           >
             <p>This will the delete the booking and related performances</p>
           </DeleteConfirmation>
-        )}
-      </div>
+        </div>
+      )}
+      {showErrorModal && (
+        <div>
+          <PopupModal
+            show={showErrorModal}
+            title="Deletion Failed"
+            showCloseIcon={true}
+            onClose={() => setShowErrorModal(false)}
+          >
+            <p>{errorMessage}</p>
+          </PopupModal>
+        </div>
+      )}
     </div>
   );
 }

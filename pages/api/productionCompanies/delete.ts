@@ -22,6 +22,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     res.status(200).json(deletedRecord);
   } else {
+    res.status(409).json({
+      errorMessage: 'Deletion is not permitted as this Production Company is responsible for one or more Shows',
+    });
     console.log('Shows associated cannot delete');
   }
 }

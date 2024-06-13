@@ -9,6 +9,7 @@ export const productionCompaniesColDefs = [
     field: 'Name',
     editable: true,
     cellRenderer: DefaultTextRenderer,
+
     width: 400,
   },
   {
