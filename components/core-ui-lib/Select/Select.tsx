@@ -154,7 +154,7 @@ export default forwardRef(function Select(
     [customStyles],
   );
 
-  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(options);
+  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(null);
   const [selectedOption, setSelectedOption] = useState<SelectOption | SelectOption[]>({ text: '', value: '' });
 
   const handleOptionSelect = (o: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
@@ -235,6 +235,8 @@ export default forwardRef(function Select(
         onInputChange={(inputValue) => {
           if (inputValue) {
             setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
+          } else {
+            setFilteredOptions(options);
           }
         }}
         onChange={handleOptionSelect}
@@ -252,6 +254,9 @@ export default forwardRef(function Select(
         isMulti={isMulti}
         hideSelectedOptions={false}
         filterOption={(option, _inputValue) => {
+          if (filteredOptions === null) {
+            return true;
+          }
           return filteredOptions.map((item) => item.value).includes(option.value);
         }}
       />
