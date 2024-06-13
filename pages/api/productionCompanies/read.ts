@@ -17,9 +17,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Logo: true,
       },
     });
-    console.log('prod co list', productionCompanyList);
     const prodCoIdList = productionCompanyList.map((item) => item.Id);
-    console.log(prodCoIdList);
     const prodCompanyWithShows = await prisma.Show.findMany({
       where: { ShowProdCoId: { in: prodCoIdList } },
     });
@@ -29,7 +27,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     // make upsert
     // make delete
     // make logo and integrate with Aruns stuff
-    console.log(productionCompanyList);
     return res.status(200).json(productionCompanyList);
   } catch (err) {
     console.log(err);

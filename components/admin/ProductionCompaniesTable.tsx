@@ -3,27 +3,18 @@ import React from 'react';
 
 interface ProductionCompaniesTableProps {
   onChange: (value: any) => void;
+  onCellClicked: (value: any) => void;
   columnDefs: any[]; // Adjust the type according to your actual data structure
   rowData: any[]; // Adjust the type according to your actual data structure
   styleProps: Record<string, any>; // Adjust the type according to your actual data structure
 }
 const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
   onChange,
+  onCellClicked,
   columnDefs,
   rowData,
   styleProps,
 }) => {
-  const onCellClicked = (e) => {
-    const { column, rowIndex } = e;
-    if (column.colId === 'delete') {
-      console.log('delete column');
-      console.log(rowIndex);
-      if (rowData.length <= 1) {
-        console.log('You cannot delete this row');
-      }
-    }
-  };
-
   return (
     <Table
       columnDefs={columnDefs}
