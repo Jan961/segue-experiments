@@ -184,6 +184,10 @@ export default forwardRef(function Select(
     }
   };
 
+  // const customFuseFilter = (option, _inputValue) => {
+  //   return filteredOptions.map((item) => item.value).includes(option.value);
+  // };
+
   useEffect(() => {
     if (isMulti && Array.isArray(value)) {
       if (options.length === value.length || (Array.isArray(value) && value.includes('select_all'))) {
