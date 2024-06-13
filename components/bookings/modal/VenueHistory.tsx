@@ -210,7 +210,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         }
 
         // if length of tempBookings is >= 2, errorMessage can be removed
-        if (tempBookings.length >= 2) {
+        if (tempBookings.length >= 1) {
           setErrorMessage('');
         }
         setSelBookings(tempBookings);
@@ -334,7 +334,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
             />
-            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={() => setShowResults(false)} />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
           </div>
         </TableWrapper>
       </PopupModal>
