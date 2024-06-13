@@ -33,7 +33,6 @@ export default function ProductionCompaniesTab() {
   const onAddNewVenueContact = async () => {
     const emptyData = { Name: '', WebSite: '', Logo: '', existsInDB: false, Id: null };
     setProductionCompanies((prev) => [emptyData, ...prev]);
-    // setCreateMode(true);
   };
   const onCellClicked = async (e) => {
     const { column, rowIndex } = e;
@@ -71,14 +70,15 @@ export default function ProductionCompaniesTab() {
   const onCellUpdate = async (e) => {
     const { rowIndex } = e;
     const productions = productionCompanies;
-    productions[rowIndex] = { ...e.data, existsInDB: productions[rowIndex].existsInDB };
+    productions[rowIndex] = { ...e.data, Id: productions[rowIndex].Id, existsInDB: productions[rowIndex].existsInDB };
+    console.log(e);
     setProductionCompanies(productions);
     if (productions[rowIndex].existsInDB) {
       const data = e.data;
       const response = await fetch('/api/productionCompanies/update', {
         method: 'POST',
         headers: {},
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, Id: productions[rowIndex].Id }),
       });
       console.log(response);
     } else {
