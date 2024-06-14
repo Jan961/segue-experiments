@@ -17,7 +17,6 @@ import { otherState } from 'state/booking/otherState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
-
 interface BookingsTableProps {
   rowData?: any;
   tableRef?: any;

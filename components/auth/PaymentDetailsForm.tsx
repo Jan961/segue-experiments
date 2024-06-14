@@ -15,6 +15,8 @@ import { AccountDetails } from 'pages/account/sign-up';
 import { add } from 'date-fns';
 import useProcessPayment from 'hooks/useProcessPayment';
 import { notify } from 'components/core-ui-lib/Notifications';
+import { useRecoilValue } from 'recoil';
+import { globalState } from 'state/global/globalState';
 
 const baseClass = `w-full block bg-primary-white p-1.5 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset border-primary-border`;
 
@@ -26,6 +28,8 @@ interface PaymentDetailsFormProps {
   plan: Plan;
 }
 const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) => {
+  const { emailTemplates } = useRecoilValue(globalState);
+
   const [paymentDetails, setPaymentDetails] = useState({
     cardHolderName: '',
     postcode: '',
@@ -59,6 +63,14 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
         startDate: today.toISOString(),
         endDate: add(today, { months: paymentDetails.paymentFrequency }).toISOString(),
         isActive: true,
+      });
+      // Send an email for account confirmation
+      const emailTemplate = emailTemplates.find(({ templateName }) => templateName === 'Confirm New Account');
+      await axios.post('/api/email/send', {
+        to: paymentDetails.email,
+        from: emailTemplate.emailFrom,
+        templateId: emailTemplate.templateId,
+        data: {},
       });
       setLoading(false);
       nextStep();
