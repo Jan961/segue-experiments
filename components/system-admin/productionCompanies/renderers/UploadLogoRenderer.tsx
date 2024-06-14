@@ -2,7 +2,6 @@ import UploadModal from 'components/core-ui-lib/UploadModal';
 import { useState } from 'react';
 import { Button } from 'components/core-ui-lib/';
 import axios from 'axios';
-import byteArrToBaseString from 'utils/byteArrToBaseString';
 
 export const UploadLogoRenderer = (params) => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
@@ -52,6 +51,7 @@ export const UploadLogoRenderer = (params) => {
       clearInterval(slowProgressInterval);
     }
   };
+
   if (openUploadModal) {
     return (
       <UploadModal
@@ -62,7 +62,7 @@ export const UploadLogoRenderer = (params) => {
         onClose={() => {
           setOpenUploadModal(false);
         }}
-        maxFileSize={512 * 1024} // 5MB
+        maxFileSize={512 * 1024} // 0.5MB
         onSave={onSave}
       />
     );
@@ -70,7 +70,7 @@ export const UploadLogoRenderer = (params) => {
   if (params.data.Logo === null) {
     return <Button text="Upload Logo" variant="secondary" onClick={() => setOpenUploadModal(true)} />;
   } else {
-    const srcTag = 'data:image/png;base64,' + byteArrToBaseString(params.data.Logo.data);
-    return <img src={srcTag} alt="Base64 Image" onClick={() => setOpenUploadModal(true)} />;
+    //  const srcTag = 'data:image/png;base64,' + params.data.Logo;
+    return <img src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />;
   }
 };

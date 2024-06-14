@@ -2,8 +2,8 @@ import { productionCompaniesColDefs, styleProps } from 'components/system-admin/
 import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
-import { DeleteConfirmation } from '../../../components/global/DeleteConfirmation';
-import { PopupModal } from '../../../components/core-ui-lib';
+import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
+import { PopupModal } from 'components/core-ui-lib';
 export default function ProductionCompaniesTab() {
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
   const [showErrorModal, setShowErrorModal] = useState<boolean>();
@@ -18,6 +18,12 @@ export default function ProductionCompaniesTab() {
     setProductionCompanies(
       (await response.json()).map((item) => {
         item.existsInDB = true;
+        if (item.Logo.length > 0) {
+          const img = new Image();
+          img.src = 'data:image/png;base64,' + item.Logo;
+          console.log(img.src);
+          item.Logo = img;
+        }
         return item;
       }),
     );
@@ -101,8 +107,10 @@ export default function ProductionCompaniesTab() {
   };
   const getRowHeight = (params) => {
     // ideally be able to take the logo height from the table if there is a column to store the height
+    console.log(params.data.Logo);
     if (params.data.Logo != null) {
-      return 200;
+      console.log(params.data.Logo.height);
+      return params.data.Logo.height;
     }
     return 50;
   };

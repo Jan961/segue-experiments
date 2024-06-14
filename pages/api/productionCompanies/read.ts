@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
+import byteArrToBaseString from '../../../utils/byteArrToBaseString';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -22,7 +23,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       ],
     });
-    return res.status(200).json(productionCompanyList);
+    return res.status(200).json(
+      productionCompanyList.map((item) => {
+        item.Logo = byteArrToBaseString(item.Logo);
+        return item;
+      }),
+    );
   } catch (err) {
     res
       .status(409)
