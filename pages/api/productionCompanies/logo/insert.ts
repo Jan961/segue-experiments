@@ -15,8 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { fields, files } = await parseFormData(req);
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
-
-    // Ensure Id is provided in the request
     const Id = parseInt(fields.Id);
 
     if (!files.file) {
@@ -25,16 +23,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const file = files.file;
-    let fileRecords;
 
     if (!Array.isArray(file)) {
       const buffer = await fs.promises.readFile(file.filepath);
-
-      // Convert buffer to base64 string
       const base64String = buffer.toString('base64');
-      // Directly use the file buffer to update the database
-      fileRecords = await prisma.productionCompany.update({
-        data: { Logo: base64String }, // Assuming file.filepath contains the file buffer
+
+      await prisma.productionCompany.update({
+        data: { Logo: base64String },
         where: {
           Id,
           AccountId,
@@ -42,7 +37,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    console.log(fileRecords);
     res.status(200).json({ status: 'success' });
   } catch (error) {
     console.log('Error uploading file: ', error);

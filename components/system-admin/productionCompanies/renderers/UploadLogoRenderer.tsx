@@ -7,15 +7,12 @@ export const UploadLogoRenderer = (params) => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
 
   const onSave = async (file, onProgress, onError) => {
-    console.log('saving', file);
-
     const formData = new FormData();
-    formData.append('file', file[0].file); // Assuming file[0].file is the actual file object
-    formData.append('path', 'marketing/');
-    formData.append('Id', params.data.Id); // Pass the Id value to the form data
+    formData.append('file', file[0].file);
+    formData.append('Id', params.data.Id);
 
-    let progress = 0; // to track overall progress
-    let slowProgressInterval; // interval for slow progress simulation
+    let progress = 0;
+    let slowProgressInterval;
 
     try {
       const response = await axios.post('/api/productionCompanies/logo/insert', formData, {
@@ -41,6 +38,10 @@ export const UploadLogoRenderer = (params) => {
           onProgress(file[0].file, progress);
         },
       });
+      if (response.status >= 400 && response.status <= 499) {
+        onError(file[0].file, 'Error uploading file. Please try again.');
+        clearInterval(slowProgressInterval);
+      }
       console.log(response);
 
       progress = 100;
@@ -70,7 +71,6 @@ export const UploadLogoRenderer = (params) => {
   if (params.data.Logo.length === 0) {
     return <Button text="Upload Logo" variant="secondary" onClick={() => setOpenUploadModal(true)} />;
   } else {
-    //  const srcTag = 'data:image/png;base64,' + params.data.Logo;
     return <img src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />;
   }
 };
