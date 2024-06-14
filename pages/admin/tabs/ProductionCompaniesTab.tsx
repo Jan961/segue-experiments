@@ -40,10 +40,13 @@ export default function ProductionCompaniesTab() {
         setShowErrorModal(true);
       } else {
         if (productionCompanies[rowIndex].Id === null) {
+          setShowDeleteModal(false);
+          setSelectedProdCompany(null);
           await fetchProductionCompanies();
+        } else {
+          setSelectedProdCompany(productionCompanies[rowIndex].Id);
+          setShowDeleteModal(true);
         }
-        setSelectedProdCompany(productionCompanies[rowIndex].Id);
-        setShowDeleteModal(true);
       }
     }
   };
