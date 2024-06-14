@@ -109,8 +109,11 @@ export default function ProductionCompaniesTab() {
     // ideally be able to take the logo height from the table if there is a column to store the height
     console.log(params.data.Logo);
     if (params.data.Logo != null) {
+      const columnWidth = 200;
+      const ratio = params.data.Logo.width / columnWidth;
+
       console.log(params.data.Logo.height);
-      return params.data.Logo.height;
+      return Math.ceil(params.data.Logo.height / ratio);
     }
     return 50;
   };
