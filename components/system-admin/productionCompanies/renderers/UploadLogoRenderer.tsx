@@ -1,17 +1,12 @@
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import { useState } from 'react';
-import { Button } from '../../../core-ui-lib';
+import { Button } from 'components/core-ui-lib/';
 import axios from 'axios';
+import byteArrToBaseString from 'utils/byteArrToBaseString';
 
 export const UploadLogoRenderer = (params) => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
 
-  const uint8ArrayToBase64 = (uint8Array) => {
-    const binaryString = uint8Array.reduce((data, byte) => {
-      return data + String.fromCharCode(byte);
-    }, '');
-    return btoa(binaryString);
-  };
   const onSave = async (file, onProgress, onError) => {
     console.log('saving', file);
 
@@ -75,10 +70,7 @@ export const UploadLogoRenderer = (params) => {
   if (params.data.Logo === null) {
     return <Button text="Upload Logo" variant="secondary" onClick={() => setOpenUploadModal(true)} />;
   } else {
-    const byteArray = new Uint8Array(params.data.Logo.data);
-    const base64String = uint8ArrayToBase64(byteArray);
-    const srcTag = 'data:image/png;base64,' + base64String;
-
+    const srcTag = 'data:image/png;base64,' + byteArrToBaseString(params.data.Logo.data);
     return <img src={srcTag} alt="Base64 Image" onClick={() => setOpenUploadModal(true)} />;
   }
 };
