@@ -67,7 +67,7 @@ export const UploadLogoRenderer = (params) => {
       />
     );
   }
-  if (params.data.Logo === null) {
+  if (params.data.Logo.length === 0) {
     return <Button text="Upload Logo" variant="secondary" onClick={() => setOpenUploadModal(true)} />;
   } else {
     //  const srcTag = 'data:image/png;base64,' + params.data.Logo;
