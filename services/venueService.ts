@@ -59,6 +59,27 @@ export const getCountryRegions = async () => {
   });
 };
 
+export const getVenueCurrencies = async () => {
+  try {
+    const venueCurrency = await prisma.Venue.findMany({
+      select: {
+        Id: true,
+        Currency: {
+          select: { SymbolUnicode: true },
+        },
+      },
+    });
+    const attempt = venueCurrency.reduce((dict, item) => {
+      dict[item.Id] = item.Currency.SymbolUnicode;
+      return dict;
+    });
+
+    return attempt;
+  } catch (exception) {
+    return '';
+  }
+};
+
 export interface DistanceStop {
   Date: string;
   Ids: number[];

@@ -37,7 +37,7 @@ export default function ActivityModal({
   variant,
   onSave,
   activityTypes,
-  venueCurrency = '£',
+  venueCurrency = '',
   bookingId,
   data,
 }: Partial<ActivityModalProps>) {
@@ -178,7 +178,7 @@ export default function ActivityModal({
             options={activityTypes}
             value={actType}
             onChange={(value) => changeActivityType(value)}
-            placeholder={'Please select Activity Type'}
+            placeholder="Please select Activity Type"
             isClearable
             isSearchable
             label="Type"
@@ -266,7 +266,7 @@ export default function ActivityModal({
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
-            className={'mt-2 h-[162px] w-full'}
+            className="mt-2 h-[162px] w-full"
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
