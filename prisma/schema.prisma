@@ -191,8 +191,8 @@ model Venue {
   VenueVenue1                                               VenueVenue[]         @relation("VenueVenue_VVVenue1IdToVenue")
   VenueVenue2                                               VenueVenue[]         @relation("VenueVenue_VVVenue2IdToVenue")
 
-  @@index([CurrencyCode], map: "Currency_Venue")
   @@index([FamilyId], map: "Venue_VenueFamily")
+  @@index([CurrencyCode], map: "Currency_Venue")
 }
 
 model VenueBarredVenue {
@@ -642,7 +642,7 @@ model DBSetting {
 model MasterTask {
   Id                             Int     @id @default(autoincrement()) @map("MasterTaskId")
   AccountId                      Int     @map("TaskAccountId")
-  Code                           Int     @map("TaskCode") @db.SmallInt
+  Code                           Int     @unique(map: "MasterTask_TaskCode_Unique") @map("TaskCode") @db.SmallInt
   Name                           String  @map("TaskName") @db.VarChar(80)
   Priority                       Int     @default(0) @map("TaskPriority") @db.TinyInt
   Notes                          String? @map("TaskNotes") @db.VarChar(500)
@@ -720,6 +720,7 @@ model ProductionTask {
   User                       User?         @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_ProductionTask_Assigned")
   TaskWatcher                TaskWatcher[]
 
+  @@unique([ProductionId, Code], map: "ProductionTask_Production_TaskCode_Unique")
   @@index([ProductionId], map: "Production_ProductionTask_fk")
   @@index([AssignedToUserId], map: "User_ProductionTask_Assigned")
 }
@@ -872,6 +873,7 @@ model DealMemo {
   DeMoAdvancePaymentDueBy                                    DateTime?               @db.Date
   DeMoSettlementDays                                         Int?                    @db.TinyInt
   DeMoContractClause                                         String?                 @db.LongText
+  DemoPrintDelVenueAddressId                                 Int?
   AccountContact                                             AccountContact?         @relation(fields: [DeMoAccContId], references: [AccContId], onDelete: Cascade, map: "AccountContactDealMemo")
   Booking                                                    Booking                 @relation(fields: [DeMoBookingId], references: [Id], onDelete: Cascade, map: "BookingDealMemo")
   VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact  VenueContact?           @relation("DealMemo_DeMoBOMVenueContactIdToVenueContact", fields: [DeMoBOMVenueContactId], references: [Id], onDelete: Cascade, map: "VenueContactDealMemoBOM")
@@ -956,6 +958,14 @@ model AccountSubscription {
 
   @@index([AccSubAccountId], map: "Account_AccountSubscription")
   @@index([AccSubPlanId], map: "SubscriptionPlan_AccountSubscription")
+}
+
+model EmailTemplate {
+  EmTemId          String  @id @db.VarChar(34)
+  EmTemName        String  @unique(map: "EmTemName") @db.VarChar(50)
+  EmTemDescription String  @db.VarChar(100)
+  EmTemFrom        String  @db.VarChar(100)
+  EmTemFields      String? @db.VarChar(100)
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1162,7 +1172,6 @@ view SalesView {
   LastFiguresDate          DateTime? @db.Date
   LastFiguresSeats         Decimal?  @db.Decimal(32, 0)
   LastFiguresValue         Decimal?  @db.Decimal(32, 2)
-  LastSaleTYpeName         String?   @db.VarChar(45)
 
   @@ignore
 }
