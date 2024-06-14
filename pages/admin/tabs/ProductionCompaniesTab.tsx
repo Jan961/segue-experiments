@@ -99,6 +99,14 @@ export default function ProductionCompaniesTab() {
       }
     }
   };
+  const getRowHeight = (params) => {
+    // ideally be able to take the logo height from the table if there is a column to store the height
+    if (params.data.Logo != null) {
+      return 200;
+    }
+    return 50;
+  };
+
   const getRowStyle = useCallback((params) => {
     if (params.data.existsInDB === false) {
       return { background: '#E9458033' };
@@ -121,6 +129,7 @@ export default function ProductionCompaniesTab() {
           onChange={onCellUpdate}
           onCellClicked={onCellClicked}
           getRowStyle={getRowStyle}
+          getRowHeight={getRowHeight}
         />
       </div>
       {showDeleteModal && (

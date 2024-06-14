@@ -8,6 +8,7 @@ interface ProductionCompaniesTableProps {
   rowData: any[]; // Adjust the type according to your actual data structure
   styleProps: Record<string, any>;
   getRowStyle: (value: any) => void; // Adjust the type according to your actual data structure
+  getRowHeight: any;
 }
 const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
   onChange,
@@ -16,6 +17,7 @@ const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
   rowData,
   styleProps,
   getRowStyle,
+  getRowHeight,
 }) => {
   return (
     <Table
@@ -25,6 +27,7 @@ const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
       onCellClicked={onCellClicked}
       onCellValueChange={onChange}
       getRowStyle={getRowStyle}
+      getRowHeight={getRowHeight}
     />
   );
 };
