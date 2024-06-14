@@ -1,6 +1,7 @@
 import DefaultTextRenderer from '../../core-ui-lib/Table/renderers/DefaultTextRenderer';
 import { tileColors } from 'config/global';
 import IconRenderer from '../../bookings/table/IconRenderer';
+import { UploadLogoRenderer } from './renderers/UploadLogoRenderer';
 export const styleProps = { headerColor: tileColors.systemAdmin };
 
 export const productionCompaniesColDefs = [
@@ -23,9 +24,7 @@ export const productionCompaniesColDefs = [
   {
     headerName: 'Company Logo',
     field: 'Logo',
-    cellRenderer: function (params) {
-      return params.data.logo || 'Image';
-    },
+    cellRenderer: UploadLogoRenderer,
     width: 200,
   },
   {
