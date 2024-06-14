@@ -12,9 +12,8 @@ export const venueOptionsSelector = selectorFamily({
       const venueDict: Record<number, VenueMinimalDTO> = get(venueState);
       const options = [];
       for (const venue of Object.values(venueDict)) {
-        // Pushes options without regions
         if (
-          (venue.RegionId === -1 || venue.RegionId === currentProduction.ShowRegionId) &&
+          (venue.RegionId === -1 || venue.RegionId === currentProduction?.ShowRegionId) &&
           !excludedVenueIds.includes(venue.Id)
         ) {
           options.push({
