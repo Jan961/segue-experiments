@@ -24,6 +24,11 @@ export const createAccountContact = async (accountContact: Partial<AccountContac
   const newAccountContact = await tx.accountContact.create({
     data: {
       ...omit(accountContact, ['AccContId']),
+      Account: {
+        connect: {
+          AccountId: accountContact.AccContAccountId,
+        },
+      },
     },
   });
   return newAccountContact;

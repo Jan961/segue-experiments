@@ -1,3 +1,4 @@
+/* eslint @typescript-eslint/no-unused-vars: 0 */
 import fs from 'fs';
 
 const nodemailer = require('nodemailer');
