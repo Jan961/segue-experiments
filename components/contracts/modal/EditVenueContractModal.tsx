@@ -61,7 +61,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       })),
     [users],
   );
-  console.log('users===>', users, venue, formData);
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
@@ -88,7 +87,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       ...formData,
       [key]: value,
     };
-    console.log('value===>', value);
     setFormData(updatedFormData);
     if (type === 'booking') {
       setSaveBookingFormData({ ...saveBookingFormData, [key]: value });
