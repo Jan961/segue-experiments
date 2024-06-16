@@ -534,6 +534,7 @@ export interface VenueContractFormData {
   performanceCount: string;
   DealNotes: string;
   status: string;
+  SignedBy: string;
 }
 
 export interface SaveContractFormState {
@@ -545,6 +546,7 @@ export interface SaveContractFormState {
   bookingNotes?: string;
   Exceptions?: string;
   Notes?: string;
+  SignedBy?: string;
 }
 
 export interface SaveContractBookingFormState {

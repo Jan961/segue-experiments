@@ -41,7 +41,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [cancelModal, setCancelModal] = useState<boolean>(false);
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [venue, setVenue] = useState<Partial<Venue>>(undefined);
+  const [venue, setVenue] = useState<Partial<Venue>>({});
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
@@ -61,7 +61,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       })),
     [users],
   );
-
+  console.log('users===>', users, venue, formData);
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
@@ -88,7 +88,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       ...formData,
       [key]: value,
     };
-
+    console.log('value===>', value);
     setFormData(updatedFormData);
     if (type === 'booking') {
       setSaveBookingFormData({ ...saveBookingFormData, [key]: value });
@@ -151,8 +151,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px]   flex">
-          <div className="w-[423px] h-[1008px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
-            <div className=" text-primary-input-text font-bold text-lg">Deal Memo</div>
+          <div className="w-[423px] h-[980px] rounded border-2 border-secondary mr-2 p-3 bg-primary-blue bg-opacity-15">
+            <div className="flex">
+              <div className=" text-primary-input-text font-bold text-lg mr-8">Deal Memo</div>
+              <div className="flex items-center">
+                <Button className="w-32" variant="primary" text="Create/Edit Deal Memo" onClick={handleEditDealMemo} />
+                <Button className="ml-3 w-32" variant="primary" text="View as PDF" />
+              </div>
+            </div>
             <div className=" text-primary-input-text font-bold text-sm mt-1.5">Deal Memo Status</div>
             <Select
               options={allStatusOptions}
@@ -206,14 +212,15 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
 
             <div className=" text-primary-input-text font-bold text-sm mt-6">Notes</div>
             <TextArea className="h-[580px] w-[400px]" value={formData.DealNotes} />
-            <div className="flex mt-4 items-center">
-              <Button className="w-60" variant="primary" text="Create/Edit Deal Memo" onClick={handleEditDealMemo} />
-              <Button className="ml-3 w-36" variant="primary" text="View as PDF" />
-            </div>
           </div>
-          <div className="w-[652px] h-[1008px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
-            <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
-
+          <div className="w-[652px] h-[980px] rounded border-2 border-secondary ml-2 p-3 bg-primary-blue bg-opacity-15">
+            <div className="flex justify-between">
+              <div className=" text-primary-input-text font-bold text-lg">Venue Contract</div>
+              <div className="flex mr-2">
+                <Button className="ml-4 w-33" variant="primary" text="Add Attachments" />
+                <Button className="ml-4 w-33" variant="primary" text="View as PDF" />
+              </div>
+            </div>
             <div className="flex mt-2.5">
               <div className="w-1/5">
                 <div className=" text-primary-input-text font-bold text-sm">Booking Status</div>
@@ -257,14 +264,14 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5 flex justify-between">
                 <Select
-                  onChange={() => {
-                    return null;
-                  }}
+                  onChange={(value) => editContractModalData('SignedBy', value.toString(), 'contract')}
+                  // SignedBy
                   className="bg-primary-white w-52"
                   placeholder="User Name Dropdown"
                   options={[{ text: 'Select Assignee', value: null }, ...userList]}
                   isClearable
                   isSearchable
+                  value={formData.SignedBy ? users[formData.SignedBy].Id : ''}
                 />
 
                 <div className="flex items-center">
@@ -300,6 +307,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       editContractModalData('ReceivedBackDate', value, 'contract')
                     }
                     value={formData.ReceivedBackDate}
+                    className="z-[1000]"
                   />
                 </div>
               </div>
@@ -442,19 +450,33 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className="w-4/5 flex">
                 <div className="w-1/3 flex">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Pre Show</div>
-                  <div className=" text-primary-input-text  text-sm">Auto Pop</div>
+                  <div className=" text-primary-input-text  text-sm">
+                    {venue.BarringWeeksPre ? venue.BarringWeeksPre : '-'}
+                  </div>
                 </div>
+
                 <div className="w-1/3 flex justify-center">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Post Show</div>
-                  <div className=" text-primary-input-text  text-sm">Auto Pop</div>
+                  <div className=" text-primary-input-text  text-sm">
+                    {venue.BarringWeeksPost ? venue.BarringWeeksPost : '-'}
+                  </div>
                 </div>
                 <div className="w-1/3 flex justify-end">
                   <div className=" text-primary-input-text font-bold text-sm mr-2">Miles</div>
-                  <div className=" text-primary-input-text  text-sm">Auto Pop</div>
+                  <div className=" text-primary-input-text  text-sm">
+                    {venue.BarringMiles ? venue.BarringMiles : '-'}
+                  </div>
                 </div>
-                <div className="w-1/3 flex mt-1">
-                  <div className=" text-primary-input-text font-bold text-sm mr-2">Venues</div>
-                  <div className=" text-primary-input-text  text-sm">Auto Pop</div>
+              </div>
+            </div>
+            <div className="flex mt-2.5 items-center">
+              <div className="w-1/5">
+                <div className=" text-primary-input-text font-bold text-sm"> </div>
+              </div>
+              <div className="w-4/5 flex">
+                <div className=" text-primary-input-text font-bold text-sm mr-2">Venues</div>
+                <div className=" text-primary-input-text  text-sm ml-3">
+                  {venue.BarringMiles ? venue.BarringMiles : '-'}
                 </div>
               </div>
             </div>
@@ -493,10 +515,6 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   onChange={(value) => editContractModalData('MerchandiseNotes', value.target.value, 'booking')}
                 />
               </div>
-            </div>
-            <div className="flex justify-end mt-4">
-              <Button className="ml-4 w-33" variant="primary" text="Add Attachments" />
-              <Button className="ml-4 w-33" variant="primary" text="View as PDF" />
             </div>
           </div>
         </div>
