@@ -215,6 +215,7 @@ export type VenueMinimalDTO = {
   Seats?: string;
   Count?: number;
   RegionId?: number;
+  CurrencyCode?: string;
 };
 
 export type OtherDTO = {
@@ -534,6 +535,7 @@ export interface VenueContractFormData {
   performanceCount: string;
   DealNotes: string;
   status: string;
+  SignedBy: string;
 }
 
 export interface SaveContractFormState {
@@ -545,6 +547,7 @@ export interface SaveContractFormState {
   bookingNotes?: string;
   Exceptions?: string;
   Notes?: string;
+  SignedBy?: string;
 }
 
 export interface SaveContractBookingFormState {

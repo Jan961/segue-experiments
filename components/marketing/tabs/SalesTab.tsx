@@ -1,7 +1,7 @@
 import { SalesSnapshot } from 'types/MarketingTypes';
-import useAxios from 'hooks/useAxios';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SalesTable from '../../global/salesTable/SalesTable';
+import axios from 'axios';
 
 interface SalesTabProps {
   bookingId: string;
@@ -21,29 +21,28 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     },
   }));
 
-  const { fetchData } = useAxios();
-
   const retrieveSalesData = async (bookingId: string) => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/' + bookingId,
-      method: 'POST',
-    });
+    try {
+      const { data } = await axios.post('/api/marketing/sales/read/' + bookingId);
 
-    if (Array.isArray(data) && data.length > 0) {
-      const tempSales = data as Array<SalesSnapshot>;
-      setSalesTable(
-        <SalesTable
-          containerHeight="h-auto"
-          containerWidth="w-[1465px]"
-          module="marketing"
-          variant="salesSnapshot"
-          data={tempSales}
-          booking={bookingId}
-          tableHeight={640}
-        />,
-      );
+      if (Array.isArray(data) && data.length > 0) {
+        const tempSales = data as Array<SalesSnapshot>;
+        setSalesTable(
+          <SalesTable
+            containerHeight="h-auto"
+            containerWidth="w-[1465px]"
+            module="marketing"
+            variant="salesSnapshot"
+            data={tempSales}
+            booking={bookingId}
+            tableHeight={640}
+          />,
+        );
 
-      setDataAvailable(true);
+        setDataAvailable(true);
+      }
+    } catch (exception) {
+      console.log(exception);
     }
   };
 

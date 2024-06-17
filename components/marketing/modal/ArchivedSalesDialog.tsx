@@ -72,6 +72,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
         town: selectedVenue.Town,
         name: selectedVenue.Name,
         code: selectedVenue.Code,
+        Id: selectedVenue.Id,
       };
     } else {
       venue = data;

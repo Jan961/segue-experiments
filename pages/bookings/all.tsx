@@ -9,7 +9,7 @@ import {
   performanceMapper,
   rehearsalMapper,
 } from 'lib/mappers';
-import { getAllVenuesMin, getCountryRegions } from 'services/venueService';
+import { getAllVenuesMin, getCountryRegions, getVenueCurrencies } from 'services/venueService';
 import { InitialState } from 'lib/recoil';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { objectify, all } from 'radash';
@@ -53,11 +53,12 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   productionJump.selected = -1;
 
   // Get in parallel
-  const [venues, productions, dateTypeRaw, countryRegions] = await all([
+  const [venues, productions, dateTypeRaw, countryRegions, venueCurrencies] = await all([
     getAllVenuesMin(),
     getProductionsWithContent(null, false),
     getDayTypes(),
     getCountryRegions(),
+    getVenueCurrencies(),
   ]);
 
   const dateBlock = [];
@@ -74,6 +75,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       const countryId = v.VenueAddress.find((address: any) => address.TypeName === 'Main')?.CountryId;
 
       const region = countryRegions.find((countryRegion: any) => countryRegion?.CountryId === countryId) ?? null;
+      const currencyCode = venueCurrencies[v.Id] ?? null;
 
       return {
         Id: v.Id,
@@ -83,6 +85,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         Seats: v.Seats,
         Count: 0,
         RegionId: region ? region.RegionId : -1,
+        CurrencyCode: currencyCode || null,
       };
     },
   );

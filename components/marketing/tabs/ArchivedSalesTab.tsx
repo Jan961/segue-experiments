@@ -5,10 +5,10 @@ import { DataList, VenueDetail } from '../MarketingHome';
 import SalesTable from 'components/global/salesTable';
 import { SalesComparison } from 'types/MarketingTypes';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import useAxios from 'hooks/useAxios';
 import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import axios from 'axios';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -30,8 +30,6 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
       setArchivedSalesTable(<div />);
     },
   }));
-
-  const { fetchData } = useAxios();
 
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
@@ -63,33 +61,34 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
 
   const showArchivedSales = async (selection) => {
     setArchivedSalesTable(<div />);
-    const selectedBookings = selection.map((obj) => obj.bookingId);
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/archived',
-      method: 'POST',
-      data: { bookingIds: selectedBookings },
-    });
 
-    if (Array.isArray(data) && data.length !== 0) {
-      const salesComp = data as Array<SalesComparison>;
-      const result = { tableData: salesComp, bookingIds: selection };
+    try {
+      const selectedBookings = selection.map((obj) => obj.bookingId);
+      const { data } = await axios.post('/api/marketing/sales/read/archived', { bookingIds: selectedBookings });
 
-      setArchivedSalesTable(
-        <div className="w-[1200px] overflow-x-auto pb-5">
-          <SalesTable
-            containerHeight="h-[1000px]"
-            containerWidth="w-auto"
-            module="marketing"
-            variant="salesComparison"
-            data={result}
-            tableHeight={580}
-          />
-        </div>,
-      );
-      setArchivedDataAvail(true);
-      setShowArchSalesModal(false);
-    } else {
-      setErrorMessage('There are no sales data available for this particular selection.');
+      if (Array.isArray(data) && data.length !== 0) {
+        const salesComp = data as Array<SalesComparison>;
+        const result = { tableData: salesComp, bookingIds: selection };
+
+        setArchivedSalesTable(
+          <div className="w-[1200px] overflow-x-auto pb-5">
+            <SalesTable
+              containerHeight="h-[1000px]"
+              containerWidth="w-auto"
+              module="marketing"
+              variant="salesComparison"
+              data={result}
+              tableHeight={580}
+            />
+          </div>,
+        );
+        setArchivedDataAvail(true);
+        setShowArchSalesModal(false);
+      } else {
+        setErrorMessage('There are no sales data available for this particular selection.');
+      }
+    } catch (exception) {
+      console.log(exception);
     }
   };
 

@@ -6,7 +6,6 @@ import moment from 'moment';
 import { convertLocalDateToUTC } from 'services/dateService';
 import { shortDateRegex } from 'utils/regexUtils';
 import Label from '../Label';
-
 interface DateInputProps {
   value?: string | Date;
   onChange: (value: Date) => void;
@@ -20,6 +19,7 @@ interface DateInputProps {
   label?: string;
   labelClassName?: string;
   disabled?: boolean;
+  position?: number;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -40,6 +40,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     label,
     labelClassName,
     disabled = false,
+    position = 0,
     ...props
   }: DateInputProps,
   ref,
@@ -148,7 +149,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           maxDate={maxDate}
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
-          popperClassName="!z-50"
+          popperClassName={`!z-50 !left-[-${position}px]`}
           onSelect={(e) => onChange(convertLocalDateToUTC(e))}
           onChange={() => null}
           selected={selectedDate}
