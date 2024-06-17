@@ -72,15 +72,17 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         data: newVc,
       });
 
-      getVenueContacts(booking.venueId.toString());
+      getVenueContacts(booking.VenueId.toString());
 
       // update fields
     } else if (variant === 'update') {
       const updatedRow = mapVenueContactToPrisma(data.updatedRow);
+      const dataToUpd = { ...updatedRow, VenueId: booking.VenueId };
+
       await fetchData({
         url: '/api/marketing/venueContacts/update',
         method: 'POST',
-        data: updatedRow,
+        data: dataToUpd,
       });
 
       // delete venue contact
