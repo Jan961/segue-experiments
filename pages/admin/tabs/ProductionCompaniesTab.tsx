@@ -21,7 +21,6 @@ export default function ProductionCompaniesTab() {
         if (item.Logo.length > 0) {
           const img = new Image();
           img.src = 'data:image/png;base64,' + item.Logo;
-          console.log(img.src);
           item.Logo = img;
         }
         return item;
@@ -98,16 +97,17 @@ export default function ProductionCompaniesTab() {
           headers: {},
           body: JSON.stringify(data),
         });
-        const tempProd = productions;
-        const jsonOutput = await response.json();
-        tempProd[rowIndex] = { ...tempProd[rowIndex], existsInDB: true, Id: jsonOutput?.Id };
-        setProductionCompanies(tempProd);
+        if (response.ok) {
+          await fetchProductionCompanies();
+        } else {
+          setErrorMessage((await response.json())?.errorMessage);
+          setShowErrorModal(true);
+        }
       }
     }
   };
   const getRowHeight = (params) => {
     // ideally be able to take the logo height from the table if there is a column to store the height
-    console.log(params.data.Logo);
     if (params.data.Logo != null) {
       const columnWidth = 200;
       const ratio = params.data.Logo.width / columnWidth;
