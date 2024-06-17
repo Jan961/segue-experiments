@@ -32,6 +32,7 @@ const useMasterTasksFilter = (tasks = []) => {
           'userName',
           'StartByWeekNum',
           'CompleteByWeekNum',
+          'Code',
         ])
       : tasks;
   }, [tasks, filters.taskText]);
