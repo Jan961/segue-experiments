@@ -38,6 +38,7 @@ export default function ProductionCompaniesTab() {
     setProductionCompanies((prev) => [emptyData, ...prev]);
   };
   const onCellClicked = async (e) => {
+    console.log(e);
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
       if (productionCompanies.length <= 1) {

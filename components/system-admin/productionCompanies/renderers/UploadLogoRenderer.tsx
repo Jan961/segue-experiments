@@ -50,6 +50,7 @@ export const UploadLogoRenderer = (params) => {
           progress = 100;
           onProgress(file[0].file, progress);
           clearInterval(slowProgressInterval);
+          location.reload();
         } catch (error) {
           onError(file[0].file, 'Error uploading file. Please try again.');
           clearInterval(slowProgressInterval);
@@ -66,6 +67,9 @@ export const UploadLogoRenderer = (params) => {
         headers: {},
         body: JSON.stringify({ Id: params.data.Id }),
       });
+
+      params.data.Logo = '';
+      location.reload();
     } catch (exception) {
       console.log(exception);
     }
@@ -104,6 +108,7 @@ Suitable image formats are jpg, tiff, svg, and png."
         variant="secondary"
         className="flex justify-center items-center ml-10 "
         onClick={() => setOpenUploadModal(true)}
+        disabled={params.data.Id === null}
       />
     );
   } else {
