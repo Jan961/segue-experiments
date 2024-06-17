@@ -4,9 +4,8 @@ import { Button } from 'components/core-ui-lib/';
 import axios from 'axios';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 
-export const UploadLogoRenderer = (params) => {
+export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
-
   const onSave = async (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
@@ -50,7 +49,6 @@ export const UploadLogoRenderer = (params) => {
           progress = 100;
           onProgress(file[0].file, progress);
           clearInterval(slowProgressInterval);
-          location.reload();
         } catch (error) {
           onError(file[0].file, 'Error uploading file. Please try again.');
           clearInterval(slowProgressInterval);
@@ -69,7 +67,6 @@ export const UploadLogoRenderer = (params) => {
       });
 
       params.data.Logo = '';
-      location.reload();
     } catch (exception) {
       console.log(exception);
     }
@@ -93,6 +90,7 @@ Suitable image formats are jpg, tiff, svg, and png."
         allowedFormats={['image/jpg', 'image/png', 'image/tiff', 'image/svg']}
         onClose={() => {
           setOpenUploadModal(false);
+          fetchProductionCompanies();
         }}
         maxFileSize={500 * 1024} // 0.5MB
         onSave={onSave}

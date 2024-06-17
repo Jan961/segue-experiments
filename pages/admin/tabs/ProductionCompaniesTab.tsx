@@ -133,7 +133,7 @@ export default function ProductionCompaniesTab() {
           </div>
         </div>
         <ProductionCompaniesTable
-          columnDefs={productionCompaniesColDefs}
+          columnDefs={productionCompaniesColDefs(fetchProductionCompanies)}
           rowData={productionCompanies}
           styleProps={styleProps}
           onChange={onCellUpdate}
