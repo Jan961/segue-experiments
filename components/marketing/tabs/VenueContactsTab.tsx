@@ -77,12 +77,12 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       // update fields
     } else if (variant === 'update') {
       const updatedRow = mapVenueContactToPrisma(data.updatedRow);
-      const dataToUpd = { ...updatedRow, VenueId: booking.VenueId };
+      const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId };
 
       await fetchData({
         url: '/api/marketing/venueContacts/update',
         method: 'POST',
-        data: dataToUpd,
+        data: dataToUpdate,
       });
 
       // delete venue contact
