@@ -35,7 +35,8 @@ export const formatRowsForPencilledBookings = (values) => {
 export const formatRowsForMultipeBookingsAtSameVenue = (values) => {
   const groupedByVenue = values.reduce((acc, item) => {
     if (item.venue) {
-      acc[item.venue] !== undefined ? (acc[item.venue] = acc[item.venue] + 1) : (acc[item.venue] = 1);
+      const key = `${item.venue}_${item.runTag}`;
+      acc[key] !== undefined ? (acc[key] = acc[key] + 1) : (acc[key] = 1);
     }
 
     return acc;
@@ -45,8 +46,10 @@ export const formatRowsForMultipeBookingsAtSameVenue = (values) => {
     .filter(([_, v]: [string, number]) => v > 1)
     .map((arr) => arr[0]);
 
-  const updated = values.map((r) =>
-    venuesWithMultipleBookings.includes(r.venue) ? { ...r, venueHasMultipleBookings: true } : r,
-  );
+  const updated = values.map((r) => ({
+    ...r,
+    venueHasMultipleBookings: venuesWithMultipleBookings.includes(`${r.venue}_${r.runTag}`),
+  }));
+
   return updated;
 };
