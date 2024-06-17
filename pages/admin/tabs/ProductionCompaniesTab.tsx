@@ -107,7 +107,8 @@ export default function ProductionCompaniesTab() {
     if (params.data.Logo != null) {
       const columnWidth = 200;
       const ratio = params.data.Logo.width / columnWidth;
-      return Math.ceil(params.data.Logo.height / ratio);
+      const calculatedHeight = Math.ceil(params.data.Logo.height / ratio);
+      return calculatedHeight >= 50 ? calculatedHeight : 50;
     }
     return 50;
   };
