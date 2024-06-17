@@ -49,7 +49,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showAddTask, setShowAddTask] = useState<boolean>(false);
   const [showEmptyProductionModal, setShowEmptyProductionModal] = useState<boolean>(false);
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
-  const [isProductionEmpty, setIsProductionEmpty] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
 
@@ -77,11 +76,9 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       filteredProductions.forEach((production) => {
         if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
           setShowEmptyProductionModal(true);
-          setIsProductionEmpty(true);
           setProductionId(production.Id);
         } else {
           setShowEmptyProductionModal(false);
-          setIsProductionEmpty(false);
           setProductionId(null);
         }
       });
@@ -97,11 +94,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   };
 
   const handleModalConditions = () => {
-    if (isProductionEmpty && isFilterMatchingInitialState()) {
-      setShowNewProduction(true);
-    } else {
-      setShowAddTask(true);
-    }
+    setShowNewProduction(true);
   };
 
   const handleNewProductionTaskSubmit = (val: string) => {

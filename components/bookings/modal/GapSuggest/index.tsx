@@ -39,7 +39,11 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
     const filteredRows = [];
     for (const row of rows || []) {
       if (!selectedVenueIds.includes(row.VenueId)) {
-        filteredRows.push({ ...row, TravelTime: formatMinutes(row.MinsFromStart + row.MinsFromEnd), Miles: row.MinsFromStart + row.MinsFromEnd });
+        filteredRows.push({
+          ...row,
+          TravelTime: formatMinutes(row.MinsFromStart + row.MinsFromEnd),
+          Miles: row.MinsFromStart + row.MinsFromEnd,
+        });
       }
     }
     return filteredRows.sort((a, b) => a.MinsFromStart - b.MinsFromStart);
@@ -130,7 +134,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
             variant="primary"
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName={'excel'}
+            sufixIconName="excel"
           />
           <Button
             onClick={onOkClick}

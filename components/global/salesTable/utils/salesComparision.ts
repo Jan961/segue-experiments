@@ -110,7 +110,6 @@ const salesComparison = async (data: SalesComp) => {
     // Push the main column group onto the tempColDef array
     tempColDef.push(mainColGroup);
   });
-
   // Processing the row data
   data.tableData.forEach((sale) => {
     tempRowData.push({

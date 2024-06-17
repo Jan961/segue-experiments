@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { filterState } from 'state/booking/filterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { rowsSelector } from 'state/booking/selectors/rowsSelector';
-import Fuse from 'fuse.js';
+import fuseFilter from 'utils/fuseFilter';
 /*
  * Hook responsible for returning filtered and sorted Bookings
  */
@@ -27,22 +27,9 @@ const useBookingFilter = () => {
         (filter.status === 'all' || status === filter.status)
       );
     });
-    const fuseOptions = {
-      includeScore: true,
-      includeMatches: true,
-      isCaseSensitive: false,
-      shouldSort: true,
-      useExtendedSearch: true,
-      threshold: 0.3,
-      keys: ['town', 'venue'],
-    };
-    if (filter.venueText !== '') {
-      const fuse = new Fuse(filteredRowList, fuseOptions);
-      filteredRowList = fuse
-        .search(filter.venueText)
-        .map((item) => item.item)
-        .reverse();
-    }
+
+    if (filter.venueText) filteredRowList = fuseFilter(filteredRowList, filter.venueText, ['town', 'venue']);
+
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
     });

@@ -57,8 +57,7 @@ SELECT
   ) AS `TotalHoldSeats`,
   `LatestTotals`.`SetSalesFiguresDate` AS `LastFiguresDate`,
   `LatestTotals`.`Seats` AS `LastFiguresSeats`,
-  `LatestTotals`.`Value` AS `LastFiguresValue`,
-  `LatestTotals`.`SaleTypeName` AS `LastSaleTYpeName`
+  `LatestTotals`.`Value` AS `LastFiguresValue`
 FROM
   (
     (

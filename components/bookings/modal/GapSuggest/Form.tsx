@@ -62,12 +62,12 @@ const Form = ({ onSave }: FormProps) => {
   return (
     <form>
       <div className="grid grid-cols-12 gap-7">
-        <div className="col-span-2"></div>
+        <div className="col-span-2" />
         <div className="col-span-8 text-center">Mileage</div>
-        <div className="col-span-2"></div>
+        <div className="col-span-2" />
       </div>
       <div className="grid grid-cols-12 gap-7 my-1">
-        <div className="col-span-2"></div>
+        <div className="col-span-2" />
         <div className="col-span-4 text-center">Min</div>
         <div className="col-span-3 text-center">Max</div>
         <div className="col-span-3 text-right">Max Travel Time</div>

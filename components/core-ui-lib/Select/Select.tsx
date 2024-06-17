@@ -1,5 +1,4 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
-import { matchSorter } from 'match-sorter';
 import WindowedSelect, {
   components,
   StylesConfig,
@@ -13,7 +12,7 @@ import { WithTestId } from 'types';
 import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
-
+import fuseFilter from 'utils/fuseFilter';
 const Option = (props: OptionProps) => {
   return <components.Option className="w-full" {...props} />;
 };
@@ -155,12 +154,8 @@ export default forwardRef(function Select(
     [customStyles],
   );
 
-  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>([]);
+  const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(null);
   const [selectedOption, setSelectedOption] = useState<SelectOption | SelectOption[]>({ text: '', value: '' });
-
-  useEffect(() => {
-    setFilteredOptions(options);
-  }, [options]);
 
   const handleOptionSelect = (o: SelectOption, actionMeta: ActionMeta<SelectOption>) => {
     const { action, option } = actionMeta;
@@ -238,7 +233,11 @@ export default forwardRef(function Select(
         ref={ref}
         className="w-full"
         onInputChange={(inputValue) => {
-          if (inputValue) setFilteredOptions(matchSorter(options, inputValue, { keys: ['text'] }));
+          if (inputValue) {
+            setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
+          } else {
+            setFilteredOptions(options);
+          }
         }}
         onChange={handleOptionSelect}
         value={selectedOption}
@@ -247,13 +246,19 @@ export default forwardRef(function Select(
         windowThreshold={50}
         isDisabled={disabled}
         closeMenuOnSelect={closeMenuOnSelect}
-        options={filteredOptions}
+        options={options}
         styles={colourStyles}
         placeholder={placeholder}
         isSearchable={isSearchable}
         isClearable={isClearable}
         isMulti={isMulti}
         hideSelectedOptions={false}
+        filterOption={(option, _inputValue) => {
+          if (filteredOptions === null) {
+            return true;
+          }
+          return filteredOptions.map((item) => item.value).includes(option.value);
+        }}
       />
     </div>
   );

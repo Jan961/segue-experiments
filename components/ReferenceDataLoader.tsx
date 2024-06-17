@@ -1,30 +1,22 @@
 import { useEffect } from 'react';
 import axios from 'axios';
 import { useSetRecoilState } from 'recoil';
-
-import { productionsList } from 'state/productions/productionsState';
+import { globalState } from 'state/global/globalState';
 
 export default function ReferenceDataLoader() {
-  const setProductionsList = useSetRecoilState(productionsList);
-
-  const getProductions = async () => {
-    const values = await axios.get(`/api/productions/read/productionsList`);
-    return values;
-  };
-
+  const setState = useSetRecoilState(globalState);
   const getReferenceData = async () => {
-    const { data: accountId } = await axios.get(`/api/account/read`);
-    console.log(accountId);
-    // TODO Save account Id in global state so we don't have keep fetching from Prisma everytime
-
-    const productionsResponse = await getProductions();
-
-    setProductionsList({ values: productionsResponse.data.productions });
+    try {
+      const { data } = await axios(`/api/email/templates/list`);
+      setState((prev) => ({ ...prev, emailTemplates: data }));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
     getReferenceData();
   }, []);
 
-  return <div></div>;
+  return <div />;
 }

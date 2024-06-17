@@ -7,6 +7,7 @@ import { isThisWeek } from 'date-fns';
 import { userState } from 'state/account/userState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { isNullOrEmpty } from 'utils';
+import fuseFilter from 'utils/fuseFilter';
 
 const generateOptions = (weekData) => {
   return Object.entries(weekData).map(([key]) => ({
@@ -18,7 +19,6 @@ const generateOptions = (weekData) => {
 export const getStatusBool = (taskStatus: string, filterStatus: string, taskDueDate: string) => {
   const dueDate = new Date(taskDueDate);
   const today = new Date();
-  console.log(filterStatus, taskStatus);
   switch (filterStatus) {
     case 'inProgress':
     case 'complete':
@@ -45,7 +45,7 @@ const useTasksFilter = () => {
 
   const usersList = useMemo(() => {
     if (isNullOrEmpty(users)) {
-      return {};
+      return [];
     }
 
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -54,6 +54,11 @@ const useTasksFilter = () => {
     }));
   }, [users]);
 
+  const userIdToNameMap = usersList.reduce((acc, user) => {
+    acc[user.value] = user.text;
+    return acc;
+  }, {});
+
   const filteredProductions = useMemo(() => {
     return productions
       .filter((productionItem) => {
@@ -61,25 +66,39 @@ const useTasksFilter = () => {
         return productionItem.Id === selected;
       })
       .map((productionData) => {
+        const tasksFilteredByAssignedUser = productionData.Tasks.map((task) => {
+          return {
+            ...task,
+            userName: task.AssignedToUserId !== -1 ? userIdToNameMap[task.AssignedToUserId] : null,
+          };
+        });
+
+        const productionTasks = filters.taskText
+          ? fuseFilter(tasksFilteredByAssignedUser, filters.taskText, [
+              'Name',
+              'Notes',
+              'userName',
+              'StartByWeekNum',
+              'CompleteByWeekNum',
+            ])
+          : productionData.Tasks;
         return {
           ...productionData,
-          Tasks: productionData.Tasks.filter(({ Name, TaskName, AssignedToUserId, Notes, CompleteDate, Status }) => {
-            return (
-              (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
-              (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
-              (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
-              (filters.assignee === -1 || AssignedToUserId === filters.assignee) &&
-              (!filters.taskText ||
-                [Name, TaskName, Notes]
-                  .map((text) => text?.toLowerCase?.())
-                  .some((text) => text?.includes?.(filters.taskText.toLowerCase())) ||
-                getFilteredUsers(usersList, AssignedToUserId, filters.taskText))
-            );
-          }).map((task) => ({
-            ...task,
-            Status: calculateTaskStatus(task.Progress || 0),
-            weekOptions: generateOptions(productionData.weekNumToDateMap),
-          })),
+
+          Tasks: productionTasks
+            .filter(({ AssignedToUserId, CompleteDate, Status }) => {
+              return (
+                (!filters.endDueDate || new Date(CompleteDate) < new Date(filters.endDueDate)) &&
+                (!filters.startDueDate || new Date(CompleteDate) > new Date(filters.startDueDate)) &&
+                (!filters.status || filters.status === 'all' || getStatusBool(Status, filters.status, CompleteDate)) &&
+                (filters.assignee === -1 || AssignedToUserId === filters.assignee)
+              );
+            })
+            .map((task) => ({
+              ...task,
+              Status: calculateTaskStatus(task.Progress || 0),
+              weekOptions: generateOptions(productionData.weekNumToDateMap),
+            })),
         };
       });
   }, [
@@ -92,7 +111,6 @@ const useTasksFilter = () => {
     filters.taskText,
     usersList,
   ]);
-
   return { filteredProductions };
 };
 

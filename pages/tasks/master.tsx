@@ -14,6 +14,10 @@ import Loader from 'components/core-ui-lib/Loader';
 import { useRouter } from 'next/router';
 import AddTask from 'components/tasks/modals/AddTask';
 import Filters from 'components/tasks/master/Filters';
+import NewProductionTask from 'components/tasks/modals/NewProductionTask';
+import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
+import MasterTaskList from 'components/tasks/modals/MasterTaskList';
+import NotesPopup from 'components/tasks/NotesPopup';
 
 export const LoadingOverlay = () => (
   <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
@@ -37,6 +41,10 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const [confirm, setConfirm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
+  const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
+  const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const [rowIndex, setRowIndex] = useState<number | null>(null);
 
@@ -54,6 +62,9 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     } else if (e.column.colId === 'edit') {
       setShowAddTask(!showAddTask);
       setCurrentTask(e.data);
+    } else if (e.column.colId === 'Notes') {
+      setCurrentTask(e.data);
+      setShowModal(true);
     }
   };
 
@@ -73,10 +84,50 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     }
   };
 
+  const handleNewProductionTaskModal = () => {
+    setShowNewProduction(false);
+  };
+
+  const handleNewProductionTaskSubmit = (val: string) => {
+    handleNewProductionTaskModal();
+    if (val === 'taskManual') setShowAddTask(true);
+    else if (val === 'master') setIsMasterTaskList(true);
+    else setIsProductionTaskList(true);
+  };
+
   const handleShowTask = () => {
-    setShowAddTask(!showAddTask);
-    if (showAddTask) {
+    setShowNewProduction(true);
+  };
+
+  const handleMasterListClose = (val: string) => {
+    setIsMasterTaskList(false);
+    if (val === 'data-added') {
       router.replace(router.asPath);
+    }
+  };
+
+  const handleProductionListClose = (val: string) => {
+    setIsProductionTaskList(false);
+    setIsMasterTaskList(false);
+    if (val === 'data-added') {
+      router.replace(router.asPath);
+    }
+  };
+
+  const onRowDoubleClicked = (e) => {
+    setCurrentTask(e.data);
+    setShowAddTask(!showAddTask);
+  };
+
+  const handleSaveNote = async (value: string) => {
+    setShowModal(false);
+    const updatedTask = { ...currentTask, Notes: value };
+    setIsLoading(true);
+    try {
+      await axios.put(`/api/tasks/master/update/`, updatedTask);
+      router.replace(router.asPath);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,17 +136,17 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
       <div className="mb-3">
         <Filters handleShowTask={handleShowTask} />
       </div>
-      <div className="mb-10">
-        <Table
-          ref={tableRef}
-          onCellClicked={handleCellClick}
-          columnDefs={columnDefs}
-          rowData={filteredTasks}
-          styleProps={styleProps}
-        />
-      </div>
+      <Table
+        ref={tableRef}
+        onCellClicked={handleCellClick}
+        columnDefs={columnDefs}
+        rowData={filteredTasks}
+        styleProps={styleProps}
+        onRowDoubleClicked={onRowDoubleClicked}
+      />
+
       <ConfirmationDialog
-        variant={'delete'}
+        variant="delete"
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
@@ -103,6 +154,19 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
       />
       {isLoading && <LoadingOverlay />}
       <AddTask visible={showAddTask} isMasterTask onClose={handleShowTask} task={currentTask} />
+      <NewProductionTask
+        visible={showNewProduction}
+        onClose={handleNewProductionTaskModal}
+        handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
+      />
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} isMaster />
+      <ProductionTaskList visible={isProductionTaskList} onClose={handleProductionListClose} isMaster />
+      <NotesPopup
+        show={showModal}
+        currentTask={currentTask}
+        onSave={handleSaveNote}
+        onCancel={() => setShowModal(false)}
+      />
     </Layout>
   );
 };

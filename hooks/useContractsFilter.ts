@@ -4,6 +4,7 @@ import { contractsFilterState } from 'state/contracts/contractsFilterState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { contractsRowsSelector } from 'state/contracts/selectors/contractsRowsSelector';
 import { contractsStatusMap } from 'config/contracts';
+import fuseFilter from '../utils/fuseFilter';
 /*
  * Hook responsible for returning filtered and sorted Bookings
  */
@@ -12,11 +13,12 @@ const useContractsFilter = () => {
 
   const { selected, includeArchived, productions } = useRecoilValue(productionJumpState);
   const { rows } = useRecoilValue(contractsRowsSelector);
+
   const filteredRows = useMemo(() => {
     const archivedProductionIds = productions
       .filter((production) => production.IsArchived)
       .map((production) => production.Id);
-    const filteredRowList = rows.filter(({ dateTime, productionId, contractStatus, venue, town }) => {
+    let filteredRowList = rows.filter(({ dateTime, productionId, contractStatus }) => {
       if (!productionId || (!includeArchived && archivedProductionIds.includes(productionId))) {
         return false;
       }
@@ -27,13 +29,12 @@ const useContractsFilter = () => {
         (filter.contractStatusDropDown === 'all' ||
           contractStatus === contractsStatusMap[filter.contractStatusDropDown]) &&
         (filter.dealMemoStatusDropDown === 'all' ||
-          contractStatus === contractsStatusMap[filter.dealMemoStatusDropDown]) &&
-        (!filter.contractText ||
-          contractStatus?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()) ||
-          venue?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()) ||
-          town?.toLowerCase?.().includes?.(filter.contractText?.toLowerCase()))
+          contractStatus === contractsStatusMap[filter.dealMemoStatusDropDown])
       );
     });
+    if (filter.contractText)
+      filteredRowList = fuseFilter(filteredRowList, filter.contractText, ['contractStatus', 'venue', 'town']);
+
     return filteredRowList.sort((a, b) => {
       return new Date(a.dateTime).valueOf() - new Date(b.dateTime).valueOf();
     });

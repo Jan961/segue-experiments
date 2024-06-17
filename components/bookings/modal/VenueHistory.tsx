@@ -16,6 +16,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import ExportModal from 'components/core-ui-lib/ExportModal';
 import { exportToExcel, exportToPDF } from 'utils/export';
 import { venueOptionsSelector } from 'state/booking/selectors/venueOptionsSelector';
+import axios from 'axios';
 
 interface VenueHistoryProps {
   visible: boolean;
@@ -132,11 +133,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
       return;
     }
     setLoading(true);
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/archived',
-      method: 'POST',
-      data: { bookingIds: selectedBookings.map((obj) => obj.bookingId) },
-    });
+
+    const data = (
+      await axios.post('/api/marketing/sales/read/archived', {
+        bookingIds: selectedBookings.map((obj) => obj.bookingId),
+      })
+    )?.data;
 
     if (Array.isArray(data) && data.length !== 0) {
       const salesComp = data as Array<SalesComparison>;
@@ -151,18 +153,20 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
   const getSalesSnapshot = async (bookingId: string) => {
     setErrorMessage('');
     setLoading(true);
-    const data = await fetchData({
-      url: '/api/marketing/sales/read/' + bookingId,
-      method: 'POST',
-    });
 
-    if (Array.isArray(data) && data.length > 0) {
-      const salesData = data as Array<SalesSnapshot>;
-      setSalesSnapData(salesData);
-      toggleModal('salesSnapshot');
-    } else {
-      setLoading(false);
-      setErrorMessage('No sales to show for this production');
+    try {
+      const { data } = await axios.post('/api/marketing/sales/read/' + bookingId);
+
+      if (Array.isArray(data) && data.length > 0) {
+        const salesData = data as Array<SalesSnapshot>;
+        setSalesSnapData(salesData);
+        toggleModal('salesSnapshot');
+      } else {
+        setLoading(false);
+        setErrorMessage('No sales to show for this production');
+      }
+    } catch (exception) {
+      console.log(exception);
     }
   };
 
@@ -210,14 +214,13 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         }
 
         // if length of tempBookings is >= 2, errorMessage can be removed
-        if (tempBookings.length >= 2) {
+        if (tempBookings.length >= 1) {
           setErrorMessage('');
         }
         setSelBookings(tempBookings);
       }
     }
   };
-
   return (
     <div>
       <PopupModal
@@ -334,7 +337,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
             />
-            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={() => setShowResults(false)} />
+            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
           </div>
         </TableWrapper>
       </PopupModal>
