@@ -38,7 +38,6 @@ export default function ProductionCompaniesTab() {
     setProductionCompanies((prev) => [emptyData, ...prev]);
   };
   const onCellClicked = async (e) => {
-    console.log(e);
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
       if (productionCompanies.length <= 1) {
@@ -108,7 +107,6 @@ export default function ProductionCompaniesTab() {
     }
   };
   const getRowHeight = (params) => {
-    // ideally be able to take the logo height from the table if there is a column to store the height
     if (params.data.Logo != null) {
       const columnWidth = 200;
       const ratio = params.data.Logo.width / columnWidth;

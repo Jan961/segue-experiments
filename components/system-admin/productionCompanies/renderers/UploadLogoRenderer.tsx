@@ -65,8 +65,6 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
         headers: {},
         body: JSON.stringify({ Id: params.data.Id }),
       });
-
-      params.data.Logo = '';
     } catch (exception) {
       console.log(exception);
     }
