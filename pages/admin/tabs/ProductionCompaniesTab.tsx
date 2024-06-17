@@ -4,6 +4,7 @@ import Button from 'components/core-ui-lib/Button';
 import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
 import { PopupModal } from 'components/core-ui-lib';
+import axios from 'axios';
 export default function ProductionCompaniesTab() {
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
   const [showErrorModal, setShowErrorModal] = useState<boolean>();
@@ -57,15 +58,13 @@ export default function ProductionCompaniesTab() {
   };
   const deleteProductionCompany = async () => {
     if (selectedProdCompany != null) {
-      const response = await fetch('/api/productionCompanies/delete', {
-        method: 'POST',
-        headers: {},
+      const response = await axios.post('/api/productionCompanies/delete', {
         body: JSON.stringify({ Id: selectedProdCompany }),
       });
-      if (response.ok) {
+      if (!(response.status >= 400 && response.status <= 499)) {
         await fetchProductionCompanies();
       } else {
-        setErrorMessage((await response.json())?.errorMessage);
+        setErrorMessage((await response.data)?.errorMessage);
         setShowErrorModal(true);
       }
       setSelectedProdCompany(null);
@@ -74,36 +73,34 @@ export default function ProductionCompaniesTab() {
   };
 
   const onCellUpdate = async (e) => {
-    const { rowIndex } = e;
-    const productions = productionCompanies;
-    productions[rowIndex] = { ...e.data, Id: productions[rowIndex].Id, existsInDB: productions[rowIndex].existsInDB };
-    setProductionCompanies(productions);
-    if (productions[rowIndex].existsInDB) {
-      const data = e.data;
-      const response = await fetch('/api/productionCompanies/update', {
-        method: 'POST',
-        headers: {},
-        body: JSON.stringify({ ...data, Id: productions[rowIndex].Id }),
-      });
-      if (!response.ok) {
-        setErrorMessage((await response.json())?.errorMessage);
-        setShowErrorModal(true);
-      }
-    } else {
-      if (e.data.Name.length > 0) {
+    try {
+      const { rowIndex } = e;
+      const productions = productionCompanies;
+      productions[rowIndex] = { ...e.data, Id: productions[rowIndex].Id, existsInDB: productions[rowIndex].existsInDB };
+      setProductionCompanies(productions);
+      if (productions[rowIndex].existsInDB) {
         const data = e.data;
-        const response = await fetch('/api/productionCompanies/insert', {
-          method: 'POST',
-          headers: {},
-          body: JSON.stringify(data),
+        const response = await axios.post('/api/productionCompanies/update', {
+          body: JSON.stringify({ ...data, Id: productions[rowIndex].Id }),
         });
-        if (response.ok) {
-          await fetchProductionCompanies();
-        } else {
-          setErrorMessage((await response.json())?.errorMessage);
+        if (response.status >= 400 && response.status <= 499) {
+          setErrorMessage((await response.data)?.errorMessage);
           setShowErrorModal(true);
         }
+      } else {
+        if (e.data.Name.length > 0) {
+          const data = e.data;
+          const response = await axios.post('/api/productionCompanies/insert', { body: JSON.stringify(data) });
+          if (!(response.status >= 400 && response.status <= 499)) {
+            await fetchProductionCompanies();
+          } else {
+            setErrorMessage((await response.data)?.errorMessage);
+            setShowErrorModal(true);
+          }
+        }
       }
+    } catch (exception) {
+      console.log(exception);
     }
   };
   const getRowHeight = (params) => {

@@ -6,7 +6,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
-    const { Name, WebSite, Id } = JSON.parse(req.body);
+    const { Name, WebSite, Id } = JSON.parse(req.body.body);
 
     const edited = await prisma.ProductionCompany.update({
       data: {
