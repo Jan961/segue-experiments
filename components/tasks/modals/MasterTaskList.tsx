@@ -14,7 +14,7 @@ import Loader from 'components/core-ui-lib/Loader';
 interface MasterTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
-  productionId: number;
+  productionId?: number;
 }
 
 const LoadingOverlay = () => (
@@ -69,7 +69,6 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
   };
 
   const handleCancel = () => {
-    console.log(selectedRows);
     if (selectedRows.length > 0) {
       setConfirm(true);
     } else {
