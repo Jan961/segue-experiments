@@ -84,13 +84,6 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     }
   };
 
-  const handleShowTask = () => {
-    setShowAddTask(!showAddTask);
-    if (showAddTask) {
-      router.replace(router.asPath);
-    }
-  };
-
   const handleNewProductionTaskModal = () => {
     setShowNewProduction(false);
   };
@@ -100,6 +93,10 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     if (val === 'taskManual') setShowAddTask(true);
     else if (val === 'master') setIsMasterTaskList(true);
     else setIsProductionTaskList(true);
+  };
+
+  const handleShowTask = () => {
+    setShowNewProduction(true);
   };
 
   const handleMasterListClose = (val: string) => {
@@ -139,16 +136,14 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
       <div className="mb-3">
         <Filters handleShowTask={handleShowTask} />
       </div>
-      <div className="mb-10">
-        <Table
-          ref={tableRef}
-          onCellClicked={handleCellClick}
-          columnDefs={columnDefs}
-          rowData={filteredTasks}
-          styleProps={styleProps}
-          onRowDoubleClicked={onRowDoubleClicked}
-        />
-      </div>
+      <Table
+        ref={tableRef}
+        onCellClicked={handleCellClick}
+        columnDefs={columnDefs}
+        rowData={filteredTasks}
+        styleProps={styleProps}
+        onRowDoubleClicked={onRowDoubleClicked}
+      />
 
       <ConfirmationDialog
         variant="delete"
@@ -164,7 +159,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} />
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} isMaster />
       <ProductionTaskList visible={isProductionTaskList} onClose={handleProductionListClose} isMaster />
       <NotesPopup
         show={showModal}

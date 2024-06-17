@@ -2,7 +2,7 @@ import { MasterTask } from '@prisma/client';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getMaxTaskCode } from 'services/TaskService';
-import { checkAccess, getEmailFromReq } from 'services/userService';
+import { checkAccess, getEmailFromReq, getAccountId } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -15,6 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
+    const AccountId = await getAccountId(email);
 
     const { Code } = await getMaxTaskCode();
 
@@ -25,6 +26,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return {
         Code: updatedCode,
         Name: task.Name,
+        AccountId,
         Priority: task.Priority,
         Notes: task.Notes,
         AssignedToUserId: task.AssignedToUserId,

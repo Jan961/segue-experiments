@@ -15,6 +15,7 @@ interface MasterTaskListProps {
   visible: boolean;
   onClose: (val?: string) => void;
   productionId?: number;
+  isMaster?: boolean;
 }
 
 const LoadingOverlay = () => (
@@ -23,7 +24,7 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps) => {
+const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: MasterTaskListProps) => {
   const { users } = useRecoilValue(userState);
 
   const styleProps = { headerColor: tileColors.tasks };
@@ -79,28 +80,55 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
 
   const handleSubmit = async () => {
     setLoading(true);
-    try {
-      const endpoint = '/api/tasks/create/multiple/';
-      const tasksData = selectedRows.map((task: MasterTask) => {
-        return {
-          ProductionId: productionId,
-          Code: task.Code,
-          Name: task.Name,
-          CompleteByIsPostProduction: false,
-          StartByIsPostProduction: false,
-          StartByWeekNum: task.StartByWeekNum,
-          CompleteByWeekNum: task.CompleteByWeekNum,
-          AssignedToUserId: task.AssignedToUserId,
-          Progress: 0,
-          Priority: task.Priority,
-        };
-      });
-      await axios.post(endpoint, tasksData);
-      setLoading(false);
-      onClose('data-added');
-    } catch (error) {
-      setLoading(false);
-      console.error(error);
+    if (isMaster) {
+      try {
+        const tasksData = selectedRows.map((task: MasterTask) => {
+          return {
+            Code: task.Code,
+            Name: task.Name,
+            CompleteByIsPostProduction: false,
+            StartByIsPostProduction: false,
+            StartByWeekNum: task.StartByWeekNum,
+            CompleteByWeekNum: task.CompleteByWeekNum,
+            AssignedToUserId: task.AssignedToUserId,
+            Priority: task.Priority,
+            Notes: task.Notes,
+            TaskStartByIsPostProduction: false,
+            TaskCompleteByIsPostProduction: false,
+          };
+        });
+        const endpoint = '/api/tasks/master/multiple';
+        await axios.post(endpoint, tasksData);
+        setLoading(false);
+        onClose('data-added');
+      } catch (error) {
+        setLoading(false);
+        onClose();
+      }
+    } else {
+      try {
+        const endpoint = '/api/tasks/create/multiple/';
+        const tasksData = selectedRows.map((task: MasterTask) => {
+          return {
+            ProductionId: productionId,
+            Code: task.Code,
+            Name: task.Name,
+            CompleteByIsPostProduction: false,
+            StartByIsPostProduction: false,
+            StartByWeekNum: task.StartByWeekNum,
+            CompleteByWeekNum: task.CompleteByWeekNum,
+            AssignedToUserId: task.AssignedToUserId,
+            Progress: 0,
+            Priority: task.Priority,
+          };
+        });
+        await axios.post(endpoint, tasksData);
+        setLoading(false);
+        onClose('data-added');
+      } catch (error) {
+        setLoading(false);
+        console.error(error);
+      }
     }
   };
 
