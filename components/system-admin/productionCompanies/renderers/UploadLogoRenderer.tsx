@@ -53,7 +53,17 @@ export const UploadLogoRenderer = (params) => {
     }
   };
 
+  const handleDelete = async () => {
+    const response = await fetch('/api/productionCompanies/logo/delete', {
+      method: 'POST',
+      headers: {},
+      body: JSON.stringify({ Id: params.data.Id }),
+    });
+    console.log(response);
+  };
+
   if (openUploadModal) {
+    console.log(params.data);
     return (
       <UploadModal
         visible={openUploadModal}
@@ -65,6 +75,8 @@ export const UploadLogoRenderer = (params) => {
         }}
         maxFileSize={512 * 1024} // 0.5MB
         onSave={onSave}
+        value={{ imageUrl: params.data.Logo.currentSrc }}
+        customHandleFileDelete={handleDelete}
       />
     );
   }
