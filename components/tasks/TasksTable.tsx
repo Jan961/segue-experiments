@@ -38,6 +38,7 @@ export default function TasksTable({
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentTask, setCurrentTask] = useState(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -92,6 +93,18 @@ export default function TasksTable({
     }
   }, [rowData]);
 
+  const onRowDoubleClicked = (e) => {
+    setCurrentTask(e.data);
+    setIsEdit(true);
+  };
+
+  const handleClose = () => {
+    if (isEdit) setIsEdit(false);
+    else handleShowTask();
+  };
+
+  const modalData = isEdit ? { ...currentTask, ProductionId: productionId } : { ProductionId: productionId };
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
@@ -102,6 +115,7 @@ export default function TasksTable({
           tableHeight={tableHeight ? 234 : 0}
           onCellValueChange={onCellValueChange}
           onCellClicked={handleCellClick}
+          onRowDoubleClicked={onRowDoubleClicked}
           ref={tableRef}
         />
       </div>
@@ -116,7 +130,7 @@ export default function TasksTable({
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
-      <AddTask visible={showAddTask} onClose={handleShowTask} task={{ ProductionId: productionId }} />
+      <AddTask visible={isEdit || showAddTask} onClose={handleClose} task={modalData} />
     </>
   );
 }

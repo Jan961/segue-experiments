@@ -1,5 +1,12 @@
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 
+const getUser = (usersList, id) => {
+  const userData = usersList.filter((user) => user.value === id);
+
+  if (userData.length > 0) return userData[0].text;
+  return null;
+};
+
 export const getMasterTasksColumnDefs = (usersList = []) => {
   return [
     {
@@ -53,8 +60,8 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       headerName: 'Assigned to',
       field: 'AssignedToUserId',
       valueGetter: function (params) {
-        return params.data?.AssignedToUserId
-          ? usersList.filter((user) => user.value === params.data?.AssignedToUserId)[0].text
+        return params.data?.AssignedToUserId && usersList.length > 0
+          ? getUser(usersList, params.data?.AssignedToUserId)
           : null;
       },
       cellRenderer: DefaultCellRenderer,

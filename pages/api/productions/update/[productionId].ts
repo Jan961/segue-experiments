@@ -3,6 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { mapToPrismaFields } from '../create';
+import { pick } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const dto: Partial<ProductionDTO> = mapToPrismaFields(req.body);
@@ -23,6 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           Code: dto.Code,
           IsArchived: dto.IsArchived,
+          ...pick(dto, ['Code', 'IsArchived', 'SalesFrequency', 'SalesEmail']),
           ...(Image?.id && {
             File: {
               connect: {
