@@ -7,7 +7,6 @@ import { AddBookingsParams } from './interface/add.interface';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const bookingsData = req.body; // Assuming your body is already in the correct format
-    console.log('booking data is', bookingsData);
 
     let formattedBookings = mapNewBookingToPrismaFields(bookingsData);
     // check if we have run of dates
