@@ -71,7 +71,7 @@ export const makeRowTextBoldAndAllignLeft = ({
 
 // TODO - Issue with Performance Time
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { productionCode, fromDate, toDate, venue, productionId } = JSON.parse(req.body) || {};
+  const { productionCode, fromDate, toDate, venue, productionId } = req.body || {};
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
