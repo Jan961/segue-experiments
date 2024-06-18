@@ -99,20 +99,17 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
         });
 
         const currentBooking: BookingSelection = bookingData.find((booking) => {
-          return !(
-            router.query.ShowCode.toString() + router.query.ProductionCode.toString() !==
-            booking.FullProductionCode
-          );
+          return !(`${ShowCode}${ProductionCode}` !== booking.FullProductionCode);
         });
         const currentProduction = productions.find((prod) => {
-          return prod.ShowCode === router.query.ShowCode.toString() && prod.Code === router.query.ProductionCode;
+          return prod.ShowCode === ShowCode && prod.Code === ProductionCode;
         });
 
         setSelectedBookings([
           {
             bookingId: currentBooking.BookingId,
             order: 1,
-            prodCode: router.query.ProductionCode.toString(),
+            prodCode: ProductionCode,
             prodName: currentProduction.ShowCode + currentProduction.Code + ' ' + currentProduction.ShowName,
             numPerfs: currentBooking.PerformanceCount,
           },
