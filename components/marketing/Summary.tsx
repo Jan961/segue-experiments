@@ -33,10 +33,11 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   }));
 
   const formatCost = (amount: number) => {
+    console.log(amount);
     if (amount === 0) {
       return currency.symbol + '-';
     } else {
-      return currency.symbol + amount.toFixed(2);
+      return currency.symbol + parseFloat(amount.toString()).toFixed(2);
     }
   };
 
@@ -99,7 +100,7 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
     },
     { id: 3, label: 'Gross Potential:', data: formatCost(info.GrossPotential) },
     { id: 4, label: 'Avg Ticket Price:', data: formatCost(info.AvgTicketPrice) },
-    { id: 5, label: 'Booking %:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-' },
+    { id: 5, label: 'Booking:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-%' },
     { id: 6, label: 'Capacity:', data: numeral(info.Capacity).format('0,0') || '-' },
     { id: 7, label: 'Perf(s):', data: summary?.Performances?.length.toString() },
     { id: 8, label: 'Total Seats:', data: numeral(info.Seats).format('0,0') || '-' },
