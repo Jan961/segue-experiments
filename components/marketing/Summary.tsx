@@ -6,6 +6,8 @@ import { LoadingTab } from './tabs/LoadingTab';
 import { SummaryResponseDTO } from 'pages/api/marketing/summary/[BookingId]';
 import classNames from 'classnames';
 import SummaryRow from './SummaryRow';
+import { useRecoilValue } from 'recoil';
+import { currencyState } from 'state/marketing/currencyState';
 
 export interface SummaryRef {
   resetData: () => void;
@@ -15,20 +17,11 @@ export interface SummaryProps {
   bookingId: string;
 }
 
-export const formatCurrency = (amount: number, currency: string) => {
-  const formatter = new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: currency || 'GBP',
-    minimumFractionDigits: 0,
-  });
-
-  return formatter.format(amount);
-};
-
 const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   const [summary, setSummary] = useState<Partial<SummaryResponseDTO>>({});
   const [loading, setLoading] = useState(false);
   const [summaryAvail, setSummaryAvail] = useState(false);
+  const currency = useRecoilValue(currencyState);
 
   const boldText = 'text-base font-bold text-primary-input-text';
   const normalText = 'text-base font-normal text-primary-input-text';
@@ -38,6 +31,14 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
       setSummaryAvail(false);
     },
   }));
+
+  const formatCost = (amount: number) => {
+    if (amount === 0) {
+      return currency.symbol + '-';
+    } else {
+      return currency.symbol + amount.toFixed(2);
+    }
+  };
 
   useEffect(() => {
     const search = async () => {
@@ -71,7 +72,6 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
 
   if (!summary?.Info) return null;
 
-  const currency = summary?.Info?.VenueCurrencyCode;
   const info = summary?.Info;
   const notes = summary?.Notes;
 
@@ -94,11 +94,11 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
     { id: 1, label: 'Total Seats Sold:', data: numeral(info.SeatsSold).format('0,0') || '-' },
     {
       id: 2,
-      label: `Total Sales ${currency}:`,
-      data: info.SalesValue ? formatCurrency(info.SalesValue, currency) : '-',
+      label: `Total Sales:`,
+      data: formatCost(info.SalesValue),
     },
-    { id: 3, label: 'Gross Potential:', data: formatCurrency(info.GrossPotential, currency) },
-    { id: 4, label: 'AVG Ticket Price:', data: formatCurrency(info.AvgTicketPrice, currency) },
+    { id: 3, label: 'Gross Potential:', data: formatCost(info.GrossPotential) },
+    { id: 4, label: 'Avg Ticket Price:', data: formatCost(info.AvgTicketPrice) },
     { id: 5, label: 'Booking %:', data: info.seatsSalePercentage ? `${info.seatsSalePercentage}%` : '-' },
     { id: 6, label: 'Capacity:', data: numeral(info.Capacity).format('0,0') || '-' },
     { id: 7, label: 'Perf(s):', data: summary?.Performances?.length.toString() },
