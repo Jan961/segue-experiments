@@ -33,23 +33,38 @@ export const formatRowsForPencilledBookings = (values) => {
 };
 
 export const formatRowsForMultipeBookingsAtSameVenue = (values) => {
-  const groupedByVenue = values.reduce((acc, item) => {
+  const groupedByVenueAndRunTag = values.reduce((acc, item) => {
     if (item.venue) {
       const key = `${item.venue}_${item.runTag}`;
-      acc[key] !== undefined ? (acc[key] = acc[key] + 1) : (acc[key] = 1);
+      acc[key] !== undefined ? acc[key].push(item) : (acc[key] = [item]);
     }
 
     return acc;
   }, {});
 
-  const venuesWithMultipleBookings = Object.entries(groupedByVenue)
-    .filter(([_, v]: [string, number]) => v > 1)
-    .map((arr) => arr[0]);
+  const venuesWithMultipleBookingsExceptRunOfDates: any = Object.entries(groupedByVenueAndRunTag)
+    .filter(([_, v]: [string, Array<any>]) => v.length <= 1)
+    .map((arr) => arr[1])
+    .flat();
 
-  const updated = values.map((r) => ({
-    ...r,
-    venueHasMultipleBookings: venuesWithMultipleBookings.includes(`${r.venue}_${r.runTag}`),
-  }));
+  const groupedByVenue = venuesWithMultipleBookingsExceptRunOfDates.reduce((acc, item) => {
+    if (item.venue) {
+      const key = `${item.venue}`;
+      acc[key] !== undefined ? acc[key].push(item) : (acc[key] = [item]);
+    }
+
+    return acc;
+  }, {});
+
+  const venuesWithMultipleBookings: any = Object.entries(groupedByVenue)
+    .filter(([_, v]: [string, Array<any>]) => v.length > 1)
+    .map((arr) => arr[1])
+    .flat();
+
+  const updated = values.map((r) => {
+    const venueHasMultipleBookings = venuesWithMultipleBookings.find(({ Id }) => r.Id === Id) !== undefined;
+    return { ...r, venueHasMultipleBookings };
+  });
 
   return updated;
 };
