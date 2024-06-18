@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
-import { exportBookingSchedule, exportMasterplanReport, onScheduleReport } from './request';
-import { useRecoilValue } from 'recoil';
-import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import { exportBookingSchedule, onScheduleReport } from './request';
 import { notify } from 'components/core-ui-lib/Notifications';
+import MasterPlanReportModal from './MasterPlanReportModal';
+import { useRecoilValue } from 'recoil';
+import BookingHelper from 'utils/booking';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 interface BookingReportProps {
   visible: boolean;
@@ -14,8 +16,15 @@ interface BookingReportProps {
 }
 
 export const BookingReports = ({ visible = false, onClose, productionId }: BookingReportProps) => {
+  const { productions } = useRecoilValue(productionJumpState);
+  const lastShowDate = useMemo(() => {
+    const helper = new BookingHelper({});
+    const { end } = helper.getRangeFromDateBlocks(productions);
+    return end;
+  }, [productions]);
+
   const [open, setOpen] = useState<boolean>(visible);
-  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
+  const [showMasterPlanReportModal, setShowMasterPlanReportModal] = useState(false);
 
   useEffect(() => {
     setOpen(visible);
@@ -38,11 +47,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         });
         break;
       case 'masterPlan':
-        notify.promise(exportMasterplanReport(scheduleStart, scheduleEnd), {
-          loading: 'Generating master plan report',
-          success: 'Master plan report downloaded successfully',
-          error: 'Error generating master plan report',
-        });
+        setShowMasterPlanReportModal(true);
     }
   };
 
@@ -91,6 +96,13 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           sufixIconName="excel"
         />
       </div>
+      {showMasterPlanReportModal && (
+        <MasterPlanReportModal
+          endDate={lastShowDate}
+          visible={showMasterPlanReportModal}
+          onClose={() => setShowMasterPlanReportModal(false)}
+        />
+      )}
     </PopupModal>
   );
 };
