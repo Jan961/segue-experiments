@@ -1,6 +1,6 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import fuseFilter from '../../../utils/fuseFilter';
+import fuseFilter from 'utils/fuseFilter';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { country, town, productionId, searchQuery, limit } = req.body;
