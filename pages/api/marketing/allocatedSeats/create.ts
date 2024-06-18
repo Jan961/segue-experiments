@@ -24,10 +24,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Seats: data.Seats,
         Comments: data.Comments,
         RequestedBy: data.RequestedBy,
-        ArrangedBy: data.ArrangedById,
         VenueConfirmationNotes: data.VenueConfirmationNotes,
         TicketHolderEmail: data.TicketHolderEmail,
         SeatsAllocated: data.SeatsAllocated,
+        AccountUser: {
+          connect: {
+            Id: data.ArrangedById,
+          },
+        },
       },
     });
     res.status(200).json({});

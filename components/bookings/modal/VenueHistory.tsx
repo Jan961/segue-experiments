@@ -172,6 +172,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleBtnBack = (type: string) => {
     setLoading(false);
+    setSelBookings([]);
     if (type === 'salesComparison') {
       setShowResults(false);
       setShowCompSelect(true);
@@ -322,24 +323,23 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
               data={salesCompData}
             />
           )}
-
-          <div className="float-right flex flex-row mt-5 py-2">
-            <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
-
-            {loading && <Spinner size="sm" className="mr-3" />}
-
-            <Button className="w-32" variant="secondary" text="Back" onClick={() => handleBtnBack('salesComparison')} />
-            <Button
-              className="ml-4 w-32"
-              onClick={() => setIsExportModalOpen(true)}
-              variant="primary"
-              text="Export"
-              iconProps={{ className: 'h-4 w-3' }}
-              sufixIconName="excel"
-            />
-            <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
-          </div>
         </TableWrapper>
+        <div className="float-right flex flex-row mt-5 py-2">
+          <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
+
+          {loading && <Spinner size="sm" className="mr-3" />}
+
+          <Button className="w-32" variant="secondary" text="Back" onClick={() => handleBtnBack('salesComparison')} />
+          <Button
+            className="ml-4 w-32"
+            onClick={() => setIsExportModalOpen(true)}
+            variant="primary"
+            text="Export"
+            iconProps={{ className: 'h-4 w-3' }}
+            sufixIconName="excel"
+          />
+          <Button className="ml-4 w-32 mr-1" variant="primary" text="Close" onClick={handleModalCancel} />
+        </div>
       </PopupModal>
       <ExportModal
         visible={isExportModalOpen}
