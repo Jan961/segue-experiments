@@ -112,8 +112,6 @@ export default function AllocatedSeatsModal({
       data = { ...data, Id: allocId };
     }
 
-    alert(JSON.stringify(data));
-
     onSave(data, parseInt(perfSelected), type);
   };
 

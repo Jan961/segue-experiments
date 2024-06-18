@@ -247,8 +247,8 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
               <div className="flex flex-row">
                 <div className="flex flex-col mr-3 mb-5">
                   <Checkbox
-                    id="Cast Rate Arranged"
-                    name="Cast Rate Arra"
+                    id="castRateArranged"
+                    name="castRateArranged"
                     checked={castRateArranged}
                     onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
                     className="w-[19px] h-[19px] mt-[2px]"

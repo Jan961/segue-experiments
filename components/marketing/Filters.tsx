@@ -15,6 +15,7 @@ import useAxios from 'hooks/useAxios';
 import { getWeekDayShort } from 'services/dateService';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
+import axios from 'axios';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -67,13 +68,10 @@ const Filters = () => {
 
   const getCurrency = async (bookingId) => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/currency/' + bookingId,
-        method: 'POST',
-      });
+      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
 
-      if (typeof data === 'object') {
-        const currencyObject = data as { currency: string };
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
         setCurrency({ symbol: currencyObject.currency });
       }
     } catch (error) {

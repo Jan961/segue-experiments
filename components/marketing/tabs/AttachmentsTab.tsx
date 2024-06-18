@@ -7,6 +7,7 @@ import { attachmentsColDefs, styleProps } from '../table/tableConfig';
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { Spinner } from 'components/global/Spinner';
+import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
 
 interface AttachmentsTabProps {
   bookingId: string;
@@ -226,17 +227,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
                 visible={showUploadModal}
                 title={attachType + ' Attachment'}
                 info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-                allowedFormats={[
-                  'application/pdf',
-                  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                  'image/jpeg',
-                  'image/png',
-                  'image/gif',
-                  'image/bmp',
-                  'image/webp',
-                  'text/plain',
-                ]}
+                allowedFormats={attachmentMimeTypes.marketing}
                 onClose={() => setShowUploadModal(false)}
                 maxFileSize={5120 * 1024} // 5MB
                 onSave={onSave}

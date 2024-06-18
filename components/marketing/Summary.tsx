@@ -33,7 +33,6 @@ const Summary = forwardRef<SummaryRef, SummaryProps>((props, ref) => {
   }));
 
   const formatCost = (amount: number) => {
-    console.log(amount);
     if (amount === 0) {
       return currency.symbol + '-';
     } else {
