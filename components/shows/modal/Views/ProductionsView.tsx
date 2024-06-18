@@ -17,7 +17,7 @@ import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
-import { all } from 'radash';
+import { all, isArray } from 'radash';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -117,6 +117,22 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   }, [isAddRow, tableRef]);
 
+  function validateShowData(showData) {
+    for (const show of showData) {
+      if (
+        !show.DateBlock ||
+        show.DateBlock.length === 0 ||
+        !show.DateBlock[0].StartDate ||
+        !show.DateBlock[0].EndDate ||
+        !show.Code
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   const handleSaveAndClose = async () => {
     try {
       const gridApi = tableRef.current.getApi();
@@ -129,6 +145,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           editedRecords.push(rowNode.data);
         }
       });
+      const showData = [...newRecords, ...editedRecords];
+      const mandatoryFieldsValidation: boolean = validateShowData(showData);
+      if (!mandatoryFieldsValidation) {
+        notify.warning(ToastMessages.requiredFieldsWarning);
+        return;
+      }
       await all([
         ...newRecords.map((record) => createNewProduction(record)),
         ...editedRecords.map((record) => updateCurrentProduction(record)),
@@ -265,25 +287,28 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     [addNewRow, currentProduction?.Id, productionUploadMap, router],
   );
 
+  // const findFirstEmptyField = (data) => {
+  //   const requiredFields = ['Code', 'DateBlock[0].StartDate', 'DateBlock[0].EndDate'];
+  //   return requiredFields.find((field) => !data[field]);
+  // };
+
   const handleCellClick = async (e) => {
     setProductionId(e.data.Id);
     setCurrentProduction(e.data);
     setRowIndex(e.rowIndex);
+
     if (e.column.colId === 'deleteId') {
       setConfirm(true);
     } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
       await updateCurrentProduction(e.data);
-    } else if (
-      isAddRow &&
-      e.column.colId === 'editId' &&
-      e.data.Code &&
-      'DateBlock[0].StartDate' in e.data &&
-      'DateBlock[0].EndDate' in e.data
-    ) {
-      await createNewProduction(e.data);
+    } else if (isAddRow && e.column.colId === 'editId') {
+      if (e.data.Code && 'DateBlock[0].StartDate' in e.data && 'DateBlock[0].EndDate' in e.data) {
+        await createNewProduction(e.data);
+      } else {
+        notify.warning('Please fill in all the required fields before saving.');
+      }
     } else if (e.column.colId === 'ImageUrl') {
       const { originalFilename: name, id } = e.data.Image || {};
-      console.log('====', e.data);
       setUploadModalContext({
         value: e.data.Image
           ? {
@@ -326,6 +351,29 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       notify.error(ToastMessages.deleteProductionFailure);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onChange = (selectedFiles) => {
+    if (isArray(selectedFiles) && selectedFiles.length === 0) {
+      const gridApi = tableRef.current.getApi();
+      const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
+      const transaction = {
+        update: [
+          {
+            ...rowDataToUpdate,
+            ImageUrl: '',
+            Image: null,
+          },
+        ],
+      };
+      applyTransactionToGrid(tableRef, transaction);
+      setProductionUploadMap((prev) => {
+        const newMap = { ...prev };
+        newMap[currentProduction.Id] = null;
+        return newMap;
+      });
+      setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
     }
   };
 
@@ -385,6 +433,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           maxFileSize={500 * 1024} // 500kb
           onSave={onSave}
           value={uploadModalContext?.value}
+          onChange={onChange}
         />
       )}
     </>
