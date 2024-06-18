@@ -1,6 +1,8 @@
+// import { generateProductionTaskId } from 'components/tasks/utils';
 import { ProductionTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+// import { getMaxProductionTaskCode } from 'services/TaskService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -11,6 +13,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId });
     if (!access) return res.status(401).end();
+
+    // const { Code } = await getMaxProductionTaskCode(ProductionId);
+
+    // const codeGenerated = generateProductionTaskId(Code, Code);
 
     const createResult = await prisma.productionTask.create({
       data: {
