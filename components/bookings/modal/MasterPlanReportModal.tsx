@@ -1,16 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { Button, DateRange, PopupModal, notify } from 'components/core-ui-lib';
-import { useRecoilValue } from 'recoil';
-import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { exportMasterplanReport } from './request';
 
 interface MasterPlanReportModalProps {
   visible: boolean;
+  endDate: string;
   onClose: () => void;
 }
-const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, onClose }) => {
-  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
-  const [formData, setFormData] = useState(() => ({ fromDate: scheduleStart, toDate: scheduleEnd }));
+const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, onClose, endDate }) => {
+  const [formData, setFormData] = useState(() => ({ fromDate: new Date()?.toISOString(), toDate: endDate }));
   const { fromDate, toDate } = formData;
 
   const onChange = useCallback(
@@ -30,7 +28,7 @@ const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, 
   return (
     <PopupModal
       show={visible}
-      title="Booking Reports"
+      title="All Productions Masterplan"
       titleClass="text-xl text-primary-navy text-bold mb-4 -mt-2"
       onClose={onClose}
     >
