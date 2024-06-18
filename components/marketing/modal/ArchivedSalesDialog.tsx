@@ -93,10 +93,9 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
       });
       if (Array.isArray(data) && data.length > 0) {
         const bookingData = data as Array<BookingSelection>;
+        const { ShowCode, ProductionCode } = router.query;
         const excludeCurrentProduction = bookingData.filter((booking) => {
-          return (
-            router.query.ShowCode.toString() + router.query.ProductionCode.toString() !== booking.FullProductionCode
-          );
+          return `${ShowCode}${ProductionCode}` !== booking.FullProductionCode;
         });
 
         const currentBooking: BookingSelection = bookingData.find((booking) => {
