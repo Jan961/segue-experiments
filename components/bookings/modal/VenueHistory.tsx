@@ -172,6 +172,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
 
   const handleBtnBack = (type: string) => {
     setLoading(false);
+    setSelBookings([]);
     if (type === 'salesComparison') {
       setShowResults(false);
       setShowCompSelect(true);
