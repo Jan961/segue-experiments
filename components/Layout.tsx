@@ -58,6 +58,7 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
         <title>{title}</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        <link rel="icon" href="/segue/segue_mini_icon.png" type="image/png" />
       </Head>
       <header className="flex flex-col">
         <HeaderNav menuIsOpen={menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
