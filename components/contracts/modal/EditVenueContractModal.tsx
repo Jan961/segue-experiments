@@ -279,7 +279,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       formData.SignedDate.toString() !== toISO(value) &&
                       editContractModalData('SignedDate', value, 'contract')
                     }
-                    position={90}
+                    position={24}
                     value={formData.SignedDate}
                   />
                 </div>
@@ -307,7 +307,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     }
                     value={formData.ReceivedBackDate}
                     className="z-[1000]"
-                    position={90}
+                    position={24}
                   />
                 </div>
               </div>

@@ -149,7 +149,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           maxDate={maxDate}
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
-          popperClassName={`!z-50 !left-[-${position}px]`}
+          popperClassName={`!z-50 !-left-${position}`}
           onSelect={(e) => onChange(convertLocalDateToUTC(e))}
           onChange={() => null}
           selected={selectedDate}
