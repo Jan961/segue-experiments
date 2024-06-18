@@ -103,7 +103,7 @@ class BookingHelper {
     return gifuDetails;
   }
 
-  getRangeFromDateBlocks(dateBlocks: DateBlockDTO[]): { start: string; end: string } {
+  getRangeFromDateBlocks(dateBlocks: Partial<DateBlockDTO>[]): { start: string; end: string } {
     let minStartDate = dateBlocks?.[0]?.StartDate;
     let maxEndDate = dateBlocks?.[0]?.EndDate;
     for (const dateBlock of dateBlocks) {

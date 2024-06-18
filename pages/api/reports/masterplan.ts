@@ -124,12 +124,12 @@ const handler = async (req, res) => {
     })
     .reduce((acc, arr) => [...acc, ...arr], []);
 
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const worksheet = workbook.addWorksheet('Masterplan', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
   });
-
-  worksheet.addRow([`Jendagi Rolling All Productions Masterplan ${formatedFromDate} to ${formatedToDate}`]);
+  const title = `Jendagi Rolling All Productions Masterplan ${formatedFromDate} to ${formatedToDate}`;
+  worksheet.addRow([title]);
   const date = new Date();
   worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
   worksheet.addRow([]);
@@ -307,7 +307,7 @@ const handler = async (req, res) => {
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-  const filename = 'Master Plan.xlsx';
+  const filename = `${title}.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
