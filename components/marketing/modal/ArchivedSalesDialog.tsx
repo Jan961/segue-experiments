@@ -91,8 +91,6 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
           showCode: router.query.ShowCode.toString(),
         },
       });
-      console.log(data);
-      console.log(productions);
       if (Array.isArray(data) && data.length > 0) {
         const bookingData = data as Array<BookingSelection>;
         const excludeCurrentProduction = bookingData.filter((booking) => {
@@ -110,7 +108,7 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
         const currentProduction = productions.find((prod) => {
           return prod.ShowCode === router.query.ShowCode.toString() && prod.Code === router.query.ProductionCode;
         });
-        console.log(currentProduction);
+
         setSelectedBookings([
           {
             bookingId: currentBooking.BookingId,
@@ -139,13 +137,11 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
     if (selectedBookings.length < 1) {
       setErrorMessage('Please select at least 1 venue for comparison.');
     } else {
-      console.log(selectedBookings);
-      onSubmit(selectedBookings.concat());
+      onSubmit(selectedBookings);
     }
   };
 
   const selectForComparison = (selectedValue) => {
-    console.log(selectedValue);
     if ('type' in selectedValue === false) {
       const tempBookings = selectedBookings;
       if (selectedValue.order === null || isNaN(selectedValue.order)) {
