@@ -60,7 +60,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
           <Label text="Graph" />
           <Select
             className="w-[312px]"
-            onChange={(value) => onChange('graph', value)}
+            onChange={(value) => onChange('graph', value as string)}
             options={graphOptions}
             value={graph}
           />
@@ -71,7 +71,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
               <Select
                 className="border-0 !shadow-none w-[410px]"
                 label="Production"
-                onChange={(value) => onChange('production', value)}
+                onChange={(value) => onChange('production', value as number)}
                 options={productionsOptions}
                 value={production}
               />
@@ -119,7 +119,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
                 <Select
                   className="border-0 !shadow-none w-[390px]"
                   label="Production"
-                  onChange={(value) => onChange('tour1production', value)}
+                  onChange={(value) => onChange('tour1production', value as number)}
                   options={productionsOptions}
                   value={tour1production}
                 />
@@ -144,7 +144,7 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
                 <Select
                   className="border-0 !shadow-none w-[390px]"
                   label="Production"
-                  onChange={(value) => onChange('tour2production', value)}
+                  onChange={(value) => onChange('tour2production', value as number)}
                   options={productionsOptions}
                   value={tour2production}
                 />
