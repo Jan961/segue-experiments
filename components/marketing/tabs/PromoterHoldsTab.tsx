@@ -11,7 +11,10 @@ import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import formatInputDate from 'utils/dateInputFormat';
 import Icon from 'components/core-ui-lib/Icon';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { userState } from 'state/account/userState';
+import { isNullOrEmpty } from 'utils';
+import { Spinner } from 'components/global/Spinner';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -42,6 +45,8 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const [allocType, setAllocType] = useState('new');
   const textAreaRef = useRef(null);
   const bookings = useRecoilState(bookingJumpState);
+  const users = useRecoilValue(userState);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -82,8 +87,17 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
       if (typeof data === 'object') {
         const promData = data as PromoterData;
         setHoldList(promData.holds);
-        setAllocRows(promData.allocations);
 
+        setAllocRows(
+          promData.allocations.map((allocRow) => {
+            const user = Object.values(users).find((user) => user.Id === allocRow.ArrangedById);
+            const firstname = isNullOrEmpty(user.FirstName) ? '' : user.FirstName;
+            const surname = isNullOrEmpty(user.LastName) ? '' : user.LastName;
+            return { ...allocRow, ArrangedById: firstname + ' ' + surname };
+          }),
+        );
+
+        // process the available seats data
         setTableHeight(120 * promData.allocations.length);
         const tempAvailSeats = [];
         promData.holds.forEach((holdRec) => {
@@ -118,6 +132,8 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         });
 
         setAvailSeatsCont(tempAvailSeats);
+
+        setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -144,9 +160,12 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         data: recData,
       });
 
+      const processedRecord = { ...recData, ArrangedById: recData.ArrangedBy };
+
       const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
       const newRows = [...allocRows];
-      newRows[rowIndex] = recData;
+      newRows[rowIndex] = processedRecord;
+
       setAllocRows(newRows);
     } else if (type === 'delete') {
       await fetchData({
@@ -219,73 +238,81 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     <>
       {dataAvailable && (
         <div>
-          <div className="flex flex-row">
-            <div className="flex flex-col mr-3 mb-5">
-              <Checkbox
-                id="Cast Rate Arranged"
-                name="Cast Rate Arra"
-                checked={castRateArranged}
-                onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
-                className="w-[19px] h-[19px] mt-[2px]"
+          {isLoading ? (
+            <div className="mt-[150px] text-center">
+              <Spinner size="lg" className="mr-3" />
+            </div>
+          ) : (
+            <div>
+              <div className="flex flex-row">
+                <div className="flex flex-col mr-3 mb-5">
+                  <Checkbox
+                    id="Cast Rate Arranged"
+                    name="Cast Rate Arra"
+                    checked={castRateArranged}
+                    onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
+                    className="w-[19px] h-[19px] mt-[2px]"
+                  />
+                </div>
+
+                <div className="text-primary-input-text">Cast Rate Arranged</div>
+              </div>
+
+              <div className="flex flex-row">
+                {castRateArranged && (
+                  <TextArea
+                    className="w-[1071px] h-auto resize-none overflow-hidden"
+                    value={castRateNotes}
+                    placeholder="Notes Field"
+                    onChange={(e) => setCastRateNotes(e.target.value)}
+                    ref={textAreaRef}
+                    onBlur={(e) => updateBooking('castRateTicketsNotes', e.target.value)}
+                  />
+                )}
+              </div>
+
+              <div className="text-xl text-primary-navy font-bold -mb-4 mt-2">Available Seats</div>
+
+              <div className="my-5">{availSeatsCont}</div>
+
+              <div className="flex flex-row justify-between items-center mb-4">
+                <div className="text-xl text-primary-navy font-bold">Allocated Seats</div>
+                <div className="flex flex-row items-center gap-4">
+                  <Button
+                    text="Export Allocated Seats"
+                    className="w-[203px]"
+                    iconProps={{ className: 'h-4 w-3' }}
+                    sufixIconName="excel"
+                  />
+                  <Button text="Add New" className="w-[160px]" onClick={() => newAllocatedSeats()} />
+                </div>
+              </div>
+
+              <Table
+                rowData={allocRows}
+                styleProps={styleProps}
+                columnDefs={allocSeatsColDefs}
+                tableHeight={tableHeight}
+                onRowDoubleClicked={triggerEdit}
+              />
+
+              <AllocatedSeatsModal
+                show={showAllocSeatsModal}
+                bookingId={bookingIdVal}
+                onCancel={() => setShowAllocSeatsModal(false)}
+                onSave={(data, perfId, type) => saveAllocatedSeats(data, perfId, type)}
+                data={allocatedRow}
+                type={allocType}
+              />
+
+              <AvailableSeatsModal
+                data={availData}
+                show={showAvailSeatsModal}
+                onCancel={() => setShowAvailSeatModal(false)}
+                onSave={(data) => saveAvailSeats(data)}
               />
             </div>
-
-            <div className="text-primary-input-text">Cast Rate Arranged</div>
-          </div>
-
-          <div className="flex flex-row">
-            {castRateArranged && (
-              <TextArea
-                className="w-[1071px] h-auto resize-none overflow-hidden"
-                value={castRateNotes}
-                placeholder="Notes Field"
-                onChange={(e) => setCastRateNotes(e.target.value)}
-                ref={textAreaRef}
-                onBlur={(e) => updateBooking('castRateTicketsNotes', e.target.value)}
-              />
-            )}
-          </div>
-
-          <div className="text-xl text-primary-navy font-bold -mb-4 mt-2">Available Seats</div>
-
-          <div className="my-5">{availSeatsCont}</div>
-
-          <div className="flex flex-row justify-between items-center mb-4">
-            <div className="text-xl text-primary-navy font-bold">Allocated Seats</div>
-            <div className="flex flex-row items-center gap-4">
-              <Button
-                text="Export Allocated Seats"
-                className="w-[203px]"
-                iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName="excel"
-              />
-              <Button text="Add New" className="w-[160px]" onClick={() => newAllocatedSeats()} />
-            </div>
-          </div>
-
-          <Table
-            rowData={allocRows}
-            styleProps={styleProps}
-            columnDefs={allocSeatsColDefs}
-            tableHeight={tableHeight}
-            onRowDoubleClicked={triggerEdit}
-          />
-
-          <AllocatedSeatsModal
-            show={showAllocSeatsModal}
-            bookingId={bookingIdVal}
-            onCancel={() => setShowAllocSeatsModal(false)}
-            onSave={(data, perfId, type) => saveAllocatedSeats(data, perfId, type)}
-            data={allocatedRow}
-            type={allocType}
-          />
-
-          <AvailableSeatsModal
-            data={availData}
-            show={showAvailSeatsModal}
-            onCancel={() => setShowAvailSeatModal(false)}
-            onSave={(data) => saveAvailSeats(data)}
-          />
+          )}
         </div>
       )}
     </>

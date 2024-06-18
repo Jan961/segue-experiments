@@ -63,7 +63,7 @@ export default function AllocatedSeatsModal({
       const perf = perfList.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
-      const user = userTempList.find((user) => user.text === data.ArrangedBy);
+      const user = userTempList.find((user) => user.text === data.ArrangedById);
       setPerfSelected(perf.value);
       setCustName(data.TicketHolderName);
       setEmail(data.TicketHolderEmail);
@@ -95,7 +95,7 @@ export default function AllocatedSeatsModal({
   const handleSave = () => {
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
     let data = {
-      ArrangedById: parseInt(arrangedBy),
+      ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
       Comments: comments,
       RequestedBy: requestedBy,
       Seats: parseInt(numSeatsReq),
@@ -111,6 +111,8 @@ export default function AllocatedSeatsModal({
     if (type === 'edit') {
       data = { ...data, Id: allocId };
     }
+
+    alert(JSON.stringify(data));
 
     onSave(data, parseInt(perfSelected), type);
   };

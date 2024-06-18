@@ -3,7 +3,7 @@ import { activityMapper } from 'lib/mappers';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
+
 export type ActivitiesResponse = {
   info: {
     IsOnSale: boolean;
@@ -19,7 +19,6 @@ export type ActivitiesResponse = {
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId = parseInt(req.query.BookingId as string);
-    const currencySymbol = await getCurrencyFromBookingId(BookingId);
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
@@ -58,11 +57,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         OnSaleDate: info.OnSaleDate ? info.OnSaleDate.toISOString() : '',
       },
     };
-    result.activities = result.activities.map((activity) => ({
-      ...activity,
-      CompanyCost: `${currencySymbol}${activity.CompanyCost}`,
-      VenueCost: `${currencySymbol}${activity.VenueCost}`,
-    }));
+
     res.json(result);
   } catch (err) {
     console.log(err);
