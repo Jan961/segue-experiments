@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
-import { exportBookingSchedule, exportMasterplanReport, onScheduleReport } from './request';
-import { useRecoilValue } from 'recoil';
-import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
+import { exportBookingSchedule, onScheduleReport } from './request';
 import { notify } from 'components/core-ui-lib/Notifications';
+import MasterPlanReportModal from './MasterPlanReportModal';
 
 interface BookingReportProps {
   visible: boolean;
@@ -15,7 +14,7 @@ interface BookingReportProps {
 
 export const BookingReports = ({ visible = false, onClose, productionId }: BookingReportProps) => {
   const [open, setOpen] = useState<boolean>(visible);
-  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
+  const [showMasterPlanReportModal, setShowMasterPlanReportModal] = useState(false);
 
   useEffect(() => {
     setOpen(visible);
@@ -38,11 +37,12 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         });
         break;
       case 'masterPlan':
-        notify.promise(exportMasterplanReport(scheduleStart, scheduleEnd), {
-          loading: 'Generating master plan report',
-          success: 'Master plan report downloaded successfully',
-          error: 'Error generating master plan report',
-        });
+        // notify.promise(exportMasterplanReport(scheduleStart, scheduleEnd), {
+        //   loading: 'Generating master plan report',
+        //   success: 'Master plan report downloaded successfully',
+        //   error: 'Error generating master plan report',
+        // });
+        setShowMasterPlanReportModal(true);
     }
   };
 
@@ -71,7 +71,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         />
 
         <Button
-          text="All Productions Masterplan"
+          text="Masterplan"
           className="w-[230px] mb-3 pl-5"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
@@ -91,6 +91,12 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           sufixIconName="excel"
         />
       </div>
+      {showMasterPlanReportModal && (
+        <MasterPlanReportModal
+          visible={showMasterPlanReportModal}
+          onClose={() => setShowMasterPlanReportModal(false)}
+        />
+      )}
     </PopupModal>
   );
 };
