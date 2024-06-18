@@ -91,12 +91,38 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
           showCode: router.query.ShowCode.toString(),
         },
       });
-
+      console.log(data);
+      console.log(productions);
       if (Array.isArray(data) && data.length > 0) {
         const bookingData = data as Array<BookingSelection>;
+        const excludeCurrentProduction = bookingData.filter((booking) => {
+          return (
+            router.query.ShowCode.toString() + router.query.ProductionCode.toString() !== booking.FullProductionCode
+          );
+        });
+
+        const currentBooking: BookingSelection = bookingData.find((booking) => {
+          return !(
+            router.query.ShowCode.toString() + router.query.ProductionCode.toString() !==
+            booking.FullProductionCode
+          );
+        });
+        const currentProduction = productions.find((prod) => {
+          return prod.ShowCode === router.query.ShowCode.toString() && prod.Code === router.query.ProductionCode;
+        });
+        console.log(currentProduction);
+        setSelectedBookings([
+          {
+            bookingId: currentBooking.BookingId,
+            order: 1,
+            prodCode: router.query.ProductionCode.toString(),
+            prodName: currentProduction.ShowCode + currentProduction.Code + ' ' + currentProduction.ShowName,
+            numPerfs: currentBooking.PerformanceCount,
+          },
+        ]);
 
         // Sort data by BookingFirstDate in descending order (newest production to oldest)
-        const sortedData = bookingData.sort(
+        const sortedData = excludeCurrentProduction.sort(
           (a, b) => new Date(b.BookingFirstDate).getTime() - new Date(a.BookingFirstDate).getTime(),
         );
 
@@ -113,11 +139,13 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
     if (selectedBookings.length < 1) {
       setErrorMessage('Please select at least 1 venue for comparison.');
     } else {
-      onSubmit(selectedBookings);
+      console.log(selectedBookings);
+      onSubmit(selectedBookings.concat());
     }
   };
 
   const selectForComparison = (selectedValue) => {
+    console.log(selectedValue);
     if ('type' in selectedValue === false) {
       const tempBookings = selectedBookings;
       if (selectedValue.order === null || isNaN(selectedValue.order)) {
