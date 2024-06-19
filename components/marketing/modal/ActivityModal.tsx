@@ -111,9 +111,9 @@ export default function ActivityModal({
 
     if (regexPattern.test(value)) {
       if (type === 'venueCost') {
-        setVenueCost(value);
+        setVenueCost(value === '' ? '0' : value);
       } else if (type === 'companyCost') {
-        setCompanyCost(value);
+        setCompanyCost(value === '' ? '0' : value);
       }
     }
   };

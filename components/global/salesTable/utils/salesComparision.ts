@@ -62,7 +62,7 @@ const salesComparison = async (data: SalesComp) => {
 
     // Define the main column group for each booking
     const mainColGroup = {
-      headerName: booking.prodName + ' ' + booking.prodCode,
+      headerName: booking.prodName,
       headerGroupComponent: 'AGGridHeaderGroupComponent',
       headerClass: ['justify-center', 'font-bold', 'text-base', borderClasses, 'headerStyles'],
       sortable: false,
