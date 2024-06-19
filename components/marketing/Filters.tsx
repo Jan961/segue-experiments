@@ -14,6 +14,8 @@ import { reverseDate } from './utils';
 import useAxios from 'hooks/useAxios';
 import { getWeekDayShort } from 'services/dateService';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
+import { currencyState } from 'state/marketing/currencyState';
+import axios from 'axios';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
@@ -25,6 +27,7 @@ const Filters = () => {
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
+  const [, setCurrency] = useRecoilState(currencyState);
   const today = formatInputDate(new Date());
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [selectedValue, setSelectedValue] = useState(null);
@@ -63,7 +66,20 @@ const Filters = () => {
     }
   }, [bookings.bookings, lastDates]);
 
-  const changeBooking = (value: string | number) => {
+  const getCurrency = async (bookingId) => {
+    try {
+      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
+        setCurrency({ symbol: currencyObject.currency });
+      }
+    } catch (error) {
+      console.error('Error retrieving currency:', error);
+    }
+  };
+
+  const changeBooking = async (value: string | number) => {
     if (value !== null) {
       const selectedBooking = bookingOptions?.find((booking) => booking.value === value);
       setSelectedIndex(bookingOptions?.findIndex((booking) => booking.value === value));
@@ -76,10 +92,12 @@ const Filters = () => {
       setVenueName(booking.Venue.Code + ' ' + booking.Venue.Name);
       setVenueId(booking.Venue.Id);
       setLandingURL(website);
+      await getCurrency(bookingIdentifier.toString());
       setBooking({ ...bookings, selected: bookingIdentifier });
     } else {
       setSelectedIndex(-1);
       setSelectedValue(null);
+      setBooking({ ...bookings, selected: null });
     }
   };
 
@@ -118,7 +136,6 @@ const Filters = () => {
   };
 
   useEffect(() => {
-    changeBooking(null);
     fetchLastDates();
   }, [productionId]);
 
