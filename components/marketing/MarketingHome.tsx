@@ -139,7 +139,7 @@ const MarketingHome = () => {
             <ArchivedSalesTab ref={archSalesRef} />
           </Tab.Panel>
 
-          <Tab.Panel className="h-[650px]">
+          <Tab.Panel className="h-[650px] w-[1085px]">
             <ActivitiesTab bookingId={bookingId} ref={activityTabRef} />
           </Tab.Panel>
 

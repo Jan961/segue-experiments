@@ -39,3 +39,17 @@ export interface UploadModalProps {
   ) => void;
   value?: UploadedFile[] | UploadedFile;
 }
+
+export const attachmentMimeTypes = {
+  marketing: [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/bmp',
+    'image/webp',
+    'text/plain',
+  ],
+};

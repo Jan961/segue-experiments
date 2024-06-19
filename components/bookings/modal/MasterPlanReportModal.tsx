@@ -20,13 +20,14 @@ const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, 
 
   const onExport = useCallback(() => {
     notify.promise(exportMasterplanReport(fromDate, toDate).then(onClose), {
-      loading: 'Generating master plan report',
-      success: 'Master plan report downloaded successfully',
-      error: 'Error generating master plan report',
+      loading: 'Generating All Productions Masterplan',
+      success: 'All Productions Masterplan successfully downloaded',
+      error: 'Error generating All Productions Master Plan',
     });
   }, [fromDate, toDate, onClose]);
   return (
     <PopupModal
+      hasOverlay={false}
       show={visible}
       title="All Productions Masterplan"
       titleClass="text-xl text-primary-navy text-bold mb-4 -mt-2"
