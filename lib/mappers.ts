@@ -122,7 +122,7 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   BookingCompNotes: b.CompNotes,
   BookingHoldNotes: b.HoldNotes,
   BookingSalesNotes: b.SalesNotes,
-  PerformanceCount: b?._count?.Performance || null,
+  PerformanceCount: b?._count?.Performance || 0,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
