@@ -34,6 +34,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   if (productionId !== null) {
     const bookings = await getSaleableBookings(productionId);
+    console.log('bookings', bookings);
     const venueRoles = await getRoles();
     const selected = null;
 

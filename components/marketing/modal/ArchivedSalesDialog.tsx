@@ -11,6 +11,7 @@ import { Spinner } from 'components/global/Spinner';
 import { DataList, SelectOption, VenueDetail } from '../MarketingHome';
 import Select from 'components/core-ui-lib/Select';
 import classNames from 'classnames';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
 export type ArchSalesDialogVariant = 'venue' | 'town' | 'both';
 
@@ -21,6 +22,7 @@ interface ArchSalesDialogProps {
   data: VenueDetail | DataList;
   onSubmit: (salesComp) => void;
   error: string;
+  selectedBookingId: number;
 }
 
 const title = {
@@ -34,11 +36,20 @@ const bothOptions = [
   { text: 'Town', value: 'Town' },
 ];
 
-const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Partial<ArchSalesDialogProps>) => {
+const ArchSalesDialog = ({
+  show,
+  onCancel,
+  variant,
+  data,
+  onSubmit,
+  error,
+  selectedBookingId,
+}: Partial<ArchSalesDialogProps>) => {
   const [visible, setVisible] = useState<boolean>(show);
   const [selectedBookings, setSelectedBookings] = useState([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const { productions } = useRecoilValue(productionJumpState);
+  const { bookings } = useRecoilValue(bookingJumpState);
   const [prodCompData, setProdCompData] = useState<Array<BookingSelection>>([]);
   const [subTitle, setSubTitle] = useState<string>('');
   const [conditionType, setConditionType] = useState('');
@@ -46,7 +57,6 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
   const [venueList, setVenueList] = useState<Array<SelectOption>>([]);
   const [townList, setTownList] = useState<Array<SelectOption>>([]);
   const router = useRouter();
-
   const { fetchData } = useAxios();
 
   const handleModalCancel = () => onCancel?.();
@@ -94,24 +104,29 @@ const ArchSalesDialog = ({ show, onCancel, variant, data, onSubmit, error }: Par
       if (Array.isArray(data) && data.length > 0) {
         const bookingData = data as Array<BookingSelection>;
         const { ShowCode, ProductionCode } = router.query;
+
         const excludeCurrentProduction = bookingData.filter((booking) => {
           return `${ShowCode}${ProductionCode}` !== booking.FullProductionCode;
         });
 
-        const currentBooking: BookingSelection = bookingData.find((booking) => {
-          return !(`${ShowCode}${ProductionCode}` !== booking.FullProductionCode);
-        });
+        // use bookings to get the bookingId
+        console.log(`${ShowCode}${ProductionCode}`);
+
         const currentProduction = productions.find((prod) => {
           return prod.ShowCode === ShowCode && prod.Code === ProductionCode;
         });
-
+        console.log(currentProduction);
+        const currentBooking = bookings.find((booking) => {
+          return booking.Id === selectedBookingId;
+        });
+        console.log(currentBooking);
         setSelectedBookings([
           {
-            bookingId: currentBooking.BookingId,
+            bookingId: currentBooking?.Id,
             order: 1,
             prodCode: ProductionCode,
-            prodName: currentProduction.ShowCode + currentProduction.Code + ' ' + currentProduction.ShowName,
-            numPerfs: currentBooking.PerformanceCount,
+            prodName: currentProduction?.ShowCode + currentProduction?.Code + ' ' + currentProduction?.ShowName,
+            numPerfs: currentBooking?.PerformanceCount,
           },
         ]);
 

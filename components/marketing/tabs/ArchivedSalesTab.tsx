@@ -14,7 +14,11 @@ export interface ArchSalesTabRef {
   resetData: () => void;
 }
 
-const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
+export interface ArchSalesProps {
+  selectedBooking: any;
+}
+
+const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref) => {
   const [showArchSalesModal, setShowArchSalesModal] = useState<boolean>(false);
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
@@ -24,7 +28,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
   const bookings = useRecoilState(bookingJumpState);
-
+  const { selectedBooking } = props;
   useImperativeHandle(ref, () => ({
     resetData: () => {
       setArchivedSalesTable(<div />);
@@ -116,6 +120,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef>((props, ref) => {
                 onCancel={() => setShowArchSalesModal(false)}
                 onSubmit={(bookings) => showArchivedSales(bookings)}
                 error={errorMessage}
+                selectedBookingId={selectedBooking}
               />
             </div>
 
