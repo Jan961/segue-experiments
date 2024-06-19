@@ -197,6 +197,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   const handleClose = () => {
     onClose();
     setInputs(DEFAULT_MASTER_TASK);
+    setIsCloned(false);
   };
 
   const handleClone = () => {

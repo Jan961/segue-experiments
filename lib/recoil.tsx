@@ -39,6 +39,7 @@ import { contractsVenueState } from 'state/contracts/contractsVenueState';
 import { contractsBookingStatusState, contractsStatusState } from 'state/contracts/contractsStatusState';
 import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
 import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
+import { currencyState } from 'state/marketing/currencyState';
 
 /*
   Experimental attempt to get Recoil.js working with SSR in React in a DRY manner.
@@ -87,6 +88,7 @@ export type InitialState = Partial<{
     venueList?: Record<number, VenueMinimalDTO>;
     defaultTab?: number;
     users?: any;
+    currencySymbol: string;
   };
   account?: {
     user: UserState;
@@ -141,6 +143,7 @@ const states: {
     venueList: venueState,
     defaultTab: tabState,
     users: userState,
+    currencySymbol: currencyState,
   },
   account: {
     user: userState,

@@ -32,32 +32,29 @@ export const formatRowsForPencilledBookings = (values) => {
   return updated;
 };
 
-export const formatRowsForMultipeBookingsAtSameVenue = (values) => {
-  const groupedByVenueAndRunTag = values.reduce((acc, item) => {
-    if (item.venue) {
-      const key = `${item.venue}_${item.runTag}`;
-      acc[key] !== undefined ? acc[key].push(item) : (acc[key] = [item]);
+const hasMoreThanOneRunOfDates = (values) => {
+  const groupByRunOfDates = values.reduce((acc, item) => {
+    if (acc[item.runTag] !== undefined) {
+      acc[item.runTag] = acc[item.runTag] + 1;
+    } else {
+      acc[item.runTag] = 1;
     }
-
     return acc;
   }, {});
+  return Object.values(groupByRunOfDates).length > 1;
+};
 
-  const venuesWithMultipleBookingsExceptRunOfDates: any = Object.entries(groupedByVenueAndRunTag)
-    .filter(([_, v]: [string, Array<any>]) => v.length <= 1)
-    .map((arr) => arr[1])
-    .flat();
-
-  const groupedByVenue = venuesWithMultipleBookingsExceptRunOfDates.reduce((acc, item) => {
+export const formatRowsForMultipeBookingsAtSameVenue = (values) => {
+  const groupedByVenue = values.reduce((acc, item) => {
     if (item.venue) {
       const key = `${item.venue}`;
       acc[key] !== undefined ? acc[key].push(item) : (acc[key] = [item]);
     }
-
     return acc;
   }, {});
 
   const venuesWithMultipleBookings: any = Object.entries(groupedByVenue)
-    .filter(([_, v]: [string, Array<any>]) => v.length > 1)
+    .filter(([_, v]: [string, Array<any>]) => hasMoreThanOneRunOfDates(v))
     .map((arr) => arr[1])
     .flat();
 
