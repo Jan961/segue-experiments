@@ -36,16 +36,16 @@ export const contractsColumnDefs = [
         return dayType !== 'Performance' && params.value !== '';
       },
       cancelledBooking: (params) => {
-        const { bookingStatus } = params.data;
-        return bookingStatus === 'Cancelled' && params.value !== '';
+        const { status } = params.data;
+        return status === 'X' && params.value !== '';
       },
       suspendedBooking: (params) => {
-        const { bookingStatus } = params.data;
-        return bookingStatus === 'Suspended' && params.value !== '';
+        const { status } = params.data;
+        return status === 'S' && params.value !== '';
       },
       pencilledBooking: (params) => {
-        const { bookingStatus, multipleVenuesOnSameDate } = params.data;
-        return bookingStatus === 'Pencilled' && multipleVenuesOnSameDate && params.value !== '';
+        const { status, multipleVenuesOnSameDate } = params.data;
+        return status === 'U' && multipleVenuesOnSameDate && params.value !== '';
       },
       multipleBookings: (params) => {
         const { dayType, venueHasMultipleBookings } = params.data;
