@@ -4,11 +4,11 @@ import ButtonSalesRenderer from './renderers/ButtonSalesRenderer';
 import DefaultCellRenderer from 'components/core-ui-lib/Table/renderers/DefaultCellRenderer';
 import formatInputDate from 'utils/dateInputFormat';
 import IconRowRenderer from './renderers/IconRowRenderer';
+import { isNullOrEmpty } from 'utils';
 
 const reverseDate = (inputDt) => {
   return new Date(inputDt.split('/').reverse().join('/')).getTime();
 };
-
 const getCellColor = (data, ignoreMonday, school) => {
   const saleDt = reverseDate(formatInputDate(data.weekOf));
   const isMonday = new Date(saleDt).getDay() === 1;
@@ -38,6 +38,24 @@ const getCellColor = (data, ignoreMonday, school) => {
   } else {
     return isMonday && school ? { backgroundColor: '#FDCE74', color: '#617293' } : {};
   }
+};
+
+const stripSymbolAndRound = (valueInput: string, decimalPlaces = 2) => {
+  const tempValue: number = parseFloat(valueInput.slice(1));
+  if (isNaN(tempValue)) {
+    return '0.00';
+  }
+  return tempValue.toFixed(decimalPlaces);
+};
+
+const valueWithCurrency = (inputText: string) => {
+  const currencySymbol = inputText.slice(0, 1);
+  const profit: string = stripSymbolAndRound(inputText);
+  return currencySymbol + profit;
+};
+
+const seatsTotalFormatter: (inputSeats: string) => number = (inputSeats: string) => {
+  return parseInt(inputSeats) || 0;
 };
 
 export const prodComparisionColDefs = (optionsLength = 0, selectForComparison, selectedBookings) => [
@@ -206,7 +224,7 @@ export const prodCompArchColDefs = (optionsLength = 0, selectForComparison, sele
   },
 ];
 
-export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booking, setSalesActivity) => {
+export const salesColDefs = (schoolDataAvail, isMarketing, booking, setSalesActivity) => {
   return [
     {
       headerName: 'Week',
@@ -276,16 +294,14 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           resizable: false,
         },
         {
-          headerName: 'Seats Sold ' + currencySymbol,
+          headerName: 'Seats Sold ',
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
             if (params.data.genTotalValue === 0 || params.data.genTotalValue === '') {
               const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.genTotalValue;
-              return prevTotal === '' || prevTotal === undefined
-                ? '-'
-                : currencySymbol + parseInt(prevTotal).toFixed(2);
+              if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
             } else {
-              return currencySymbol + parseInt(params.data.genTotalValue).toFixed(2);
+              return valueWithCurrency(params.data.genTotalValue);
             }
           },
           width: 90,
@@ -315,12 +331,13 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           resizable: false,
         },
         {
-          headerName: 'Reserved ' + currencySymbol,
+          headerName: 'Reserved ',
           field: 'genReservations',
           cellRenderer: function (params) {
+            const currencySymbol = params.data.genReservations.charAt(0);
             return params.data.genReservations === ''
               ? '-'
-              : currencySymbol + parseFloat(params.data.genReservations).toFixed(2);
+              : currencySymbol + stripSymbolAndRound(params.data.genReservations);
           },
           width: 100,
           cellStyle: {
@@ -343,12 +360,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           headerName: 'Seat Sold No.',
           field: 'schSeatsSold',
           cellRenderer: function (params) {
-            if (params.data.schSeatsSold === '') {
-              const prevSeatsSold = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schSeatsSold;
-              return prevSeatsSold === '' || prevSeatsSold === undefined ? '-' : prevSeatsSold;
-            } else {
-              return params.data.schSeatsSold;
-            }
+            return params.data.schSeatsSold || 0;
           },
           width: 90,
           cellStyle: {
@@ -361,16 +373,14 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           resizable: false,
         },
         {
-          headerName: 'Seats Sold ' + currencySymbol,
+          headerName: 'Seats Sold ',
           field: 'seatsSaleChange',
           cellRenderer: function (params) {
-            if (params.data.schTotalValue === '' || params.data.schTotalValue === undefined) {
+            if (isNullOrEmpty(params.data.schTotalValue)) {
               const prevTotal = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schTotalValue;
-              return prevTotal === '' || prevTotal === undefined
-                ? '-'
-                : currencySymbol + parseInt(prevTotal).toFixed(2);
+              if (prevTotal) return !prevTotal ? '-' : stripSymbolAndRound(prevTotal.toString());
             } else {
-              return currencySymbol + parseInt(params.data.schTotalValue).toFixed(2);
+              return valueWithCurrency(params.data.schTotalValue);
             }
           },
           width: 90,
@@ -387,7 +397,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           headerName: 'Reserved No',
           field: 'schReserved',
           cellRenderer: function (params) {
-            return params.data.schReserved;
+            return params.data.schReserved || 0;
           },
           width: 100,
           cellStyle: {
@@ -400,19 +410,16 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
           resizable: false,
         },
         {
-          headerName: 'Reserved ' + currencySymbol,
+          headerName: 'Reserved ',
           field: 'schReservations',
           cellRenderer: function (params) {
             if (params.data.schReservations === '') {
               const previousRev = params.api.getDisplayedRowAtIndex(params.node.rowIndex - 1)?.data.schReservations;
-              return previousRev === undefined || previousRev === ''
-                ? '-'
-                : currencySymbol + parseFloat(previousRev).toFixed(2);
+              if (previousRev) return !previousRev ? '-' : stripSymbolAndRound(previousRev.toString());
             } else {
-              return (
-                currencySymbol +
-                (params.data.schReservations === '' ? '0.00' : parseFloat(params.data.schReservations).toFixed(2))
-              );
+              return params.data.schReservations === ''
+                ? valueWithCurrency('00.00')
+                : valueWithCurrency(params.data.schReservations);
             }
           },
           width: 100,
@@ -431,13 +438,20 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
       headerName: 'Total Value',
       field: 'totalValue',
       cellRenderer: function (params) {
-        const currSchResValue = params.data.schReservations === '' ? 0 : parseFloat(params.data.schReservations);
-        const currGenResValue = params.data.genReservations === '' ? 0 : parseFloat(params.data.genReservations);
+        const currSchResValue =
+          params.data.schReservations === '' ? 0 : parseFloat(stripSymbolAndRound(params.data.schReservations));
+        const currGenResValue =
+          params.data.genReservations === ''
+            ? 0
+            : parseFloat(stripSymbolAndRound(params.data.genReservations.substring(1)));
         const totalReserve = currSchResValue + currGenResValue;
-        const currSchSoldVal = params.data.schTotalValue === '' ? 0 : parseFloat(params.data.schTotalValue);
-        const currGenSoldVal = params.data.genTotalValue === '' ? 0 : parseFloat(params.data.genTotalValue);
+        const currSchSoldVal =
+          params.data.schTotalValue === '' ? 0 : parseFloat(stripSymbolAndRound(params.data.schTotalValue));
+        const currGenSoldVal =
+          params.data.genTotalValue === '' ? 0 : parseFloat(stripSymbolAndRound(params.data.genTotalValue));
         const totalSold = currSchSoldVal + currGenSoldVal;
 
+        const currencySymbol = params.data.genTotalValue.charAt(0);
         const currentValue = totalReserve + totalSold;
         return currentValue === 0 ? '-' : currencySymbol + currentValue.toFixed(2).toString();
       },
@@ -456,26 +470,32 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
       field: 'valueChange',
       cellRenderer: function (params) {
         const rowIndex = params.node.rowIndex;
-        const currSchResValue = params.data.schReservations === '' ? 0 : parseFloat(params.data.schReservations);
-        const currGenResValue = params.data.genReservations === '' ? 0 : parseFloat(params.data.genReservations);
+        const currSchResValue =
+          params.data.schReservations === '' ? 0 : parseFloat(params.data.schReservations.slice(1));
+        const currGenResValue =
+          params.data.genReservations === '' ? 0 : parseFloat(params.data.genReservations.slice(1));
         const totalReserve = currSchResValue + currGenResValue;
-        const currSchSoldVal = params.data.schTotalValue === '' ? 0 : parseFloat(params.data.schTotalValue);
-        const currGenSoldVal = params.data.genTotalValue === '' ? 0 : parseFloat(params.data.genTotalValue);
+        const currSchSoldVal = params.data.schTotalValue === '' ? 0 : parseFloat(params.data.schTotalValue.slice(1));
+        const currGenSoldVal = params.data.genTotalValue === '' ? 0 : parseFloat(params.data.genTotalValue.slice(1));
+
         const totalSold = currSchSoldVal + currGenSoldVal;
         const currentValue = totalReserve + totalSold;
-
+        const currencySymbol = params.data.genTotalValue.charAt(0);
         let valueChange;
         if (rowIndex === 0) {
           valueChange = currentValue;
         } else {
           const previousRowData = params.api.getDisplayedRowAtIndex(rowIndex - 1).data;
           const prevSchResValue =
-            previousRowData.schReservations === '' ? 0 : parseFloat(previousRowData.schReservations);
+            previousRowData.schReservations === '' ? 0 : parseFloat(previousRowData.schReservations.slice(1));
           const prevGenResValue =
-            previousRowData.genReservations === '' ? 0 : parseFloat(previousRowData.genReservations);
+            previousRowData.genReservations === '' ? 0 : parseFloat(previousRowData.genReservations.slice(1));
           const totalPrevReserve = prevSchResValue + prevGenResValue;
-          const prevSchSoldVal = previousRowData.schTotalValue === '' ? 0 : parseFloat(previousRowData.schTotalValue);
-          const prevGenSoldVal = previousRowData.genTotalValue === '' ? 0 : parseFloat(previousRowData.genTotalValue);
+          const prevSchSoldVal =
+            previousRowData.schTotalValue === '' ? 0 : parseFloat(previousRowData.schTotalValue.slice(1));
+          const prevGenSoldVal =
+            previousRowData.genTotalValue === '' ? 0 : parseFloat(previousRowData.genTotalValue.slice(1));
+
           const totalPrevSold = prevSchSoldVal + prevGenSoldVal;
           const prevValueTotal = totalPrevReserve + totalPrevSold;
           valueChange = currentValue - prevValueTotal;
@@ -483,7 +503,7 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
 
         // if negative display the minus sign before the currencySymbol
         if (valueChange < 0) {
-          return '-' + currencySymbol + (valueChange * -1).toFixed(2).toString();
+          return currencySymbol + '-' + (valueChange * -1).toFixed(2).toString();
         } else if (valueChange > 0) {
           return currencySymbol + parseInt(valueChange).toFixed(2).toString();
         } else {
@@ -505,10 +525,10 @@ export const salesColDefs = (currencySymbol, schoolDataAvail, isMarketing, booki
       field: 'seatsChange',
       cellRenderer: function (params) {
         const rowIndex = params.node.rowIndex;
-        const schSeatsSold = params.data.schSeatsSold === '' ? 0 : parseInt(params.data.schSeatsSold);
-        const genSeatsSold = params.data.genSeatsSold === '' ? 0 : parseInt(params.data.genSeatsSold);
-        const schReserved = params.data.schReserved === '' ? 0 : parseInt(params.data.schReserved);
-        const genReserved = params.data.genReserved === '' ? 0 : parseInt(params.data.genReserved);
+        const schSeatsSold = seatsTotalFormatter(params.data.schSeatsSold);
+        const genSeatsSold = seatsTotalFormatter(params.data.genSeatsSold);
+        const schReserved = seatsTotalFormatter(params.data.schReserved);
+        const genReserved = seatsTotalFormatter(params.data.genReserved);
         const currentValue = schSeatsSold + genSeatsSold + schReserved + genReserved;
 
         let seatsChange;

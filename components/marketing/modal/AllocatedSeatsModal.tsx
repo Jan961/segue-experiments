@@ -95,7 +95,7 @@ export default function AllocatedSeatsModal({
   const handleSave = () => {
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
     let data = {
-      ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
+      ArrangedById: parseInt(arrangedBy),
       Comments: comments,
       RequestedBy: requestedBy,
       Seats: parseInt(numSeatsReq),
@@ -248,7 +248,7 @@ export default function AllocatedSeatsModal({
                 options={perfList}
                 value={perfSelected}
                 onChange={(value) => setPerfSelected(value.toString())}
-                placeholder={'Select Date/Time'}
+                placeholder="Select Date/Time"
                 isClearable
                 isSearchable
               />
@@ -343,7 +343,7 @@ export default function AllocatedSeatsModal({
                 options={userList}
                 value={arrangedBy}
                 onChange={(value) => setArrangedBy(value !== null ? value.toString() : '')}
-                placeholder={'Select User'}
+                placeholder="Select User"
                 isClearable
                 isSearchable
               />

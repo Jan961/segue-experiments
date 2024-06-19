@@ -22,7 +22,7 @@ describe('DateInput Component', () => {
     const minDate = new Date('2022-01-01');
     const maxDate = new Date('2022-12-31');
     const placeholder = 'Select date';
-
+    const position = 24;
     render(
       <DateInput
         onChange={handleChange}
@@ -31,6 +31,7 @@ describe('DateInput Component', () => {
         minDate={minDate}
         maxDate={maxDate}
         placeholder={placeholder}
+        position={position}
       />,
     );
 

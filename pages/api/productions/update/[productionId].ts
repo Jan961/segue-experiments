@@ -25,13 +25,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           Code: dto.Code,
           IsArchived: dto.IsArchived,
           ...pick(dto, ['Code', 'IsArchived', 'SalesFrequency', 'SalesEmail']),
-          ...(Image?.id && {
-            File: {
-              connect: {
-                Id: Image?.id,
-              },
-            },
-          }),
+          ...(Image?.id
+            ? {
+                File: {
+                  connect: {
+                    Id: Image.id,
+                  },
+                },
+              }
+            : {
+                File: {
+                  disconnect: true,
+                },
+              }),
           DateBlock: {
             // Remove DateBlocks not in the DTO
             deleteMany: {

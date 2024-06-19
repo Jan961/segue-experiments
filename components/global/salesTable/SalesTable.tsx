@@ -47,7 +47,6 @@ export default function SalesTable({
 }: Partial<SalesTableProps>) {
   const [columnDefs, setColumnDefs] = useState([]);
   const [rowData, setRowData] = useState([]);
-  const [currency, setCurrency] = useState('£');
   const [height, setHeight] = useState(containerHeight);
   const [schoolSales, setSchoolSales] = useState<boolean>(false);
   const [numBookings, setNumBookings] = useState<number>(0);
@@ -58,8 +57,6 @@ export default function SalesTable({
   const styleProps = { headerColor: tileColors[module] };
 
   const salesSnapshot = (data: Array<SalesSnapshot>) => {
-    setCurrency('£');
-
     // check for school data
     const schoolSalesFound = data.find(
       (data) =>
@@ -67,7 +64,7 @@ export default function SalesTable({
     );
     setSchoolSales(Boolean(schoolSalesFound));
 
-    let colDefs = salesColDefs(currency, Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
+    let colDefs = salesColDefs(Boolean(schoolSalesFound), module !== 'bookings', booking, setSalesActivity);
     if (!schoolSalesFound) {
       colDefs = colDefs.filter((column) => column.headerName !== 'School Sales');
       setHeight(containerHeight);
@@ -212,7 +209,6 @@ export default function SalesTable({
         const MARKETING_TAB_WIDTH = 195;
         const SCHOOLS_TAB_WIDTH = 135;
 
-        // Regex to extract integers
         let baseContainerWidth = 1220;
         baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
         baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;

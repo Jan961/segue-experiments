@@ -48,7 +48,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-
     const venueId = data[0].VenueId;
     try {
       const bookingsForVenue: number[] = (
