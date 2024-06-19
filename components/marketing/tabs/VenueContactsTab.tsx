@@ -7,6 +7,7 @@ import { UiVenueContact, mapVenueContactToPrisma } from 'utils/venue';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import useAxios from 'hooks/useAxios';
 import { VenueContactDTO } from 'interfaces';
+import { Spinner } from 'components/global/Spinner';
 
 interface VenueContactsProps {
   bookingId: string;
@@ -22,6 +23,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
   const [venueContactsTable, setVenueContactsTable] = useState(<div />);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const venueStandardRoleList = [
     ...venueRoles.filter((vr) => vr.Standard === true).map((vr) => vr.Standard && { text: vr.Name, value: vr.Id }),
   ];
@@ -136,6 +138,8 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
             module="marketing"
           />,
         );
+
+        setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -151,7 +155,21 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
     }
   }, [props.bookingId]);
 
-  return <div>{dataAvailable && <div>{venueContactsTable}</div>}</div>;
+  return (
+    <div>
+      {dataAvailable && (
+        <div>
+          {isLoading ? (
+            <div className="mt-[150px] text-center">
+              <Spinner size="lg" className="mr-3" />
+            </div>
+          ) : (
+            <div>{venueContactsTable}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 });
 
 VenueContactsTab.displayName = 'VenueContactsTab';

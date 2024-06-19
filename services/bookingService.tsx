@@ -31,6 +31,7 @@ const bookingInclude = Prisma.validator<Prisma.BookingInclude>()({
   Venue: true,
   Performance: true,
   DateBlock: true,
+  _count: true,
 });
 
 export type BookingsWithPerformances = Prisma.BookingGetPayload<{
@@ -196,6 +197,11 @@ export const getSaleableBookings = async (ProductionId: number) => {
               Show: true,
             },
           },
+        },
+      },
+      _count: {
+        select: {
+          Performance: true,
         },
       },
     },

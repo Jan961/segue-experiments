@@ -9,6 +9,7 @@ import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { userState } from 'state/account/userState';
+import { Spinner } from 'components/global/Spinner';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -29,6 +30,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const users = useRecoilValue(userState);
 
@@ -54,6 +56,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
         setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
         setContactNoteRows(sortedContactNotes);
+        setIsLoading(false);
       }
     } catch (error) {
       console.log(error);
@@ -159,11 +162,17 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
             </div>
           </div>
 
-          <div className="flex flex-row">
-            <div className="w-[1086px] h-[500px]">
-              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+          {isLoading ? (
+            <div className="mt-[150px] text-center">
+              <Spinner size="lg" className="mr-3" />
             </div>
-          </div>
+          ) : (
+            <div className="flex flex-row">
+              <div className="w-[1086px] h-[500px]">
+                <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+              </div>
+            </div>
+          )}
 
           <ContactNoteModal
             show={showContactNoteModal}

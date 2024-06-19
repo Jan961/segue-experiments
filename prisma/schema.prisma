@@ -925,7 +925,7 @@ model DealMemoTechProvision {
 model File {
   Id               Int          @id @default(autoincrement()) @map("FileId")
   OriginalFilename String       @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?      @map("FileMediaType") @db.VarChar(20)
+  MediaType        String?      @map("FileMediaType") @db.VarChar(200)
   Location         String       @map("FileLocation") @db.VarChar(512)
   UploadDateTime   DateTime     @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId     Int          @map("FileUploadUserId")

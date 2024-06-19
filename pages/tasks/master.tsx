@@ -53,17 +53,15 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   const handleCellClick = async (e) => {
     setRowIndex(e.rowIndex);
     setTaskId(e.data.Id);
+    setCurrentTask(e.data);
     if (e.column.colId === 'delete') {
       setConfirm(true);
     } else if (e.column.colId === 'clone') {
       delete e.data.Id;
-      setShowAddTask(!showAddTask);
-      setCurrentTask(e.data);
+      setShowAddTask(true);
     } else if (e.column.colId === 'edit') {
-      setShowAddTask(!showAddTask);
-      setCurrentTask(e.data);
+      setShowAddTask(true);
     } else if (e.column.colId === 'Notes') {
-      setCurrentTask(e.data);
       setShowModal(true);
     }
   };
@@ -86,6 +84,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const handleNewProductionTaskModal = () => {
     setShowNewProduction(false);
+    setShowAddTask(false);
   };
 
   const handleNewProductionTaskSubmit = (val: string) => {
@@ -96,7 +95,8 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   };
 
   const handleShowTask = () => {
-    setShowNewProduction(true);
+    setShowAddTask(false);
+    router.replace(router.asPath);
   };
 
   const handleMasterListClose = (val: string) => {
@@ -116,7 +116,11 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const onRowDoubleClicked = (e) => {
     setCurrentTask(e.data);
-    setShowAddTask(!showAddTask);
+    setShowAddTask(true);
+  };
+
+  const handleNewTask = () => {
+    setShowNewProduction(true);
   };
 
   const handleSaveNote = async (value: string) => {
@@ -134,7 +138,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-3">
-        <Filters handleShowTask={handleShowTask} />
+        <Filters handleShowTask={handleNewTask} />
       </div>
       <Table
         ref={tableRef}

@@ -1,32 +1,10 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import fuseFilter from 'utils/fuseFilter';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { country, town, productionId, searchQuery, limit } = req.body;
   const queryConditions: any = { IsDeleted: false };
-  if (searchQuery) {
-    queryConditions.OR = [
-      {
-        Name: {
-          contains: searchQuery,
-        },
-      },
-      {
-        Code: {
-          contains: searchQuery,
-        },
-      },
-      {
-        VenueAddress: {
-          some: {
-            Town: {
-              contains: searchQuery,
-            },
-          },
-        },
-      },
-    ];
-  }
   if (country) {
     queryConditions.VenueAddress = {
       some: {
@@ -55,7 +33,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   try {
     const venues = await prisma.venue.findMany({
-      ...(limit && { take: limit }),
       where: queryConditions,
       include: {
         VenueAddress: true,
@@ -77,7 +54,21 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       ],
     });
-    res.status(200).json(venues);
+    const tempVenues = venues.map((venue) => {
+      return {
+        ...venue,
+        Town: venue.VenueAddress.find((address) => {
+          return address.TypeName === 'Main';
+        })?.Town,
+      };
+    });
+    const filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
+    if (filteredVenues.length > 0) {
+      const returnLength = filteredVenues.length >= limit ? limit : filteredVenues.length;
+      res.status(200).json(filteredVenues.slice(0, returnLength));
+    } else {
+      res.status(200).json([]);
+    }
   } catch (error) {
     res.status(500).json({ error: 'Unable to fetch venues' });
   }
