@@ -109,17 +109,14 @@ const ArchSalesDialog = ({
           return `${ShowCode}${ProductionCode}` !== booking.FullProductionCode;
         });
 
-        // use bookings to get the bookingId
-        console.log(`${ShowCode}${ProductionCode}`);
-
         const currentProduction = productions.find((prod) => {
           return prod.ShowCode === ShowCode && prod.Code === ProductionCode;
         });
-        console.log(currentProduction);
+
         const currentBooking = bookings.find((booking) => {
           return booking.Id === selectedBookingId;
         });
-        console.log(currentBooking);
+
         setSelectedBookings([
           {
             bookingId: currentBooking?.Id,
