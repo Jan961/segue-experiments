@@ -61,7 +61,6 @@ const NewBookingView = ({
   const { fromDate, toDate, dateType, isDateTypeOnly, venueId, shouldFilterVenues, isRunOfDates } = formData;
 
   useEffect(() => {
-    onChange({ isRunOfDates: true });
     updateModalTitle('Create New Booking');
     onBarringCheckComplete('New Booking Details');
   }, []);
