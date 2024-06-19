@@ -119,9 +119,17 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueFamily && <small className="text-primary-red">{validationErrors.venueFamily}</small>}
       </div>
-      <div className="flex flex-col">
-        {validationErrors.currency && <small className="text-primary-red">{validationErrors.currency}</small>}
-      </div>
+      <label htmlFor="" className="flex flex-row gap-5 justify-between ">
+        <p className="text-primary-input-text">Town Population</p>
+        <TextInput
+          placeholder="Enter Town Population"
+          type="number"
+          className="w-[364px]"
+          value={formData.townPopulation + ''}
+          onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
+        />
+      </label>
+
       <div className="flex flex-col">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <p className="text-primary-input-text">Capacity</p>
@@ -135,16 +143,7 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueCapacity && <small className="text-primary-red">{validationErrors.venueCapacity}</small>}
       </div>
-      <label htmlFor="" className="flex flex-row gap-5 justify-between ">
-        <p className="text-primary-input-text">Town Population</p>
-        <TextInput
-          placeholder="Enter Town Population"
-          type="number"
-          className="w-[364px]"
-          value={formData.townPopulation + ''}
-          onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
-        />
-      </label>
+
       <label
         htmlFor=""
         className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
