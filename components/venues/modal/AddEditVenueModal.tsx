@@ -31,7 +31,6 @@ interface AddEditVenueModalProps {
 export default function AddEditVenueModal({
   venue,
   visible,
-  venueCurrencyOptionList,
   venueFamilyOptionList,
   venueRoleOptionList,
   countryOptions,
@@ -136,7 +135,6 @@ export default function AddEditVenueModal({
           <div className="grid grid-cols-2 gap-5">
             <MainVenueForm
               venue={formData}
-              venueCurrencyOptionList={venueCurrencyOptionList}
               venueFamilyOptionList={venueFamilyOptionList}
               onChange={onChange}
               validationErrors={validationErrors}

@@ -11,7 +11,6 @@ import { UiTransformedVenue } from 'utils/venue';
 
 interface MainVenueFormProps {
   venue: Partial<UiTransformedVenue>;
-  venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
@@ -19,7 +18,6 @@ interface MainVenueFormProps {
 }
 const MainVenueForm = ({
   venue,
-  venueCurrencyOptionList,
   venueFamilyOptionList,
   validationErrors,
   updateValidationErrrors,
@@ -96,13 +94,13 @@ const MainVenueForm = ({
       <div className="flex flex-row justify-between pl-20">
         <Checkbox
           label="VAT Indicator"
-          id={'vatIndicator'}
+          id="vatIndicator"
           checked={formData.vatIndicator}
           onChange={(e) => handleInputChange('vatIndicator', e.target.value)}
         />
         <Checkbox
           label="Culturally Exempt Venue"
-          id={'culturallyExempt'}
+          id="culturallyExempt"
           checked={formData.culturallyExempt}
           onChange={(e) => handleInputChange('culturallyExempt', e.target.value)}
         />
@@ -122,18 +120,6 @@ const MainVenueForm = ({
         {validationErrors.venueFamily && <small className="text-primary-red">{validationErrors.venueFamily}</small>}
       </div>
       <div className="flex flex-col">
-        <label className="flex flex-row gap-5 justify-between">
-          <p className="text-primary-input-text">Currency</p>
-          <Select
-            name="currency"
-            className="w-[364px] font-bold"
-            placeholder="Currency Dropdown"
-            value={formData.currency}
-            onChange={(value) => handleInputChange('currency', value)}
-            options={venueCurrencyOptionList}
-            isSearchable
-          />
-        </label>
         {validationErrors.currency && <small className="text-primary-red">{validationErrors.currency}</small>}
       </div>
       <div className="flex flex-col">
@@ -194,7 +180,7 @@ const MainVenueForm = ({
           <Icon iconName="info-circle-solid" />
         </Tooltip>
         <Checkbox
-          id={'excludeFromChecks'}
+          id="excludeFromChecks"
           checked={formData.excludeFromChecks}
           onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)}
         />
