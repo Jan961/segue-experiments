@@ -70,6 +70,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         towns: townList,
         venueList: venue,
         defaultTab: 0,
+        currencySymbol: '',
         users,
       },
     };

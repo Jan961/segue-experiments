@@ -16,7 +16,7 @@ export default function VenueColumnRenderer(props: CustomCellRendererProps) {
       return 'bg-secondary-purple text-primary-white';
     } else if (bookingStatus === 'Pencilled' && multipleVenuesOnSameDate) {
       return 'bg-primary-blue text-primary-white';
-    } else if (venueHasMultipleBookings) {
+    } else if (venueHasMultipleBookings && bookingStatus !== 'Confirmed') {
       return 'text-primary-red font-bold';
     }
     return '';

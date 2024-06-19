@@ -16,7 +16,7 @@ interface BookingReportProps {
 }
 
 export const BookingReports = ({ visible = false, onClose, productionId }: BookingReportProps) => {
-  const { productions } = useRecoilValue(productionJumpState);
+  const { productions, selected } = useRecoilValue(productionJumpState);
   const lastShowDate = useMemo(() => {
     const helper = new BookingHelper({});
     const { end } = helper.getRangeFromDateBlocks(productions);
@@ -65,6 +65,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExport('tourSchedule')}
+          disabled={selected === -1}
         />
 
         <Button
@@ -73,6 +74,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
           onClick={() => onExport('tourSummary')}
+          disabled={selected === -1}
         />
 
         <Button
