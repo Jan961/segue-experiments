@@ -20,7 +20,6 @@ import useAxiosCancelToken from 'hooks/useCancelToken';
 
 interface AddEditVenueModalProps {
   visible: boolean;
-  venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   countryOptions: SelectOption[];
   venueRoleOptionList: SelectOption[];
