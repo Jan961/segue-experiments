@@ -162,7 +162,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const onSave = (file, onProgress, onError, onUploadingImage) => {
-    console.log('==onSave==', file);
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
@@ -230,20 +229,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         notify.success(ToastMessages.updateProductionSuccess);
-        // if (payloadData.isArchived && !isArchived) {
-        //   const gridApi = tableRef.current.getApi();
-        //   const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
-        //   const transaction = {
-        //     remove: [rowDataToRemove],
-        //   };
-        //   applyTransactionToGrid(tableRef, transaction);
-        // }
         setEditedOrAddedRecords((prev) => prev.filter((id) => id !== data.Id));
         const excludeUpdatedRecords = editedOrAddedRecords?.filter((id) => id !== data.Id);
         setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
         notify.error(ToastMessages.updateProductionFailure);
-        console.log('Error updating production', error);
+        debug('Error updating production', error);
       } finally {
         setIsLoading(false);
         setIsEdited(false);
@@ -251,7 +242,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         router.replace(router.asPath);
       }
     },
-    [currentProduction?.Id, isArchived, productionUploadMap, router],
+    [currentProduction?.Id, editedOrAddedRecords, productionUploadMap, router],
   );
 
   const createNewProduction = useCallback(
@@ -275,7 +266,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         notify.success(ToastMessages.createNewProductionSuccess);
       } catch (error) {
         notify.error(ToastMessages.createNewProductionFailure);
-        console.log('Error creating production', error);
+        debug('Error creating production', error);
       } finally {
         setIsEdited(false);
         setCurrentProduction(intProduction);
@@ -367,6 +358,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           },
         ],
       };
+      setIsEdited(true);
       applyTransactionToGrid(tableRef, transaction);
       setProductionUploadMap((prev) => {
         const newMap = { ...prev };
