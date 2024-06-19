@@ -325,7 +325,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           )}
         </TableWrapper>
         <div className="float-right flex flex-row mt-5 py-2">
-          <div className={`text text-base text-primary-red ${errorMessage.length > 0 && 'mr-12'}`}>{errorMessage}</div>
+          <div className={classNames('text', 'text-base', 'text-primary-red', { 'mr-12': errorMessage.length > 0 })}>
+            {errorMessage}
+          </div>
 
           {loading && <Spinner size="sm" className="mr-3" />}
 
