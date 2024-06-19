@@ -13,7 +13,7 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { useEffect, useState } from 'react';
 import { DistanceParams } from 'distance';
 import axios from 'axios';
-import { formatRowsForPencilledBookings } from 'components/bookings/utils';
+import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from 'components/bookings/utils';
 import { isNullOrEmpty } from 'utils';
 
 const gridOptions = {
@@ -60,6 +60,7 @@ export default function PreviewBookingDetails({
         return row;
       });
       updatedRows = formatRowsForPencilledBookings(updatedRows);
+      updatedRows = formatRowsForMultipeBookingsAtSameVenue(updatedRows);
       setRows(updatedRows);
     }
   };
