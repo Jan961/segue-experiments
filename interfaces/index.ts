@@ -111,6 +111,7 @@ export type BookingDTO = {
   BookingSalesNotes: string;
   BookingCompNotes: string;
   BookingHoldNotes: string;
+  PerformanceCount: number;
 };
 
 export type ContractsDTO = {
