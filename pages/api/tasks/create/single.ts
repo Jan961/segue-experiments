@@ -1,8 +1,7 @@
-// import { generateProductionTaskId } from 'components/tasks/utils';
 import { ProductionTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-// import { getMaxProductionTaskCode } from 'services/TaskService';
+import { getMaxProductionTaskCode } from 'services/TaskService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -14,14 +13,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { ProductionId });
     if (!access) return res.status(401).end();
 
-    // const { Code } = await getMaxProductionTaskCode(ProductionId);
-
-    // const codeGenerated = generateProductionTaskId(Code, Code);
+    const { Code } = await getMaxProductionTaskCode(ProductionId);
 
     const createResult = await prisma.productionTask.create({
       data: {
         ProductionId: task.ProductionId,
-        Code: task.Code,
+        Code: Code + 1,
         Name: task.Name,
         Priority: task.Priority,
         Notes: task.Notes,
@@ -36,7 +33,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     res.json(createResult);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: 'Error creating ProductionTask' });
+    if (err.code === 'P2002' && err.meta && err.meta.target.includes('SECONDARY')) {
+      res.status(409).json({ error: 'A show with the specified AccountId and Code already exists.' });
+    } else {
+      res.status(500).json({ error: `Error occurred while creating Show ${err?.message}`, ok: false });
+    }
   }
 }

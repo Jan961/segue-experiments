@@ -16,13 +16,16 @@ const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
   value: index.toString(),
 }));
 
-export const getColumnDefs = (usersList = [], productionName = '') => {
+export const getColumnDefs = (usersList = [], production) => {
   return [
     {
       headerName: 'Code',
       field: 'Code',
       cellRenderer: DefaultCellRenderer,
-      width: 72,
+      width: 120,
+      valueGetter: function (params) {
+        if (production) return `${production.ShowCode}${production?.Code}-${params?.data?.Code}`;
+      },
       cellStyle: function (params) {
         const { CompleteDate, Progress } = params.data;
         const taskDateStatusColor = getTaskDateStatusColor(CompleteDate, Progress);
@@ -35,7 +38,7 @@ export const getColumnDefs = (usersList = [], productionName = '') => {
       field: 'Name',
       cellRenderer: DefaultCellRenderer,
       headerValueGetter: function () {
-        if (productionName) return `${productionName} Task Name`;
+        if (production.ShowName) return `${production.ShowName} Task Name`;
         else return 'Task Name';
       },
       cellStyle: function (params) {
