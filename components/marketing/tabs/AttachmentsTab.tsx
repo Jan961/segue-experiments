@@ -76,7 +76,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
         FileDateTime: new Date(),
         FileDescription: attachType,
         FileOriginalFilename: response.data.originalFilename,
-        FileUrl: 'https://d1e9vbizioozy0.cloudfront.net/' + response.data.location,
+        FileURL: 'https://d1e9vbizioozy0.cloudfront.net/' + response.data.location,
         FileUploadedDateTime: new Date(),
       };
 
@@ -134,7 +134,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
 
   const handleCellClicked = (event) => {
     if (event.column.colId === 'ViewBtn') {
-      const fileUrl = event.data.FileUrl;
+      const fileUrl = event.data.FileURL;
       window.open(fileUrl, '_blank');
     } else if (event.column.colId === 'icons') {
       setAttachRow(event.data);
