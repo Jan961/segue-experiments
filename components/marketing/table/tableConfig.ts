@@ -367,7 +367,7 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
       cellRendererParams: function (params) {
         return {
           value: isNullOrEmpty(params.data.value) ? '0' : params.data.value.toString(),
-          className: 'w-[90px] ml-1 mt-1',
+          className: 'w-[90px] ml-1',
           onChange: (e) => handleUpdate(e.target.value, params.data, type, 'value'),
           currency,
         };

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
 import useAxios from 'hooks/useAxios';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
@@ -38,7 +38,11 @@ interface SalesFigureSet {
   schools: SalesFigure;
 }
 
-export default function Entry() {
+export interface SalesEntryRef {
+  resetForm: (salesWeek) => void;
+}
+
+const Entry = forwardRef<SalesEntryRef>((ref) => {
   const [genSeatsSold, setGenSeatsSold] = useState('');
   const [genSeatsSoldVal, setGenSeatsSoldVal] = useState('');
   const [genSeatsReserved, setGenSeatsReserved] = useState('');
@@ -100,7 +104,7 @@ export default function Entry() {
   };
 
   const handleCancel = () => {
-    console.log('cancel');
+    setSalesFigures(true);
   };
 
   const setNumericVal = (setFunction: (value) => void, value: string) => {
@@ -220,6 +224,13 @@ export default function Entry() {
     initForm();
     setCurrency('£');
   }, [fetchData, bookings.selected]);
+
+  useImperativeHandle(ref, () => ({
+    resetForm: (week) => {
+      alert(week);
+      setSalesFigures(false);
+    },
+  }));
 
   return (
     <div>
@@ -399,6 +410,7 @@ export default function Entry() {
                   columnDefs={salesEntryColDefs('Holds', currency, handleTableUpdate)}
                   rowData={holdData}
                   styleProps={styleProps}
+                  gridOptions={{ suppressHorizontalScroll: true }}
                 />
 
                 <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Holds Notes</div>
@@ -415,6 +427,7 @@ export default function Entry() {
                   columnDefs={salesEntryColDefs('Comps', currency, handleTableUpdate)}
                   rowData={compData}
                   styleProps={styleProps}
+                  gridOptions={{ suppressHorizontalScroll: true }}
                 />
 
                 <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Comp Notes</div>
@@ -441,4 +454,7 @@ export default function Entry() {
       )}
     </div>
   );
-}
+});
+
+Entry.displayName = 'Entry';
+export default Entry;

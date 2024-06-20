@@ -1,10 +1,11 @@
 import Layout from 'components/Layout';
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
-import Entry from 'components/marketing/sales/entry';
+import Entry, { SalesEntryRef } from 'components/marketing/sales/entry';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
 import { objectify } from 'radash';
+import { useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
@@ -15,15 +16,16 @@ import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
   const bookings = useRecoilValue(bookingJumpState);
+  const salesEntryRef = useRef<SalesEntryRef>();
 
   return (
     <div>
       <Layout title="Marketing | Segue">
         <div className="mb-8">
-          <SalesEntryFilters />
+          <SalesEntryFilters onDateChanged={(salesWeek) => alert(salesWeek + ' in onDate')} />
         </div>
 
-        {bookings.selected !== undefined && bookings.selected !== null && <Entry />}
+        {bookings.selected !== undefined && bookings.selected !== null && <Entry ref={salesEntryRef} />}
       </Layout>
     </div>
   );

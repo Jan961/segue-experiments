@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Select from 'components/core-ui-lib/Select';
@@ -16,7 +16,11 @@ type TourResponse = {
   frequency: string;
 };
 
-const SalesEntryFilters = () => {
+type Props = {
+  onDateChanged?: (salesWeek: any) => void;
+};
+
+const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
   const [selectedValue, setSelectedValue] = useState(null);
@@ -28,6 +32,7 @@ const SalesEntryFilters = () => {
 
   const bookingOptions = useMemo(() => {
     try {
+      onDateChanged(selectedTourWeek);
       const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
       const optWithRun = initialOptions.map((option) => {
         const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
