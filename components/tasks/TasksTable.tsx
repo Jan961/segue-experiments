@@ -101,6 +101,7 @@ export default function TasksTable({
   const handleClose = () => {
     if (isEdit) setIsEdit(false);
     else handleShowTask();
+    router.replace(router.asPath);
   };
 
   const modalData = isEdit ? { ...currentTask, ProductionId: productionId } : { ProductionId: productionId };
