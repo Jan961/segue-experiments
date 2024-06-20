@@ -1,4 +1,4 @@
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { venueRoleState } from 'state/marketing/venueRoleState';
 import VenueContactForm from 'components/venues/modal/VenueContactsForm';
@@ -19,8 +19,8 @@ export interface VenueContactTabRef {
 
 const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((props, ref) => {
   const bookings = useRecoilState(bookingJumpState);
-  const venueRoles = useRecoilValue(venueRoleState);
-  const [venueContactsTable, setVenueContactsTable] = useState(<div />);
+  const [venueRoles, setVenueRoles] = useRecoilState(venueRoleState);
+  const [venueContacts, setVenueContacts] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -36,13 +36,14 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
     },
   }));
 
-  const saveVenueContact = async (data) => {
+  const saveVenueContact = async (inputData, mode, updatedFormData) => {
+    const data = { ...inputData, mode, updatedFormData };
     const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
     const variant = data.mode;
 
     // create venue contact
     if (variant === 'create') {
-      const newContact = data.updatedFormData.venueContacts.find((contact) => contact.venueRoleId === null);
+      const newContact = data.venueContacts.find((contact) => contact.venueRoleId === null);
       const roleIndex = venueStandardRoleList.findIndex((role) => role.text === newContact.roleName);
       let venueRole = null;
 
@@ -56,6 +57,8 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
             isStandard: false,
           },
         });
+
+        setVenueRoles([...venueRoles, venueRole]);
       }
 
       const newVc = {
@@ -64,22 +67,39 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         LastName: newContact.lastName,
         Phone: newContact.phone,
         Email: newContact.email,
-        VenueRoleId: venueRole.Id,
+        VenueRoleId: venueRole ? venueRole.Id : null,
         VenueId: booking.VenueId,
       };
 
-      await fetchData({
+      const newVenueContact = await fetchData({
         url: '/api/marketing/venueContacts/create',
         method: 'POST',
         data: newVc,
       });
 
-      getVenueContacts(booking.VenueId.toString());
+      if (typeof newVenueContact === 'object') {
+        const newRole = newVenueContact as VenueContactDTO;
+        const tempVenueContactUi: UiVenueContact = {
+          ...newContact,
+          venueId: parseInt(newVc.VenueId),
+          roleName: newContact.roleName,
+          venueRoleId: newVc.VenueRoleId,
+          id: newRole.Id,
+        };
+
+        setVenueContacts([...venueContacts, tempVenueContactUi]);
+      }
 
       // update fields
     } else if (variant === 'update') {
-      const updatedRow = mapVenueContactToPrisma(data.updatedRow);
-      const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId };
+      const role = venueRoles.find((role) => role.Name === data.updatedFormData.roleName);
+      if (!role || role.Id === undefined) {
+        return;
+      }
+
+      const vcId = venueContacts.find((vc) => vc.venueRoleId === role.Id).id;
+      const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
+      const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
 
       await fetchData({
         url: '/api/marketing/venueContacts/update',
@@ -89,7 +109,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
       // delete venue contact
     } else if (variant === 'delete') {
-      const updatedRow = mapVenueContactToPrisma(data.rowToDel);
+      const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
       await fetchData({
         url: '/api/marketing/venueContacts/delete',
         method: 'POST',
@@ -100,7 +120,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
   const getVenueContacts = async (venueId: string) => {
     try {
-      setVenueContactsTable(<div />);
+      setVenueContacts([]);
 
       const data = await fetchData({
         url: '/api/marketing/venueContacts/' + venueId,
@@ -126,18 +146,8 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
           venueContactUiList.push(tempVenueContactUi);
         });
 
-        setVenueContactsTable(
-          <VenueContactForm
-            venueRoleOptionList={venueStandardRoleList}
-            venue={selectedVenue}
-            contactsList={venueContactUiList}
-            onChange={(newData) => saveVenueContact(newData)}
-            tableStyleProps={styleProps}
-            tableHeight={585}
-            title=""
-            module="marketing"
-          />,
-        );
+        setVenueContacts(venueContactUiList);
+        setDataAvailable(true);
 
         setIsLoading(false);
       }
@@ -151,7 +161,6 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
       setSelectedVenue(booking.Venue);
       getVenueContacts(booking.VenueId.toString());
-      setDataAvailable(true);
     }
   }, [props.bookingId]);
 
@@ -164,7 +173,16 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
               <Spinner size="lg" className="mr-3" />
             </div>
           ) : (
-            <div>{venueContactsTable}</div>
+            <VenueContactForm
+              venueRoleOptionList={venueStandardRoleList}
+              venue={selectedVenue}
+              contactsList={venueContacts}
+              onChange={(newData, mode, updatedRow) => saveVenueContact(newData, mode, updatedRow)}
+              tableStyleProps={styleProps}
+              tableHeight={585}
+              title=""
+              module="marketing"
+            />
           )}
         </div>
       )}

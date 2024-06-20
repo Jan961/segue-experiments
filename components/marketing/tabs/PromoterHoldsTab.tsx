@@ -77,7 +77,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   };
 
   const getPromoterHoldData = async (bookingId) => {
-    setAvailSeatsCont([]);
     try {
       const data = await fetchData({
         url: '/api/marketing/promoterHolds/' + bookingId,
@@ -151,7 +150,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         data: recData,
       });
 
-      setAllocRows([...allocRows, recData]);
+      getPromoterHoldData(bookingIdVal);
       setShowAllocSeatsModal(false);
     } else if (type === 'edit') {
       await fetchData({
@@ -160,13 +159,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         data: recData,
       });
 
-      const processedRecord = { ...recData, ArrangedById: recData.ArrangedBy };
-
-      const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
-      const newRows = [...allocRows];
-      newRows[rowIndex] = processedRecord;
-
-      setAllocRows(newRows);
+      getPromoterHoldData(bookingIdVal);
     } else if (type === 'delete') {
       await fetchData({
         url: '/api/marketing/allocatedSeats/delete',
@@ -174,12 +167,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
         data: recData,
       });
 
-      const rowIndex = allocRows.findIndex((alloc) => alloc.Id === data.Id);
-      const newRows = [...allocRows];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
-      }
-      setAllocRows(newRows);
+      getPromoterHoldData(bookingIdVal);
     }
 
     setShowAllocSeatsModal(false);
