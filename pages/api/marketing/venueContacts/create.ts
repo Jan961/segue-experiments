@@ -1,7 +1,6 @@
 import { loggingService } from 'services/loggingService';
 import prisma from 'lib/prisma';
 import { VenueContactDTO } from 'interfaces';
-import { venueRoleMapper } from 'lib/mappers';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -26,7 +25,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       },
     });
-    res.status(200).json(venueRoleMapper(result));
+
+    res.status(200).json(result);
   } catch (err) {
     await loggingService.logError(err);
     console.log(err);

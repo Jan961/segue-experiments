@@ -7,11 +7,8 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const data = req.body as CompAllocation;
-
-    const { AvailableCompId } = data;
-
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { AvailableCompId });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
     await prisma.compAllocation.update({
@@ -28,10 +25,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Seats: data.Seats,
         Comments: data.Comments,
         RequestedBy: data.RequestedBy,
-        ArrangedBy: data.ArrangedById,
         VenueConfirmationNotes: data.VenueConfirmationNotes,
         TicketHolderEmail: data.TicketHolderEmail,
         SeatsAllocated: data.SeatsAllocated,
+        AccountUser: {
+          connect: {
+            Id: data.ArrangedById,
+          },
+        },
       },
     });
     res.status(200).json({});

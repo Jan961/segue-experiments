@@ -66,8 +66,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     res.status(200).end();
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ err: 'Error occurred while creating production.' });
+  } catch (error) {
+    console.log(error);
+    if (error.code === 'P2002' && error.meta && error.meta.target.includes('SECONDARY')) {
+      // The target might not exactly match 'SECONDARY', depending on Prisma version and database
+      res.status(409).json({ error: 'A Production with the specified ShowId and Code already exists.', ok: false });
+    } else {
+      res.status(500).json({ err: 'Error occurred while creating production.', ok: false });
+    }
   }
 }
