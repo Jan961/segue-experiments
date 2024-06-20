@@ -191,7 +191,7 @@ export const productionsTableConfig = [
         'DateBlock[0].StartDate',
         0,
         'StartDate',
-        { disableAnimations: true, defaultMinDateToToday: false },
+        { disableAnimations: true, defaultMinDateToToday: false, isRequired: true },
         DateRenderer,
       ),
       generateChildCol(
@@ -199,7 +199,7 @@ export const productionsTableConfig = [
         'DateBlock[0].EndDate',
         0,
         'EndDate',
-        { disableAnimations: true, defaultMinDateToToday: false },
+        { disableAnimations: true, defaultMinDateToToday: false, isRequired: true },
         DateRenderer,
       ),
     ],
