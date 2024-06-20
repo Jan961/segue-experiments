@@ -2,6 +2,7 @@ import { SalesSnapshot } from 'types/MarketingTypes';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import SalesTable from '../../global/salesTable/SalesTable';
 import axios from 'axios';
+import { Spinner } from 'components/global/Spinner';
 
 interface SalesTabProps {
   bookingId: string;
@@ -14,6 +15,7 @@ export interface SalesTabRef {
 const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   const [salesTable, setSalesTable] = useState(<div />);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -40,6 +42,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
         );
 
         setDataAvailable(true);
+        setIsLoading(false);
       }
     } catch (exception) {
       console.log(exception);
@@ -53,7 +56,21 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     }
   }, [props.bookingId]);
 
-  return <>{dataAvailable && <div>{salesTable}</div>}</>;
+  return (
+    <>
+      {dataAvailable && (
+        <div>
+          {isLoading ? (
+            <div className="mt-[150px] text-center">
+              <Spinner size="lg" className="mr-3" />
+            </div>
+          ) : (
+            <div>{salesTable}</div>
+          )}
+        </div>
+      )}
+    </>
+  );
 });
 
 SalesTab.displayName = 'SalesTab';

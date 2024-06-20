@@ -1,7 +1,9 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Button from 'components/core-ui-lib/Button';
-import SalesSummaryReportModal from './SalesSummaryReportModal';
+import SalesSummaryAndWeeklyTotalsModal from './SalesSummaryAndWeeklyTotalsModal';
+import GrossVenuesPromotorHoldsAndCompsModal from './GrossVenuesPromotorHoldsAndCompsModal';
+import SalesGraphModal from './SalesGraphModal';
 
 interface MarketingReportsProps {
   visible: boolean;
@@ -10,6 +12,16 @@ interface MarketingReportsProps {
 
 export const MarketingReports = ({ visible = false, onClose }: MarketingReportsProps) => {
   const [activeModal, setActiveModal] = useState<string>(null);
+
+  const isSummaryWeeklyTotalsOrCapacity = useMemo(
+    () => ['salesSummary', 'salesSummaryAndWeeklyTotals', 'salesVsCapacity'].includes(activeModal),
+    [activeModal],
+  );
+
+  const isGrossVenuesPromotorHoldsAndComps = useMemo(
+    () => ['totalGrossSales', 'selectedVenues', 'promotorHolds', 'holdsAndComps'].includes(activeModal),
+    [activeModal],
+  );
 
   const onExportClick = useCallback((key: string) => {
     setActiveModal(key);
@@ -38,6 +50,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('salesSummaryAndWeeklyTotals')}
         />
 
         <Button
@@ -45,6 +58,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-5"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('salesVsCapacity')}
         />
 
         <Button
@@ -52,6 +66,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('totalGrossSales')}
         />
 
         <Button
@@ -59,6 +74,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('salesGraphs')}
         />
 
         <Button
@@ -66,6 +82,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('selectedVenues')}
         />
 
         <Button
@@ -73,6 +90,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('promotorHolds')}
         />
 
         <Button
@@ -80,10 +98,25 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
           className="w-[262px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
+          onClick={() => onExportClick('holdsAndComps')}
         />
       </div>
-      {activeModal === 'salesSummary' && (
-        <SalesSummaryReportModal visible={activeModal === 'salesSummary'} onClose={closeActiveModal} />
+      {isSummaryWeeklyTotalsOrCapacity && (
+        <SalesSummaryAndWeeklyTotalsModal
+          activeModal={activeModal}
+          visible={isSummaryWeeklyTotalsOrCapacity}
+          onClose={closeActiveModal}
+        />
+      )}
+      {isGrossVenuesPromotorHoldsAndComps && (
+        <GrossVenuesPromotorHoldsAndCompsModal
+          visible={isGrossVenuesPromotorHoldsAndComps}
+          activeModal={activeModal}
+          onClose={closeActiveModal}
+        />
+      )}
+      {activeModal === 'salesGraphs' && (
+        <SalesGraphModal visible={activeModal === 'salesGraphs'} onClose={closeActiveModal} />
       )}
     </PopupModal>
   );

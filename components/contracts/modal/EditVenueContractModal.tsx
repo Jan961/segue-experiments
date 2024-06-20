@@ -63,20 +63,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   );
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
-      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id}`,
+      `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
     if (demoModalData.data && demoModalData.data.DeMoBookingId) {
       setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
-      if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
-        const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
-        setVenue(venueData.data as unknown as Venue);
-      }
+    }
+    if (selectedTableCell.contract && selectedTableCell.contract.venueId) {
+      const venueData = await axios.get(`/api/venue/${selectedTableCell.contract.venueId}`);
+      setVenue(venueData.data as unknown as Venue);
     }
   };
   useEffect(() => {
     const callDealMemoData = async () => {
       setIsLoading(true);
-      callDealMemoApi();
+      await callDealMemoApi();
       setIsLoading(false);
     };
     callDealMemoData();
@@ -269,7 +269,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                   options={[{ text: 'Select Assignee', value: null }, ...userList]}
                   isClearable
                   isSearchable
-                  value={formData.SignedBy ? users[formData.SignedBy].Id : ''}
+                  // value={formData.SignedBy ? users[formData.SignedBy].Id : ''}
                 />
 
                 <div className="flex items-center">
