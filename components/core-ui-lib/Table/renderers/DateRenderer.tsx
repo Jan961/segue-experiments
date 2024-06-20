@@ -5,6 +5,7 @@ import { useRef, useState } from 'react';
 interface CustomDateCellRendererParams extends ICellRendererParams {
   disableAnimations?: boolean;
   defaultMinDateToToday?: boolean;
+  isRequired?: boolean;
 }
 
 const DateRenderer = ({
@@ -13,8 +14,9 @@ const DateRenderer = ({
   value,
   setValue,
   node,
-  disableAnimations,
+  disableAnimations = false,
   defaultMinDateToToday = true,
+  isRequired = false,
 }: CustomDateCellRendererParams) => {
   const fromInputRef = useRef(null);
   const [error, setError] = useState<string>('');
@@ -29,7 +31,7 @@ const DateRenderer = ({
       ...data,
       [colDef?.field]: dateVal,
     });
-    if (!disableAnimations && !dateVal) {
+    if (!dateVal) {
       setError('error');
     }
   };
@@ -39,11 +41,11 @@ const DateRenderer = ({
       <DateInput
         ref={fromInputRef}
         popperClassName="ag-custom-component-popup !z-50 rounded"
-        inputClass="!shadow-none !border-primary-white"
+        inputClass={`!shadow-none  ${error && isRequired ? '!border-primary-red' : '!border-primary-white'}`}
         value={date}
         onChange={handleDateFromChange}
         minDate={defaultMinDateToToday ? new Date() : null}
-        error={error}
+        error={!disableAnimations && error}
       />
     </div>
   );

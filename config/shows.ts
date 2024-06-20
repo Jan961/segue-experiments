@@ -7,4 +7,5 @@ export const ToastMessages = {
   updateProductionFailure: 'Unable to update production details. Please retry.',
   deleteProductionSuccess: 'Production successfully deleted.',
   deleteProductionFailure: 'Production deletion failed. Please retry.',
+  requiredFieldsWarning: 'Please enter all the required fields and try again.',
 };

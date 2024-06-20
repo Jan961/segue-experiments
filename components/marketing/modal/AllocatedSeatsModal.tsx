@@ -95,7 +95,7 @@ export default function AllocatedSeatsModal({
   const handleSave = () => {
     const perf = perfList.find((perfRec) => perfRec.value === parseInt(perfSelected));
     let data = {
-      ArrangedBy: userList.find((user) => user.value === parseInt(arrangedBy)).text,
+      ArrangedById: parseInt(arrangedBy),
       Comments: comments,
       RequestedBy: requestedBy,
       Seats: parseInt(numSeatsReq),

@@ -57,7 +57,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
-  const bookings = useRecoilState(bookingJumpState);
+  const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -270,9 +270,33 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const editBooking = async (field: string, value: any) => {
-    const updObj = { [field]: value };
+    // Mapping of local state fields to booking object fields
+    const fieldMapping = {
+      ticketsOnSale: 'TicketsOnSale',
+      marketingPlanReceived: 'MarketingPlanReceived',
+      printReqsReceived: 'PrintReqsReceived',
+      contactInfoReceived: 'ContactInfoReceived',
+      ticketsOnSaleFromDate: 'TicketsOnSaleFromDate',
+      marketingCostsNotes: 'MarketingCostsNotes',
+      marketingCostsApprovalDate: 'MarketingCostsApprovalDate',
+      marketingCostsStatus: 'MarketingCostsStatus',
+    };
 
-    // update locally first
+    // Find the booking index
+    const bookingIndex = bookings.bookings.findIndex((booking) => booking.Id === props.bookingId);
+
+    // Create a new bookings array with the updated booking
+    const newBookings = bookings.bookings.map((booking, index) => {
+      if (index === bookingIndex) {
+        return {
+          ...booking,
+          [fieldMapping[field]]: value,
+        };
+      }
+      return booking;
+    });
+
+    // Update the local state based on the field being edited
     switch (field) {
       case 'ticketsOnSale':
         setOnSaleCheck(value);
@@ -300,20 +324,25 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         break;
     }
 
-    // update in the database
+    // Update the bookings state with the new bookings array
+    setBookings({ bookings: newBookings, selected: bookings.selected });
+
+    // Update in the database
     await fetchData({
       url: '/api/bookings/update/' + props.bookingId.toString(),
       method: 'POST',
-      data: updObj,
+      data: { [field]: value },
     });
   };
+
   useEffect(() => {
     if (!isNullOrEmpty(props.bookingId)) {
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString());
 
       // set checkbox row on activities tab
-      const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
+      const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
+
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
