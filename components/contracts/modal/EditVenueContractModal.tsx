@@ -139,13 +139,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     setEditDealMemoModal(false);
     callDealMemoApi();
   };
-
   return (
     <PopupModal
       show={visible}
       title={modalTitle}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
+      hasOverlay={false}
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px]   flex">
@@ -233,11 +233,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
               <div className=" text-primary-input-text font-bold text-sm ml-2">1</div>
               <div className=" text-primary-input-text text-sm ml-1">
-                {formData.performanceTimes && formData.performanceTimes.split(';')[0]}
+                {formData.performanceTimes && formData.performanceTimes.split(';')[0].split('?')[0]} -
+                {formData.performanceTimes &&
+                  formattedDateWithDay(formData.performanceTimes.split(';')[0].split('?')[1])}
               </div>
               <div className=" text-primary-input-text font-bold text-sm ml-2">2</div>
               <div className=" text-primary-input-text text-sm ml-1">
-                {formData.performanceTimes && formData.performanceTimes.split(';')[1]}
+                {/* {formData.performanceTimes && formData.performanceTimes.split(';')[1]} */}
+                {formData.performanceTimes &&
+                  formData.performanceTimes.split(';')[1] &&
+                  formData.performanceTimes.split(';')[1].split('?')[0]}{' '}
+                -
+                {formData.performanceTimes &&
+                  formData.performanceTimes.split(';')[1] &&
+                  formattedDateWithDay(formData.performanceTimes.split(';')[1].split('?')[1])}
               </div>
             </div>
             <div className="flex mt-2.5 items-center">
@@ -279,7 +288,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       formData.SignedDate.toString() !== toISO(value) &&
                       editContractModalData('SignedDate', value, 'contract')
                     }
-                    position={24}
+                    position="!-left-24"
                     value={formData.SignedDate}
                   />
                 </div>
@@ -307,7 +316,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     }
                     value={formData.ReceivedBackDate}
                     className="z-[1000]"
-                    position={24}
+                    position="!-left-24"
                   />
                 </div>
               </div>

@@ -13,7 +13,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           include: {
             VenueRole: true, // Include related VenueRole data within VenueContact
           },
-        }, // Include related VenueContact data
+        },
+        VenueAddress: true, // Include related VenueContact data
       },
     });
     res.status(200).json(venue);
