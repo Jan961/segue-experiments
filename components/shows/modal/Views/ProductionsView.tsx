@@ -264,11 +264,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         };
         applyTransactionToGrid(tableRef, transaction);
         notify.success(ToastMessages.createNewProductionSuccess);
+        setIsEdited(false);
       } catch (error) {
-        notify.error(ToastMessages.createNewProductionFailure);
+        let errorMessage = ToastMessages.createNewProductionFailure;
+        if (error?.response?.status === 409) {
+          errorMessage = `Production with ProdCode: ${data.code} already exists.`;
+        }
+        notify.error(errorMessage);
         debug('Error creating production', error);
       } finally {
-        setIsEdited(false);
         setCurrentProduction(intProduction);
         addNewRow();
         router.replace(router.asPath);
