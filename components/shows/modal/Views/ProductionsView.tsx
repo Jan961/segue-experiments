@@ -265,21 +265,20 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         applyTransactionToGrid(tableRef, transaction);
         notify.success(ToastMessages.createNewProductionSuccess);
         setIsEdited(false);
+        setCurrentProduction(intProduction);
+        router.replace(router.asPath);
       } catch (error) {
         let errorMessage = ToastMessages.createNewProductionFailure;
         if (error?.response?.status === 409) {
-          errorMessage = `Production with ProdCode: ${data.code} already exists.`;
+          errorMessage = `ProdCode: ${data.Code} already exists. Please try with different ProdCode`;
         }
         notify.error(errorMessage);
         debug('Error creating production', error);
       } finally {
-        setCurrentProduction(intProduction);
-        addNewRow();
-        router.replace(router.asPath);
         setIsLoading(false);
       }
     },
-    [addNewRow, currentProduction?.Id, productionUploadMap, router],
+    [currentProduction?.Id, productionUploadMap, router],
   );
 
   // const findFirstEmptyField = (data) => {
