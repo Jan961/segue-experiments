@@ -128,7 +128,7 @@ const handler = async (req, res) => {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 2, ySplit: 6 }],
   });
-  const title = `Jendagi Rolling All Productions Masterplan ${formatedFromDate} to ${formatedToDate}`;
+  const title = `All Productions Masterplan ${formatedFromDate} to ${formatedToDate}`;
   worksheet.addRow([title]);
   const date = new Date();
   worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
@@ -258,7 +258,7 @@ const handler = async (req, res) => {
 
         return [...acc, `Week ${value}`];
       }, []);
-      worksheet.addRow(['Week Minus', '', ...weeks]);
+      worksheet.addRow(['Week No', '', ...weeks]);
       rowNo++;
       fillRowBGColorAndTextColor({
         worksheet,

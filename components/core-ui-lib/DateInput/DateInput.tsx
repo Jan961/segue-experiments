@@ -19,7 +19,7 @@ interface DateInputProps {
   label?: string;
   labelClassName?: string;
   disabled?: boolean;
-  position?: number;
+  position?: string;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -40,7 +40,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     label,
     labelClassName,
     disabled = false,
-    position = 0,
+    position = '',
     ...props
   }: DateInputProps,
   ref,
@@ -149,7 +149,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           maxDate={maxDate}
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
-          popperClassName={`!z-50 !-left-${position}`}
+          popperClassName={`!z-50 ${position}`}
           onSelect={(e) => onChange(convertLocalDateToUTC(e))}
           onChange={() => null}
           selected={selectedDate}

@@ -56,3 +56,18 @@ export const getDealMemoCall = (dealMemoCall) => {
   });
   return [updateCall, createCall];
 };
+
+export const getContactIdData = (dealMemo) => {
+  if (dealMemo.DeMoBOMVenueContactId) {
+    dealMemo.VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact = {
+      connect: { Id: dealMemo.DeMoBOMVenueContactId },
+    };
+  }
+
+  if (dealMemo.DeMoTechVenueContactId) {
+    dealMemo.VenueContact_DealMemo_DeMoTechVenueContactIdToVenueContact = {
+      connect: { Id: dealMemo.DeMoTechVenueContactId },
+    };
+  }
+  return dealMemo;
+};

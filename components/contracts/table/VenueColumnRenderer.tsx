@@ -1,7 +1,7 @@
 import { CustomCellRendererProps } from 'ag-grid-react';
 
 export default function VenueColumnRenderer(props: CustomCellRendererProps) {
-  const { dayType, bookingStatus, multipleVenuesOnSameDate, venueHasMultipleBookings } = props.data;
+  const { dayType, status, multipleVenuesOnSameDate, venueHasMultipleBookings } = props.data;
 
   const getEndClass = () => {
     if (!dayType) {
@@ -10,13 +10,13 @@ export default function VenueColumnRenderer(props: CustomCellRendererProps) {
 
     if (dayType !== 'Performance') {
       return 'bg-primary-red text-primary-yellow';
-    } else if (bookingStatus === 'Cancelled') {
+    } else if (status === 'X') {
       return 'bg-primary-black text-primary-white';
-    } else if (bookingStatus === 'Suspended') {
+    } else if (status === 'S') {
       return 'bg-secondary-purple text-primary-white';
-    } else if (bookingStatus === 'Pencilled' && multipleVenuesOnSameDate) {
+    } else if (status === 'U' && multipleVenuesOnSameDate) {
       return 'bg-primary-blue text-primary-white';
-    } else if (venueHasMultipleBookings && bookingStatus !== 'Confirmed') {
+    } else if (venueHasMultipleBookings && status !== 'C') {
       return 'text-primary-red font-bold';
     }
     return '';

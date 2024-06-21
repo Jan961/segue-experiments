@@ -630,6 +630,12 @@ export const venueColumnDefs = [
 
 export const venueContactDefs = (defaultRoles) => [
   {
+    headerName: 'Id',
+    field: 'id',
+    cellRenderer: DefaultCellRenderer,
+    hide: true,
+  },
+  {
     headerName: 'Role',
     field: 'roleName',
     cellRenderer: DefaultCellRenderer,

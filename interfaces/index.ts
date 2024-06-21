@@ -111,6 +111,7 @@ export type BookingDTO = {
   BookingSalesNotes: string;
   BookingCompNotes: string;
   BookingHoldNotes: string;
+  PerformanceCount: number;
 };
 
 export type ContractsDTO = {
@@ -298,7 +299,7 @@ export type AllocatedHoldDTO = {
   Seats: number;
   Comments?: string;
   RequestedBy?: string;
-  ArrangedBy?: string;
+  ArrangedById?: string;
   VenueConfirmationNotes?: string;
   TicketHolderEmail?: string;
   SeatsAllocated?: string;

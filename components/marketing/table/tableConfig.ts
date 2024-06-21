@@ -13,7 +13,7 @@ import { isNullOrEmpty } from 'utils';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
-export const activityColDefs = (updateActivity) => [
+export const activityColDefs = (updateActivity, currencySymbol) => [
   {
     headerName: 'Activity Name',
     field: 'actName',
@@ -57,7 +57,7 @@ export const activityColDefs = (updateActivity) => [
     headerName: 'Company Cost',
     field: 'companyCost',
     cellRenderer: (params) => {
-      return params.data.venueCost.charAt(0) + parseFloat(params.data.companyCost.substring(1)).toFixed(2);
+      return currencySymbol + params.data.companyCost.toFixed(2);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -69,7 +69,7 @@ export const activityColDefs = (updateActivity) => [
     headerName: 'Venue Cost',
     field: 'venueCost',
     cellRenderer: (params) => {
-      return params.data.venueCost.charAt(0) + parseFloat(params.data.venueCost.substring(1)).toFixed(2);
+      return currencySymbol + params.data.venueCost.toFixed(2);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -239,7 +239,7 @@ export const allocSeatsColDefs = [
   },
   {
     headerName: 'Arranged by',
-    field: 'ArrangedBy',
+    field: 'ArrangedById',
     cellRenderer: DefaultCellRenderer,
     width: 120,
   },

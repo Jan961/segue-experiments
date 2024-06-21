@@ -13,7 +13,7 @@ const defaultPrice = {
   'Babes in Arms': { DMPTicketName: 'Babes in Arms', DMPTicketPrice: 0, DMPNumTickets: 0, DMPDeMoId: 0, DMPNotes: '' },
 };
 
-const techProv = ['Lighting', 'Sound', 'Other', 'Technical Stuff'];
+const techProv = ['Lighting', 'Sound', 'Other', 'Technical Staff'];
 
 export const defaultTechProvision = {
   Lighting: {
@@ -31,8 +31,8 @@ export const defaultTechProvision = {
     DMTechVenue: '',
     DMTechCompany: '',
   },
-  'Technical Stuff': {
-    DMTechName: 'Technical Stuff',
+  'Technical Staff': {
+    DMTechName: 'Technical Staff',
     DMTechVenue: '',
     DMTechCompany: '',
   },
@@ -76,4 +76,15 @@ export const filterTechProvision = (techProvision) => {
     }
   });
   return techData;
+};
+
+export const filterPercentage = (num: number) => {
+  if ((num >= 0 && num < 100) || Number.isNaN(num)) {
+    return num;
+  }
+  return 100;
+};
+
+export const filterCurrencyNum = (num: number) => {
+  return Math.floor(num * 100) / 100;
 };

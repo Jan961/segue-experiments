@@ -99,9 +99,9 @@ model Contract {
   BookingId            Int                    @id @map("ContractBookingId")
   StatusCode           String?                @map("ContractStatusCode") @db.VarChar(4)
   SignedDate           DateTime?              @map("ContractSignedDate") @db.Date
-  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(30)
+  SignedBy             String?                @map("ContractSignedBy") @db.VarChar(100)
   ReturnDate           DateTime?              @map("ContractReturnDate") @db.Date
-  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(30)
+  CheckedBy            String?                @map("ContractCheckedBy") @db.VarChar(100)
   RoyaltyPercentage    Decimal?               @map("ContractRoyaltyPercentage") @db.Decimal(5, 2)
   DealType             String?                @map("ContractDealType") @db.VarChar(4)
   Notes                String?                @map("ContractNotes") @db.LongText
@@ -925,7 +925,7 @@ model DealMemoTechProvision {
 model File {
   Id               Int          @id @default(autoincrement()) @map("FileId")
   OriginalFilename String       @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?      @map("FileMediaType") @db.VarChar(20)
+  MediaType        String?      @map("FileMediaType") @db.VarChar(200)
   Location         String       @map("FileLocation") @db.VarChar(512)
   UploadDateTime   DateTime     @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId     Int          @map("FileUploadUserId")

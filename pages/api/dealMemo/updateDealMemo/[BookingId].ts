@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getDealMemoCall, getPrice, getTechProvision } from '../utils';
+import { getDealMemoCall, getPrice, getTechProvision, getContactIdData } from '../utils';
 import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -11,8 +11,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-    const data = req.body.formData;
-    omit(data, [
+    const data = getContactIdData(req.body.formData);
+    const updatedDate = omit(data, [
       'error',
       'DeMoId',
       'DeMoBookingId',
@@ -27,17 +27,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     let updateCreateDealMemo;
-    const priceData = getPrice(data.DealMemoPrice);
-    const techProvisionData = getTechProvision(data.DealMemoTechProvision);
+    const priceData = getPrice(updatedDate.DealMemoPrice);
+    const techProvisionData = getTechProvision(updatedDate.DealMemoTechProvision);
 
-    const dealMemoCallData = getDealMemoCall(data.DealMemoCall);
+    const dealMemoCallData = getDealMemoCall(updatedDate.DealMemoCall);
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
           DeMoBookingId: BookingId,
         },
         data: {
-          ...data,
+          ...updatedDate,
           DealMemoPrice: {
             updateMany: priceData[0],
             create: priceData[1],
@@ -58,7 +58,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     } else {
       updateCreateDealMemo = await prisma.dealMemo.create({
         data: {
-          ...data,
+          ...updatedDate,
           DealMemoPrice: {
             create: priceData[1],
           },

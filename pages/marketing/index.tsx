@@ -65,6 +65,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         venueRole: venueRoles.map(venueRoleMapper),
         towns: townList,
         venueList: venue,
+        currencySymbol: '',
         defaultTab: 0,
       },
     };

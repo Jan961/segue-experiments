@@ -10,7 +10,7 @@ import { StyleProps } from 'components/core-ui-lib/Table/Table';
 interface VenueContactDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
   contactsList?: UiVenueContact[];
-  onChange: (data: any) => void;
+  onChange: (data: any, mode?: string, updatedRow?: any) => void;
   venueRoleOptionList: SelectOption[];
   tableStyleProps?: StyleProps;
   tableHeight?: number;
@@ -90,13 +90,13 @@ const VenueContactForm = ({
     };
 
     if (createMode) {
-      onChange({ mode: 'create', updatedFormData });
+      onChange(updatedFormData, 'create');
       const { roleName, firstName, lastName, phone, email } = updatedContacts[0];
       if (roleName || firstName || lastName || phone || email) {
         setCreateMode(false);
       }
     } else {
-      onChange({ mode: 'update', updatedFormData, updatedRow: e.data });
+      onChange(updatedFormData, 'update', e.data);
     }
   };
 
@@ -122,7 +122,7 @@ const VenueContactForm = ({
       ...venue,
       venueContacts: updatedContactVenueTableRows,
     };
-    onChange({ rowToDel, mode: 'delete', ...updatedFormData });
+    onChange(updatedFormData, 'delete', rowToDel);
     if (createMode && deleteIndex === 0) {
       setCreateMode(false);
     }
