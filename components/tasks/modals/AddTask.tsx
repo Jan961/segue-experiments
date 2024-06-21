@@ -87,6 +87,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     [],
   );
 
+  const showCode = useMemo(() => {
+    return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
+  }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
+
   useEffect(() => {
     if (isCloned) {
       const updatedInputs = { ...inputs };
@@ -263,7 +267,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             className="w-128 placeholder-secondary"
             placeholder="Code is assigned when task is created"
             onChange={handleOnChange}
-            value={isMasterTask ? inputs?.Code?.toString() : `${production.ShowCode}${production?.Code}-${inputs.Code}`}
+            value={isMasterTask ? inputs?.Code?.toString() : showCode}
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center">

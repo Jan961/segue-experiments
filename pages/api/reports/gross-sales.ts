@@ -92,7 +92,7 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
 };
 
 const handler = async (req, res) => {
-  const { productionId } = JSON.parse(req.body) || {};
+  const { productionId } = req.body || {};
 
   if (!productionId) {
     throw new Error('Params are missing');
