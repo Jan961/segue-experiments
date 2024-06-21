@@ -60,6 +60,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             Name: dateBlock.Name,
             StartDate: new Date(dateBlock.StartDate),
             EndDate: new Date(dateBlock.EndDate),
+            IsPrimary: dateBlock.IsPrimary,
           })),
         },
       },
