@@ -28,9 +28,22 @@ const defaultFormData = {
   productionStartDate: null,
   productionEndDate: null,
 };
+
+const getModalTitle = (activeModal: string): string => {
+  switch (activeModal) {
+    case 'salesSummary':
+      return 'Sales Summary';
+    case 'salesSummaryAndWeeklyTotals':
+      return 'Sales Summary and Weekly Totals';
+    case 'salesVsCapacity':
+      return 'Sales vs Capacity %';
+  }
+};
+
 const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummaryReportModalProps) => {
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
+  const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
   const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
@@ -81,34 +94,26 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
 
   const onExport = useCallback(() => {
     notify.promise(
-      exportSalesSummaryReport({ ...formData, isWeeklyReport: activeModal === 'salesSummaryAndWeeklyTotals' }).then(
-        () => onClose(),
-      ),
+      exportSalesSummaryReport({
+        ...formData,
+        ...(activeModal === 'salesSummaryAndWeeklyTotals' && { isWeeklyReport: true }),
+        ...(activeModal === 'salesVsCapacity' && { isSeatsDataRequired: true }),
+      }).then(() => onClose()),
       {
-        loading: 'Generating Sales summary report',
-        success: 'Sales summary report downloaded successfully',
-        error: 'Error generating Sales summary report',
+        loading: `'Generating ${title}`,
+        success: `${title}downloaded successfully`,
+        error: `Error generating ${title}`,
       },
     );
-  }, [formData, onClose, activeModal]);
-
-  const returnModalTitle = (): string => {
-    switch (activeModal) {
-      case 'salesSummary':
-        return 'Sales Summary';
-      case 'salesSummaryAndWeeklyTotals':
-        return 'Sales Summary and Weekly Totals';
-      case 'salesVsCapacity':
-        return 'Sales vs Capacity %';
-    }
-  };
+  }, [formData, activeModal, title, onClose]);
 
   return (
     <PopupModal
       titleClass="text-xl text-primary-navy text-bold"
-      title={returnModalTitle()}
+      title={title}
       show={visible}
       onClose={onClose}
+      hasOverlay={false}
     >
       <form className="flex flex-col gap-4 w-[383px] mt-4">
         <Select

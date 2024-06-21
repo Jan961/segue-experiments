@@ -258,7 +258,7 @@ const handler = async (req, res) => {
 
         return [...acc, `Week ${value}`];
       }, []);
-      worksheet.addRow(['Week Minus', '', ...weeks]);
+      worksheet.addRow(['Week No', '', ...weeks]);
       rowNo++;
       fillRowBGColorAndTextColor({
         worksheet,

@@ -86,7 +86,7 @@ const getBooleanAsString = (val: boolean | null): string => {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { productionId, showId, productionCode, options } = JSON.parse(req.body);
+    const { productionId, showId, productionCode, options } = req.body || {};
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId: productionId });

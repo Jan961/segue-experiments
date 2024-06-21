@@ -180,7 +180,7 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
 };
 
 const handler = async (req, res) => {
-  const { ProductionId, productionCode, fromDate, toDate, venue } = JSON.parse(req.body) || {};
+  const { ProductionId, productionCode, fromDate, toDate, venue } = req.body;
 
   // This doesn't check productionCode
   const email = await getEmailFromReq(req);
