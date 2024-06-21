@@ -87,6 +87,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     [],
   );
 
+  const showCode = useMemo(() => {
+    return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
+  }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
+
   useEffect(() => {
     if (isCloned) {
       const updatedInputs = { ...inputs };
@@ -235,10 +239,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
       }
     }
   };
-
-  const showCode = useMemo(() => {
-    return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
-  }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
 
   return (
     <PopupModal
