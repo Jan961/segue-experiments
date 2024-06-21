@@ -63,7 +63,7 @@ export default function AllocatedSeatsModal({
       const perf = perfList.find(
         (perfRec) => formatInputDate(perfRec.date) === data.date && getTimeFromDateAndTime(perfRec.date) === data.time,
       );
-      const user = userTempList.find((user) => user.text === data.ArrangedBy);
+      const user = userTempList.find((user) => user.text === data.ArrangedById);
       setPerfSelected(perf.value);
       setCustName(data.TicketHolderName);
       setEmail(data.TicketHolderEmail);

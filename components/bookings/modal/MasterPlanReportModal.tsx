@@ -1,16 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import { Button, DateRange, PopupModal, notify } from 'components/core-ui-lib';
-import { useRecoilValue } from 'recoil';
-import { dateBlockSelector } from 'state/booking/selectors/dateBlockSelector';
 import { exportMasterplanReport } from './request';
 
 interface MasterPlanReportModalProps {
   visible: boolean;
+  endDate: string;
   onClose: () => void;
 }
-const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, onClose }) => {
-  const { scheduleStart, scheduleEnd } = useRecoilValue(dateBlockSelector);
-  const [formData, setFormData] = useState(() => ({ fromDate: scheduleStart, toDate: scheduleEnd }));
+const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, onClose, endDate }) => {
+  const [formData, setFormData] = useState(() => ({ fromDate: new Date()?.toISOString(), toDate: endDate }));
   const { fromDate, toDate } = formData;
 
   const onChange = useCallback(
@@ -22,15 +20,16 @@ const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, 
 
   const onExport = useCallback(() => {
     notify.promise(exportMasterplanReport(fromDate, toDate).then(onClose), {
-      loading: 'Generating master plan report',
-      success: 'Master plan report downloaded successfully',
-      error: 'Error generating master plan report',
+      loading: 'Generating All Productions Masterplan',
+      success: 'All Productions Masterplan successfully downloaded',
+      error: 'Error generating All Productions Master Plan',
     });
   }, [fromDate, toDate, onClose]);
   return (
     <PopupModal
+      hasOverlay={false}
       show={visible}
-      title="Booking Reports"
+      title="All Productions Masterplan"
       titleClass="text-xl text-primary-navy text-bold mb-4 -mt-2"
       onClose={onClose}
     >

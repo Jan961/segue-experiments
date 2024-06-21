@@ -1,5 +1,6 @@
 import { MasterTask } from '@prisma/client';
 import axios from 'axios';
+import { ConfirmationDialog } from 'components/core-ui-lib';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateInput from 'components/core-ui-lib/DateInput';
@@ -13,6 +14,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
 import { weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
@@ -68,9 +70,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number }
   >(task || DEFAULT_MASTER_TASK);
 
+  const production = useRecoilValue(currentProductionSelector);
+
   useEffect(() => {
     setInputs(task);
   }, [task]);
+
+  const [confirm, setConfirm] = useState<boolean>(false);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
@@ -197,10 +203,37 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   const handleClose = () => {
     onClose();
     setInputs(DEFAULT_MASTER_TASK);
+    setIsCloned(false);
   };
 
   const handleClone = () => {
     setIsCloned(true);
+  };
+
+  const handleConfirm = () => {
+    setConfirm(true);
+  };
+
+  const handleDelete = async () => {
+    setConfirm(false);
+    setLoading(true);
+    if (isMasterTask) {
+      try {
+        await axios.delete(`/api/tasks/master/delete/${inputs?.Id}`);
+        setLoading(false);
+        onClose();
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      try {
+        await axios.delete(`/api/tasks/delete/${inputs?.Id}`);
+        setLoading(false);
+        onClose();
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
@@ -226,11 +259,11 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <Label className="!text-secondary pr-6 " text="Task Code" />
           <TextInput
             id="Code"
-            disabled={isMasterTask}
+            disabled
             className="w-128 placeholder-secondary"
             placeholder="Code is assigned when task is created"
             onChange={handleOnChange}
-            value={inputs?.Code?.toString()}
+            value={isMasterTask ? inputs?.Code?.toString() : `${production.ShowCode}${production?.Code}-${inputs.Code}`}
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center">
@@ -273,14 +306,15 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
               value={inputs?.Progress}
               placeholder="Progress"
-              className="w-20"
+              isSearchable
+              className="w-32"
               options={generatePercentageOptions}
             />
           </div>
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
-              disabled={isMasterTask}
+              disabled={isMasterTask || inputs.Progress === 100}
               value={inputs?.DueDate}
               onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
             />
@@ -303,7 +337,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               value={inputs?.RepeatInterval}
               className="w-32"
               options={RepeatOptions}
-              placeholder="Week No."
+              placeholder="Select..."
               disabled={repeatInterval}
             />
           </div>
@@ -370,7 +404,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex">
             <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
-              <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+              <>
+                <Button variant="tertiary" onClick={handleConfirm} className="mr-4 w-[132px]" text="Delete" />
+                <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+              </>
             )}
             <Button
               variant="primary"
@@ -381,6 +418,14 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           </div>
         </div>
       </form>
+
+      <ConfirmationDialog
+        variant="delete"
+        show={confirm}
+        onYesClick={handleDelete}
+        onNoClick={() => setConfirm(false)}
+        hasOverlay={false}
+      />
     </PopupModal>
   );
 };

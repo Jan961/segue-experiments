@@ -38,6 +38,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
+
       setRows(formattedRows);
     }
   }, [rowData]);
