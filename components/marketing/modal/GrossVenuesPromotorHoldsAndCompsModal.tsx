@@ -7,7 +7,13 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import DateRange from 'components/core-ui-lib/DateRange';
-import { exportPromoterHoldsReport, fetchProductionVenues } from './request';
+import {
+  exportHoldsComps,
+  exportProductionGrossSales,
+  exportPromoterHoldsReport,
+  exportSelectedVenues,
+  fetchProductionVenues,
+} from './request';
 import { notify } from 'components/core-ui-lib';
 import { useQuery } from '@tanstack/react-query';
 import { transformToOptions } from 'utils';
@@ -26,6 +32,20 @@ const defaultFormData = {
   toDate: null,
   venue: null,
 };
+
+const getModalTitle = (activeModal: string): string => {
+  switch (activeModal) {
+    case 'totalGrossSales':
+      return 'Tour Gross Sales';
+    case 'selectedVenues':
+      return 'Selected Venues';
+    case 'promotorHolds':
+      return 'Promoter Holds';
+    case 'holdsAndComps':
+      return 'Holds and Comps';
+  }
+};
+
 const GrossVenuesPromotorHoldsAndCompsModal = ({
   visible,
   onClose,
@@ -33,6 +53,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
 }: GrossVenuesPromotorHoldsAndCompsModalProps) => {
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
+  const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, selection, fromDate, toDate, venue } = formData;
   const selectionOptions = [];
   const productionsOptions = useMemo(
@@ -75,35 +96,38 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const onExport = useCallback(() => {
     const selectedProduction = productionJump.productions?.find((prod) => prod.Id === parseInt(production));
     const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
-    notify.promise(
-      exportPromoterHoldsReport({ ...formData, productionCode }).then(() => onClose()),
-      {
-        loading: 'Generating report',
-        success: 'Report downloaded successfully',
-        error: 'Error generating report',
-      },
-    );
-  }, [formData, onClose, production, productionJump.productions]);
-
-  const returnModalTitle = (): string => {
+    let promise;
     switch (activeModal) {
+      case 'promoterHolds': {
+        promise = exportPromoterHoldsReport({ ...formData, productionCode }).then(() => onClose());
+        break;
+      }
       case 'totalGrossSales':
-        return 'Tour Gross Sales';
-      case 'selectedVenues':
-        return 'Selected Venues';
-      case 'promotorHolds':
-        return 'Promoter Holds';
+        promise = exportProductionGrossSales({ ...formData }).then(() => onClose());
+        break;
       case 'holdsAndComps':
-        return 'Holds and Comps';
+        promise = exportHoldsComps({ ...formData, productionCode }).then(() => onClose());
+        break;
+      case 'selectedVenues':
+        promise = exportSelectedVenues({ ...formData, productionCode, showId: selectedProduction.ShowId }).then(() =>
+          onClose(),
+        );
+        break;
     }
-  };
+    notify.promise(promise, {
+      loading: `Generating ${title}`,
+      success: `${title} downloaded successfully`,
+      error: `Error generating ${title}`,
+    });
+  }, [activeModal, formData, onClose, production, productionJump.productions, title]);
 
   return (
     <PopupModal
       titleClass="text-xl text-primary-navy text-bold"
-      title={returnModalTitle()}
+      title={title}
       show={visible}
       onClose={onClose}
+      hasOverlay={false}
     >
       <form className="flex flex-col gap-2 w-[383px] mt-4">
         <Select
