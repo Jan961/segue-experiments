@@ -77,3 +77,14 @@ export const filterTechProvision = (techProvision) => {
   });
   return techData;
 };
+
+export const filterPercentage = (num: number) => {
+  if ((num >= 0 && num < 100) || Number.isNaN(num)) {
+    return num;
+  }
+  return 100;
+};
+
+export const filterCurrencyNum = (num: number) => {
+  return Math.floor(num * 100) / 100;
+};

@@ -233,19 +233,22 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
 });
 
 export const contractStatusmapper = (status: ContractStatusType) => {
-  return {
-    BookingId: status.BookingId ? status.BookingId : '',
-    StatusCode: status.StatusCode,
-    SignedDate: convertDate(status.SignedDate),
-    SignedBy: status.SignedBy,
-    ReturnDate: convertDate(status.ReturnDate),
-    CheckedBy: status.CheckedBy,
-    RoyaltyPercentage: convertToString(status.RoyaltyPercentage),
-    DealType: status.DealType,
-    ContractNotes: status.Notes,
-    ReceivedBackDate: convertDate(status.ReceivedBackDate),
-    Exceptions: status.Exceptions,
-  };
+  if (status && status.BookingId) {
+    return {
+      BookingId: status.BookingId ? status.BookingId : '',
+      StatusCode: status.StatusCode,
+      SignedDate: convertDate(status.SignedDate),
+      SignedBy: status.SignedBy,
+      ReturnDate: convertDate(status.ReturnDate),
+      CheckedBy: status.CheckedBy,
+      RoyaltyPercentage: convertToString(status.RoyaltyPercentage),
+      DealType: status.DealType,
+      ContractNotes: status.Notes,
+      ReceivedBackDate: convertDate(status.ReceivedBackDate),
+      Exceptions: status.Exceptions,
+    };
+  }
+  return null;
 };
 
 export const contractBookingStatusmapper = (status: ContractBookingStatusType) => {
