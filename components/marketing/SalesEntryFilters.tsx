@@ -10,6 +10,8 @@ import { SelectOption } from './MarketingHome';
 import { getWeekDayShort } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
+import { currencyState } from 'state/marketing/currencyState';
+import axios from 'axios';
 
 type TourResponse = {
   data: Array<SelectOption>;
@@ -28,11 +30,11 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   const [selectedTourWeek, setSelectedTourWeek] = useState(null);
   const [tourLabel, setTourLabel] = useState('');
   const [lastDates, setLastDates] = useState([]);
+  const [, setCurrency] = useRecoilState(currencyState);
   const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
 
   const bookingOptions = useMemo(() => {
     try {
-      onDateChanged(selectedTourWeek);
       const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
       const optWithRun = initialOptions.map((option) => {
         const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
@@ -78,14 +80,27 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
     }
   };
 
-  const changeBooking = (value: string | number) => {
+  const getCurrency = async (bookingId) => {
+    try {
+      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
+        setCurrency({ symbol: currencyObject.currency });
+      }
+    } catch (error) {
+      console.error('Error retrieving currency:', error);
+    }
+  };
+
+  const changeBooking = async (value: string | number) => {
     if (value !== null) {
       const selectedBooking = bookingOptions.find((booking) => booking.value === value);
       setSelectedValue(selectedBooking.value.toString());
 
       const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
-
       setBooking({ ...bookings, selected: bookingIdentifier });
+      await getCurrency(bookingIdentifier.toString());
     } else {
       setSelectedValue(null);
       setBooking({ ...bookings, selected: undefined });
@@ -108,8 +123,12 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
     }
   };
 
+  const setTourWeek = (tourDate: string) => {
+    onDateChanged(tourDate);
+    setSelectedTourWeek(tourDate);
+  };
+
   useEffect(() => {
-    changeBooking(null);
     setSelectedTourWeek(null);
     if (productionId !== null && productionId !== undefined) {
       getTourWeeks(productionId);
@@ -144,7 +163,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
             </div>
 
             <Select
-              onChange={(tourWeek) => setSelectedTourWeek(tourWeek)}
+              onChange={(tourWeek) => setTourWeek(tourWeek.toString())}
               value={selectedTourWeek}
               disabled={!productionId}
               placeholder="Select Sales Week"

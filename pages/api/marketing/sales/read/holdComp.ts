@@ -23,6 +23,7 @@ export default async function handle(req, res) {
 
     let holdDataResult = [];
     let compDataResult = [];
+    let setId = -1;
 
     const holdData = await prisma.$queryRaw`
         SELECT 
@@ -31,7 +32,8 @@ export default async function handle(req, res) {
             HoldType.HoldTypeCode, 
             HoldType.HoldTypeName, 
             SetHold.SetHoldSeats, 
-            SetHold.SetHoldValue 
+            SetHold.SetHoldValue,
+            SalesSet.SetId
         FROM 
             SalesSet
         CROSS JOIN 
@@ -53,7 +55,8 @@ export default async function handle(req, res) {
             CompType.CompTypeId,
             CompType.CompTypeCode,
             CompType.CompTypeName,
-            SetComp.SetCompSeats
+            SetComp.SetCompSeats,
+            SalesSet.SetId
         FROM
             SalesSet
         CROSS JOIN
@@ -72,6 +75,7 @@ export default async function handle(req, res) {
     const filteredHolds = holdData.filter(
       (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
     );
+
     const filteredComps = compData.filter(
       (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
     );
@@ -102,9 +106,18 @@ export default async function handle(req, res) {
       });
     }
 
+    if (filteredHolds.length > 0 || filteredComps.length > 0) {
+      if ('SetId' in filteredHolds[0]) {
+        setId = filteredHolds[0].SetId;
+      } else {
+        setId = filteredComps[0].SetId;
+      }
+    }
+
     const result = {
       holds: holdDataResult,
       comps: compDataResult,
+      setId,
     };
 
     res.status(200).json(result);

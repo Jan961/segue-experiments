@@ -15,6 +15,8 @@ export default async function handle(req, res) {
       },
     });
 
+    console.log(setResult);
+
     const sales = [];
 
     if (req.body.general) {

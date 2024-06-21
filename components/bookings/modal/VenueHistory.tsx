@@ -368,13 +368,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         onClose={handleModalCancel}
         hasOverlay={false}
       >
-        <div className="w-[1220px] h-auto">
+        <div className="w-auto h-auto">
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           <SalesTable
             salesTableRef={salesTableRef}
             containerHeight="h-auto"
-            containerWidth="w-[1220px]"
             module="bookings"
             variant="salesSnapshot"
             data={salesSnapData}

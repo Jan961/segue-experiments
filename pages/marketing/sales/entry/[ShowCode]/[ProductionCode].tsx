@@ -6,26 +6,30 @@ import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
 import { objectify } from 'radash';
 import { useRef } from 'react';
-import { useRecoilValue } from 'recoil';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
-import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
+import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
-  const bookings = useRecoilValue(bookingJumpState);
   const salesEntryRef = useRef<SalesEntryRef>();
+
+  const handleDateChanged = (salesWeek) => {
+    if (salesEntryRef.current) {
+      salesEntryRef.current.resetForm(salesWeek);
+    }
+  };
 
   return (
     <div>
       <Layout title="Marketing | Segue">
         <div className="mb-8">
-          <SalesEntryFilters onDateChanged={(salesWeek) => alert(salesWeek + ' in onDate')} />
+          <SalesEntryFilters onDateChanged={handleDateChanged} />
         </div>
 
-        {bookings.selected !== undefined && bookings.selected !== null && <Entry ref={salesEntryRef} />}
+        <Entry ref={salesEntryRef} />
       </Layout>
     </div>
   );
