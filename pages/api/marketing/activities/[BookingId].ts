@@ -16,6 +16,45 @@ export type ActivitiesResponse = {
   activityTypes: { Id: number; Name: string }[];
 };
 
+export const getActivitiesByBookingId = async (BookingId) => {
+  const activityTypes = await prisma.activityType.findMany({
+    select: {
+      Name: true,
+      Id: true,
+    },
+  });
+
+  const info = await prisma.booking.findUnique({
+    where: {
+      Id: BookingId,
+    },
+    select: {
+      TicketsOnSale: true,
+      TicketsOnSaleFromDate: true,
+      MarketingPlanReceived: true,
+      ContactInfoReceived: true,
+      PrintReqsReceived: true,
+    },
+  });
+
+  const activities = await prisma.bookingActivity.findMany({
+    where: {
+      BookingId,
+    },
+  });
+
+  const result = {
+    activityTypes,
+    activities: activities.map(activityMapper),
+    info: {
+      ...info,
+      OnSaleDate: info.OnSaleDate ? info.OnSaleDate.toISOString() : '',
+    },
+  };
+
+  return result;
+};
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const BookingId = parseInt(req.query.BookingId as string);
@@ -23,40 +62,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
 
-    const activityTypes = await prisma.activityType.findMany({
-      select: {
-        Name: true,
-        Id: true,
-      },
-    });
-
-    const info = await prisma.booking.findUnique({
-      where: {
-        Id: BookingId,
-      },
-      select: {
-        TicketsOnSale: true,
-        TicketsOnSaleFromDate: true,
-        MarketingPlanReceived: true,
-        ContactInfoReceived: true,
-        PrintReqsReceived: true,
-      },
-    });
-
-    const activities = await prisma.bookingActivity.findMany({
-      where: {
-        BookingId,
-      },
-    });
-
-    const result = {
-      activityTypes,
-      activities: activities.map(activityMapper),
-      info: {
-        ...info,
-        OnSaleDate: info.OnSaleDate ? info.OnSaleDate.toISOString() : '',
-      },
-    };
+    const result = await getActivitiesByBookingId(BookingId);
 
     res.json(result);
   } catch (err) {
