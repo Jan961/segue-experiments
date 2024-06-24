@@ -10,6 +10,8 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { userState } from 'state/account/userState';
 import { Spinner } from 'components/global/Spinner';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -145,6 +147,21 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
     }
   }, [props.bookingId]);
 
+  const onExport = async () => {
+    const urlPath = `/api/reports/marketing/contactNotes/${props.bookingId}`;
+    const payload = {
+      productionName: 'productionName',
+      venueAndDate: 'venueAndDate',
+    };
+    const downloadContactNotesReport = async () =>
+      await exportExcelReport(urlPath, payload, 'Contact Notes Report.xlsx');
+    notify.promise(downloadContactNotesReport(), {
+      loading: 'Generating contact notes report',
+      success: 'Contact notes report downloaded successfully',
+      error: 'Error generating contact notes report',
+    });
+  };
+
   return (
     <>
       {dataAvailable && (
@@ -157,6 +174,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
                 disabled={!productionId}
                 iconProps={{ className: 'h-4 w-3' }}
                 sufixIconName="excel"
+                onClick={() => onExport()}
               />
               <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
             </div>

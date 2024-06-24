@@ -70,8 +70,8 @@ const handler = async (req, res) => {
   };
 
   createHeaderRow(productionName, 16);
-  createHeaderRow(venueAndDate, 14);
-  createHeaderRow('Marketing Activities Report', 12);
+  createHeaderRow(venueAndDate, 16);
+  createHeaderRow('Marketing Activities Report', 14);
 
   const headerRow = worksheet.addRow(['Activity Name', 'Type', 'Date', 'Company Cost', 'Venue Cost', 'Notes']);
   headerRow.eachCell((cell) => {

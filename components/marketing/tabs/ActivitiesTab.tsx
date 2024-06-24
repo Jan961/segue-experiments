@@ -20,6 +20,8 @@ import Table from 'components/core-ui-lib/Table';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -356,6 +358,20 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     }
   }, [props.bookingId]);
 
+  const onExport = async () => {
+    const urlPath = `/api/reports/marketing/activitiesReport/${props.bookingId}`;
+    const payload = {
+      productionName: 'productionName',
+      venueAndDate: 'venueAndDate',
+    };
+    const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report.xlsx');
+    notify.promise(downloadContactNotesReport(), {
+      loading: 'Generating activities report',
+      success: 'Activities report downloaded successfully',
+      error: 'Error generating activities report',
+    });
+  };
+
   return (
     <>
       {dataAvailable && (
@@ -457,6 +473,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                     disabled={!productionId}
                     iconProps={{ className: 'h-4 w-3' }}
                     sufixIconName="excel"
+                    onClick={() => onExport()}
                   />
                   <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
                 </div>

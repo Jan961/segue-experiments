@@ -39,8 +39,8 @@ const handler = async (req, res) => {
   };
 
   createHeaderRow(productionName, 16);
-  createHeaderRow(venueAndDate, 14);
-  createHeaderRow('Contact Notes Report', 12);
+  createHeaderRow(venueAndDate, 16);
+  createHeaderRow('Contact Notes Report', 14);
 
   const headerRow = worksheet.addRow(['Who', 'Date', 'Time', 'Actioned By', 'Notes']);
   headerRow.eachCell((cell) => {

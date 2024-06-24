@@ -9,6 +9,8 @@ import { townState } from 'state/marketing/townState';
 import { venueState } from 'state/booking/venueState';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import axios from 'axios';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib/Notifications';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -28,6 +30,8 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
   const bookings = useRecoilState(bookingJumpState);
+  const [bookingsSelection, setBookingsSelection] = useState([]);
+
   const { selectedBooking } = props;
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -96,6 +100,24 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
     }
   };
 
+  const onArchivedSalesReport = async () => {
+    const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
+    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const payload = {
+      bookingsSelection,
+      venueAndDate,
+    };
+    await exportExcelReport('/api/reports/marketing/archivedSales', payload, 'Archived Sales Report.xlsx');
+  };
+
+  const onExport = () => {
+    notify.promise(onArchivedSalesReport(), {
+      loading: 'Generating archived sales report',
+      success: 'Archived sales report downloaded successfully',
+      error: 'Error generating archived sales report',
+    });
+  };
+
   return (
     <>
       {bookings[0].selected !== undefined && bookings[0].selected !== null && (
@@ -111,6 +133,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
                 iconProps={{ className: 'h-4 w-3 ml-5' }}
                 sufixIconName="excel"
                 disabled={!archivedDataAvail}
+                onClick={() => onExport()}
               />
 
               <ArchSalesDialog
@@ -118,7 +141,10 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
                 variant={archSaleVariant}
                 data={archivedData}
                 onCancel={() => setShowArchSalesModal(false)}
-                onSubmit={(bookings) => showArchivedSales(bookings)}
+                onSubmit={(bookings) => {
+                  showArchivedSales(bookings);
+                  setBookingsSelection(bookings);
+                }}
                 error={errorMessage}
                 selectedBookingId={selectedBooking}
               />
