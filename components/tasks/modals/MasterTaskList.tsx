@@ -152,9 +152,12 @@ const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: Ma
         variant="delete"
         show={confirm}
         onYesClick={handleClose}
-        content={{ question: 'Are you sure ?', warning: '' }}
+        content={{
+          question: 'Are you sure you want to cancel?',
+          warning: 'Any unsaved changes may be lost.',
+        }}
         onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
+        hasOverlay={true}
       />
     </PopupModal>
   );
