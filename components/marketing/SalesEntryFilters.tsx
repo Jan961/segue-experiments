@@ -33,34 +33,6 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   const [, setCurrency] = useRecoilState(currencyState);
   const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
 
-  const bookingOptions = useMemo(() => {
-    try {
-      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
-      const optWithRun = initialOptions.map((option) => {
-        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
-        if (lastDate !== undefined) {
-          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
-          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
-          if (option.date === endDateStr) {
-            return option;
-          } else {
-            return {
-              ...option,
-              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
-            };
-          }
-        } else {
-          return option;
-        }
-      });
-
-      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return optWithRun;
-    } catch (error) {
-      console.log(error);
-    }
-  }, [selectedTourWeek]);
-
   const { fetchData } = useAxios();
 
   const getTourWeeks = async (productionId) => {
@@ -128,8 +100,38 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
     setSelectedTourWeek(tourDate);
   };
 
+  const bookingOptions = useMemo(() => {
+    try {
+      changeBooking(null);
+      setSelectedTourWeek(null);
+      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+
+      const optWithRun = initialOptions.map((option) => {
+        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
+        if (lastDate !== undefined) {
+          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
+          if (option.date === endDateStr) {
+            return option;
+          } else {
+            return {
+              ...option,
+              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            };
+          }
+        } else {
+          return option;
+        }
+      });
+
+      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return optWithRun;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [bookings.bookings]);
+
   useEffect(() => {
-    setSelectedTourWeek(null);
     if (productionId !== null && productionId !== undefined) {
       getTourWeeks(productionId);
       fetchLastDates();

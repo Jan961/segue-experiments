@@ -33,6 +33,7 @@ export default async function handle(req, res) {
             HoldType.HoldTypeName, 
             SetHold.SetHoldSeats, 
             SetHold.SetHoldValue,
+            SetHold.SetHoldId,
             SalesSet.SetId
         FROM 
             SalesSet
@@ -56,6 +57,7 @@ export default async function handle(req, res) {
             CompType.CompTypeCode,
             CompType.CompTypeName,
             SetComp.SetCompSeats,
+            SetComp.SetCompId,
             SalesSet.SetId
         FROM
             SalesSet
@@ -84,12 +86,18 @@ export default async function handle(req, res) {
     if (filteredHolds.length === 0) {
       const holdTypes = await prisma.$queryRaw`select * from HoldType order by HoldTypeSeqNo`;
       holdDataResult = holdTypes.map((hold) => {
-        return { name: hold.HoldTypeName, seats: 0, value: 0 };
+        return { name: hold.HoldTypeName, seats: 0, value: 0, id: hold.HoldTypeId, recId: null };
       });
       // else map the db fields to nicer field names to be handled in the UI
     } else {
       holdDataResult = filteredHolds.map((hold) => {
-        return { name: hold.HoldTypeName, seats: hold.SetHoldSeats, value: hold.SetHoldValue };
+        return {
+          name: hold.HoldTypeName,
+          seats: hold.SetHoldSeats,
+          value: hold.SetHoldValue,
+          id: hold.HoldTypeId,
+          recId: hold.SetHoldId,
+        };
       });
     }
 
@@ -97,12 +105,12 @@ export default async function handle(req, res) {
     if (filteredHolds.length === 0) {
       const compTypes = await prisma.$queryRaw`select * from CompType order by CompTypeSeqNo`;
       compDataResult = compTypes.map((comp) => {
-        return { name: comp.CompTypeName, seats: 0 };
+        return { name: comp.CompTypeName, seats: 0, id: comp.CompTypeId, recId: null };
       });
       // else map the db fields to nicer field names to be handled in the UI
     } else {
       compDataResult = filteredComps.map((comp) => {
-        return { name: comp.CompTypeName, seats: comp.SetCompSeats };
+        return { name: comp.CompTypeName, seats: comp.SetCompSeats, id: comp.CompTypeId, recId: comp.SetCompId };
       });
     }
 

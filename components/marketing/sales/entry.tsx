@@ -20,6 +20,8 @@ interface HoldComp {
   name: number;
   seats: number;
   value?: number;
+  id: number;
+  recId: number;
 }
 
 interface HoldCompSet {
@@ -88,30 +90,43 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
       },
     };
 
-    await fetchData({
+    const response = await fetchData({
       url: '/api/marketing/sales/process/entry/sales',
       method: 'POST',
       data,
     });
+
+    if (typeof response === 'object') {
+      const setIdObj = response as { setId: number };
+      setSetId(setIdObj.setId);
+    }
   };
 
-  const handleTableUpdate = (value, data, type, field) => {
-    if (type === 'Holds') {
-      const holdRecIndex = holdData.findIndex((rec) => rec.name === data.name);
-      const tempHoldRecs = [...holdData];
+  const handleTableUpdate = async (value, data, type, field) => {
+    const inputData = {
+      value,
+      data,
+      type,
+      field,
+      setId,
+      salesDate,
+      bookingId: bookings.selected,
+    };
 
-      if (holdRecIndex !== -1) {
-        tempHoldRecs[holdRecIndex] = { ...tempHoldRecs[holdRecIndex], [field]: value };
-      }
+    const response = await fetchData({
+      url: '/api/marketing/sales/process/entry/compHold',
+      method: 'POST',
+      data: inputData,
+    });
 
-      setHoldData(tempHoldRecs);
-      console.log(props);
-      console.log(setId);
+    if (typeof response === 'object') {
+      const setIdObj = response as { setId: number };
+      setSetId(setIdObj.setId);
     }
   };
 
   const handleCancel = () => {
-    setSalesFigures(false);
+    setSalesFigures(salesDate, false);
   };
 
   const setNumericVal = (setFunction: (value) => void, value: string) => {
@@ -126,7 +141,7 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
     }
   };
 
-  const getSalesDate = async () => {
+  const getSalesFrequency = async () => {
     const data = await fetchData({
       url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
       method: 'POST',
@@ -137,32 +152,25 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
       if (tourData.frequency === undefined) {
         return;
       }
-      const salesDate = tourData.frequency === 'W' ? getMonday(new Date()) : new Date();
-      setSalesDate(salesDate);
 
-      return { date: salesDate, frequency: tourData.frequency };
+      return tourData.frequency;
     }
   };
 
-  const setSalesFigures = async (previous: boolean) => {
+  const setSalesFigures = async (inputDate: Date, previous: boolean) => {
     // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
     // this will happen on first launch of the module
     if (bookings.selected === undefined || bookings.selected === null) {
       return;
     }
 
-    setLoading(true);
-    const saleParams = await getSalesDate();
-    if (saleParams === undefined) {
-      return;
-    }
+    const frequency = await getSalesFrequency();
 
-    let salesDate = new Date();
-    const duration = saleParams.frequency === 'W' ? 7 : 1;
+    const duration = frequency === 'W' ? 7 : 1;
+    let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
+
     if (previous) {
-      salesDate = addDurationToDate(saleParams.date, duration, false);
-    } else {
-      salesDate = saleParams.date;
+      salesDate = addDurationToDate(salesDate, duration, false);
     }
 
     // get the salesFigures for the selected date/week if they exist
@@ -172,7 +180,7 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
       data: {
         bookingId: bookings.selected,
         salesDate,
-        frequency: saleParams.frequency,
+        frequency,
       },
     });
 
@@ -201,6 +209,7 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
     });
 
     if (typeof holdCompList === 'object') {
+      console.log(holdCompList);
       const holdCompData = holdCompList as HoldCompSet;
 
       setHoldData(holdCompData.holds);
@@ -276,10 +285,11 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
   useEffect(() => {
     const initForm = async () => {
       try {
+        setSalesDate(new Date());
         // set the current days sales figues if available
-        setSalesFigures(false);
+        setSalesFigures(new Date(), false);
       } catch (error) {
-        console.log('error is: ' + error);
+        console.log(error);
       }
     };
 
@@ -290,8 +300,8 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     resetForm: (week) => {
-      console.log(week);
-      setSalesFigures(false);
+      setSalesDate(new Date(week));
+      setSalesFigures(new Date(week), false);
     },
   }));
 
@@ -304,7 +314,11 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
           ) : (
             <div className="flex flex-row w-full gap-8">
               <div className="flex flex-col">
-                <div className="w-[849px] h-[275px] bg-primary-green/[0.30] rounded-xl mt-5 p-4">
+                <div
+                  className={`w-[849px] ${
+                    schoolSalesNotRequired ? 'h-[185px]' : 'h-[275px]'
+                  } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
+                >
                   <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">General</div>
 
                   <div className="flex flex-row justify-between">
@@ -376,97 +390,120 @@ const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
                           className="w-[211px] flex flex-row"
                           variant="primary"
                           text="Copy Previous Week's Sales"
-                          onClick={() => setSalesFigures(true)}
+                          onClick={() => setSalesFigures(salesDate, true)}
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
-
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-col mr-[20px]">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
+                  {schoolSalesNotRequired ? (
+                    <div className="gap-[510px] flex flex-row">
+                      <div className="flex flex-row mb-5 mt-5">
+                        <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3 ">
+                          School Sales required
                         </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="schSeatsSold"
-                          value={schSeatsSold}
-                          onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
-                        />
+                        <div className="flex flex-col">
+                          <Checkbox
+                            id="schSalesNotRequired"
+                            name="schSalesNotRequired"
+                            checked={false}
+                            onChange={() => setSchoolSalesNotRequired(false)}
+                            className="w-[19px] h-[19px]"
+                          />
+                        </div>
                       </div>
 
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="schSeatsReserved"
-                          value={schSeatsReserved}
-                          onChange={(event) => setNumericVal(setSchSeatsReserved, event.target.value)}
-                        />
-                      </div>
+                      <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
                     </div>
+                  ) : (
+                    <div>
+                      <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
 
-                    <div className="flex flex-col">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="schSeatsSoldVal"
-                          value={schSeatsSoldVal}
-                          onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
-                        />
-                      </div>
-
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="schSeatsReservedVal"
-                          value={schSeatsReservedVal}
-                          onChange={(event) => setNumericVal(setSchSeatsReservedVal, event.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col mt-4 justify-end">
-                      <div className="flex flex-col items-end">
-                        <div className="flex flex-row mb-5">
-                          <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
-                            School Sales not required
+                      <div className="flex flex-row justify-between">
+                        <div className="flex flex-col mr-[20px]">
+                          <div className="flex flex-row mt-4">
+                            <div className="flex flex-col">
+                              <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
+                            </div>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Seats"
+                              id="schSeatsSold"
+                              value={schSeatsSold}
+                              onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
+                            />
                           </div>
-                          <div className="flex flex-col">
-                            <Checkbox
-                              id="Marketing Plans Received"
-                              name="Marketing Plans Received"
-                              checked={schoolSalesNotRequired}
-                              onChange={(e) => setSchoolSalesNotRequired(e.target.checked)}
-                              className="w-[19px] h-[19px]"
+
+                          <div className="flex flex-row mt-4">
+                            <div className="flex flex-col">
+                              <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats</div>
+                            </div>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Seats"
+                              id="schSeatsReserved"
+                              value={schSeatsReserved}
+                              onChange={(event) => setNumericVal(setSchSeatsReserved, event.target.value)}
                             />
                           </div>
                         </div>
 
-                        <Button
-                          className="w-[132px] flex flex-row"
-                          variant="secondary"
-                          text="Cancel"
-                          onClick={handleCancel}
-                        />
+                        <div className="flex flex-col">
+                          <div className="flex flex-row mt-4">
+                            <div className="flex flex-col">
+                              <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold Value</div>
+                            </div>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Value"
+                              id="schSeatsSoldVal"
+                              value={schSeatsSoldVal}
+                              onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
+                            />
+                          </div>
+
+                          <div className="flex flex-row mt-4">
+                            <div className="flex flex-col">
+                              <div className="text-primary-dark-blue base font-bold mr-5">Reserved Seats Value</div>
+                            </div>
+                            <TextInput
+                              className="w-[137px] h-[31px] flex flex-col -mt-1"
+                              placeholder="Enter Value"
+                              id="schSeatsReservedVal"
+                              value={schSeatsReservedVal}
+                              onChange={(event) => setNumericVal(setSchSeatsReservedVal, event.target.value)}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col mt-4 justify-end">
+                          <div className="flex flex-col items-end">
+                            <div className="flex flex-row mb-5">
+                              <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3">
+                                School Sales not required
+                              </div>
+                              <div className="flex flex-col">
+                                <Checkbox
+                                  id="schSalesNotRequired"
+                                  name="schSalesNotRequired"
+                                  checked={false}
+                                  onChange={() => setSchoolSalesNotRequired(true)}
+                                  className="w-[19px] h-[19px]"
+                                />
+                              </div>
+                            </div>
+
+                            <Button
+                              className="w-[132px] flex flex-row"
+                              variant="secondary"
+                              text="Cancel"
+                              onClick={handleCancel}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="flex flex-row w-[849px] gap-6 mt-5">
