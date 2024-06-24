@@ -55,12 +55,22 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
     () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
+      Object.values(users).map(({ FirstName = '', LastName = '' }) => ({
+        value: `${FirstName || ''} ${LastName || ''}`,
         text: `${FirstName || ''} ${LastName || ''}`,
       })),
     [users],
   );
+
+  const producerList = useMemo(() => {
+    const list = {};
+    Object.values(users).forEach((listData) => {
+      list[`${listData.FirstName || ''} ${listData.LastName || ''}`] = `${listData.FirstName || ''} ${
+        listData.LastName || ''
+      }`;
+    });
+    return list;
+  }, [users]);
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
@@ -271,14 +281,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5 flex justify-between">
                 <Select
-                  onChange={(value) => editContractModalData('SignedBy', value.toString(), 'contract')}
-                  // SignedBy
+                  onChange={(value) => editContractModalData('SignedBy', value, 'contract')}
                   className="bg-primary-white w-52"
                   placeholder="User Name Dropdown"
                   options={[{ text: 'Select Assignee', value: null }, ...userList]}
                   isClearable
                   isSearchable
-                  // value={formData.SignedBy ? users[formData.SignedBy].Id : ''}
+                  value={formData.SignedBy ? producerList[formData.SignedBy] : ''}
                 />
 
                 <div className="flex items-center">
