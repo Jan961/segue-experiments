@@ -14,7 +14,7 @@ export type DateRangeError = {
   toError: string;
 };
 
-interface DateRangePorps {
+interface DateRangeProps {
   className?: string;
   disabled?: boolean;
   testId?: string;
@@ -40,7 +40,7 @@ export default function DateRange({
   minDate = null,
   maxDate = null,
   labelClass,
-}: DateRangePorps) {
+}: DateRangeProps) {
   const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
   const fromInputRef = useRef(null);
@@ -92,6 +92,12 @@ export default function DateRange({
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      onChange(dateRange);
+    }
+  };
+
   return (
     <div
       className={`${className} !shadow-sm-shadow border border-primary-border rounded-md flex items-center ${disabledClass}`}
@@ -115,6 +121,7 @@ export default function DateRange({
         error={errors?.fromError}
         minDate={minDate}
         maxDate={maxDate}
+        onKeyDown={handleKeyDown}
       />
       <span className="mx-1 text-primary-label">to</span>
       <DateInput
@@ -125,6 +132,7 @@ export default function DateRange({
         minDate={dateRange.from || minDate}
         error={errors?.toError}
         maxDate={maxDate}
+        onKeyDown={handleKeyDown}
       />
     </div>
   );
