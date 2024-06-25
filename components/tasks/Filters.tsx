@@ -102,12 +102,12 @@ const Filters = ({ usersList, handleShowTask }: FiltersProps) => {
             label="Assigned to"
             options={usersList}
           />
+          <Button className="text-sm leading-8 w-[132px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
       <div className="grid grid-cols-2 grid-rows-2 gap-4 max-w-[280px] py-2">
         <Button text="Tasks Reports" className="w-[132px]" sufixIconName="excel" onClick={handleShowReports} />
         <Button text="Master Task List" className="w-[132px]" onClick={() => router.push('/tasks/master')} />
-        <Button className="text-sm leading-8 w-[132px]" text="Clear Filters" onClick={onClearFilters} />
         <Button
           onClick={handleShowTask}
           disabled={!selected || selected === -1}
