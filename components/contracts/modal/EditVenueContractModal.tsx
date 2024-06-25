@@ -32,6 +32,7 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { LoadingOverlay } from 'components/shows/ShowsTable';
+import { transformToOptions } from 'utils';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -55,10 +56,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
     () =>
-      Object.values(users).map(({ FirstName = '', LastName = '' }) => ({
-        value: `${FirstName || ''} ${LastName || ''}`,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
+      transformToOptions(
+        Object.values(users),
+        null,
+        null,
+        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
+        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
+      ),
     [users],
   );
 
@@ -149,6 +153,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     setEditDealMemoModal(false);
     callDealMemoApi();
   };
+
   return (
     <PopupModal
       show={visible}
