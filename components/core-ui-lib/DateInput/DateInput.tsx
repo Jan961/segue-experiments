@@ -21,7 +21,6 @@ interface DateInputProps {
   labelClassName?: string;
   disabled?: boolean;
   position?: string;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -43,7 +42,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     labelClassName,
     disabled = false,
     position = '',
-    onKeyDown,
     ...props
   }: DateInputProps,
   ref,
@@ -131,8 +129,8 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (onKeyDown) {
-      onKeyDown(e);
+    if (e.code === 'Enter') {
+      inputRef.current.blur();
     }
   };
 
