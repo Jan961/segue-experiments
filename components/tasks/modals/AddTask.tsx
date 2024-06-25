@@ -148,7 +148,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
     let newInputs = { ...inputs, [id]: value };
     if (id === 'Progress' && value === 100) {
-      newInputs = { ...newInputs, [id]: value, DueDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
+      newInputs = { ...newInputs, DueDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
       setInputs(newInputs);
     } else {
       setInputs(newInputs);
