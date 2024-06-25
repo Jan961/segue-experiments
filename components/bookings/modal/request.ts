@@ -110,3 +110,32 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
     console.log(error);
   }
 };
+
+export const exportExcelReport = async (urlPath, payload = {}, fileName = 'Report.xlsx') => {
+  try {
+    const response = await axios.post(urlPath, payload, { responseType: 'blob' });
+
+    if (response.status >= 200 && response.status < 300) {
+      let suggestedName: string | null = null;
+
+      const contentDisposition = response.headers['content-disposition'];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match && match[1]) {
+          suggestedName = match[1];
+        }
+      }
+
+      if (!suggestedName) {
+        suggestedName = fileName;
+      }
+
+      const content = response.data;
+      if (content) {
+        downloadFromContent(content, suggestedName);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
