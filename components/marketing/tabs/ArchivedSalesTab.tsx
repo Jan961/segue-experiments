@@ -11,6 +11,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import axios from 'axios';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib/Notifications';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 export interface ArchSalesTabRef {
   resetData: () => void;
@@ -31,7 +32,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const venueDict = useRecoilValue(venueState);
   const bookings = useRecoilState(bookingJumpState);
   const [bookingsSelection, setBookingsSelection] = useState([]);
-
+  const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const { selectedBooking } = props;
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -103,9 +104,13 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const onArchivedSalesReport = async () => {
     const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
     const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const selectedProduction = productions?.filter((production) => production.Id === productionId);
+    const { ShowName, ShowCode, Code } = selectedProduction[0];
+    const productionName = `${ShowName} (${ShowCode + Code})`;
     const payload = {
       bookingsSelection,
       venueAndDate,
+      productionName,
     };
     await exportExcelReport('/api/reports/marketing/archivedSales', payload, 'Archived Sales Report.xlsx');
   };

@@ -63,7 +63,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const currency = useRecoilValue(currencyState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -360,9 +360,14 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const onExport = async () => {
     const urlPath = `/api/reports/marketing/activitiesReport/${props.bookingId}`;
+    const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
+    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const selectedProduction = productions?.filter((production) => production.Id === productionId);
+    const { ShowName, ShowCode, Code } = selectedProduction[0];
+    const productionName = `${ShowName} (${ShowCode + Code})`;
     const payload = {
-      productionName: 'productionName',
-      venueAndDate: 'venueAndDate',
+      productionName,
+      venueAndDate,
     };
     const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report.xlsx');
     notify.promise(downloadContactNotesReport(), {

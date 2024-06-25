@@ -2,8 +2,9 @@ import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { getArchivedSalesList } from 'pages/api/marketing/sales/read/archived';
 import { isArray } from 'radash';
+import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
-const createExcelFromData = (data, bookingInfo) => {
+const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Booking Data');
 
@@ -14,7 +15,7 @@ const createExcelFromData = (data, bookingInfo) => {
 
   const createHeaderCell = (cell, value, mergeAcross = 1, fontSize = 12) => {
     cell.value = value;
-    cell.font = { bold: true, size: fontSize, color: { argb: 'FFFFFF' } };
+    cell.font = { bold: true, size: fontSize, color: { argb: COLOR_HEXCODE.WHITE } };
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -22,8 +23,8 @@ const createExcelFromData = (data, bookingInfo) => {
     };
     cell.alignment = { vertical: 'middle', horizontal: 'center' };
     cell.border = {
-      bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
-      right: { style: 'thin', color: { argb: 'FFFFFF' } },
+      bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
+      right: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
     };
     if (mergeAcross > 1) {
       worksheet.mergeCells(cell.row, cell.col, cell.row, cell.col + mergeAcross - 1);
@@ -35,13 +36,13 @@ const createExcelFromData = (data, bookingInfo) => {
   const totalColumns = 2 + bookingIds.length * 2;
 
   const headerRow1 = worksheet.addRow(['Venue Archived Sales Report']);
-  const headerRow2 = worksheet.addRow(['Bridesmaids (of Britain) (BOB23)']);
-  const headerRow3 = worksheet.addRow(['(HAYBEC (Beck Theatre, HAYES))']);
+  const headerRow2 = worksheet.addRow([productionName]);
+  const headerRow3 = worksheet.addRow([venueAndDate]);
   const emptyRow = worksheet.addRow([]);
 
   createHeaderCell(headerRow1.getCell(1), 'Venue Archived Sales Report', totalColumns, 16);
-  createHeaderCell(headerRow2.getCell(1), 'Bridesmaids (of Britain) (BOB23)', totalColumns, 16);
-  createHeaderCell(headerRow3.getCell(1), '(HAYBEC (Beck Theatre, HAYES))', totalColumns, 16);
+  createHeaderCell(headerRow2.getCell(1), productionName, totalColumns, 16);
+  createHeaderCell(headerRow3.getCell(1), venueAndDate, totalColumns, 16);
 
   headerRow1.height = 30;
   headerRow2.height = 30;
@@ -65,10 +66,9 @@ const createExcelFromData = (data, bookingInfo) => {
     columnIndex += 2;
   });
 
-  // Add data rows
   data.forEach((item, index) => {
     const isLastRow = index === data.length - 1;
-    const rowData: string[] = [
+    const rowData = [
       isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`,
       moment(item.SetProductionWeekDate).format('DD/MM/YYYY'),
     ];
@@ -91,8 +91,30 @@ const createExcelFromData = (data, bookingInfo) => {
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: '87CEEB' },
+          fgColor: { argb: COLOR_HEXCODE.BLUE },
         };
+      }
+
+      if (colNumber > 2) {
+        if (item.SetNotOnSale) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: COLOR_HEXCODE.RED },
+          };
+        } else if (item.SetBrochureReleased) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: COLOR_HEXCODE.YELLOW },
+          };
+        } else if (item.SetSingleSeats) {
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: COLOR_HEXCODE.DARK_GREEN },
+          };
+        }
       }
     });
   });
@@ -111,7 +133,7 @@ const handler = async (req, res) => {
     throw new Error('the method is not allowed');
   }
 
-  const { bookingsSelection } = req.body || {};
+  const { bookingsSelection, productionName, venueAndDate } = req.body || {};
 
   if (!bookingsSelection || (isArray(bookingsSelection) && bookingsSelection.length === 0)) {
     throw new Error('Required params are missing');
@@ -121,7 +143,7 @@ const handler = async (req, res) => {
 
   const data = await getArchivedSalesList(bookingIds);
 
-  const workbook = createExcelFromData(data, bookingsSelection);
+  const workbook = createExcelFromData(data, bookingsSelection, productionName, venueAndDate);
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', 'attachment; filename=booking_data.xlsx');

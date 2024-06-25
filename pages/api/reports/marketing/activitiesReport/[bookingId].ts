@@ -1,6 +1,7 @@
 import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { getActivitiesByBookingId } from 'pages/api/marketing/activities/[BookingId]';
+import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 interface ActivityType {
   Name: string;
@@ -55,7 +56,7 @@ const handler = async (req, res) => {
     const row = worksheet.addRow([text]);
     row.height = 30;
     const cell = row.getCell(1);
-    cell.font = { bold: true, size, color: { argb: 'FFFFFF' } };
+    cell.font = { bold: true, size, color: { argb: COLOR_HEXCODE.WHITE } };
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
@@ -63,8 +64,8 @@ const handler = async (req, res) => {
     };
     cell.alignment = { vertical: 'middle', horizontal: 'center' };
     cell.border = {
-      bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
-      right: { style: 'thin', color: { argb: 'FFFFFF' } },
+      bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
+      right: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
     };
     worksheet.mergeCells(`A${row.number}:F${row.number}`);
   };
@@ -80,11 +81,11 @@ const handler = async (req, res) => {
       pattern: 'solid',
       fgColor: { argb: '41A29A' },
     };
-    cell.font = { color: { argb: 'FFFFFF' }, bold: true };
+    cell.font = { color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
     cell.alignment = { vertical: 'middle', horizontal: 'center' };
     cell.border = {
-      bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
-      right: { style: 'thin', color: { argb: 'FFFFFF' } },
+      bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
+      right: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
     };
   });
   headerRow.height = 30;

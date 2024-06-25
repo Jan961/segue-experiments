@@ -57,11 +57,23 @@ export const getArchivedSalesList = async (bookingIds) => {
   );
   const commonData = formattedData
     .filter((x: TSalesView) => x.BookingId === bookingIds[0])
-    .map(({ SetBookingWeekNum, SetProductionWeekDate, SetIsFinalFigures }) => ({
-      SetBookingWeekNum,
-      SetProductionWeekDate,
-      SetIsFinalFigures,
-    }));
+    .map(
+      ({
+        SetBookingWeekNum,
+        SetProductionWeekDate,
+        SetIsFinalFigures,
+        SetNotOnSale,
+        SetBrochureReleased,
+        SetSingleSeats,
+      }) => ({
+        SetBookingWeekNum,
+        SetProductionWeekDate,
+        SetIsFinalFigures,
+        SetNotOnSale,
+        SetBrochureReleased,
+        SetSingleSeats,
+      }),
+    );
   commonData.sort((a, b) => {
     const t1 = Number(a.SetBookingWeekNum);
     const t2 = Number(b.SetBookingWeekNum);
@@ -80,6 +92,9 @@ export const getArchivedSalesList = async (bookingIds) => {
         SetProductionWeekDate: x.SetProductionWeekDate,
         SetIsFinalFigures: x.SetIsFinalFigures,
         data: rearrangeArray({ arr: result[idx], bookingIds, currencySymbol }),
+        SetNotOnSale: x.SetNotOnSale,
+        SetBrochureReleased: x.SetBrochureReleased,
+        SetSingleSeats: x.SetSingleSeats,
       },
     ],
     [],
