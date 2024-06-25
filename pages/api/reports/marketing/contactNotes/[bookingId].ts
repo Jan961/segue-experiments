@@ -2,8 +2,26 @@ import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { getContactNotesByBookingId } from 'services/venueContactsService';
 import { bookingContactNoteMapper } from 'lib/mappers';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-const handler = async (req, res) => {
+const createHeaderRow = (worksheet: any, text: string, size: number) => {
+  const row = worksheet.addRow([text]);
+  row.height = 30;
+  const cell = row.getCell(1);
+  cell.font = { bold: true, size, color: { argb: 'FFFFFF' } };
+  cell.fill = {
+    type: 'pattern',
+    pattern: 'solid',
+    fgColor: { argb: '41A29A' },
+  };
+  cell.alignment = { vertical: 'middle', horizontal: 'center' };
+  cell.border = {
+    bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
+  };
+  worksheet.mergeCells(`A${row.number}:E${row.number}`);
+};
+
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId } = req.query || {};
 
   if (req.method !== 'POST') {
@@ -16,31 +34,14 @@ const handler = async (req, res) => {
     throw new Error('Required params are missing');
   }
 
-  const data = await getContactNotesByBookingId(parseInt(bookingId));
+  const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contact Notes');
 
-  const createHeaderRow = (text: string, size: number) => {
-    const row = worksheet.addRow([text]);
-    row.height = 30;
-    const cell = row.getCell(1);
-    cell.font = { bold: true, size, color: { argb: 'FFFFFF' } };
-    cell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: '41A29A' },
-    };
-    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-    cell.border = {
-      bottom: { style: 'thin', color: { argb: 'FFFFFF' } },
-    };
-    worksheet.mergeCells(`A${row.number}:E${row.number}`);
-  };
-
-  createHeaderRow(productionName, 16);
-  createHeaderRow(venueAndDate, 14);
-  createHeaderRow('Contact Notes Report', 12);
+  createHeaderRow(worksheet, productionName, 16);
+  createHeaderRow(worksheet, venueAndDate, 14);
+  createHeaderRow(worksheet, 'Contact Notes Report', 12);
 
   const headerRow = worksheet.addRow(['Who', 'Date', 'Time', 'Actioned By', 'Notes']);
   headerRow.eachCell((cell) => {
