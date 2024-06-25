@@ -388,3 +388,40 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
 
   return colDefs;
 };
+
+export const updateWarningColDefs = (type) => {
+  const colDefs = [];
+
+  colDefs.push(
+    {
+      headerName: 'Date',
+      field: 'date',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: (params) => {
+        return {
+          value: formatInputDate(params.data.date),
+        };
+      },
+      width: 185,
+    },
+    {
+      headerName: 'Seats',
+      field: 'seats',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+      resizable: type !== 'Hold',
+    },
+  );
+
+  if (type === 'Hold') {
+    colDefs.push({
+      headerName: 'Value',
+      field: 'value',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+      resizable: false,
+    });
+  }
+
+  return colDefs;
+};

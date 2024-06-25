@@ -6,10 +6,11 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { SelectOption } from '../MarketingHome';
-import { addDurationToDate, getMonday } from 'services/dateService';
+import { addDurationToDate, getMonday, toISO } from 'services/dateService';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
+import { UpdateWarningModal } from '../modal/UpdateWarning';
 
 type TourResponse = {
   data: Array<SelectOption>;
@@ -62,6 +63,11 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [compData, setCompData] = useState([]);
   const [compNotes, setCompNotes] = useState('');
   const [salesDate, setSalesDate] = useState(null);
+  const [futureData, setFutureData] = useState([]);
+  const [fieldName, setFieldName] = useState('');
+  const [batchUpdateData, setBatchUpdateData] = useState({});
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [warnFieldType, setWarnFieldType] = useState('');
   const [loading, setLoading] = useState<boolean>(true);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const [setId, setSetId] = useState(-1);
@@ -101,6 +107,23 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   };
 
   const handleTableUpdate = async (value, data, type, field) => {
+    setFieldName(data.name);
+
+    // first check for future data - we may need to batch update other fields
+    const fieldType = type === 'Holds' ? 'Hold' : 'Comp';
+    setWarnFieldType(fieldType);
+    const futureData: any = await fetchData({
+      url: '/api/marketing/sales/read/checkFuture',
+      method: 'POST',
+      data: {
+        bookingId: bookings.selected,
+        type: fieldType,
+        saleDate: toISO(salesDate).substring(0, 10),
+        typeId: data.id,
+        field,
+      },
+    });
+
     const inputData = {
       value,
       data,
@@ -121,6 +144,51 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       const setIdObj = response as { setId: number };
       setSetId(setIdObj.setId);
     }
+
+    // there are future field, show warning
+    if (futureData.length > 0) {
+      setBatchUpdateData({
+        value,
+        bookingId: bookings.selected,
+        typeId: data.id,
+        type: fieldType,
+        saleDate: salesDate,
+        field,
+      });
+
+      if (fieldType === 'Hold') {
+        const holdMapped = futureData.map((hold) => {
+          return {
+            seats: hold.SetHoldSeats,
+            value: hold.SetHoldValue,
+            date: hold.SetSalesFiguresDate,
+          };
+        });
+
+        setFutureData(holdMapped);
+        setShowWarning(true);
+      } else {
+        const compMapped = futureData.map((comp) => {
+          return {
+            seats: comp.SetCompSeats,
+            date: comp.SetSalesFiguresDate,
+          };
+        });
+
+        setFutureData(compMapped);
+        setShowWarning(true);
+      }
+    }
+  };
+
+  const batchUpdate = async () => {
+    await fetchData({
+      url: '/api/marketing/sales/process/entry/batchUpdate',
+      method: 'POST',
+      data: batchUpdateData,
+    });
+
+    setShowWarning(false);
   };
 
   const handleCancel = () => {
@@ -207,7 +275,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     });
 
     if (typeof holdCompList === 'object') {
-      console.log(holdCompList);
       const holdCompData = holdCompList as HoldCompSet;
 
       setHoldData(holdCompData.holds);
@@ -559,6 +626,15 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           )}
         </div>
       )}
+
+      <UpdateWarningModal
+        data={futureData}
+        onCancel={() => setShowWarning(false)}
+        type={warnFieldType}
+        visible={showWarning}
+        name={fieldName}
+        onSave={batchUpdate}
+      />
     </div>
   );
 });
