@@ -46,9 +46,7 @@ export interface SalesEntryRef {
   resetForm: (salesWeek: string) => void;
 }
 
-type Props = Record<string, never>;
-
-const Entry = forwardRef<SalesEntryRef, Props>((props, ref) => {
+const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [genSeatsSold, setGenSeatsSold] = useState('');
   const [genSeatsSoldVal, setGenSeatsSoldVal] = useState('');
   const [genSeatsReserved, setGenSeatsReserved] = useState('');
