@@ -2,6 +2,7 @@ import React, { forwardRef } from 'react';
 import Icon from '../Icon';
 import { IconName } from '../Icon/Icon';
 import classNames from 'classnames';
+
 export interface TextInputProps {
   id?: string;
   name?: string;
@@ -18,6 +19,7 @@ export interface TextInputProps {
   onFocus?: (e: any) => void;
   onBlur?: (e: any) => void;
   type?: string;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
@@ -33,6 +35,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       iconName,
       error,
       inputClassName,
+      onKeyDown,
       ...rest
     },
     ref,
@@ -42,7 +45,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
     return (
       <div
-        className={`flex justify-between items-center relative  ${inputClassName} ${disabled ? 'disabled-input' : ''} `}
+        className={`flex justify-between items-center relative ${inputClassName} ${disabled ? 'disabled-input' : ''}`}
         onClick={onClick}
       >
         <input
@@ -54,6 +57,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           placeholder={placeholder}
           disabled={disabled}
           value={value || ''}
+          onKeyDown={onKeyDown}
           {...rest}
         />
         {iconName && (
