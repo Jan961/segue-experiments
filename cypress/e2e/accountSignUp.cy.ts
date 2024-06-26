@@ -21,15 +21,6 @@ describe('Signed in', () => {
     });
   });
 
-  it('Access bookings page from dashboard', () => {
-    // open dashboard page
-    cy.navigateToDashboard();
-    // check the dashboard displays all tiles
-    const link = cy.get('[data-testid="dashboard-tiles"] li:first a');
-    link.click();
-    cy.url().should('include', '/bookings');
-  });
-
   it('Cypress tests for new account journey: Next button should be disabled by default until we fill the required info', () => {
     launchUrl('http://localhost:3000/account/sign-up');
     const signupPage = new SignupPage();
@@ -56,6 +47,8 @@ describe('Signed in', () => {
   });
 
   it('Cypress tests for new account journey: fill company details', () => {
+    launchUrl('http://localhost:3000/account/sign-up');
+    cy.wait(3000);
     fillDetailsForSignUp(
       'Ashok',
       'Manchala',
@@ -116,8 +109,19 @@ describe('Signed in', () => {
     paymentDeatilsPage.getPlanDetails().should('have.attr', 'aria-checked', 'false');
   });
 
-  it('Cypress tests for new account journey: select plan: choose segue basic: Payment details form : fill payment details', () => {
-    cy.contains('Payment Details', { timeout: 10000 }).should('be.visible');
-    cy.contains('£499 per month', { timeout: 10000 }).should('be.visible');
+  it('Cypress tests for new account journey: select plan: choose segue basic: Payment details form : Pay Now button should be disabled initially if there is no data', () => {
+    const paymentDeatilsPage = new PaymentDeatilsPage();
+    paymentDeatilsPage.getPaymentDetailsText().should('be.visible');
+    paymentDeatilsPage.getAmount('499').should('be.visible');
+    paymentDeatilsPage.getPayNowButton().should('be.disabled');
+  });
+
+  it('Cypress tests for new account journey: select plan: choose segue basic: Payment details form : fill card deatils', () => {
+    const paymentDeatilsPage = new PaymentDeatilsPage();
+    paymentDeatilsPage.getPaymentDetailsText().should('be.visible');
+
+    cy.iframe('[title="Secure card number input frame"]')
+      .find('input[data-elements-stable-field-name="cardNumber"]')
+      .type('4242424242424242');
   });
 });

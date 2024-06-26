@@ -159,6 +159,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
           <div>
             <Label htmlFor="cardHolderName" text="Cardholder Name" />
             <TextInput
+              data-testid="card-holder-name"
               id="cardHolderName"
               name="cardHolderName"
               value={paymentDetails.cardHolderName}
@@ -186,11 +187,18 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
 
           <div>
             <Label htmlFor="postcode" text="Postcode" />
-            <TextInput id="postcode" name="postcode" value={paymentDetails.postcode} onChange={handleFormChange} />
+            <TextInput
+              id="postcode"
+              name="postcode"
+              value={paymentDetails.postcode}
+              onChange={handleFormChange}
+              data-testid="post-code"
+            />
           </div>
           <div>
             <Label htmlFor="email" text="Email" />
             <TextInput
+              data-testid="email-in-payment-details"
               className="flex w-full"
               placeholder="Email Address"
               id="email"
