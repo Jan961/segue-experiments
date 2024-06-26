@@ -1,4 +1,4 @@
-import { productionCompaniesColDefs, styleProps } from 'components/system-admin/productionCompanies/tableConfig';
+import { productionCompaniesColDefs, styleProps } from 'components/admin/tableConfig';
 import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
@@ -11,33 +11,37 @@ export default function ProductionCompaniesTab() {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>();
   const [selectedProdCompany, setSelectedProdCompany] = useState();
   const [errorMessage, setErrorMessage] = useState<string>();
+
   const fetchProductionCompanies = async () => {
-    const response = await fetch('/api/productionCompanies/read', {
-      method: 'POST',
-      headers: {},
-    });
-    setProductionCompanies(
-      (await response.json()).map((item) => {
-        item.existsInDB = true;
-        if (item.Logo.length > 0) {
-          const img = new Image();
-          img.src = 'data:image/png;base64,' + item.Logo;
-          item.Logo = img;
-        }
-        return item;
-      }),
-    );
+    try {
+      const response = await fetch('/api/productionCompanies/read', {
+        method: 'POST',
+        headers: {},
+      });
+      setProductionCompanies(
+        (await response.json()).map((item) => {
+          if (item.Logo.length > 0) {
+            const img = new Image();
+            img.src = 'data:image/png;base64,' + item.Logo;
+            item.Logo = img;
+          }
+          return item;
+        }),
+      );
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
-    (async () => {
-      await fetchProductionCompanies();
-    })();
+    fetchProductionCompanies();
   }, []);
-  const onAddNewVenueContact = async () => {
-    const emptyData = { Name: '', WebSite: '', Logo: '', existsInDB: false, Id: null };
-    setProductionCompanies((prev) => [emptyData, ...prev]);
+
+  const addNewVenueContact = async () => {
+    const newRow = { Name: '', WebSite: '', Logo: '', Id: null };
+    setProductionCompanies((prev) => [newRow, ...prev]);
   };
+
   const onCellClicked = async (e) => {
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
@@ -76,9 +80,9 @@ export default function ProductionCompaniesTab() {
     try {
       const { rowIndex } = e;
       const productions = productionCompanies;
-      productions[rowIndex] = { ...e.data, Id: productions[rowIndex].Id, existsInDB: productions[rowIndex].existsInDB };
+      productions[rowIndex] = { ...e.data, Id: productions[rowIndex].Id };
       setProductionCompanies(productions);
-      if (productions[rowIndex].existsInDB) {
+      if (productions[rowIndex].Id) {
         const data = e.data;
         const response = await axios.post('/api/productionCompanies/update', {
           body: JSON.stringify({ ...data, Id: productions[rowIndex].Id }),
@@ -113,19 +117,17 @@ export default function ProductionCompaniesTab() {
     return 50;
   };
 
-  const getRowStyle = useCallback((params) => {
-    if (params.data.existsInDB === false) {
-      return { background: '#E9458033' };
-    }
-    return null;
+  const getRowStyle = useCallback(({ data }) => {
+    return data.existsInDB === false ? { background: '#E9458033' } : null;
   }, []);
+
   return (
     <div>
       <div>
         <div className="flex justify-between items-center pt-8">
-          <h1 className="text-primary-navy text-2xl font-semibold">Production Companies / Special Purpose Vehicles</h1>
+          <h1 className="text-primary-navy text-responsive-xl">Production Companies / Special Purpose Vehicles</h1>
           <div className="pb-4">
-            <Button onClick={onAddNewVenueContact} variant="secondary" text="Add New Company" />
+            <Button onClick={addNewVenueContact} variant="secondary" text="Add New Company" />
           </div>
         </div>
         <ProductionCompaniesTable
@@ -139,30 +141,26 @@ export default function ProductionCompaniesTab() {
         />
       </div>
       {showDeleteModal && (
-        <div>
-          <DeleteConfirmation
-            title="Delete Booking"
-            onCancel={() => {
-              setShowDeleteModal(false);
-              setSelectedProdCompany(null);
-            }}
-            onConfirm={deleteProductionCompany}
-          >
-            <p>This will the delete the booking and related performances</p>
-          </DeleteConfirmation>
-        </div>
+        <DeleteConfirmation
+          title="Delete Booking"
+          onCancel={() => {
+            setShowDeleteModal(false);
+            setSelectedProdCompany(null);
+          }}
+          onConfirm={deleteProductionCompany}
+        >
+          <p>This will the delete the booking and related performances</p>
+        </DeleteConfirmation>
       )}
       {showErrorModal && (
-        <div>
-          <PopupModal
-            show={showErrorModal}
-            title="Deletion Failed"
-            showCloseIcon={true}
-            onClose={() => setShowErrorModal(false)}
-          >
-            <p>{errorMessage}</p>
-          </PopupModal>
-        </div>
+        <PopupModal
+          show={showErrorModal}
+          title="Deletion Failed"
+          showCloseIcon={true}
+          onClose={() => setShowErrorModal(false)}
+        >
+          <p>{errorMessage}</p>
+        </PopupModal>
       )}
     </div>
   );

@@ -1,13 +1,13 @@
-import DefaultTextRenderer from '../../core-ui-lib/Table/renderers/DefaultTextRenderer';
+import DefaultTextRenderer from '../core-ui-lib/Table/renderers/DefaultTextRenderer';
 import { tileColors } from 'config/global';
-import IconRenderer from '../../bookings/table/IconRenderer';
+import IconRenderer from '../bookings/table/IconRenderer';
 import { UploadLogoRenderer } from './renderers/UploadLogoRenderer';
 export const styleProps = { headerColor: tileColors.systemAdmin };
 
+const createUploadLogoRenderer = (fetchProductionCompanies) => {
+  return (params) => UploadLogoRenderer(params, fetchProductionCompanies);
+};
 export const productionCompaniesColDefs = (fetchProductionCompanies) => {
-  const createUploadLogoRenderer = (fetchProductionCompanies) => {
-    return (params) => UploadLogoRenderer(params, fetchProductionCompanies);
-  };
   return [
     {
       headerName: 'Company name',
@@ -40,7 +40,7 @@ export const productionCompaniesColDefs = (fetchProductionCompanies) => {
         tooltipPosition: 'left',
         popover: true,
       },
-      width: 50,
+      flex: 1,
     },
   ];
 };

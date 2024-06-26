@@ -1,5 +1,4 @@
 import Table from 'components/core-ui-lib/Table';
-import React from 'react';
 
 interface ProductionCompaniesTableProps {
   onChange: (value: any) => void;
@@ -10,7 +9,7 @@ interface ProductionCompaniesTableProps {
   getRowStyle: (value: any) => void; // Adjust the type according to your actual data structure
   getRowHeight: any;
 }
-const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
+const ProductionCompaniesTable = ({
   onChange,
   onCellClicked,
   columnDefs,
@@ -18,7 +17,7 @@ const ProductionCompaniesTable: React.FC<ProductionCompaniesTableProps> = ({
   styleProps,
   getRowStyle,
   getRowHeight,
-}) => {
+}: ProductionCompaniesTableProps) => {
   return (
     <Table
       columnDefs={columnDefs}

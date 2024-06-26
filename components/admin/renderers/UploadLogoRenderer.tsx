@@ -1,11 +1,13 @@
 import UploadModal from 'components/core-ui-lib/UploadModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from 'components/core-ui-lib/';
 import axios from 'axios';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
+import Image from 'next/image';
 
 export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
+  const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
   const onSave = async (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
@@ -70,16 +72,28 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
     }
   };
 
-  if (openUploadModal) {
-    let value: UploadedFile;
-    if (params.data.Logo !== '') {
-      value = {
+  useEffect(() => {
+    if (openUploadModal && params.data.Logo !== '') {
+      setUploadedFile({
         imageUrl: params.data.Logo.currentSrc,
         name: 'Company Logo',
         size: params.data.Logo.size,
-      };
+      });
     }
-    return (
+  }, [openUploadModal]);
+
+  return (
+    <div className="h-full flex justify-center items-center">
+      {params.data.Logo.length === 0 ? (
+        <Button
+          text="Upload Logo"
+          variant="secondary"
+          onClick={() => setOpenUploadModal(true)}
+          disabled={params.data.Id === null}
+        />
+      ) : (
+        <Image src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />
+      )}
       <UploadModal
         visible={openUploadModal}
         title="Image Attachment"
@@ -92,22 +106,9 @@ Suitable image formats are jpg, tiff, svg, and png."
         }}
         maxFileSize={500 * 1024} // 0.5MB
         onSave={onSave}
-        value={value}
+        value={uploadedFile}
         customHandleFileDelete={handleDelete}
       />
-    );
-  }
-  if (params.data.Logo.length === 0) {
-    return (
-      <Button
-        text="Upload Logo"
-        variant="secondary"
-        className="flex justify-center items-center ml-10 "
-        onClick={() => setOpenUploadModal(true)}
-        disabled={params.data.Id === null}
-      />
-    );
-  } else {
-    return <img src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />;
-  }
+    </div>
+  );
 };
