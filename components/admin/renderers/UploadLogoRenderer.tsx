@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react';
 import { Button } from 'components/core-ui-lib/';
 import axios from 'axios';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import Image from 'next/image';
+import NextImage from 'next/image';
 
 export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
   const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
+
   const onSave = async (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
@@ -92,7 +93,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
           disabled={params.data.Id === null}
         />
       ) : (
-        <Image src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />
+        <NextImage src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />
       )}
       <UploadModal
         visible={openUploadModal}
