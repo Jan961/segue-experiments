@@ -28,7 +28,7 @@ model Booking {
   LandingPageURL                    String?               @map("BookingLandingPageURL") @db.VarChar(255)
   TicketsOnSaleFromDate             DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
   TicketsOnSale                     Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
-  HasSchoolsSales                   Boolean               @default(dbgenerated("(b'0')")) @db.Bit(1)
+  HasSchoolsSales                   Boolean               @map("BookingHasSchoolsSales") @default(dbgenerated("(b'0')")) @db.Bit(1)
   MarketingPlanReceived             Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
   ContactInfoReceived               Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
   PrintReqsReceived                 Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
@@ -38,7 +38,7 @@ model Booking {
   MarketingDealNotes                String?               @map("BookingMarketingDealNotes") @db.LongText
   CrewNotes                         String?               @map("BookingCrewNotes") @db.LongText
   SalesNotes                        String?               @map("BookingSalesNotes") @db.LongText
-  FinalSalesDiscrepancyNotes        String?               @db.LongText
+  FinalSalesDiscrepancyNotes        String?               @map("BookingFinalSalesDiscrepancyNotes") @db.LongText
   HoldNotes                         String?               @map("BookingHoldNotes") @db.LongText
   CompNotes                         String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes                  String?               @map("BookingMerchandiseNotes") @db.LongText
@@ -468,7 +468,7 @@ model SalesSet {
   SetSingleSeats                  Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetNotOnSale                    Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsFinalFigures               Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  FinalSalesApprovedByUser        String?      @db.VarChar(100)
+  FinalSalesApprovedByUser        String?      @map("BookingFinalSalesApprovedByUser") @db.VarChar(100)
   SetIsCopy                       Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
   Sale                            Sale[]
   Booking                         Booking      @relation(fields: [SetBookingId], references: [Id], onUpdate: Restrict, map: "Booking_BookingSale")
