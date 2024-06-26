@@ -1,29 +1,35 @@
 import Layout from 'components/Layout';
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
-import Entry from 'components/marketing/sales/entry';
+import Entry, { SalesEntryRef } from 'components/marketing/sales/entry';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
 import { objectify } from 'radash';
-import { useRecoilValue } from 'recoil';
+import { useRef } from 'react';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
-import { BookingJump, bookingJumpState } from 'state/marketing/bookingJumpState';
+import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
-  const bookings = useRecoilValue(bookingJumpState);
+  const salesEntryRef = useRef<SalesEntryRef>();
+
+  const handleDateChanged = (salesWeek) => {
+    if (salesEntryRef.current) {
+      salesEntryRef.current.resetForm(salesWeek);
+    }
+  };
 
   return (
     <div>
       <Layout title="Marketing | Segue">
         <div className="mb-8">
-          <SalesEntryFilters />
+          <SalesEntryFilters onDateChanged={handleDateChanged} />
         </div>
 
-        {bookings.selected !== undefined && bookings.selected !== null && <Entry />}
+        <Entry ref={salesEntryRef} />
       </Layout>
     </div>
   );

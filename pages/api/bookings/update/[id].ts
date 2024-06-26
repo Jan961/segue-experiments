@@ -15,9 +15,9 @@ const mapToPrisma = (fields) => {
     MarketingCostsNotes: fields.marketingCostsNotes,
     CastRateTicketsArranged: fields.castRateTicketsArranged,
     CastRateTicketsNotes: fields.castRateTicketsNotes,
-    BookingSalesNotes: fields.bookingSalesNotes,
-    BookingHoldNotes: fields.bookingHoldNotes,
-    BookingCompNotes: fields.bookingCompNotes,
+    SalesNotes: fields.salesNotes,
+    HoldNotes: fields.holdNotes,
+    CompNotes: fields.compNotes,
   };
 };
 

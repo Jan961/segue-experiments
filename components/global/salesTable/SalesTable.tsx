@@ -206,15 +206,16 @@ export default function SalesTable({
     switch (variant) {
       case 'salesSnapshot': {
         const isMarketing = module !== 'bookings';
-        const MARKETING_TAB_WIDTH = 195;
-        const SCHOOLS_TAB_WIDTH = 135;
+        let SCHOOLS_WIDTH = 1465;
+        let NORMAL_WIDTH = 1085;
 
-        let baseContainerWidth = 1220;
-        baseContainerWidth -= schoolSales ? 0 : SCHOOLS_TAB_WIDTH;
-        baseContainerWidth -= isMarketing ? 0 : MARKETING_TAB_WIDTH;
-        containerWidth = baseContainerWidth.toString() + 'px';
+        if (!isMarketing) {
+          SCHOOLS_WIDTH -= 110;
+          NORMAL_WIDTH -= 120;
+        }
 
-        return containerWidth;
+        const width = schoolSales ? SCHOOLS_WIDTH : NORMAL_WIDTH;
+        return width.toString() + 'px';
       }
 
       case 'salesComparison': {
