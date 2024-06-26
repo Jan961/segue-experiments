@@ -77,118 +77,130 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const { fetchData } = useAxios();
 
   const handleUpdate = async () => {
-    const data = {
-      bookingId: bookings.selected,
-      salesDate,
-      schools: {
-        seatsSold: parseInt(schSeatsSold),
-        seatsSoldVal: parseFloat(schSeatsSoldVal),
-        seatsReserved: parseInt(schSeatsReserved),
-        seatsReservedVal: parseFloat(schSeatsReservedVal),
-      },
-      general: {
-        seatsSold: parseInt(genSeatsSold),
-        seatsSoldVal: parseFloat(genSeatsSoldVal),
-        seatsReserved: parseInt(genSeatsReserved),
-        seatsReservedVal: parseFloat(genSeatsReservedVal),
-      },
-    };
+    try {
+      const data = {
+        bookingId: bookings.selected,
+        salesDate,
+        schools: {
+          seatsSold: parseInt(schSeatsSold),
+          seatsSoldVal: parseFloat(schSeatsSoldVal),
+          seatsReserved: parseInt(schSeatsReserved),
+          seatsReservedVal: parseFloat(schSeatsReservedVal),
+        },
+        general: {
+          seatsSold: parseInt(genSeatsSold),
+          seatsSoldVal: parseFloat(genSeatsSoldVal),
+          seatsReserved: parseInt(genSeatsReserved),
+          seatsReservedVal: parseFloat(genSeatsReservedVal),
+        },
+      };
 
-    const response = await fetchData({
-      url: '/api/marketing/sales/process/entry/sales',
-      method: 'POST',
-      data,
-    });
+      const response = await fetchData({
+        url: '/api/marketing/sales/process/entry/sales',
+        method: 'POST',
+        data,
+      });
 
-    if (typeof response === 'object') {
-      const setIdObj = response as { setId: number };
-      setSetId(setIdObj.setId);
+      if (typeof response === 'object') {
+        const setIdObj = response as { setId: number };
+        setSetId(setIdObj.setId);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const handleTableUpdate = async (value, data, type, field) => {
-    setFieldName(data.name);
+    try {
+      setFieldName(data.name);
 
-    // first check for future data - we may need to batch update other fields
-    const fieldType = type === 'Holds' ? 'Hold' : 'Comp';
-    setWarnFieldType(fieldType);
-    const futureData: any = await fetchData({
-      url: '/api/marketing/sales/read/checkFuture',
-      method: 'POST',
-      data: {
-        bookingId: bookings.selected,
-        type: fieldType,
-        saleDate: toISO(salesDate).substring(0, 10),
-        typeId: data.id,
-        field,
-      },
-    });
-
-    const inputData = {
-      value,
-      data,
-      type,
-      field,
-      setId,
-      salesDate,
-      bookingId: bookings.selected,
-    };
-
-    const response = await fetchData({
-      url: '/api/marketing/sales/process/entry/compHold',
-      method: 'POST',
-      data: inputData,
-    });
-
-    if (typeof response === 'object') {
-      const setIdObj = response as { setId: number };
-      setSetId(setIdObj.setId);
-    }
-
-    // there are future field, show warning
-    if (futureData.length > 0) {
-      setBatchUpdateData({
-        value,
-        bookingId: bookings.selected,
-        typeId: data.id,
-        type: fieldType,
-        saleDate: salesDate,
-        field,
+      // first check for future data - we may need to batch update other fields
+      const fieldType = type === 'Holds' ? 'Hold' : 'Comp';
+      setWarnFieldType(fieldType);
+      const futureData: any = await fetchData({
+        url: '/api/marketing/sales/read/checkFuture',
+        method: 'POST',
+        data: {
+          bookingId: bookings.selected,
+          type: fieldType,
+          saleDate: toISO(salesDate).substring(0, 10),
+          typeId: data.id,
+          field,
+        },
       });
 
-      if (fieldType === 'Hold') {
-        const holdMapped = futureData.map((hold) => {
-          return {
-            seats: hold.SetHoldSeats,
-            value: hold.SetHoldValue,
-            date: hold.SetSalesFiguresDate,
-          };
-        });
+      const inputData = {
+        value,
+        data,
+        type,
+        field,
+        setId,
+        salesDate,
+        bookingId: bookings.selected,
+      };
 
-        setFutureData(holdMapped);
-        setShowWarning(true);
-      } else {
-        const compMapped = futureData.map((comp) => {
-          return {
-            seats: comp.SetCompSeats,
-            date: comp.SetSalesFiguresDate,
-          };
-        });
+      const response = await fetchData({
+        url: '/api/marketing/sales/process/entry/compHold',
+        method: 'POST',
+        data: inputData,
+      });
 
-        setFutureData(compMapped);
-        setShowWarning(true);
+      if (typeof response === 'object') {
+        const setIdObj = response as { setId: number };
+        setSetId(setIdObj.setId);
       }
+
+      // there are future field, show warning
+      if (futureData.length > 0) {
+        setBatchUpdateData({
+          value,
+          bookingId: bookings.selected,
+          typeId: data.id,
+          type: fieldType,
+          saleDate: salesDate,
+          field,
+        });
+
+        if (fieldType === 'Hold') {
+          const holdMapped = futureData.map((hold) => {
+            return {
+              seats: hold.SetHoldSeats,
+              value: hold.SetHoldValue,
+              date: hold.SetSalesFiguresDate,
+            };
+          });
+
+          setFutureData(holdMapped);
+          setShowWarning(true);
+        } else {
+          const compMapped = futureData.map((comp) => {
+            return {
+              seats: comp.SetCompSeats,
+              date: comp.SetSalesFiguresDate,
+            };
+          });
+
+          setFutureData(compMapped);
+          setShowWarning(true);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const batchUpdate = async () => {
-    await fetchData({
-      url: '/api/marketing/sales/process/entry/batchUpdate',
-      method: 'POST',
-      data: batchUpdateData,
-    });
+    try {
+      await fetchData({
+        url: '/api/marketing/sales/process/entry/batchUpdate',
+        method: 'POST',
+        data: batchUpdateData,
+      });
 
-    setShowWarning(false);
+      setShowWarning(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleCancel = () => {
@@ -208,88 +220,96 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   };
 
   const getSalesFrequency = async () => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-      method: 'POST',
-    });
+    try {
+      const data = await fetchData({
+        url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+        method: 'POST',
+      });
 
-    if (typeof data === 'object') {
-      const tourData = data as TourResponse;
-      if (tourData.frequency === undefined) {
-        return;
+      if (typeof data === 'object') {
+        const tourData = data as TourResponse;
+        if (tourData.frequency === undefined) {
+          return;
+        }
+
+        return tourData.frequency;
       }
-
-      return tourData.frequency;
+    } catch (error) {
+      console.log(error);
     }
   };
 
   const setSalesFigures = async (inputDate: Date, previous: boolean) => {
-    // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
-    // this will happen on first launch of the module
-    if (bookings.selected === undefined || bookings.selected === null) {
-      return;
+    try {
+      // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
+      // this will happen on first launch of the module
+      if (bookings.selected === undefined || bookings.selected === null) {
+        return;
+      }
+
+      const frequency = await getSalesFrequency();
+
+      const duration = frequency === 'W' ? 7 : 1;
+      let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
+
+      if (previous) {
+        salesDate = addDurationToDate(salesDate, duration, false);
+      }
+
+      // get the salesFigures for the selected date/week if they exist
+      const sales = await fetchData({
+        url: '/api/marketing/sales/read/currentDay',
+        method: 'POST',
+        data: {
+          bookingId: bookings.selected,
+          salesDate,
+          frequency,
+        },
+      });
+
+      if (typeof sales === 'object') {
+        const salesFigures = sales as SalesFigureSet;
+
+        // set the sales figures, if available
+        setGenSeatsReserved(validateSale(salesFigures.general?.seatsReserved));
+        setGenSeatsReservedVal(validateSale(salesFigures.general?.seatsReservedVal));
+        setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
+        setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
+        setSchSeatsReserved(validateSale(salesFigures.schools?.seatsReserved));
+        setSchSeatsReservedVal(validateSale(salesFigures.schools?.seatsReservedVal));
+        setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
+        setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
+      }
+
+      // holds and comps
+      const holdCompList = await fetchData({
+        url: '/api/marketing/sales/read/holdComp',
+        method: 'POST',
+        data: {
+          bookingId: bookings.selected,
+          salesDate,
+        },
+      });
+
+      if (typeof holdCompList === 'object') {
+        const holdCompData = holdCompList as HoldCompSet;
+
+        setHoldData(holdCompData.holds);
+        setCompData(holdCompData.comps);
+        setSetId(holdCompData.setId);
+      }
+
+      // get the booking details to set the notes fields
+      const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
+
+      setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
+      setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
+      setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
+
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
     }
-
-    const frequency = await getSalesFrequency();
-
-    const duration = frequency === 'W' ? 7 : 1;
-    let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
-
-    if (previous) {
-      salesDate = addDurationToDate(salesDate, duration, false);
-    }
-
-    // get the salesFigures for the selected date/week if they exist
-    const sales = await fetchData({
-      url: '/api/marketing/sales/read/currentDay',
-      method: 'POST',
-      data: {
-        bookingId: bookings.selected,
-        salesDate,
-        frequency,
-      },
-    });
-
-    if (typeof sales === 'object') {
-      const salesFigures = sales as SalesFigureSet;
-
-      // set the sales figures, if available
-      setGenSeatsReserved(validateSale(salesFigures.general?.seatsReserved));
-      setGenSeatsReservedVal(validateSale(salesFigures.general?.seatsReservedVal));
-      setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
-      setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
-      setSchSeatsReserved(validateSale(salesFigures.schools?.seatsReserved));
-      setSchSeatsReservedVal(validateSale(salesFigures.schools?.seatsReservedVal));
-      setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
-      setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
-    }
-
-    // holds and comps
-    const holdCompList = await fetchData({
-      url: '/api/marketing/sales/read/holdComp',
-      method: 'POST',
-      data: {
-        bookingId: bookings.selected,
-        salesDate,
-      },
-    });
-
-    if (typeof holdCompList === 'object') {
-      const holdCompData = holdCompList as HoldCompSet;
-
-      setHoldData(holdCompData.holds);
-      setCompData(holdCompData.comps);
-      setSetId(holdCompData.setId);
-    }
-
-    // get the booking details to set the notes fields
-    const booking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
-
-    setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
-    setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
-    setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
-
-    setLoading(false);
   };
 
   const validateSale = (saleFigure) => {
@@ -301,50 +321,54 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   };
 
   const editBooking = async (field: string, value: any) => {
-    const updObj = { [field]: value };
+    try {
+      const updObj = { [field]: value };
 
-    // update locally first
-    switch (field) {
-      case 'salesNotes':
-        setBookingSaleNotes(value);
-        break;
-      case 'holdNotes':
-        setHoldNotes(value);
-        break;
-      case 'compNotes':
-        setCompNotes(value);
-        break;
-    }
-
-    const fieldMapping = {
-      salesNotes: 'BookingSalesNotes',
-      holdNotes: 'BookingHoldNotes',
-      compNotes: 'BookingCompNotes',
-    };
-
-    // Find the booking index
-    const bookingIndex = bookings.bookings.findIndex((booking) => booking.Id === bookings.selected);
-
-    // Create a new bookings array with the updated booking
-    const newBookings = bookings.bookings.map((booking, index) => {
-      if (index === bookingIndex) {
-        return {
-          ...booking,
-          [fieldMapping[field]]: value,
-        };
+      // update locally first
+      switch (field) {
+        case 'salesNotes':
+          setBookingSaleNotes(value);
+          break;
+        case 'holdNotes':
+          setHoldNotes(value);
+          break;
+        case 'compNotes':
+          setCompNotes(value);
+          break;
       }
-      return booking;
-    });
 
-    // Update the bookings state with the new bookings array
-    setBookings({ bookings: newBookings, selected: bookings.selected });
+      const fieldMapping = {
+        salesNotes: 'BookingSalesNotes',
+        holdNotes: 'BookingHoldNotes',
+        compNotes: 'BookingCompNotes',
+      };
 
-    // update in the database
-    await fetchData({
-      url: '/api/bookings/update/' + bookings.selected.toString(),
-      method: 'POST',
-      data: updObj,
-    });
+      // Find the booking index
+      const bookingIndex = bookings.bookings.findIndex((booking) => booking.Id === bookings.selected);
+
+      // Create a new bookings array with the updated booking
+      const newBookings = bookings.bookings.map((booking, index) => {
+        if (index === bookingIndex) {
+          return {
+            ...booking,
+            [fieldMapping[field]]: value,
+          };
+        }
+        return booking;
+      });
+
+      // Update the bookings state with the new bookings array
+      setBookings({ bookings: newBookings, selected: bookings.selected });
+
+      // update in the database
+      await fetchData({
+        url: '/api/bookings/update/' + bookings.selected.toString(),
+        method: 'POST',
+        data: updObj,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
