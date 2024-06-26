@@ -18,6 +18,8 @@ const mapToPrisma = (fields) => {
     SalesNotes: fields.salesNotes,
     HoldNotes: fields.holdNotes,
     CompNotes: fields.compNotes,
+    FinalSalesDiscrepancyNotes: fields.finalSalesDiscrepancyNotes,
+    HasSchoolsSales: fields.hasSchoolsSales,
   };
 };
 
@@ -31,6 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!access) return res.status(401).end();
     const BookingId = parseInt(req.query.id as string, 10);
     const bookingUpdate = mapToPrisma(req.body);
+
+    console.log(bookingUpdate);
 
     const updatedBooking = await prisma.booking.update({
       where: {

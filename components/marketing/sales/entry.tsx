@@ -56,7 +56,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [schSeatsSoldVal, setSchSeatsSoldVal] = useState('');
   const [schSeatsReserved, setSchSeatsReserved] = useState('');
   const [schSeatsReservedVal, setSchSeatsReservedVal] = useState('');
-  const [schoolSalesNotRequired, setSchoolSalesNotRequired] = useState<boolean>(false);
+  const [bookingHasSchoolSales, setBookingHasSchoolSales] = useState<boolean>(false);
   const [bookingSaleNotes, setBookingSaleNotes] = useState('');
   const [holdData, setHoldData] = useState([]);
   const [holdNotes, setHoldNotes] = useState('');
@@ -241,6 +241,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const setSalesFigures = async (inputDate: Date, previous: boolean) => {
     try {
+      setLoading(true);
       // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
       // this will happen on first launch of the module
       if (bookings.selected === undefined || bookings.selected === null) {
@@ -305,6 +306,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
       setCompNotes(booking.BookingCompNotes === null ? '' : booking.BookingCompNotes);
       setHoldNotes(booking.BookingHoldNotes === null ? '' : booking.BookingHoldNotes);
+      setBookingHasSchoolSales(booking.BookingHasSchoolsSales);
 
       setLoading(false);
     } catch (error) {
@@ -335,12 +337,15 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         case 'compNotes':
           setCompNotes(value);
           break;
+        case 'hasSchoolsSales':
+          setBookingHasSchoolSales(value);
       }
 
       const fieldMapping = {
         salesNotes: 'BookingSalesNotes',
         holdNotes: 'BookingHoldNotes',
         compNotes: 'BookingCompNotes',
+        hasSchoolsSales: 'BookingHasSchoolsSales',
       };
 
       // Find the booking index
@@ -358,7 +363,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       });
 
       // Update the bookings state with the new bookings array
-      setBookings({ bookings: newBookings, selected: bookings.selected });
+      setBookings({ ...bookings, bookings: newBookings });
 
       // update in the database
       await fetchData({
@@ -405,7 +410,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
               <div className="flex flex-col">
                 <div
                   className={`w-[849px] ${
-                    schoolSalesNotRequired ? 'h-[185px]' : 'h-[275px]'
+                    bookingHasSchoolSales ? 'h-[275px]' : 'h-[185px]'
                   } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
                 >
                   <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">General</div>
@@ -485,26 +490,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                     </div>
                   </div>
 
-                  {schoolSalesNotRequired ? (
-                    <div className="gap-[510px] flex flex-row">
-                      <div className="flex flex-row mb-5 mt-5">
-                        <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3 ">
-                          School Sales required
-                        </div>
-                        <div className="flex flex-col">
-                          <Checkbox
-                            id="schSalesNotRequired"
-                            name="schSalesNotRequired"
-                            checked={false}
-                            onChange={() => setSchoolSalesNotRequired(false)}
-                            className="w-[19px] h-[19px]"
-                          />
-                        </div>
-                      </div>
-
-                      <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
-                    </div>
-                  ) : (
+                  {bookingHasSchoolSales ? (
                     <div>
                       <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
 
@@ -576,7 +562,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   id="schSalesNotRequired"
                                   name="schSalesNotRequired"
                                   checked={false}
-                                  onChange={() => setSchoolSalesNotRequired(true)}
+                                  onChange={() => editBooking('hasSchoolsSales', false)}
                                   className="w-[19px] h-[19px]"
                                 />
                               </div>
@@ -591,6 +577,25 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  ) : (
+                    <div className="gap-[510px] flex flex-row">
+                      <div className="flex flex-row mb-5 mt-5">
+                        <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3 ">
+                          School Sales required
+                        </div>
+                        <div className="flex flex-col">
+                          <Checkbox
+                            id="schSalesRequired"
+                            name="schSalesRequired"
+                            checked={false}
+                            onChange={() => editBooking('hasSchoolsSales', true)}
+                            className="w-[19px] h-[19px]"
+                          />
+                        </div>
+                      </div>
+
+                      <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
                     </div>
                   )}
                 </div>
