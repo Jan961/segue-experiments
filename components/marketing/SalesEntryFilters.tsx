@@ -129,7 +129,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
     } catch (error) {
       console.log(error);
     }
-  }, [bookings.bookings]);
+  }, [productionId]);
 
   useEffect(() => {
     if (productionId !== null && productionId !== undefined) {
