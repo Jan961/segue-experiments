@@ -478,7 +478,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                     disabled={!productionId}
                     iconProps={{ className: 'h-4 w-3' }}
                     sufixIconName="excel"
-                    onClick={() => onExport()}
+                    onClick={onExport}
                   />
                   <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
                 </div>
