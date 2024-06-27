@@ -28,6 +28,7 @@ model Booking {
   LandingPageURL             String?               @map("BookingLandingPageURL") @db.VarChar(255)
   TicketsOnSaleFromDate      DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
   TicketsOnSale              Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
+  HasSchoolsSales            Boolean               @default(dbgenerated("(b'0')")) @map("BookingHasSchoolsSales") @db.Bit(1)
   MarketingPlanReceived      Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
   ContactInfoReceived        Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
   PrintReqsReceived          Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
@@ -37,6 +38,7 @@ model Booking {
   MarketingDealNotes         String?               @map("BookingMarketingDealNotes") @db.LongText
   CrewNotes                  String?               @map("BookingCrewNotes") @db.LongText
   SalesNotes                 String?               @map("BookingSalesNotes") @db.LongText
+  FinalSalesDiscrepancyNotes String?               @map("BookingFinalSalesDiscrepancyNotes") @db.LongText
   HoldNotes                  String?               @map("BookingHoldNotes") @db.LongText
   CompNotes                  String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes           String?               @map("BookingMerchandiseNotes") @db.LongText
@@ -345,6 +347,9 @@ model Account {
   AccountLogo            Bytes?
   AccountMainEmail       String?               @db.VarChar(120)
   AccountNumPeople       Int?                  @db.TinyInt
+  AccountOrganisationId  String?               @db.Char(8)
+  AccountTermsAgreedBy   String?               @db.VarChar(100)
+  AccountTermsAgreedDate DateTime?             @db.Date
   AccountContact         AccountContact?
   AccountSubscription    AccountSubscription[]
   AccountUser            AccountUser[]
@@ -457,20 +462,21 @@ model SaleType {
 }
 
 model SalesSet {
-  SetId               Int          @id @default(autoincrement())
-  SetBookingId        Int
-  SetPerformanceId    Int?
-  SetSalesFiguresDate DateTime     @db.Date
-  SetBrochureReleased Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetSingleSeats      Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetNotOnSale        Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsFinalFigures   Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsCopy           Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  Sale                Sale[]
-  Booking             Booking      @relation(fields: [SetBookingId], references: [Id], onUpdate: Restrict, map: "Booking_BookingSale")
-  Performance         Performance? @relation(fields: [SetPerformanceId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "Performance_SalesSet")
-  SetComp             SetComp[]
-  SetHold             SetHold[]
+  SetId                    Int          @id @default(autoincrement())
+  SetBookingId             Int
+  SetPerformanceId         Int?
+  SetSalesFiguresDate      DateTime     @db.Date
+  SetBrochureReleased      Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetSingleSeats           Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetNotOnSale             Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsFinalFigures        Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  FinalSalesApprovedByUser String?      @map("BookingFinalSalesApprovedByUser") @db.VarChar(100)
+  SetIsCopy                Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  Sale                     Sale[]
+  Booking                  Booking      @relation(fields: [SetBookingId], references: [Id], onUpdate: Restrict, map: "Booking_BookingSale")
+  Performance              Performance? @relation(fields: [SetPerformanceId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "Performance_SalesSet")
+  SetComp                  SetComp[]
+  SetHold                  SetHold[]
 
   @@index([SetBookingId, SetSalesFiguresDate], map: "BookingSale_Booking_SalesFigures")
   @@index([SetBookingId], map: "Booking_BookingSale_fk")
@@ -567,6 +573,7 @@ model AccountUser {
   UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserPIN            String?                 @db.VarChar(4)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
   AccountUserPermission AccountUserPermission[]
@@ -634,9 +641,10 @@ model PerformanceReport {
 }
 
 model DBSetting {
-  DBSettingId    Int    @id @default(autoincrement())
-  DBSettingName  String @unique(map: "SettingName") @db.VarChar(50)
-  DBSettingValue String @db.VarChar(255)
+  DBSettingId    Int       @id @default(autoincrement())
+  DBSettingName  String    @unique(map: "SettingName") @db.VarChar(50)
+  DBSettingValue String    @db.VarChar(255)
+  DBLastDataLoad DateTime? @db.DateTime(0)
 }
 
 model MasterTask {
@@ -765,6 +773,7 @@ model ProductionCompany {
   WebSite             String? @map("ProdCoWebSite") @db.VarChar(80)
   Logo                Bytes?  @map("ProdCoLogo")
   ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
+  ProdCoVATCode       String? @db.VarChar(20)
   Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
   Show                Show[]
 
