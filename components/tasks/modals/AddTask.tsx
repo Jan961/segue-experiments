@@ -82,6 +82,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
   const [isCloned, setIsCloned] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
@@ -159,31 +160,35 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
 
-  const handleOnSubmit = async () => {
-    setLoading(true);
-    if (isMasterTask) {
-      try {
-        const keysToDelete = ['DueDate', 'Progress', 'ProductionId'];
-        for (const key of keysToDelete) {
-          delete inputs[key];
-        }
-        if (inputs.Id) {
-          await axios.post('/api/tasks/master/update', inputs);
-          setLoading(false);
-          onClose();
-          setInputs(DEFAULT_MASTER_TASK);
-        } else {
-          const endpoint = '/api/tasks/master/create';
-          await axios.post(endpoint, inputs);
-          setLoading(false);
-          onClose();
-          setInputs(DEFAULT_MASTER_TASK);
-        }
-      } catch (error) {
+  const handleMasterTask = async () => {
+    try {
+      const keysToDelete = ['DueDate', 'Progress', 'ProductionId'];
+      for (const key of keysToDelete) {
+        delete inputs[key];
+      }
+      if (inputs.Id) {
+        await axios.post('/api/tasks/master/update', inputs);
+        setLoading(false);
+        onClose();
+        setInputs(DEFAULT_MASTER_TASK);
+      } else {
+        const endpoint = '/api/tasks/master/create';
+        await axios.post(endpoint, inputs);
         setLoading(false);
         onClose();
         setInputs(DEFAULT_MASTER_TASK);
       }
+    } catch (error) {
+      setLoading(false);
+      onClose();
+      setInputs(DEFAULT_MASTER_TASK);
+    }
+  };
+
+  const handleOnSubmit = async () => {
+    setLoading(true);
+    if (isMasterTask) {
+      handleMasterTask();
     } else {
       const keysToDelete = ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction'];
       for (const key of keysToDelete) {
@@ -202,6 +207,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           const endpoint = '/api/tasks/create/single/';
           await axios.post(endpoint, inputs);
           setLoading(false);
+          handleMasterTask();
           onClose();
         } catch (error) {
           setLoading(false);
@@ -325,7 +331,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
-              disabled={isMasterTask || inputs.Progress < 100}
+              disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100}
               value={inputs?.DueDate}
               onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
             />
@@ -346,7 +352,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
               value={inputs?.RepeatInterval}
-              className="w-32"
+              className="w-44"
               options={RepeatOptions}
               placeholder="Select..."
               disabled={repeatInterval}
@@ -401,11 +407,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <div className="flex">
               <Label className="!text-secondary pr-2" text="Add to Master Task List" />
               <Checkbox
-                id="occurence"
-                value={inputs?.RepeatInterval}
-                checked={isMasterTask}
+                id="addToMasterTask"
+                checked={isChecked}
                 disabled={isMasterTask}
-                onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
+                onChange={() => setIsChecked(!isChecked)}
               />
             </div>
           </div>
