@@ -143,7 +143,7 @@ const handler = async (req, res) => {
       date,
       dateFormat: 'DD/MM/YY',
       timezoneOffset,
-    })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'hh:mm', timezoneOffset })}`,
+    })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
   ]);
   worksheet.addRow([]);
   worksheet.addRow(['', '', ...destinctShowNames.map((x) => x.ShowName)]);
