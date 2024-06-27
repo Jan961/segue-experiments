@@ -12,6 +12,7 @@ import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import moment from 'moment';
+import { omit } from 'radash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
@@ -162,10 +163,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const handleMasterTask = async () => {
     try {
-      const keysToDelete = ['DueDate', 'Progress', 'ProductionId'];
-      for (const key of keysToDelete) {
-        delete inputs[key];
-      }
+      omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
       if (inputs.Id) {
         await axios.post('/api/tasks/master/update', inputs);
         setLoading(false);
@@ -190,10 +188,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     if (isMasterTask) {
       handleMasterTask();
     } else {
-      const keysToDelete = ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction'];
-      for (const key of keysToDelete) {
-        delete inputs[key];
-      }
+      omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction']);
       if (inputs.Id) {
         try {
           await axios.post('/api/tasks/update', inputs);
