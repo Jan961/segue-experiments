@@ -7,7 +7,6 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
-import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 import SalesValueInputRenderer from './SalesValueInputRenderer';
 import { isNullOrEmpty } from 'utils';
 
@@ -335,6 +334,12 @@ export const attachmentsColDefs = [
 export const salesEntryColDefs = (type: string, currency: string, handleUpdate) => {
   const colDefs = [
     {
+      headerName: 'Type ID',
+      field: 'id',
+      cellRenderer: DefaultTextRenderer,
+      hide: true,
+    },
+    {
       headerName: type,
       field: 'name',
       cellRenderer: DefaultTextRenderer,
@@ -345,12 +350,13 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
     {
       headerName: 'Seats',
       field: 'seats',
-      cellRenderer: TextInputRenderer,
+      cellRenderer: SalesValueInputRenderer,
       cellRendererParams: function (params) {
         return {
           value: isNullOrEmpty(params.data.seats) ? '0' : params.data.seats.toString(),
           className: 'w-[100px] ml-1 mt-1',
-          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'seats'),
+          onUpdate: (value) => handleUpdate(value, params.data, type, 'seats'),
+          currency: '',
         };
       },
       width: 112,
@@ -367,8 +373,8 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
       cellRendererParams: function (params) {
         return {
           value: isNullOrEmpty(params.data.value) ? '0' : params.data.value.toString(),
-          className: 'w-[90px] ml-1 mt-1',
-          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'value'),
+          className: 'w-[90px] ml-1',
+          onUpdate: (value) => handleUpdate(value, params.data, type, 'value'),
           currency,
         };
       },
@@ -376,6 +382,43 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
         marginLeft: '4px',
       },
       width: 120,
+      resizable: false,
+    });
+  }
+
+  return colDefs;
+};
+
+export const updateWarningColDefs = (type) => {
+  const colDefs = [];
+
+  colDefs.push(
+    {
+      headerName: 'Date',
+      field: 'date',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: (params) => {
+        return {
+          value: formatInputDate(params.data.date),
+        };
+      },
+      width: 185,
+    },
+    {
+      headerName: 'Seats',
+      field: 'seats',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+      resizable: type !== 'Hold',
+    },
+  );
+
+  if (type === 'Hold') {
+    colDefs.push({
+      headerName: 'Value',
+      field: 'value',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
       resizable: false,
     });
   }

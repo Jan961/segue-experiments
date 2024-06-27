@@ -5,11 +5,14 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { BookingContactNoteDTO } from 'interfaces';
 import useAxios from 'hooks/useAxios';
 import { contactNoteColDefs, styleProps } from '../table/tableConfig';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { userState } from 'state/account/userState';
 import { Spinner } from 'components/global/Spinner';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -31,7 +34,8 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId, productions } = useRecoilValue(productionJumpState);
+  const bookings = useRecoilState(bookingJumpState);
   const users = useRecoilValue(userState);
 
   useImperativeHandle(ref, () => ({
@@ -145,6 +149,26 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
     }
   }, [props.bookingId]);
 
+  const onExport = async () => {
+    const urlPath = `/api/reports/marketing/contactNotes/${props.bookingId}`;
+    const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
+    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const selectedProduction = productions?.filter((production) => production.Id === productionId);
+    const { ShowName, ShowCode, Code } = selectedProduction[0];
+    const productionName = `${ShowName} (${ShowCode + Code})`;
+    const payload = {
+      productionName,
+      venueAndDate,
+    };
+    const downloadContactNotesReport = async () =>
+      await exportExcelReport(urlPath, payload, 'Contact Notes Report.xlsx');
+    notify.promise(downloadContactNotesReport(), {
+      loading: 'Generating contact notes report',
+      success: 'Contact notes report downloaded successfully',
+      error: 'Error generating contact notes report',
+    });
+  };
+
   return (
     <>
       {dataAvailable && (
@@ -157,6 +181,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
                 disabled={!productionId}
                 iconProps={{ className: 'h-4 w-3' }}
                 sufixIconName="excel"
+                onClick={() => onExport()}
               />
               <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
             </div>

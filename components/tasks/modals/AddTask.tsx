@@ -11,6 +11,7 @@ import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
+import moment from 'moment';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
@@ -145,8 +146,14 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
       value = 'once';
     }
 
-    const newInputs = { ...inputs, [id]: value };
-    setInputs(newInputs);
+    let newInputs = { ...inputs, [id]: value };
+    if (id === 'Progress' && value === 100) {
+      newInputs = { ...newInputs, DueDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
+      setInputs(newInputs);
+    } else {
+      setInputs(newInputs);
+    }
+
     setStatus({ ...status, submitted: false });
   };
 
@@ -308,7 +315,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
-              value={inputs?.Progress}
+              value={inputs?.Progress?.toString()}
               placeholder="Progress"
               isSearchable
               className="w-32"
@@ -318,7 +325,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
-              disabled={isMasterTask || inputs.Progress === 100}
+              disabled={isMasterTask || inputs.Progress < 100}
               value={inputs?.DueDate}
               onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
             />
@@ -417,7 +424,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
               variant="primary"
               className="w-[132px]"
               onClick={handleOnSubmit}
-              text={inputs.Id ? 'Edit Task' : 'Create New Task'}
+              text={inputs.Id ? 'Save' : 'Create New Task'}
             />
           </div>
         </div>
@@ -428,7 +435,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
+        hasOverlay={true}
       />
     </PopupModal>
   );

@@ -20,6 +20,8 @@ import Table from 'components/core-ui-lib/Table';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -61,7 +63,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const currency = useRecoilValue(currencyState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -356,6 +358,25 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     }
   }, [props.bookingId]);
 
+  const onExport = async () => {
+    const urlPath = `/api/reports/marketing/activitiesReport/${props.bookingId}`;
+    const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
+    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const selectedProduction = productions?.filter((production) => production.Id === productionId);
+    const { ShowName, ShowCode, Code } = selectedProduction[0];
+    const productionName = `${ShowName} (${ShowCode + Code})`;
+    const payload = {
+      productionName,
+      venueAndDate,
+    };
+    const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report.xlsx');
+    notify.promise(downloadContactNotesReport(), {
+      loading: 'Generating activities report',
+      success: 'Activities report downloaded successfully',
+      error: 'Error generating activities report',
+    });
+  };
+
   return (
     <>
       {dataAvailable && (
@@ -457,6 +478,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                     disabled={!productionId}
                     iconProps={{ className: 'h-4 w-3' }}
                     sufixIconName="excel"
+                    onClick={onExport}
                   />
                   <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
                 </div>

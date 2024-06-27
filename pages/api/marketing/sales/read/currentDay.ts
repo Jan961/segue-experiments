@@ -25,6 +25,7 @@ export default async function handle(req, res) {
 
     const data =
       await prisma.$queryRaw`select SaleTypeName, Seats, Value, SetSalesFiguresDate, SetProductionWeekDate from SalesView where BookingId = ${bookingId}`;
+
     const filtered = data.filter((sale) => removeTime(sale[dateField]).getTime() === removeTime(salesDate).getTime());
 
     const schoolReservations = filtered.find((sale) => sale.SaleTypeName === 'School Reservations');

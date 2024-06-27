@@ -48,6 +48,60 @@ const rearrangeArray = ({
   return arrangedArray;
 };
 
+export const getArchivedSalesList = async (bookingIds) => {
+  const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(
+    bookingIds,
+  )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate limit 300`;
+  const formattedData: TSalesView[] = data.filter(
+    (x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales',
+  );
+  const commonData = formattedData
+    .filter((x: TSalesView) => x.BookingId === bookingIds[0])
+    .map(
+      ({
+        SetBookingWeekNum,
+        SetProductionWeekDate,
+        SetIsFinalFigures,
+        SetNotOnSale,
+        SetBrochureReleased,
+        SetSingleSeats,
+      }) => ({
+        SetBookingWeekNum,
+        SetProductionWeekDate,
+        SetIsFinalFigures,
+        SetNotOnSale,
+        SetBrochureReleased,
+        SetSingleSeats,
+      }),
+    );
+  commonData.sort((a, b) => {
+    const t1 = Number(a.SetBookingWeekNum);
+    const t2 = Number(b.SetBookingWeekNum);
+    return t1 - t2;
+  });
+  const currencySymbol = (await getCurrencyFromBookingId(bookingIds[0])) || '';
+  const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
+    formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
+  );
+
+  const archivedSalesList = commonData.reduce(
+    (acc, x, idx) => [
+      ...acc,
+      {
+        SetBookingWeekNum: x.SetBookingWeekNum,
+        SetProductionWeekDate: x.SetProductionWeekDate,
+        SetIsFinalFigures: x.SetIsFinalFigures,
+        data: rearrangeArray({ arr: result[idx], bookingIds, currencySymbol }),
+        SetNotOnSale: x.SetNotOnSale,
+        SetBrochureReleased: x.SetBrochureReleased,
+        SetSingleSeats: x.SetSingleSeats,
+      },
+    ],
+    [],
+  );
+  return archivedSalesList;
+};
+
 export default async function handle(req, res) {
   try {
     const bookingIds: number[] = req.body.bookingIds;
@@ -61,43 +115,9 @@ export default async function handle(req, res) {
       if (!access) return res.status(401).end();
     }
 
-    const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(
-      bookingIds,
-    )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate`;
-    const formattedData: TSalesView[] = data.filter(
-      (x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales',
-    );
-    const commonData = formattedData
-      .filter((x: TSalesView) => x.BookingId === bookingIds[0])
-      .map(({ SetBookingWeekNum, SetProductionWeekDate, SetIsFinalFigures }) => ({
-        SetBookingWeekNum,
-        SetProductionWeekDate,
-        SetIsFinalFigures,
-      }));
-    commonData.sort((a, b) => {
-      const t1 = Number(a.SetBookingWeekNum);
-      const t2 = Number(b.SetBookingWeekNum);
-      return t1 - t2;
-    });
-    const currencySymbol = (await getCurrencyFromBookingId(bookingIds[0])) || '';
-    const result: TSalesView[][] = commonData.map(({ SetBookingWeekNum }) =>
-      formattedData.reduce((acc, y) => (y.SetBookingWeekNum === SetBookingWeekNum ? [...acc, y] : [...acc]), []),
-    );
+    const archivedSalesList = await getArchivedSalesList(bookingIds);
 
-    const archivedSalesList = commonData.reduce(
-      (acc, x, idx) => [
-        ...acc,
-        {
-          SetBookingWeekNum: x.SetBookingWeekNum,
-          SetProductionWeekDate: x.SetProductionWeekDate,
-          SetIsFinalFigures: x.SetIsFinalFigures,
-          data: rearrangeArray({ arr: result[idx], bookingIds, currencySymbol }),
-        },
-      ],
-      [],
-    );
-
-    res.send(archivedSalesList);
+    res.status(200).json(archivedSalesList);
   } catch (error) {
     res.status(500).json({ error: 'Error occurred while generating search results.', message: error.message });
   }
