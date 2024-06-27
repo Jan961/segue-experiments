@@ -21,7 +21,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.status(200).json(edited);
   } catch (exception) {
     res
-      .status(409)
+      .status(500)
       .json({ errorMessage: 'An error occurred whilst updating your Production Company details. Please try again.' });
   }
 }

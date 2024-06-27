@@ -1,11 +1,12 @@
 import { productionCompaniesColDefs, styleProps } from 'components/admin/tableConfig';
 import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
-import ProductionCompaniesTable from 'components/admin/ProductionCompaniesTable';
+import Table from 'components/core-ui-lib/Table';
 import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
 import { PopupModal } from 'components/core-ui-lib';
 import axios from 'axios';
-export default function ProductionCompaniesTab() {
+
+const ProductionCompaniesTab = () => {
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
   const [showErrorModal, setShowErrorModal] = useState<boolean>();
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>();
@@ -130,12 +131,12 @@ export default function ProductionCompaniesTab() {
             <Button onClick={addNewVenueContact} variant="secondary" text="Add New Company" />
           </div>
         </div>
-        <ProductionCompaniesTable
+        <Table
           columnDefs={productionCompaniesColDefs(fetchProductionCompanies)}
           rowData={productionCompanies}
           styleProps={styleProps}
-          onChange={onCellUpdate}
           onCellClicked={onCellClicked}
+          onCellValueChange={onCellUpdate}
           getRowStyle={getRowStyle}
           getRowHeight={getRowHeight}
         />
@@ -164,4 +165,6 @@ export default function ProductionCompaniesTab() {
       )}
     </div>
   );
-}
+};
+
+export default ProductionCompaniesTab;

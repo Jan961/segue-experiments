@@ -18,7 +18,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.status(200).json(newProdCompany);
   } catch (exception) {
     res
-      .status(409)
+      .status(500)
       .json({ errorMessage: 'An error occurred while creating your Production Company. Please try again.' });
   }
 }

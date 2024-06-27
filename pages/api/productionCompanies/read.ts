@@ -31,7 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     );
   } catch (err) {
     res
-      .status(409)
+      .status(500)
       .json({ errorMessage: 'An error occurred while retrieving your Production Companies. Please try again.' });
   }
 }

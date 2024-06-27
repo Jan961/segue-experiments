@@ -6,7 +6,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
-    const { Id } = JSON.parse(req.body.body);
+    const { Id } = req.body;
 
     const prodCompanyWithShows = await prisma.Show.count({
       where: { ShowProdCoId: Id },
@@ -25,17 +25,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
         res.status(200).json(deletedRecord);
       } else {
-        res.status(409).json({
+        res.status(500).json({
           errorMessage: 'Deletion is not permitted as this list must have at least one entry.',
         });
       }
     } else {
-      res.status(409).json({
+      res.status(500).json({
         errorMessage: 'Deletion is not permitted as this Production Company is responsible for one or more Shows',
       });
     }
   } catch (exception) {
-    res.status(409).json({
+    res.status(500).json({
       errorMessage: 'An error occurred whilst deleting your Production Company. Please try again.',
     });
   }
