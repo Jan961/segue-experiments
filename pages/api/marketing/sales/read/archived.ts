@@ -51,7 +51,7 @@ const rearrangeArray = ({
 export const getArchivedSalesList = async (bookingIds) => {
   const data: TSalesView[] = await prisma.$queryRaw`select * from SalesView where BookingId in (${Prisma.join(
     bookingIds,
-  )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate`;
+  )}) and SaleTypeName = \'General Sales\' order by BookingFirstDate, SetSalesFiguresDate limit 300`;
   const formattedData: TSalesView[] = data.filter(
     (x: TSalesView) => bookingIds.includes(x.BookingId) && x.SaleTypeName === 'General Sales',
   );
@@ -117,7 +117,7 @@ export default async function handle(req, res) {
 
     const archivedSalesList = await getArchivedSalesList(bookingIds);
 
-    res.send(archivedSalesList);
+    res.status(200).json(archivedSalesList);
   } catch (error) {
     res.status(500).json({ error: 'Error occurred while generating search results.', message: error.message });
   }

@@ -14,6 +14,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 import Select from 'components/core-ui-lib/Select';
 import ProductionOption from 'components/global/nav/ProductionOption';
 import Checkbox from 'components/core-ui-lib/Checkbox';
+import { ConfirmationDialog } from 'components/core-ui-lib';
 
 interface ProductionTaskListProps {
   visible: boolean;
@@ -34,6 +35,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const styleProps = { headerColor: tileColors.tasks };
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [confirm, setConfirm] = useState<boolean>(false);
 
   const [productionJump, setProductionJump] = useRecoilState(productionJumpState);
   const [selected, setSelected] = useState(null);
@@ -167,6 +169,19 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     setIncludeArchived(e.target.value);
   };
 
+  const handleClose = () => {
+    onClose();
+  };
+
+  const handleCancel = () => {
+    if (selectedRows.length > 0) {
+      setConfirm(true);
+    } else {
+      setConfirm(false);
+      onClose();
+    }
+  };
+
   return (
     <PopupModal
       show={visible}
@@ -208,9 +223,20 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
         />
       </div>
       <div className="flex mt-4 justify-end">
-        <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={onClose} />
+        <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={handleCancel} />
         <Button text="Add" className="w-[132px]" onClick={handleSubmit} disabled={selectedRows.length === 0} />
       </div>
+      <ConfirmationDialog
+        variant="delete"
+        show={confirm}
+        onYesClick={handleClose}
+        content={{
+          question: 'Are you sure you want to cancel?',
+          warning: 'Any unsaved changes may be lost.',
+        }}
+        onNoClick={() => setConfirm(false)}
+        hasOverlay={false}
+      />
     </PopupModal>
   );
 };

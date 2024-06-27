@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Select from 'components/core-ui-lib/Select';
@@ -10,13 +10,19 @@ import { SelectOption } from './MarketingHome';
 import { getWeekDayShort } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
+import { currencyState } from 'state/marketing/currencyState';
+import axios from 'axios';
 
 type TourResponse = {
   data: Array<SelectOption>;
   frequency: string;
 };
 
-const SalesEntryFilters = () => {
+type Props = {
+  onDateChanged?: (salesWeek: any) => void;
+};
+
+const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
   const [selectedValue, setSelectedValue] = useState(null);
@@ -24,11 +30,82 @@ const SalesEntryFilters = () => {
   const [selectedTourWeek, setSelectedTourWeek] = useState(null);
   const [tourLabel, setTourLabel] = useState('');
   const [lastDates, setLastDates] = useState([]);
+  const [, setCurrency] = useRecoilState(currencyState);
   const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
+
+  const { fetchData } = useAxios();
+
+  const getTourWeeks = async (productionId) => {
+    const data = await fetchData({
+      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+      method: 'POST',
+    });
+
+    if (typeof data === 'object') {
+      const tourData = data as TourResponse;
+      setTourWeeks(tourData.data);
+      if (tourData.frequency === 'W') {
+        setTourLabel('Sales Week');
+      } else if (tourData.frequency === 'D') {
+        setTourLabel('Sales Date');
+      }
+    }
+  };
+
+  const getCurrency = async (bookingId) => {
+    try {
+      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+
+      if (response.data && typeof response.data === 'object') {
+        const currencyObject = response.data as { currency: string };
+        setCurrency({ symbol: currencyObject.currency });
+      }
+    } catch (error) {
+      console.error('Error retrieving currency:', error);
+    }
+  };
+
+  const changeBooking = async (value: string | number) => {
+    if (value !== null) {
+      const selectedBooking = bookingOptions.find((booking) => booking.value === value);
+      setSelectedValue(selectedBooking.value.toString());
+
+      const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
+      setBooking({ ...bookings, selected: bookingIdentifier });
+      await getCurrency(bookingIdentifier.toString());
+    } else {
+      setSelectedValue(null);
+      setBooking({ ...bookings, selected: undefined });
+    }
+  };
+
+  const fetchLastDates = async () => {
+    try {
+      const data = await fetchData({
+        url: '/api/performances/lastDate/' + productionId,
+        method: 'POST',
+      });
+
+      if (typeof data === 'object') {
+        const lastDates = data as Array<LastPerfDate>;
+        setLastDates(lastDates);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const setTourWeek = (tourDate: string) => {
+    onDateChanged(tourDate);
+    setSelectedTourWeek(tourDate);
+  };
 
   const bookingOptions = useMemo(() => {
     try {
+      changeBooking(null);
+      setSelectedTourWeek(null);
       const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+
       const optWithRun = initialOptions.map((option) => {
         const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
         if (lastDate !== undefined) {
@@ -52,60 +129,9 @@ const SalesEntryFilters = () => {
     } catch (error) {
       console.log(error);
     }
-  }, [selectedTourWeek]);
-
-  const { fetchData } = useAxios();
-
-  const getTourWeeks = async (productionId) => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-      method: 'POST',
-    });
-
-    if (typeof data === 'object') {
-      const tourData = data as TourResponse;
-      setTourWeeks(tourData.data);
-      if (tourData.frequency === 'W') {
-        setTourLabel('Sales Week');
-      } else if (tourData.frequency === 'D') {
-        setTourLabel('Sales Date');
-      }
-    }
-  };
-
-  const changeBooking = (value: string | number) => {
-    if (value !== null) {
-      const selectedBooking = bookingOptions.find((booking) => booking.value === value);
-      setSelectedValue(selectedBooking.value.toString());
-
-      const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
-
-      setBooking({ ...bookings, selected: bookingIdentifier });
-    } else {
-      setSelectedValue(null);
-      setBooking({ ...bookings, selected: undefined });
-    }
-  };
-
-  const fetchLastDates = async () => {
-    try {
-      const data = await fetchData({
-        url: '/api/performances/lastDate/' + productionId,
-        method: 'POST',
-      });
-
-      if (typeof data === 'object') {
-        const lastDates = data as Array<LastPerfDate>;
-        setLastDates(lastDates);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }, [bookings.bookings]);
 
   useEffect(() => {
-    changeBooking(null);
-    setSelectedTourWeek(null);
     if (productionId !== null && productionId !== undefined) {
       getTourWeeks(productionId);
       fetchLastDates();
@@ -139,7 +165,7 @@ const SalesEntryFilters = () => {
             </div>
 
             <Select
-              onChange={(tourWeek) => setSelectedTourWeek(tourWeek)}
+              onChange={(tourWeek) => setTourWeek(tourWeek.toString())}
               value={selectedTourWeek}
               disabled={!productionId}
               placeholder="Select Sales Week"

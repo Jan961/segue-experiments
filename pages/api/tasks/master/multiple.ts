@@ -22,7 +22,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     let updatedCode = Code;
 
     const createData = tasks.map((task) => {
-      updatedCode += updatedCode;
+      updatedCode += 1;
       return {
         Code: updatedCode,
         Name: task.Name,
