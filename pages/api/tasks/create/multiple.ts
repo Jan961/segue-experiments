@@ -1,6 +1,7 @@
 import { ProductionTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { getMaxProductionTaskCode } from 'services/TaskService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -24,19 +25,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     }
 
-    const createData = tasks.map((task) => ({
-      ProductionId: task.ProductionId,
-      Code: task.Code,
-      Name: task.Name,
-      Priority: task.Priority,
-      Notes: task.Notes,
-      Progress: task.Progress,
-      AssignedToUserId: task.AssignedToUserId,
-      StartByWeekNum: task.StartByWeekNum,
-      CompleteByWeekNum: task.CompleteByWeekNum,
-      StartByIsPostProduction: task.StartByIsPostProduction,
-      CompleteByIsPostProduction: task.CompleteByIsPostProduction,
-    }));
+    const { Code } = await getMaxProductionTaskCode(ProductionId);
+
+    let updatedCode = Code;
+
+    const createData = tasks.map((task) => {
+      updatedCode += 1;
+      return {
+        ProductionId: task.ProductionId,
+        Code: updatedCode,
+        Name: task.Name,
+        Priority: task.Priority,
+        Notes: task.Notes,
+        Progress: task.Progress,
+        AssignedToUserId: task.AssignedToUserId,
+        StartByWeekNum: task.StartByWeekNum,
+        CompleteByWeekNum: task.CompleteByWeekNum,
+        StartByIsPostProduction: task.StartByIsPostProduction,
+        CompleteByIsPostProduction: task.CompleteByIsPostProduction,
+      };
+    });
 
     const createResults = await prisma.productionTask.createMany({
       data: createData,

@@ -57,9 +57,9 @@ export const getColumnDefs = (usersList = [], production) => {
       cellStyle: {
         overflow: 'visible',
       },
-      cellRendererParams: function (params) {
+      cellRendererParams: function () {
         return {
-          options: params.data.weekOptions,
+          options: weekOptions,
           isSearchable: true,
         };
       },
@@ -86,9 +86,9 @@ export const getColumnDefs = (usersList = [], production) => {
       cellStyle: {
         overflow: 'visible',
       },
-      cellRendererParams: function (params) {
+      cellRendererParams: function () {
         return {
-          options: params.data.weekOptions,
+          options: weekOptions,
           isSearchable: true,
         };
       },

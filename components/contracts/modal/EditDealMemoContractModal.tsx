@@ -374,12 +374,12 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Phone</div>
           <div className="w-4/5 flex items-center">
             <div className="w-3/4">
-              <TextInput className="w-2/4" value={contactsData.phone} />
+              <TextInput className="w-2/4 text-primary-input-text font-bold" disabled value={contactsData.phone} />
             </div>
 
             <div className="text-primary-input-text font-bold ml-8 mr-4">Email</div>
             <div className="w-3/4">
-              <TextInput className="w-3/4" value={contactsData.email} />
+              <TextInput className="w-3/4 text-primary-input-text font-bold" disabled value={contactsData.email} />
             </div>
           </div>
         </div>
@@ -389,9 +389,17 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Show Title</div>
 
           <div className="w-4/5 flex items-center">
-            <TextInput className="w-[400px]" value={productionJumpState.ShowName} />
+            <TextInput
+              className="w-[400px] text-primary-input-text font-bold"
+              disabled
+              value={productionJumpState.ShowName}
+            />
             <div className="text-primary-input-text font-bold ml-8 mr-4"> No. of Performances</div>
-            <TextInput className="w-[350px]" value={selectedTableCell.contract.performanceCount} />
+            <TextInput
+              className="w-[350px] text-primary-input-text font-bold"
+              disabled
+              value={selectedTableCell.contract.performanceCount}
+            />
           </div>
         </div>
         <div className="flex items-center mt-4">
@@ -405,12 +413,13 @@ export const EditDealMemoContractModal = ({
                     <TextInput
                       key={times}
                       id="venueText"
-                      className="w-[350px] mt-1 mb-1"
+                      className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
+                      disabled
                       value={`${formattedDateWithDay(times.split('?')[1])} : ${times.split('?')[0]}`}
                     />
                   ))}
               {!selectedTableCell.contract.performanceTimes && (
-                <TextInput id="venueText" className="w-[350px] mt-1 mb-1" />
+                <TextInput id="venueText" className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold" disabled />
               )}
             </div>
           </div>
@@ -467,7 +476,7 @@ export const EditDealMemoContractModal = ({
               <div className="w-4/5">
                 <TextInput
                   id="venueText"
-                  className="w-full font-bold "
+                  className="w-full text-primary-input-text font-bold"
                   value={venueData ? venueData[input[1]] : ''}
                   onChange={(value) => editDemoModalData('DeMoPerformanceNotes', value.target.value, 'dealMemo')}
                   disabled={true}
@@ -496,7 +505,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
+              disabled
               value={
                 venueUserData[formData.DeMoProgrammerVenueContactId]
                   ? venueUserData[formData.DeMoProgrammerVenueContactId].Phone
@@ -510,7 +520,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
+              disabled
               value={
                 venueUserData[formData.DeMoProgrammerVenueContactId]
                   ? venueUserData[formData.DeMoProgrammerVenueContactId].Email
@@ -736,7 +747,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
+              disabled
               value={
                 venueUserData[formData.DeMoBOMVenueContactId] ? venueUserData[formData.DeMoBOMVenueContactId].Phone : ''
               }
@@ -748,7 +760,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
+              disabled
               value={
                 venueUserData[formData.DeMoBOMVenueContactId] ? venueUserData[formData.DeMoBOMVenueContactId].Email : ''
               }
@@ -785,7 +798,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
+              disabled
               value={
                 venueUserData[formData.DeMoSettlementVenueContactId]
                   ? venueUserData[formData.DeMoSettlementVenueContactId].Phone
@@ -799,7 +813,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
+              disabled
               value={
                 venueUserData[formData.DeMoSettlementVenueContactId]
                   ? venueUserData[formData.DeMoSettlementVenueContactId].Email
@@ -1240,10 +1255,11 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
               value={
                 venueUserData[formData.DeMoMMVenueContactId] ? venueUserData[formData.DeMoMMVenueContactId].Phone : ''
               }
+              disabled
             />
           </div>
         </div>
@@ -1252,10 +1268,11 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
               value={
                 venueUserData[formData.DeMoMMVenueContactId] ? venueUserData[formData.DeMoMMVenueContactId].Email : ''
               }
+              disabled
             />
           </div>
         </div>
@@ -1291,7 +1308,7 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Print Delivery Address</div>
           <div className="w-4/5">
-            <TextInput id="venueText" className="w-full" />
+            <TextInput id="venueText" className="w-full" disabled />
           </div>
         </div>
         <div className="flex items-center mt-4">
@@ -1446,12 +1463,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
               value={
                 venueUserData[formData.DeMoTechVenueContactId]
                   ? venueUserData[formData.DeMoTechVenueContactId].Phone
                   : ''
               }
+              disabled
             />
           </div>
         </div>
@@ -1460,12 +1478,13 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5">
             <TextInput
               id="venueText"
-              className="w-full"
+              className="w-full text-primary-input-text font-bold"
               value={
                 venueUserData[formData.DeMoTechVenueContactId]
                   ? venueUserData[formData.DeMoTechVenueContactId].Email
                   : ''
               }
+              disabled
             />
           </div>
         </div>
@@ -1492,10 +1511,20 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Stage Door What3Words</div>
           <div className="w-4/5 flex items-center">
-            <TextInput id="venueText" className="w-[25vw]" value={venueData ? venueData.AddressStageDoorW3W : null} />
+            <TextInput
+              id="venueText"
+              className="w-[25vw] text-primary-input-text font-bold"
+              disabled
+              value={venueData ? venueData.AddressStageDoorW3W : null}
+            />
             <div className="w-1/5 text-primary-input-text font-bold ml-4">Loading Bay What3Words</div>
 
-            <TextInput id="venueText" className="w-[25vw]" value={venueData ? venueData.AddressLoadingW3W : null} />
+            <TextInput
+              id="venueText"
+              className="w-[25vw] text-primary-input-text font-bold"
+              disabled
+              value={venueData ? venueData.AddressLoadingW3W : null}
+            />
           </div>
         </div>
         <div className="flex items-center mt-4 -mb-2">

@@ -14,7 +14,7 @@ export type DateRangeError = {
   toError: string;
 };
 
-interface DateRangePorps {
+interface DateRangeProps {
   className?: string;
   disabled?: boolean;
   testId?: string;
@@ -40,7 +40,7 @@ export default function DateRange({
   minDate = null,
   maxDate = null,
   labelClass,
-}: DateRangePorps) {
+}: DateRangeProps) {
   const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
 
   const fromInputRef = useRef(null);

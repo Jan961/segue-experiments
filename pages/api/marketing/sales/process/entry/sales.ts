@@ -5,7 +5,7 @@ export default async function handle(req, res) {
     const setResult = await prisma.SalesSet.create({
       data: {
         SetBookingId: parseInt(req.body.bookingId),
-        SetPerformanceId: parseInt(req),
+        SetPerformanceId: null,
         SetSalesFiguresDate: req.body.salesDate,
         SetBrochureReleased: false,
         SetSingleSeats: false,
@@ -51,11 +51,11 @@ export default async function handle(req, res) {
       );
     }
 
-    const saleResult = await prisma.Sale.createMany({
+    await prisma.Sale.createMany({
       data: sales,
     });
 
-    res.status(200).json({ sales: saleResult, salesSet: setResult });
+    res.status(200).json({ setId: setResult.SetId });
   } catch (e) {
     console.error('Error:', e);
     res.status(500).json({ error: e.message });
