@@ -1,19 +1,12 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Checkbox, TextArea, TextInput } from 'components/core-ui-lib';
 import useAxios from 'hooks/useAxios';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { productionJumpState } from 'state/booking/productionJumpState';
-import { SelectOption } from '../MarketingHome';
-import { addDurationToDate, getMonday } from 'services/dateService';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
-
-type TourResponse = {
-  data: Array<SelectOption>;
-  frequency: string;
-};
+import { currentUserState } from 'state/marketing/currentUserState';
 
 interface SalesFigure {
   seatsReserved: string;
@@ -31,22 +24,19 @@ export interface SalesEntryRef {
   resetForm: (salesWeek: string) => void;
 }
 
-const Final = forwardRef<SalesEntryRef>((_, ref) => {
+const Final = () => {
   const [genSeatsSold, setGenSeatsSold] = useState('');
   const [genSeatsSoldVal, setGenSeatsSoldVal] = useState('');
-  const [genSeatsReserved, setGenSeatsReserved] = useState('');
-  const [genSeatsReservedVal, setGenSeatsReservedVal] = useState('');
   const [schSeatsSold, setSchSeatsSold] = useState('');
   const [schSeatsSoldVal, setSchSeatsSoldVal] = useState('');
-  const [schSeatsReserved, setSchSeatsReserved] = useState('');
-  const [schSeatsReservedVal, setSchSeatsReservedVal] = useState('');
   const [hasSchoolsSales, setHasSchoolSales] = useState<boolean>(false);
   const [bookingSaleNotes, setBookingSaleNotes] = useState('');
   const [discrepancyNotes, setDiscrepancyNotes] = useState('');
-  const [salesDate, setSalesDate] = useState(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const currentUser = useRecoilValue(currentUserState);
+  const [userConfirmed, setUserConfirmed] = useState<boolean>(false);
+  const [confirmedUser, setConfirmedUser] = useState('');
   const currency = useRecoilValue(currencyState);
 
   const { fetchData } = useAxios();
@@ -54,24 +44,23 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
   const handleUpdate = async () => {
     try {
       const data = {
+        salesDate: new Date(),
         bookingId: bookings.selected,
-        salesDate,
-        schools: {
-          seatsSold: parseInt(schSeatsSold),
-          seatsSoldVal: parseFloat(schSeatsSoldVal),
-          seatsReserved: parseInt(schSeatsReserved),
-          seatsReservedVal: parseFloat(schSeatsReservedVal),
-        },
+        user: currentUser.name,
+        schools: hasSchoolsSales
+          ? {
+              seatsSold: parseInt(schSeatsSold),
+              seatsSoldVal: parseFloat(schSeatsSoldVal),
+            }
+          : {},
         general: {
           seatsSold: parseInt(genSeatsSold),
           seatsSoldVal: parseFloat(genSeatsSoldVal),
-          seatsReserved: parseInt(genSeatsReserved),
-          seatsReservedVal: parseFloat(genSeatsReservedVal),
         },
       };
 
       await fetchData({
-        url: '/api/marketing/sales/process/entry/sales',
+        url: '/api/marketing/sales/process/entry/final',
         method: 'POST',
         data,
       });
@@ -81,7 +70,10 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
   };
 
   const handleCancel = () => {
-    setSalesFigures(salesDate, false);
+    setSchSeatsSold('');
+    setSchSeatsSoldVal('');
+    setGenSeatsSold('');
+    setGenSeatsSoldVal('');
   };
 
   const setNumericVal = (setFunction: (value) => void, value: string) => {
@@ -96,27 +88,7 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
     }
   };
 
-  const getSalesFrequency = async () => {
-    try {
-      const data = await fetchData({
-        url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-        method: 'POST',
-      });
-
-      if (typeof data === 'object') {
-        const tourData = data as TourResponse;
-        if (tourData.frequency === undefined) {
-          return;
-        }
-
-        return tourData.frequency;
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const setSalesFigures = async (inputDate: Date, previous: boolean) => {
+  const setSalesFigures = async () => {
     try {
       setLoading(true);
 
@@ -126,23 +98,12 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
         return;
       }
 
-      const frequency = await getSalesFrequency();
-
-      const duration = frequency === 'W' ? 7 : 1;
-      let salesDate = frequency === 'W' ? getMonday(inputDate) : inputDate;
-
-      if (previous) {
-        salesDate = addDurationToDate(salesDate, duration, false);
-      }
-
       // get the salesFigures for the selected date/week if they exist
       const sales = await fetchData({
-        url: '/api/marketing/sales/read/currentDay',
+        url: '/api/marketing/sales/read/final',
         method: 'POST',
         data: {
           bookingId: bookings.selected,
-          salesDate,
-          frequency,
         },
       });
 
@@ -150,12 +111,8 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
         const salesFigures = sales as SalesFigureSet;
 
         // set the sales figures, if available
-        setGenSeatsReserved(validateSale(salesFigures.general?.seatsReserved));
-        setGenSeatsReservedVal(validateSale(salesFigures.general?.seatsReservedVal));
         setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
         setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
-        setSchSeatsReserved(validateSale(salesFigures.schools?.seatsReserved));
-        setSchSeatsReservedVal(validateSale(salesFigures.schools?.seatsReservedVal));
         setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
         setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
       }
@@ -228,12 +185,16 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
     }
   };
 
+  const markUserConfirmed = (status: boolean) => {
+    setUserConfirmed(status);
+    setConfirmedUser(status ? currentUser.toString() : '');
+  };
+
   useEffect(() => {
     const initForm = async () => {
       try {
-        setSalesDate(new Date());
         // set the current days sales figues if available
-        setSalesFigures(new Date(), false);
+        setSalesFigures();
       } catch (error) {
         console.log(error);
       }
@@ -244,13 +205,6 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
     }
   }, [fetchData, bookings.selected]);
 
-  useImperativeHandle(ref, () => ({
-    resetForm: (week) => {
-      setSalesDate(new Date(week));
-      setSalesFigures(new Date(week), false);
-    },
-  }));
-
   return (
     <div>
       {bookings.selected !== undefined && bookings.selected !== null && (
@@ -258,70 +212,20 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
           {loading ? (
             <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
           ) : (
-            <div className="flex flex-row w-full gap-8">
+            <div className="flex flex-row">
               <div className="flex flex-col">
                 <div
                   className={`w-[849px] ${
-                    hasSchoolsSales ? 'h-[275px]' : 'h-[185px]'
+                    hasSchoolsSales ? 'h-[295px]' : 'h-[235px]'
                   } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
                 >
-                  <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">General</div>
-
-                  <div className="flex flex-row justify-between">
-                    <div className="flex flex-col mr-[20px]">
-                      <div className="flex flex-row mt-4">
-                        <div className="flex flex-col">
-                          <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Seats"
-                          id="genSeatsSold"
-                          value={genSeatsSold}
-                          onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
-                        />
-                      </div>
-                    </div>
-
+                  <div className="flex flex-row">
                     <div className="flex flex-col">
-                      <div className="flex flex-row mt-4 items-center">
-                        <div className="flex flex-row items-center mr-[20px]">
-                          <div className="text-primary-dark-blue base font-bold">Value</div>
-                          <div className="ml-10 -mr-3">{currency.symbol}</div>
-                        </div>
-                        <TextInput
-                          className="w-[137px] h-[31px] flex flex-col -mt-1"
-                          placeholder="Enter Value"
-                          id="genSeatsSoldVal"
-                          value={genSeatsSoldVal}
-                          onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
-                        />
+                      <div className="flex flex-row">
+                        <div className="leading-6 text-xl text-primary-input-text font-bold mt-1">General</div>
                       </div>
-                    </div>
 
-                    <div className="flex flex-col mt-4 justify-end">
-                      <div className="flex flex-col items-end">
-                        <Button
-                          className="w-[132px] flex flex-row mb-2"
-                          variant="primary"
-                          text="Update"
-                          onClick={handleUpdate}
-                        />
-                        <Button
-                          className="w-[132px] flex flex-row"
-                          variant="secondary"
-                          text="Cancel"
-                          onClick={() => alert('cancel')}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {hasSchoolsSales ? (
-                    <div>
-                      <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
-
-                      <div className="flex flex-row justify-between">
+                      <div className="flex flex-row">
                         <div className="flex flex-col mr-[20px]">
                           <div className="flex flex-row mt-4">
                             <div className="flex flex-col">
@@ -330,9 +234,9 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
                             <TextInput
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Seats"
-                              id="schSeatsSold"
-                              value={schSeatsSold}
-                              onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
+                              id="genSeatsSold"
+                              value={genSeatsSold}
+                              onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
                             />
                           </div>
                         </div>
@@ -346,38 +250,110 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
                             <TextInput
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Value"
-                              id="schSeatsSoldVal"
-                              value={schSeatsSoldVal}
-                              onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
+                              id="genSeatsSoldVal"
+                              value={genSeatsSoldVal}
+                              onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
                             />
                           </div>
                         </div>
                       </div>
+
+                      {hasSchoolsSales && (
+                        <div>
+                          <div className="flex flex-row">
+                            <div className="leading-6 text-xl text-primary-input-text font-bold mt-5">School</div>
+                          </div>
+
+                          <div className="flex flex-row">
+                            <div className="flex flex-col mr-[20px]">
+                              <div className="flex flex-row mt-4">
+                                <div className="flex flex-col">
+                                  <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
+                                </div>
+                                <TextInput
+                                  className="w-[137px] h-[31px] flex flex-col -mt-1"
+                                  placeholder="Enter Seats"
+                                  id="schSeatsSold"
+                                  value={schSeatsSold}
+                                  onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="flex flex-col">
+                              <div className="flex flex-row mt-4 items-center">
+                                <div className="flex flex-row items-center mr-[20px]">
+                                  <div className="text-primary-dark-blue base font-bold">Value</div>
+                                  <div className="ml-10 -mr-3">{currency.symbol}</div>
+                                </div>
+                                <TextInput
+                                  className="w-[137px] h-[31px] flex flex-col -mt-1"
+                                  placeholder="Enter Value"
+                                  id="schSeatsSoldVal"
+                                  value={schSeatsSoldVal}
+                                  onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="gap-[510px] flex flex-row">
-                      <div className="flex flex-row mb-5 mt-5">
-                        <div className="text-base text-primary-dark-blue font-bold flex flex-col mr-3 ">
-                          School Sales required
-                        </div>
-                        <div className="flex flex-col">
-                          <Checkbox
-                            id="schSalesRequired"
-                            name="schSalesRequired"
-                            checked={false}
-                            onChange={null}
-                            className="w-[19px] h-[19px]"
-                          />
-                        </div>
+
+                    <div className="flex flex-col ml-[150px]">
+                      <div className="flex flex-row mt-[42px]">
+                        <Button
+                          className="w-[132px] flex flex-row mb-2"
+                          variant="primary"
+                          text="Update"
+                          onClick={handleUpdate}
+                          disabled={!userConfirmed}
+                        />
                       </div>
 
-                      <Button className="w-[132px] mt-3" variant="secondary" text="Cancel" onClick={handleCancel} />
+                      <div className="flex flex-row">
+                        <Button
+                          className="w-[132px] flex flex-row mb-2"
+                          variant="secondary"
+                          text="Cancel"
+                          onClick={handleCancel}
+                        />
+                      </div>
                     </div>
-                  )}
+                  </div>
+
+                  <div className="flex flex-row">
+                    <div className="flex flex-col">
+                      <div className="leading-6 text-base text-primary-input-text font-bold mt-5">
+                        I confirm these are the final figures for the above production venue / date, as agreed by all
+                        parties.
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col">
+                      <Checkbox
+                        id="schSalesNotRequired"
+                        name="schSalesNotRequired"
+                        checked={userConfirmed}
+                        onChange={() => markUserConfirmed(!userConfirmed)}
+                        className="w-[19px] h-[19px] mt-6 ml-3"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row">
+                    <TextInput
+                      className="w-[364px] h-[31px] flex flex-col mt-3"
+                      id="currentUser"
+                      value={confirmedUser}
+                      disabled={true}
+                      onChange={null}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex flex-col ml-5">
                 <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">
                   Booking Sales Notes
                 </div>
@@ -399,13 +375,6 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
                   onChange={(e) => setDiscrepancyNotes(e.target.value)}
                   onBlur={(e) => editBooking('finalSalesDiscrepancyNotes', e.target.value)}
                 />
-
-                <Button
-                  className="w-[132px] flex flex-row mb-2"
-                  variant="primary"
-                  text="Update"
-                  onClick={() => alert('ok')}
-                />
               </div>
             </div>
           )}
@@ -413,7 +382,7 @@ const Final = forwardRef<SalesEntryRef>((_, ref) => {
       )}
     </div>
   );
-});
+};
 
 Final.displayName = 'Final';
 export default Final;
