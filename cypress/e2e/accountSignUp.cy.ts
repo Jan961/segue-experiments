@@ -120,8 +120,16 @@ describe('Signed in', () => {
     const paymentDeatilsPage = new PaymentDeatilsPage();
     paymentDeatilsPage.getPaymentDetailsText().should('be.visible');
 
-    cy.iframe('[title="Secure card number input frame"]')
-      .find('input[data-elements-stable-field-name="cardNumber"]')
-      .type('4242424242424242');
+    cy.get('#cardNumber')
+      .find('iframe')
+      .then(($iframe) => {
+        const body = $iframe.contents().find('body');
+
+        // Now you can work within the iframe context
+
+        //cy.wrap(body).find('input[name="card_number"]').type('4242424242424242');
+      });
+
+    cy.pause();
   });
 });

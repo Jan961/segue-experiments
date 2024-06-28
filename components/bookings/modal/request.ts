@@ -66,6 +66,10 @@ export const exportBookingSchedule = async (ProductionId: number) => {
   }
 };
 
+export const getTimezonOffset = () => {
+  return new Date().getTimezoneOffset();
+};
+
 export const exportMasterplanReport = async (fromDate: string, toDate: string) => {
   try {
     const response = await axios.post(
@@ -73,6 +77,7 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
       {
         fromDate: moment(getMonday(fromDate)).format('YYYY-MM-DD'),
         toDate: moment(new Date(toDate)).format('YYYY-MM-DD'),
+        timezoneOffset: getTimezonOffset(),
       },
       { responseType: 'blob' },
     );
