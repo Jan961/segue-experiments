@@ -349,7 +349,7 @@ model Account {
   AccountLogo            Bytes?
   AccountMainEmail       String?               @db.VarChar(120)
   AccountNumPeople       Int?                  @db.TinyInt
-  AccountOrganisationId  String?               @db.Char(8)
+  AccountOrganisationId  String?               @unique(map: "Account_AccountOrganisationId_Unique") @db.Char(8)
   AccountTermsAgreedBy   String?               @db.VarChar(100)
   AccountTermsAgreedDate DateTime?             @db.Date
   AccountContact         AccountContact?
@@ -684,28 +684,28 @@ model AccountUserProduction {
 }
 
 model Production {
-  Id                           Int                     @id @default(autoincrement()) @map("ProductionId")
-  ShowId                       Int                     @map("ProductionShowId")
-  Code                         String                  @map("ProductionCode") @db.VarChar(10)
-  SalesEmail                   String?                 @map("ProductionSalesEmail") @db.VarChar(80)
-  IsArchived                   Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
-  IsDeleted                    Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  Logo                         Bytes?                  @map("ProductionLogo")
-  SalesFrequency               String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
-  RunningTime                  DateTime?               @map("ProductionRunningTime") @db.Time(0)
-  RunningTimeNote              String?                 @map("ProductionRunningTimeNote") @db.VarChar(80)
-  ImageFileId                  Int?                    @map("ProductionImageFileId")
-  ReportCurrencyCode           String                  @map("ProductionReportCurrencyCode") @db.VarChar(3)
-  ProdCoId                     Int?                    @map("ProductionProdCoId")
-  AccountUserProduction        AccountUserProduction[]
-  ConversionRate               ConversionRate[]
-  DateBlock                    DateBlock[]
-  Currency                     Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
-  ProductionCompany            ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
-  File                         File?                   @relation(fields: [ImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
-  Show                         Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
-  ProductionRegion             ProductionRegion[]
-  ProductionTask               ProductionTask[]
+  Id                    Int                     @id @default(autoincrement()) @map("ProductionId")
+  ShowId                Int                     @map("ProductionShowId")
+  Code                  String                  @map("ProductionCode") @db.VarChar(10)
+  SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
+  IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
+  IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
+  Logo                  Bytes?                  @map("ProductionLogo")
+  SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
+  RunningTime           DateTime?               @map("ProductionRunningTime") @db.Time(0)
+  RunningTimeNote       String?                 @map("ProductionRunningTimeNote") @db.VarChar(80)
+  ImageFileId           Int?                    @map("ProductionImageFileId")
+  ReportCurrencyCode    String                  @map("ProductionReportCurrencyCode") @db.VarChar(3)
+  ProdCoId              Int?                    @map("ProductionProdCoId")
+  AccountUserProduction AccountUserProduction[]
+  ConversionRate        ConversionRate[]
+  DateBlock             DateBlock[]
+  Currency              Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
+  ProductionCompany     ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
+  File                  File?                   @relation(fields: [ImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
+  Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
+  ProductionRegion      ProductionRegion[]
+  ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
   @@index([ImageFileId], map: "Production_File")
@@ -987,17 +987,17 @@ model EmailTemplate {
 }
 
 model GlobalBookingActivity {
-  Id               Int           @map("GlobalActivityId") @id @default(autoincrement())
+  Id               Int           @id @default(autoincrement()) @map("GlobalActivityId")
   ProductionId     Int           @map("GlobalActivityProductionId")
   Date             DateTime?     @map("GlobalActivityDate") @db.Date
   Name             String?       @map("GlobalActivityName") @db.VarChar(30)
   ActivityTypeId   Int?          @map("GlobalActivityActivityTypeId")
   Cost             Decimal?      @map("GlobalActivityCost") @db.Decimal(8, 2)
-  FollowUpRequired Boolean       @map("GlobalActivityFollowUpRequired") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  FollowUpRequired Boolean       @default(dbgenerated("(b'0')")) @map("GlobalActivityFollowUpRequired") @db.Bit(1)
   DueByDate        DateTime?     @map("GlobalActivityDueByDate") @db.Date
   CreatedDT        DateTime?     @map("GlobalActivityCreatedDT") @db.Date
   Notes            String?       @map("GlobalActivityNotes") @db.LongText
-  ActivityType                   ActivityType? @relation(fields: [ActivityTypeId], references: [Id], onDelete: Cascade, map: "GlobalActivityType_BookingActivity")
+  ActivityType     ActivityType? @relation(fields: [ActivityTypeId], references: [Id], onDelete: Cascade, map: "GlobalActivityType_BookingActivity")
 
   @@index([ActivityTypeId], map: "GlobalActivityType_BookingActivity")
 }
