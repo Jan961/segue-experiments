@@ -92,12 +92,6 @@ export default function DateRange({
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      onChange(dateRange);
-    }
-  };
-
   return (
     <div
       className={`${className} !shadow-sm-shadow border border-primary-border rounded-md flex items-center ${disabledClass}`}
@@ -121,7 +115,6 @@ export default function DateRange({
         error={errors?.fromError}
         minDate={minDate}
         maxDate={maxDate}
-        onKeyDown={handleKeyDown}
       />
       <span className="mx-1 text-primary-label">to</span>
       <DateInput
@@ -132,7 +125,6 @@ export default function DateRange({
         minDate={dateRange.from || minDate}
         error={errors?.toError}
         maxDate={maxDate}
-        onKeyDown={handleKeyDown}
       />
     </div>
   );

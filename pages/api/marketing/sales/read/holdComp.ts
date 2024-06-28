@@ -23,6 +23,7 @@ export default async function handle(req, res) {
 
     let holdDataResult = [];
     let compDataResult = [];
+    let setId = -1;
 
     const holdData = await prisma.$queryRaw`
         SELECT 
@@ -31,7 +32,9 @@ export default async function handle(req, res) {
             HoldType.HoldTypeCode, 
             HoldType.HoldTypeName, 
             SetHold.SetHoldSeats, 
-            SetHold.SetHoldValue 
+            SetHold.SetHoldValue,
+            SetHold.SetHoldId,
+            SalesSet.SetId
         FROM 
             SalesSet
         CROSS JOIN 
@@ -53,7 +56,9 @@ export default async function handle(req, res) {
             CompType.CompTypeId,
             CompType.CompTypeCode,
             CompType.CompTypeName,
-            SetComp.SetCompSeats
+            SetComp.SetCompSeats,
+            SetComp.SetCompId,
+            SalesSet.SetId
         FROM
             SalesSet
         CROSS JOIN
@@ -72,6 +77,7 @@ export default async function handle(req, res) {
     const filteredHolds = holdData.filter(
       (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
     );
+
     const filteredComps = compData.filter(
       (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
     );
@@ -80,12 +86,18 @@ export default async function handle(req, res) {
     if (filteredHolds.length === 0) {
       const holdTypes = await prisma.$queryRaw`select * from HoldType order by HoldTypeSeqNo`;
       holdDataResult = holdTypes.map((hold) => {
-        return { name: hold.HoldTypeName, seats: 0, value: 0 };
+        return { name: hold.HoldTypeName, seats: 0, value: 0, id: hold.HoldTypeId, recId: null };
       });
       // else map the db fields to nicer field names to be handled in the UI
     } else {
       holdDataResult = filteredHolds.map((hold) => {
-        return { name: hold.HoldTypeName, seats: hold.SetHoldSeats, value: hold.SetHoldValue };
+        return {
+          name: hold.HoldTypeName,
+          seats: hold.SetHoldSeats,
+          value: hold.SetHoldValue,
+          id: hold.HoldTypeId,
+          recId: hold.SetHoldId,
+        };
       });
     }
 
@@ -93,18 +105,27 @@ export default async function handle(req, res) {
     if (filteredHolds.length === 0) {
       const compTypes = await prisma.$queryRaw`select * from CompType order by CompTypeSeqNo`;
       compDataResult = compTypes.map((comp) => {
-        return { name: comp.CompTypeName, seats: 0 };
+        return { name: comp.CompTypeName, seats: 0, id: comp.CompTypeId, recId: null };
       });
       // else map the db fields to nicer field names to be handled in the UI
     } else {
       compDataResult = filteredComps.map((comp) => {
-        return { name: comp.CompTypeName, seats: comp.SetCompSeats };
+        return { name: comp.CompTypeName, seats: comp.SetCompSeats, id: comp.CompTypeId, recId: comp.SetCompId };
       });
+    }
+
+    if (filteredHolds.length > 0 || filteredComps.length > 0) {
+      if ('SetId' in filteredHolds[0]) {
+        setId = filteredHolds[0].SetId;
+      } else {
+        setId = filteredComps[0].SetId;
+      }
     }
 
     const result = {
       holds: holdDataResult,
       comps: compDataResult,
+      setId,
     };
 
     res.status(200).json(result);
