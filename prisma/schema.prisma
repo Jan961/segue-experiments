@@ -708,10 +708,10 @@ model Production {
   ProductionTask               ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
-  @@index([ProductionImageFileId], map: "Production_File")
+  @@index([ImageFileId], map: "Production_File")
   @@index([ShowId], map: "Show_Production")
-  @@index([ProductionReportCurrencyCode], map: "Currency_Production")
-  @@index([ProductionProdCoId], map: "ProductionCompany_Production")
+  @@index([ReportCurrencyCode], map: "Currency_Production")
+  @@index([ProdCoId], map: "ProductionCompany_Production")
 }
 
 model ProductionTask {
