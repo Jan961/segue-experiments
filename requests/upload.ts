@@ -45,7 +45,7 @@ export const uploadFile = async (
   onUploadingImage: (file: File, url: string) => void,
 ): Promise<UploadImageResponse> => {
   let progress = 0;
-  let slowProgressInterval: number;
+  let slowProgressInterval: ReturnType<typeof setInterval>;
 
   try {
     const response = await axios.post<UploadImageResponse>('/api/upload', formData, {
