@@ -28,7 +28,7 @@ const Global = () => {
   const [colDefs, setColDefs] = useState([]);
   const [showGlobalActivityModal, setShowGlobalActivityModal] = useState<boolean>(false);
   const [actModalVariant, setActModalVariant] = useState<ActivityModalVariant>();
-  // const [actRow, setActRow] = useState(null);
+  const [actRow, setActRow] = useState(null);
 
   const { fetchData } = useAxios();
 
@@ -37,31 +37,69 @@ const Global = () => {
     setShowGlobalActivityModal(true);
   };
 
-  // const addActivity = async () => {
-  //   try {
-  //     const inputData: GlobalActivityDTO = {
-  //       ActivityTypeId: 1,
-  //       Cost: 10,
-  //       Date: new Date(),
-  //       FollowUpRequired: false,
-  //       Name: 'Test global 2',
-  //       Notes: 'note field value',
-  //       ProductionId: 10,
-  //     }
+  const updateGlobalActivity = async (type: string, data: any) => {
+    if (type === 'add') {
+      try {
+        const inputData: GlobalActivityDTO = {
+          ActivityTypeId: data.ActivityTypeId,
+          Cost: data.Cost,
+          Date: new Date(data.Date),
+          FollowUpRequired: data.FollowUpRequired,
+          Name: data.Name,
+          Notes: data.Notes,
+          ProductionId: data.ProductionId,
+          DueByDate: data.DueByDate,
+        };
 
-  //     await fetchData({
-  //       url: '/api/marketing/globalActivities/create',
-  //       method: 'POST',
-  //       data: inputData
-  //     });
+        await fetchData({
+          url: '/api/marketing/globalActivities/create',
+          method: 'POST',
+          data: inputData,
+        });
 
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
+        const tableRow = {
+          actName: data.Name,
+          actType: activityTypes.find((type) => type.value === data.ActivityTypeId).text,
+          actDate: data.Date,
+          followUpCheck: data.FollowUpRequired,
+          cost: data.Cost,
+          notes: data.Notes,
+          followUpDt: data.DueByDate,
+        };
 
-  const updateGlobalActivity = (type: string, data: any) => {
-    console.log(type, data);
+        setRowData([...rowData, tableRow]);
+        setShowGlobalActivityModal(false);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const toggleModal = async (type: ActivityModalVariant, data: any) => {
+    const actTypeResponse = await fetchData({
+      url: '/api/marketing/globalActivities/' + productionId.toString(),
+      method: 'POST',
+    });
+
+    if (typeof actTypeResponse === 'object') {
+      const globalActivities = actTypeResponse as GlobalActivitiesResponse;
+
+      const tempRow = {
+        Name: data.actName,
+        ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
+        Cost: data.cost,
+        Date: new Date(data.actDate),
+        FollowUpRequired: data.followUpCheck,
+        Notes: data.notes,
+        ProductionId: productionId,
+        DueByDate: data.followUpDt,
+      };
+
+      setActRow(tempRow);
+
+      setActModalVariant(type);
+      setShowGlobalActivityModal(true);
+    }
   };
 
   const getGlobalActivities = async () => {
@@ -76,7 +114,7 @@ const Global = () => {
 
         setActivityTypes(globalActivities.activityTypes);
 
-        setColDefs(globalActivityColDefs(updateGlobalActivity, currency.symbol));
+        setColDefs(globalActivityColDefs(toggleModal, currency.symbol));
         const globalRows = globalActivities.activities.map((activity) => {
           return {
             actName: activity.Name,
@@ -126,7 +164,7 @@ const Global = () => {
         variant={actModalVariant}
         activityTypes={activityTypes}
         onSave={(variant, data) => updateGlobalActivity(variant, data)}
-        data={null} // actRow
+        data={actRow}
         productionId={productionId}
         productionCurrency={currency.symbol}
       />
