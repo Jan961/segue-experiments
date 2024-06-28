@@ -334,24 +334,24 @@ model Rehearsal {
 }
 
 model Account {
-  AccountId              Int                   @id @default(autoincrement())
-  AccountName            String                @db.VarChar(50)
-  AccountAddress1        String?               @db.VarChar(50)
-  AccountAddress2        String?               @db.VarChar(50)
-  AccountAddress3        String?               @db.VarChar(50)
-  AccountAddressTown     String?               @db.VarChar(50)
-  AccountAddressCounty   String?               @db.VarChar(50)
-  AccountAddressPostcode String?               @db.VarChar(20)
-  AccountAddressCountry  String?               @db.VarChar(30)
-  AccountVATNumber       String?               @db.VarChar(20)
-  AccountCurrencyCode    String                @db.VarChar(3)
-  AccountCompanyNumber   String?               @db.VarChar(20)
-  AccountLogo            Bytes?
-  AccountMainEmail       String?               @db.VarChar(120)
-  AccountNumPeople       Int?                  @db.TinyInt
-  AccountOrganisationId  String?               @unique(map: "Account_AccountOrganisationId_Unique") @db.Char(8)
-  AccountTermsAgreedBy   String?               @db.VarChar(100)
-  AccountTermsAgreedDate DateTime?             @db.Date
+  AccountId              Int                   @map("AccountId") @id @default(autoincrement())
+  AccountName            String                @map("AccountName") @db.VarChar(50)
+  AccountAddress1        String?               @map("AccountAddress1") @db.VarChar(50)
+  AccountAddress2        String?               @map("AccountAddress2") @db.VarChar(50)
+  AccountAddress3        String?               @map("AccountAddress3") @db.VarChar(50)
+  AccountAddressTown     String?               @map("AccountAddressTown") @db.VarChar(50)
+  AccountAddressCounty   String?               @map("AccountAddressCounty") @db.VarChar(50)
+  AccountAddressPostcode String?               @map("AccountAddressPostcode") @db.VarChar(20)
+  AccountAddressCountry  String?               @map("AccountAddressCountry") @db.VarChar(30)
+  AccountVATNumber       String?               @map("AccountVATNumber") @db.VarChar(20)
+  AccountCurrencyCode    String                @map("AccountCurrencyCode") @db.VarChar(3)
+  AccountCompanyNumber   String?               @map("AccountCompanyNumber") @db.VarChar(20)
+  AccountLogo            Bytes?                @map("AccountLogo")
+  AccountMainEmail       String?               @map("AccountMainEmail") @db.VarChar(120)
+  AccountNumPeople       Int?                  @map("AccountNumPeople") @db.TinyInt
+  AccountOrganisationId  String?               @map("AccountOrganisationId") @unique(map: "Account_AccountOrganisationId_Unique") @db.Char(8)
+  AccountTermsAgreedBy   String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
+  AccountTermsAgreedDate DateTime?             @map("AccountTermsAgreedDate") @db.Date
   AccountContact         AccountContact?
   AccountSubscription    AccountSubscription[]
   AccountUser            AccountUser[]
@@ -643,10 +643,10 @@ model PerformanceReport {
 }
 
 model DBSetting {
-  DBSettingId    Int       @id @default(autoincrement())
-  DBSettingName  String    @unique(map: "SettingName") @db.VarChar(50)
-  DBSettingValue String    @db.VarChar(255)
-  DBLastDataLoad DateTime? @db.DateTime(0)
+  DBSettingId    Int       @map("DBSettingId") @id @default(autoincrement())
+  DBSettingName  String    @map("DBSettingName") @unique(map: "SettingName") @db.VarChar(50)
+  DBSettingValue String    @map("DBSettingValue") @db.VarChar(255)
+  DBLastDataLoad DateTime? @map("DBLastDataLoad") @db.DateTime(0)
 }
 
 model MasterTask {
