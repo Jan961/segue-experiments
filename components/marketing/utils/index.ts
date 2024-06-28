@@ -1,4 +1,4 @@
-import { ActivityDTO, BookingContactNoteDTO } from 'interfaces';
+import { ActivityDTO, BookingContactNoteDTO, GlobalActivityDTO } from 'interfaces';
 
 export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: ActivityDTO): boolean => {
   // List all keys to be compared
@@ -84,4 +84,31 @@ export const reverseDate = (inputDt: string) => {
   const date = new Date(reversedDateStr);
 
   return date;
+};
+
+export const hasGlobalActivityChanged = (oldActivity: GlobalActivityDTO, newActivity: GlobalActivityDTO): boolean => {
+  // List all keys to be compared
+  const keys = Object.keys(oldActivity) as Array<keyof GlobalActivityDTO>;
+
+  for (const key of keys) {
+    // if Id skip - we can assume the Id will be the same
+    if (key === 'Id') {
+      return;
+    }
+
+    // handle dates differently
+    if (key === 'Date' || key === 'DueByDate') {
+      // check for change
+      if (new Date(oldActivity[key]).getTime() !== new Date(newActivity[key]).getTime()) {
+        return true;
+      }
+      // else any other field
+    } else {
+      if (oldActivity[key] !== newActivity[key]) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 };

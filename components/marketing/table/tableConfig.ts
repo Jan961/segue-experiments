@@ -425,3 +425,100 @@ export const updateWarningColDefs = (type) => {
 
   return colDefs;
 };
+
+export const globalActivityColDefs = (updateActivity, currencySymbol) => [
+  {
+    headerName: 'Activity Name',
+    field: 'actName',
+    cellRenderer: DefaultCellRenderer,
+    width: 188,
+  },
+  {
+    headerName: 'Type',
+    field: 'actType',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Date',
+    field: 'actDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Follow Up Req.',
+    field: 'followUpCheck',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => ({
+      onChange: () => null, // no action required, checkbox fixed in table
+      checked: params.data.followUpCheck,
+    }),
+    width: 85,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Cost',
+    field: 'cost',
+    cellRenderer: (params) => {
+      console.log(params.data);
+      return currencySymbol + params.data.cost.toFixed(2);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 100,
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    cellStyle: {
+      marginTop: '5px',
+    },
+    width: 320,
+  },
+  {
+    headerName: 'Due By Date',
+    field: 'followUpDt',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.followUpDt);
+    },
+    width: 100,
+    hide: true,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'edit',
+          onClick: () => updateActivity('edit', params.data),
+        },
+        {
+          name: 'delete',
+          onClick: () => updateActivity('delete', params.data),
+        },
+      ],
+    }),
+    width: 90,
+    resizable: false,
+  },
+];

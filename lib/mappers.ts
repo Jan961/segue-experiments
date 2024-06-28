@@ -12,6 +12,7 @@ import {
   ProductionTask,
   User,
   File,
+  GlobalBookingActivity,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -34,6 +35,7 @@ import {
   ContractStatusType,
   FileDTO,
   ContractBookingStatusType,
+  GlobalActivityDTO,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
@@ -221,6 +223,18 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   FollowUpRequired: a.FollowUpRequired,
   DueByDate: convertDate(a.DueByDate),
   Notes: a.ActivityNotes,
+});
+
+export const globalActivityMapper = (a: GlobalBookingActivity): GlobalActivityDTO => ({
+  Id: a.Id,
+  ProductionId: a.ProductionId,
+  Date: convertDate(a.Date),
+  Name: a.Name,
+  ActivityTypeId: a.ActivityTypeId,
+  Cost: Number(a.Cost),
+  FollowUpRequired: a.FollowUpRequired,
+  DueByDate: convertDate(a.DueByDate),
+  Notes: a.Notes,
 });
 
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({

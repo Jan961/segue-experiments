@@ -1,60 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
-import Select from 'components/core-ui-lib/Select';
-import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
-import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
-import useAxios from 'hooks/useAxios';
-import { SelectOption } from './MarketingHome';
-import { getWeekDayShort } from 'services/dateService';
-import formatInputDate from 'utils/dateInputFormat';
-import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
+import GlobalToolbar from 'components/toolbar';
+import { Button, DateRange, TextInput } from 'components/core-ui-lib';
 
-type TourResponse = {
-  data: Array<SelectOption>;
-  frequency: string;
-};
-
-type Props = {
-  onDateChanged?: (salesWeek: any) => void;
-};
-
-const GlobalActivityFilters: React.FC<Props> = ({ onDateChanged }) => {
+const GlobalActivityFilters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
-  const [bookings, setBooking] = useRecoilState(bookingJumpState);
-  const [selectedValue, setSelectedValue] = useState(null);
-  const [tourWeeks, setTourWeeks] = useState([]);
-  const [selectedTourWeek, setSelectedTourWeek] = useState(null);
-  const [tourLabel, setTourLabel] = useState('');
-  const [lastDates, setLastDates] = useState([]);
+  const [dateRange, setDateRange] = useState<{ to: Date; from: Date }>({ to: null, from: null });
+  const [filterText, setFilterText] = useState('');
   const [, setCurrency] = useRecoilState(currencyState);
-  const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
 
-  const { fetchData } = useAxios();
-
-  const getTourWeeks = async (productionId) => {
-    const data = await fetchData({
-      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-      method: 'POST',
-    });
-
-    if (typeof data === 'object') {
-      const tourData = data as TourResponse;
-      setTourWeeks(tourData.data);
-      if (tourData.frequency === 'W') {
-        setTourLabel('Sales Week');
-      } else if (tourData.frequency === 'D') {
-        setTourLabel('Sales Date');
-      }
-    }
-  };
-
-  const getCurrency = async (bookingId) => {
+  const getCurrency = async (productionId) => {
     try {
-      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+      const response = await axios.post('/api/marketing/currency/' + productionId, {});
 
       if (response.data && typeof response.data === 'object') {
         const currencyObject = response.data as { currency: string };
@@ -65,131 +25,44 @@ const GlobalActivityFilters: React.FC<Props> = ({ onDateChanged }) => {
     }
   };
 
-  const changeBooking = async (value: string | number) => {
-    if (value !== null) {
-      const selectedBooking = bookingOptions.find((booking) => booking.value === value);
-      setSelectedValue(selectedBooking.value.toString());
-
-      const bookingIdentifier = typeof value === 'string' ? parseInt(value) : value;
-      setBooking({ ...bookings, selected: bookingIdentifier });
-      await getCurrency(bookingIdentifier.toString());
-    } else {
-      setSelectedValue(null);
-      setBooking({ ...bookings, selected: undefined });
-    }
+  const onClearFilters = () => {
+    setFilterText('');
+    setDateRange({ to: null, from: null });
   };
-
-  const fetchLastDates = async () => {
-    try {
-      const data = await fetchData({
-        url: '/api/performances/lastDate/' + productionId,
-        method: 'POST',
-      });
-
-      if (typeof data === 'object') {
-        const lastDates = data as Array<LastPerfDate>;
-        setLastDates(lastDates);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const setTourWeek = (tourDate: string) => {
-    onDateChanged(tourDate);
-    setSelectedTourWeek(tourDate);
-  };
-
-  const bookingOptions = useMemo(() => {
-    try {
-      changeBooking(null);
-      setSelectedTourWeek(null);
-      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
-
-      const optWithRun = initialOptions.map((option) => {
-        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
-        if (lastDate !== undefined) {
-          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
-          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
-          if (option.date === endDateStr) {
-            return option;
-          } else {
-            return {
-              ...option,
-              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
-            };
-          }
-        } else {
-          return option;
-        }
-      });
-
-      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return optWithRun;
-    } catch (error) {
-      console.log(error);
-    }
-  }, [bookings.bookings]);
 
   useEffect(() => {
-    if (productionId !== null && productionId !== undefined) {
-      getTourWeeks(productionId);
-      fetchLastDates();
-    }
+    // hardcoding currency to the currency of bookingId 10 but this will in time change to production
+    getCurrency(10);
   }, [productionId]);
-
-  useEffect(() => {
-    try {
-      const selectedTourIndex = tourWeeks.findIndex((week) => week.selected === true);
-      if (selectedTourIndex !== -1) {
-        setSelectedTourWeek(tourWeeks[selectedTourIndex].value);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [tourWeeks]);
 
   return (
     <div>
       <div className="w-full flex justify-between flex-row">
-        <div className="flex flex-col mb-4">
-          <div className="py-2 flex flex-row items-center gap-4">
-            <h1 className="text-4xl font-bold text-primary-green">Sales Entry</h1>
-
-            <div className="bg-white border-primary-border rounded-md border shadow-md">
-              <div className="rounded-l-md">
-                <div className="flex items-center">
-                  <ProductionJumpMenu showArchivedCheck={false} />
-                </div>
-              </div>
-            </div>
-
-            <Select
-              onChange={(tourWeek) => setTourWeek(tourWeek.toString())}
-              value={selectedTourWeek}
-              disabled={!productionId}
-              placeholder="Select Sales Week"
-              className="bg-white w-[437px]"
-              options={tourWeeks}
-              isClearable
-              isSearchable
-              label={tourLabel}
-            />
-          </div>
-        </div>
+        <GlobalToolbar titleClassName="text-primary-green" title="Global Activities" />
       </div>
 
-      <div className="flex flex-row items-center gap-4 mt-1">
-        <Select
-          onChange={changeBooking}
-          value={selectedValue}
-          disabled={selectedTourWeek == null}
-          placeholder="Select a Venue/Date"
-          className="bg-white w-[550px]"
-          options={bookingOptions}
-          isClearable
-          isSearchable
+      <div className="flex flex-row">
+        <div className="bg-white">
+          <DateRange
+            disabled={!productionId}
+            className="bg-primary-white justify-between"
+            label="Date"
+            onChange={(dateRange) => setDateRange(dateRange)}
+            value={dateRange}
+          />
+        </div>
+
+        <TextInput
+          id="filterText"
+          disabled={!productionId}
+          placeholder="Search Global activities..."
+          className="w-[467px] mt-1 ml-5"
+          iconName="search"
+          value={filterText}
+          onChange={(event) => setFilterText(event.target.value)}
         />
+
+        <Button className="text-sm leading-8 w-[120px] mt-1 ml-5" text="Clear Filters" onClick={onClearFilters} />
       </div>
     </div>
   );
