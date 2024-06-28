@@ -121,7 +121,7 @@ const ArchSalesDialog = ({
           {
             bookingId: currentBooking?.Id,
             order: 1,
-            prodCode: ProductionCode,
+            prodCode: (ShowCode as string) + ProductionCode,
             prodName: currentProduction?.ShowCode + currentProduction?.Code + ' ' + currentProduction?.ShowName,
             numPerfs: currentBooking?.PerformanceCount,
           },
