@@ -18,6 +18,7 @@ export interface TextInputProps {
   onFocus?: (e: any) => void;
   onBlur?: (e: any) => void;
   type?: string;
+  required?: boolean;
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>(

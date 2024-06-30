@@ -2,7 +2,6 @@ import axios from 'axios';
 import { styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import Table from 'components/core-ui-lib/Table';
 import { LoadingOverlay } from 'components/shows/ShowsTable';
 import { getProductionsConvertedPayload } from 'components/shows/constants';
@@ -18,6 +17,7 @@ import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
 import { all, isArray } from 'radash';
+import ProductionDetailsForm from './ProductionDetailsForm';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -52,14 +52,11 @@ const rowClassRules = {
 const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) => {
   const tableRef = useRef(null);
   const router = useRouter();
-
-  const [confirm, setConfirm] = useState<boolean>(false);
-  const [productionId, setProductionId] = useState<number>(0);
+  const [openEditModal, setOpenEditModal] = useState<boolean>(false);
   const [currentProduction, setCurrentProduction] = useState(intProduction);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isEdited, setIsEdited] = useState<boolean>(false);
   const [uploadModalContext, setUploadModalContext] = useState<any>(false);
   const [productionUploadMap, setProductionUploadMap] = useState<Record<string, FileDTO>>(() => {
     return showData.productions.reduce((prodImageMap, production) => {
@@ -237,7 +234,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         debug('Error updating production', error);
       } finally {
         setIsLoading(false);
-        setIsEdited(false);
         setCurrentProduction(intProduction);
         router.replace(router.asPath);
       }
@@ -264,7 +260,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         };
         applyTransactionToGrid(tableRef, transaction);
         notify.success(ToastMessages.createNewProductionSuccess);
-        setIsEdited(false);
         setCurrentProduction(intProduction);
         router.replace(router.asPath);
       } catch (error) {
@@ -281,26 +276,13 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     [currentProduction?.Id, productionUploadMap, router],
   );
 
-  // const findFirstEmptyField = (data) => {
-  //   const requiredFields = ['Code', 'DateBlock[0].StartDate', 'DateBlock[0].EndDate'];
-  //   return requiredFields.find((field) => !data[field]);
-  // };
-
   const handleCellClick = async (e) => {
-    setProductionId(e.data.Id);
     setCurrentProduction(e.data);
     setRowIndex(e.rowIndex);
 
-    if (e.column.colId === 'deleteId') {
-      setConfirm(true);
-    } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
-      await updateCurrentProduction(e.data);
-    } else if (isAddRow && e.column.colId === 'editId') {
-      if (e.data.Code && 'DateBlock[0].StartDate' in e.data && 'DateBlock[0].EndDate' in e.data) {
-        await createNewProduction(e.data);
-      } else {
-        notify.warning('Please fill in all the required fields before saving.');
-      }
+    if (e.column.colId === 'editId') {
+      // await updateCurrentProduction(e.data);
+      setOpenEditModal(true);
     } else if (e.column.colId === 'ImageUrl') {
       const { originalFilename: name, id } = e.data.Image || {};
       setUploadModalContext({
@@ -322,11 +304,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     debug('handleCellChanges', e);
     setEditedOrAddedRecords((prev) => [...prev, e.data.Id]);
     setCurrentProduction(e.data);
-    setIsEdited(true);
   };
 
-  const handleDelete = async () => {
-    setConfirm(false);
+  const handleDelete = async (productionId: number, callback?: () => void) => {
+    callback?.();
     setIsLoading(true);
     try {
       if (productionId) {
@@ -361,7 +342,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           },
         ],
       };
-      setIsEdited(true);
       applyTransactionToGrid(tableRef, transaction);
       setProductionUploadMap((prev) => {
         const newMap = { ...prev };
@@ -389,7 +369,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           </div>
         </div>
       </div>
-      <div className=" w-[750px] lg:w-[1568px] h-full flex flex-col ">
+      <div className=" w-[750px] lg:w-[870px] h-full flex flex-col ">
         <Table
           ref={tableRef}
           columnDefs={productionColumDefs}
@@ -411,13 +391,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           <Button className=" w-33" text="Save and Close" onClick={handleSaveAndClose} />
         </div>
       </div>
-      <ConfirmationDialog
-        variant="delete"
-        show={confirm}
-        onYesClick={handleDelete}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
-      />
       {uploadModalContext?.visibility && (
         <UploadModal
           visible={uploadModalContext?.visibility}
@@ -429,6 +402,15 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           onSave={onSave}
           value={uploadModalContext?.value}
           onChange={onChange}
+        />
+      )}
+      {openEditModal && (
+        <ProductionDetailsForm
+          production={currentProduction}
+          title={currentProduction?.ShowName || ''}
+          onClose={() => setOpenEditModal(false)}
+          onDelete={handleDelete}
+          visible={openEditModal}
         />
       )}
     </>
