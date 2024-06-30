@@ -18,6 +18,7 @@ import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
 import { all, isArray } from 'radash';
 import ProductionDetailsForm from './ProductionDetailsForm';
+import { uploadFile } from 'requests/upload';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -158,62 +159,34 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   };
 
-  const onSave = (file, onProgress, onError, onUploadingImage) => {
+  const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
     formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
 
-    let progress = 0; // to track overall progress
-    let slowProgressInterval; // interval for slow progress simulation
+    try {
+      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
 
-    axios
-      .post('/api/upload', formData, {
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          if (percentCompleted <= 50) {
-            progress = percentCompleted;
-          } else if (percentCompleted === 100) {
-            progress = 50;
-            clearInterval(slowProgressInterval);
-            slowProgressInterval = setInterval(() => {
-              if (progress < 95) {
-                progress += 0.5;
-                onProgress(file[0].file, progress);
-              } else {
-                clearInterval(slowProgressInterval);
-              }
-            }, 100);
-          }
+      const gridApi = tableRef.current.getApi();
+      const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
 
-          onProgress(file[0].file, progress);
-        },
-      }) // eslint-disable-next-line
-      .then((response: any) => {
-        progress = 100;
-        onProgress(file[0].file, progress);
-        notify.success(ToastMessages.imageUploadSuccess);
-        onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
-        clearInterval(slowProgressInterval);
-        const gridApi = tableRef.current.getApi();
-        const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
-        setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response.data }));
-        setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
-        const transaction = {
-          update: [
-            {
-              ...rowDataToUpdate,
-              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`,
-              Image: response.data,
-            },
-          ],
-        };
-        applyTransactionToGrid(tableRef, transaction);
-      }) // eslint-disable-next-line
-      .catch((error) => {
-        notify.error(ToastMessages.imageUploadFailure);
-        onError(file[0].file, 'Error uploading file. Please try again.');
-        clearInterval(slowProgressInterval);
-      });
+      setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response }));
+      setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
+
+      const transaction = {
+        update: [
+          {
+            ...rowDataToUpdate,
+            ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.location}`,
+            Image: response,
+          },
+        ],
+      };
+
+      applyTransactionToGrid(tableRef, transaction);
+    } catch (error) {
+      onError(file[0].file, error.message);
+    }
   };
 
   const updateCurrentProduction = useCallback(

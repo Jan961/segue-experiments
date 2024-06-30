@@ -20,6 +20,7 @@ import NewProductionTask from 'components/tasks/modals/NewProductionTask';
 import { intialTasksState, tasksfilterState } from 'state/tasks/tasksFilterState';
 import MasterTaskList from 'components/tasks/modals/MasterTaskList';
 import ProductionTaskList from 'components/tasks/modals/ProductionTaskList';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -52,7 +53,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
 
-  const [productionId, setProductionId] = useState<number>(null);
+  const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   const handleShowTask = () => {
     setShowAddTask(!showAddTask);
@@ -76,10 +77,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       filteredProductions.forEach((production) => {
         if (production.Tasks.length === 0 && isFilterMatchingInitialState()) {
           setShowEmptyProductionModal(true);
-          setProductionId(production.Id);
         } else {
           setShowEmptyProductionModal(false);
-          setProductionId(null);
         }
       });
     }
@@ -153,11 +152,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         onClose={handleNewProductionTaskModal}
         handleNewProductionTaskSubmit={handleNewProductionTaskSubmit}
       />
-      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={productionId} />
+      <MasterTaskList visible={isMasterTaskList} onClose={handleMasterListClose} productionId={ProductionId} />
       <ProductionTaskList
         visible={isProductionTaskList}
         onClose={handleProductionListClose}
-        productionId={productionId}
+        productionId={ProductionId}
       />
     </Layout>
   );

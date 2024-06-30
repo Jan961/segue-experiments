@@ -57,9 +57,9 @@ export const getColumnDefs = (usersList = [], production) => {
       cellStyle: {
         overflow: 'visible',
       },
-      cellRendererParams: function (params) {
+      cellRendererParams: function () {
         return {
-          options: params.data.weekOptions,
+          options: weekOptions,
           isSearchable: true,
         };
       },
@@ -86,9 +86,9 @@ export const getColumnDefs = (usersList = [], production) => {
       cellStyle: {
         overflow: 'visible',
       },
-      cellRendererParams: function (params) {
+      cellRendererParams: function () {
         return {
-          options: params.data.weekOptions,
+          options: weekOptions,
           isSearchable: true,
         };
       },
@@ -186,32 +186,14 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerName: 'Start by (WK)',
       field: 'StartByWeekNum',
-      cellRenderer: SelectCellRenderer,
-      cellStyle: {
-        overflow: 'visible',
-      },
-      cellRendererParams: function () {
-        return {
-          options: weekOptions,
-          isSearchable: true,
-        };
-      },
+      cellRenderer: DefaultCellRenderer,
       width: 100,
       minWidth: 100,
     },
     {
       headerName: 'Complete by (WK)',
       field: 'CompleteByWeekNum',
-      cellRenderer: SelectCellRenderer,
-      cellStyle: {
-        overflow: 'visible',
-      },
-      cellRendererParams: function () {
-        return {
-          options: weekOptions,
-          isSearchable: true,
-        };
-      },
+      cellRenderer: DefaultCellRenderer,
       width: 110,
       minWidth: 100,
     },
