@@ -11,11 +11,12 @@ datasource db {
 }
 
 model ActivityType {
-  Id              Int               @id @default(autoincrement()) @map("ActivityTypeId")
-  Name            String            @map("ActivityTypeName") @db.VarChar(30)
-  ColourIndex     Int?              @map("ActivityTypeColourIndex") @db.TinyInt
-  Code            String            @map("ActivityTypeCode") @db.VarChar(2)
-  BookingActivity BookingActivity[]
+  Id                    Int                     @id @default(autoincrement()) @map("ActivityTypeId")
+  Name                  String                  @map("ActivityTypeName") @db.VarChar(30)
+  ColourIndex           Int?                    @map("ActivityTypeColourIndex") @db.TinyInt
+  Code                  String                  @map("ActivityTypeCode") @db.VarChar(2)
+  BookingActivity       BookingActivity[]
+  GlobalBookingActivity GlobalBookingActivity[]
 }
 
 model Booking {
@@ -28,6 +29,7 @@ model Booking {
   LandingPageURL             String?               @map("BookingLandingPageURL") @db.VarChar(255)
   TicketsOnSaleFromDate      DateTime?             @map("BookingTicketsOnSaleFromDate") @db.Date
   TicketsOnSale              Boolean?              @map("BookingTicketsOnSale") @db.Bit(1)
+  HasSchoolsSales            Boolean               @default(dbgenerated("(b'0')")) @map("BookingHasSchoolsSales") @db.Bit(1)
   MarketingPlanReceived      Boolean               @default(dbgenerated("(b'0')")) @map("BookingMarketingPlanReceived") @db.Bit(1)
   ContactInfoReceived        Boolean               @default(dbgenerated("(b'0')")) @map("BookingContactInfoReceived") @db.Bit(1)
   PrintReqsReceived          Boolean               @default(dbgenerated("(b'0')")) @map("BookingPrintReqsReceived") @db.Bit(1)
@@ -37,6 +39,7 @@ model Booking {
   MarketingDealNotes         String?               @map("BookingMarketingDealNotes") @db.LongText
   CrewNotes                  String?               @map("BookingCrewNotes") @db.LongText
   SalesNotes                 String?               @map("BookingSalesNotes") @db.LongText
+  FinalSalesDiscrepancyNotes String?               @map("BookingFinalSalesDiscrepancyNotes") @db.LongText
   HoldNotes                  String?               @map("BookingHoldNotes") @db.LongText
   CompNotes                  String?               @map("BookingCompNotes") @db.LongText
   MerchandiseNotes           String?               @map("BookingMerchandiseNotes") @db.LongText
@@ -118,6 +121,7 @@ model Currency {
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Country                                                            Country[]
+  Production                                                         Production[]
   Venue                                                              Venue[]
 }
 
@@ -330,21 +334,24 @@ model Rehearsal {
 }
 
 model Account {
-  AccountId              Int                   @id @default(autoincrement())
-  AccountName            String                @db.VarChar(50)
-  AccountAddress1        String?               @db.VarChar(50)
-  AccountAddress2        String?               @db.VarChar(50)
-  AccountAddress3        String?               @db.VarChar(50)
-  AccountAddressTown     String?               @db.VarChar(50)
-  AccountAddressCounty   String?               @db.VarChar(50)
-  AccountAddressPostcode String?               @db.VarChar(20)
-  AccountAddressCountry  String?               @db.VarChar(30)
-  AccountVATNumber       String?               @db.VarChar(20)
-  AccountCurrencyCode    String                @db.VarChar(3)
-  AccountCompanyNumber   String?               @db.VarChar(20)
-  AccountLogo            Bytes?
-  AccountMainEmail       String?               @db.VarChar(120)
-  AccountNumPeople       Int?                  @db.TinyInt
+  AccountId              Int                   @map("AccountId") @id @default(autoincrement())
+  AccountName            String                @map("AccountName") @db.VarChar(50)
+  AccountAddress1        String?               @map("AccountAddress1") @db.VarChar(50)
+  AccountAddress2        String?               @map("AccountAddress2") @db.VarChar(50)
+  AccountAddress3        String?               @map("AccountAddress3") @db.VarChar(50)
+  AccountAddressTown     String?               @map("AccountAddressTown") @db.VarChar(50)
+  AccountAddressCounty   String?               @map("AccountAddressCounty") @db.VarChar(50)
+  AccountAddressPostcode String?               @map("AccountAddressPostcode") @db.VarChar(20)
+  AccountAddressCountry  String?               @map("AccountAddressCountry") @db.VarChar(30)
+  AccountVATNumber       String?               @map("AccountVATNumber") @db.VarChar(20)
+  AccountCurrencyCode    String                @map("AccountCurrencyCode") @db.VarChar(3)
+  AccountCompanyNumber   String?               @map("AccountCompanyNumber") @db.VarChar(20)
+  AccountLogo            Bytes?                @map("AccountLogo")
+  AccountMainEmail       String?               @map("AccountMainEmail") @db.VarChar(120)
+  AccountNumPeople       Int?                  @map("AccountNumPeople") @db.TinyInt
+  AccountOrganisationId  String?               @map("AccountOrganisationId") @unique(map: "Account_AccountOrganisationId_Unique") @db.Char(8)
+  AccountTermsAgreedBy   String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
+  AccountTermsAgreedDate DateTime?             @map("AccountTermsAgreedDate") @db.Date
   AccountContact         AccountContact?
   AccountSubscription    AccountSubscription[]
   AccountUser            AccountUser[]
@@ -457,20 +464,21 @@ model SaleType {
 }
 
 model SalesSet {
-  SetId               Int          @id @default(autoincrement())
-  SetBookingId        Int
-  SetPerformanceId    Int?
-  SetSalesFiguresDate DateTime     @db.Date
-  SetBrochureReleased Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetSingleSeats      Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetNotOnSale        Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsFinalFigures   Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsCopy           Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
-  Sale                Sale[]
-  Booking             Booking      @relation(fields: [SetBookingId], references: [Id], onUpdate: Restrict, map: "Booking_BookingSale")
-  Performance         Performance? @relation(fields: [SetPerformanceId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "Performance_SalesSet")
-  SetComp             SetComp[]
-  SetHold             SetHold[]
+  SetId                       Int          @id @default(autoincrement())
+  SetBookingId                Int
+  SetPerformanceId            Int?
+  SetSalesFiguresDate         DateTime     @db.Date
+  SetBrochureReleased         Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetSingleSeats              Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetNotOnSale                Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsFinalFigures           Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetFinalSalesApprovedByUser String?      @db.VarChar(100)
+  SetIsCopy                   Boolean      @default(dbgenerated("(b'0')")) @db.Bit(1)
+  Sale                        Sale[]
+  Booking                     Booking      @relation(fields: [SetBookingId], references: [Id], onUpdate: Restrict, map: "Booking_BookingSale")
+  Performance                 Performance? @relation(fields: [SetPerformanceId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "Performance_SalesSet")
+  SetComp                     SetComp[]
+  SetHold                     SetHold[]
 
   @@index([SetBookingId, SetSalesFiguresDate], map: "BookingSale_Booking_SalesFigures")
   @@index([SetBookingId], map: "Booking_BookingSale_fk")
@@ -567,6 +575,7 @@ model AccountUser {
   UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserPIN            String?                 @db.VarChar(4)
   Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
   User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
   AccountUserPermission AccountUserPermission[]
@@ -634,9 +643,10 @@ model PerformanceReport {
 }
 
 model DBSetting {
-  DBSettingId    Int    @id @default(autoincrement())
-  DBSettingName  String @unique(map: "SettingName") @db.VarChar(50)
-  DBSettingValue String @db.VarChar(255)
+  DBSettingId    Int       @map("DBSettingId") @id @default(autoincrement())
+  DBSettingName  String    @map("DBSettingName") @unique(map: "SettingName") @db.VarChar(50)
+  DBSettingValue String    @map("DBSettingValue") @db.VarChar(255)
+  DBLastDataLoad DateTime? @map("DBLastDataLoad") @db.DateTime(0)
 }
 
 model MasterTask {
@@ -684,18 +694,24 @@ model Production {
   SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
   RunningTime           DateTime?               @map("ProductionRunningTime") @db.Time(0)
   RunningTimeNote       String?                 @map("ProductionRunningTimeNote") @db.VarChar(80)
-  ProductionImageFileId Int?
+  ImageFileId           Int?                    @map("ProductionImageFileId")
+  ReportCurrencyCode    String                  @map("ProductionReportCurrencyCode") @db.VarChar(3)
+  ProdCoId              Int?                    @map("ProductionProdCoId")
   AccountUserProduction AccountUserProduction[]
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
-  File                  File?                   @relation(fields: [ProductionImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
+  Currency              Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
+  ProductionCompany     ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
+  File                  File?                   @relation(fields: [ImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
-  @@index([ProductionImageFileId], map: "Production_File")
+  @@index([ImageFileId], map: "Production_File")
   @@index([ShowId], map: "Show_Production")
+  @@index([ReportCurrencyCode], map: "Currency_Production")
+  @@index([ProdCoId], map: "ProductionCompany_Production")
 }
 
 model ProductionTask {
@@ -759,13 +775,15 @@ model CountryInRegion {
 }
 
 model ProductionCompany {
-  Id                  Int     @id @default(autoincrement()) @map("ProdCoId")
-  AccountId           Int     @map("ProdCoAccountId")
-  Name                String  @map("ProdCoName") @db.VarChar(50)
-  WebSite             String? @map("ProdCoWebSite") @db.VarChar(80)
-  Logo                Bytes?  @map("ProdCoLogo")
-  ProdCoSaleStartWeek Int?    @default(-50) @db.SmallInt
-  Account             Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
+  Id                  Int          @id @default(autoincrement()) @map("ProdCoId")
+  AccountId           Int          @map("ProdCoAccountId")
+  Name                String       @map("ProdCoName") @db.VarChar(50)
+  WebSite             String?      @map("ProdCoWebSite") @db.VarChar(80)
+  Logo                Bytes?       @map("ProdCoLogo")
+  ProdCoSaleStartWeek Int?         @default(-50) @db.SmallInt
+  ProdCoVATCode       String?      @db.VarChar(20)
+  Production          Production[]
+  Account             Account      @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
   Show                Show[]
 
   @@index([AccountId], map: "Account_ProductionCompany")
@@ -968,6 +986,22 @@ model EmailTemplate {
   EmTemFields      String? @db.VarChar(100)
 }
 
+model GlobalBookingActivity {
+  Id               Int           @id @default(autoincrement()) @map("GlobalActivityId")
+  ProductionId     Int           @map("GlobalActivityProductionId")
+  Date             DateTime?     @map("GlobalActivityDate") @db.Date
+  Name             String?       @map("GlobalActivityName") @db.VarChar(30)
+  ActivityTypeId   Int?          @map("GlobalActivityActivityTypeId")
+  Cost             Decimal?      @map("GlobalActivityCost") @db.Decimal(8, 2)
+  FollowUpRequired Boolean       @default(dbgenerated("(b'0')")) @map("GlobalActivityFollowUpRequired") @db.Bit(1)
+  DueByDate        DateTime?     @map("GlobalActivityDueByDate") @db.Date
+  CreatedDT        DateTime?     @map("GlobalActivityCreatedDT") @db.Date
+  Notes            String?       @map("GlobalActivityNotes") @db.LongText
+  ActivityType     ActivityType? @relation(fields: [ActivityTypeId], references: [Id], onDelete: Cascade, map: "GlobalActivityType_BookingActivity")
+
+  @@index([ActivityTypeId], map: "GlobalActivityType_BookingActivity")
+}
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesFiguresView {
   SetId               Int      @default(0)
@@ -1136,42 +1170,43 @@ view VenueVenueView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesView {
-  ShowName                 String    @db.VarChar(80)
-  ProductionId             Int       @default(0)
-  FullProductionCode       String?   @db.VarChar(20)
-  ProductionStartDate      DateTime? @db.Date
-  ProductionEndDate        DateTime? @db.Date
-  BookingId                Int       @default(0)
-  BookingFirstDate         DateTime  @db.Date
-  BookingStatusCode        String    @default("U") @db.Char(1)
-  BookingProductionWeekNum Int?      @db.SmallInt
-  VenueTown                String?   @db.VarChar(50)
-  VenueCode                String    @db.VarChar(6)
-  VenueName                String    @db.VarChar(255)
-  VenueCurrencyCode        String    @db.VarChar(3)
-  ConversionToCurrencyCode String?   @db.VarChar(3)
-  ConversionRate           Decimal?  @db.Decimal(8, 4)
-  SetSalesFiguresDate      DateTime? @db.Date
-  SetBookingWeekNum        Int?      @db.SmallInt
-  SetProductionWeekDate    DateTime? @db.Date
-  SetProductionWeekNum     Int?      @db.SmallInt
-  SetNotOnSale             Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsFinalFigures        Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetSingleSeats           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetBrochureReleased      Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsCopy                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName             String?   @db.VarChar(45)
-  Seats                    Decimal?  @db.Decimal(32, 0)
-  Value                    Decimal?  @db.Decimal(32, 2)
-  TotalCapacity            Float?
-  FinalFiguresDate         DateTime? @db.Date
-  FinalFiguresSeats        Decimal?  @db.Decimal(32, 0)
-  FinalFiguresValue        Decimal?  @db.Decimal(32, 2)
-  NotOnSaleDate            DateTime? @db.Date
-  TotalHoldSeats           Decimal?  @db.Decimal(32, 0)
-  LastFiguresDate          DateTime? @db.Date
-  LastFiguresSeats         Decimal?  @db.Decimal(32, 0)
-  LastFiguresValue         Decimal?  @db.Decimal(32, 2)
+  ShowName                    String    @db.VarChar(80)
+  ProductionId                Int       @default(0)
+  FullProductionCode          String?   @db.VarChar(20)
+  ProductionStartDate         DateTime? @db.Date
+  ProductionEndDate           DateTime? @db.Date
+  BookingId                   Int       @default(0)
+  BookingFirstDate            DateTime  @db.Date
+  BookingStatusCode           String    @default("U") @db.Char(1)
+  BookingProductionWeekNum    Int?      @db.SmallInt
+  VenueTown                   String?   @db.VarChar(50)
+  VenueCode                   String    @db.VarChar(6)
+  VenueName                   String    @db.VarChar(255)
+  VenueCurrencyCode           String    @db.VarChar(3)
+  ConversionToCurrencyCode    String?   @db.VarChar(3)
+  ConversionRate              Decimal?  @db.Decimal(8, 4)
+  SetSalesFiguresDate         DateTime? @db.Date
+  SetBookingWeekNum           Int?      @db.SmallInt
+  SetProductionWeekDate       DateTime? @db.Date
+  SetProductionWeekNum        Int?      @db.SmallInt
+  SetNotOnSale                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsFinalFigures           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetFinalSalesApprovedByUser String?   @db.VarChar(100)
+  SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SaleTypeName                String?   @db.VarChar(45)
+  Seats                       Decimal?  @db.Decimal(32, 0)
+  Value                       Decimal?  @db.Decimal(32, 2)
+  TotalCapacity               Float?
+  FinalFiguresDate            DateTime? @db.Date
+  FinalFiguresSeats           Decimal?  @db.Decimal(32, 0)
+  FinalFiguresValue           Decimal?  @db.Decimal(32, 2)
+  NotOnSaleDate               DateTime? @db.Date
+  TotalHoldSeats              Decimal?  @db.Decimal(32, 0)
+  LastFiguresDate             DateTime? @db.Date
+  LastFiguresSeats            Decimal?  @db.Decimal(32, 0)
+  LastFiguresValue            Decimal?  @db.Decimal(32, 2)
 
   @@ignore
 }
