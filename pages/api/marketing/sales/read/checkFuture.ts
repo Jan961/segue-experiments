@@ -5,8 +5,6 @@ export default async function handle(req, res) {
     let data = null;
     let result = null;
 
-    console.log(req.body.saleDate);
-
     if (req.body.type === 'Hold') {
       // get current values across weeks from the entered week
       data = await prisma.$queryRaw`

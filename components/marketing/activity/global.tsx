@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button, Table } from 'components/core-ui-lib';
 import useAxios from 'hooks/useAxios';
 import { useRecoilValue } from 'recoil';
@@ -9,10 +9,16 @@ import { GlobalActivityDTO } from 'interfaces';
 import { globalActivityColDefs, styleProps } from '../table/tableConfig';
 import GlobalActivityModal, { ActivityModalVariant } from '../modal/GlobalActivityModal';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { bookingJumpState } from 'state/marketing/bookingJumpState';
 
 type GlobalActivitiesResponse = {
   activities: GlobalActivityDTO[];
   activityTypes: Array<SelectOption>;
+};
+
+type TourResponse = {
+  data: Array<SelectOption>;
+  frequency: string;
 };
 
 export interface SalesEntryRef {
@@ -29,8 +35,45 @@ const Global = () => {
   const [showGlobalActivityModal, setShowGlobalActivityModal] = useState<boolean>(false);
   const [actModalVariant, setActModalVariant] = useState<ActivityModalVariant>();
   const [actRow, setActRow] = useState(null);
+  const bookings = useRecoilValue(bookingJumpState);
+  const [tourWeeks, setTourWeeks] = useState([]);
 
   const { fetchData } = useAxios();
+
+  const venueList = useMemo(() => {
+    try {
+      const venues = bookings.bookings.map((option) => {
+        return {
+          ...option.Venue,
+          date: new Date(option.Date),
+        };
+      });
+
+      venues.unshift({
+        Name: 'All Venues including and thereafter week',
+        selected: false,
+        Code: 'SELECT',
+        Id: 0,
+        Website: '',
+      });
+
+      return venues;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [bookings.bookings]);
+
+  const getTourWeeks = async (productionId) => {
+    const data = await fetchData({
+      url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+      method: 'POST',
+    });
+
+    if (typeof data === 'object') {
+      const tourData = data as TourResponse;
+      setTourWeeks(tourData.data);
+    }
+  };
 
   const showAddActivity = () => {
     setActModalVariant('add');
@@ -138,6 +181,7 @@ const Global = () => {
   useEffect(() => {
     setLoading(true);
     getGlobalActivities();
+    getTourWeeks(productionId);
   }, [productionId]);
 
   return (
@@ -167,6 +211,8 @@ const Global = () => {
         data={actRow}
         productionId={productionId}
         productionCurrency={currency.symbol}
+        venues={venueList}
+        tourWeeks={tourWeeks}
       />
     </div>
   );

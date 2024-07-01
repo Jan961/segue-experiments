@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import TextInput from 'components/core-ui-lib/TextInput';
 import Select, { SelectOption } from 'components/core-ui-lib/Select/Select';
@@ -7,11 +7,13 @@ import DateInput from 'components/core-ui-lib/DateInput';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
-import { GlobalActivityDTO } from 'interfaces';
+import { GlobalActivityDTO, VenueDTO } from 'interfaces';
 import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasGlobalActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
+import { gloablModalVenueColDefs, styleProps } from '../table/tableConfig';
+import { Table } from 'components/core-ui-lib';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
@@ -30,6 +32,8 @@ interface ActivityModalProps {
   productionCurrency?: string;
   productionId: number;
   data?: GlobalActivityDTO;
+  venues: Array<VenueDTO>;
+  tourWeeks: Array<SelectOption>;
 }
 
 export default function GlobalActivityModal({
@@ -41,6 +45,8 @@ export default function GlobalActivityModal({
   productionCurrency = '',
   productionId,
   data,
+  venues,
+  tourWeeks,
 }: Partial<ActivityModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
@@ -54,8 +60,35 @@ export default function GlobalActivityModal({
   const [error, setError] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('close');
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [venueColDefs, setVenueColDefs] = useState([]);
+  const [selectedList, setSelectedList] = useState([]);
+
+  const venueList = useMemo(() => {
+    const tempVenueList = venues.map((venue, index) => {
+      return {
+        ...venue,
+        selected: selectedList.findIndex((item) => item === index) !== -1,
+      };
+    });
+
+    console.log(tempVenueList);
+
+    return tempVenueList;
+  }, [venues, selectedList]);
 
   const initForm = () => {
+    const dropList = tourWeeks
+      .filter((week) => week.weekNo > 0)
+      .map((week) => {
+        return {
+          text: week.weekNo,
+          value: week.value,
+          selected: false,
+        };
+      });
+
+    setVenueColDefs(gloablModalVenueColDefs(dropList, selectVenue)); // multiVenueSelect))
+
     if (variant === 'add') {
       setActName('');
       setActType(null);
@@ -74,6 +107,21 @@ export default function GlobalActivityModal({
       setActId(data.Id);
     }
   };
+
+  const selectVenue = (index, value) => {
+    console.log(value);
+    setSelectedList((prevSelectedList) => {
+      if (prevSelectedList.includes(index)) {
+        return prevSelectedList.filter((i) => i !== index);
+      } else {
+        return [...prevSelectedList, index];
+      }
+    });
+  };
+
+  // const multiVenueSelect = (value) => {
+  //   console.log(value);
+  // }
 
   const handleSave = () => {
     // display error if the activity type is not selected
@@ -145,6 +193,12 @@ export default function GlobalActivityModal({
     }
   };
 
+  // const handleCellClicked = (e) => {
+  //   if(typeof e.column === 'object' && e.column.colId === 'select'){
+
+  //   }
+  // }
+
   useEffect(() => {
     setVisible(show);
     initForm();
@@ -153,7 +207,7 @@ export default function GlobalActivityModal({
   return (
     <div>
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
-        <div className="h-[526px] w-[404px]">
+        <div className="h-[780px] w-[450px]">
           <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>
           <TextInput
@@ -244,6 +298,18 @@ export default function GlobalActivityModal({
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
           />
+
+          <div className="flex flex-row mt-5">
+            <div className="w-[450px]">
+              <Table
+                columnDefs={venueColDefs}
+                rowData={venueList}
+                styleProps={styleProps}
+                tableHeight={600}
+                // onCellClicked={handleCellClicked}
+              />
+            </div>
+          </div>
 
           <div className="float-right flex flex-row mt-5 py-2">
             <Button

@@ -9,6 +9,7 @@ import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SalesValueInputRenderer from './SalesValueInputRenderer';
 import { isNullOrEmpty } from 'utils';
+import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -470,7 +471,6 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Cost',
     field: 'cost',
     cellRenderer: (params) => {
-      console.log(params.data);
       return currencySymbol + params.data.cost.toFixed(2);
     },
     cellStyle: {
@@ -520,5 +520,55 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     }),
     width: 90,
     resizable: false,
+  },
+];
+
+export const gloablModalVenueColDefs = (weekList, selectVenue) => [
+  //, multiSelect) => [
+  {
+    headerName: '',
+    field: 'checked',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => {
+      return {
+        onChange: (checked) => selectVenue(params.node.rowIndex, checked),
+        checked: params.node.rowIndex === 0 ? false : params.data.selected,
+      };
+    },
+    width: 50,
+    resizable: false,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Venue',
+    field: 'Name',
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    width: 285,
+    resizable: false,
+  },
+  {
+    headerName: '',
+    field: 'select',
+    cellRenderer: SelectRenderer,
+    cellRendererParams: function (params) {
+      return {
+        options: weekList,
+        hidden: params.node.rowIndex !== 0,
+        onChange: (value) => alert(value),
+      };
+    },
+    width: 100,
+    resizable: false,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
   },
 ];
