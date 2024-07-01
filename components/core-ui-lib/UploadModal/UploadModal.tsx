@@ -46,8 +46,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
   );
 
   const isUploadComplete = useMemo(() => {
-    if (selectedFiles.length === 0) return true;
-    return selectedFiles.every((file) => progress[file?.name] === 100);
+    if (selectedFiles.length === 0) return false;
+    return selectedFiles.every((file) => progress[file?.name] === 100 || file.id);
   }, [selectedFiles, progress]);
 
   const onProgress = (file: File, uploadProgress: number) => {

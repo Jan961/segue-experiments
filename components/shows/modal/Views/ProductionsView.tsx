@@ -7,37 +7,19 @@ import { LoadingOverlay } from 'components/shows/ShowsTable';
 import { getProductionsConvertedPayload } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import applyTransactionToGrid from 'utils/applyTransactionToGrid';
-import UploadModal from 'components/core-ui-lib/UploadModal';
-import { FileDTO } from 'interfaces';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import useComponentMountStatus from 'hooks/useComponentMountStatus';
 import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
-import { all, isArray } from 'radash';
-import ProductionDetailsForm from './ProductionDetailsForm';
-import { uploadFile } from 'requests/upload';
+import { all } from 'radash';
+import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
   onClose: () => void;
 }
-
-const intProduction = {
-  Id: null,
-  ShowId: null,
-  Code: '',
-  ShowName: '',
-  ShowCode: '',
-  IsArchived: false,
-  StartDate: '',
-  EndDate: '',
-  SalesFrequency: 'W',
-  SalesEmail: '',
-  RegionList: [],
-};
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -54,18 +36,8 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const tableRef = useRef(null);
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
-  const [currentProduction, setCurrentProduction] = useState(intProduction);
-  const [isAddRow, setIsAddRow] = useState<boolean>(false);
-  const [rowIndex, setRowIndex] = useState<number | null>(null);
+  const [currentProduction, setCurrentProduction] = useState<ProductionFormData>(defaultProductionFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [uploadModalContext, setUploadModalContext] = useState<any>(false);
-  const [productionUploadMap, setProductionUploadMap] = useState<Record<string, FileDTO>>(() => {
-    return showData.productions.reduce((prodImageMap, production) => {
-      prodImageMap[production.Id] = production.Image;
-      return prodImageMap;
-    }, {});
-  });
-  const [editedOrAddedRecords, setEditedOrAddedRecords] = useState([]);
   const isMounted = useComponentMountStatus();
   const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
 
@@ -76,7 +48,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const addNewRow = () => {
-    setIsAddRow(!isAddRow);
+    setCurrentProduction(defaultProductionFormData);
   };
 
   const [isArchived, setIsArchived] = useState<boolean>(true);
@@ -97,23 +69,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const handleArchive = () => {
     setIsArchived(!isArchived);
   };
-
-  useEffect(() => {
-    if (isAddRow) {
-      applyTransactionToGrid(tableRef, {
-        add: [
-          {
-            ...intProduction,
-            ShowId: showData.Id,
-            ShowName: showData.Name,
-            ShowCode: showData.Code,
-            highlightRow: true,
-          },
-        ],
-        addIndex: 0,
-      });
-    }
-  }, [isAddRow, tableRef]);
 
   function validateShowData(showData) {
     for (const show of showData) {
@@ -139,8 +94,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       gridApi.forEachNode((rowNode) => {
         if (!rowNode.data.Id) {
           newRecords.push(rowNode.data);
-        } else if (editedOrAddedRecords.includes(rowNode.data.Id)) {
-          editedRecords.push(rowNode.data);
         }
       });
       const showData = [...newRecords, ...editedRecords];
@@ -159,81 +112,31 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   };
 
-  const onSave = async (file, onProgress, onError, onUploadingImage) => {
-    const formData = new FormData();
-    formData.append('file', file[0].file);
-    formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
-
-    try {
-      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
-
-      const gridApi = tableRef.current.getApi();
-      const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
-
-      setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response }));
-      setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
-
-      const transaction = {
-        update: [
-          {
-            ...rowDataToUpdate,
-            ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.location}`,
-            Image: response,
-          },
-        ],
-      };
-
-      applyTransactionToGrid(tableRef, transaction);
-    } catch (error) {
-      onError(file[0].file, error.message);
-    }
-  };
-
   const updateCurrentProduction = useCallback(
     async (data) => {
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload(
-          { ...data, Id: currentProduction?.Id, Image: productionUploadMap[data.Id] },
-          true,
-        );
-        await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
+        const payloadData = getProductionsConvertedPayload({ ...data }, true);
+        await axios.put(`/api/productions/update/${currentProduction?.id}`, payloadData);
         notify.success(ToastMessages.updateProductionSuccess);
-        setEditedOrAddedRecords((prev) => prev.filter((id) => id !== data.Id));
-        const excludeUpdatedRecords = editedOrAddedRecords?.filter((id) => id !== data.Id);
-        setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
         notify.error(ToastMessages.updateProductionFailure);
         debug('Error updating production', error);
       } finally {
         setIsLoading(false);
-        setCurrentProduction(intProduction);
+        setCurrentProduction(defaultProductionFormData);
         router.replace(router.asPath);
       }
     },
-    [currentProduction?.Id, editedOrAddedRecords, productionUploadMap, router],
+    [router],
   );
 
   const createNewProduction = useCallback(
     async (data) => {
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload(
-          { ...data, Id: currentProduction?.Id, Image: productionUploadMap[data.Id] },
-          false,
-        );
+        const payloadData = getProductionsConvertedPayload({ ...data }, false);
         await axios.post(`/api/productions/create`, payloadData);
-        const transaction = {
-          update: [
-            {
-              ...data,
-              highlightRow: false,
-            },
-          ],
-        };
-        applyTransactionToGrid(tableRef, transaction);
-        notify.success(ToastMessages.createNewProductionSuccess);
-        setCurrentProduction(intProduction);
         router.replace(router.asPath);
       } catch (error) {
         let errorMessage = ToastMessages.createNewProductionFailure;
@@ -246,37 +149,59 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         setIsLoading(false);
       }
     },
-    [currentProduction?.Id, productionUploadMap, router],
+    [router],
   );
 
-  const handleCellClick = async (e) => {
-    setCurrentProduction(e.data);
-    setRowIndex(e.rowIndex);
+  const updateCurrentProductionState = (data) => {
+    console.log('updateCurrentProductionState', data);
+    const {
+      DateBlock = [],
+      Code,
+      Id,
+      RegionList,
+      SalesFrequency,
+      SalesEmail,
+      IsArchived,
+      ImageUrl,
+      Image,
+      ShowId,
+    } = data;
+    const productionDateBlock = DateBlock.find((d) => d.Name === 'Production');
+    const rehearsalDateBlock = DateBlock.find((d) => d.Name === 'Rehearsal');
+    setCurrentProduction({
+      id: Id,
+      showId: ShowId,
+      prodCode: Code,
+      productionDateBlock,
+      rehearsalDateBlock,
+      region: RegionList,
+      email: SalesEmail,
+      frequency: SalesFrequency,
+      isArchived: IsArchived,
+      imageUrl: ImageUrl,
+      currency: '',
+      company: null,
+      ...(ImageUrl && {
+        image: {
+          id: Image.id,
+          imageUrl: ImageUrl,
+          name: Image.originalFilename,
+        },
+      }),
+    });
+  };
 
+  const handleCellClick = async (e) => {
+    updateCurrentProductionState(e.data);
     if (e.column.colId === 'editId') {
-      // await updateCurrentProduction(e.data);
       setOpenEditModal(true);
-    } else if (e.column.colId === 'ImageUrl') {
-      const { originalFilename: name, id } = e.data.Image || {};
-      setUploadModalContext({
-        value: e.data.Image
-          ? {
-              imageUrl: e.data.ImageUrl,
-              name,
-              id,
-            }
-          : null,
-        visibility: true,
-      });
-      setCurrentProduction(e.data);
     }
   };
 
   const handleCellChanges = (e) => {
     if (e.oldValue === e.newValue) return;
     debug('handleCellChanges', e);
-    setEditedOrAddedRecords((prev) => [...prev, e.data.Id]);
-    setCurrentProduction(e.data);
+    updateCurrentProductionState(e.data);
   };
 
   const handleDelete = async (productionId: number, callback?: () => void) => {
@@ -288,40 +213,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         router.replace(router.asPath);
       }
       notify.success(ToastMessages.deleteProductionSuccess);
-      const gridApi = tableRef.current.getApi();
-      const rowDataToRemove = gridApi.getDisplayedRowAtIndex(rowIndex).data;
-      const transaction = {
-        remove: [rowDataToRemove],
-      };
-      setEditedOrAddedRecords((prev) => prev.filter((id) => id !== rowDataToRemove.Id));
-      applyTransactionToGrid(tableRef, transaction);
     } catch (error) {
       notify.error(ToastMessages.deleteProductionFailure);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const onChange = (selectedFiles) => {
-    if (isArray(selectedFiles) && selectedFiles.length === 0) {
-      const gridApi = tableRef.current.getApi();
-      const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
-      const transaction = {
-        update: [
-          {
-            ...rowDataToUpdate,
-            ImageUrl: '',
-            Image: null,
-          },
-        ],
-      };
-      applyTransactionToGrid(tableRef, transaction);
-      setProductionUploadMap((prev) => {
-        const newMap = { ...prev };
-        newMap[currentProduction.Id] = null;
-        return newMap;
-      });
-      setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
     }
   };
 
@@ -338,7 +233,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
               id=""
               onChange={handleArchive}
             />
-            <Button disabled={isAddRow} onClick={addNewRow} text="Add New Production" />
+            <Button onClick={addNewRow} text="Add New Production" />
           </div>
         </div>
       </div>
@@ -364,23 +259,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           <Button className=" w-33" text="Save and Close" onClick={handleSaveAndClose} />
         </div>
       </div>
-      {uploadModalContext?.visibility && (
-        <UploadModal
-          visible={uploadModalContext?.visibility}
-          title="Production Image"
-          info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
-          allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
-          onClose={() => setUploadModalContext(null)}
-          maxFileSize={500 * 1024} // 500kb
-          onSave={onSave}
-          value={uploadModalContext?.value}
-          onChange={onChange}
-        />
-      )}
       {openEditModal && (
         <ProductionDetailsForm
           production={currentProduction}
-          title={currentProduction?.ShowName || ''}
+          title={showName || ''}
           onClose={() => setOpenEditModal(false)}
           onDelete={handleDelete}
           visible={openEditModal}

@@ -93,10 +93,16 @@ export const getShowsByAccountId = async (AccountId: number) => {
   });
 };
 
-export const getAllProductionCompanyList = () => {
-  return prisma.ProductionCompany.findMany({
+export const getAllProductionCompanyList = async () => {
+  const productionCompanies = await prisma.ProductionCompany.findMany({
     orderBy: {
       Name: 'asc',
     },
   });
+  return productionCompanies.map(({ Id, AccountId, Name, Website }) => ({
+    id: Id,
+    name: Name,
+    accountId: AccountId,
+    website: Website || '',
+  }));
 };

@@ -9,6 +9,18 @@ export type Currency = {
   exchangeRate: number;
 };
 
+export type CurrencyDTO = {
+  Code: number;
+  Name: string;
+  SymbolUnicode: string;
+};
+
+export type UICurrency = {
+  code: number;
+  name: string;
+  symbolUnicode: string;
+};
+
 export type User = {
   UserId: number;
   UserCode: string;

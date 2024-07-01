@@ -1,123 +1,128 @@
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
-import { ConfirmationDialog, Icon, TextInput, Tooltip, UploadModal } from 'components/core-ui-lib';
+import { ConfirmationDialog, Icon, TextInput, TimeInput, Tooltip, UploadModal } from 'components/core-ui-lib';
 import { REGIONS_LIST, SALES_FIG_OPTIONS } from 'config/shows';
-import axios from 'axios';
+import { uploadFile } from 'requests/upload';
+import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
+import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
+import { useRecoilValue } from 'recoil';
+import { currencyListState } from 'state/productions/currencyState';
+import { transformToOptions } from 'utils';
+import { productionCompanyState } from 'state/productions/productionCompanyState';
+import { DateBlockDTO } from 'interfaces';
 
-interface FormDataType {
-  production: number | null;
+export interface ProductionFormData {
+  id: number | null;
   currency: string | null;
   region: string | null;
-  rehearsalToDate: string | null;
-  rehearsalFromDate: string | null;
-  productionToDate: string | null;
-  productionFromDate: string | null;
+  productionDateBlock: DateBlockDTO;
+  rehearsalDateBlock: DateBlockDTO;
   company: string | null;
   email: string | null;
   frequency: string | null;
   isArchived: boolean | null;
   prodCode: string | null;
-  imageUrl?: '';
+  imageUrl?: string;
+  image?: Partial<UploadedFile>;
+  runningTime?: string;
+  runningTimeNotes?: string;
+  showId?: number;
 }
 interface ProductionsViewModalProps {
   visible: boolean;
   title: string;
   production: any;
   onClose: () => void;
-  onSave?: (formData: FormDataType) => void;
+  onSave?: (formData: ProductionFormData) => void;
   onDelete?: (productionId: number, callback?: () => void) => void;
 }
 
-const defaultFormData: FormDataType = {
-  production: null,
+export const defaultProductionFormData: ProductionFormData = {
+  id: null,
   currency: null,
   region: null,
-  rehearsalToDate: null,
-  rehearsalFromDate: null,
-  productionToDate: null,
-  productionFromDate: null,
+  productionDateBlock: null,
+  rehearsalDateBlock: null,
   company: null,
   email: null,
   frequency: null,
   isArchived: null,
   prodCode: null,
   imageUrl: '',
+  image: null,
+  runningTime: '',
+  runningTimeNotes: '',
 };
-const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: ProductionsViewModalProps) => {
+const ProductionDetailsForm = ({
+  visible,
+  onClose,
+  title,
+  onSave,
+  onDelete,
+  production,
+}: ProductionsViewModalProps) => {
+  const currencyList = useRecoilValue(currencyListState);
+  const productionCompanyList = useRecoilValue(productionCompanyState);
   const [confirm, setConfirm] = useState<boolean>(false);
-  const [formData, setFormData] = useState(defaultFormData);
+  const [formData, setFormData] = useState(production || defaultProductionFormData);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const currencyListOptions = useMemo(() => transformToOptions(currencyList, 'name', 'code'), [currencyList]);
+  const productionCompanyOptions = useMemo(
+    () => transformToOptions(productionCompanyList, 'name', 'id'),
+    [productionCompanyList],
+  );
   const {
-    production,
+    id,
     currency,
     region,
-    rehearsalToDate,
-    rehearsalFromDate,
-    productionToDate,
-    productionFromDate,
+    productionDateBlock,
+    rehearsalDateBlock,
     company,
     email,
     frequency,
     isArchived,
     prodCode,
     imageUrl,
+    image,
+    runningTime,
+    runningTimeNotes,
   } = formData;
 
-  const currencyOptions = [];
-  const companyOptions = [];
-  const onChange = useCallback((key: string, value: string | number) => {
+  const onChange = useCallback((key: string, value: string | number | DateBlockDTO) => {
     setFormData((data) => ({ ...data, [key]: value }));
   }, []);
 
-  const onSaveUpload = (file, onProgress, onError, onUploadingImage) => {
+  const onSaveUpload = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', `images/production${production ? '/' + production : ''}`);
-
-    let progress = 0; // to track overall progress
-    let slowProgressInterval; // interval for slow progress simulation
-
-    axios
-      .post('/api/upload', formData, {
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          if (percentCompleted <= 50) {
-            progress = percentCompleted;
-          } else if (percentCompleted === 100) {
-            progress = 50;
-            clearInterval(slowProgressInterval);
-            slowProgressInterval = setInterval(() => {
-              if (progress < 95) {
-                progress += 0.5;
-                onProgress(file[0].file, progress);
-              } else {
-                clearInterval(slowProgressInterval);
-              }
-            }, 100);
-          }
-
-          onProgress(file[0].file, progress);
-        },
-      }) // eslint-disable-next-line
-      .then((response: any) => {
-        progress = 100;
-        onProgress(file[0].file, progress);
-        onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
-        clearInterval(slowProgressInterval);
-      }) // eslint-disable-next-line
-      .catch((error) => {
-        onError(file[0].file, 'Error uploading file. Please try again.');
-        clearInterval(slowProgressInterval);
-      });
+    formData.append('path', `images/production${id ? '/' + id : ''}`);
+    try {
+      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
+      const { id, originalFilename, location } = response || {};
+      const imageUrl = `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${location}`;
+      setFormData((prev) => ({
+        ...prev,
+        ImageUrl: imageUrl,
+        Image: { id, imageUrl, name: originalFilename, size: null } as UploadedFile,
+      }));
+    } catch (error) {
+      onError(file[0].file, error.message);
+    }
   };
 
   const onConfirmDelete = () => {
-    onDelete(production, () => setConfirm(false));
+    onDelete(id, () => setConfirm(false));
+  };
+
+  const onFileUploadChange = (selectedFiles) => {
+    if (Array.isArray(selectedFiles) && selectedFiles.length === 0) {
+      setFormData((prev) => ({ ...prev, ImageUrl: '' }));
+    }
   };
 
   return (
@@ -136,7 +141,7 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
               onClick={() => setIsUploadOpen(true)}
             >
               {imageUrl ? (
-                <img className="h-10 w-14 pb-2" src={imageUrl} />
+                <img className="h-full w-full pb-2" src={imageUrl} />
               ) : (
                 <Icon iconName="camera-solid" variant="2xl" />
               )}
@@ -163,11 +168,11 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
             title="Production Image"
             info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
             allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
-            onClose={() => {
-              setIsUploadOpen(false);
-            }}
+            onClose={() => setIsUploadOpen(false)}
             onSave={onSaveUpload}
             maxFileSize={500 * 1024} // 500kb
+            onChange={onFileUploadChange}
+            value={image}
           />
         )}
 
@@ -177,12 +182,13 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
             className="w-fit"
             label="Date"
             onChange={({ from, to }) => {
-              onChange('rehearsalFromDate', from?.toISOString() || '');
-              onChange('rehearsalToDate', !rehearsalToDate && !to ? from?.toISOString() : to?.toISOString() || '');
+              const StartDate = from?.toISOString() || '';
+              const EndDate = !rehearsalDateBlock?.EndDate && !to ? from?.toISOString() : to?.toISOString() || '';
+              onChange('rehearsalDateBlock', { ...rehearsalDateBlock, StartDate, EndDate });
             }}
             value={{
-              from: rehearsalFromDate ? new Date(rehearsalFromDate) : null,
-              to: rehearsalToDate ? new Date(rehearsalToDate) : null,
+              from: rehearsalDateBlock?.StartDate ? new Date(rehearsalDateBlock?.StartDate) : null,
+              to: rehearsalDateBlock?.EndDate ? new Date(rehearsalDateBlock?.EndDate) : null,
             }}
           />
         </div>
@@ -192,12 +198,13 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
             className="w-fit"
             label="Date"
             onChange={({ from, to }) => {
-              onChange('productionFromDate', from?.toISOString() || '');
-              onChange('productionToDate', !productionToDate && !to ? from?.toISOString() : to?.toISOString() || '');
+              const StartDate = from?.toISOString() || '';
+              const EndDate = !productionDateBlock?.EndDate && !to ? from?.toISOString() : to?.toISOString() || '';
+              onChange('productionDateBlock', { ...productionDateBlock, StartDate, EndDate });
             }}
             value={{
-              from: productionFromDate ? new Date(productionFromDate) : null,
-              to: productionToDate ? new Date(productionToDate) : null,
+              from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
+              to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
             }}
           />
         </div>
@@ -211,25 +218,25 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
             options={REGIONS_LIST}
             value={region}
             isMulti={true}
+            renderOption={(option) => <CustomOption option={option} isMulti={true} />}
           />
         </div>
         <div className="flex items-center gap-6">
           <Label text="Currency for Reports" />
           <Select
-            className="w-[150px]"
+            className="w-64"
             onChange={(value) => onChange('currency', value as string)}
-            options={currencyOptions}
+            options={currencyListOptions}
             value={currency}
-            isMulti={true}
           />
         </div>
         <div className="flex items-center gap-[87px]">
-          <Label required text="Company" />
+          <Label text="Company" />
           <Select
             className="w-full"
             placeholder="Select Production Company"
             onChange={(value) => onChange('company', value as string)}
-            options={companyOptions}
+            options={productionCompanyOptions}
             value={company}
           />
         </div>
@@ -252,14 +259,33 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
             options={SALES_FIG_OPTIONS}
             value={frequency}
           />
-          <div className="flex items-center ml-1 float-end">
-            <Checkbox
-              id="isArchived"
-              label="Archived"
-              checked={isArchived}
-              onChange={(e) => onChange('isArchived', e.target.checked)}
-            />
-          </div>
+        </div>
+        <div className="flex items-center gap-[120px]">
+          <Label text="Running Time" />
+          <TimeInput
+            className="w-28 placeholder-primary"
+            onChange={({ hrs, min }) => onChange('runningTime', `${hrs || 0}:${min || 0}`)}
+            value={runningTime}
+          />
+        </div>
+        <div className="flex items-center gap-[85px]">
+          <Label text="Running Time Notes" />
+          <TextInput
+            id="runningTimeNotes"
+            className="w-[320px] placeholder-primary"
+            placeholder="Running Time Notes..."
+            type="string"
+            onChange={(e) => onChange('runningTimeNotes', e.target.value)}
+            value={runningTimeNotes}
+          />
+        </div>
+        <div className="flex items-center ml-1 float-end justify-end">
+          <Checkbox
+            id="isArchived"
+            label="Archived"
+            checked={isArchived}
+            onChange={(e) => onChange('isArchived', e.target.checked)}
+          />
         </div>
 
         <div className="pt-3 w-full flex items-center justify-end gap-2">
@@ -290,4 +316,4 @@ const ProductionsViewModal = ({ visible, onClose, title, onSave, onDelete }: Pro
   );
 };
 
-export default ProductionsViewModal;
+export default ProductionDetailsForm;
