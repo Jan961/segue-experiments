@@ -17,6 +17,14 @@ import { Table } from 'components/core-ui-lib';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete';
 
+interface Venue extends VenueDTO {
+  date: Date;
+}
+
+export interface GlobalActivity extends GlobalActivityDTO {
+  VenueIds: Array<number>;
+}
+
 const titleOptions = {
   add: 'Add New Global Actvity',
   edit: 'Edit Global Activity',
@@ -31,8 +39,8 @@ interface ActivityModalProps {
   activityTypes: Array<SelectOption>;
   productionCurrency?: string;
   productionId: number;
-  data?: GlobalActivityDTO;
-  venues: Array<VenueDTO>;
+  data?: GlobalActivity;
+  venues: Array<Venue>;
   tourWeeks: Array<SelectOption>;
 }
 
@@ -54,7 +62,7 @@ export default function GlobalActivityModal({
   const [actDate, setActDate] = useState<Date>();
   const [actFollowUp, setActFollowUp] = useState<boolean>(false);
   const [followUpDt, setFollowUpDt] = useState<Date>();
-  const [cost, setCost] = useState<string>();
+  const [cost, setCost] = useState<string>('');
   const [actNotes, setActNotes] = useState<string>();
   const [actId, setActId] = useState(null);
   const [error, setError] = useState<boolean>(false);
@@ -64,16 +72,26 @@ export default function GlobalActivityModal({
   const [selectedList, setSelectedList] = useState([]);
 
   const venueList = useMemo(() => {
-    const tempVenueList = venues.map((venue, index) => {
-      return {
-        ...venue,
-        selected: selectedList.findIndex((item) => item === index) !== -1,
-      };
-    });
+    let tempVenueList;
+    if (venues === undefined || selectedList === undefined) {
+      tempVenueList = venues.map((venue) => {
+        return {
+          ...venue,
+          selected: false,
+        };
+      });
+    } else {
+      tempVenueList = venues.map((venue) => {
+        return {
+          ...venue,
+          selected: selectedList?.findIndex((item) => item === venue.Id) !== -1,
+        };
+      });
+    }
 
-    console.log(tempVenueList);
+    const sortedVenues = tempVenueList.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-    return tempVenueList;
+    return sortedVenues;
   }, [venues, selectedList]);
 
   const initForm = () => {
@@ -87,7 +105,7 @@ export default function GlobalActivityModal({
         };
       });
 
-    setVenueColDefs(gloablModalVenueColDefs(dropList, selectVenue)); // multiVenueSelect))
+    setVenueColDefs(gloablModalVenueColDefs(dropList, selectVenue, multiVenueSelect));
 
     if (variant === 'add') {
       setActName('');
@@ -96,6 +114,7 @@ export default function GlobalActivityModal({
       setActFollowUp(false);
       setFollowUpDt(null);
       setActNotes('');
+      setCost('');
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
@@ -105,23 +124,45 @@ export default function GlobalActivityModal({
       setCost(data.Cost.toString());
       setActNotes(data.Notes);
       setActId(data.Id);
+      setSelectedList(data.VenueIds === null ? [] : data.VenueIds);
     }
   };
 
-  const selectVenue = (index, value) => {
-    console.log(value);
-    setSelectedList((prevSelectedList) => {
-      if (prevSelectedList.includes(index)) {
-        return prevSelectedList.filter((i) => i !== index);
+  const selectVenue = (data, value) => {
+    // if top checkbox is clicked
+    if (data.Id === 0) {
+      // if checked select all
+      if (value) {
+        const allIds = venueList.map((venue) => venue.Id);
+        allIds.push(0);
+        setSelectedList(allIds);
       } else {
-        return [...prevSelectedList, index];
+        // else unchecked unselect all
+        setSelectedList([]);
       }
-    });
+    } else {
+      setSelectedList((prevSelectedList) => {
+        if (prevSelectedList.includes(data.Id) && !value) {
+          return prevSelectedList.filter((i) => i !== data.Id);
+        } else {
+          return [...prevSelectedList, data.Id];
+        }
+      });
+    }
   };
 
-  // const multiVenueSelect = (value) => {
-  //   console.log(value);
-  // }
+  const multiVenueSelect = (value) => {
+    setSelectedList([]);
+    const compareToEpoch = new Date(value).getTime();
+    const tempSelectedIndexList = [];
+    venueList.forEach((venue) => {
+      if (new Date(venue.date).getTime() >= compareToEpoch) {
+        tempSelectedIndexList.push(venue.Id);
+      }
+    });
+
+    setSelectedList((prevSelectedList) => [...prevSelectedList, ...tempSelectedIndexList]);
+  };
 
   const handleSave = () => {
     // display error if the activity type is not selected
@@ -130,7 +171,7 @@ export default function GlobalActivityModal({
       return;
     }
 
-    let data: GlobalActivityDTO = {
+    let data: GlobalActivity = {
       ActivityTypeId: actType,
       Cost: parseFloat(cost),
       Date: startOfDay(new Date(actDate)),
@@ -139,6 +180,7 @@ export default function GlobalActivityModal({
       Notes: actNotes,
       DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
       ProductionId: productionId,
+      VenueIds: selectedList,
     };
 
     // only add iD if not adding
@@ -171,7 +213,7 @@ export default function GlobalActivityModal({
   const handleConfirm = (type: ConfDialogVariant) => {
     // only check if variant is edit
     if (variant === 'edit') {
-      const changedRow: GlobalActivityDTO = {
+      const changedRow: GlobalActivity = {
         ActivityTypeId: actType,
         ProductionId: productionId,
         Cost: parseFloat(cost),
@@ -180,6 +222,7 @@ export default function GlobalActivityModal({
         Name: actName,
         Notes: actNotes,
         DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
+        VenueIds: selectedList,
       };
 
       if (hasGlobalActivityChanged(data, changedRow)) {
@@ -193,14 +236,9 @@ export default function GlobalActivityModal({
     }
   };
 
-  // const handleCellClicked = (e) => {
-  //   if(typeof e.column === 'object' && e.column.colId === 'select'){
-
-  //   }
-  // }
-
   useEffect(() => {
     setVisible(show);
+    setSelectedList([]);
     initForm();
   }, [show]);
 
@@ -293,7 +331,7 @@ export default function GlobalActivityModal({
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
-            className="mt-2 h-[162px] w-full"
+            className="mt-2 w-full h-auto"
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
@@ -301,13 +339,7 @@ export default function GlobalActivityModal({
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
-              <Table
-                columnDefs={venueColDefs}
-                rowData={venueList}
-                styleProps={styleProps}
-                tableHeight={600}
-                // onCellClicked={handleCellClicked}
-              />
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
             </div>
           </div>
 

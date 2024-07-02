@@ -86,9 +86,6 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     cellRendererParams: {
       truncate: false,
     },
-    cellStyle: {
-      marginTop: '5px',
-    },
     width: 320,
   },
   {
@@ -429,6 +426,20 @@ export const updateWarningColDefs = (type) => {
 
 export const globalActivityColDefs = (updateActivity, currencySymbol) => [
   {
+    headerName: 'Id',
+    field: 'id',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Venue Ids',
+    field: 'venueIds',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: false,
+  },
+  {
     headerName: 'Activity Name',
     field: 'actName',
     cellRenderer: DefaultCellRenderer,
@@ -471,7 +482,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Cost',
     field: 'cost',
     cellRenderer: (params) => {
-      return currencySymbol + params.data.cost.toFixed(2);
+      return `${currencySymbol === undefined ? '' : currencySymbol}${params.data.cost.toFixed(2)}`;
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -523,16 +534,15 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
   },
 ];
 
-export const gloablModalVenueColDefs = (weekList, selectVenue) => [
-  //, multiSelect) => [
+export const gloablModalVenueColDefs = (weekList, selectVenue, selectMultiVenue) => [
   {
     headerName: '',
     field: 'checked',
     cellRenderer: CheckboxRenderer,
     cellRendererParams: (params) => {
       return {
-        onChange: (checked) => selectVenue(params.node.rowIndex, checked),
-        checked: params.node.rowIndex === 0 ? false : params.data.selected,
+        onChange: (checked) => selectVenue(params.data, checked),
+        checked: params.data.selected,
       };
     },
     width: 50,
@@ -542,6 +552,7 @@ export const gloablModalVenueColDefs = (weekList, selectVenue) => [
       justifyContent: 'center',
       paddingTop: '1rem',
     },
+    sortable: false,
   },
   {
     headerName: 'Venue',
@@ -550,8 +561,12 @@ export const gloablModalVenueColDefs = (weekList, selectVenue) => [
     cellRendererParams: {
       truncate: false,
     },
+    cellStyle: {
+      marginTop: '5px',
+    },
     width: 285,
     resizable: false,
+    sortable: false,
   },
   {
     headerName: '',
@@ -561,7 +576,7 @@ export const gloablModalVenueColDefs = (weekList, selectVenue) => [
       return {
         options: weekList,
         hidden: params.node.rowIndex !== 0,
-        onChange: (value) => alert(value),
+        onChange: (value) => selectMultiVenue(value),
       };
     },
     width: 100,
@@ -570,5 +585,6 @@ export const gloablModalVenueColDefs = (weekList, selectVenue) => [
       textAlign: 'center',
       overflow: 'visible',
     },
+    sortable: false,
   },
 ];

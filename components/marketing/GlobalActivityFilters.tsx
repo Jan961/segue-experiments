@@ -35,6 +35,13 @@ const GlobalActivityFilters = () => {
     getCurrency(10);
   }, [productionId]);
 
+  // Ensuring the currency is set on initial component mount
+  useEffect(() => {
+    if (!productionId) {
+      getCurrency(10);
+    }
+  }, []);
+
   return (
     <div>
       <div className="w-full flex justify-between flex-row">

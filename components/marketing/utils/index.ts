@@ -1,4 +1,6 @@
-import { ActivityDTO, BookingContactNoteDTO, GlobalActivityDTO } from 'interfaces';
+import { ActivityDTO, BookingContactNoteDTO } from 'interfaces';
+import { GlobalActivity } from '../modal/GlobalActivityModal';
+import { hasIntArrayChanged } from 'utils/hasIntArrayChanged';
 
 export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: ActivityDTO): boolean => {
   // List all keys to be compared
@@ -86,9 +88,9 @@ export const reverseDate = (inputDt: string) => {
   return date;
 };
 
-export const hasGlobalActivityChanged = (oldActivity: GlobalActivityDTO, newActivity: GlobalActivityDTO): boolean => {
+export const hasGlobalActivityChanged = (oldActivity: GlobalActivity, newActivity: GlobalActivity): boolean => {
   // List all keys to be compared
-  const keys = Object.keys(oldActivity) as Array<keyof GlobalActivityDTO>;
+  const keys = Object.keys(oldActivity) as Array<keyof GlobalActivity>;
 
   for (const key of keys) {
     // if Id skip - we can assume the Id will be the same
@@ -100,6 +102,10 @@ export const hasGlobalActivityChanged = (oldActivity: GlobalActivityDTO, newActi
     if (key === 'Date' || key === 'DueByDate') {
       // check for change
       if (new Date(oldActivity[key]).getTime() !== new Date(newActivity[key]).getTime()) {
+        return true;
+      }
+    } else if (key === 'VenueIds') {
+      if (hasIntArrayChanged(oldActivity[key], newActivity[key])) {
         return true;
       }
       // else any other field

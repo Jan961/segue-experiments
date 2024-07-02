@@ -7,12 +7,13 @@ import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { GlobalActivityDTO } from 'interfaces';
 import { globalActivityColDefs, styleProps } from '../table/tableConfig';
-import GlobalActivityModal, { ActivityModalVariant } from '../modal/GlobalActivityModal';
+import GlobalActivityModal, { ActivityModalVariant, GlobalActivity } from '../modal/GlobalActivityModal';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import { startOfDay } from 'date-fns';
 
 type GlobalActivitiesResponse = {
-  activities: GlobalActivityDTO[];
+  activities: GlobalActivity[];
   activityTypes: Array<SelectOption>;
 };
 
@@ -50,7 +51,7 @@ const Global = () => {
       });
 
       venues.unshift({
-        Name: 'All Venues including and thereafter week',
+        Name: 'Charge to this and all future weeks',
         selected: false,
         Code: 'SELECT',
         Id: 0,
@@ -80,24 +81,13 @@ const Global = () => {
     setShowGlobalActivityModal(true);
   };
 
-  const updateGlobalActivity = async (type: string, data: any) => {
+  const updateGlobalActivity = async (type: string, data: GlobalActivityDTO) => {
     if (type === 'add') {
       try {
-        const inputData: GlobalActivityDTO = {
-          ActivityTypeId: data.ActivityTypeId,
-          Cost: data.Cost,
-          Date: new Date(data.Date),
-          FollowUpRequired: data.FollowUpRequired,
-          Name: data.Name,
-          Notes: data.Notes,
-          ProductionId: data.ProductionId,
-          DueByDate: data.DueByDate,
-        };
-
         await fetchData({
           url: '/api/marketing/globalActivities/create',
           method: 'POST',
-          data: inputData,
+          data,
         });
 
         const tableRow = {
@@ -115,6 +105,28 @@ const Global = () => {
       } catch (error) {
         console.log(error);
       }
+    } else if (type === 'edit') {
+      await fetchData({
+        url: '/api/marketing/globalActivities/update',
+        method: 'POST',
+        data,
+      });
+
+      const updatedRow = {
+        actName: data.Name,
+        actType: activityTypes.find((type) => type.value === data.ActivityTypeId).text,
+        actDate: data.Date,
+        followUpCheck: data.FollowUpRequired,
+        cost: data.Cost,
+        notes: data.Notes,
+        followUpDt: data.DueByDate,
+      };
+
+      const rowIndex = rowData.findIndex((act) => act.id === data.Id);
+      const newRows = [...rowData];
+      newRows[rowIndex] = updatedRow;
+
+      setShowGlobalActivityModal(false);
     }
   };
 
@@ -126,16 +138,17 @@ const Global = () => {
 
     if (typeof actTypeResponse === 'object') {
       const globalActivities = actTypeResponse as GlobalActivitiesResponse;
-
       const tempRow = {
         Name: data.actName,
         ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
         Cost: data.cost,
-        Date: new Date(data.actDate),
+        Date: startOfDay(data.actDate),
         FollowUpRequired: data.followUpCheck,
         Notes: data.notes,
         ProductionId: productionId,
-        DueByDate: data.followUpDt,
+        DueByDate: data.followUpCheck ? data.followUpDt : null,
+        VenueIds: data.venueIds,
+        Id: data.id,
       };
 
       setActRow(tempRow);
@@ -156,8 +169,8 @@ const Global = () => {
         const globalActivities = data as GlobalActivitiesResponse;
 
         setActivityTypes(globalActivities.activityTypes);
-
         setColDefs(globalActivityColDefs(toggleModal, currency.symbol));
+
         const globalRows = globalActivities.activities.map((activity) => {
           return {
             actName: activity.Name,
@@ -167,6 +180,8 @@ const Global = () => {
             cost: activity.Cost,
             notes: activity.Notes,
             followUpDt: activity.DueByDate,
+            venueIds: activity.VenueIds,
+            id: activity.Id,
           };
         });
 

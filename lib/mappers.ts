@@ -59,7 +59,7 @@ We also have full control of types here so we can get type safety to child objec
 */
 
 // This is so we can change the implimentation if needed. We had some issues with timezone.
-const convertDate = (date: Date) => {
+export const convertDate = (date: Date) => {
   if (date) return toISO(date);
   return '';
 };
@@ -222,7 +222,7 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
   DueByDate: convertDate(a.DueByDate),
-  Notes: a.ActivityNotes,
+  Notes: a.Notes,
 });
 
 export const globalActivityMapper = (a: GlobalBookingActivity): GlobalActivityDTO => ({
