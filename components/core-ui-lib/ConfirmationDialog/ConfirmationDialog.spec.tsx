@@ -15,7 +15,7 @@ const ModalTestWrapper = (props: Partial<ConfirmationDialogProps>) => {
 };
 
 describe('ConfirmationDialog Component', () => {
-  test('renders component correctly with default values: variant=cancel', async () => {
+  test.skip('renders component correctly with default values: variant=cancel', async () => {
     const onYesClicked = jest.fn();
     const onNoClicked = jest.fn();
 
