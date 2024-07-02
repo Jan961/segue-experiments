@@ -31,7 +31,7 @@ describe('Tabs Component', () => {
     });
   });
 
-  it.skip('does not call onChange when tabs are disabled', async () => {
+  it('does not call onChange when tabs are disabled', async () => {
     render(
       <Tabs tabs={mockTabs} onChange={mockOnChange} disabled={true}>
         <div key="1">Content 1</div>
