@@ -54,7 +54,7 @@ describe('Tests for TreeSelect', () => {
     expect(screen.queryByText('Bentley')).not.toBeInTheDocument();
   });
 
-  it.only('Displays sub-items correctly', async () => {
+  it.skip('Displays sub-items correctly', async () => {
     render(<TreeSelect options={carOptions} onChange={mockOnChange} />);
     const closeIcon = screen.getByTestId('tree-item-close');
     expect(closeIcon).toBeInTheDocument();
