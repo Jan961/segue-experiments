@@ -12,7 +12,7 @@ export const getProductionsConvertedPayload = (production) => {
     rehearsalDateBlock,
     productionDateBlock,
     runningTime,
-    runningNotes,
+    runningTimeNote,
     currency,
   } = production;
   return {
@@ -23,7 +23,7 @@ export const getProductionsConvertedPayload = (production) => {
     image,
     company,
     runningTime,
-    runningNotes,
+    runningTimeNote,
     currency,
     salesEmail: email,
     salesFrequency: frequency,

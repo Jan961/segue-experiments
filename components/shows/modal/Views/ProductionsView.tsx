@@ -3,7 +3,6 @@ import { styleProps } from 'components/bookings/table/tableConfig';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
-import { LoadingOverlay } from 'components/shows/ShowsTable';
 import { getProductionsConvertedPayload } from 'components/shows/constants';
 import { productionsTableConfig } from 'components/shows/table/tableConfig';
 import { useRouter } from 'next/router';
@@ -15,6 +14,8 @@ import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
 import { all } from 'radash';
 import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
+
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -38,6 +39,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
   const [currentProduction, setCurrentProduction] = useState<ProductionFormData>(defaultProductionFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
   const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
 
@@ -48,10 +50,9 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const addNewRow = () => {
+    setOpenEditModal(true);
     setCurrentProduction(defaultProductionFormData);
   };
-
-  const [isArchived, setIsArchived] = useState<boolean>(true);
 
   const unArchivedList = useMemo(() => {
     return sortByProductionStartDate(showData.productions.filter((item) => !item.IsArchived && !item.IsDeleted));
@@ -82,7 +83,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         return false;
       }
     }
-
     return true;
   }
 
@@ -113,44 +113,59 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const updateCurrentProduction = useCallback(
-    async (data) => {
+    async (data: ProductionFormData, cb?: () => void) => {
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload({ ...data }, true);
+        const payloadData = getProductionsConvertedPayload(data);
         await axios.put(`/api/productions/update/${currentProduction?.id}`, payloadData);
+        cb?.();
         notify.success(ToastMessages.updateProductionSuccess);
       } catch (error) {
         notify.error(ToastMessages.updateProductionFailure);
-        debug('Error updating production', error);
+        debug('Error updating production', error, data);
       } finally {
         setIsLoading(false);
         setCurrentProduction(defaultProductionFormData);
         router.replace(router.asPath);
       }
     },
-    [router],
+    [router, currentProduction],
   );
 
   const createNewProduction = useCallback(
-    async (data) => {
+    async (data: ProductionFormData, cb?: () => void) => {
       setIsLoading(true);
       try {
-        const payloadData = getProductionsConvertedPayload({ ...data }, false);
-        await axios.post(`/api/productions/create`, payloadData);
+        const payloadData = getProductionsConvertedPayload(data);
+        await axios.post(`/api/productions/create`, { ...payloadData, showId: showData?.Id });
+        cb?.();
         router.replace(router.asPath);
       } catch (error) {
         let errorMessage = ToastMessages.createNewProductionFailure;
         if (error?.response?.status === 409) {
-          errorMessage = `ProdCode: ${data.Code} already exists. Please try with different ProdCode`;
+          errorMessage = `ProdCode: ${data.prodCode} already exists. Please try with different ProdCode`;
         }
         notify.error(errorMessage);
-        debug('Error creating production', error);
+        debug('Error creating production', error, data);
       } finally {
         setIsLoading(false);
       }
     },
     [router],
   );
+
+  const onSaveProduction = (production: ProductionFormData, cb?: () => void) => {
+    const mandatoryFieldsValidation: boolean = validateShowData(showData);
+    if (!mandatoryFieldsValidation) {
+      notify.warning(ToastMessages.requiredFieldsWarning);
+      return;
+    }
+    if (production?.id) {
+      updateCurrentProduction(production, cb);
+    } else {
+      createNewProduction(production, cb);
+    }
+  };
 
   const updateCurrentProductionState = (data) => {
     console.log('updateCurrentProductionState', data);
@@ -165,6 +180,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       ImageUrl,
       Image,
       ShowId,
+      ReportCurrencyCode,
+      RunningTime,
+      RunningTimeNote,
+      ProdCoId,
     } = data;
     const productionDateBlock = DateBlock.find((d) => d.Name === 'Production');
     const rehearsalDateBlock = DateBlock.find((d) => d.Name === 'Rehearsal');
@@ -179,8 +198,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       frequency: SalesFrequency,
       isArchived: IsArchived,
       imageUrl: ImageUrl,
-      currency: '',
-      company: null,
+      currency: ReportCurrencyCode,
+      company: ProdCoId,
+      runningTime: RunningTime,
+      runningTimeNote: RunningTimeNote,
       ...(ImageUrl && {
         image: {
           id: Image.id,
@@ -263,9 +284,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         <ProductionDetailsForm
           production={currentProduction}
           title={showName || ''}
-          onClose={() => setOpenEditModal(false)}
           onDelete={handleDelete}
           visible={openEditModal}
+          onSave={onSaveProduction}
+          onClose={() => setOpenEditModal(false)}
         />
       )}
     </>

@@ -31,9 +31,9 @@ import axios from 'axios';
 import { defaultDemoCall, filterCurrencyNum, filterPercentage, filterPrice, filterTechProvision } from '../utils';
 import { DealMemoTechProvision } from '@prisma/client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { LoadingOverlay } from 'components/shows/ShowsTable';
 import { formattedDateWithDay } from 'services/dateService';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 export const EditDealMemoContractModal = ({
   visible,

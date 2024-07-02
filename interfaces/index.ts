@@ -9,10 +9,23 @@ export type Currency = {
   exchangeRate: number;
 };
 
+export type CountryInRegion = {
+  CountryId: number;
+  RegionId: number;
+};
+
+export type CountryDTO = {
+  Id: number;
+  Name: string;
+  Code: string;
+  CurrencyCode?: string;
+};
+
 export type CurrencyDTO = {
-  Code: number;
+  Code: string;
   Name: string;
   SymbolUnicode: string;
+  CountryList: CountryDTO[];
 };
 
 export type UICurrency = {
@@ -201,6 +214,14 @@ export interface FileDTO {
   imageUrl?: string;
 }
 
+export type ConversionRateDTO = {
+  Id: number;
+  FromCurrencyCode: string;
+  ToCurrencyCode: string;
+  Rate: number;
+  ProductionId: number;
+};
+
 export type ProductionDTO = {
   Id?: number;
   ShowId: number;
@@ -218,6 +239,11 @@ export type ProductionDTO = {
   ImageUrl?: string;
   Image?: Partial<FileDTO>;
   ShowRegionId?: number;
+  ReportCurrencyCode?: string;
+  RunningTime?: string;
+  RunningTimeNote?: string;
+  ProdCoId?: number;
+  ConversionRateList?: ConversionRateDTO[];
 };
 
 export type VenueMinimalDTO = {

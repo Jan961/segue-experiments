@@ -13,6 +13,38 @@ const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
   DateBlock: true,
   ProductionRegion: true,
   File: true,
+  ConversionRate: {
+    include: {
+      Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency: {
+        include: {
+          Country: {
+            include: {
+              CountryInRegion: {
+                include: {
+                  Country: true,
+                  Region: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      Currency_ConversionRate_ConversionToCurrencyCodeToCurrency: {
+        include: {
+          Country: {
+            include: {
+              CountryInRegion: {
+                include: {
+                  Country: true,
+                  Region: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 });
 
 export const getActiveProductions = async (accountId: number) => {

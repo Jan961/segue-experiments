@@ -12,6 +12,9 @@ import {
   ProductionTask,
   User,
   File,
+  ConversionRate,
+  Currency,
+  Country,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -34,11 +37,14 @@ import {
   ContractStatusType,
   FileDTO,
   ContractBookingStatusType,
+  ConversionRateDTO,
+  CurrencyDTO,
+  CountryDTO,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
-import { toISO } from 'services/dateService';
+import { dateTimeToTime, toISO } from 'services/dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
 
 /*
@@ -77,6 +83,7 @@ export const showMapper = (show: Show): ShowDTO => ({
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
+  // console.table(s.Production);
   return s.Production.map(productionEditorMapper);
 };
 
@@ -179,6 +186,20 @@ export const FileMapper = (file: File & { ImageUrl?: string }): FileDTO => ({
   uploadDateTime: file.UploadDateTime.toISOString(),
 });
 
+export const countryMapper = (c: Country): CountryDTO => ({
+  ...c,
+});
+
+export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => ({
+  ...c,
+  CountryList: c.Country.map(countryMapper),
+});
+
+export const conversionRateMapper = (c: ConversionRate): ConversionRateDTO => ({
+  ...c,
+  Rate: c.Rate?.toNumber?.(),
+});
+
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
   Id: t.Id,
   ShowId: t.Show.Id,
@@ -190,9 +211,14 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   SalesEmail: t.SalesEmail,
   IsDeleted: t.IsDeleted,
   SalesFrequency: t.SalesFrequency,
+  RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
+  RunningTimeNote: t.RunningTimeNote,
+  ReportCurrencyCode: t.ReportCurrencyCode,
+  ProdCoId: t.ProdCoId,
   RegionList: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
   ImageUrl: t?.File?.Location ? getFileUrlFromLocation(t.File.Location) : null,
   Image: t?.File ? FileMapper(t?.File) : null,
+  ConversionRateList: t?.ConversionRate?.map(conversionRateMapper) || [],
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({

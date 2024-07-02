@@ -5,8 +5,8 @@ import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
-import { ConfirmationDialog, Icon, TextInput, TimeInput, Tooltip, UploadModal } from 'components/core-ui-lib';
-import { REGIONS_LIST, SALES_FIG_OPTIONS } from 'config/shows';
+import { ConfirmationDialog, Icon, TextInput, TimeInput, Tooltip, UploadModal, notify } from 'components/core-ui-lib';
+import { REGIONS_LIST, SALES_FIG_OPTIONS, ToastMessages } from 'config/shows';
 import { uploadFile } from 'requests/upload';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
@@ -15,22 +15,24 @@ import { currencyListState } from 'state/productions/currencyState';
 import { transformToOptions } from 'utils';
 import { productionCompanyState } from 'state/productions/productionCompanyState';
 import { DateBlockDTO } from 'interfaces';
+import { productionFormSchema } from './schema';
+import { debug } from 'utils/logging';
 
 export interface ProductionFormData {
-  id: number | null;
-  currency: string | null;
-  region: string | null;
+  id?: number;
+  currency: string;
+  region: number[];
   productionDateBlock: DateBlockDTO;
   rehearsalDateBlock: DateBlockDTO;
-  company: string | null;
-  email: string | null;
-  frequency: string | null;
-  isArchived: boolean | null;
-  prodCode: string | null;
+  company: number;
+  email?: string;
+  frequency?: string;
+  isArchived?: boolean;
+  prodCode: string;
   imageUrl?: string;
   image?: Partial<UploadedFile>;
   runningTime?: string;
-  runningTimeNotes?: string;
+  runningTimeNote?: string;
   showId?: number;
 }
 interface ProductionsViewModalProps {
@@ -38,25 +40,25 @@ interface ProductionsViewModalProps {
   title: string;
   production: any;
   onClose: () => void;
-  onSave?: (formData: ProductionFormData) => void;
+  onSave?: (formData: ProductionFormData, callback?: () => void) => void;
   onDelete?: (productionId: number, callback?: () => void) => void;
 }
 
 export const defaultProductionFormData: ProductionFormData = {
   id: null,
   currency: null,
-  region: null,
+  region: [],
   productionDateBlock: null,
   rehearsalDateBlock: null,
   company: null,
   email: null,
-  frequency: null,
+  frequency: 'W',
   isArchived: null,
   prodCode: null,
   imageUrl: '',
   image: null,
   runningTime: '',
-  runningTimeNotes: '',
+  runningTimeNote: '',
 };
 const ProductionDetailsForm = ({
   visible,
@@ -71,6 +73,7 @@ const ProductionDetailsForm = ({
   const [confirm, setConfirm] = useState<boolean>(false);
   const [formData, setFormData] = useState(production || defaultProductionFormData);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const currencyListOptions = useMemo(() => transformToOptions(currencyList, 'name', 'code'), [currencyList]);
   const productionCompanyOptions = useMemo(
     () => transformToOptions(productionCompanyList, 'name', 'id'),
@@ -90,11 +93,12 @@ const ProductionDetailsForm = ({
     imageUrl,
     image,
     runningTime,
-    runningTimeNotes,
+    runningTimeNote,
   } = formData;
 
   const onChange = useCallback((key: string, value: string | number | DateBlockDTO) => {
     setFormData((data) => ({ ...data, [key]: value }));
+    setValidationErrors((prev) => ({ ...prev, [key]: null }));
   }, []);
 
   const onSaveUpload = async (file, onProgress, onError, onUploadingImage) => {
@@ -107,8 +111,8 @@ const ProductionDetailsForm = ({
       const imageUrl = `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${location}`;
       setFormData((prev) => ({
         ...prev,
-        ImageUrl: imageUrl,
-        Image: { id, imageUrl, name: originalFilename, size: null } as UploadedFile,
+        imageUrl,
+        image: { id, imageUrl, name: originalFilename, size: null } as UploadedFile,
       }));
     } catch (error) {
       onError(file[0].file, error.message);
@@ -124,6 +128,29 @@ const ProductionDetailsForm = ({
       setFormData((prev) => ({ ...prev, ImageUrl: '' }));
     }
   };
+
+  async function validateProduction(data: ProductionFormData) {
+    try {
+      await productionFormSchema.validate({ ...data }, { abortEarly: false });
+      return true;
+    } catch (validationErrors) {
+      const errors = {};
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
+      });
+      setValidationErrors(errors);
+      debug('validation Errors', errors);
+      return false;
+    }
+  }
+
+  const onSubmit = useCallback(async () => {
+    const isValid = await validateProduction(formData);
+    if (isValid) {
+      onSave(formData, onClose);
+    }
+    notify.warning(ToastMessages.requiredFieldsWarning);
+  }, [formData, onClose, validateProduction]);
 
   return (
     <PopupModal
@@ -155,6 +182,7 @@ const ProductionDetailsForm = ({
               type="string"
               onChange={(e) => onChange('prodCode', e.target.value)}
               value={prodCode}
+              error={validationErrors?.prodCode}
               required
             />
             <Tooltip>
@@ -271,12 +299,12 @@ const ProductionDetailsForm = ({
         <div className="flex items-center gap-[85px]">
           <Label text="Running Time Notes" />
           <TextInput
-            id="runningTimeNotes"
+            id="runningTimeNote"
             className="w-[320px] placeholder-primary"
             placeholder="Running Time Notes..."
             type="string"
-            onChange={(e) => onChange('runningTimeNotes', e.target.value)}
-            value={runningTimeNotes}
+            onChange={(e) => onChange('runningTimeNote', e.target.value)}
+            value={runningTimeNote}
           />
         </div>
         <div className="flex items-center ml-1 float-end justify-end">
@@ -301,7 +329,7 @@ const ProductionDetailsForm = ({
             variant="primary"
             iconProps={{ className: 'h-4 w-3' }}
             text="Save and Close"
-            onClick={() => onSave(formData)}
+            onClick={onSubmit}
           />
         </div>
       </form>

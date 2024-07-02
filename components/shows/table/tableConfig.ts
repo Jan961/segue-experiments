@@ -134,6 +134,21 @@ export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
   },
 ];
 
+export const currencyConversionTableConfig = [
+  {
+    headerName: 'Show',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'Name',
+    cellRenderer: ShowNameAndCodeRenderer,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
+    width: 265,
+    flex: 1,
+  },
+];
+
 export const productionsTableConfig = [
   {
     headerName: 'Show',
