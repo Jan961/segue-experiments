@@ -1,4 +1,4 @@
-import { DealMemoPrice, DealMemoTechProvision } from '@prisma/client';
+import { DealMemoPrice, DealMemoTechProvision, Region } from '@prisma/client';
 
 export type StatusCode = 'C' | 'U' | 'X';
 
@@ -19,6 +19,7 @@ export type CountryDTO = {
   Name: string;
   Code: string;
   CurrencyCode?: string;
+  RegionList?: Region[];
 };
 
 export type CurrencyDTO = {
@@ -220,6 +221,8 @@ export type ConversionRateDTO = {
   ToCurrencyCode: string;
   Rate: number;
   ProductionId: number;
+  FromCurrency?: CurrencyDTO;
+  ToCurrency?: CurrencyDTO;
 };
 
 export type ProductionDTO = {

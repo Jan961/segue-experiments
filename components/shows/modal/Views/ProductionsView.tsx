@@ -15,6 +15,7 @@ import { debug } from 'utils/logging';
 import { all } from 'radash';
 import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import CurrencyConversionModal from './CurrencyConversionModal';
 
 interface ProductionsViewProps {
   showData: any;
@@ -37,6 +38,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const tableRef = useRef(null);
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+  const [openCurrencyConversionModal, setOpenCurrencyConversionModal] = useState<boolean>(false);
   const [currentProduction, setCurrentProduction] = useState<ProductionFormData>(defaultProductionFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isArchived, setIsArchived] = useState<boolean>(true);
@@ -184,6 +186,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       RunningTime,
       RunningTimeNote,
       ProdCoId,
+      ConversionRateList,
     } = data;
     const productionDateBlock = DateBlock.find((d) => d.Name === 'Production');
     const rehearsalDateBlock = DateBlock.find((d) => d.Name === 'Rehearsal');
@@ -202,6 +205,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       company: ProdCoId,
       runningTime: RunningTime,
       runningTimeNote: RunningTimeNote,
+      conversionRateList: ConversionRateList,
       ...(ImageUrl && {
         image: {
           id: Image.id,
@@ -216,6 +220,9 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     updateCurrentProductionState(e.data);
     if (e.column.colId === 'editId') {
       setOpenEditModal(true);
+    }
+    if (e.column.colId === 'updateCurrencyConversion') {
+      setOpenCurrencyConversionModal(true);
     }
   };
 
@@ -288,6 +295,14 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           visible={openEditModal}
           onSave={onSaveProduction}
           onClose={() => setOpenEditModal(false)}
+        />
+      )}
+      {openCurrencyConversionModal && (
+        <CurrencyConversionModal
+          conversionRates={currentProduction?.conversionRateList}
+          title={showName || ''}
+          visible={openCurrencyConversionModal}
+          onClose={() => setOpenCurrencyConversionModal(false)}
         />
       )}
     </>

@@ -14,7 +14,7 @@ import { useRecoilValue } from 'recoil';
 import { currencyListState } from 'state/productions/currencyState';
 import { transformToOptions } from 'utils';
 import { productionCompanyState } from 'state/productions/productionCompanyState';
-import { DateBlockDTO } from 'interfaces';
+import { ConversionRateDTO, DateBlockDTO } from 'interfaces';
 import { productionFormSchema } from './schema';
 import { debug } from 'utils/logging';
 
@@ -34,6 +34,7 @@ export interface ProductionFormData {
   runningTime?: string;
   runningTimeNote?: string;
   showId?: number;
+  conversionRateList?: ConversionRateDTO[];
 }
 interface ProductionsViewModalProps {
   visible: boolean;

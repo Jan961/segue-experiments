@@ -6,6 +6,7 @@ import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
 import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import CurrencyExchangeRenderer from './CurrencyExchangeRenderer';
 
 export const generateChildCol = (
   headerName: string,
@@ -136,16 +137,49 @@ export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
 
 export const currencyConversionTableConfig = [
   {
-    headerName: 'Show',
+    headerName: 'Currency',
     headerClass: 'justify-center font-bold text-base ',
-    field: 'Name',
-    cellRenderer: ShowNameAndCodeRenderer,
+    field: 'currency',
+    width: 185,
     cellStyle: {
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
     },
-    width: 265,
+  },
+  {
+    headerName: 'Countries',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'countries',
     flex: 1,
+    width: 185,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
+  },
+  {
+    headerName: 'Region',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'region',
+    flex: 1,
+    width: 185,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
+  },
+  {
+    headerName: 'Exchange rate for Production \n (Production Currency : Venue Currency)',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'rate',
+    cellRenderer: CurrencyExchangeRenderer,
+    width: 300,
+    autoHeaderHeight: true,
+    resizable: false,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
   },
 ];
 
@@ -188,7 +222,7 @@ export const productionsTableConfig = [
   },
   {
     headerName: '',
-    field: 'updateCurrency',
+    field: 'updateCurrencyConversion',
     width: 270,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {

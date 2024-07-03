@@ -15,6 +15,8 @@ import {
   ConversionRate,
   Currency,
   Country,
+  CountryInRegion,
+  Region,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -186,8 +188,11 @@ export const FileMapper = (file: File & { ImageUrl?: string }): FileDTO => ({
   uploadDateTime: file.UploadDateTime.toISOString(),
 });
 
-export const countryMapper = (c: Country): CountryDTO => ({
+export const countryMapper = (
+  c: Country & { CountryInRegion?: (CountryInRegion & { Region?: Region })[] },
+): CountryDTO => ({
   ...c,
+  RegionList: c.CountryInRegion.map((c) => c.Region) || [],
 });
 
 export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => ({
@@ -195,9 +200,16 @@ export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDT
   CountryList: c.Country.map(countryMapper),
 });
 
-export const conversionRateMapper = (c: ConversionRate): ConversionRateDTO => ({
+export const conversionRateMapper = (
+  c: ConversionRate & {
+    Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency?: Currency & { Country: Country[] };
+    Currency_ConversionRate_ConversionToCurrencyCodeToCurrency?: Currency & { Country: Country[] };
+  },
+): ConversionRateDTO => ({
   ...c,
   Rate: c.Rate?.toNumber?.(),
+  FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
+  ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
 });
 
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
