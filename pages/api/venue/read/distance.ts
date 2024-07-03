@@ -20,6 +20,7 @@ export interface GapSuggestionUnbalancedProps {
   MinToMiles?: number;
   MaxToMiles?: number;
   MinSeats?: number;
+  MaxSeats?: number;
   MaxFromTime?: number;
   MaxToTime?: number;
   ExcludeLondonVenues?: boolean;
@@ -54,6 +55,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     ExcludeLondonVenues,
     IncludeExcludedVenues,
     MinSeats = 0,
+    MaxSeats = 0,
     MaxFromTime,
     MaxToTime,
   } = req.body as GapSuggestionUnbalancedProps;
@@ -220,7 +222,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         if (!IncludeExcludedVenues && ExcludeFromChecks) return null;
         return { ...x, Capacity: Seats, ...Address, Name };
       })
-      .filter((venue) => venue && venue.Capacity >= MinSeats);
+      .filter((venue) => venue && venue.Capacity >= MinSeats && venue.Capacity <= MaxSeats);
     const result: GapSuggestionReponse = {
       SliderMax: sliderMax,
       DefaultMin: safeMin,
