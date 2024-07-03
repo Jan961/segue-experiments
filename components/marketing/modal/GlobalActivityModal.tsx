@@ -15,14 +15,14 @@ import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/Con
 import { gloablModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
 
-export type ActivityModalVariant = 'add' | 'edit' | 'delete';
+export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
 
 interface Venue extends VenueDTO {
   date: Date;
 }
 
 export interface GlobalActivity extends GlobalActivityDTO {
-  VenueIds: Array<number>;
+  VenueIds?: Array<number>;
 }
 
 const titleOptions = {
@@ -40,8 +40,8 @@ interface ActivityModalProps {
   productionCurrency?: string;
   productionId: number;
   data?: GlobalActivity;
-  venues: Array<Venue>;
-  tourWeeks: Array<SelectOption>;
+  venues?: Array<Venue>;
+  tourWeeks?: Array<SelectOption>;
 }
 
 export default function GlobalActivityModal({
@@ -53,7 +53,7 @@ export default function GlobalActivityModal({
   productionCurrency = '',
   productionId,
   data,
-  venues,
+  venues = [],
   tourWeeks,
 }: Partial<ActivityModalProps>) {
   const [visible, setVisible] = useState<boolean>(show);
@@ -72,6 +72,10 @@ export default function GlobalActivityModal({
   const [selectedList, setSelectedList] = useState([]);
 
   const venueList = useMemo(() => {
+    if (venues.length === 0) {
+      return [];
+    }
+
     let tempVenueList;
     if (venues === undefined || selectedList === undefined) {
       tempVenueList = venues.map((venue) => {
@@ -95,17 +99,25 @@ export default function GlobalActivityModal({
   }, [venues, selectedList]);
 
   const initForm = () => {
-    const dropList = tourWeeks
-      .filter((week) => week.weekNo > 0)
-      .map((week) => {
-        return {
-          text: week.weekNo,
-          value: week.value,
-          selected: false,
-        };
-      });
+    let dropList = null;
+
+    if (venues.length === 0) {
+      dropList = [];
+    } else {
+      dropList = tourWeeks
+        .filter((week) => week.weekNo > 0)
+        .map((week) => {
+          return {
+            text: week.weekNo,
+            value: week.value,
+            selected: false,
+          };
+        });
+    }
 
     setVenueColDefs(gloablModalVenueColDefs(dropList, selectVenue, multiVenueSelect));
+
+    console.log(data);
 
     if (variant === 'add') {
       setActName('');
@@ -125,6 +137,15 @@ export default function GlobalActivityModal({
       setActNotes(data.Notes);
       setActId(data.Id);
       setSelectedList(data.VenueIds === null ? [] : data.VenueIds);
+    } else if (variant === 'view') {
+      setActName(data.Name);
+      setActType(data.ActivityTypeId);
+      setActDate(startOfDay(new Date(data.Date)));
+      setActFollowUp(data.FollowUpRequired);
+      setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
+      setCost(data.Cost.toString());
+      setActNotes(data.Notes);
+      setActId(data.Id);
     }
   };
 
@@ -239,13 +260,16 @@ export default function GlobalActivityModal({
   useEffect(() => {
     setVisible(show);
     setSelectedList([]);
-    initForm();
+
+    if (typeof data === 'object') {
+      initForm();
+    }
   }, [show]);
 
   return (
     <div>
       <PopupModal show={visible} onClose={() => handleConfirm('close')} showCloseIcon={true} hasOverlay={showConfirm}>
-        <div className="h-[780px] w-[450px]">
+        <div className={`h-[${variant === 'view' ? 400 : 780}px] w-[450px]`}>
           <div className="text-xl text-primary-navy font-bold mb-4">{titleOptions[variant]}</div>
           <div className="text-base font-bold text-primary-input-text">Activity Name</div>
           <TextInput
@@ -254,6 +278,7 @@ export default function GlobalActivityModal({
             id="activityName"
             value={actName}
             onChange={(event) => setActName(event.target.value)}
+            disabled={variant === 'view'}
           />
 
           <Select
@@ -265,6 +290,7 @@ export default function GlobalActivityModal({
             isClearable
             isSearchable
             label="Type"
+            disabled={variant === 'view'}
           />
 
           {error && <div className="text text-base text-primary-red mb-4">Please select an Activity Type</div>}
@@ -277,6 +303,7 @@ export default function GlobalActivityModal({
                 label="Date"
                 inputClass="!border-0 !shadow-none"
                 labelClassName="text-primary-input-text"
+                disabled={variant === 'view'}
               />
             </div>
 
@@ -289,6 +316,7 @@ export default function GlobalActivityModal({
                 name="followUpRequired"
                 checked={actFollowUp}
                 onChange={(e) => setActFollowUp(e.target.checked)}
+                disabled={variant === 'view'}
               />
             </div>
           </div>
@@ -304,6 +332,7 @@ export default function GlobalActivityModal({
                   label="Date"
                   inputClass="!border-0 !shadow-none"
                   labelClassName="text-primary-input-text"
+                  disabled={variant === 'view'}
                 />
               </div>
             </div>
@@ -324,6 +353,7 @@ export default function GlobalActivityModal({
                   id="cost"
                   value={cost}
                   onChange={(event) => setCostValue(event.target.value)}
+                  disabled={variant === 'view'}
                 />
               </div>
             </div>
@@ -335,22 +365,36 @@ export default function GlobalActivityModal({
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
+            disabled={variant === 'view'}
           />
 
-          <div className="flex flex-row mt-5">
-            <div className="w-[450px]">
-              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
+          {variant !== 'view' && (
+            <div className="flex flex-row mt-5">
+              <div className="w-[450px]">
+                <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="float-right flex flex-row mt-5 py-2">
-            <Button
-              className="ml-4 w-[132px]"
-              onClick={() => handleConfirm('cancel')}
-              variant="secondary"
-              text="Cancel"
-            />
-            <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+            {variant === 'view' ? (
+              <Button
+                className="ml-4 w-[132px]"
+                onClick={() => handleConfirm('close')}
+                variant="primary"
+                text="Close"
+              />
+            ) : (
+              <div>
+                <Button
+                  className="ml-4 w-[132px]"
+                  onClick={() => handleConfirm('cancel')}
+                  variant="secondary"
+                  text="Cancel"
+                />
+                <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+              </div>
+            )}
           </div>
         </div>
       </PopupModal>

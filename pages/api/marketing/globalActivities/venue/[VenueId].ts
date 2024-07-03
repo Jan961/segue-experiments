@@ -10,33 +10,31 @@ export type GlobalActivitiesResponse = {
   activityTypes: Array<SelectOption>;
 };
 
-export const getActivitiesByBookingId = async (ProductionId) => {
-  const activityTypes = await prisma.activityType.findMany({
-    select: {
-      Name: true,
-      Id: true,
-    },
-  });
-
+export const getActivitiesByVenueId = async (VenueId) => {
   const activities = await prisma.$queryRaw`SELECT 
         gba.*,
-        GROUP_CONCAT(gbav.GBAVVenueId) AS VenueIds
+        GROUP_CONCAT(gbav.GBAVVenueId) AS VenueIds,
+        COUNT(DISTINCT gbav.GBAVVenueId) AS VenueCount
     FROM 
         GlobalBookingActivity gba
-    LEFT JOIN 
+    JOIN 
         GlobalBookingActivityVenue gbav
     ON 
         gba.GlobalActivityId = gbav.GBAVGlobalActivityId
     WHERE 
-        gba.GlobalActivityProductionId = ${ProductionId}
+        gbav.GBAVGlobalActivityId IN (
+            SELECT 
+                GBAVGlobalActivityId 
+            FROM 
+                GlobalBookingActivityVenue 
+            WHERE 
+                GBAVVenueId = ${VenueId}
+        )
     GROUP BY 
         gba.GlobalActivityId;
     `;
 
   const result = {
-    activityTypes: activityTypes.map((type) => {
-      return { text: type.Name, value: type.Id };
-    }),
     activities: activities.map((activity) => {
       return fieldsMapper(activity);
     }),
@@ -51,21 +49,20 @@ const fieldsMapper = (original) => ({
   Date: convertDate(original.GlobalActivityDate),
   Name: original.GlobalActivityName,
   ActivityTypeId: original.GlobalActivityActivityTypeId,
-  Cost: Number(original.GlobalActivityCost),
+  Cost: Number(original.GlobalActivityCost) / Number(original.VenueCount),
   FollowUpRequired: original.GlobalActivityFollowUpRequired,
   DueByDate: convertDate(original.GlobalActivityDueByDate),
   Notes: original.GlobalActivityNotes,
-  VenueIds: original.VenueIds === null ? null : original.VenueIds.split(',').map(Number),
 });
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const ProductionId = parseInt(req.query.ProductionId as string);
+    const VenueId = parseInt(req.query.VenueId as string);
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    const result = await getActivitiesByBookingId(ProductionId);
+    const result = await getActivitiesByVenueId(VenueId);
 
     res.json(result);
   } catch (err) {

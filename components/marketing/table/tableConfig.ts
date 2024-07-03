@@ -588,3 +588,83 @@ export const gloablModalVenueColDefs = (weekList, selectVenue, selectMultiVenue)
     sortable: false,
   },
 ];
+
+export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => [
+  {
+    headerName: 'Activity Name',
+    field: 'actName',
+    cellRenderer: DefaultCellRenderer,
+    width: 230,
+  },
+  {
+    headerName: 'Type',
+    field: 'actType',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Date',
+    field: 'actDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Follow Up Req.',
+    field: 'followUpCheck',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => ({
+      onChange: () => null, // no action required, checkbox fixed in table
+      checked: params.data.followUpCheck,
+    }),
+    width: 100,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Cost',
+    field: 'cost',
+    cellRenderer: (params) => {
+      return currencySymbol + params.data.cost.toFixed(2);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    width: 400,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'info-circle-solid',
+          onClick: () => showGlobalActivity(params.data),
+        },
+      ],
+    }),
+    width: 50,
+    resizable: false,
+  },
+];

@@ -194,7 +194,7 @@ const Global = () => {
   const getGlobalActivities = async () => {
     try {
       const data = await fetchData({
-        url: '/api/marketing/globalActivities/' + productionId.toString(),
+        url: '/api/marketing/globalActivities/production/' + productionId.toString(),
         method: 'POST',
       });
 
