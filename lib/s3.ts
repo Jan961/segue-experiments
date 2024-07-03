@@ -6,7 +6,7 @@ aws.config.update({
 });
 
 export const getFileUrl = (fileLocation: string) => {
-  return process.env.CLOUDFRONT_DOMAIN + '/' + fileLocation;
+  return `${process.env.CLOUDFRONT_DOMAIN}/${fileLocation}`;
 };
 
 const s3 = new aws.S3();
