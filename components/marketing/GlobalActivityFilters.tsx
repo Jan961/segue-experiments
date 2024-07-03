@@ -1,15 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
 import GlobalToolbar from 'components/toolbar';
 import { Button, DateRange, TextInput } from 'components/core-ui-lib';
+import { filterState } from 'state/marketing/filterState';
 
 const GlobalActivityFilters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
-  const [dateRange, setDateRange] = useState<{ to: Date; from: Date }>({ to: null, from: null });
-  const [filterText, setFilterText] = useState('');
+  const [filter, setFilter] = useRecoilState(filterState);
   const [, setCurrency] = useRecoilState(currencyState);
 
   const getCurrency = async (productionId) => {
@@ -26,8 +26,7 @@ const GlobalActivityFilters = () => {
   };
 
   const onClearFilters = () => {
-    setFilterText('');
-    setDateRange({ to: null, from: null });
+    setFilter({ startDate: null, endDate: null, searchText: '' });
   };
 
   useEffect(() => {
@@ -54,8 +53,8 @@ const GlobalActivityFilters = () => {
             disabled={!productionId}
             className="bg-primary-white justify-between"
             label="Date"
-            onChange={(dateRange) => setDateRange(dateRange)}
-            value={dateRange}
+            onChange={(dateRange) => setFilter({ ...filter, startDate: dateRange.from, endDate: dateRange.to })}
+            value={{ to: filter.endDate, from: filter.startDate }}
           />
         </div>
 
@@ -65,8 +64,8 @@ const GlobalActivityFilters = () => {
           placeholder="Search Global activities..."
           className="w-[467px] mt-1 ml-5"
           iconName="search"
-          value={filterText}
-          onChange={(event) => setFilterText(event.target.value)}
+          value={filter.searchText}
+          onChange={(event) => setFilter({ ...filter, searchText: event.target.value })}
         />
 
         <Button className="text-sm leading-8 w-[120px] mt-1 ml-5" text="Clear Filters" onClick={onClearFilters} />

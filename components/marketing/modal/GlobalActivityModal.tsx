@@ -34,7 +34,7 @@ const titleOptions = {
 interface ActivityModalProps {
   show: boolean;
   onCancel: () => void;
-  onSave: (variant: ActivityModalVariant, data: GlobalActivityDTO) => void;
+  onSave: (variant: ActivityModalVariant, data: GlobalActivity) => void;
   variant: ActivityModalVariant;
   activityTypes: Array<SelectOption>;
   productionCurrency?: string;
