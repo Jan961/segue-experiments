@@ -179,6 +179,8 @@ export const currencyConversionTableConfig = [
     cellStyle: {
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
+      display: 'flex',
+      justifyContent: 'center',
     },
   },
 ];

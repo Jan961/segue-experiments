@@ -29,9 +29,9 @@ const CurrencyConversionModal = ({ conversionRates, onClose, title, visible }: C
           rate: Rate,
           currency: `${FromCurrency.Code} | ${FromCurrency.Name}`,
           countries: FromCurrency.CountryList.map(({ Code }) => Code).join(', '),
-          exChange: {
-            Tosymbol: ToCurrency?.SymbolUnicode,
-            FromCurrencyCode: FromCurrency.Code,
+          exchange: {
+            toSymbol: ToCurrency?.SymbolUnicode,
+            fromCurrencyCode: FromCurrency.Code,
           },
           region: uniqueRegions.map(({ Name }) => Name).join(', '),
           ToCurrency,

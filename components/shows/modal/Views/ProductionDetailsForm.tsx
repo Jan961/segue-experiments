@@ -75,7 +75,7 @@ const ProductionDetailsForm = ({
   const [formData, setFormData] = useState(production || defaultProductionFormData);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const currencyListOptions = useMemo(() => transformToOptions(currencyList, 'name', 'code'), [currencyList]);
+  const currencyListOptions = useMemo(() => transformToOptions(currencyList, 'code', 'code'), [currencyList]);
   const productionCompanyOptions = useMemo(
     () => transformToOptions(productionCompanyList, 'name', 'id'),
     [productionCompanyList],
@@ -176,7 +176,7 @@ const ProductionDetailsForm = ({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Label text="Prod Code" />
+            <Label required text="Prod Code" />
             <TextInput
               id="prodcode"
               className="w-[60px] placeholder-primary"
@@ -205,7 +205,7 @@ const ProductionDetailsForm = ({
           />
         )}
 
-        <div className="flex items-center gap-[85px] col-span-3 row-start-3">
+        <div className="flex items-center gap-[93px] col-span-3 row-start-3">
           <Label text="Rehearsals" />
           <DateRange
             className="w-fit"
@@ -222,7 +222,7 @@ const ProductionDetailsForm = ({
           />
         </div>
         <div className="flex items-center gap-12 col-span-3 row-start-3">
-          <Label text="Production Dates" />
+          <Label required text="Production Dates" />
           <DateRange
             className="w-fit"
             label="Date"
@@ -238,10 +238,10 @@ const ProductionDetailsForm = ({
           />
         </div>
 
-        <div className="flex items-center gap-[105px]">
-          <Label text="Region" />
+        <div className="flex items-center gap-[107px]">
+          <Label required text="Region" />
           <Select
-            className="w-full"
+            className="flex-1"
             placeholder="Select Region(s)"
             onChange={(value) => onChange('region', value as string)}
             options={REGIONS_LIST}
@@ -250,8 +250,8 @@ const ProductionDetailsForm = ({
             renderOption={(option) => <CustomOption option={option} isMulti={true} />}
           />
         </div>
-        <div className="flex items-center gap-6">
-          <Label text="Currency for Reports" />
+        <div className="flex items-center gap-7">
+          <Label required text="Currency for Reports" />
           <Select
             className="w-64"
             onChange={(value) => onChange('currency', value as string)}
@@ -259,10 +259,10 @@ const ProductionDetailsForm = ({
             value={currency}
           />
         </div>
-        <div className="flex items-center gap-[87px]">
-          <Label text="Company" />
+        <div className="flex items-center gap-[92px]">
+          <Label required text="Company" />
           <Select
-            className="w-full"
+            className="flex-1"
             placeholder="Select Production Company"
             onChange={(value) => onChange('company', value as string)}
             options={productionCompanyOptions}
