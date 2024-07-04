@@ -1,6 +1,5 @@
 import { ActivityDTO, BookingContactNoteDTO } from 'interfaces';
 import { GlobalActivity } from '../modal/GlobalActivityModal';
-import { hasIntArrayChanged } from 'utils/hasIntArrayChanged';
 
 export const hasActivityChanged = (oldActivity: ActivityDTO, newActivity: ActivityDTO): boolean => {
   // List all keys to be compared
@@ -105,7 +104,8 @@ export const hasGlobalActivityChanged = (oldActivity: GlobalActivity, newActivit
         return true;
       }
     } else if (key === 'VenueIds') {
-      if (hasIntArrayChanged(oldActivity[key], newActivity[key])) {
+      const venueIdsEqual = JSON.stringify(oldActivity[key]) === JSON.stringify(newActivity[key]);
+      if (!venueIdsEqual) {
         return true;
       }
       // else any other field

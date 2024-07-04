@@ -49,7 +49,7 @@ const fieldsMapper = (original) => ({
   Date: convertDate(original.GlobalActivityDate),
   Name: original.GlobalActivityName,
   ActivityTypeId: original.GlobalActivityActivityTypeId,
-  Cost: Number(original.GlobalActivityCost) / Number(original.VenueCount),
+  Cost: Number(original.VenueCount) === 0 ? 0 : Number(original.GlobalActivityCost) / Number(original.VenueCount),
   FollowUpRequired: original.GlobalActivityFollowUpRequired,
   DueByDate: convertDate(original.GlobalActivityDueByDate),
   Notes: original.GlobalActivityNotes,
@@ -67,6 +67,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.json(result);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: 'Error occurred while generating search results.' });
+    res.status(500).json({ err: 'Error occurred while querying for Global Activities by VenueId.' });
   }
 }

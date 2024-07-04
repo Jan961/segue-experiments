@@ -28,7 +28,7 @@ export interface SalesEntryRef {
   resetForm: (salesWeek: string) => void;
 }
 
-const Global = () => {
+const GlobalActivityView = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const currency = useRecoilValue(currencyState);
@@ -301,5 +301,5 @@ const Global = () => {
   );
 };
 
-Global.displayName = 'Global';
-export default Global;
+GlobalActivityView.displayName = 'GlobalActivityView';
+export default GlobalActivityView;

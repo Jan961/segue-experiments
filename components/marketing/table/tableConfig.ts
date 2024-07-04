@@ -633,7 +633,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Cost',
     field: 'cost',
     cellRenderer: (params) => {
-      return currencySymbol + params.data.cost.toFixed(2);
+      return currencySymbol + params.data.cost; // .toFixed(2);
     },
     cellStyle: {
       paddingLeft: '8px',

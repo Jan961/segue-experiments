@@ -10,7 +10,6 @@ import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
 import { objectify } from 'radash';
 import GlobalActivityFilters from 'components/marketing/GlobalActivityFilters';
-import Global from 'components/marketing/activity/global';
 
 const Index = () => {
   return (
@@ -18,7 +17,6 @@ const Index = () => {
       <div className="mb-8">
         <GlobalActivityFilters />
       </div>
-      <Global />
     </Layout>
   );
 };
@@ -26,7 +24,7 @@ export default Index;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'marketing/activity/global', accountId);
+  const productionJump = await getProductionJumpState(ctx, 'marketing/activity/GlobalActivity', accountId);
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
 
