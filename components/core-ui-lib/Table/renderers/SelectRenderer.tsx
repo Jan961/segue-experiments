@@ -6,9 +6,10 @@ import { SelectProps } from 'components/core-ui-lib/Select/Select';
 interface SelectRendererProps extends SelectProps {
   id?: string;
   eGridCell: HTMLElement;
+  hidden?: boolean;
 }
 
-const SelectRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
+const SelectRenderer = ({ eGridCell, hidden = false, ...props }: SelectRendererProps) => {
   const selectRef = useRef(null);
 
   const handleOnFocus = () => {
@@ -18,7 +19,7 @@ const SelectRenderer = ({ eGridCell, ...props }: SelectRendererProps) => {
   return (
     <div className="pl-1 pr-2 mt-1">
       <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
-        <Select ref={selectRef} {...props} />
+        {!hidden && <Select ref={selectRef} {...props} />}
       </BaseCellRenderer>
     </div>
   );
