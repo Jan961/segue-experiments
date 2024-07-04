@@ -91,7 +91,7 @@ model BookingContactNotes {
   ContactDate   DateTime?    @map("ContactNoteDateTime") @db.DateTime(0)
   UserId        Int?         @map("ContactNoteActionAccountUserId")
   Notes         String?      @map("ContactNoteNotes") @db.LongText
-  AccountUser   AccountUser? @relation(fields: [UserId], references: [UserId], onDelete: NoAction, map: "AccountUserBookingContactNotes")
+  AccountUser   AccountUser? @relation(fields: [UserId], references: [UserId], onDelete: Cascade, map: "AccountUserBookingContactNotes")
   Booking       Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([UserId], map: "AccountUserBookingContactNotes")
@@ -134,20 +134,17 @@ model DateType {
 }
 
 model Show {
-  Id                Int               @id @default(autoincrement()) @map("ShowId")
-  AccountId         Int               @map("ShowAccountId")
-  Code              String            @map("ShowCode") @db.VarChar(10)
-  Name              String            @map("ShowName") @db.VarChar(80)
-  Type              String?           @map("ShowType") @db.VarChar(1)
-  IsArchived        Boolean           @default(dbgenerated("(b'0')")) @map("ShowIsArchived") @db.Bit(1)
-  ShowProdCoId      Int
-  Production        Production[]
-  Account           Account           @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
-  ProductionCompany ProductionCompany @relation(fields: [ShowProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Show")
+  Id         Int          @id @default(autoincrement()) @map("ShowId")
+  AccountId  Int          @map("ShowAccountId")
+  Code       String       @map("ShowCode") @db.VarChar(10)
+  Name       String       @map("ShowName") @db.VarChar(80)
+  Type       String?      @map("ShowType") @db.VarChar(1)
+  IsArchived Boolean      @default(dbgenerated("(b'0')")) @map("ShowIsArchived") @db.Bit(1)
+  Production Production[]
+  Account    Account      @relation(fields: [AccountId], references: [AccountId], onUpdate: Restrict, map: "Account_Show")
 
   @@unique([AccountId, Code], map: "SECONDARY")
   @@index([AccountId], map: "Account_Show_idx")
-  @@index([ShowProdCoId], map: "ProductionCompany_Show")
 }
 
 model Venue {
@@ -572,8 +569,8 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
+  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String?                 @db.VarChar(4)
@@ -677,7 +674,7 @@ model AccountUserProduction {
   AUPId           Int         @id @default(autoincrement())
   AUPAccUserId    Int
   AUPProductionId Int
-  AccountUser     AccountUser @relation(fields: [AUPAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccountUserProduction")
+  AccountUser     AccountUser @relation(fields: [AUPAccUserId], references: [Id], onDelete: NoAction, map: "AccountUser_AccountUserProduction")
   Production      Production  @relation(fields: [AUPProductionId], references: [Id], onDelete: Cascade, map: "Production_AccountUserProduction")
 
   @@index([AUPAccUserId], map: "AccountUser_AccountUserProduction")
@@ -754,13 +751,15 @@ model AccountContact {
 }
 
 model Country {
-  Id              Int               @id @default(autoincrement()) @map("CountryId")
-  Code            String            @map("CountryCode") @db.VarChar(3)
-  Name            String            @map("CountryName") @db.VarChar(40)
-  CurrencyCode    String?           @map("CountryCurrencyCode") @db.VarChar(3)
-  Currency        Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Country_Currency")
-  CountryInRegion CountryInRegion[]
-  VenueAddress    VenueAddress[]
+  Id                                                 Int               @id @default(autoincrement()) @map("CountryId")
+  Code                                               String            @map("CountryCode") @db.VarChar(3)
+  Name                                               String            @map("CountryName") @db.VarChar(40)
+  CurrencyCode                                       String?           @map("CountryCurrencyCode") @db.VarChar(3)
+  Currency                                           Currency?         @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Country_Currency")
+  CountryInRegion                                    CountryInRegion[]
+  Person_Person_PersonExpensesBankCountryIdToCountry Person[]          @relation("Person_PersonExpensesBankCountryIdToCountry")
+  Person_Person_PersonPaymentBankCountryIdToCountry  Person[]          @relation("Person_PersonPaymentBankCountryIdToCountry")
+  VenueAddress                                       VenueAddress[]
 
   @@index([CurrencyCode], map: "Country_Currency")
 }
@@ -780,14 +779,15 @@ model ProductionCompany {
   AccountId           Int          @map("ProdCoAccountId")
   Name                String       @map("ProdCoName") @db.VarChar(50)
   WebSite             String?      @map("ProdCoWebSite") @db.VarChar(80)
-  Logo                Bytes?       @map("ProdCoLogo")
   ProdCoSaleStartWeek Int?         @default(-50) @db.SmallInt
   ProdCoVATCode       String?      @db.VarChar(20)
+  ProdCoLogoFileId    Int?
   Production          Production[]
   Account             Account      @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_ProductionCompany")
-  Show                Show[]
+  File                File?        @relation(fields: [ProdCoLogoFileId], references: [Id], onDelete: Cascade, map: "File_Production")
 
   @@index([AccountId], map: "Account_ProductionCompany")
+  @@index([ProdCoLogoFileId], map: "File_Production")
 }
 
 model ProductionRegion {
@@ -942,14 +942,15 @@ model DealMemoTechProvision {
 }
 
 model File {
-  Id               Int          @id @default(autoincrement()) @map("FileId")
-  OriginalFilename String       @map("FileOriginalFilename") @db.VarChar(200)
-  MediaType        String?      @map("FileMediaType") @db.VarChar(200)
-  Location         String       @map("FileLocation") @db.VarChar(512)
-  UploadDateTime   DateTime     @map("FileUploadDateTime") @db.DateTime(0)
-  UploadUserId     Int          @map("FileUploadUserId")
-  User             User         @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
-  Production       Production[]
+  Id                Int                 @id @default(autoincrement()) @map("FileId")
+  OriginalFilename  String              @map("FileOriginalFilename") @db.VarChar(200)
+  MediaType         String?             @map("FileMediaType") @db.VarChar(200)
+  Location          String              @map("FileLocation") @db.VarChar(512)
+  UploadDateTime    DateTime            @map("FileUploadDateTime") @db.DateTime(0)
+  UploadUserId      Int                 @map("FileUploadUserId")
+  User              User                @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
+  Production        Production[]
+  ProductionCompany ProductionCompany[]
 
   @@index([UploadUserId], map: "UserAttachedFile")
 }

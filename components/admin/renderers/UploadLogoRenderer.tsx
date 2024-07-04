@@ -1,99 +1,57 @@
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import { useEffect, useState } from 'react';
 import { Button } from 'components/core-ui-lib/';
+import Image from 'next/image';
 import axios from 'axios';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
-import NextImage from 'next/image';
+import { uploadFile } from 'requests/upload';
+import { getFileUrl } from 'lib/s3';
 
 export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
+  const { id, fileId, fileLocation, fileName } = params.data;
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
   const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
+  const [fileUrl, setFileUrl] = useState<string>('');
 
-  const onSave = async (file, onProgress, onError) => {
+  const getUrlForImage = async (path) => {
+    const url = await getFileUrl(path);
+    setFileUrl(url);
+  };
+
+  useEffect(() => {
+    if (fileLocation) {
+      getUrlForImage(fileLocation);
+    }
+  }, [fileLocation]);
+
+  const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('Id', params.data.Id);
-    const imageURL = URL.createObjectURL(file[0].file);
-    const tempImage = new Image();
-    tempImage.src = imageURL;
-    tempImage.onload = async () => {
-      if (tempImage.width <= 300 && tempImage.height <= 200) {
-        let progress = 0;
-        let slowProgressInterval;
-        try {
-          const response = await axios.post('/api/productionCompanies/logo/insert', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              if (percentCompleted <= 50) {
-                progress = percentCompleted;
-              } else if (percentCompleted === 100) {
-                progress = 50;
-                clearInterval(slowProgressInterval);
-                slowProgressInterval = setInterval(() => {
-                  if (progress < 95) {
-                    progress += 0.5;
-                    onProgress(file[0].file, progress);
-                  } else {
-                    clearInterval(slowProgressInterval);
-                  }
-                }, 100);
-              }
-              onProgress(file[0].file, progress);
-            },
-          });
-          if (response.status >= 400 && response.status <= 499) {
-            onError(file[0].file, 'Error uploading file. Please try again.');
-            clearInterval(slowProgressInterval);
-          }
+    formData.append('Id', id.toString());
 
-          progress = 100;
-          onProgress(file[0].file, progress);
-          clearInterval(slowProgressInterval);
-        } catch (error) {
-          onError(file[0].file, 'Error uploading file. Please try again.');
-          clearInterval(slowProgressInterval);
-        }
-      } else {
-        onError(file[0].file, 'This image is too big. Please upload a smaller image.');
+    try {
+      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
+      if (response.status >= 400 && response.status <= 499) {
+        onError(file[0].file, 'Error uploading file. Please try again.');
       }
-    };
+    } catch (error) {
+      onError(file[0].file, 'Error uploading file. Please try again.');
+    }
   };
   const handleDelete = async () => {
     try {
-      await fetch('/api/productionCompanies/logo/delete', {
-        method: 'POST',
-        headers: {},
-        body: JSON.stringify({ Id: params.data.Id }),
-      });
+      await axios.delete(`/api/productionCompanies/logo/delete?Id=${fileId}`);
     } catch (exception) {
       console.log(exception);
     }
   };
 
-  useEffect(() => {
-    if (openUploadModal && params.data.Logo !== '') {
-      setUploadedFile({
-        imageUrl: params.data.Logo.currentSrc,
-        name: 'Company Logo',
-        size: params.data.Logo.size,
-      });
-    }
-  }, [openUploadModal]);
-
   return (
     <div className="h-full flex justify-center items-center">
-      {params.data.Logo.length === 0 ? (
-        <Button
-          text="Upload Logo"
-          variant="secondary"
-          onClick={() => setOpenUploadModal(true)}
-          disabled={params.data.Id === null}
-        />
+      {!fileId ? (
+        <Button text="Upload Logo" variant="secondary" onClick={() => setOpenUploadModal(true)} disabled={!!fileId} />
       ) : (
-        <NextImage src={params.data.Logo.src} alt="Company Logo" onClick={() => setOpenUploadModal(true)} />
+        <Image src={fileUrl} alt="Company Logo" width={200} height={200} onClick={() => setOpenUploadModal(true)} />
       )}
       <UploadModal
         visible={openUploadModal}

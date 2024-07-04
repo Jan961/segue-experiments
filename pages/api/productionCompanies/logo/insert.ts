@@ -18,7 +18,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const Id = parseInt(fields.Id);
 
     if (!files.file) {
-      res.status(400).json({ message: 'File upload error: No file was uploaded.' });
+      res.status(500).json({ message: 'File upload error: No file was uploaded.' });
       return;
     }
 

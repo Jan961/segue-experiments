@@ -1,7 +1,17 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import byteArrToBaseString from '../../../utils/byteArrToBaseString';
+
+const formatCompanyDetails = (company: any) => {
+  return {
+    id: company.Id,
+    companyName: company.Name,
+    fileName: company.File?.OriginalFilename || '',
+    fileLocation: company.File?.Location || '',
+    fileId: company.File?.Id,
+    website: company.WebSite,
+  };
+};
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,11 +21,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         AccountId,
       },
-      select: {
-        Id: true,
-        Name: true,
-        WebSite: true,
-        Logo: true,
+      include: {
+        File: true,
       },
       orderBy: [
         {
@@ -23,12 +30,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       ],
     });
-    return res.status(200).json(
-      productionCompanyList.map((item) => {
-        item.Logo = byteArrToBaseString(item.Logo);
-        return item;
-      }),
-    );
+    return res.status(200).json(productionCompanyList.map(formatCompanyDetails));
   } catch (err) {
     res
       .status(500)

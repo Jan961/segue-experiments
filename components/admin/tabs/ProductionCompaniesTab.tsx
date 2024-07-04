@@ -15,20 +15,8 @@ const ProductionCompaniesTab = () => {
 
   const fetchProductionCompanies = async () => {
     try {
-      const response = await fetch('/api/productionCompanies/read', {
-        method: 'POST',
-        headers: {},
-      });
-      setProductionCompanies(
-        (await response.json()).map((item) => {
-          if (item.Logo.length > 0) {
-            const img = new Image();
-            img.src = 'data:image/png;base64,' + item.Logo;
-            item.Logo = img;
-          }
-          return item;
-        }),
-      );
+      const { data } = await axios('/api/productionCompanies/read');
+      setProductionCompanies(data);
     } catch (e) {
       console.log(e);
     }

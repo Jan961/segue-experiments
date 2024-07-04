@@ -11,7 +11,7 @@ export const productionCompaniesColDefs = (fetchProductionCompanies) => {
   return [
     {
       headerName: 'Company name',
-      field: 'Name',
+      field: 'companyName',
       editable: true,
       cellRenderer: DefaultTextRenderer,
 
@@ -19,15 +19,14 @@ export const productionCompaniesColDefs = (fetchProductionCompanies) => {
     },
     {
       headerName: 'Company Website',
-      field: 'WebSite',
+      field: 'website',
       cellRenderer: DefaultTextRenderer,
-      // width was 400 but changed for the delete icon
       width: 325,
       editable: true,
     },
     {
       headerName: 'Company Logo',
-      field: 'Logo',
+      field: 'fileLocation',
       cellRenderer: createUploadLogoRenderer(fetchProductionCompanies),
       width: 200,
     },

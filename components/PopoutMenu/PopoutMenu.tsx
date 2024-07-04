@@ -129,7 +129,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         options: [
           {
             label: 'Company Information',
-            value: '',
+            value: '/admin/company-information',
             labelClass: leve2,
             options: [
               { label: 'Company Details', value: '', labelClass: level3 },
