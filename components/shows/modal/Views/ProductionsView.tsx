@@ -165,7 +165,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
+    formData.append(
+      'path',
+      `production/${currentProduction.Id ? currentProduction.Id : new Date().getTime().toString()}`,
+    );
 
     try {
       const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
