@@ -102,8 +102,6 @@ export class BookingService {
 
       const createdItems = await Promise.allSettled(promises);
 
-      console.log(createdItems);
-
       for (const item of createdItems) {
         if (item.status === 'fulfilled') {
           const type = orderMap.get(counter);
