@@ -4,6 +4,7 @@ import prisma from 'lib/prisma';
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
+import { formatDateWithTimezoneOffset } from 'services/dateService';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -78,14 +79,20 @@ const alignCellText = ({
 };
 
 const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductionCode} - ${ShowName} - ${EntryDate}`;
-const formatDate = (date) => moment(date).format('DD/MM/YY');
+
 const getShowAndProductionKey = ({ FullProductionCode, ShowName }) => `${FullProductionCode} - ${ShowName}`;
 
-const handler = async (req, res) => {
-  const { fromDate, toDate } = req.body || {};
+type ReqBody = {
+  fromDate: string;
+  toDate: string;
+  timezoneOffset: number;
+};
 
-  const formatedFromDate = formatDate(fromDate);
-  const formatedToDate = formatDate(toDate);
+const handler = async (req, res) => {
+  const { fromDate, toDate, timezoneOffset }: ReqBody = req.body || {};
+
+  const formatedFromDate = formatDateWithTimezoneOffset({ date: fromDate, timezoneOffset });
+  const formatedToDate = formatDateWithTimezoneOffset({ date: toDate, timezoneOffset });
   if (!fromDate || !toDate) {
     throw new Error('Params are missing');
   }
@@ -131,7 +138,13 @@ const handler = async (req, res) => {
   const title = `All Productions Masterplan ${formatedFromDate} to ${formatedToDate}`;
   worksheet.addRow([title]);
   const date = new Date();
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
+  worksheet.addRow([
+    `Exported: ${formatDateWithTimezoneOffset({
+      date,
+      dateFormat: 'DD/MM/YY',
+      timezoneOffset,
+    })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`,
+  ]);
   worksheet.addRow([]);
   worksheet.addRow(['', '', ...destinctShowNames.map((x) => x.ShowName)]);
   worksheet.addRow(['DAY', 'DATE', ...destinctShowNames.map((x) => x.FullProductionCode)]);
@@ -203,7 +216,7 @@ const handler = async (req, res) => {
   for (let i = 1; i <= daysDiff; i++) {
     const weekDay = moment(moment(fromDate).add(i - 1, 'day')).format('dddd');
     const dateInIncomingFormat = moment(moment(fromDate).add(i - 1, 'day')).format('YYYY-MM-DD');
-    const date = formatDate(dateInIncomingFormat);
+    const date = formatDateWithTimezoneOffset({ date: dateInIncomingFormat, timezoneOffset });
 
     const values: string[] = destinctShowNames.map(({ FullProductionCode, ShowName }) => {
       const key = getKey({ FullProductionCode, ShowName, EntryDate: dateInIncomingFormat });
