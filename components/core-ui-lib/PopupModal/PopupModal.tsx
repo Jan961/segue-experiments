@@ -3,7 +3,6 @@ import { Dialog, Transition } from '@headlessui/react';
 import { calibri } from 'lib/fonts';
 import Icon from '../Icon';
 import classNames from 'classnames';
-import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 interface PopupModalProps {
   title?: string;
@@ -15,7 +14,6 @@ interface PopupModalProps {
   panelClass?: string;
   hasOverlay?: boolean;
   closeOnOverlayClick?: boolean; // New prop to close on overlay click
-  isLoading?: boolean;
 }
 
 export default function PopupModal({
@@ -28,7 +26,6 @@ export default function PopupModal({
   panelClass,
   hasOverlay = false,
   closeOnOverlayClick = false, // Default to false
-  isLoading = false,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
 
@@ -95,7 +92,6 @@ export default function PopupModal({
                 </Dialog.Title>
 
                 <div className="mt-1">{children}</div>
-                {isLoading && <LoadingOverlay />}
               </Dialog.Panel>
             </Transition.Child>
           </div>

@@ -110,7 +110,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       ]);
       onClose();
     } catch (error) {
-      console.log('Error Saving Records');
+      debug('Error Saving Records', error);
     }
   };
 
@@ -170,7 +170,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   };
 
   const updateCurrentProductionState = (data) => {
-    console.log('updateCurrentProductionState', data);
     const {
       DateBlock = [],
       Code,
