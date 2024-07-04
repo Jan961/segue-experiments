@@ -198,6 +198,7 @@ const NewBookingView = ({
         <div className="flex items-center gap-2">
           <Label className="text-white font-bold" text="Set Venue" />
           <Toggle
+            testId="new-booking-set-venue"
             label="SetVenue"
             checked={isDateTypeOnly}
             onChange={(value) =>
@@ -227,6 +228,7 @@ const NewBookingView = ({
         {!isDateTypeOnly && (
           <>
             <Select
+              testId="new-booking-venue"
               className={classNames('my-2 w-full !border-0')}
               options={venueOptions}
               disabled={stage !== 0}
@@ -236,6 +238,7 @@ const NewBookingView = ({
               placeholder="Please select a venue"
             />
             <Checkbox
+              testId="new-booking-filter-venues"
               id="shouldFilterVenues"
               labelClassName="text-white"
               onChange={(e: any) => onChange({ shouldFilterVenues: e.target.checked })}
@@ -246,6 +249,7 @@ const NewBookingView = ({
               className={classNames('w-full', { 'cursor-not-allowed caret-primary-input-text': !(fromDate && toDate) })}
             >
               <Button
+                testId="new-booking-gap-suggest"
                 className="px-4 my-2 !w-full"
                 disabled={!(fromDate && toDate)}
                 variant="secondary"

@@ -13,29 +13,6 @@ import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
 import fuseFilter from 'utils/fuseFilter';
-const Option = (props: OptionProps) => {
-  return <components.Option className="w-full" {...props} />;
-};
-
-const IndicatorsContainer = (props: IndicatorsContainerProps) => {
-  return (
-    <div className="p-0">
-      <components.IndicatorsContainer {...props} />
-    </div>
-  );
-};
-
-const MultiValueRemove = () => {
-  return null;
-};
-
-const DropdownIndicator = (props: DropdownIndicatorProps) => {
-  return (
-    <components.DropdownIndicator {...props} className="px-1">
-      <Icon iconName="chevron-down" variant="xs" />
-    </components.DropdownIndicator>
-  );
-};
 
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
 
@@ -62,6 +39,36 @@ export interface SelectProps extends WithTestId {
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
 }
+
+const Option = (props: OptionProps & { testId?: string }) => {
+  return (
+    <components.Option
+      data-testId={`select-option-${props.testId}-${(props.data as SelectOption)?.value}`}
+      className="w-full"
+      {...props}
+    />
+  );
+};
+
+const IndicatorsContainer = (props: IndicatorsContainerProps) => {
+  return (
+    <div className="p-0">
+      <components.IndicatorsContainer {...props} />
+    </div>
+  );
+};
+
+const MultiValueRemove = () => {
+  return null;
+};
+
+const DropdownIndicator = (props: DropdownIndicatorProps) => {
+  return (
+    <components.DropdownIndicator {...props} className="px-1">
+      <Icon iconName="chevron-down" variant="xs" />
+    </components.DropdownIndicator>
+  );
+};
 
 export default forwardRef(function Select(
   {
@@ -206,7 +213,7 @@ export default forwardRef(function Select(
   };
 
   const customComponents = {
-    Option: (option) => (renderOption ? renderOption(option) : <Option {...option} />),
+    Option: (option) => (renderOption ? renderOption(option) : <Option testId={testId} {...option} />),
     IndicatorSeparator: null,
     IndicatorsContainer,
     MultiValueRemove,
@@ -221,7 +228,7 @@ export default forwardRef(function Select(
         { 'shadow-sm-shadow': !inline },
         className,
       )}
-      data-testid={`${testId ? `form-select-${testId}` : 'form-select'}`}
+      data-testid={`${testId ? `core-ui-lib-select-${testId}` : 'core-ui-lib-select'}`}
     >
       {label && (
         <div className="border-r min-w-fit border-primary-border px-3">

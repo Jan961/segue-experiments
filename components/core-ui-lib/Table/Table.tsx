@@ -37,6 +37,7 @@ interface TableProps {
   excelStyles?: any[];
   rowSelection?: string;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  testId?: string;
 }
 
 const ROW_HEIGHT = 43;
@@ -71,6 +72,7 @@ export default forwardRef(function Table(
     excelStyles = [],
     rowSelection = 'single',
     onSelectionChanged,
+    testId,
   }: TableProps,
   ref,
 ) {
@@ -150,6 +152,7 @@ export default forwardRef(function Table(
         }}
       >
         <AgGridReact
+          data-testid={`core-ui-lib-table-${testId}`}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? gridHeaderHeight : 0}
