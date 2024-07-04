@@ -28,6 +28,7 @@ const Form = ({ onSave }: FormProps) => {
     maxTravelTimeToNextVenue,
     includeExcludedVenues,
     minSeats,
+    maxSeats,
   } = formData;
 
   const handleOnChange = (event: any) => {
@@ -49,6 +50,7 @@ const Form = ({ onSave }: FormProps) => {
       MaxToMiles: parseInt(formData.maxToNextVenue),
       IncludeExcludedVenues: formData.includeExcludedVenues,
       MinSeats: parseInt(formData.minSeats),
+      MaxSeats: parseInt(formData.maxSeats),
       MaxFromTime: getTimeInMins(formData.maxTravelTimeFromLastVenue),
       MaxToTime: getTimeInMins(formData.maxTravelTimeToNextVenue),
     };
@@ -59,6 +61,7 @@ const Form = ({ onSave }: FormProps) => {
       () => setLoading(true),
     );
   };
+
   return (
     <form>
       <div className="grid grid-cols-12 gap-7">
@@ -128,8 +131,8 @@ const Form = ({ onSave }: FormProps) => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-12 gap-3 my-2">
-        <div className="col-span-2 text-sm flex items-center">Min No. Seats</div>
+      <div className="grid grid-cols-12 gap-3 my-2 items-center">
+        <div className="col-span-2 text-sm flex items-center">No. Seats</div>
         <div className="col-span-4">
           <TextInput
             className="w-full"
@@ -139,21 +142,30 @@ const Form = ({ onSave }: FormProps) => {
             onChange={handleOnChange}
           />
         </div>
-        <div className="col-span-6 items-center justify-end flex">
-          <Checkbox
-            className="flex flex-row-reverse"
-            labelClassName="!text-base"
-            label="Include Excluded Venues"
-            id="includeExcludedVenues"
-            name="includeExcludedVenues"
-            checked={includeExcludedVenues}
+        <div className="col-span-4">
+          <TextInput
+            className="w-full"
+            placeholder="Enter Seats"
+            id="maxSeats"
+            value={maxSeats as string}
             onChange={handleOnChange}
           />
         </div>
       </div>
+      <div className="col-span-6 items-center justify-end flex">
+        <Checkbox
+          className="flex flex-row-reverse"
+          labelClassName="!text-base"
+          label="Include Excluded Venues"
+          id="includeExcludedVenues"
+          name="includeExcludedVenues"
+          checked={includeExcludedVenues}
+          onChange={handleOnChange}
+        />
+      </div>
       <Button
         onClick={getSuggestions}
-        className="float-right px-4 font-normal"
+        className="float-right px-4 font-normal mt-2"
         variant="primary"
         text="Get Suggestions"
       >

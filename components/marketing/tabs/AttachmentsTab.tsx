@@ -8,6 +8,7 @@ import UploadModal from 'components/core-ui-lib/UploadModal';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { Spinner } from 'components/global/Spinner';
 import { attachmentMimeTypes } from 'components/core-ui-lib/UploadModal/interface';
+import { getFileUrl } from 'lib/s3';
 
 interface AttachmentsTabProps {
   bookingId: string;
@@ -76,7 +77,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
         FileDateTime: new Date(),
         FileDescription: attachType,
         FileOriginalFilename: response.data.originalFilename,
-        FileURL: 'https://d1e9vbizioozy0.cloudfront.net/' + response.data.location,
+        FileURL: getFileUrl(response.data.location),
         FileUploadedDateTime: new Date(),
       };
 
