@@ -10,17 +10,17 @@ export default function index() {
     },
     {
       title: 'Artiste Contracts',
-      route: '/contracts/artisteContracts',
+      route: '/contracts/company-contracts',
       color: 'bg-primary-blue',
     },
     {
       title: 'Creative Contracts',
-      route: '/contracts/creativeContracts',
+      route: '/contracts/company-contracts',
       color: 'bg-primary-blue',
     },
     {
       title: 'SM/Tech/Crew Contracts',
-      route: '/contracts/stateTechCrewContracts',
+      route: '/contracts/company-contracts',
       color: 'bg-primary-blue',
     },
   ];

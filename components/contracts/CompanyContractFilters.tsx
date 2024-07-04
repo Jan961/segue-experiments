@@ -34,7 +34,7 @@ const ContractFilters = () => {
             searchFilter={filter.contractText}
             setSearchFilter={(contractText) => setFilter({ contractText })}
             titleClassName="text-primary-blue"
-            title="Venue Contracts"
+            title="Company Contracts"
           >
             <TextInput
               id="contractText"
@@ -74,6 +74,31 @@ const ContractFilters = () => {
           <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
+      <div className=" text-primary-input-text">Contract Status</div>
+
+      <Select
+        onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
+        className="bg-white w-52"
+        value={filter.contractStatusDropDown}
+        disabled={!productionId}
+        placeholder="Contract Status"
+        options={allStatusOptions}
+        isClearable
+        isSearchable
+      />
+
+      <div className=" text-primary-input-text">Contract Status</div>
+
+      <Select
+        onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
+        className="bg-white w-52"
+        value={filter.contractStatusDropDown}
+        disabled={!productionId}
+        placeholder="Contract Status"
+        options={allStatusOptions}
+        isClearable
+        isSearchable
+      />
     </div>
   );
 };
