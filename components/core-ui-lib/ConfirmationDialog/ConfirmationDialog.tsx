@@ -30,6 +30,7 @@ export interface ConfirmationDialogProps {
   labelNo?: string;
   hasOverlay?: boolean;
   content?: ConfirmationDialogContent;
+  dataTestId?: string;
 }
 
 export const confOptions = {
@@ -68,6 +69,7 @@ export default function ConfirmationDialog({
   variant,
   hasOverlay = false,
   content,
+  dataTestId,
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -81,7 +83,12 @@ export default function ConfirmationDialog({
   };
 
   return (
-    <PopupModal show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
+    <PopupModal
+      data-testid={`core-ui-lib-popup-modal-${dataTestId}`}
+      show={visible}
+      showCloseIcon={false}
+      hasOverlay={hasOverlay}
+    >
       <div data-testid="confirmation-dialog" className="-mt-5">
         <div className="text-center">
           <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">

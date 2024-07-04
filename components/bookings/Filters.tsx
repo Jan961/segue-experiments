@@ -66,12 +66,14 @@ const Filters = ({ onExportClick }: FiltersProps) => {
           >
             <div className="flex items-center gap-4">
               <Button
+                id="booking-filters-gototoday"
                 disabled={!todayOnSchedule || !ProductionId}
                 text="Go To Today"
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => gotoToday()}
               />
               <Button
+                id="booking-filters-tour-summary"
                 text="Tour Summary"
                 disabled={ProductionId === -1 || !ProductionId}
                 className="text-sm leading-8 w-[120px]"
@@ -106,7 +108,12 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             value={filter.venueText}
             onChange={onChange}
           />
-          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
+          <Button
+            id="booking-filters-clear-filters"
+            className="text-sm leading-8 w-[120px]"
+            text="Clear Filters"
+            onClick={onClearFilters}
+          />
         </div>
       </div>
       <BookingsButtons onExportClick={onExportClick} />

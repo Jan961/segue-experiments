@@ -62,6 +62,7 @@ export default function Button({
       )}
       disabled={disabled}
       onClick={onClick}
+      data-testid={`core-ui-lib-btn-${id}`}
     >
       {prefixIconName && (
         <span className="col-span-1 absolute left-2">

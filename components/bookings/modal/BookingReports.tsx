@@ -60,6 +60,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
     >
       <div className="-mb-1">
         <Button
+          id="booking-reports-tour-schedule"
           text="Tour Schedule"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
@@ -69,6 +70,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         />
 
         <Button
+          id="booking-reports-travel-summary"
           text="Travel Summary"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
@@ -78,6 +80,7 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         />
 
         <Button
+          id="booking-reports-masterplan"
           text="All Productions Masterplan"
           className="w-[230px] mb-3 pl-5"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
@@ -86,12 +89,14 @@ export const BookingReports = ({ visible = false, onClose, productionId }: Booki
         />
 
         <Button
+          id="booking-reports-multiple-pencil"
           text="Multiple Pencil Report"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
           sufixIconName="excel"
         />
         <Button
+          id="booking-reports-export-mytrbk"
           text="Export to MyTrBk"
           className="w-[230px] mb-3 pl-6"
           iconProps={{ className: 'h-4 w-3 ml-5' }}
