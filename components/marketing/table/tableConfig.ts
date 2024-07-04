@@ -534,62 +534,79 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
   },
 ];
 
-export const gloablModalVenueColDefs = (weekList, selectVenue, selectMultiVenue) => [
-  {
-    headerName: '',
-    field: 'checked',
-    cellRenderer: CheckboxRenderer,
-    cellRendererParams: (params) => {
-      return {
-        onChange: (checked) => selectVenue(params.data, checked),
-        checked: params.data.selected,
-      };
+export const globalModalVenueColDefs = (weekList, selectVenue, selectMultiVenue, variant) => {
+  const colDefs = [];
+
+  colDefs.push(
+    {
+      headerName: '',
+      field: 'checked',
+      cellRenderer: CheckboxRenderer,
+      cellRendererParams: (params) => {
+        return {
+          onChange: (checked) => selectVenue(params.data, checked),
+          checked: params.data.selected,
+          disabled: variant === 'view',
+        };
+      },
+      width: 50,
+      resizable: false,
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        paddingTop: '1rem',
+      },
+      sortable: false,
     },
-    width: 50,
-    resizable: false,
-    cellStyle: {
-      display: 'flex',
-      justifyContent: 'center',
-      paddingTop: '1rem',
+    {
+      headerName: 'Venue',
+      field: 'Name',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: {
+        truncate: false,
+      },
+      cellStyle: {
+        marginTop: '5px',
+      },
+      width: 285,
+      resizable: false,
+      sortable: false,
     },
-    sortable: false,
-  },
-  {
-    headerName: 'Venue',
-    field: 'Name',
-    cellRenderer: DefaultTextRenderer,
-    cellRendererParams: {
-      truncate: false,
-    },
-    cellStyle: {
-      marginTop: '5px',
-    },
-    width: 285,
-    resizable: false,
-    sortable: false,
-  },
-  {
-    headerName: '',
-    field: 'select',
-    cellRenderer: SelectRenderer,
-    cellRendererParams: function (params) {
-      return {
-        options: weekList,
-        hidden: params.node.rowIndex !== 0,
-        onChange: (value) => selectMultiVenue(value),
-      };
-    },
-    width: 100,
-    resizable: false,
-    cellStyle: {
-      textAlign: 'center',
-      overflow: 'visible',
-    },
-    sortable: false,
-  },
-];
+  );
+
+  if (variant !== 'view') {
+    colDefs.push({
+      headerName: '',
+      field: 'select',
+      cellRenderer: SelectRenderer,
+      cellRendererParams: function (params) {
+        return {
+          options: weekList,
+          hidden: params.node.rowIndex !== 0,
+          onChange: (value) => selectMultiVenue(value),
+        };
+      },
+      width: 100,
+      resizable: false,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      sortable: false,
+    });
+  }
+
+  return colDefs;
+};
 
 export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => [
+  {
+    headerName: 'Venue Ids',
+    field: 'venueIds',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
   {
     headerName: 'Activity Name',
     field: 'actName',

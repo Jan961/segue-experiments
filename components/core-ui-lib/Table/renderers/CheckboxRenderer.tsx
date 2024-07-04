@@ -11,6 +11,7 @@ interface CheckboxRendererProps {
   label?: string;
   labelBeforeCheck?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 const CheckboxRenderer = ({
@@ -22,6 +23,7 @@ const CheckboxRenderer = ({
   labelBeforeCheck,
   label,
   className,
+  disabled,
 }: CheckboxRendererProps) => {
   const checkRef = useRef(null);
 
@@ -40,6 +42,7 @@ const CheckboxRenderer = ({
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
           className="w-[1.1875rem] h-[1.1875rem]"
+          disabled={disabled}
         />
         {!labelBeforeCheck && <div className="-mt-2.5 ml-2">{label}</div>}
       </div>

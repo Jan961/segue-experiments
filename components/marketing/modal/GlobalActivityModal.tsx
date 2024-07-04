@@ -12,7 +12,7 @@ import { startOfDay } from 'date-fns';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { hasGlobalActivityChanged } from '../utils';
 import { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
-import { gloablModalVenueColDefs, styleProps } from '../table/tableConfig';
+import { globalModalVenueColDefs, styleProps } from '../table/tableConfig';
 import { Table } from 'components/core-ui-lib';
 
 export type ActivityModalVariant = 'add' | 'edit' | 'delete' | 'view';
@@ -88,7 +88,7 @@ export default function GlobalActivityModal({
       tempVenueList = venues.map((venue) => {
         return {
           ...venue,
-          selected: selectedList?.findIndex((item) => item === venue.Id) !== -1,
+          selected: selectedList?.findIndex((item) => parseInt(item) === venue.Id) !== -1,
         };
       });
     }
@@ -101,7 +101,7 @@ export default function GlobalActivityModal({
   const initForm = () => {
     let dropList = null;
 
-    if (venues.length === 0) {
+    if (venues.length === 0 || variant === 'view') {
       dropList = [];
     } else {
       dropList = tourWeeks
@@ -115,9 +115,7 @@ export default function GlobalActivityModal({
         });
     }
 
-    setVenueColDefs(gloablModalVenueColDefs(dropList, selectVenue, multiVenueSelect));
-
-    console.log(data);
+    setVenueColDefs(globalModalVenueColDefs(dropList, selectVenue, multiVenueSelect, variant));
 
     if (variant === 'add') {
       setActName('');
@@ -127,7 +125,7 @@ export default function GlobalActivityModal({
       setFollowUpDt(null);
       setActNotes('');
       setCost('');
-    } else if (variant === 'edit') {
+    } else if (variant === 'edit' || variant === 'view') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
       setActDate(startOfDay(new Date(data.Date)));
@@ -137,15 +135,6 @@ export default function GlobalActivityModal({
       setActNotes(data.Notes);
       setActId(data.Id);
       setSelectedList(data.VenueIds === null ? [] : data.VenueIds);
-    } else if (variant === 'view') {
-      setActName(data.Name);
-      setActType(data.ActivityTypeId);
-      setActDate(startOfDay(new Date(data.Date)));
-      setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
-      setCost(data.Cost.toString());
-      setActNotes(data.Notes);
-      setActId(data.Id);
     }
   };
 
@@ -368,13 +357,11 @@ export default function GlobalActivityModal({
             disabled={variant === 'view'}
           />
 
-          {variant !== 'view' && (
-            <div className="flex flex-row mt-5">
-              <div className="w-[450px]">
-                <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
-              </div>
+          <div className="flex flex-row mt-5">
+            <div className="w-[450px]">
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
             </div>
-          )}
+          </div>
 
           <div className="float-right flex flex-row mt-5 py-2">
             {variant === 'view' ? (

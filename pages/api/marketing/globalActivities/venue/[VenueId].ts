@@ -11,31 +11,38 @@ export type GlobalActivitiesResponse = {
 };
 
 export const getActivitiesByVenueId = async (VenueId) => {
-  const activities = await prisma.$queryRaw`SELECT 
-        gba.*,
-        GROUP_CONCAT(gbav.GBAVVenueId) AS VenueIds,
-        COUNT(DISTINCT gbav.GBAVVenueId) AS VenueCount
-    FROM 
-        GlobalBookingActivity gba
-    JOIN 
-        GlobalBookingActivityVenue gbav
-    ON 
-        gba.GlobalActivityId = gbav.GBAVGlobalActivityId
-    WHERE 
-        gbav.GBAVGlobalActivityId IN (
-            SELECT 
-                GBAVGlobalActivityId 
-            FROM 
-                GlobalBookingActivityVenue 
-            WHERE 
-                GBAVVenueId = ${VenueId}
-        )
-    GROUP BY 
-        gba.GlobalActivityId;
-    `;
+  const activities = await prisma.$queryRaw`
+  SELECT 
+      gba.*,
+      GROUP_CONCAT(DISTINCT gbav.GBAVVenueId) AS VenueIds,
+      COUNT(DISTINCT gbav.GBAVVenueId) AS VenueCount
+  FROM 
+      GlobalBookingActivity gba
+  JOIN 
+      GlobalBookingActivityVenue gbav
+  ON 
+      gba.GlobalActivityId = gbav.GBAVGlobalActivityId
+  WHERE 
+      gbav.GBAVGlobalActivityId IN (
+          SELECT 
+              GBAVGlobalActivityId 
+          FROM 
+              GlobalBookingActivityVenue 
+          WHERE 
+              GBAVVenueId = ${VenueId}
+      )
+  GROUP BY 
+      gba.GlobalActivityId;
+`;
+
+  // Parsing the VenueIds to get a list of venueIds
+  const activitiesWithVenueList = activities.map((activity) => ({
+    ...activity,
+    VenueIds: activity.VenueIds ? activity.VenueIds.split(',') : [],
+  }));
 
   const result = {
-    activities: activities.map((activity) => {
+    activities: activitiesWithVenueList.map((activity) => {
       return fieldsMapper(activity);
     }),
   };
@@ -53,6 +60,7 @@ const fieldsMapper = (original) => ({
   FollowUpRequired: original.GlobalActivityFollowUpRequired,
   DueByDate: convertDate(original.GlobalActivityDueByDate),
   Notes: original.GlobalActivityNotes,
+  VenueIds: original.VenueIds,
 });
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {

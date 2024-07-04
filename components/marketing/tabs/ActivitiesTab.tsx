@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState, useMemo } from 'react';
 import { SelectOption } from '../MarketingHome';
 import { ActivityDTO, ActivityTypeDTO, GlobalActivityDTO } from 'interfaces';
 import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
@@ -22,7 +22,7 @@ import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
-import GlobalActivityModal from '../modal/GlobalActivityModal';
+import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModal';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -38,7 +38,7 @@ type ActivityList = {
 };
 
 type GlobalActivityList = {
-  activities: Array<GlobalActivityDTO>;
+  activities: Array<GlobalActivity>;
 };
 
 const approvalStatusList = [
@@ -89,8 +89,26 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const { fetchData } = useAxios();
 
+  const venueList = useMemo(() => {
+    try {
+      const venues = bookings.bookings.map((option) => {
+        return {
+          ...option.Venue,
+          date: new Date(option.Date),
+        };
+      });
+
+      return venues;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [bookings.bookings]);
+
   const getActivities = async (bookingId: string) => {
     try {
+      setActColDefs(activityColDefs(activityUpdate, currency.symbol));
+      setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
+
       const data = await fetchData({
         url: '/api/marketing/activities/' + bookingId,
         method: 'POST',
@@ -107,7 +125,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       }));
 
       setActTypeList(actTypes);
-      setActColDefs(activityColDefs(activityUpdate, currency.symbol));
 
       const sortedActivities = activityData.activities.sort(
         (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
@@ -151,11 +168,11 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         cost: act.Cost,
         id: act.Id,
         notes: act.Notes,
+        venueIds: act.VenueIds,
       }));
 
       setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
 
-      setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
       setGlobalRowData(tempGlobList);
 
       setIsLoading(false);
@@ -164,9 +181,24 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     }
   };
 
-  const viewGlobalActivity = (data) => {
-    const tempGlobAct: GlobalActivityDTO = {
-      ActivityTypeId: actTypeList.find((type) => type.text === data.actType).value,
+  const viewGlobalActivity = async (data) => {
+    const accTypeResponse = await fetchData({
+      url: '/api/marketing/activities/' + bookings.selected.toString(),
+      method: 'POST',
+    });
+
+    if (typeof accTypeResponse !== 'object') {
+      return;
+    }
+
+    const activityData = accTypeResponse as ActivityList;
+    const actTypes = activityData.activityTypes.map((type) => ({
+      text: type.Name,
+      value: type.Id,
+    }));
+
+    const tempGlobAct: GlobalActivity = {
+      ActivityTypeId: actTypes.find((type) => type.text === data.actType).value,
       Cost: data.cost,
       Date: data.actDate,
       FollowUpRequired: data.followUpCheck,
@@ -175,6 +207,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
       Id: data.id,
       ProductionId: productionId,
+      VenueIds: data.venueIds,
     };
 
     setGlobalActRow(tempGlobAct);
@@ -629,6 +662,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 data={globalActRow}
                 productionId={productionId}
                 productionCurrency={currency.symbol}
+                venues={venueList}
               />
 
               <ActivityModal
