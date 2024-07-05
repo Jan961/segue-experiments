@@ -5,7 +5,6 @@ import Select from 'components/core-ui-lib/Select';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
-import useAxios from 'hooks/useAxios';
 import { getWeekDayShort } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
@@ -19,8 +18,6 @@ const FinalEntryFilters = () => {
   const [selectedValue, setSelectedValue] = useState(null);
   const [lastDates, setLastDates] = useState([]);
   const [, setCurrency] = useRecoilState(currencyState);
-
-  const { fetchData } = useAxios();
 
   const getCurrency = async (bookingId) => {
     try {
@@ -51,10 +48,7 @@ const FinalEntryFilters = () => {
 
   const fetchLastDates = async () => {
     try {
-      const data = await fetchData({
-        url: '/api/performances/lastDate/' + productionId,
-        method: 'POST',
-      });
+      const data = await axios.post('/api/performances/lastDate/' + productionId, {});
 
       if (Array.isArray(data)) {
         const lastDates = data as Array<LastPerfDate>;
