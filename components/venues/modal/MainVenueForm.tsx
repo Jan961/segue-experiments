@@ -169,7 +169,8 @@ const MainVenueForm = ({
           onChange={(e) => handleInputChange('notes', e.target.value)}
         />
       </label>
-      <div className="flex flex-row items-center gap-4 ">
+      <div />
+      <div className="flex items-center gap-4 w-full justify-end ">
         <p className="text-primary-input-text">Exclude from Barring Check and Venue Gap Suggestions</p>
         <Tooltip
           width="w-[200px]"
