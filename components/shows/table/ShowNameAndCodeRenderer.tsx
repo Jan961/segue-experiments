@@ -3,7 +3,7 @@ const ShowNameAndCodeRenderer = (params) => {
   return (
     <div className="flex justify-between">
       <p>{rowData.ShowName}</p>
-      <p>{rowData.ShowCode}</p>
+      <p>{rowData.ShowCode + (rowData.Code || '')}</p>
     </div>
   );
 };

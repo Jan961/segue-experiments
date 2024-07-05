@@ -10,10 +10,9 @@ import Checkbox from 'components/core-ui-lib/Checkbox';
 import Button from 'components/core-ui-lib/Button';
 import { useMemo, useState } from 'react';
 import { getAllCurrencylist, getRegionlist } from 'services/productionService';
-import { transformToOptions } from 'utils';
 
 export default function Index(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { showsList = [], productionCompanyOptions = [] } = props;
+  const { showsList = [] } = props;
   const [isArchived, setIsArchived] = useState<boolean>(false);
   const [isAddRow, setIsAddRow] = useState<boolean>(false);
   const [isEdited, setIsEdited] = useState<boolean>(false);
@@ -61,7 +60,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
           </div>
         </div>
         <ShowsTable
-          productionCompanyOptions={productionCompanyOptions}
           handleEdit={handleEdit}
           isEdited={isEdited}
           isArchived={isArchived}
@@ -102,7 +100,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       showsList,
       initialState,
       regionsList,
-      productionCompanyOptions: transformToOptions(productionCompanyList, 'name', 'id'),
     },
   };
 };

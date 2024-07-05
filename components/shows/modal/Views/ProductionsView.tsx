@@ -12,7 +12,6 @@ import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
-import { all } from 'radash';
 import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import CurrencyConversionModal from './CurrencyConversionModal';
@@ -20,6 +19,7 @@ import CurrencyConversionModal from './CurrencyConversionModal';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
+  showCode: string;
   onClose: () => void;
 }
 
@@ -34,7 +34,7 @@ const rowClassRules = {
   },
 };
 
-const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) => {
+const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: ProductionsViewProps) => {
   const tableRef = useRef(null);
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
@@ -44,6 +44,10 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
   const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
+  const title = useMemo(
+    () => `${showName || ''} ${showCode || ''}${currentProduction?.prodCode || ''}`,
+    [showName, showCode, currentProduction],
+  );
 
   const gridOptions = {
     getRowId: (params) => {
@@ -71,47 +75,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
 
   const handleArchive = () => {
     setIsArchived(!isArchived);
-  };
-
-  function validateShowData(showData) {
-    for (const show of showData) {
-      if (
-        !show.DateBlock ||
-        show.DateBlock.length === 0 ||
-        !show.DateBlock[0].StartDate ||
-        !show.DateBlock[0].EndDate ||
-        !show.Code
-      ) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  const handleSaveAndClose = async () => {
-    try {
-      const gridApi = tableRef.current.getApi();
-      const editedRecords = [];
-      const newRecords = [];
-      gridApi.forEachNode((rowNode) => {
-        if (!rowNode.data.Id) {
-          newRecords.push(rowNode.data);
-        }
-      });
-      const showData = [...newRecords, ...editedRecords];
-      const mandatoryFieldsValidation: boolean = validateShowData(showData);
-      if (!mandatoryFieldsValidation) {
-        notify.warning(ToastMessages.requiredFieldsWarning);
-        return;
-      }
-      await all([
-        ...newRecords.map((record) => createNewProduction(record)),
-        ...editedRecords.map((record) => updateCurrentProduction(record)),
-      ]);
-      onClose();
-    } catch (error) {
-      debug('Error Saving Records', error);
-    }
   };
 
   const updateCurrentProduction = useCallback(
@@ -157,11 +120,6 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
   );
 
   const onSaveProduction = (production: ProductionFormData, cb?: () => void) => {
-    const mandatoryFieldsValidation: boolean = validateShowData(showData);
-    if (!mandatoryFieldsValidation) {
-      notify.warning(ToastMessages.requiredFieldsWarning);
-      return;
-    }
     if (production?.id) {
       updateCurrentProduction(production, cb);
     } else {
@@ -249,7 +207,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
 
   return (
     <>
-      <div className="flex justify-between">
+      <div className="flex justify-between mb-2">
         <div className="text-primary-navy text-xl relative bottom-2 font-bold">{showName}</div>
         <div className="flex items-center justify-between">
           <div className="flex gap-2 items-center">
@@ -282,14 +240,14 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       <div className="pt-4 w-full grid grid-cols-2 items-center  justify-end  justify-items-end gap-3">
         <div />
         <div className="flex gap-3">
-          <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" />
-          <Button className=" w-33" text="Save and Close" onClick={handleSaveAndClose} />
+          {/* <Button className="w-33 " variant="secondary" onClick={onClose} text="Cancel" /> */}
+          <Button className=" w-33" text="Close" onClick={onClose} />
         </div>
       </div>
       {openEditModal && (
         <ProductionDetailsForm
           production={currentProduction}
-          title={showName || ''}
+          title={title || ''}
           onDelete={handleDelete}
           visible={openEditModal}
           onSave={onSaveProduction}
@@ -299,7 +257,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       {openCurrencyConversionModal && (
         <CurrencyConversionModal
           conversionRates={currentProduction?.conversionRateList}
-          title={showName || ''}
+          title={title || ''}
           visible={openCurrencyConversionModal}
           onClose={() => setOpenCurrencyConversionModal(false)}
         />

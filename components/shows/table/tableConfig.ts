@@ -4,8 +4,6 @@ import TableCheckboxRenderer from './TableCheckboxRenderer';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
-import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import CurrencyExchangeRenderer from './CurrencyExchangeRenderer';
 
 export const generateChildCol = (
@@ -37,7 +35,7 @@ export const generateChildCol = (
   };
 };
 
-export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
+export const showsTableConfig = [
   {
     headerName: 'Show Name',
     field: 'Name',
@@ -62,20 +60,6 @@ export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
     headerClass: 'text-center',
     headerTooltip:
       'The Show Code should be unique to this particular Show and should be a recognisable abbreviation for example Touring Show may be ‘TOUR’. This will be used in combination with the production code, eg Touring Show touring the UK in 2025 could be ‘TOURUK25’',
-  },
-  {
-    headerName: 'Company',
-    field: 'ShowProdCoId',
-    cellRenderer: SelectCellRenderer,
-    cellRendererParams: {
-      options: prodCompanyOptions,
-    },
-    cellStyle: {
-      overflow: 'visible',
-    },
-    width: 270,
-    headerClass: 'text-center',
-    headerTooltip: 'Please select the Company Name or “Special Purpose Vehicle” that is presenting this production.',
   },
   {
     headerName: 'Productions',
@@ -155,6 +139,8 @@ export const currencyConversionTableConfig = [
     cellStyle: {
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
+      wordBreak: 'break-word',
+      overflowWrap: 'break-word',
     },
   },
   {
@@ -187,7 +173,7 @@ export const currencyConversionTableConfig = [
 
 export const productionsTableConfig = [
   {
-    headerName: 'Show',
+    headerName: 'Production',
     headerClass: 'justify-center font-bold text-base ',
     field: 'Name',
     cellRenderer: ShowNameAndCodeRenderer,
@@ -204,6 +190,9 @@ export const productionsTableConfig = [
     width: 92,
     maxWidth: 92,
     cellRenderer: TableCheckboxRenderer,
+    cellRendererParams: {
+      disabled: true,
+    },
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',

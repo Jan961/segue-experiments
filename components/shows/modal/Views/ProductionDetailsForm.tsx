@@ -156,7 +156,7 @@ const ProductionDetailsForm = ({
 
   return (
     <PopupModal
-      hasOverlay={false}
+      hasOverlay={true}
       titleClass="text-xl text-primary-navy text-bold"
       title={title}
       show={visible}
@@ -185,6 +185,7 @@ const ProductionDetailsForm = ({
               onChange={(e) => onChange('prodCode', e.target.value)}
               value={prodCode}
               error={validationErrors?.prodCode}
+              maxlength={10}
               required
             />
             <Tooltip>
@@ -258,6 +259,7 @@ const ProductionDetailsForm = ({
             onChange={(value) => onChange('currency', value as string)}
             options={currencyListOptions}
             value={currency}
+            isSearchable
           />
         </div>
         <div className="flex items-center gap-[92px]">
@@ -290,8 +292,8 @@ const ProductionDetailsForm = ({
             value={frequency}
           />
         </div>
-        <div className="flex items-center gap-[120px]">
-          <Label text="Running Time" />
+        <div className="flex items-center gap-[45px]">
+          <Label text="Running Time (inc Intervals)" />
           <TimeInput
             className="w-28 placeholder-primary"
             onChange={({ hrs, min }) => onChange('runningTime', `${hrs || 0}:${min || 0}`)}

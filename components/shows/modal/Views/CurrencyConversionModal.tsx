@@ -24,11 +24,12 @@ const CurrencyConversionModal = ({ conversionRates, onClose, title, visible }: C
       conversionRates.map(({ Rate, FromCurrency, ToCurrency, ...others }) => {
         const allRegions = FromCurrency.CountryList.flatMap(({ RegionList }) => RegionList);
         const uniqueRegions = unique(allRegions, ({ Id }) => Id);
+        const countries = FromCurrency.CountryList.map(({ Code }) => Code);
         return {
           ...others,
           rate: Rate,
           currency: `${FromCurrency.Code} | ${FromCurrency.Name}`,
-          countries: FromCurrency.CountryList.map(({ Code }) => Code).join(', '),
+          countries: unique(countries).join(', '),
           exchange: {
             toSymbol: ToCurrency?.SymbolUnicode,
             fromCurrencyCode: FromCurrency.Code,
@@ -51,7 +52,6 @@ const CurrencyConversionModal = ({ conversionRates, onClose, title, visible }: C
   );
 
   const onSubmit = useCallback(() => {
-    console.log('onSubmit', editMap);
     const updates = Object.entries(editMap).map(([key, value]) => ({ id: parseInt(key, 10), rate: value }));
     notify.promise(
       updateConversionRate({ updates }).then(() => {
@@ -68,7 +68,7 @@ const CurrencyConversionModal = ({ conversionRates, onClose, title, visible }: C
 
   return (
     <PopupModal
-      hasOverlay={false}
+      hasOverlay={true}
       titleClass="text-xl text-primary-navy font-bold"
       title={title}
       show={visible}
