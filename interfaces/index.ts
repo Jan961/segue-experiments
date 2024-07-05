@@ -319,6 +319,18 @@ export type ActivityDTO = {
   Notes: string;
 };
 
+export type GlobalActivityDTO = {
+  Id?: number;
+  Date: Date | string;
+  Name: string;
+  ProductionId: number;
+  ActivityTypeId: number;
+  Cost: number;
+  FollowUpRequired: boolean;
+  DueByDate?: Date | string;
+  Notes: string;
+};
+
 export type ActivityTypeDTO = {
   Name: string;
   Id: number;
