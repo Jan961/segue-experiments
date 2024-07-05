@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Button, Checkbox, TextArea, TextInput } from 'components/core-ui-lib';
-import useAxios from 'hooks/useAxios';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { currentUserState } from 'state/marketing/currentUserState';
-import { TourResponse } from './entry';
+import { TourResponse } from './Entry';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import axios from 'axios';
 
 interface SalesFigure {
   seatsReserved: string;
@@ -47,14 +47,10 @@ const Final = () => {
   const [showDiscrepancyNotes, setShowDiscrepancyNotes] = useState<boolean>(false);
   const [discrepancyButtonText, setDiscepancyButtonText] = useState('Ok');
 
-  const { fetchData } = useAxios();
-
   const getSalesFrequency = async () => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-        method: 'POST',
-      });
+      const response = await axios.get('/api/marketing/sales/tourWeeks/' + productionId.toString());
+      const data = response.data;
 
       if (typeof data === 'object') {
         const tourData = data as TourResponse;
@@ -76,15 +72,13 @@ const Final = () => {
         const frequency = await getSalesFrequency();
 
         // get previous sales figures first and check for errors
-        const sales = await fetchData({
-          url: '/api/marketing/sales/read/currentDay',
-          method: 'POST',
-          data: {
-            bookingId: bookings.selected,
-            salesDate: null,
-            frequency,
-          },
+        const response = await axios.post('/api/marketing/sales/current/read', {
+          bookingId: bookings.selected,
+          salesDate: null,
+          frequency,
         });
+
+        const sales = response.data;
 
         if (typeof sales === 'object') {
           const salesFigures = sales as SalesFigureSet;
@@ -163,12 +157,7 @@ const Final = () => {
         },
       };
 
-      await fetchData({
-        url: '/api/marketing/sales/process/entry/final',
-        method: 'POST',
-        data,
-      });
-
+      await axios.post('/api/marketing/sales/process/entry/create', data);
       setBookings({ ...bookings, selected: null });
     } catch (error) {
       console.log(error);
@@ -218,15 +207,13 @@ const Final = () => {
       }
 
       // get the salesFigures for the selected date/week if they exist
-      const sales = await fetchData({
-        url: '/api/marketing/sales/read/final',
-        method: 'POST',
-        data: {
-          bookingId: bookings.selected,
-        },
+      const response = await axios.post('/api/marketing/sales/final/read', {
+        bookingId: bookings.selected,
       });
 
-      if (typeof sales === 'object' && Object.keys(sales).length > 0) {
+      const sales = response.data;
+
+      if (!isNullOrEmpty(sales) && typeof sales === 'object') {
         const salesFigures = sales as SalesFigureSet;
 
         // set the sales figures, if available
@@ -319,11 +306,7 @@ const Final = () => {
       setBookings({ bookings: newBookings, selected: bookings.selected });
 
       // update in the database
-      await fetchData({
-        url: '/api/bookings/update/' + bookings.selected.toString(),
-        method: 'POST',
-        data: updObj,
-      });
+      await axios.post('/api/bookings/update/' + bookings.selected.toString(), updObj);
     } catch (error) {
       console.log(error);
     }
@@ -347,7 +330,7 @@ const Final = () => {
     if (bookings.selected !== undefined && bookings.selected !== null) {
       initForm();
     }
-  }, [fetchData, bookings.selected]);
+  }, [bookings.selected]);
 
   return (
     <div>

@@ -259,7 +259,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
       // get the salesFigures for the selected date/week if they exist
       const sales = await fetchData({
-        url: '/api/marketing/sales/read/currentDay',
+        url: '/api/marketing/sales/current/read',
         method: 'POST',
         data: {
           bookingId: bookings.selected,

@@ -99,6 +99,3 @@ export const getProductionsConvertedPayload = (input, isEdit = false) => {
 
   return output;
 };
-
-// regex for dd/mm/yy
-export const DATE_PATTERN = /(\d{2}\/\d{2}\/\d{2})/;

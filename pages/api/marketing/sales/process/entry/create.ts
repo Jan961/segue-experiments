@@ -1,37 +1,40 @@
 import prisma from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
+    const { bookingId, salesDate, user, general, schools } = req.body;
+
     const setResult = await prisma.SalesSet.create({
       data: {
-        SetBookingId: parseInt(req.body.bookingId),
+        SetBookingId: parseInt(bookingId),
         SetPerformanceId: null,
-        SetSalesFiguresDate: req.body.salesDate,
+        SetSalesFiguresDate: salesDate,
         SetBrochureReleased: false,
         SetSingleSeats: false,
         SetNotOnSale: false,
         SetIsFinalFigures: true,
         SetIsCopy: false,
-        SetFinalSalesApprovedByUser: req.body.user,
+        SetFinalSalesApprovedByUser: user,
       },
     });
 
     const sales = [];
 
-    if (req.body.general) {
+    if (general) {
       sales.push({
         SaleSaleTypeId: 1,
-        SaleSeats: req.body.general.seatsSold,
-        SaleValue: req.body.general.seatsSoldVal,
+        SaleSeats: general.seatsSold,
+        SaleValue: general.seatsSoldVal,
         SaleSetId: setResult.SetId,
       });
     }
 
-    if (Object.values(req.body.schools).length !== 0) {
+    if (!isNullOrEmpty(schools)) {
       sales.push({
         SaleSaleTypeId: 3,
-        SaleSeats: req.body.schools.seatsSold,
-        SaleValue: req.body.schools.seatsSoldVal,
+        SaleSeats: schools.seatsSold,
+        SaleValue: schools.seatsSoldVal,
         SaleSetId: setResult.SetId,
       });
     }

@@ -5,27 +5,27 @@ import Select from 'components/core-ui-lib/Select';
 import { mapBookingsToProductionOptions } from 'mappers/productionCodeMapper';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
-import { getWeekDayShort } from 'services/dateService';
+import { getWeekDayShort , DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
-import { DATE_PATTERN } from 'components/shows/constants';
+import { isNullOrEmpty } from 'utils';
 
 const FinalEntryFilters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
-  const [selectedValue, setSelectedValue] = useState(null);
+  const [selectedValue, setSelectedValue] = useState<string>(null);
   const [lastDates, setLastDates] = useState([]);
   const [, setCurrency] = useRecoilState(currencyState);
 
   const getCurrency = async (bookingId) => {
     try {
-      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+      const response = await axios.get('/api/marketing/currency/' + bookingId);
 
-      if (response.data && typeof response.data === 'object') {
-        const currencyObject = response.data as { currency: string };
-        setCurrency({ symbol: currencyObject.currency });
+      if (response.data) {
+        const { currency } = response.data;
+        setCurrency({ symbol: currency });
       }
     } catch (error) {
       console.error('Error retrieving currency:', error);
@@ -48,7 +48,7 @@ const FinalEntryFilters = () => {
 
   const fetchLastDates = async () => {
     try {
-      const data = await axios.post('/api/performances/lastDate/' + productionId, {});
+      const data = await axios.get('/api/performances/lastDate/' + productionId);
 
       if (Array.isArray(data)) {
         const lastDates = data as Array<LastPerfDate>;
@@ -85,7 +85,7 @@ const FinalEntryFilters = () => {
   }, [bookings.bookings, lastDates]);
 
   useEffect(() => {
-    if (productionId !== null && productionId !== undefined) {
+    if (!isNullOrEmpty(productionId)) {
       fetchLastDates();
     }
   }, [productionId]);
@@ -97,32 +97,27 @@ const FinalEntryFilters = () => {
   }, [bookings.selected]);
 
   return (
-    <div>
-      <div className="w-full flex justify-between flex-row">
-        <div className="flex flex-col mb-4">
-          <div className="py-2 flex flex-row items-center gap-4">
-            <h1 className="text-4xl font-bold text-primary-green">Final Sales Entry</h1>
+    <div className="py-2 flex flex-row items-center gap-4">
+      <h1 className="text-4xl font-bold text-primary-green">Final Sales Entry</h1>
 
-            <div className="bg-white border-primary-border rounded-md border shadow-md">
-              <div className="rounded-l-md">
-                <div className="flex items-center">
-                  <ProductionJumpMenu showArchivedCheck={false} />
-                </div>
-              </div>
-            </div>
-            <Select
-              onChange={changeBooking}
-              value={selectedValue}
-              disabled={!productionId}
-              placeholder="Select a Venue/Date"
-              className="bg-white w-[550px]"
-              options={bookingOptions}
-              isClearable
-              isSearchable
-            />
+      <div className="bg-white border-primary-border rounded-md border shadow-md">
+        <div className="rounded-l-md">
+          <div className="flex items-center">
+            <ProductionJumpMenu showArchivedCheck={false} />
           </div>
         </div>
       </div>
+
+      <Select
+        onChange={changeBooking}
+        value={selectedValue}
+        disabled={!productionId}
+        placeholder="Select a Venue/Date"
+        className="bg-white w-[550px]"
+        options={bookingOptions}
+        isClearable
+        isSearchable
+      />
     </div>
   );
 };
