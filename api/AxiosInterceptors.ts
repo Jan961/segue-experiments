@@ -1,5 +1,5 @@
 import axios, { AxiosResponse, AxiosError, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
-import { getTimezonOffset } from 'components/bookings/modal/request';
+import { getTimezonOffset } from 'services/dateService';
 
 /**
  * Axios Error Response Handler
