@@ -1,6 +1,6 @@
 import axios, { AxiosResponseHeaders } from 'axios';
 import moment from 'moment';
-import { getMonday } from 'services/dateService';
+import { getMonday, getTimezonOffset } from 'services/dateService';
 
 export const downloadFromContent = (content: Blob, filename: string) => {
   const url = window.URL.createObjectURL(content);
@@ -64,10 +64,6 @@ export const exportBookingSchedule = async (ProductionId: number) => {
   } catch (error) {
     console.log(error);
   }
-};
-
-export const getTimezonOffset = () => {
-  return new Date().getTimezoneOffset();
 };
 
 export const exportMasterplanReport = async (fromDate: string, toDate: string) => {
