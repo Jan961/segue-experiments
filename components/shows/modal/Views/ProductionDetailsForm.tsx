@@ -322,12 +322,15 @@ const ProductionDetailsForm = ({
 
         <div className="pt-3 w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
-          <Button
-            onClick={() => setConfirm(true)}
-            className="float-right px-4 w-33 font-normal"
-            variant="tertiary"
-            text="Delete"
-          />
+          <Tooltip body={!production?.isArchived ? 'Please archive the production prior to deleting' : ''}>
+            <Button
+              disabled={!production?.isArchived}
+              onClick={() => setConfirm(true)}
+              className="float-right px-4 w-33 font-normal"
+              variant="tertiary"
+              text="Delete"
+            />
+          </Tooltip>
           <Button
             className="float-right px-4 font-normal w-33 text-center"
             variant="primary"

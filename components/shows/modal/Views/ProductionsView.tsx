@@ -145,8 +145,8 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
       ProdCoId,
       ConversionRateList,
     } = data;
-    const productionDateBlock = DateBlock.find((d) => d.Name === 'Production');
-    const rehearsalDateBlock = DateBlock.find((d) => d.Name === 'Rehearsal');
+    const productionDateBlock = DateBlock.find((d) => d.Name === 'Production') || {};
+    const rehearsalDateBlock = DateBlock.find((d) => d.Name === 'Rehearsal') || {};
     setCurrentProduction({
       id: Id,
       showId: ShowId,

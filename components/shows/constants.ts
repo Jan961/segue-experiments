@@ -29,18 +29,22 @@ export const getProductionsConvertedPayload = (production) => {
     salesFrequency: frequency,
     regionList: region.filter((o) => o !== 'select_all'),
     dateBlockList: [
-      {
-        name: 'Rehearsal',
-        startDate: rehearsalDateBlock.StartDate,
-        endDate: rehearsalDateBlock.EndDate,
-        isPrimary: false,
-      },
+      ...((rehearsalDateBlock?.StartDate &&
+        rehearsalDateBlock?.EndDate && [
+          {
+            name: 'Rehearsal',
+            startDate: rehearsalDateBlock?.StartDate,
+            endDate: rehearsalDateBlock?.EndDate,
+            isPrimary: false,
+          },
+        ]) ||
+        []),
       {
         name: 'Production',
-        startDate: productionDateBlock.StartDate,
-        endDate: productionDateBlock.EndDate,
+        startDate: productionDateBlock?.StartDate,
+        endDate: productionDateBlock?.EndDate,
         isPrimary: true,
       },
-    ],
+    ].filter((x) => x),
   };
 };

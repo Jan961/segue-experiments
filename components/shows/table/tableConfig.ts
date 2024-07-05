@@ -136,11 +136,15 @@ export const currencyConversionTableConfig = [
     field: 'countries',
     flex: 1,
     width: 185,
+    wrapText: true,
+    autoHeight: true,
     cellStyle: {
       paddingRight: '0.75em',
       paddingLeft: '0.75em',
       wordBreak: 'break-word',
       overflowWrap: 'break-word',
+      overflow: 'unset',
+      textOverflow: 'unset',
     },
   },
   {
