@@ -4,6 +4,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
+import { UploadModal } from '../../core-ui-lib';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -19,6 +20,7 @@ const VenueTechnicalDetailsForm = ({
   updateValidationErrrors,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
+  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...venue,
@@ -33,6 +35,15 @@ const VenueTechnicalDetailsForm = ({
 
   return (
     <>
+      {uploadVisible && (
+        <UploadModal
+          title="Upload Tech Specs"
+          visible={uploadVisible}
+          info="Please select the files you would like to upload"
+          allowedFormats={['image/jpeg', 'image/png']}
+          onClose={() => setUploadVisible(false)}
+        />
+      )}
       <div className="flex flex-row  justify-between">
         <div className="flex flex-col">
           <label
