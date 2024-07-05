@@ -125,7 +125,7 @@ const MainVenueForm = ({
           placeholder="Enter Town Population"
           type="number"
           className="w-[364px]"
-          value={formData.townPopulation + ''}
+          value={formData.townPopulation}
           onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
         />
       </label>
@@ -137,7 +137,7 @@ const MainVenueForm = ({
             placeholder="Enter Capacity"
             type="number"
             className="w-[364px]"
-            value={formData.venueCapacity + ''}
+            value={formData.venueCapacity}
             onChange={(e) => handleInputChange('venueCapacity', parseFloat(e.target.value))}
           />
         </label>
