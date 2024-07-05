@@ -10,15 +10,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (!access) return res.status(401).end();
 
   try {
-    await prisma.production.update({
+    await prisma.production.delete({
       where: {
         Id: ProductionId,
       },
-      data: {
-        IsDeleted: true,
-      },
     });
-    res.status(200).end();
+    res.status(200).json({ message: 'Production deleted successfully', ok: true });
   } catch (e) {
     console.log(e);
     res.status(500).json({ err: 'Error occurred while deleting production.' });

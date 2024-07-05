@@ -6,6 +6,7 @@ import moment from 'moment';
 import { convertLocalDateToUTC } from 'services/dateService';
 import { shortDateRegex } from 'utils/regexUtils';
 import Label from '../Label';
+
 interface DateInputProps {
   value?: string | Date;
   onChange: (value: Date) => void;
@@ -19,7 +20,7 @@ interface DateInputProps {
   label?: string;
   labelClassName?: string;
   disabled?: boolean;
-  position?: number;
+  position?: string;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -40,7 +41,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     label,
     labelClassName,
     disabled = false,
-    position = 0,
+    position = '',
     ...props
   }: DateInputProps,
   ref,
@@ -62,7 +63,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       }
     } else {
       setInputValue('');
-
       setSelectedDate(useIfValueNull);
     }
   };
@@ -88,7 +88,6 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
       if (value.length < 9) {
         let dateText = value.replace(/\D/g, '');
         dateText = dateText.replace(/(\d{2})(?=\d)/g, '$1/');
-
         setInputValue(dateText);
         if (regex.test(inputValue) && !moment(inputValue, 'DD/MM/YY').isValid()) {
           setErrorMsg('Invalid Date');
@@ -129,6 +128,12 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.code === 'Enter') {
+      inputRef.current.blur();
+    }
+  };
+
   return (
     <div
       className={`relative h-[1.9375rem] flex flex-row rounded-md ${
@@ -149,7 +154,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           maxDate={maxDate}
           placeholderText={placeholder}
           dateFormat="dd/MM/yy"
-          popperClassName={`!z-50 !-left-${position}`}
+          popperClassName={`!z-50 ${position}`}
           onSelect={(e) => onChange(convertLocalDateToUTC(e))}
           onChange={() => null}
           selected={selectedDate}
@@ -170,6 +175,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           onChange={handleInputChange}
           onFocus={handleInputFocus}
           onBlur={handleInputBlur}
+          onKeyDown={handleKeyDown}
           disabled={disabled}
         />
       </div>

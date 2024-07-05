@@ -325,7 +325,9 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
           )}
         </TableWrapper>
         <div className="float-right flex flex-row mt-5 py-2">
-          <div className="text text-base text-primary-red mr-12">{errorMessage}</div>
+          <div className={classNames('text', 'text-base', 'text-primary-red', { 'mr-12': errorMessage.length > 0 })}>
+            {errorMessage}
+          </div>
 
           {loading && <Spinner size="sm" className="mr-3" />}
 
@@ -366,13 +368,12 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
         onClose={handleModalCancel}
         hasOverlay={false}
       >
-        <div className="w-[1220px] h-auto">
+        <div className="w-auto h-auto">
           <div className="text-xl text-primary-navy font-bold mb-4">{venueDesc}</div>
 
           <SalesTable
             salesTableRef={salesTableRef}
             containerHeight="h-auto"
-            containerWidth="w-[1220px]"
             module="bookings"
             variant="salesSnapshot"
             data={salesSnapData}

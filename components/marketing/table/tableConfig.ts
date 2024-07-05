@@ -7,9 +7,9 @@ import { getTimeFromDateAndTime } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
-import TextInputRenderer from 'components/core-ui-lib/Table/renderers/TextInputRenderer';
 import SalesValueInputRenderer from './SalesValueInputRenderer';
 import { isNullOrEmpty } from 'utils';
+import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -85,9 +85,6 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: {
       truncate: false,
-    },
-    cellStyle: {
-      marginTop: '5px',
     },
     width: 320,
   },
@@ -335,6 +332,12 @@ export const attachmentsColDefs = [
 export const salesEntryColDefs = (type: string, currency: string, handleUpdate) => {
   const colDefs = [
     {
+      headerName: 'Type ID',
+      field: 'id',
+      cellRenderer: DefaultTextRenderer,
+      hide: true,
+    },
+    {
       headerName: type,
       field: 'name',
       cellRenderer: DefaultTextRenderer,
@@ -345,12 +348,13 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
     {
       headerName: 'Seats',
       field: 'seats',
-      cellRenderer: TextInputRenderer,
+      cellRenderer: SalesValueInputRenderer,
       cellRendererParams: function (params) {
         return {
           value: isNullOrEmpty(params.data.seats) ? '0' : params.data.seats.toString(),
           className: 'w-[100px] ml-1 mt-1',
-          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'seats'),
+          onUpdate: (value) => handleUpdate(value, params.data, type, 'seats'),
+          currency: '',
         };
       },
       width: 112,
@@ -367,8 +371,8 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
       cellRendererParams: function (params) {
         return {
           value: isNullOrEmpty(params.data.value) ? '0' : params.data.value.toString(),
-          className: 'w-[90px] ml-1 mt-1',
-          onChange: (e) => handleUpdate(e.target.value, params.data, type, 'value'),
+          className: 'w-[90px] ml-1',
+          onUpdate: (value) => handleUpdate(value, params.data, type, 'value'),
           currency,
         };
       },
@@ -382,3 +386,302 @@ export const salesEntryColDefs = (type: string, currency: string, handleUpdate) 
 
   return colDefs;
 };
+
+export const updateWarningColDefs = (type) => {
+  const colDefs = [];
+
+  colDefs.push(
+    {
+      headerName: 'Date',
+      field: 'date',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: (params) => {
+        return {
+          value: formatInputDate(params.data.date),
+        };
+      },
+      width: 185,
+    },
+    {
+      headerName: 'Seats',
+      field: 'seats',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+      resizable: type !== 'Hold',
+    },
+  );
+
+  if (type === 'Hold') {
+    colDefs.push({
+      headerName: 'Value',
+      field: 'value',
+      cellRenderer: DefaultTextRenderer,
+      width: 185,
+      resizable: false,
+    });
+  }
+
+  return colDefs;
+};
+
+export const globalActivityColDefs = (updateActivity, currencySymbol) => [
+  {
+    headerName: 'Id',
+    field: 'id',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Venue Ids',
+    field: 'venueIds',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Activity Name',
+    field: 'actName',
+    cellRenderer: DefaultCellRenderer,
+    width: 188,
+  },
+  {
+    headerName: 'Type',
+    field: 'actType',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Date',
+    field: 'actDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Follow Up Req.',
+    field: 'followUpCheck',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => ({
+      onChange: () => null, // no action required, checkbox fixed in table
+      checked: params.data.followUpCheck,
+    }),
+    width: 85,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Cost',
+    field: 'cost',
+    cellRenderer: (params) => {
+      return `${currencySymbol === undefined ? '' : currencySymbol}${params.data.cost.toFixed(2)}`;
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 100,
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    cellStyle: {
+      marginTop: '5px',
+    },
+    width: 320,
+  },
+  {
+    headerName: 'Due By Date',
+    field: 'followUpDt',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.followUpDt);
+    },
+    width: 100,
+    hide: true,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'edit',
+          onClick: () => updateActivity('edit', params.data),
+        },
+        {
+          name: 'delete',
+          onClick: () => updateActivity('delete', params.data),
+        },
+      ],
+    }),
+    width: 90,
+    resizable: false,
+  },
+];
+
+export const globalModalVenueColDefs = (weekList, selectVenue, selectMultiVenue, variant) => {
+  const colDefs = [];
+
+  colDefs.push(
+    {
+      headerName: '',
+      field: 'checked',
+      cellRenderer: CheckboxRenderer,
+      cellRendererParams: (params) => {
+        return {
+          onChange: (checked) => selectVenue(params.data, checked),
+          checked: params.data.selected,
+          disabled: variant === 'view',
+        };
+      },
+      width: 50,
+      resizable: false,
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        paddingTop: '1rem',
+      },
+      sortable: false,
+    },
+    {
+      headerName: 'Venue',
+      field: 'Name',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: {
+        truncate: false,
+      },
+      cellStyle: {
+        marginTop: '5px',
+      },
+      width: 285,
+      resizable: false,
+      sortable: false,
+    },
+  );
+
+  if (variant !== 'view') {
+    colDefs.push({
+      headerName: '',
+      field: 'select',
+      cellRenderer: SelectRenderer,
+      cellRendererParams: function (params) {
+        return {
+          options: weekList,
+          hidden: params.node.rowIndex !== 0,
+          onChange: (value) => selectMultiVenue(value),
+        };
+      },
+      width: 100,
+      resizable: false,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      sortable: false,
+    });
+  }
+
+  return colDefs;
+};
+
+export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => [
+  {
+    headerName: 'Venue Ids',
+    field: 'venueIds',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Activity Name',
+    field: 'actName',
+    cellRenderer: DefaultCellRenderer,
+    width: 230,
+  },
+  {
+    headerName: 'Type',
+    field: 'actType',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Date',
+    field: 'actDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Follow Up Req.',
+    field: 'followUpCheck',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => ({
+      onChange: () => null, // no action required, checkbox fixed in table
+      checked: params.data.followUpCheck,
+    }),
+    width: 100,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Cost',
+    field: 'cost',
+    cellRenderer: (params) => {
+      return currencySymbol + params.data.cost; // .toFixed(2);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    width: 400,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'info-circle-solid',
+          onClick: () => showGlobalActivity(params.data),
+        },
+      ],
+    }),
+    width: 50,
+    resizable: false,
+  },
+];

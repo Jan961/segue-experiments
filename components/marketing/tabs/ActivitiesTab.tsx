@@ -1,10 +1,10 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { ActivityList, SelectOption } from '../MarketingHome';
-import { ActivityDTO } from 'interfaces';
+import { forwardRef, useEffect, useImperativeHandle, useState, useMemo } from 'react';
+import { SelectOption } from '../MarketingHome';
+import { ActivityDTO, ActivityTypeDTO, GlobalActivityDTO } from 'interfaces';
 import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
 import useAxios from 'hooks/useAxios';
 import { startOfDay } from 'date-fns';
-import { activityColDefs, styleProps } from '../table/tableConfig';
+import { activityColDefs, globalActivityTabColDefs, styleProps } from '../table/tableConfig';
 import { hasActivityChanged } from '../utils';
 import ConfirmationDialog, { ConfDialogVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -20,6 +20,9 @@ import Table from 'components/core-ui-lib/Table';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
+import GlobalActivityModal, { GlobalActivity } from '../modal/GlobalActivityModal';
 
 interface ActivitiesTabProps {
   bookingId: string;
@@ -28,6 +31,15 @@ interface ActivitiesTabProps {
 export interface ActivityTabRef {
   resetData: () => void;
 }
+
+type ActivityList = {
+  activities: Array<ActivityDTO>;
+  activityTypes: Array<ActivityTypeDTO>;
+};
+
+type GlobalActivityList = {
+  activities: Array<GlobalActivity>;
+};
 
 const approvalStatusList = [
   { text: 'Pending Approval', value: 'P' },
@@ -39,7 +51,12 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [actTypeList, setActTypeList] = useState<Array<SelectOption>>(null);
   const [actColDefs, setActColDefs] = useState([]);
   const [actRowData, setActRowData] = useState([]);
+  const [globalRowData, setGlobalRowData] = useState([]);
+  const [globalColDefs, setGlobalColDefs] = useState([]);
+  const [globalTotalCost, setGlobalTotalCost] = useState<number>(0);
+  const [globalVenueShareCost, setGlobalVenueShareCost] = useState<number>(0);
   const [actRow, setActRow] = useState<ActivityDTO>();
+  const [globalActRow, setGlobalActRow] = useState<GlobalActivityDTO>();
   const [actModalVariant, setActModalVariant] = useState<ActivityModalVariant>();
   const [approvalStatus, setApprovalStatus] = useState<string>();
   const [changeDate, setChangeDate] = useState<Date>();
@@ -53,15 +70,16 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   const [totalVenueCost, setTotalVenueCost] = useState<number>(0);
   const [totalCompanyCost, setTotalCompanyCost] = useState<number>(0);
   const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
+  const [showGlobalActivityModal, setShowGlobalActivityModal] = useState<boolean>(false);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [confVariant, setConfVariant] = useState<ConfDialogVariant>('delete');
-  const bookings = useRecoilState(bookingJumpState);
+  const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const currency = useRecoilValue(currencyState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const { selected: productionId, productions } = useRecoilValue(productionJumpState);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -71,8 +89,26 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const { fetchData } = useAxios();
 
+  const venueList = useMemo(() => {
+    try {
+      const venues = bookings.bookings.map((option) => {
+        return {
+          ...option.Venue,
+          date: new Date(option.Date),
+        };
+      });
+
+      return venues;
+    } catch (error) {
+      console.log(error);
+    }
+  }, [bookings.bookings]);
+
   const getActivities = async (bookingId: string) => {
     try {
+      setActColDefs(activityColDefs(activityUpdate, currency.symbol));
+      setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
+
       const data = await fetchData({
         url: '/api/marketing/activities/' + bookingId,
         method: 'POST',
@@ -89,7 +125,6 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       }));
 
       setActTypeList(actTypes);
-      setActColDefs(activityColDefs(activityUpdate, currency.symbol));
 
       const sortedActivities = activityData.activities.sort(
         (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
@@ -111,10 +146,72 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       calculateActivityTotals(tempRows);
       setActRowData(tempRows);
 
+      const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
+
+      const globResponse = await fetchData({
+        url: '/api/marketing/globalActivities/venue/' + venueId,
+        method: 'POST',
+      });
+
+      if (typeof globResponse !== 'object') {
+        return;
+      }
+
+      const globalActivities = globResponse as GlobalActivityList;
+
+      const tempGlobList = globalActivities.activities.map((act) => ({
+        actName: act.Name,
+        actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+        actDate: startOfDay(new Date(act.Date)),
+        followUpCheck: act.FollowUpRequired,
+        followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
+        cost: act.Cost,
+        id: act.Id,
+        notes: act.Notes,
+        venueIds: act.VenueIds,
+      }));
+
+      setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
+
+      setGlobalRowData(tempGlobList);
+
       setIsLoading(false);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const viewGlobalActivity = async (data) => {
+    const accTypeResponse = await fetchData({
+      url: '/api/marketing/activities/' + bookings.selected.toString(),
+      method: 'POST',
+    });
+
+    if (typeof accTypeResponse !== 'object') {
+      return;
+    }
+
+    const activityData = accTypeResponse as ActivityList;
+    const actTypes = activityData.activityTypes.map((type) => ({
+      text: type.Name,
+      value: type.Id,
+    }));
+
+    const tempGlobAct: GlobalActivity = {
+      ActivityTypeId: actTypes.find((type) => type.text === data.actType).value,
+      Cost: data.cost,
+      Date: data.actDate,
+      FollowUpRequired: data.followUpCheck,
+      Name: data.actName,
+      Notes: data.notes,
+      DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+      Id: data.id,
+      ProductionId: productionId,
+      VenueIds: data.venueIds,
+    };
+
+    setGlobalActRow(tempGlobAct);
+    setShowGlobalActivityModal(true);
   };
 
   const calculateActivityTotals = (tableRows) => {
@@ -270,9 +367,33 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const editBooking = async (field: string, value: any) => {
-    const updObj = { [field]: value };
+    // Mapping of local state fields to booking object fields
+    const fieldMapping = {
+      ticketsOnSale: 'TicketsOnSale',
+      marketingPlanReceived: 'MarketingPlanReceived',
+      printReqsReceived: 'PrintReqsReceived',
+      contactInfoReceived: 'ContactInfoReceived',
+      ticketsOnSaleFromDate: 'TicketsOnSaleFromDate',
+      marketingCostsNotes: 'MarketingCostsNotes',
+      marketingCostsApprovalDate: 'MarketingCostsApprovalDate',
+      marketingCostsStatus: 'MarketingCostsStatus',
+    };
 
-    // update locally first
+    // Find the booking index
+    const bookingIndex = bookings.bookings.findIndex((booking) => booking.Id === props.bookingId);
+
+    // Create a new bookings array with the updated booking
+    const newBookings = bookings.bookings.map((booking, index) => {
+      if (index === bookingIndex) {
+        return {
+          ...booking,
+          [fieldMapping[field]]: value,
+        };
+      }
+      return booking;
+    });
+
+    // Update the local state based on the field being edited
     switch (field) {
       case 'ticketsOnSale':
         setOnSaleCheck(value);
@@ -300,20 +421,28 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         break;
     }
 
-    // update in the database
+    // Update the bookings state with the new bookings array
+    setBookings({ bookings: newBookings, selected: bookings.selected });
+
+    // Update in the database
     await fetchData({
       url: '/api/bookings/update/' + props.bookingId.toString(),
       method: 'POST',
-      data: updObj,
+      data: { [field]: value },
     });
   };
+
   useEffect(() => {
     if (!isNullOrEmpty(props.bookingId)) {
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString());
 
+      // just a temp measure until RCK advises
+      setGlobalVenueShareCost(0);
+
       // set checkbox row on activities tab
-      const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
+      const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
+
       setOnSaleCheck(booking.TicketsOnSale);
       setMarketingPlansCheck(booking.MarketingPlanReceived);
       setPrintReqCheck(booking.PrintReqsReceived);
@@ -326,6 +455,25 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setDataAvailable(true);
     }
   }, [props.bookingId]);
+
+  const onExport = async () => {
+    const urlPath = `/api/reports/marketing/activitiesReport/${props.bookingId}`;
+    const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
+    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const selectedProduction = productions?.filter((production) => production.Id === productionId);
+    const { ShowName, ShowCode, Code } = selectedProduction[0];
+    const productionName = `${ShowName} (${ShowCode + Code})`;
+    const payload = {
+      productionName,
+      venueAndDate,
+    };
+    const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report.xlsx');
+    notify.promise(downloadContactNotesReport(), {
+      loading: 'Generating activities report',
+      success: 'Activities report downloaded successfully',
+      error: 'Error generating activities report',
+    });
+  };
 
   return (
     <>
@@ -428,11 +576,12 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                     disabled={!productionId}
                     iconProps={{ className: 'h-4 w-3' }}
                     sufixIconName="excel"
+                    onClick={onExport}
                   />
                   <Button text="Add New Activity" className="w-[160px]" onClick={addActivity} />
                 </div>
               </div>
-              <div className="w-[1086px] h-[500px]">
+              <div className="w-[1086px] h-[375px]">
                 <Table columnDefs={actColDefs} rowData={actRowData} styleProps={styleProps} tableHeight={250} />
 
                 <div
@@ -471,6 +620,50 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                   </div>
                 </div>
               </div>
+
+              <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">Global Activities</div>
+
+              <div className="w-[1086px] h-[500px]">
+                <Table columnDefs={globalColDefs} rowData={globalRowData} styleProps={styleProps} tableHeight={250} />
+
+                <div
+                  className={classNames(
+                    'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
+                    actRowData.length === 0 ? '-mt-[405px]' : '',
+                  )}
+                >
+                  <div className="flex flex-row gap-4">
+                    <div className="flex flex-col text-center">
+                      <div className="text-base font-bold text-primary-input-text">Total Cost</div>
+                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
+                        <div className="text text-base text-left pl-2 text-primary-input-text">
+                          {currency.symbol + globalTotalCost.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col text-center">
+                      <div className="text-base font-bold text-primary-input-text">Venue Share</div>
+                      <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
+                        <div className="text text-base text-left pl-2 text-primary-input-text">
+                          {currency.symbol + globalVenueShareCost.toFixed(2)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <GlobalActivityModal
+                show={showGlobalActivityModal}
+                onCancel={() => setShowGlobalActivityModal(false)}
+                variant="view"
+                activityTypes={actTypeList}
+                data={globalActRow}
+                productionId={productionId}
+                productionCurrency={currency.symbol}
+                venues={venueList}
+              />
 
               <ActivityModal
                 show={showActivityModal}

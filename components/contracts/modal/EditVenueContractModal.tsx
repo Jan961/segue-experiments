@@ -32,6 +32,7 @@ import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
 import { LoadingOverlay } from 'components/shows/ShowsTable';
+import { transformToOptions } from 'utils';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);
@@ -55,12 +56,25 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const { users } = useRecoilValue(userState);
   const userList = useMemo(
     () =>
-      Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
-        value: Id,
-        text: `${FirstName || ''} ${LastName || ''}`,
-      })),
+      transformToOptions(
+        Object.values(users),
+        null,
+        null,
+        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
+        ({ FirstName, LastName }) => `${FirstName || ''} ${LastName || ''}`,
+      ),
     [users],
   );
+
+  const producerList = useMemo(() => {
+    const list = {};
+    Object.values(users).forEach((listData) => {
+      list[`${listData.FirstName || ''} ${listData.LastName || ''}`] = `${listData.FirstName || ''} ${
+        listData.LastName || ''
+      }`;
+    });
+    return list;
+  }, [users]);
   const callDealMemoApi = async () => {
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
@@ -146,6 +160,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
       title={modalTitle}
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
       onClose={() => handleCancelForm(false)}
+      hasOverlay={false}
     >
       <div className="h-[80vh] w-auto overflow-y-scroll flex">
         <div className="h-[800px]   flex">
@@ -233,11 +248,20 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               <div className=" text-primary-input-text font-bold text-sm ml-4">Times</div>
               <div className=" text-primary-input-text font-bold text-sm ml-2">1</div>
               <div className=" text-primary-input-text text-sm ml-1">
-                {formData.performanceTimes && formData.performanceTimes.split(';')[0]}
+                {formData.performanceTimes && formData.performanceTimes.split(';')[0].split('?')[0]} -
+                {formData.performanceTimes &&
+                  formattedDateWithDay(formData.performanceTimes.split(';')[0].split('?')[1])}
               </div>
               <div className=" text-primary-input-text font-bold text-sm ml-2">2</div>
               <div className=" text-primary-input-text text-sm ml-1">
-                {formData.performanceTimes && formData.performanceTimes.split(';')[1]}
+                {/* {formData.performanceTimes && formData.performanceTimes.split(';')[1]} */}
+                {formData.performanceTimes &&
+                  formData.performanceTimes.split(';')[1] &&
+                  formData.performanceTimes.split(';')[1].split('?')[0]}{' '}
+                -
+                {formData.performanceTimes &&
+                  formData.performanceTimes.split(';')[1] &&
+                  formattedDateWithDay(formData.performanceTimes.split(';')[1].split('?')[1])}
               </div>
             </div>
             <div className="flex mt-2.5 items-center">
@@ -262,14 +286,13 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
               </div>
               <div className="w-4/5 flex justify-between">
                 <Select
-                  onChange={(value) => editContractModalData('SignedBy', value.toString(), 'contract')}
-                  // SignedBy
+                  onChange={(value) => editContractModalData('SignedBy', value, 'contract')}
                   className="bg-primary-white w-52"
                   placeholder="User Name Dropdown"
                   options={[{ text: 'Select Assignee', value: null }, ...userList]}
                   isClearable
                   isSearchable
-                  // value={formData.SignedBy ? users[formData.SignedBy].Id : ''}
+                  value={formData.SignedBy ? producerList[formData.SignedBy] : ''}
                 />
 
                 <div className="flex items-center">
@@ -279,7 +302,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                       formData.SignedDate.toString() !== toISO(value) &&
                       editContractModalData('SignedDate', value, 'contract')
                     }
-                    position={24}
+                    position="!-left-24"
                     value={formData.SignedDate}
                   />
                 </div>
@@ -307,7 +330,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
                     }
                     value={formData.ReceivedBackDate}
                     className="z-[1000]"
-                    position={24}
+                    position="!-left-24"
                   />
                 </div>
               </div>

@@ -20,7 +20,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   const [rows, setRows] = useState([]);
   const gridOptions = {
     getRowStyle: (params) => {
-      return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
+      return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
     },
   };
 
@@ -38,6 +38,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
+
       setRows(formattedRows);
     }
   }, [rowData]);

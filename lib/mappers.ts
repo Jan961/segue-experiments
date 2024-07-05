@@ -12,6 +12,7 @@ import {
   ProductionTask,
   User,
   File,
+  GlobalBookingActivity,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -34,6 +35,7 @@ import {
   ContractStatusType,
   FileDTO,
   ContractBookingStatusType,
+  GlobalActivityDTO,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
@@ -57,7 +59,7 @@ We also have full control of types here so we can get type safety to child objec
 */
 
 // This is so we can change the implimentation if needed. We had some issues with timezone.
-const convertDate = (date: Date) => {
+export const convertDate = (date: Date) => {
   if (date) return toISO(date);
   return '';
 };
@@ -220,7 +222,19 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
   DueByDate: convertDate(a.DueByDate),
-  Notes: a.ActivityNotes,
+  Notes: a.Notes,
+});
+
+export const globalActivityMapper = (a: GlobalBookingActivity): GlobalActivityDTO => ({
+  Id: a.Id,
+  ProductionId: a.ProductionId,
+  Date: convertDate(a.Date),
+  Name: a.Name,
+  ActivityTypeId: a.ActivityTypeId,
+  Cost: Number(a.Cost),
+  FollowUpRequired: a.FollowUpRequired,
+  DueByDate: convertDate(a.DueByDate),
+  Notes: a.Notes,
 });
 
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({
@@ -233,19 +247,22 @@ export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContact
 });
 
 export const contractStatusmapper = (status: ContractStatusType) => {
-  return {
-    BookingId: status.BookingId ? status.BookingId : '',
-    StatusCode: status.StatusCode,
-    SignedDate: convertDate(status.SignedDate),
-    SignedBy: status.SignedBy,
-    ReturnDate: convertDate(status.ReturnDate),
-    CheckedBy: status.CheckedBy,
-    RoyaltyPercentage: convertToString(status.RoyaltyPercentage),
-    DealType: status.DealType,
-    ContractNotes: status.Notes,
-    ReceivedBackDate: convertDate(status.ReceivedBackDate),
-    Exceptions: status.Exceptions,
-  };
+  if (status && status.BookingId) {
+    return {
+      BookingId: status.BookingId ? status.BookingId : '',
+      StatusCode: status.StatusCode,
+      SignedDate: convertDate(status.SignedDate),
+      SignedBy: status.SignedBy,
+      ReturnDate: convertDate(status.ReturnDate),
+      CheckedBy: status.CheckedBy,
+      RoyaltyPercentage: convertToString(status.RoyaltyPercentage),
+      DealType: status.DealType,
+      ContractNotes: status.Notes,
+      ReceivedBackDate: convertDate(status.ReceivedBackDate),
+      Exceptions: status.Exceptions,
+    };
+  }
+  return null;
 };
 
 export const contractBookingStatusmapper = (status: ContractBookingStatusType) => {

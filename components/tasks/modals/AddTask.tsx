@@ -1,5 +1,6 @@
 import { MasterTask } from '@prisma/client';
 import axios from 'axios';
+import { ConfirmationDialog } from 'components/core-ui-lib';
 import Button from 'components/core-ui-lib/Button';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateInput from 'components/core-ui-lib/DateInput';
@@ -10,9 +11,12 @@ import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
+import moment from 'moment';
+import { omit } from 'radash';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
+import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
 import { weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
@@ -68,18 +72,27 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number }
   >(task || DEFAULT_MASTER_TASK);
 
+  const production = useRecoilValue(currentProductionSelector);
+
   useEffect(() => {
     setInputs(task);
   }, [task]);
 
+  const [confirm, setConfirm] = useState<boolean>(false);
+
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
   const [isCloned, setIsCloned] = useState<boolean>(false);
+  const [isChecked, setIsChecked] = useState<boolean>(false);
 
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
   );
+
+  const showCode = useMemo(() => {
+    return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
+  }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
 
   useEffect(() => {
     if (isCloned) {
@@ -135,43 +148,47 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
       value = 'once';
     }
 
-    const newInputs = { ...inputs, [id]: value };
-    setInputs(newInputs);
+    let newInputs = { ...inputs, [id]: value };
+    if (id === 'Progress' && value === 100) {
+      newInputs = { ...newInputs, DueDate: moment.utc(new Date(), 'DD/MM/YY').toString() };
+      setInputs(newInputs);
+    } else {
+      setInputs(newInputs);
+    }
+
     setStatus({ ...status, submitted: false });
   };
 
   const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
 
-  const handleOnSubmit = async () => {
-    setLoading(true);
-    if (isMasterTask) {
-      try {
-        const keysToDelete = ['DueDate', 'Progress', 'ProductionId'];
-        for (const key of keysToDelete) {
-          delete inputs[key];
-        }
-        if (inputs.Id) {
-          await axios.post('/api/tasks/master/update', inputs);
-          setLoading(false);
-          onClose();
-          setInputs(DEFAULT_MASTER_TASK);
-        } else {
-          const endpoint = '/api/tasks/master/create';
-          await axios.post(endpoint, inputs);
-          setLoading(false);
-          onClose();
-          setInputs(DEFAULT_MASTER_TASK);
-        }
-      } catch (error) {
+  const handleMasterTask = async () => {
+    try {
+      omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
+      if (inputs.Id) {
+        await axios.post('/api/tasks/master/update', inputs);
+        setLoading(false);
+        onClose();
+        setInputs(DEFAULT_MASTER_TASK);
+      } else {
+        const endpoint = '/api/tasks/master/create';
+        await axios.post(endpoint, inputs);
         setLoading(false);
         onClose();
         setInputs(DEFAULT_MASTER_TASK);
       }
+    } catch (error) {
+      setLoading(false);
+      onClose();
+      setInputs(DEFAULT_MASTER_TASK);
+    }
+  };
+
+  const handleOnSubmit = async () => {
+    setLoading(true);
+    if (isMasterTask) {
+      handleMasterTask();
     } else {
-      const keysToDelete = ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction'];
-      for (const key of keysToDelete) {
-        delete inputs[key];
-      }
+      omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction']);
       if (inputs.Id) {
         try {
           await axios.post('/api/tasks/update', inputs);
@@ -185,6 +202,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           const endpoint = '/api/tasks/create/single/';
           await axios.post(endpoint, inputs);
           setLoading(false);
+          handleMasterTask();
           onClose();
         } catch (error) {
           setLoading(false);
@@ -202,6 +220,32 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
 
   const handleClone = () => {
     setIsCloned(true);
+  };
+
+  const handleConfirm = () => {
+    setConfirm(true);
+  };
+
+  const handleDelete = async () => {
+    setConfirm(false);
+    setLoading(true);
+    if (isMasterTask) {
+      try {
+        await axios.delete(`/api/tasks/master/delete/${inputs?.Id}`);
+        setLoading(false);
+        onClose();
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      try {
+        await axios.delete(`/api/tasks/delete/${inputs?.Id}`);
+        setLoading(false);
+        onClose();
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
@@ -227,11 +271,11 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <Label className="!text-secondary pr-6 " text="Task Code" />
           <TextInput
             id="Code"
-            disabled={isMasterTask}
+            disabled
             className="w-128 placeholder-secondary"
             placeholder="Code is assigned when task is created"
             onChange={handleOnChange}
-            value={inputs?.Code?.toString()}
+            value={isMasterTask ? inputs?.Code?.toString() : showCode}
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center">
@@ -272,16 +316,17 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
-              value={inputs?.Progress}
+              value={inputs?.Progress?.toString()}
               placeholder="Progress"
-              className="w-20"
+              isSearchable
+              className="w-32"
               options={generatePercentageOptions}
             />
           </div>
           <div className="flex ml-2">
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
-              disabled={isMasterTask}
+              disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100}
               value={inputs?.DueDate}
               onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
             />
@@ -302,9 +347,9 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
               value={inputs?.RepeatInterval}
-              className="w-32"
+              className="w-44"
               options={RepeatOptions}
-              placeholder="Week No."
+              placeholder="Select..."
               disabled={repeatInterval}
             />
           </div>
@@ -357,11 +402,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <div className="flex">
               <Label className="!text-secondary pr-2" text="Add to Master Task List" />
               <Checkbox
-                id="occurence"
-                value={inputs?.RepeatInterval}
-                checked={isMasterTask}
+                id="addToMasterTask"
+                checked={isChecked}
                 disabled={isMasterTask}
-                onChange={(checked) => handleOnChange({ target: { id: 'CompleteByWeekNum', checked } })}
+                onChange={() => setIsChecked(!isChecked)}
               />
             </div>
           </div>
@@ -371,17 +415,28 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
           <div className="flex">
             <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
-              <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+              <>
+                <Button variant="tertiary" onClick={handleConfirm} className="mr-4 w-[132px]" text="Delete" />
+                <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+              </>
             )}
             <Button
               variant="primary"
               className="w-[132px]"
               onClick={handleOnSubmit}
-              text={inputs.Id ? 'Edit Task' : 'Create New Task'}
+              text={inputs.Id ? 'Save' : 'Create New Task'}
             />
           </div>
         </div>
       </form>
+
+      <ConfirmationDialog
+        variant="delete"
+        show={confirm}
+        onYesClick={handleDelete}
+        onNoClick={() => setConfirm(false)}
+        hasOverlay={true}
+      />
     </PopupModal>
   );
 };

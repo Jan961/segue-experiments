@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponseHeaders } from 'axios';
 import moment from 'moment';
 import { getMonday } from 'services/dateService';
 
@@ -15,26 +15,30 @@ export const downloadFromContent = (content: Blob, filename: string) => {
   }, 0);
 };
 
+const getFileNameFromHeaders = (headers: AxiosResponseHeaders, defaultName: string, extension = 'xlsx') => {
+  let suggestedName: string | null = null;
+
+  const contentDisposition = headers['content-disposition'];
+  if (contentDisposition) {
+    const match = contentDisposition.match(/filename="(.+)"/);
+    if (match && match[1]) {
+      suggestedName = match[1];
+    }
+  }
+
+  if (!suggestedName) {
+    suggestedName = `${defaultName}.${extension}`;
+  }
+  return suggestedName;
+};
+
 export const onScheduleReport = async (ProductionId: number) => {
   try {
     const response = await axios.post('/api/reports/schedule-report', { ProductionId }, { responseType: 'blob' });
 
     if (response.status >= 200 && response.status < 300) {
-      const productionName = `${ProductionId}`;
-      let suggestedName: string | null = null;
-
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
-
+      const defaultName = `${ProductionId}`;
+      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
       const content = response.data;
       if (content) {
         downloadFromContent(content, suggestedName);
@@ -50,20 +54,37 @@ export const exportBookingSchedule = async (ProductionId: number) => {
     const response = await axios.post('/api/reports/booking-schedule', { ProductionId }, { responseType: 'blob' });
 
     if (response.status >= 200 && response.status < 300) {
-      const productionName = `${ProductionId}`;
-      let suggestedName: string | null = null;
-
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
+      const defaultName = `${ProductionId}`;
+      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
+      const content = response.data;
+      if (content) {
+        downloadFromContent(content, suggestedName);
       }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
+export const getTimezonOffset = () => {
+  return new Date().getTimezoneOffset();
+};
+
+export const exportMasterplanReport = async (fromDate: string, toDate: string) => {
+  try {
+    const response = await axios.post(
+      '/api/reports/masterplan',
+      {
+        fromDate: moment(getMonday(fromDate)).format('YYYY-MM-DD'),
+        toDate: moment(new Date(toDate)).format('YYYY-MM-DD'),
+        timezoneOffset: getTimezonOffset(),
+      },
+      { responseType: 'blob' },
+    );
+
+    if (response.status >= 200 && response.status < 300) {
+      const defaultName = `Report`;
+      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, defaultName, 'xlsx');
 
       const content = response.data;
       if (content) {
@@ -75,31 +96,12 @@ export const exportBookingSchedule = async (ProductionId: number) => {
   }
 };
 
-export const exportMasterplanReport = async (fromDate: string, toDate: string) => {
+export const exportExcelReport = async (urlPath, payload = {}, fileName = 'Report') => {
   try {
-    const response = await axios.post(
-      '/api/reports/masterplan',
-      {
-        fromDate: moment(getMonday(fromDate)).format('YYYY-MM-DD'),
-        toDate: moment(new Date(toDate)).format('YYYY-MM-DD'),
-      },
-      { responseType: 'blob' },
-    );
+    const response = await axios.post(urlPath, payload, { responseType: 'blob' });
 
     if (response.status >= 200 && response.status < 300) {
-      let suggestedName: string | null = null;
-
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = 'Report.xlsx';
-      }
+      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, fileName, 'xlsx');
 
       const content = response.data;
       if (content) {

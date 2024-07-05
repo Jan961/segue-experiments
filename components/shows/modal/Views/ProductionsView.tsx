@@ -17,7 +17,8 @@ import { sortByProductionStartDate } from './util';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { ToastMessages } from 'config/shows';
 import { debug } from 'utils/logging';
-import { all } from 'radash';
+import { all, isArray } from 'radash';
+import { uploadFile } from 'requests/upload';
 interface ProductionsViewProps {
   showData: any;
   showName: string;
@@ -117,6 +118,22 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   }, [isAddRow, tableRef]);
 
+  function validateShowData(showData) {
+    for (const show of showData) {
+      if (
+        !show.DateBlock ||
+        show.DateBlock.length === 0 ||
+        !show.DateBlock[0].StartDate ||
+        !show.DateBlock[0].EndDate ||
+        !show.Code
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   const handleSaveAndClose = async () => {
     try {
       const gridApi = tableRef.current.getApi();
@@ -129,6 +146,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           editedRecords.push(rowNode.data);
         }
       });
+      const showData = [...newRecords, ...editedRecords];
+      const mandatoryFieldsValidation: boolean = validateShowData(showData);
+      if (!mandatoryFieldsValidation) {
+        notify.warning(ToastMessages.requiredFieldsWarning);
+        return;
+      }
       await all([
         ...newRecords.map((record) => createNewProduction(record)),
         ...editedRecords.map((record) => updateCurrentProduction(record)),
@@ -139,63 +162,37 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
     }
   };
 
-  const onSave = (file, onProgress, onError, onUploadingImage) => {
-    console.log('==onSave==', file);
+  const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', `images/production${currentProduction.Id ? '/' + currentProduction.Id : ''}`);
+    formData.append(
+      'path',
+      `production/${currentProduction.Id ? currentProduction.Id : new Date().getTime().toString()}`,
+    );
 
-    let progress = 0; // to track overall progress
-    let slowProgressInterval; // interval for slow progress simulation
+    try {
+      const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
 
-    axios
-      .post('/api/upload', formData, {
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          if (percentCompleted <= 50) {
-            progress = percentCompleted;
-          } else if (percentCompleted === 100) {
-            progress = 50;
-            clearInterval(slowProgressInterval);
-            slowProgressInterval = setInterval(() => {
-              if (progress < 95) {
-                progress += 0.5;
-                onProgress(file[0].file, progress);
-              } else {
-                clearInterval(slowProgressInterval);
-              }
-            }, 100);
-          }
+      const gridApi = tableRef.current.getApi();
+      const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
 
-          onProgress(file[0].file, progress);
-        },
-      }) // eslint-disable-next-line
-      .then((response: any) => {
-        progress = 100;
-        onProgress(file[0].file, progress);
-        notify.success(ToastMessages.imageUploadSuccess);
-        onUploadingImage(file[0].file, `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`);
-        clearInterval(slowProgressInterval);
-        const gridApi = tableRef.current.getApi();
-        const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
-        setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response.data }));
-        setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
-        const transaction = {
-          update: [
-            {
-              ...rowDataToUpdate,
-              ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.data.location}`,
-              Image: response.data,
-            },
-          ],
-        };
-        applyTransactionToGrid(tableRef, transaction);
-      }) // eslint-disable-next-line
-      .catch((error) => {
-        notify.error(ToastMessages.imageUploadFailure);
-        onError(file[0].file, 'Error uploading file. Please try again.');
-        clearInterval(slowProgressInterval);
-      });
+      setProductionUploadMap((prev) => ({ ...prev, [currentProduction.Id]: response }));
+      setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
+
+      const transaction = {
+        update: [
+          {
+            ...rowDataToUpdate,
+            ImageUrl: `${process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN}/${response.location}`,
+            Image: response,
+          },
+        ],
+      };
+
+      applyTransactionToGrid(tableRef, transaction);
+    } catch (error) {
+      onError(file[0].file, error.message);
+    }
   };
 
   const updateCurrentProduction = useCallback(
@@ -208,20 +205,12 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         );
         await axios.put(`/api/productions/update/${currentProduction?.Id}`, payloadData);
         notify.success(ToastMessages.updateProductionSuccess);
-        // if (payloadData.isArchived && !isArchived) {
-        //   const gridApi = tableRef.current.getApi();
-        //   const rowDataToRemove = gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
-        //   const transaction = {
-        //     remove: [rowDataToRemove],
-        //   };
-        //   applyTransactionToGrid(tableRef, transaction);
-        // }
         setEditedOrAddedRecords((prev) => prev.filter((id) => id !== data.Id));
         const excludeUpdatedRecords = editedOrAddedRecords?.filter((id) => id !== data.Id);
         setEditedOrAddedRecords(excludeUpdatedRecords);
       } catch (error) {
         notify.error(ToastMessages.updateProductionFailure);
-        console.log('Error updating production', error);
+        debug('Error updating production', error);
       } finally {
         setIsLoading(false);
         setIsEdited(false);
@@ -229,7 +218,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         router.replace(router.asPath);
       }
     },
-    [currentProduction?.Id, isArchived, productionUploadMap, router],
+    [currentProduction?.Id, editedOrAddedRecords, productionUploadMap, router],
   );
 
   const createNewProduction = useCallback(
@@ -251,39 +240,45 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
         };
         applyTransactionToGrid(tableRef, transaction);
         notify.success(ToastMessages.createNewProductionSuccess);
-      } catch (error) {
-        notify.error(ToastMessages.createNewProductionFailure);
-        console.log('Error creating production', error);
-      } finally {
         setIsEdited(false);
         setCurrentProduction(intProduction);
-        addNewRow();
         router.replace(router.asPath);
+      } catch (error) {
+        let errorMessage = ToastMessages.createNewProductionFailure;
+        if (error?.response?.status === 409) {
+          errorMessage = `ProdCode: ${data.Code} already exists. Please try with different ProdCode`;
+        }
+        notify.error(errorMessage);
+        debug('Error creating production', error);
+      } finally {
         setIsLoading(false);
       }
     },
-    [addNewRow, currentProduction?.Id, productionUploadMap, router],
+    [currentProduction?.Id, productionUploadMap, router],
   );
+
+  // const findFirstEmptyField = (data) => {
+  //   const requiredFields = ['Code', 'DateBlock[0].StartDate', 'DateBlock[0].EndDate'];
+  //   return requiredFields.find((field) => !data[field]);
+  // };
 
   const handleCellClick = async (e) => {
     setProductionId(e.data.Id);
     setCurrentProduction(e.data);
     setRowIndex(e.rowIndex);
+
     if (e.column.colId === 'deleteId') {
       setConfirm(true);
     } else if (e.column.colId === 'editId' && isEdited && !isAddRow) {
       await updateCurrentProduction(e.data);
-    } else if (
-      isAddRow &&
-      e.column.colId === 'editId' &&
-      e.data.Code &&
-      'DateBlock[0].StartDate' in e.data &&
-      'DateBlock[0].EndDate' in e.data
-    ) {
-      await createNewProduction(e.data);
+    } else if (isAddRow && e.column.colId === 'editId') {
+      if (e.data.Code && 'DateBlock[0].StartDate' in e.data && 'DateBlock[0].EndDate' in e.data) {
+        await createNewProduction(e.data);
+      } else {
+        notify.warning('Please fill in all the required fields before saving.');
+      }
     } else if (e.column.colId === 'ImageUrl') {
       const { originalFilename: name, id } = e.data.Image || {};
-      console.log('====', e.data);
       setUploadModalContext({
         value: e.data.Image
           ? {
@@ -326,6 +321,30 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
       notify.error(ToastMessages.deleteProductionFailure);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const onChange = (selectedFiles) => {
+    if (isArray(selectedFiles) && selectedFiles.length === 0) {
+      const gridApi = tableRef.current.getApi();
+      const rowDataToUpdate = gridApi.getDisplayedRowAtIndex(rowIndex).data;
+      const transaction = {
+        update: [
+          {
+            ...rowDataToUpdate,
+            ImageUrl: '',
+            Image: null,
+          },
+        ],
+      };
+      setIsEdited(true);
+      applyTransactionToGrid(tableRef, transaction);
+      setProductionUploadMap((prev) => {
+        const newMap = { ...prev };
+        newMap[currentProduction.Id] = null;
+        return newMap;
+      });
+      setEditedOrAddedRecords((prev) => [...prev, rowDataToUpdate.Id]);
     }
   };
 
@@ -385,6 +404,7 @@ const ProductionsView = ({ showData, showName, onClose }: ProductionsViewProps) 
           maxFileSize={500 * 1024} // 500kb
           onSave={onSave}
           value={uploadModalContext?.value}
+          onChange={onChange}
         />
       )}
     </>
