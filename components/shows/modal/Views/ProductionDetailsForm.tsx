@@ -149,7 +149,7 @@ const ProductionDetailsForm = ({
   const onSubmit = useCallback(async () => {
     const isValid = await validateProduction(formData);
     if (isValid) {
-      onSave(formData, onClose);
+      return onSave(formData, onClose);
     }
     notify.warning(ToastMessages.requiredFieldsWarning);
   }, [formData, onClose, validateProduction]);
