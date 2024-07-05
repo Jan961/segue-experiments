@@ -17,6 +17,7 @@ import { productionCompanyState } from 'state/productions/productionCompanyState
 import { ConversionRateDTO, DateBlockDTO } from 'interfaces';
 import { productionFormSchema } from './schema';
 import { debug } from 'utils/logging';
+import { uploadStrings } from 'config/upload';
 
 export interface ProductionFormData {
   id?: number;
@@ -195,7 +196,7 @@ const ProductionDetailsForm = ({
           <UploadModal
             visible={isUploadOpen}
             title="Production Image"
-            info="Please upload your production image here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
+            info={uploadStrings.info}
             allowedFormats={['image/png', 'image/jpg', 'image/jpeg']}
             onClose={() => setIsUploadOpen(false)}
             onSave={onSaveUpload}
