@@ -41,7 +41,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
   const onSave = async (file, onProgress, onError) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('path', 'marketing/');
+    formData.append('path', 'marketing');
 
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation

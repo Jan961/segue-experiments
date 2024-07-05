@@ -10,7 +10,6 @@ import { useRouter } from 'next/router';
 import { tabState } from 'state/marketing/tabState';
 import SalesTab, { SalesTabRef } from './tabs/SalesTab';
 import ActivitiesTab, { ActivityTabRef } from './tabs/ActivitiesTab';
-import { ActivityDTO, ActivityTypeDTO } from 'interfaces';
 import ArchivedSalesTab, { ArchSalesTabRef } from './tabs/ArchivedSalesTab';
 import ContactNotesTab, { ContactNoteTabRef } from './tabs/ContactNotesTab';
 import VenueContactsTab, { VenueContactTabRef } from './tabs/VenueContactsTab';
@@ -21,11 +20,6 @@ export type SelectOption = {
   text: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
-};
-
-export type ActivityList = {
-  activities: Array<ActivityDTO>;
-  activityTypes: Array<ActivityTypeDTO>;
 };
 
 export type DataList = {
