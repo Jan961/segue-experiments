@@ -55,6 +55,7 @@ export default async function handle(req, res) {
             text: weekNo.toString() + ' ' + formatInputDate(date),
             value: date,
             selected: false,
+            weekNo,
           };
 
           if (startOfDay(new Date(date)).getTime() === startOfDay(new Date()).getTime()) {
@@ -70,6 +71,7 @@ export default async function handle(req, res) {
           text: weekNo.toString() + ' ' + formatInputDate(weekStart) + ' - ' + formatInputDate(weekEnd),
           value: weekStart,
           selected: false,
+          weekNo,
         };
 
         // if current date is between the week start/end, add selected true

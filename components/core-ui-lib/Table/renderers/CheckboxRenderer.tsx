@@ -8,9 +8,23 @@ interface CheckboxRendererProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   eGridCell: HTMLElement;
+  label?: string;
+  labelBeforeCheck?: boolean;
+  className?: string;
+  disabled?: boolean;
 }
 
-const CheckboxRenderer = ({ id, eGridCell, checked, onChange, name }: CheckboxRendererProps) => {
+const CheckboxRenderer = ({
+  id,
+  eGridCell,
+  checked,
+  onChange,
+  name,
+  labelBeforeCheck,
+  label,
+  className,
+  disabled,
+}: CheckboxRendererProps) => {
   const checkRef = useRef(null);
 
   const handleOnFocus = () => {
@@ -19,14 +33,19 @@ const CheckboxRenderer = ({ id, eGridCell, checked, onChange, name }: CheckboxRe
 
   return (
     <BaseCellRenderer eGridCell={eGridCell} onFocus={handleOnFocus}>
-      <Checkbox
-        ref={checkRef}
-        id={id}
-        name={name}
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="w-[1.1875rem] h-[1.1875rem]"
-      />
+      <div className={`flex flex-row ${className}`}>
+        {labelBeforeCheck && <div className="-mt-2.5 mr-2">{label}</div>}
+        <Checkbox
+          ref={checkRef}
+          id={id}
+          name={name}
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          className="w-[1.1875rem] h-[1.1875rem]"
+          disabled={disabled}
+        />
+        {!labelBeforeCheck && <div className="-mt-2.5 ml-2">{label}</div>}
+      </div>
     </BaseCellRenderer>
   );
 };
