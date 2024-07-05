@@ -6,10 +6,11 @@ const formatCompanyDetails = (company: any) => {
   return {
     id: company.Id,
     companyName: company.Name,
+    companyVATNo: company.ProdCoVATCode || '',
     fileName: company.File?.OriginalFilename || '',
     fileLocation: company.File?.Location || '',
     fileId: company.File?.Id,
-    website: company.WebSite,
+    webSite: company.WebSite,
   };
 };
 

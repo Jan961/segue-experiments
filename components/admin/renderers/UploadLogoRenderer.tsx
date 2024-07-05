@@ -1,5 +1,5 @@
 import UploadModal from 'components/core-ui-lib/UploadModal';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Button } from 'components/core-ui-lib/';
 import Image from 'next/image';
 import axios from 'axios';
@@ -7,40 +7,33 @@ import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
 import { uploadFile } from 'requests/upload';
 import { getFileUrl } from 'lib/s3';
 
-export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
-  const { id, fileId, fileLocation, fileName } = params.data;
+export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSucess) => {
+  const { id, companyName, companyVATNo, webSite, fileLocation, fileName } = params.data;
+  console.log(params.data);
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
   const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
-  const [fileUrl, setFileUrl] = useState<string>('');
-
-  const getUrlForImage = async (path) => {
-    const url = await getFileUrl(path);
-    setFileUrl(url);
-  };
-
-  useEffect(() => {
-    if (fileLocation) {
-      getUrlForImage(fileLocation);
-    }
-  }, [fileLocation]);
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
     formData.append('file', file[0].file);
-    formData.append('Id', id.toString());
+    formData.append('path', `admin/company/logo`);
 
     try {
       const response = await uploadFile(formData, onProgress, onError, onUploadingImage);
       if (response.status >= 400 && response.status <= 499) {
         onError(file[0].file, 'Error uploading file. Please try again.');
+      } else {
+        onUploadSucess({ companyName, companyVATNo, id, webSite, fileId: response.id });
       }
     } catch (error) {
       onError(file[0].file, 'Error uploading file. Please try again.');
     }
   };
+
   const handleDelete = async () => {
     try {
-      await axios.delete(`/api/productionCompanies/logo/delete?Id=${fileId}`);
+      await axios.delete(`/api/file/delete?location${fileLocation}`);
+      await axios.delete(`/api/productionCompanies/logo/delete?Id=${id}}`);
     } catch (exception) {
       console.log(exception);
     }
@@ -48,10 +41,21 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies) => {
 
   return (
     <div className="h-full flex justify-center items-center">
-      {!fileId ? (
-        <Button text="Upload Logo" variant="secondary" onClick={() => setOpenUploadModal(true)} disabled={!!fileId} />
+      {!fileLocation ? (
+        <Button
+          text="Upload Logo"
+          variant="secondary"
+          onClick={() => setOpenUploadModal(true)}
+          disabled={!!fileLocation}
+        />
       ) : (
-        <Image src={fileUrl} alt="Company Logo" width={200} height={200} onClick={() => setOpenUploadModal(true)} />
+        <Image
+          src={getFileUrl(fileLocation)}
+          alt={fileName}
+          width={200}
+          height={200}
+          onClick={() => setOpenUploadModal(true)}
+        />
       )}
       <UploadModal
         visible={openUploadModal}

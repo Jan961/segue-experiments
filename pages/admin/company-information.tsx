@@ -8,7 +8,7 @@ export default function CompanyInformation() {
   return (
     <Layout title="Company Details | Segue" flush>
       <h1 className="mt-3 text-4xl font-bold text-primary-pink">Company Details</h1>
-      <div className="w-[62rem] mx-auto mt-12">
+      <div className="w-[96rem] mx-auto mt-12">
         <Tabs tabs={tabs} selectedTabClass="!bg-primary-pink/[0.50] !text-primary-navy" buttonWidth="w-1/2">
           <Tab.Panel className="h-[650px] overflow-y-hidden">
             <CompanyDetailsTab />

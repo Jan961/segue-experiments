@@ -4,10 +4,11 @@ import IconRenderer from '../bookings/table/IconRenderer';
 import { UploadLogoRenderer } from './renderers/UploadLogoRenderer';
 export const styleProps = { headerColor: tileColors.systemAdmin };
 
-const createUploadLogoRenderer = (fetchProductionCompanies) => {
-  return (params) => UploadLogoRenderer(params, fetchProductionCompanies);
+const createUploadLogoRenderer = (fetchProductionCompanies, onUploadSucess) => {
+  return (params) => UploadLogoRenderer(params, fetchProductionCompanies, onUploadSucess);
 };
-export const productionCompaniesColDefs = (fetchProductionCompanies) => {
+
+export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSucess) => {
   return [
     {
       headerName: 'Company name',
@@ -19,15 +20,22 @@ export const productionCompaniesColDefs = (fetchProductionCompanies) => {
     },
     {
       headerName: 'Company Website',
-      field: 'website',
+      field: 'webSite',
       cellRenderer: DefaultTextRenderer,
-      width: 325,
+      flex: 1,
+      editable: true,
+    },
+    {
+      headerName: 'Company VAT No.',
+      field: 'companyVATNo',
+      cellRenderer: DefaultTextRenderer,
+      width: 230,
       editable: true,
     },
     {
       headerName: 'Company Logo',
       field: 'fileLocation',
-      cellRenderer: createUploadLogoRenderer(fetchProductionCompanies),
+      cellRenderer: createUploadLogoRenderer(fetchProductionCompanies, onUploadSucess),
       width: 200,
     },
     {
@@ -39,7 +47,7 @@ export const productionCompaniesColDefs = (fetchProductionCompanies) => {
         tooltipPosition: 'left',
         popover: true,
       },
-      flex: 1,
+      width: 40,
     },
   ];
 };
