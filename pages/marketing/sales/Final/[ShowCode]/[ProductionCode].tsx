@@ -31,7 +31,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountId(email);
   const currentUser = await getUserNameFromReq(ctx.req);
 
-  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/Final', accountId);
+  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/final', accountId);
 
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
