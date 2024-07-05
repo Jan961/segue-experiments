@@ -120,27 +120,6 @@ const VenueAddressForm = ({
             <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
           )}
         </div>
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Postcode</p>
-          <TextInput
-            placeholder="Phone"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.primaryPhone}
-            onChange={(e) => handleInputChange('primaryPhone', e.target.value)}
-          />
-        </label>
-
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Email</p>
-          <TextInput
-            placeholder="Email"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.primaryEmail}
-            onChange={(e) => handleInputChange('primaryEmail', e.target.value)}
-          />
-        </label>
 
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Stage Door</p>
@@ -222,28 +201,6 @@ const VenueAddressForm = ({
             onChange={(value) => handleInputChange('deliveryCountry', parseInt(value as string, 10))}
             options={countryOptions}
             isSearchable
-          />
-        </label>
-
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Postcode</p>
-          <TextInput
-            placeholder="Phone"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.deliveryPhone}
-            onChange={(e) => handleInputChange('deliveryPhone', e.target.value)}
-          />
-        </label>
-
-        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Email</p>
-          <TextInput
-            placeholder="Email"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.deliveryEmail}
-            onChange={(e) => handleInputChange('deliveryEmail', e.target.value)}
           />
         </label>
 
