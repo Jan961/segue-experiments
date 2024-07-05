@@ -11,7 +11,6 @@ import { UiTransformedVenue } from 'utils/venue';
 
 interface MainVenueFormProps {
   venue: Partial<UiTransformedVenue>;
-  venueCurrencyOptionList: SelectOption[];
   venueFamilyOptionList: SelectOption[];
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
@@ -19,7 +18,6 @@ interface MainVenueFormProps {
 }
 const MainVenueForm = ({
   venue,
-  venueCurrencyOptionList,
   venueFamilyOptionList,
   validationErrors,
   updateValidationErrrors,
@@ -96,13 +94,13 @@ const MainVenueForm = ({
       <div className="flex flex-row justify-between pl-20">
         <Checkbox
           label="VAT Indicator"
-          id={'vatIndicator'}
+          id="vatIndicator"
           checked={formData.vatIndicator}
           onChange={(e) => handleInputChange('vatIndicator', e.target.value)}
         />
         <Checkbox
           label="Culturally Exempt Venue"
-          id={'culturallyExempt'}
+          id="culturallyExempt"
           checked={formData.culturallyExempt}
           onChange={(e) => handleInputChange('culturallyExempt', e.target.value)}
         />
@@ -121,21 +119,17 @@ const MainVenueForm = ({
         </label>
         {validationErrors.venueFamily && <small className="text-primary-red">{validationErrors.venueFamily}</small>}
       </div>
-      <div className="flex flex-col">
-        <label className="flex flex-row gap-5 justify-between">
-          <p className="text-primary-input-text">Currency</p>
-          <Select
-            name="currency"
-            className="w-[364px] font-bold"
-            placeholder="Currency Dropdown"
-            value={formData.currency}
-            onChange={(value) => handleInputChange('currency', value)}
-            options={venueCurrencyOptionList}
-            isSearchable
-          />
-        </label>
-        {validationErrors.currency && <small className="text-primary-red">{validationErrors.currency}</small>}
-      </div>
+      <label htmlFor="" className="flex flex-row gap-5 justify-between ">
+        <p className="text-primary-input-text">Town Population</p>
+        <TextInput
+          placeholder="Enter Town Population"
+          type="number"
+          className="w-[364px]"
+          value={formData.townPopulation}
+          onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
+        />
+      </label>
+
       <div className="flex flex-col">
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <p className="text-primary-input-text">Capacity</p>
@@ -143,22 +137,13 @@ const MainVenueForm = ({
             placeholder="Enter Capacity"
             type="number"
             className="w-[364px]"
-            value={formData.venueCapacity + ''}
+            value={formData.venueCapacity}
             onChange={(e) => handleInputChange('venueCapacity', parseFloat(e.target.value))}
           />
         </label>
         {validationErrors.venueCapacity && <small className="text-primary-red">{validationErrors.venueCapacity}</small>}
       </div>
-      <label htmlFor="" className="flex flex-row gap-5 justify-between ">
-        <p className="text-primary-input-text">Town Population</p>
-        <TextInput
-          placeholder="Enter Town Population"
-          type="number"
-          className="w-[364px]"
-          value={formData.townPopulation + ''}
-          onChange={(e) => handleInputChange('townPopulation', parseFloat(e.target.value))}
-        />
-      </label>
+
       <label
         htmlFor=""
         className="grid grid-cols-[100px_minmax(500px,_1fr)] flex-row gap-10 justify-between col-span-2 w-full"
@@ -184,7 +169,8 @@ const MainVenueForm = ({
           onChange={(e) => handleInputChange('notes', e.target.value)}
         />
       </label>
-      <div className="flex flex-row items-center gap-4 ">
+      <div />
+      <div className="flex items-center gap-4 w-full justify-end ">
         <p className="text-primary-input-text">Exclude from Barring Check and Venue Gap Suggestions</p>
         <Tooltip
           width="w-[200px]"
@@ -194,7 +180,7 @@ const MainVenueForm = ({
           <Icon iconName="info-circle-solid" />
         </Tooltip>
         <Checkbox
-          id={'excludeFromChecks'}
+          id="excludeFromChecks"
           checked={formData.excludeFromChecks}
           onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)}
         />
