@@ -12,7 +12,7 @@ export default async function handle(req, res) {
         SetNotOnSale: false,
         SetIsFinalFigures: true,
         SetIsCopy: false,
-        FinalSalesApprovedByUser: req.body.user,
+        SetFinalSalesApprovedByUser: req.body.user,
       },
     });
 

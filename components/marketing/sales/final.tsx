@@ -7,6 +7,8 @@ import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { currentUserState } from 'state/marketing/currentUserState';
+import { TourResponse } from './entry';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 interface SalesFigure {
   seatsReserved: string;
@@ -18,6 +20,7 @@ interface SalesFigure {
 interface SalesFigureSet {
   general: SalesFigure;
   schools: SalesFigure;
+  user: string;
 }
 
 export interface SalesEntryRef {
@@ -38,15 +41,116 @@ const Final = () => {
   const [userConfirmed, setUserConfirmed] = useState<boolean>(false);
   const [confirmedUser, setConfirmedUser] = useState('');
   const currency = useRecoilValue(currencyState);
+  const { selected: productionId } = useRecoilValue(productionJumpState);
+  const [schoolWarning, setSchoolWarning] = useState('');
+  const [generalWarning, setGeneralWarning] = useState('');
+  const [showDiscrepancyNotes, setShowDiscrepancyNotes] = useState<boolean>(false);
+  const [discrepancyButtonText, setDiscepancyButtonText] = useState('Ok');
 
   const { fetchData } = useAxios();
 
+  const getSalesFrequency = async () => {
+    try {
+      const data = await fetchData({
+        url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
+        method: 'POST',
+      });
+
+      if (typeof data === 'object') {
+        const tourData = data as TourResponse;
+        if (tourData.frequency === undefined) {
+          return;
+        }
+
+        return tourData.frequency;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleUpdate = async () => {
     try {
+      // conly complete checks if discrepancy notes are not visible
+      if (!showDiscrepancyNotes) {
+        const frequency = await getSalesFrequency();
+
+        // get previous sales figures first and check for errors
+        const sales = await fetchData({
+          url: '/api/marketing/sales/read/currentDay',
+          method: 'POST',
+          data: {
+            bookingId: bookings.selected,
+            salesDate: null,
+            frequency,
+          },
+        });
+
+        if (typeof sales === 'object') {
+          const salesFigures = sales as SalesFigureSet;
+
+          let tempGeneralWarning = '';
+          // check if the final value submitted is lower the the last sales entry
+          if (salesFigures.general.seatsSold !== '' && salesFigures.general.seatsSoldVal !== '') {
+            if (parseInt(genSeatsSold) < parseInt(salesFigures.general.seatsSold)) {
+              tempGeneralWarning =
+                'Number of general seats sold (' +
+                genSeatsSold +
+                ') is less than the previously entered value (' +
+                salesFigures.general.seatsSold +
+                ')\n';
+            }
+
+            if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.general.seatsSoldVal)) {
+              tempGeneralWarning =
+                tempGeneralWarning +
+                'Value of general seats (' +
+                genSeatsSoldVal +
+                ') is less than the previously entered value (' +
+                salesFigures.general.seatsSold +
+                ')\n';
+            }
+          }
+
+          let tempSchoolWarning = '';
+          if (salesFigures.schools.seatsSold !== '' && salesFigures.schools.seatsSoldVal !== '') {
+            if (parseInt(schSeatsSold) < parseInt(salesFigures.schools.seatsSold)) {
+              tempSchoolWarning =
+                'Number of school seats sold (' +
+                genSeatsSold +
+                ') is less than the previously entered value (' +
+                salesFigures.general.seatsSold +
+                ')\n';
+            }
+
+            if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.schools.seatsSoldVal)) {
+              tempSchoolWarning =
+                tempSchoolWarning +
+                'Valie of school seats sold (' +
+                genSeatsSoldVal +
+                ') is less than the previously entered value (' +
+                salesFigures.general.seatsSold +
+                ')\n';
+            }
+          }
+
+          // if tempWarning is not blank, setWarning, display the discrepency note field and exit the function
+          if (tempGeneralWarning !== '' || tempSchoolWarning !== '') {
+            setSchoolWarning(tempSchoolWarning);
+            setGeneralWarning(tempGeneralWarning);
+            setShowDiscrepancyNotes(true);
+            setConfirmedUser('');
+            setUserConfirmed(false);
+
+            return;
+          }
+        }
+      }
+
       const data = {
         salesDate: new Date(),
         bookingId: bookings.selected,
-        user: currentUser.name,
+        user: currentUser,
         schools: hasSchoolsSales
           ? {
               seatsSold: parseInt(schSeatsSold),
@@ -64,6 +168,8 @@ const Final = () => {
         method: 'POST',
         data,
       });
+
+      setBookings({ ...bookings, selected: null });
     } catch (error) {
       console.log(error);
     }
@@ -74,6 +180,10 @@ const Final = () => {
     setSchSeatsSoldVal('');
     setGenSeatsSold('');
     setGenSeatsSoldVal('');
+    setDiscrepancyNotes('');
+    setGeneralWarning('');
+    setSchoolWarning('');
+    setShowDiscrepancyNotes(false);
   };
 
   const setNumericVal = (setFunction: (value) => void, value: string) => {
@@ -91,6 +201,15 @@ const Final = () => {
   const setSalesFigures = async () => {
     try {
       setLoading(true);
+      setUserConfirmed(false);
+      setShowDiscrepancyNotes(false);
+      setGeneralWarning('');
+      setSchoolWarning('');
+      setConfirmedUser('');
+      setGenSeatsSold('');
+      setGenSeatsSoldVal('');
+      setSchSeatsSold('');
+      setSchSeatsSoldVal('');
 
       // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
       // this will happen on first launch of the module
@@ -107,7 +226,7 @@ const Final = () => {
         },
       });
 
-      if (typeof sales === 'object') {
+      if (typeof sales === 'object' && Object.keys(sales).length > 0) {
         const salesFigures = sales as SalesFigureSet;
 
         // set the sales figures, if available
@@ -115,6 +234,14 @@ const Final = () => {
         setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
         setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
         setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
+
+        if (salesFigures.user === null) {
+          setUserConfirmed(false);
+          setConfirmedUser('');
+        } else {
+          setUserConfirmed(true);
+          setConfirmedUser(salesFigures.user);
+        }
       }
 
       // get the booking details to set the notes fields
@@ -123,6 +250,12 @@ const Final = () => {
       setBookingSaleNotes(booking.BookingSalesNotes === null ? '' : booking.BookingSalesNotes);
       setDiscrepancyNotes(booking.BookingFinalSalesDiscrepancyNotes);
       setHasSchoolSales(booking.BookingHasSchoolsSales);
+
+      // if discrepancy notes is not null set show them
+      if (!isNullOrEmpty(booking.BookingFinalSalesDiscrepancyNotes)) {
+        setShowDiscrepancyNotes(true);
+        setDiscepancyButtonText('Edit');
+      }
 
       setLoading(false);
     } catch (error) {
@@ -135,6 +268,17 @@ const Final = () => {
       return '';
     } else {
       return saleFigure;
+    }
+  };
+
+  const submitDiscrepancyNotes = () => {
+    // if button is current edit, field is made editable
+    if (discrepancyButtonText === 'Edit') {
+      setDiscepancyButtonText('Ok');
+      // else field is set and the button is changed back  to edit
+    } else {
+      setDiscepancyButtonText('Edit');
+      editBooking('finalSalesDiscrepancyNotes', discrepancyNotes);
     }
   };
 
@@ -215,14 +359,17 @@ const Final = () => {
             <div className="flex flex-row">
               <div className="flex flex-col">
                 <div
-                  className={`w-[849px] ${
-                    hasSchoolsSales ? 'h-[295px]' : 'h-[235px]'
-                  } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
+                  className={`w-[849px] h-auto'
+                    } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
                 >
                   <div className="flex flex-row">
                     <div className="flex flex-col">
                       <div className="flex flex-row">
                         <div className="leading-6 text-xl text-primary-input-text font-bold mt-1">General</div>
+                      </div>
+
+                      <div className="flex flex-row">
+                        <div className="leading-6 text-base text-primary-red font-bold mt-5">{generalWarning}</div>
                       </div>
 
                       <div className="flex flex-row">
@@ -262,6 +409,10 @@ const Final = () => {
                         <div>
                           <div className="flex flex-row">
                             <div className="leading-6 text-xl text-primary-input-text font-bold mt-5">School</div>
+                          </div>
+
+                          <div className="flex flex-row">
+                            <div className="leading-6 text-xl text-primary-red font-bold mt-5">{schoolWarning}</div>
                           </div>
 
                           <div className="flex flex-row">
@@ -365,16 +516,27 @@ const Final = () => {
                   onBlur={(e) => editBooking('salesNotes', e.target.value)}
                 />
 
-                <div className="leading-6 text-xl text-primary-red font-bold -mt-5 flex-row">
-                  Sales Discrepancy Notes
-                </div>
-                <TextArea
-                  className="mt-2 h-[124px] w-[543px] mb-10"
-                  value={discrepancyNotes}
-                  placeholder="Notes Field"
-                  onChange={(e) => setDiscrepancyNotes(e.target.value)}
-                  onBlur={(e) => editBooking('finalSalesDiscrepancyNotes', e.target.value)}
-                />
+                {showDiscrepancyNotes && (
+                  <div>
+                    <div className="leading-6 text-xl text-primary-red font-bold -mt-5 flex-row">
+                      Sales Discrepancy Notes
+                    </div>
+                    <TextArea
+                      className="mt-2 h-[124px] w-[543px] mb-5"
+                      value={discrepancyNotes}
+                      placeholder="Notes Field"
+                      onChange={(e) => setDiscrepancyNotes(e.target.value)}
+                      disabled={discrepancyButtonText === 'Edit'}
+                    />
+
+                    <Button
+                      className="w-[65px] flex flex-row float-right"
+                      variant="primary"
+                      text={discrepancyButtonText}
+                      onClick={submitDiscrepancyNotes}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           )}

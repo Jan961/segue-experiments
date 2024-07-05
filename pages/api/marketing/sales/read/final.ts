@@ -15,26 +15,38 @@ export default async function handle(req, res) {
                                 Value, 
                                 SetSalesFiguresDate, 
                                 SetProductionWeekDate, 
-                                SetIsFinalFigures 
+                                SetIsFinalFigures,
+                                SetFinalSalesApprovedByUser
                             from SalesView
                             where BookingId = ${bookingId}
                             AND SetIsFinalFigures = TRUE `;
 
-    const schoolSales = data.find((sale) => sale.SaleTypeName === 'School Sales');
-    const generalSales = data.find((sale) => sale.SaleTypeName === 'General Sales');
+    if (data.length > 0) {
+      const schoolSales = data.find((sale) => sale.SaleTypeName === 'School Sales');
+      const generalSales = data.find((sale) => sale.SaleTypeName === 'General Sales');
 
-    const result = {
-      schools: {
-        seatsSold: schoolSales?.Seats === undefined ? '' : schoolSales.Seats,
-        seatsSoldVal: schoolSales?.Value === undefined ? '' : schoolSales.Value,
-      },
-      general: {
-        seatsSold: generalSales?.Seats === undefined ? '' : generalSales.Seats,
-        seatsSoldVal: generalSales?.Value === undefined ? '' : generalSales.Value,
-      },
-    };
+      let result = {
+        schools: {
+          seatsSold: schoolSales?.Seats === undefined ? '' : schoolSales.Seats,
+          seatsSoldVal: schoolSales?.Value === undefined ? '' : schoolSales.Value,
+        },
+        general: {
+          seatsSold: generalSales?.Seats === undefined ? '' : generalSales.Seats,
+          seatsSoldVal: generalSales?.Value === undefined ? '' : generalSales.Value,
+        },
+        user: null,
+      };
 
-    res.status(200).json(result);
+      if ('SetFinalSalesApprovedByUser' in generalSales) {
+        result = { ...result, user: generalSales.SetFinalSalesApprovedByUser };
+      } else if ('SetFinalSalesApprovedByUser' in schoolSales) {
+        result = { ...result, user: schoolSales.SetFinalSalesApprovedByUser };
+      }
+
+      res.status(200).json(result);
+    } else {
+      res.status(200).json({});
+    }
   } catch (err) {
     console.log(err);
     res.status(500).json({ err: 'Error occurred getting current days sales.' });

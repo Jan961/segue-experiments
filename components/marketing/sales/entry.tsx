@@ -12,7 +12,7 @@ import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
 
-type TourResponse = {
+export type TourResponse = {
   data: Array<SelectOption>;
   frequency: string;
 };

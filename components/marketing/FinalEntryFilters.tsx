@@ -58,7 +58,6 @@ const FinalEntryFilters = () => {
 
       if (Array.isArray(data)) {
         const lastDates = data as Array<LastPerfDate>;
-        console.log(lastDates);
         setLastDates(lastDates || []);
       }
     } catch (error) {
@@ -96,6 +95,12 @@ const FinalEntryFilters = () => {
       fetchLastDates();
     }
   }, [productionId]);
+
+  useEffect(() => {
+    if (bookings.selected === null) {
+      setSelectedValue(null);
+    }
+  }, [bookings.selected]);
 
   return (
     <div>
