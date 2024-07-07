@@ -336,3 +336,7 @@ export const formatDateWithTimezoneOffset = ({
   }
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
 };
+
+export const getTimezonOffset = () => {
+  return new Date().getTimezoneOffset();
+};
