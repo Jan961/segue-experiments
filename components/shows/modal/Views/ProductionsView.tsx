@@ -15,6 +15,7 @@ import { debug } from 'utils/logging';
 import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import CurrencyConversionModal from './CurrencyConversionModal';
+import { ConfirmationDialog } from 'components/core-ui-lib';
 
 interface ProductionsViewProps {
   showData: any;
@@ -38,6 +39,7 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
   const tableRef = useRef(null);
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
+  const [confirm, setConfirm] = useState<boolean>(false);
   const [openCurrencyConversionModal, setOpenCurrencyConversionModal] = useState<boolean>(false);
   const [currentProduction, setCurrentProduction] = useState<ProductionFormData>(defaultProductionFormData);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -181,6 +183,9 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
     if (e.column.colId === 'updateCurrencyConversion') {
       setOpenCurrencyConversionModal(true);
     }
+    if (e.column.colId === 'delete' && e.data?.IsArchived) {
+      setConfirm(true);
+    }
   };
 
   const handleCellChanges = (e) => {
@@ -204,6 +209,10 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
       setIsLoading(false);
     }
   };
+
+  const onConfirmDelete = useCallback(() => {
+    handleDelete(currentProduction?.id, () => setConfirm(false));
+  }, [handleDelete, setConfirm, currentProduction]);
 
   return (
     <>
@@ -244,11 +253,17 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
           <Button className=" w-33" text="Close" onClick={onClose} />
         </div>
       </div>
+      <ConfirmationDialog
+        variant="delete"
+        show={confirm}
+        onYesClick={onConfirmDelete}
+        onNoClick={() => setConfirm(false)}
+        hasOverlay={false}
+      />
       {openEditModal && (
         <ProductionDetailsForm
           production={currentProduction}
           title={title || ''}
-          onDelete={handleDelete}
           visible={openEditModal}
           onSave={onSaveProduction}
           onClose={() => setOpenEditModal(false)}

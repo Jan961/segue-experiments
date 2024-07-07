@@ -5,7 +5,7 @@ import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateRange from 'components/core-ui-lib/DateRange';
-import { ConfirmationDialog, Icon, TextInput, TimeInput, Tooltip, UploadModal, notify } from 'components/core-ui-lib';
+import { Icon, TextInput, TimeInput, Tooltip, UploadModal, notify } from 'components/core-ui-lib';
 import { REGIONS_LIST, SALES_FIG_OPTIONS, ToastMessages } from 'config/shows';
 import { uploadFile } from 'requests/upload';
 import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
@@ -43,7 +43,6 @@ interface ProductionsViewModalProps {
   production: any;
   onClose: () => void;
   onSave?: (formData: ProductionFormData, callback?: () => void) => void;
-  onDelete?: (productionId: number, callback?: () => void) => void;
 }
 
 export const defaultProductionFormData: ProductionFormData = {
@@ -62,17 +61,9 @@ export const defaultProductionFormData: ProductionFormData = {
   runningTime: '',
   runningTimeNote: '',
 };
-const ProductionDetailsForm = ({
-  visible,
-  onClose,
-  title,
-  onSave,
-  onDelete,
-  production,
-}: ProductionsViewModalProps) => {
+const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: ProductionsViewModalProps) => {
   const currencyList = useRecoilValue(currencyListState);
   const productionCompanyList = useRecoilValue(productionCompanyState);
-  const [confirm, setConfirm] = useState<boolean>(false);
   const [formData, setFormData] = useState(production || defaultProductionFormData);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -119,10 +110,6 @@ const ProductionDetailsForm = ({
     } catch (error) {
       onError(file[0].file, error.message);
     }
-  };
-
-  const onConfirmDelete = () => {
-    onDelete(id, () => setConfirm(false));
   };
 
   const onFileUploadChange = (selectedFiles) => {
@@ -322,15 +309,6 @@ const ProductionDetailsForm = ({
 
         <div className="pt-3 w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
-          <Tooltip body={!production?.isArchived ? 'Please archive the production prior to deleting' : ''}>
-            <Button
-              disabled={!production?.isArchived}
-              onClick={() => setConfirm(true)}
-              className="float-right px-4 w-33 font-normal"
-              variant="tertiary"
-              text="Delete"
-            />
-          </Tooltip>
           <Button
             className="float-right px-4 font-normal w-33 text-center"
             variant="primary"
@@ -340,13 +318,6 @@ const ProductionDetailsForm = ({
           />
         </div>
       </form>
-      <ConfirmationDialog
-        variant="delete"
-        show={confirm}
-        onYesClick={onConfirmDelete}
-        onNoClick={() => setConfirm(false)}
-        hasOverlay={false}
-      />
     </PopupModal>
   );
 };

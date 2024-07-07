@@ -228,4 +228,21 @@ export const productionsTableConfig = [
     resizable: false,
     headerClass: 'text-center',
   },
+  {
+    headerName: '',
+    field: 'delete',
+    width: 70,
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: (params) => ({
+      buttonText: 'Delete',
+      variant: 'tertiary',
+      disabled: !params.data.IsArchived,
+      tooltipText: 'Please archive the production prior to deleting',
+    }),
+    cellStyle: {
+      paddingRight: '0.5em',
+    },
+    resizable: false,
+    headerClass: 'text-center',
+  },
 ];
