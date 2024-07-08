@@ -10,6 +10,7 @@ type ProductionCompany = {
   webSite: '';
   companyVATNo: '';
   id: null;
+  fileLocation: '';
 };
 const ProductionCompaniesTab = () => {
   const [productionCompanies, setProductionCompanies] = useState<any[]>();
@@ -53,16 +54,20 @@ const ProductionCompaniesTab = () => {
   };
   const deleteProductionCompany = async () => {
     if (selectedProdCompany) {
-      await axios.delete(`/api/productionCompanies/delete?id=${selectedProdCompany.id}`);
-      await fetchProductionCompanies();
-      setSelectedProdCompany(null);
+      try {
+        await axios.delete(`/api/productionCompanies/delete?id=${selectedProdCompany.id}`);
+        await axios.delete(`/api/file/delete?location=${selectedProdCompany.fileLocation}`);
+        await fetchProductionCompanies();
+        setSelectedProdCompany(null);
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
   const onCellUpdate = async (e) => {
     try {
       const { rowIndex, data } = e;
-      console.log(data);
       const productions = productionCompanies;
       productions[rowIndex] = { ...e.data, id: productions[rowIndex].id };
       setProductionCompanies(productions);

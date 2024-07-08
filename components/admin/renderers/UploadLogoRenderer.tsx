@@ -1,5 +1,5 @@
 import UploadModal from 'components/core-ui-lib/UploadModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from 'components/core-ui-lib/';
 import Image from 'next/image';
 import axios from 'axios';
@@ -9,9 +9,14 @@ import { getFileUrl } from 'lib/s3';
 
 export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSucess) => {
   const { id, companyName, companyVATNo, webSite, fileLocation, fileName } = params.data;
-  console.log(params.data);
   const [openUploadModal, setOpenUploadModal] = useState<boolean>();
   const [uploadedFile, setUploadedFile] = useState<UploadedFile>(null);
+
+  useEffect(() => {
+    if (fileLocation) {
+      setUploadedFile((prev) => ({ ...prev, imageUrl: getFileUrl(fileLocation) }));
+    }
+  }, [fileLocation]);
 
   const onSave = async (file, onProgress, onError, onUploadingImage) => {
     const formData = new FormData();
@@ -23,6 +28,7 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
       if (response.status >= 400 && response.status <= 499) {
         onError(file[0].file, 'Error uploading file. Please try again.');
       } else {
+        setUploadedFile((prev) => ({ ...prev, imageUrl: getFileUrl(response.location) }));
         onUploadSucess({ companyName, companyVATNo, id, webSite, fileId: response.id });
       }
     } catch (error) {
@@ -33,7 +39,13 @@ export const UploadLogoRenderer = (params, fetchProductionCompanies, onUploadSuc
   const handleDelete = async () => {
     try {
       await axios.delete(`/api/file/delete?location${fileLocation}`);
-      await axios.delete(`/api/productionCompanies/logo/delete?Id=${id}}`);
+      await axios.post('/api/productionCompanies/update', {
+        id,
+        companyName,
+        companyVATNo,
+        webSite,
+        fileLocation: null,
+      });
     } catch (exception) {
       console.log(exception);
     }
