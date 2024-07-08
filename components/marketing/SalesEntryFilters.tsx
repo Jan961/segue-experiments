@@ -7,7 +7,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
-import { getWeekDayShort } from 'services/dateService';
+import { getWeekDayShort , DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
@@ -31,7 +31,6 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   const [tourLabel, setTourLabel] = useState('');
   const [lastDates, setLastDates] = useState([]);
   const [, setCurrency] = useRecoilState(currencyState);
-  const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
 
   const { fetchData } = useAxios();
 
@@ -86,9 +85,9 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
         method: 'POST',
       });
 
-      if (typeof data === 'object') {
+      if (Array.isArray(data)) {
         const lastDates = data as Array<LastPerfDate>;
-        setLastDates(lastDates);
+        setLastDates(lastDates || []);
       }
     } catch (error) {
       console.log(error);
@@ -101,35 +100,29 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
   };
 
   const bookingOptions = useMemo(() => {
-    try {
-      changeBooking(null);
-      setSelectedTourWeek(null);
-      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+    const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
 
-      const optWithRun = initialOptions.map((option) => {
-        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
-        if (lastDate !== undefined) {
-          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
-          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
-          if (option.date === endDateStr) {
-            return option;
-          } else {
-            return {
-              ...option,
-              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
-            };
-          }
-        } else {
+    const optWithRun = initialOptions.map((option) => {
+      const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
+      if (lastDate !== undefined) {
+        const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+        const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
+        if (option.date === endDateStr) {
           return option;
+        } else {
+          return {
+            ...option,
+            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+          };
         }
-      });
+      } else {
+        return option;
+      }
+    });
 
-      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return optWithRun;
-    } catch (error) {
-      console.log(error);
-    }
-  }, [bookings.bookings]);
+    optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return optWithRun;
+  }, [bookings.bookings, lastDates]);
 
   useEffect(() => {
     if (productionId !== null && productionId !== undefined) {

@@ -1,44 +1,31 @@
 import Layout from 'components/Layout';
-import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
-import Entry, { SalesEntryRef } from 'components/marketing/sales/entry';
+import FinalEntryFilters from 'components/marketing/FinalEntryFilters';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
 import { objectify } from 'radash';
-import { useRef } from 'react';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
-import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
+import { getAccountId, getEmailFromReq, getUserNameFromReq, getUsers } from 'services/userService';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
-  const salesEntryRef = useRef<SalesEntryRef>();
-
-  const handleDateChanged = (salesWeek) => {
-    if (salesEntryRef.current) {
-      salesEntryRef.current.resetForm(salesWeek);
-    }
-  };
-
   return (
-    <div>
-      <Layout title="Marketing | Segue">
-        <div className="mb-8">
-          <SalesEntryFilters onDateChanged={handleDateChanged} />
-        </div>
-
-        <Entry ref={salesEntryRef} />
-      </Layout>
-    </div>
+    <Layout title="Marketing | Segue">
+      <div className="mb-8">
+        <FinalEntryFilters />
+      </div>
+    </Layout>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
   const accountId = await getAccountId(email);
-  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/entry', accountId);
+  const currentUser = await getUserNameFromReq(ctx.req);
+  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/final', accountId);
 
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
@@ -76,8 +63,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         towns: townList,
         venueList: venue,
         defaultTab: 0,
-        currencySymbol: '',
         users,
+        currencySymbol: '',
+        currentUser,
       },
     };
   } else {
