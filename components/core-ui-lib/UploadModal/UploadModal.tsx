@@ -18,6 +18,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
   onChange,
   onSave,
   value,
+  customHandleFileDelete,
 }) => {
   const hiddenFileInput = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string>('');
@@ -83,6 +84,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleFileDelete = (fileName) => {
+    if (customHandleFileDelete) {
+      customHandleFileDelete();
+    }
+
     const filesList = selectedFiles.filter((file) => file?.name !== fileName);
     setSelectedFiles(filesList);
     onChange?.(filesList);
@@ -192,8 +197,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
               fileSize={file?.size}
               progress={progress[file?.name]}
               errorMessage={errorMessages[file?.name]}
-              onDelete={() => handleFileDelete(file?.name)}
               imageUrl={uploadedImageUrls[file?.name]}
+              onDelete={() => {
+                handleFileDelete(file?.name);
+              }}
             />
           ))}
         </div>

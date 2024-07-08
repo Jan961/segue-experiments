@@ -7,23 +7,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method !== 'DELETE') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
-  const { location: Location } = req.body;
-  if (!location || Array.isArray(location)) {
+  const { location: Location } = req.query;
+
+  if (!Location || Array.isArray(Location)) {
     return res.status(400).json({ message: 'Invalid request' });
   }
   try {
-    const file: File = await prisma.File.findUnique({
+    const files: File[] = await prisma.File.findMany({
       where: { Location },
     });
-    if (!file) {
+    if (files.length === 0) {
       return res.status(404).json({ message: 'File not found' });
     }
-    await deleteFile(file.Location);
+
+    await deleteFile(files[0].Location);
     const deletedFile = await prisma.File.delete({
-      where: { Location },
+      where: { Id: files[0].Id },
     });
     res.status(200).json(deletedFile);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Failed to delete the file' });
   }
 }

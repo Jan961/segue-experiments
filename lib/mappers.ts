@@ -83,7 +83,6 @@ export const showMapper = (show: Show): ShowDTO => ({
   Type: show.Type,
   Code: show.Code,
   IsArchived: show.IsArchived,
-  ShowProdCoId: show.ShowProdCoId,
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {

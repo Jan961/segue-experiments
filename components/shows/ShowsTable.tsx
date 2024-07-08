@@ -31,7 +31,6 @@ const intShowData = {
   Type: 'P',
   IsArchived: false,
   productions: [],
-  ShowProdCoId: null,
 };
 const ShowsTable = ({
   rowsData,

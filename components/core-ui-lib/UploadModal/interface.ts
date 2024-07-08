@@ -39,6 +39,7 @@ export interface UploadModalProps {
     onUploadingImage: (file: File, imageUrl: string) => void,
   ) => void;
   value?: UploadedFile[] | UploadedFile;
+  customHandleFileDelete?: () => Promise<void>;
 }
 
 export const attachmentMimeTypes = {
