@@ -40,6 +40,8 @@ import { contractsBookingStatusState, contractsStatusState } from 'state/contrac
 import { contractRehearsalState } from 'state/contracts/contractRehearsalState';
 import { contractGetInFitUpState } from 'state/contracts/contractGetInFitUpState';
 import { currencyState } from 'state/marketing/currencyState';
+import { CurrencyList, currencyListState } from 'state/productions/currencyState';
+import { ProductionCompanyList, productionCompanyState } from 'state/productions/productionCompanyState';
 import { currentUserState } from 'state/marketing/currentUserState';
 
 /*
@@ -95,6 +97,10 @@ export type InitialState = Partial<{
   account?: {
     user: UserState;
   };
+  productions?: {
+    currencyList?: CurrencyList;
+    productionCompanyList?: ProductionCompanyList;
+  };
 }>;
 
 const states: {
@@ -104,6 +110,7 @@ const states: {
   contracts: Record<keyof InitialState['contracts'], RecoilState<any>>;
   marketing: Record<keyof InitialState['marketing'], RecoilState<any>>;
   account: Record<keyof InitialState['account'], RecoilState<any>>;
+  productions: Record<keyof InitialState['productions'], RecoilState<any>>;
 } = {
   global: {
     productionJump: productionJumpState,
@@ -150,6 +157,10 @@ const states: {
   },
   account: {
     user: userState,
+  },
+  productions: {
+    currencyList: currencyListState,
+    productionCompanyList: productionCompanyState,
   },
 };
 

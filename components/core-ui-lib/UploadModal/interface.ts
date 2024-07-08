@@ -5,6 +5,7 @@ export enum FileStatusVals {
 }
 
 export interface UploadedFile {
+  id?: number;
   size: number;
   name: string;
   error?: string;
@@ -38,6 +39,7 @@ export interface UploadModalProps {
     onUploadingImage: (file: File, imageUrl: string) => void,
   ) => void;
   value?: UploadedFile[] | UploadedFile;
+  customHandleFileDelete?: () => Promise<void>;
 }
 
 export const attachmentMimeTypes = {

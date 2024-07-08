@@ -7,7 +7,7 @@ import { pick } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const dto: Partial<ProductionDTO> = mapToPrismaFields(req.body);
-  const { Id, Image } = dto;
+  const { Id, Image, ReportCurrencyCode, ProdCoId } = dto;
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: Id });
@@ -24,7 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         data: {
           Code: dto.Code,
           IsArchived: dto.IsArchived,
-          ...pick(dto, ['Code', 'IsArchived', 'SalesFrequency', 'SalesEmail']),
+          ...pick(dto, ['Code', 'IsArchived', 'SalesFrequency', 'SalesEmail', 'RunningTimeNote']),
           ...(Image?.id
             ? {
                 File: {
@@ -35,6 +35,32 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               }
             : {
                 File: {
+                  disconnect: true,
+                },
+              }),
+          ...(ReportCurrencyCode
+            ? {
+                Currency: {
+                  connect: {
+                    Code: ReportCurrencyCode,
+                  },
+                },
+              }
+            : {
+                ReportCurrencyCode: {
+                  disconnect: true,
+                },
+              }),
+          ...(ProdCoId
+            ? {
+                ProductionCompany: {
+                  connect: {
+                    Id: ProdCoId,
+                  },
+                },
+              }
+            : {
+                ProductionCompany: {
                   disconnect: true,
                 },
               }),
