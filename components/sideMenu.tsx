@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-
 const SideNavBar = (data?) => (
   <div className="1/12 w-60 h-full shadow-md bg-white px-1 ">
     <ul className="relative">
@@ -57,7 +56,7 @@ const SideNavBar = (data?) => (
           <li className="relative">
             <a
               className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"
-              href="/marketing/sales/entry"
+              href="/marketing/sales/Entry"
               data-mdb-ripple="true"
               data-mdb-ripple-color="dark"
             >
@@ -67,7 +66,7 @@ const SideNavBar = (data?) => (
           <li className="relative">
             <a
               className="flex items-center text-sm py-4 px-6 h-12 overflow-hidden text-gray-700 text-ellipsis whitespace-nowrap rounded hover:text-gray-900 hover:bg-gray-100 transition duration-300 ease-in-out"
-              href="/marketing/sales/final"
+              href="/marketing/sales/Final"
               data-mdb-ripple="true"
               data-mdb-ripple-color="dark"
             >

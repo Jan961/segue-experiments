@@ -29,6 +29,7 @@ SELECT
   ) AS `SetProductionWeekNum`,
   `frtxigoo_dev`.`SalesSet`.`SetNotOnSale` AS `SetNotOnSale`,
   `frtxigoo_dev`.`SalesSet`.`SetIsFinalFigures` AS `SetIsFinalFigures`,
+  `frtxigoo_dev`.`SalesSet`.`SetFinalSalesApprovedByUser` AS `SetFinalSalesApprovedByUser`,
   `frtxigoo_dev`.`SalesSet`.`SetSingleSeats` AS `SetSingleSeats`,
   `frtxigoo_dev`.`SalesSet`.`SetBrochureReleased` AS `SetBrochureReleased`,
   `frtxigoo_dev`.`SalesSet`.`SetIsCopy` AS `SetIsCopy`,
@@ -107,8 +108,9 @@ FROM
           )
         )
         LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` `FinalFiguresTotals` ON(
-          `FinalFiguresSet`.`SetBookingId` = `FinalFiguresTotals`.`SetBookingId`
+          `frtxigoo_dev`.`Booking`.`BookingId` = `FinalFiguresTotals`.`SetBookingId`
           AND `FinalFiguresSet`.`SetSalesFiguresDate` = `FinalFiguresTotals`.`SetSalesFiguresDate`
+          AND `SalesSetTotalsView`.`SaleTypeName` = `FinalFiguresTotals`.`SaleTypeName`
         )
       )
       LEFT JOIN `frtxigoo_dev`.`SalesSet` `NotOnSaleSet` ON(

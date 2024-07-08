@@ -18,6 +18,8 @@ const mapToPrisma = (fields) => {
     SalesNotes: fields.salesNotes,
     HoldNotes: fields.holdNotes,
     CompNotes: fields.compNotes,
+    FinalSalesDiscrepancyNotes: fields.finalSalesDiscrepancyNotes,
+    HasSchoolsSales: fields.hasSchoolsSales,
   };
 };
 
