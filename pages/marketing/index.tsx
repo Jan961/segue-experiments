@@ -1,7 +1,7 @@
 import Layout from 'components/Layout';
 import Filters from 'components/marketing/Filters';
 import MarketingHome from 'components/marketing/MarketingHome';
-import { getAccountIdFromReq } from 'services/userService';
+import { getAccountIdFromReq, getUserNameFromReq } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
@@ -28,6 +28,7 @@ export default MarketingPage;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
+  const currentUser = await getUserNameFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'marketing', accountId);
   const productionId = productionJump.selected;
   let initialState: InitialState;
@@ -67,6 +68,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         venueList: venue,
         currencySymbol: '',
         defaultTab: 0,
+        currentUser,
       },
     };
   } else {

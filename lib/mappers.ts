@@ -83,7 +83,6 @@ export const showMapper = (show: Show): ShowDTO => ({
   Type: show.Type,
   Code: show.Code,
   IsArchived: show.IsArchived,
-  ShowProdCoId: show.ShowProdCoId,
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
@@ -134,6 +133,8 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   BookingHoldNotes: b.HoldNotes,
   BookingSalesNotes: b.SalesNotes,
   PerformanceCount: b?._count?.Performance || 0,
+  BookingFinalSalesDiscrepancyNotes: b.FinalSalesDiscrepancyNotes,
+  BookingHasSchoolsSales: b.HasSchoolsSales,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
