@@ -3,6 +3,7 @@ import DefaultCellRenderer from '../bookings/table/DefaultCellRenderer';
 import VenueColumnRenderer from './table/VenueColumnRenderer';
 import DateColumnRenderer from './table/DateColumnRenderer';
 import { tileColors } from 'config/global';
+import InputRenderer from 'components/global/salesTable/renderers/InputRenderer';
 
 export const contractsStyleProps = { headerColor: tileColors.contracts };
 
@@ -63,5 +64,46 @@ export const contractsColumnDefs = [
     cellRenderer: ContractStatusCellRenderer,
     resizable: false,
     width: 180,
+  },
+];
+
+export const standardSeatKillsColumnDefs = [
+  {
+    headerName: 'Type',
+    field: 'type',
+    cellRenderer: DefaultCellRenderer,
+    width: 150,
+    headerClass: 'right-border-full',
+    suppressMovable: true,
+    sortable: false,
+    resizable: false,
+  },
+  {
+    headerName: 'Seats',
+    field: 'seats',
+    cellRenderer: InputRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
+    headerClass: 'right-border-full',
+    suppressMovable: true,
+    sortable: false,
+    resizable: false,
+  },
+  {
+    headerName: 'Value',
+    field: 'value',
+    cellRenderer: InputRenderer,
+    width: 120,
+    cellStyle: {
+      textAlign: 'center',
+      overflow: 'visible',
+    },
+    headerClass: 'right-border-full',
+    suppressMovable: true,
+    sortable: false,
+    resizable: false,
   },
 ];

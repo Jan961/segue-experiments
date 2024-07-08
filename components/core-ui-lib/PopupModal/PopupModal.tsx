@@ -14,6 +14,7 @@ interface PopupModalProps {
   panelClass?: string;
   hasOverlay?: boolean;
   closeOnOverlayClick?: boolean; // New prop to close on overlay click
+  hasOverflow?: boolean;
 }
 
 export default function PopupModal({
@@ -26,6 +27,7 @@ export default function PopupModal({
   panelClass,
   hasOverlay = false,
   closeOnOverlayClick = false, // Default to false
+  hasOverflow = true,
 }: PopupModalProps) {
   const [overlay, setOverlay] = useState<boolean>(false);
 
@@ -57,7 +59,8 @@ export default function PopupModal({
         <div
           className={classNames(
             calibri.variable,
-            'font-calibri fixed inset-0 overflow-y-auto z-50',
+            'font-calibri fixed inset-0 z-50',
+            hasOverflow ? 'overflow-y-auto' : '',
             overlay ? '' : 'bg-black/75',
           )}
           data-testid="overlay"

@@ -4,7 +4,7 @@ import { InitialState } from 'lib/recoil';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq, getUsers } from 'services/userService';
 import ContractFilters from 'components/contracts/ContractsFilters';
-import ContractsTable from 'components/contracts/ContractsTable';
+import ContractsTable from 'components/contracts/table/ContractsTable';
 import {
   DateTypeMapper,
   bookingMapper,

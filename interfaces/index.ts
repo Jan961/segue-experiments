@@ -189,6 +189,16 @@ export interface FileDTO {
   imageUrl?: string;
 }
 
+export interface ProductionCompanyDTO {
+  AccountId?: number;
+  Id?: number;
+  Logo?: string;
+  Name?: string;
+  ProdCoSaleStartWeek?: number;
+  ProdCoVATCode?: number;
+  WebSite?: string;
+}
+
 export type ProductionDTO = {
   Id?: number;
   ShowId: number;
@@ -206,6 +216,7 @@ export type ProductionDTO = {
   ImageUrl?: string;
   Image?: Partial<FileDTO>;
   ShowRegionId?: number;
+  ProductionCompany?: Partial<ProductionCompanyDTO>;
 };
 
 export type VenueMinimalDTO = {
@@ -517,6 +528,12 @@ export interface ContractTableRowType {
   venue: string | null;
   venueId: number | null;
   week: number | null;
+}
+
+export interface StandardSeatRowType {
+  type: string;
+  seats: string;
+  value: string;
 }
 export interface VenueContractFormData {
   StatusCode: string;
