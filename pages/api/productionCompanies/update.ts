@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { companyName, webSite, id, companyVATNo, fileId } = req.body;
-    console.log(req.body);
+
     const updated = await prisma.productionCompany.update({
       data: {
         WebSite: webSite,
