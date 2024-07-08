@@ -21,6 +21,15 @@ export const getEmailAddressForClerkId = async (userId: string): Promise<string>
   return matching.emailAddress;
 };
 
+export const getUserNameForClerkId = async (userId: string): Promise<string> => {
+  const user = await clerkClient.users.getUser(userId);
+  const matching = user.emailAddresses.filter((x) => x.id === user.primaryEmailAddressId)[0];
+  const accountId = await getAccountId(matching.emailAddress);
+  const users = await getUsers(accountId);
+  const currentUser = users.find((user) => user.Email === matching.emailAddress);
+  return currentUser.FirstName + ' ' + currentUser.LastName;
+};
+
 export const getAccountId = async (email: string) => {
   const { AccountId } = await prisma.user.findUnique({
     where: {
@@ -38,6 +47,11 @@ export const getEmailFromReq = async (req: any) => {
   // It is definitely worth caching this!
   const { userId } = getAuth(req);
   return getEmailAddressForClerkId(userId);
+};
+
+export const getUserNameFromReq = async (req: any) => {
+  const { userId } = getAuth(req);
+  return getUserNameForClerkId(userId);
 };
 
 export const getAccountIdFromReq = async (req: any) => {

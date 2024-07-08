@@ -2,7 +2,7 @@ import Layout from 'components/Layout';
 import MarketingHome from 'components/marketing/MarketingHome';
 import Filters from 'components/marketing/Filters';
 import { GetServerSideProps } from 'next';
-import { getAccountIdFromReq, getUsers } from 'services/userService';
+import { getAccountIdFromReq, getUserNameFromReq, getUsers } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
 import { getSaleableBookings } from 'services/bookingService';
@@ -26,6 +26,7 @@ export default Index;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const accountId = await getAccountIdFromReq(ctx.req);
+  const currentUser = await getUserNameFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'marketing', accountId);
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
@@ -65,6 +66,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         defaultTab: 0,
         currencySymbol: '',
         users,
+        currentUser,
       },
     };
   } else {

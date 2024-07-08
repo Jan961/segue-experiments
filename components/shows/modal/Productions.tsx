@@ -17,7 +17,7 @@ const Productions = ({ visible, onClose, showData }: ProductionsProps) => {
       panelClass="relative"
       hasOverlay={false}
     >
-      <ProductionsView onClose={onClose} showData={showData} showName={showData.Name} />
+      <ProductionsView onClose={onClose} showData={showData} showName={showData.Name} showCode={showData.Code} />
     </PopupModal>
   );
 };

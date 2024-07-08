@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
 import { GetServerSideProps } from 'next';
-import { getAccountIdFromReq, getUsers } from 'services/userService';
+import { getAccountIdFromReq, getUserNameFromReq, getUsers } from 'services/userService';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { InitialState } from 'lib/recoil';
 import { getSaleableBookings } from 'services/bookingService';
@@ -32,6 +32,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   if (productionId !== null) {
     const bookings = await getSaleableBookings(productionId);
+    const currentUser = await getUserNameFromReq(ctx.req);
     const venueRoles = await getRoles();
     const selected = null;
     const bookingJump: BookingJump = {
@@ -63,6 +64,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         defaultTab: 0,
         currencySymbol: '',
         users,
+        currentUser,
       },
     };
   } else {
