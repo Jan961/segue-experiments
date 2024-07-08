@@ -5,6 +5,7 @@ export enum FileStatusVals {
 }
 
 export interface UploadedFile {
+  id?: number;
   size: number;
   name: string;
   error?: string;

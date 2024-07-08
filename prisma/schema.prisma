@@ -411,18 +411,18 @@ model CompType {
 }
 
 model ConversionRate {
-  ConversionId                                                 Int        @id @default(autoincrement())
-  ConversionFromCurrencyCode                                   String     @db.VarChar(3)
-  ConversionToCurrencyCode                                     String     @db.VarChar(3)
-  ConversionProductionId                                       Int
-  ConversionRate                                               Decimal    @db.Decimal(8, 4)
-  Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency Currency   @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency", fields: [ConversionFromCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_ConversionDate_From")
-  Currency_ConversionRate_ConversionToCurrencyCodeToCurrency   Currency   @relation("ConversionRate_ConversionToCurrencyCodeToCurrency", fields: [ConversionToCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_ConversionDate_To")
-  Production                                                   Production @relation(fields: [ConversionProductionId], references: [Id], onUpdate: Restrict, map: "Production_ConversionRate")
+  Id                                                           Int        @map("ConversionId")@id @default(autoincrement())
+  FromCurrencyCode                                             String     @map("ConversionFromCurrencyCode")@db.VarChar(3)
+  ToCurrencyCode                                               String     @map("ConversionToCurrencyCode")@db.VarChar(3)
+  ProductionId                                                 Int        @map("ConversionProductionId")
+  Rate                                                         Decimal    @map("ConversionRate")@db.Decimal(8, 4)
+  Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency Currency   @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency", fields: [FromCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_ConversionDate_From")
+  Currency_ConversionRate_ConversionToCurrencyCodeToCurrency   Currency   @relation("ConversionRate_ConversionToCurrencyCodeToCurrency", fields: [ToCurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_ConversionDate_To")
+  Production                                                   Production @relation(fields: [ProductionId], references: [Id], onUpdate: Restrict, map: "Production_ConversionRate")
 
-  @@index([ConversionFromCurrencyCode], map: "Currency_ConversionDate_From_idx")
-  @@index([ConversionToCurrencyCode], map: "Currency_ConversionDate_To_idx")
-  @@index([ConversionProductionId], map: "Production_ConversionDate_idx")
+  @@index([FromCurrencyCode], map: "Currency_ConversionDate_From_idx")
+  @@index([ToCurrencyCode], map: "Currency_ConversionDate_To_idx")
+  @@index([ProductionId], map: "Production_ConversionDate_idx")
 }
 
 model HoldType {
