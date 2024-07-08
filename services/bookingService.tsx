@@ -285,6 +285,7 @@ export const createNewBooking = (
           })),
         },
       },
+      HasSchoolsSales: true,
     },
     include: {
       Performance: true,

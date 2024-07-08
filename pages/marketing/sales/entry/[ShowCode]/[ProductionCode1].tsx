@@ -1,38 +1,53 @@
 import Layout from 'components/Layout';
-import { GetServerSideProps } from 'next';
-import { getAccountIdFromReq, getUserNameFromReq, getUsers } from 'services/userService';
-import { getProductionJumpState } from 'utils/getProductionJumpState';
+import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
+import Entry, { SalesEntryRef } from 'components/marketing/sales/Entry';
+import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
+import { GetServerSideProps } from 'next';
+import { objectify } from 'radash';
+import { useRef } from 'react';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
-import { BookingJump } from 'state/marketing/bookingJumpState';
-import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
+import { getAccountId, getEmailFromReq, getUserNameFromReq, getUsers } from 'services/userService';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
-import { objectify } from 'radash';
-import GlobalActivityFilters from 'components/marketing/GlobalActivityFilters';
+import { BookingJump } from 'state/marketing/bookingJumpState';
+import { getProductionJumpState } from 'utils/getProductionJumpState';
 
 const Index = () => {
+  const salesEntryRef = useRef<SalesEntryRef>();
+
+  const handleDateChanged = (salesWeek) => {
+    if (salesEntryRef.current) {
+      salesEntryRef.current.resetForm(salesWeek);
+    }
+  };
+
   return (
-    <Layout title="Marketing | Segue" flush>
-      <div className="mb-8">
-        <GlobalActivityFilters />
-      </div>
-    </Layout>
+    <div>
+      <Layout title="Marketing | Segue">
+        <div className="mb-8">
+          <SalesEntryFilters onDateChanged={handleDateChanged} />
+        </div>
+
+        <Entry ref={salesEntryRef} />
+      </Layout>
+    </div>
   );
 };
-export default Index;
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const accountId = await getAccountIdFromReq(ctx.req);
-  const productionJump = await getProductionJumpState(ctx, 'marketing/activity/GlobalActivity', accountId);
+  const email = await getEmailFromReq(ctx.req);
+  const accountId = await getAccountId(email);
+  const currentUser = await getUserNameFromReq(ctx.req);
+  const productionJump = await getProductionJumpState(ctx, 'marketing/sales/entry', accountId);
+
   const productionId = productionJump.selected;
   const users = await getUsers(accountId);
 
-  let initialState: InitialState;
+  let initialState: InitialState = null;
 
   if (productionId !== null) {
     const bookings = await getSaleableBookings(productionId);
-    const currentUser = await getUserNameFromReq(ctx.req);
     const venueRoles = await getRoles();
     const selected = null;
     const bookingJump: BookingJump = {
@@ -77,3 +92,5 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return { props: { initialState } };
 };
+
+export default Index;
