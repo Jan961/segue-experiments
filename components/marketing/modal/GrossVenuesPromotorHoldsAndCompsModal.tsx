@@ -67,7 +67,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const { data: venues = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => {
-      if (!production) return;
+      if (!production || !['promoterHolds', 'holdsAndComps'].includes(activeModal)) return;
       const productionVenuesPromise = fetchProductionVenues(production);
       notify.promise(productionVenuesPromise, {
         loading: 'fetching production venues',
@@ -127,7 +127,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       title={title}
       show={visible}
       onClose={onClose}
-      hasOverlay={false}
+      hasOverlay={true}
     >
       <form className="flex flex-col gap-2 w-[383px] mt-4">
         <Select

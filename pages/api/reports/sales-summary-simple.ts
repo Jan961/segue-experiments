@@ -449,8 +449,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     getChangeVsLastWeekValue(weekWiseDataInPound),
     ...seatsDataForPound,
   ]);
+  styleHeader({ worksheet, row: 1, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
+
   applyFormattingToRange({
     worksheet,
     startRow: row,

@@ -190,6 +190,7 @@ export default forwardRef(function Select(
         setSelectedOption(selectedValues);
       }
     } else {
+      console.trace(value);
       setSelectedOption(value && options ? options.find((o) => value === o.value) : null);
     }
   }, [value, options, isMulti]);
