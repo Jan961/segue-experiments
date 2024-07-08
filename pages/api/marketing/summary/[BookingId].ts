@@ -115,11 +115,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             EndDate: true,
             Production: {
               select: {
-                ConversionRate: {
-                  select: {
-                    ConversionRate: true,
-                  },
-                },
+                ConversionRate: true,
               },
             },
           },

@@ -1,23 +1,16 @@
 import { Show } from '@prisma/client';
 import Table from 'components/core-ui-lib/Table';
 import { styleProps } from '../bookings/table/tableConfig';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
-import { Spinner } from 'components/global/Spinner';
-import { getShowsTableConfig } from './table/tableConfig';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
 import Productions from './modal/Productions';
 import { useRouter } from 'next/router';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { omit } from 'radash';
 import { ProductionDTO } from 'interfaces';
-
-export const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
-    <Spinner size="lg" />
-  </div>
-);
+import LoadingOverlay from './LoadingOverlay';
+import { showsTableConfig } from './table/tableConfig';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -38,7 +31,6 @@ const intShowData = {
   Type: 'P',
   IsArchived: false,
   productions: [],
-  ShowProdCoId: null,
 };
 const ShowsTable = ({
   rowsData,
@@ -47,7 +39,6 @@ const ShowsTable = ({
   isEdited = false,
   handleEdit,
   isArchived = false,
-  productionCompanyOptions,
 }: {
   rowsData: (Show & { productions: ProductionDTO[] })[];
   isAddRow: boolean;
@@ -55,7 +46,6 @@ const ShowsTable = ({
   isArchived: boolean;
   isEdited: boolean;
   handleEdit: () => void;
-  productionCompanyOptions: SelectOption[];
 }) => {
   const tableRef = useRef(null);
   const router = useRouter();
@@ -68,7 +58,6 @@ const ShowsTable = ({
   const [rowIndex, setRowIndex] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showProductionsModal, setShowProductionsModal] = useState<boolean>(false);
-  const columnDefs = useMemo(() => getShowsTableConfig(productionCompanyOptions), [productionCompanyOptions]);
 
   const gridOptions = {
     getRowId: (params) => {
@@ -173,7 +162,7 @@ const ShowsTable = ({
   return (
     <>
       <Table
-        columnDefs={columnDefs}
+        columnDefs={showsTableConfig}
         ref={tableRef}
         rowData={rowsData}
         styleProps={styleProps}

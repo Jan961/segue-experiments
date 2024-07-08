@@ -5,9 +5,18 @@ import { useEffect, useState } from 'react';
 
 interface CheckPerfRendererProps extends ICellRendererParams {
   dayTypeOptions: SelectOption[];
+  disabled?: boolean;
 }
 
-const TableCheckboxRenderer = ({ eGridCell, data, node, setValue, value, colDef }: CheckPerfRendererProps) => {
+const TableCheckboxRenderer = ({
+  eGridCell,
+  data,
+  node,
+  setValue,
+  value,
+  colDef,
+  disabled,
+}: CheckPerfRendererProps) => {
   const [perfChecked, setPerfChecked] = useState<boolean>(false);
 
   useEffect(() => {
@@ -24,6 +33,14 @@ const TableCheckboxRenderer = ({ eGridCell, data, node, setValue, value, colDef 
     });
   };
 
-  return <CheckboxRenderer eGridCell={eGridCell} checked={perfChecked} onChange={handleCheckboxChange} id="perf" />;
+  return (
+    <CheckboxRenderer
+      disabled={disabled}
+      eGridCell={eGridCell}
+      checked={perfChecked}
+      onChange={handleCheckboxChange}
+      id="perf"
+    />
+  );
 };
 export default TableCheckboxRenderer;

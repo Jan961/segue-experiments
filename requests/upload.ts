@@ -1,40 +1,11 @@
-// export const uploadFile = async (formData, onProgress)=>{
-//     let progress = 0; // to track overall progress
-//     let slowProgressInterval; // interval for slow progress simulation
-//     return axios
-//       .post('/api/upload', formData, {
-//         onUploadProgress: (progressEvent) => {
-//           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-//           if (percentCompleted <= 50) {
-//             progress = percentCompleted;
-//           } else if (percentCompleted === 100) {
-//             progress = 50;
-//             clearInterval(slowProgressInterval);
-//             slowProgressInterval = setInterval(() => {
-//               if (progress < 95) {
-//                 progress += 0.5;
-//                 onProgress(file[0].file, progress);
-//               } else {
-//                 clearInterval(slowProgressInterval);
-//               }
-//             }, 100);
-//           }
-
-//           onProgress(file[0].file, progress);
-//         },
-//       }) // eslint-disable-next-line
-//       .then((response: any) => {
-//         progress = 100;
-//         onProgress(file[0].file, progress);
-//       })
-// }
-
 import axios from 'axios';
 import { notify } from 'components/core-ui-lib';
 import { ToastMessages } from 'config/shows';
 
 interface UploadImageResponse {
+  id?: number;
   location: string;
+  originalFilename: string;
   [key: string]: any;
 }
 

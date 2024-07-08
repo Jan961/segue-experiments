@@ -2,15 +2,11 @@ import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRendere
 import ShowsTextInputRenderer from 'components/shows/table/ShowsTextInputRenderer';
 import TableCheckboxRenderer from './TableCheckboxRenderer';
 import ShowNameAndCodeRenderer from './ShowNameAndCodeRenderer';
-import { REGIONS_LIST, SALES_FIG_OPTIONS } from '../constants';
 import { ICellRendererParams } from 'ag-grid-community';
 import React from 'react';
-import DateRenderer from 'components/core-ui-lib/Table/renderers/DateRenderer';
-import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
-import UploadRenderer from 'components/bookings/table/UploadRenderer';
-import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import CurrencyExchangeRenderer from './CurrencyExchangeRenderer';
 
-const generateChildCol = (
+export const generateChildCol = (
   headerName: string,
   field: string,
   dateBlockIndex,
@@ -39,7 +35,7 @@ const generateChildCol = (
   };
 };
 
-export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
+export const showsTableConfig = [
   {
     headerName: 'Show Name',
     field: 'Name',
@@ -64,20 +60,6 @@ export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
     headerClass: 'text-center',
     headerTooltip:
       'The Show Code should be unique to this particular Show and should be a recognisable abbreviation for example Touring Show may be ‘TOUR’. This will be used in combination with the production code, eg Touring Show touring the UK in 2025 could be ‘TOURUK25’',
-  },
-  {
-    headerName: 'Company',
-    field: 'ShowProdCoId',
-    cellRenderer: SelectCellRenderer,
-    cellRendererParams: {
-      options: prodCompanyOptions,
-    },
-    cellStyle: {
-      overflow: 'visible',
-    },
-    width: 270,
-    headerClass: 'text-center',
-    headerTooltip: 'Please select the Company Name or “Special Purpose Vehicle” that is presenting this production.',
   },
   {
     headerName: 'Productions',
@@ -137,9 +119,65 @@ export const getShowsTableConfig = (prodCompanyOptions: SelectOption[]) => [
   },
 ];
 
+export const currencyConversionTableConfig = [
+  {
+    headerName: 'Currency',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'currency',
+    width: 185,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
+  },
+  {
+    headerName: 'Countries',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'countries',
+    flex: 1,
+    width: 185,
+    wrapText: true,
+    autoHeight: true,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+      wordBreak: 'break-word',
+      overflowWrap: 'break-word',
+      overflow: 'unset',
+      textOverflow: 'unset',
+    },
+  },
+  {
+    headerName: 'Region',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'region',
+    flex: 1,
+    width: 185,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+    },
+  },
+  {
+    headerName: 'Exchange rate for Production \n (Production Currency : Venue Currency)',
+    headerClass: 'justify-center font-bold text-base ',
+    field: 'rate',
+    cellRenderer: CurrencyExchangeRenderer,
+    width: 300,
+    autoHeaderHeight: true,
+    resizable: false,
+    cellStyle: {
+      paddingRight: '0.75em',
+      paddingLeft: '0.75em',
+      display: 'flex',
+      justifyContent: 'center',
+    },
+  },
+];
+
 export const productionsTableConfig = [
   {
-    headerName: 'Show',
+    headerName: 'Production',
     headerClass: 'justify-center font-bold text-base ',
     field: 'Name',
     cellRenderer: ShowNameAndCodeRenderer,
@@ -151,115 +189,14 @@ export const productionsTableConfig = [
     flex: 1,
   },
   {
-    headerName: 'Prod Code',
-    field: 'Code',
-    cellRenderer: ShowsTextInputRenderer,
-    width: 72,
-    headerClass: 'right-border-full',
-    resizable: false,
-  },
-  {
-    headerName: 'Rehearsals',
-    marryChildren: true,
-    headerClass: 'thin-group-header-parent right-border-full',
-    children: [
-      generateChildCol(
-        'Start',
-        'DateBlock[1].StartDate',
-        1,
-        'StartDate',
-        { disableAnimations: true, defaultMinDateToToday: false },
-        DateRenderer,
-      ),
-      generateChildCol(
-        'End',
-        'DateBlock[1].EndDate',
-        1,
-        'EndDate',
-        { disableAnimations: true, defaultMinDateToToday: false },
-        DateRenderer,
-      ),
-    ],
-  },
-  {
-    headerName: 'Production Dates',
-    marryChildren: true,
-    headerClass: 'thin-group-header-parent right-border-full',
-    children: [
-      generateChildCol(
-        'Start',
-        'DateBlock[0].StartDate',
-        0,
-        'StartDate',
-        { disableAnimations: true, defaultMinDateToToday: false, isRequired: true },
-        DateRenderer,
-      ),
-      generateChildCol(
-        'End',
-        'DateBlock[0].EndDate',
-        0,
-        'EndDate',
-        { disableAnimations: true, defaultMinDateToToday: false, isRequired: true },
-        DateRenderer,
-      ),
-    ],
-  },
-  {
-    headerName: 'Prod Image',
-    field: 'ImageUrl',
-    width: 80,
-    cellRenderer: UploadRenderer,
-    cellRendererParams: {
-      buttonText: 'Upload',
-    },
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'Region',
-    field: 'RegionList',
-    cellRenderer: SelectCellRenderer,
-    cellRendererParams: {
-      options: REGIONS_LIST,
-      placeholder: 'Select Region(s)',
-      isMulti: true,
-      customWidth: '258px',
-    },
-    cellStyle: {
-      overflow: 'visible',
-    },
-    width: 170,
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'Email Address for Sales Figures',
-    field: 'SalesEmail',
-    cellRendererParams: {
-      placeholder: 'Enter email address',
-    },
-    width: 172,
-    cellRenderer: ShowsTextInputRenderer,
-    headerClass: 'text-center',
-  },
-  {
-    headerName: 'Input Freq of Sales Figs',
-    field: 'SalesFrequency',
-    width: 130,
-    cellRenderer: SelectCellRenderer,
-    cellRendererParams: {
-      options: SALES_FIG_OPTIONS,
-      defaultValue: 'W',
-    },
-    cellStyle: {
-      overflow: 'visible',
-    },
-    headerClass: 'text-center',
-  },
-  {
     headerName: 'Archive',
     field: 'IsArchived',
     width: 92,
     maxWidth: 92,
     cellRenderer: TableCheckboxRenderer,
+    cellRendererParams: {
+      disabled: true,
+    },
     cellStyle: {
       display: 'flex',
       justifyContent: 'center',
@@ -272,25 +209,38 @@ export const productionsTableConfig = [
     field: 'editId',
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
-      buttonText: 'Save',
-      variant: 'primary',
+      buttonText: 'View/Edit',
     },
     resizable: false,
-    cellStyle: {
-      width: 80,
-    },
-    width: 60,
+    width: 133,
     headerClass: 'text-center',
   },
   {
     headerName: '',
-    field: 'deleteId',
-    width: 74,
+    field: 'updateCurrencyConversion',
+    width: 270,
     cellRenderer: ButtonRenderer,
     cellRendererParams: {
+      buttonText: 'SET CURRENCY CONVERSION RATES',
+      variant: 'secondary',
+      width: 270,
+    },
+    resizable: false,
+    headerClass: 'text-center',
+  },
+  {
+    headerName: '',
+    field: 'delete',
+    width: 70,
+    cellRenderer: ButtonRenderer,
+    cellRendererParams: (params) => ({
       buttonText: 'Delete',
       variant: 'tertiary',
-      width: 80,
+      disabled: !params.data.IsArchived,
+      tooltipText: 'Please archive the production prior to deleting',
+    }),
+    cellStyle: {
+      paddingRight: '0.5em',
     },
     resizable: false,
     headerClass: 'text-center',

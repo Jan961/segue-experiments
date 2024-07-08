@@ -9,6 +9,7 @@ interface TabsProps {
   onChange?: (index: number) => void;
   disabled?: boolean;
   defaultIndex?: number;
+  buttonWidth?: string;
 }
 
 export default function Tabs({
@@ -18,6 +19,7 @@ export default function Tabs({
   onChange,
   disabled = false,
   defaultIndex = 0,
+  buttonWidth = 'w-[155px]',
 }: TabsProps) {
   return (
     <div>
@@ -28,7 +30,7 @@ export default function Tabs({
               {({ selected }) => (
                 <TabButton
                   text={tabLabel}
-                  className={`w-[155px] ${selected && !disabled ? selectedTabClass : ''}`}
+                  className={`${buttonWidth} ${selected && !disabled ? selectedTabClass : ''}`}
                   disabled={disabled}
                   variant="secondary"
                   onClick={() => onChange?.(index)}
