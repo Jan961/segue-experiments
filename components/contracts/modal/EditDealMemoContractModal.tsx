@@ -38,7 +38,6 @@ import {
 } from '../utils';
 import { DealMemoTechProvision } from '@prisma/client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { LoadingOverlay } from 'components/shows/ShowsTable';
 import {
   convertTimeToTodayDateFormat,
   dateToTimeString,
@@ -47,6 +46,7 @@ import {
 } from 'services/dateService';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
 import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 export const EditDealMemoContractModal = ({
   visible,

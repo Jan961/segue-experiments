@@ -5,7 +5,7 @@ export default function index() {
   const links = [
     {
       title: 'Company Information',
-      route: '/company-information',
+      route: '/admin/company-information',
       color: 'bg-primary-pink',
     },
     {

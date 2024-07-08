@@ -76,7 +76,7 @@ model BookingActivity {
   FollowUpRequired Boolean       @default(dbgenerated("(b'0')")) @map("ActivityFollowUpRequired") @db.Bit(1)
   DueByDate        DateTime?     @map("ActivityDueByDate") @db.Date
   CreatedDT        DateTime?     @map("ActivityCreatedDT") @db.DateTime(0)
-  ActivityNotes    String?       @db.LongText
+  Notes            String?       @map("ActivityNotes") @db.LongText
   ActivityType     ActivityType? @relation(fields: [ActivityTypeId], references: [Id], onDelete: Restrict, onUpdate: Restrict, map: "ActivityType_BookingActivity")
   Booking          Booking       @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "Booking_Activity")
 
@@ -408,18 +408,18 @@ model CompType {
 }
 
 model ConversionRate {
-  ConversionId                                                 Int        @id @default(autoincrement())
-  ConversionFromCurrencyCode                                   String     @db.VarChar(3)
-  ConversionToCurrencyCode                                     String     @db.VarChar(3)
-  ConversionProductionId                                       Int
-  ConversionRate                                               Decimal    @db.Decimal(8, 4)
-  Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency Currency   @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency", fields: [ConversionFromCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ConversionDate_From")
-  Currency_ConversionRate_ConversionToCurrencyCodeToCurrency   Currency   @relation("ConversionRate_ConversionToCurrencyCodeToCurrency", fields: [ConversionToCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ConversionDate_To")
-  Production                                                   Production @relation(fields: [ConversionProductionId], references: [Id], onDelete: Cascade, map: "Production_ConversionRate")
+  Id                                                           Int        @id @default(autoincrement()) @map("ConversionId")
+  FromCurrencyCode                                             String     @map("ConversionFromCurrencyCode") @db.VarChar(3)
+  ToCurrencyCode                                               String     @map("ConversionToCurrencyCode") @db.VarChar(3)
+  ProductionId                                                 Int        @map("ConversionProductionId")
+  Rate                                                         Decimal    @map("ConversionRate") @db.Decimal(8, 4)
+  Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency Currency   @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency", fields: [FromCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ConversionDate_From")
+  Currency_ConversionRate_ConversionToCurrencyCodeToCurrency   Currency   @relation("ConversionRate_ConversionToCurrencyCodeToCurrency", fields: [ToCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ConversionDate_To")
+  Production                                                   Production @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ConversionRate")
 
-  @@index([ConversionFromCurrencyCode], map: "Currency_ConversionDate_From_idx")
-  @@index([ConversionToCurrencyCode], map: "Currency_ConversionDate_To_idx")
-  @@index([ConversionProductionId], map: "Production_ConversionDate_idx")
+  @@index([FromCurrencyCode], map: "Currency_ConversionDate_From_idx")
+  @@index([ToCurrencyCode], map: "Currency_ConversionDate_To_idx")
+  @@index([ProductionId], map: "Production_ConversionDate_idx")
 }
 
 model HoldType {
@@ -1008,6 +1008,16 @@ model GlobalBookingActivity {
   @@index([ActivityTypeId], map: "GlobalActivityType_BookingActivity")
 }
 
+model GlobalBookingActivityVenue {
+  GlobalActivityId      Int                   @map("GBAVGlobalActivityId")
+  VenueId               Int                   @map("GBAVVenueId")
+  GlobalBookingActivity GlobalBookingActivity @relation(fields: [GlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
+  Venue                 Venue                 @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
+
+  @@id([GlobalActivityId, VenueId])
+  @@index([VenueId], map: "Venue_GBAV")
+}
+
 model ACCContract {
   ACCContractId     Int                 @id @default(autoincrement())
   ACCContractPerson ACCContractPerson[]
@@ -1031,16 +1041,6 @@ model Address {
   AddressCounty   String?  @db.VarChar(50)
   AddressPostcode String?  @db.VarChar(12)
   Person          Person[]
-}
-
-model GlobalBookingActivityVenue {
-  GBAVGlobalActivityId  Int
-  GBAVVenueId           Int
-  GlobalBookingActivity GlobalBookingActivity @relation(fields: [GBAVGlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
-  Venue                 Venue                 @relation(fields: [GBAVVenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
-
-  @@id([GBAVGlobalActivityId, GBAVVenueId])
-  @@index([GBAVVenueId], map: "Venue_GBAV")
 }
 
 model Organisation {

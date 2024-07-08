@@ -15,6 +15,25 @@ interface SelectCellRendererProps extends ICellRendererParams {
   isSearchable?: boolean;
 }
 
+export const CustomOption = ({ option, isMulti = false, ...props }: { option: OptionProps; isMulti?: boolean }) => {
+  const { label, isSelected } = option;
+
+  return (
+    <components.Option {...option}>
+      <div>
+        <span
+          className={classNames(`block truncate text-base ${isSelected ? 'font-medium' : 'font-normal'}`, {
+            'font-medium': isSelected,
+            'font-normal': !isSelected,
+          })}
+        >
+          {isMulti && <input checked={isSelected} type="checkbox" {...props} />} {label}
+        </span>
+      </div>
+    </components.Option>
+  );
+};
+
 const SelectCellRenderer = ({
   options = [],
   setValue,
@@ -43,25 +62,6 @@ const SelectCellRenderer = ({
     });
   };
 
-  const CustomOption = ({ option }: { option: OptionProps }) => {
-    const { label, isSelected } = option;
-
-    return (
-      <components.Option {...option}>
-        <div>
-          <span
-            className={classNames(`block truncate text-base ${isSelected ? 'font-medium' : 'font-normal'}`, {
-              'font-medium': isSelected,
-              'font-normal': !isSelected,
-            })}
-          >
-            {isMulti && <input checked={isSelected} type="checkbox" {...props} />} {label}
-          </span>
-        </div>
-      </components.Option>
-    );
-  };
-
   const customStyles = {
     menu: (provided) => ({
       ...provided,
@@ -82,7 +82,7 @@ const SelectCellRenderer = ({
         customStyles={customStyles}
         ref={selectRef}
         isSearchable={isSearchable}
-        renderOption={(option) => <CustomOption option={option} />}
+        renderOption={(option) => <CustomOption option={option} isMulti={isMulti} {...props} />}
         {...props}
       />
     </BaseCellRenderer>

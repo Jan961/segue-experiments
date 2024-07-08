@@ -354,3 +354,7 @@ export const dateToTimeString = (dateStr) => {
   const date = moment(dateStr);
   return date.format('HH:mm');
 };
+
+export const getTimezonOffset = () => {
+  return new Date().getTimezoneOffset();
+};

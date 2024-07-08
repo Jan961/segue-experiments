@@ -9,6 +9,7 @@ import TwoLineRenderer from './TwoLineRenderer';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import SalesValueInputRenderer from './SalesValueInputRenderer';
 import { isNullOrEmpty } from 'utils';
+import SelectRenderer from 'components/core-ui-lib/Table/renderers/SelectRenderer';
 
 export const styleProps = { headerColor: tileColors.marketing };
 
@@ -84,9 +85,6 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     cellRenderer: DefaultTextRenderer,
     cellRendererParams: {
       truncate: false,
-    },
-    cellStyle: {
-      marginTop: '5px',
     },
     width: 320,
   },
@@ -425,3 +423,265 @@ export const updateWarningColDefs = (type) => {
 
   return colDefs;
 };
+
+export const globalActivityColDefs = (updateActivity, currencySymbol) => [
+  {
+    headerName: 'Id',
+    field: 'id',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Venue Ids',
+    field: 'venueIds',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Activity Name',
+    field: 'actName',
+    cellRenderer: DefaultCellRenderer,
+    width: 188,
+  },
+  {
+    headerName: 'Type',
+    field: 'actType',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Date',
+    field: 'actDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Follow Up Req.',
+    field: 'followUpCheck',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => ({
+      onChange: () => null, // no action required, checkbox fixed in table
+      checked: params.data.followUpCheck,
+    }),
+    width: 85,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Cost',
+    field: 'cost',
+    cellRenderer: (params) => {
+      return `${currencySymbol === undefined ? '' : currencySymbol}${params.data.cost.toFixed(2)}`;
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 100,
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    cellStyle: {
+      marginTop: '5px',
+    },
+    width: 320,
+  },
+  {
+    headerName: 'Due By Date',
+    field: 'followUpDt',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.followUpDt);
+    },
+    width: 100,
+    hide: true,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'edit',
+          onClick: () => updateActivity('edit', params.data),
+        },
+        {
+          name: 'delete',
+          onClick: () => updateActivity('delete', params.data),
+        },
+      ],
+    }),
+    width: 90,
+    resizable: false,
+  },
+];
+
+export const globalModalVenueColDefs = (weekList, selectVenue, selectMultiVenue, variant) => {
+  const colDefs = [];
+
+  colDefs.push(
+    {
+      headerName: '',
+      field: 'checked',
+      cellRenderer: CheckboxRenderer,
+      cellRendererParams: (params) => {
+        return {
+          onChange: (checked) => selectVenue(params.data, checked),
+          checked: params.data.selected,
+          disabled: variant === 'view',
+        };
+      },
+      width: 50,
+      resizable: false,
+      cellStyle: {
+        display: 'flex',
+        justifyContent: 'center',
+        paddingTop: '1rem',
+      },
+      sortable: false,
+    },
+    {
+      headerName: 'Venue',
+      field: 'Name',
+      cellRenderer: DefaultTextRenderer,
+      cellRendererParams: {
+        truncate: false,
+      },
+      cellStyle: {
+        marginTop: '5px',
+      },
+      width: 285,
+      resizable: false,
+      sortable: false,
+    },
+  );
+
+  if (variant !== 'view') {
+    colDefs.push({
+      headerName: '',
+      field: 'select',
+      cellRenderer: SelectRenderer,
+      cellRendererParams: function (params) {
+        return {
+          options: weekList,
+          hidden: params.node.rowIndex !== 0,
+          onChange: (value) => selectMultiVenue(value),
+        };
+      },
+      width: 100,
+      resizable: false,
+      cellStyle: {
+        textAlign: 'center',
+        overflow: 'visible',
+      },
+      sortable: false,
+    });
+  }
+
+  return colDefs;
+};
+
+export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => [
+  {
+    headerName: 'Venue Ids',
+    field: 'venueIds',
+    cellRenderer: DefaultCellRenderer,
+    width: 95,
+    hide: true,
+  },
+  {
+    headerName: 'Activity Name',
+    field: 'actName',
+    cellRenderer: DefaultCellRenderer,
+    width: 230,
+  },
+  {
+    headerName: 'Type',
+    field: 'actType',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+  },
+  {
+    headerName: 'Date',
+    field: 'actDate',
+    cellRenderer: function (params) {
+      return formatInputDate(params.data.actDate);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Follow Up Req.',
+    field: 'followUpCheck',
+    cellRenderer: CheckboxRenderer,
+    cellRendererParams: (params) => ({
+      onChange: () => null, // no action required, checkbox fixed in table
+      checked: params.data.followUpCheck,
+    }),
+    width: 100,
+    cellStyle: {
+      display: 'flex',
+      justifyContent: 'center',
+      paddingTop: '1rem',
+    },
+  },
+  {
+    headerName: 'Cost',
+    field: 'cost',
+    cellRenderer: (params) => {
+      return currencySymbol + params.data.cost; // .toFixed(2);
+    },
+    cellStyle: {
+      paddingLeft: '8px',
+      paddingRight: '8px',
+    },
+    width: 90,
+  },
+  {
+    headerName: 'Notes',
+    field: 'notes',
+    wrapText: true,
+    autoHeight: true,
+    cellRenderer: DefaultTextRenderer,
+    cellRendererParams: {
+      truncate: false,
+    },
+    width: 400,
+  },
+  {
+    headerName: '',
+    field: 'icons',
+    cellRenderer: IconRowRenderer,
+    cellRendererParams: (params) => ({
+      iconList: [
+        {
+          name: 'info-circle-solid',
+          onClick: () => showGlobalActivity(params.data),
+        },
+      ],
+    }),
+    width: 50,
+    resizable: false,
+  },
+];
