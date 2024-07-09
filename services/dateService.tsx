@@ -91,6 +91,11 @@ export const getWeekDay = (dateToFormat: Date | string) => {
   return date.toLocaleDateString('en-US', { weekday: 'long' });
 };
 
+export const getShortWeekFormat = (dateToFormat: Date | string) => {
+  const weekdayName = moment(dateToFormat).format('ddd');
+  return weekdayName;
+};
+
 export const getWeekDayShort = (dateToFormat: Date | string) => {
   const date = safeDate(dateToFormat);
   return date.toLocaleDateString('en-US', { weekday: 'short' });
@@ -338,6 +343,19 @@ export const formatDateWithTimezoneOffset = ({
     date = new Date(date);
   }
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
+};
+
+export const convertTimeToTodayDateFormat = (time) => {
+  const timeStr = `${time.hrs}:${time.min}`;
+  const today = moment();
+  const [hours, minutes] = timeStr.split(':').map(Number);
+  today.set({ hour: hours, minute: minutes, second: 0, millisecond: 0 });
+  return today;
+};
+
+export const dateToTimeString = (dateStr) => {
+  const date = moment(dateStr);
+  return date.format('HH:mm');
 };
 
 export const getTimezonOffset = () => {

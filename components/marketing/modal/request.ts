@@ -67,12 +67,12 @@ export const exportSalesSummaryReport = async ({
   }
 };
 
-export const exportPromoterHoldsReport = async ({ production, dateFrom, dateTo, venue, productionCode }: any) => {
+export const exportPromoterHoldsReport = async ({ production, fromDate, toDate, venue, productionCode }: any) => {
   const payload = {
     productionId: parseInt(production, 10),
     productionCode,
-    fromDate: dateFrom,
-    toDate: dateTo,
+    fromDate,
+    toDate,
     venue,
   };
 
@@ -100,8 +100,10 @@ export const exportPromoterHoldsReport = async ({ production, dateFrom, dateTo, 
         downloadFromContent(content, suggestedName);
       }
     }
+    return response;
   } catch (error) {
     console.log('Error downloading report', error);
+    return error;
   }
 };
 
@@ -133,8 +135,10 @@ export const exportProductionGrossSales = async ({ production }) => {
         downloadFromContent(content, suggestedName);
       }
     }
+    return response;
   } catch (error) {
     console.log('Error downloading report', error);
+    return error;
   }
 };
 
@@ -143,8 +147,8 @@ export const exportHoldsComps = async ({ production, productionCode, venue, from
     ProductionId: parseInt(production, 10),
     productionCode,
     venue,
-    dateFrom: fromDate,
-    dateTo: toDate,
+    fromDate,
+    toDate,
   };
   try {
     const response = await axios.post('/api/reports/holds-comps', payload, { responseType: 'blob' });
@@ -170,8 +174,10 @@ export const exportHoldsComps = async ({ production, productionCode, venue, from
         downloadFromContent(content, suggestedName);
       }
     }
+    return response;
   } catch (error) {
     console.log('Error downloading report', error);
+    return error;
   }
 };
 

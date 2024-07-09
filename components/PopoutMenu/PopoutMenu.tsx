@@ -75,7 +75,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
               { label: 'Attachments', value: '/marketing?tabIndex=6', labelClass: level3 },
             ],
           },
-          { label: 'Sales Entry', value: '/marketing/sales/Entry', labelClass: leve2 },
+          { label: 'Sales Entry', value: '/marketing/sales/entry', labelClass: leve2 },
           { label: 'Final Figures Entry', value: '/marketing/sales/Final', labelClass: leve2 },
           { label: 'Load Sales History', value: '/marketing/sales/history-load', labelClass: leve2 },
           { label: 'Global Activities', value: '/marketing/activity/GlobalActivity', labelClass: leve2 },
