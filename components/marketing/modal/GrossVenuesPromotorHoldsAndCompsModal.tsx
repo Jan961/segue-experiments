@@ -67,7 +67,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const { data: venues = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => {
-      if (!production) return;
+      if (!production || !['promoterHolds', 'holdsAndComps'].includes(activeModal)) return;
       const productionVenuesPromise = fetchProductionVenues(production);
       notify.promise(productionVenuesPromise, {
         loading: 'fetching production venues',
