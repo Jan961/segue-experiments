@@ -172,13 +172,17 @@ export const EditDealMemoContractModal = ({
 
   const saveDemoModalData = async () => {
     setIsLoading(true);
+    try {
+      await axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
+        formData,
+      });
 
-    await axios.post(`/api/dealMemo/updateDealMemo/${selectedTableCell.contract.Id}`, {
-      formData,
-    });
-
-    setIsLoading(false);
-    onCloseDemoForm();
+      setIsLoading(false);
+      onCloseDemoForm();
+    } catch (e) {
+      console.log('error', e);
+      setIsLoading(false);
+    }
   };
 
   const handleContactsSection = async (value, key) => {
