@@ -150,7 +150,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   }, [props.bookingId]);
 
   const onExport = async () => {
-    const urlPath = `/api/reports/marketing/contactNotes/${props.bookingId}`;
+    const urlPath = `/api/reports/marketing/contact-notes/${props.bookingId}`;
     const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
     const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
     const selectedProduction = productions?.filter((production) => production.Id === productionId);
