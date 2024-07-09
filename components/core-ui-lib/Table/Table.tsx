@@ -72,7 +72,7 @@ export default forwardRef(function Table(
     excelStyles = [],
     rowSelection = 'single',
     onSelectionChanged,
-    testId,
+    testId = 'core-ui-lib-table',
   }: TableProps,
   ref,
 ) {
@@ -152,7 +152,7 @@ export default forwardRef(function Table(
         }}
       >
         <AgGridReact
-          data-testid={`core-ui-lib-table-${testId}`}
+          data-testid={testId}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? gridHeaderHeight : 0}

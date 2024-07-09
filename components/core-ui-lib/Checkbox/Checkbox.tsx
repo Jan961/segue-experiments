@@ -25,7 +25,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       name,
       disabled = false,
       showIntermediate = false,
-      testId,
+      testId = 'core-ui-lib-checkbox',
       className,
       label,
       labelClassName,

@@ -11,7 +11,7 @@ export interface ToggleProps {
   testId?: string;
 }
 
-const Toggle = ({ label, onChange, name, checked, className, testId }: ToggleProps) => {
+const Toggle = ({ label, onChange, name, checked, className, testId = 'core-ui-lib-toggle' }: ToggleProps) => {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const Toggle = ({ label, onChange, name, checked, className, testId }: TogglePro
 
   return (
     <Switch
-      data-testid={`core-ui-lib-toggle-${testId || name}`}
+      data-testid={testId || name}
       name={name}
       checked={enabled}
       onChange={onToggle}

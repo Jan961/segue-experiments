@@ -80,7 +80,7 @@ export default forwardRef(function Select(
     customStyles = {},
     placeholder = '',
     disabled = false,
-    testId,
+    testId = 'core-ui-lib-select',
     label,
     inline = false,
     isSearchable = false,
