@@ -15,7 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       vatIndicator: VATIndicator,
       culturallyExempt: CulturallyExempt,
       venueFamily: FamilyId,
-      currency: CurrencyCode,
       venueCapacity: Seats,
       townPopulation: TownPopulation,
       venueWebsite: Website,
@@ -42,12 +41,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       primaryPostCode,
       primaryTown,
       primaryCountry,
+      primaryPhoneNumber,
+      primaryEMail,
       deliveryAddress1,
       deliveryAddress2,
       deliveryAddress3,
       deliveryPostCode,
       deliveryCountry,
       deliveryTown,
+      deliveryPhoneNumber,
+      deliveryEMail,
       barredVenues,
       venueContacts,
     } = req.body;
@@ -59,6 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       CountryId: primaryCountry,
       Postcode: primaryPostCode,
       TypeName: 'Main',
+      VenueAddressPhone: primaryPhoneNumber,
+      VenueAddressEmail: primaryEMail,
     };
 
     const deliveryAddress = {
@@ -69,6 +74,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       CountryId: deliveryCountry,
       Postcode: deliveryPostCode,
       TypeName: 'Delivery',
+      VenueAddressPhone: deliveryPhoneNumber,
+      VenueAddressEmail: deliveryEMail,
     };
 
     try {
@@ -82,7 +89,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             VATIndicator,
             CulturallyExempt,
             FamilyId,
-            CurrencyCode,
             Seats,
             TownPopulation,
             Website,

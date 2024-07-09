@@ -95,7 +95,7 @@ model BookingContactNotes {
   Booking       Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([BookingId], map: "BookingBookingContactNotes")
-  @@index([UserId], map: "AccountUser_BookingContactNotes")
+  @@index([UserId], map: "AccountUserBookingContactNotes")
 }
 
 model Contract {
@@ -122,7 +122,6 @@ model Currency {
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Country                                                            Country[]
   Production                                                         Production[]
-  Venue                                                              Venue[]
 }
 
 model DateType {
@@ -153,7 +152,6 @@ model Venue {
   Name                                                      String                       @map("VenueName") @db.VarChar(255)
   StatusCode                                                String                       @default("O") @map("VenueStatusCode") @db.VarChar(1)
   Website                                                   String?                      @map("VenueWebsite") @db.VarChar(255)
-  CurrencyCode                                              String                       @map("VenueCurrencyCode") @db.VarChar(3)
   VATIndicator                                              Boolean                      @default(dbgenerated("(b'0')")) @map("VenueVATIndicator") @db.Bit(1)
   TechSpecsURL                                              String?                      @map("VenueTechSpecsURL") @db.VarChar(255)
   Seats                                                     Float?                       @map("VenueSeats")
@@ -175,7 +173,6 @@ model Venue {
   VenueNotes                                                String?                      @db.LongText
   VenueWarningNotes                                         String?                      @db.LongText
   ExcludeFromChecks                                         Boolean                      @default(dbgenerated("(b'0')")) @map("VenueExcludeFromChecks") @db.Bit(1)
-  VenueCountryId                                            Int?
   FamilyId                                                  Int?                         @map("VenueVenueFamilyId")
   AddressStageDoorW3W                                       String?                      @map("VenueAddressStageDoorW3W") @db.VarChar(70)
   AddressLoadingW3W                                         String?                      @map("VenueAddressLoadingW3W") @db.VarChar(70)
@@ -184,7 +181,6 @@ model Venue {
   GetInFitUp                                                GetInFitUp[]
   GlobalBookingActivityVenue                                GlobalBookingActivityVenue[]
   Rehearsal                                                 Rehearsal[]
-  Currency                                                  Currency                     @relation(fields: [CurrencyCode], references: [Code], onUpdate: Restrict, map: "Currency_Venue")
   VenueFamily                                               VenueFamily?                 @relation(fields: [FamilyId], references: [Id], onDelete: NoAction, map: "Venue_VenueFamily")
   VenueAddress                                              VenueAddress[]
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]           @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
@@ -194,7 +190,6 @@ model Venue {
   VenueVenue2                                               VenueVenue[]                 @relation("VenueVenue_VVVenue2IdToVenue")
 
   @@index([FamilyId], map: "Venue_VenueFamily")
-  @@index([CurrencyCode], map: "Currency_Venue")
 }
 
 model VenueBarredVenue {
@@ -396,7 +391,7 @@ model CompAllocation {
   AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([ArrangedById], map: "AccountUser_CompAllocation")
-  @@index([AvailableCompId], map: "AvailableComp_CompAllocation")
+  @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
 }
 
 model CompType {
@@ -906,7 +901,7 @@ model DealMemo {
 
   @@index([DeMoBOMVenueContactId], map: "VenueContactDealMemoBOM")
   @@index([DeMoTechVenueContactId], map: "VenueContactDealMemoTech")
-  @@index([DeMoAccContId], map: "AccountContact_DealMemo")
+  @@index([DeMoAccContId], map: "AccountContactDealMemo")
 }
 
 model DealMemoCall {
@@ -955,7 +950,7 @@ model File {
   Production        Production[]
   ProductionCompany ProductionCompany[]
 
-  @@index([UploadUserId], map: "User_AttachedFile")
+  @@index([UploadUserId], map: "UserAttachedFile")
 }
 
 model SubscriptionPlan {
@@ -1187,53 +1182,6 @@ view ScheduleView {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view VenueView {
-  VenueId                      Int     @default(0)
-  VenueCode                    String  @db.VarChar(6)
-  VenueName                    String  @db.VarChar(255)
-  VenueStatusCode              String  @default("O") @db.VarChar(1)
-  VenueWebsite                 String? @db.VarChar(255)
-  VenueFamily                  String? @db.VarChar(50)
-  VenueCurrencyCode            String  @db.VarChar(3)
-  VenueVATIndicator            Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  VenueTechSpecsURL            String? @db.VarChar(255)
-  VenueSeats                   Float?
-  VenueBarringClause           String? @db.VarChar(255)
-  VenueTownPopulation          Float?
-  VenueLXDesk                  String? @db.VarChar(50)
-  VenueLXNotes                 String? @db.VarChar(2000)
-  VenueSoundDesk               String? @db.VarChar(50)
-  VenueSoundNotes              String? @db.VarChar(2000)
-  VenueStageSize               String? @db.VarChar(50)
-  VenueGridHeight              String? @db.VarChar(50)
-  VenueVenueFlags              String? @db.VarChar(2000)
-  VenueBarringWeeksPre         Int?    @db.TinyInt
-  VenueBarringWeeksPost        Int?    @db.TinyInt
-  VenueBarringMiles            Int?
-  VenueCulturallyExempt        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  VenueAccountId               Int
-  VenueIsDeleted               Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  VenueMainAddress1            String? @db.VarChar(50)
-  VenueMainAddress2            String? @db.VarChar(50)
-  VenueMainAddress3            String? @db.VarChar(50)
-  VenueMainAddressTown         String? @db.VarChar(50)
-  VenueMainAddressCounty       String? @db.VarChar(50)
-  VenueMainAddressPostcode     String? @db.VarChar(12)
-  VenueMainAddressCountry      String? @db.VarChar(40)
-  VenueDeliveryAddress1        String? @db.VarChar(50)
-  VenueDeliveryAddress2        String? @db.VarChar(50)
-  VenueDeliveryAddress3        String? @db.VarChar(50)
-  VenueDeliveryAddressTown     String? @db.VarChar(50)
-  VenueDeliveryAddressCounty   String? @db.VarChar(50)
-  VenueDeliveryAddressPostcode String? @db.VarChar(12)
-  VenueDeliveryAddressCountry  String? @db.VarChar(40)
-  VenueMainNoteText            String? @db.LongText
-  VenueWarningNoteText         String? @db.LongText
-
-  @@ignore
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view DateBlockDatesView {
   DateBlockId         Int      @default(0)
   EntryType           String?  @db.VarChar(30)
@@ -1282,64 +1230,6 @@ view VenueVenueView {
   ToVenueId   Int     @default(0)
   Mileage     Decimal @default(0.0) @db.Decimal(5, 1)
   TimeMins    Int?
-
-  @@ignore
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view SalesView {
-  ShowName                    String    @db.VarChar(80)
-  ProductionId                Int       @default(0)
-  FullProductionCode          String?   @db.VarChar(20)
-  ProductionStartDate         DateTime? @db.Date
-  ProductionEndDate           DateTime? @db.Date
-  BookingId                   Int       @default(0)
-  BookingFirstDate            DateTime  @db.Date
-  BookingStatusCode           String    @default("U") @db.Char(1)
-  BookingProductionWeekNum    Int?      @db.SmallInt
-  VenueTown                   String?   @db.VarChar(50)
-  VenueCode                   String    @db.VarChar(6)
-  VenueName                   String    @db.VarChar(255)
-  VenueCurrencyCode           String    @db.VarChar(3)
-  ConversionToCurrencyCode    String?   @db.VarChar(3)
-  ConversionRate              Decimal?  @db.Decimal(8, 4)
-  SetSalesFiguresDate         DateTime? @db.Date
-  SetBookingWeekNum           Int?      @db.SmallInt
-  SetProductionWeekDate       DateTime? @db.Date
-  SetProductionWeekNum        Int?      @db.SmallInt
-  SetNotOnSale                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsFinalFigures           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetFinalSalesApprovedByUser String?   @db.VarChar(100)
-  SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
-  SaleTypeName                String?   @db.VarChar(45)
-  Seats                       Decimal?  @db.Decimal(32, 0)
-  Value                       Decimal?  @db.Decimal(32, 2)
-  TotalCapacity               Float?
-  FinalFiguresDate            DateTime? @db.Date
-  FinalFiguresSeats           Decimal?  @db.Decimal(32, 0)
-  FinalFiguresValue           Decimal?  @db.Decimal(32, 2)
-  NotOnSaleDate               DateTime? @db.Date
-  TotalHoldSeats              Decimal?  @db.Decimal(32, 0)
-  LastFiguresDate             DateTime? @db.Date
-  LastFiguresSeats            Decimal?  @db.Decimal(32, 0)
-  LastFiguresValue            Decimal?  @db.Decimal(32, 2)
-
-  @@ignore
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view BookingSelectionView {
-  BookingId             Int      @default(0)
-  BookingStatusCode     String   @default("U") @db.Char(1)
-  BookingFirstDate      DateTime @db.Date
-  VenueId               Int      @default(0)
-  VenueCode             String   @db.VarChar(6)
-  VenueMainAddressTown  String?  @db.VarChar(50)
-  ProductionId          Int      @default(0)
-  FullProductionCode    String?  @db.VarChar(20)
-  ProductionLengthWeeks Int?     @db.SmallInt
 
   @@ignore
 }
@@ -1411,31 +1301,6 @@ view SalesSetTotalsView {
   Value               Decimal? @db.Decimal(32, 2)
 
   @@unique([SetBookingId, SetSalesFiguresDate])
-}
-
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view SalesSummaryView {
-  ProductionId             Int       @default(0)
-  FullProductionCode       String?   @db.VarChar(20)
-  ShowName                 String    @db.VarChar(80)
-  ProductionStartDate      DateTime? @db.Date
-  ProductionEndDate        DateTime? @db.Date
-  ProductionWeekNum        Int?      @db.SmallInt
-  EntryDate                DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
-  Location                 String?   @db.VarChar(50)
-  EntryId                  Int       @default(0)
-  EntryName                String?   @db.VarChar(255)
-  EntryType                String?   @db.VarChar(30)
-  EntryStatusCode          String    @default("") @db.Char(1)
-  Value                    Decimal?  @db.Decimal(32, 2)
-  VenueCurrencyCode        String?   @db.VarChar(3)
-  ConversionRate           Decimal?  @db.Decimal(8, 4)
-  ConversionToCurrencyCode String?   @db.VarChar(3)
-  SaleTypeName             String?   @db.VarChar(45)
-  SetSalesFiguresDate      DateTime? @db.Date
-  FinalSetSalesFiguresDate DateTime? @db.Date
-
-  @@ignore
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
