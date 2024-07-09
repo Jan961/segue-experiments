@@ -485,7 +485,6 @@ export const getChangeVsLastWeekValue = (weeksDataArray: number[]): number => {
     // const symbol = weeksDataArray[len - 2] ? weeksDataArray[len - 2].substring(0, 1) : weeksDataArray[len - 1].substring(0, 1)
     // const prefix = val >= 0 ? `${symbol}` : `-${symbol}`
     if (isNaN(val)) {
-      console.log('getChangeVsLastWeekValue', 'Nan values found:', weeksDataArray);
       return 0;
     }
     return val > 0 ? val : -1 * val;

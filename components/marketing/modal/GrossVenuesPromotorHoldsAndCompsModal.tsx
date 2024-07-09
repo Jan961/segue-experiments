@@ -127,7 +127,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       title={title}
       show={visible}
       onClose={onClose}
-      hasOverlay={true}
+      hasOverlay={false}
     >
       <form className="flex flex-col gap-2 w-[383px] mt-4">
         <Select

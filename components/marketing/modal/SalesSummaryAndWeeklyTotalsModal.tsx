@@ -52,7 +52,6 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
   const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: async () => {
-      console.log('production in query', production);
       if (!production) return;
       const productionWeekPromise = fetchProductionWeek(production);
       notify.promise(productionWeekPromise, {
@@ -116,7 +115,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
       title={title}
       show={visible}
       onClose={onClose}
-      hasOverlay={true}
+      hasOverlay={false}
     >
       <form className="flex flex-col gap-4 w-[383px] mt-4">
         <Select
