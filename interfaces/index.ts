@@ -216,6 +216,15 @@ export interface FileDTO {
   imageUrl?: string;
 }
 
+export interface ProductionCompanyDTO {
+  AccountId?: number;
+  Id?: number;
+  Logo?: string;
+  Name?: string;
+  ProdCoSaleStartWeek?: number;
+  ProdCoVATCode?: number;
+  WebSite?: string;
+}
 export type ConversionRateDTO = {
   Id: number;
   FromCurrencyCode: string;
@@ -243,6 +252,7 @@ export type ProductionDTO = {
   ImageUrl?: string;
   Image?: Partial<FileDTO>;
   ShowRegionId?: number;
+  ProductionCompany?: Partial<ProductionCompanyDTO>;
   ReportCurrencyCode?: string;
   RunningTime?: string;
   RunningTimeNote?: string;
@@ -571,6 +581,12 @@ export interface ContractTableRowType {
   venue: string | null;
   venueId: number | null;
   week: number | null;
+}
+
+export interface StandardSeatRowType {
+  type: string;
+  seats: string;
+  value: string;
 }
 export interface VenueContractFormData {
   StatusCode: string;

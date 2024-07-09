@@ -28,11 +28,24 @@ import {
 } from 'config/contracts';
 import { ConfirmationDialog, Icon, TimeInput } from 'components/core-ui-lib';
 import axios from 'axios';
-import { defaultDemoCall, filterCurrencyNum, filterPercentage, filterPrice, filterTechProvision } from '../utils';
+import {
+  defaultDemoCall,
+  filterCurrencyNum,
+  filterPercentage,
+  filterPrice,
+  filterTechProvision,
+  seatKillsData,
+} from '../utils';
 import { DealMemoTechProvision } from '@prisma/client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
-import { formattedDateWithDay } from 'services/dateService';
+import {
+  convertTimeToTodayDateFormat,
+  dateToTimeString,
+  formattedDateWithDay,
+  getShortWeekFormat,
+} from 'services/dateService';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
+import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 export const EditDealMemoContractModal = ({
@@ -60,6 +73,8 @@ export const EditDealMemoContractModal = ({
   const [dealMemoCustomPriceFormData, setDealMemoCustomPriceFormData] = useState<any>([]);
   const [dealMemoTechProvision, setDealMemoTechProvision] = useState<DealMemoTechProvision[]>([]);
   const [formEdited, setFormEdited] = useState<boolean>(false);
+  const [disableDate, setDisableDate] = useState<boolean>(true);
+
   const venueUserList = useMemo(
     () =>
       venueData && venueData.VenueContact
@@ -94,6 +109,7 @@ export const EditDealMemoContractModal = ({
         ? demoModalData.DealMemoCall
         : [defaultDemoCall];
     setDealCall([...demoCall]);
+    setDisableDate(false);
   }, []);
 
   const [contactsData, setContactsData] = useState<ContactDemoFormData>({ phone: '', email: '' });
@@ -278,14 +294,14 @@ export const EditDealMemoContractModal = ({
       onCloseDemoForm();
     }
   };
-
   return (
     <PopupModal
       show={visible}
       title="Deal Memo"
       titleClass={classNames('text-xl text-primary-navy font-bold -mt-2.5')}
-      onClose={() => onCloseDemoForm()}
+      onClose={() => handleCancelForm(false)}
       hasOverlay={true}
+      hasOverflow={false}
     >
       <div className="h-[80vh] w-[82vw] overflow-y-scroll pr-2">
         <p className="text-primary-red ">PLEASE NOTE:</p>{' '}
@@ -301,7 +317,11 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Show</div>
           <div className="w-4/5">
             <div className="w-full">
-              <TextInput className="w-full" value={productionJumpState.ShowName} />
+              <TextInput
+                className="w-full text-primary-input-text font-bold"
+                disabled
+                value={productionJumpState.ShowName}
+              />
             </div>
           </div>
         </div>
@@ -309,12 +329,16 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Venue</div>
           <div className="w-4/5">
             <div className="w-full">
-              <TextInput className="w-full" value={selectedTableCell.contract.venue} />
+              <TextInput
+                className="w-full text-primary-input-text font-bold"
+                disabled
+                value={selectedTableCell.contract.venue}
+              />
             </div>
           </div>
         </div>
         <div className="flex items-center mt-4">
-          <div className="w-1/5 text-primary-input-text font-bold">Agreed Deal Memo Dated</div>
+          <div className="w-1/5 text-primary-input-text font-bold">Date Deal Memo Issued</div>
           <div className="w-4/5 flex">
             <DateInput
               onChange={(value) => {
@@ -325,8 +349,8 @@ export const EditDealMemoContractModal = ({
           </div>
         </div>
         <div className="text-primary-input-text mt-4">
-          Please read this carefully to ensure it reflects the terms as agreed between {`Jendagi Productions Limited`}{' '}
-          and {`${selectedTableCell.contract.venue}`}.
+          Please read this carefully to ensure it reflects the terms as agreed between{' '}
+          {`${productionJumpState.ProductionCompany.Name}`} and {`${selectedTableCell.contract.venue}`}.
           <br />
           Please note that any terms not specifically mentioned here are still to be negotiated. If you have any
           standard conditions that you consider to be non-negotiable, or if you{' '}
@@ -349,7 +373,7 @@ export const EditDealMemoContractModal = ({
         <div className="text-primary-input-text mt-4">
           If we have requested anything that incurs a cost, it must be agreed with {`Jendagi Productions Limited`} prior
           to our arrival. No extras will be paid without a pre-authorisation
-          {`(this includes internal access).`} Unless otherwise agreed, all staff calls will be scheduled within the
+          {`(this includes internet access).`} Unless otherwise agreed, all staff calls will be scheduled within the
           contractual allowance- if you foresee any overtime, please advise immediately.
         </div>
         <hr className="bg-primary h-[3px] mt-4 mb-4" />
@@ -374,12 +398,26 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Phone</div>
           <div className="w-4/5 flex items-center">
             <div className="w-3/4">
-              <TextInput className="w-2/4 text-primary-input-text font-bold" disabled value={contactsData.phone} />
+              <TextInput
+                className="w-3/4 text-primary-input-text font-bold"
+                disabled
+                value={contactsData.phone}
+                placeholder={
+                  contactsData.phone ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
+                }
+              />
             </div>
 
             <div className="text-primary-input-text font-bold ml-8 mr-4">Email</div>
             <div className="w-3/4">
-              <TextInput className="w-3/4 text-primary-input-text font-bold" disabled value={contactsData.email} />
+              <TextInput
+                className="w-3/4 text-primary-input-text font-bold"
+                disabled
+                value={contactsData.email}
+                placeholder={
+                  contactsData.email ? 'Add details to the Contact Database' : 'Please select from the dropdown above'
+                }
+              />
             </div>
           </div>
         </div>
@@ -415,17 +453,24 @@ export const EditDealMemoContractModal = ({
                       id="venueText"
                       className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
                       disabled
-                      value={`${formattedDateWithDay(times.split('?')[1])} : ${times.split('?')[0]}`}
+                      value={`${getShortWeekFormat(times.split('?')[1])} ${formattedDateWithDay(
+                        times.split('?')[1],
+                      )} : ${times.split('?')[0]}`}
                     />
                   ))}
               {!selectedTableCell.contract.performanceTimes && (
-                <TextInput id="venueText" className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold" disabled />
+                <TextInput
+                  id="venueText"
+                  className="w-[350px] mt-1 mb-1 text-primary-input-text font-bold"
+                  placeholder="—"
+                  disabled
+                />
               )}
             </div>
           </div>
         </div>
         <div className="flex items-center mt-4">
-          <div className="w-1/5 text-primary-input-text font-bold">Running Time</div>
+          <div className="w-1/5 text-primary-input-text font-bold">Running Time (inc. Intervals)</div>
           <div className="w-4/5 flex items-center">
             <TextInput id="venueText" className="w-[80px] mt-1 mb-1" placeholder="hh:mm" />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
@@ -442,7 +487,7 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Pre / Post Show Events</div>
           <div className="w-4/5 flex">
             <TextArea
-              className="h-[102px] w-[65vw]"
+              className="w-[65vw]"
               value={formData.DeMoPrePostShowEvents}
               onChange={(value) => editDemoModalData('DeMoPrePostShowEvents', value.target.value, 'dealMemo')}
             />
@@ -451,7 +496,15 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Off-Stage Venue Curfew Time</div>
           <div className="w-4/5 flex items-center">
-            <TextInput placeholder="hh:mm" id="venueText" className="w-[80px] mt-1 mb-1" />
+            <TimeInput
+              className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
+              value={formData ? dateToTimeString(formData.DeMoVenueCurfewTime) : null}
+              disabled={disableDate}
+              onChange={(value) =>
+                editDemoModalData('DeMoVenueCurfewTime', convertTimeToTodayDateFormat(value), 'dealMemo')
+              }
+            />
+            {/* <TextInput placeholder="hh:mm" id="venueText" className="w-[80px] mt-1 mb-1" /> */}
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
             <TextInput
@@ -507,6 +560,11 @@ export const EditDealMemoContractModal = ({
               id="venueText"
               className="w-full text-primary-input-text font-bold"
               disabled
+              placeholder={
+                venueUserData[formData.DeMoProgrammerVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoProgrammerVenueContactId]
                   ? venueUserData[formData.DeMoProgrammerVenueContactId].Phone
@@ -522,6 +580,11 @@ export const EditDealMemoContractModal = ({
               id="venueText"
               className="w-full text-primary-input-text font-bold"
               disabled
+              placeholder={
+                venueUserData[formData.DeMoProgrammerVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoProgrammerVenueContactId]
                   ? venueUserData[formData.DeMoProgrammerVenueContactId].Email
@@ -533,7 +596,7 @@ export const EditDealMemoContractModal = ({
         <hr className="bg-primary h-[3px] mt-4 mb-4" />
         <div className="text-xl text-primary-navy font-bold -mt-2.5">Deal</div>
         <div className="flex items-center">
-          <div className="w-1/5 text-primary-input-text font-bold">Royalty Off the top</div>
+          <div className="w-1/5 text-primary-input-text font-bold">Royalty Off The Top</div>
           <div className="w-4/5 flex items-center">
             <TextInput
               id="venueText"
@@ -566,20 +629,24 @@ export const EditDealMemoContractModal = ({
                 editDemoModalData('DeMoGuarantee', value === 1, 'dealMemo');
               }}
               className="bg-primary-white w-26 mr-3"
-              placeholder="YES|NO"
+              placeholder="Please select.."
               options={booleanOptions}
               isClearable
               isSearchable
+              value={formData.DeMoGuarantee}
             />
             <div className="text-primary-input-text font-bold ml-14 mr-5">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
 
             <TextInput
               id="venueText"
               className="w-[140px] ml-1"
+              type="number"
               value={formData.DeMoGuaranteeAmount}
               onChange={(value) =>
                 editDemoModalData('DeMoGuaranteeAmount', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
+              placeholder="Value / %"
+              disabled={!formData.DeMoGuarantee}
             />
           </div>
         </div>
@@ -588,10 +655,10 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex ">
             <Select
               onChange={(value) => {
-                editDemoModalData('DeMoHasCalls', value, 'dealMemo');
+                editDemoModalData('DeMoHasCalls', value === 1, 'dealMemo');
               }}
               className="bg-primary-white w-26 mr-1 h-8"
-              placeholder="YES|NO"
+              placeholder="Please select.."
               options={booleanOptions}
               isClearable
               isSearchable
@@ -613,7 +680,7 @@ export const EditDealMemoContractModal = ({
                       options={callOptions}
                       isClearable
                       isSearchable
-                      disabled={dealCall[index].DeMoHasCalls === 1}
+                      disabled={!formData.DeMoHasCalls}
                     />
 
                     <Select
@@ -626,34 +693,47 @@ export const EditDealMemoContractModal = ({
                       options={callValueOptions}
                       isClearable
                       isSearchable
-                      disabled={dealCall[index].DeMoHasCalls === 1}
+                      disabled={!formData.DeMoHasCalls}
                     />
-                    <div className="text-primary-input-text font-bold ml-8 mr-2">{`${
-                      dealCall[index].DMCType === 'p' ? '' : VENUE_CURRENCY_SYMBOLS.POUND
-                    }`}</div>
+                    <div
+                      className={`text-primary-input-text font-bold ml-8 ${
+                        dealCall[index].DMCType === 'p' ? 'mr-4' : 'mr-2'
+                      }`}
+                    >{`${dealCall[index].DMCType === 'p' ? ' ' : VENUE_CURRENCY_SYMBOLS.POUND}`}</div>
 
                     <TextInput
                       id="venueText"
                       className="w-[140px] ml-2"
                       type="number"
                       value={dealCall[index].DMCValue}
-                      disabled={formData.DealMemoCall && formData.DealMemoCall.DeMoHasCalls === 1}
+                      placeholder="Value / %"
+                      disabled={!formData.DeMoHasCalls}
                       onChange={(value) =>
                         editDemoCallModalData('DMCValue', filterCurrencyNum(parseFloat(value.target.value)), index)
                       }
                     />
-                    <div className=" text-primary-input-text font-bold ml-2">{`${
+                    <div className=" text-primary-input-text font-bold ml-2 w-2">{`${
                       dealCall[index].DMCType === 'v' ? '' : '%'
                     }`}</div>
-                    <Icon className="ml-2" iconName="plus-circle-solid" onClick={() => handleCall(true)} variant="lg" />
-                    {dealCall.length > 1 && (
-                      <Icon
-                        className="ml-2"
-                        iconName="minus-circle-solid"
-                        onClick={() => handleCall(false)}
-                        variant="lg"
-                      />
-                    )}
+                    <div className="flex ">
+                      {index === dealCall.length - 1 && (
+                        <Icon
+                          className="ml-2"
+                          iconName="plus-circle-solid"
+                          onClick={() => handleCall(true)}
+                          variant="lg"
+                        />
+                      )}
+
+                      {index === dealCall.length - 1 && index > 0 && (
+                        <Icon
+                          className="ml-2"
+                          iconName="minus-circle-solid"
+                          onClick={() => handleCall(false)}
+                          variant="lg"
+                        />
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -665,7 +745,7 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex items-center">
             <TextInput
               id="venueText"
-              className="w-[150px]"
+              className="w-[100px] ml-6"
               type="number"
               value={formData.DeMoPromoterSplitPercentage}
               onChange={(value) =>
@@ -748,6 +828,11 @@ export const EditDealMemoContractModal = ({
             <TextInput
               id="venueText"
               className="w-full text-primary-input-text font-bold"
+              placeholder={
+                venueUserData[formData.DeMoBOMVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               disabled
               value={
                 venueUserData[formData.DeMoBOMVenueContactId] ? venueUserData[formData.DeMoBOMVenueContactId].Phone : ''
@@ -761,6 +846,11 @@ export const EditDealMemoContractModal = ({
             <TextInput
               id="venueText"
               className="w-full text-primary-input-text font-bold"
+              placeholder={
+                venueUserData[formData.DeMoBOMVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               disabled
               value={
                 venueUserData[formData.DeMoBOMVenueContactId] ? venueUserData[formData.DeMoBOMVenueContactId].Email : ''
@@ -800,6 +890,11 @@ export const EditDealMemoContractModal = ({
               id="venueText"
               className="w-full text-primary-input-text font-bold"
               disabled
+              placeholder={
+                venueUserData[formData.DeMoSettlementVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoSettlementVenueContactId]
                   ? venueUserData[formData.DeMoSettlementVenueContactId].Phone
@@ -815,6 +910,11 @@ export const EditDealMemoContractModal = ({
               id="venueText"
               className="w-full text-primary-input-text font-bold"
               disabled
+              placeholder={
+                venueUserData[formData.DeMoSettlementVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoSettlementVenueContactId]
                   ? venueUserData[formData.DeMoSettlementVenueContactId].Email
@@ -851,15 +951,18 @@ export const EditDealMemoContractModal = ({
             <TextInput id="venueText" className="w-[15vw]" value={venueData.Seats} disabled />
           </div>
         </div>
-        <div className="flex items-center mt-4">
+        <div className="flex mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Standard Seat Skills</div>
-          <div className="w-4/5">
-            <TextInput
-              id="venueText"
-              className="w-full"
-              value={formData.DeMoStandardSeatKills}
-              onChange={(value) => editDemoModalData('DeMoStandardSeatKills', value.target.value, 'dealMemo')}
-            />
+          <div className="w-4/5 flex">
+            <div className="w-[394px]">
+              <div>
+                <StandardSeatKillsTable rowData={seatKillsData} />
+              </div>
+            </div>
+            <div className="ml-16">
+              <div className="text-primary-input-text font-bold">Hold Notes</div>
+              <TextInput className="w-[18vw]" />
+            </div>
           </div>
         </div>
         <hr className="bg-primary h-[3px] mt-4 mb-4" />
@@ -987,12 +1090,12 @@ export const EditDealMemoContractModal = ({
                         }
                       />
                     </div>
-                    <Icon
+                    {/* <Icon
                       iconName="minus-circle-solid"
                       className="mr-8"
                       onClick={() => handleCustomPrice(false, index)}
                       variant="lg"
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
@@ -1043,17 +1146,19 @@ export const EditDealMemoContractModal = ({
                 />
               </div>
               <Icon
-                iconName="minus-circle-solid"
-                className="mr-1"
-                onClick={() => handleCustomPrice(false, 0)}
-                variant="lg"
-              />
-              <Icon
                 iconName="plus-circle-solid"
-                className="mr-1 ml-1"
+                className={`${dealMemoCustomPriceFormData.length > 1 ? 'mr-2' : 'mr-8'} ml-1`}
                 onClick={() => handleCustomPrice(true, 0)}
                 variant="lg"
               />
+              {dealMemoCustomPriceFormData.length > 1 && (
+                <Icon
+                  iconName="minus-circle-solid"
+                  className="mr-1"
+                  onClick={() => handleCustomPrice(false, 0)}
+                  variant="lg"
+                />
+              )}
             </div>
           </div>
         </div>
@@ -1124,18 +1229,20 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Agreed Discounts</div>
           <div className="w-4/5 flex">
-            <TextInput
-              id="venueText"
-              className="w-auto"
-              value={formData.DeMoAgreedDiscounts}
-              onChange={(value) => editDemoModalData('DeMoAgreedDiscounts', value.target.value, 'dealMemo')}
-            />
+            <div className="w-full">
+              <TextInput
+                id="venueText"
+                className="w-full"
+                value={formData.DeMoAgreedDiscounts}
+                onChange={(value) => editDemoModalData('DeMoAgreedDiscounts', value.target.value, 'dealMemo')}
+              />
+            </div>
           </div>
         </div>
         <div className="flex items-center">
           <div className="w-1/5"> </div>
-          <div className="w-4/5 flex text-primary-input-text mt-2 -mb-4">
-            No other discounts without written agreement from {`${productionJumpState.ShowName}`}
+          <div className="w-4/5 flex text-primary-input-text -mb-1">
+            No other discounts without written agreement from {`${productionJumpState.ProductionCompany.Name}`}
           </div>
         </div>
         {[
@@ -1225,12 +1332,13 @@ export const EditDealMemoContractModal = ({
               onChange={() => {
                 // editDemoModalData('DeMoMMVenueContactId1', value, 'dealMemo');
               }}
+              isMulti
               className="bg-primary-white w-full"
               placeholder="Please select..."
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
-              value={formData.DeMoMMVenueContactId}
+              // value={formData.DeMoMMVenueContactId}
             />
           </div>
         </div>
@@ -1256,6 +1364,11 @@ export const EditDealMemoContractModal = ({
             <TextInput
               id="venueText"
               className="w-full text-primary-input-text font-bold"
+              placeholder={
+                venueUserData[formData.DeMoMMVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoMMVenueContactId] ? venueUserData[formData.DeMoMMVenueContactId].Phone : ''
               }
@@ -1269,6 +1382,11 @@ export const EditDealMemoContractModal = ({
             <TextInput
               id="venueText"
               className="w-full text-primary-input-text font-bold"
+              placeholder={
+                venueUserData[formData.DeMoMMVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoMMVenueContactId] ? venueUserData[formData.DeMoMMVenueContactId].Email : ''
               }
@@ -1299,7 +1417,7 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Print Requirements</div>
           <div className="w-4/5">
             <TextArea
-              className="h-[93px] w-full"
+              className=" w-full"
               value={formData.DeMoPrintReqs}
               onChange={(value) => editDemoModalData('DeMoPrintReqs', value.target.value, 'dealMemo')}
             />
@@ -1307,8 +1425,20 @@ export const EditDealMemoContractModal = ({
         </div>
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Print Delivery Address</div>
-          <div className="w-4/5">
-            <TextInput id="venueText" className="w-full" disabled />
+          <div className="w-4/5 flex">
+            <div className="w-1/4">
+              <Checkbox
+                className="pr-10"
+                labelClassName="!text-base"
+                id="includeExcludedVenues"
+                onChange={(value) => editDemoModalData('DeMoSellProgrammes', value.target.value, 'dealMemo')}
+                checked={formData.DeMoSellProgrammes}
+                label="Same as Venue Address"
+              />
+            </div>
+            <div className="w-3/4">
+              <TextInput id="venueText" className="w-3/4" disabled />
+            </div>
           </div>
         </div>
         <div className="flex items-center mt-4">
@@ -1329,8 +1459,10 @@ export const EditDealMemoContractModal = ({
                 )
               }
             />
-            <div className="text-primary-input-text font-bold ml-20">Local Marketing Contra </div>
-            <div className="text-primary-input-text font-bold ml-20 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+            <div className="text-primary-input-text font-bold ml-28">Local Marketing Contra </div>
+            <div className="text-primary-input-text font-bold ml-20 -mr-12" />
+            <div className="text-primary-input-text font-bold mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
+
             <TextInput
               id="venueText"
               className="w-auto"
@@ -1389,7 +1521,7 @@ export const EditDealMemoContractModal = ({
             />
 
             <TextArea
-              className="h-[200px] w-[48vw] ml-2"
+              className="w-[48vw] ml-2"
               value={formData.DeMoSellNotes}
               onChange={(value) => editDemoModalData('DeMoSellNotes', value.target.value, 'dealMemo')}
             />
@@ -1464,6 +1596,11 @@ export const EditDealMemoContractModal = ({
             <TextInput
               id="venueText"
               className="w-full text-primary-input-text font-bold"
+              placeholder={
+                venueUserData[formData.DeMoTechVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoTechVenueContactId]
                   ? venueUserData[formData.DeMoTechVenueContactId].Phone
@@ -1479,6 +1616,11 @@ export const EditDealMemoContractModal = ({
             <TextInput
               id="venueText"
               className="w-full text-primary-input-text font-bold"
+              placeholder={
+                venueUserData[formData.DeMoTechVenueContactId]
+                  ? 'Add details to Venue Database'
+                  : 'Please select from the dropdown above'
+              }
               value={
                 venueUserData[formData.DeMoTechVenueContactId]
                   ? venueUserData[formData.DeMoTechVenueContactId].Email
@@ -1501,9 +1643,11 @@ export const EditDealMemoContractModal = ({
             <div className="ml-4 w-[100px]">
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
-                value={venueData ? venueData.DeMoTechArrivalTime : null}
-                onChange={() => null}
-                disabled={true}
+                value={formData ? dateToTimeString(formData.DeMoTechArrivalTime) : null}
+                disabled={disableDate}
+                onChange={(value) =>
+                  editDemoModalData('DeMoTechArrivalTime', convertTimeToTodayDateFormat(value), 'dealMemo')
+                }
               />
             </div>
           </div>
@@ -1517,7 +1661,7 @@ export const EditDealMemoContractModal = ({
               disabled
               value={venueData ? venueData.AddressStageDoorW3W : null}
             />
-            <div className="w-1/5 text-primary-input-text font-bold ml-4">Loading Bay What3Words</div>
+            <div className="w-1/5 text-primary-input-text font-bold ml-8">Loading Bay What3Words</div>
 
             <TextInput
               id="venueText"
@@ -1655,11 +1799,12 @@ export const EditDealMemoContractModal = ({
               onChange={(value) => {
                 editDemoModalData('DeMoAdvancePaymentRequired', value === 1, 'dealMemo');
               }}
-              className="bg-primary-white w-36"
-              placeholder="YES|NO"
+              className="bg-primary-white w-40"
+              placeholder="Please select..."
               options={booleanOptions}
               isClearable
               isSearchable
+              value={formData.DeMoAdvancePaymentRequired}
             />
             <div className=" text-primary-input-text font-bold ml-20">
               If Yes, Amount<span className="ml-2 mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</span>
@@ -1677,6 +1822,7 @@ export const EditDealMemoContractModal = ({
                   'dealMemo',
                 )
               }
+              disabled={!formData.DeMoAdvancePaymentRequired}
             />
             <div className=" text-primary-input-text font-bold ml-20 mr-2"> Date Payment to be Made</div>
 
@@ -1685,6 +1831,7 @@ export const EditDealMemoContractModal = ({
                 editDemoModalData('DeMoAdvancePaymentDueBy', value, 'dealMemo');
               }}
               value={formData.DeMoAdvancePaymentDueBy}
+              disabled={!formData.DeMoAdvancePaymentRequired}
             />
           </div>
         </div>
@@ -1715,7 +1862,9 @@ export const EditDealMemoContractModal = ({
           </div>
         </div>
         <div className="flex items-center mt-4">
-          <div className="w-1/5 text-primary-input-text font-bold">VAT No.</div>
+          <div className="w-1/5 text-primary-input-text font-bold">
+            {productionJumpState.ProductionCompany.Name} VAT No.
+          </div>
           <div className="w-4/5 flex">
             <div className="w-full">
               <TextInput id="venueText" className="w-full" />
