@@ -64,7 +64,6 @@ export default function AddEditVenueModal({
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
-      console.log('posting');
       await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
       onClose(true);
     } catch (e) {

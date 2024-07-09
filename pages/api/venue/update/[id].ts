@@ -109,7 +109,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         Email: deliveryEMail,
       });
     }
-    console.log(FamilyId);
     const updatedData = {
       Code,
       Name,
