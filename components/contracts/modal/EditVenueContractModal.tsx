@@ -31,8 +31,8 @@ import {
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import { formattedDateWithDay, toISO } from 'services/dateService';
 import { EditDealMemoContractModal } from './EditDealMemoContractModal';
-import { LoadingOverlay } from 'components/shows/ShowsTable';
 import { transformToOptions } from 'utils';
+import LoadingOverlay from 'components/shows/LoadingOverlay';
 
 const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClose: () => void }) => {
   const productionJumpState = useRecoilValue(currentProductionSelector);

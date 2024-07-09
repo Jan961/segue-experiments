@@ -1,6 +1,9 @@
 import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid } from 'date-fns';
 import moment from 'moment';
 
+// regex for dd/mm/yy
+export const DATE_PATTERN = /(\d{2}\/\d{2}\/\d{2})/;
+
 export const safeDate = (date: Date | string) => {
   if (typeof date === 'string') return new Date(date);
   return date;
@@ -335,4 +338,8 @@ export const formatDateWithTimezoneOffset = ({
     date = new Date(date);
   }
   return moment(date).utcOffset(-timezoneOffset).format(dateFormat);
+};
+
+export const getTimezonOffset = () => {
+  return new Date().getTimezoneOffset();
 };

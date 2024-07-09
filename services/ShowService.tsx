@@ -31,6 +31,38 @@ const showInclude = Prisma.validator<Prisma.ShowInclude>()({
       DateBlock: true,
       ProductionRegion: true,
       File: true,
+      ConversionRate: {
+        include: {
+          Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency: {
+            include: {
+              Country: {
+                include: {
+                  CountryInRegion: {
+                    include: {
+                      Country: true,
+                      Region: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          Currency_ConversionRate_ConversionToCurrencyCodeToCurrency: {
+            include: {
+              Country: {
+                include: {
+                  CountryInRegion: {
+                    include: {
+                      Country: true,
+                      Region: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   },
   Account: {
@@ -93,10 +125,16 @@ export const getShowsByAccountId = async (AccountId: number) => {
   });
 };
 
-export const getAllProductionCompanyList = () => {
-  return prisma.ProductionCompany.findMany({
+export const getAllProductionCompanyList = async () => {
+  const productionCompanies = await prisma.ProductionCompany.findMany({
     orderBy: {
       Name: 'asc',
     },
   });
+  return productionCompanies.map(({ Id, AccountId, Name, Website }) => ({
+    id: Id,
+    name: Name,
+    accountId: AccountId,
+    website: Website || '',
+  }));
 };

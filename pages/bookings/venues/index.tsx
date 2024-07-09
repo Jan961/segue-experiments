@@ -35,7 +35,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
   const {
     venueTownList = [],
     venueCountryOptionList = [],
-    venueCurrencyOptionList = [],
     venueFamilyOptionList = [],
     venueRoleOptionList = [],
   } = props;
@@ -115,7 +114,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
         <AddEditVenueModal
           venue={editVenueContext}
           venueFamilyOptionList={venueFamilyOptionList}
-          venueCurrencyOptionList={venueCurrencyOptionList}
           countryOptions={venueCountryOptionList}
           venueRoleOptionList={venueRoleOptionList}
           visible={!!editVenueContext}

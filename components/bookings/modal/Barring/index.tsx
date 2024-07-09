@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
-import { Spinner } from 'components/global/Spinner';
+import Spinner from 'components/core-ui-lib/Spinner';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
 import Form from './Form';
@@ -127,7 +127,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 variant="primary"
                 text="Export"
                 iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName={'excel'}
+                sufixIconName="excel"
               />
               <Button
                 onClick={onClose}
