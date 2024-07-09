@@ -94,7 +94,7 @@ export const transformVenueContacts = (contacts?: VenueContact & { VenueRole: Ve
 };
 
 export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => {
-  const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, CountryId } = address || {};
+  const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, CountryId, Phone, Email } = address || {};
   if (TypeName === 'Main') {
     return {
       primaryAddressId: id,
@@ -104,6 +104,8 @@ export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => 
       primaryCountry: CountryId,
       primaryTown: Town,
       primaryPostCode: Postcode,
+      primaryPhoneNumber: Phone,
+      primaryEMail: Email,
     };
   }
   return {
@@ -114,6 +116,8 @@ export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => 
     deliveryCountry: CountryId,
     deliveryTown: Town,
     deliveryPostCode: Postcode,
+    deliveryPhoneNumber: Phone,
+    deliveryEMail: Email,
   };
 };
 
