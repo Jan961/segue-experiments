@@ -3,7 +3,7 @@ import 'react-range-slider-input/dist/style.css';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'ag-grid-enterprise/styles/ag-grid.css';
 import 'ag-grid-enterprise/styles/ag-theme-quartz.css';
-// import 'api/AxiosInterceptors';
+import 'request/AxiosInterceptors';
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
