@@ -472,7 +472,15 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Running Time (inc. Intervals)</div>
           <div className="w-4/5 flex items-center">
-            <TextInput id="venueText" className="w-[80px] mt-1 mb-1" placeholder="hh:mm" />
+            {/* <TextInput id="venueText" className="w-[80px] mt-1 mb-1" placeholder="hh:mm" /> */}
+            <TimeInput
+              className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
+              value={formData && formData.DeMoRunningTime ? dateToTimeString(formData.DeMoRunningTime) : null}
+              disabled={disableDate}
+              onChange={(value) =>
+                editDemoModalData('DeMoRunningTime', convertTimeToTodayDateFormat(value), 'dealMemo')
+              }
+            />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
             <TextInput
@@ -497,8 +505,8 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Off-Stage Venue Curfew Time</div>
           <div className="w-4/5 flex items-center">
             <TimeInput
-              className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
-              value={formData ? dateToTimeString(formData.DeMoVenueCurfewTime) : null}
+              className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
+              value={formData && formData.DeMoVenueCurfewTime ? dateToTimeString(formData.DeMoVenueCurfewTime) : null}
               disabled={disableDate}
               onChange={(value) =>
                 editDemoModalData('DeMoVenueCurfewTime', convertTimeToTodayDateFormat(value), 'dealMemo')
@@ -1633,7 +1641,6 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Company Arrival Date / Time</div>
           <div className="w-4/5 flex">
-            {/* DeMoTechArrivalDate / DeMoTechArrivalTime */}
             <DateInput
               onChange={(value) => {
                 editDemoModalData('DeMoTechArrivalDate', value, 'dealMemo');
@@ -1643,7 +1650,7 @@ export const EditDealMemoContractModal = ({
             <div className="ml-4 w-[100px]">
               <TimeInput
                 className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow ml-2"
-                value={formData ? dateToTimeString(formData.DeMoTechArrivalTime) : null}
+                value={formData && formData.DeMoTechArrivalTime ? dateToTimeString(formData.DeMoTechArrivalTime) : null}
                 disabled={disableDate}
                 onChange={(value) =>
                   editDemoModalData('DeMoTechArrivalTime', convertTimeToTodayDateFormat(value), 'dealMemo')
