@@ -62,8 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       CountryId: primaryCountry,
       Postcode: primaryPostCode,
       TypeName: 'Main',
-      VenueAddressPhone: primaryPhoneNumber,
-      VenueAddressEmail: primaryEMail,
+      Phone: primaryPhoneNumber,
+      Email: primaryEMail,
     };
 
     const deliveryAddress = {
@@ -74,10 +74,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       CountryId: deliveryCountry,
       Postcode: deliveryPostCode,
       TypeName: 'Delivery',
-      VenueAddressPhone: deliveryPhoneNumber,
-      VenueAddressEmail: deliveryEMail,
+      Phone: deliveryPhoneNumber,
+      Email: deliveryEMail,
     };
-
     try {
       const venue = await prisma.$transaction(async (tx) => {
         return createVenue(

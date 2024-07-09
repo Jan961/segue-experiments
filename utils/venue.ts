@@ -53,7 +53,6 @@ export interface UiVenue {
   vatIndicator: boolean;
   culturallyExempt?: boolean;
   venueFamily: number;
-  currency: string;
   venueCapacity: number;
   townPopulation: number;
   venueWebsite: string;
@@ -134,7 +133,6 @@ export const transformVenues = (
       Code,
       StatusCode,
       Website,
-      CurrencyCode,
       VATIndicator,
       TechSpecsURL,
       Seats,
@@ -176,7 +174,6 @@ export const transformVenues = (
         vatIndicator: VATIndicator,
         culturallyExempt: CulturallyExempt,
         venueFamily: FamilyId,
-        currency: CurrencyCode,
         venueCapacity: Seats,
         townPopulation: TownPopulation,
         venueWebsite: Website,
