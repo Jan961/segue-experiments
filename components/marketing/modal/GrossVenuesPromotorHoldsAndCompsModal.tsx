@@ -67,7 +67,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const { data: venues = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => {
-      if (!production || !['promoterHolds', 'holdsAndComps'].includes(activeModal)) return;
+      if (!production || !['promotorHolds', 'holdsAndComps'].includes(activeModal)) return;
       const productionVenuesPromise = fetchProductionVenues(production);
       notify.promise(productionVenuesPromise, {
         loading: 'fetching production venues',
@@ -83,7 +83,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
       transformToOptions(
         venues,
         'Name',
-        'Id',
+        'Code',
         // (week) => ` Wk ${week.productionWeekNum} | ${dateToSimple(week?.mondayDate)}`,
       ),
     [venues],
@@ -98,7 +98,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
     const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
     let promise;
     switch (activeModal) {
-      case 'promoterHolds': {
+      case 'promotorHolds': {
         promise = exportPromoterHoldsReport({ ...formData, productionCode }).then(() => onClose());
         break;
       }
@@ -156,6 +156,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             options={prodVenuesOptions}
             value={venue}
             placeholder="Please select a venue"
+            isSearchable
           />
         )}
 
