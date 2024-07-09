@@ -179,6 +179,7 @@ const NewBookingView = ({
         {!isDateTypeOnly && (
           <div className="flex items-center gap-2 my-1 justify-start">
             <Checkbox
+              testId="cnb-runofdates-checkbox"
               className="!w-fit"
               id="shouldFilterVenues"
               labelClassName="text-white w-fit"
@@ -186,14 +187,17 @@ const NewBookingView = ({
               checked={isRunOfDates}
               label="This is a run of dates. Y/N"
             />
-            <Tooltip
-              body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
-              position="right"
-              width="w-[140px]"
-              bgColorClass="primary-input-text"
-            >
-              <Icon iconName="info-circle-solid" />
-            </Tooltip>
+            <div data-testid="cnb-runofdates-info-icon">
+              <Tooltip
+                testId="cnb-runofdates-info-tooltip"
+                body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
+                position="right"
+                width="w-[140px]"
+                bgColorClass="primary-input-text"
+              >
+                <Icon iconName="info-circle-solid" />
+              </Tooltip>
+            </div>
           </div>
         )}
         <div className="flex items-center gap-2">

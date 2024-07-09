@@ -30,7 +30,7 @@ export interface ConfirmationDialogProps {
   labelNo?: string;
   hasOverlay?: boolean;
   content?: ConfirmationDialogContent;
-  dataTestId?: string;
+  testId?: string;
 }
 
 export const confOptions = {
@@ -69,7 +69,7 @@ export default function ConfirmationDialog({
   variant,
   hasOverlay = false,
   content,
-  dataTestId,
+  testId,
 }: Partial<ConfirmationDialogProps>) {
   const [visible, setVisible] = useState<boolean>(show);
 
@@ -83,12 +83,7 @@ export default function ConfirmationDialog({
   };
 
   return (
-    <PopupModal
-      data-testid={`core-ui-lib-popup-modal-${dataTestId}`}
-      show={visible}
-      showCloseIcon={false}
-      hasOverlay={hasOverlay}
-    >
+    <PopupModal data-testid={testId} show={visible} showCloseIcon={false} hasOverlay={hasOverlay}>
       <div data-testid="confirmation-dialog" className="-mt-5">
         <div className="text-center">
           <div data-testid="confirmation-dialog-question" className="text text-primary-navy font-bold text-xl">
@@ -100,9 +95,16 @@ export default function ConfirmationDialog({
         </div>
         <div className="w-full mt-4 flex justify-center items-center">
           {labelNo && (
-            <Button className="w-32" variant="secondary" text={labelNo} onClick={() => handleAction(false)} />
+            <Button
+              testId="confirmation-dialog-no-btn"
+              className="w-32"
+              variant="secondary"
+              text={labelNo}
+              onClick={() => handleAction(false)}
+            />
           )}
           <Button
+            testId="confirmation-dialog-yes-btn"
             className="ml-4 w-32"
             variant={variant === 'delete' ? 'tertiary' : 'primary'}
             text={labelYes}
