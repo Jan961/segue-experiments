@@ -4,6 +4,10 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
+import { UploadModal } from '../../core-ui-lib';
+import axios from 'axios';
+import { getFileUrl } from '../../../lib/s3';
+import useAxios from '../../../hooks/useAxios';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -19,6 +23,8 @@ const VenueTechnicalDetailsForm = ({
   updateValidationErrrors,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
+  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
+  const { fetchData } = useAxios();
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...venue,
@@ -31,8 +37,73 @@ const VenueTechnicalDetailsForm = ({
     }
   };
 
+  const onSave = async (file, onProgress, onError) => {
+    const formData = new FormData();
+    formData.append('file', file[0].file);
+    formData.append('path', 'marketing');
+
+    let progress = 0; // to track overall progress
+    let slowProgressInterval; // interval for slow progress simulation
+
+    try {
+      const response = await axios.post('/api/upload', formData, {
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          if (percentCompleted <= 50) {
+            progress = percentCompleted;
+          } else if (percentCompleted === 100) {
+            progress = 50;
+            clearInterval(slowProgressInterval);
+            slowProgressInterval = setInterval(() => {
+              if (progress < 95) {
+                progress += 0.5;
+                onProgress(file[0].file, progress);
+              } else {
+                clearInterval(slowProgressInterval);
+              }
+            }, 100);
+          }
+          onProgress(file[0].file, progress);
+        },
+      });
+
+      progress = 100;
+      onProgress(file[0].file, progress);
+      clearInterval(slowProgressInterval);
+
+      const fileRec = {
+        FileBookingBookingId: 1,
+        FileDateTime: new Date(),
+        FileDescription: '',
+        FileOriginalFilename: response.data.originalFilename,
+        FileURL: getFileUrl(response.data.location),
+        FileUploadedDateTime: new Date(),
+      };
+      // url: '/api/marketing/attachments/create',
+      // update in the database
+      await fetchData({
+        url: '',
+        method: 'POST',
+        data: fileRec,
+      });
+    } catch (error) {
+      onError(file[0].file, 'Error uploading file. Please try again.');
+      clearInterval(slowProgressInterval);
+    }
+  };
+
   return (
     <>
+      <UploadModal
+        title=""
+        visible={uploadVisible}
+        info=""
+        allowedFormats={[]}
+        onClose={() => {
+          setUploadVisible(false);
+        }}
+        onSave={onSave}
+      />
       <div className="flex flex-row  justify-between">
         <div className="flex flex-col">
           <label
@@ -51,7 +122,12 @@ const VenueTechnicalDetailsForm = ({
           </label>
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
-        <Button text="Upload Venue Tech Spec" />
+        <Button
+          text="Upload Venue Tech Spec"
+          onClick={() => {
+            setUploadVisible(true);
+          }}
+        />
       </div>
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">
