@@ -472,7 +472,6 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Running Time (inc. Intervals)</div>
           <div className="w-4/5 flex items-center">
-            {/* <TextInput id="venueText" className="w-[80px] mt-1 mb-1" placeholder="hh:mm" /> */}
             <TimeInput
               className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
               value={formData && formData.DeMoRunningTime ? dateToTimeString(formData.DeMoRunningTime) : null}
