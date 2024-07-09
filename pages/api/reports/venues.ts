@@ -192,8 +192,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     alignColumn({ worksheet, colAsChar: 'B', align: ALIGNMENT.RIGHT });
 
-    const lastColumn: number = 'A'.charCodeAt(numberOfColumns);
-    worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`);
+    const lastColumn = String.fromCharCode('A'.charCodeAt(0) + numberOfColumns);
+    worksheet.mergeCells(`A1:${lastColumn}1`);
 
     for (let row = 1; row <= 4; row++) {
       styleHeader({ worksheet, row, numberOfColumns });

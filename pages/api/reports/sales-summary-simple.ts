@@ -519,11 +519,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   makeRowTextNormal({ worksheet, row: row - 4 });
   makeRowTextNormal({ worksheet, row: row - 3 });
 
-  const totalColumns: number = worksheet.columnCount;
-  const lastColumn: number = 'A'.charCodeAt(totalColumns);
-  worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`);
   worksheet.getCell(1, 1).font = { size: 16, bold: true };
   const numberOfColumns = worksheet.columnCount;
+  const lastColumn = String.fromCharCode('A'.charCodeAt(0) + numberOfColumns);
+  worksheet.mergeCells(`A1:${lastColumn}1`);
   worksheet.getColumn('A').width = 9;
   worksheet.getColumn('B').width = 5;
   worksheet.getColumn('C').width = 10;
@@ -555,7 +554,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
-
+  worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${title}.xlsx"`);
 
