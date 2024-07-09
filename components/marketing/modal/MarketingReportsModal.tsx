@@ -31,6 +31,7 @@ export const MarketingReports = ({ visible = false, onClose }: MarketingReportsP
 
   return (
     <PopupModal
+      hasOverlay={!!activeModal}
       show={visible}
       title="Marketing Reports"
       titleClass="text-xl text-primary-navy text-bold mb-4 -mt-2"
