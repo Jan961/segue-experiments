@@ -96,16 +96,18 @@ const ProductionCompaniesTab = () => {
   };
 
   const getRowStyle = useCallback(({ data }) => {
-    return data.existsInDB === false ? { background: '#E9458033' } : null;
+    return !data.id ? { background: '#E9458033' } : null;
   }, []);
 
   return (
     <div>
       <div>
-        <div className="flex justify-between items-center pt-8">
-          <h1 className="text-primary-navy text-responsive-xl">Production Companies / Special Purpose Vehicles</h1>
-          <div className="pb-4">
-            <Button onClick={addNewVenueContact} variant="secondary" text="Add New Company" />
+        <div className="flex justify-between items-center pt-4">
+          <h1 className="text-primary-navy text-responsive-xl font-bold leading-8">
+            Production Companies / Special Purpose Vehicles
+          </h1>
+          <div className="pb-4 pr-2">
+            <Button className="w-[160px]" onClick={addNewVenueContact} variant="secondary" text="Add New Company" />
           </div>
         </div>
         <Table

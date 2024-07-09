@@ -11,7 +11,7 @@ const createUploadLogoRenderer = (fetchProductionCompanies, onUploadSucess) => {
 export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSucess) => {
   return [
     {
-      headerName: 'Company name',
+      headerName: 'Company Name',
       field: 'companyName',
       editable: true,
       cellRenderer: DefaultTextRenderer,
@@ -48,6 +48,7 @@ export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSuc
         popover: true,
       },
       width: 40,
+      resizable: false,
     },
   ];
 };
