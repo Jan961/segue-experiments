@@ -43,7 +43,7 @@ export interface SelectProps extends WithTestId {
 const Option = (props: OptionProps & { testId?: string }) => {
   return (
     <components.Option
-      data-testId={`select-option-${props.testId}-${(props.data as SelectOption)?.value}`}
+      data-testid={`${props.testId}-${(props.data as SelectOption)?.value}`}
       className="w-full"
       {...props}
     />
@@ -213,7 +213,7 @@ export default forwardRef(function Select(
   };
 
   const customComponents = {
-    Option: (option) => (renderOption ? renderOption(option) : <Option testId={testId} {...option} />),
+    Option: (option) => (renderOption ? renderOption(option) : <Option testId={`${testId}-option`} {...option} />),
     IndicatorSeparator: null,
     IndicatorsContainer,
     MultiValueRemove,
@@ -228,45 +228,45 @@ export default forwardRef(function Select(
         { 'shadow-sm-shadow': !inline },
         className,
       )}
-      data-testid={`${testId ? `core-ui-lib-select-${testId}` : 'core-ui-lib-select'}`}
     >
       {label && (
         <div className="border-r min-w-fit border-primary-border px-3">
-          <Label text={label} />
+          <Label testId={`${testId ? `${testId}-label` : 'core-ui-lib-select-label'}`} text={label} />
         </div>
       )}
-
-      <WindowedSelect
-        ref={ref}
-        className="w-full"
-        onInputChange={(inputValue) => {
-          if (inputValue) {
-            setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
-          } else {
-            setFilteredOptions(options);
-          }
-        }}
-        onChange={handleOptionSelect}
-        value={selectedOption}
-        components={customComponents}
-        getOptionLabel={(props: SelectOption) => props.text}
-        windowThreshold={50}
-        isDisabled={disabled}
-        closeMenuOnSelect={closeMenuOnSelect}
-        options={options}
-        styles={colourStyles}
-        placeholder={placeholder}
-        isSearchable={isSearchable}
-        isClearable={isClearable}
-        isMulti={isMulti}
-        hideSelectedOptions={false}
-        filterOption={(option, _inputValue) => {
-          if (filteredOptions === null) {
-            return true;
-          }
-          return filteredOptions.map((item) => item.value).includes(option.value);
-        }}
-      />
+      <div className="w-full h-full" data-testid={`${testId ? `${testId}` : 'core-ui-lib-select'}`}>
+        <WindowedSelect
+          ref={ref}
+          className="w-full"
+          onInputChange={(inputValue) => {
+            if (inputValue) {
+              setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
+            } else {
+              setFilteredOptions(options);
+            }
+          }}
+          onChange={handleOptionSelect}
+          value={selectedOption}
+          components={customComponents}
+          getOptionLabel={(props: SelectOption) => props.text}
+          windowThreshold={50}
+          isDisabled={disabled}
+          closeMenuOnSelect={closeMenuOnSelect}
+          options={options}
+          styles={colourStyles}
+          placeholder={placeholder}
+          isSearchable={isSearchable}
+          isClearable={isClearable}
+          isMulti={isMulti}
+          hideSelectedOptions={false}
+          filterOption={(option, _inputValue) => {
+            if (filteredOptions === null) {
+              return true;
+            }
+            return filteredOptions.map((item) => item.value).includes(option.value);
+          }}
+        />
+      </div>
     </div>
   );
 });

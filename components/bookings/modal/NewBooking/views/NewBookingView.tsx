@@ -163,6 +163,7 @@ const NewBookingView = ({
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
+          testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
           onChange={({ from, to }) => {
@@ -215,6 +216,7 @@ const NewBookingView = ({
         {isDateTypeOnly && (
           <>
             <Select
+              testId="cnb-datetype-selector"
               className="my-2 w-full !border-0"
               options={dayTypeOptions}
               disabled={stage !== 0}
@@ -228,7 +230,7 @@ const NewBookingView = ({
         {!isDateTypeOnly && (
           <>
             <Select
-              testId="new-booking-venue"
+              testId="cnb-venue-selector"
               className={classNames('my-2 w-full !border-0')}
               options={venueOptions}
               disabled={stage !== 0}
@@ -238,7 +240,7 @@ const NewBookingView = ({
               placeholder="Please select a venue"
             />
             <Checkbox
-              testId="new-booking-filter-venues"
+              testId="cnb-filter-existing-booking-venues"
               id="shouldFilterVenues"
               labelClassName="text-white"
               onChange={(e: any) => onChange({ shouldFilterVenues: e.target.checked })}

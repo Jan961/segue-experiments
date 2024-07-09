@@ -97,9 +97,11 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             className="bg-white w-52"
             label="Status"
             options={allStatusOptions}
+            testId="booking-status-filter"
           />
           <BookingFilter />
           <TextInput
+            testId="booking-filters-search"
             id="venueText"
             disabled={!ProductionId}
             placeholder="Search bookings..."

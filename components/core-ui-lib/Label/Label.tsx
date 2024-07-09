@@ -6,6 +6,7 @@ interface LabelProps {
   className?: string;
   htmlFor?: string;
   required?: boolean;
+  testId?: string;
 }
 
 const labelClassMap = {
@@ -14,10 +15,10 @@ const labelClassMap = {
   md: 'text-base',
   lg: 'text-lg',
 };
-export default function Label({ text, variant = 'sm', className = '', htmlFor, required = false }: LabelProps) {
+export default function Label({ text, variant = 'sm', className = '', htmlFor, required = false, testId }: LabelProps) {
   const basClass = `text-primary-label font-calibri ${labelClassMap[variant]}`;
   return (
-    <label htmlFor={htmlFor} className={`${basClass} ${className}`}>
+    <label htmlFor={htmlFor} data-testid={testId} className={`${basClass} ${className}`}>
       {text} {required && <sup className="">*</sup>}
     </label>
   );

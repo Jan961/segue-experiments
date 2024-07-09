@@ -48,7 +48,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <input
           ref={ref}
           id={`form-input-checkbox-${id}`}
-          data-testid={`core-ui-lib-checkbox-${testId}`}
+          data-testid={`${testId}`}
           type="checkbox"
           name={name}
           onChange={modifyOnChange}

@@ -21,6 +21,7 @@ interface DateInputProps {
   labelClassName?: string;
   disabled?: boolean;
   position?: string;
+  testId?: string;
 }
 
 const regex = /^\d{2}\/\d{2}\/\d{2}$/;
@@ -42,6 +43,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     labelClassName,
     disabled = false,
     position = '',
+    testId,
     ...props
   }: DateInputProps,
   ref,
@@ -142,12 +144,12 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
     >
       <div className="flex flex-col">
         {label && (
-          <div className="border-r min-w-fit border-primary-border px-3">
+          <div data-testid={`${testId}-label`} className="border-r min-w-fit border-primary-border px-3">
             <Label className={labelClassName} text={label} />
           </div>
         )}
       </div>
-      <div className="absolute right-3 top-3 z-10 flex flex-col">
+      <div data-testid={`${testId}-picker`} className="absolute right-3 top-3 z-10 flex flex-col">
         <DatePicker
           ref={dpRef}
           minDate={minDate}
@@ -164,7 +166,7 @@ export default forwardRef<Ref, DateInputProps>(function DateInput(
           {...props}
         />
       </div>
-      <div className={errorMsg ? 'animate-shake' : ''}>
+      <div data-testid={`${testId}-input`} className={errorMsg ? 'animate-shake' : ''}>
         <TextInput
           data-testid="date-input"
           placeholder={placeholder}
