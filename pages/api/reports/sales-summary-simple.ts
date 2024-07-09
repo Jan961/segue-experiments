@@ -403,7 +403,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const weekWiseDataInEuro = headerWeekNums.map((weekNum) =>
     getCurrencyWiseTotal({ totalForWeeks, setProductionWeekNum: weekNum, currencySymbol: VENUE_CURRENCY_SYMBOLS.EURO }),
   );
-  console.log('weekWiseDataInEuro', weekWiseDataInEuro);
   if (weekWiseDataInEuro.length) {
     worksheet.addRow([
       '',
@@ -449,10 +448,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     getChangeVsLastWeekValue(weekWiseDataInPound),
     ...seatsDataForPound,
   ]);
-  styleHeader({ worksheet, row: 1, bgColor: COLOR_HEXCODE.DARK_GREEN });
-  styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
-  styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
-  styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
 
   applyFormattingToRange({
     worksheet,
@@ -556,6 +551,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   makeRowTextBold({ worksheet, row: 1 });
   makeRowTextBoldAndALignCenter({ worksheet, row: 3 });
   makeRowTextBoldAndALignCenter({ worksheet, row: 4 });
+  styleHeader({ worksheet, row: 1, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${title}.xlsx"`);
