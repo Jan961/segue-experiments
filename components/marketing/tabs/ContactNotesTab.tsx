@@ -160,9 +160,8 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       productionName,
       venueAndDate,
     };
-    const downloadContactNotesReport = async () =>
-      await exportExcelReport(urlPath, payload, 'Contact Notes Report.xlsx');
-    notify.promise(downloadContactNotesReport(), {
+
+    notify.promise(exportExcelReport(urlPath, payload), {
       loading: 'Generating contact notes report',
       success: 'Contact notes report downloaded successfully',
       error: 'Error generating contact notes report',
