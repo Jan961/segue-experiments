@@ -42,13 +42,17 @@ const ProductionCompaniesTab = () => {
   const onCellClicked = async (e) => {
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
-      if (productionCompanies[rowIndex].id === null) {
+      if (!productionCompanies[rowIndex].id) {
         setShowDeleteModal(false);
         setSelectedProdCompany(null);
         await fetchProductionCompanies();
       } else {
-        setSelectedProdCompany(productionCompanies[rowIndex]);
-        setShowDeleteModal(true);
+        const selectedRow = productionCompanies[rowIndex];
+        // A company can be deleted only if it has no productions and is not the only company on record
+        if (productionCompanies.length > 1 && !selectedRow.hasProductions) {
+          setSelectedProdCompany(productionCompanies[rowIndex]);
+          setShowDeleteModal(true);
+        }
       }
     }
   };
@@ -56,7 +60,10 @@ const ProductionCompaniesTab = () => {
     if (selectedProdCompany) {
       try {
         await axios.delete(`/api/productionCompanies/delete?id=${selectedProdCompany.id}`);
-        await axios.delete(`/api/file/delete?location=${selectedProdCompany.fileLocation}`);
+        if (selectedProdCompany.fileLocation) {
+          await axios.delete(`/api/file/delete?location=${selectedProdCompany.fileLocation}`);
+        }
+
         await fetchProductionCompanies();
         setSelectedProdCompany(null);
       } catch (error) {
@@ -96,16 +103,18 @@ const ProductionCompaniesTab = () => {
   };
 
   const getRowStyle = useCallback(({ data }) => {
-    return data.existsInDB === false ? { background: '#E9458033' } : null;
+    return !data.id ? { background: '#E9458033' } : null;
   }, []);
 
   return (
     <div>
       <div>
-        <div className="flex justify-between items-center pt-8">
-          <h1 className="text-primary-navy text-responsive-xl">Production Companies / Special Purpose Vehicles</h1>
-          <div className="pb-4">
-            <Button onClick={addNewVenueContact} variant="secondary" text="Add New Company" />
+        <div className="flex justify-between items-center pt-4">
+          <h1 className="text-primary-navy text-responsive-xl font-bold leading-8">
+            Production Companies / Special Purpose Vehicles
+          </h1>
+          <div className="pb-4 pr-2">
+            <Button className="w-[160px]" onClick={addNewVenueContact} variant="secondary" text="Add New Company" />
           </div>
         </div>
         <Table
