@@ -2,9 +2,10 @@ import Button from 'components/core-ui-lib/Button';
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
 import { UploadModal } from '../../core-ui-lib';
+import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -56,6 +57,19 @@ const VenueTechnicalDetailsForm = ({
   //   imageUrl?: string;
   // }
 
+  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
+  useEffect(() => {
+    fileList.forEach((file) => {
+      const tempFile = file.get('file');
+      const widget: UploadedFile = {
+        size: tempFile.size,
+        name: tempFile.name,
+      };
+
+      setFileWidgets([...fileWidgets, widget]);
+    });
+  }, [fileList]);
+
   return (
     <>
       {uploadVisible && (
@@ -68,6 +82,7 @@ const VenueTechnicalDetailsForm = ({
             setUploadVisible(false);
           }}
           onSave={onSave}
+          value={fileWidgets}
         />
       )}
       <div className="flex flex-row  justify-between">
