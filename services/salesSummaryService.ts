@@ -645,18 +645,19 @@ export const makeColumnTextBold = ({ worksheet, colAsChar }: { worksheet: any; c
 };
 
 export const salesReportName = ({ isWeeklyReport, isSeatsDataRequired, data }): string => {
-  if (data.length) {
-    const { ShowName, FullProductionCode } = data[0];
-    return `${FullProductionCode} ${ShowName} Sales Summary - ${moment().format('DD.MM.YY')}`;
+  if (isSeatsDataRequired) {
+    return `Sales Vs Capacity - ${moment().format('DD.MM.YY')}`;
   }
 
   if (isWeeklyReport) {
     return `Sales Summary Weekly - ${moment().format('DD.MM.YY')}`;
   }
 
-  if (isSeatsDataRequired) {
-    return `Sales Vs Capacity - ${moment().format('DD.MM.YY')}`;
+  if (data.length) {
+    const { ShowName, FullProductionCode } = data[0];
+    return `${FullProductionCode} ${ShowName} Sales Summary - ${moment().format('DD.MM.YY')}`;
   }
+
   return `Sales Summary - ${moment().format('DD.MM.YY')}`;
 };
 

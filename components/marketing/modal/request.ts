@@ -25,6 +25,7 @@ export const exportSalesSummaryReport = async ({
   productionWeek,
   numberOfWeeks,
   isWeeklyReport = false,
+  isSeatsDataRequired = false,
 }) => {
   const toWeek = productionWeek?.split('T')?.[0];
   const fromWeek = moment(productionWeek)
@@ -36,6 +37,7 @@ export const exportSalesSummaryReport = async ({
     fromWeek,
     toWeek,
     isWeeklyReport,
+    isSeatsDataRequired,
   };
   const response = await axios.post('/api/reports/sales-summary-simple', payload, { responseType: 'blob' });
 
