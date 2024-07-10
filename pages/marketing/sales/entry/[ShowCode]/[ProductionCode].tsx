@@ -1,6 +1,6 @@
 import Layout from 'components/Layout';
 import SalesEntryFilters from 'components/marketing/SalesEntryFilters';
-import Entry, { SalesEntryRef } from 'components/marketing/sales/entry';
+import Entry, { SalesEntryRef } from 'components/marketing/sales/Entry';
 import { bookingMapperWithVenue, venueRoleMapper } from 'lib/mappers';
 import { InitialState } from 'lib/recoil';
 import { GetServerSideProps } from 'next';
@@ -8,7 +8,7 @@ import { objectify } from 'radash';
 import { useRef } from 'react';
 import { getSaleableBookings } from 'services/bookingService';
 import { getRoles } from 'services/contactService';
-import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
+import { getAccountId, getEmailFromReq, getUserNameFromReq, getUsers } from 'services/userService';
 import { getAllVenuesMin, getUniqueVenueTownlist } from 'services/venueService';
 import { BookingJump } from 'state/marketing/bookingJumpState';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
@@ -38,6 +38,7 @@ const Index = () => {
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const email = await getEmailFromReq(ctx.req);
   const accountId = await getAccountId(email);
+  const currentUser = await getUserNameFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'marketing/sales/entry', accountId);
 
   const productionId = productionJump.selected;
@@ -78,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
         defaultTab: 0,
         currencySymbol: '',
         users,
+        currentUser,
       },
     };
   } else {

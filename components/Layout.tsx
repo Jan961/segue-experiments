@@ -3,10 +3,10 @@ import Head from 'next/head';
 import { HeaderNav } from 'components/HeaderNav';
 import PopoutMenu from 'components/PopoutMenu/index';
 import Router from 'next/router';
-import { Spinner } from './global/Spinner';
 import { calibri } from 'lib/fonts';
 import { useRecoilValue } from 'recoil';
 import { globalState } from 'state/global/globalState';
+import Spinner from './core-ui-lib/Spinner';
 
 type Props = {
   children?: ReactNode;
