@@ -87,6 +87,7 @@ export interface IconProps {
   color?: string;
   fill?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export default function Icon({
@@ -99,12 +100,15 @@ export default function Icon({
   fill,
   className,
   onClick,
+  disabled = false,
 }: IconProps) {
   if (!IconNameMap.get(iconName)) return null;
 
   const getIcon = <T extends keyof ModuleType>(icon: T): ModuleType[T] => iconDir[icon as T];
 
   const IconComp = getIcon(IconNameMap.get(iconName) as any);
+  const fillValue = disabled && fill ? fill.slice(0, 1) + '66' + fill.slice(1) : fill;
+  const strokeValue = disabled && stroke ? stroke.slice(0, 1) + '66' + stroke.slice(1) : stroke;
 
   const getSizeForVariant = (v) =>
     ({
@@ -123,8 +127,8 @@ export default function Icon({
     <IconComp
       role="img"
       strokeWidth={strokeWidth}
-      stroke={stroke}
-      fill={fill}
+      stroke={strokeValue}
+      fill={fillValue}
       data-testid={testId}
       color={color}
       width={getSizeForVariant(variant)}

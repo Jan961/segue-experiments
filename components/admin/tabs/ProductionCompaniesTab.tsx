@@ -42,13 +42,17 @@ const ProductionCompaniesTab = () => {
   const onCellClicked = async (e) => {
     const { column, rowIndex } = e;
     if (column.colId === 'delete') {
-      if (productionCompanies[rowIndex].id === null) {
+      if (!productionCompanies[rowIndex].id) {
         setShowDeleteModal(false);
         setSelectedProdCompany(null);
         await fetchProductionCompanies();
       } else {
-        setSelectedProdCompany(productionCompanies[rowIndex]);
-        setShowDeleteModal(true);
+        const selectedRow = productionCompanies[rowIndex];
+        // A company can be deleted only if it has no productions and is not the only company on record
+        if (productionCompanies.length > 1 && !selectedRow.hasProductions) {
+          setSelectedProdCompany(productionCompanies[rowIndex]);
+          setShowDeleteModal(true);
+        }
       }
     }
   };
@@ -56,7 +60,10 @@ const ProductionCompaniesTab = () => {
     if (selectedProdCompany) {
       try {
         await axios.delete(`/api/productionCompanies/delete?id=${selectedProdCompany.id}`);
-        await axios.delete(`/api/file/delete?location=${selectedProdCompany.fileLocation}`);
+        if (selectedProdCompany.fileLocation) {
+          await axios.delete(`/api/file/delete?location=${selectedProdCompany.fileLocation}`);
+        }
+
         await fetchProductionCompanies();
         setSelectedProdCompany(null);
       } catch (error) {

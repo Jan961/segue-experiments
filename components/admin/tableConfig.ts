@@ -42,11 +42,16 @@ export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSuc
       headerName: '',
       field: 'delete',
       cellRenderer: IconRenderer,
-      cellRendererParams: {
-        iconName: 'delete',
-        tooltipPosition: 'left',
+      cellRendererParams: (params) => ({
+        value: 'Delete',
+        iconProps: {
+          iconName: 'delete',
+          fill: '#617293',
+          disabled: params.data?.id && params.data?.hasProductions,
+        },
+        tooltipPosition: 'right',
         popover: true,
-      },
+      }),
       width: 40,
       resizable: false,
     },
