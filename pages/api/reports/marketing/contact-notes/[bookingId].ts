@@ -1,9 +1,30 @@
+import { Prisma } from '@prisma/client';
 import ExcelJS from 'exceljs';
 import moment from 'moment';
+import prisma from 'lib/prisma';
 import { getContactNotesByBookingId } from 'services/venueContactsService';
 import { bookingContactNoteMapper } from 'lib/mappers';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+const getProductionAndVenueDetailsFromBookingId = async (bookingId: number) => {
+  const conditions: Prisma.Sql[] = [Prisma.sql` EntryType=${'Booking'}`];
+  if (bookingId) {
+    conditions.push(Prisma.sql` EntryId=${bookingId}`);
+  }
+  const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
+  const results: any[] =
+    await prisma.$queryRaw`SELECT FullProductionCode, ShowName, EntryName FROM ScheduleView ${where}`;
+  if (results.length) {
+    const { FullProductionCode, ShowName, EntryName } = results[0];
+    return {
+      prodCode: FullProductionCode,
+      showName: ShowName,
+      venueName: EntryName,
+    };
+  }
+  return {};
+};
 
 const createHeaderRow = (worksheet: any, text: string, size: number) => {
   const row = worksheet.addRow([text]);
@@ -34,9 +55,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!bookingId || !productionName || !venueAndDate) {
     throw new Error('Required params are missing');
   }
-
+  const { prodCode, showName, venueName } = await getProductionAndVenueDetailsFromBookingId(
+    parseInt(bookingId as string, 10),
+  );
   const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
-
+  const fileName = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contact Notes');
 
@@ -83,7 +106,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename=contact_notes.xlsx');
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
   return workbook.xlsx.write(res).then(() => {
     res.status(200).end();

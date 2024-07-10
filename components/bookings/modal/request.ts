@@ -93,18 +93,12 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
 };
 
 export const exportExcelReport = async (urlPath, payload = {}, fileName = 'Report') => {
-  try {
-    const response = await axios.post(urlPath, payload, { responseType: 'blob' });
-
-    if (response.status >= 200 && response.status < 300) {
-      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, fileName, 'xlsx');
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
-      }
+  const response = await axios.post(urlPath, payload, { responseType: 'blob' });
+  if (response.status >= 200 && response.status < 300) {
+    const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, fileName, 'xlsx');
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
     }
-  } catch (error) {
-    console.log(error);
   }
 };
