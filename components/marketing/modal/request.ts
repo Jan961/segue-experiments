@@ -129,13 +129,14 @@ export const exportProductionGrossSales = async ({ production }) => {
   return response;
 };
 
-export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate }) => {
+export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate, status }) => {
   const payload = {
-    ProductionId: parseInt(production, 10),
+    productionId: parseInt(production, 10),
     productionCode,
     venue,
     fromDate,
     toDate,
+    status,
   };
   const response = await axios.post('/api/reports/holds-comps', payload, { responseType: 'blob' });
 
