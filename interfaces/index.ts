@@ -658,8 +658,10 @@ export interface DealMemoContractFormData {
   DeMoAgreementDate?: Date;
   DeMoAccContId?: number;
   DeMoRunningTime?: Date;
+  DeMoDateIssued?: Date;
   DeMoRunningTimeNotes?: string;
   DeMoPrePostShowEvents?: string;
+  DeMoDressingRooms?: string;
   DeMoVenueCurfewTime?: Date;
   DeMoPerformanceNotes?: string;
   DeMoProgrammerVenueContactId?: number;
