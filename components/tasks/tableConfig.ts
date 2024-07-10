@@ -241,7 +241,9 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       field: 'edit',
       cellRenderer: IconRenderer,
       cellRendererParams: {
-        iconName: 'edit',
+        iconProps: {
+          iconName: 'edit',
+        },
       },
       width: 20,
       cellClass: 'no-right-border',
@@ -253,7 +255,9 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       field: 'delete',
       cellRenderer: IconRenderer,
       cellRendererParams: {
-        iconName: 'delete',
+        iconProps: {
+          iconName: 'delete',
+        },
       },
       width: 20,
       resizable: false,
