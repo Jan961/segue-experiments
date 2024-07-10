@@ -11,6 +11,8 @@ interface VenueTechnicalDetailsFormProps {
   validationErrors?: Record<string, string>;
   onChange: (data: any) => void;
   updateValidationErrrors?: (key: string, value: string) => void;
+  fileList: any;
+  setFileList: (data: any) => void;
 }
 
 const VenueTechnicalDetailsForm = ({
@@ -18,6 +20,8 @@ const VenueTechnicalDetailsForm = ({
   validationErrors,
   onChange,
   updateValidationErrrors,
+  fileList,
+  setFileList,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
   const [uploadVisible, setUploadVisible] = useState<boolean>(false);
@@ -33,15 +37,28 @@ const VenueTechnicalDetailsForm = ({
     }
   };
 
+  const onSave = async (files) => {
+    files.forEach((file) => {
+      const formData = new FormData();
+      formData.append('file', file.file);
+      formData.append('path', 'techSpecs');
+
+      setFileList([...fileList, formData]);
+    });
+  };
+
   return (
     <>
       {uploadVisible && (
         <UploadModal
           title="Upload Tech Specs"
           visible={uploadVisible}
-          info="Please select the files you would like to upload"
-          allowedFormats={['image/jpeg', 'image/png']}
-          onClose={() => setUploadVisible(false)}
+          info=""
+          allowedFormats={[]}
+          onClose={() => {
+            setUploadVisible(false);
+          }}
+          onSave={onSave}
         />
       )}
       <div className="flex flex-row  justify-between">
@@ -62,7 +79,12 @@ const VenueTechnicalDetailsForm = ({
           </label>
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
-        <Button text="Upload Venue Tech Spec" />
+        <Button
+          text="Upload Venue Tech Spec"
+          onClick={() => {
+            setUploadVisible(true);
+          }}
+        />
       </div>
       <div className="grid grid-cols-2 gap-5 pt-5">
         <div className="flex flex-col gap-5">

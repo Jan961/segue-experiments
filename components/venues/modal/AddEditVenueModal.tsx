@@ -17,6 +17,8 @@ import VenueContactForm from './VenueContactsForm';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
+import { getFileUrl } from 'lib/s3';
+import useAxios from 'hooks/useAxios';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -41,6 +43,7 @@ export default function AddEditVenueModal({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [fileList, setFileList] = useState<any>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -76,7 +79,9 @@ export default function AddEditVenueModal({
     const isValid = await validateVenue(formData);
     if (isValid) {
       const apiPromise = formData.id ? updateVenue(formData) : createVenue(formData);
-      await apiPromise;
+      const response = await apiPromise;
+      console.log(response);
+      saveFiles(response);
     }
     setIsSaving(false);
   };
@@ -95,6 +100,8 @@ export default function AddEditVenueModal({
       return false;
     }
   }
+
+  const { fetchData } = useAxios();
 
   const onChange = (data = {}) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -119,6 +126,57 @@ export default function AddEditVenueModal({
     }
     setIsDeleting(false);
   }, [onClose, toggleDeleteConfirmation, venue.id]);
+
+  const saveFiles = async (venueResponse: any) => {
+    console.log(venueResponse);
+    //  response will have the venueId we use in the file storage
+    let progress = 0; // to track overall progress
+    let slowProgressInterval; // interval for slow progress simulation
+
+    try {
+      fileList.foreach(async (file) => {
+        const response = await axios.post('/api/upload', file, {
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            if (percentCompleted <= 50) {
+              progress = percentCompleted;
+            } else if (percentCompleted === 100) {
+              progress = 50;
+              clearInterval(slowProgressInterval);
+              slowProgressInterval = setInterval(() => {
+                if (progress < 95) {
+                  progress += 0.5;
+                } else {
+                  clearInterval(slowProgressInterval);
+                }
+              }, 100);
+            }
+          },
+        });
+        progress = 100;
+        clearInterval(slowProgressInterval);
+
+        const fileRec = {
+          FileVenueFileId: response.data.FileId,
+          FileVenueId: venueResponse.data.Id,
+          FileDescription: 'Tech Spec',
+          FileOriginalFilename: response.data.originalFilename,
+          FileURL: getFileUrl(response.data.location),
+          FileDateTime: new Date(),
+          FileUploadedDateTime: new Date(),
+        };
+
+        // update in the database
+        await fetchData({
+          url: '/api/venue/techSpecs/create',
+          method: 'POST',
+          data: fileRec,
+        });
+      });
+    } catch (error) {
+      clearInterval(slowProgressInterval);
+    }
+  };
 
   return (
     <>
@@ -165,6 +223,8 @@ export default function AddEditVenueModal({
               onChange={onChange}
               validationErrors={validationErrors}
               updateValidationErrrors={updateValidationErrors}
+              setFileList={setFileList}
+              fileList={fileList}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>
