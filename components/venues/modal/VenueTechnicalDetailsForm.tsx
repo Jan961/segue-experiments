@@ -42,10 +42,19 @@ const VenueTechnicalDetailsForm = ({
       const formData = new FormData();
       formData.append('file', file.file);
       formData.append('path', 'techSpecs');
-
       setFileList([...fileList, formData]);
     });
+    setUploadVisible(false);
   };
+
+  //   export interface UploadedFile {
+  //   id?: number;
+  //   size: number;
+  //   name: string;
+  //   error?: string;
+  //   file?: File;
+  //   imageUrl?: string;
+  // }
 
   return (
     <>
@@ -54,7 +63,7 @@ const VenueTechnicalDetailsForm = ({
           title="Upload Tech Specs"
           visible={uploadVisible}
           info=""
-          allowedFormats={[]}
+          allowedFormats={['image/jpg', 'image/jpeg', 'document/pdf', 'image/png']}
           onClose={() => {
             setUploadVisible(false);
           }}

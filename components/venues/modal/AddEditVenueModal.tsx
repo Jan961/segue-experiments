@@ -178,6 +178,9 @@ export default function AddEditVenueModal({
     }
   };
 
+  fileList.forEach((file) => {
+    console.log(file.get('file'));
+  });
   return (
     <>
       <PopupModal
