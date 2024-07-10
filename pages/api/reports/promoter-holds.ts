@@ -3,9 +3,11 @@ import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { toSql } from 'services/dateService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { getExportedAtTitle } from 'utils/export';
 
 type TPromoter = {
   ProductionId: number;
@@ -71,8 +73,10 @@ export const makeRowTextBoldAndAllignLeft = ({
 
 // TODO - Issue with Performance Time
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { productionCode, fromDate, toDate, venue, productionId } = req.body || {};
-
+  const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
+  let { productionCode, fromDate, toDate, venue, productionId } = req.body || {};
+  fromDate = toSql(fromDate);
+  toDate = toSql(toDate);
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
@@ -91,15 +95,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
   const data: TPromoter[] = await prisma.$queryRaw`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`;
-
+  console.table(data);
   const worksheet = workbook.addWorksheet('My Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }],
   });
 
   worksheet.addRow(['PROMOTER HOLDS']);
-  const date = new Date();
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
+  const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+  worksheet.addRow([exportedAtTitle]);
   worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']);
   worksheet.addRow([
     'CODE',
@@ -173,7 +177,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   alignCellTextCenter({ worksheet, colAsChar: 'H' });
 
   for (let row = 1; row <= 4; row++) {
-    makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
+    makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.DARK_GREEN });
   }
   worksheet.getColumn('A').width = 8;
   addWidthAsPerContent({
