@@ -11,6 +11,7 @@ const formatCompanyDetails = (company: any) => {
     fileLocation: company.File?.Location || '',
     fileId: company.File?.Id,
     webSite: company.WebSite,
+    hasProductions: company.Production?.length > 0,
   };
 };
 
@@ -24,6 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
       include: {
         File: true,
+        Production: true,
       },
       orderBy: [
         {
@@ -31,6 +33,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       ],
     });
+
     return res.status(200).json(productionCompanyList.map(formatCompanyDetails));
   } catch (err) {
     res
