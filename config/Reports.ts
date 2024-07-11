@@ -6,6 +6,17 @@ export const salesSummarySortOptions = [
   { value: 'change', text: 'Change (Lowest to highest)' },
 ];
 
+export const marketingGraphOptions: SelectOption[] = [
+  {
+    value: 'salesVsPreviousTour',
+    text: 'Sales vs Previous Tour',
+  },
+  {
+    value: 'salesPercentageChange',
+    text: 'Sales Percentage Change',
+  },
+];
+
 export const getWeekOptions = (start: number, end: number): SelectOption[] => {
   const options = [];
   for (let week = start; week <= end; week++) {
@@ -16,3 +27,9 @@ export const getWeekOptions = (start: number, end: number): SelectOption[] => {
 
 export const MIN_WEEK = 2;
 export const MAX_WEEK = 99;
+
+export const bookingStatusOptions: SelectOption[] = [
+  { text: 'Confirmed (C)', value: 'C' },
+  { text: 'Unconfirmed (U)', value: 'U' },
+  { text: 'Cancelled (X)', value: 'X' },
+];

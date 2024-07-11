@@ -6,6 +6,7 @@ export type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
 export interface ButtonProps {
   id?: string;
+  testId?: string;
   text?: string;
   variant?: ButtonVariant;
   disabled?: boolean;
@@ -34,6 +35,7 @@ const ClassMap = new Map([
 
 export default function Button({
   id,
+  testId = 'core-ui-lib-btn',
   text = '',
   variant = 'primary',
   className = '',
@@ -62,6 +64,7 @@ export default function Button({
       )}
       disabled={disabled}
       onClick={onClick}
+      data-testid={`${testId || id}`}
     >
       {prefixIconName && (
         <span className="col-span-1 absolute left-2">

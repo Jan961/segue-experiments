@@ -20,6 +20,7 @@ export interface TextInputProps {
   onBlur?: (e: any) => void;
   type?: string;
   required?: boolean;
+  testId?: string;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
@@ -37,6 +38,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
       error,
       inputClassName,
       onKeyDown,
+      testId,
       ...rest
     },
     ref,
@@ -50,6 +52,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         onClick={onClick}
       >
         <input
+          data-testid={testId || 'core-ui-lib-text-input'}
           ref={ref}
           id={id}
           type={rest.type ? rest.type : 'text'}
@@ -62,7 +65,10 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
           {...rest}
         />
         {iconName && (
-          <div className="input-icon pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+          <div
+            data-testid={testId ? `${testId}-icon` : 'core-ui-lib-text-input-icon'}
+            className="input-icon pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
+          >
             <Icon aria-hidden="true" iconName={iconName} />
           </div>
         )}

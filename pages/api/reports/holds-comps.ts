@@ -3,7 +3,9 @@ import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { all } from 'radash';
 import { toSql } from 'services/dateService';
+import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
@@ -44,6 +46,12 @@ type TBookingHoldsGrouped = {
   SoldSeats: number;
   ReservedSeats: number | null;
   data: TBookingCodeAndName[];
+};
+
+type ProductionDetails = {
+  Show?: {
+    Name?: string;
+  };
 };
 
 type TBookingHoldsGroupedByCommonKey = {
@@ -194,13 +202,11 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-  let { ProductionId, productionCode, fromDate, toDate, venue } = req.body;
-  fromDate = toSql(fromDate);
-  toDate = toSql(toDate);
+  let { productionId, productionCode = '', fromDate, toDate, venue, status } = req.body;
 
   // This doesn't check productionCode
   const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { ProductionId });
+  const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
 
   const workbook = new ExcelJS.Workbook();
@@ -212,12 +218,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     conditions.push(Prisma.sql`VenueCode = ${venue}`);
   }
   if (fromDate && toDate) {
+    fromDate = toSql(fromDate);
+    toDate = toSql(toDate);
     conditions.push(Prisma.sql`BookingFirstDate BETWEEN ${fromDate} AND ${toDate}`);
   }
+  if (status) {
+    conditions.push(Prisma.sql`BookingStatusCode = ${status}`);
+  }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: TBookingHolds[] =
-    await prisma.$queryRaw`SELECT * FROM BookingHoldCompsView ${where} ORDER BY BookingFirstDate;`;
+  const [data, productionDetails] = await all([
+    prisma.$queryRaw`SELECT * FROM BookingHoldCompsView ${where} ORDER BY BookingFirstDate;`,
+    getProductionWithContent(productionId),
+  ]);
 
+  const { VenueName = '' } = data?.[0] || {};
+  const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
+  const filename = `${productionCode} ${showName} ${VenueName}`;
   const worksheet = workbook.addWorksheet('My Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
   });
@@ -231,7 +247,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const numberOfColumns = worksheet.columnCount;
 
   const groupBasedOnVenueAndDate: TBookingHoldsGroupedByCommonKey = groupBasedOnVenueAndSameDate({
-    fetchedValues: data,
+    fetchedValues: data as TBookingHolds[],
   });
   const groupBasedOnVenueAndDateForAllTypes: TBookingHoldsGrouped[] = Object.values(groupBasedOnVenueAndDate).map(
     (x: TBookingHoldsGrouped) => ({ ...x, data: groupBasedOnTypeAndCode({ allBookingCodeAndNameForADate: x.data }) }),
@@ -395,11 +411,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     maxColWidth: Infinity,
   });
 
-  const filename = `Holds_Comps${productionCode ? '_' + productionCode : ''}${
-    fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
-  }.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();
