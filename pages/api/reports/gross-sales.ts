@@ -89,9 +89,9 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 const formatDate = (date) => moment(date).format('DD/MM/YY');
 
 const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
-  const euroVal = totalOfCurrency.EURO;
+  const euroVal = totalOfCurrency['€'];
   const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toFixed(2) : 0;
-  return totalOfCurrency.GBP ? new Decimal(totalOfCurrency.GBP).plus(finalValOfEuro).toFixed(2) : finalValOfEuro;
+  return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toFixed(2) : finalValOfEuro;
 };
 
 const handler = async (req, res) => {
@@ -108,7 +108,6 @@ const handler = async (req, res) => {
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
 
   const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`;
-  console.table(data);
 
   let filename = 'Gross Sales';
   const workbook = new ExcelJS.Workbook();
@@ -200,20 +199,17 @@ const handler = async (req, res) => {
       r8.push('');
       r9.push('');
     } else {
+      value.VenueCurrencySymbol = currencyCodeToSymbolMap[value.VenueCurrencyCode];
       if (!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
         conversionRate = value.ConversionRate;
       }
       r7.push(value.Location || '');
       r8.push(value.EntryName || '');
-      r9.push(
-        value.VenueCurrencyCode && value.Value
-          ? `${currencyCodeToSymbolMap[value.VenueCurrencyCode]}${value.Value}`
-          : '',
-      );
-      if (value.VenueCurrencyCode && value.Value) {
-        const val = totalOfCurrency[value.VenueCurrencyCode];
+      r9.push(value.VenueCurrencySymbol && value.Value ? `${value.VenueCurrencySymbol}${value.Value}` : '');
+      if (value.VenueCurrencySymbol && value.Value) {
+        const val = totalOfCurrency[value.VenueCurrencySymbol];
         if (val || val === 0) {
-          totalOfCurrency[value.VenueCurrencyCode] = new Decimal(val)
+          totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
             .plus(new Decimal(value.Value).toFixed(2))
             .toFixed(2) as any as number;
         }
@@ -244,10 +240,10 @@ const handler = async (req, res) => {
 
     if (i === 0) {
       r7.push('Total EUR');
-      r9.push(totalOfCurrency.EURO ? `€${String(totalOfCurrency.EURO)}` : '');
+      r9.push(totalOfCurrency['€'] ? `€${String(totalOfCurrency['€'])}` : '');
     } else if (i === 1) {
       r7.push('Total GBP');
-      r9.push(totalOfCurrency.GBP ? `£${String(totalOfCurrency.GBP)}` : '');
+      r9.push(totalOfCurrency['£'] ? `£${String(totalOfCurrency['£'])}` : '');
     } else {
       r7.push('Grand Total');
       r9.push(`£${getTotalInPound({ totalOfCurrency, conversionRate })}`);
