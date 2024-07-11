@@ -42,6 +42,9 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
+    getRowNodeId: (data) => {
+      return data.id;
+    },
     onRowDataUpdated: (params) => {
       params.api.forEachNode((rowNode) => {
         rowNode.id = rowNode.data.date;
