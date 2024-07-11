@@ -14,7 +14,7 @@ export const allowEditingForSelectedDayType = (dayTypeOptions, dayType) => {
   return DAY_TYPE_FILTERS.includes(selectedDayTypeOption.text);
 };
 export const formatRowsForPencilledBookings = (values) => {
-  const pencilled = values.filter(({ bookingStatus }) => bookingStatus === 'Pencilled');
+  const pencilled = values.filter(({ bookingStatus }) => bookingStatus === 'U' || bookingStatus === 'Pencilled');
   const groupedByDate = pencilled.reduce((acc, item) => {
     if (acc[item.date] !== undefined) {
       acc[item.date] = acc[item.date] + 1;
