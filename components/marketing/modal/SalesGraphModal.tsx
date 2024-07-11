@@ -1,12 +1,14 @@
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import DateInput from 'components/core-ui-lib/DateInput';
+import { marketingGraphOptions } from 'config/Reports';
+import ProductionSelector from 'components/productions/ProductionSelector';
 
 interface SalesSummaryReportModalProps {
   visible: boolean;
@@ -17,37 +19,14 @@ const defaultFormData = {
   production: null,
   graph: null,
   finalFigures: false,
-  includeArchived: false,
-  includeArchivedTour1: false,
-  includeArchivedTour2: false,
-  tour1production: null,
-  tour2production: null,
+  production1: null,
+  production2: null,
   salesFigureDate: new Date(),
 };
 const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalProps) => {
-  const productionJump = useRecoilValue(productionJumpState);
+  const { productions } = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
-  const {
-    production,
-    graph,
-    finalFigures,
-    includeArchived,
-    includeArchivedTour1,
-    includeArchivedTour2,
-    tour1production,
-    tour2production,
-    salesFigureDate,
-  } = formData;
-  const graphOptions = [];
-
-  const productionsOptions = useMemo(
-    () =>
-      productionJump.productions.map((production) => ({
-        text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
-        value: production.Id,
-      })),
-    [productionJump],
-  );
+  const { graph, finalFigures, salesFigureDate } = formData;
 
   const onChange = useCallback((key: string, value: string | number) => {
     setFormData((data) => ({ ...data, [key]: value }));
@@ -61,42 +40,18 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
           <Select
             className="w-[312px]"
             onChange={(value) => onChange('graph', value as string)}
-            options={graphOptions}
+            options={marketingGraphOptions}
             value={graph}
           />
         </div>
-        <div className="bg-white border-primary-border rounded-md border shadow-md max-w-[550px]">
-          <div className="rounded-l-md">
-            <div className="flex items-center">
-              <Select
-                className="border-0 !shadow-none w-[410px]"
-                label="Production"
-                onChange={(value) => onChange('production', value as number)}
-                options={productionsOptions}
-                value={production}
-              />
-              <div className="flex items-center ml-1 float-end">
-                <Checkbox
-                  id="IncludeArchived"
-                  label="Include archived"
-                  checked={includeArchived}
-                  onChange={(e) => onChange('includeArchived', e.target.checked)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="flex flex-row mb-4">
-          <div className="flex flex-col w-[262px]">
-            <DateInput
-              onChange={(value) => onChange('salesFigureDate', value.toISOString())}
-              value={salesFigureDate}
-              label="Sales Figures Date"
-              inputClass="!border-0 !shadow-none"
-              labelClassName="text-primary-input-text"
-            />
-          </div>
+          <DateInput
+            onChange={(value) => onChange('salesFigureDate', value.toISOString())}
+            value={salesFigureDate}
+            label="Sales Figures Date"
+            inputClass="!border-0 !shadow-none"
+            labelClassName="text-primary-input-text"
+          />
 
           <div className="flex flex-col ml-[50px]">
             <Checkbox
@@ -111,56 +66,8 @@ const SalesSummaryReportModal = ({ visible, onClose }: SalesSummaryReportModalPr
           </div>
         </div>
         <p className="text-primary-input-text font-bold ">Compare with</p>
-        <div className="flex items-center gap-2">
-          <Label text="Tour 1" />
-          <div className="bg-white border-primary-border rounded-md border shadow-md max-w-[550px]">
-            <div className="rounded-l-md">
-              <div className="flex items-center">
-                <Select
-                  className="border-0 !shadow-none w-[390px]"
-                  label="Production"
-                  onChange={(value) => onChange('tour1production', value as number)}
-                  options={productionsOptions}
-                  value={tour1production}
-                />
-                <div className="flex items-center ml-1 mr-3">
-                  <Checkbox
-                    id="IncludeArchived"
-                    label="Include archived"
-                    checked={includeArchivedTour1}
-                    onChange={(e) => onChange('includeArchivedTour1', e.target.checked)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Label text="Tour 2" />
-          <div className="bg-white border-primary-border rounded-md border shadow-md max-w-[550px]">
-            <div className="rounded-l-md">
-              <div className="flex items-center">
-                <Select
-                  className="border-0 !shadow-none w-[390px]"
-                  label="Production"
-                  onChange={(value) => onChange('tour2production', value as number)}
-                  options={productionsOptions}
-                  value={tour2production}
-                />
-                <div className="flex items-center ml-1 mr-3">
-                  <Checkbox
-                    id="IncludeArchived"
-                    label="Include archived"
-                    checked={includeArchivedTour2}
-                    onChange={(e) => onChange('includeArchivedTour2', e.target.checked)}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        <ProductionSelector productions={productions} onChange={(value) => onChange('production1', value)} />
+        <ProductionSelector productions={productions} onChange={(value) => onChange('production2', value)} />
         <div className="pt-3 w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
           <Button
