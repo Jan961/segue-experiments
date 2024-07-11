@@ -13,29 +13,6 @@ import Icon from '../Icon';
 import Label from '../Label';
 import classNames from 'classnames';
 import fuseFilter from 'utils/fuseFilter';
-const Option = (props: OptionProps) => {
-  return <components.Option className="w-full" {...props} />;
-};
-
-const IndicatorsContainer = (props: IndicatorsContainerProps) => {
-  return (
-    <div className="p-0">
-      <components.IndicatorsContainer {...props} />
-    </div>
-  );
-};
-
-const MultiValueRemove = () => {
-  return null;
-};
-
-const DropdownIndicator = (props: DropdownIndicatorProps) => {
-  return (
-    <components.DropdownIndicator {...props} className="px-1">
-      <Icon iconName="chevron-down" variant="xs" />
-    </components.DropdownIndicator>
-  );
-};
 
 export type SelectOption = { text: string; value: string | number; [key: string]: any };
 
@@ -63,6 +40,36 @@ export interface SelectProps extends WithTestId {
   closeMenuOnSelect?: boolean;
 }
 
+const Option = (props: OptionProps & { testId?: string }) => {
+  return (
+    <components.Option
+      data-testid={`${props.testId}-${(props.data as SelectOption)?.value}`}
+      className="w-full"
+      {...props}
+    />
+  );
+};
+
+const IndicatorsContainer = (props: IndicatorsContainerProps) => {
+  return (
+    <div className="p-0">
+      <components.IndicatorsContainer {...props} />
+    </div>
+  );
+};
+
+const MultiValueRemove = () => {
+  return null;
+};
+
+const DropdownIndicator = (props: DropdownIndicatorProps) => {
+  return (
+    <components.DropdownIndicator {...props} className="px-1">
+      <Icon iconName="chevron-down" variant="xs" />
+    </components.DropdownIndicator>
+  );
+};
+
 export default forwardRef(function Select(
   {
     value,
@@ -73,7 +80,7 @@ export default forwardRef(function Select(
     customStyles = {},
     placeholder = '',
     disabled = false,
-    testId,
+    testId = 'core-ui-lib-select',
     label,
     inline = false,
     isSearchable = false,
@@ -206,7 +213,7 @@ export default forwardRef(function Select(
   };
 
   const customComponents = {
-    Option: (option) => (renderOption ? renderOption(option) : <Option {...option} />),
+    Option: (option) => (renderOption ? renderOption(option) : <Option testId={`${testId}-option`} {...option} />),
     IndicatorSeparator: null,
     IndicatorsContainer,
     MultiValueRemove,
@@ -221,45 +228,45 @@ export default forwardRef(function Select(
         { 'shadow-sm-shadow': !inline },
         className,
       )}
-      data-testid={`${testId ? `form-select-${testId}` : 'form-select'}`}
     >
       {label && (
         <div className="border-r min-w-fit border-primary-border px-3">
-          <Label text={label} />
+          <Label testId={`${testId ? `${testId}-label` : 'core-ui-lib-select-label'}`} text={label} />
         </div>
       )}
-
-      <WindowedSelect
-        ref={ref}
-        className="w-full"
-        onInputChange={(inputValue) => {
-          if (inputValue) {
-            setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
-          } else {
-            setFilteredOptions(options);
-          }
-        }}
-        onChange={handleOptionSelect}
-        value={selectedOption}
-        components={customComponents}
-        getOptionLabel={(props: SelectOption) => props.text}
-        windowThreshold={50}
-        isDisabled={disabled}
-        closeMenuOnSelect={closeMenuOnSelect}
-        options={options}
-        styles={colourStyles}
-        placeholder={placeholder}
-        isSearchable={isSearchable}
-        isClearable={isClearable}
-        isMulti={isMulti}
-        hideSelectedOptions={false}
-        filterOption={(option, _inputValue) => {
-          if (filteredOptions === null) {
-            return true;
-          }
-          return filteredOptions.map((item) => item.value).includes(option.value);
-        }}
-      />
+      <div className="w-full h-full" data-testid={`${testId ? `${testId}` : 'core-ui-lib-select'}`}>
+        <WindowedSelect
+          ref={ref}
+          className="w-full"
+          onInputChange={(inputValue) => {
+            if (inputValue) {
+              setFilteredOptions(fuseFilter(options, inputValue, ['text']).reverse());
+            } else {
+              setFilteredOptions(options);
+            }
+          }}
+          onChange={handleOptionSelect}
+          value={selectedOption}
+          components={customComponents}
+          getOptionLabel={(props: SelectOption) => props.text}
+          windowThreshold={50}
+          isDisabled={disabled}
+          closeMenuOnSelect={closeMenuOnSelect}
+          options={options}
+          styles={colourStyles}
+          placeholder={placeholder}
+          isSearchable={isSearchable}
+          isClearable={isClearable}
+          isMulti={isMulti}
+          hideSelectedOptions={false}
+          filterOption={(option, _inputValue) => {
+            if (filteredOptions === null) {
+              return true;
+            }
+            return filteredOptions.map((item) => item.value).includes(option.value);
+          }}
+        />
+      </div>
     </div>
   );
 });

@@ -15,9 +15,9 @@ const removeTime = (inputDate: Date) => {
 export default async function handle(req, res) {
   try {
     const bookingId = parseInt(req.body.bookingId);
-    const salesDate = new Date(req.body.salesDate);
+    let salesDate = new Date(req.body.salesDate);
     const salesFrequency = req.body.frequency;
-    const dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
+    let dateField = salesFrequency === 'W' ? 'SetProductionWeekDate' : 'SetSalesFiguresDate';
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email);
@@ -25,6 +25,16 @@ export default async function handle(req, res) {
 
     const data =
       await prisma.$queryRaw`select SaleTypeName, Seats, Value, SetSalesFiguresDate, SetProductionWeekDate from SalesView where BookingId = ${bookingId}`;
+
+    // if sale date is null, final sales entry is making the request, set the sales date to the last date entry
+    if (req.body.salesDate === null) {
+      const sortedData = data.sort(
+        (a, b) => new Date(b.SetProductionWeekDate).getTime() - new Date(a.SetProductionWeekDate).getTime(),
+      );
+
+      salesDate = new Date(sortedData[0].SetProductionWeekDate);
+      dateField = 'SetProductionWeekDate';
+    }
 
     const filtered = data.filter((sale) => removeTime(sale[dateField]).getTime() === removeTime(salesDate).getTime());
 

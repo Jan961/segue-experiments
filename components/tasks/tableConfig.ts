@@ -186,32 +186,14 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerName: 'Start by (WK)',
       field: 'StartByWeekNum',
-      cellRenderer: SelectCellRenderer,
-      cellStyle: {
-        overflow: 'visible',
-      },
-      cellRendererParams: function () {
-        return {
-          options: weekOptions,
-          isSearchable: true,
-        };
-      },
+      cellRenderer: DefaultCellRenderer,
       width: 100,
       minWidth: 100,
     },
     {
       headerName: 'Complete by (WK)',
       field: 'CompleteByWeekNum',
-      cellRenderer: SelectCellRenderer,
-      cellStyle: {
-        overflow: 'visible',
-      },
-      cellRendererParams: function () {
-        return {
-          options: weekOptions,
-          isSearchable: true,
-        };
-      },
+      cellRenderer: DefaultCellRenderer,
       width: 110,
       minWidth: 100,
     },
@@ -259,7 +241,9 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       field: 'edit',
       cellRenderer: IconRenderer,
       cellRendererParams: {
-        iconName: 'edit',
+        iconProps: {
+          iconName: 'edit',
+        },
       },
       width: 20,
       cellClass: 'no-right-border',
@@ -271,7 +255,9 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
       field: 'delete',
       cellRenderer: IconRenderer,
       cellRendererParams: {
-        iconName: 'delete',
+        iconProps: {
+          iconName: 'delete',
+        },
       },
       width: 20,
       resizable: false,

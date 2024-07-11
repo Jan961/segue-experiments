@@ -25,7 +25,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       name,
       disabled = false,
       showIntermediate = false,
-      testId,
+      testId = 'core-ui-lib-checkbox',
       className,
       label,
       labelClassName,
@@ -48,7 +48,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
         <input
           ref={ref}
           id={`form-input-checkbox-${id}`}
-          data-testid={`core-ui-lib-checkbox-${testId}`}
+          data-testid={`${testId}`}
           type="checkbox"
           name={name}
           onChange={modifyOnChange}
@@ -58,7 +58,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           className="peer relative appearance-none shrink-0 w-[1.1875rem] h-[1.1875rem] rounded-sm focus:ring-transparent  focus:checked:bg-primary-input-text checked:hover:bg-primary-input-text  checked:bg-primary-input-text border-2"
         />
 
-        {label && <Label text={label} className={labelClassName} variant="sm" />}
+        {label && <Label data-testid={`${testId}-label`} text={label} className={labelClassName} variant="sm" />}
 
         {showIntermediate && (
           <svg

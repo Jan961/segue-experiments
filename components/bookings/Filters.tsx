@@ -66,12 +66,14 @@ const Filters = ({ onExportClick }: FiltersProps) => {
           >
             <div className="flex items-center gap-4">
               <Button
+                testId="booking-filters-gototoday"
                 disabled={!todayOnSchedule || !ProductionId}
                 text="Go To Today"
                 className="text-sm leading-8 w-[120px]"
                 onClick={() => gotoToday()}
               />
               <Button
+                testId="booking-filters-tour-summary"
                 text="Tour Summary"
                 disabled={ProductionId === -1 || !ProductionId}
                 className="text-sm leading-8 w-[120px]"
@@ -95,9 +97,11 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             className="bg-white w-52"
             label="Status"
             options={allStatusOptions}
+            testId="booking-status-filter"
           />
           <BookingFilter />
           <TextInput
+            testId="booking-filters-search"
             id="venueText"
             disabled={!ProductionId}
             placeholder="Search bookings..."
@@ -106,7 +110,12 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             value={filter.venueText}
             onChange={onChange}
           />
-          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
+          <Button
+            testId="booking-filters-clear-filters"
+            className="text-sm leading-8 w-[120px]"
+            text="Clear Filters"
+            onClick={onClearFilters}
+          />
         </div>
       </div>
       <BookingsButtons onExportClick={onExportClick} />

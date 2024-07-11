@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Select from 'components/core-ui-lib/Select';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { exportSalesSummaryReport, fetchProductionWeek } from './request';
@@ -45,9 +45,13 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
   const [formData, setFormData] = useState(defaultFormData);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
+  const updateProductionWeek = useCallback(() => {
+    const currentWeekMonday = getCurrentMondayDate();
+    setFormData((data) => ({ ...data, productionWeek: currentWeekMonday }));
+  }, []);
   const { data: weeks = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
-    queryFn: () => {
+    queryFn: async () => {
       if (!production) return;
       const productionWeekPromise = fetchProductionWeek(production);
       notify.promise(productionWeekPromise, {
@@ -55,7 +59,9 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
         success: 'Production weeks fetched successfully',
         error: 'Error fetching production weeks',
       });
-      return productionWeekPromise;
+      const result = await productionWeekPromise;
+      updateProductionWeek();
+      return result;
     },
   });
 
@@ -70,10 +76,6 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
     [weeks],
   );
 
-  useEffect(() => {
-    const currentWeekMonday = getCurrentMondayDate();
-    setFormData((data) => ({ ...data, productionWeek: currentWeekMonday }));
-  }, [weeks]);
   const weekOptions = useMemo(() => getWeekOptions(MIN_WEEK, MAX_WEEK), []);
 
   const productionsOptions = useMemo(
@@ -130,6 +132,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
               onChange={(value) => onChange('productionWeek', value as number)}
               options={prodweekOptions}
               value={productionWeek}
+              isSearchable
             />
           </div>
           <div className="flex items-center gap-2">

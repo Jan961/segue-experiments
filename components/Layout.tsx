@@ -3,10 +3,10 @@ import Head from 'next/head';
 import { HeaderNav } from 'components/HeaderNav';
 import PopoutMenu from 'components/PopoutMenu/index';
 import Router from 'next/router';
-import { Spinner } from './global/Spinner';
 import { calibri } from 'lib/fonts';
 import { useRecoilValue } from 'recoil';
 import { globalState } from 'state/global/globalState';
+import Spinner from './core-ui-lib/Spinner';
 
 type Props = {
   children?: ReactNode;
@@ -14,8 +14,8 @@ type Props = {
   flush?: boolean;
 };
 
-const LoadingOverlay = () => (
-  <div className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
+const LoadingOverlay = ({ testId = 'loading-overlay' }: { testId: string }) => (
+  <div data-testid={testId} className="inset-0 absolute bg-white bg-opacity-50 z-50 flex justify-center items-center">
     <Spinner size="lg" />
   </div>
 );
@@ -65,7 +65,7 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
       </header>
       <main className="h-full w-full flex flex-rows flex-1">
         <PopoutMenu menuIsOpen={state.menuPinned || menuIsOpen} setMenuIsOpen={setMenuIsOpen} />
-        {isLoading && <LoadingOverlay />}
+        {isLoading && <LoadingOverlay testId="page-loader" />}
         <div className={`flex flex-col ${flush ? 'flex-1' : 'flex-1 px-4'} ${state.menuPinned ? 'ml-64 pl-1' : ''}`}>
           {children}
         </div>

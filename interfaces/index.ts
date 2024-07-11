@@ -1,4 +1,4 @@
-import { DealMemoPrice, DealMemoTechProvision } from '@prisma/client';
+import { DealMemoPrice, DealMemoTechProvision, Region } from '@prisma/client';
 
 export type StatusCode = 'C' | 'U' | 'X';
 
@@ -7,6 +7,32 @@ export type Currency = {
   fullTitle: string;
   symbol: string;
   exchangeRate: number;
+};
+
+export type CountryInRegion = {
+  CountryId: number;
+  RegionId: number;
+};
+
+export type CountryDTO = {
+  Id: number;
+  Name: string;
+  Code: string;
+  CurrencyCode?: string;
+  RegionList?: Region[];
+};
+
+export type CurrencyDTO = {
+  Code: string;
+  Name: string;
+  SymbolUnicode: string;
+  CountryList: CountryDTO[];
+};
+
+export type UICurrency = {
+  code: number;
+  name: string;
+  symbolUnicode: string;
 };
 
 export type User = {
@@ -40,7 +66,6 @@ export type ShowDTO = {
   Name: string;
   Type: string;
   IsArchived: boolean;
-  ShowProdCoId: number;
 };
 
 export type ProductionTaskDTO = {
@@ -112,6 +137,8 @@ export type BookingDTO = {
   BookingCompNotes: string;
   BookingHoldNotes: string;
   PerformanceCount: number;
+  BookingFinalSalesDiscrepancyNotes: string;
+  BookingHasSchoolsSales: boolean;
 };
 
 export type ContractsDTO = {
@@ -189,6 +216,25 @@ export interface FileDTO {
   imageUrl?: string;
 }
 
+export interface ProductionCompanyDTO {
+  AccountId?: number;
+  Id?: number;
+  Logo?: string;
+  Name?: string;
+  ProdCoSaleStartWeek?: number;
+  ProdCoVATCode?: number;
+  WebSite?: string;
+}
+export type ConversionRateDTO = {
+  Id: number;
+  FromCurrencyCode: string;
+  ToCurrencyCode: string;
+  Rate: number;
+  ProductionId: number;
+  FromCurrency?: CurrencyDTO;
+  ToCurrency?: CurrencyDTO;
+};
+
 export type ProductionDTO = {
   Id?: number;
   ShowId: number;
@@ -206,6 +252,12 @@ export type ProductionDTO = {
   ImageUrl?: string;
   Image?: Partial<FileDTO>;
   ShowRegionId?: number;
+  ProductionCompany?: Partial<ProductionCompanyDTO>;
+  ReportCurrencyCode?: string;
+  RunningTime?: string;
+  RunningTimeNote?: string;
+  ProdCoId?: number;
+  ConversionRateList?: ConversionRateDTO[];
 };
 
 export type VenueMinimalDTO = {
@@ -273,6 +325,18 @@ export type ActivityDTO = {
   ActivityTypeId: number;
   CompanyCost: number;
   VenueCost: number;
+  FollowUpRequired: boolean;
+  DueByDate?: Date | string;
+  Notes: string;
+};
+
+export type GlobalActivityDTO = {
+  Id?: number;
+  Date: Date | string;
+  Name: string;
+  ProductionId: number;
+  ActivityTypeId: number;
+  Cost: number;
   FollowUpRequired: boolean;
   DueByDate?: Date | string;
   Notes: string;
@@ -518,6 +582,12 @@ export interface ContractTableRowType {
   venueId: number | null;
   week: number | null;
 }
+
+export interface StandardSeatRowType {
+  type: string;
+  seats: string;
+  value: string;
+}
 export interface VenueContractFormData {
   StatusCode: string;
   SignedDate: Date;
@@ -588,8 +658,10 @@ export interface DealMemoContractFormData {
   DeMoAgreementDate?: Date;
   DeMoAccContId?: number;
   DeMoRunningTime?: Date;
+  DeMoDateIssued?: Date;
   DeMoRunningTimeNotes?: string;
   DeMoPrePostShowEvents?: string;
+  DeMoDressingRooms?: string;
   DeMoVenueCurfewTime?: Date;
   DeMoPerformanceNotes?: string;
   DeMoProgrammerVenueContactId?: number;

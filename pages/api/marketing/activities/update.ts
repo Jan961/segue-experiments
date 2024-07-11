@@ -28,6 +28,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         VenueCost: data.VenueCost,
         FollowUpRequired: data.FollowUpRequired,
         DueByDate: data.DueByDate,
+        Notes: data.Notes,
       },
     });
     res.status(200).json({});

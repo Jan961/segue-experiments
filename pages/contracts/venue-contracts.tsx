@@ -5,7 +5,7 @@ import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import useContractsFilter from 'hooks/useContractsFilter';
 import ContractFilters from 'components/contracts/ContractsFilters';
-import ContractsTable from 'components/contracts/ContractsTable';
+import ContractsTable from 'components/contracts/table/ContractsTable';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ContractsPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {

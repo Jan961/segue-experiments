@@ -1,6 +1,6 @@
 import axios, { AxiosResponseHeaders } from 'axios';
 import moment from 'moment';
-import { getMonday } from 'services/dateService';
+import { getMonday, getTimezonOffset } from 'services/dateService';
 
 export const downloadFromContent = (content: Blob, filename: string) => {
   const url = window.URL.createObjectURL(content);
@@ -66,10 +66,6 @@ export const exportBookingSchedule = async (ProductionId: number) => {
   }
 };
 
-export const getTimezonOffset = () => {
-  return new Date().getTimezoneOffset();
-};
-
 export const exportMasterplanReport = async (fromDate: string, toDate: string) => {
   try {
     const response = await axios.post(
@@ -97,18 +93,12 @@ export const exportMasterplanReport = async (fromDate: string, toDate: string) =
 };
 
 export const exportExcelReport = async (urlPath, payload = {}, fileName = 'Report') => {
-  try {
-    const response = await axios.post(urlPath, payload, { responseType: 'blob' });
-
-    if (response.status >= 200 && response.status < 300) {
-      const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, fileName, 'xlsx');
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
-      }
+  const response = await axios.post(urlPath, payload, { responseType: 'blob' });
+  if (response.status >= 200 && response.status < 300) {
+    const suggestedName = getFileNameFromHeaders(response.headers as AxiosResponseHeaders, fileName, 'xlsx');
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
     }
-  } catch (error) {
-    console.log(error);
   }
 };

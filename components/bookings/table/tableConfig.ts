@@ -508,6 +508,7 @@ export const newBookingColumnDefs = (
     cellRenderer: NoteColumnRenderer,
     cellRendererParams: {
       tpActive: false,
+      testId: `cnb-booking-details-tbl-notes`,
     },
     resizable: false,
     width: 85,
@@ -583,7 +584,9 @@ export const barredVenueColumnDefs = [
     field: 'info',
     cellRenderer: IconRenderer,
     cellRendererParams: {
-      iconName: 'info-circle-solid',
+      iconProps: {
+        iconName: 'info-circle-solid',
+      },
       tooltipPosition: 'left',
       popover: true,
     },
@@ -680,7 +683,9 @@ export const venueContactDefs = (defaultRoles) => [
     field: 'delete',
     cellRenderer: IconRenderer,
     cellRendererParams: {
-      iconName: 'delete',
+      iconProps: {
+        iconName: 'delete',
+      },
       tooltipPosition: 'left',
       popover: true,
     },
@@ -715,7 +720,9 @@ export const getBarredVenuesColDefs = (venueOptions) => [
     field: 'delete',
     cellRenderer: IconRenderer,
     cellRendererParams: {
-      iconName: 'delete',
+      iconProps: {
+        iconName: 'delete',
+      },
       tooltipPosition: 'left',
       popover: true,
     },

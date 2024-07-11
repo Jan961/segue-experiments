@@ -76,9 +76,9 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
             ],
           },
           { label: 'Sales Entry', value: '/marketing/sales/entry', labelClass: leve2 },
-          { label: 'Final Figures Entry', value: '/marketing/sales/final', labelClass: leve2 },
+          { label: 'Final Figures Entry', value: '/marketing/sales/Final', labelClass: leve2 },
           { label: 'Load Sales History', value: '/marketing/sales/history-load', labelClass: leve2 },
-          { label: 'Global Activities', value: '/marketing/activity/global', labelClass: leve2 },
+          { label: 'Global Activities', value: '/marketing/activity/GlobalActivity', labelClass: leve2 },
         ],
       },
       {
@@ -129,7 +129,7 @@ export default function PopoutMenu({ menuIsOpen, setMenuIsOpen }: any, data?: an
         options: [
           {
             label: 'Company Information',
-            value: '',
+            value: '/admin/company-information',
             labelClass: leve2,
             options: [
               { label: 'Company Details', value: '', labelClass: level3 },

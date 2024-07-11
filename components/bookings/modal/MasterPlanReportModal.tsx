@@ -43,8 +43,15 @@ const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, 
         value={{ from: fromDate ? new Date(fromDate) : null, to: toDate ? new Date(toDate) : null }}
       />
       <div className="pt-3 w-full flex items-center justify-end gap-2">
-        <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
         <Button
+          testId="booking-master-plan-report-modal-cancel"
+          onClick={onClose}
+          className="float-right px-4 w-33 font-normal"
+          variant="secondary"
+          text="Cancel"
+        />
+        <Button
+          testId="booking-master-plan-report-modal-export"
           className="float-right px-4 font-normal w-33 text-center"
           variant="primary"
           sufixIconName="excel"

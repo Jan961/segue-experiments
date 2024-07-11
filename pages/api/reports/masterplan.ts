@@ -28,7 +28,7 @@ type UniqueHeadersObject = {
   ShowName: string;
 };
 
-enum ALIGNMENT {
+export enum ALIGNMENT {
   CENTER = 'center',
   RIGHT = 'right',
   LEFT = 'left',
@@ -64,7 +64,7 @@ export const styleHeader = ({
   }
 };
 
-const alignCellText = ({
+export const alignCellText = ({
   worksheet,
   row,
   col,
