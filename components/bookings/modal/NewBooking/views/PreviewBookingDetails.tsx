@@ -24,6 +24,12 @@ const gridOptions = {
       ...(params.data.isDeleted && { 'background-color': '#D4D4D4' }),
     };
   },
+  getRowNodeId: (data) => data.id,
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.date;
+    });
+  },
 };
 
 export type PreviewBookingDetailsProps = {

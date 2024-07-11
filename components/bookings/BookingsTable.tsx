@@ -119,7 +119,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
-      console.log(formattedRows);
       setRows(formattedRows);
     }
   }, [rowData]);

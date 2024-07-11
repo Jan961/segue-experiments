@@ -104,6 +104,17 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       </p>
     );
   }
+  const gapSuggestTableOptions = {
+    ...gridOptions,
+    getRowNodeId: (data) => {
+      return data.id;
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.Name;
+      });
+    },
+  };
 
   return (
     <div className="text-primary-input-text w-[800px] flex-col">
@@ -121,7 +132,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
               onCellClicked={onCellClicked}
               rowData={filteredRows?.slice(0, 30)}
               styleProps={styleProps}
-              gridOptions={gridOptions}
+              gridOptions={gapSuggestTableOptions}
             />
           </div>
         </div>
