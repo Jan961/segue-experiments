@@ -11,6 +11,7 @@ import {
   ContactDemoFormData,
   ContactsFormData,
   DealMemoContractFormData,
+  DealMemoHoldType,
   ProductionDTO,
 } from 'interfaces';
 import { AddEditContractsState } from 'state/contracts/contractsState';
@@ -31,10 +32,10 @@ import axios from 'axios';
 import {
   defaultDemoCall,
   filterCurrencyNum,
+  filterHoldTypeData,
   filterPercentage,
   filterPrice,
   filterTechProvision,
-  seatKillsData,
 } from '../utils';
 import { DealMemoTechProvision } from '@prisma/client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
@@ -55,6 +56,7 @@ export const EditDealMemoContractModal = ({
   selectedTableCell,
   demoModalData,
   venueData,
+  dealHoldType,
 }: {
   visible: boolean;
   onCloseDemoForm: () => void;
@@ -62,6 +64,7 @@ export const EditDealMemoContractModal = ({
   selectedTableCell: AddEditContractsState;
   demoModalData: Partial<DealMemoContractFormData>;
   venueData;
+  dealHoldType: DealMemoHoldType;
 }) => {
   const [formData, setFormData] = useRecoilState(dealMemoInitialState);
   const [contactsFormData, setContactsFormData] = useState<ContactDemoFormAccountData>({});
@@ -74,7 +77,7 @@ export const EditDealMemoContractModal = ({
   const [dealMemoTechProvision, setDealMemoTechProvision] = useState<DealMemoTechProvision[]>([]);
   const [formEdited, setFormEdited] = useState<boolean>(false);
   const [disableDate, setDisableDate] = useState<boolean>(true);
-
+  const [seatKillsData, setSeatKillsData] = useState([]);
   const venueUserList = useMemo(
     () =>
       venueData && venueData.VenueContact
@@ -99,6 +102,9 @@ export const EditDealMemoContractModal = ({
   useEffect(() => {
     setFormData({ ...demoModalData });
     const priceData = filterPrice(demoModalData.DealMemoPrice);
+    const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
+    console.log('holdTypeData==>', holdTypeData);
+    setSeatKillsData(holdTypeData);
     setdealMemoPriceFormData(priceData[0]);
     setDealMemoCustomPriceFormData(priceData[1]);
     const techProvisionData = demoModalData.DealMemoTechProvision ? demoModalData.DealMemoTechProvision : [];
@@ -298,6 +304,7 @@ export const EditDealMemoContractModal = ({
       onCloseDemoForm();
     }
   };
+  console.log('seatKillsData==>', seatKillsData, demoModalData, dealHoldType);
   return (
     <PopupModal
       show={visible}

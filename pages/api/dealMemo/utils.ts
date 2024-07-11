@@ -57,6 +57,26 @@ export const getDealMemoCall = (dealMemoCall) => {
   return [updateCall, createCall];
 };
 
+export const getDealMemoHold = (dealMemoHold) => {
+  const updateHold = [];
+  const createHold = [];
+
+  dealMemoHold.forEach((hold) => {
+    if (hold.DMHoldDeMoId) {
+      const price = {
+        where: { DMHoldDeMoId: hold.DMHoldDeMoId },
+        data: hold,
+      };
+      delete price.data.DMHoldDeMoId;
+      updateHold.push(price);
+    } else {
+      delete hold.DMHoldDeMoId;
+      createHold.push(hold);
+    }
+  });
+  return [updateHold, createHold];
+};
+
 export const getContactIdData = (dealMemo) => {
   if (dealMemo.DeMoBOMVenueContactId) {
     dealMemo.VenueContact_DealMemo_DeMoBOMVenueContactIdToVenueContact = {

@@ -78,6 +78,40 @@ export const filterTechProvision = (techProvision) => {
   return techData;
 };
 
+export const filterHoldTypeData = (dealHoldType, dealMemoHoldData) => {
+  const dealHoldObj = {};
+  if (dealMemoHoldData && dealMemoHoldData.length > 0) {
+    dealMemoHoldData.forEach((hold) => {
+      dealHoldObj[hold.DMHoldHoldTypeId] = hold;
+    });
+  }
+  const holdTypeTableData = dealHoldType.map((holdData) => {
+    if (dealHoldObj[holdData.HoldTypeId]) {
+      holdData.value = dealHoldObj[holdData.HoldTypeId].DMHoldValue;
+      holdData.seats = dealHoldObj[holdData.HoldTypeId].DMHoldSeats;
+    } else {
+      holdData.value = '';
+      holdData.seats = '';
+    }
+    holdData.type = holdData.HoldTypeName;
+    return holdData;
+  });
+  return holdTypeTableData;
+  // {type: 'Promoter', seats: '', value: '',id:''}
+
+  // DMHoldId?: number,
+  // DMHoldDeMoId?: number,
+  // DMHoldHoldTypeId?: HoldTypeId,
+  // DMHoldSeats?: number,
+  // DMHoldValue?: number
+  // DMHoldHoldTypeId
+
+  //   HoldTypeCode: "PRO"
+  // HoldTypeId: 1
+  // HoldTypeName: "Promoter"
+  // HoldTypeSeqNo: 10
+};
+
 export const filterPercentage = (num: number) => {
   if ((num >= 0 && num < 100) || Number.isNaN(num)) {
     return Math.floor(num * 100) / 100;

@@ -67,7 +67,7 @@ export const contractsColumnDefs = [
   },
 ];
 
-export const standardSeatKillsColumnDefs = [
+export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -82,6 +82,22 @@ export const standardSeatKillsColumnDefs = [
     headerName: 'Seats',
     field: 'seats',
     cellRenderer: InputRenderer,
+    cellRendererParams: () => ({
+      // options: getNumericalOptions(
+      //   optionsLength,
+      //   [],
+      //   // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
+      // ),
+      // selectForComparison,
+      // selectedBookings,
+      placeholder: 'ggggg',
+      inline: true,
+      onChange: (value) => {
+        onChangeData(value);
+      },
+      holdValue,
+      // hasSalesData: params.data.hasSalesData,
+    }),
     width: 120,
     cellStyle: {
       textAlign: 'center',
@@ -96,6 +112,22 @@ export const standardSeatKillsColumnDefs = [
     headerName: 'Value',
     field: 'value',
     cellRenderer: InputRenderer,
+    cellRendererParams: () => ({
+      // options: getNumericalOptions(
+      //   optionsLength,
+      //   [],
+      //   // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
+      // ),
+      // selectForComparison,
+      // selectedBookings,
+      placeholder: 'ggggg11',
+      inline: true,
+      onChange: (value) => {
+        onChangeData(value);
+      },
+      holdValue,
+      // hasSalesData: params.data.hasSalesData,
+    }),
     width: 120,
     cellStyle: {
       textAlign: 'center',

@@ -652,6 +652,14 @@ export interface DealMemoCall {
   DMCType?: string;
   DMCValue?: number;
 }
+
+export interface DealMemoHold {
+  DMHoldId?: number;
+  DMHoldDeMoId?: number;
+  DMHoldHoldTypeId?: number;
+  DMHoldSeats?: number;
+  DMHoldValue?: number;
+}
 export interface DealMemoContractFormData {
   DeMoId?: number;
   DeMoBookingId?: number;
@@ -728,6 +736,14 @@ export interface DealMemoContractFormData {
   DealMemoPrice?: DealMemoPrice[];
   DealMemoTechProvision?: DealMemoTechProvision[];
   DealMemoCall?: any;
+  DealMemoHold?: DealMemoHold;
+}
+
+export interface DealMemoHoldType {
+  HoldTypeCode?: string;
+  HoldTypeId?: number;
+  HoldTypeName?: string;
+  HoldTypeSeqNo?: number;
 }
 
 export interface DealMemoPriceState {

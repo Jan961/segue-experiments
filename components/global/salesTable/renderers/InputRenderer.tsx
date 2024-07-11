@@ -14,12 +14,18 @@ interface SelectRendererProps extends SelectProps {
 }
 
 const InputRenderer = (props: SelectRendererProps) => {
+  console.log('props==>', props);
   return (
     <div className={`pl-1 pr-2 ${props.colDef.field === 'value' ? 'mt-0' : 'mt-1'} flex `}>
       {props.colDef.field === 'value' && (
         <div className="text-primary-input-text mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
       )}
-      <TextInput id="venueText" className="w-full text-primary-input-text font-bold" />
+      <TextInput
+        id="venueText"
+        className="w-full text-primary-input-text font-bold"
+        value={props.holdValue}
+        onChange={(value) => props.onChange(value)}
+      />
     </div>
   );
 };

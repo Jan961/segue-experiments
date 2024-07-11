@@ -11,10 +11,18 @@ interface ContractsTableProps {
 export default function StandardSeatKillsTable({ rowData }: ContractsTableProps) {
   const tableRef = useRef(null);
   const [rows, setRows] = useState([]);
+  const [columnDefs, setColumnDefs] = useState([]);
+  const [holdValue, setHoldValue] = useState('');
+
   const gridOptions = {
     getRowStyle: (params) => {
       return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
     },
+  };
+
+  const handleValueData = () => {
+    console.log('======>????', 1111111);
+    setHoldValue('yyyyy');
   };
 
   useEffect(() => {
@@ -26,6 +34,9 @@ export default function StandardSeatKillsTable({ rowData }: ContractsTableProps)
     }
   }, [rowData]);
 
+  useEffect(() => {
+    setColumnDefs(standardSeatKillsColumnDefs(handleValueData, holdValue));
+  }, [holdValue]);
   //   const handleRowDoubleClicked = (e: RowDoubleClickedEvent) => {
   //     setEditContractData({
   //       visible: true,
@@ -43,7 +54,7 @@ export default function StandardSeatKillsTable({ rowData }: ContractsTableProps)
     <>
       <div className="w-full">
         <Table
-          columnDefs={standardSeatKillsColumnDefs}
+          columnDefs={columnDefs}
           rowData={rows}
           styleProps={contractsStyleProps}
           gridOptions={gridOptions}

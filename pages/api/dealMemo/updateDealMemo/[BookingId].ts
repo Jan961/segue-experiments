@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getDealMemoCall, getPrice, getTechProvision, getContactIdData } from '../utils';
+import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHold } from '../utils';
 import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -31,6 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const techProvisionData = getTechProvision(updatedDate.DealMemoTechProvision);
 
     const dealMemoCallData = getDealMemoCall(updatedDate.DealMemoCall);
+    const dealMemoHoldData = getDealMemoHold(updatedDate.DealMemoHold);
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
@@ -50,6 +51,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             updateMany: dealMemoCallData[0],
             create: dealMemoCallData[1],
           },
+          DealMemoHold: {
+            updateMany: dealMemoHoldData[0],
+            create: dealMemoHoldData[1],
+          },
           Booking: {
             connect: { Id: BookingId },
           },
@@ -67,6 +72,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
           DealMemoCall: {
             create: data.DealMemoCall,
+          },
+          DealMemoHold: {
+            create: data.DealMemoHold,
           },
           Booking: {
             connect: { Id: BookingId },
