@@ -12,52 +12,18 @@ export const getCurrencyFromBookingId = async (bookingId: number) => {
       select: { VenueId: true },
     });
     const venueId = venueIdQuery ? venueIdQuery?.VenueId : null;
-
-    const venueCountryQuery: any | null = await prisma.VenueAddress.findFirst({
+    const currencyCodeQuery: any | null = await prisma.Venue.findFirst({
       where: {
-        VenueId: { equals: venueId },
-        TypeName: { equals: 'Main' },
+        Id: { equals: venueId },
       },
       select: {
-        CountryId: true,
+        Currency: {
+          select: { SymbolUnicode: true },
+        },
       },
     });
-    const countryId: number | null = venueCountryQuery?.CountryId || null;
-
-    const currencyCodeQuery: any | null = await prisma.Country.findFirst({
-      where: {
-        Id: { equals: countryId },
-      },
-      select: {
-        CurrencyCode: true,
-      },
-    });
-    const currencyCode: string | null = currencyCodeQuery?.CurrencyCode;
-
-    const currencySymbolQuery: any | null = await prisma.Currency.findFirst({
-      where: {
-        Code: { equals: currencyCode },
-      },
-      select: {
-        SymbolUnicode: true,
-      },
-    });
-    const currencySymbol: string | null = currencySymbolQuery?.SymbolUnicode || null;
-
-    return currencySymbol ? charCodeToCurrency(currencySymbol) : null;
+    return currencyCodeQuery ? charCodeToCurrency(currencyCodeQuery.Currency.SymbolUnicode) : null;
   } catch (exception) {
     console.log(exception);
   }
-};
-
-export const getCurrencyCodeFromCountryId: (countryId: number) => Promise<any> = async (countryId: number) => {
-  const currencyCodeQuery: any | null = await prisma.Country.findFirst({
-    where: {
-      Id: { equals: countryId },
-    },
-    select: {
-      CurrencyCode: true,
-    },
-  });
-  return currencyCodeQuery?.CurrencyCode;
 };

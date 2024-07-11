@@ -154,8 +154,6 @@ export const initialVenueAddressDetails = {
   deliveryAddress3: '',
   deliveryAddress2: '',
   deliveryAddress1: '',
-  deliveryEMail: '',
-  deliveryPhoneNumber: '',
 
   primaryCountry: null,
   primaryPostCode: '',
@@ -163,8 +161,6 @@ export const initialVenueAddressDetails = {
   primaryAddress3: '',
   primaryAddress2: '',
   primaryAddress1: '',
-  primaryPhoneNumber: '',
-  primaryEMail: '',
   what3WordsStage: '',
   what3WordsLoading: '',
 };

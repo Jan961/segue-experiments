@@ -5,7 +5,6 @@ import { calculateWeekNumber } from 'services/dateService';
 import { group } from 'radash';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 import { loggingService } from 'services/loggingService';
-import { getCurrencyCodeFromCountryId } from 'services/venueCurrencyService';
 
 export type SummaryResponseDTO = {
   Performances: PerformanceDTO[];
@@ -102,7 +101,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         Venue: {
           select: {
             Seats: true,
-            VenueAddress: { where: { TypeName: { equals: 'Main' } }, select: { CountryId: true } },
+            CurrencyCode: true,
+            Currency: {
+              select: {
+                SymbolUnicode: true,
+              },
+            },
           },
         },
         DateBlock: {
@@ -135,16 +139,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       CompNotes,
     } = booking || {};
 
-    const currencyCode: string | null = await getCurrencyCodeFromCountryId(booking?.Venue?.VenueAddress[0]?.CountryId);
-    const { Seats: Capacity } = booking?.Venue || {};
-
-    const unicodeQuery = await prisma.Currency.findFirst({
-      where: { Code: { equals: currencyCode } },
-      select: { SymbolUnicode: true },
-    });
-
-    const SymbolUnicode = unicodeQuery?.SymbolUnicode;
-
+    const { Seats: Capacity, CurrencyCode } = booking?.Venue || {};
+    const { SymbolUnicode } = booking?.Venue?.Currency || {};
     const { ConversionRate } = performance?.DateBlock?.Production?.ConversionRate || {};
     const AvgTicketPrice = salesSummary === null ? 0 : salesSummary?.Value / salesSummary?.Seats;
     const TotalSeats = Capacity * NumberOfPerformances;
@@ -159,7 +155,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         SalesValue: salesSummary?.Value === undefined ? 0 : salesSummary?.Value,
         AvgTicketPrice: AvgTicketPrice && parseFloat(AvgTicketPrice.toFixed(2)),
         GrossPotential: GrossProfit && parseFloat(GrossProfit.toFixed(2)),
-        VenueCurrencyCode: currencyCode,
+        VenueCurrencyCode: CurrencyCode,
         VenueCurrencySymbol: SymbolUnicode,
         seatsSalePercentage: seatsSalePercentage && parseFloat(seatsSalePercentage.toFixed(1)),
         ConversionRate,

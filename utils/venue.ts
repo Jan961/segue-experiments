@@ -9,8 +9,8 @@ export interface PrimaryAddress {
   primaryCountry?: number;
   primaryTown?: string;
   primaryPostCode?: string;
-  primaryPhoneNumber?: string;
-  primaryEMail?: string;
+  primaryPhone?: string;
+  primaryEmail?: string;
 }
 
 export interface DeliveryAddress {
@@ -21,8 +21,8 @@ export interface DeliveryAddress {
   deliveryCountry?: number;
   deliveryTown?: string;
   deliveryPostCode?: string;
-  deliveryPhoneNumber?: string;
-  deliveryEMail?: string;
+  deliveryPhone?: string;
+  deliveryEmail?: string;
 }
 
 export interface UiVenueContact {
@@ -53,6 +53,7 @@ export interface UiVenue {
   vatIndicator: boolean;
   culturallyExempt?: boolean;
   venueFamily: number;
+  currency: string;
   venueCapacity: number;
   townPopulation: number;
   venueWebsite: string;
@@ -94,7 +95,7 @@ export const transformVenueContacts = (contacts?: VenueContact & { VenueRole: Ve
 };
 
 export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => {
-  const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, CountryId, Phone, Email } = address || {};
+  const { Id: id, Line1, Line2, Line3, TypeName, Town, Postcode, CountryId } = address || {};
   if (TypeName === 'Main') {
     return {
       primaryAddressId: id,
@@ -104,8 +105,6 @@ export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => 
       primaryCountry: CountryId,
       primaryTown: Town,
       primaryPostCode: Postcode,
-      primaryPhoneNumber: Phone,
-      primaryEMail: Email,
     };
   }
   return {
@@ -116,8 +115,6 @@ export const trasformVenueAddress = (address?: VenueAddress): UiVenueAddress => 
     deliveryCountry: CountryId,
     deliveryTown: Town,
     deliveryPostCode: Postcode,
-    deliveryPhoneNumber: Phone,
-    deliveryEMail: Email,
   };
 };
 
@@ -137,6 +134,7 @@ export const transformVenues = (
       Code,
       StatusCode,
       Website,
+      CurrencyCode,
       VATIndicator,
       TechSpecsURL,
       Seats,
@@ -178,6 +176,7 @@ export const transformVenues = (
         vatIndicator: VATIndicator,
         culturallyExempt: CulturallyExempt,
         venueFamily: FamilyId,
+        currency: CurrencyCode,
         venueCapacity: Seats,
         townPopulation: TownPopulation,
         venueWebsite: Website,

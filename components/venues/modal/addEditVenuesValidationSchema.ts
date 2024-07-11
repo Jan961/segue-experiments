@@ -10,6 +10,7 @@ const venueSchema = Yup.object().shape({
     .typeError('Primary Address Country is a required field')
     .required('Primary Address Country is a required field'),
   primaryAddress1: Yup.string().required('Primary Address 1 is a required field'),
+  currency: Yup.string().nullable().required('Currency is a required field'),
 });
 
 export default venueSchema;
