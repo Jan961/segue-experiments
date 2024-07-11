@@ -3,9 +3,13 @@ import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { all } from 'radash';
+import { toSql } from 'services/dateService';
+import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { getExportedAtTitle } from 'utils/export';
 
 type TPromoter = {
   ProductionId: number;
@@ -69,10 +73,16 @@ export const makeRowTextBoldAndAllignLeft = ({
   }
 };
 
+type ProductionDetails = {
+  Show?: {
+    Name?: string;
+  };
+};
+
 // TODO - Issue with Performance Time
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { productionCode, fromDate, toDate, venue, productionId } = req.body || {};
-
+  const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
+  let { productionCode = '', fromDate, toDate, venue, productionId } = req.body || {};
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
@@ -87,19 +97,26 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     conditions.push(Prisma.sql`VenueCode = ${venue}`);
   }
   if (fromDate && toDate) {
+    fromDate = toSql(fromDate);
+    toDate = toSql(toDate);
     conditions.push(Prisma.sql`PerformanceDate BETWEEN ${fromDate} AND ${toDate}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: TPromoter[] = await prisma.$queryRaw`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`;
-
+  const [data, productionDetails] = await all([
+    prisma.$queryRaw<TPromoter[]>`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`,
+    getProductionWithContent(productionId),
+  ]);
+  const { VenueName } = data?.[0] || {};
+  const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
+  const fileName = `${productionCode} ${showName} ${VenueName}`;
   const worksheet = workbook.addWorksheet('My Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }],
   });
 
   worksheet.addRow(['PROMOTER HOLDS']);
-  const date = new Date();
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
+  const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+  worksheet.addRow([exportedAtTitle]);
   worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW', '', 'AVAILABLE', '', 'ALLOCATED', '']);
   worksheet.addRow([
     'CODE',
@@ -119,7 +136,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     'VENUE CONFIRMATION',
   ]);
 
-  data.forEach((x) => {
+  (data as TPromoter[]).forEach((x) => {
     const productionCode = x.FullProductionCode || '';
     const venueCode = x.VenueCode || '';
     const venueName = x.VenueName || '';
@@ -173,7 +190,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   alignCellTextCenter({ worksheet, colAsChar: 'H' });
 
   for (let row = 1; row <= 4; row++) {
-    makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns });
+    makeRowTextBoldAndAllignLeft({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.DARK_GREEN });
   }
   worksheet.getColumn('A').width = 8;
   addWidthAsPerContent({
@@ -193,11 +210,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-  const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${
-    fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
-  }.xlsx`;
+  // const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${
+  //   fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
+  // }.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

@@ -37,6 +37,17 @@ const UploadModal: React.FC<UploadModalProps> = ({
     }, {});
   });
 
+  useEffect(() => {
+    if (value) {
+      const urls = (Array.isArray(value) ? value : [value]).reduce((urlMap, upload) => {
+        urlMap[upload.name] = upload.imageUrl;
+        return urlMap;
+      }, {});
+      setUploadedImageUrls(urls);
+      setSelectedFiles(Array.isArray(value) ? value : [value]);
+    }
+  }, [value]);
+
   const isUploadDisabled = useMemo(
     () =>
       selectedFiles?.length === 0 ||

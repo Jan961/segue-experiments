@@ -2,6 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { pdfStandardColors } from 'config/global';
 import { ExcelExportParams, ExcelRow } from 'ag-grid-enterprise';
+import { formatDateWithTimezoneOffset } from 'services/dateService';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 export const exportToExcel = (tableRef, extraContent = {}) => {
@@ -150,4 +151,13 @@ export const dateToReadableFormat = (isoDate) => {
   const readableDate = formattedDay + ' ' + formattedDate.slice(formattedDate.indexOf(' ') + 1);
 
   return readableDate;
+};
+
+export const getExportedAtTitle = (timezoneOffset = 0) => {
+  const date = new Date();
+  return `Exported: ${formatDateWithTimezoneOffset({
+    date,
+    dateFormat: 'DD/MM/YY',
+    timezoneOffset,
+  })} at ${formatDateWithTimezoneOffset({ date, dateFormat: 'HH:mm', timezoneOffset })}`;
 };

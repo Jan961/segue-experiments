@@ -132,6 +132,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
               onChange={(value) => onChange('productionWeek', value as number)}
               options={prodweekOptions}
               value={productionWeek}
+              isSearchable
             />
           </div>
           <div className="flex items-center gap-2">
