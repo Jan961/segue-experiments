@@ -38,6 +38,7 @@ interface TableProps {
   excelStyles?: any[];
   rowSelection?: string;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  tableTestId?: string;
 }
 
 const ROW_HEIGHT = 43;
@@ -72,6 +73,7 @@ export default forwardRef(function Table(
     excelStyles = [],
     rowSelection = 'single',
     onSelectionChanged,
+    tableTestId,
   }: TableProps,
   ref,
 ) {
@@ -116,6 +118,14 @@ export default forwardRef(function Table(
       return { ...column, headerClass: 'text-center' };
     });
     params.api.updateGridOptions({ columnDefs: updColDefs });
+
+    if (tableTestId) {
+      const rootWrapper = document.querySelector('.ag-root-wrapper');
+      if (rootWrapper) {
+        rootWrapper.setAttribute('data-testid', tableTestId);
+        // Additional modifications can be done here
+      }
+    }
   };
 
   useEffect(() => {

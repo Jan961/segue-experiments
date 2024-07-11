@@ -42,11 +42,9 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
-    getRowNodeId: (data) => data.id,
     onRowDataUpdated: (params) => {
       params.api.forEachNode((rowNode) => {
-        console.log(rowNode);
-        rowNode.data.id = rowNode.id;
+        rowNode.id = rowNode.data.date;
       });
     },
   };
@@ -145,6 +143,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
           gridOptions={gridOptions}
           ref={tableRef}
           excelStyles={columnDefsExportStyles}
+          tableTestId="BookingsMainTable"
         />
       </div>
       <NotesPopup
