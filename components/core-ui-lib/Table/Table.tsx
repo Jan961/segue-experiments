@@ -13,6 +13,7 @@ import {
 } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import CustomTooltipRenderer from './renderers/CustomTooltipRenderer';
+import Loader from '../Loader';
 
 export type StyleProps = {
   headerColor?: string;
@@ -173,6 +174,7 @@ export default forwardRef(function Table(
           suppressContextMenu
           excelStyles={excelStyles}
           onSelectionChanged={onSelectionChanged}
+          loadingOverlayComponent={Loader}
         />
       </div>
     </>
