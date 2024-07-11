@@ -132,7 +132,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     }
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
-
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
