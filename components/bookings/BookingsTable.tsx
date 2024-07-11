@@ -42,9 +42,17 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
+    getRowNodeId: (data) => data.id,
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        console.log(rowNode);
+        rowNode.data.id = rowNode.id;
+      });
+    },
   };
 
   const handleCellClick = (e) => {
+    console.log(e);
     if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
       setProductionItem(e.data);
       setShowModal(true);
@@ -113,6 +121,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     if (rowData) {
       let formattedRows = formatRowsForPencilledBookings(rowData);
       formattedRows = formatRowsForMultipeBookingsAtSameVenue(formattedRows);
+      console.log(formattedRows);
       setRows(formattedRows);
     }
   }, [rowData]);
