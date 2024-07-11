@@ -7,12 +7,13 @@ import { useEffect, useState } from 'react';
 
 interface NotesPopupProps {
   show: boolean;
+  testId?: string;
   onSave: (n: string) => void;
   onCancel: () => void;
   productionItem: any;
 }
 
-export default function NotesPopup({ show, onSave, onCancel, productionItem }: NotesPopupProps) {
+export default function NotesPopup({ show, onSave, onCancel, productionItem, testId }: NotesPopupProps) {
   const [note, setNote] = useState<string>('');
   const [confirm, setConfirm] = useState<boolean>(false);
   const [confVariant, setVariant] = useState<ConfDialogVariant>('close');
@@ -50,18 +51,32 @@ export default function NotesPopup({ show, onSave, onCancel, productionItem }: N
             productionItem?.venue !== undefined ? productionItem?.venue : ''
           }`}</h3>
           <TextArea
-            className={'mt-2 h-[237px] w-full min-w-[508px]'}
+            testId={`${testId}-textarea`}
+            className="mt-2 h-[237px] w-full min-w-[508px]"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
           <div className="w-full mt-4 flex justify-end items-center">
-            <Button className="w-33" variant="secondary" text="Cancel" onClick={() => showConfModal('cancel')} />
-            <Button className="ml-4 w-33" variant="primary" text="Save and Close" onClick={() => onSave(note)} />
+            <Button
+              testId={`${testId}-cancel-btn`}
+              className="w-33"
+              variant="secondary"
+              text="Cancel"
+              onClick={() => showConfModal('cancel')}
+            />
+            <Button
+              testId={`${testId}-save-btn`}
+              className="ml-4 w-33"
+              variant="primary"
+              text="Save and Close"
+              onClick={() => onSave(note)}
+            />
           </div>
         </div>
       </PopupModal>
 
       <ConfirmationDialog
+        testId={`${testId}-confirmation-dialog`}
         variant={confVariant}
         show={confirm}
         onYesClick={handleCancel}

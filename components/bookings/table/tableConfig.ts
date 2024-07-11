@@ -508,6 +508,7 @@ export const newBookingColumnDefs = (
     cellRenderer: NoteColumnRenderer,
     cellRendererParams: {
       tpActive: false,
+      testId: `cnb-booking-details-tbl-notes`,
     },
     resizable: false,
     width: 85,
