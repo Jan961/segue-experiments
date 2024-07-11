@@ -39,6 +39,9 @@ export default function Report({
 
   const defaultColDef = {
     wrapHeaderText: true,
+    getRowNodeId: (data) => {
+      return data.id;
+    },
   };
 
   const gridOptions = {
@@ -52,6 +55,11 @@ export default function Report({
       } else {
         return { fontWeight: 'normal' };
       }
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.name;
+      });
     },
   };
 
@@ -69,7 +77,7 @@ export default function Report({
               {productionSummary.map((item, index) => (
                 <div key={index} className={`w-full ${item.bold ? 'font-bold' : 'font-normal'}`}>
                   {item.length > 0 && (
-                    <div className={'w-full mb-2 overflow-x-hidden'}>
+                    <div className="w-full mb-2 overflow-x-hidden">
                       <Table
                         key={index}
                         columnDefs={tourSummaryColumnDefs}
