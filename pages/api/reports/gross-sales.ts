@@ -4,6 +4,8 @@ import prisma from 'lib/prisma';
 import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
+import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
+import { getExportedAtTitle } from 'utils/export';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -92,6 +94,7 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
 };
 
 const handler = async (req, res) => {
+  const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
   const { productionId } = req.body || {};
 
   if (!productionId) {
@@ -104,7 +107,9 @@ const handler = async (req, res) => {
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
 
   const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`;
+  console.table(data);
 
+  let filename = 'Gross Sales';
   const workbook = new ExcelJS.Workbook();
   const formattedData = data.map((x) => ({
     ...x,
@@ -113,14 +118,13 @@ const handler = async (req, res) => {
     ProductionEndDate: moment(x.ProductionEndDate).format('YYYY-MM-DD'),
   }));
 
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const worksheet = workbook.addWorksheet('Gross Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
   });
 
   if (!formattedData?.length) {
-    const filename = 'Production Gross Sales.xlsx';
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
     await workbook.xlsx.write(res).then(() => {
       res.end();
@@ -128,10 +132,11 @@ const handler = async (req, res) => {
     return;
   }
 
-  const { ShowName, FullProductionCode } = data[0];
-  worksheet.addRow([`${ShowName} (${FullProductionCode})`]);
-  const date = new Date();
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YYYY')} at ${moment(date).format('hh:mm')}`]);
+  const { FullProductionCode = '', ShowName = '' } = data?.[0] || {};
+  filename = `${FullProductionCode} ${ShowName} Gross Sales`;
+  worksheet.addRow([`${filename}`]);
+  const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+  worksheet.addRow([exportedAtTitle]);
 
   worksheet.addRow([]);
 
@@ -322,10 +327,13 @@ const handler = async (req, res) => {
       ...(cellColor && { cellColor }),
     });
   });
-
-  const filename = 'Production Gross Sales.xlsx';
+  styleHeader({ worksheet, row: 1, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  styleHeader({ worksheet, row: 2, bgColor: COLOR_HEXCODE.DARK_GREEN });
+  alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
+  alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT });
+  worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

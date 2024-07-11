@@ -16,7 +16,7 @@ describe('Select Component', () => {
 
   test('renders correctly with basic props', () => {
     renderSelect();
-    expect(screen.getByTestId('form-select')).toBeInTheDocument();
+    expect(screen.getByTestId('core-ui-lib-select')).toBeInTheDocument();
   });
 
   test('renders label', () => {

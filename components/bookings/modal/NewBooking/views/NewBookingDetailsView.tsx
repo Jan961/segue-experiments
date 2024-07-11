@@ -400,6 +400,7 @@ export default function NewBookingDetailsView({
           onCellValueChange={handleCellValueChange}
         />
         <NotesPopup
+          testId="cnb-booking-details-tbl-notes"
           show={showNotesModal}
           productionItem={productionItem}
           onSave={handleSaveNote}

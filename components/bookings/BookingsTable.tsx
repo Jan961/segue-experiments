@@ -128,6 +128,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     <>
       <div className="w-full h-[calc(100%-140px)]">
         <Table
+          testId="bookings"
           columnDefs={bookingColumDefs}
           rowData={rows}
           styleProps={styleProps}
