@@ -114,6 +114,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 style={{ maxHeight: 'calc(100vh - 450px)', minHeight: '110px' }}
               >
                 <Table
+                  testId="BarringTable"
                   onRowSelected={onRowSelected}
                   ref={tableRef}
                   columnDefs={barredVenueColumnDefs}

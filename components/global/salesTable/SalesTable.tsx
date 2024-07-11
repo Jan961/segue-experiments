@@ -308,6 +308,7 @@ export default function SalesTable({
   return (
     <div className={classNames('table-container')} style={{ width: tableWidth, height }}>
       <Table
+        testId="SalesTable"
         ref={salesTableRef}
         columnDefs={columnDefs}
         rowData={rowData}

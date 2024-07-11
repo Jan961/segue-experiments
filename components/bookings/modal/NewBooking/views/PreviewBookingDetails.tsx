@@ -223,7 +223,13 @@ export default function PreviewBookingDetails({
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table gridOptions={gridOptions} rowData={rows} columnDefs={previewColumnDefs} styleProps={styleProps} />
+        <Table
+          testId="PreviewBookingDetails"
+          gridOptions={gridOptions}
+          rowData={rows}
+          columnDefs={previewColumnDefs}
+          styleProps={styleProps}
+        />
       </div>
     </>
   );
