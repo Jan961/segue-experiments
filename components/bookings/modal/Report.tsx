@@ -61,6 +61,7 @@ export default function Report({
         rowNode.id = rowNode.data.name;
       });
     },
+    getRowNodeId: (data) => data.id,
   };
 
   return (
