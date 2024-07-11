@@ -78,10 +78,10 @@ export default function AddEditVenueModal({
     setIsSaving(true);
     const isValid = await validateVenue(formData);
     if (isValid) {
-      const apiPromise = formData.id ? updateVenue(formData) : createVenue(formData);
-      const response = await apiPromise;
-      console.log(response);
-      saveFiles(response);
+      const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
+
+      console.log(apiResponse);
+      saveFiles(apiResponse);
     }
     setIsSaving(false);
   };
