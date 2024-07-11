@@ -118,6 +118,12 @@ export default forwardRef(function Table(
       return { ...column, headerClass: 'text-center' };
     });
     params.api.updateGridOptions({ columnDefs: updColDefs });
+
+    const rootWrapper = document.querySelector('.ag-root-wrapper');
+    if (rootWrapper) {
+      rootWrapper.setAttribute('data-testid', testId);
+      // Additional modifications can be done here
+    }
   };
 
   useEffect(() => {

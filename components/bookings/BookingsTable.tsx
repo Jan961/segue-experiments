@@ -144,7 +144,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
           gridOptions={gridOptions}
           ref={tableRef}
           excelStyles={columnDefsExportStyles}
-          tableTestId="BookingsMainTable"
         />
       </div>
       <NotesPopup
