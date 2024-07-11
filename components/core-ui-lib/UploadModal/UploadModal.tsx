@@ -117,6 +117,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    console.log(files);
+    console.log(selectedFiles);
     setIsUploading(false);
     if (!files || files?.length === 0) {
       setError('No file selected');
@@ -124,7 +126,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
       onChange?.([]);
       return;
     }
-
+    console.log(maxFiles);
     if (maxFiles && files.length > maxFiles) {
       setError(`You can upload up to ${maxFiles} files.`);
       setSelectedFiles([]);
@@ -140,13 +142,14 @@ const UploadModal: React.FC<UploadModalProps> = ({
         errorMessages[file?.name] = `Invalid file format. Allowed formats: ${allowedFormats.join(', ')}.`;
       }
     }
-    const filesList = Array.from(files).map((file) => ({
+
+    const filesList: UploadedFile[] = Array.from(files).map((file) => ({
       name: file?.name,
       size: file?.size,
       file,
     }));
     setError('');
-    setSelectedFiles(filesList);
+    setSelectedFiles([...selectedFiles, ...filesList]);
     onChange?.(filesList);
     hiddenFileInput.current.value = '';
   };

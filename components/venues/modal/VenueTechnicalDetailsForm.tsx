@@ -69,6 +69,8 @@ const VenueTechnicalDetailsForm = ({
       setFileWidgets([...fileWidgets, widget]);
     });
   }, [fileList]);
+  // docs,spreadsheets
+  // 10mb
 
   return (
     <>
@@ -83,6 +85,9 @@ const VenueTechnicalDetailsForm = ({
           }}
           onSave={onSave}
           value={fileWidgets}
+          isMultiple={true}
+          maxFiles={20}
+          maxFileSize={10240 * 1024}
         />
       )}
       <div className="flex flex-row  justify-between">
