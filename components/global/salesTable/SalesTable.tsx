@@ -249,7 +249,30 @@ export default function SalesTable({
           getRowNodeId: (data) => data.id,
         };
       }
+      case 'salesSnapshot': {
+        return {
+          ...gridOptions,
+          onRowDataUpdated: (params) => {
+            params.api.forEachNode((rowNode) => {
+              rowNode.id = rowNode.data.week;
+            });
+          },
+          getRowNodeId: (data) => data.id,
+        };
+      }
+      case 'salesComparison': {
+        return {
+          ...gridOptions,
+          onRowDataUpdated: (params) => {
+            params.api.forEachNode((rowNode) => {
+              rowNode.id = rowNode.data.week;
+            });
+          },
+          getRowNodeId: (data) => data.id,
+        };
+      }
     }
+    return gridOptions;
   };
 
   const exec = async (variant: string, data) => {
