@@ -25,6 +25,12 @@ const barringGridOptions = {
   rowClassRules: {
     '!bg-primary-orange !bg-opacity-25': (params) => params.data.hasBarringConflict,
   },
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.name;
+    });
+  },
+  getRowNodeId: (data) => data.id,
 };
 
 export default function Barring({ visible, onClose }: BarringProps) {
