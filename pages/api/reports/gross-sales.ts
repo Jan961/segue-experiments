@@ -6,6 +6,7 @@ import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
+import { currencyCodeToSymbolMap } from 'config/Reports';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -88,9 +89,9 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 const formatDate = (date) => moment(date).format('DD/MM/YY');
 
 const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
-  const euroVal = totalOfCurrency['€'];
+  const euroVal = totalOfCurrency.EURO;
   const finalValOfEuro = euroVal ? new Decimal(euroVal).mul(conversionRate).toFixed(2) : 0;
-  return totalOfCurrency['£'] ? new Decimal(totalOfCurrency['£']).plus(finalValOfEuro).toFixed(2) : finalValOfEuro;
+  return totalOfCurrency.GBP ? new Decimal(totalOfCurrency.GBP).plus(finalValOfEuro).toFixed(2) : finalValOfEuro;
 };
 
 const handler = async (req, res) => {
@@ -204,11 +205,15 @@ const handler = async (req, res) => {
       }
       r7.push(value.Location || '');
       r8.push(value.EntryName || '');
-      r9.push(value.VenueCurrencySymbol && value.Value ? `${value.VenueCurrencySymbol}${value.Value}` : '');
-      if (value.VenueCurrencySymbol && value.Value) {
-        const val = totalOfCurrency[value.VenueCurrencySymbol];
+      r9.push(
+        value.VenueCurrencyCode && value.Value
+          ? `${currencyCodeToSymbolMap[value.VenueCurrencyCode]}${value.Value}`
+          : '',
+      );
+      if (value.VenueCurrencyCode && value.Value) {
+        const val = totalOfCurrency[value.VenueCurrencyCode];
         if (val || val === 0) {
-          totalOfCurrency[value.VenueCurrencySymbol] = new Decimal(val)
+          totalOfCurrency[value.VenueCurrencyCode] = new Decimal(val)
             .plus(new Decimal(value.Value).toFixed(2))
             .toFixed(2) as any as number;
         }
@@ -239,10 +244,10 @@ const handler = async (req, res) => {
 
     if (i === 0) {
       r7.push('Total EUR');
-      r9.push(totalOfCurrency['€'] ? `€${String(totalOfCurrency['€'])}` : '');
+      r9.push(totalOfCurrency.EURO ? `€${String(totalOfCurrency.EURO)}` : '');
     } else if (i === 1) {
       r7.push('Total GBP');
-      r9.push(totalOfCurrency['£'] ? `£${String(totalOfCurrency['£'])}` : '');
+      r9.push(totalOfCurrency.GBP ? `£${String(totalOfCurrency.GBP)}` : '');
     } else {
       r7.push('Grand Total');
       r9.push(`£${getTotalInPound({ totalOfCurrency, conversionRate })}`);
@@ -281,7 +286,7 @@ const handler = async (req, res) => {
 
   for (let rowNo = 4; rowNo <= 9; rowNo++) {
     // makeRowBold({worksheet, row: rowNo})
-    worksheet.getRow(rowNo).font = { bold: true, size: 12, name: 'Times New Roman' };
+    worksheet.getRow(rowNo).font = { bold: false, size: 11, name: 'Calibri' };
   }
 
   worksheet.mergeCells(1, 1, 1, numberOfColumns);
@@ -300,14 +305,14 @@ const handler = async (req, res) => {
 
   for (let i = 1; i <= numberOfColumns; i++) {
     if (i % 8 === 1) {
-      for (let row = 5; row <= 8; row++) {
+      for (let row = 5; row <= 9; row++) {
         worksheet.getCell(row, i).border = {
           left: { style: 'thick' },
         };
       }
     }
   }
-  for (let row = 5; row <= 8; row++) {
+  for (let row = 5; row <= 9; row++) {
     worksheet.getCell(row, colNo + 3).border = {
       left: { style: 'thick' },
     };
