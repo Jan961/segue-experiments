@@ -44,14 +44,14 @@ const MasterPlanReportModal: React.FC<MasterPlanReportModalProps> = ({ visible, 
       />
       <div className="pt-3 w-full flex items-center justify-end gap-2">
         <Button
-          id="booking-master-plan-report-modal-cancel"
+          testId="booking-master-plan-report-modal-cancel"
           onClick={onClose}
           className="float-right px-4 w-33 font-normal"
           variant="secondary"
           text="Cancel"
         />
         <Button
-          id="booking-master-plan-report-modal-export"
+          testId="booking-master-plan-report-modal-export"
           className="float-right px-4 font-normal w-33 text-center"
           variant="primary"
           sufixIconName="excel"

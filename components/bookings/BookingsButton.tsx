@@ -37,7 +37,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         disabled={!ProductionId ? true : !bookingsDisabled}
       >
         <Button
-          id="booking-filters-create-new-booking"
+          testId="booking-filters-create-new-booking"
           disabled={bookingsDisabled}
           text="Create New Booking"
           className="w-[155px]"
@@ -45,7 +45,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         />
       </Tooltip>
       <Button
-        id="booking-filters-booking-reports"
+        testId="booking-filters-booking-reports"
         disabled={disabled}
         text="Booking Reports"
         className="w-[155px]"
@@ -54,14 +54,14 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         onClick={() => setShowBookingReportsModal(true)}
       />
       <Button
-        id="booking-filters-venue-history"
+        testId="booking-filters-venue-history"
         onClick={() => setShowVenueHistory(true)}
         text="Venue History"
         className="w-[155px]"
       />
 
       <Button
-        id="booking-filters-barring-check"
+        testId="booking-filters-barring-check"
         disabled={disabled}
         text="Barring Check"
         className="w-[155px]"

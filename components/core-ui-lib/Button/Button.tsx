@@ -35,7 +35,7 @@ const ClassMap = new Map([
 
 export default function Button({
   id,
-  testId,
+  testId = 'core-ui-lib-btn',
   text = '',
   variant = 'primary',
   className = '',
@@ -64,7 +64,7 @@ export default function Button({
       )}
       disabled={disabled}
       onClick={onClick}
-      data-testid={`core-ui-lib-btn-${testId || id}`}
+      data-testid={`${testId || id}`}
     >
       {prefixIconName && (
         <span className="col-span-1 absolute left-2">
