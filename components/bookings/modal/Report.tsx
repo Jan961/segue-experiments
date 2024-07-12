@@ -58,6 +58,7 @@ export default function Report({
     },
     onRowDataUpdated: (params) => {
       params.api.forEachNode((rowNode) => {
+        console.log(rowNode.data);
         rowNode.id = rowNode.data.name;
       });
     },
