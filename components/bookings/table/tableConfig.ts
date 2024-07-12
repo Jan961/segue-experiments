@@ -55,6 +55,32 @@ export const columnDefs = [
     cellClassRules: {
       isMonday: (params) => params.value.includes('Mon'),
     },
+    comparator: (valueA, valueB, _nodeA, _nodeB, _isDescending) => {
+      const aTrimmed = valueA.slice(4);
+      const bTrimmed = valueB.slice(4);
+      const aDateParts = aTrimmed
+        .split('/')
+        .map((item: string) => {
+          return parseInt(item);
+        })
+        .reverse();
+      const bDateParts = bTrimmed
+        .split('/')
+        .map((item: string) => {
+          return parseInt(item);
+        })
+        .reverse();
+      const compareDates = (date1: number[], date2: number[]) => {
+        if (date1.length === 0 || date2.length === 0) return 0;
+
+        if (date1[0] === date2[0]) {
+          return compareDates(date1.slice(1), date2.slice(1));
+        } else {
+          return date1[0] > date2[0] ? 1 : -1;
+        }
+      };
+      return compareDates(aDateParts, bDateParts);
+    },
   },
   { headerName: 'Wk', field: 'week', headerClass: ['bgOrangeTextWhite'], cellRenderer: DefaultCellRenderer, width: 55 },
   {
