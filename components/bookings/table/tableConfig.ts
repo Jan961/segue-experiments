@@ -44,6 +44,7 @@ export const columnDefs = [
     cellRenderer: DefaultCellRenderer,
     headerClass: ['bgOrangeTextWhite'],
     width: 106,
+    sortable: true,
   },
   {
     headerName: 'Date',

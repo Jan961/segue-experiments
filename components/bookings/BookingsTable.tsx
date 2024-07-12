@@ -37,6 +37,7 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   const [showConfirmationModal, setShowConfirmationModal] = useState<boolean>(false);
   const isMounted = useComponentMountStatus();
   const bookingColumDefs = useMemo(() => (isMounted ? columnDefs : []), [isMounted]);
+
   const gridOptions = {
     suppressColumnVirtualisation: false,
     getRowStyle: (params) => {
@@ -131,6 +132,11 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     }
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
+
+  if (bookingColumDefs.length > 0) {
+    bookingColumDefs[0].sortable = currentProduction === undefined;
+  }
+
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
