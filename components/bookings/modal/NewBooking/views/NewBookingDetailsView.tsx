@@ -390,7 +390,7 @@ export default function NewBookingDetailsView({
       </div>
       <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
         <Table
-          testId="newBookingDetailsTable"
+          testId="new-booking-details-table"
           ref={tableRef}
           columnDefs={columnDefs}
           rowData={bookingData}

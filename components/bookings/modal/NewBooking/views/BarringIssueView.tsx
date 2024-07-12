@@ -46,7 +46,7 @@ export default function BarringIssueView({
       </span>
       <div className="w-[634px] flex flex-col">
         <Table
-          testId="barringIssueTable"
+          testId="barring-issue-table"
           columnDefs={barringIssueColumnDefs}
           rowData={barringConflicts}
           styleProps={styleProps}

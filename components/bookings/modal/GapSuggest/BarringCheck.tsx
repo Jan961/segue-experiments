@@ -87,7 +87,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
             style={{ maxHeight: 'calc(100vh - 200px)', minHeight: '110px' }}
           >
             <Table
-              testId="barringCheckTable"
+              testId="barring-check-table"
               ref={tableRef}
               onRowSelected={onRowSelected}
               columnDefs={barredVenueColumnDefs}

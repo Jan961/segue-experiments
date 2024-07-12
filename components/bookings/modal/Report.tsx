@@ -77,7 +77,7 @@ export default function Report({
                   {item.length > 0 && (
                     <div className="w-full mb-2 overflow-x-hidden">
                       <Table
-                        testId="tourReport"
+                        testId="tour-report"
                         key={index}
                         columnDefs={tourSummaryColumnDefs}
                         rowData={item}

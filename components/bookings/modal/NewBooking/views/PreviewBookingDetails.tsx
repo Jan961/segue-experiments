@@ -224,7 +224,7 @@ export default function PreviewBookingDetails({
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
         <Table
-          testId="previewBookingDetails"
+          testId="preview-booking-details"
           gridOptions={gridOptions}
           rowData={rows}
           columnDefs={previewColumnDefs}
