@@ -106,13 +106,17 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
   }
   const gapSuggestTableOptions = {
     ...gridOptions,
-    getRowNodeId: (data) => {
-      return data.id;
-    },
+
     onRowDataUpdated: (params) => {
       params.api.forEachNode((rowNode) => {
         rowNode.id = rowNode.data.Name;
       });
+    },
+    getRowId: (data) => {
+      return data.data.name;
+    },
+    getRowNodeId: (data) => {
+      return data.id;
     },
   };
 

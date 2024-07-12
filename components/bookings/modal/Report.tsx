@@ -56,13 +56,9 @@ export default function Report({
       });
     },
     getRowId: (data) => {
-      console.log(data);
-      console.log('Im getting the super cool row id');
       return data.data.name;
     },
     getRowNodeId: (data) => {
-      console.log('Im getting the row id');
-      console.log(data.id);
       return data.id;
     },
   };
