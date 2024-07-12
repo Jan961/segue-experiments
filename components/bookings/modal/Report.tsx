@@ -53,14 +53,13 @@ export default function Report({
         return { fontWeight: 'normal' };
       }
     },
-    onRowDataUpdated: (params) => {
-      params.api.forEachNode((rowNode) => {
-        console.log(rowNode.data);
-        rowNode.id = rowNode.data.name;
-      });
-    },
     getRowNodeId: (data) => {
       return data.id;
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.name;
+      });
     },
   };
 
