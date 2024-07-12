@@ -33,3 +33,9 @@ export const bookingStatusOptions: SelectOption[] = [
   { text: 'Unconfirmed (U)', value: 'U' },
   { text: 'Cancelled (X)', value: 'X' },
 ];
+
+export const currencyCodeToSymbolMap = {
+  GBP: '£',
+  EUR: '€',
+  USD: '$',
+};
