@@ -113,7 +113,7 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       });
     },
     getRowId: (data) => {
-      return data.data.name;
+      return data.data.Name;
     },
     getRowNodeId: (data) => {
       return data.id;
