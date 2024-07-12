@@ -53,7 +53,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
   };
 
   const handleCellClick = (e) => {
-    console.log(e);
     if (e.column.colId === 'note' && e.data.venue && !isNullOrEmpty(e.data.dayType)) {
       setProductionItem(e.data);
       setShowModal(true);

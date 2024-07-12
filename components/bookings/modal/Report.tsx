@@ -61,7 +61,6 @@ export default function Report({
       return data.id;
     },
   };
-  console.log(gridOptions);
   return (
     <>
       <PopupModal show={visible} onClose={onClose} title="Tour Summary" titleClass="text-primary-navy">
