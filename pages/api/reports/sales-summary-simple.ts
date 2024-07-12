@@ -51,6 +51,7 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { styleHeader } from './masterplan';
+import { currencyCodeToSymbolMap } from 'config/Reports';
 
 // TODO
 // Decimal upto 2 places fix
@@ -84,7 +85,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         VenueTown,
         VenueName,
         Value,
-        VenueCurrencySymbol,
+        VenueCurrencyCode,
         SetBookingWeekNum,
         SetProductionWeekDate,
         ConversionRate,
@@ -102,7 +103,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         VenueTown,
         VenueName,
         Value: Value?.toNumber?.(),
-        VenueCurrencySymbol,
+        VenueCurrencySymbol: currencyCodeToSymbolMap[VenueCurrencyCode],
         SetBookingWeekNum,
         SetProductionWeekDate,
         ConversionRate,
@@ -508,6 +509,35 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     addCellBorder({ worksheet, row, col: i + 5, argbColor: COLOR_HEXCODE.YELLOW });
     makeCellTextBold({ worksheet, row, col: i + 5 });
   }
+  row++;
+  // Add empty row
+  worksheet.addRow([]);
+  row++;
+  const WeeklyIncrease = weekWiseGrandTotalInPound.map((value: number, i: number) =>
+    i === 0 ? 0 : value - weekWiseGrandTotalInPound[i - 1],
+  );
+  worksheet.addRow(['', '', '', '', 'Weekly Increase £', ...WeeklyIncrease]);
+  applyFormattingToRange({
+    worksheet,
+    startRow: row,
+    startColumn: worksheet.getColumn(6).letter,
+    endRow: row,
+    endColumn: worksheet.getColumn(6 + weekWiseGrandTotalInPound.length).letter,
+    formatOptions: { numFmt: '£#,##0.00' },
+  });
+  row++;
+  const WeeklyIncreasePercent = weekWiseGrandTotalInPound.map((_: number, i: number) =>
+    i === 0 ? 0 : WeeklyIncrease[i] / weekWiseGrandTotalInPound[i],
+  );
+  worksheet.addRow(['', '', '', '', 'Weekly Increase %', ...WeeklyIncreasePercent]);
+  applyFormattingToRange({
+    worksheet,
+    startRow: row,
+    startColumn: worksheet.getColumn(6).letter,
+    endRow: row,
+    endColumn: worksheet.getColumn(6 + weekWiseGrandTotalInPound.length).letter,
+    formatOptions: { numFmt: '0.00%' },
+  });
   row++;
 
   makeColumnTextBold({ worksheet, colAsChar: 'A' });
