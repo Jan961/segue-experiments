@@ -235,6 +235,46 @@ export default function SalesTable({
     }
   };
 
+  const getGridOptions = () => {
+    const gridOptions = { suppressHorizontalScroll: true };
+    switch (variant) {
+      case 'prodComparision': {
+        return {
+          ...gridOptions,
+          onRowDataUpdated: (params) => {
+            params.api.forEachNode((rowNode) => {
+              rowNode.id = rowNode.data.prodName;
+            });
+          },
+          getRowNodeId: (data) => data.id,
+        };
+      }
+      case 'salesSnapshot': {
+        return {
+          ...gridOptions,
+          onRowDataUpdated: (params) => {
+            params.api.forEachNode((rowNode) => {
+              rowNode.id = rowNode.data.week;
+            });
+          },
+          getRowNodeId: (data) => data.id,
+        };
+      }
+      case 'salesComparison': {
+        return {
+          ...gridOptions,
+          onRowDataUpdated: (params) => {
+            params.api.forEachNode((rowNode) => {
+              rowNode.id = rowNode.data.week;
+            });
+          },
+          getRowNodeId: (data) => data.id,
+        };
+      }
+    }
+    return gridOptions;
+  };
+
   const exec = async (variant: string, data) => {
     switch (variant) {
       case 'salesComparison': {
@@ -264,10 +304,11 @@ export default function SalesTable({
     const newWidth = calculateWidth();
     setTableWidth(newWidth);
   }, [variant, data, numBookings, schoolSales, containerWidth]);
-
+  const gridOptions = getGridOptions();
   return (
     <div className={classNames('table-container')} style={{ width: tableWidth, height }}>
       <Table
+        testId="sales-table"
         ref={salesTableRef}
         columnDefs={columnDefs}
         rowData={rowData}
@@ -275,7 +316,7 @@ export default function SalesTable({
         onCellClicked={onCellClick}
         onCellValueChange={onCellValChange}
         tableHeight={tableHeight}
-        gridOptions={{ suppressHorizontalScroll: true }}
+        gridOptions={gridOptions}
         excelStyles={excelStyles}
       />
     </div>
