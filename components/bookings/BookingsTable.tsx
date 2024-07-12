@@ -42,6 +42,14 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     getRowStyle: (params) => {
       return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
     },
+    getRowNodeId: (data) => {
+      return data.id;
+    },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.date;
+      });
+    },
   };
 
   const handleCellClick = (e) => {
@@ -123,7 +131,6 @@ export default function BookingsTable({ rowData, tableRef }: BookingsTableProps)
     }
     setShowAddEditBookingModal(ADD_EDIT_MODAL_DEFAULT_STATE);
   };
-
   return (
     <>
       <div className="w-full h-[calc(100%-140px)]">
