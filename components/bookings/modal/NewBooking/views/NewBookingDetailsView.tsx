@@ -396,8 +396,6 @@ export default function NewBookingDetailsView({
           rowData={bookingData}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
-          Changing
-          test
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
           onCellValueChange={handleCellValueChange}
