@@ -62,7 +62,7 @@ export const contractsRowsSelector = selector({
         production: getProductionCode(production),
         productionId: ProductionId,
         dayType: type === 'Other' ? otherDayType : type,
-        bookingStatus: contractsStatusMap[data?.StatusCode] || '',
+        bookingStatus: data?.StatusCode,
         status: data?.StatusCode,
         venue: getValueForDayType(rowData.venue, type),
         contractStatus: contractData[rowData.Id] ? contractsStatusMap[contractData[rowData.Id].StatusCode] : '',

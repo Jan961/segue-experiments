@@ -112,7 +112,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
       venueAndDate,
       productionName,
     };
-    await exportExcelReport('/api/reports/marketing/archivedSales', payload, 'Archived Sales Report.xlsx');
+    await exportExcelReport('/api/reports/marketing/archivedSales', payload, 'Archived Sales');
   };
 
   const onExport = () => {

@@ -37,7 +37,6 @@ interface ResponseData {
 
 const createHeaderRow = (worksheet: any, text: string, size: number) => {
   const row = worksheet.addRow([text]);
-  row.height = 30;
   const cell = row.getCell(1);
   cell.font = { bold: true, size, color: { argb: COLOR_HEXCODE.WHITE } };
   cell.fill = {
@@ -89,7 +88,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       right: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
     };
   });
-  headerRow.height = 30;
 
   const activityTypeMap = new Map(data.activityTypes.map((type) => [type.Id, type.Name]));
 
@@ -109,7 +107,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         cell.alignment = { vertical: 'top', horizontal: 'left', wrapText: true };
       }
     });
-    row.height = 70;
   });
 
   const widths = [30, 20, 15, 15, 15, 50];
