@@ -39,9 +39,6 @@ export default function Report({
 
   const defaultColDef = {
     wrapHeaderText: true,
-    getRowNodeId: (data) => {
-      return data.id;
-    },
   };
 
   const gridOptions = {
@@ -62,7 +59,9 @@ export default function Report({
         rowNode.id = rowNode.data.name;
       });
     },
-    getRowNodeId: (data) => data.id,
+    getRowNodeId: (data) => {
+      return data.id;
+    },
   };
 
   return (
