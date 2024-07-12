@@ -467,7 +467,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       productionName,
       venueAndDate,
     };
-    const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report.xlsx');
+    const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report');
     notify.promise(downloadContactNotesReport(), {
       loading: 'Generating activities report',
       success: 'Activities report downloaded successfully',

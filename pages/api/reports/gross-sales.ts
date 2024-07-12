@@ -6,6 +6,7 @@ import Decimal from 'decimal.js';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
+import { currencyCodeToSymbolMap } from 'config/Reports';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -107,7 +108,6 @@ const handler = async (req, res) => {
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
 
   const data: SALES_SUMMARY[] = await prisma.$queryRaw`select * FROM SalesSummaryView ${where} order by EntryDate;`;
-  console.table(data);
 
   let filename = 'Gross Sales';
   const workbook = new ExcelJS.Workbook();
@@ -199,6 +199,7 @@ const handler = async (req, res) => {
       r8.push('');
       r9.push('');
     } else {
+      value.VenueCurrencySymbol = currencyCodeToSymbolMap[value.VenueCurrencyCode];
       if (!conversionRate && value.ConversionRate && Number(value.ConversionRate) !== 1) {
         conversionRate = value.ConversionRate;
       }
@@ -281,7 +282,7 @@ const handler = async (req, res) => {
 
   for (let rowNo = 4; rowNo <= 9; rowNo++) {
     // makeRowBold({worksheet, row: rowNo})
-    worksheet.getRow(rowNo).font = { bold: true, size: 12, name: 'Times New Roman' };
+    worksheet.getRow(rowNo).font = { bold: false, size: 11, name: 'Calibri' };
   }
 
   worksheet.mergeCells(1, 1, 1, numberOfColumns);
@@ -300,14 +301,14 @@ const handler = async (req, res) => {
 
   for (let i = 1; i <= numberOfColumns; i++) {
     if (i % 8 === 1) {
-      for (let row = 5; row <= 8; row++) {
+      for (let row = 5; row <= 9; row++) {
         worksheet.getCell(row, i).border = {
           left: { style: 'thick' },
         };
       }
     }
   }
-  for (let row = 5; row <= 8; row++) {
+  for (let row = 5; row <= 9; row++) {
     worksheet.getCell(row, colNo + 3).border = {
       left: { style: 'thick' },
     };

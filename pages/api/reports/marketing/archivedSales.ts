@@ -72,7 +72,7 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
       isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`,
       moment(item.SetProductionWeekDate).format('DD/MM/YYYY'),
     ];
-
+    console.table(item);
     bookingIds.forEach((bookingId) => {
       const bookingData = item.data.find((d) => d.BookingId === bookingId) || {};
       rowData.push(bookingData.Seats ? parseInt(bookingData.Seats).toString() : '0');
@@ -146,7 +146,7 @@ const handler = async (req, res) => {
   const workbook = createExcelFromData(data, bookingsSelection, productionName, venueAndDate);
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename=booking_data.xlsx');
+  res.setHeader('Content-Disposition', 'attachment; filename=Archived Sales.xlsx');
 
   return workbook.xlsx.write(res).then(() => {
     res.status(200).end();
