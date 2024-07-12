@@ -390,12 +390,14 @@ export default function NewBookingDetailsView({
       </div>
       <div className=" w-[750px] lg:w-[1450px] h-full flex flex-col ">
         <Table
-          testId="NewBookingDetailsTable"
+          testId="newBookingDetailsTable"
           ref={tableRef}
           columnDefs={columnDefs}
           rowData={bookingData}
           styleProps={styleProps}
           onCellClicked={handleCellClick}
+          Changing
+          test
           onRowClicked={handleRowSelected}
           gridOptions={gridOptions}
           onCellValueChange={handleCellValueChange}

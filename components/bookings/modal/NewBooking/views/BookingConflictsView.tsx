@@ -67,7 +67,7 @@ export default function BookingConflictsView({
       } bookings`}</span>
       <div className="w-[634px] max-h-[calc(100%-140px)] flex flex-col">
         <Table
-          testId="BookingConflictsTable"
+          testId="bookingConflictsTable"
           columnDefs={bookingConflictsColumnDefs}
           rowData={rows}
           styleProps={styleProps}
