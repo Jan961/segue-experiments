@@ -15,13 +15,12 @@ import { debug } from 'utils/logging';
 import ProductionDetailsForm, { ProductionFormData, defaultProductionFormData } from './ProductionDetailsForm';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
 import CurrencyConversionModal from './CurrencyConversionModal';
-import { ConfirmationDialog } from 'components/core-ui-lib';
+import { ConfirmationDialog, PopupModal } from 'components/core-ui-lib';
 
 interface ProductionsViewProps {
   showData: any;
-  showName: string;
-  showCode: string;
   onClose: () => void;
+  visible: boolean;
 }
 
 const rowClassRules = {
@@ -35,7 +34,7 @@ const rowClassRules = {
   },
 };
 
-const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: ProductionsViewProps) => {
+const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) => {
   const tableRef = useRef(null);
   const router = useRouter();
   const [openEditModal, setOpenEditModal] = useState<boolean>(false);
@@ -46,6 +45,8 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
   const [isArchived, setIsArchived] = useState<boolean>(true);
   const isMounted = useComponentMountStatus();
   const productionColumDefs = useMemo(() => (isMounted ? productionsTableConfig : []), [isMounted]);
+  const showName = useMemo(() => showData.Name, [showData]);
+  const showCode = useMemo(() => showData.Code, [showData]);
   const title = useMemo(
     () => `${showName || ''} ${showCode || ''}${currentProduction?.prodCode || ''}`,
     [showName, showCode, currentProduction],
@@ -215,7 +216,14 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
   }, [handleDelete, setConfirm, currentProduction]);
 
   return (
-    <>
+    <PopupModal
+      show={visible}
+      onClose={() => onClose()}
+      titleClass="text-xl text-primary-navy text-bold"
+      title="Productions"
+      panelClass="relative"
+      hasOverlay={openEditModal || openCurrencyConversionModal || confirm}
+    >
       <div className="flex justify-between mb-2">
         <div className="text-primary-navy text-xl relative bottom-2 font-bold">{showName}</div>
         <div className="flex items-center justify-between">
@@ -277,7 +285,7 @@ const ProductionsView = ({ showData, showName = '', showCode = '', onClose }: Pr
           onClose={() => setOpenCurrencyConversionModal(false)}
         />
       )}
-    </>
+    </PopupModal>
   );
 };
 

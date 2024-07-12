@@ -143,7 +143,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
 
   return (
     <PopupModal
-      hasOverlay={true}
+      hasOverlay={isUploadOpen}
       titleClass="text-xl text-primary-navy text-bold"
       title={title}
       show={visible}
