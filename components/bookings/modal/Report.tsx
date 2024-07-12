@@ -37,12 +37,8 @@ export default function Report({
     }
   }, [ProductionId]);
 
-  const defaultColDef = {
-    wrapHeaderText: true,
-  };
-
   const gridOptions = {
-    defaultColDef,
+    defaultColDef: { wrapHeaderText: true },
     autoSizeStrategy: {
       type: 'fitGridWidth',
     },
@@ -53,14 +49,21 @@ export default function Report({
         return { fontWeight: 'normal' };
       }
     },
-    getRowNodeId: (data) => {
-      return data.id;
-    },
     onRowDataUpdated: (params) => {
       params.api.forEachNode((rowNode) => {
-        console.log(rowNode.data);
         rowNode.id = rowNode.data.name;
+        console.log(rowNode.id);
       });
+    },
+    getRowId: (data) => {
+      console.log(data);
+      console.log('Im getting the super cool row id');
+      return data.data.name;
+    },
+    getRowNodeId: (data) => {
+      console.log('Im getting the row id');
+      console.log(data.id);
+      return data.id;
     },
   };
   console.log(gridOptions);
