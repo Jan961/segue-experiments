@@ -76,37 +76,79 @@ export default function AccountDetailsTab() {
   // }
 
   const handleInputChange = (field: string, value: any) => {
-    let sanitizedValue = value;
-
-    if (field === 'venueCode') {
-      sanitizedValue = sanitizedValue?.replace(/[^a-zA-Z]/g, '').toUpperCase();
-    }
-    // validate email here
-
+    console.log(value);
+    console.log(field);
     const updatedFormData = {
-      // ...venue,
-      [field]: sanitizedValue,
+      ...formData,
+      [field]: value,
     };
+    console.log(updatedFormData);
     setFormData(updatedFormData);
   };
-  console.log(countryOptions);
+  console.log(formData);
+  const selectedCountry = countryOptions.find((option) => option.text === formData.country)?.value;
   return (
     <div className="flex flex-row gap-5 w-full">
       <div className="flex flex-col gap-5 w-1/2">
         <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
         <div className="flex flex-col">
-          <FormField value={formData.firstName} displayText="First Name" handleInputChange={handleInputChange} />
+          <FormField
+            currentValue={formData.firstName}
+            displayText="First Name"
+            fieldName="firstName"
+            handleInputChange={handleInputChange}
+          />
           {validationErrors.firstName && <small className="text-primary-red flex">{validationErrors.firstName}</small>}
         </div>
-        <FormField value={formData.lastName} displayText="Last Name" handleInputChange={handleInputChange} />
-        <FormField value={formData.companyName} displayText="Company Name" handleInputChange={handleInputChange} />
-        <FormField value={formData.phoneNumber} displayText="Phone Number" handleInputChange={handleInputChange} />
-        <FormField value={formData.addressLine1} displayText="Address Line 1" handleInputChange={handleInputChange} />
-        <FormField value={formData.addressLine2} displayText="Address Line 2" handleInputChange={handleInputChange} />
-        <FormField value={formData.addressLine3} displayText="Address Line 3" handleInputChange={handleInputChange} />
-        <FormField value={formData.townName} displayText="Town" handleInputChange={handleInputChange} />
-        <FormField value={formData.postcode} displayText="Postcode" handleInputChange={handleInputChange} />
-        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full ">
+        <FormField
+          currentValue={formData.lastName}
+          displayText="Last Name"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.companyName}
+          displayText="Company Name"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.phoneNumber}
+          displayText="Phone Number"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.addressLine1}
+          displayText="Address Line 1"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.addressLine2}
+          displayText="Address Line 2"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.addressLine3}
+          displayText="Address Line 3"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.townName}
+          displayText="Town"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.postcode}
+          displayText="Postcode"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full ">
           <Tooltip
             body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
             width="w-[200px]"
@@ -118,7 +160,7 @@ export default function AccountDetailsTab() {
             name="country"
             className="w-full font-bold"
             placeholder="Country"
-            value={formData.country}
+            value={selectedCountry}
             onChange={(value) => handleInputChange('country', parseInt(value as string, 10))}
             options={countryOptions}
             isSearchable
@@ -127,8 +169,8 @@ export default function AccountDetailsTab() {
       </div>
       <div className="flex flex-col gap-5 w-1/2">
         <div className="flex flex-col">
-          <div className="h-[255px] overflow-y-hidden">
-            <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between mt-16 w-full ml-16">
+          <div className="h-[255px] overflow-y-hidden overflow-x-hidden">
+            <label className="grid grid-cols-[90px_minmax(255px,_1fr)] gap-10 justify-between mt-16 w-full ml-96">
               <p className="text-primary-input-text">Company Logo</p>
               <Button
                 onClick={() => {
@@ -149,7 +191,12 @@ export default function AccountDetailsTab() {
               />
             </label>
           </div>
-          <FormField value={formData.companyEmail} displayText="Email Address" handleInputChange={handleInputChange} />
+          <FormField
+            currentValue={formData.companyEmail}
+            displayText="Email Address"
+            fieldName=""
+            handleInputChange={handleInputChange}
+          />
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Currency for Payment</p>
             <Select
@@ -163,10 +210,30 @@ export default function AccountDetailsTab() {
             />
           </label>
         </div>
-        <FormField value={formData.vatNumber} displayText="VAT Number" handleInputChange={handleInputChange} />
-        <FormField value={formData.companyNumber} displayText="Company Number" handleInputChange={handleInputChange} />
-        <FormField value={formData.companyWebsite} displayText="Website" handleInputChange={handleInputChange} />
-        <FormField value={formData.typeOfCompany} displayText="Type of Company" handleInputChange={handleInputChange} />
+        <FormField
+          currentValue={formData.vatNumber}
+          displayText="VAT Number"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.companyNumber}
+          displayText="Company Number"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.companyWebsite}
+          displayText="Website"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
+        <FormField
+          currentValue={formData.typeOfCompany}
+          displayText="Type of Company"
+          fieldName=""
+          handleInputChange={handleInputChange}
+        />
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Company Currency</p>
           <Select
