@@ -2,9 +2,14 @@ import { Prisma } from '@prisma/client';
 import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
+import { NextApiRequest, NextApiResponse } from 'next';
+import { all } from 'radash';
+import { toSql } from 'services/dateService';
+import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { getExportedAtTitle } from 'utils/export';
 
 enum HOLD_OR_COMP {
   HOLD = 'Hold',
@@ -43,6 +48,12 @@ type TBookingHoldsGrouped = {
   data: TBookingCodeAndName[];
 };
 
+type ProductionDetails = {
+  Show?: {
+    Name?: string;
+  };
+};
+
 type TBookingHoldsGroupedByCommonKey = {
   [key: string]: TBookingHoldsGrouped;
 };
@@ -63,7 +74,17 @@ const makeTopBorderDouble = ({ worksheet, row, col }: { worksheet: any; row: num
   worksheet.getCell(row, col).border = { top: { style: 'thin', color: { argb: COLOR_HEXCODE.BLACK } } };
 };
 
-const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row: number; numberOfColumns: number }) => {
+const styleHeader = ({
+  worksheet,
+  row,
+  numberOfColumns,
+  bgColor = COLOR_HEXCODE.BLUE,
+}: {
+  worksheet: any;
+  row: number;
+  numberOfColumns: number;
+  bgColor: COLOR_HEXCODE;
+}) => {
   for (let col = 1; col <= numberOfColumns; col++) {
     const cell = worksheet.getCell(row, col);
     cell.font = { bold: true, color: { argb: COLOR_HEXCODE.WHITE } };
@@ -71,7 +92,7 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: COLOR_HEXCODE.BLUE },
+      fgColor: { argb: bgColor },
     };
   }
 };
@@ -179,12 +200,13 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
   worksheet.getCell(row, col).font = { bold: true };
 };
 
-const handler = async (req, res) => {
-  const { ProductionId, productionCode, fromDate, toDate, venue } = req.body;
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
+  let { productionId, productionCode = '', fromDate, toDate, venue, status } = req.body;
 
   // This doesn't check productionCode
   const email = await getEmailFromReq(req);
-  const access = await checkAccess(email, { ProductionId });
+  const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
 
   const workbook = new ExcelJS.Workbook();
@@ -196,26 +218,36 @@ const handler = async (req, res) => {
     conditions.push(Prisma.sql`VenueCode = ${venue}`);
   }
   if (fromDate && toDate) {
+    fromDate = toSql(fromDate);
+    toDate = toSql(toDate);
     conditions.push(Prisma.sql`BookingFirstDate BETWEEN ${fromDate} AND ${toDate}`);
   }
+  if (status) {
+    conditions.push(Prisma.sql`BookingStatusCode = ${status}`);
+  }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: TBookingHolds[] =
-    await prisma.$queryRaw`SELECT * FROM BookingHoldCompsView ${where} ORDER BY BookingFirstDate;`;
+  const [data, productionDetails] = await all([
+    prisma.$queryRaw`SELECT * FROM BookingHoldCompsView ${where} ORDER BY BookingFirstDate;`,
+    getProductionWithContent(productionId),
+  ]);
 
+  const { VenueName = '' } = data?.[0] || {};
+  const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
+  const filename = `${productionCode} ${showName} ${VenueName}`;
   const worksheet = workbook.addWorksheet('My Sales', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
   });
 
   worksheet.addRow(['BOOKING HOLDS/COMPS REPORT']);
-  const date = new Date();
-  worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
+  const exportedAtTitle = getExportedAtTitle(timezoneOffset);
+  worksheet.addRow([exportedAtTitle]);
   worksheet.addRow(['PRODUCTION', 'VENUE', '', 'SHOW']);
   worksheet.addRow(['CODE', 'CODE', 'NAME', 'DATE', 'TYPE', 'CODE', 'NAME', 'SEATS', 'TOTAL', 'REMAINING']);
 
   const numberOfColumns = worksheet.columnCount;
 
   const groupBasedOnVenueAndDate: TBookingHoldsGroupedByCommonKey = groupBasedOnVenueAndSameDate({
-    fetchedValues: data,
+    fetchedValues: data as TBookingHolds[],
   });
   const groupBasedOnVenueAndDateForAllTypes: TBookingHoldsGrouped[] = Object.values(groupBasedOnVenueAndDate).map(
     (x: TBookingHoldsGrouped) => ({ ...x, data: groupBasedOnTypeAndCode({ allBookingCodeAndNameForADate: x.data }) }),
@@ -363,7 +395,7 @@ const handler = async (req, res) => {
   worksheet.getColumn('G').alignment = { vertical: 'top', horizontal: 'left' };
 
   for (let row = 1; row <= 4; row++) {
-    styleHeader({ worksheet, row, numberOfColumns });
+    styleHeader({ worksheet, row, numberOfColumns, bgColor: COLOR_HEXCODE.DARK_GREEN });
   }
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
@@ -379,11 +411,8 @@ const handler = async (req, res) => {
     maxColWidth: Infinity,
   });
 
-  const filename = `Holds_Comps${productionCode ? '_' + productionCode : ''}${
-    fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
-  }.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

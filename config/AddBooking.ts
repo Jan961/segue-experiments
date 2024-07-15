@@ -88,6 +88,7 @@ export const DEFAULT_GAP_SUGGEST_FORM_STATE = {
   maxToNextVenue: '125',
   maxTravelTimeToNextVenue: '3',
   minSeats: '400',
+  maxSeats: '2500',
   includeExcludedVenues: false,
 };
 export const DayTypeEdit = {};

@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import axios from 'axios';
 import { BarredVenue } from 'pages/api/productions/venue/barringCheck';
-import { Spinner } from 'components/global/Spinner';
+import Spinner from 'components/core-ui-lib/Spinner';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
 import Form from './Form';
@@ -24,6 +24,18 @@ const barringGridOptions = {
   ...gridOptions,
   rowClassRules: {
     '!bg-primary-orange !bg-opacity-25': (params) => params.data.hasBarringConflict,
+  },
+
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.name;
+    });
+  },
+  getRowId: (data) => {
+    return data.data.name;
+  },
+  getRowNodeId: (data) => {
+    return data.id;
   },
 };
 
@@ -108,6 +120,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 style={{ maxHeight: 'calc(100vh - 450px)', minHeight: '110px' }}
               >
                 <Table
+                  testId="barring-table"
                   onRowSelected={onRowSelected}
                   ref={tableRef}
                   columnDefs={barredVenueColumnDefs}
@@ -127,7 +140,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 variant="primary"
                 text="Export"
                 iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName={'excel'}
+                sufixIconName="excel"
               />
               <Button
                 onClick={onClose}

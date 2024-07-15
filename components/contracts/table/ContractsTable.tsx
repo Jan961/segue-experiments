@@ -3,10 +3,10 @@ import { contractsStyleProps, contractsColumnDefs } from 'components/contracts/t
 import { useEffect, useRef, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { contractsFilterState } from 'state/contracts/contractsFilterState';
-import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../bookings/utils';
+import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
 import { ContractTableRowType } from 'interfaces';
-import EditVenueContractModal from './modal/EditVenueContractModal';
-import { addEditContractsState } from '../../state/contracts/contractsState';
+import EditVenueContractModal from '../modal/EditVenueContractModal';
+import { addEditContractsState } from '../../../state/contracts/contractsState';
 import { RowDoubleClickedEvent } from 'ag-grid-community';
 
 interface ContractsTableProps {
@@ -20,7 +20,7 @@ export default function ContractsTable({ rowData }: ContractsTableProps) {
   const [rows, setRows] = useState([]);
   const gridOptions = {
     getRowStyle: (params) => {
-      return params.data.bookingStatus === 'Pencilled' ? { fontStyle: 'italic' } : '';
+      return params.data.status === 'U' ? { fontStyle: 'italic' } : '';
     },
   };
 

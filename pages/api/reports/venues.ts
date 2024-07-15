@@ -6,6 +6,7 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { ALIGNMENT } from './masterplan';
 
 type BOOKING = {
   Id: number;
@@ -40,11 +41,6 @@ type PRODUCTION_DATA = {
   bookings: BOOKING[];
 };
 
-enum ALIGNMENT {
-  CENTER = 'center',
-  RIGHT = 'right',
-}
-
 const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align: ALIGNMENT }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
     cell.alignment = { horizontal: align };
@@ -73,7 +69,7 @@ const styleHeader = ({ worksheet, row, numberOfColumns }: { worksheet: any; row:
     cell.fill = {
       type: 'pattern',
       pattern: 'solid',
-      fgColor: { argb: COLOR_HEXCODE.BLUE },
+      fgColor: { argb: COLOR_HEXCODE.DARK_GREEN },
     };
   }
 };
@@ -86,7 +82,7 @@ const getBooleanAsString = (val: boolean | null): string => {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { productionId, showId, productionCode, options } = req.body || {};
+    const { productionId, showId, productionCode } = req.body || {};
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId: productionId });
@@ -130,6 +126,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       ShowCode: data.Production.Show.Code,
       ShowName: data.Production.Show.Name,
     };
+    const { ShowName, Code: ProductionCode = productionCode, ShowCode } = production;
+    const filename = `${ShowCode}${ProductionCode} ${ShowName} Selected Venues`;
     const bookings = data.Booking.map((booking) => {
       const venue = booking.Venue;
       return {
@@ -148,9 +146,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       views: [{ state: 'frozen', ySplit: 5 }],
     });
 
-    const { Code: ProductionCode, ShowCode, ShowName } = response?.production || {};
-
-    worksheet.addRow([`${ShowCode + ProductionCode || ''} (${ShowName || ''}) VENUES : ALL`]);
+    worksheet.addRow([`${filename}`]);
     const date = new Date();
     worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
     worksheet.addRow(['PRODUCTION', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']);
@@ -162,8 +158,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const VenueCode = booking.VenueCode;
       const ShowTown = booking.VenueTown;
       const VenueName = booking.VenueName;
-      const OnSale = getBooleanAsString(booking.IsOnSale);
-      const OnSaleDate = booking.OnSaleDate ? moment(booking.OnSaleDate).format('DD/MM/YY') : '';
+      const OnSale = getBooleanAsString(booking.TicketsOnSale);
+      const OnSaleDate = booking.OnSaleDate ? moment(booking.TicketsOnSaleFromDate).format('DD/MM/YY') : '';
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
@@ -192,8 +188,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     alignColumn({ worksheet, colAsChar: 'B', align: ALIGNMENT.RIGHT });
 
-    const lastColumn: number = 'A'.charCodeAt(numberOfColumns);
-    worksheet.mergeCells(`A1:${String.fromCharCode(lastColumn)}1`);
+    const lastColumn = String.fromCharCode('A'.charCodeAt(0) + numberOfColumns - 1);
+    worksheet.mergeCells(`A1:${lastColumn}1`);
 
     for (let row = 1; row <= 4; row++) {
       styleHeader({ worksheet, row, numberOfColumns });
@@ -220,10 +216,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
-
-    const filename = `Venues_${productionCode || options}.xlsx`;
+    alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
     workbook.xlsx.write(res).then(() => {
       res.end();

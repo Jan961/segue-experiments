@@ -11,7 +11,6 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
-import useAxios from 'hooks/useAxios';
 import { getWeekDayShort } from 'services/dateService';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
@@ -23,7 +22,6 @@ type FutureBooking = {
 };
 
 const Filters = () => {
-  const { fetchData } = useAxios();
   const [filter, setFilter] = useRecoilState(filterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
   const [bookings, setBooking] = useRecoilState(bookingJumpState);
@@ -42,7 +40,7 @@ const Filters = () => {
     try {
       const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
       const optWithRun = initialOptions.map((option) => {
-        const lastDate = lastDates.find((x) => x.BookingId === parseInt(option.value));
+        const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
         if (lastDate !== undefined) {
           const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
           const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
@@ -120,11 +118,10 @@ const Filters = () => {
   };
 
   const fetchLastDates = async () => {
+    if (!productionId) return;
+
     try {
-      const data = await fetchData({
-        url: '/api/performances/lastDate/' + productionId,
-        method: 'POST',
-      });
+      const { data } = await axios(`/api/performances/lastDate/${productionId}`);
 
       if (typeof data === 'object') {
         const lastDates = data as Array<LastPerfDate>;

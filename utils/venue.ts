@@ -9,6 +9,8 @@ export interface PrimaryAddress {
   primaryCountry?: number;
   primaryTown?: string;
   primaryPostCode?: string;
+  primaryPhone?: string;
+  primaryEmail?: string;
 }
 
 export interface DeliveryAddress {
@@ -19,6 +21,8 @@ export interface DeliveryAddress {
   deliveryCountry?: number;
   deliveryTown?: string;
   deliveryPostCode?: string;
+  deliveryPhone?: string;
+  deliveryEmail?: string;
 }
 
 export interface UiVenueContact {

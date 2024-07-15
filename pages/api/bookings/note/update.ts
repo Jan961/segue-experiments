@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
 
 const updateNoteInBookings = async (Id: number, Notes: string) => {
-  console.log('updateNoteInBookings', Id, Notes);
   await prisma.booking.update({
     data: {
       Notes,

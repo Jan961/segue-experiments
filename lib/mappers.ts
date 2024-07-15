@@ -12,6 +12,12 @@ import {
   ProductionTask,
   User,
   File,
+  ConversionRate,
+  Currency,
+  Country,
+  CountryInRegion,
+  Region,
+  GlobalBookingActivity,
 } from '@prisma/client';
 import {
   ActivityDTO,
@@ -34,11 +40,15 @@ import {
   ContractStatusType,
   FileDTO,
   ContractBookingStatusType,
+  ConversionRateDTO,
+  CurrencyDTO,
+  CountryDTO,
+  GlobalActivityDTO,
 } from 'interfaces';
 import { ShowWithProductions } from 'services/ShowService';
 import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
-import { toISO } from 'services/dateService';
+import { dateTimeToTime, toISO } from 'services/dateService';
 import { getFileUrlFromLocation } from 'utils/fileUpload';
 
 /*
@@ -57,7 +67,7 @@ We also have full control of types here so we can get type safety to child objec
 */
 
 // This is so we can change the implimentation if needed. We had some issues with timezone.
-const convertDate = (date: Date) => {
+export const convertDate = (date: Date) => {
   if (date) return toISO(date);
   return '';
 };
@@ -73,10 +83,10 @@ export const showMapper = (show: Show): ShowDTO => ({
   Type: show.Type,
   Code: show.Code,
   IsArchived: show.IsArchived,
-  ShowProdCoId: show.ShowProdCoId,
 });
 
 export const showProductionMapper = (s: ShowWithProductions): ProductionDTO[] => {
+  // console.table(s.Production);
   return s.Production.map(productionEditorMapper);
 };
 
@@ -123,6 +133,8 @@ export const bookingMapper = (b: BookingsWithPerformances): BookingDTO => ({
   BookingHoldNotes: b.HoldNotes,
   BookingSalesNotes: b.SalesNotes,
   PerformanceCount: b?._count?.Performance || 0,
+  BookingFinalSalesDiscrepancyNotes: b.FinalSalesDiscrepancyNotes,
+  BookingHasSchoolsSales: b.HasSchoolsSales,
 });
 
 export const bookingMapperWithVenue = (b: any): BookingWithVenueDTO => ({
@@ -179,6 +191,30 @@ export const FileMapper = (file: File & { ImageUrl?: string }): FileDTO => ({
   uploadDateTime: file.UploadDateTime.toISOString(),
 });
 
+export const countryMapper = (
+  c: Country & { CountryInRegion?: (CountryInRegion & { Region?: Region })[] },
+): CountryDTO => ({
+  ...c,
+  RegionList: c.CountryInRegion.map((c) => c.Region) || [],
+});
+
+export const currencyMapper = (c: Currency & { Country: Country[] }): CurrencyDTO => ({
+  ...c,
+  CountryList: c.Country.map(countryMapper),
+});
+
+export const conversionRateMapper = (
+  c: ConversionRate & {
+    Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency?: Currency & { Country: Country[] };
+    Currency_ConversionRate_ConversionToCurrencyCodeToCurrency?: Currency & { Country: Country[] };
+  },
+): ConversionRateDTO => ({
+  ...c,
+  Rate: c.Rate?.toNumber?.(),
+  FromCurrency: currencyMapper(c.Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency),
+  ToCurrency: currencyMapper(c.Currency_ConversionRate_ConversionToCurrencyCodeToCurrency),
+});
+
 export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionDTO => ({
   Id: t.Id,
   ShowId: t.Show.Id,
@@ -190,9 +226,14 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   SalesEmail: t.SalesEmail,
   IsDeleted: t.IsDeleted,
   SalesFrequency: t.SalesFrequency,
+  RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
+  RunningTimeNote: t.RunningTimeNote,
+  ReportCurrencyCode: t.ReportCurrencyCode,
+  ProdCoId: t.ProdCoId,
   RegionList: t.ProductionRegion ? t.ProductionRegion.map((productionReg) => productionReg.PRRegionId) : [],
   ImageUrl: t?.File?.Location ? getFileUrlFromLocation(t.File.Location) : null,
   Image: t?.File ? FileMapper(t?.File) : null,
+  ConversionRateList: t?.ConversionRate?.map(conversionRateMapper) || [],
 });
 
 export const DateTypeMapper = (dt: DateType): DateTypeDTO => ({
@@ -220,7 +261,19 @@ export const activityMapper = (a: BookingActivity): ActivityDTO => ({
   VenueCost: Number(a.VenueCost),
   FollowUpRequired: a.FollowUpRequired,
   DueByDate: convertDate(a.DueByDate),
-  Notes: a.ActivityNotes,
+  Notes: a.Notes,
+});
+
+export const globalActivityMapper = (a: GlobalBookingActivity): GlobalActivityDTO => ({
+  Id: a.Id,
+  ProductionId: a.ProductionId,
+  Date: convertDate(a.Date),
+  Name: a.Name,
+  ActivityTypeId: a.ActivityTypeId,
+  Cost: Number(a.Cost),
+  FollowUpRequired: a.FollowUpRequired,
+  DueByDate: convertDate(a.DueByDate),
+  Notes: a.Notes,
 });
 
 export const bookingContactNoteMapper = (a: BookingContactNotes): BookingContactNoteDTO => ({

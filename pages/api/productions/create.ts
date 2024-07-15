@@ -1,6 +1,7 @@
 import { ProductionDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { pick } from 'radash';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export const mapToPrismaFields = ({
@@ -13,6 +14,10 @@ export const mapToPrismaFields = ({
   dateBlockList,
   id: Id,
   image: Image,
+  runningTime: RunningTime,
+  runningTimeNote: RunningTimeNote,
+  currency: ReportCurrencyCode,
+  company: ProdCoId,
 }) => ({
   Id,
   Code,
@@ -22,6 +27,10 @@ export const mapToPrismaFields = ({
   ShowId,
   RegionList,
   Image,
+  ProdCoId,
+  ReportCurrencyCode,
+  RunningTime,
+  RunningTimeNote,
   DateBlock: dateBlockList.map(
     ({ name: Name, startDate: StartDate, endDate: EndDate, isPrimary: IsPrimary, id: Id }) => ({
       Name,
@@ -35,7 +44,7 @@ export const mapToPrismaFields = ({
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const production: Partial<ProductionDTO> = mapToPrismaFields(req.body);
-  const { ShowId, Image } = production;
+  const { ShowId, Image, ReportCurrencyCode, ProdCoId } = production;
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
@@ -44,17 +53,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     await prisma.production.create({
       data: {
-        Code: production.Code,
-        IsArchived: production.IsArchived,
-        ShowId: production.ShowId,
-        SalesFrequency: production.SalesFrequency,
-        SalesEmail: production.SalesEmail,
+        ...pick(production, ['Code', 'IsArchived', 'SalesFrequency', 'SalesEmail', 'RunningTimeNote']),
         ProductionRegion: {
           create: production.RegionList.map((regionId) => ({
             PRRegionId: regionId,
           })),
         },
-        ProductionImageFileId: Image?.id,
         DateBlock: {
           create: production.DateBlock.map((dateBlock) => ({
             Name: dateBlock.Name,
@@ -62,6 +66,28 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             EndDate: new Date(dateBlock.EndDate),
             IsPrimary: dateBlock.IsPrimary,
           })),
+        },
+        ...(Image?.id && {
+          File: {
+            connect: {
+              Id: Image?.id,
+            },
+          },
+        }),
+        Show: {
+          connect: {
+            Id: ShowId,
+          },
+        },
+        Currency: {
+          connect: {
+            Code: ReportCurrencyCode,
+          },
+        },
+        ProductionCompany: {
+          connect: {
+            Id: ProdCoId,
+          },
         },
       },
     });

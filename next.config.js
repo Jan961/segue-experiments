@@ -25,7 +25,12 @@ module.exports = withBundleAnalyzer({
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: [process.env.NEXT_PUBLIC_CLOUDFRONT_DOMAIN || 'https://segue-prod.vercel.app'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+    ],
   },
   webpack(config) {
     // Grab the existing rule that handles SVG imports

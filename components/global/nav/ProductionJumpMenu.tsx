@@ -102,6 +102,7 @@ export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArch
   return (
     <>
       <Select
+        testId="pjm-production-selector"
         className="border-0 !shadow-none w-[420px]"
         value={selected}
         label="Production"
@@ -116,6 +117,7 @@ export const ProductionJumpMenu: React.FC<ProductionJumpMenuProps> = ({ showArch
       {showArchivedCheck && (
         <div className="flex  items-center ml-1 mr-4">
           <Checkbox
+            testId="pjm-include-archived-checkbox"
             id="IncludeArchived"
             label="Include archived"
             checked={includeArchived}

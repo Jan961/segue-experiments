@@ -4,6 +4,8 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
+import Icon from 'components/core-ui-lib/Icon';
+import Tooltip from 'components/core-ui-lib/Tooltip';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -97,7 +99,13 @@ const VenueAddressForm = ({
         </label>
         <div className="flex flex-col">
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <p className="text-primary-input-text">Country</p>
+            <Tooltip
+              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+              width="w-[200px]"
+            >
+              <p className="text-primary-input-text">Country</p>
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
             <Select
               name="primaryCountry"
               className="w-full font-bold"
@@ -112,6 +120,7 @@ const VenueAddressForm = ({
             <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
           )}
         </div>
+
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Stage Door</p>
           <TextInput
@@ -120,16 +129,6 @@ const VenueAddressForm = ({
             inputClassName="w-full"
             value={formData.what3WordsStage}
             onChange={(e) => handleInputChange('what3WordsStage', e.target.value)}
-          />
-        </label>
-        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">What3Words Loading</p>
-          <TextInput
-            placeholder="what.three.words"
-            className="w-full justify-between"
-            inputClassName="w-full"
-            value={formData.what3WordsLoading}
-            onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
           />
         </label>
       </div>
@@ -187,15 +186,32 @@ const VenueAddressForm = ({
         </label>
 
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Country</p>
+          <Tooltip
+            body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+            width="w-[200px]"
+          >
+            <p className="text-primary-input-text">Country</p>
+            <Icon iconName="info-circle-solid" />
+          </Tooltip>
           <Select
             name="deliveryCountry"
-            className="w-full font-bold"
+            className="font-bold"
             placeholder="Country"
             value={formData.deliveryCountry}
             onChange={(value) => handleInputChange('deliveryCountry', parseInt(value as string, 10))}
             options={countryOptions}
             isSearchable
+          />
+        </label>
+
+        <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">What3Words Loading</p>
+          <TextInput
+            placeholder="what.three.words"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.what3WordsLoading}
+            onChange={(e) => handleInputChange('what3WordsLoading', e.target.value)}
           />
         </label>
       </div>

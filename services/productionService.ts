@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client';
 import { showProductionMapper, productionEditorMapper } from 'lib/mappers';
 import { getShowWithProductionsById } from './ShowService';
 import { getAccountId, getEmailFromReq } from './userService';
-import { ProductionDTO } from 'interfaces';
+import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
 
@@ -13,6 +13,38 @@ const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
   DateBlock: true,
   ProductionRegion: true,
   File: true,
+  ConversionRate: {
+    include: {
+      Currency_ConversionRate_ConversionFromCurrencyCodeToCurrency: {
+        include: {
+          Country: {
+            include: {
+              CountryInRegion: {
+                include: {
+                  Country: true,
+                  Region: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      Currency_ConversionRate_ConversionToCurrencyCodeToCurrency: {
+        include: {
+          Country: {
+            include: {
+              CountryInRegion: {
+                include: {
+                  Country: true,
+                  Region: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 });
 
 export const getActiveProductions = async (accountId: number) => {
@@ -113,6 +145,7 @@ export const getAllProductions = async (AccountId: number) => {
         },
       },
       DateBlock: true,
+      ProductionCompany: true,
     },
     where: {
       IsDeleted: false,
@@ -248,4 +281,13 @@ export const getAllProductionRegions = async () => {
     console.log(Exception);
     return [];
   }
+};
+
+export const getAllCurrencylist = async (): Promise<UICurrency[]> => {
+  const currencyList = await prisma.currency.findMany({});
+  return currencyList.map(({ Code, Name, SymbolUnicode }) => ({
+    code: Code,
+    name: Name,
+    symbolUnicode: SymbolUnicode,
+  }));
 };

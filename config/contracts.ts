@@ -51,13 +51,13 @@ export const saleFrequencyDay = [
 ];
 
 export const transactionOptions = [
-  { text: 'Per Ticket', value: 'preTicket' },
-  { text: 'Per Transaction', value: 'perTransaction' },
+  { text: 'Per Ticket', value: '1' },
+  { text: 'Per Transaction', value: '2' },
 ];
 
 export const sellerOptions = [
-  { text: 'PRODUCTION', value: 'production' },
-  { text: 'VENUE', value: 'venue' },
+  { text: 'PRODUCTION', value: '1' },
+  { text: 'VENUE', value: '2' },
 ];
 
 export const contractsStatusMap = {
