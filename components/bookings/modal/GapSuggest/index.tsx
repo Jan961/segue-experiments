@@ -104,6 +104,21 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
       </p>
     );
   }
+  const gapSuggestTableOptions = {
+    ...gridOptions,
+
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.Name;
+      });
+    },
+    getRowId: (data) => {
+      return data.data.Name;
+    },
+    getRowNodeId: (data) => {
+      return data.id;
+    },
+  };
 
   return (
     <div className="text-primary-input-text w-[800px] flex-col">
@@ -115,13 +130,14 @@ const GapSuggest = ({ startDate, endDate, productionId, onOkClick = () => null }
           <div className="text-md my-2">Check the box of venues you wish to remove from this list.</div>
           <div className="w-full overflow-hidden flex flex-col" style={{ maxHeight: 'calc(100vh - 400px)' }}>
             <Table
+              testId="gap-suggest-table"
               onRowSelected={onRowSelected}
               ref={tableRef}
               columnDefs={gapSuggestColumnDefs}
               onCellClicked={onCellClicked}
               rowData={filteredRows?.slice(0, 30)}
               styleProps={styleProps}
-              gridOptions={gridOptions}
+              gridOptions={gapSuggestTableOptions}
             />
           </div>
         </div>

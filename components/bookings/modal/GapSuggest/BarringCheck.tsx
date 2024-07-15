@@ -87,6 +87,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
             style={{ maxHeight: 'calc(100vh - 200px)', minHeight: '110px' }}
           >
             <Table
+              testId="barring-check-table"
               ref={tableRef}
               onRowSelected={onRowSelected}
               columnDefs={barredVenueColumnDefs}
@@ -106,7 +107,7 @@ const BarringCheck = ({ visible, startDate, endDate, venueId, productionId, onCl
             variant="primary"
             text="Export"
             iconProps={{ className: 'h-4 w-3' }}
-            sufixIconName={'excel'}
+            sufixIconName="excel"
           />
         )) ||
           ''}

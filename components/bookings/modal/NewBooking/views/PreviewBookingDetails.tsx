@@ -24,6 +24,12 @@ const gridOptions = {
       ...(params.data.isDeleted && { 'background-color': '#D4D4D4' }),
     };
   },
+  getRowNodeId: (data) => data.id,
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.date;
+    });
+  },
 };
 
 export type PreviewBookingDetailsProps = {
@@ -217,7 +223,13 @@ export default function PreviewBookingDetails({
         <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       </div>
       <div className="w-[700px] lg:w-[1386px] h-full  z-[999] flex flex-col ">
-        <Table gridOptions={gridOptions} rowData={rows} columnDefs={previewColumnDefs} styleProps={styleProps} />
+        <Table
+          testId="preview-booking-details"
+          gridOptions={gridOptions}
+          rowData={rows}
+          columnDefs={previewColumnDefs}
+          styleProps={styleProps}
+        />
       </div>
     </>
   );
