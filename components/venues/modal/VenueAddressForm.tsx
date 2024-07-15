@@ -4,6 +4,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
+import { Icon, Tooltip } from '../../core-ui-lib';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -97,7 +98,15 @@ const VenueAddressForm = ({
         </label>
         <div className="flex flex-col">
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <p className="text-primary-input-text">Country</p>
+            <Tooltip
+              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+              width="w-[200px]"
+            >
+              <p className="text-primary-input-text">Country</p>
+
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
+
             <Select
               name="primaryCountry"
               className="w-full font-bold"
@@ -197,7 +206,14 @@ const VenueAddressForm = ({
         </label>
 
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-          <p className="text-primary-input-text">Country</p>
+          <Tooltip
+            body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+            width="w-[200px]"
+          >
+            <p className="text-primary-input-text">Country</p>
+
+            <Icon iconName="info-circle-solid" />
+          </Tooltip>
           <Select
             name="deliveryCountry"
             className="w-full font-bold"
