@@ -30,6 +30,26 @@ export default function AccountDetailsTab() {
         setCountryOptions(transformToOptions(data.countryList, 'Name', 'Id'));
         console.log(transformToOptions(data.countryList, 'Name', 'Id'));
         setCurrencyOptions(transformToOptions(data.currencyList, 'Code', 'Code'));
+        const companyDetails = data?.companyDetails;
+        setFormData({
+          firstName: companyDetails?.FirstName || '',
+          lastName: companyDetails?.LastName || '',
+          companyName: companyDetails?.AccountName || '',
+          phoneNumber: '',
+          addressLine1: companyDetails?.AccountAddress1 || '',
+          addressLine2: companyDetails?.AccountAddress2 || '',
+          addressLine3: companyDetails?.AccountAddress3 || '',
+          townName: companyDetails?.AccountAddressTown || '',
+          postcode: companyDetails?.AccountAddressPostcode || '',
+          country: companyDetails?.AccountAddressCountry || '',
+          companyEmail: companyDetails?.AccountMainEmail || '',
+          currencyForPayment: companyDetails?.AccountCurrencyCode || '',
+          vatNumber: companyDetails?.AccountVATNumber || '',
+          companyNumber: companyDetails?.AccountCompanyNumber || '',
+          companyWebsite: companyDetails?.Website || '',
+          typeOfCompany: companyDetails?.TypeOfCompany || '',
+          currency: companyDetails?.AccountCurrencyCode || '',
+        });
       } catch (error) {
         setValidationErrors({});
         console.log(companyInfo);
@@ -117,7 +137,7 @@ export default function AccountDetailsTab() {
                 text="Upload"
                 variant="secondary"
                 className="w-[132px]"
-               />
+              />
               <UploadModal
                 title=""
                 visible={uploadVisible}

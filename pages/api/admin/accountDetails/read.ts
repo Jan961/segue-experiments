@@ -8,16 +8,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
 
-    // const countryList;
-    // const currencyList;
     const companyDetails = await prisma.Account.findFirst({
       where: { AccountId: { equals: AccountId } },
     });
     console.log(companyDetails);
-
-    const userDetails = await prisma.AccountContact.findFirst({
-      where: { AccContMainEmail: { equals: email } },
+    console.log(email);
+    const userDetails = await prisma.User.findFirst({
+      where: { Email: { equals: email } },
     });
+
+    console.log(userDetails);
 
     const completeCompanyDetails = { ...companyDetails, ...userDetails };
 
