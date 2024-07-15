@@ -6,6 +6,7 @@ import Icon from '../../core-ui-lib/Icon';
 import Select from '../../core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { transformToOptions } from '../../../utils';
+import { Button, UploadModal } from '../../core-ui-lib';
 
 export default function AccountDetailsTab() {
   const [formData, setFormData] = useState<Partial<UiAccountType>>({ ...initialUiAccountDetails });
@@ -13,6 +14,7 @@ export default function AccountDetailsTab() {
   const [companyInfo, setCompanyInfo] = useState(null);
   const [countryOptions, setCountryOptions] = useState<SelectOption[]>([]);
   const [currencyOptions, setCurrencyOptions] = useState<SelectOption[]>([]);
+  const [uploadVisible, setUploadVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCompanyInfo = async () => {
@@ -84,7 +86,7 @@ export default function AccountDetailsTab() {
         <FormField value={formData.addressLine3} displayText="Address Line 3" handleInputChange={handleInputChange} />
         <FormField value={formData.townName} displayText="Town" handleInputChange={handleInputChange} />
         <FormField value={formData.postcode} displayText="Postcode" handleInputChange={handleInputChange} />
-        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full ">
           <Tooltip
             body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
             width="w-[200px]"
@@ -104,10 +106,32 @@ export default function AccountDetailsTab() {
         </label>
       </div>
       <div className="flex flex-col gap-5 w-1/2">
-        <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
         <div className="flex flex-col">
+          <div className="h-[255px] overflow-y-hidden">
+            <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between mt-16 w-full ml-16">
+              <p className="text-primary-input-text">Company Logo</p>
+              <Button
+                onClick={() => {
+                  setUploadVisible(true);
+                }}
+                text="Upload"
+                variant="secondary"
+                className="w-[132px]"
+               />
+              <UploadModal
+                title=""
+                visible={uploadVisible}
+                info=""
+                allowedFormats={[]}
+                onClose={() => {
+                  setUploadVisible(false);
+                }}
+              />
+            </label>
+          </div>
+          <FormField value={formData.companyEmail} displayText="Email Address" handleInputChange={handleInputChange} />
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-            <p className="text-primary-input-text">Country</p>
+            <p className="text-primary-input-text">Currency for Payment</p>
             <Select
               name="currencyForPayment"
               className="w-full font-bold"
@@ -119,9 +143,22 @@ export default function AccountDetailsTab() {
             />
           </label>
         </div>
-        <FormField value={formData.lastName} displayText="Last Name" handleInputChange={handleInputChange} />
-        <FormField value={formData.companyName} displayText="Company Name" handleInputChange={handleInputChange} />
-        <FormField value={formData.phoneNumber} displayText="Phone Number" handleInputChange={handleInputChange} />
+        <FormField value={formData.vatNumber} displayText="VAT Number" handleInputChange={handleInputChange} />
+        <FormField value={formData.companyNumber} displayText="Company Number" handleInputChange={handleInputChange} />
+        <FormField value={formData.companyWebsite} displayText="Website" handleInputChange={handleInputChange} />
+        <FormField value={formData.typeOfCompany} displayText="Type of Company" handleInputChange={handleInputChange} />
+        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Company Currency</p>
+          <Select
+            name="currency"
+            className="w-full font-bold"
+            placeholder="Currency"
+            value={formData.currency}
+            onChange={(value) => handleInputChange('currency', parseInt(value as string, 10))}
+            options={currencyOptions}
+            isSearchable
+          />
+        </label>
       </div>
     </div>
   );
