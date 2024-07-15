@@ -389,6 +389,7 @@ export type Venue = {
   Code: string;
   Name: string;
   Website: string | null;
+  FamilyId: number | null;
   VenueFamily: string | null;
   Address1: string | null;
   Address2: string | null;
@@ -396,8 +397,6 @@ export type Venue = {
   Town: string | null;
   County: string | null;
   Postcode: string | null;
-  Country: string | null;
-  Currency: string;
   VATIndicator: boolean;
   TechSpecsURL: string | null;
   Seats: number | null;
