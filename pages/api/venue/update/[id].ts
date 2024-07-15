@@ -23,7 +23,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       vatIndicator: VATIndicator,
       culturallyExempt: CulturallyExempt,
       venueFamily: FamilyId,
-      currency: CurrencyCode,
       venueCapacity: Seats,
       townPopulation: TownPopulation,
       venueWebsite: Website,
@@ -40,17 +39,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       stageSize: StageSize,
       gridHeight: GridHeight,
       techSpecsUrl: TechSpecsURL,
-      flags: VenueFlags,
-      excludeFromChecks: ExcludeFromChecks,
       what3WordsStage: AddressStageDoorW3W,
       what3WordsLoading: AddressLoadingW3W,
-      primaryAddressId,
+      flags: VenueFlags,
+      excludeFromChecks: ExcludeFromChecks,
       primaryAddress1,
       primaryAddress2,
       primaryAddress3,
       primaryPostCode,
       primaryTown,
       primaryCountry,
+      primaryPhoneNumber,
+      primaryEMail,
+      primaryAddressId,
       deliveryAddressId,
       deliveryAddress1,
       deliveryAddress2,
@@ -58,6 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       deliveryPostCode,
       deliveryCountry,
       deliveryTown,
+      deliveryPhoneNumber,
+      deliveryEMail,
       barredVenues,
       venueContacts,
     } = req.body;
@@ -80,6 +83,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         CountryId: primaryCountry,
         Postcode: primaryPostCode,
         TypeName: 'Main',
+        Phone: primaryPhoneNumber,
+        Email: primaryEMail,
       });
     }
     if (
@@ -100,6 +105,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         CountryId: deliveryCountry,
         Postcode: deliveryPostCode,
         TypeName: 'Delivery',
+        Phone: deliveryPhoneNumber,
+        Email: deliveryEMail,
       });
     }
     const updatedData = {
@@ -109,7 +116,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       VATIndicator,
       CulturallyExempt,
       FamilyId,
-      CurrencyCode,
       Seats,
       TownPopulation,
       Website,
