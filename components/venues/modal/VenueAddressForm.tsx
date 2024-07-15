@@ -4,7 +4,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-import { Icon, Tooltip } from '../../core-ui-lib';
+import { Icon, Tooltip } from 'components/core-ui-lib';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
