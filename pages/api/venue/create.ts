@@ -15,7 +15,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       vatIndicator: VATIndicator,
       culturallyExempt: CulturallyExempt,
       venueFamily: FamilyId,
-      currency: CurrencyCode,
       venueCapacity: Seats,
       townPopulation: TownPopulation,
       venueWebsite: Website,
@@ -42,12 +41,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       primaryPostCode,
       primaryTown,
       primaryCountry,
+      primaryPhoneNumber,
+      primaryEMail,
       deliveryAddress1,
       deliveryAddress2,
       deliveryAddress3,
       deliveryPostCode,
       deliveryCountry,
       deliveryTown,
+      deliveryPhoneNumber,
+      deliveryEMail,
       barredVenues,
       venueContacts,
     } = req.body;
@@ -59,6 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       CountryId: primaryCountry,
       Postcode: primaryPostCode,
       TypeName: 'Main',
+      Phone: primaryPhoneNumber,
+      Email: primaryEMail,
     };
 
     const deliveryAddress = {
@@ -69,8 +74,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       CountryId: deliveryCountry,
       Postcode: deliveryPostCode,
       TypeName: 'Delivery',
+      Phone: deliveryPhoneNumber,
+      Email: deliveryEMail,
     };
-
     try {
       const venue = await prisma.$transaction(async (tx) => {
         return createVenue(
@@ -82,7 +88,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             VATIndicator,
             CulturallyExempt,
             FamilyId,
-            CurrencyCode,
             Seats,
             TownPopulation,
             Website,
