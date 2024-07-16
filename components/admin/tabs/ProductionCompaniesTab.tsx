@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import axios from 'axios';
-import { ConfirmationDialog } from '../../core-ui-lib';
+import { ConfirmationDialog } from 'components/core-ui-lib';
 
 type ProductionCompany = {
   companyName: '';
