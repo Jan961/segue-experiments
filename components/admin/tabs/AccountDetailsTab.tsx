@@ -76,15 +76,25 @@ export default function AccountDetailsTab() {
   // }
 
   const handleInputChange = (field: string, value: any) => {
-    console.log(value);
-    console.log(field);
     const updatedFormData = {
       ...formData,
       [field]: value,
     };
-    console.log(updatedFormData);
     setFormData(updatedFormData);
   };
+
+  const handleBlur = async () => {
+    try {
+      const response = await fetch('/api/admin/accountDetails/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      console.log(data);
+    } catch (Exception) {}
+  };
+
   console.log(formData);
   const selectedCountry = countryOptions.find((option) => option.text === formData.country)?.value;
   return (
@@ -97,56 +107,65 @@ export default function AccountDetailsTab() {
             displayText="First Name"
             fieldName="firstName"
             handleInputChange={handleInputChange}
+            onBlur={handleBlur}
           />
           {validationErrors.firstName && <small className="text-primary-red flex">{validationErrors.firstName}</small>}
         </div>
         <FormField
           currentValue={formData.lastName}
           displayText="Last Name"
-          fieldName=""
+          fieldName="lastName"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.companyName}
           displayText="Company Name"
-          fieldName=""
+          fieldName="companyName"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.phoneNumber}
           displayText="Phone Number"
-          fieldName=""
+          fieldName="phoneNumber"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.addressLine1}
           displayText="Address Line 1"
-          fieldName=""
+          fieldName="addressLine1"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.addressLine2}
           displayText="Address Line 2"
-          fieldName=""
+          fieldName="addressLine2"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.addressLine3}
           displayText="Address Line 3"
-          fieldName=""
+          fieldName="addressLine3"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.townName}
           displayText="Town"
-          fieldName=""
+          fieldName="townName"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.postcode}
           displayText="Postcode"
-          fieldName=""
+          fieldName="postcode"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full ">
           <Tooltip
@@ -161,9 +180,12 @@ export default function AccountDetailsTab() {
             className="w-full font-bold"
             placeholder="Country"
             value={selectedCountry}
-            onChange={(value) => handleInputChange('country', parseInt(value as string, 10))}
+            onChange={(value) => {
+              handleInputChange('country', countryOptions.find((option) => value === option.value)?.text);
+            }}
             options={countryOptions}
             isSearchable
+            onBlur={handleBlur}
           />
         </label>
       </div>
@@ -196,6 +218,7 @@ export default function AccountDetailsTab() {
             displayText="Email Address"
             fieldName=""
             handleInputChange={handleInputChange}
+            onBlur={handleBlur}
           />
           <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Currency for Payment</p>
@@ -204,35 +227,42 @@ export default function AccountDetailsTab() {
               className="w-full font-bold"
               placeholder="Currency For Payment"
               value={formData.currencyForPayment}
-              onChange={(value) => handleInputChange('currencyForPayment', parseInt(value as string, 10))}
+              onChange={(value) => {
+                handleInputChange('currencyForPayment', currencyOptions.find((option) => value === option.value)?.text);
+              }}
               options={currencyOptions}
               isSearchable
+              onBlur={handleBlur}
             />
           </label>
         </div>
         <FormField
           currentValue={formData.vatNumber}
           displayText="VAT Number"
-          fieldName=""
+          fieldName="vatNumber"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.companyNumber}
           displayText="Company Number"
-          fieldName=""
+          fieldName="companyNumber"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.companyWebsite}
           displayText="Website"
-          fieldName=""
+          fieldName="companyWebsite"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <FormField
           currentValue={formData.typeOfCompany}
           displayText="Type of Company"
-          fieldName=""
+          fieldName="typeOfCompany"
           handleInputChange={handleInputChange}
+          onBlur={handleBlur}
         />
         <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Company Currency</p>
@@ -241,9 +271,12 @@ export default function AccountDetailsTab() {
             className="w-full font-bold"
             placeholder="Currency"
             value={formData.currency}
-            onChange={(value) => handleInputChange('currency', parseInt(value as string, 10))}
+            onChange={(value) => {
+              handleInputChange('currency', currencyOptions.find((option) => value === option.value)?.text);
+            }}
             options={currencyOptions}
             isSearchable
+            onBlur={handleBlur}
           />
         </label>
       </div>
