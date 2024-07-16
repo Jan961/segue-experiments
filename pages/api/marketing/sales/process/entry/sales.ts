@@ -72,7 +72,7 @@ export default async function handle(req, res) {
 
       sales.forEach((sale) => {
         salesUpdates.push(
-          prisma.Sale.updateMany({
+          prisma.Sale.update({
             where: {
               SaleSetId: sale.SaleSetId,
               SaleSaleTypeId: sale.SaleSaleTypeId,
