@@ -6,7 +6,7 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 
 const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
   const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Booking Data');
+  const worksheet = workbook.addWorksheet('Archived Sales');
 
   const bookingToProdCode = bookingInfo.reduce((acc, item) => {
     acc[item.bookingId] = item.prodCode;
