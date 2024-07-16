@@ -18,7 +18,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const data = req.body as BookingAttachedFile;
 
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { BookingId: data.FileBookingBookingId });
+    const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
     await prisma.bookingAttachedFile.create({

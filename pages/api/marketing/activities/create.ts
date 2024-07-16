@@ -24,7 +24,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
         CreatedDT: new Date(),
         DueByDate: data.DueByDate ? new Date(data.DueByDate) : null,
-        ActivityNotes: data.Notes,
+        Notes: data.Notes,
         Booking: {
           connect: {
             Id: data.BookingId,
