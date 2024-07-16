@@ -2,8 +2,8 @@ import { productionCompaniesColDefs, styleProps } from 'components/admin/tableCo
 import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
 import axios from 'axios';
+import { ProdCompanyDeleteModal } from '../modals/ProdCompanyDeleteModal';
 
 type ProductionCompany = {
   companyName: '';
@@ -128,16 +128,14 @@ const ProductionCompaniesTab = () => {
         />
       </div>
       {showDeleteModal && (
-        <DeleteConfirmation
-          title="Delete Company Details"
+        <ProdCompanyDeleteModal
           onCancel={() => {
             setShowDeleteModal(false);
-            setSelectedProdCompany(null);
           }}
           onConfirm={deleteProductionCompany}
-        >
-          <p>This will the delete the company details</p>
-        </DeleteConfirmation>
+          title="Are you sure you want to delete?"
+          text="This action cannot be undone."
+        />
       )}
     </div>
   );
