@@ -106,13 +106,17 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
     const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
     const selectedProduction = productions?.filter((production) => production.Id === productionId);
     const { ShowName, ShowCode, Code } = selectedProduction[0];
-    const productionName = `${ShowName} (${ShowCode + Code})`;
+    const productionName = `${ShowCode + Code} ${ShowName}`;
     const payload = {
       bookingsSelection,
       venueAndDate,
       productionName,
     };
-    await exportExcelReport('/api/reports/marketing/archivedSales', payload, 'Archived Sales');
+    await exportExcelReport(
+      '/api/reports/marketing/archived-sales',
+      payload,
+      `${productionName} ${selectedVenue[0].Venue.Name}`,
+    );
   };
 
   const onExport = () => {
