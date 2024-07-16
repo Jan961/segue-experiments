@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import axios from 'axios';
-import { ProdCompanyDeleteModal } from '../modals/ProdCompanyDeleteModal';
+import { ConfirmationDialog } from '../../core-ui-lib';
 
 type ProductionCompany = {
   companyName: '';
@@ -128,13 +128,16 @@ const ProductionCompaniesTab = () => {
         />
       </div>
       {showDeleteModal && (
-        <ProdCompanyDeleteModal
-          onCancel={() => {
+        <ConfirmationDialog
+          show
+          onYesClick={() => {
+            deleteProductionCompany();
             setShowDeleteModal(false);
           }}
-          onConfirm={deleteProductionCompany}
-          title="Are you sure you want to delete?"
-          text="This action cannot be undone."
+          onNoClick={() => {
+            setShowDeleteModal(false);
+          }}
+          variant="delete"
         />
       )}
     </div>
