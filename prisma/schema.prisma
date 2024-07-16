@@ -118,6 +118,7 @@ model Currency {
   Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
   Name                                                               String           @map("CurrencyName") @db.VarChar(30)
   SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
+  Account                                                            Account[]
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Country                                                            Country[]
@@ -327,30 +328,37 @@ model Rehearsal {
 }
 
 model Account {
-  AccountId              Int                   @id @default(autoincrement()) @map("AccountId")
-  AccountName            String                @map("AccountName") @db.VarChar(50)
-  AccountAddress1        String?               @map("AccountAddress1") @db.VarChar(50)
-  AccountAddress2        String?               @map("AccountAddress2") @db.VarChar(50)
-  AccountAddress3        String?               @map("AccountAddress3") @db.VarChar(50)
-  AccountAddressTown     String?               @map("AccountAddressTown") @db.VarChar(50)
-  AccountAddressCounty   String?               @map("AccountAddressCounty") @db.VarChar(50)
-  AccountAddressPostcode String?               @map("AccountAddressPostcode") @db.VarChar(20)
-  AccountAddressCountry  String?               @map("AccountAddressCountry") @db.VarChar(30)
-  AccountVATNumber       String?               @map("AccountVATNumber") @db.VarChar(20)
-  AccountCurrencyCode    String                @map("AccountCurrencyCode") @db.VarChar(3)
-  AccountCompanyNumber   String?               @map("AccountCompanyNumber") @db.VarChar(20)
-  AccountLogo            Bytes?                @map("AccountLogo")
-  AccountMainEmail       String?               @map("AccountMainEmail") @db.VarChar(120)
-  AccountNumPeople       Int?                  @map("AccountNumPeople") @db.TinyInt
-  AccountOrganisationId  Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
-  AccountTermsAgreedBy   String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
-  AccountTermsAgreedDate DateTime?             @map("AccountTermsAgreedDate") @db.Date
-  AccountContact         AccountContact?
-  AccountSubscription    AccountSubscription[]
-  AccountUser            AccountUser[]
-  MasterTask             MasterTask[]
-  ProductionCompany      ProductionCompany[]
-  Show                   Show[]
+  AccountId                  Int                   @id @default(autoincrement()) @map("AccountId")
+  AccountName                String                @map("AccountName") @db.VarChar(50)
+  AccountAddress1            String?               @map("AccountAddress1") @db.VarChar(50)
+  AccountAddress2            String?               @map("AccountAddress2") @db.VarChar(50)
+  AccountAddress3            String?               @map("AccountAddress3") @db.VarChar(50)
+  AccountAddressTown         String?               @map("AccountAddressTown") @db.VarChar(50)
+  AccountAddressCounty       String?               @map("AccountAddressCounty") @db.VarChar(50)
+  AccountAddressPostcode     String?               @map("AccountAddressPostcode") @db.VarChar(20)
+  AccountAddressCountry      String?               @map("AccountAddressCountry") @db.VarChar(30)
+  AccountVATNumber           String?               @map("AccountVATNumber") @db.VarChar(20)
+  AccountCurrencyCode        String                @map("AccountCurrencyCode") @db.VarChar(3)
+  AccountCompanyNumber       String?               @map("AccountCompanyNumber") @db.VarChar(20)
+  AccountLogo                Bytes?                @map("AccountLogo")
+  AccountMainEmail           String?               @map("AccountMainEmail") @db.VarChar(120)
+  AccountNumPeople           Int?                  @map("AccountNumPeople") @db.TinyInt
+  AccountOrganisationId      Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
+  AccountTermsAgreedBy       String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
+  AccountTermsAgreedDate     DateTime?             @map("AccountTermsAgreedDate") @db.Date
+  AccountWebsite             String?               @map("AccountWebsite") @db.VarChar(255)
+  AccountTypeOfCompany       String?               @map("AccountTypeOfCompany")@db.VarChar(30)
+  AccountPhone               String?               @map("AccountPhone")@db.VarChar(30)
+  AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode")@db.VarChar(3)
+  Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Account_Payment")
+  AccountContact             AccountContact?
+  AccountSubscription        AccountSubscription[]
+  AccountUser                AccountUser[]
+  MasterTask                 MasterTask[]
+  ProductionCompany          ProductionCompany[]
+  Show                       Show[]
+
+  @@index([AccountPaymentCurrencyCode], map: "Currency_Account_Payment")
 }
 
 model AvailableComp {
@@ -474,9 +482,8 @@ model SalesSet {
   SetComp                     SetComp[]
   SetHold                     SetHold[]
 
-  @@index([SetBookingId, SetSalesFiguresDate], map: "BookingSale_Booking_SalesFigures")
-  @@index([SetBookingId], map: "Booking_BookingSale_fk")
-  @@index([SetPerformanceId], map: "Performance_SalesSet_idx")
+  @@unique([SetBookingId, SetSalesFiguresDate, SetPerformanceId], map: "SaleSet_Unique")
+  @@index([SetPerformanceId], map: "Performance_SalesSet")
 }
 
 model SetComp {
@@ -534,20 +541,20 @@ model ContractAttachedFile {
 }
 
 model VenueAddress {
-  Id                Int      @id @default(autoincrement()) @map("VenueAddressId")
-  VenueId           Int      @map("VenueAddressVenueId")
-  TypeName          String   @map("VenueAddressTypeName") @db.VarChar(15)
-  Line1             String?  @map("VenueAddress1") @db.VarChar(50)
-  Line2             String?  @map("VenueAddress2") @db.VarChar(50)
-  Line3             String?  @map("VenueAddress3") @db.VarChar(50)
-  Town              String?  @map("VenueAddressTown") @db.VarChar(50)
-  County            String?  @map("VenueAddressCounty") @db.VarChar(50)
-  Postcode          String?  @map("VenueAddressPostcode") @db.VarChar(12)
-  CountryId         Int?     @map("VenueAddressCountryId")
-  Phone             String?  @map("VenueAddressPhone") @db.VarChar(30)
-  Email             String?  @map("VenueAddressEmail") @db.VarChar(80)
-  Country           Country? @relation(fields: [CountryId], references: [Id], onDelete: NoAction, map: "CountryVenueAddress")
-  Venue             Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
+  Id        Int      @id @default(autoincrement()) @map("VenueAddressId")
+  VenueId   Int      @map("VenueAddressVenueId")
+  TypeName  String   @map("VenueAddressTypeName") @db.VarChar(15)
+  Line1     String?  @map("VenueAddress1") @db.VarChar(50)
+  Line2     String?  @map("VenueAddress2") @db.VarChar(50)
+  Line3     String?  @map("VenueAddress3") @db.VarChar(50)
+  Town      String?  @map("VenueAddressTown") @db.VarChar(50)
+  County    String?  @map("VenueAddressCounty") @db.VarChar(50)
+  Postcode  String?  @map("VenueAddressPostcode") @db.VarChar(12)
+  CountryId Int?     @map("VenueAddressCountryId")
+  Phone     String?  @map("VenueAddressPhone") @db.VarChar(30)
+  Email     String?  @map("VenueAddressEmail") @db.VarChar(80)
+  Country   Country? @relation(fields: [CountryId], references: [Id], onDelete: NoAction, map: "CountryVenueAddress")
+  Venue     Venue    @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueAddress")
 
   @@index([VenueId], map: "Venue_VenueAddress")
   @@index([CountryId], map: "CountryVenueAddress")
@@ -1272,6 +1279,7 @@ view BookingHoldCompsView {
 view PromoterHoldsView {
   ProductionId                         Int       @default(0)
   FullProductionCode                   String?   @db.VarChar(20)
+  ShowName                             String    @db.VarChar(80)
   VenueCode                            String    @db.VarChar(6)
   VenueName                            String    @db.VarChar(255)
   BookingId                            Int       @default(0)
@@ -1362,6 +1370,7 @@ view ProductionView {
   @@ignore
 }
 
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ShowView {
   ShowId         Int     @default(0)
@@ -1370,6 +1379,138 @@ view ShowView {
   ShowType       String? @db.VarChar(1)
   ShowIsArchived Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
   ShowAccountId  Int
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view VenueView {
+  VenueId                      Int     @default(0)
+  VenueCode                    String  @db.VarChar(6)
+  VenueName                    String  @db.VarChar(255)
+  VenueStatusCode              String  @default("O") @db.VarChar(1)
+  VenueWebsite                 String? @db.VarChar(255)
+  VenueFamily                  String? @db.VarChar(50)
+  VenueCurrencyCode            String? @db.VarChar(3)
+  VenueVATIndicator            Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueTechSpecsURL            String? @db.VarChar(255)
+  VenueSeats                   Float?
+  VenueBarringClause           String? @db.VarChar(255)
+  VenueTownPopulation          Float?
+  VenueLXDesk                  String? @db.VarChar(50)
+  VenueLXNotes                 String? @db.VarChar(2000)
+  VenueSoundDesk               String? @db.VarChar(50)
+  VenueSoundNotes              String? @db.VarChar(2000)
+  VenueStageSize               String? @db.VarChar(50)
+  VenueGridHeight              String? @db.VarChar(50)
+  VenueVenueFlags              String? @db.VarChar(2000)
+  VenueBarringWeeksPre         Int?    @db.TinyInt
+  VenueBarringWeeksPost        Int?    @db.TinyInt
+  VenueBarringMiles            Int?
+  VenueCulturallyExempt        Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueAccountId               Int
+  VenueIsDeleted               Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
+  VenueMainAddress1            String? @db.VarChar(50)
+  VenueMainAddress2            String? @db.VarChar(50)
+  VenueMainAddress3            String? @db.VarChar(50)
+  VenueMainAddressTown         String? @db.VarChar(50)
+  VenueMainAddressCounty       String? @db.VarChar(50)
+  VenueMainAddressPostcode     String? @db.VarChar(12)
+  VenueMainAddressCountry      String? @db.VarChar(40)
+  VenueDeliveryAddress1        String? @db.VarChar(50)
+  VenueDeliveryAddress2        String? @db.VarChar(50)
+  VenueDeliveryAddress3        String? @db.VarChar(50)
+  VenueDeliveryAddressTown     String? @db.VarChar(50)
+  VenueDeliveryAddressCounty   String? @db.VarChar(50)
+  VenueDeliveryAddressPostcode String? @db.VarChar(12)
+  VenueDeliveryAddressCountry  String? @db.VarChar(40)
+  VenueMainNoteText            String? @db.LongText
+  VenueWarningNoteText         String? @db.LongText
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view SalesView {
+  ShowName                    String    @db.VarChar(80)
+  ProductionId                Int       @default(0)
+  FullProductionCode          String?   @db.VarChar(20)
+  ProductionStartDate         DateTime? @db.Date
+  ProductionEndDate           DateTime? @db.Date
+  BookingId                   Int       @default(0)
+  BookingFirstDate            DateTime  @db.Date
+  BookingStatusCode           String    @default("U") @db.Char(1)
+  BookingProductionWeekNum    Int?      @db.SmallInt
+  VenueTown                   String?   @db.VarChar(50)
+  VenueCode                   String    @db.VarChar(6)
+  VenueName                   String    @db.VarChar(255)
+  VenueCurrencyCode           String?   @db.VarChar(3)
+  VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
+  ConversionToCurrencyCode    String?   @db.VarChar(3)
+  ConversionRate              Decimal?  @db.Decimal(8, 4)
+  SetSalesFiguresDate         DateTime? @db.Date
+  SetBookingWeekNum           Int?      @db.SmallInt
+  SetProductionWeekDate       DateTime? @db.Date
+  SetProductionWeekNum        Int?      @db.SmallInt
+  SetNotOnSale                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsFinalFigures           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetFinalSalesApprovedByUser String?   @db.VarChar(100)
+  SetSingleSeats              Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetBrochureReleased         Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SetIsCopy                   Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
+  SaleTypeName                String?   @db.VarChar(45)
+  Seats                       Decimal?  @db.Decimal(32, 0)
+  Value                       Decimal?  @db.Decimal(32, 2)
+  TotalCapacity               Float?
+  FinalFiguresDate            DateTime? @db.Date
+  FinalFiguresSeats           Decimal?  @db.Decimal(32, 0)
+  FinalFiguresValue           Decimal?  @db.Decimal(32, 2)
+  NotOnSaleDate               DateTime? @db.Date
+  TotalHoldSeats              Decimal?  @db.Decimal(32, 0)
+  LastFiguresDate             DateTime? @db.Date
+  LastFiguresSeats            Decimal?  @db.Decimal(32, 0)
+  LastFiguresValue            Decimal?  @db.Decimal(32, 2)
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view BookingSelectionView {
+  BookingId             Int      @default(0)
+  BookingStatusCode     String   @default("U") @db.Char(1)
+  BookingFirstDate      DateTime @db.Date
+  VenueId               Int      @default(0)
+  VenueCode             String   @db.VarChar(6)
+  VenueMainAddressTown  String?  @db.VarChar(50)
+  ProductionId          Int      @default(0)
+  FullProductionCode    String?  @db.VarChar(20)
+  ProductionLengthWeeks Int?     @db.SmallInt
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view SalesSummaryView {
+  ProductionId               Int       @default(0)
+  FullProductionCode         String?   @db.VarChar(20)
+  ShowName                   String    @db.VarChar(80)
+  ProductionStartDate        DateTime? @db.Date
+  ProductionEndDate          DateTime? @db.Date
+  ProductionWeekNum          Int?      @db.SmallInt
+  EntryDate                  DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
+  Location                   String?   @db.VarChar(50)
+  EntryId                    Int       @default(0)
+  EntryName                  String?   @db.VarChar(255)
+  EntryType                  String?   @db.VarChar(30)
+  EntryStatusCode            String    @default("") @db.Char(1)
+  Value                      Decimal?  @db.Decimal(32, 2)
+  VenueCurrencyCode          String?   @db.VarChar(3)
+  VenueCurrencySymbolUnicode String?   @db.VarChar(30)
+  ConversionRate             Decimal?  @db.Decimal(8, 4)
+  ConversionToCurrencyCode   String?   @db.VarChar(3)
+  SaleTypeName               String?   @db.VarChar(45)
+  SetSalesFiguresDate        DateTime? @db.Date
+  FinalSetSalesFiguresDate   DateTime? @db.Date
 
   @@ignore
 }
