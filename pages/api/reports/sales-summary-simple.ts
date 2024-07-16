@@ -131,7 +131,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   }));
 
   // Write data to the worksheet
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const worksheet = workbook.addWorksheet('Sales Summary', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 5 }],
   });
@@ -153,6 +153,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   // Adding Heading
   const title = salesReportName({ isWeeklyReport, isSeatsDataRequired, data });
+  const { FullProductionCode, ShowName } = data?.[0] || {};
+  const showTitle = `${FullProductionCode || ''} ${ShowName || ''}`;
   worksheet.addRow([title]);
   // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullProductionCode + ')' : 'Dummy Report'
   worksheet.addRow([]);
@@ -586,7 +588,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${title}.xlsx"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${showTitle} ${title}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();
