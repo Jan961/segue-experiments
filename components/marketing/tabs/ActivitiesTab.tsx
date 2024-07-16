@@ -634,7 +634,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div
                   className={classNames(
                     'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-                    actRowData.length === 0 ? '-mt-[405px]' : '',
+                    globalRowData.length === 0 ? '-mt-[400px]' : '',
                   )}
                 >
                   <div className="flex flex-row gap-4">

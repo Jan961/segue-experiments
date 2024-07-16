@@ -363,26 +363,26 @@ export default function GlobalActivityModal({
             </div>
           </div>
 
-          <div className="float-right flex flex-row mt-5 py-2">
-            {variant === 'view' ? (
+          {variant === 'view' ? (
+            <div className="float-right flex flex-row mt-5 py-2">
               <Button
                 className="ml-4 w-[132px]"
                 onClick={() => handleConfirm('close')}
                 variant="primary"
                 text="Close"
               />
-            ) : (
-              <div>
-                <Button
-                  className="ml-4 w-[132px]"
-                  onClick={() => handleConfirm('cancel')}
-                  variant="secondary"
-                  text="Cancel"
-                />
-                <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="float-right flex flex-row mt-5 py-2">
+              <Button
+                className="ml-4 w-[132px]"
+                onClick={() => handleConfirm('cancel')}
+                variant="secondary"
+                text="Cancel"
+              />
+              <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+            </div>
+          )}
         </div>
       </PopupModal>
 

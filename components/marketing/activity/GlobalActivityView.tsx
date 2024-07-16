@@ -160,34 +160,38 @@ const GlobalActivityView = () => {
   };
 
   const toggleModal = async (type: ActivityModalVariant, data: any) => {
-    const actTypeResponse = await fetchData({
-      url: '/api/marketing/globalActivities/' + productionId.toString(),
-      method: 'POST',
-    });
+    try {
+      const actTypeResponse = await fetchData({
+        url: '/api/marketing/globalActivities/production/' + productionId.toString(),
+        method: 'POST',
+      });
 
-    if (typeof actTypeResponse === 'object') {
-      const globalActivities = actTypeResponse as GlobalActivitiesResponse;
-      const tempRow = {
-        Name: data.actName,
-        ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
-        Cost: data.cost,
-        Date: startOfDay(data.actDate),
-        FollowUpRequired: data.followUpCheck,
-        Notes: data.notes,
-        ProductionId: productionId,
-        DueByDate: data.followUpCheck ? data.followUpDt : null,
-        VenueIds: data.venueIds,
-        Id: data.id,
-      };
+      if (typeof actTypeResponse === 'object') {
+        const globalActivities = actTypeResponse as GlobalActivitiesResponse;
+        const tempRow = {
+          Name: data.actName,
+          ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
+          Cost: data.cost,
+          Date: startOfDay(data.actDate),
+          FollowUpRequired: data.followUpCheck,
+          Notes: data.notes,
+          ProductionId: productionId,
+          DueByDate: data.followUpCheck ? data.followUpDt : null,
+          VenueIds: data.venueIds,
+          Id: data.id,
+        };
 
-      setActRow(tempRow);
+        setActRow(tempRow);
 
-      if (type === 'add' || type === 'edit') {
-        setActModalVariant(type);
-        setShowGlobalActivityModal(true);
-      } else if (type === 'delete') {
-        setShowConfirm(true);
+        if (type === 'add' || type === 'edit') {
+          setActModalVariant(type);
+          setShowGlobalActivityModal(true);
+        } else if (type === 'delete') {
+          setShowConfirm(true);
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 

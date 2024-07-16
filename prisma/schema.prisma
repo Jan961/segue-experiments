@@ -1052,13 +1052,13 @@ model DealMemoHold {
 }
 
 model GlobalBookingActivityVenue {
-  GBAVGlobalActivityId  Int
-  GBAVVenueId           Int
-  GlobalBookingActivity GlobalBookingActivity @relation(fields: [GBAVGlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
-  Venue                 Venue                 @relation(fields: [GBAVVenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
+  GlobalActivityId         Int                   @map("GBAVGlobalActivityId")
+  VenueId                  Int                   @map("GBAVVenueId")
+  GlobalBookingActivity    GlobalBookingActivity @relation(fields: [GlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
+  Venue                    Venue                 @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
 
-  @@id([GBAVGlobalActivityId, GBAVVenueId])
-  @@index([GBAVVenueId], map: "Venue_GBAV")
+  @@id([GlobalActivityId, VenueId])
+  @@index([VenueId], map: "Venue_GBAV")
 }
 
 model Organisation {
