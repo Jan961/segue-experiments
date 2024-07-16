@@ -9,13 +9,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     console.log(AccountId);
     const reqBody = await req.body;
 
-    console.log(reqBody);
-    //  missing fields:
-    //  CompanyWebsite
-    //  type of company
-    //  phone number
-    // one of the currency fields
-    //
     const companyDetails = await prisma.Account.update({
       where: { AccountId },
       data: {
@@ -26,10 +19,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AccountAddressTown: reqBody?.townName,
         AccountAddressCountry: reqBody?.country,
         AccountAddressPostcode: reqBody?.postcode,
+        AccountPhone: reqBody?.phoneNumber,
         AccountMainEmail: reqBody?.companyEmail,
+        AccountWebsite: reqBody?.companyWebsite,
         AccountVATNumber: reqBody?.vatNumber,
         AccountCompanyNumber: reqBody?.companyNumber,
         AccountCurrencyCode: reqBody?.currencyCode,
+        AccountTypeOfCompany: reqBody?.typeOfCompany,
+        AccountPaymentCurrencyCode: reqBody?.currencyForPayment,
       },
     });
     console.log(companyDetails);
