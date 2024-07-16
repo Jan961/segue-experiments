@@ -148,6 +148,7 @@ export default forwardRef(function Table(
       <GridStyles {...styleProps} />
       <div
         className="ag-theme-quartz"
+        data-testid={testId}
         style={{
           height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : '',
         }}

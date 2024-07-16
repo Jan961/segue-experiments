@@ -160,34 +160,38 @@ const GlobalActivityView = () => {
   };
 
   const toggleModal = async (type: ActivityModalVariant, data: any) => {
-    const actTypeResponse = await fetchData({
-      url: '/api/marketing/globalActivities/' + productionId.toString(),
-      method: 'POST',
-    });
+    try {
+      const actTypeResponse = await fetchData({
+        url: '/api/marketing/globalActivities/production/' + productionId.toString(),
+        method: 'POST',
+      });
 
-    if (typeof actTypeResponse === 'object') {
-      const globalActivities = actTypeResponse as GlobalActivitiesResponse;
-      const tempRow = {
-        Name: data.actName,
-        ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
-        Cost: data.cost,
-        Date: startOfDay(data.actDate),
-        FollowUpRequired: data.followUpCheck,
-        Notes: data.notes,
-        ProductionId: productionId,
-        DueByDate: data.followUpCheck ? data.followUpDt : null,
-        VenueIds: data.venueIds,
-        Id: data.id,
-      };
+      if (typeof actTypeResponse === 'object') {
+        const globalActivities = actTypeResponse as GlobalActivitiesResponse;
+        const tempRow = {
+          Name: data.actName,
+          ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
+          Cost: data.cost,
+          Date: startOfDay(data.actDate),
+          FollowUpRequired: data.followUpCheck,
+          Notes: data.notes,
+          ProductionId: productionId,
+          DueByDate: data.followUpCheck ? data.followUpDt : null,
+          VenueIds: data.venueIds,
+          Id: data.id,
+        };
 
-      setActRow(tempRow);
+        setActRow(tempRow);
 
-      if (type === 'add' || type === 'edit') {
-        setActModalVariant(type);
-        setShowGlobalActivityModal(true);
-      } else if (type === 'delete') {
-        setShowConfirm(true);
+        if (type === 'add' || type === 'edit') {
+          setActModalVariant(type);
+          setShowGlobalActivityModal(true);
+        } else if (type === 'delete') {
+          setShowConfirm(true);
+        }
       }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -262,18 +266,19 @@ const GlobalActivityView = () => {
   return (
     <div>
       {loading ? (
-        <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
+        <Spinner size="lg" className="mt-[40px] mr-3 -mb-1" />
       ) : (
         <div>
           <div className="flex flex-row w-full justify-end">
             <Button text="Add New Activity" className="w-[160px] mb-5" onClick={() => showAddActivity()} />
           </div>
 
-          <div className="flex flex-row">
-            <div className="w-full h-[500px]">
-              <Table columnDefs={colDefs} rowData={rowData} styleProps={styleProps} />
-            </div>
-          </div>
+          <Table
+            columnDefs={colDefs}
+            rowData={rowData}
+            styleProps={styleProps}
+            gridOptions={{ suppressHorizontalScroll: true }}
+          />
         </div>
       )}
 

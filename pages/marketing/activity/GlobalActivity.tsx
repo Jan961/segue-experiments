@@ -14,9 +14,7 @@ import GlobalActivityFilters from 'components/marketing/GlobalActivityFilters';
 const Index = () => {
   return (
     <Layout title="Marketing | Segue" flush>
-      <div className="mb-8">
-        <GlobalActivityFilters />
-      </div>
+      <GlobalActivityFilters />
     </Layout>
   );
 };
