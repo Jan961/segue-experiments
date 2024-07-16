@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
-import prisma from '../../../../lib/prisma';
-import { getAllCurrencyList } from '../../../../services/currencyService';
+import prisma from 'lib/prisma';
+import { getAllCurrencyList } from 'services/currencyService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -11,13 +11,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const companyDetails = await prisma.Account.findFirst({
       where: { AccountId: { equals: AccountId } },
     });
-    console.log(companyDetails);
-    console.log(email);
+
     const userDetails = await prisma.User.findFirst({
       where: { Email: { equals: email } },
     });
-
-    console.log(userDetails);
 
     const completeCompanyDetails = { ...companyDetails, ...userDetails };
 
@@ -28,6 +25,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     res.status(200).json({ companyDetails: completeCompanyDetails, countryList, currencyList });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error fetching Master Task' });
+    res.status(500).json({ error: 'Error Updating Account Information' });
   }
 }

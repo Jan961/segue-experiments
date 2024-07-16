@@ -1,15 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getAccountId, getEmailFromReq } from 'services/userService';
 import prisma from 'lib/prisma';
+import schema from 'components/admin/tabs/AccountDetailsValidationSchema';
+import { UiAccountType } from 'config/account';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const email = await getEmailFromReq(req);
     const AccountId: number = await getAccountId(email);
-    console.log(AccountId);
     const reqBody = await req.body;
 
-    const companyDetails = await prisma.Account.update({
+    if (!(await validateInfo(reqBody))) res.status(500).json({ error: 'Error Updating Account Information' });
+
+    await prisma.Account.update({
       where: { AccountId },
       data: {
         AccountName: reqBody?.companyName,
@@ -24,21 +27,33 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AccountWebsite: reqBody?.companyWebsite,
         AccountVATNumber: reqBody?.vatNumber,
         AccountCompanyNumber: reqBody?.companyNumber,
-        AccountCurrencyCode: reqBody?.currencyCode,
+        AccountCurrencyCode: reqBody?.currency,
         AccountTypeOfCompany: reqBody?.typeOfCompany,
         AccountPaymentCurrencyCode: reqBody?.currencyForPayment,
       },
     });
-    console.log(companyDetails);
-    const userDetails = await prisma.User.update({
+
+    await prisma.User.update({
       where: { Email: email },
       data: { FirstName: reqBody.firstName, LastName: reqBody.lastName },
     });
-    console.log(userDetails);
 
     res.status(200).json({ status: 'Success' });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Error fetching Master Task' });
+    res.status(500).json({ error: 'Error Updating Account Information' });
+  }
+}
+
+async function validateInfo(data: UiAccountType) {
+  try {
+    await schema.validate({ ...data }, { abortEarly: false });
+    return true;
+  } catch (validationErrors) {
+    const errors = {};
+    validationErrors.inner.forEach((error) => {
+      errors[error.path] = error.message;
+    });
+    return false;
   }
 }

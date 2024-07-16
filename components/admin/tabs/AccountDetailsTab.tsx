@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react';
 import { UiAccountType, initialUiAccountDetails } from 'config/account';
-import { FormField } from '../../account/Form/FormField';
-import Tooltip from '../../core-ui-lib/Tooltip';
-import Icon from '../../core-ui-lib/Icon';
-import Select from '../../core-ui-lib/Select';
+import { FormField } from 'components/account/Form/FormField';
+import Tooltip from 'components/core-ui-lib/Tooltip';
+import Icon from 'components/core-ui-lib/Icon';
+import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { transformToOptions } from '../../../utils';
-import { Button, UploadModal } from '../../core-ui-lib';
+import { transformToOptions } from 'utils';
+import { Button, UploadModal } from 'components/core-ui-lib';
+import schema from './AccountDetailsValidationSchema';
 
 export default function AccountDetailsTab() {
-  const [formData, setFormData] = useState<Partial<UiAccountType>>({ ...initialUiAccountDetails });
+  const [formData, setFormData] = useState<UiAccountType>({ ...initialUiAccountDetails });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const [companyInfo, setCompanyInfo] = useState(null);
   const [countryOptions, setCountryOptions] = useState<SelectOption[]>([]);
   const [currencyOptions, setCurrencyOptions] = useState<SelectOption[]>([]);
   const [uploadVisible, setUploadVisible] = useState<boolean>(false);
@@ -25,17 +25,16 @@ export default function AccountDetailsTab() {
           body: null,
         });
         const data = await response.json();
-        setCompanyInfo(data);
-        console.log(data.countryList);
+
         setCountryOptions(transformToOptions(data.countryList, 'Name', 'Id'));
-        console.log(transformToOptions(data.countryList, 'Name', 'Id'));
+
         setCurrencyOptions(transformToOptions(data.currencyList, 'Code', 'Code'));
         const companyDetails = data?.companyDetails;
         setFormData({
           firstName: companyDetails?.FirstName || '',
           lastName: companyDetails?.LastName || '',
           companyName: companyDetails?.AccountName || '',
-          phoneNumber: '',
+          phoneNumber: companyDetails?.AccountPhone || '',
           addressLine1: companyDetails?.AccountAddress1 || '',
           addressLine2: companyDetails?.AccountAddress2 || '',
           addressLine3: companyDetails?.AccountAddress3 || '',
@@ -43,16 +42,14 @@ export default function AccountDetailsTab() {
           postcode: companyDetails?.AccountAddressPostcode || '',
           country: companyDetails?.AccountAddressCountry || '',
           companyEmail: companyDetails?.AccountMainEmail || '',
-          currencyForPayment: companyDetails?.AccountCurrencyCode || '',
+          currencyForPayment: companyDetails?.AccountPaymentCurrencyCode || '',
           vatNumber: companyDetails?.AccountVATNumber || '',
           companyNumber: companyDetails?.AccountCompanyNumber || '',
-          companyWebsite: companyDetails?.Website || '',
-          typeOfCompany: companyDetails?.TypeOfCompany || '',
+          companyWebsite: companyDetails?.AccountWebsite || '',
+          typeOfCompany: companyDetails?.AccountTypeOfCompany || '',
           currency: companyDetails?.AccountCurrencyCode || '',
         });
       } catch (error) {
-        setValidationErrors({});
-        console.log(companyInfo);
         console.log(error);
       }
     };
@@ -60,20 +57,20 @@ export default function AccountDetailsTab() {
     fetchCompanyInfo();
   }, []);
 
-  // async function validateDetails(data: UiAccountType) {
-  //   try {
-  //     await schema.validate({ ...data }, { abortEarly: false });
-  //     return true;
-  //   } catch (validationErrors) {
-  //     const errors = {};
-  //     validationErrors.inner.forEach((error) => {
-  //       errors[error.path] = error.message;
-  //     });
-  //     setValidationErrors(errors);
-  //     console.log('validation Errors', errors);
-  //     return false;
-  //   }
-  // }
+  async function validateInfo(data: UiAccountType) {
+    try {
+      await schema.validate({ ...data }, { abortEarly: false });
+      return true;
+    } catch (validationErrors) {
+      const errors = {};
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
+      });
+      setValidationErrors(errors);
+      console.log('validation Errors', errors);
+      return false;
+    }
+  }
 
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
@@ -85,17 +82,17 @@ export default function AccountDetailsTab() {
 
   const handleBlur = async () => {
     try {
-      const response = await fetch('/api/admin/accountDetails/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      const data = await response.json();
-      console.log(data);
+      const isValid = await validateInfo(formData);
+      if (isValid) {
+        await fetch('/api/admin/accountDetails/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+      }
     } catch (Exception) {}
   };
 
-  console.log(formData);
   const selectedCountry = countryOptions.find((option) => option.text === formData.country)?.value;
   return (
     <div className="flex flex-row gap-5 w-full">
@@ -217,7 +214,7 @@ export default function AccountDetailsTab() {
           <FormField
             currentValue={formData.companyEmail}
             displayText="Email Address"
-            fieldName=""
+            fieldName="companyEmail"
             handleInputChange={handleInputChange}
             onBlur={handleBlur}
           />
