@@ -266,18 +266,19 @@ const GlobalActivityView = () => {
   return (
     <div>
       {loading ? (
-        <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
+        <Spinner size="lg" className="mt-[40px] mr-3 -mb-1" />
       ) : (
         <div>
           <div className="flex flex-row w-full justify-end">
             <Button text="Add New Activity" className="w-[160px] mb-5" onClick={() => showAddActivity()} />
           </div>
 
-          <div className="flex flex-row">
-            <div className="w-full h-[500px]">
-              <Table columnDefs={colDefs} rowData={rowData} styleProps={styleProps} />
-            </div>
-          </div>
+          <Table
+            columnDefs={colDefs}
+            rowData={rowData}
+            styleProps={styleProps}
+            gridOptions={{ suppressHorizontalScroll: true }}
+          />
         </div>
       )}
 

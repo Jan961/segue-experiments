@@ -22,6 +22,9 @@ export const getActivitiesByBookingId = async (BookingId) => {
       Name: true,
       Id: true,
     },
+    orderBy: {
+      Name: 'asc',
+    },
   });
 
   const info = await prisma.booking.findUnique({
