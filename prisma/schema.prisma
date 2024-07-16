@@ -1370,6 +1370,7 @@ view ProductionView {
   @@ignore
 }
 
+
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ShowView {
   ShowId         Int     @default(0)
