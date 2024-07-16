@@ -16,6 +16,9 @@ export const getActivitiesByProductionId = async (ProductionId) => {
       Name: true,
       Id: true,
     },
+    orderBy: {
+      Name: 'asc',
+    },
   });
 
   const activities = await prisma.$queryRaw`SELECT 
