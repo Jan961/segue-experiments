@@ -53,7 +53,7 @@ const Layout = ({ children, title = 'Your production assistant', flush = false }
   }, []);
 
   return (
-    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col  px-6`}>
+    <div className={`${calibri.variable} font-calibri background-gradient flex flex-col px-6 min-w-max min-h-max`}>
       <Head>
         <title>{title}</title>
         <meta charSet="utf-8" />
