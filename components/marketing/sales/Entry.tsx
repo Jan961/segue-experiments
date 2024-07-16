@@ -81,6 +81,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       const data = {
         bookingId: bookings.selected,
         salesDate,
+        setId,
         schools: {
           seatsSold: parseInt(schSeatsSold),
           seatsSoldVal: parseFloat(schSeatsSoldVal),
