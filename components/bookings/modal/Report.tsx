@@ -37,12 +37,8 @@ export default function Report({
     }
   }, [ProductionId]);
 
-  const defaultColDef = {
-    wrapHeaderText: true,
-  };
-
   const gridOptions = {
-    defaultColDef,
+    defaultColDef: { wrapHeaderText: true },
     autoSizeStrategy: {
       type: 'fitGridWidth',
     },
@@ -53,8 +49,18 @@ export default function Report({
         return { fontWeight: 'normal' };
       }
     },
+    onRowDataUpdated: (params) => {
+      params.api.forEachNode((rowNode) => {
+        rowNode.id = rowNode.data.name;
+      });
+    },
+    getRowId: (data) => {
+      return data.data.name;
+    },
+    getRowNodeId: (data) => {
+      return data.id;
+    },
   };
-
   return (
     <>
       <PopupModal show={visible} onClose={onClose} title="Tour Summary" titleClass="text-primary-navy">
@@ -69,8 +75,9 @@ export default function Report({
               {productionSummary.map((item, index) => (
                 <div key={index} className={`w-full ${item.bold ? 'font-bold' : 'font-normal'}`}>
                   {item.length > 0 && (
-                    <div className={'w-full mb-2 overflow-x-hidden'}>
+                    <div className="w-full mb-2 overflow-x-hidden">
                       <Table
+                        testId="tour-report"
                         key={index}
                         columnDefs={tourSummaryColumnDefs}
                         rowData={item}

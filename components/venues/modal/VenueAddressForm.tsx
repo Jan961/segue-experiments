@@ -4,8 +4,7 @@ import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueAddressDetails } from 'config/venue';
 import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-import Icon from 'components/core-ui-lib/Icon';
-import Tooltip from 'components/core-ui-lib/Tooltip';
+import { Icon, Tooltip } from 'components/core-ui-lib';
 
 interface VenueAddressFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -104,8 +103,10 @@ const VenueAddressForm = ({
               width="w-[200px]"
             >
               <p className="text-primary-input-text">Country</p>
+
               <Icon iconName="info-circle-solid" />
             </Tooltip>
+
             <Select
               name="primaryCountry"
               className="w-full font-bold"
@@ -120,7 +121,26 @@ const VenueAddressForm = ({
             <small className="text-primary-red flex">{validationErrors.primaryCountry}</small>
           )}
         </div>
-
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Phone</p>
+          <TextInput
+            placeholder="Enter Phone Number"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryPhoneNumber}
+            onChange={(e) => handleInputChange('primaryPhoneNumber', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Email</p>
+          <TextInput
+            placeholder="Enter Email"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.primaryEMail}
+            onChange={(e) => handleInputChange('primaryEMail', e.target.value)}
+          />
+        </label>
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Stage Door</p>
           <TextInput
@@ -191,16 +211,37 @@ const VenueAddressForm = ({
             width="w-[200px]"
           >
             <p className="text-primary-input-text">Country</p>
+
             <Icon iconName="info-circle-solid" />
           </Tooltip>
           <Select
             name="deliveryCountry"
-            className="font-bold"
+            className="w-full font-bold"
             placeholder="Country"
             value={formData.deliveryCountry}
             onChange={(value) => handleInputChange('deliveryCountry', parseInt(value as string, 10))}
             options={countryOptions}
             isSearchable
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Phone</p>
+          <TextInput
+            placeholder="Enter Phone Number"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryPhoneNumber}
+            onChange={(e) => handleInputChange('deliveryPhoneNumber', e.target.value)}
+          />
+        </label>
+        <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <p className="text-primary-input-text">Email</p>
+          <TextInput
+            placeholder="Enter Email"
+            className="w-full justify-between"
+            inputClassName="w-full"
+            value={formData.deliveryEMail}
+            onChange={(e) => handleInputChange('deliveryEMail', e.target.value)}
           />
         </label>
 

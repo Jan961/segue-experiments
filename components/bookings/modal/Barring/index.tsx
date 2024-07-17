@@ -25,6 +25,18 @@ const barringGridOptions = {
   rowClassRules: {
     '!bg-primary-orange !bg-opacity-25': (params) => params.data.hasBarringConflict,
   },
+
+  onRowDataUpdated: (params) => {
+    params.api.forEachNode((rowNode) => {
+      rowNode.id = rowNode.data.name;
+    });
+  },
+  getRowId: (data) => {
+    return data.data.name;
+  },
+  getRowNodeId: (data) => {
+    return data.id;
+  },
 };
 
 export default function Barring({ visible, onClose }: BarringProps) {
@@ -108,6 +120,7 @@ export default function Barring({ visible, onClose }: BarringProps) {
                 style={{ maxHeight: 'calc(100vh - 450px)', minHeight: '110px' }}
               >
                 <Table
+                  testId="barring-table"
                   onRowSelected={onRowSelected}
                   ref={tableRef}
                   columnDefs={barredVenueColumnDefs}

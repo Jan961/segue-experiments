@@ -2,8 +2,8 @@ import { productionCompaniesColDefs, styleProps } from 'components/admin/tableCo
 import { useCallback, useEffect, useState } from 'react';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { DeleteConfirmation } from 'components/global/DeleteConfirmation';
 import axios from 'axios';
+import { ConfirmationDialog } from 'components/core-ui-lib';
 
 type ProductionCompany = {
   companyName: '';
@@ -128,16 +128,17 @@ const ProductionCompaniesTab = () => {
         />
       </div>
       {showDeleteModal && (
-        <DeleteConfirmation
-          title="Delete Company Details"
-          onCancel={() => {
+        <ConfirmationDialog
+          show
+          onYesClick={() => {
+            deleteProductionCompany();
             setShowDeleteModal(false);
-            setSelectedProdCompany(null);
           }}
-          onConfirm={deleteProductionCompany}
-        >
-          <p>This will the delete the company details</p>
-        </DeleteConfirmation>
+          onNoClick={() => {
+            setShowDeleteModal(false);
+          }}
+          variant="delete"
+        />
       )}
     </div>
   );
