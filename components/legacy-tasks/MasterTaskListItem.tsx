@@ -28,7 +28,7 @@ const TaskListItem = ({ task }: TaskListItemProps) => {
   const [showDeleteConfirmation, setShowDeleteConfirmation] = React.useState(false);
   const { users = {} } = useRecoilValue(userState);
   const assignedToUser = useMemo(() => users[task.AssignedToUserId], [task, users]);
-  const weekOptions = useMemo(() => getWeekOptions(null), []);
+  const weekOptions = useMemo(() => getWeekOptions(null, true), []);
   // const toggleSelected = () => {
   //   setBulkSelection({ ...bulkSelection, [task.Id]: !bulkSelection[task.Id] });
   // };
