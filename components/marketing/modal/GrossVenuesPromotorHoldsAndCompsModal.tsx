@@ -82,7 +82,10 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   });
 
   const prodVenuesOptions: SelectOption[] = useMemo(
-    () => transformToOptions(venues, null, 'Code', ({ Code, Name }) => `${Code} ${Name}`),
+    () =>
+      transformToOptions(venues, null, 'Code', ({ Code, Name }) => `${Code} ${Name}`).sort((a, b) =>
+        a.text.localeCompare(b.text),
+      ),
     [venues],
   );
 
