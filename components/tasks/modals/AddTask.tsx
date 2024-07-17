@@ -51,7 +51,13 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number } = {
+const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
+  Progress?: number;
+  DueDate?: string;
+  ProductionId?: number;
+  CompleteDate?: string;
+  TaskCompletedDate?: string;
+} = {
   Id: undefined,
   Code: 0,
   Name: '',
@@ -67,11 +73,12 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   Progress: 0,
   DueDate: '',
   ProductionId: 0,
+  TaskCompletedDate: '',
 };
 
 const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = null }: AddTaskProps) => {
   const [inputs, setInputs] = useState<
-    Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number }
+    Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number; TaskCompletedDate?: string }
   >(task || DEFAULT_MASTER_TASK);
 
   const productionList = useRecoilValue(productionJumpState).productions;
@@ -251,6 +258,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   console.log(isMasterTask ? inputs?.Code?.toString() : showCode);
+  console.log(inputs);
   return (
     <PopupModal
       show={visible}
@@ -332,8 +340,8 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Label className="!text-secondary pr-6" text="Completed on" />
             <DateInput
               disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100}
-              value={inputs?.DueDate}
-              onChange={(value) => handleOnChange({ target: { id: 'DueDate', value } })}
+              value={inputs?.TaskCompletedDate}
+              onChange={(value) => handleOnChange({ target: { id: 'TaskCompletedDate', value } })}
             />
           </div>
         </div>

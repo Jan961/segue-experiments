@@ -174,6 +174,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const productionsWithTasks = await getProductionsAndTasks(AccountId, ProductionId);
 
   const productions: ProductionsWithTasks[] = mapToProductionTasksDTO(productionsWithTasks);
+
   const initialState: InitialState = {
     global: {
       productionJump,

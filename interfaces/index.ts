@@ -90,6 +90,7 @@ export type ProductionTaskDTO = {
   AssignedToUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
+  TaskCompletedDate: string;
 };
 
 // Existing Production interface for old schema. Remove eventually

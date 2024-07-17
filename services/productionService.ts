@@ -259,6 +259,18 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
     },
   });
   productionsWithTasks = productionsWithTasks.map((production) => {
+    return {
+      ...production,
+      ProductionTask: production.ProductionTask.map((task) => {
+        return {
+          ...task,
+          TaskCompletedDate: task.TaskCompletedDate != null ? task.TaskCompletedDate.toISOString() : null,
+        };
+      }),
+    };
+  });
+
+  productionsWithTasks = productionsWithTasks.map((production) => {
     const { StartDate, EndDate } = production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
     const weekNumsList = production.ProductionTask.map((ProductionTask) => [
       ProductionTask.CompleteByWeekNum,
