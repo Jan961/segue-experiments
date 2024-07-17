@@ -32,10 +32,10 @@ interface HoldCompSet {
 }
 
 interface SalesFigure {
-  seatsReserved: string;
-  seatsReservedVal: string;
-  seatsSold: string;
-  seatsSoldVal: string;
+  seatsReserved: number;
+  seatsReservedVal: number;
+  seatsSold: number;
+  seatsSoldVal: number;
 }
 
 interface SalesFigureSet {
@@ -48,14 +48,8 @@ export interface SalesEntryRef {
 }
 
 const Entry = forwardRef<SalesEntryRef>((_, ref) => {
-  const [genSeatsSold, setGenSeatsSold] = useState('');
-  const [genSeatsSoldVal, setGenSeatsSoldVal] = useState('');
-  const [genSeatsReserved, setGenSeatsReserved] = useState('');
-  const [genSeatsReservedVal, setGenSeatsReservedVal] = useState('');
-  const [schSeatsSold, setSchSeatsSold] = useState('');
-  const [schSeatsSoldVal, setSchSeatsSoldVal] = useState('');
-  const [schSeatsReserved, setSchSeatsReserved] = useState('');
-  const [schSeatsReservedVal, setSchSeatsReservedVal] = useState('');
+  const [prevSalesFigureSet, setPrevSalesFigureSet] = useState<SalesFigureSet>(null);
+  const [currSalesFigureSet, setCurrSalesFigureSet] = useState<SalesFigureSet>(null);
   const [bookingHasSchoolSales, setBookingHasSchoolSales] = useState<boolean>(false);
   const [bookingSaleNotes, setBookingSaleNotes] = useState('');
   const [holdData, setHoldData] = useState([]);
@@ -72,29 +66,72 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [bookings, setBookings] = useRecoilState(bookingJumpState);
   const [setId, setSetId] = useState(-1);
   const { selected: productionId } = useRecoilValue(productionJumpState);
+  const [schoolErrors, setSchoolErrors] = useState([]);
+  const [generalErrors, setGeneralErrors] = useState([]);
+  const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
 
   const { fetchData } = useAxios();
 
-  const handleUpdate = async () => {
+  const compareSalesFigures = (prev: SalesFigure, curr: SalesFigure) => {
+    // If prev is null, there are no errors.
+    if (!prev) {
+      return null;
+    }
+
+    const fields = [
+      { key: 'seatsReserved', name: 'Seats Reserved' },
+      { key: 'seatsReservedVal', name: 'Seats Reserved Value' },
+      { key: 'seatsSold', name: 'Seats Sold' },
+      { key: 'seatsSoldVal', name: 'Seats Sold Value' },
+    ];
+
+    const errors = [];
+
+    fields.forEach((field) => {
+      if (curr[field.key] < prev[field.key]) {
+        errors.push(`${field.name} in current weeks values is less than previously entered values.`);
+      }
+    });
+
+    return errors.length > 0 ? errors : null;
+  };
+
+  const handleUpdate = async (currSetId: number) => {
     try {
-      const data = {
+      if (!warningIssued) {
+        const generalErrors = compareSalesFigures(prevSalesFigureSet.general, currSalesFigureSet.general);
+        const schoolErrors = compareSalesFigures(prevSalesFigureSet.schools, currSalesFigureSet.schools);
+
+        let figuresHaveIssue = false;
+
+        if (generalErrors !== null) {
+          setGeneralErrors(generalErrors);
+          figuresHaveIssue = true;
+        }
+
+        if (schoolErrors !== null) {
+          setSchoolErrors(schoolErrors);
+          figuresHaveIssue = true;
+        }
+
+        if (figuresHaveIssue) {
+          setWarningIssued(true);
+          return;
+        }
+      }
+
+      let data = {
         bookingId: bookings.selected,
         salesDate,
-        setId,
-        schools: {
-          seatsSold: parseInt(schSeatsSold),
-          seatsSoldVal: parseFloat(schSeatsSoldVal),
-          seatsReserved: parseInt(schSeatsReserved),
-          seatsReservedVal: parseFloat(schSeatsReservedVal),
-        },
-        general: {
-          seatsSold: parseInt(genSeatsSold),
-          seatsSoldVal: parseFloat(genSeatsSoldVal),
-          seatsReserved: parseInt(genSeatsReserved),
-          seatsReservedVal: parseFloat(genSeatsReservedVal),
-        },
+        setId: currSetId,
+        general: currSalesFigureSet.general,
+        schools: {},
       };
+
+      if (currSalesFigureSet.schools !== null) {
+        data = { ...data, schools: currSalesFigureSet.schools };
+      }
 
       const response = await fetchData({
         url: '/api/marketing/sales/process/entry/sales',
@@ -103,8 +140,11 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       });
 
       if (typeof response === 'object') {
-        const setIdObj = response as { setId: number };
+        const setIdObj = response as { setId: number; transaction: string };
         setSetId(setIdObj.setId);
+        setWarningIssued(false);
+        setSchoolErrors([]);
+        setGeneralErrors([]);
       }
     } catch (error) {
       console.log(error);
@@ -205,17 +245,17 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   };
 
   const handleCancel = () => {
-    setSalesFigures(salesDate, false);
+    copyPreviousWeeks();
   };
 
-  const setNumericVal = (setFunction: (value) => void, value: string) => {
+  const validateNumber = (value: string): number => {
     if (value === '') {
-      setFunction(0);
+      return 0;
     } else {
       const regexPattern = /^-?\d*(\.\d*)?$/;
 
       if (regexPattern.test(value)) {
-        setFunction(value);
+        return parseInt(value);
       }
     }
   };
@@ -273,14 +313,25 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         const salesFigures = sales as SalesFigureSet;
 
         // set the sales figures, if available
-        setGenSeatsReserved(validateSale(salesFigures.general?.seatsReserved));
-        setGenSeatsReservedVal(validateSale(salesFigures.general?.seatsReservedVal));
-        setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
-        setGenSeatsSoldVal(validateSale(salesFigures.general?.seatsSoldVal));
-        setSchSeatsReserved(validateSale(salesFigures.schools?.seatsReserved));
-        setSchSeatsReservedVal(validateSale(salesFigures.schools?.seatsReservedVal));
-        setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
-        setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
+        const general: SalesFigure = {
+          seatsReserved: validateSale(salesFigures.general?.seatsReserved),
+          seatsReservedVal: validateSale(salesFigures.general?.seatsReservedVal),
+          seatsSold: validateSale(salesFigures.general?.seatsSold),
+          seatsSoldVal: validateSale(salesFigures.general?.seatsSoldVal),
+        };
+
+        const schools: SalesFigure = {
+          seatsReserved: validateSale(salesFigures.schools?.seatsReserved),
+          seatsReservedVal: validateSale(salesFigures.schools?.seatsReservedVal),
+          seatsSold: validateSale(salesFigures.schools?.seatsSold),
+          seatsSoldVal: validateSale(salesFigures.schools?.seatsSoldVal),
+        };
+
+        if (previous) {
+          setPrevSalesFigureSet({ general, schools });
+        } else {
+          setCurrSalesFigureSet({ general, schools });
+        }
       }
 
       // holds and comps
@@ -317,9 +368,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const validateSale = (saleFigure) => {
     if (isNullOrEmpty(saleFigure)) {
-      return '';
+      return 0;
     } else {
-      return saleFigure;
+      return parseInt(saleFigure);
     }
   };
 
@@ -377,12 +428,20 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     }
   };
 
+  const copyPreviousWeeks = () => {
+    setCurrSalesFigureSet(prevSalesFigureSet);
+  };
+
   useEffect(() => {
     const initForm = async () => {
       try {
         setSalesDate(new Date());
         // set the current days sales figues if available
         setSalesFigures(new Date(), false);
+
+        // set the prev sales figures to the previously enter values
+        // not the best way but to be improved when the marketing module is being refactored in full
+        setSalesFigures(salesDate, true);
       } catch (error) {
         console.log(error);
       }
@@ -393,10 +452,27 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     }
   }, [fetchData, bookings.selected]);
 
+  // functionality to send data to the db when the return key is pressed - using an event listener so the other set functions are interfered with.
+  // Temp commented out because state for current field is not processed therefore new value is not sent to DB
+  // useEffect(() => {
+  //   const handleKeyPress = async (event) => {
+  //     if (event.key === 'Enter') {
+  //       await handleUpdate(setId);
+  //     }
+  //   };
+
+  //   window.addEventListener('keydown', handleKeyPress);
+
+  //   return () => {
+  //     window.removeEventListener('keydown', handleKeyPress);
+  //   };
+  // }, []);
+
   useImperativeHandle(ref, () => ({
     resetForm: (week) => {
       setSalesDate(new Date(week));
       setSalesFigures(new Date(week), false);
+      setSalesFigures(new Date(week), true);
     },
   }));
 
@@ -409,12 +485,20 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
           ) : (
             <div className="flex flex-row w-full gap-8">
               <div className="flex flex-col">
-                <div
-                  className={`w-[849px] ${
-                    bookingHasSchoolSales ? 'h-[275px]' : 'h-[185px]'
-                  } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
-                >
+                <div className="w-[849px] bg-primary-green/[0.30] rounded-xl mt-5 p-4">
                   <div className="leading-6 text-xl text-primary-input-text font-bold mt-1 flex-row">General</div>
+
+                  {generalErrors && generalErrors.length > 0 && (
+                    <div className="flex flex-row">
+                      <div className="leading-6 text-base text-primary-red font-bold mt-5">
+                        {generalErrors.map((error, index) => (
+                          <div className="flex flex-row" key={index}>
+                            {error}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex flex-row justify-between">
                     <div className="flex flex-col mr-[20px]">
@@ -426,8 +510,13 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           className="w-[137px] h-[31px] flex flex-col -mt-1"
                           placeholder="Enter Seats"
                           id="genSeatsSold"
-                          value={genSeatsSold}
-                          onChange={(event) => setNumericVal(setGenSeatsSold, event.target.value)}
+                          value={currSalesFigureSet.general.seatsSold}
+                          onChange={(event) =>
+                            setCurrSalesFigureSet({
+                              ...currSalesFigureSet,
+                              general: { ...currSalesFigureSet.general, seatsSold: validateNumber(event.target.value) },
+                            })
+                          }
                         />
                       </div>
 
@@ -439,8 +528,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           className="w-[137px] h-[31px] flex flex-col -mt-1"
                           placeholder="Enter Seats"
                           id="genSeatsReserved"
-                          value={genSeatsReserved}
-                          onChange={(event) => setNumericVal(setGenSeatsReserved, event.target.value)}
+                          value={currSalesFigureSet.general.seatsReserved}
+                          onChange={(event) =>
+                            setCurrSalesFigureSet({
+                              ...currSalesFigureSet,
+                              general: {
+                                ...currSalesFigureSet.general,
+                                seatsReserved: validateNumber(event.target.value),
+                              },
+                            })
+                          }
                         />
                       </div>
                     </div>
@@ -454,8 +551,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           className="w-[137px] h-[31px] flex flex-col -mt-1"
                           placeholder="Enter Value"
                           id="genSeatsSoldVal"
-                          value={genSeatsSoldVal}
-                          onChange={(event) => setNumericVal(setGenSeatsSoldVal, event.target.value)}
+                          value={currSalesFigureSet.general.seatsSoldVal}
+                          onChange={(event) =>
+                            setCurrSalesFigureSet({
+                              ...currSalesFigureSet,
+                              general: {
+                                ...currSalesFigureSet.general,
+                                seatsSoldVal: validateNumber(event.target.value),
+                              },
+                            })
+                          }
                         />
                       </div>
 
@@ -467,8 +572,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           className="w-[137px] h-[31px] flex flex-col -mt-1"
                           placeholder="Enter Value"
                           id="genSeatsReservedVal"
-                          value={genSeatsReservedVal}
-                          onChange={(event) => setNumericVal(setGenSeatsReservedVal, event.target.value)}
+                          value={currSalesFigureSet.general.seatsReservedVal}
+                          onChange={(event) =>
+                            setCurrSalesFigureSet({
+                              ...currSalesFigureSet,
+                              general: {
+                                ...currSalesFigureSet.general,
+                                seatsReservedVal: validateNumber(event.target.value),
+                              },
+                            })
+                          }
                         />
                       </div>
                     </div>
@@ -479,13 +592,13 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           className="w-[132px] flex flex-row mb-2"
                           variant="primary"
                           text="Update"
-                          onClick={handleUpdate}
+                          onClick={() => handleUpdate(setId)}
                         />
                         <Button
                           className="w-[211px] flex flex-row"
                           variant="primary"
                           text="Copy Previous Week's Sales"
-                          onClick={() => setSalesFigures(salesDate, true)}
+                          onClick={copyPreviousWeeks}
                         />
                       </div>
                     </div>
@@ -494,6 +607,18 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                   {bookingHasSchoolSales ? (
                     <div>
                       <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Schools</div>
+
+                      {schoolErrors && schoolErrors.length > 0 && (
+                        <div className="flex flex-row">
+                          <div className="leading-6 text-base text-primary-red font-bold mt-5">
+                            {schoolErrors.map((error, index) => (
+                              <div className="flex flex-row" key={index}>
+                                {error}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="flex flex-row justify-between">
                         <div className="flex flex-col mr-[20px]">
@@ -505,8 +630,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Seats"
                               id="schSeatsSold"
-                              value={schSeatsSold}
-                              onChange={(event) => setNumericVal(setSchSeatsSold, event.target.value)}
+                              value={currSalesFigureSet.schools.seatsSold}
+                              onChange={(event) =>
+                                setCurrSalesFigureSet({
+                                  ...currSalesFigureSet,
+                                  schools: {
+                                    ...currSalesFigureSet.schools,
+                                    seatsSold: validateNumber(event.target.value),
+                                  },
+                                })
+                              }
                             />
                           </div>
 
@@ -518,8 +651,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Seats"
                               id="schSeatsReserved"
-                              value={schSeatsReserved}
-                              onChange={(event) => setNumericVal(setSchSeatsReserved, event.target.value)}
+                              value={currSalesFigureSet.schools.seatsReserved}
+                              onChange={(event) =>
+                                setCurrSalesFigureSet({
+                                  ...currSalesFigureSet,
+                                  schools: {
+                                    ...currSalesFigureSet.schools,
+                                    seatsReserved: validateNumber(event.target.value),
+                                  },
+                                })
+                              }
                             />
                           </div>
                         </div>
@@ -533,8 +674,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Value"
                               id="schSeatsSoldVal"
-                              value={schSeatsSoldVal}
-                              onChange={(event) => setNumericVal(setSchSeatsSoldVal, event.target.value)}
+                              value={currSalesFigureSet.schools.seatsSoldVal}
+                              onChange={(event) =>
+                                setCurrSalesFigureSet({
+                                  ...currSalesFigureSet,
+                                  schools: {
+                                    ...currSalesFigureSet.schools,
+                                    seatsSoldVal: validateNumber(event.target.value),
+                                  },
+                                })
+                              }
                             />
                           </div>
 
@@ -546,8 +695,16 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
                               placeholder="Enter Value"
                               id="schSeatsReservedVal"
-                              value={schSeatsReservedVal}
-                              onChange={(event) => setNumericVal(setSchSeatsReservedVal, event.target.value)}
+                              value={currSalesFigureSet.schools.seatsReservedVal}
+                              onChange={(event) =>
+                                setCurrSalesFigureSet({
+                                  ...currSalesFigureSet,
+                                  schools: {
+                                    ...currSalesFigureSet.schools,
+                                    seatsReservedVal: validateNumber(event.target.value),
+                                  },
+                                })
+                              }
                             />
                           </div>
                         </div>
