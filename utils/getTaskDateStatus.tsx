@@ -57,8 +57,6 @@ export const getWeekOptions = (production, isMasterTask: boolean): SelectOption[
     } else {
       const weekDifference = week - numWeeksInDropDown;
       if (weekDifference >= 0) return { text: `EOT+${weekDifference + 1}`, value: week };
-
-      console.log(weekDifference);
       return week < 0 ? formatWeekOption(week) : formatWeekOption(week + 1);
     }
   });
