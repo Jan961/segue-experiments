@@ -24,3 +24,24 @@ export const Primary: Story = {
     className: 'w-128',
   },
 };
+
+export const DisabledDefault: Story = {
+  args: {
+    label: 'Production',
+    placeholder: 'Please select...',
+    options: values,
+    disabled: true,
+    className: 'w-128',
+  },
+};
+
+export const DisabledWhite: Story = {
+  args: {
+    label: 'Production',
+    placeholder: 'Please select...',
+    options: values,
+    disabled: true,
+    defaultDisabled: false,
+    className: 'w-128',
+  },
+};

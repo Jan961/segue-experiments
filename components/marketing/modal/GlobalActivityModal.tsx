@@ -128,7 +128,7 @@ export default function GlobalActivityModal({
     } else if (variant === 'edit' || variant === 'view') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(startOfDay(new Date(data.Date)));
+      setActDate(data.Date.toString() === 'Invalid Date' ? null : startOfDay(new Date(data.Date)));
       setActFollowUp(data.FollowUpRequired);
       setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
       setCost(data.Cost.toString());
@@ -355,6 +355,7 @@ export default function GlobalActivityModal({
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
             disabled={variant === 'view'}
+            defaultDisabled={false}
           />
 
           {variant !== 'view' && (
@@ -365,7 +366,7 @@ export default function GlobalActivityModal({
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
-              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={300} />
             </div>
           </div>
 

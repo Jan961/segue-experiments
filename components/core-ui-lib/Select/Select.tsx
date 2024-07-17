@@ -38,6 +38,7 @@ export interface SelectProps extends WithTestId {
   isClearable?: boolean;
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
+  defaultDisabled?: boolean;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -80,6 +81,7 @@ export default forwardRef(function Select(
     customStyles = {},
     placeholder = '',
     disabled = false,
+    defaultDisabled = true,
     testId = 'core-ui-lib-select',
     label,
     inline = false,
@@ -92,73 +94,68 @@ export default forwardRef(function Select(
 ) {
   const colourStyles: StylesConfig = useMemo(
     () => ({
-      ...{
-        control: (styles, { isDisabled }) => ({
-          ...styles,
-          fontWeight: 'bold',
-          fontSize: '1rem',
-          lineHeight: '1.5rem',
-          backgroundColor: isDisabled ? '#E9EBF0CC' : '#FFF',
-          padding: '0 4px 0 4px',
-          border: 0,
-          // This line disable the blue border
-          boxShadow: 'none',
-          minHeight: COMP_HEIGHT,
-          height: COMP_HEIGHT,
-        }),
-        option: (styles, { isDisabled, isSelected, isFocused }) => {
-          return {
-            ...styles,
-            fontSize: '1rem',
-            lineHeight: '1.5rem',
-            backgroundColor: isDisabled
-              ? undefined
-              : isSelected
-              ? '#21345BCC'
-              : isFocused
-              ? '#21345B99'
-              : styles.backgroundColor,
-            color: isDisabled ? '#ccc' : isSelected || isFocused ? '#FFF' : '#617293',
-            cursor: isDisabled ? 'not-allowed' : 'default',
-            ':active': {
-              ...styles[':active'],
-              backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
-            },
-            ':hover': {
-              ...styles[':hover'],
-              color: '#FFF',
-              backgroundColor: '#21345B99',
-            },
-          };
+      control: (styles, { isDisabled }) => ({
+        ...styles,
+        fontWeight: 'bold',
+        fontSize: '1rem',
+        lineHeight: '1.5rem',
+        backgroundColor: isDisabled ? (defaultDisabled ? '#E9EBF0CC' : '#FFF') : '#FFF',
+        padding: '0 4px 0 4px',
+        border: 0,
+        boxShadow: 'none',
+        minHeight: COMP_HEIGHT,
+        height: COMP_HEIGHT,
+      }),
+      option: (styles, { isDisabled, isSelected, isFocused }) => ({
+        ...styles,
+        fontSize: '1rem',
+        lineHeight: '1.5rem',
+        backgroundColor: isDisabled
+          ? undefined
+          : isSelected
+          ? '#21345BCC'
+          : isFocused
+          ? '#21345B99'
+          : styles.backgroundColor,
+        color: isDisabled ? (defaultDisabled ? '#ccc' : styles.color) : isSelected || isFocused ? '#FFF' : '#617293',
+        cursor: isDisabled ? (defaultDisabled ? 'not-allowed' : 'default') : 'default',
+        ':active': {
+          ...styles[':active'],
+          backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
         },
-        valueContainer: (styles) => ({
-          ...styles,
-          height: COMP_HEIGHT,
-          padding: '0 6px',
-        }),
-        input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
-        placeholder: (styles) => ({ ...styles, color: '#617293' }),
-        singleValue: (styles) => ({
-          ...styles,
-          color: '#617293',
-          '::selection': {
-            color: 'red',
-            background: 'yellow',
-          },
-        }),
-        clearIndicator: (styles) => ({
-          ...styles,
-          paddingLeft: '0 !important',
-          paddingRight: '0 !important',
-          paddingTop: '4px  !important',
-          paddingBottom: '4px  !important',
-          height: COMP_HEIGHT,
-        }),
-        menu: (styles) => ({ ...styles, zIndex: 20 }),
-      },
+        ':hover': {
+          ...styles[':hover'],
+          color: '#FFF',
+          backgroundColor: '#21345B99',
+        },
+      }),
+      valueContainer: (styles) => ({
+        ...styles,
+        height: COMP_HEIGHT,
+        padding: '0 6px',
+      }),
+      input: (styles) => ({ ...styles, color: '#617293', margin: '0px' }),
+      placeholder: (styles) => ({ ...styles, color: '#617293' }),
+      singleValue: (styles) => ({
+        ...styles,
+        color: '#617293',
+        '::selection': {
+          color: 'red',
+          background: 'yellow',
+        },
+      }),
+      clearIndicator: (styles) => ({
+        ...styles,
+        paddingLeft: '0 !important',
+        paddingRight: '0 !important',
+        paddingTop: '4px  !important',
+        paddingBottom: '4px  !important',
+        height: COMP_HEIGHT,
+      }),
+      menu: (styles) => ({ ...styles, zIndex: 20 }),
       ...customStyles,
     }),
-    [customStyles],
+    [customStyles, defaultDisabled],
   );
 
   const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(null);
@@ -224,17 +221,17 @@ export default forwardRef(function Select(
   return (
     <div
       className={classNames(
-        `border border-primary-border rounded-md flex items-center text-sm`,
+        'border border-primary-border rounded-md flex items-center text-sm',
         { 'shadow-sm-shadow': !inline },
         className,
       )}
     >
       {label && (
         <div className="border-r min-w-fit border-primary-border px-3">
-          <Label testId={`${testId ? `${testId}-label` : 'core-ui-lib-select-label'}`} text={label} />
+          <Label testId={testId ? `${testId}-label` : 'core-ui-lib-select-label'} text={label} />
         </div>
       )}
-      <div className="w-full h-full" data-testid={`${testId ? `${testId}` : 'core-ui-lib-select'}`}>
+      <div className="w-full h-full" data-testid={testId || 'core-ui-lib-select'}>
         <WindowedSelect
           ref={ref}
           className="w-full"
