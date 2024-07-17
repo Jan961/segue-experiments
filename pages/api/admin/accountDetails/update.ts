@@ -8,7 +8,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   try {
     const email = await getEmailFromReq(req);
     const AccountId: number = await getAccountId(email);
-    const reqBody = await req.body;
+    const reqBody = req.body;
 
     if (!(await validateInfo(reqBody))) res.status(500).json({ error: 'Error Updating Account Information' });
 
