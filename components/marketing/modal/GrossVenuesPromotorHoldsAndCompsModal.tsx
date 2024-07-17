@@ -81,13 +81,13 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
     },
   });
 
-  const prodVenuesOptions: SelectOption[] = useMemo(
-    () =>
-      transformToOptions(venues, null, 'Code', ({ Code, Name }) => `${Code} ${Name}`).sort((a, b) =>
-        a.text.localeCompare(b.text),
-      ),
-    [venues],
-  );
+  const prodVenuesOptions: SelectOption[] = useMemo(() => {
+    const options = transformToOptions(venues, null, 'Code', ({ Code, Name }) => `${Code} ${Name}`).sort((a, b) =>
+      a.text.localeCompare(b.text),
+    );
+    options.unshift({ text: 'All', value: null });
+    return options;
+  }, [venues, activeModal]);
 
   const onChange = useCallback((key: string, value: string | number) => {
     setFormData((data) => ({ ...data, [key]: value }));
