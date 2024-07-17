@@ -164,11 +164,12 @@ export const exportHoldsComps = async ({ production, productionCode, venue, from
   return response;
 };
 
-export const exportSelectedVenues = async ({ production, productionCode, showId }) => {
+export const exportSelectedVenues = async ({ production, productionCode, showId, selection }) => {
   const payload = {
     productionId: parseInt(production, 10),
     productionCode,
     showId,
+    selection,
   };
   const response = await axios.post('/api/reports/venues', payload, { responseType: 'blob' });
 
