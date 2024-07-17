@@ -399,15 +399,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
         {!inputs.Id && (
           <div className="flex justify-between">
             <div />
-            <div className="flex">
-              <Label className="!text-secondary pr-2" text="Add to Master Task List" />
-              <Checkbox
-                id="addToMasterTask"
-                checked={isChecked}
-                disabled={isMasterTask}
-                onChange={() => setIsChecked(!isChecked)}
-              />
-            </div>
+
+            {!isMasterTask && (
+              <div className="flex">
+                <Label className="!text-secondary pr-2" text="Add to Master Task List" />
+                <Checkbox id="addToMasterTask" checked={isChecked} onChange={() => setIsChecked(!isChecked)} />
+              </div>
+            )}
           </div>
         )}
         <div className="flex justify-between">
