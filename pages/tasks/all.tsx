@@ -14,6 +14,7 @@ import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
+import { productionJumpState } from '../../state/booking/productionJumpState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
@@ -35,7 +36,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   if (!exists) {
     usersList.unshift({ value: -1, text: 'All' });
   }
-
+  const currentProductionObjList = useRecoilValue(productionJumpState).productions;
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
@@ -45,7 +46,10 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         <TasksTable rowData={[]} />
       ) : (
         filteredProductions.map((production) => {
-          const columnDefs = getColumnDefs(usersList, production);
+          const columnDefs = getColumnDefs(
+            usersList,
+            currentProductionObjList.find((item) => item.Id === production.Id),
+          );
           return (
             <div key={production.Id} className="mb-10">
               <TasksTable
