@@ -29,9 +29,9 @@ export const MIN_WEEK = 2;
 export const MAX_WEEK = 99;
 
 export const bookingStatusOptions: SelectOption[] = [
+  { text: 'All', value: null },
   { text: 'Confirmed (C)', value: 'C' },
   { text: 'Unconfirmed (U)', value: 'U' },
-  { text: 'Cancelled (X)', value: 'X' },
 ];
 
 export const currencyCodeToSymbolMap = {
