@@ -346,10 +346,10 @@ model Account {
   AccountOrganisationId      Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
   AccountTermsAgreedBy       String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
   AccountTermsAgreedDate     DateTime?             @map("AccountTermsAgreedDate") @db.Date
-  AccountWebsite             String?               @db.VarChar(255)
-  AccountTypeOfCompany       String?               @db.VarChar(30)
-  AccountPhone               String?               @db.VarChar(30)
-  AccountPaymentCurrencyCode String?               @db.VarChar(3)
+  AccountWebsite             String?               @map("AccountWebsite") @db.VarChar(255)
+  AccountTypeOfCompany       String?               @map("AccountTypeOfCompany")@db.VarChar(30)
+  AccountPhone               String?               @map("AccountPhone")@db.VarChar(30)
+  AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode")@db.VarChar(3)
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Account_Payment")
   AccountContact             AccountContact?
   AccountSubscription        AccountSubscription[]
@@ -1369,6 +1369,7 @@ view ProductionView {
 
   @@ignore
 }
+
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ShowView {

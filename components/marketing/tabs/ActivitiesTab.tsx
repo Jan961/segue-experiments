@@ -457,17 +457,22 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   }, [props.bookingId]);
 
   const onExport = async () => {
-    const urlPath = `/api/reports/marketing/activitiesReport/${props.bookingId}`;
+    const urlPath = `/api/reports/marketing/activities/${props.bookingId}`;
     const selectedVenue = bookings.bookings?.filter((booking) => booking.Id === bookings.selected);
-    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const venueAndDate = selectedVenue?.[0]?.Venue?.Code + ' ' + selectedVenue?.[0]?.Venue?.Name;
     const selectedProduction = productions?.filter((production) => production.Id === productionId);
     const { ShowName, ShowCode, Code } = selectedProduction[0];
-    const productionName = `${ShowName} (${ShowCode + Code})`;
+    const productionName = `${ShowCode + Code} ${ShowName}`;
     const payload = {
       productionName,
       venueAndDate,
     };
-    const downloadContactNotesReport = async () => await exportExcelReport(urlPath, payload, 'Activities Report');
+    const downloadContactNotesReport = async () =>
+      await exportExcelReport(
+        urlPath,
+        payload,
+        `${productionName} ${selectedVenue?.[0]?.Venue?.Name} Marketing Activities`,
+      );
     notify.promise(downloadContactNotesReport(), {
       loading: 'Generating activities report',
       success: 'Activities report downloaded successfully',
