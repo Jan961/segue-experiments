@@ -60,6 +60,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="First Name" />
             <TextInput
+              data-testid="first-name"
               name="firstName"
               placeholder="Enter first name"
               className="w-full"
@@ -70,6 +71,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Last Name" />
             <TextInput
+              data-testid="last-name"
               name="lastName"
               placeholder="Enter last name"
               className="w-full"
@@ -80,6 +82,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Company" />
             <TextInput
+              data-testid="company-name"
               name="companyName"
               placeholder="Enter name of main company"
               className="w-full"
@@ -90,6 +93,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Phone Number" />
             <TextInput
+              data-testid="phone-number"
               name="phoneNumber"
               placeholder="Enter phone number"
               className="w-full"
@@ -100,6 +104,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 1" />
             <TextInput
+              data-testid="address-line1"
               name="addressLine1"
               placeholder="Enter address line 1"
               className="w-full"
@@ -110,6 +115,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 2" />
             <TextInput
+              data-testid="address-line2"
               name="addressLine2"
               placeholder="Enter address line 2"
               className="w-full"
@@ -120,6 +126,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Address line 3" />
             <TextInput
+              data-testid="address-line3"
               name="addressLine3"
               placeholder="Enter address line 3"
               className="w-full"
@@ -132,6 +139,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Town" />
             <TextInput
+              data-testid="town"
               name="town"
               placeholder="Enter town"
               className="w-full"
@@ -142,6 +150,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Postcode" />
             <TextInput
+              data-testid="post-code"
               name="postcode"
               placeholder="Enter postcode"
               className="w-full"
@@ -164,6 +173,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="Company Email Address" />
             <TextInput
+              data-testid="company-email"
               name="email"
               placeholder="EnterCompany Email Addressr"
               className="w-full"
@@ -186,6 +196,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
           <div className="mb-2">
             <Label text="VAT Number" />
             <TextInput
+              data-testid="vat-number"
               name="vatNumber"
               placeholder="Enter VAT Number"
               className="w-full"
