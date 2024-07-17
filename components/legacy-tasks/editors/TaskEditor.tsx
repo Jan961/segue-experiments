@@ -31,7 +31,7 @@ const DEFAULT_TASK: ProductionTaskDTO = {
   AssignedToUserId: 2,
   Progress: 0,
   Priority: 0,
-  TaskCompletedDate: '',
+  TaskCompletedDate: new Date(null),
 };
 
 const TaskEditor = ({ task, triggerClose, open, recurring = false }: NewTaskFormProps) => {
