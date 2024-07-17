@@ -28,12 +28,17 @@ export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x)
   };
 });
 
-export const getWeekOptions = (prefix = 'week'): SelectOption[] =>
+const formatWeekOption = (prefix = 'week', week: number) => {
+  const formattedWeek = week < 0 ? `${prefix} - ${Math.abs(week)}` : `${prefix} + ${week}`;
+
+  return {
+    text: formattedWeek,
+    value: week,
+  };
+};
+// 52
+export const getWeekOptions = (prefix: string): SelectOption[] =>
   Array.from(Array(104).keys()).map((x) => {
     const week = x - 52;
-    const formattedWeek = week < 0 ? `${prefix} - ${Math.abs(week)}` : `${prefix} + ${week}`;
-    return {
-      text: formattedWeek,
-      value: week,
-    };
+    return week < 0 ? formatWeekOption(prefix, week) : formatWeekOption(prefix, week + 1);
   });
