@@ -59,7 +59,7 @@ export default function GlobalActivityModal({
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
-  const [actDate, setActDate] = useState<Date>();
+  const [actDate, setActDate] = useState<Date>(null);
   const [actFollowUp, setActFollowUp] = useState<boolean>(false);
   const [followUpDt, setFollowUpDt] = useState<Date>();
   const [cost, setCost] = useState<string>('');
@@ -184,7 +184,7 @@ export default function GlobalActivityModal({
     let data: GlobalActivity = {
       ActivityTypeId: actType,
       Cost: parseFloat(cost),
-      Date: startOfDay(new Date(actDate)),
+      Date: actDate === null ? null : startOfDay(new Date(actDate)),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
@@ -296,7 +296,7 @@ export default function GlobalActivityModal({
               />
             </div>
 
-            <div className="flex flex-col ml-[50px]">
+            <div className="flex flex-col ml-[110px]">
               <Checkbox
                 className="ml-5 mt-2"
                 labelClassName="!text-base text-primary-input-text"
@@ -350,12 +350,18 @@ export default function GlobalActivityModal({
 
           <div className="text-base font-bold text-primary-input-text">Notes</div>
           <TextArea
-            className="mt-2 w-full h-auto"
+            className="mt-2 mb-2 w-full h-auto"
             value={actNotes}
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
             disabled={variant === 'view'}
           />
+
+          {variant !== 'view' && (
+            <div className="flex flex-row text-base text-primary-input-text -mb-2">
+              Select all venues you wish to apply global activity to:
+            </div>
+          )}
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
@@ -363,26 +369,26 @@ export default function GlobalActivityModal({
             </div>
           </div>
 
-          <div className="float-right flex flex-row mt-5 py-2">
-            {variant === 'view' ? (
+          {variant === 'view' ? (
+            <div className="float-right flex flex-row mt-5 py-2">
               <Button
                 className="ml-4 w-[132px]"
                 onClick={() => handleConfirm('close')}
                 variant="primary"
                 text="Close"
               />
-            ) : (
-              <div>
-                <Button
-                  className="ml-4 w-[132px]"
-                  onClick={() => handleConfirm('cancel')}
-                  variant="secondary"
-                  text="Cancel"
-                />
-                <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="float-right flex flex-row mt-5 py-2">
+              <Button
+                className="ml-4 w-[132px]"
+                onClick={() => handleConfirm('cancel')}
+                variant="secondary"
+                text="Cancel"
+              />
+              <Button className="ml-4 w-[132px] mr-1" variant="primary" text="Save and Close" onClick={handleSave} />
+            </div>
+          )}
         </div>
       </PopupModal>
 

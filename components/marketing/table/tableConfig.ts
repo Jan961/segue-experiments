@@ -502,7 +502,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     cellStyle: {
       marginTop: '5px',
     },
-    width: 320,
+    width: 420,
   },
   {
     headerName: 'Due By Date',
@@ -529,7 +529,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
         },
       ],
     }),
-    width: 90,
+    width: 20,
     resizable: false,
   },
 ];

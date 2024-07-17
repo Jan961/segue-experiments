@@ -15,7 +15,7 @@ import GlobalActivityView from 'components/marketing/activity/GlobalActivityView
 const Index = () => {
   return (
     <Layout title="Marketing | Segue" flush>
-      <div className="mb-8">
+      <div className="-mb-2">
         <GlobalActivityFilters />
       </div>
       <GlobalActivityView />
