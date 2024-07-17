@@ -56,6 +56,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
                 tableHeight={filteredProductions.length > 1}
                 rowData={production.Tasks}
                 columnDefs={columnDefs}
+                productionId={production.Id}
               />
             </div>
           );

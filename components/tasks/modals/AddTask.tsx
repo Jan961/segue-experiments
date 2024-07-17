@@ -20,12 +20,14 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { isNullOrEmpty } from 'utils';
 import { getWeekOptions, weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
+import { productionJumpState } from '../../../state/booking/productionJumpState';
 
 interface AddTaskProps {
   visible: boolean;
   isMasterTask?: boolean;
   onClose: () => void;
   task?: Partial<MasterTask> & { ProductionId?: number };
+  productionId?: number;
 }
 
 const RepeatOptions = [
@@ -67,16 +69,17 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   ProductionId: 0,
 };
 
-const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps) => {
+const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = null }: AddTaskProps) => {
   const [inputs, setInputs] = useState<
     Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number }
   >(task || DEFAULT_MASTER_TASK);
 
-  const production = useRecoilValue(currentProductionSelector);
+  const productionList = useRecoilValue(productionJumpState).productions;
+  const production =
+    useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
   useEffect(() => {
     setInputs(task);
   }, [task]);
-
   const [confirm, setConfirm] = useState<boolean>(false);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
@@ -246,6 +249,8 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
       }
     }
   };
+
+  console.log(isMasterTask ? inputs?.Code?.toString() : showCode);
   return (
     <PopupModal
       show={visible}

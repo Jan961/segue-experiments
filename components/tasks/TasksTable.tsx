@@ -39,7 +39,7 @@ export default function TasksTable({
   const [currentTask, setCurrentTask] = useState(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-
+  console.log(productionId);
   const router = useRouter();
 
   const handleCellClick = (e) => {
@@ -131,7 +131,7 @@ export default function TasksTable({
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
-      <AddTask visible={isEdit || showAddTask} onClose={handleClose} task={modalData} />
+      <AddTask visible={isEdit || showAddTask} onClose={handleClose} task={modalData} productionId={productionId} />
     </>
   );
 }
