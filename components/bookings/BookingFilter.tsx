@@ -34,6 +34,7 @@ export default function BookingsButtons() {
   return (
     <div className="bg-white">
       <DateRange
+        testId="booking-filters-production-date-range"
         disabled={!ProductionId}
         className="bg-primary-white justify-between"
         label="Date"

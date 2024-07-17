@@ -5,12 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
 import axios from 'axios';
 import applyTransactionToGrid from 'utils/applyTransactionToGrid';
-import Productions from './modal/Productions';
 import { useRouter } from 'next/router';
 import { omit } from 'radash';
 import { ProductionDTO } from 'interfaces';
 import LoadingOverlay from './LoadingOverlay';
 import { showsTableConfig } from './table/tableConfig';
+import ProductionsView from './modal/Views/ProductionsView';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -181,7 +181,7 @@ const ShowsTable = ({
       {isLoading && <LoadingOverlay />}
 
       {showProductionsModal && (
-        <Productions
+        <ProductionsView
           visible={showProductionsModal}
           onClose={() => setShowProductionsModal(false)}
           showData={currentShow}

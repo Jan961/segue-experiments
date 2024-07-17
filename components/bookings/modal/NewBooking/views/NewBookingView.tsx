@@ -163,6 +163,7 @@ const NewBookingView = ({
       <div className="text-primary-navy text-xl my-2 font-bold">{productionCode}</div>
       <form className="flex flex-col bg-primary-navy py-3 pl-4 pr-5 rounded-lg" onSubmit={handleOnSubmit}>
         <DateRange
+          testId="cnb-date-range"
           label="Date"
           className=" bg-white my-2 w-fit"
           onChange={({ from, to }) => {
@@ -178,6 +179,7 @@ const NewBookingView = ({
         {!isDateTypeOnly && (
           <div className="flex items-center gap-2 my-1 justify-start">
             <Checkbox
+              testId="cnb-runofdates-checkbox"
               className="!w-fit"
               id="shouldFilterVenues"
               labelClassName="text-white w-fit"
@@ -185,25 +187,28 @@ const NewBookingView = ({
               checked={isRunOfDates}
               label="This is a run of dates. Y/N"
             />
-            <Tooltip
-              body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
-              position="right"
-              width="w-[140px]"
-              bgColorClass="primary-input-text"
-            >
-              <Icon iconName="info-circle-solid" />
-            </Tooltip>
+            <div data-testid="cnb-runofdates-info-icon">
+              <Tooltip
+                testId="cnb-runofdates-info-tooltip"
+                body="A run of dates is a single booking over multiple days. Ie a week of performances at one venue. If this is not selected, each date will be considered a separate booking."
+                position="right"
+                width="w-[140px]"
+                bgColorClass="primary-input-text"
+              >
+                <Icon iconName="info-circle-solid" />
+              </Tooltip>
+            </div>
           </div>
         )}
         <div className="flex items-center gap-2">
           <Label className="text-white font-bold" text="Set Venue" />
           <Toggle
+            testId="new-booking-set-venue"
             label="SetVenue"
             checked={isDateTypeOnly}
             onChange={(value) =>
               onChange({
                 isDateTypeOnly: value,
-                isRunOfDates: value ? false : isRunOfDates,
                 dateType: value ? dateType : null,
                 venueId: null,
               })
@@ -214,6 +219,7 @@ const NewBookingView = ({
         {isDateTypeOnly && (
           <>
             <Select
+              testId="cnb-datetype-selector"
               className="my-2 w-full !border-0"
               options={dayTypeOptions}
               disabled={stage !== 0}
@@ -227,6 +233,7 @@ const NewBookingView = ({
         {!isDateTypeOnly && (
           <>
             <Select
+              testId="cnb-venue-selector"
               className={classNames('my-2 w-full !border-0')}
               options={venueOptions}
               disabled={stage !== 0}
@@ -236,6 +243,7 @@ const NewBookingView = ({
               placeholder="Please select a venue"
             />
             <Checkbox
+              testId="cnb-filter-existing-booking-venues"
               id="shouldFilterVenues"
               labelClassName="text-white"
               onChange={(e: any) => onChange({ shouldFilterVenues: e.target.checked })}
@@ -246,6 +254,7 @@ const NewBookingView = ({
               className={classNames('w-full', { 'cursor-not-allowed caret-primary-input-text': !(fromDate && toDate) })}
             >
               <Button
+                testId="new-booking-gap-suggest"
                 className="px-4 my-2 !w-full"
                 disabled={!(fromDate && toDate)}
                 variant="secondary"

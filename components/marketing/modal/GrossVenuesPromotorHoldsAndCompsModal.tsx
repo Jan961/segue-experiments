@@ -18,6 +18,7 @@ import { notify } from 'components/core-ui-lib';
 import { useQuery } from '@tanstack/react-query';
 import { transformToOptions } from 'utils';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
+import { bookingStatusOptions, venueSelectionOptions } from 'config/Reports';
 
 interface GrossVenuesPromotorHoldsAndCompsModalProps {
   visible: boolean;
@@ -27,10 +28,11 @@ interface GrossVenuesPromotorHoldsAndCompsModalProps {
 
 const defaultFormData = {
   production: null,
-  selection: null,
+  status: null,
   fromDate: null,
   toDate: null,
   venue: null,
+  selection: 'all',
 };
 
 const getModalTitle = (activeModal: string): string => {
@@ -54,16 +56,17 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
-  const { production, selection, fromDate, toDate, venue } = formData;
-  const selectionOptions = [];
-  const productionsOptions = useMemo(
-    () =>
-      productionJump.productions.map((production) => ({
-        text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
-        value: production.Id,
-      })),
-    [productionJump],
-  );
+  const { production, status, fromDate, toDate, venue, selection } = formData;
+  const productionsOptions = useMemo(() => {
+    const options = productionJump.productions.map((production) => ({
+      text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
+      value: production.Id,
+    }));
+    if (activeModal === 'selectedVenues') {
+      options.unshift({ text: 'All', value: -1 });
+    }
+    return options;
+  }, [productionJump]);
   const { data: venues = [] } = useQuery({
     queryKey: ['productionWeeks' + production],
     queryFn: () => {
@@ -78,16 +81,13 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
     },
   });
 
-  const prodVenuesOptions: SelectOption[] = useMemo(
-    () =>
-      transformToOptions(
-        venues,
-        'Name',
-        'Code',
-        // (week) => ` Wk ${week.productionWeekNum} | ${dateToSimple(week?.mondayDate)}`,
-      ),
-    [venues],
-  );
+  const prodVenuesOptions: SelectOption[] = useMemo(() => {
+    const options = transformToOptions(venues, null, 'Code', ({ Code, Name }) => `${Code} ${Name}`).sort((a, b) =>
+      a.text.localeCompare(b.text),
+    );
+    options.unshift({ text: 'All', value: null });
+    return options;
+  }, [venues, activeModal]);
 
   const onChange = useCallback((key: string, value: string | number) => {
     setFormData((data) => ({ ...data, [key]: value }));
@@ -109,7 +109,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
         promise = exportHoldsComps({ ...formData, productionCode }).then(() => onClose());
         break;
       case 'selectedVenues':
-        promise = exportSelectedVenues({ ...formData, productionCode, showId: selectedProduction.ShowId }).then(() =>
+        promise = exportSelectedVenues({ ...formData, productionCode, showId: selectedProduction?.ShowId }).then(() =>
           onClose(),
         );
         break;
@@ -160,13 +160,25 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
           />
         )}
 
-        {['holdsAndComps', 'selectedVenues'].includes(activeModal) && (
+        {['holdsAndComps'].includes(activeModal) && (
+          <div className="flex items-center gap-2">
+            <Label text="Selection" />
+            <Select
+              className="w-full"
+              onChange={(value) => onChange('status', value as string)}
+              options={bookingStatusOptions}
+              value={status}
+            />
+          </div>
+        )}
+
+        {activeModal === 'selectedVenues' && (
           <div className="flex items-center gap-2">
             <Label text="Selection" />
             <Select
               className="w-full"
               onChange={(value) => onChange('selection', value as string)}
-              options={selectionOptions}
+              options={venueSelectionOptions}
               value={selection}
             />
           </div>

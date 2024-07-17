@@ -141,6 +141,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
           <div className="w-full flex items-center">
             <Label text="Pay Monthly" />
             <Toggle
+              testId="payment-details-form-pay-monthly"
               className="mx-2"
               label="Monthly"
               name="toggle"
@@ -159,6 +160,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
           <div>
             <Label htmlFor="cardHolderName" text="Cardholder Name" />
             <TextInput
+              testId="payment-details-form-cardholdername"
               id="cardHolderName"
               name="cardHolderName"
               value={paymentDetails.cardHolderName}
@@ -168,17 +170,17 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
             />
           </div>
 
-          <div>
+          <div data-testid="payment-details-form-cardnumber">
             <Label htmlFor="cardNumber" text="Card Number" />
             <CardNumberElement id="cardNumber" className={baseClass} />
           </div>
 
           <div className="flex gap-2 w-full items-center">
-            <div className="w-1/2">
+            <div data-testid="payment-details-form-cardexpiry" className="w-1/2">
               <Label htmlFor="cardExpiry" text="Expiry Date" />
               <CardExpiryElement id="cardExpiry" className={classNames(baseClass, 'w-full')} />
             </div>
-            <div className="w-1/2">
+            <div data-testid="payment-details-form-cardcvc" className="w-1/2">
               <Label htmlFor="cardCVC" text="CVC" />
               <CardCvcElement id="cardCVC" className={classNames(baseClass, 'w-full')} />
             </div>
@@ -186,11 +188,18 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
 
           <div>
             <Label htmlFor="postcode" text="Postcode" />
-            <TextInput id="postcode" name="postcode" value={paymentDetails.postcode} onChange={handleFormChange} />
+            <TextInput
+              testId="payment-details-form-postcode"
+              id="postcode"
+              name="postcode"
+              value={paymentDetails.postcode}
+              onChange={handleFormChange}
+            />
           </div>
           <div>
             <Label htmlFor="email" text="Email" />
             <TextInput
+              testId="payment-details-form-email"
               className="flex w-full"
               placeholder="Email Address"
               id="email"
@@ -201,7 +210,13 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
           </div>
 
           <div className="pt-3">
-            <Button type="submit" text="Pay Now" className="w-32" disabled={loading} />
+            <Button
+              testId="payment-details-form-submit"
+              type="submit"
+              text="Pay Now"
+              className="w-32"
+              disabled={loading}
+            />
           </div>
           <div className="pt-3">
             {errorMessage && <Label text={errorMessage} variant="md" className="text-primary-red" />}

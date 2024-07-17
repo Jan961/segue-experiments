@@ -13,6 +13,7 @@ import {
 } from 'ag-grid-community';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import CustomTooltipRenderer from './renderers/CustomTooltipRenderer';
+import Loader from '../Loader';
 
 export type StyleProps = {
   headerColor?: string;
@@ -37,6 +38,7 @@ interface TableProps {
   excelStyles?: any[];
   rowSelection?: string;
   onSelectionChanged?: (event: SelectionChangedEvent) => void;
+  testId?: string;
 }
 
 const ROW_HEIGHT = 43;
@@ -71,6 +73,7 @@ export default forwardRef(function Table(
     excelStyles = [],
     rowSelection = 'single',
     onSelectionChanged,
+    testId = 'core-ui-lib-table',
   }: TableProps,
   ref,
 ) {
@@ -145,11 +148,13 @@ export default forwardRef(function Table(
       <GridStyles {...styleProps} />
       <div
         className="ag-theme-quartz"
+        data-testid={testId}
         style={{
           height: !rowData?.length ? '100%' : gridHeight > autoHeightLimit ? `${autoHeightLimit}px` : '',
         }}
       >
         <AgGridReact
+          data-testid={testId}
           rowData={rowData}
           columnDefs={columnDefs}
           headerHeight={displayHeader ? gridHeaderHeight : 0}
@@ -173,6 +178,7 @@ export default forwardRef(function Table(
           suppressContextMenu
           excelStyles={excelStyles}
           onSelectionChanged={onSelectionChanged}
+          loadingOverlayComponent={Loader}
         />
       </div>
     </>

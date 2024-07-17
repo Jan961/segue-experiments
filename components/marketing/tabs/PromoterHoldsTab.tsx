@@ -15,6 +15,9 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
+import { exportExcelReport } from 'components/bookings/modal/request';
+import { notify } from 'components/core-ui-lib';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -46,6 +49,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const textAreaRef = useRef(null);
   const bookings = useRecoilState(bookingJumpState);
   const users = useRecoilValue(userState);
+  const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useImperativeHandle(ref, () => ({
@@ -222,6 +226,26 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     }
   }, [castRateNotes]);
 
+  const onExport = async () => {
+    const urlPath = `/api/reports/marketing/promoter-holds/allocated-seats`;
+    const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
+    const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
+    const selectedProduction = productions?.filter((production) => production.Id === productionId);
+    const { ShowName, ShowCode, Code } = selectedProduction[0];
+    const productionName = `${ShowName} (${ShowCode + Code})`;
+    const payload = {
+      productionName,
+      venueAndDate,
+      bookingId: props.bookingId,
+    };
+
+    notify.promise(exportExcelReport(urlPath, payload), {
+      loading: 'Generating contact notes report',
+      success: 'Contact notes report downloaded successfully',
+      error: 'Error generating contact notes report',
+    });
+  };
+
   return (
     <>
       {dataAvailable && (
@@ -271,6 +295,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                     className="w-[203px]"
                     iconProps={{ className: 'h-4 w-3' }}
                     sufixIconName="excel"
+                    onClick={onExport}
                   />
                   <Button text="Add New" className="w-[160px]" onClick={() => newAllocatedSeats()} />
                 </div>
