@@ -166,7 +166,7 @@ export const getColumnDefs = (usersList = [], production) => {
   ];
 };
 
-const weekOptions = getWeekOptions('');
+const weekOptions = getWeekOptions(null, false);
 
 export const getMasterTasksColumnDefs = (usersList = []) => {
   return [
