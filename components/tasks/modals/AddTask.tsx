@@ -281,10 +281,11 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-6 mr-4" text="Start By" />
             <Select
               value={inputs?.StartByWeekNum}
-              options={isMasterTask ? weekOptions : getWeekOptions(production)}
+              options={getWeekOptions(production, isMasterTask)}
               placeholder="Week No."
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
               className="w-52"
+              isSearchable={true}
             />
           </div>
           <div className="flex ml-10">
@@ -292,9 +293,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={isMasterTask ? weekOptions : getWeekOptions(production)}
+              options={getWeekOptions(production, isMasterTask)}
               placeholder="Week No."
               className="w-52"
+              isSearchable={true}
             />
           </div>
         </div>

@@ -41,21 +41,25 @@ const formatWeekOption = (week: number, prefix = '') => {
   };
 };
 
-export const getWeekOptions = (production): SelectOption[] => {
-  const startDate = new Date(production?.StartDate);
-  const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
-  console.log(production);
-
-  const numWeeksInDropDown = 52;
-  return Array.from(Array(numWeeksInDropDown * 2).keys()).map((x) => {
+export const getWeekOptions = (production, isMasterTask: boolean): SelectOption[] => {
+  const eotNumber = isMasterTask ? 26 : 0;
+  const numWeeksInDropDown = isMasterTask ? 260 : 52;
+  return Array.from(Array(numWeeksInDropDown * 2 + eotNumber).keys()).map((x) => {
     const week = x - numWeeksInDropDown;
-    if (production) {
+    if (!isMasterTask && production) {
+      const startDate = new Date(production?.StartDate);
+      const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
+
       const weeklyDate = new Date(startDate.getTime() + week * millisecondsPerWeek);
       return week < 0
         ? formatWeekOption(week, formatDateUK(weeklyDate))
         : formatWeekOption(week + 1, formatDateUK(weeklyDate));
-    }
+    } else {
+      const weekDifference = week - numWeeksInDropDown;
+      if (weekDifference >= 0) return { text: `EOT+${weekDifference + 1}`, value: week };
 
-    return week < 0 ? formatWeekOption(week) : formatWeekOption(week + 1);
+      console.log(weekDifference);
+      return week < 0 ? formatWeekOption(week) : formatWeekOption(week + 1);
+    }
   });
 };
