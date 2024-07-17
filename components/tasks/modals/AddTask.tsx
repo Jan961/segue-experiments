@@ -435,7 +435,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
         show={confirm}
         onYesClick={handleDelete}
         onNoClick={() => setConfirm(false)}
-        hasOverlay={true}
+        hasOverlay={false}
       />
     </PopupModal>
   );
