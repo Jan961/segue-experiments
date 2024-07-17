@@ -42,22 +42,28 @@ const formatWeekOption = (week: number, prefix = '') => {
 };
 
 export const getWeekOptions = (production, isMasterTask: boolean): SelectOption[] => {
-  const eotNumber = isMasterTask ? 26 : 0;
-  const numWeeksInDropDown = isMasterTask ? 260 : 52;
-  return Array.from(Array(numWeeksInDropDown * 2 + eotNumber).keys()).map((x) => {
-    const week = x - numWeeksInDropDown;
-    if (!isMasterTask && production) {
-      const startDate = new Date(production?.StartDate);
-      const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
+  const eotNumber = 26;
+  const numWeeksInDropDown = 260;
+  if (!isMasterTask && production) {
+    const startDate = new Date(production?.StartDate);
+    const endDate = new Date(production?.EndDate);
+    const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
 
+    const numTourWeeks: number =
+      Math.ceil((endDate.getTime() - startDate.getTime()) / millisecondsPerWeek) || -eotNumber;
+    console.log(production);
+    console.log(numTourWeeks);
+    return Array.from(Array(numWeeksInDropDown + numTourWeeks + eotNumber).keys()).map((x) => {
+      const week = x - numWeeksInDropDown;
       const weeklyDate = new Date(startDate.getTime() + week * millisecondsPerWeek);
-      return week < 0
-        ? formatWeekOption(week, formatDateUK(weeklyDate))
-        : formatWeekOption(week + 1, formatDateUK(weeklyDate));
-    } else {
-      const weekDifference = week - numWeeksInDropDown;
-      if (weekDifference >= 0) return { text: `EOT+${weekDifference + 1}`, value: week };
-      return week < 0 ? formatWeekOption(week) : formatWeekOption(week + 1);
-    }
-  });
+      if (week < 0) {
+        return formatWeekOption(week, formatDateUK(weeklyDate));
+      } else if (week >= 0 && week < numTourWeeks) {
+        return formatWeekOption(week + 1, formatDateUK(weeklyDate));
+      } else {
+        const optionOutput = `${formatDateUK(weeklyDate)} | EOT+${week + 1 - numTourWeeks}`;
+        return { text: optionOutput, value: week };
+      }
+    });
+  }
 };

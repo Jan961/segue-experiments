@@ -117,7 +117,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
       router.replace(router.asPath);
     }
   };
-
+  const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
@@ -127,7 +127,7 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
         <TasksTable rowData={[]} />
       ) : (
         filteredProductions.map((production) => {
-          const columnDefs = getColumnDefs(usersList, production);
+          const columnDefs = getColumnDefs(usersList, currentProductionObj);
           return (
             <div key={production.Id} className="mb-10">
               <TasksTable

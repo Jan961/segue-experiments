@@ -17,6 +17,9 @@ const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
 }));
 
 export const getColumnDefs = (usersList = [], production) => {
+  console.log(production);
+  const weekOptions = getWeekOptions(production, false);
+  console.log(weekOptions);
   return [
     {
       headerName: 'Code',
@@ -165,8 +168,6 @@ export const getColumnDefs = (usersList = [], production) => {
     },
   ];
 };
-
-const weekOptions = getWeekOptions(null, false);
 
 export const getMasterTasksColumnDefs = (usersList = []) => {
   return [
