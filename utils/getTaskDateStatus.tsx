@@ -65,5 +65,17 @@ export const getWeekOptions = (production, isMasterTask: boolean): SelectOption[
         return { text: optionOutput, value: week };
       }
     });
+  } else {
+    return Array.from(Array(numWeeksInDropDown * 2 + eotNumber).keys()).map((x) => {
+      const week = x - numWeeksInDropDown;
+      if (week < 0) {
+        return formatWeekOption(week);
+      } else if (week >= 0 && week < numWeeksInDropDown) {
+        return formatWeekOption(week + 1);
+      } else {
+        const optionOutput = `EOT+${week - numWeeksInDropDown + 1}`;
+        return { text: optionOutput, value: week };
+      }
+    });
   }
 };
