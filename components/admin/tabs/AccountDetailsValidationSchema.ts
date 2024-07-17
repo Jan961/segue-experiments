@@ -1,6 +1,5 @@
 import * as Yup from 'yup';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//  .matches(/^[A-Za-z]{6}$/, 'Venue Code must be exactly 6 letters and only contain letters.')
 const accountDetailsSchema = Yup.object().shape({
   firstName: Yup.string()
     .required('First name is a required field.')
