@@ -111,3 +111,11 @@ export const seatKillsData = [
   { type: 'House Management', seats: '', value: '' },
   { type: 'Cast/Crew', seats: '', value: '' },
 ];
+
+export const addNewPersonInputData = [
+  { first: 'First Name', second: 'Email Address' },
+  { first: 'Last Name', second: 'Landline Number' },
+  { first: 'Address', second: 'Mobile Number' },
+  { first: ' ', second: 'Full Name as it appears on Passport' },
+  { first: ' ', second: 'Passport Number' },
+];

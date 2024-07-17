@@ -21,7 +21,7 @@ SELECT
     `ScheduleView`.`EntryType` = 'Booking',
 (
       SELECT
-        `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`
+        max(`frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`)
       FROM
         `frtxigoo_dev`.`SalesSet`
       WHERE
@@ -35,26 +35,36 @@ FROM
     (
       (
         (
-          `frtxigoo_dev`.`ScheduleView`
-          LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` ON(
-            `ScheduleView`.`EntryType` = 'Booking'
-            AND `ScheduleView`.`EntryId` = `SalesSetTotalsView`.`SetBookingId`
-            AND `SalesSetTotalsView`.`SetSalesFiguresDate` = (
-              SELECT
-                max(`LatestTotals`.`SetSalesFiguresDate`)
-              FROM
-                `frtxigoo_dev`.`SalesSetTotalsView` `LatestTotals`
-              WHERE
-                `LatestTotals`.`SetBookingId` = `ScheduleView`.`EntryId`
+          (
+            (
+              `frtxigoo_dev`.`ScheduleView`
+              LEFT JOIN `frtxigoo_dev`.`SalesSetTotalsView` ON(
+                `ScheduleView`.`EntryId` = `SalesSetTotalsView`.`SetBookingId`
+                AND `SalesSetTotalsView`.`SetSalesFiguresDate` = (
+                  SELECT
+                    max(`LatestTotals`.`SetSalesFiguresDate`)
+                  FROM
+                    `frtxigoo_dev`.`SalesSetTotalsView` `LatestTotals`
+                  WHERE
+                    `LatestTotals`.`SetBookingId` = `ScheduleView`.`EntryId`
+                )
+              )
+            )
+            LEFT JOIN `frtxigoo_dev`.`Venue` ON(
+              `ScheduleView`.`VenueId` = `frtxigoo_dev`.`Venue`.`VenueId`
             )
           )
+          LEFT JOIN `frtxigoo_dev`.`VenueAddress` `MainAddress` ON(
+            `frtxigoo_dev`.`Venue`.`VenueId` = `MainAddress`.`VenueAddressVenueId`
+            AND `MainAddress`.`VenueAddressTypeName` = 'Main'
+          )
         )
-        LEFT JOIN `frtxigoo_dev`.`Venue` ON(
-          `ScheduleView`.`VenueId` = `frtxigoo_dev`.`Venue`.`VenueId`
+        LEFT JOIN `frtxigoo_dev`.`Country` `MainCountry` ON(
+          `MainAddress`.`VenueAddressCountryId` = `MainCountry`.`CountryId`
         )
       )
       LEFT JOIN `frtxigoo_dev`.`Currency` ON(
-        `frtxigoo_dev`.`Venue`.`VenueCurrencyCode` = `frtxigoo_dev`.`Currency`.`CurrencyCode`
+        `MainCountry`.`CountryCurrencyCode` = `frtxigoo_dev`.`Currency`.`CurrencyCode`
       )
     )
     LEFT JOIN `frtxigoo_dev`.`ConversionRate` ON(
@@ -64,5 +74,4 @@ FROM
   )
 WHERE
   `ScheduleView`.`EntryDate` >= `ScheduleView`.`ProductionStartDate`
-ORDER BY
-  `ScheduleView`.`EntryDate`
+  AND `ScheduleView`.`EntryType` = 'Booking'

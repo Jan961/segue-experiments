@@ -95,7 +95,7 @@ model BookingContactNotes {
   Booking       Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([BookingId], map: "BookingBookingContactNotes")
-  @@index([UserId], map: "AccountUserBookingContactNotes")
+  @@index([UserId], map: "AccountUser_BookingContactNotes")
 }
 
 model Contract {
@@ -118,7 +118,6 @@ model Currency {
   Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
   Name                                                               String           @map("CurrencyName") @db.VarChar(30)
   SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
-  Account                                                            Account[]
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
   Country                                                            Country[]
@@ -328,37 +327,30 @@ model Rehearsal {
 }
 
 model Account {
-  AccountId                  Int                   @id @default(autoincrement()) @map("AccountId")
-  AccountName                String                @map("AccountName") @db.VarChar(50)
-  AccountAddress1            String?               @map("AccountAddress1") @db.VarChar(50)
-  AccountAddress2            String?               @map("AccountAddress2") @db.VarChar(50)
-  AccountAddress3            String?               @map("AccountAddress3") @db.VarChar(50)
-  AccountAddressTown         String?               @map("AccountAddressTown") @db.VarChar(50)
-  AccountAddressCounty       String?               @map("AccountAddressCounty") @db.VarChar(50)
-  AccountAddressPostcode     String?               @map("AccountAddressPostcode") @db.VarChar(20)
-  AccountAddressCountry      String?               @map("AccountAddressCountry") @db.VarChar(30)
-  AccountVATNumber           String?               @map("AccountVATNumber") @db.VarChar(20)
-  AccountCurrencyCode        String                @map("AccountCurrencyCode") @db.VarChar(3)
-  AccountCompanyNumber       String?               @map("AccountCompanyNumber") @db.VarChar(20)
-  AccountLogo                Bytes?                @map("AccountLogo")
-  AccountMainEmail           String?               @map("AccountMainEmail") @db.VarChar(120)
-  AccountNumPeople           Int?                  @map("AccountNumPeople") @db.TinyInt
-  AccountOrganisationId      Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
-  AccountTermsAgreedBy       String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
-  AccountTermsAgreedDate     DateTime?             @map("AccountTermsAgreedDate") @db.Date
-  AccountWebsite             String?               @map("AccountWebsite") @db.VarChar(255)
-  AccountTypeOfCompany       String?               @map("AccountTypeOfCompany")@db.VarChar(30)
-  AccountPhone               String?               @map("AccountPhone")@db.VarChar(30)
-  AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode")@db.VarChar(3)
-  Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Account_Payment")
-  AccountContact             AccountContact?
-  AccountSubscription        AccountSubscription[]
-  AccountUser                AccountUser[]
-  MasterTask                 MasterTask[]
-  ProductionCompany          ProductionCompany[]
-  Show                       Show[]
-
-  @@index([AccountPaymentCurrencyCode], map: "Currency_Account_Payment")
+  AccountId              Int                   @id @default(autoincrement()) @map("AccountId")
+  AccountName            String                @map("AccountName") @db.VarChar(50)
+  AccountAddress1        String?               @map("AccountAddress1") @db.VarChar(50)
+  AccountAddress2        String?               @map("AccountAddress2") @db.VarChar(50)
+  AccountAddress3        String?               @map("AccountAddress3") @db.VarChar(50)
+  AccountAddressTown     String?               @map("AccountAddressTown") @db.VarChar(50)
+  AccountAddressCounty   String?               @map("AccountAddressCounty") @db.VarChar(50)
+  AccountAddressPostcode String?               @map("AccountAddressPostcode") @db.VarChar(20)
+  AccountAddressCountry  String?               @map("AccountAddressCountry") @db.VarChar(30)
+  AccountVATNumber       String?               @map("AccountVATNumber") @db.VarChar(20)
+  AccountCurrencyCode    String                @map("AccountCurrencyCode") @db.VarChar(3)
+  AccountCompanyNumber   String?               @map("AccountCompanyNumber") @db.VarChar(20)
+  AccountLogo            Bytes?                @map("AccountLogo")
+  AccountMainEmail       String?               @map("AccountMainEmail") @db.VarChar(120)
+  AccountNumPeople       Int?                  @map("AccountNumPeople") @db.TinyInt
+  AccountOrganisationId  String?               @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId") @db.Char(8)
+  AccountTermsAgreedBy   String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
+  AccountTermsAgreedDate DateTime?             @map("AccountTermsAgreedDate") @db.Date
+  AccountContact         AccountContact?
+  AccountSubscription    AccountSubscription[]
+  AccountUser            AccountUser[]
+  MasterTask             MasterTask[]
+  ProductionCompany      ProductionCompany[]
+  Show                   Show[]
 }
 
 model AvailableComp {
@@ -399,7 +391,7 @@ model CompAllocation {
   AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([ArrangedById], map: "AccountUser_CompAllocation")
-  @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
+  @@index([AvailableCompId], map: "AvailableComp_CompAllocation")
 }
 
 model CompType {
@@ -575,7 +567,7 @@ model User {
 
 model AccountUser {
   Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
+  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String?                 @db.VarChar(4)
@@ -910,7 +902,7 @@ model DealMemo {
 
   @@index([DeMoBOMVenueContactId], map: "VenueContactDealMemoBOM")
   @@index([DeMoTechVenueContactId], map: "VenueContactDealMemoTech")
-  @@index([DeMoAccContId], map: "AccountContactDealMemo")
+  @@index([DeMoAccContId], map: "AccountContact_DealMemo")
 }
 
 model DealMemoCall {
@@ -959,7 +951,7 @@ model File {
   Production        Production[]
   ProductionCompany ProductionCompany[]
 
-  @@index([UploadUserId], map: "UserAttachedFile")
+  @@index([UploadUserId], map: "User_AttachedFile")
 }
 
 model SubscriptionPlan {
@@ -1052,10 +1044,10 @@ model DealMemoHold {
 }
 
 model GlobalBookingActivityVenue {
-  GlobalActivityId         Int                   @map("GBAVGlobalActivityId")
-  VenueId                  Int                   @map("GBAVVenueId")
-  GlobalBookingActivity    GlobalBookingActivity @relation(fields: [GlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
-  Venue                    Venue                 @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
+  GlobalActivityId      Int                   @map("GBAVGlobalActivityId")
+  VenueId               Int                   @map("GBAVVenueId")
+  GlobalBookingActivity GlobalBookingActivity @relation(fields: [GlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
+  Venue                 Venue                 @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
 
   @@id([GlobalActivityId, VenueId])
   @@index([VenueId], map: "Venue_GBAV")
@@ -1279,7 +1271,6 @@ view BookingHoldCompsView {
 view PromoterHoldsView {
   ProductionId                         Int       @default(0)
   FullProductionCode                   String?   @db.VarChar(20)
-  ShowName                             String    @db.VarChar(80)
   VenueCode                            String    @db.VarChar(6)
   VenueName                            String    @db.VarChar(255)
   BookingId                            Int       @default(0)
@@ -1370,7 +1361,6 @@ view ProductionView {
   @@ignore
 }
 
-
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ShowView {
   ShowId         Int     @default(0)
@@ -1445,7 +1435,6 @@ view SalesView {
   VenueCode                   String    @db.VarChar(6)
   VenueName                   String    @db.VarChar(255)
   VenueCurrencyCode           String?   @db.VarChar(3)
-  VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
   SetSalesFiguresDate         DateTime? @db.Date
@@ -1491,26 +1480,25 @@ view BookingSelectionView {
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view SalesSummaryView {
-  ProductionId               Int       @default(0)
-  FullProductionCode         String?   @db.VarChar(20)
-  ShowName                   String    @db.VarChar(80)
-  ProductionStartDate        DateTime? @db.Date
-  ProductionEndDate          DateTime? @db.Date
-  ProductionWeekNum          Int?      @db.SmallInt
-  EntryDate                  DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
-  Location                   String?   @db.VarChar(50)
-  EntryId                    Int       @default(0)
-  EntryName                  String?   @db.VarChar(255)
-  EntryType                  String?   @db.VarChar(30)
-  EntryStatusCode            String    @default("") @db.Char(1)
-  Value                      Decimal?  @db.Decimal(32, 2)
-  VenueCurrencyCode          String?   @db.VarChar(3)
-  VenueCurrencySymbolUnicode String?   @db.VarChar(30)
-  ConversionRate             Decimal?  @db.Decimal(8, 4)
-  ConversionToCurrencyCode   String?   @db.VarChar(3)
-  SaleTypeName               String?   @db.VarChar(45)
-  SetSalesFiguresDate        DateTime? @db.Date
-  FinalSetSalesFiguresDate   DateTime? @db.Date
+  ProductionId             Int       @default(0)
+  FullProductionCode       String?   @db.VarChar(20)
+  ShowName                 String    @db.VarChar(80)
+  ProductionStartDate      DateTime? @db.Date
+  ProductionEndDate        DateTime? @db.Date
+  ProductionWeekNum        Int?      @db.SmallInt
+  EntryDate                DateTime  @default(dbgenerated("('0000-00-00')")) @db.Date
+  Location                 String?   @db.VarChar(50)
+  EntryId                  Int       @default(0)
+  EntryName                String?   @db.VarChar(255)
+  EntryType                String?   @db.VarChar(30)
+  EntryStatusCode          String    @default("") @db.Char(1)
+  Value                    Decimal?  @db.Decimal(32, 2)
+  VenueCurrencyCode        String?   @db.VarChar(3)
+  ConversionRate           Decimal?  @db.Decimal(8, 4)
+  ConversionToCurrencyCode String?   @db.VarChar(3)
+  SaleTypeName             String?   @db.VarChar(45)
+  SetSalesFiguresDate      DateTime? @db.Date
+  FinalSetSalesFiguresDate DateTime? @db.Date
 
   @@ignore
 }

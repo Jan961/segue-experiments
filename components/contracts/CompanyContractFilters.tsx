@@ -33,7 +33,7 @@ const CompanyContractFilters = () => {
   };
 
   return (
-    <div className="w-full flex items-center justify-between flex-wrap">
+    <div className="w-full  items-center justify-between flex-wrap">
       <div className="mx-0">
         <div className="px-4">
           <GlobalToolbar
