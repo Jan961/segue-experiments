@@ -1,4 +1,4 @@
-import TextInput from '../../core-ui-lib/TextInput';
+import TextInput from 'components/core-ui-lib/TextInput';
 
 interface FormFieldProps {
   currentValue: string;

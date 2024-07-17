@@ -7,14 +7,14 @@ const accountDetailsSchema = Yup.object().shape({
     .max(50, 'First name can be at most 50 characters long'),
   lastName: Yup.string()
     .required('Last name is a required field.')
-    .max(50, 'First name can be at most 50 characters long'),
+    .max(50, 'Last Name can be at most 50 characters long'),
   companyName: Yup.string()
     .required('Company Name is a required field.')
-    .max(50, 'First name can be at most 50 characters long'),
+    .max(50, 'Company name can be at most 50 characters long'),
   phoneNumber: Yup.string().max(30, 'Phone Number can be at most 30 characters long'),
   addressLine1: Yup.string()
     .required('Address Line 1 is a required field')
-    .max(50, 'First name can be at most 3 characters long'),
+    .max(50, 'Address Line 1 can be at most 50 characters long'),
   addressLine2: Yup.string().max(50, 'Address Line 2 can be at most 50 characters long'),
   addressLine3: Yup.string().max(50, 'Address Line 3 can be at most 50 characters long'),
   townName: Yup.string().max(50, 'Town Name can be at most 50 characters long'),
