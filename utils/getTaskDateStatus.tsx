@@ -33,7 +33,7 @@ export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x)
 });
 
 const formatWeekOption = (week: number, prefix = '') => {
-  prefix += ' | ';
+  prefix = prefix.length > 0 ? prefix + ' | ' : prefix;
   const formattedWeek = week < 0 ? `${prefix} - ${Math.abs(week)}` : `${prefix} + ${week}`;
   return {
     text: formattedWeek,
