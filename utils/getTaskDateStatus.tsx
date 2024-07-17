@@ -1,5 +1,6 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { isThisWeek } from 'date-fns';
+import { formatDateUK } from '../services/dateService';
 
 export default function getTaskDateStatusColor(date: string, progress: number) {
   if (progress === 100) {
@@ -20,25 +21,41 @@ export default function getTaskDateStatusColor(date: string, progress: number) {
 }
 
 export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x) => {
-  const week = x - 52;
-  const formattedWeek = week < 0 ? ` - ${Math.abs(week)}` : `+ ${week}`;
-  return {
-    text: formattedWeek,
-    value: week,
+  const formatWeekOption = (week: number) => {
+    const formattedWeek = week < 0 ? `${week}` : `+ ${week}`;
+    return {
+      text: formattedWeek,
+      value: week,
+    };
   };
+  const week = x - 52;
+  return week < 0 ? formatWeekOption(week) : formatWeekOption(week + 1);
 });
 
-const formatWeekOption = (prefix = 'week', week: number) => {
+const formatWeekOption = (week: number, prefix = '') => {
+  prefix += ' | ';
   const formattedWeek = week < 0 ? `${prefix} - ${Math.abs(week)}` : `${prefix} + ${week}`;
-
   return {
     text: formattedWeek,
     value: week,
   };
 };
-// 52
-export const getWeekOptions = (prefix: string): SelectOption[] =>
-  Array.from(Array(104).keys()).map((x) => {
-    const week = x - 52;
-    return week < 0 ? formatWeekOption(prefix, week) : formatWeekOption(prefix, week + 1);
+
+export const getWeekOptions = (production): SelectOption[] => {
+  const startDate = new Date(production?.StartDate);
+  const millisecondsPerWeek = 7 * 24 * 60 * 60 * 1000;
+  console.log(production);
+
+  const numWeeksInDropDown = 52;
+  return Array.from(Array(numWeeksInDropDown * 2).keys()).map((x) => {
+    const week = x - numWeeksInDropDown;
+    if (production) {
+      const weeklyDate = new Date(startDate.getTime() + week * millisecondsPerWeek);
+      return week < 0
+        ? formatWeekOption(week, formatDateUK(weeklyDate))
+        : formatWeekOption(week + 1, formatDateUK(weeklyDate));
+    }
+
+    return week < 0 ? formatWeekOption(week) : formatWeekOption(week + 1);
   });
+};

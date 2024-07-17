@@ -18,7 +18,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
-import { weekOptions } from 'utils/getTaskDateStatus';
+import { getWeekOptions, weekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 
 interface AddTaskProps {
@@ -73,7 +73,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
   >(task || DEFAULT_MASTER_TASK);
 
   const production = useRecoilValue(currentProductionSelector);
-
   useEffect(() => {
     setInputs(task);
   }, [task]);
@@ -247,7 +246,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
       }
     }
   };
-
   return (
     <PopupModal
       show={visible}
@@ -283,10 +281,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-6 mr-4" text="Start By" />
             <Select
               value={inputs?.StartByWeekNum}
-              options={weekOptions}
+              options={isMasterTask ? weekOptions : getWeekOptions(production)}
               placeholder="Week No."
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
-              className="w-32"
+              className="w-52"
             />
           </div>
           <div className="flex ml-10">
@@ -294,9 +292,9 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={weekOptions}
+              options={isMasterTask ? weekOptions : getWeekOptions(production)}
               placeholder="Week No."
-              className="w-32"
+              className="w-52"
             />
           </div>
         </div>
