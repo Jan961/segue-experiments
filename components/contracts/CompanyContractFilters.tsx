@@ -7,12 +7,14 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { contractsFilterState, intialContractsFilterState } from 'state/contracts/contractsFilterState';
 import { allStatusOptions } from 'config/contracts';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import { ContractScheduleModal } from './modal/ContractSchedule';
+import { useState } from 'react';
 
-const ContractFilters = () => {
+const CompanyContractFilters = () => {
   const [filter, setFilter] = useRecoilState(contractsFilterState);
   const { selected: productionId } = useRecoilValue(productionJumpState);
-
-  const onChange = (e: any) => {
+  const [openContract, setOpenContract] = useState(false);
+  const onChange = (e) => {
     setFilter({ ...filter, [e.target.id]: e.target.value });
   };
 
@@ -24,6 +26,10 @@ const ContractFilters = () => {
       scheduleStartDate: filter.scheduleStartDate,
       scheduleEndDate: filter.scheduleEndDate,
     });
+  };
+
+  const openContractSchedule = () => {
+    setOpenContract(true);
   };
 
   return (
@@ -48,8 +54,7 @@ const ContractFilters = () => {
           </GlobalToolbar>
         </div>
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
-          <ContractsDateFilter />
-          <div className=" text-primary-input-text">Deal Memo Status</div>
+          <div className=" text-primary-input-text">First Name</div>
           <Select
             onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
             className="bg-primary-white w-52"
@@ -60,7 +65,18 @@ const ContractFilters = () => {
             isClearable
             isSearchable
           />
-          <div className=" text-primary-input-text">Contract Status</div>
+          <div className=" text-primary-input-text">Last Name</div>
+          <Select
+            onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
+            className="bg-white w-52"
+            value={filter.contractStatusDropDown}
+            disabled={!productionId}
+            placeholder="Contract Status"
+            options={allStatusOptions}
+            isClearable
+            isSearchable
+          />
+          <div className=" text-primary-input-text">Department</div>
           <Select
             onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
             className="bg-white w-52"
@@ -74,33 +90,33 @@ const ContractFilters = () => {
           <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
-      <div className=" text-primary-input-text">Contract Status</div>
+      <div className="flex mt-2">
+        <div className=" text-primary-input-text">Department</div>
+        <Select
+          onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
+          className="bg-white w-52"
+          value={filter.contractStatusDropDown}
+          // disabled={!productionId}
+          placeholder="Contract Status"
+          options={allStatusOptions}
+          isClearable
+          isSearchable
+        />
 
-      <Select
-        onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
-        className="bg-white w-52"
-        value={filter.contractStatusDropDown}
-        disabled={!productionId}
-        placeholder="Contract Status"
-        options={allStatusOptions}
-        isClearable
-        isSearchable
-      />
+        <div className=" text-primary-input-text">Date Issued</div>
 
-      <div className=" text-primary-input-text">Contract Status</div>
+        <ContractsDateFilter />
+        <Button className="text-sm leading-8 w-[120px]" text="Start New Contract" onClick={openContractSchedule} />
 
-      <Select
-        onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
-        className="bg-white w-52"
-        value={filter.contractStatusDropDown}
-        disabled={!productionId}
-        placeholder="Contract Status"
-        options={allStatusOptions}
-        isClearable
-        isSearchable
-      />
+        <Button
+          className="text-sm leading-8 w-[120px]"
+          text="View / Edit Contract Templates"
+          onClick={onClearFilters}
+        />
+      </div>
+      {openContract && <ContractScheduleModal openContract={openContract} />}
     </div>
   );
 };
 
-export default ContractFilters;
+export default CompanyContractFilters;
