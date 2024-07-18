@@ -128,7 +128,7 @@ export default function GlobalActivityModal({
     } else if (variant === 'edit' || variant === 'view') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(data.Date.toString() === 'Invalid Date' ? null : startOfDay(new Date(data.Date)));
+      setActDate(data.Date === null ? null : startOfDay(new Date(data.Date)));
       setActFollowUp(data.FollowUpRequired);
       setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
       setCost(data.Cost.toString());
