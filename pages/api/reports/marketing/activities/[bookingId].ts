@@ -114,7 +114,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   currentRowNum++;
   worksheet.addRow([]);
   currentRowNum++;
-  worksheet.addRow(['', '', '', 'Grand Total', totalCompanyCost + totalVenueCost]);
+  worksheet.addRow(['', '', '', 'Total Cost', totalCompanyCost + totalVenueCost]);
   applyFormattingToRange({
     worksheet,
     startRow: 5,

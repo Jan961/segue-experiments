@@ -115,7 +115,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
     await exportExcelReport(
       '/api/reports/marketing/archived-sales',
       payload,
-      `${productionName} ${selectedVenue?.[0]?.Venue?.Name}`,
+      `${productionName} ${selectedVenue?.[0]?.Venue?.Name} Archived Sales`,
     );
   };
 

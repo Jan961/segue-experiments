@@ -10,7 +10,7 @@ export default function CompanyInformation() {
       <h1 className="mt-3 text-4xl font-bold text-primary-pink">Company Details</h1>
       <div className="w-[96rem] mx-auto mt-12">
         <Tabs tabs={tabs} selectedTabClass="!bg-primary-pink/[0.50] !text-primary-navy" buttonWidth="w-1/2">
-          <Tab.Panel className="h-[650px] overflow-y-hidden">
+          <Tab.Panel className="h-[800px] overflow-y-hidden">
             <CompanyDetailsTab />
           </Tab.Panel>
           <Tab.Panel className="h-[650px] overflow-y-hidden">

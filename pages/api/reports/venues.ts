@@ -7,6 +7,7 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { ALIGNMENT } from './masterplan';
+import { marketingCostsStatusToLabelMap } from 'config/Reports';
 
 type BOOKING = {
   Id: number;
@@ -27,6 +28,7 @@ type BOOKING = {
   VenueName: string;
   VenueTown: string;
   FullProductionCode: string;
+  MarketingCostsStatus: string;
 };
 
 const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align: ALIGNMENT }) => {
@@ -68,9 +70,40 @@ const getBooleanAsString = (val: boolean | null): string => {
   return '';
 };
 
+const applySelectionFilter = (bookings: BOOKING[], selection: string) => {
+  switch (selection) {
+    case 'all':
+      return bookings;
+    case 'on_sale':
+      return bookings.filter((booking) => booking.TicketsOnSale);
+    case 'not_onsale':
+      return bookings.filter((booking) => !booking.TicketsOnSale);
+    case 'marketing_plans_received':
+      return bookings.filter((booking) => booking.MarketingPlanReceived);
+    case 'marketing_plans_not_received':
+      return bookings.filter((booking) => !booking.MarketingPlanReceived);
+    case 'contact_info_received':
+      return bookings.filter((booking) => booking.ContactInfoReceived);
+    case 'contact_info_not_received':
+      return bookings.filter((booking) => !booking.ContactInfoReceived);
+    case 'print_requirements_received':
+      return bookings.filter((booking) => booking.PrintReqsReceived);
+    case 'print_requirements_not_received':
+      return bookings.filter((booking) => !booking.PrintReqsReceived);
+    case 'marketing_costs_pending':
+      return bookings.filter((booking) => booking.MarketingCostsStatus === 'P');
+    case 'marketing_costs_approved':
+      return bookings.filter((booking) => booking.MarketingCostsStatus === 'A');
+    case 'marketing_costs_not_approved':
+      return bookings.filter((booking) => booking.MarketingCostsStatus === 'N');
+    default:
+      return bookings;
+  }
+};
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    let { productionId, showId = null } = req.body || {};
+    let { productionId, showId = null, selection } = req.body || {};
     if (productionId === -1) {
       productionId = null;
     }
@@ -148,10 +181,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     worksheet.addRow([`${filename}`]);
     const date = new Date();
     worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
-    worksheet.addRow(['PRODUCTION', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']);
-    worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']);
+    worksheet.addRow([
+      'PRODUCTION',
+      'SHOW',
+      '',
+      '',
+      '',
+      '',
+      'ON SALE',
+      'MARKETING',
+      'CONTACT',
+      'PRINT',
+      'MARKETING COSTS',
+    ]);
+    worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS', 'STATUS']);
     worksheet.addRow([]);
-    bookings?.forEach((booking: BOOKING) => {
+    applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
       const ShowDate = moment(booking.FirstDate).format('DD/MM/YY');
       const VenueCode = booking.VenueCode;
       const ShowTown = booking.VenueTown;
@@ -172,6 +217,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         MarketingPlan,
         ContactInfo,
         PrintReqsReceived,
+        marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
       ]);
     });
 
