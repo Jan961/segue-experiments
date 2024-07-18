@@ -69,7 +69,7 @@ export const dateToPicker = (dateToFormat: Date | string) => {
 };
 
 export const dateTimeToTime = (dateToFormat: string) => {
-  return moment(dateToFormat).format('HH:mm');
+  return moment.utc(dateToFormat).format('HH:mm');
 };
 
 export const toISO = (date: Date) => {
