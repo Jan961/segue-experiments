@@ -172,7 +172,7 @@ const GlobalActivityView = () => {
           Name: data.actName,
           ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
           Cost: data.cost,
-          Date: startOfDay(data.actDate),
+          Date: data.actDate === '' ? null : startOfDay(data.actDate),
           FollowUpRequired: data.followUpCheck,
           Notes: data.notes,
           ProductionId: productionId,
