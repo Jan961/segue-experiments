@@ -93,8 +93,10 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const handleFetchTasks = async () => {
     setLoading(true);
     try {
+      console.log(selected);
       const response = await axios.get(`/api/tasks/list/${selected}`);
       setRowData(response.data[0].Tasks || []);
+      console.log('raaaaah');
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -103,7 +105,12 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   };
 
   useEffect(() => {
-    if (selected) handleFetchTasks();
+    const fetchTasks = async () => {
+      console.log(selected);
+      if (selected) await handleFetchTasks();
+    };
+
+    fetchTasks();
   }, [selected]);
 
   const handleSubmit = async () => {

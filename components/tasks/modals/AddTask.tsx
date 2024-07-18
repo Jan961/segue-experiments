@@ -172,6 +172,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   const repeatInterval = true;
   const handleMasterTask = async () => {
     try {
+      console.log(inputs);
       omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
       if (inputs.Id) {
         await axios.post('/api/tasks/master/update', inputs);
@@ -193,11 +194,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const handleOnSubmit = async () => {
-    setLoading(true);
+    setLoading(false);
+    console.log(isMasterTask);
     if (isMasterTask) {
-      handleMasterTask();
+      await handleMasterTask();
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction']);
+      console.log(inputs);
       if (inputs.Id) {
         try {
           await axios.post('/api/tasks/update', inputs);
@@ -211,7 +214,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
           const endpoint = '/api/tasks/create/single/';
           await axios.post(endpoint, inputs);
           setLoading(false);
-          handleMasterTask();
+          if (isChecked) {
+            console.log('is checked wtaf');
+            await handleMasterTask();
+          }
           onClose();
         } catch (error) {
           setLoading(false);
@@ -223,6 +229,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
 
   const handleClose = () => {
     onClose();
+    setLoading(false);
     setInputs(DEFAULT_MASTER_TASK);
     setIsCloned(false);
   };
@@ -259,6 +266,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
 
   console.log(isMasterTask ? inputs?.Code?.toString() : showCode);
   console.log(inputs);
+  console.log(loading);
   return (
     <PopupModal
       show={visible}

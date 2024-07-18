@@ -56,8 +56,9 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   const handleShowTask = () => {
-    setShowAddTask(!showAddTask);
-    router.replace(router.asPath);
+    setShowAddTask(false);
+    //  This was making the loading spinner stick
+    //  router.replace(router.asPath);
   };
 
   const isFilterMatchingInitialState = () => {
@@ -118,6 +119,8 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     }
   };
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
+  console.log(isProductionTaskList);
+
   return (
     <Layout title="Tasks | Segue" flush>
       <div className="mb-8">
