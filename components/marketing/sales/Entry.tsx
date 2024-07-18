@@ -248,7 +248,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     copyPreviousWeeks();
   };
 
-  const validateSaleFigure = (value: string): number => {
+  const sanitiseSalesFigue = (value: string): number => {
     if (value === '') {
       return 0;
     } else {
@@ -516,7 +516,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsSold: validateSaleFigure(event.target.value),
+                                seatsSold: sanitiseSalesFigue(event.target.value),
                               },
                             })
                           }
@@ -537,7 +537,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsReserved: validateSaleFigure(event.target.value),
+                                seatsReserved: sanitiseSalesFigue(event.target.value),
                               },
                             })
                           }
@@ -560,7 +560,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsSoldVal: validateSaleFigure(event.target.value),
+                                seatsSoldVal: sanitiseSalesFigue(event.target.value),
                               },
                             })
                           }
@@ -581,7 +581,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsReservedVal: validateSaleFigure(event.target.value),
+                                seatsReservedVal: sanitiseSalesFigue(event.target.value),
                               },
                             })
                           }
@@ -639,7 +639,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsSold: validateSaleFigure(event.target.value),
+                                    seatsSold: sanitiseSalesFigue(event.target.value),
                                   },
                                 })
                               }
@@ -660,7 +660,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsReserved: validateSaleFigure(event.target.value),
+                                    seatsReserved: sanitiseSalesFigue(event.target.value),
                                   },
                                 })
                               }
@@ -683,7 +683,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsSoldVal: validateSaleFigure(event.target.value),
+                                    seatsSoldVal: sanitiseSalesFigue(event.target.value),
                                   },
                                 })
                               }
@@ -704,7 +704,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsReservedVal: validateSaleFigure(event.target.value),
+                                    seatsReservedVal: sanitiseSalesFigue(event.target.value),
                                   },
                                 })
                               }
