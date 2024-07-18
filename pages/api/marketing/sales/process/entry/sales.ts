@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
@@ -27,16 +28,16 @@ export default async function handle(req, res) {
 
     // only create sales record if SaleSeats or SaleValue are not null
 
-    if (general.seatsSold !== null || general.seatsSoldVal !== null) {
+    if (!isNullOrEmpty(general.seatsSold) || !isNullOrEmpty(general.seatsSoldVal)) {
       sales.push({
         SaleSaleTypeId: 1,
-        SaleSeats: general.seatsSold,
-        SaleValue: general.seatsSoldVal,
+        SaleSeats: parseInt(general.seatsSold),
+        SaleValue: parseFloat(general.seatsSoldVal),
         SaleSetId: setId,
       });
     }
 
-    if (general.seatsReserved !== null || general.seatsReservedVal !== null) {
+    if (!isNullOrEmpty(general.seatsReserved) || !isNullOrEmpty(general.seatsReservedVal)) {
       sales.push({
         SaleSaleTypeId: 2,
         SaleSeats: general.seatsReserved,
@@ -45,7 +46,7 @@ export default async function handle(req, res) {
       });
     }
 
-    if (schools.seatsSold !== null || schools.seatsSoldVal !== null) {
+    if (!isNullOrEmpty(schools.seatsSold) || !isNullOrEmpty(schools.seatsSoldVal)) {
       sales.push({
         SaleSaleTypeId: 3,
         SaleSeats: schools.seatsSold,
@@ -54,7 +55,7 @@ export default async function handle(req, res) {
       });
     }
 
-    if (schools.seatsReserved !== null || schools.seatsReservedVal !== null) {
+    if (!isNullOrEmpty(schools.seatsReserved) || !isNullOrEmpty(schools.seatsReservedVal)) {
       sales.push({
         SaleSaleTypeId: 4,
         SaleSeats: schools.seatsReserved,
@@ -70,9 +71,10 @@ export default async function handle(req, res) {
     } else if (transactionState === 'update') {
       const salesUpdates = [];
 
+      // even though only one record should match query, as we don't have the saleID, we need to use updateMany
       sales.forEach((sale) => {
         salesUpdates.push(
-          prisma.Sale.update({
+          prisma.Sale.updateMany({
             where: {
               SaleSetId: sale.SaleSetId,
               SaleSaleTypeId: sale.SaleSaleTypeId,
