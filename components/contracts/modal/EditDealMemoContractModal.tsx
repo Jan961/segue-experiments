@@ -37,7 +37,7 @@ import {
   filterPrice,
   filterTechProvision,
 } from '../utils';
-import { DealMemoTechProvision } from '@prisma/client';
+import { DealMemoHold, DealMemoTechProvision } from '@prisma/client';
 import { dealMemoInitialState } from 'state/contracts/contractsFilterState';
 import {
   convertTimeToTodayDateFormat,
@@ -103,7 +103,6 @@ export const EditDealMemoContractModal = ({
     setFormData({ ...demoModalData });
     const priceData = filterPrice(demoModalData.DealMemoPrice);
     const holdTypeData = filterHoldTypeData(dealHoldType, demoModalData.DealMemoHold);
-    console.log('holdTypeData==>', holdTypeData);
     setSeatKillsData(holdTypeData);
     setdealMemoPriceFormData(priceData[0]);
     setDealMemoCustomPriceFormData(priceData[1]);
@@ -304,7 +303,15 @@ export const EditDealMemoContractModal = ({
       onCloseDemoForm();
     }
   };
-  console.log('seatKillsData==>', seatKillsData, demoModalData, dealHoldType);
+
+  const handleStandardSeatsTableData = (value) => {
+    const updatedFormData = {
+      ...formData,
+      DealMemoHold: Object.values(value) as unknown as DealMemoHold[],
+    };
+
+    setFormData({ ...updatedFormData });
+  };
   return (
     <PopupModal
       show={visible}
@@ -973,12 +980,20 @@ export const EditDealMemoContractModal = ({
           <div className="w-4/5 flex">
             <div className="w-[394px]">
               <div>
-                <StandardSeatKillsTable rowData={seatKillsData} />
+                <StandardSeatKillsTable
+                  rowData={seatKillsData}
+                  tableData={(value) => handleStandardSeatsTableData(value)}
+                />
               </div>
             </div>
             <div className="ml-16">
               <div className="text-primary-input-text font-bold">Hold Notes</div>
-              <TextInput className="w-[18vw]" />
+              <TextInput
+                id="venueText"
+                className="w-[18vw]"
+                value={formData.DeMoOtherHolds}
+                onChange={(value) => editDemoModalData('DeMoOtherHolds', value.target.value, 'dealMemo')}
+              />
             </div>
           </div>
         </div>
@@ -1449,8 +1464,8 @@ export const EditDealMemoContractModal = ({
                 className="pr-10"
                 labelClassName="!text-base"
                 id="includeExcludedVenues"
-                onChange={(value) => editDemoModalData('DeMoSellProgrammes', value.target.value, 'dealMemo')}
-                checked={formData.DeMoSellProgrammes}
+                onChange={(value) => editDemoModalData('DeMoPrintDelUseVenueAddress', value.target.value, 'dealMemo')}
+                checked={formData.DeMoPrintDelUseVenueAddress}
                 label="Same as Venue Address"
               />
             </div>

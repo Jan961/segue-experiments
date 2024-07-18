@@ -83,20 +83,12 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
     field: 'seats',
     cellRenderer: InputRenderer,
     cellRendererParams: () => ({
-      // options: getNumericalOptions(
-      //   optionsLength,
-      //   [],
-      //   // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
-      // ),
-      // selectForComparison,
-      // selectedBookings,
-      placeholder: 'ggggg',
+      placeholder: '',
       inline: true,
-      onChange: (value) => {
-        onChangeData(value);
+      onChange: (value, holdTypeValue, holdTypeName, field) => {
+        onChangeData(value, holdTypeValue, holdTypeName, field);
       },
       holdValue,
-      // hasSalesData: params.data.hasSalesData,
     }),
     width: 120,
     cellStyle: {
@@ -113,20 +105,12 @@ export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
     field: 'value',
     cellRenderer: InputRenderer,
     cellRendererParams: () => ({
-      // options: getNumericalOptions(
-      //   optionsLength,
-      //   [],
-      //   // selectedBookings !== undefined ? selectedBookings.map((booking) => booking.order) : [],
-      // ),
-      // selectForComparison,
-      // selectedBookings,
-      placeholder: 'ggggg11',
+      placeholder: '',
       inline: true,
-      onChange: (value) => {
-        onChangeData(value);
+      onChange: (value, holdTypeValue, holdTypeName, field) => {
+        onChangeData(value, holdTypeValue, holdTypeName, field);
       },
       holdValue,
-      // hasSalesData: params.data.hasSalesData,
     }),
     width: 120,
     cellStyle: {

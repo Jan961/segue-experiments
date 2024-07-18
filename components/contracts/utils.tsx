@@ -38,7 +38,6 @@ export const defaultTechProvision = {
   },
 };
 export const defaultDemoCall = {
-  // DMCId: null,
   DMCDeMoId: null,
   DMCCallNum: 0,
   DMCPromoterOrVenue: '',
@@ -89,6 +88,7 @@ export const filterHoldTypeData = (dealHoldType, dealMemoHoldData) => {
     if (dealHoldObj[holdData.HoldTypeId]) {
       holdData.value = dealHoldObj[holdData.HoldTypeId].DMHoldValue;
       holdData.seats = dealHoldObj[holdData.HoldTypeId].DMHoldSeats;
+      holdData.DMHoldDeMoId = holdData.HoldTypeId;
     } else {
       holdData.value = '';
       holdData.seats = '';
@@ -96,20 +96,8 @@ export const filterHoldTypeData = (dealHoldType, dealMemoHoldData) => {
     holdData.type = holdData.HoldTypeName;
     return holdData;
   });
+
   return holdTypeTableData;
-  // {type: 'Promoter', seats: '', value: '',id:''}
-
-  // DMHoldId?: number,
-  // DMHoldDeMoId?: number,
-  // DMHoldHoldTypeId?: HoldTypeId,
-  // DMHoldSeats?: number,
-  // DMHoldValue?: number
-  // DMHoldHoldTypeId
-
-  //   HoldTypeCode: "PRO"
-  // HoldTypeId: 1
-  // HoldTypeName: "Promoter"
-  // HoldTypeSeqNo: 10
 };
 
 export const filterPercentage = (num: number) => {

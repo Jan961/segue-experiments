@@ -12,6 +12,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
     const data = getContactIdData(req.body.formData);
+    const demoIdData = data.DeMoId;
     const updatedDate = omit(data, [
       'error',
       'DeMoId',
@@ -31,7 +32,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const techProvisionData = getTechProvision(updatedDate.DealMemoTechProvision);
 
     const dealMemoCallData = getDealMemoCall(updatedDate.DealMemoCall);
-    const dealMemoHoldData = getDealMemoHold(updatedDate.DealMemoHold);
+    const dealMemoHoldData = getDealMemoHold(updatedDate.DealMemoHold, demoIdData);
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
@@ -74,7 +75,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             create: data.DealMemoCall,
           },
           DealMemoHold: {
-            create: data.DealMemoHold,
+            create: dealMemoHoldData[1],
           },
           Booking: {
             connect: { Id: BookingId },

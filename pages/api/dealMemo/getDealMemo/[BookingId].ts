@@ -17,6 +17,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         DealMemoPrice: true,
         DealMemoTechProvision: true,
         DealMemoCall: true,
+        DealMemoHold: true,
       },
     });
 
