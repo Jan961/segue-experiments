@@ -80,6 +80,8 @@ const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: Ma
 
   const handleSubmit = async () => {
     setLoading(true);
+    // do existing work in here
+
     if (isMaster) {
       try {
         const tasksData = selectedRows.map((task: MasterTask) => {
@@ -97,6 +99,8 @@ const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: Ma
             TaskCompleteByIsPostProduction: false,
           };
         });
+        console.log(tasksData);
+
         const endpoint = '/api/tasks/master/multiple';
         await axios.post(endpoint, tasksData);
         setLoading(false);
@@ -131,7 +135,7 @@ const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: Ma
       }
     }
   };
-
+  console.log(rowData);
   return (
     <PopupModal show={visible} onClose={onClose} title="Add Master Task" titleClass="text-primary-navy text-xl mb-2">
       <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">

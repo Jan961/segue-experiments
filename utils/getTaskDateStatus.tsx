@@ -1,6 +1,6 @@
 import { SelectOption } from 'components/global/forms/FormInputSelect';
 import { isThisWeek } from 'date-fns';
-import { formatShortDateUK } from '../services/dateService';
+import { formatShortDateUK } from 'services/dateService';
 
 export default function getTaskDateStatusColor(date: string, progress: number) {
   if (progress === 100) {
