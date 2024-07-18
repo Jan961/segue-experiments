@@ -294,7 +294,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Label className="!text-secondary pr-6 mr-4" text="Start By" />
             <Select
               value={inputs?.StartByWeekNum}
-              options={getWeekOptions(production, isMasterTask)}
+              options={getWeekOptions(production, isMasterTask, !isMasterTask)}
               placeholder="Week No."
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
               className="w-52"
@@ -306,7 +306,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'CompleteByWeekNum', value } })}
               value={inputs?.CompleteByWeekNum}
-              options={getWeekOptions(production, isMasterTask)}
+              options={getWeekOptions(production, isMasterTask, !isMasterTask)}
               placeholder="Week No."
               className="w-52"
               isSearchable={true}

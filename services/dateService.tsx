@@ -1,4 +1,4 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format } from 'date-fns';
 import moment from 'moment';
 
 // regex for dd/mm/yy
@@ -160,9 +160,12 @@ export const timeFormat = (mins?: number) => {
 };
 
 export const formatDateUK = (date) => {
-  // This will ignre date
   const today = new Date(date);
   return today.toLocaleDateString('en-GB');
+};
+
+export const formatShortDateUK = (date) => {
+  return format(new Date(date), 'dd/MM/yy');
 };
 
 export const getMonday = (inputDate) => {
