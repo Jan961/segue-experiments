@@ -25,23 +25,23 @@ export const Primary: Story = {
   },
 };
 
-export const DisabledDefault: Story = {
+export const disabledTransparent: Story = {
   args: {
     label: 'Production',
     placeholder: 'Please select...',
     options: values,
     disabled: true,
+    variant: 'transparent',
     className: 'w-128',
   },
 };
 
-export const DisabledWhite: Story = {
+export const disabledNormal: Story = {
   args: {
     label: 'Production',
     placeholder: 'Please select...',
     options: values,
     disabled: true,
-    defaultDisabled: false,
     className: 'w-128',
   },
 };

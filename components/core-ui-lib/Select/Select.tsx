@@ -22,6 +22,9 @@ interface CustMultiValueProps extends MultiValueProps {
 
 const COMP_HEIGHT = '1.9375rem';
 
+// used to customise the disabled UI
+type SelectVariant = 'transparent' | 'colored';
+
 export interface SelectProps extends WithTestId {
   value?: string | number | any[] | undefined | boolean;
   onChange: (value: string | number | (string | number)[]) => void;
@@ -31,6 +34,7 @@ export interface SelectProps extends WithTestId {
   className?: string;
   placeholder?: string;
   name?: string;
+  variant?: SelectVariant;
   disabled?: boolean;
   label?: string;
   inline?: boolean;
@@ -38,7 +42,6 @@ export interface SelectProps extends WithTestId {
   isClearable?: boolean;
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
-  defaultDisabled?: boolean;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -81,7 +84,6 @@ export default forwardRef(function Select(
     customStyles = {},
     placeholder = '',
     disabled = false,
-    defaultDisabled = true,
     testId = 'core-ui-lib-select',
     label,
     inline = false,
@@ -89,6 +91,7 @@ export default forwardRef(function Select(
     isClearable = true,
     isMulti = false,
     closeMenuOnSelect = true,
+    variant = 'colored',
   }: SelectProps,
   ref,
 ) {
@@ -99,7 +102,7 @@ export default forwardRef(function Select(
         fontWeight: 'bold',
         fontSize: '1rem',
         lineHeight: '1.5rem',
-        backgroundColor: isDisabled ? (defaultDisabled ? '#E9EBF0CC' : '#FFF') : '#FFF',
+        backgroundColor: isDisabled ? (variant === 'colored' ? '#E9EBF0CC' : '#FFF') : '#FFF',
         padding: '0 4px 0 4px',
         border: 0,
         boxShadow: 'none',
@@ -117,8 +120,14 @@ export default forwardRef(function Select(
           : isFocused
           ? '#21345B99'
           : styles.backgroundColor,
-        color: isDisabled ? (defaultDisabled ? '#ccc' : styles.color) : isSelected || isFocused ? '#FFF' : '#617293',
-        cursor: isDisabled ? (defaultDisabled ? 'not-allowed' : 'default') : 'default',
+        color: isDisabled
+          ? variant === 'colored'
+            ? '#ccc'
+            : styles.color
+          : isSelected || isFocused
+          ? '#FFF'
+          : '#617293',
+        cursor: isDisabled ? (variant === 'colored' ? 'not-allowed' : 'default') : 'default',
         ':active': {
           ...styles[':active'],
           backgroundColor: !isDisabled ? (isSelected ? '#FDCE74' : '#41A29A') : undefined,
@@ -155,7 +164,7 @@ export default forwardRef(function Select(
       menu: (styles) => ({ ...styles, zIndex: 20 }),
       ...customStyles,
     }),
-    [customStyles, defaultDisabled],
+    [customStyles, variant],
   );
 
   const [filteredOptions, setFilteredOptions] = React.useState<SelectOption[]>(null);

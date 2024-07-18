@@ -280,6 +280,7 @@ export default function GlobalActivityModal({
             isSearchable
             label="Type"
             disabled={variant === 'view'}
+            variant={variant === 'view' ? 'transparent' : 'colored'}
           />
 
           {error && <div className="text text-base text-primary-red mb-4">Please select an Activity Type</div>}
