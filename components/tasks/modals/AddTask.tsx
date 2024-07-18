@@ -92,6 +92,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   const [loading, setLoading] = useState<boolean>(false);
   const [isCloned, setIsCloned] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
 
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
@@ -152,7 +153,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     )
       value = parseInt(value, 10);
 
+    if (checked != null) {
+      setIsRecurring(checked);
+    }
+
     if (id === 'RepeatInterval' && checked) {
+      setIsRecurring(checked);
       value = 'once';
     }
 
@@ -169,7 +175,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
 
   // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
   // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
-  const repeatInterval = true;
   const handleMasterTask = async () => {
     try {
       console.log(inputs);
@@ -211,7 +216,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         }
       } else {
         try {
-          const endpoint = '/api/tasks/create/single/';
+          const endpoint = `/api/tasks/create/${isRecurring ? 'recurring' : 'single'}/`;
           await axios.post(endpoint, inputs);
           setLoading(false);
           if (isChecked) {
@@ -358,44 +363,47 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
           <div className="flex">
             <Label className="!text-secondary pr-2" text="Only Once" />
             <Checkbox
-              id="RepeatInterval"
-              checked={repeatInterval}
-              onChange={(event) => handleOnChange({ target: { id: 'RepeatInterval', checked: event.target.checked } })}
+              id="isRecurring"
+              checked={isRecurring}
+              onChange={(event) => handleOnChange({ target: { id: 'isRecurring', checked: event.target.checked } })}
             />
           </div>
-          <div className="flex">
-            <Label className="!text-secondary px-2" text="Repeat" />
-            <Select
-              onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
-              value={!inputs?.Id}
-              className="w-44"
-              options={RepeatOptions}
-              placeholder="Select..."
-              disabled={repeatInterval}
-            />
-          </div>
-          <div className="flex ml-2">
-            <Label className="!text-secondary pr-2" text="From" />
-            <Select
-              onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
-              value={!inputs?.Id}
-              options={weekOptions}
-              className="w-32"
-              placeholder="Week No."
-              disabled={repeatInterval}
-            />
-          </div>
-          <div className="flex ml-2">
-            <Label className="!text-secondary pr-2" text="To" />
-            <Select
-              onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
-              value={!inputs?.Id}
-              options={weekOptions}
-              disabled={repeatInterval}
-              placeholder="Week No."
-              className="w-32"
-            />
-          </div>
+          {isRecurring && (
+            <div className="flex">
+              <Label className="!text-secondary px-2" text="Repeat" />
+              <Select
+                onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
+                value={!inputs?.Id}
+                className="w-44"
+                options={RepeatOptions}
+                placeholder="Select..."
+              />
+            </div>
+          )}
+          {isRecurring && (
+            <div className="flex ml-2">
+              <Label className="!text-secondary pr-2" text="From" />
+              <Select
+                onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
+                value={!inputs?.Id}
+                options={weekOptions}
+                className="w-32"
+                placeholder="Week No."
+              />
+            </div>
+          )}
+          {isRecurring && (
+            <div className="flex ml-2">
+              <Label className="!text-secondary" text="To" />
+              <Select
+                onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
+                value={!inputs?.Id}
+                options={weekOptions}
+                placeholder="Week No."
+                className="w-32"
+              />
+            </div>
+          )}
         </div>
         <div className="flex">
           <Label className="!text-secondary pr-6 mr-4" text="Assigned to" />

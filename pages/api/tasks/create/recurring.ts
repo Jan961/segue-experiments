@@ -2,10 +2,36 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 
+// The req.body {
+//   ProductionId: 29,
+//   Name: 'mmmana',
+//   StartByWeekNum: -260,
+//   CompleteByWeekNum: -259,
+//   Priority: 1,
+//   Progress: 100,
+//   TaskCompletedDate: '2024-07-18T00:00:00.000Z',
+//   RepeatInterval: 'weekly',
+//   TaskRepeatFromWeekNum: -52,
+//   TaskRepeatToWeekNum: -51,
+//   AssignedToUserId: 1,
+//   Notes: 'sdasd'
+// }
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
+    console.log('The req.body', req.body);
     const {
+      Name,
+      StartByWeekNum,
+      CompleteByWeekNum,
+      Priority,
+      Progress,
+      RepeatInterval,
+      TaskRepeatFromWeekNum,
+      TaskRepeatToWeekNum,
+      AssignedToUserId,
       taskTitle,
+      productionId,
       dueDate,
       interval,
       progress,
@@ -14,11 +40,22 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       // status,
       priority,
       // followUp,
-      productionId,
+      ProductionId,
       notes,
       intervalWeekDay,
       intervalMonthDate,
     } = req.body;
+
+    console.log(Name);
+    console.log(CompleteByWeekNum);
+    console.log(StartByWeekNum);
+    console.log(Priority);
+    console.log(Progress);
+    console.log(RepeatInterval);
+    console.log(TaskRepeatFromWeekNum);
+    console.log(TaskRepeatToWeekNum);
+    console.log(AssignedToUserId);
+    console.log(ProductionId);
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId: productionId });
