@@ -54,3 +54,9 @@ export const venueSelectionOptions: SelectOption[] = [
   { text: 'Marketing Costs Approved', value: 'marketing_costs_approved' },
   { text: 'Marketing Costs Not Approved', value: 'marketing_costs_not_approved' },
 ];
+
+export const marketingCostsStatusToLabelMap = {
+  P: 'Pending Approval on Settlement',
+  A: 'Approved on Settlement',
+  N: 'Not Approved on Settlement',
+};

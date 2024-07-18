@@ -280,6 +280,7 @@ export default function GlobalActivityModal({
             isSearchable
             label="Type"
             disabled={variant === 'view'}
+            variant={variant === 'view' ? 'transparent' : 'colored'}
           />
 
           {error && <div className="text text-base text-primary-red mb-4">Please select an Activity Type</div>}
@@ -355,6 +356,7 @@ export default function GlobalActivityModal({
             placeholder="Notes Field"
             onChange={(e) => setActNotes(e.target.value)}
             disabled={variant === 'view'}
+            defaultDisabled={false}
           />
 
           {variant !== 'view' && (
@@ -365,7 +367,7 @@ export default function GlobalActivityModal({
 
           <div className="flex flex-row mt-5">
             <div className="w-[450px]">
-              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={600} />
+              <Table columnDefs={venueColDefs} rowData={venueList} styleProps={styleProps} tableHeight={300} />
             </div>
           </div>
 

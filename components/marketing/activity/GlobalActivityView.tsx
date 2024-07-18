@@ -168,7 +168,6 @@ const GlobalActivityView = () => {
 
       if (typeof actTypeResponse === 'object') {
         const globalActivities = actTypeResponse as GlobalActivitiesResponse;
-        alert(data.actDate);
         const tempRow = {
           Name: data.actName,
           ActivityTypeId: globalActivities.activityTypes.find((type) => type.text === data.actType).value,
