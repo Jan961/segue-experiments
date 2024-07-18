@@ -90,11 +90,11 @@ export default function ActivityModal({
       BookingId: bookingId,
       CompanyCost: parseFloat(companyCost),
       VenueCost: parseFloat(venueCost),
-      Date: startOfDay(new Date(actDate)),
+      Date: actDate === null ? null : startOfDay(new Date(actDate)),
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? startOfDay(new Date(followUpDt)) : null,
+      DueByDate: actFollowUp ? (followUpDt === null ? null : startOfDay(new Date(followUpDt))) : null,
     };
 
     // only add iD if not adding
