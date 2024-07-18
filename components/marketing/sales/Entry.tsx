@@ -248,7 +248,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     copyPreviousWeeks();
   };
 
-  const validateNumber = (value: string): number => {
+  const validateSaleFigure = (value: string): number => {
     if (value === '') {
       return 0;
     } else {
@@ -514,7 +514,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           onChange={(event) =>
                             setCurrSalesFigureSet({
                               ...currSalesFigureSet,
-                              general: { ...currSalesFigureSet.general, seatsSold: validateNumber(event.target.value) },
+                              general: {
+                                ...currSalesFigureSet.general,
+                                seatsSold: validateSaleFigure(event.target.value),
+                              },
                             })
                           }
                         />
@@ -534,7 +537,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsReserved: validateNumber(event.target.value),
+                                seatsReserved: validateSaleFigure(event.target.value),
                               },
                             })
                           }
@@ -557,7 +560,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsSoldVal: validateNumber(event.target.value),
+                                seatsSoldVal: validateSaleFigure(event.target.value),
                               },
                             })
                           }
@@ -578,7 +581,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                               ...currSalesFigureSet,
                               general: {
                                 ...currSalesFigureSet.general,
-                                seatsReservedVal: validateNumber(event.target.value),
+                                seatsReservedVal: validateSaleFigure(event.target.value),
                               },
                             })
                           }
@@ -636,7 +639,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsSold: validateNumber(event.target.value),
+                                    seatsSold: validateSaleFigure(event.target.value),
                                   },
                                 })
                               }
@@ -657,7 +660,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsReserved: validateNumber(event.target.value),
+                                    seatsReserved: validateSaleFigure(event.target.value),
                                   },
                                 })
                               }
@@ -680,7 +683,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsSoldVal: validateNumber(event.target.value),
+                                    seatsSoldVal: validateSaleFigure(event.target.value),
                                   },
                                 })
                               }
@@ -701,7 +704,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                                   ...currSalesFigureSet,
                                   schools: {
                                     ...currSalesFigureSet.schools,
-                                    seatsReservedVal: validateNumber(event.target.value),
+                                    seatsReservedVal: validateSaleFigure(event.target.value),
                                   },
                                 })
                               }
