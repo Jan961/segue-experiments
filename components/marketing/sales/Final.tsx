@@ -46,6 +46,7 @@ const Final = () => {
   const [generalWarning, setGeneralWarning] = useState('');
   const [showDiscrepancyNotes, setShowDiscrepancyNotes] = useState<boolean>(false);
   const [discrepancyButtonText, setDiscepancyButtonText] = useState('Ok');
+  const [setId, setSetId] = useState(-1);
 
   const getSalesFrequency = async () => {
     try {
@@ -78,65 +79,67 @@ const Final = () => {
           frequency,
         });
 
-        const sales = response.data;
+        if (Object.values(response.data).length > 0) {
+          const sales = response.data;
 
-        if (typeof sales === 'object') {
-          const salesFigures = sales as SalesFigureSet;
+          if (typeof sales === 'object') {
+            const salesFigures = sales as SalesFigureSet;
 
-          let tempGeneralWarning = '';
-          // check if the final value submitted is lower the the last sales entry
-          if (salesFigures.general.seatsSold !== '' && salesFigures.general.seatsSoldVal !== '') {
-            if (parseInt(genSeatsSold) < parseInt(salesFigures.general.seatsSold)) {
-              tempGeneralWarning =
-                'Number of general seats sold (' +
-                genSeatsSold +
-                ') is less than the previously entered value (' +
-                salesFigures.general.seatsSold +
-                ')\n';
+            let tempGeneralWarning = '';
+            // check if the final value submitted is lower the the last sales entry
+            if (salesFigures.general.seatsSold !== '' && salesFigures.general.seatsSoldVal !== '') {
+              if (parseInt(genSeatsSold) < parseInt(salesFigures.general.seatsSold)) {
+                tempGeneralWarning =
+                  'Number of general seats sold (' +
+                  genSeatsSold +
+                  ') is less than the previously entered value (' +
+                  salesFigures.general.seatsSold +
+                  ')\n';
+              }
+
+              if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.general.seatsSoldVal)) {
+                tempGeneralWarning =
+                  tempGeneralWarning +
+                  'Value of general seats (' +
+                  genSeatsSoldVal +
+                  ') is less than the previously entered value (' +
+                  salesFigures.general.seatsSoldVal +
+                  ')\n';
+              }
             }
 
-            if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.general.seatsSoldVal)) {
-              tempGeneralWarning =
-                tempGeneralWarning +
-                'Value of general seats (' +
-                genSeatsSoldVal +
-                ') is less than the previously entered value (' +
-                salesFigures.general.seatsSold +
-                ')\n';
+            let tempSchoolWarning = '';
+            if (salesFigures.schools.seatsSold !== '' && salesFigures.schools.seatsSoldVal !== '') {
+              if (parseInt(schSeatsSold) < parseInt(salesFigures.schools.seatsSold)) {
+                tempSchoolWarning =
+                  'Number of school seats sold (' +
+                  genSeatsSold +
+                  ') is less than the previously entered value (' +
+                  salesFigures.general.seatsSold +
+                  ')\n';
+              }
+
+              if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.schools.seatsSoldVal)) {
+                tempSchoolWarning =
+                  tempSchoolWarning +
+                  'Valie of school seats sold (' +
+                  genSeatsSoldVal +
+                  ') is less than the previously entered value (' +
+                  salesFigures.general.seatsSoldVal +
+                  ')\n';
+              }
             }
-          }
 
-          let tempSchoolWarning = '';
-          if (salesFigures.schools.seatsSold !== '' && salesFigures.schools.seatsSoldVal !== '') {
-            if (parseInt(schSeatsSold) < parseInt(salesFigures.schools.seatsSold)) {
-              tempSchoolWarning =
-                'Number of school seats sold (' +
-                genSeatsSold +
-                ') is less than the previously entered value (' +
-                salesFigures.general.seatsSold +
-                ')\n';
+            // if tempWarning is not blank, setWarning, display the discrepency note field and exit the function
+            if (tempGeneralWarning !== '' || tempSchoolWarning !== '') {
+              setSchoolWarning(tempSchoolWarning);
+              setGeneralWarning(tempGeneralWarning);
+              setShowDiscrepancyNotes(true);
+              setConfirmedUser('');
+              setUserConfirmed(false);
+
+              return;
             }
-
-            if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.schools.seatsSoldVal)) {
-              tempSchoolWarning =
-                tempSchoolWarning +
-                'Valie of school seats sold (' +
-                genSeatsSoldVal +
-                ') is less than the previously entered value (' +
-                salesFigures.general.seatsSold +
-                ')\n';
-            }
-          }
-
-          // if tempWarning is not blank, setWarning, display the discrepency note field and exit the function
-          if (tempGeneralWarning !== '' || tempSchoolWarning !== '') {
-            setSchoolWarning(tempSchoolWarning);
-            setGeneralWarning(tempGeneralWarning);
-            setShowDiscrepancyNotes(true);
-            setConfirmedUser('');
-            setUserConfirmed(false);
-
-            return;
           }
         }
       }
@@ -157,7 +160,18 @@ const Final = () => {
         },
       };
 
-      await axios.post('/api/marketing/sales/process/entry/create', data);
+      // if setId is -1 we need to run the create api, otherwise run update
+      if (setId === -1) {
+        const finalEntryCreate = await axios.post('/api/marketing/sales/process/final/create', data);
+        setSetId(finalEntryCreate.data.setId);
+      } else {
+        const finalEntryUpdate = await axios.post('/api/marketing/sales/process/final/update', {
+          ...data,
+          SetId: setId,
+        });
+        setSetId(finalEntryUpdate.data.setId);
+      }
+
       setBookings({ ...bookings, selected: null });
     } catch (error) {
       console.log(error);
@@ -213,8 +227,10 @@ const Final = () => {
 
       const sales = response.data;
 
-      if (!isNullOrEmpty(sales) && typeof sales === 'object') {
+      if (Object.values(sales).length > 0) {
         const salesFigures = sales as SalesFigureSet;
+
+        setSetId(sales.setId);
 
         // set the sales figures, if available
         setGenSeatsSold(validateSale(salesFigures.general?.seatsSold));
@@ -222,7 +238,7 @@ const Final = () => {
         setSchSeatsSold(validateSale(salesFigures.schools?.seatsSold));
         setSchSeatsSoldVal(validateSale(salesFigures.schools?.seatsSoldVal));
 
-        if (salesFigures.user === null) {
+        if (salesFigures.user === undefined) {
           setUserConfirmed(false);
           setConfirmedUser('');
         } else {
@@ -321,6 +337,7 @@ const Final = () => {
     const initForm = async () => {
       try {
         // set the current days sales figues if available
+        setSetId(-1);
         setSalesFigures();
       } catch (error) {
         console.log(error);
@@ -342,7 +359,7 @@ const Final = () => {
             <div className="flex flex-row">
               <div className="flex flex-col">
                 <div
-                  className={`w-[849px] h-auto'
+                  className={`w-[900px] h-auto'
                     } bg-primary-green/[0.30] rounded-xl mt-5 p-4`}
                 >
                   <div className="flex flex-row">
@@ -351,15 +368,17 @@ const Final = () => {
                         <div className="leading-6 text-xl text-primary-input-text font-bold mt-1">General</div>
                       </div>
 
-                      <div className="flex flex-row">
-                        <div className="leading-6 text-base text-primary-red font-bold mt-5">{generalWarning}</div>
-                      </div>
+                      {generalWarning !== '' && (
+                        <div className="flex flex-row">
+                          <div className="leading-6 text-base text-primary-red font-bold mt-5">{generalWarning}</div>
+                        </div>
+                      )}
 
                       <div className="flex flex-row">
                         <div className="flex flex-col mr-[20px]">
                           <div className="flex flex-row mt-4">
                             <div className="flex flex-col">
-                              <div className="text-primary-dark-blue base font-bold mr-[52px]">Seats Sold</div>
+                              <div className="text-primary-dark-blue base font-bold mr-[10px]">Seats Sold</div>
                             </div>
                             <TextInput
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
@@ -374,8 +393,8 @@ const Final = () => {
                         <div className="flex flex-col">
                           <div className="flex flex-row mt-4 items-center">
                             <div className="flex flex-row items-center mr-[20px]">
-                              <div className="text-primary-dark-blue base font-bold">Value</div>
-                              <div className="ml-10 -mr-3">{currency.symbol}</div>
+                              <div className="text-primary-dark-blue base font-bold ml-[10px]">Value</div>
+                              <div className="ml-5 -mr-3">{currency.symbol}</div>
                             </div>
                             <TextInput
                               className="w-[137px] h-[31px] flex flex-col -mt-1"
@@ -394,9 +413,11 @@ const Final = () => {
                             <div className="leading-6 text-xl text-primary-input-text font-bold mt-5">School</div>
                           </div>
 
-                          <div className="flex flex-row">
-                            <div className="leading-6 text-xl text-primary-red font-bold mt-5">{schoolWarning}</div>
-                          </div>
+                          {schoolWarning !== '' && (
+                            <div className="flex flex-row">
+                              <div className="leading-6 text-xl text-primary-red font-bold mt-5">{schoolWarning}</div>
+                            </div>
+                          )}
 
                           <div className="flex flex-row">
                             <div className="flex flex-col mr-[20px]">
@@ -434,7 +455,7 @@ const Final = () => {
                       )}
                     </div>
 
-                    <div className="flex flex-col ml-[150px]">
+                    <div className="flex flex-col ml-[280px]">
                       <div className="flex flex-row mt-[42px]">
                         <Button
                           className="w-[132px] flex flex-row mb-2"
@@ -445,7 +466,7 @@ const Final = () => {
                         />
                       </div>
 
-                      <div className="flex flex-row">
+                      <div className="flex flex-row mb-3">
                         <Button
                           className="w-[132px] flex flex-row mb-2"
                           variant="secondary"
@@ -458,7 +479,7 @@ const Final = () => {
 
                   <div className="flex flex-row">
                     <div className="flex flex-col">
-                      <div className="leading-6 text-base text-primary-input-text font-bold mt-5">
+                      <div className="leading-6 text-base text-primary-input-text font-bold -mt-[45px]">
                         I confirm these are the final figures for the above production venue / date, as agreed by all
                         parties.
                       </div>
@@ -466,18 +487,18 @@ const Final = () => {
 
                     <div className="flex flex-col">
                       <Checkbox
-                        id="schSalesNotRequired"
-                        name="schSalesNotRequired"
+                        id="userConfirmed"
+                        name="userConfirmed"
                         checked={userConfirmed}
                         onChange={() => markUserConfirmed(!userConfirmed)}
-                        className="w-[19px] h-[19px] mt-6 ml-3"
+                        className="w-[19px] h-[19px] ml-5 -mt-[40px]"
                       />
                     </div>
                   </div>
 
                   <div className="flex flex-row">
                     <TextInput
-                      className="w-[364px] h-[31px] flex flex-col mt-3"
+                      className="w-[364px] h-[31px] flex flex-col -mt-[12px]"
                       id="currentUser"
                       value={confirmedUser}
                       disabled={true}
