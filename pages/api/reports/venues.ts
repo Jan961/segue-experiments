@@ -27,6 +27,7 @@ type BOOKING = {
   VenueName: string;
   VenueTown: string;
   FullProductionCode: string;
+  MarketingCostsStatus: string;
 };
 
 const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align: ALIGNMENT }) => {
@@ -148,8 +149,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     worksheet.addRow([`${filename}`]);
     const date = new Date();
     worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
-    worksheet.addRow(['PRODUCTION', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']);
-    worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']);
+    worksheet.addRow([
+      'PRODUCTION',
+      'SHOW',
+      '',
+      '',
+      '',
+      '',
+      'ON SALE',
+      'MARKETING',
+      'CONTACT',
+      'PRINT',
+      'MARKETING COSTS',
+    ]);
+    worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS', 'STATUS']);
     worksheet.addRow([]);
     bookings?.forEach((booking: BOOKING) => {
       const ShowDate = moment(booking.FirstDate).format('DD/MM/YY');
@@ -172,6 +185,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         MarketingPlan,
         ContactInfo,
         PrintReqsReceived,
+        booking.MarketingCostsStatus,
       ]);
     });
 
