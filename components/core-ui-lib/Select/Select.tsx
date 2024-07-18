@@ -38,6 +38,7 @@ export interface SelectProps extends WithTestId {
   isClearable?: boolean;
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
+  onBlur?: () => void;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -87,6 +88,7 @@ export default forwardRef(function Select(
     isClearable = true,
     isMulti = false,
     closeMenuOnSelect = true,
+    onBlur,
   }: SelectProps,
   ref,
 ) {
@@ -259,6 +261,7 @@ export default forwardRef(function Select(
           isClearable={isClearable}
           isMulti={isMulti}
           hideSelectedOptions={false}
+          onBlur={onBlur}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
               return true;
