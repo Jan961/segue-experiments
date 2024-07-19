@@ -21,6 +21,7 @@ import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 import { productionJumpState } from '../../../state/booking/productionJumpState';
+import { addDurationToDate, addOneMonth } from '../../../services/dateService';
 
 interface AddTaskProps {
   visible: boolean;
@@ -77,7 +78,15 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
 
 const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = null }: AddTaskProps) => {
   const [inputs, setInputs] = useState<
-    Partial<MasterTask> & { Progress?: number; DueDate?: string; ProductionId?: number; TaskCompletedDate?: string }
+    Partial<MasterTask> & {
+      Progress?: number;
+      DueDate?: string;
+      ProductionId?: number;
+      TaskCompletedDate?: string;
+      RepeatInterval?: string;
+      TaskRepeatFromWeekNum?: string;
+      TaskRepeatToWeekNum?: string;
+    }
   >(task || DEFAULT_MASTER_TASK);
 
   const productionList = useRecoilValue(productionJumpState).productions;
@@ -93,12 +102,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   const [isCloned, setIsCloned] = useState<boolean>(false);
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [isRecurring, setIsRecurring] = useState<boolean>(false);
-
+  const [showRecurringConfirmation, setShowRecurringConfirmation] = useState<boolean>(false);
+  const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
   );
-
   const showCode = useMemo(() => {
     return inputs?.Id ? `${production?.ShowCode}${production?.Code}-${inputs.Code}` : null;
   }, [inputs?.Id, production?.ShowCode, production?.Code, inputs.Code]);
@@ -139,6 +148,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   }, [users]);
 
   const handleOnChange = (e: any) => {
+    if (taskRecurringInfo === null) {
+      setTaskRecurringInfo(inputs);
+    }
+
     let { id, value, checked } = e.target;
     if (
       [
@@ -171,6 +184,24 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     }
 
     setStatus({ ...status, submitted: false });
+  };
+
+  const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
+    console.log(repeatInterval);
+    let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
+    const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
+
+    const multiplier = repeatInterval === 'biweekly' ? 2 : 1;
+    let counter = 0;
+    while (taskStartDate <= taskEndDate) {
+      counter++;
+      taskStartDate =
+        repeatInterval === 'monthly'
+          ? addOneMonth(taskStartDate)
+          : addDurationToDate(taskStartDate, 7 * multiplier, true);
+    }
+
+    return counter;
   };
 
   // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
@@ -220,7 +251,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
           await axios.post(endpoint, inputs);
           setLoading(false);
           if (isChecked) {
-            console.log('is checked wtaf');
             await handleMasterTask();
           }
           onClose();
@@ -269,9 +299,8 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     }
   };
 
-  console.log(isMasterTask ? inputs?.Code?.toString() : showCode);
-  console.log(inputs);
-  console.log(loading);
+  console.log(taskRecurringInfo);
+
   return (
     <PopupModal
       show={visible}
@@ -368,7 +397,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               onChange={(event) => handleOnChange({ target: { id: 'isRecurring', checked: event.target.checked } })}
             />
           </div>
-          {isRecurring && (
+          {!isRecurring && (
             <div className="flex">
               <Label className="!text-secondary px-2" text="Repeat" />
               <Select
@@ -380,7 +409,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               />
             </div>
           )}
-          {isRecurring && (
+          {!isRecurring && (
             <div className="flex ml-2">
               <Label className="!text-secondary pr-2" text="From" />
               <Select
@@ -393,7 +422,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               />
             </div>
           )}
-          {isRecurring && (
+          {!isRecurring && (
             <div className="flex ml-2">
               <Label className="!text-secondary" text="To" />
               <Select
@@ -452,11 +481,41 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Button
               variant="primary"
               className="w-[132px]"
-              onClick={handleOnSubmit}
+              onClick={() => {
+                return isRecurring ? setShowRecurringConfirmation(true) : handleOnSubmit();
+              }}
               text={inputs.Id ? 'Save' : 'Create New Task'}
             />
           </div>
         </div>
+        {isRecurring && (
+          <PopupModal show={showRecurringConfirmation} onClose={() => setShowRecurringConfirmation(false)}>
+            {inputs?.Id ? (
+              <div>{}</div>
+            ) : (
+              <div>
+                <h1>This task is set to repeat</h1>
+                <p>
+                  This task is set to repeat. There will be{' '}
+                  {getNewTasksNum(
+                    new Date(production?.StartDate),
+                    inputs?.TaskRepeatFromWeekNum,
+                    inputs?.TaskRepeatToWeekNum,
+                    inputs?.RepeatInterval,
+                  )}{' '}
+                  new tasks added
+                </p>
+              </div>
+            )}
+
+            <Button variant="primary" className="bg-primary-red" onClick={() => setShowRecurringConfirmation(false)}>
+              Cancel
+            </Button>
+            <Button variant="secondary" onClick={handleOnSubmit}>
+              Continue
+            </Button>
+          </PopupModal>
+        )}
       </form>
 
       <ConfirmationDialog

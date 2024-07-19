@@ -91,6 +91,7 @@ export type ProductionTaskDTO = {
   StartDate?: string;
   CompleteDate?: string;
   TaskCompletedDate: Date;
+  ProductionTaskRepeat?: any;
 };
 
 // Existing Production interface for old schema. Remove eventually

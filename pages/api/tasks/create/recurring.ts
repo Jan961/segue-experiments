@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { addDurationToDate, calculateWeekNumber } from 'services/dateService';
+import { addDurationToDate, calculateWeekNumber, addOneMonth } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -39,12 +39,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ToWeekNumIsPostProduction: TaskRepeatToWeekNum < 0,
       },
     });
-
-    const addOneMonth = (date: Date) => {
-      const newDate = new Date(date); // Create a new Date object to avoid mutating the original date
-      newDate.setMonth(newDate.getMonth() + 1); // Add one month to the new date
-      return newDate;
-    };
 
     const prodBlock = productionWeeks.find((dateBlock) => {
       return dateBlock.Name === 'Production';

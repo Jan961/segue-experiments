@@ -255,6 +255,9 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
         orderBy: {
           StartByWeekNum: 'asc',
         },
+        include: {
+          ProductionTaskRepeat: true,
+        },
       },
     },
   });
@@ -279,6 +282,7 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
     const WeekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
     return { ...production, WeekNumToDateMap };
   });
+  console.log(getProductionsByStartDate(productionsWithTasks)[0]);
   return getProductionsByStartDate(productionsWithTasks);
 };
 

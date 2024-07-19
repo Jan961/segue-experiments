@@ -4,6 +4,8 @@ import { ProductionsWithTasks } from 'state/tasks/productionState';
 import { calculateTaskStatus } from 'utils/tasks';
 
 export const mapToProductionTasksDTO = (productionTasks): ProductionsWithTasks[] => {
+  console.log();
+  console.log(productionTasks);
   return productionTasks.map((t: any) => ({
     Id: t.Id,
     ShowName: t.Show.Name,

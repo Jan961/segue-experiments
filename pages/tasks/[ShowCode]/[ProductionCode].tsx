@@ -25,7 +25,7 @@ import { productionJumpState } from 'state/booking/productionJumpState';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { filteredProductions } = useTasksFilter();
-
+  console.log(filteredProductions);
   const { users } = useRecoilValue(userState);
 
   const filter = useRecoilValue(tasksfilterState);

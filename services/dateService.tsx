@@ -154,6 +154,12 @@ export const formatTime = (timestamp) => {
   return today.toLocaleTimeString();
 };
 
+export const addOneMonth = (date: Date) => {
+  const newDate = new Date(date); // Create a new Date object to avoid mutating the original date
+  newDate.setMonth(newDate.getMonth() + 1); // Add one month to the new date
+  return newDate;
+};
+
 export const timeFormat = (mins?: number) => {
   if (!mins) return '';
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
