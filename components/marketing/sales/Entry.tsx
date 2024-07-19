@@ -41,6 +41,7 @@ interface SalesFigure {
 interface SalesFigureSet {
   general: SalesFigure;
   schools: SalesFigure;
+  setId: number;
 }
 
 export interface SalesEntryRef {
@@ -97,7 +98,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     return errors.length > 0 ? errors : null;
   };
 
-  const handleUpdate = async (currSetId: number) => {
+  const handleUpdate = async () => {
     try {
       if (!warningIssued) {
         const generalErrors = compareSalesFigures(prevSalesFigureSet.general, currSalesFigureSet.general);
@@ -124,7 +125,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       let data = {
         bookingId: bookings.selected,
         salesDate,
-        setId: currSetId,
+        setId,
         general: currSalesFigureSet.general,
         schools: {},
       };
@@ -283,6 +284,31 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const setSalesFigures = async (inputDate: Date, previous: boolean) => {
     try {
       setLoading(true);
+
+      // initialise values
+      setSetId(-1);
+      const emptySalesSet = {
+        setId: 0,
+        general: {
+          seatsReserved: 0,
+          seatsReservedVal: 0,
+          seatsSold: 0,
+          seatsSoldVal: 0,
+        },
+        schools: {
+          seatsReserved: 0,
+          seatsReservedVal: 0,
+          seatsSold: 0,
+          seatsSoldVal: 0,
+        },
+      };
+
+      if (previous) {
+        setPrevSalesFigureSet(emptySalesSet);
+      } else {
+        setCurrSalesFigureSet(emptySalesSet);
+      }
+
       // handle when the useImperitive calls this function on selection of a sales week/day before the booking is selected
       // this will happen on first launch of the module
       if (bookings.selected === undefined || bookings.selected === null) {
@@ -309,7 +335,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         },
       });
 
-      if (typeof sales === 'object') {
+      if (typeof sales === 'object' && Object.values(sales).length > 0) {
         const salesFigures = sales as SalesFigureSet;
 
         // set the sales figures, if available
@@ -328,9 +354,11 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         };
 
         if (previous) {
-          setPrevSalesFigureSet({ general, schools });
+          setPrevSalesFigureSet({ general, schools, setId: salesFigures.setId });
         } else {
-          setCurrSalesFigureSet({ general, schools });
+          // only ever set the setId for the current week
+          setSetId(salesFigures.setId);
+          setCurrSalesFigureSet({ general, schools, setId: salesFigures.setId });
         }
       }
 
@@ -349,7 +377,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
         setHoldData(holdCompData.holds);
         setCompData(holdCompData.comps);
-        setSetId(holdCompData.setId);
       }
 
       // get the booking details to set the notes fields
@@ -457,7 +484,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   // useEffect(() => {
   //   const handleKeyPress = async (event) => {
   //     if (event.key === 'Enter') {
-  //       await handleUpdate(setId);
+  //       await handleUpdate();
   //     }
   //   };
 
@@ -595,7 +622,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                           className="w-[132px] flex flex-row mb-2"
                           variant="primary"
                           text="Update"
-                          onClick={() => handleUpdate(setId)}
+                          onClick={handleUpdate}
                         />
                         <Button
                           className="w-[211px] flex flex-row"
@@ -768,6 +795,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       rowData={holdData}
                       styleProps={styleProps}
                       gridOptions={{ suppressHorizontalScroll: true }}
+                      tableHeight={700}
                     />
 
                     <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Holds Notes</div>
@@ -786,6 +814,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
                       rowData={compData}
                       styleProps={styleProps}
                       gridOptions={{ suppressHorizontalScroll: true }}
+                      tableHeight={700}
                     />
 
                     <div className="leading-6 text-xl text-primary-input-text font-bold mt-5 flex-row">Comp Notes</div>
