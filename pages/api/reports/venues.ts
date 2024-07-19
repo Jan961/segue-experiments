@@ -8,22 +8,11 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
+import { Booking } from '@prisma/client';
 
-type BOOKING = {
-  Id: number;
-  DateBlockId: number;
-  VenueId: number;
-  FirstDate: string;
-  StatusCode: string;
-  PencilNum: null;
-  LandingPageURL: string;
-  TicketsOnSaleFromDate: Date;
-  TicketsOnSale: boolean;
+type BOOKING = Partial<Booking> & {
   IsOnSale: boolean;
   OnSaleDate: string | null;
-  MarketingPlanReceived: boolean;
-  ContactInfoReceived: boolean;
-  PrintReqsReceived: boolean;
   VenueCode: string;
   VenueName: string;
   VenueTown: string;
@@ -193,8 +182,24 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       'CONTACT',
       'PRINT',
       'MARKETING COSTS',
+      'MARKETING COSTS',
+      'MARKETING COSTS',
     ]);
-    worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS', 'STATUS']);
+    worksheet.addRow([
+      'CODE',
+      'DATE',
+      'CODE',
+      'NAME',
+      'TOWN',
+      'ON SALE',
+      'DATE',
+      'PLAN',
+      'INFO',
+      'REQS',
+      'STATUS',
+      'APPROVAL DATE',
+      'NOTES',
+    ]);
     worksheet.addRow([]);
     applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
       const ShowDate = moment(booking.FirstDate).format('DD/MM/YY');
@@ -206,6 +211,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
+      const marketingCostsApprovalDate = booking.MarketingCostsApprovalDate
+        ? moment(booking.MarketingCostsApprovalDate).format('DD/MM/YY')
+        : '';
       worksheet.addRow([
         booking.FullProductionCode,
         ShowDate,
@@ -218,6 +226,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ContactInfo,
         PrintReqsReceived,
         marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
+        marketingCostsApprovalDate,
+        booking.MarketingCostsNotes || '',
       ]);
     });
 
