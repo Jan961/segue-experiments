@@ -3,21 +3,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { addDurationToDate, calculateWeekNumber } from 'services/dateService';
 
-// The req.body {
-//   ProductionId: 29,
-//   Name: 'mmmana',
-//   StartByWeekNum: -260,
-//   CompleteByWeekNum: -259,
-//   Priority: 1,
-//   Progress: 100,
-//   TaskCompletedDate: '2024-07-18T00:00:00.000Z',
-//   RepeatInterval: 'weekly',
-//   TaskRepeatFromWeekNum: -52,
-//   TaskRepeatToWeekNum: -51,
-//   AssignedToUserId: 1,
-//   Notes: 'sdasd'
-// }
-
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
     const {
@@ -30,8 +15,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       TaskRepeatFromWeekNum,
       TaskRepeatToWeekNum,
       TaskCompletedDate,
-      interval,
-      intervalWeekDay,
       AssignedToUserId,
       ProductionId,
       Notes,
@@ -57,18 +40,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    // add days to a date
-    const addDays = (date, days) => {
-      const newDate = new Date(date);
-      newDate.setDate(newDate.getDate() + days);
+    const addOneMonth = (date: Date) => {
+      const newDate = new Date(date); // Create a new Date object to avoid mutating the original date
+      newDate.setMonth(newDate.getMonth() + 1); // Add one month to the new date
       return newDate;
     };
 
     const prodBlock = productionWeeks.find((dateBlock) => {
       return dateBlock.Name === 'Production';
     });
-
-    const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     let maxTaskCode =
       (
@@ -85,47 +65,34 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const tasksToCreate = [];
 
-    if (RepeatInterval === 'monthly') {
-      const prodStartDate = new Date(prodBlock?.StartDate);
-      const taskAllowance = CompleteByWeekNum - StartByWeekNum;
-      let taskStartDate = addDurationToDate(prodStartDate, TaskRepeatFromWeekNum * 7, true);
-      const taskEndDate = addDurationToDate(prodStartDate, TaskRepeatToWeekNum * 7, true);
-      while (taskStartDate <= taskEndDate) {
-        tasksToCreate.push({
-          ProductionId: parseInt(ProductionId),
-          Code: maxTaskCode,
-          Name,
-          Priority,
-          Notes,
-          Progress,
-          AssignedToUserId,
-          CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-          StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
-          StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-          CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate) + taskAllowance,
-          TaskCompletedDate,
-          PRTId: recurringTask.Id,
-        });
-        maxTaskCode++;
-        taskStartDate = addDurationToDate(taskStartDate, 7, true);
-      }
-    } else if (interval === 'week' || interval === 'biweek') {
-      const dayOffset = weekDays.indexOf(intervalWeekDay);
-      const weekOffset = interval === 'biWeek' ? 2 : 1;
+    const prodStartDate = new Date(prodBlock?.StartDate);
+    const taskAllowance = CompleteByWeekNum - StartByWeekNum;
+    let taskStartDate = addDurationToDate(prodStartDate, TaskRepeatFromWeekNum * 7, true);
+    const taskEndDate = addDurationToDate(prodStartDate, TaskRepeatToWeekNum * 7, true);
 
-      for (let i = 0; i < productionWeeks.length; i += weekOffset) {
-        const productionWeek = productionWeeks[i];
-        const date = addDays(productionWeek.MondayDate, dayOffset);
-        tasksToCreate.push({
-          dueDate: date,
-          startByWeekCode: productionWeek.WeekCode,
-          completeByWeekCode: productionWeeks[i + 1]?.WeekCode || '',
-        });
-      }
+    const multiplier = RepeatInterval === 'biWeekly' ? 2 : 1;
+    while (taskStartDate <= taskEndDate) {
+      tasksToCreate.push({
+        ProductionId: parseInt(ProductionId),
+        Code: maxTaskCode,
+        Name,
+        Priority,
+        Notes,
+        Progress,
+        AssignedToUserId,
+        CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
+        StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
+        StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
+        CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate) + taskAllowance,
+        TaskCompletedDate,
+        PRTId: recurringTask.Id,
+      });
+      maxTaskCode++;
+      taskStartDate =
+        RepeatInterval === 'monthly'
+          ? addOneMonth(taskStartDate)
+          : addDurationToDate(taskStartDate, 7 * multiplier, true);
     }
-
-    //  await console.log("tasks to create", tasksToCreate)
-    //  await console.log("the interval", interval)
 
     const createdTasks = await Promise.all(
       tasksToCreate.map(
