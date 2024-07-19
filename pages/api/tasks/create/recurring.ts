@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { addDurationToDate, calculateWeekNumber } from 'services/dateService';
 
 // The req.body {
 //   ProductionId: 29,
@@ -19,7 +20,6 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    console.log('The req.body', req.body);
     const {
       Name,
       StartByWeekNum,
@@ -29,43 +29,31 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       RepeatInterval,
       TaskRepeatFromWeekNum,
       TaskRepeatToWeekNum,
-      AssignedToUserId,
-      taskTitle,
-      productionId,
-      dueDate,
+      TaskCompletedDate,
       interval,
-      progress,
-      assignee,
-      assignedBy,
-      // status,
-      priority,
-      // followUp,
-      ProductionId,
-      notes,
       intervalWeekDay,
-      intervalMonthDate,
+      AssignedToUserId,
+      ProductionId,
+      Notes,
     } = req.body;
 
-    console.log(Name);
-    console.log(CompleteByWeekNum);
-    console.log(StartByWeekNum);
-    console.log(Priority);
-    console.log(Progress);
-    console.log(RepeatInterval);
-    console.log(TaskRepeatFromWeekNum);
-    console.log(TaskRepeatToWeekNum);
-    console.log(AssignedToUserId);
-    console.log(ProductionId);
-
     const email = await getEmailFromReq(req);
-    const access = await checkAccess(email, { ProductionId: productionId });
+    const access = await checkAccess(email, { ProductionId });
     if (!access) return res.status(401).end();
 
-    console.log('The req.body', req.body);
-    // Fetch production weeks
-    const productionWeeks = await prisma.productionWeek.findMany({
+    const productionWeeks = await prisma.DateBlock.findMany({
       where: {
-        ProductionId: parseInt(productionId),
+        ProductionId: parseInt(ProductionId),
+      },
+    });
+
+    const recurringTask = await prisma.ProductionTaskRepeat.create({
+      data: {
+        FromWeekNum: TaskRepeatFromWeekNum,
+        ToWeekNum: TaskRepeatToWeekNum,
+        Interval: RepeatInterval,
+        FromWeekNumIsPostProduction: TaskRepeatFromWeekNum < 0,
+        ToWeekNumIsPostProduction: TaskRepeatToWeekNum < 0,
       },
     });
 
@@ -76,61 +64,51 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       return newDate;
     };
 
+    const prodBlock = productionWeeks.find((dateBlock) => {
+      return dateBlock.Name === 'Production';
+    });
+
     const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    let maxTaskCode =
+      (
+        await prisma.ProductionTask.findFirst({
+          select: {
+            Code: true,
+          },
+          where: { ProductionId: { equals: ProductionId } },
+          orderBy: {
+            Code: 'desc',
+          },
+        })
+      )?.Code + 1 || 0;
 
     const tasksToCreate = [];
 
-    if (interval === 'once') {
-      const dueDateObj = dueDate ? new Date(dueDate) : undefined;
-
-      if (dueDateObj) {
-        const matchedProductionWeek = productionWeeks.find((productionWeek) => {
-          const mondayDate = new Date(productionWeek.MondayDate);
-          const sundayDate = new Date(productionWeek.SundayDate);
-
-          return dueDateObj >= mondayDate && dueDateObj <= sundayDate;
-        });
-
-        if (matchedProductionWeek) {
-          tasksToCreate.push({
-            dueDate: dueDateObj,
-            startByWeekCode: matchedProductionWeek.WeekCode,
-            completeByWeekCode: matchedProductionWeek.WeekCode,
-          });
-        } else {
-          console.error('No due date found');
-          tasksToCreate.push({
-            dueDate: dueDateObj,
-            startByWeekCode: '-',
-            completeByWeekCode: '-',
-          });
-        }
-      }
-    } else if (interval === 'month') {
-      const months = {};
-      // sort the weeks into
-      productionWeeks.forEach((productionWeek, index) => {
-        const date = new Date(productionWeek.MondayDate);
-        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-
-        if (!months[monthKey]) {
-          months[monthKey] = {
-            date,
-            startByWeekCode: productionWeek.WeekCode,
-            completeByWeekCode: productionWeeks[index + 1]?.WeekCode || '',
-          };
-        }
-      });
-
-      Object.values(months).forEach((monthObj: any) => {
-        const date = new Date(monthObj.date);
-        date.setDate(Math.min(intervalMonthDate, new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()));
+    if (RepeatInterval === 'monthly') {
+      const prodStartDate = new Date(prodBlock?.StartDate);
+      const taskAllowance = CompleteByWeekNum - StartByWeekNum;
+      let taskStartDate = addDurationToDate(prodStartDate, TaskRepeatFromWeekNum * 7, true);
+      const taskEndDate = addDurationToDate(prodStartDate, TaskRepeatToWeekNum * 7, true);
+      while (taskStartDate <= taskEndDate) {
         tasksToCreate.push({
-          dueDate: date,
-          startByWeekCode: monthObj.startByWeekCode,
-          completeByWeekCode: monthObj.completeByWeekCode,
+          ProductionId: parseInt(ProductionId),
+          Code: maxTaskCode,
+          Name,
+          Priority,
+          Notes,
+          Progress,
+          AssignedToUserId,
+          CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
+          StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
+          StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
+          CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate) + taskAllowance,
+          TaskCompletedDate,
+          PRTId: recurringTask.Id,
         });
-      });
+        maxTaskCode++;
+        taskStartDate = addDurationToDate(taskStartDate, 7, true);
+      }
     } else if (interval === 'week' || interval === 'biweek') {
       const dayOffset = weekDays.indexOf(intervalWeekDay);
       const weekOffset = interval === 'biWeek' ? 2 : 1;
@@ -154,30 +132,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         async (task) =>
           await prisma.productionTask.create({
             data: {
-              Code: parseInt('0'),
-              Name: taskTitle,
-              StartByWeekNum: task.startByWeekCode,
-              CompleteByWeekNum: task.completeByWeekCode,
-              Priority: parseInt(priority),
-              Notes: notes,
-              Progress: parseInt(progress),
-              Assignee: assignee ? parseInt(req.body.assignee) : undefined,
-              AssignedBy: assignedBy ? parseInt(assignedBy) : undefined,
-              Production: {
-                connect: {
-                  Id: parseInt(productionId),
-                },
-              },
-              User: {
-                connect: {
-                  id: parseInt(assignedBy),
-                },
-              },
+              ...task,
             },
           }),
       ),
     );
-
     res.json(createdTasks);
   } catch (err) {
     console.log(err);

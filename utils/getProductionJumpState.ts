@@ -34,7 +34,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           ShowRegionId: allProductionRegions
             ? allProductionRegions.find((pair: any) => pair.PRProductionId === t.Id)?.PRRegionId
             : null,
-          RunningTime: t.RunningTime,
+          RunningTime: t.RunningTime?.toISOString() || null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
           ProductionCompany: t.ProductionCompany,

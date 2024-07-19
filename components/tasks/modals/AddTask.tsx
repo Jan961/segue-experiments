@@ -18,7 +18,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
-import { getWeekOptions, weekOptions } from 'utils/getTaskDateStatus';
+import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 import { productionJumpState } from '../../../state/booking/productionJumpState';
 
@@ -386,9 +386,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
                 value={!inputs?.Id}
-                options={weekOptions}
+                options={getWeekOptions(production, isMasterTask, false)}
                 className="w-32"
                 placeholder="Week No."
+                isSearchable={true}
               />
             </div>
           )}
@@ -398,9 +399,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
                 value={!inputs?.Id}
-                options={weekOptions}
+                options={getWeekOptions(production, isMasterTask, false)}
                 placeholder="Week No."
                 className="w-32"
+                isSearchable={true}
               />
             </div>
           )}

@@ -34,7 +34,7 @@ export const weekOptions: SelectOption[] = Array.from(Array(104).keys()).map((x)
 
 const formatWeekOption = (week: number, suffix = '') => {
   suffix = suffix.length > 0 ? ' | ' + suffix : suffix;
-  const formattedWeek = week < 0 ? ` - ${Math.abs(week)} ${suffix}` : ` + ${week} ${suffix}`;
+  const formattedWeek = week < 0 ? ` -${Math.abs(week)} ${suffix}` : ` +${week} ${suffix}`;
   return {
     text: formattedWeek,
     value: week,
@@ -60,7 +60,7 @@ export const getWeekOptions = (production, isMasterTask: boolean, appendDate: bo
         return formatWeekOption(week + 1, appendDate ? formatShortDateUK(weeklyDate) : '');
       } else {
         const optionOutput = `EOT+${week + 1 - numTourWeeks} ${appendDate ? '|' + formatShortDateUK(weeklyDate) : ''} `;
-        return { text: optionOutput, value: week };
+        return { text: optionOutput, value: week + 1 };
       }
     });
   } else {
