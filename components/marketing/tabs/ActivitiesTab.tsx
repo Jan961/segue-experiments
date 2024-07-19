@@ -133,7 +133,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       const tempRows = sortedActivities.map((act) => ({
         actName: act.Name,
         actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: startOfDay(new Date(act.Date)),
+        actDate: act.Date === '' ? null : startOfDay(new Date(act.Date)),
         followUpCheck: act.FollowUpRequired,
         followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
         companyCost: act.CompanyCost,
@@ -265,7 +265,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
         FollowUpRequired: data.followUpCheck,
         Name: data.actName,
         Notes: data.notes,
-        DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+        DueByDate: data.followUpCheck ? (data.followUpDt === null ? null : new Date(data.followUpDt)) : null,
         Id: data.id,
       };
 
@@ -592,7 +592,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div
                   className={classNames(
                     'flex flex-col w-[487px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-                    actRowData.length === 0 ? '-mt-[405px]' : '',
+                    actRowData.length === 0 ? '-mt-[250px]' : '',
                   )}
                 >
                   <div className="flex flex-row gap-4">
@@ -634,7 +634,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div
                   className={classNames(
                     'flex flex-col w-[331px] h-[69px] bg-primary-green/[0.30] rounded-xl mt-5 px-2 float-right',
-                    globalRowData.length === 0 ? '-mt-[400px]' : '',
+                    globalRowData.length === 0 ? '-mt-[350px]' : '',
                   )}
                 >
                   <div className="flex flex-row gap-4">
