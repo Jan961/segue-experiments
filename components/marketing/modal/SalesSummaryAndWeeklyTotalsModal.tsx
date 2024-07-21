@@ -43,6 +43,7 @@ const getModalTitle = (activeModal: string): string => {
 const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummaryReportModalProps) => {
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
+  const [loading, setLoading] = useState(false);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
   const updateProductionWeek = useCallback(() => {
@@ -94,20 +95,27 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
     [setFormData],
   );
 
-  const onExport = useCallback(() => {
-    notify.promise(
-      exportSalesSummaryReport({
-        ...formData,
-        ...(activeModal === 'salesSummaryAndWeeklyTotals' && { isWeeklyReport: true }),
-        ...(activeModal === 'salesVsCapacity' && { isSeatsDataRequired: true }),
-      }).then(() => onClose()),
-      {
-        loading: `'Generating ${title}`,
-        success: `${title}downloaded successfully`,
-        error: `Error generating ${title}`,
-      },
-    );
-  }, [formData, activeModal, title, onClose]);
+  const onExport = useCallback(
+    (format: string) => {
+      setLoading(true);
+      notify.promise(
+        exportSalesSummaryReport({
+          ...formData,
+          ...(activeModal === 'salesSummaryAndWeeklyTotals' && { isWeeklyReport: true }),
+          ...(activeModal === 'salesVsCapacity' && { isSeatsDataRequired: true }),
+          format,
+        })
+          .then(() => onClose())
+          .finally(() => setLoading(false)),
+        {
+          loading: `'Generating ${title}`,
+          success: `${title}downloaded successfully`,
+          error: `Error generating ${title}`,
+        },
+      );
+    },
+    [formData, activeModal, title, onClose],
+  );
 
   return (
     <PopupModal
@@ -158,12 +166,22 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
         <div className="pt-3 w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
           <Button
-            onClick={onExport}
+            onClick={() => onExport('excel')}
             className="float-right px-4 font-normal w-33 text-center"
             variant="primary"
             sufixIconName="excel"
             iconProps={{ className: 'h-4 w-3' }}
-            text="Create Report"
+            text="Export to Excel"
+            disabled={loading}
+          />
+          <Button
+            onClick={() => onExport('pdf')}
+            className="float-right px-4 font-normal w-33 text-center"
+            variant="primary"
+            sufixIconName="document-solid"
+            iconProps={{ className: 'h-4 w-3' }}
+            text="Export to PDF"
+            disabled={loading}
           />
         </div>
       </form>
