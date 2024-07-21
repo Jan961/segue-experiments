@@ -38,7 +38,6 @@ describe('getDealMemoCall', () => {
       { DMCCallNum: 200, DMCPromoterOrVenue: 'Venue2', DMCType: 'Type2', DMCValue: 2000 },
     ];
     const [updateCall, createCall] = getDealMemoCall(input);
-    console.log('updateCall===>', updateCall);
     expect(updateCall).toEqual([
       {
         where: { DMCId: 1 },
