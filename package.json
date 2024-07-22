@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--max-http-header-size=24576' node server.js next dev",
     "db-pull": "prisma db pull",
-    "build": "next build",
+    "build": "npm run install-libreoffice && next build",
     "start": "next start",
     "cp-start": "NODE_ENV=production node server.js",
     "test": "jest --config jest.config.js --no-cache",
@@ -18,7 +18,8 @@
     "cy:ci": "npx cypress run",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "db-dev": "prisma studio"
+    "db-dev": "prisma studio",
+    "install-libreoffice": "sh ./install-libreoffice.sh"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
