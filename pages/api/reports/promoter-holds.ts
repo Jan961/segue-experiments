@@ -106,10 +106,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     prisma.$queryRaw<TPromoter[]>`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`,
     getProductionWithContent(productionId),
   ]);
-  const { VenueName } = data?.[0] || {};
   const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
-  const fileName = `${productionCode} ${showName} ${VenueName}`;
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const fileName = `${productionCode} ${showName} Promoter Holds`;
+  const worksheet = workbook.addWorksheet('Promoter Holds', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }],
   });

@@ -231,10 +231,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     getProductionWithContent(productionId),
   ]);
 
-  const { VenueName = '' } = data?.[0] || {};
   const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
-  const filename = `${productionCode} ${showName} ${VenueName}`;
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const filename = `${productionCode} ${showName} Holds and Comps`;
+  const worksheet = workbook.addWorksheet('Holds and Comps', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
   });
 

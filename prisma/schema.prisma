@@ -12,9 +12,9 @@ datasource db {
 
 model ActivityType {
   Id                    Int                     @id @default(autoincrement()) @map("ActivityTypeId")
-  Name                  String                  @map("ActivityTypeName") @db.VarChar(30)
+  Name                  String                  @unique(map: "ActivityType_Name_Unique") @map("ActivityTypeName") @db.VarChar(30)
   ColourIndex           Int?                    @map("ActivityTypeColourIndex") @db.TinyInt
-  Code                  String                  @map("ActivityTypeCode") @db.VarChar(2)
+  Code                  String                  @unique(map: "ActivityType_Code_Unique") @map("ActivityTypeCode") @db.VarChar(2)
   BookingActivity       BookingActivity[]
   GlobalBookingActivity GlobalBookingActivity[]
 }
@@ -187,6 +187,7 @@ model Venue {
   VenueBarredVenue_VenueBarredVenue_VBVBarredVenueIdToVenue VenueBarredVenue[]           @relation("VenueBarredVenue_VBVBarredVenueIdToVenue")
   VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue       VenueBarredVenue[]           @relation("VenueBarredVenue_VBVVenueIdToVenue")
   VenueContact                                              VenueContact[]
+  VenueFile                                                 VenueFile[]
   VenueVenue1                                               VenueVenue[]                 @relation("VenueVenue_VVVenue1IdToVenue")
   VenueVenue2                                               VenueVenue[]                 @relation("VenueVenue_VVVenue2IdToVenue")
 
@@ -347,9 +348,9 @@ model Account {
   AccountTermsAgreedBy       String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
   AccountTermsAgreedDate     DateTime?             @map("AccountTermsAgreedDate") @db.Date
   AccountWebsite             String?               @map("AccountWebsite") @db.VarChar(255)
-  AccountTypeOfCompany       String?               @map("AccountTypeOfCompany")@db.VarChar(30)
-  AccountPhone               String?               @map("AccountPhone")@db.VarChar(30)
-  AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode")@db.VarChar(3)
+  AccountTypeOfCompany       String?               @map("AccountTypeOfCompany") @db.VarChar(30)
+  AccountPhone               String?               @map("AccountPhone") @db.VarChar(30)
+  AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode") @db.VarChar(3)
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Account_Payment")
   AccountContact             AccountContact?
   AccountSubscription        AccountSubscription[]
@@ -653,25 +654,27 @@ model DBSetting {
 }
 
 model MasterTask {
-  Id                             Int     @id @default(autoincrement()) @map("MasterTaskId")
-  AccountId                      Int     @map("TaskAccountId")
-  Code                           Int     @unique(map: "MasterTask_TaskCode_Unique") @map("TaskCode") @db.SmallInt
-  Name                           String  @map("TaskName") @db.VarChar(80)
-  Priority                       Int     @default(0) @map("TaskPriority") @db.TinyInt
-  Notes                          String? @map("TaskNotes") @db.VarChar(500)
-  AssignedToUserId               Int?    @map("TaskAssignedToUserId")
-  RepeatInterval                 String? @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
-  StartByWeekNum                 Int?    @map("TaskStartByWeekNum") @db.SmallInt
-  TaskStartByIsPostProduction    Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  CompleteByWeekNum              Int?    @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskCompleteByIsPostProduction Boolean @default(dbgenerated("(b'0')")) @db.Bit(1)
-  TaskRepeatFromWeekNum          Int?    @db.SmallInt
-  TaskRepeatToWeekNum            Int?    @db.SmallInt
-  Account                        Account @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
-  User                           User?   @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
+  Id                             Int               @id @default(autoincrement()) @map("MasterTaskId")
+  AccountId                      Int               @map("TaskAccountId")
+  Code                           Int               @unique(map: "MasterTask_TaskCode_Unique") @map("TaskCode") @db.SmallInt
+  Name                           String            @map("TaskName") @db.VarChar(80)
+  CopiedFrom                 String?               @map("TaskCopiedFrom") @db.Char(1)
+  CopiedId                   Int?                  @map("TaskCopiedId")
+  Priority                       Int               @default(0) @map("TaskPriority") @db.TinyInt
+  Notes                          String?           @map("TaskNotes") @db.VarChar(500)
+  AssignedToUserId               Int?              @map("TaskAssignedToUserId")
+  StartByWeekNum                 Int?              @map("TaskStartByWeekNum") @db.SmallInt
+  TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
+  CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
+  TaskCompleteByIsPostProduction Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
+  MTRId                      Int?                  @map("TaskMTRId")
+  Account                        Account           @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
+  MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [Id], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
+  User                           User?             @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
 
   @@index([AccountId], map: "Account_MasterTask")
   @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
+  @@index([MTRId], map: "MasterTaskRepeat_MasterTask")
 }
 
 model AccountUserProduction {
@@ -717,30 +720,31 @@ model Production {
 }
 
 model ProductionTask {
-  Id                         Int           @id @default(autoincrement()) @map("ProductionTaskId")
+  Id                         Int                   @id @default(autoincrement()) @map("ProductionTaskId")
   ProductionId               Int
-  Code                       Int           @map("TaskCode") @db.SmallInt
-  Name                       String        @map("TaskName") @db.VarChar(80)
-  Priority                   Int           @default(0) @map("TaskPriority") @db.TinyInt
-  Notes                      String?       @map("TaskNotes") @db.VarChar(500)
-  Progress                   Int           @default(0) @map("TaskProgress") @db.TinyInt
-  AssignedToUserId           Int?          @map("TaskAssignedToUserId")
-  CompleteByIsPostProduction Boolean       @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostProduction") @db.Bit(1)
-  RepeatInterval             String?       @default("once") @map("TaskRepeatInterval") @db.VarChar(20)
-  RepeatCount                Bytes?        @map("TaskRepeatCount") @db.TinyBlob
-  StartByWeekNum             Int?          @map("TaskStartByWeekNum") @db.SmallInt
-  StartByIsPostProduction    Boolean       @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostProduction") @db.Bit(1)
-  CompleteByWeekNum          Int?          @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskCompletedDate          DateTime?     @db.Date
-  TaskRepeatFromWeekNum      Int?          @db.SmallInt
-  TaskRepeatToWeekNum        Int?          @db.SmallInt
-  Production                 Production    @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ProductionTask")
-  User                       User?         @relation(fields: [AssignedToUserId], references: [Id], onDelete: NoAction, map: "User_ProductionTask_Assigned")
+  Code                       Int                   @map("TaskCode") @db.SmallInt
+  Name                       String                @map("TaskName") @db.VarChar(80)
+  CopiedFrom             String?                   @map("TaskCopiedFrom")@db.Char(1)
+  CopiedId               Int?                      @map("TaskCopiedId")
+  Priority                   Int                   @default(0) @map("TaskPriority") @db.TinyInt
+  Notes                      String?               @map("TaskNotes") @db.VarChar(500)
+  Progress                   Int                   @default(0) @map("TaskProgress") @db.TinyInt
+  AssignedToUserId           Int?                  @map("TaskAssignedToUserId")
+  CompleteByIsPostProduction Boolean               @default(dbgenerated("(b'0')")) @map("TaskCompleteByIsPostProduction") @db.Bit(1)
+  StartByWeekNum             Int?                  @map("TaskStartByWeekNum") @db.SmallInt
+  StartByIsPostProduction    Boolean               @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostProduction") @db.Bit(1)
+  CompleteByWeekNum          Int?                  @map("TaskCompleteByWeekNum") @db.SmallInt
+  TaskCompletedDate          DateTime?             @db.Date
+  PRTId                  Int?                      @map("TaskPRTId")
+  ProductionTaskRepeat       ProductionTaskRepeat? @relation(fields: [Id], references: [Id], onDelete: Cascade, map: "ProductionTaskRepeat_ProductionTask")
+  Production                 Production            @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ProductionTask")
+  User                       User?                 @relation(fields: [AssignedToUserId], references: [Id], onDelete: NoAction, map: "User_ProductionTask_Assigned")
   TaskWatcher                TaskWatcher[]
 
   @@unique([ProductionId, Code], map: "ProductionTask_Production_TaskCode_Unique")
   @@index([ProductionId], map: "Production_ProductionTask_fk")
   @@index([AssignedToUserId], map: "User_ProductionTask_Assigned")
+  @@index([PRTId], map: "ProductionTaskRepeat_ProductionTask")
 }
 
 model AccountContact {
@@ -1052,10 +1056,10 @@ model DealMemoHold {
 }
 
 model GlobalBookingActivityVenue {
-  GlobalActivityId         Int                   @map("GBAVGlobalActivityId")
-  VenueId                  Int                   @map("GBAVVenueId")
-  GlobalBookingActivity    GlobalBookingActivity @relation(fields: [GlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
-  Venue                    Venue                 @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
+  GlobalActivityId      Int                   @map("GBAVGlobalActivityId")
+  VenueId               Int                   @map("GBAVVenueId")
+  GlobalBookingActivity GlobalBookingActivity @relation(fields: [GlobalActivityId], references: [Id], onDelete: Cascade, map: "GlobalBookingActivity_GBAV")
+  Venue                 Venue                 @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_GBAV")
 
   @@id([GlobalActivityId, VenueId])
   @@index([VenueId], map: "Venue_GBAV")
@@ -1136,6 +1140,37 @@ model PersonPersonRole {
 model PersonRole {
   PersonRoleId   Int    @id @default(autoincrement())
   PersonRoleName String @unique(map: "PersonRole_Unique") @db.VarChar(50)
+}
+
+model MasterTaskRepeat {
+  Id                             Int          @map("MTRId")@id @default(autoincrement())
+  FromWeekNum                    Int          @map("MTRFromWeekNum")@db.SmallInt
+  MTRFromWeekNumIsPostProduction Boolean      @map("MTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
+  MTRToWeekNum                   Int          @map("MTRToWeekNum")@db.SmallInt
+  MTRToWeekNumIsPostProduction   Boolean      @map("MTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
+  MTRInterval                    String       @map("MTRInterval")@db.VarChar(20)
+  MasterTask                     MasterTask[]
+}
+
+model ProductionTaskRepeat {
+  Id                          Int              @map("PTRId")@id @default(autoincrement())
+  FromWeekNum                 Int              @map("PTRFromWeekNum")@db.SmallInt
+  FromWeekNumIsPostProduction Boolean          @map("PTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
+  ToWeekNum                   Int              @map("PTRToWeekNum")@db.SmallInt
+  ToWeekNumIsPostProduction   Boolean          @map("PTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
+  Interval                    String           @map("PRTInterval")@db.VarChar(20)
+  ProductionTask                 ProductionTask[]
+}
+
+model VenueFile {
+  Id          Int              @map("VenueFileId")@id @default(autoincrement())
+  VenueId     Int              @map("VenueFileVenueId")
+  FileId      Int              @map("VenueFileFileId")
+  Type        String?          @map("VenueFileType")@db.VarChar(20)
+  Description String?          @map("VenueFileDescription")@db.VarChar(80)
+  Venue                Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueFile")
+
+  @@index([VenueId], map: "Venue_VenueFile")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1370,7 +1405,6 @@ view ProductionView {
   @@ignore
 }
 
-
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view ShowView {
   ShowId         Int     @default(0)
@@ -1448,6 +1482,7 @@ view SalesView {
   VenueCurrencySymbolUnicode  String?   @db.VarChar(30)
   ConversionToCurrencyCode    String?   @db.VarChar(3)
   ConversionRate              Decimal?  @db.Decimal(8, 4)
+  SetId                       Int?      @default(0)
   SetSalesFiguresDate         DateTime? @db.Date
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date

@@ -44,6 +44,9 @@ export const getActivitiesByBookingId = async (BookingId) => {
     where: {
       BookingId,
     },
+    orderBy: {
+      Date: 'asc',
+    },
   });
 
   const result = {
