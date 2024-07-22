@@ -55,8 +55,8 @@ const Filters = ({ onExportClick }: FiltersProps) => {
   };
 
   return (
-    <div className="w-full flex items-center justify-between flex-wrap ">
-      <div className="mx-0 ">
+    <div className="w-full flex items-center justify-between flex-wrap">
+      <div className="mx-0">
         <div className="px-4">
           <GlobalToolbar
             searchFilter={filter.venueText}
@@ -89,7 +89,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             </div>
           </GlobalToolbar>
         </div>
-        <div className="px-4 flex items-center gap-4 flex-wrap ">
+        <div className="px-4 flex items-center gap-4 flex-wrap">
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             disabled={!ProductionId}
