@@ -55,8 +55,8 @@ const Filters = ({ onExportClick }: FiltersProps) => {
   };
 
   return (
-    <div className="w-full flex items-center justify-between flex-wrap">
-      <div className="mx-0">
+    <div className="w-full flex items-center justify-between flex-wrap ">
+      <div className="mx-0 ">
         <div className="px-4">
           <GlobalToolbar
             searchFilter={filter.venueText}
@@ -69,14 +69,14 @@ const Filters = ({ onExportClick }: FiltersProps) => {
                 testId="booking-filters-gototoday"
                 disabled={!todayOnSchedule || !ProductionId}
                 text="Go To Today"
-                className="text-sm leading-8 w-[120px]"
+                className="text-sm leading-8 w-[120px] h-[30px]"
                 onClick={() => gotoToday()}
               />
               <Button
                 testId="booking-filters-tour-summary"
                 text="Tour Summary"
                 disabled={ProductionId === -1 || !ProductionId}
-                className="text-sm leading-8 w-[120px]"
+                className="text-sm leading-8 w-[120px] h-[30px]"
                 onClick={() => setShowProductionSummary(true)}
               />
               {showProductionSummary && (
@@ -89,7 +89,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             </div>
           </GlobalToolbar>
         </div>
-        <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
+        <div className="px-4 flex items-center gap-4 flex-wrap ">
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             disabled={!ProductionId}
@@ -112,7 +112,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
           />
           <Button
             testId="booking-filters-clear-filters"
-            className="text-sm leading-8 w-[120px]"
+            className="text-sm leading-8 w-[120px] h-[30px]"
             text="Clear Filters"
             onClick={onClearFilters}
           />
