@@ -68,9 +68,9 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(JSON.stringify(data.Date) === 'null' ? null : startOfDay(new Date(data.Date)));
+      setActDate(!data.Date ? null : startOfDay(new Date(data.Date)));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(JSON.stringify(data.DueByDate) === 'null' ? null : startOfDay(new Date(data.DueByDate)));
+      setFollowUpDt(!data.DueByDate ? null : startOfDay(new Date(data.DueByDate)));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);

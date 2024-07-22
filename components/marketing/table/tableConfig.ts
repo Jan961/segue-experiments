@@ -455,7 +455,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return params.data.actDate === null ? '' : formatInputDate(params.data.actDate);
+      return !params.data.actDate ? '' : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -623,7 +623,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return isNullOrEmpty(params.data.actDate) === undefined ? null : formatInputDate(params.data.actDate);
+      return !params.data.actDate ? null : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
