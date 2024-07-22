@@ -117,7 +117,7 @@ export default function AccountDetailsTab() {
   return (
     <div>
       <h2 className="text-2xl text-primary font-bold pt-3 mb-4">Account Holder Details</h2>
-      <div className="flex flex-row gap-5 w-full">
+      <div className="flex flex-row gap-8 w-full">
         <div className="flex flex-col gap-3 w-1/2">
           <div className="flex flex-col">
             <FormField
@@ -233,62 +233,58 @@ export default function AccountDetailsTab() {
         </div>
 
         <div className="flex flex-col gap-3 w-1/2">
-          <div className="flex flex-col">
-            <div className="h-[255px] overflow-y-hidden overflow-x-hidden">
-              <label className="flex items-center justify-end gap-x-3 mt-[24px] w-full">
-                <p className="text-primary-input-text">Company Logo</p>
-                <Button
-                  onClick={() => {
-                    setUploadVisible(true);
-                  }}
-                  text="Upload"
-                  variant="secondary"
-                  className="w-[132px] overflow-visible"
-                />
-                <UploadModal
-                  title="Upload Company Logo"
-                  visible={uploadVisible}
-                  info="Please upload your company logo here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
-                  allowedFormats={['image/jpg', 'image/tiff', 'image/svg', 'image/png']}
-                  onClose={() => {
-                    setUploadVisible(false);
-                  }}
-                  maxFileSize={1024 * 500}
-                />
-              </label>
-            </div>
-            <FormField
-              currentValue={formData.companyEmail}
-              displayText="Email Address"
-              fieldName="companyEmail"
-              handleInputChange={handleInputChange}
-              onBlur={handleBlur}
-            />
-            {validationErrors.companyEmail && (
-              <small className="text-primary-red flex">{validationErrors.companyEmail}</small>
-            )}
-            <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
-              <p className="text-primary-input-text">Currency for Payment</p>
-              <Select
-                name="currencyForPayment"
-                className="w-full font-bold"
-                placeholder="Currency For Payment"
-                value={formData.currencyForPayment}
-                onChange={(value) => {
-                  handleInputChange(
-                    'currencyForPayment',
-                    currencyOptions.find((option) => value === option.value)?.text,
-                  );
+          <div className="h-[190px] overflow-y-hidden overflow-x-hidden">
+            <label className="flex items-center justify-end gap-x-3 mt-[24px] w-full">
+              <p className="text-primary-input-text">Company Logo</p>
+              <Button
+                onClick={() => {
+                  setUploadVisible(true);
                 }}
-                options={currencyOptions}
-                isSearchable
-                onBlur={handleBlur}
+                text="Upload"
+                variant="secondary"
+                className="w-[132px] overflow-visible"
               />
-              {validationErrors.currencyForPayment && (
-                <small className="text-primary-red flex">{validationErrors.currencyForPayment}</small>
-              )}
+              <UploadModal
+                title="Upload Company Logo"
+                visible={uploadVisible}
+                info="Please upload your company logo here. Image should be no larger than 300px wide x 200px high (Max 500kb). Images in a square or portrait format will be proportionally scaled to fit with the rectangular boundary box. Suitable image formats are jpg, tiff, svg, and png."
+                allowedFormats={['image/jpg', 'image/tiff', 'image/svg', 'image/png']}
+                onClose={() => {
+                  setUploadVisible(false);
+                }}
+                maxFileSize={1024 * 500}
+              />
             </label>
           </div>
+
+          <FormField
+            currentValue={formData.companyEmail}
+            displayText="Email Address"
+            fieldName="companyEmail"
+            handleInputChange={handleInputChange}
+            onBlur={handleBlur}
+          />
+          {validationErrors.companyEmail && (
+            <small className="text-primary-red flex">{validationErrors.companyEmail}</small>
+          )}
+          <label className="grid w-full">
+            <p className="text-primary-input-text">Currency for Payment</p>
+            <Select
+              name="currencyForPayment"
+              className="w-full font-bold"
+              placeholder="Currency For Payment"
+              value={formData.currencyForPayment}
+              onChange={(value) => {
+                handleInputChange('currencyForPayment', currencyOptions.find((option) => value === option.value)?.text);
+              }}
+              options={currencyOptions}
+              isSearchable
+              onBlur={handleBlur}
+            />
+            {validationErrors.currencyForPayment && (
+              <small className="text-primary-red flex">{validationErrors.currencyForPayment}</small>
+            )}
+          </label>
           <FormField
             currentValue={formData.vatNumber}
             displayText="VAT Number"
@@ -327,7 +323,7 @@ export default function AccountDetailsTab() {
           {validationErrors.typeOfCompany && (
             <small className="text-primary-red flex">{validationErrors.typeOfCompany}</small>
           )}
-          <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+          <label className="grid w-full">
             <p className="text-primary-input-text">Company Currency</p>
             <Select
               name="currency"
