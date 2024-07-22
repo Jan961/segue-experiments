@@ -115,7 +115,7 @@ export default function AccountDetailsTab() {
 
   const selectedCountry = countryOptions.find((option) => option.text === formData.country)?.value;
   return (
-    <div>
+    <div className="mb-8">
       <h2 className="text-2xl text-primary font-bold pt-3 mb-4">Account Holder Details</h2>
       <div className="flex flex-row gap-8 w-full">
         <div className="flex flex-col gap-3 w-1/2">
@@ -227,6 +227,7 @@ export default function AccountDetailsTab() {
               options={countryOptions}
               isSearchable
               onBlur={handleBlur}
+              menuPlacement="top"
             />
             {validationErrors.country && <small className="text-primary-red flex">{validationErrors.country}</small>}
           </label>
@@ -336,6 +337,7 @@ export default function AccountDetailsTab() {
               options={currencyOptions}
               isSearchable
               onBlur={handleBlur}
+              menuPlacement="top"
             />
             {validationErrors.currency && <small className="text-primary-red flex">{validationErrors.currency}</small>}
           </label>
