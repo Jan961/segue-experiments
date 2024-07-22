@@ -146,6 +146,9 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         setWarningIssued(false);
         setSchoolErrors([]);
         setGeneralErrors([]);
+
+        // reset page
+        setBookings({ ...bookings, selected: null });
       }
     } catch (error) {
       console.log(error);
@@ -335,7 +338,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         },
       });
 
-      if (typeof sales === 'object' && Object.values(sales).length > 0) {
+      if (typeof sales === 'object' && !isNullOrEmpty(sales)) {
         const salesFigures = sales as SalesFigureSet;
 
         // set the sales figures, if available
