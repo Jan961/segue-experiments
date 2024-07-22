@@ -86,9 +86,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       RepeatInterval?: string;
       TaskRepeatFromWeekNum?: string;
       TaskRepeatToWeekNum?: string;
+      ProductionTaskRepeat?: any;
     }
   >(task || DEFAULT_MASTER_TASK);
-
+  inputs.RepeatInterval = inputs.ProductionTaskRepeat.Interval;
+  inputs.TaskRepeatFromWeekNum = inputs.ProductionTaskRepeat.FromWeekNum;
+  inputs.TaskRepeatToWeekNum = inputs.ProductionTaskRepeat.ToWeekNum;
   const productionList = useRecoilValue(productionJumpState).productions;
   const production =
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
@@ -402,7 +405,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               <Label className="!text-secondary px-2" text="Repeat" />
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
-                value={!inputs?.Id}
+                value={inputs?.RepeatInterval}
                 className="w-44"
                 options={RepeatOptions}
                 placeholder="Select..."
@@ -414,7 +417,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               <Label className="!text-secondary pr-2" text="From" />
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
-                value={!inputs?.Id}
+                value={inputs?.TaskRepeatFromWeekNum}
                 options={getWeekOptions(production, isMasterTask, false)}
                 className="w-32"
                 placeholder="Week No."
@@ -427,7 +430,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               <Label className="!text-secondary" text="To" />
               <Select
                 onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
-                value={!inputs?.Id}
+                value={inputs?.TaskRepeatToWeekNum}
                 options={getWeekOptions(production, isMasterTask, false)}
                 placeholder="Week No."
                 className="w-32"
