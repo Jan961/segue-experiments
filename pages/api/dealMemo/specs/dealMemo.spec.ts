@@ -1,4 +1,4 @@
-import { getDealMemoCall, getPrice, getTechProvision } from './utils';
+import { getDealMemoCall, getPrice, getTechProvision } from '../utils';
 
 describe('getPrice', () => {
   it('should categorize prices into update and create correctly', () => {
