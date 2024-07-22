@@ -226,7 +226,7 @@ export const productionEditorMapper = (t: ProductionWithDateblocks): ProductionD
   SalesEmail: t.SalesEmail,
   IsDeleted: t.IsDeleted,
   SalesFrequency: t.SalesFrequency,
-  RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
+  RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime?.toISOString?.()) : null,
   RunningTimeNote: t.RunningTimeNote,
   ReportCurrencyCode: t.ReportCurrencyCode,
   ProdCoId: t.ProdCoId,
