@@ -116,8 +116,8 @@ export default function AccountDetailsTab() {
   const selectedCountry = countryOptions.find((option) => option.text === formData.country)?.value;
   return (
     <div className="flex flex-row gap-5 w-full">
-      <div className="flex flex-col gap-5 w-1/2">
-        <h2 className="text-base text-primary-input-text font-bold pt-7">Primary</h2>
+      <div className="flex flex-col gap-3 w-1/2">
+        <h2 className="text-2xl text-primary font-bold pt-3 mb-4">Account Holder Details</h2>
         <div className="flex flex-col">
           <FormField
             currentValue={formData.firstName}
@@ -202,14 +202,17 @@ export default function AccountDetailsTab() {
           onBlur={handleBlur}
         />
         {validationErrors.postcode && <small className="text-primary-red flex">{validationErrors.postcode}</small>}
-        <label className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between w-full ">
-          <Tooltip
-            body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
-            width="w-[200px]"
-          >
+        <label className="grid w-full">
+          <div className="w-fit flex gap-x-2 items-center">
             <p className="text-primary-input-text">Country</p>
-            <Icon iconName="info-circle-solid" />
-          </Tooltip>
+            <Tooltip
+              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+              width="w-[200px]"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
+          </div>
+
           <Select
             name="country"
             className="w-full font-bold"
@@ -225,10 +228,10 @@ export default function AccountDetailsTab() {
           {validationErrors.country && <small className="text-primary-red flex">{validationErrors.country}</small>}
         </label>
       </div>
-      <div className="flex flex-col gap-5 w-1/2">
+      <div className="flex flex-col gap-3 w-1/2">
         <div className="flex flex-col">
           <div className="h-[255px] overflow-y-hidden overflow-x-hidden">
-            <label className="grid grid-cols-[90px_minmax(255px,_1fr)] gap-10 justify-between mt-16 w-full ml-96">
+            <label className="grid  mt-16 w-full ml-96">
               <p className="text-primary-input-text">Company Logo</p>
               <Button
                 onClick={() => {
