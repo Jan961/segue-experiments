@@ -69,14 +69,14 @@ const Filters = ({ onExportClick }: FiltersProps) => {
                 testId="booking-filters-gototoday"
                 disabled={!todayOnSchedule || !ProductionId}
                 text="Go To Today"
-                className="text-sm leading-8 w-[120px] h-[30px]"
+                className="text-sm leading-8 w-[120px]"
                 onClick={() => gotoToday()}
               />
               <Button
                 testId="booking-filters-tour-summary"
                 text="Tour Summary"
                 disabled={ProductionId === -1 || !ProductionId}
-                className="text-sm leading-8 w-[120px] h-[30px]"
+                className="text-sm leading-8 w-[120px]"
                 onClick={() => setShowProductionSummary(true)}
               />
               {showProductionSummary && (
@@ -112,7 +112,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
           />
           <Button
             testId="booking-filters-clear-filters"
-            className="text-sm leading-8 w-[120px] h-[30px]"
+            className="text-sm leading-8 w-[120px]"
             text="Clear Filters"
             onClick={onClearFilters}
           />
