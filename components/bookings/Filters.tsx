@@ -94,7 +94,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             disabled={!ProductionId}
             value={filter.status}
-            className="bg-white w-52 "
+            className="bg-white w-52"
             label="Status"
             options={allStatusOptions}
             testId="booking-status-filter"
