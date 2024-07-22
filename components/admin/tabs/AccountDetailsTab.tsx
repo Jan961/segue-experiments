@@ -234,7 +234,7 @@ export default function AccountDetailsTab() {
 
         <div className="flex flex-col gap-3 w-1/2">
           <div className="h-[190px] overflow-y-hidden overflow-x-hidden">
-            <label className="flex items-center justify-end gap-x-3 mt-[24px] w-full">
+            <div className="flex items-center justify-end gap-x-3 mt-[24px]">
               <p className="text-primary-input-text">Company Logo</p>
               <Button
                 onClick={() => {
@@ -242,7 +242,7 @@ export default function AccountDetailsTab() {
                 }}
                 text="Upload"
                 variant="secondary"
-                className="w-[132px] overflow-visible"
+                className="w-[132px]"
               />
               <UploadModal
                 title="Upload Company Logo"
@@ -254,7 +254,7 @@ export default function AccountDetailsTab() {
                 }}
                 maxFileSize={1024 * 500}
               />
-            </label>
+            </div>
           </div>
 
           <FormField
