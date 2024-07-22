@@ -50,7 +50,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               include: { ProductionTask: true },
             })
           )?.ProductionTask || [];
-        console.log(numTasksExist.length);
+        console.log(numTasksExist);
         console.log(numTasksByCalc);
 
         if (numTasksExist !== numTasksByCalc) {
@@ -69,6 +69,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           ];
           // this is to find tasks that already exist and match the newly generated tasks so they wont be deleted
           numTasksExist.forEach((task) => {
+            console.log(task);
             let taskFound = false;
             newTasks.forEach((newTask) => {
               let fieldMisMatch = false;
@@ -85,7 +86,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               tasksToDelete.push(task);
             }
           });
-
+          console.log('DELETING');
+          console.log(tasksToDelete.reduce((task) => task.Id));
+          console.log('RAHHHHhhh');
           await prisma.ProductionTask.delete({ where: { Id: { in: tasksToDelete.reduce((task) => task.Id) } } });
 
           const createdTasks = await Promise.all(
