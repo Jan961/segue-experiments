@@ -95,7 +95,7 @@ model BookingContactNotes {
   Booking       Booking      @relation(fields: [BookingId], references: [Id], onDelete: Cascade, map: "BookingBookingContactNotes")
 
   @@index([BookingId], map: "BookingBookingContactNotes")
-  @@index([UserId], map: "AccountUser_BookingContactNotes")
+  @@index([UserId], map: "AccountUserBookingContactNotes")
 }
 
 model Contract {
@@ -400,7 +400,7 @@ model CompAllocation {
   AvailableComp          AvailableComp @relation(fields: [AvailableCompId], references: [Id], onDelete: Cascade, map: "AvailableCompsMayBeAllocated")
 
   @@index([ArrangedById], map: "AccountUser_CompAllocation")
-  @@index([AvailableCompId], map: "AvailableComp_CompAllocation")
+  @@index([AvailableCompId], map: "AvailableCompsMayBeAllocated")
 }
 
 model CompType {
@@ -575,7 +575,7 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
+  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
   UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
@@ -914,7 +914,7 @@ model DealMemo {
 
   @@index([DeMoBOMVenueContactId], map: "VenueContactDealMemoBOM")
   @@index([DeMoTechVenueContactId], map: "VenueContactDealMemoTech")
-  @@index([DeMoAccContId], map: "AccountContact_DealMemo")
+  @@index([DeMoAccContId], map: "AccountContactDealMemo")
 }
 
 model DealMemoCall {
@@ -963,7 +963,7 @@ model File {
   Production        Production[]
   ProductionCompany ProductionCompany[]
 
-  @@index([UploadUserId], map: "User_AttachedFile")
+  @@index([UploadUserId], map: "UserAttachedFile")
 }
 
 model SubscriptionPlan {
@@ -1546,6 +1546,19 @@ view SalesSummaryView {
   SaleTypeName               String?   @db.VarChar(45)
   SetSalesFiguresDate        DateTime? @db.Date
   FinalSetSalesFiguresDate   DateTime? @db.Date
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view AccountUserPermissionsView {
+  AccountId      Int
+  UserId         Int     @default(0)
+  AccUserId      Int     @default(0)
+  UserFirstName  String  @db.VarChar(50)
+  UserLastName   String? @db.VarChar(50)
+  UserEmail      String  @db.VarChar(120)
+  AllPermissions String? @db.MediumText
 
   @@ignore
 }

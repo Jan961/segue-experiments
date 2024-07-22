@@ -2,6 +2,7 @@ import DefaultTextRenderer from '../core-ui-lib/Table/renderers/DefaultTextRende
 import { tileColors } from 'config/global';
 import IconRenderer from '../bookings/table/IconRenderer';
 import { UploadLogoRenderer } from './renderers/UploadLogoRenderer';
+import IconRowRenderer from 'components/global/salesTable/renderers/IconRowRenderer';
 export const styleProps = { headerColor: tileColors.systemAdmin };
 
 const createUploadLogoRenderer = (fetchProductionCompanies, onUploadSucess) => {
@@ -15,7 +16,6 @@ export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSuc
       field: 'companyName',
       editable: true,
       cellRenderer: DefaultTextRenderer,
-
       width: 400,
     },
     {
@@ -53,6 +53,54 @@ export const productionCompaniesColDefs = (fetchProductionCompanies, onUploadSuc
         popover: true,
       }),
       width: 40,
+      resizable: false,
+    },
+  ];
+};
+
+export const usersColDef = (updateUser) => {
+  return [
+    {
+      headerName: 'Name',
+      field: 'name',
+      cellRenderer: DefaultTextRenderer,
+      width: 400,
+    },
+    {
+      headerName: 'Email',
+      field: 'email',
+      cellRenderer: DefaultTextRenderer,
+      flex: 1,
+    },
+    {
+      headerName: 'User Permissions Summary',
+      field: 'permissionDesc',
+      cellRenderer: DefaultTextRenderer,
+      flex: 1,
+    },
+    {
+      headerName: 'Type of Licence',
+      field: 'licence',
+      cellRenderer: DefaultTextRenderer,
+      flex: 1,
+    },
+    {
+      headerName: '',
+      field: 'icons',
+      cellRenderer: IconRowRenderer,
+      cellRendererParams: (params) => ({
+        iconList: [
+          {
+            name: 'edit',
+            onClick: () => updateUser('edit', params.data),
+          },
+          {
+            name: 'delete',
+            onClick: () => updateUser('delete', params.data),
+          },
+        ],
+      }),
+      width: 90,
       resizable: false,
     },
   ];
