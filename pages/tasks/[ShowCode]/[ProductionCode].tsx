@@ -52,11 +52,16 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
+  const [currentTopModal, setCurrentTopModal] = useState<string>('');
 
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   const handleShowTask = () => {
     setShowAddTask(false);
+
+    // use this with a hasOverlay = {!currentTopModal==" blah "}
+    console.log(currentTopModal);
+    setCurrentTopModal('');
     //  This was making the loading spinner stick
     //  router.replace(router.asPath);
   };
