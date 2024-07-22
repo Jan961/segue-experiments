@@ -98,6 +98,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             label="Status"
             options={allStatusOptions}
             testId="booking-status-filter"
+            isClearable={false}
           />
           <BookingFilter />
           <TextInput
