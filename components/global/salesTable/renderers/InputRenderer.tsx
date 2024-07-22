@@ -1,6 +1,7 @@
 import { TextInput } from 'components/core-ui-lib';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
 import { ChangeEvent } from 'react';
+import { isNullOrEmpty } from 'utils';
 interface Standard {
   field: string;
 }
@@ -24,9 +25,7 @@ const InputRenderer = (props: SelectRendererProps) => {
         id="venueText"
         type="number"
         className="w-full text-primary-input-text font-bold"
-        value={
-          Object.keys(props.holdValue).length > 0 ? props.holdValue[props.data.HoldTypeName][props.colDef.field] : 0
-        }
+        value={!isNullOrEmpty(props.holdValue) ? props.holdValue[props.data.HoldTypeName][props.colDef.field] : 0}
         onChange={(value) => props.onChange(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)}
       />
     </div>

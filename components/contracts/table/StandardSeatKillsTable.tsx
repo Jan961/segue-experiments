@@ -3,6 +3,7 @@ import { contractsStyleProps, standardSeatKillsColumnDefs } from 'components/con
 import { useEffect, useRef, useState } from 'react';
 import { formatRowsForMultipeBookingsAtSameVenue, formatRowsForPencilledBookings } from '../../bookings/utils';
 import { StandardSeatRowType } from 'interfaces';
+import { isNullOrEmpty } from 'utils';
 interface ContractsTableProps {
   rowData?: StandardSeatRowType[];
   tableData?: any;
@@ -15,7 +16,7 @@ export default function StandardSeatKillsTable({ rowData, tableData }: Contracts
   const [holdValue, setHoldValue] = useState({});
 
   useEffect(() => {
-    if (Object.keys(holdValue).length === 0) {
+    if (isNullOrEmpty(holdValue)) {
       const holdValueData = {};
       rows.forEach((value) => {
         holdValueData[value.HoldTypeName] = value;
