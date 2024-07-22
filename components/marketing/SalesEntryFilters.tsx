@@ -142,6 +142,10 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
     }
   }, [tourWeeks]);
 
+  useEffect(() => {
+    setSelectedValue(bookings.selected);
+  }, [bookings.selected]);
+
   return (
     <div>
       <div className="w-full flex justify-between flex-row">

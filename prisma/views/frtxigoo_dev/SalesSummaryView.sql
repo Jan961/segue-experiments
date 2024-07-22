@@ -13,6 +13,7 @@ SELECT
   `ScheduleView`.`EntryStatusCode` AS `EntryStatusCode`,
   `SalesSetTotalsView`.`Value` AS `Value`,
   `frtxigoo_dev`.`Currency`.`CurrencyCode` AS `VenueCurrencyCode`,
+  `frtxigoo_dev`.`Currency`.`CurrencySymbolUnicode` AS `VenueCurrencySymbolUnicode`,
   `frtxigoo_dev`.`ConversionRate`.`ConversionRate` AS `ConversionRate`,
   `frtxigoo_dev`.`ConversionRate`.`ConversionToCurrencyCode` AS `ConversionToCurrencyCode`,
   `SalesSetTotalsView`.`SaleTypeName` AS `SaleTypeName`,

@@ -37,6 +37,8 @@ export const isNullOrEmpty = (value: any) => {
     return value === '';
   } else if (Array.isArray(value)) {
     return value.length === 0;
+  } else if (Object.keys(value).length === 0) {
+    return true;
   }
 };
 
