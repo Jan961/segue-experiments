@@ -131,6 +131,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
   };
 
   const updateCurrentProductionState = (data) => {
+    const productionRecord = showData.productions.find((production) => production.Id === data.Id);
     const {
       DateBlock = [],
       Code,
@@ -147,7 +148,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
       RunningTimeNote,
       ProdCoId,
       ConversionRateList,
-    } = data;
+    } = productionRecord;
     const productionDateBlock = DateBlock.find((d) => d.Name === 'Production') || {};
     const rehearsalDateBlock = DateBlock.find((d) => d.Name === 'Rehearsal') || {};
     setCurrentProduction({
@@ -171,6 +172,7 @@ const ProductionsView = ({ showData, visible, onClose }: ProductionsViewProps) =
           id: Image.id,
           imageUrl: ImageUrl,
           name: Image.originalFilename,
+          location: Image.location,
         },
       }),
     });
