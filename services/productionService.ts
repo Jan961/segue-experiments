@@ -238,7 +238,7 @@ export const getProductionById = async (Id: number) => {
 };
 
 export const getProductionsAndTasks = async (AccountId: number, ProductionId?: number) => {
-  let productionsWithTasks = await prisma.production.findMany({
+  let productionsWithTasks = await prisma.Production.findMany({
     where: {
       IsArchived: false,
       ...(ProductionId && { Id: ProductionId }),

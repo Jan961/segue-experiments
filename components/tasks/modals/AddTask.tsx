@@ -22,12 +22,13 @@ import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
 import { productionJumpState } from '../../../state/booking/productionJumpState';
 import { addDurationToDate, addOneMonth } from '../../../services/dateService';
+import { RecurringTasksPopup } from './RecurringTasksPopup';
 
 interface AddTaskProps {
   visible: boolean;
   isMasterTask?: boolean;
   onClose: () => void;
-  task?: Partial<MasterTask> & { ProductionId?: number };
+  task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
   productionId?: number;
 }
 
@@ -88,10 +89,17 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       TaskRepeatToWeekNum?: string;
       ProductionTaskRepeat?: any;
     }
-  >(task || DEFAULT_MASTER_TASK);
-  inputs.RepeatInterval = inputs.ProductionTaskRepeat.Interval;
-  inputs.TaskRepeatFromWeekNum = inputs.ProductionTaskRepeat.FromWeekNum;
-  inputs.TaskRepeatToWeekNum = inputs.ProductionTaskRepeat.ToWeekNum;
+  >(
+    task ||
+      DEFAULT_MASTER_TASK || {
+        ProductionTaskRepeat: task?.ProductionTaskRepeat.Interval,
+        TaskRepeatFromWeekNum: task?.ProductionTaskRepeat?.FromWeekNum,
+        TaskRepeatToWeekNum: task?.ProductionTaskRepeat?.ToWeekNum,
+      },
+  );
+  inputs.RepeatInterval = inputs?.RepeatInterval || inputs.ProductionTaskRepeat?.Interval;
+  inputs.TaskRepeatFromWeekNum = inputs?.TaskRepeatFromWeekNum || inputs.ProductionTaskRepeat?.FromWeekNum;
+  inputs.TaskRepeatToWeekNum = inputs?.TaskRepeatToWeekNum || inputs.ProductionTaskRepeat?.ToWeekNum;
   const productionList = useRecoilValue(productionJumpState).productions;
   const production =
     useRecoilValue(currentProductionSelector) || productionList.find((item) => item.Id === productionId);
@@ -207,6 +215,65 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     return counter;
   };
 
+  const checkIfRecurringModal = async (isRecurring: boolean, previousInfo, newInfo) => {
+    console.log(previousInfo);
+    console.log(newInfo);
+
+    if (previousInfo === null) {
+      await handleOnSubmit();
+      onClose();
+      return;
+    }
+
+    const fieldsToCheck = ['TaskRepeatToWeekNum', 'TaskRepeatFromWeekNum', 'RepeatInterval'];
+    let differenceInObj = false;
+    fieldsToCheck.forEach((field) => {
+      if (newInfo[field] !== previousInfo[field]) {
+        differenceInObj = true;
+      }
+    });
+
+    if (!differenceInObj) {
+      console.log('diff');
+      await handleOnSubmit();
+      onClose();
+      
+    } else if (previousInfo?.Name === undefined) {
+      console.log('Name null');
+      await handleOnSubmit();
+      onClose();
+      
+    } else {
+      setShowRecurringConfirmation(true);
+      
+    }
+  };
+
+  const getNumTaskDifference = (previousTaskInfo, updatedTaskInfo, production) => {
+    console.log(previousTaskInfo);
+    console.log(updatedTaskInfo);
+    console.log(previousTaskInfo?.Name);
+    if (previousTaskInfo?.Name === null) {
+      setShowRecurringConfirmation(false);
+      handleOnSubmit();
+    }
+
+    const previousTasks = getNewTasksNum(
+      new Date(production?.StartDate),
+      previousTaskInfo?.TaskRepeatFromWeekNum,
+      previousTaskInfo?.TaskRepeatToWeekNum,
+      previousTaskInfo?.RepeatInterval,
+    );
+
+    const updatedTasks = getNewTasksNum(
+      new Date(production?.StartDate),
+      updatedTaskInfo?.TaskRepeatFromWeekNum,
+      updatedTaskInfo?.TaskRepeatToWeekNum,
+      updatedTaskInfo?.RepeatInterval,
+    );
+    return updatedTasks - previousTasks;
+  };
+
   // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
   // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
   const handleMasterTask = async () => {
@@ -242,6 +309,10 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       console.log(inputs);
       if (inputs.Id) {
         try {
+          if (inputs.RepeatInterval !== taskRecurringInfo.RepeatInterval) {
+            console.log(' update the modal');
+          }
+
           await axios.post('/api/tasks/update', inputs);
           setLoading(false);
           onClose();
@@ -485,39 +556,26 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               variant="primary"
               className="w-[132px]"
               onClick={() => {
-                return isRecurring ? setShowRecurringConfirmation(true) : handleOnSubmit();
+                console.log(isRecurring);
+                return checkIfRecurringModal(isRecurring, taskRecurringInfo, inputs);
               }}
               text={inputs.Id ? 'Save' : 'Create New Task'}
             />
           </div>
         </div>
-        {isRecurring && (
-          <PopupModal show={showRecurringConfirmation} onClose={() => setShowRecurringConfirmation(false)}>
-            {inputs?.Id ? (
-              <div>{}</div>
-            ) : (
-              <div>
-                <h1>This task is set to repeat</h1>
-                <p>
-                  This task is set to repeat. There will be{' '}
-                  {getNewTasksNum(
-                    new Date(production?.StartDate),
-                    inputs?.TaskRepeatFromWeekNum,
-                    inputs?.TaskRepeatToWeekNum,
-                    inputs?.RepeatInterval,
-                  )}{' '}
-                  new tasks added
-                </p>
-              </div>
-            )}
-
-            <Button variant="primary" className="bg-primary-red" onClick={() => setShowRecurringConfirmation(false)}>
-              Cancel
-            </Button>
-            <Button variant="secondary" onClick={handleOnSubmit}>
-              Continue
-            </Button>
-          </PopupModal>
+        {showRecurringConfirmation && (
+          <RecurringTasksPopup
+            visible={showRecurringConfirmation}
+            onClose={() => {
+              setShowRecurringConfirmation(false);
+            }}
+            numTaskChange={getNumTaskDifference(taskRecurringInfo, inputs, production)}
+            onSubmit={() => {
+              console.log('update');
+              handleOnSubmit();
+            }}
+            isNewTask={inputs?.Id === undefined}
+          />
         )}
       </form>
 
