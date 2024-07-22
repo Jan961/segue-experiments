@@ -62,7 +62,7 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
   };
 
   return (
-    <div className="grid grid-cols-2 grid-rows-2 gap-4">
+    <div className="grid grid-cols-2 grid-rows-2 gap-[14px]">
       <Button
         text={landingUrl === '' ? 'Add Landing Page' : 'Edit Landing Page'}
         className="w-[155px] mt-5"
@@ -75,20 +75,20 @@ export const MarketingButtons: React.FC<MarketingBtnProps> = ({ venueName, venue
         className="w-[165px] mt-5"
         disabled={!productionId}
         iconProps={{ className: 'h-4 w-3' }}
-        sufixIconName={'excel'}
+        sufixIconName="excel"
         onClick={() => setShowMarketingReportsModal(true)}
       />
 
       <Button
         text="Venue Website"
-        className="w-[155px]"
+        className="w-[155px] mt-[3px]"
         disabled={!productionId || website === ''}
         onClick={() => window.open(website, '_blank')}
       />
 
       <InputDialog
         show={showEditUrlModal}
-        titleText={'Add/Edit Landing Page'}
+        titleText="Add/Edit Landing Page"
         subTitleText={venueName}
         onCancelClick={() => setShowEditUrl(false)}
         onSaveClick={(value) => updateLandingPage(value)}
