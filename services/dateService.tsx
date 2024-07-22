@@ -1,4 +1,5 @@
-import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid } from 'date-fns';
+import { startOfWeek, differenceInWeeks, addWeeks, isBefore, isValid, format } from 'date-fns';
+import { toZonedTime } from 'date-fns-tz';
 import moment from 'moment';
 
 // regex for dd/mm/yy
@@ -69,7 +70,8 @@ export const dateToPicker = (dateToFormat: Date | string) => {
 };
 
 export const dateTimeToTime = (dateToFormat: string) => {
-  return moment.utc(dateToFormat).format('HH:mm');
+  const date = toZonedTime(dateToFormat, 'UTC');
+  return format(date, 'HH:mm');
 };
 
 export const toISO = (date: Date) => {
