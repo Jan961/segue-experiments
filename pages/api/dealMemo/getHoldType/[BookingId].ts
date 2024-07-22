@@ -9,17 +9,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
-    const dealMemo = await prisma.dealMemo.findFirst({
-      where: {
-        DeMoBookingId: BookingId,
-      },
-      include: {
-        DealMemoPrice: true,
-        DealMemoTechProvision: true,
-        DealMemoCall: true,
-        DealMemoHold: true,
-      },
-    });
+    const dealMemo = await prisma.HoldType.findMany({});
 
     await res.json(dealMemo);
   } catch (err) {
