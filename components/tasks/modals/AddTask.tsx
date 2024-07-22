@@ -237,15 +237,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       console.log('diff');
       await handleOnSubmit();
       onClose();
-      
     } else if (previousInfo?.Name === undefined) {
       console.log('Name null');
       await handleOnSubmit();
       onClose();
-      
     } else {
       setShowRecurringConfirmation(true);
-      
     }
   };
 
@@ -305,23 +302,19 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     if (isMasterTask) {
       await handleMasterTask();
     } else {
-      omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction']);
+      omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
       console.log(inputs);
       if (inputs.Id) {
         try {
-          if (inputs.RepeatInterval !== taskRecurringInfo.RepeatInterval) {
-            console.log(' update the modal');
-          }
-
-          await axios.post('/api/tasks/update', inputs);
+          await axios.post(`/api/tasks/update${!isRecurring ? '/recurring' : ''}`, inputs);
           setLoading(false);
-          onClose();
+          handleClose();
         } catch (error) {
           setLoading(false);
         }
       } else {
         try {
-          const endpoint = `/api/tasks/create/${isRecurring ? 'recurring' : 'single'}/`;
+          const endpoint = `/api/tasks/create/${!isRecurring ? 'recurring' : 'single'}/`;
           await axios.post(endpoint, inputs);
           setLoading(false);
           if (isChecked) {

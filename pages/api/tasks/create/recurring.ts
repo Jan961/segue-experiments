@@ -1,24 +1,11 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { addDurationToDate, calculateWeekNumber, addOneMonth } from 'services/dateService';
+import { generateRecurringTasks } from 'services/TaskService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const {
-      Name,
-      StartByWeekNum,
-      CompleteByWeekNum,
-      Priority,
-      Progress,
-      RepeatInterval,
-      TaskRepeatFromWeekNum,
-      TaskRepeatToWeekNum,
-      TaskCompletedDate,
-      AssignedToUserId,
-      ProductionId,
-      Notes,
-    } = req.body;
+    const { RepeatInterval, TaskRepeatFromWeekNum, TaskRepeatToWeekNum, ProductionId } = req.body;
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId });
@@ -43,53 +30,13 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prodBlock = productionWeeks.find((dateBlock) => {
       return dateBlock.Name === 'Production';
     });
-
-    let maxTaskCode =
-      (
-        await prisma.ProductionTask.findFirst({
-          select: {
-            Code: true,
-          },
-          where: { ProductionId: { equals: ProductionId } },
-          orderBy: {
-            Code: 'desc',
-          },
-        })
-      )?.Code + 1 || 0;
-
-    const tasksToCreate = [];
-
-    const prodStartDate = new Date(prodBlock?.StartDate);
-    const taskAllowance = CompleteByWeekNum - StartByWeekNum;
-    let taskStartDate = addDurationToDate(prodStartDate, TaskRepeatFromWeekNum * 7, true);
-    const taskEndDate = addDurationToDate(prodStartDate, TaskRepeatToWeekNum * 7, true);
-
-    const multiplier = RepeatInterval === 'biWeekly' ? 2 : 1;
-    while (taskStartDate <= taskEndDate) {
-      tasksToCreate.push({
-        ProductionId: parseInt(ProductionId),
-        Code: maxTaskCode,
-        Name,
-        Priority,
-        Notes,
-        Progress,
-        AssignedToUserId,
-        CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-        StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
-        StartByIsPostProduction: StartByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
-        CompleteByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate) + taskAllowance,
-        TaskCompletedDate,
-        PRTId: recurringTask.Id,
-      });
-      maxTaskCode++;
-      taskStartDate =
-        RepeatInterval === 'monthly'
-          ? addOneMonth(taskStartDate)
-          : addDurationToDate(taskStartDate, 7 * multiplier, true);
-    }
+    console.log(
+      'NEW TASK LIST -------------------------------------------------------------------------------------------------------------',
+    );
+    const taskList: any[] = await generateRecurringTasks(req.body, prodBlock, prodBlock?.StartDate, recurringTask.Id);
 
     const createdTasks = await Promise.all(
-      tasksToCreate.map(
+      taskList.map(
         async (task) =>
           await prisma.productionTask.create({
             data: {
