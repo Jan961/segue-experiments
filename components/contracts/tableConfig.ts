@@ -67,7 +67,7 @@ export const contractsColumnDefs = [
   },
 ];
 
-export const standardSeatKillsColumnDefs = [
+export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
   {
     headerName: 'Type',
     field: 'type',
@@ -82,6 +82,14 @@ export const standardSeatKillsColumnDefs = [
     headerName: 'Seats',
     field: 'seats',
     cellRenderer: InputRenderer,
+    cellRendererParams: () => ({
+      placeholder: '',
+      inline: true,
+      onChange: (value, holdTypeValue, holdTypeName, field) => {
+        onChangeData(value, holdTypeValue, holdTypeName, field);
+      },
+      holdValue,
+    }),
     width: 120,
     cellStyle: {
       textAlign: 'center',
@@ -96,6 +104,14 @@ export const standardSeatKillsColumnDefs = [
     headerName: 'Value',
     field: 'value',
     cellRenderer: InputRenderer,
+    cellRendererParams: () => ({
+      placeholder: '',
+      inline: true,
+      onChange: (value, holdTypeValue, holdTypeName, field) => {
+        onChangeData(value, holdTypeValue, holdTypeName, field);
+      },
+      holdValue,
+    }),
     width: 120,
     cellStyle: {
       textAlign: 'center',

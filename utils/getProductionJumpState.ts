@@ -1,5 +1,6 @@
 import { dateBlockMapper } from 'lib/mappers';
 import { ParsedUrlQuery } from 'querystring';
+import { dateTimeToTime } from 'services/dateService';
 import { getAllProductions, getAllProductionRegions } from 'services/productionService';
 import { ProductionJump } from 'state/booking/productionJumpState';
 
@@ -34,7 +35,7 @@ export const getProductionJumpState = async (ctx, path: string, AccountId: numbe
           ShowRegionId: allProductionRegions
             ? allProductionRegions.find((pair: any) => pair.PRProductionId === t.Id)?.PRRegionId
             : null,
-          RunningTime: t.RunningTime,
+          RunningTime: t.RunningTime ? dateTimeToTime(t.RunningTime.toISOString()) : null,
           RunningTimeNote: t.RunningTimeNote,
           SalesFrequency: t.SalesFrequency,
           ProductionCompany: t.ProductionCompany,
