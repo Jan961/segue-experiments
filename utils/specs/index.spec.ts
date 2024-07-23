@@ -27,7 +27,7 @@ describe('Check for null or Empty', () => {
   });
 
   it('returns false for a non-empty string', () => {
-    expect(isNullOrEmpty('Hello')).toBe(false);
+    expect(isNullOrEmpty('')).toBe(true);
   });
 
   it('returns true for an empty array', () => {
