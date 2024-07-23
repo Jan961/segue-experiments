@@ -10,56 +10,59 @@ export type GlobalActivitiesResponse = {
   activityTypes: Array<SelectOption>;
 };
 
-export const getActivitiesByVenueId = async (VenueId) => {
-  const activities = await prisma.$queryRaw`
-  SELECT 
-      gba.*,
-      GROUP_CONCAT(DISTINCT gbav.GBAVVenueId) AS VenueIds,
-      COUNT(DISTINCT gbav.GBAVVenueId) AS VenueCount
-  FROM 
-      GlobalBookingActivity gba
-  JOIN 
-      GlobalBookingActivityVenue gbav
-  ON 
-      gba.GlobalActivityId = gbav.GBAVGlobalActivityId
-  WHERE 
-      gbav.GBAVGlobalActivityId IN (
-          SELECT 
-              GBAVGlobalActivityId 
-          FROM 
-              GlobalBookingActivityVenue 
-          WHERE 
-              GBAVVenueId = ${VenueId}
-      )
-  GROUP BY 
-      gba.GlobalActivityId;
-`;
+export const getActivitiesByVenueId = async (VenueId: number) => {
+  // First fetch the GlobalActivityIds related to the given VenueId
+  const activityIdsResult = await prisma.globalBookingActivityVenue.findMany({
+    where: {
+      VenueId,
+    },
+    select: {
+      GlobalActivityId: true,
+    },
+  });
 
-  // Parsing the VenueIds to get a list of venueIds
-  const activitiesWithVenueList = activities.map((activity) => ({
-    ...activity,
-    VenueIds: activity.VenueIds ? activity.VenueIds.split(',') : [],
-  }));
+  const activityIds = activityIdsResult.map((item) => item.GlobalActivityId);
 
+  // Fetch activities related to the fetched GlobalActivityIds
+  const activities = await prisma.globalBookingActivity.findMany({
+    where: {
+      Id: {
+        in: activityIds,
+      },
+    },
+    include: {
+      GlobalBookingActivityVenue: true, // Include related venue data
+    },
+  });
+
+  // Process activities to aggregate VenueIds and count them
+  const activitiesWithVenueList = activities.map((activity) => {
+    const venueIds = activity.GlobalBookingActivityVenue.map((venue) => venue.VenueId);
+    return {
+      ...activity,
+      VenueIds: venueIds,
+      VenueCount: venueIds.length,
+    };
+  });
+
+  // Map fields to the required format
   const result = {
-    activities: activitiesWithVenueList.map((activity) => {
-      return fieldsMapper(activity);
-    }),
+    activities: activitiesWithVenueList.map((activity) => fieldsMapper(activity)),
   };
 
   return result;
 };
 
 const fieldsMapper = (original) => ({
-  Id: original.GlobalActivityId,
-  ProductionId: original.GlobalActivityProductionId,
-  Date: convertDate(original.GlobalActivityDate),
-  Name: original.GlobalActivityName,
-  ActivityTypeId: original.GlobalActivityActivityTypeId,
-  Cost: Number(original.VenueCount) === 0 ? 0 : Number(original.GlobalActivityCost) / Number(original.VenueCount),
-  FollowUpRequired: original.GlobalActivityFollowUpRequired,
-  DueByDate: convertDate(original.GlobalActivityDueByDate),
-  Notes: original.GlobalActivityNotes,
+  Id: original.Id,
+  ProductionId: original.ProductionId,
+  Date: convertDate(original.Date),
+  Name: original.Name,
+  ActivityTypeId: original.ActivityTypeId,
+  Cost: Number(original.VenueCount) === 0 ? 0 : Number(original.Cost) / Number(original.VenueCount),
+  FollowUpRequired: original.FollowUpRequired,
+  DueByDate: convertDate(original.DueByDate),
+  Notes: original.Notes,
   VenueIds: original.VenueIds,
 });
 
