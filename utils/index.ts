@@ -39,6 +39,8 @@ export const isNullOrEmpty = (value: any) => {
     return value.length === 0;
   } else if (Object.keys(value).length === 0) {
     return true;
+  } else if (typeof value === 'object' && !Array.isArray(value)) {
+    return Object.keys(value).length === 0;
   }
 };
 
