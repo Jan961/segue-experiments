@@ -46,7 +46,7 @@ const CompanyContractFilters = () => {
               id="contractText"
               disabled={!productionId}
               placeholder="Search contracts..."
-              className="w-[340px]"
+              className="w-[33vw]"
               iconName="search"
               value={filter.contractText}
               onChange={onChange}
@@ -54,10 +54,10 @@ const CompanyContractFilters = () => {
           </GlobalToolbar>
         </div>
         <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
-          <div className=" text-primary-input-text">First Name</div>
+          <div className=" text-primary-input-text font-bold">First Name</div>
           <Select
             onChange={(value) => onChange({ target: { id: 'dealMemoStatusDropDown', value } })}
-            className="bg-primary-white w-52"
+            className="bg-primary-white w-[20vw]"
             value={filter.dealMemoStatusDropDown}
             disabled={!productionId}
             placeholder="Deal Memo Status"
@@ -65,10 +65,10 @@ const CompanyContractFilters = () => {
             isClearable
             isSearchable
           />
-          <div className=" text-primary-input-text">Last Name</div>
+          <div className=" text-primary-input-text font-bold ml-4">Last Name</div>
           <Select
             onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
-            className="bg-white w-52"
+            className="bg-white w-[20vw]"
             value={filter.contractStatusDropDown}
             disabled={!productionId}
             placeholder="Contract Status"
@@ -76,10 +76,10 @@ const CompanyContractFilters = () => {
             isClearable
             isSearchable
           />
-          <div className=" text-primary-input-text">Department</div>
+          <div className=" text-primary-input-text font-bold ml-4">Department</div>
           <Select
             onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
-            className="bg-white w-52"
+            className="bg-white w-[20vw]"
             value={filter.contractStatusDropDown}
             disabled={!productionId}
             placeholder="Contract Status"
@@ -87,14 +87,14 @@ const CompanyContractFilters = () => {
             isClearable
             isSearchable
           />
-          <Button className="text-sm leading-8 w-[120px]" text="Clear Filters" onClick={onClearFilters} />
+          <Button className="text-sm leading-8 w-[120px] ml-6" text="Clear Filters" onClick={onClearFilters} />
         </div>
       </div>
-      <div className="flex mt-2">
-        <div className=" text-primary-input-text">Department</div>
+      <div className="px-4 flex items-center gap-4 flex-wrap  mt-2">
+        <div className=" text-primary-input-text font-bold">Contract Status</div>
         <Select
           onChange={(value) => onChange({ target: { id: 'contractStatusDropDown', value } })}
-          className="bg-white w-52"
+          className="bg-white w-[16vw]"
           value={filter.contractStatusDropDown}
           // disabled={!productionId}
           placeholder="Contract Status"
@@ -103,16 +103,18 @@ const CompanyContractFilters = () => {
           isSearchable
         />
 
-        <div className=" text-primary-input-text">Date Issued</div>
+        <div className=" text-primary-input-text font-bold ml-6">Date Issued</div>
 
         <ContractsDateFilter />
-        <Button className="text-sm leading-8 w-[120px]" text="Start New Contract" onClick={openContractSchedule} />
+        <div className="flex ml-[15.5vw]">
+          <Button className="text-sm leading-8 w-[120px]" text="Start New Contract" onClick={openContractSchedule} />
 
-        <Button
-          className="text-sm leading-8 w-[120px]"
-          text="View / Edit Contract Templates"
-          onClick={onClearFilters}
-        />
+          <Button
+            className="text-sm leading-8 w-[120px] ml-4"
+            text="View / Edit Contract Templates"
+            onClick={onClearFilters}
+          />
+        </div>
       </div>
       {openContract && <ContractScheduleModal openContract={openContract} />}
     </div>

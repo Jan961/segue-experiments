@@ -72,7 +72,8 @@ export const companyContractsColumnDefs = [
     headerName: 'First Name',
     field: 'Last Name',
     cellRenderer: DefaultCellRenderer,
-    width: 106,
+    width: 120,
+    minWidth: 120,
   },
   {
     headerName: 'Last Name',
@@ -84,38 +85,16 @@ export const companyContractsColumnDefs = [
       isMonday: (params) => params.value.includes('Mon'),
     },
   },
-  { headerName: 'Role', field: 'week', cellRenderer: DefaultCellRenderer, width: 80 },
+  { headerName: 'Role', field: 'week', cellRenderer: DefaultCellRenderer, width: 140 },
   {
     headerName: 'Contract Status',
     field: 'venue',
     cellRenderer: VenueColumnRenderer,
-    minWidth: 6,
-    flex: 2,
-    cellClassRules: {
-      dayTypeNotPerformance: (params) => {
-        const { dayType } = params.data;
-        return dayType !== 'Performance' && params.value !== '';
-      },
-      cancelledBooking: (params) => {
-        const { status } = params.data;
-        return status === 'X' && params.value !== '';
-      },
-      suspendedBooking: (params) => {
-        const { status } = params.data;
-        return status === 'S' && params.value !== '';
-      },
-      pencilledBooking: (params) => {
-        const { status, multipleVenuesOnSameDate } = params.data;
-        return status === 'U' && multipleVenuesOnSameDate && params.value !== '';
-      },
-      multipleBookings: (params) => {
-        const { dayType, venueHasMultipleBookings } = params.data;
-        return dayType === 'Performance' && venueHasMultipleBookings && params.value !== '';
-      },
-    },
+    width: 100,
+    minWidth: 100,
   },
-  { headerName: '', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 80, flex: 1 },
-  { headerName: 'Completed By', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 90 },
+  { headerName: '', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
+  { headerName: 'Completed By', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 150 },
   { headerName: 'Checked By', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
   { headerName: 'Date Issued', field: 'contractStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
   {
@@ -130,7 +109,7 @@ export const companyContractsColumnDefs = [
     field: 'contractStatus',
     cellRenderer: ContractStatusCellRenderer,
     resizable: false,
-    width: 180,
+    width: 80,
   },
 ];
 
