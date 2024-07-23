@@ -20,7 +20,7 @@ export default async function handle(req, res) {
 
     const sales = [];
 
-    if (general) {
+    if (Object.values(general).length > 0) {
       sales.push({
         SaleSaleTypeId: 1,
         SaleSeats: general.seatsSold,

@@ -79,7 +79,7 @@ const Final = () => {
           frequency,
         });
 
-        if (Object.values(response.data).length > 0) {
+        if (!isNullOrEmpty(response.data)) {
           const sales = response.data;
 
           if (typeof sales === 'object') {
@@ -90,48 +90,36 @@ const Final = () => {
             if (salesFigures.general.seatsSold !== '' && salesFigures.general.seatsSoldVal !== '') {
               if (parseInt(genSeatsSold) < parseInt(salesFigures.general.seatsSold)) {
                 tempGeneralWarning =
-                  'Number of general seats sold (' +
-                  genSeatsSold +
-                  ') is less than the previously entered value (' +
-                  salesFigures.general.seatsSold +
-                  ')\n';
+                  `Number of general seats sold (${genSeatsSold}) is less than ` +
+                  `the previously entered value (${salesFigures.general.seatsSold})\n`;
               }
 
               if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.general.seatsSoldVal)) {
                 tempGeneralWarning =
                   tempGeneralWarning +
-                  'Value of general seats (' +
-                  genSeatsSoldVal +
-                  ') is less than the previously entered value (' +
-                  salesFigures.general.seatsSoldVal +
-                  ')\n';
+                  `Value of general seats (${genSeatsSoldVal}) is less than the ` +
+                  `previously entered value (${salesFigures.general.seatsSoldVal})\n`;
               }
             }
 
             let tempSchoolWarning = '';
-            if (salesFigures.schools.seatsSold !== '' && salesFigures.schools.seatsSoldVal !== '') {
+            if (salesFigures.schools.seatsSold && salesFigures.schools.seatsSoldVal) {
               if (parseInt(schSeatsSold) < parseInt(salesFigures.schools.seatsSold)) {
                 tempSchoolWarning =
-                  'Number of school seats sold (' +
-                  genSeatsSold +
-                  ') is less than the previously entered value (' +
-                  salesFigures.general.seatsSold +
-                  ')\n';
+                  `Number of school seats sold (${genSeatsSold}) is less than ` +
+                  `the previously entered value (${salesFigures.general.seatsSold})\n`;
               }
 
               if (parseInt(genSeatsSoldVal) < parseInt(salesFigures.schools.seatsSoldVal)) {
                 tempSchoolWarning =
                   tempSchoolWarning +
-                  'Valie of school seats sold (' +
-                  genSeatsSoldVal +
-                  ') is less than the previously entered value (' +
-                  salesFigures.general.seatsSoldVal +
-                  ')\n';
+                  `Value of school seats sold (${genSeatsSoldVal}) is less than ` +
+                  `the previously entered value (${salesFigures.general.seatsSoldVal})\n`;
               }
             }
 
             // if tempWarning is not blank, setWarning, display the discrepency note field and exit the function
-            if (tempGeneralWarning !== '' || tempSchoolWarning !== '') {
+            if (tempGeneralWarning || tempSchoolWarning) {
               setSchoolWarning(tempSchoolWarning);
               setGeneralWarning(tempGeneralWarning);
               setShowDiscrepancyNotes(true);
@@ -160,17 +148,11 @@ const Final = () => {
         },
       };
 
-      // if setId is -1 we need to run the create api, otherwise run update
-      if (setId === -1) {
-        const finalEntryCreate = await axios.post('/api/marketing/sales/process/final/create', data);
-        setSetId(finalEntryCreate.data.setId);
-      } else {
-        const finalEntryUpdate = await axios.post('/api/marketing/sales/process/final/update', {
-          ...data,
-          SetId: setId,
-        });
-        setSetId(finalEntryUpdate.data.setId);
-      }
+      const finalEntryCreate = await axios.post(
+        `/api/marketing/sales/process/final/${setId === -1 ? 'create' : 'update'}`,
+        data,
+      );
+      setSetId(finalEntryCreate.data.setId);
 
       setBookings({ ...bookings, selected: null });
     } catch (error) {
