@@ -89,7 +89,7 @@ const Filters = ({ onExportClick }: FiltersProps) => {
             </div>
           </GlobalToolbar>
         </div>
-        <div className="px-4 flex items-center gap-4 flex-wrap  py-1">
+        <div className="px-4 flex items-center gap-4 flex-wrap">
           <Select
             onChange={(value) => onChange({ target: { id: 'status', value } })}
             disabled={!ProductionId}
