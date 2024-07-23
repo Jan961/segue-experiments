@@ -87,7 +87,7 @@ const Final = () => {
 
             let tempGeneralWarning = '';
             // check if the final value submitted is lower the the last sales entry
-            if (salesFigures.general.seatsSold !== '' && salesFigures.general.seatsSoldVal !== '') {
+            if (!salesFigures.general.seatsSold && !salesFigures.general.seatsSoldVal) {
               if (parseInt(genSeatsSold) < parseInt(salesFigures.general.seatsSold)) {
                 tempGeneralWarning =
                   `Number of general seats sold (${genSeatsSold}) is less than ` +
@@ -326,14 +326,14 @@ const Final = () => {
       }
     };
 
-    if (bookings.selected !== undefined && bookings.selected !== null) {
+    if (bookings.selected) {
       initForm();
     }
   }, [bookings.selected]);
 
   return (
     <div>
-      {bookings.selected !== undefined && bookings.selected !== null && (
+      {bookings.selected && (
         <div>
           {loading ? (
             <Spinner size="lg" className="mt-2 mr-3 -mb-1" />
@@ -350,7 +350,7 @@ const Final = () => {
                         <div className="leading-6 text-xl text-primary-input-text font-bold mt-1">General</div>
                       </div>
 
-                      {generalWarning !== '' && (
+                      {generalWarning && (
                         <div className="flex flex-row">
                           <div className="leading-6 text-base text-primary-red font-bold mt-5">{generalWarning}</div>
                         </div>
@@ -395,7 +395,7 @@ const Final = () => {
                             <div className="leading-6 text-xl text-primary-input-text font-bold mt-5">School</div>
                           </div>
 
-                          {schoolWarning !== '' && (
+                          {schoolWarning && (
                             <div className="flex flex-row">
                               <div className="leading-6 text-xl text-primary-red font-bold mt-5">{schoolWarning}</div>
                             </div>
@@ -473,7 +473,7 @@ const Final = () => {
                         name="userConfirmed"
                         checked={userConfirmed}
                         onChange={() => markUserConfirmed(!userConfirmed)}
-                        className="w-[19px] h-[19px] ml-5 -mt-[40px]"
+                        className="w-[19px] h-[19px] ml-5 -mt-10"
                       />
                     </div>
                   </div>
