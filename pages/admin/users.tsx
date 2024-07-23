@@ -1,16 +1,31 @@
-import { styleProps, usersColDef } from 'components/admin/tableConfig';
+import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
 import { Button, Table } from 'components/core-ui-lib';
 import Layout from 'components/Layout';
 import useAxios from 'hooks/useAxios';
 import { useEffect, useState } from 'react';
 
 export default function Users() {
-  const [rowData, setRowData] = useState([]);
-  const [colDefs, setColDefs] = useState([]);
+  const [userRowData, setUserRowData] = useState([]);
+  const [pgRowData, setPgRowData] = useState([]);
+  const [fullLicences, setFullLicences] = useState(0);
+  const [fullLicencesUsed, setFullLicencesUsed] = useState(0);
+  const [touringLicences, setTouringLicences] = useState(0);
+  const [touringLicencesUsed, setTouringLicencesUsed] = useState(0);
 
   const { fetchData } = useAxios();
 
-  const toggleModal = (type, data) => {
+  const toggleUserModal = (type, data) => {
+    console.log('table data: ', type, data);
+
+    // this is just to use the set functions so git commit works
+    setFullLicences(0);
+    setFullLicencesUsed(0);
+    setTouringLicences(0);
+    setTouringLicencesUsed(0);
+    setPgRowData([]);
+  };
+
+  const togglePermissionGroupModal = (type, data) => {
     console.log('table data: ', type, data);
   };
 
@@ -21,8 +36,7 @@ export default function Users() {
     });
 
     if (Array.isArray(users)) {
-      setColDefs(usersColDef(toggleModal));
-      setRowData(
+      setUserRowData(
         users.map((user) => {
           const firstname = user.UserFirstName === null ? '' : user.UserFirstName;
           const lastname = user.UserLastName === null ? '' : user.UserLastName;
@@ -31,7 +45,7 @@ export default function Users() {
             name: firstname + ' ' + lastname,
             email: user.UserEmail,
             permissionDesc: user.AllPermissions,
-            license: 'to be added later',
+            licence: 'to be added later',
           };
         }),
       );
@@ -39,8 +53,10 @@ export default function Users() {
   };
 
   useEffect(() => {
-    populateUserTable();
-  });
+    if (userRowData.length === 0) {
+      populateUserTable();
+    }
+  }, [userRowData]);
 
   return (
     <Layout title="Users | Segue" flush>
@@ -55,11 +71,72 @@ export default function Users() {
         </div>
       </div>
 
-      <div className="flex flex-row" />
+      <div className="flex flex-row">
+        <div className="flex flex-col mr-2">
+          <div className="text-base primary-dark-blue">Total Number of Full Licences:</div>
+        </div>
+        <div className="flex flex-col mr-[60px]">
+          <div className="text-base primary-dark-blue font-bold">{fullLicences}</div>
+        </div>
 
-      <div className="flex flex-row" />
+        <div className="flex flex-col mr-2">
+          <div className="text-base primary-dark-blue">Total Number of Touring Management Licences:</div>
+        </div>
+        <div className="flex flex-col">
+          <div className="text-base primary-dark-blue font-bold">{touringLicences}</div>
+        </div>
+      </div>
 
-      <Table testId="admin-users-table" columnDefs={colDefs} rowData={rowData} styleProps={styleProps} />
+      <div className="flex flex-row">
+        <div className="flex flex-col mr-2">
+          <div className="text-base primary-dark-blue">Total Number of Full Licences Used:</div>
+        </div>
+        <div className="flex flex-col mr-[24px]">
+          <div className="text-base primary-dark-blue font-bold">{fullLicencesUsed}</div>
+        </div>
+
+        <div className="flex flex-col mr-2">
+          <div className="text-base primary-dark-blue">Total Number of Touring Management Licences Used:</div>
+        </div>
+        <div className="flex flex-col">
+          <div className="text-base primary-dark-blue font-bold">{touringLicencesUsed}</div>
+        </div>
+      </div>
+
+      <div className="flex flex-row justify-between items-center my-4">
+        <div className="text-primary-navy text-xl font-bold">All Users</div>
+        <div className="flex flex-row gap-4">
+          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Touring Management User" />
+          <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Full User" />
+        </div>
+      </div>
+
+      <Table
+        testId="admin-users-table"
+        columnDefs={usersColDef(toggleUserModal)}
+        rowData={userRowData}
+        styleProps={styleProps}
+        tableHeight={300}
+      />
+
+      <div className="flex justify-end mt-5">
+        <div className="w-[700px]">
+          <div className="flex flex-row justify-between items-center my-4">
+            <div className="text-primary-navy text-xl font-bold">Your Permission Groups</div>
+            <div className="flex flex-row gap-4">
+              <Button className="px-8 mt-2 -mb-1" variant="secondary" text="Add New Permission Group" />
+            </div>
+          </div>
+
+          <Table
+            testId="admin-permission-group-table"
+            columnDefs={permissionGroupColDef(togglePermissionGroupModal)}
+            rowData={pgRowData}
+            styleProps={styleProps}
+            tableHeight={300}
+          />
+        </div>
+      </div>
     </Layout>
   );
 }

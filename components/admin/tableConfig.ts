@@ -105,3 +105,33 @@ export const usersColDef = (updateUser) => {
     },
   ];
 };
+
+export const permissionGroupColDef = (updateGroup) => {
+  return [
+    {
+      headerName: 'Name of Permission Group',
+      field: 'name',
+      cellRenderer: DefaultTextRenderer,
+      width: 600,
+    },
+    {
+      headerName: '',
+      field: 'icons',
+      cellRenderer: IconRowRenderer,
+      cellRendererParams: (params) => ({
+        iconList: [
+          {
+            name: 'edit',
+            onClick: () => updateGroup('edit', params.data),
+          },
+          {
+            name: 'delete',
+            onClick: () => updateGroup('delete', params.data),
+          },
+        ],
+      }),
+      width: 90,
+      resizable: false,
+    },
+  ];
+};
