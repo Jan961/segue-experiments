@@ -244,6 +244,7 @@ export const VenueHistory = ({ visible = false, onCancel }: VenueHistoryProps) =
                 onChange={(value) => getBookingSelection(value as number)}
                 placeholder="Please select a venue"
                 label="Venue"
+                testId="venue-filter"
               />
 
               <div className="float-right flex flex-row">
