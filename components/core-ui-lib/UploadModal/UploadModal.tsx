@@ -95,11 +95,13 @@ const UploadModal: React.FC<UploadModalProps> = ({
     setUploadedImageUrls({});
   };
 
-  const handleFileDelete = (fileName) => {
+  const handleFileDelete = (file) => {
+    console.log(file);
+    const fileName = file?.name;
     if (customHandleFileDelete) {
-      customHandleFileDelete();
+      customHandleFileDelete(file);
     }
-
+    console.log(fileName);
     const filesList = selectedFiles.filter((file) => file?.name !== fileName);
     setSelectedFiles(filesList);
     onChange?.(filesList);
@@ -214,7 +216,7 @@ const UploadModal: React.FC<UploadModalProps> = ({
               errorMessage={errorMessages[file?.name]}
               imageUrl={uploadedImageUrls[file?.name]}
               onDelete={() => {
-                handleFileDelete(file?.name);
+                handleFileDelete(file);
               }}
             />
           ))}

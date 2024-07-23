@@ -2,10 +2,11 @@ import Button from 'components/core-ui-lib/Button';
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
 import { UploadModal } from '../../core-ui-lib';
 import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
+import axios from 'axios';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -39,36 +40,40 @@ const VenueTechnicalDetailsForm = ({
   };
 
   const onSave = async (files) => {
-    files.forEach((file) => {
+    const newFileList = [...fileList];
+    for (const file of files) {
       const formData = new FormData();
       formData.append('file', file.file);
       formData.append('path', 'techSpecs');
-      setFileList([...fileList, formData]);
-    });
+      newFileList.push(formData);
+    }
+    setFileList(newFileList);
     setUploadVisible(false);
   };
 
-  //   export interface UploadedFile {
-  //   id?: number;
-  //   size: number;
-  //   name: string;
-  //   error?: string;
-  //   file?: File;
-  //   imageUrl?: string;
-  // }
+  const makeWidgets = async () => {
+    console.log(fileList);
+    const newFileWidgets = [];
 
-  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
-  useEffect(() => {
+    // Process fileList
     fileList.forEach((file) => {
+      console.log(file);
       const tempFile = file.get('file');
-      const widget: UploadedFile = {
-        size: tempFile.size,
-        name: tempFile.name,
-      };
+      console.log(tempFile);
+      if (tempFile !== 'undefined') {
+        console.log(tempFile);
+        const widget: UploadedFile = {
+          size: tempFile.size,
+          name: tempFile.name,
+          imageUrl: URL.createObjectURL(tempFile),
+        };
 
-      setFileWidgets([...fileWidgets, widget]);
+        newFileWidgets.push(widget);
+      }
     });
-    venue.files.forEach(async (file) => {
+
+    // Process venue files
+    for (const file of venue.files) {
       console.log(file);
       const response = await fetch(file.FileUrl);
       const blob = await response.blob();
@@ -78,10 +83,25 @@ const VenueTechnicalDetailsForm = ({
         size: tempFile.size,
         name: tempFile.name,
         imageUrl: file.imageUrl,
+        fileLocation: file.fileLocation,
+        fileId: file.id,
       };
-      setFileWidgets([...fileWidgets, widget]);
-    });
-  }, [fileList, venue]);
+      console.log(widget);
+      newFileWidgets.push(widget);
+    }
+
+    // Set the state once with the accumulated widgets
+    setFileWidgets(newFileWidgets);
+  };
+
+  const deleteFileOnServer = async (fileId) => {
+    if (fileId) {
+      await axios.post('/api/venue/techSpecs/delete', { fileId });
+    }
+  };
+
+  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
+
   // docs,spreadsheets
   // 10mb
 
@@ -101,7 +121,12 @@ const VenueTechnicalDetailsForm = ({
           isMultiple={true}
           maxFiles={20}
           maxFileSize={10240 * 1024}
-          onChange={(selectedFiles) => console.log(selectedFiles)}
+          customHandleFileDelete={async (file) => {
+            console.log(file);
+            if (file?.fileLocation !== null && file?.fileId !== null) {
+              await deleteFileOnServer(file.fileId);
+            }
+          }}
         />
       )}
       <div className="flex flex-row  justify-between">
@@ -124,7 +149,9 @@ const VenueTechnicalDetailsForm = ({
         </div>
         <Button
           text="Upload Venue Tech Spec"
-          onClick={() => {
+          onClick={async () => {
+            setFileWidgets([]);
+            await makeWidgets();
             setUploadVisible(true);
           }}
         />

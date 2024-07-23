@@ -20,5 +20,6 @@ export const getFileCardFromFileId = async (Id: number) => {
     name: result.OriginalFilename,
     imageUrl: getFileUrl(result.Location.replaceAll(' ', '+')),
     MediaType: result.MediaType,
+    fileLocation: result.Location,
   };
 };
