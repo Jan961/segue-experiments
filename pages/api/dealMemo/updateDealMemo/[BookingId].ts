@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { getDealMemoCall, getPrice, getTechProvision, getContactIdData } from '../utils';
+import { getDealMemoCall, getPrice, getTechProvision, getContactIdData, getDealMemoHold } from '../utils';
 import { omit } from 'radash';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
@@ -12,6 +12,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { BookingId });
     if (!access) return res.status(401).end();
     const data = getContactIdData(req.body.formData);
+    const demoIdData = data.DeMoId;
     const updatedDate = omit(data, [
       'error',
       'DeMoId',
@@ -31,6 +32,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const techProvisionData = getTechProvision(updatedDate.DealMemoTechProvision);
 
     const dealMemoCallData = getDealMemoCall(updatedDate.DealMemoCall);
+    const dealMemoHoldData = getDealMemoHold(updatedDate.DealMemoHold, demoIdData);
     if (existingDealMemo) {
       updateCreateDealMemo = await prisma.dealMemo.update({
         where: {
@@ -50,6 +52,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             updateMany: dealMemoCallData[0],
             create: dealMemoCallData[1],
           },
+          DealMemoHold: {
+            updateMany: dealMemoHoldData[0],
+            create: dealMemoHoldData[1],
+          },
           Booking: {
             connect: { Id: BookingId },
           },
@@ -67,6 +73,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
           DealMemoCall: {
             create: data.DealMemoCall,
+          },
+          DealMemoHold: {
+            create: dealMemoHoldData[1],
           },
           Booking: {
             connect: { Id: BookingId },

@@ -10,7 +10,7 @@ const ProductionOption = ({ option }: { option: ProductionOptionProps }) => {
 
   return (
     <components.Option {...option}>
-      <div>
+      <div data-testid="prod-option">
         <span
           className={classNames(`block truncate text-base ${isSelected ? 'font-medium' : 'font-normal'}`, {
             'font-medium': isSelected,
