@@ -36,6 +36,7 @@ export const getProductionsConvertedPayload = (production) => {
             startDate: rehearsalDateBlock?.StartDate,
             endDate: rehearsalDateBlock?.EndDate,
             isPrimary: false,
+            id: rehearsalDateBlock?.Id,
           },
         ]) ||
         []),
@@ -44,6 +45,7 @@ export const getProductionsConvertedPayload = (production) => {
         startDate: productionDateBlock?.StartDate,
         endDate: productionDateBlock?.EndDate,
         isPrimary: true,
+        id: productionDateBlock?.Id,
       },
     ].filter((x) => x),
   };

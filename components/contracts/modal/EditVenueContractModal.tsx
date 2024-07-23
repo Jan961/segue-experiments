@@ -24,6 +24,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Venue } from '@prisma/client';
 import {
   DealMemoContractFormData,
+  DealMemoHoldType,
   SaveContractBookingFormState,
   SaveContractFormState,
   VenueContractFormData,
@@ -43,6 +44,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
   const [editDealMemoModal, setEditDealMemoModal] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [venue, setVenue] = useState<Partial<Venue>>({});
+  const [dealHoldType, setDealHoldType] = useState<Partial<DealMemoHoldType>>({});
   const [formData, setFormData] = useState<Partial<VenueContractFormData>>({
     ...initialEditContractFormData,
     ...selectedTableCell.contract,
@@ -79,6 +81,8 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
     const demoModalData = await axios.get<DealMemoContractFormData>(
       `/api/dealMemo/getDealMemo/${selectedTableCell.contract.Id ? selectedTableCell.contract.Id : 1}`,
     );
+    const getHoldType = await axios.get<DealMemoHoldType>(`/api/dealMemo/getHoldType/${selectedTableCell.contract.Id}`);
+    setDealHoldType(getHoldType.data as DealMemoHoldType);
     if (demoModalData.data && demoModalData.data.DeMoBookingId) {
       setDemoModalData(demoModalData.data as unknown as DealMemoContractFormData);
     }
@@ -562,6 +566,7 @@ const EditVenueContractModal = ({ visible, onClose }: { visible: boolean; onClos
           selectedTableCell={selectedTableCell}
           demoModalData={demoModalData}
           venueData={venue}
+          dealHoldType={dealHoldType}
         />
       )}
       {isLoading && <LoadingOverlay />}
