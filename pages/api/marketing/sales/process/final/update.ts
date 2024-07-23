@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
@@ -6,7 +7,7 @@ export default async function handle(req, res) {
 
     const salesUpdates = [];
 
-    if (Object.values(general).length > 0) {
+    if (!isNullOrEmpty(general)) {
       salesUpdates.push(
         prisma.Sale.updateMany({
           where: {
@@ -21,7 +22,7 @@ export default async function handle(req, res) {
       );
     }
 
-    if (Object.values(schools).length > 0) {
+    if (!isNullOrEmpty(schools)) {
       salesUpdates.push(
         prisma.Sale.updateMany({
           where: {

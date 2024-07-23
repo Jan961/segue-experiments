@@ -1,4 +1,5 @@
 import prisma from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
@@ -20,7 +21,7 @@ export default async function handle(req, res) {
 
     const sales = [];
 
-    if (Object.values(general).length > 0) {
+    if (!isNullOrEmpty(general)) {
       sales.push({
         SaleSaleTypeId: 1,
         SaleSeats: general.seatsSold,
@@ -29,7 +30,7 @@ export default async function handle(req, res) {
       });
     }
 
-    if (Object.values(schools).length > 0) {
+    if (!isNullOrEmpty(schools)) {
       sales.push({
         SaleSaleTypeId: 3,
         SaleSeats: schools.seatsSold,
