@@ -4,6 +4,7 @@ import prisma from 'lib/prisma';
 import { AccessCheck, checkAccess as checkAccessDirect } from './accessService';
 import { userMapper } from 'lib/mappers';
 import { UserDto } from 'interfaces';
+import { isNullOrEmpty } from 'utils';
 
 export const getUsers = async (AccountId: number): Promise<UserDto[]> => {
   const result = await prisma.user.findMany({
@@ -27,7 +28,9 @@ export const getUserNameForClerkId = async (userId: string): Promise<string> => 
   const accountId = await getAccountId(matching.emailAddress);
   const users = await getUsers(accountId);
   const currentUser = users.find((user) => user.Email === matching.emailAddress);
-  return currentUser.FirstName + ' ' + currentUser.LastName;
+  const firstname = isNullOrEmpty(currentUser.FirstName) ? '' : currentUser.FirstName;
+  const lastname = isNullOrEmpty(currentUser.LastName) ? '' : currentUser.LastName;
+  return firstname + ' ' + lastname;
 };
 
 export const getAccountId = async (email: string) => {
