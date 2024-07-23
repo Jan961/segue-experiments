@@ -17,9 +17,8 @@ import VenueContactForm from './VenueContactsForm';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
-import { getFileUrl } from 'lib/s3';
-import useAxios from 'hooks/useAxios';
 
+//  import { getFileUrl } from 'lib/s3';
 interface AddEditVenueModalProps {
   visible: boolean;
   venueFamilyOptionList: SelectOption[];
@@ -58,8 +57,9 @@ export default function AddEditVenueModal({
 
   const createVenue = async (venue: UiTransformedVenue) => {
     try {
-      await axios.post('/api/venue/create', venue, { cancelToken });
+      const data = await axios.post('/api/venue/create', venue, { cancelToken });
       onClose(true);
+      return data;
     } catch (e) {
       debug('Error creating venue', e);
     }
@@ -67,8 +67,9 @@ export default function AddEditVenueModal({
 
   const updateVenue = async (venue: UiTransformedVenue) => {
     try {
-      await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
+      const data = await axios.post('/api/venue/update/' + venue.id, venue, { cancelToken });
       onClose(true);
+      return data;
     } catch (e) {
       debug('Error updating venue', e);
     }
@@ -81,7 +82,7 @@ export default function AddEditVenueModal({
       const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
 
       console.log(apiResponse);
-      saveFiles(apiResponse);
+      await saveFiles(apiResponse);
     }
     setIsSaving(false);
   };
@@ -100,8 +101,6 @@ export default function AddEditVenueModal({
       return false;
     }
   }
-
-  const { fetchData } = useAxios();
 
   const onChange = (data = {}) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -133,8 +132,8 @@ export default function AddEditVenueModal({
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation
 
-    try {
-      fileList.foreach(async (file) => {
+    await Promise.all(
+      fileList.map(async (file) => {
         const response = await axios.post('/api/upload', file, {
           onUploadProgress: (progressEvent) => {
             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -153,34 +152,20 @@ export default function AddEditVenueModal({
             }
           },
         });
+
         progress = 100;
         clearInterval(slowProgressInterval);
-
         const fileRec = {
-          FileVenueFileId: response.data.FileId,
-          FileVenueId: venueResponse.data.Id,
-          FileDescription: 'Tech Spec',
-          FileOriginalFilename: response.data.originalFilename,
-          FileURL: getFileUrl(response.data.location),
-          FileDateTime: new Date(),
-          FileUploadedDateTime: new Date(),
+          FileId: response.data.id,
+          VenueId: venueResponse.data.Id,
+          Description: 'Tech Spec',
         };
 
         // update in the database
-        await fetchData({
-          url: '/api/venue/techSpecs/create',
-          method: 'POST',
-          data: fileRec,
-        });
-      });
-    } catch (error) {
-      clearInterval(slowProgressInterval);
-    }
+        await axios.post('/api/venue/techSpecs/create', fileRec);
+      }),
+    );
   };
-
-  fileList.forEach((file) => {
-    console.log(file.get('file'));
-  });
   return (
     <>
       <PopupModal
