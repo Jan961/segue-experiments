@@ -115,7 +115,6 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
             // all sale values are in prime numbered columns like 5, 7, 9, 11
             const index = Math.round(salesIndex / 3);
             const symbol = currencySymbols?.[index - 1] || '';
-            console.log(symbol, currencySymbols, colNumber, salesIndex - 1);
             cell.numFmt = symbol + '#,##0.00';
           }
         }
