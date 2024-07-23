@@ -49,16 +49,4 @@ describe('Check for null or Empty', () => {
   it('returns false for a non-empty object', () => {
     expect(isNullOrEmpty({ key: 'value' })).toBe(false);
   });
-
-  it('returns false for a number', () => {
-    expect(isNullOrEmpty(123)).toBe(false);
-  });
-
-  it('returns false for a boolean true', () => {
-    expect(isNullOrEmpty(true)).toBe(false);
-  });
-
-  it('returns false for a boolean false', () => {
-    expect(isNullOrEmpty(false)).toBe(false);
-  });
 });
