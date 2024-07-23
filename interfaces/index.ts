@@ -1,4 +1,4 @@
-import { DealMemoPrice, DealMemoTechProvision, Region } from '@prisma/client';
+import { DealMemoHold, DealMemoPrice, DealMemoTechProvision, Region } from '@prisma/client';
 
 export type StatusCode = 'C' | 'U' | 'X';
 
@@ -389,6 +389,7 @@ export type Venue = {
   Code: string;
   Name: string;
   Website: string | null;
+  FamilyId: number | null;
   VenueFamily: string | null;
   Address1: string | null;
   Address2: string | null;
@@ -396,8 +397,6 @@ export type Venue = {
   Town: string | null;
   County: string | null;
   Postcode: string | null;
-  Country: string | null;
-  Currency: string;
   VATIndicator: boolean;
   TechSpecsURL: string | null;
   Seats: number | null;
@@ -652,6 +651,7 @@ export interface DealMemoCall {
   DMCType?: string;
   DMCValue?: number;
 }
+
 export interface DealMemoContractFormData {
   DeMoId?: number;
   DeMoBookingId?: number;
@@ -705,6 +705,7 @@ export interface DealMemoContractFormData {
   DeMoLocalMarketingContra?: number;
   DeMoSellWho?: string;
   DeMoSellProgrammes?: boolean;
+  DeMoPrintDelUseVenueAddress?: boolean;
   DeMoSellMerch?: boolean;
   DeMoSellNotes?: string;
   DeMoSellProgCommPercent?: number;
@@ -728,6 +729,14 @@ export interface DealMemoContractFormData {
   DealMemoPrice?: DealMemoPrice[];
   DealMemoTechProvision?: DealMemoTechProvision[];
   DealMemoCall?: any;
+  DealMemoHold?: DealMemoHold[];
+}
+
+export interface DealMemoHoldType {
+  HoldTypeCode?: string;
+  HoldTypeId?: number;
+  HoldTypeName?: string;
+  HoldTypeSeqNo?: number;
 }
 
 export interface DealMemoPriceState {

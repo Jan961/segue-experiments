@@ -58,7 +58,8 @@ const UploadModal: React.FC<UploadModalProps> = ({
   );
 
   const isUploadComplete = useMemo(() => {
-    if (selectedFiles.length === 0) return false;
+    // this has return true if selected files is zero to handle deletion case
+    if (selectedFiles.length === 0) return true;
     return selectedFiles.every((file) => progress[file?.name] === 100 || file.id);
   }, [selectedFiles, progress]);
 

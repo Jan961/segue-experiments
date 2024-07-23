@@ -18,6 +18,7 @@ import { ConversionRateDTO, DateBlockDTO } from 'interfaces';
 import { productionFormSchema } from './schema';
 import { debug } from 'utils/logging';
 import { uploadStrings } from 'config/upload';
+import axios from 'axios';
 
 export interface ProductionFormData {
   id?: number;
@@ -113,8 +114,17 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
   };
 
   const onFileUploadChange = (selectedFiles) => {
-    if (Array.isArray(selectedFiles) && selectedFiles.length === 0) {
-      setFormData((prev) => ({ ...prev, ImageUrl: '' }));
+    if (Array.isArray(selectedFiles) && selectedFiles.length === 0 && image?.location) {
+      notify.promise(
+        axios
+          .delete(`/api/file/delete?location=${image?.location}`)
+          .then(() => setFormData((prev) => ({ ...prev, imageUrl: '', image: null }))),
+        {
+          success: 'Image deleted successfully',
+          loading: 'Deleting Image',
+          error: 'Deleting Image failed. Please try again later',
+        },
+      );
     }
   };
 
@@ -143,7 +153,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
 
   return (
     <PopupModal
-      hasOverlay={true}
+      hasOverlay={isUploadOpen}
       titleClass="text-xl text-primary-navy text-bold"
       title={title}
       show={visible}
@@ -163,21 +173,24 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Label required text="Prod Code" />
-            <TextInput
-              id="prodcode"
-              className="w-[60px] placeholder-primary"
-              type="string"
-              onChange={(e) => onChange('prodCode', e.target.value)}
-              value={prodCode}
-              error={validationErrors?.prodCode}
-              maxlength={10}
-              required
-            />
-            <Tooltip>
-              <Icon iconName="info-circle-solid" variant="2xl" />
-            </Tooltip>
+          <div className="flex-col">
+            <div className="flex items-center gap-2">
+              <Label required text="Prod Code" />
+              <TextInput
+                id="prodcode"
+                className="w-[60px] placeholder-primary"
+                type="string"
+                onChange={(e) => onChange('prodCode', e.target.value)}
+                value={prodCode}
+                error={validationErrors?.prodCode}
+                maxlength={10}
+                required
+              />
+              <Tooltip>
+                <Icon iconName="info-circle-solid" variant="2xl" />
+              </Tooltip>
+            </div>
+            {validationErrors.prodCode && <small className="text-red-400">{validationErrors.prodCode}</small>}
           </div>
         </div>
         {isUploadOpen && (
@@ -210,54 +223,67 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             }}
           />
         </div>
-        <div className="flex items-center gap-12 col-span-3 row-start-3">
-          <Label required text="Production Dates" />
-          <DateRange
-            className="w-fit"
-            label="Date"
-            onChange={({ from, to }) => {
-              const StartDate = from?.toISOString() || '';
-              const EndDate = !productionDateBlock?.EndDate && !to ? from?.toISOString() : to?.toISOString() || '';
-              onChange('productionDateBlock', { ...productionDateBlock, StartDate, EndDate });
-            }}
-            value={{
-              from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
-              to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
-            }}
-          />
+        <div className="flex-col">
+          <div className="flex items-center gap-12 col-span-3 row-start-3">
+            <Label required text="Production Dates" />
+            <DateRange
+              className="w-fit"
+              label="Date"
+              onChange={({ from, to }) => {
+                const StartDate = from?.toISOString() || '';
+                const EndDate = !productionDateBlock?.EndDate && !to ? from?.toISOString() : to?.toISOString() || '';
+                onChange('productionDateBlock', { ...productionDateBlock, StartDate, EndDate });
+              }}
+              value={{
+                from: productionDateBlock?.StartDate ? new Date(productionDateBlock?.StartDate) : null,
+                to: productionDateBlock?.EndDate ? new Date(productionDateBlock?.EndDate) : null,
+              }}
+            />
+          </div>
+          {validationErrors.productionDateBlock && (
+            <small className="text-red-400">{validationErrors.productionDateBlock}</small>
+          )}
         </div>
-
-        <div className="flex items-center gap-[107px]">
-          <Label required text="Region" />
-          <Select
-            className="flex-1"
-            placeholder="Select Region(s)"
-            onChange={(value) => onChange('region', value as string)}
-            options={REGIONS_LIST}
-            value={region}
-            isMulti={true}
-            renderOption={(option) => <CustomOption option={option} isMulti={true} />}
-          />
+        <div className="flex-col">
+          <div className="flex items-center gap-[107px]">
+            <Label required text="Region" />
+            <Select
+              className="flex-1"
+              placeholder="Select Region(s)"
+              onChange={(value) => onChange('region', value as string)}
+              options={REGIONS_LIST}
+              value={region}
+              isMulti={true}
+              renderOption={(option) => <CustomOption option={option} isMulti={true} />}
+            />
+          </div>
+          {validationErrors.region && <small className="text-red-400">{validationErrors.region}</small>}
         </div>
-        <div className="flex items-center gap-7">
-          <Label required text="Currency for Reports" />
-          <Select
-            className="w-64"
-            onChange={(value) => onChange('currency', value as string)}
-            options={currencyListOptions}
-            value={currency}
-            isSearchable
-          />
+        <div className="flex-col">
+          <div className="flex items-center gap-7">
+            <Label required text="Currency for Reports" />
+            <Select
+              className="w-64"
+              onChange={(value) => onChange('currency', value as string)}
+              options={currencyListOptions}
+              value={currency}
+              isSearchable
+            />
+          </div>
+          {validationErrors.currency && <small className="text-red-400">{validationErrors.currency}</small>}
         </div>
-        <div className="flex items-center gap-[92px]">
-          <Label required text="Company" />
-          <Select
-            className="flex-1"
-            placeholder="Select Production Company"
-            onChange={(value) => onChange('company', value as string)}
-            options={productionCompanyOptions}
-            value={company}
-          />
+        <div className="flex-col">
+          <div className="flex items-center gap-[92px]">
+            <Label required text="Company" />
+            <Select
+              className="flex-1"
+              placeholder="Select Production Company"
+              onChange={(value) => onChange('company', value as string)}
+              options={productionCompanyOptions}
+              value={company}
+            />
+          </div>
+          {validationErrors.company && <small className="text-red-400">{validationErrors.company}</small>}
         </div>
         <div className="flex items-center gap-6">
           <Label text="Email Address for Sales Figures" />

@@ -1,49 +1,24 @@
 import prisma from 'lib/prisma';
-import { pick, omit } from 'radash';
+import { omit } from 'radash';
 import ExcelJS from 'exceljs';
 import moment from 'moment';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { ALIGNMENT } from './masterplan';
+import { marketingCostsStatusToLabelMap } from 'config/Reports';
+import { Booking } from '@prisma/client';
 
-type BOOKING = {
-  Id: number;
-  DateBlockId: number;
-  VenueId: number;
-  FirstDate: string;
-  StatusCode: string;
-  PencilNum: null;
-  LandingPageURL: string;
-  TicketsOnSaleFromDate: string;
-  TicketsOnSale: boolean;
+type BOOKING = Partial<Booking> & {
   IsOnSale: boolean;
   OnSaleDate: string | null;
-  MarketingPlanReceived: boolean;
-  ContactInfoReceived: boolean;
-  PrintReqsReceived: boolean;
   VenueCode: string;
   VenueName: string;
   VenueTown: string;
+  FullProductionCode: string;
+  MarketingCostsStatus: string;
 };
-
-type PRODUCTION = {
-  Id: number;
-  Code: string;
-  ShowId: number;
-  ShowCode: string;
-  ShowName: string;
-};
-
-type PRODUCTION_DATA = {
-  production: PRODUCTION;
-  bookings: BOOKING[];
-};
-
-enum ALIGNMENT {
-  CENTER = 'center',
-  RIGHT = 'right',
-}
 
 const alignColumn = ({ worksheet, colAsChar, align }: { worksheet: any; colAsChar: string; align: ALIGNMENT }) => {
   worksheet.getColumn(colAsChar).eachCell((cell) => {
@@ -84,15 +59,48 @@ const getBooleanAsString = (val: boolean | null): string => {
   return '';
 };
 
+const applySelectionFilter = (bookings: BOOKING[], selection: string) => {
+  switch (selection) {
+    case 'all':
+      return bookings;
+    case 'on_sale':
+      return bookings.filter((booking) => booking.TicketsOnSale);
+    case 'not_onsale':
+      return bookings.filter((booking) => !booking.TicketsOnSale);
+    case 'marketing_plans_received':
+      return bookings.filter((booking) => booking.MarketingPlanReceived);
+    case 'marketing_plans_not_received':
+      return bookings.filter((booking) => !booking.MarketingPlanReceived);
+    case 'contact_info_received':
+      return bookings.filter((booking) => booking.ContactInfoReceived);
+    case 'contact_info_not_received':
+      return bookings.filter((booking) => !booking.ContactInfoReceived);
+    case 'print_requirements_received':
+      return bookings.filter((booking) => booking.PrintReqsReceived);
+    case 'print_requirements_not_received':
+      return bookings.filter((booking) => !booking.PrintReqsReceived);
+    case 'marketing_costs_pending':
+      return bookings.filter((booking) => booking.MarketingCostsStatus === 'P');
+    case 'marketing_costs_approved':
+      return bookings.filter((booking) => booking.MarketingCostsStatus === 'A');
+    case 'marketing_costs_not_approved':
+      return bookings.filter((booking) => booking.MarketingCostsStatus === 'N');
+    default:
+      return bookings;
+  }
+};
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { productionId, showId, productionCode, options } = req.body || {};
-
+    let { productionId, showId = null, selection } = req.body || {};
+    if (productionId === -1) {
+      productionId = null;
+    }
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId: productionId });
     if (!access) return res.status(401).end();
 
-    const data = await prisma.DateBlock.findFirst({
+    const data = await prisma.DateBlock.findMany({
       where: {
         ...(productionId && { ProductionId: productionId }),
         Name: 'Production',
@@ -123,53 +131,91 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
           },
         },
       },
+      orderBy: {
+        StartDate: 'desc',
+      },
     });
-    const production = {
-      ...pick(data.Production, ['Id', 'Code']),
-      ShowId: data.Production.Show.Id,
-      ShowCode: data.Production.Show.Code,
-      ShowName: data.Production.Show.Name,
-    };
-    const bookings = data.Booking.map((booking) => {
-      const venue = booking.Venue;
-      return {
-        ...omit(booking, ['Venue']),
-        VenueId: venue.Id,
-        VenueCode: venue.Code,
-        VenueName: venue.Name,
-        VenueTown: venue.VenueAddress?.[0]?.Town || '',
-      };
-    });
+    let filename = `Selected Venues`;
+    if (productionId) {
+      const selectedProduction = data?.[0]?.Production;
+      const showCode = selectedProduction?.Show?.Code || '';
+      const showName = selectedProduction?.Show?.Name || '';
+      const productionCode = selectedProduction?.Code || '';
+      filename = `${showCode}${productionCode} ${showName} ${filename}`;
+    }
+    let bookings = [];
+    for (const dateBlock of data) {
+      const showCode = dateBlock.Production?.Show?.Code || '';
+      const productionCode = dateBlock.Production?.Code || '';
+      const dateBlockBookings = dateBlock?.Booking?.map?.((booking) => {
+        const venue = booking.Venue;
+        return {
+          ...omit(booking, ['Venue']),
+          VenueId: venue.Id,
+          VenueCode: venue.Code,
+          VenueName: venue.Name,
+          VenueTown: venue.VenueAddress?.[0]?.Town || '',
+          FullProductionCode: `${showCode}${productionCode}`,
+        };
+      });
+      bookings = [...bookings, ...dateBlockBookings];
+    }
 
     const workbook = new ExcelJS.Workbook();
-    const response: PRODUCTION_DATA = { production, bookings };
     const worksheet = workbook.addWorksheet('SELECTED VENUES', {
       pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
       views: [{ state: 'frozen', ySplit: 5 }],
     });
 
-    const { Code: ProductionCode, ShowCode, ShowName } = response?.production || {};
-
-    worksheet.addRow([`${ShowCode + ProductionCode || ''} (${ShowName || ''}) VENUES : ALL`]);
+    worksheet.addRow([`${filename}`]);
     const date = new Date();
     worksheet.addRow([`Exported: ${moment(date).format('DD/MM/YY')} at ${moment(date).format('hh:mm')}`]);
-    worksheet.addRow(['PRODUCTION', 'SHOW', '', '', '', '', 'ON SALE', 'MARKETING', 'CONTACT', 'PRINT']);
-    worksheet.addRow(['CODE', 'DATE', 'CODE', 'NAME', 'TOWN', 'ON SALE', 'DATE', 'PLAN', 'INFO', 'REQS']);
+    worksheet.addRow([
+      'PRODUCTION',
+      'SHOW',
+      '',
+      '',
+      '',
+      '',
+      'ON SALE',
+      'MARKETING',
+      'CONTACT',
+      'PRINT',
+      'MARKETING COSTS',
+      'MARKETING COSTS',
+      'MARKETING COSTS',
+    ]);
+    worksheet.addRow([
+      'CODE',
+      'DATE',
+      'CODE',
+      'NAME',
+      'TOWN',
+      'ON SALE',
+      'DATE',
+      'PLAN',
+      'INFO',
+      'REQS',
+      'STATUS',
+      'APPROVAL DATE',
+      'NOTES',
+    ]);
     worksheet.addRow([]);
-
-    response?.bookings.forEach((booking: BOOKING) => {
+    applySelectionFilter(bookings, selection)?.forEach((booking: BOOKING) => {
       const ShowDate = moment(booking.FirstDate).format('DD/MM/YY');
       const VenueCode = booking.VenueCode;
       const ShowTown = booking.VenueTown;
       const VenueName = booking.VenueName;
-      const OnSale = getBooleanAsString(booking.IsOnSale);
-      const OnSaleDate = booking.OnSaleDate ? moment(booking.OnSaleDate).format('DD/MM/YY') : '';
+      const OnSale = getBooleanAsString(booking.TicketsOnSale);
+      const OnSaleDate = booking.OnSaleDate ? moment(booking.TicketsOnSaleFromDate).format('DD/MM/YY') : '';
       const MarketingPlan = getBooleanAsString(booking.MarketingPlanReceived);
       const ContactInfo = getBooleanAsString(booking.ContactInfoReceived);
       const PrintReqsReceived = getBooleanAsString(booking.PrintReqsReceived);
-
+      const marketingCostsApprovalDate = booking.MarketingCostsApprovalDate
+        ? moment(booking.MarketingCostsApprovalDate).format('DD/MM/YY')
+        : '';
       worksheet.addRow([
-        ShowCode + ProductionCode,
+        booking.FullProductionCode,
         ShowDate,
         VenueCode,
         VenueName,
@@ -179,6 +225,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         MarketingPlan,
         ContactInfo,
         PrintReqsReceived,
+        marketingCostsStatusToLabelMap[booking.MarketingCostsStatus] || '',
+        marketingCostsApprovalDate,
+        booking.MarketingCostsNotes || '',
       ]);
     });
 
@@ -192,7 +241,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     alignColumn({ worksheet, colAsChar: 'B', align: ALIGNMENT.RIGHT });
 
-    const lastColumn = String.fromCharCode('A'.charCodeAt(0) + numberOfColumns);
+    const lastColumn = String.fromCharCode('A'.charCodeAt(0) + numberOfColumns - 1);
     worksheet.mergeCells(`A1:${lastColumn}1`);
 
     for (let row = 1; row <= 4; row++) {
@@ -220,15 +269,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
-
-    const filename = `Venues_${productionCode || options}.xlsx`;
+    alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
     workbook.xlsx.write(res).then(() => {
       res.end();
     });
   } catch (error) {
+    console.log('Error generated report', error);
     res.status(500).end();
   }
 }

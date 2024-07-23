@@ -68,7 +68,7 @@ const CurrencyConversionModal = ({ conversionRates, onClose, title, visible }: C
 
   return (
     <PopupModal
-      hasOverlay={true}
+      hasOverlay={false}
       titleClass="text-xl text-primary-navy font-bold"
       title={title}
       show={visible}

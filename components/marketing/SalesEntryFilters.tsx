@@ -7,7 +7,7 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
-import { getWeekDayShort , DATE_PATTERN } from 'services/dateService';
+import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
@@ -141,6 +141,10 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
       console.log(error);
     }
   }, [tourWeeks]);
+
+  useEffect(() => {
+    setSelectedValue(bookings.selected);
+  }, [bookings.selected]);
 
   return (
     <div>

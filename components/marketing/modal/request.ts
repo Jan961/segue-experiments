@@ -25,6 +25,7 @@ export const exportSalesSummaryReport = async ({
   productionWeek,
   numberOfWeeks,
   isWeeklyReport = false,
+  isSeatsDataRequired = false,
 }) => {
   const toWeek = productionWeek?.split('T')?.[0];
   const fromWeek = moment(productionWeek)
@@ -32,38 +33,34 @@ export const exportSalesSummaryReport = async ({
     .toISOString()
     ?.split('T')?.[0];
   const payload = {
-    ProductionId: parseInt(production, 10),
+    productionId: parseInt(production, 10),
     fromWeek,
     toWeek,
     isWeeklyReport,
+    isSeatsDataRequired,
   };
+  const response = await axios.post('/api/reports/sales-summary-simple', payload, { responseType: 'blob' });
 
-  try {
-    const response = await axios.post('/api/reports/sales-summary-simple', payload, { responseType: 'blob' });
+  if (response.status >= 200 && response.status < 300) {
+    const productionName = 'Sales Summary';
+    let suggestedName: string | null = null;
 
-    if (response.status >= 200 && response.status < 300) {
-      const productionName = 'Sales Summary';
-      let suggestedName: string | null = null;
-
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
+    const contentDisposition = response.headers['content-disposition'];
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match && match[1]) {
+        suggestedName = match[1];
       }
     }
-  } catch (error) {
-    console.log('Error downloading report', error);
+
+    if (!suggestedName) {
+      suggestedName = `${productionName}.xlsx`;
+    }
+
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
+    }
   }
 };
 
@@ -76,142 +73,125 @@ export const exportPromoterHoldsReport = async ({ production, fromDate, toDate, 
     venue,
   };
 
-  try {
-    const response = await axios.post('/api/reports/promoter-holds', payload, { responseType: 'blob' });
+  const response = await axios.post('/api/reports/promoter-holds', payload, { responseType: 'blob' });
 
-    if (response.status >= 200 && response.status < 300) {
-      const productionName = 'Sales Summary';
-      let suggestedName: string | null = null;
+  if (response.status >= 200 && response.status < 300) {
+    const productionName = 'Sales Summary';
+    let suggestedName: string | null = null;
 
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
+    const contentDisposition = response.headers['content-disposition'];
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match && match[1]) {
+        suggestedName = match[1];
       }
     }
-    return response;
-  } catch (error) {
-    console.log('Error downloading report', error);
-    return error;
+
+    if (!suggestedName) {
+      suggestedName = `${productionName}.xlsx`;
+    }
+
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
+    }
   }
+  return response;
 };
 
 export const exportProductionGrossSales = async ({ production }) => {
   const payload = {
     productionId: parseInt(production, 10),
   };
-  try {
-    const response = await axios.post('/api/reports/gross-sales', payload, { responseType: 'blob' });
+  const response = await axios.post('/api/reports/gross-sales', payload, { responseType: 'blob' });
 
-    if (response.status >= 200 && response.status < 300) {
-      const productionName = 'Gross Sales';
-      let suggestedName: string | null = null;
+  if (response.status >= 200 && response.status < 300) {
+    const productionName = 'Gross Sales';
+    let suggestedName: string | null = null;
 
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
+    const contentDisposition = response.headers['content-disposition'];
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match && match[1]) {
+        suggestedName = match[1];
       }
     }
-    return response;
-  } catch (error) {
-    console.log('Error downloading report', error);
-    return error;
+
+    if (!suggestedName) {
+      suggestedName = `${productionName}.xlsx`;
+    }
+
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
+    }
   }
+  return response;
 };
 
-export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate }) => {
+export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate, status }) => {
   const payload = {
-    ProductionId: parseInt(production, 10),
+    productionId: parseInt(production, 10),
     productionCode,
     venue,
     fromDate,
     toDate,
+    status,
   };
-  try {
-    const response = await axios.post('/api/reports/holds-comps', payload, { responseType: 'blob' });
+  const response = await axios.post('/api/reports/holds-comps', payload, { responseType: 'blob' });
 
-    if (response.status >= 200 && response.status < 300) {
-      const productionName = 'Holds Comps';
-      let suggestedName: string | null = null;
+  if (response.status >= 200 && response.status < 300) {
+    const productionName = 'Holds Comps';
+    let suggestedName: string | null = null;
 
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
+    const contentDisposition = response.headers['content-disposition'];
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match && match[1]) {
+        suggestedName = match[1];
       }
     }
-    return response;
-  } catch (error) {
-    console.log('Error downloading report', error);
-    return error;
+
+    if (!suggestedName) {
+      suggestedName = `${productionName}.xlsx`;
+    }
+
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
+    }
   }
+  return response;
 };
 
-export const exportSelectedVenues = async ({ production, productionCode, showId }) => {
+export const exportSelectedVenues = async ({ production, productionCode, showId, selection }) => {
   const payload = {
     productionId: parseInt(production, 10),
     productionCode,
     showId,
+    selection,
   };
-  try {
-    const response = await axios.post('/api/reports/venues', payload, { responseType: 'blob' });
+  const response = await axios.post('/api/reports/venues', payload, { responseType: 'blob' });
 
-    if (response.status >= 200 && response.status < 300) {
-      const productionName = 'Holds Comps';
-      let suggestedName: string | null = null;
+  if (response.status >= 200 && response.status < 300) {
+    const productionName = 'Holds Comps';
+    let suggestedName: string | null = null;
 
-      const contentDisposition = response.headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
-        if (match && match[1]) {
-          suggestedName = match[1];
-        }
-      }
-
-      if (!suggestedName) {
-        suggestedName = `${productionName}.xlsx`;
-      }
-
-      const content = response.data;
-      if (content) {
-        downloadFromContent(content, suggestedName);
+    const contentDisposition = response.headers['content-disposition'];
+    if (contentDisposition) {
+      const match = contentDisposition.match(/filename="(.+)"/);
+      if (match && match[1]) {
+        suggestedName = match[1];
       }
     }
-  } catch (error) {
-    console.log('Error downloading report', error);
+
+    if (!suggestedName) {
+      suggestedName = `${productionName}.xlsx`;
+    }
+
+    const content = response.data;
+    if (content) {
+      downloadFromContent(content, suggestedName);
+    }
   }
 };

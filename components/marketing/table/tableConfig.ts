@@ -30,7 +30,7 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return formatInputDate(params.data.actDate);
+      return !params.data.actDate ? null : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -92,7 +92,7 @@ export const activityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Due By Date',
     field: 'followUpDt',
     cellRenderer: function (params) {
-      return formatInputDate(params.data.followUpDt);
+      return !params.data.followUpDt ? null : formatInputDate(params.data.followUpDt);
     },
     width: 100,
     hide: true,
@@ -455,7 +455,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return formatInputDate(params.data.actDate);
+      return !params.data.actDate ? '' : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',
@@ -502,7 +502,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
     cellStyle: {
       marginTop: '5px',
     },
-    width: 320,
+    width: 420,
   },
   {
     headerName: 'Due By Date',
@@ -529,7 +529,7 @@ export const globalActivityColDefs = (updateActivity, currencySymbol) => [
         },
       ],
     }),
-    width: 90,
+    width: 20,
     resizable: false,
   },
 ];
@@ -623,7 +623,7 @@ export const globalActivityTabColDefs = (showGlobalActivity, currencySymbol) => 
     headerName: 'Date',
     field: 'actDate',
     cellRenderer: function (params) {
-      return formatInputDate(params.data.actDate);
+      return !params.data.actDate ? null : formatInputDate(params.data.actDate);
     },
     cellStyle: {
       paddingLeft: '8px',

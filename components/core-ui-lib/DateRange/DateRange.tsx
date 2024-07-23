@@ -108,6 +108,7 @@ export default function DateRange({
         </div>
       )}
       <DateInput
+        testId={`${testId}-start-date`}
         ref={fromInputRef}
         inputClass={`!shadow-none ${!errors?.fromError ? '!border-primary-white' : ''}`}
         value={dateRange.from}
@@ -118,6 +119,7 @@ export default function DateRange({
       />
       <span className="mx-1 text-primary-label">to</span>
       <DateInput
+        testId={`${testId}-end-date`}
         ref={toInputRef}
         inputClass={`!shadow-none ${!errors?.toError ? '!border-primary-white' : ''}`}
         value={dateRange.to}

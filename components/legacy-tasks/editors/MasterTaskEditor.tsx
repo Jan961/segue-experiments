@@ -23,7 +23,6 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> = {
   AssignedToUserId: null,
   Priority: 0,
   AccountId: 0,
-  RepeatInterval: '',
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,

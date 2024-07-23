@@ -1,61 +1,96 @@
 import prisma from 'lib/prisma';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req, res) {
   try {
-    const setResult = await prisma.SalesSet.create({
-      data: {
-        SetBookingId: parseInt(req.body.bookingId),
-        SetPerformanceId: null,
-        SetSalesFiguresDate: req.body.salesDate,
-        SetBrochureReleased: false,
-        SetSingleSeats: false,
-        SetNotOnSale: false,
-        SetIsFinalFigures: false,
-        SetIsCopy: false,
-      },
-    });
+    let { bookingId, salesDate, general, schools, setId } = req.body;
+
+    const transactionState = setId === -1 ? 'create' : 'update';
+
+    if (setId === -1) {
+      const setResult = await prisma.SalesSet.create({
+        data: {
+          SetBookingId: parseInt(bookingId),
+          SetPerformanceId: null,
+          SetSalesFiguresDate: salesDate,
+          SetBrochureReleased: false,
+          SetSingleSeats: false,
+          SetNotOnSale: false,
+          SetIsFinalFigures: false,
+          SetIsCopy: false,
+        },
+      });
+
+      setId = setResult.SetId;
+    }
 
     const sales = [];
 
-    if (req.body.general) {
-      sales.push(
-        {
-          SaleSaleTypeId: 1,
-          SaleSeats: req.body.general.seatsSold,
-          SaleValue: req.body.general.seatsSoldVal,
-          SaleSetId: setResult.SetId,
-        },
-        {
-          SaleSaleTypeId: 2,
-          SaleSeats: req.body.general.seatsReserved,
-          SaleValue: req.body.general.seatsReservedVal,
-          SaleSetId: setResult.SetId,
-        },
-      );
+    // only create sales record if SaleSeats or SaleValue are not null
+
+    if (!isNullOrEmpty(general.seatsSold) || !isNullOrEmpty(general.seatsSoldVal)) {
+      sales.push({
+        SaleSaleTypeId: 1,
+        SaleSeats: parseInt(general.seatsSold),
+        SaleValue: parseFloat(general.seatsSoldVal),
+        SaleSetId: setId,
+      });
     }
 
-    if (req.body.schools) {
-      sales.push(
-        {
-          SaleSaleTypeId: 3,
-          SaleSeats: req.body.schools.seatsSold,
-          SaleValue: req.body.schools.seatsSoldVal,
-          SaleSetId: setResult.SetId,
-        },
-        {
-          SaleSaleTypeId: 4,
-          SaleSeats: req.body.schools.seatsReserved,
-          SaleValue: req.body.schools.seatsReservedVal,
-          SaleSetId: setResult.SetId,
-        },
-      );
+    if (!isNullOrEmpty(general.seatsReserved) || !isNullOrEmpty(general.seatsReservedVal)) {
+      sales.push({
+        SaleSaleTypeId: 2,
+        SaleSeats: general.seatsReserved,
+        SaleValue: general.seatsReservedVal,
+        SaleSetId: setId,
+      });
     }
 
-    await prisma.Sale.createMany({
-      data: sales,
-    });
+    if (!isNullOrEmpty(schools.seatsSold) || !isNullOrEmpty(schools.seatsSoldVal)) {
+      sales.push({
+        SaleSaleTypeId: 3,
+        SaleSeats: schools.seatsSold,
+        SaleValue: schools.seatsSoldVal,
+        SaleSetId: setId,
+      });
+    }
 
-    res.status(200).json({ setId: setResult.SetId });
+    if (!isNullOrEmpty(schools.seatsReserved) || !isNullOrEmpty(schools.seatsReservedVal)) {
+      sales.push({
+        SaleSaleTypeId: 4,
+        SaleSeats: schools.seatsReserved,
+        SaleValue: schools.seatsReservedVal,
+        SaleSetId: setId,
+      });
+    }
+
+    if (transactionState === 'create') {
+      await prisma.Sale.createMany({
+        data: sales,
+      });
+    } else if (transactionState === 'update') {
+      const salesUpdates = [];
+
+      // even though only one record should match query, as we don't have the saleID, we need to use updateMany
+      sales.forEach((sale) => {
+        salesUpdates.push(
+          prisma.Sale.updateMany({
+            where: {
+              SaleSetId: sale.SaleSetId,
+              SaleSaleTypeId: sale.SaleSaleTypeId,
+            },
+            data: {
+              SaleSeats: sale.SaleSeats,
+              SaleValue: sale.SaleValue,
+            },
+          }),
+        );
+      });
+
+      await prisma.$transaction(salesUpdates);
+    }
+
+    res.status(200).json({ setId, transaction: transactionState });
   } catch (e) {
     console.error('Error:', e);
     res.status(500).json({ error: e.message });

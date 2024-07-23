@@ -4,7 +4,9 @@ export interface TextInputProps {
   id?: string;
   value?: string;
   disabled?: boolean;
+  defaultDisabled?: boolean;
   className?: string;
+  testId?: string;
   onChange?: (e: any) => void;
   placeholder?: string;
   onClick?: (e: any) => void;
@@ -12,7 +14,21 @@ export interface TextInputProps {
 }
 
 const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
-  ({ id, value = '', className = '', disabled = false, onChange, placeholder = '', onClick, onBlur }, ref) => {
+  (
+    {
+      id,
+      value = '',
+      className = '',
+      disabled = false,
+      defaultDisabled = true,
+      onChange,
+      placeholder = '',
+      onClick,
+      onBlur,
+      testId,
+    },
+    ref,
+  ) => {
     const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
 
     useEffect(() => {
@@ -32,11 +48,14 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextInputProps>(
     };
 
     const baseClass = `block min-w-fit h-[1.9375rem] text-sm shadow-input-shadow text-primary-input-text rounded-md !border-primary-border outline-none focus:ring-2 focus:ring-primary-input-text ring-inset`;
-    const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
+    const disabledClass = disabled
+      ? `${defaultDisabled ? '!bg-disabled-input' : 'disabled-input'} !cursor-not-allowed !pointer-events-none`
+      : '';
 
     return (
       <div className="relative" onClick={onClick}>
         <textarea
+          data-testid={testId || 'core-ui-lib-textarea'}
           ref={(node) => {
             textAreaRef.current = node;
             if (typeof ref === 'function') {

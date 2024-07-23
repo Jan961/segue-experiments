@@ -57,7 +57,6 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & { Progress?: number; DueDate?: 
   AssignedToUserId: null,
   Priority: 0,
   AccountId: 0,
-  RepeatInterval: '',
   StartByWeekNum: 0,
   TaskStartByIsPostProduction: false,
   CompleteByWeekNum: 0,
@@ -159,8 +158,9 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
     setStatus({ ...status, submitted: false });
   };
 
-  const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
-
+  // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
+  // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
+  const repeatInterval = true;
   const handleMasterTask = async () => {
     try {
       omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
@@ -346,7 +346,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary px-2" text="Repeat" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'RepeatInterval', value } })}
-              value={inputs?.RepeatInterval}
+              value={!inputs?.Id}
               className="w-44"
               options={RepeatOptions}
               placeholder="Select..."
@@ -357,7 +357,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-2" text="From" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatFromWeekNum', value } })}
-              value={inputs?.TaskRepeatFromWeekNum}
+              value={!inputs?.Id}
               options={weekOptions}
               className="w-32"
               placeholder="Week No."
@@ -368,7 +368,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false }: AddTaskProps)
             <Label className="!text-secondary pr-2" text="To" />
             <Select
               onChange={(value) => handleOnChange({ target: { id: 'TaskRepeatToWeekNum', value } })}
-              value={inputs?.TaskRepeatToWeekNum}
+              value={!inputs?.Id}
               options={weekOptions}
               disabled={repeatInterval}
               placeholder="Week No."

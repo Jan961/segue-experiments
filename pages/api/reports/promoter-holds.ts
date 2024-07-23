@@ -3,7 +3,9 @@ import ExcelJS from 'exceljs';
 import prisma from 'lib/prisma';
 import moment from 'moment';
 import { NextApiRequest, NextApiResponse } from 'next';
+import { all } from 'radash';
 import { toSql } from 'services/dateService';
+import { getProductionWithContent } from 'services/productionService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
@@ -71,12 +73,16 @@ export const makeRowTextBoldAndAllignLeft = ({
   }
 };
 
+type ProductionDetails = {
+  Show?: {
+    Name?: string;
+  };
+};
+
 // TODO - Issue with Performance Time
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-  let { productionCode, fromDate, toDate, venue, productionId } = req.body || {};
-  fromDate = toSql(fromDate);
-  toDate = toSql(toDate);
+  let { productionCode = '', fromDate, toDate, venue, productionId } = req.body || {};
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
@@ -91,12 +97,18 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     conditions.push(Prisma.sql`VenueCode = ${venue}`);
   }
   if (fromDate && toDate) {
+    fromDate = toSql(fromDate);
+    toDate = toSql(toDate);
     conditions.push(Prisma.sql`PerformanceDate BETWEEN ${fromDate} AND ${toDate}`);
   }
   const where: Prisma.Sql = conditions.length ? Prisma.sql` where ${Prisma.join(conditions, ' and ')}` : Prisma.empty;
-  const data: TPromoter[] = await prisma.$queryRaw`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`;
-  console.table(data);
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const [data, productionDetails] = await all([
+    prisma.$queryRaw<TPromoter[]>`select * FROM PromoterHoldsView ${where} order by PerformanceDate;`,
+    getProductionWithContent(productionId),
+  ]);
+  const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
+  const fileName = `${productionCode} ${showName} Promoter Holds`;
+  const worksheet = workbook.addWorksheet('Promoter Holds', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }],
   });
@@ -123,7 +135,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     'VENUE CONFIRMATION',
   ]);
 
-  data.forEach((x) => {
+  (data as TPromoter[]).forEach((x) => {
     const productionCode = x.FullProductionCode || '';
     const venueCode = x.VenueCode || '';
     const venueName = x.VenueName || '';
@@ -197,11 +209,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
-  const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${
-    fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
-  }.xlsx`;
+  // const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${
+  //   fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
+  // }.xlsx`;
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

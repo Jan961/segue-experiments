@@ -4,23 +4,7 @@ import { getContactNotesByBookingId } from 'services/venueContactsService';
 import { bookingContactNoteMapper } from 'lib/mappers';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-const createHeaderRow = (worksheet: any, text: string, size: number) => {
-  const row = worksheet.addRow([text]);
-  row.height = 30;
-  const cell = row.getCell(1);
-  cell.font = { bold: true, size, color: { argb: COLOR_HEXCODE.WHITE } };
-  cell.fill = {
-    type: 'pattern',
-    pattern: 'solid',
-    fgColor: { argb: '41A29A' },
-  };
-  cell.alignment = { vertical: 'middle', horizontal: 'center' };
-  cell.border = {
-    bottom: { style: 'thin', color: { argb: COLOR_HEXCODE.WHITE } },
-  };
-  worksheet.mergeCells(`A${row.number}:E${row.number}`);
-};
+import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'services/marketing/reports';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId } = req.query || {};
@@ -34,9 +18,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!bookingId || !productionName || !venueAndDate) {
     throw new Error('Required params are missing');
   }
-
+  const { prodCode, showName, venueName } = await getProductionAndVenueDetailsFromBookingId(
+    parseInt(bookingId as string, 10),
+  );
   const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
-
+  const fileName = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contact Notes');
 
@@ -83,7 +69,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename=contact_notes.xlsx');
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
   return workbook.xlsx.write(res).then(() => {
     res.status(200).end();

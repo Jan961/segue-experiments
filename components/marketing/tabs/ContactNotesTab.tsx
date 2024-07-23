@@ -150,7 +150,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   }, [props.bookingId]);
 
   const onExport = async () => {
-    const urlPath = `/api/reports/marketing/contactNotes/${props.bookingId}`;
+    const urlPath = `/api/reports/marketing/contact-notes/${props.bookingId}`;
     const selectedVenue = bookings[0].bookings?.filter((booking) => booking.Id === bookings[0].selected);
     const venueAndDate = selectedVenue[0].Venue.Code + ' ' + selectedVenue[0].Venue.Name;
     const selectedProduction = productions?.filter((production) => production.Id === productionId);
@@ -160,9 +160,8 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       productionName,
       venueAndDate,
     };
-    const downloadContactNotesReport = async () =>
-      await exportExcelReport(urlPath, payload, 'Contact Notes Report.xlsx');
-    notify.promise(downloadContactNotesReport(), {
+
+    notify.promise(exportExcelReport(urlPath, payload), {
       loading: 'Generating contact notes report',
       success: 'Contact notes report downloaded successfully',
       error: 'Error generating contact notes report',

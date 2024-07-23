@@ -51,6 +51,7 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { styleHeader } from './masterplan';
+import { currencyCodeToSymbolMap } from 'config/Reports';
 
 // TODO
 // Decimal upto 2 places fix
@@ -84,7 +85,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         VenueTown,
         VenueName,
         Value,
-        VenueCurrencySymbol,
+        VenueCurrencyCode,
         SetBookingWeekNum,
         SetProductionWeekDate,
         ConversionRate,
@@ -102,7 +103,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         VenueTown,
         VenueName,
         Value: Value?.toNumber?.(),
-        VenueCurrencySymbol,
+        VenueCurrencySymbol: currencyCodeToSymbolMap[VenueCurrencyCode],
         SetBookingWeekNum,
         SetProductionWeekDate,
         ConversionRate,
@@ -130,7 +131,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   }));
 
   // Write data to the worksheet
-  const worksheet = workbook.addWorksheet('My Sales', {
+  const worksheet = workbook.addWorksheet('Sales Summary', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 5 }],
   });
@@ -152,6 +153,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
   // Adding Heading
   const title = salesReportName({ isWeeklyReport, isSeatsDataRequired, data });
+  const { FullProductionCode, ShowName } = data?.[0] || {};
+  const showTitle = `${FullProductionCode || ''} ${ShowName || ''}`;
   worksheet.addRow([title]);
   // worksheet.getCell(1, 1).value = data?.length ? data[0].ShowName + ' (' + data[0].FullProductionCode + ')' : 'Dummy Report'
   worksheet.addRow([]);
@@ -509,6 +512,35 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     makeCellTextBold({ worksheet, row, col: i + 5 });
   }
   row++;
+  // Add empty row
+  worksheet.addRow([]);
+  row++;
+  const WeeklyIncrease = weekWiseGrandTotalInPound.map((value: number, i: number) =>
+    i === 0 ? 0 : value - weekWiseGrandTotalInPound[i - 1],
+  );
+  worksheet.addRow(['', '', '', '', 'Weekly Increase £', ...WeeklyIncrease]);
+  applyFormattingToRange({
+    worksheet,
+    startRow: row,
+    startColumn: worksheet.getColumn(6).letter,
+    endRow: row,
+    endColumn: worksheet.getColumn(6 + weekWiseGrandTotalInPound.length).letter,
+    formatOptions: { numFmt: '£#,##0.00' },
+  });
+  row++;
+  const WeeklyIncreasePercent = weekWiseGrandTotalInPound.map((_: number, i: number) =>
+    i === 0 ? 0 : WeeklyIncrease[i] / weekWiseGrandTotalInPound[i],
+  );
+  worksheet.addRow(['', '', '', '', 'Weekly Increase %', ...WeeklyIncreasePercent]);
+  applyFormattingToRange({
+    worksheet,
+    startRow: row,
+    startColumn: worksheet.getColumn(6).letter,
+    endRow: row,
+    endColumn: worksheet.getColumn(6 + weekWiseGrandTotalInPound.length).letter,
+    formatOptions: { numFmt: '0.00%' },
+  });
+  row++;
 
   makeColumnTextBold({ worksheet, colAsChar: 'A' });
   makeColumnTextBold({ worksheet, colAsChar: 'B' });
@@ -556,7 +588,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${title}.xlsx"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${showTitle} ${title}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

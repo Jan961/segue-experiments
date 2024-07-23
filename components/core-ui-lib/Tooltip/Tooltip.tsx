@@ -11,6 +11,7 @@ export interface TooltipProps {
   bgColorClass?: string;
   txtColorClass?: string;
   disabled?: boolean;
+  testId?: string;
 }
 
 const positionStyle = {
@@ -37,6 +38,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   bgColorClass = 'primary-navy',
   txtColorClass = 'text-white',
   disabled = false,
+  testId = 'core-ui-lib-tooltip',
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
@@ -58,16 +60,28 @@ const Tooltip: React.FC<TooltipProps> = ({
         {children}
       </div>
       {showTooltip && (
-        <div className={classNames('absolute', positionStyle[position])}>
+        <div data-testid={testId} className={classNames('absolute', positionStyle[position])}>
           <div
             className={`z-[10000] relative flex flex-col justify-center p-4 ${txtColorClass} bg-${bgColorClass} rounded-md ${height} ${width} max-w-[300px]`}
           >
             <div className={`${arrowStyle[position]}`} />
             <div className="text-center">
               {title && (
-                <div className="font-bold leading-[1.125] break-words whitespace-normal not-italic">{title}</div>
+                <div
+                  data-testid={`${testId}-title`}
+                  className="font-bold leading-[1.125] break-words whitespace-normal not-italic"
+                >
+                  {title}
+                </div>
               )}
-              {body && <div className="leading-[1.125] break-words whitespace-normal not-italic">{body}</div>}
+              {body && (
+                <div
+                  data-testid={`${testId}-body`}
+                  className="leading-[1.125] break-words whitespace-normal not-italic"
+                >
+                  {body}
+                </div>
+              )}
             </div>
           </div>
         </div>

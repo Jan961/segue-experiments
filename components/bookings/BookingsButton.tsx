@@ -29,7 +29,7 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
   }, [production, ProductionId]);
 
   return (
-    <div className="grid grid-cols-2 grid-rows-2 gap-4">
+    <div className="grid grid-cols-2 grid-rows-2 gap-3 mt-2.5">
       <Tooltip
         body="Please select a current Production"
         position="left"
@@ -37,13 +37,16 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         disabled={!ProductionId ? true : !bookingsDisabled}
       >
         <Button
+          testId="booking-filters-create-new-booking"
           disabled={bookingsDisabled}
           text="Create New Booking"
           className="w-[155px]"
           onClick={() => setAddNewBookingModalVisible({ visible: true, startDate: null, endDate: null })}
         />
       </Tooltip>
+
       <Button
+        testId="booking-filters-booking-reports"
         disabled={disabled}
         text="Booking Reports"
         className="w-[155px]"
@@ -51,12 +54,19 @@ export default function BookingsButtons({ onExportClick }: BookingsButtonProps) 
         sufixIconName="excel"
         onClick={() => setShowBookingReportsModal(true)}
       />
-      <Button onClick={() => setShowVenueHistory(true)} text="Venue History" className="w-[155px]" />
 
       <Button
+        testId="booking-filters-venue-history"
+        onClick={() => setShowVenueHistory(true)}
+        text="Venue History"
+        className="w-[155px] mt-0.5"
+      />
+
+      <Button
+        testId="booking-filters-barring-check"
         disabled={disabled}
         text="Barring Check"
-        className="w-[155px]"
+        className="w-[155px] mt-0.5"
         onClick={() => setShowBarringModal(true)}
       />
 
