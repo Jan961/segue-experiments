@@ -1,7 +1,7 @@
-import { DateInput, Select, TextInput } from 'components/core-ui-lib';
+import { Button, Checkbox, DateInput, Select, TextInput } from 'components/core-ui-lib';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import { AddNewPersonInput } from '../AddNewPersonInputs';
-import { addNewPersonInputData } from '../utils';
+import { addNewPersonInputData, agencyDetailsData, emergecnyContactData, salaryDetailsData } from '../utils';
 import { booleanOptions } from 'config/contracts';
 
 export const ContractNewPersonModal = ({ openNewPersonContract }: { openNewPersonContract: boolean }) => {
@@ -13,7 +13,7 @@ export const ContractNewPersonModal = ({ openNewPersonContract }: { openNewPerso
       // onClose={handleModalCancel}
       // hasOverlay={showSalesSnapshot}
     >
-      <div className="h-[80vh] w-[82vw]">
+      <div className="h-[80vh] w-[82vw] overflow-y-scroll">
         {addNewPersonInputData.map((newPersonData) => {
           return (
             <>
@@ -191,6 +191,73 @@ export const ContractNewPersonModal = ({ openNewPersonContract }: { openNewPerso
             </div>
           );
         })}
+
+        <div className="flex">
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">Emergency Contact 1</div>
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">Emergency Contact 2</div>
+        </div>
+        {emergecnyContactData.map((newPersonData) => {
+          return (
+            <>
+              <AddNewPersonInput newPersonData={newPersonData} />
+            </>
+          );
+        })}
+        <div className="flex">
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">Agency Details</div>
+        </div>
+        {agencyDetailsData.map((newPersonData) => {
+          return (
+            <>
+              <AddNewPersonInput newPersonData={newPersonData} />
+            </>
+          );
+        })}
+        <div className="flex">
+          <div className="text-xl text-primary-navy font-bold w-[50vw]">Salary Details</div>
+        </div>
+
+        <div className="flex">
+          <div className="text-m text-primary-navy font-bold w-[50vw]">Salary</div>
+          <div className="text-m text-primary-navy font-bold w-[50vw]">Expenses</div>
+        </div>
+
+        <div className="flex">
+          <div className="flex w-[50vw]">
+            <div className="text-sm text-primary-navy font-bold">Salary to be Paid to</div>
+
+            <Checkbox
+              className="flex flex-row-reverse mr-2"
+              labelClassName="!text-base"
+              id="includeExcludedVenues"
+              // onChange={(value) => editDemoModalData('DeMoNumFacilitiesLaundry', value.target.value, 'dealMemo')}
+              // checked={formData.DeMoNumFacilitiesLaundry}
+            />
+            <div className="text-primary-input-text font-bold mr-2 ml-6">Agent</div>
+          </div>
+          <div className="flex w-[50vw]">
+            <div className="text-sm text-primary-navy font-bold ">Expenses to be paid to</div>
+            <Checkbox
+              className="flex flex-row-reverse mr-2"
+              labelClassName="!text-base"
+              id="includeExcludedVenues"
+              // onChange={(value) => editDemoModalData('DeMoNumFacilitiesLaundry', value.target.value, 'dealMemo')}
+              // checked={formData.DeMoNumFacilitiesLaundry}
+            />
+            <div className="text-primary-input-text font-bold mr-2 ml-6">Company Member</div>
+          </div>
+        </div>
+        {salaryDetailsData.map((newPersonData) => {
+          return (
+            <>
+              <AddNewPersonInput newPersonData={newPersonData} />
+            </>
+          );
+        })}
+      </div>
+      <div className="w-full mt-4 flex justify-end items-center">
+        <Button className="w-33" variant="secondary" text="Cancel" />
+        <Button className="ml-4 w-33" variant="primary" text="Save and Return to Contracts" />
       </div>
     </PopupModal>
   );
