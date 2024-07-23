@@ -4,6 +4,7 @@ cat /etc/os-release
 # Update yum and install LibreOffice
 yum -y update
 yum -y upgrade
+yum -y update yum
 yum -y install libreoffice
 yum --version
 # Export the path for LibreOffice binaries
