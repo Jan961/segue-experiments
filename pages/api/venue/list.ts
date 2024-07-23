@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import fuseFilter from 'utils/fuseFilter';
-
+import { getFileCardFromFileId } from 'services/fileService';
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { country, town, productionId, searchQuery, limit } = req.body;
   const queryConditions: any = { IsDeleted: false };
@@ -36,6 +36,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: queryConditions,
       include: {
         VenueAddress: true,
+        VenueFile: true,
+
         VenueContact: {
           include: {
             VenueRole: true,
@@ -54,6 +56,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         },
       ],
     });
+
     const tempVenues = venues.map((venue) => {
       return {
         ...venue,
@@ -62,10 +65,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         })?.Town,
       };
     });
-    const filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
+    let filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
     if (filteredVenues.length > 0) {
       const returnLength = filteredVenues.length >= limit ? limit : filteredVenues.length;
-      res.status(200).json(filteredVenues.slice(0, returnLength));
+      filteredVenues = await Promise.all(
+        filteredVenues.slice(0, returnLength).map(async (venue) => {
+          const files = await Promise.all(
+            venue.VenueFile.map(async (file) => {
+              return await getFileCardFromFileId(file.FileId);
+            }),
+          );
+
+          return {
+            ...venue,
+            Files: files,
+          };
+        }),
+      );
+      console.log(filteredVenues);
+      res.status(200).json(filteredVenues);
     } else {
       res.status(200).json([]);
     }

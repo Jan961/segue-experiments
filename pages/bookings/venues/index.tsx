@@ -79,6 +79,7 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
 
   const onSelectVenue = useCallback(
     (venue: UiTransformedVenue) => {
+      console.log(venue);
       setEditVenueContext(venue);
     },
     [setEditVenueContext],
@@ -93,7 +94,6 @@ export default function Index(props: InferGetServerSidePropsType<typeof getServe
     },
     [refreshTable, setEditVenueContext],
   );
-
   return (
     <>
       <Layout title="Venues | Segue" flush>

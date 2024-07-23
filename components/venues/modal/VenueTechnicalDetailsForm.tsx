@@ -68,7 +68,20 @@ const VenueTechnicalDetailsForm = ({
 
       setFileWidgets([...fileWidgets, widget]);
     });
-  }, [fileList]);
+    venue.files.forEach(async (file) => {
+      console.log(file);
+      const response = await fetch(file.FileUrl);
+      const blob = await response.blob();
+
+      const tempFile = new File([blob], file.name, { type: blob.type });
+      const widget: UploadedFile = {
+        size: tempFile.size,
+        name: tempFile.name,
+        imageUrl: file.imageUrl,
+      };
+      setFileWidgets([...fileWidgets, widget]);
+    });
+  }, [fileList, venue]);
   // docs,spreadsheets
   // 10mb
 
@@ -88,6 +101,7 @@ const VenueTechnicalDetailsForm = ({
           isMultiple={true}
           maxFiles={20}
           maxFileSize={10240 * 1024}
+          onChange={(selectedFiles) => console.log(selectedFiles)}
         />
       )}
       <div className="flex flex-row  justify-between">

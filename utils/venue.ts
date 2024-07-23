@@ -74,6 +74,7 @@ export interface UiVenue {
   what3WordsStage?: string;
   what3WordsLoading?: string;
   barredVenues?: UiBarredVenue[];
+  files?: any;
 }
 
 export const transformVenueContacts = (contacts?: VenueContact & { VenueRole: VenueRole }): UiVenueContact => {
@@ -128,6 +129,7 @@ export const transformVenues = (
     VenueAddress: VenueAddress[];
     VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: VenueBarredVenue[];
     VenueContact: (VenueContact & { VenueRole: VenueRole })[];
+    Files: any[];
   })[],
 ): UiTransformedVenue[] => {
   return Venues.map(
@@ -162,6 +164,7 @@ export const transformVenues = (
       AddressLoadingW3W,
       VenueBarredVenue_VenueBarredVenue_VBVVenueIdToVenue: BarredVenues,
       VenueContact,
+      Files,
     }) => {
       const address1 = trasformVenueAddress(VenueAddress?.[0]) || {};
       const address2 = trasformVenueAddress(VenueAddress?.[1]) || {};
@@ -202,6 +205,7 @@ export const transformVenues = (
         ...address1,
         ...address2,
         venueContacts,
+        files: Files,
       };
     },
   );

@@ -18,7 +18,6 @@ import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/Confirmat
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 
-//  import { getFileUrl } from 'lib/s3';
 interface AddEditVenueModalProps {
   visible: boolean;
   venueFamilyOptionList: SelectOption[];
