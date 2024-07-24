@@ -94,6 +94,25 @@ export type ProductionTaskDTO = {
   ProductionTaskRepeat?: any;
 };
 
+export type MasterTaskDTO = {
+  TaskName?: any;
+  Id?: number;
+  Code?: number;
+  Name: string;
+  Priority?: number;
+  Notes?: string;
+  DueDate?: string;
+  FollowUp?: string;
+  CreatedDate?: string;
+  Status?: string;
+  AssignedBy?: string;
+  AssignedTo?: string;
+  StartByWeekNum?: number;
+  CompleteByWeekNum?: number;
+  AssignedToUserId?: number;
+  MasterTaskRepeat?: any;
+};
+
 // Existing Production interface for old schema. Remove eventually
 export type Production = {
   ProductionId: number;

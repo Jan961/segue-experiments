@@ -35,6 +35,17 @@ export const getMaxProductionTaskCode = async (prodId: number) => {
   });
 };
 
+export const getMaxMasterTaskCode = async () => {
+  return await prisma.MasterTask.findFirst({
+    orderBy: {
+      Code: 'desc',
+    },
+    select: {
+      Code: true,
+    },
+  });
+};
+
 export const generateRecurringTasks = async (requestBody, prodBlock, prodStartDate, PRTId) => {
   const {
     Name,

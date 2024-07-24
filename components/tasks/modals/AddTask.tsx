@@ -272,30 +272,36 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
   // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
   const handleMasterTask = async () => {
-    try {
-      omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
-      if (inputs.Id) {
-        await axios.post('/api/tasks/master/update', inputs);
+    omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
+    if (inputs.Id) {
+      try {
+        await axios.post(`/api/tasks/master/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
         setLoading(false);
-        onClose();
-        setInputs(DEFAULT_MASTER_TASK);
-      } else {
-        const endpoint = '/api/tasks/master/create';
+        handleClose();
+      } catch (error) {
+        setLoading(false);
+      }
+    } else {
+      try {
+        console.log(inputs);
+        const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
         await axios.post(endpoint, inputs);
         setLoading(false);
+        if (isChecked) {
+          await handleMasterTask();
+        }
         onClose();
-        setInputs(DEFAULT_MASTER_TASK);
+      } catch (error) {
+        setLoading(false);
+        console.error(error);
       }
-    } catch (error) {
-      setLoading(false);
-      onClose();
-      setInputs(DEFAULT_MASTER_TASK);
     }
   };
 
   const handleOnSubmit = async () => {
     setLoading(false);
     if (isMasterTask) {
+      console.log('Is master task');
       await handleMasterTask();
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
