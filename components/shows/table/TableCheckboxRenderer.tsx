@@ -1,4 +1,5 @@
 import { ICellRendererParams } from 'ag-grid-community';
+import classNames from 'classnames';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import CheckboxRenderer from 'components/core-ui-lib/Table/renderers/CheckboxRenderer';
 import { useEffect, useState } from 'react';
@@ -35,6 +36,7 @@ const TableCheckboxRenderer = ({
 
   return (
     <CheckboxRenderer
+      className={classNames({ 'opacity-30': disabled })}
       disabled={disabled}
       eGridCell={eGridCell}
       checked={perfChecked}

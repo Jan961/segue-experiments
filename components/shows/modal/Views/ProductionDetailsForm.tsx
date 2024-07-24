@@ -59,7 +59,7 @@ export const defaultProductionFormData: ProductionFormData = {
   prodCode: null,
   imageUrl: '',
   image: null,
-  runningTime: '',
+  runningTime: null,
   runningTimeNote: '',
 };
 const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: ProductionsViewModalProps) => {
@@ -68,7 +68,10 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
   const [formData, setFormData] = useState(production || defaultProductionFormData);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  const currencyListOptions = useMemo(() => transformToOptions(currencyList, 'code', 'code'), [currencyList]);
+  const currencyListOptions = useMemo(
+    () => transformToOptions(currencyList, null, 'code', ({ code, name }) => `${code} | ${name}`),
+    [currencyList],
+  );
   const productionCompanyOptions = useMemo(
     () => transformToOptions(productionCompanyList, 'name', 'id'),
     [productionCompanyList],
@@ -167,7 +170,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               onClick={() => setIsUploadOpen(true)}
             >
               {imageUrl ? (
-                <img className="h-full w-full pb-2" src={imageUrl} />
+                <img className="h-full w-full" src={imageUrl} />
               ) : (
                 <Icon iconName="camera-solid" variant="2xl" />
               )}
@@ -178,7 +181,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               <Label required text="Prod Code" />
               <TextInput
                 id="prodcode"
-                className="w-[60px] placeholder-primary"
+                className="w-[100px] placeholder-primary"
                 type="string"
                 onChange={(e) => onChange('prodCode', e.target.value)}
                 value={prodCode}
@@ -263,7 +266,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
           <div className="flex items-center gap-7">
             <Label required text="Currency for Reports" />
             <Select
-              className="w-64"
+              className="flex-1"
               onChange={(value) => onChange('currency', value as string)}
               options={currencyListOptions}
               value={currency}

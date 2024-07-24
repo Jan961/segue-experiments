@@ -27,6 +27,11 @@ export default async function handle(req, res) {
     const data =
       await prisma.$queryRaw`select SaleTypeName, Seats, Value, SetSalesFiguresDate, SetProductionWeekDate, SetId from SalesView where BookingId = ${bookingId}`;
 
+    if (data.length === 0) {
+      res.status(200).json({});
+      return;
+    }
+
     // if sale date is null, final sales entry is making the request, set the sales date to the last date entry
     if (req.body.salesDate === null) {
       const sortedData = data.sort(

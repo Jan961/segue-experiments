@@ -17,7 +17,6 @@ import classNames from 'classnames';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
-import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { exportExcelReport } from 'components/bookings/modal/request';
@@ -433,7 +432,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   useEffect(() => {
-    if (!isNullOrEmpty(props.bookingId)) {
+    if (props.bookingId) {
       setBookingIdVal(props.bookingId);
       getActivities(props.bookingId.toString());
 

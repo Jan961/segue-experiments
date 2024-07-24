@@ -7,6 +7,7 @@ import WindowedSelect, {
   IndicatorsContainerProps,
   MultiValueProps,
   ActionMeta,
+  MenuPlacement,
 } from 'react-windowed-select';
 import { WithTestId } from 'types';
 import Icon from '../Icon';
@@ -43,6 +44,7 @@ export interface SelectProps extends WithTestId {
   isMulti?: boolean;
   closeMenuOnSelect?: boolean;
   onBlur?: () => void;
+  menuPlacement?: MenuPlacement;
 }
 
 const Option = (props: OptionProps & { testId?: string }) => {
@@ -94,6 +96,7 @@ export default forwardRef(function Select(
     closeMenuOnSelect = true,
     variant = 'colored',
     onBlur,
+    menuPlacement = 'bottom',
   }: SelectProps,
   ref,
 ) {
@@ -268,6 +271,7 @@ export default forwardRef(function Select(
           isMulti={isMulti}
           hideSelectedOptions={false}
           onBlur={onBlur}
+          menuPlacement={menuPlacement}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
               return true;
