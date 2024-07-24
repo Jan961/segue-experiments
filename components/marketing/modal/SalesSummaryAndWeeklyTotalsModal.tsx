@@ -25,7 +25,7 @@ const defaultFormData = {
   production: null,
   productionWeek: null,
   numberOfWeeks: 2,
-  order: null,
+  order: 'date',
   productionStartDate: null,
   productionEndDate: null,
 };
@@ -42,8 +42,8 @@ const getModalTitle = (activeModal: string): string => {
 };
 
 const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummaryReportModalProps) => {
-  const productionJump = useRecoilValue(productionJumpState);
-  const [formData, setFormData] = useState(defaultFormData);
+  const { selected, productions } = useRecoilValue(productionJumpState);
+  const [formData, setFormData] = useState({ ...defaultFormData, production: selected });
   const [loading, setLoading] = useState(false);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
@@ -80,11 +80,11 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
 
   const productionsOptions = useMemo(
     () =>
-      productionJump.productions.map((production) => ({
+      productions.map((production) => ({
         text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
         value: production.Id,
       })),
-    [productionJump],
+    [productions],
   );
 
   const onChange = useCallback(
