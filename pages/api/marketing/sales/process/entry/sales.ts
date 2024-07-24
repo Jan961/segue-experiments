@@ -1,13 +1,5 @@
 import prisma from 'lib/prisma';
 
-const isValidNumber = (value) => {
-  if (typeof value === 'number') {
-    return true;
-  } else {
-    return false;
-  }
-};
-
 export default async function handle(req, res) {
   try {
     let { bookingId, salesDate, general, schools, setId } = req.body;
@@ -35,7 +27,7 @@ export default async function handle(req, res) {
 
     // only create sales record if SaleSeats or SaleValue are not null
 
-    if (isValidNumber(general.seatsSold) || isValidNumber(general.seatsSoldVal)) {
+    if (!isNaN(general.seatsSold) || !isNaN(general.seatsSoldVal)) {
       sales.push({
         SaleSaleTypeId: 1,
         SaleSeats: parseInt(general.seatsSold),
@@ -44,7 +36,7 @@ export default async function handle(req, res) {
       });
     }
 
-    if (isValidNumber(general.seatsReserved) || isValidNumber(general.seatsReservedVal)) {
+    if (!isNaN(general.seatsReserved) || !isNaN(general.seatsReservedVal)) {
       sales.push({
         SaleSaleTypeId: 2,
         SaleSeats: general.seatsReserved,
@@ -53,7 +45,7 @@ export default async function handle(req, res) {
       });
     }
 
-    if (isValidNumber(schools.seatsSold) || isValidNumber(schools.seatsSoldVal)) {
+    if (!isNaN(schools.seatsSold) || !isNaN(schools.seatsSoldVal)) {
       sales.push({
         SaleSaleTypeId: 3,
         SaleSeats: schools.seatsSold,
@@ -62,7 +54,7 @@ export default async function handle(req, res) {
       });
     }
 
-    if (isValidNumber(schools.seatsReserved) || isValidNumber(schools.seatsReservedVal)) {
+    if (!isNaN(schools.seatsReserved) || !isNaN(schools.seatsReservedVal)) {
       sales.push({
         SaleSaleTypeId: 4,
         SaleSeats: schools.seatsReserved,
