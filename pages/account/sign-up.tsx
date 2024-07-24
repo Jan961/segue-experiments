@@ -88,10 +88,13 @@ const NewAccount = ({ plans }: { stripeOptions: any; plans: Plan[] }) => {
           onChange={setAccountDetails}
           onSave={handleSaveAccountDetails}
         />
-        <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />
-        <Elements stripe={stripe}>
-          <PaymentDetailsForm accountDetails={accountDetails} plan={subcriptionDetails} />
-        </Elements>
+        {/* Subscription plans and Payment details have been temporarily disabled */}
+        {false && <SubscriptionPlans plans={plans} onSubmit={seSubscriptionDetails} />}
+        {false && (
+          <Elements stripe={stripe}>
+            <PaymentDetailsForm accountDetails={accountDetails} plan={subcriptionDetails} />
+          </Elements>
+        )}
         <AccountConfirmation />
       </Wizard>
     </div>
