@@ -32,9 +32,6 @@ interface AccountDetailsFormProps {
 const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
-  /* const isValidEmail = useMemo(() => {
-    return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(accountDetails.email);
-  }, [accountDetails.email]); */
 
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
