@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS='--max-http-header-size=24576' node server.js next dev",
     "db-pull": "prisma db pull",
-    "build": "npm run install-libreoffice && next build",
+    "build": "next build",
     "start": "next start",
     "cp-start": "NODE_ENV=production node server.js",
     "test": "jest --config jest.config.js --no-cache",
