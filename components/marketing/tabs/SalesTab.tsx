@@ -56,21 +56,17 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
     }
   }, [props.bookingId]);
 
-  return (
-    <>
-      {dataAvailable && (
-        <div>
-          {isLoading ? (
-            <div className="mt-[150px] text-center">
-              <Spinner size="lg" className="mr-3" />
-            </div>
-          ) : (
-            <div>{salesTable}</div>
-          )}
+  if (dataAvailable) {
+    if (isLoading) {
+      return (
+        <div className="mt-[150px] text-center">
+          <Spinner size="lg" className="mr-3" />
         </div>
-      )}
-    </>
-  );
+      );
+    } else {
+      return <div>{salesTable}</div>;
+    }
+  }
 });
 
 SalesTab.displayName = 'SalesTab';

@@ -184,69 +184,67 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
     }
   }, [props.bookingId]);
 
-  return (
-    <>
-      {dataAvailable && (
-        <div>
-          {isLoading ? (
-            <div className="mt-[150px] text-center">
-              <Spinner size="lg" className="mr-3" />
-            </div>
-          ) : (
-            <div>
-              <div className="flex flex-row justify-between items-center mb-4">
-                <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
-                <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Venue')} />
-              </div>
-
-              <div className="mb-5">
-                <Table
-                  columnDefs={attachmentsColDefs}
-                  rowData={venueAttachRows}
-                  styleProps={styleProps}
-                  tableHeight={250}
-                  onCellClicked={(e) => handleCellClicked(e)}
-                  onCellValueChange={handleCellValueChange}
-                />
-              </div>
-
-              <div className="flex flex-row justify-between items-center mb-4">
-                <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
-                <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Production')} />
-              </div>
-
-              <Table
-                columnDefs={attachmentsColDefs}
-                rowData={prodAttachRows}
-                styleProps={styleProps}
-                tableHeight={250}
-                onCellClicked={(e) => handleCellClicked(e)}
-                onCellValueChange={handleCellValueChange}
-              />
-
-              <UploadModal
-                visible={showUploadModal}
-                title={attachType + ' Attachment'}
-                info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
-                allowedFormats={attachmentMimeTypes.marketing}
-                onClose={() => setShowUploadModal(false)}
-                maxFileSize={5120 * 1024} // 5MB
-                onSave={onSave}
-              />
-
-              <ConfirmationDialog
-                variant="delete"
-                show={showConfirm}
-                onYesClick={() => deleteAttachment(attachRow, attachIndex)}
-                onNoClick={() => setShowConfirm(false)}
-                hasOverlay={false}
-              />
-            </div>
-          )}
+  if (dataAvailable) {
+    if (isLoading) {
+      return (
+        <div className="mt-[150px] text-center">
+          <Spinner size="lg" className="mr-3" />
         </div>
-      )}
-    </>
-  );
+      );
+    } else {
+      return (
+        <div>
+          <div className="flex flex-row justify-between items-center mb-4">
+            <div className="text-xl text-primary-navy font-bold">Venue Attachments</div>
+            <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Venue')} />
+          </div>
+
+          <div className="mb-5">
+            <Table
+              columnDefs={attachmentsColDefs}
+              rowData={venueAttachRows}
+              styleProps={styleProps}
+              tableHeight={250}
+              onCellClicked={(e) => handleCellClicked(e)}
+              onCellValueChange={handleCellValueChange}
+            />
+          </div>
+
+          <div className="flex flex-row justify-between items-center mb-4">
+            <div className="text-xl text-primary-navy font-bold">Production Attachments</div>
+            <Button text="Upload New File" className="w-[160px]" onClick={() => toggleUploadModal('Production')} />
+          </div>
+
+          <Table
+            columnDefs={attachmentsColDefs}
+            rowData={prodAttachRows}
+            styleProps={styleProps}
+            tableHeight={250}
+            onCellClicked={(e) => handleCellClicked(e)}
+            onCellValueChange={handleCellValueChange}
+          />
+
+          <UploadModal
+            visible={showUploadModal}
+            title={attachType + ' Attachment'}
+            info="Please upload your file by dragging it into the grey box below or by clicking the upload cloud."
+            allowedFormats={attachmentMimeTypes.marketing}
+            onClose={() => setShowUploadModal(false)}
+            maxFileSize={5120 * 1024} // 5MB
+            onSave={onSave}
+          />
+
+          <ConfirmationDialog
+            variant="delete"
+            show={showConfirm}
+            onYesClick={() => deleteAttachment(attachRow, attachIndex)}
+            onNoClick={() => setShowConfirm(false)}
+            hasOverlay={false}
+          />
+        </div>
+      );
+    }
+  }
 });
 
 AttachmentsTab.displayName = 'AttachmentsTab';

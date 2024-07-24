@@ -168,56 +168,54 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
     });
   };
 
-  return (
-    <>
-      {dataAvailable && (
-        <div>
-          <div className="flex justify-end">
-            <div className="flex flex-row items-center justify-between pb-5 gap-4">
-              <Button
-                text="Contact Notes Report"
-                className="w-[203px]"
-                disabled={!productionId}
-                iconProps={{ className: 'h-4 w-3' }}
-                sufixIconName="excel"
-                onClick={() => onExport()}
-              />
-              <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+  if (dataAvailable) {
+    return (
+      <div>
+        <div className="flex justify-end">
+          <div className="flex flex-row items-center justify-between pb-5 gap-4">
+            <Button
+              text="Contact Notes Report"
+              className="w-[203px]"
+              disabled={!productionId}
+              iconProps={{ className: 'h-4 w-3' }}
+              sufixIconName="excel"
+              onClick={() => onExport()}
+            />
+            <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+          </div>
+        </div>
+
+        {isLoading ? (
+          <div className="mt-[150px] text-center">
+            <Spinner size="lg" className="mr-3" />
+          </div>
+        ) : (
+          <div className="flex flex-row">
+            <div className="w-[1086px] h-[500px]">
+              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
             </div>
           </div>
+        )}
 
-          {isLoading ? (
-            <div className="mt-[150px] text-center">
-              <Spinner size="lg" className="mr-3" />
-            </div>
-          ) : (
-            <div className="flex flex-row">
-              <div className="w-[1086px] h-[500px]">
-                <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
-              </div>
-            </div>
-          )}
+        <ContactNoteModal
+          show={showContactNoteModal}
+          onCancel={() => setShowContactNoteModal(false)}
+          variant={contactModalVariant}
+          data={contactNoteRow}
+          onSave={(variant, data) => saveContactNote(variant, data)}
+          bookingId={bookingIdVal}
+        />
 
-          <ContactNoteModal
-            show={showContactNoteModal}
-            onCancel={() => setShowContactNoteModal(false)}
-            variant={contactModalVariant}
-            data={contactNoteRow}
-            onSave={(variant, data) => saveContactNote(variant, data)}
-            bookingId={bookingIdVal}
-          />
-
-          <ConfirmationDialog
-            variant="delete"
-            show={showConfirm}
-            onYesClick={() => saveContactNote('delete', contactNoteRow)}
-            onNoClick={() => setShowConfirm(false)}
-            hasOverlay={false}
-          />
-        </div>
-      )}
-    </>
-  );
+        <ConfirmationDialog
+          variant="delete"
+          show={showConfirm}
+          onYesClick={() => saveContactNote('delete', contactNoteRow)}
+          onNoClick={() => setShowConfirm(false)}
+          hasOverlay={false}
+        />
+      </div>
+    );
+  }
 });
 
 ContactNotesTab.displayName = 'ContactNotesTab';

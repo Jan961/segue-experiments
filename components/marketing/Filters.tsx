@@ -11,14 +11,18 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import MarketingButtons from './MarketingButtons';
 import formatInputDate from 'utils/dateInputFormat';
 import { reverseDate } from './utils';
-import { getWeekDayShort } from 'services/dateService';
-import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
+import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
   nextBooking: any;
+};
+
+type LastPerfDate = {
+  BookingId: number;
+  LastPerformanaceDate: string;
 };
 
 const Filters = () => {
@@ -34,34 +38,29 @@ const Filters = () => {
   const [landingURL, setLandingURL] = useState('');
   const [futureBookings, setFutureBookings] = useState<FutureBooking>({ hasFutureBooking: false, nextBooking: null });
   const [lastDates, setLastDates] = useState([]);
-  const datePattern = /(\d{2}\/\d{2}\/\d{2})/;
 
   const bookingOptions = useMemo(() => {
-    try {
-      const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
-      const optWithRun = initialOptions.map((option) => {
-        const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
-        if (lastDate !== undefined) {
-          const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
-          const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
-          if (option.date === endDateStr) {
-            return option;
-          } else {
-            return {
-              ...option,
-              text: option.text.replace(datePattern, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
-            };
-          }
-        } else {
+    const initialOptions = bookings.bookings ? mapBookingsToProductionOptions(bookings.bookings) : [];
+    const optWithRun = initialOptions.map((option) => {
+      const lastDate = lastDates?.find((x) => x.BookingId === parseInt(option.value));
+      if (lastDate !== undefined) {
+        const endDateDay = getWeekDayShort(lastDate.LastPerformanceDate);
+        const endDateStr = formatInputDate(lastDate.LastPerformanceDate);
+        if (option.date === endDateStr) {
           return option;
+        } else {
+          return {
+            ...option,
+            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+          };
         }
-      });
+      } else {
+        return option;
+      }
+    });
 
-      optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return optWithRun;
-    } catch (error) {
-      console.log(error);
-    }
+    optWithRun.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return optWithRun;
   }, [bookings.bookings, lastDates]);
 
   const getCurrency = async (bookingId) => {
@@ -138,19 +137,16 @@ const Filters = () => {
 
   useEffect(() => {
     const futureBookings = bookingOptions?.filter((booking) => {
-      try {
-        const reversedBookingDate = reverseDate(booking.date);
-        const reversedTodayDate = reverseDate(today);
+      const reversedBookingDate = reverseDate(booking.date);
+      const reversedTodayDate = reverseDate(today);
 
-        if (reversedBookingDate !== '' && reversedTodayDate !== '') {
-          return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
-        } else {
-          return false;
-        }
-      } catch (error) {
+      if (reversedBookingDate !== '' && reversedTodayDate !== '') {
+        return reversedBookingDate.getTime() >= reversedTodayDate.getTime();
+      } else {
         return false;
       }
     });
+
     setFutureBookings({
       hasFutureBooking: futureBookings?.length > 0,
       nextBooking: futureBookings?.length > 0 ? futureBookings[0] : null,

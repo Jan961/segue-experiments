@@ -1,4 +1,4 @@
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { venueRoleState } from 'state/marketing/venueRoleState';
 import VenueContactForm from 'components/venues/modal/VenueContactsForm';
@@ -18,7 +18,7 @@ export interface VenueContactTabRef {
 }
 
 const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((props, ref) => {
-  const bookings = useRecoilState(bookingJumpState);
+  const bookings = useRecoilValue(bookingJumpState);
   const [venueRoles, setVenueRoles] = useRecoilState(venueRoleState);
   const [venueContacts, setVenueContacts] = useState([]);
   const [selectedVenue, setSelectedVenue] = useState(null);
@@ -38,7 +38,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
   const saveVenueContact = async (inputData, mode, updatedFormData) => {
     const data = { ...inputData, mode, updatedFormData };
-    const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
+    const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
     const variant = data.mode;
 
     // create venue contact
@@ -158,36 +158,36 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
   useEffect(() => {
     if (props.bookingId !== undefined && props.bookingId !== null) {
-      const booking = bookings[0].bookings.find((booking) => booking.Id === props.bookingId);
+      const booking = bookings.bookings.find((booking) => booking.Id === props.bookingId);
       setSelectedVenue(booking.Venue);
       getVenueContacts(booking.VenueId.toString());
     }
   }, [props.bookingId]);
 
-  return (
-    <div>
-      {dataAvailable && (
-        <div>
-          {isLoading ? (
-            <div className="mt-[150px] text-center">
-              <Spinner size="lg" className="mr-3" />
-            </div>
-          ) : (
-            <VenueContactForm
-              venueRoleOptionList={venueStandardRoleList}
-              venue={selectedVenue}
-              contactsList={venueContacts}
-              onChange={(newData, mode, updatedRow) => saveVenueContact(newData, mode, updatedRow)}
-              tableStyleProps={styleProps}
-              tableHeight={585}
-              title=""
-              module="marketing"
-            />
-          )}
+  if (dataAvailable) {
+    if (isLoading) {
+      return (
+        <div className="mt-[150px] text-center">
+          <Spinner size="lg" className="mr-3" />
         </div>
-      )}
-    </div>
-  );
+      );
+    } else {
+      return (
+        <div>
+          <VenueContactForm
+            venueRoleOptionList={venueStandardRoleList}
+            venue={selectedVenue}
+            contactsList={venueContacts}
+            onChange={(newData, mode, updatedRow) => saveVenueContact(newData, mode, updatedRow)}
+            tableStyleProps={styleProps}
+            tableHeight={585}
+            title=""
+            module="marketing"
+          />
+        </div>
+      );
+    }
+  }
 });
 
 VenueContactsTab.displayName = 'VenueContactsTab';
