@@ -1,11 +1,11 @@
 import ExcelJS from 'exceljs';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getPerformanceCompAllocationsByBookingId } from 'pages/api/marketing/promoterHolds/[BookingId]';
 import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'services/marketing/reports';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { objectify } from 'radash';
+import { getPerformanceCompAllocationsByBookingId } from 'services/marketing/promoterHoldsService';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -59,7 +59,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       cell.alignment = { horizontal: 'center', wrapText: true };
     }
   });
-  console.table(data);
   data.forEach(
     ({
       date,
