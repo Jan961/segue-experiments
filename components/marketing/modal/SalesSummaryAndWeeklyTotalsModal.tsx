@@ -24,7 +24,7 @@ const defaultFormData = {
   production: null,
   productionWeek: null,
   numberOfWeeks: 2,
-  order: null,
+  order: 'date',
   productionStartDate: null,
   productionEndDate: null,
 };
@@ -41,8 +41,8 @@ const getModalTitle = (activeModal: string): string => {
 };
 
 const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummaryReportModalProps) => {
-  const productionJump = useRecoilValue(productionJumpState);
-  const [formData, setFormData] = useState(defaultFormData);
+  const { selected, productions } = useRecoilValue(productionJumpState);
+  const [formData, setFormData] = useState({ ...defaultFormData, production: selected });
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
   const updateProductionWeek = useCallback(() => {
@@ -80,11 +80,11 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
 
   const productionsOptions = useMemo(
     () =>
-      productionJump.productions.map((production) => ({
+      productions.map((production) => ({
         text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
         value: production.Id,
       })),
-    [productionJump],
+    [productions],
   );
 
   const onChange = useCallback(
@@ -102,8 +102,8 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
         ...(activeModal === 'salesVsCapacity' && { isSeatsDataRequired: true }),
       }).then(() => onClose()),
       {
-        loading: `'Generating ${title}`,
-        success: `${title}downloaded successfully`,
+        loading: `'Generating ${title}...`,
+        success: `${title} downloaded successfully`,
         error: `Error generating ${title}`,
       },
     );
@@ -141,6 +141,7 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
               onChange={(value) => onChange('numberOfWeeks', value as number)}
               options={weekOptions}
               value={numberOfWeeks}
+              isSearchable
             />
           </div>
         </div>
