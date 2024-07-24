@@ -17,7 +17,7 @@ import VenueContactForm from './VenueContactsForm';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
-import { isNullOrEmpty } from '../../../utils';
+import { isNullOrEmpty } from 'utils';
 
 interface AddEditVenueModalProps {
   visible: boolean;

@@ -32,12 +32,10 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     The itinery or miles will be different however, as this relies on the preview booking, and has to be generateed programatically
   */
-  console.log('im heres');
+
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'bookings', AccountId);
-  console.log(productionJump);
   const ProductionId = productionJump.selected;
-  console.log(ProductionId);
   // See _app.tsx for how this is picked up
   const initialState: InitialState = {
     global: {

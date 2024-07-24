@@ -30,7 +30,7 @@ const VenueTechnicalDetailsForm = ({
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
   const [uploadVisible, setUploadVisible] = useState<boolean>(false);
-
+  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
   useEffect(() => {
     const loadWidgets = async () => {
       await makeWidgets();
@@ -65,7 +65,6 @@ const VenueTechnicalDetailsForm = ({
   const makeWidgets = async () => {
     const newFileWidgets = [];
     fileList.forEach((file) => {
-      console.log(file);
       const tempFile = file.get('file');
       if (tempFile?.size && tempFile.name) {
         const widget: UploadedFile = {
@@ -79,7 +78,6 @@ const VenueTechnicalDetailsForm = ({
     });
 
     for (const file of venue.files) {
-      console.log(file);
       const response = await fetch(file.FileUrl);
       const blob = await response.blob();
       const tempFile = new File([blob], file.name, { type: blob.type });
@@ -95,9 +93,6 @@ const VenueTechnicalDetailsForm = ({
 
     setFileWidgets(newFileWidgets);
   };
-
-  const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
-  const buttonText = fileWidgets.length > 0 ? 'View/ Edit Tech Specs' : 'Upload Tech Specs';
 
   return (
     <>
@@ -151,7 +146,7 @@ const VenueTechnicalDetailsForm = ({
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
         <Button
-          text={buttonText}
+          text={fileWidgets.length > 0 ? 'View/ Edit Tech Specs' : 'Upload Tech Specs'}
           onClick={async () => {
             setFileWidgets([]);
             await makeWidgets();

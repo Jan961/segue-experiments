@@ -2,6 +2,8 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import fuseFilter from 'utils/fuseFilter';
 import { getFileCardFromFileId } from 'services/fileService';
+import { omit } from 'radash';
+
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const { country, town, productionId, searchQuery, limit } = req.body;
   const queryConditions: any = { IsDeleted: false };
@@ -37,7 +39,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       include: {
         VenueAddress: true,
         VenueFile: true,
-
         VenueContact: {
           include: {
             VenueRole: true,
@@ -66,6 +67,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       };
     });
     let filteredVenues = fuseFilter(tempVenues, searchQuery, ['Name', 'Code', 'Town']);
+
     if (filteredVenues.length > 0) {
       const returnLength = filteredVenues.length >= limit ? limit : filteredVenues.length;
       filteredVenues = await Promise.all(
@@ -75,7 +77,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               return await getFileCardFromFileId(file.FileId);
             }),
           );
-
+          venue = omit(venue, ['VenueFile']);
           return {
             ...venue,
             Files: files,

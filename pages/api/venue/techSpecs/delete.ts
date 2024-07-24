@@ -1,6 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -16,12 +17,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: { FileId: fileId, Type: 'Tech Specs' },
       select: { Id: true },
     });
-
-    await prisma.VenueFile.delete({
-      where: { FileId: fileId, Id: venueFileObj.Id },
-    });
-    res.status(200).json({});
+    if (!isNullOrEmpty(venueFileObj)) {
+      await prisma.VenueFile.delete({
+        where: { FileId: fileId, Id: venueFileObj.Id },
+      });
+      res.status(200).json({});
+    } else {
+      res.status(400).json('File was already deleted.');
+    }
   } catch (exception) {
     console.log(exception);
+    res.status(400).json('Failed to delete file.');
   }
 }
