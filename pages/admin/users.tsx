@@ -1,7 +1,7 @@
+import axios from 'axios';
 import { permissionGroupColDef, styleProps, usersColDef } from 'components/admin/tableConfig';
 import { Button, Table } from 'components/core-ui-lib';
 import Layout from 'components/Layout';
-import useAxios from 'hooks/useAxios';
 import { useEffect, useState } from 'react';
 
 export default function Users() {
@@ -11,8 +11,6 @@ export default function Users() {
   const [fullLicencesUsed, setFullLicencesUsed] = useState(0);
   const [touringLicences, setTouringLicences] = useState(0);
   const [touringLicencesUsed, setTouringLicencesUsed] = useState(0);
-
-  const { fetchData } = useAxios();
 
   const toggleUserModal = (type, data) => {
     console.log('table data: ', type, data);
@@ -30,25 +28,26 @@ export default function Users() {
   };
 
   const populateUserTable = async () => {
-    const users = await fetchData({
-      url: '/api/admin/users/read',
-      method: 'GET',
-    });
+    try {
+      const users = await axios.get('/api/admin/users/read');
 
-    if (Array.isArray(users)) {
-      setUserRowData(
-        users.map((user) => {
-          const firstname = user.UserFirstName === null ? '' : user.UserFirstName;
-          const lastname = user.UserLastName === null ? '' : user.UserLastName;
+      if (Array.isArray(users.data)) {
+        setUserRowData(
+          users.data.map((user) => {
+            const firstname = user.UserFirstName || '';
+            const lastname = user.UserLastName || '';
 
-          return {
-            name: firstname + ' ' + lastname,
-            email: user.UserEmail,
-            permissionDesc: user.AllPermissions,
-            licence: 'to be added later',
-          };
-        }),
-      );
+            return {
+              name: `${firstname} ${lastname}`,
+              email: user.UserEmail,
+              permissionDesc: user.AllPermissions,
+              licence: 'to be added later',
+            };
+          }),
+        );
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
