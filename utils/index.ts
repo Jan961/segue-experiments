@@ -33,12 +33,10 @@ export const mapRecursive = <T>(
 export const isNullOrEmpty = (value: any) => {
   if (!value || value === null) {
     return true;
-  } else if (typeof value === 'string') {
-    return value === '';
   } else if (Array.isArray(value)) {
     return value.length === 0;
-  } else if (Object.keys(value).length === 0) {
-    return true;
+  } else if (typeof value === 'object') {
+    return Object.keys(value).length === 0;
   }
 };
 

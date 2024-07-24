@@ -10,7 +10,7 @@ interface FormFieldProps {
 
 export const FormField = ({ currentValue, displayText, fieldName, handleInputChange, onBlur }: FormFieldProps) => {
   return (
-    <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
+    <label htmlFor="" className="grid w-full">
       <p className="text-primary-input-text">{displayText}</p>
       <TextInput
         placeholder={`Enter ${displayText}`}
