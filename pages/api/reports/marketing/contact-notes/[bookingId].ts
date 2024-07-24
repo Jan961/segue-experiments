@@ -5,11 +5,12 @@ import { bookingContactNoteMapper } from 'lib/mappers';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'services/marketing/reports';
+import { convertToPDF } from 'utils/report';
 import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
 import { objectify } from 'radash';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { bookingId } = req.query || {};
+  const { bookingId, format } = req.query || {};
 
   if (req.method !== 'POST') {
     throw new Error('the method is not allowed');
@@ -28,7 +29,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const users = await getUsers(accountId);
   const usersMap = objectify(users, (user) => user.Id);
   const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
-  const fileName = `${prodCode} ${showName} ${venueName} Contact Notes`;
+  const filename = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Contact Notes');
 
@@ -76,8 +77,27 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     worksheet.getColumn(index + 1).width = width;
   });
 
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 
   return workbook.xlsx.write(res).then(() => {
     res.status(200).end();

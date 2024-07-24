@@ -9,6 +9,7 @@ import { getEmailFromReq, checkAccess } from 'services/userService';
 import { ALIGNMENT } from './masterplan';
 import { marketingCostsStatusToLabelMap } from 'config/Reports';
 import { Booking } from '@prisma/client';
+import { convertToPDF } from 'utils/report';
 
 type BOOKING = Partial<Booking> & {
   IsOnSale: boolean;
@@ -92,7 +93,7 @@ const applySelectionFilter = (bookings: BOOKING[], selection: string) => {
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
-    let { productionId, showId = null, selection } = req.body || {};
+    let { productionId, showId = null, selection, format } = req.body || {};
     if (productionId === -1) {
       productionId = null;
     }
@@ -270,6 +271,25 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
     alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
+    if (format === 'pdf') {
+      worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+      worksheet.pageSetup.fitToWidth = 1;
+      worksheet.pageSetup.fitToHeight = 1;
+      worksheet.pageSetup.orientation = 'landscape';
+      worksheet.pageSetup.fitToPage = true;
+      worksheet.pageSetup.margins = {
+        left: 0.25,
+        right: 0.25,
+        top: 0.25,
+        bottom: 0.25,
+        header: 0.3,
+        footer: 0.3,
+      };
+      const pdf = await convertToPDF(workbook);
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+      res.end(pdf);
+    }
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
