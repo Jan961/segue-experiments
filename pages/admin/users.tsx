@@ -12,21 +12,6 @@ export default function Users() {
   const [touringLicences, setTouringLicences] = useState(0);
   const [touringLicencesUsed, setTouringLicencesUsed] = useState(0);
 
-  const toggleUserModal = (type, data) => {
-    console.log('table data: ', type, data);
-
-    // this is just to use the set functions so git commit works
-    setFullLicences(0);
-    setFullLicencesUsed(0);
-    setTouringLicences(0);
-    setTouringLicencesUsed(0);
-    setPgRowData([]);
-  };
-
-  const togglePermissionGroupModal = (type, data) => {
-    console.log('table data: ', type, data);
-  };
-
   const populateUserTable = async () => {
     try {
       const users = await axios.get('/api/admin/users/read');
@@ -112,7 +97,7 @@ export default function Users() {
 
       <Table
         testId="admin-users-table"
-        columnDefs={usersColDef(toggleUserModal)}
+        columnDefs={usersColDef(null)}
         rowData={userRowData}
         styleProps={styleProps}
         tableHeight={300}
@@ -129,7 +114,7 @@ export default function Users() {
 
           <Table
             testId="admin-permission-group-table"
-            columnDefs={permissionGroupColDef(togglePermissionGroupModal)}
+            columnDefs={permissionGroupColDef(null)}
             rowData={pgRowData}
             styleProps={styleProps}
             tableHeight={300}
