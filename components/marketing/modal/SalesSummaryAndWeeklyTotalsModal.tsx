@@ -107,8 +107,8 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
           .then(() => onClose())
           .finally(() => setLoading(false)),
         {
-          loading: `'Generating ${title}`,
-          success: `${title}downloaded successfully`,
+          loading: `'Generating ${title}...`,
+          success: `${title} downloaded successfully`,
           error: `Error generating ${title}`,
         },
       );

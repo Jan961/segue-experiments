@@ -6,6 +6,8 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'services/marketing/reports';
 import { convertToPDF } from 'utils/report';
+import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
+import { objectify } from 'radash';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const { bookingId, format } = req.query || {};
@@ -19,9 +21,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!bookingId || !productionName || !venueAndDate) {
     throw new Error('Required params are missing');
   }
+  const email = await getEmailFromReq(req);
+  const accountId = await getAccountId(email);
   const { prodCode, showName, venueName } = await getProductionAndVenueDetailsFromBookingId(
     parseInt(bookingId as string, 10),
   );
+  const users = await getUsers(accountId);
+  const usersMap = objectify(users, (user) => user.Id);
   const data = await getContactNotesByBookingId(parseInt(bookingId as string, 10));
   const filename = `${prodCode} ${showName} ${venueName} Contact Notes`;
   const workbook = new ExcelJS.Workbook();
@@ -48,11 +54,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   headerRow.height = 30;
 
   data.map(bookingContactNoteMapper).forEach((note) => {
+    const { FirstName = '', LastName = '' } = usersMap[note.UserId] || {};
+    const actionedBy = `${FirstName || ''} ${LastName || ''}`;
     const row = worksheet.addRow([
       note.CoContactName,
       moment(note.ContactDate).format('DD/MM/YYYY'),
       moment(note.ContactDate).format('HH:mm'),
-      note.UserId || '',
+      actionedBy || '',
       note.Notes,
     ]);
     row.eachCell((cell, colNumber) => {

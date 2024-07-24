@@ -4,6 +4,9 @@ import { getArchivedSalesList } from 'pages/api/marketing/sales/read/archived';
 import { isArray } from 'radash';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { convertToPDF } from 'utils/report';
+import formatInputDate from 'utils/dateInputFormat';
+import { ALIGNMENT } from '../masterplan';
+import { addWidthAsPerContent } from 'services/reportsService';
 
 const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) => {
   const workbook = new ExcelJS.Workbook();
@@ -34,21 +37,19 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
 
   const bookingIds = [...new Set(data.flatMap((item) => item.data.map((d) => d.BookingId)))];
 
-  const totalColumns = 2 + bookingIds.length * 2;
+  const totalColumns = 2 + bookingIds.length * 3;
 
   const headerRow1 = worksheet.addRow(['Venue Archived Sales Report']);
   const headerRow2 = worksheet.addRow([productionName]);
   const headerRow3 = worksheet.addRow([venueAndDate]);
-  const emptyRow = worksheet.addRow([]);
 
   createHeaderCell(headerRow1.getCell(1), 'Venue Archived Sales Report', totalColumns, 16);
-  createHeaderCell(headerRow2.getCell(1), productionName, totalColumns, 16);
-  createHeaderCell(headerRow3.getCell(1), venueAndDate, totalColumns, 16);
+  createHeaderCell(headerRow2.getCell(1), productionName, totalColumns, 14);
+  createHeaderCell(headerRow3.getCell(1), venueAndDate, totalColumns, 12);
 
   headerRow1.height = 30;
   headerRow2.height = 30;
   headerRow3.height = 30;
-  emptyRow.height = 15;
 
   const dataHeaderRow1 = worksheet.addRow(['', '']);
   const dataHeaderRow2 = worksheet.addRow(['Week', 'Week of']);
@@ -61,10 +62,11 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
   let columnIndex = 3;
   bookingIds.forEach((bookingId) => {
     const prodCode = bookingToProdCode[bookingId as string] || `Unknown (${bookingId})`;
-    createHeaderCell(dataHeaderRow1.getCell(columnIndex), prodCode, 2, 12);
-    createHeaderCell(dataHeaderRow2.getCell(columnIndex), 'Seats', 1, 12);
-    createHeaderCell(dataHeaderRow2.getCell(columnIndex + 1), 'Value', 1, 12);
-    columnIndex += 2;
+    createHeaderCell(dataHeaderRow1.getCell(columnIndex), prodCode, 3, 12);
+    createHeaderCell(dataHeaderRow2.getCell(columnIndex), 'Date', 1, 12);
+    createHeaderCell(dataHeaderRow2.getCell(columnIndex + 1), 'Seats', 1, 12);
+    createHeaderCell(dataHeaderRow2.getCell(columnIndex + 2), 'Value', 1, 12);
+    columnIndex += 3;
   });
 
   data.forEach((item, index) => {
@@ -73,17 +75,22 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
       isLastRow ? 'Final' : `Week ${item.SetBookingWeekNum}`,
       moment(item.SetProductionWeekDate).format('DD/MM/YYYY'),
     ];
-    console.table(item);
+    const currencySymbols = [];
     bookingIds.forEach((bookingId) => {
       const bookingData = item.data.find((d) => d.BookingId === bookingId) || {};
-      rowData.push(bookingData.Seats ? parseInt(bookingData.Seats).toString() : '0');
-      rowData.push(bookingData.ValueWithCurrencySymbol || 'No Sales');
+      rowData.push(bookingData.SetSalesFiguresDate ? formatInputDate(bookingData.SetSalesFiguresDate) : '');
+      rowData.push(bookingData.Seats?.toNumber?.() || '-');
+      rowData.push(bookingData.Value?.toNumber?.() || '-');
+      currencySymbols.push(bookingData.currencySymbol);
     });
 
     const row = worksheet.addRow(rowData);
 
     row.height = 25;
     row.eachCell((cell, colNumber) => {
+      // column number starts from 1
+      // subtract first two cells for week and weekof
+      const salesIndex = colNumber - 2;
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
       if (colNumber <= 2) {
         cell.font = { bold: true };
@@ -97,6 +104,21 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
       }
 
       if (colNumber > 2) {
+        // Production Sales has 3 columns with date, seats, value
+        const isSeatsCol = salesIndex % 3 === 2;
+        const isValueCol = salesIndex % 3 === 0;
+        if (isSeatsCol || isValueCol) {
+          cell.alignment = {
+            horizontal: ALIGNMENT.RIGHT,
+          };
+          cell.numFmt = '#,##0';
+          if (isValueCol) {
+            // all sale values are in prime numbered columns like 5, 7, 9, 11
+            const index = Math.round(salesIndex / 3);
+            const symbol = currencySymbols?.[index - 1] || '';
+            cell.numFmt = symbol + '#,##0.00';
+          }
+        }
         if (item.SetNotOnSale) {
           cell.fill = {
             type: 'pattern',
@@ -122,9 +144,17 @@ const createExcelFromData = (data, bookingInfo, productionName, venueAndDate) =>
 
   worksheet.getColumn(1).width = 10;
   worksheet.getColumn(2).width = 15;
-  for (let i = 3; i <= columnIndex - 1; i++) {
-    worksheet.getColumn(i).width = 15;
-  }
+  const numberOfColumns = worksheet.columnCount;
+  addWidthAsPerContent({
+    worksheet,
+    fromColNumber: 3,
+    toColNumber: numberOfColumns,
+    startingColAsCharWIthCapsOn: 'C',
+    minColWidth: 10,
+    bufferWidth: 2,
+    rowsToIgnore: 5,
+    maxColWidth: Infinity,
+  });
 
   return workbook;
 };
