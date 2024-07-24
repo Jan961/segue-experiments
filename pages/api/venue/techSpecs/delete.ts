@@ -11,8 +11,14 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     await prisma.File.delete({
       where: { Id: fileId },
     });
+
+    const venueFileObj = await prisma.VenueFile.findFirst({
+      where: { FileId: fileId, Type: 'Tech Specs' },
+      select: { Id: true },
+    });
+
     await prisma.VenueFile.delete({
-      where: { FileId: fileId },
+      where: { FileId: fileId, Id: venueFileObj.Id },
     });
     res.status(200).json({});
   } catch (exception) {

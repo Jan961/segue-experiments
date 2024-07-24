@@ -17,6 +17,7 @@ import VenueContactForm from './VenueContactsForm';
 import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/ConfirmationDialog';
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
+import { isNullOrEmpty } from '../../../utils';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -25,6 +26,7 @@ interface AddEditVenueModalProps {
   venueRoleOptionList: SelectOption[];
   venue?: UiTransformedVenue;
   onClose: (isSuccess?: boolean) => void;
+  fetchVenues: () => Promise<void>;
 }
 
 export default function AddEditVenueModal({
@@ -34,6 +36,7 @@ export default function AddEditVenueModal({
   venueRoleOptionList,
   countryOptions,
   onClose,
+  fetchVenues,
 }: AddEditVenueModalProps) {
   const [formData, setFormData] = useState({ ...initialVenueState, ...(venue || {}) });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -42,6 +45,7 @@ export default function AddEditVenueModal({
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [fileList, setFileList] = useState<any>([]);
+  const [filesToDelete, setFilesToDelete] = useState<any>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
     let sanitizedValue = value;
@@ -82,7 +86,9 @@ export default function AddEditVenueModal({
 
       console.log(apiResponse);
       await saveFiles(apiResponse);
+      await deleteFileOnServer();
     }
+    await fetchVenues();
     setIsSaving(false);
   };
 
@@ -125,43 +131,57 @@ export default function AddEditVenueModal({
     setIsDeleting(false);
   }, [onClose, toggleDeleteConfirmation, venue.id]);
 
+  const deleteFileOnServer = async () => {
+    const promises = filesToDelete.map(async (file) => {
+      const fileId = file.fileId;
+      if (fileId) {
+        await axios.post('/api/venue/techSpecs/delete', { fileId });
+      }
+    });
+    await Promise.all(promises);
+    setFilesToDelete([]);
+  };
+
   const saveFiles = async (venueResponse: any) => {
     console.log(venueResponse);
     //  response will have the venueId we use in the file storage
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation
 
+    console.log(fileList);
     await Promise.all(
       fileList.map(async (file) => {
-        const response = await axios.post('/api/upload', file, {
-          onUploadProgress: (progressEvent) => {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            if (percentCompleted <= 50) {
-              progress = percentCompleted;
-            } else if (percentCompleted === 100) {
-              progress = 50;
-              clearInterval(slowProgressInterval);
-              slowProgressInterval = setInterval(() => {
-                if (progress < 95) {
-                  progress += 0.5;
-                } else {
-                  clearInterval(slowProgressInterval);
-                }
-              }, 100);
-            }
-          },
-        });
+        if (isNullOrEmpty(file.get('file'))) {
+          const response = await axios.post('/api/upload', file, {
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+              if (percentCompleted <= 50) {
+                progress = percentCompleted;
+              } else if (percentCompleted === 100) {
+                progress = 50;
+                clearInterval(slowProgressInterval);
+                slowProgressInterval = setInterval(() => {
+                  if (progress < 95) {
+                    progress += 0.5;
+                  } else {
+                    clearInterval(slowProgressInterval);
+                  }
+                }, 100);
+              }
+            },
+          });
 
-        progress = 100;
-        clearInterval(slowProgressInterval);
-        const fileRec = {
-          FileId: response.data.id,
-          VenueId: venueResponse.data.Id,
-          Description: 'Tech Spec',
-        };
+          progress = 100;
+          clearInterval(slowProgressInterval);
+          const fileRec = {
+            FileId: response.data.id,
+            VenueId: venueResponse.data.Id,
+            Description: 'Tech Spec',
+          };
 
-        // update in the database
-        await axios.post('/api/venue/techSpecs/create', fileRec);
+          // update in the database
+          await axios.post('/api/venue/techSpecs/create', fileRec);
+        }
       }),
     );
   };
@@ -212,6 +232,8 @@ export default function AddEditVenueModal({
               updateValidationErrrors={updateValidationErrors}
               setFileList={setFileList}
               fileList={fileList}
+              setFilesToDelete={setFilesToDelete}
+              filesToDelete={filesToDelete}
             />
             <div className="pt-7 ">
               <h2 className="text-xl text-primary-navy font-bold ">Barring</h2>

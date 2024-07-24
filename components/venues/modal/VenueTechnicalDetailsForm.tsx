@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
 import { UploadModal } from '../../core-ui-lib';
 import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
-import axios from 'axios';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -15,6 +14,8 @@ interface VenueTechnicalDetailsFormProps {
   updateValidationErrrors?: (key: string, value: string) => void;
   fileList: any;
   setFileList: (data: any) => void;
+  setFilesToDelete: (data: any) => void;
+  filesToDelete: any;
 }
 
 const VenueTechnicalDetailsForm = ({
@@ -24,6 +25,8 @@ const VenueTechnicalDetailsForm = ({
   updateValidationErrrors,
   fileList,
   setFileList,
+  setFilesToDelete,
+  filesToDelete,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
   const [uploadVisible, setUploadVisible] = useState<boolean>(false);
@@ -52,16 +55,12 @@ const VenueTechnicalDetailsForm = ({
   };
 
   const makeWidgets = async () => {
-    console.log(fileList);
     const newFileWidgets = [];
 
     // Process fileList
     fileList.forEach((file) => {
-      console.log(file);
       const tempFile = file.get('file');
-      console.log(tempFile);
       if (tempFile !== 'undefined') {
-        console.log(tempFile);
         const widget: UploadedFile = {
           size: tempFile.size,
           name: tempFile.name,
@@ -94,12 +93,6 @@ const VenueTechnicalDetailsForm = ({
     setFileWidgets(newFileWidgets);
   };
 
-  const deleteFileOnServer = async (fileId) => {
-    if (fileId) {
-      await axios.post('/api/venue/techSpecs/delete', { fileId });
-    }
-  };
-
   const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
 
   // docs,spreadsheets
@@ -123,9 +116,25 @@ const VenueTechnicalDetailsForm = ({
           maxFileSize={10240 * 1024}
           customHandleFileDelete={async (file) => {
             console.log(file);
-            if (file?.fileLocation !== null && file?.fileId !== null) {
-              await deleteFileOnServer(file.fileId);
+            if (file?.fileLocation && file?.fileId) {
+              console.log('already uploaded');
+              setFilesToDelete((prevFilesToDelete) => [...prevFilesToDelete, file]);
+            } else {
+              const fileIndex = fileList.findIndex((files) => {
+                const tempFile = files.get('file');
+                return tempFile.name === file.name;
+              });
+              if (fileIndex !== -1) {
+                console.log('found');
+                const updatedFileList = [...fileList];
+                updatedFileList.splice(fileIndex, 1);
+                setFileList(updatedFileList);
+                console.log(updatedFileList);
+              }
             }
+            setTimeout(() => {
+              console.log(filesToDelete); // Check the updated state here
+            }, 0);
           }}
         />
       )}
