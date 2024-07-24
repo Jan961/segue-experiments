@@ -367,6 +367,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   console.log(taskRecurringInfo);
+  console.log(inputs);
 
   return (
     <PopupModal

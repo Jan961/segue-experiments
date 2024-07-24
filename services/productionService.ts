@@ -6,6 +6,7 @@ import { getAccountId, getEmailFromReq } from './userService';
 import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
+import { omit } from 'radash';
 
 // Edit Production Page
 const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
@@ -256,7 +257,14 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
           StartByWeekNum: 'asc',
         },
         include: {
-          ProductionTaskRepeat: true,
+          ProductionTaskRepeat: {
+            select: {
+              Id: true,
+              FromWeekNum: true,
+              ToWeekNum: true,
+              Interval: true,
+            },
+          },
         },
       },
     },
@@ -265,10 +273,14 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
     return {
       ...production,
       ProductionTask: production.ProductionTask.map((task) => {
-        return {
+        const tempTask = {
           ...task,
           TaskCompletedDate: task.TaskCompletedDate != null ? task.TaskCompletedDate.toISOString() : null,
+          TaskRepeatFromWeekNum: task.ProductionTaskRepeat?.FromWeekNum || null,
+          TaskRepeatToWeekNum: task.ProductionTaskRepeat?.ToWeekNum || null,
+          RepeatInterval: task.ProductionTaskRepeat?.Interval || null,
         };
+        return omit(tempTask, ['ProductionTaskRepeat']);
       }),
     };
   });
