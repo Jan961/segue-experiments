@@ -4,7 +4,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const { taskId, selectOption, PRTId, weekStart } = req.body;
-      console.log(selectOption);
       if (!taskId) return res.status(401).json({ error: 'missing required params' });
       switch (selectOption) {
         case 'Delete this occurrence only': {
@@ -18,11 +17,20 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         }
 
         case 'Delete this and all future occurrence of this task': {
-          await prisma.ProductionTask.delete({
+          const tasksToDelete: number[] = (
+            await prisma.ProductionTask.findMany({
+              where: {
+                PRTId,
+                StartByWeekNum: { gte: weekStart },
+              },
+              select: {
+                Id: true,
+              },
+            })
+          ).map((task) => task.Id);
+          await prisma.ProductionTask.deleteMany({
             where: {
-              Id: taskId,
-              PRTId,
-              StartByWeekNum: { gte: weekStart },
+              Id: { in: tasksToDelete },
             },
           });
 
@@ -30,9 +38,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         }
 
         case 'Delete every occurrence of this task': {
-          await prisma.ProductionTask.delete({
+          const tasksToDelete: number[] = (
+            await prisma.ProductionTask.findMany({
+              where: {
+                PRTId,
+              },
+              select: {
+                Id: true,
+              },
+            })
+          ).map((task) => task.Id);
+          await prisma.ProductionTask.deleteMany({
             where: {
-              PRTId,
+              Id: { in: tasksToDelete },
             },
           });
 
