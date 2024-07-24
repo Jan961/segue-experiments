@@ -116,7 +116,7 @@ const CompanyContractFilters = () => {
           />
         </div>
       </div>
-      {openContract && <ContractScheduleModal openContract={openContract} />}
+      {openContract && <ContractScheduleModal openContract={openContract} onClose={() => setOpenContract(false)} />}
     </div>
   );
 };

@@ -40,7 +40,7 @@ export const ARCHIVED_OPTION_STYLES = {
   },
 };
 
-export const ContractScheduleModal = ({ openContract }: { openContract: boolean }) => {
+export const ContractScheduleModal = ({ openContract, onClose }: { openContract: boolean; onClose: () => void }) => {
   const [openNewPersonContract, setOpenNewPersonContract] = useState(false);
   const [openNewBuildContract, setOpenNewBuildContract] = useState(false);
 
@@ -49,7 +49,7 @@ export const ContractScheduleModal = ({ openContract }: { openContract: boolean 
       show={openContract}
       title="Contract Schedule"
       titleClass="text-xl text-primary-navy font-bold -mt-2"
-      // onClose={handleModalCancel}
+      onClose={onClose}
       // hasOverlay={showSalesSnapshot}
     >
       <div className="w-[430px] h-auto">
