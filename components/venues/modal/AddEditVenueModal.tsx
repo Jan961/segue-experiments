@@ -26,7 +26,7 @@ interface AddEditVenueModalProps {
   venueRoleOptionList: SelectOption[];
   venue?: UiTransformedVenue;
   onClose: (isSuccess?: boolean) => void;
-  fetchVenues: () => Promise<void>;
+  fetchVenues: (payload?: any) => Promise<void>;
 }
 
 export default function AddEditVenueModal({
@@ -83,8 +83,6 @@ export default function AddEditVenueModal({
     const isValid = await validateVenue(formData);
     if (isValid) {
       const apiResponse = formData.id ? await updateVenue(formData) : await createVenue(formData);
-
-      console.log(apiResponse);
       await saveFiles(apiResponse);
       await deleteFileOnServer();
     }
@@ -143,12 +141,8 @@ export default function AddEditVenueModal({
   };
 
   const saveFiles = async (venueResponse: any) => {
-    console.log(venueResponse);
-    //  response will have the venueId we use in the file storage
     let progress = 0; // to track overall progress
     let slowProgressInterval; // interval for slow progress simulation
-
-    console.log(fileList);
     await Promise.all(
       fileList.map(async (file) => {
         if (isNullOrEmpty(file.get('file'))) {
@@ -179,7 +173,6 @@ export default function AddEditVenueModal({
             Description: 'Tech Spec',
           };
 
-          // update in the database
           await axios.post('/api/venue/techSpecs/create', fileRec);
         }
       }),

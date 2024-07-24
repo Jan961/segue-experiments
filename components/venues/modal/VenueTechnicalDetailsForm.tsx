@@ -2,10 +2,11 @@ import Button from 'components/core-ui-lib/Button';
 import TextArea from 'components/core-ui-lib/TextArea';
 import TextInput from 'components/core-ui-lib/TextInput';
 import { initialVenueTechnicalDetails } from 'config/venue';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UiTransformedVenue } from 'utils/venue';
-import { UploadModal } from '../../core-ui-lib';
-import { UploadedFile } from '../../core-ui-lib/UploadModal/interface';
+import { UploadModal } from 'components/core-ui-lib';
+import { UploadedFile } from 'components/core-ui-lib/UploadModal/interface';
+import { techSpecsFileFormats } from '../techSpecsFileFormats';
 
 interface VenueTechnicalDetailsFormProps {
   venue: Partial<UiTransformedVenue>;
@@ -26,10 +27,17 @@ const VenueTechnicalDetailsForm = ({
   fileList,
   setFileList,
   setFilesToDelete,
-  filesToDelete,
 }: VenueTechnicalDetailsFormProps) => {
   const [formData, setFormData] = useState<Partial<UiTransformedVenue>>({ ...initialVenueTechnicalDetails, ...venue });
   const [uploadVisible, setUploadVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const loadWidgets = async () => {
+      await makeWidgets();
+    };
+    loadWidgets();
+  }, [fileList]);
+
   const handleInputChange = (field: string, value: any) => {
     const updatedFormData = {
       ...venue,
@@ -56,11 +64,10 @@ const VenueTechnicalDetailsForm = ({
 
   const makeWidgets = async () => {
     const newFileWidgets = [];
-
-    // Process fileList
     fileList.forEach((file) => {
+      console.log(file);
       const tempFile = file.get('file');
-      if (tempFile !== 'undefined') {
+      if (tempFile?.size && tempFile.name) {
         const widget: UploadedFile = {
           size: tempFile.size,
           name: tempFile.name,
@@ -71,12 +78,10 @@ const VenueTechnicalDetailsForm = ({
       }
     });
 
-    // Process venue files
     for (const file of venue.files) {
       console.log(file);
       const response = await fetch(file.FileUrl);
       const blob = await response.blob();
-
       const tempFile = new File([blob], file.name, { type: blob.type });
       const widget: UploadedFile = {
         size: tempFile.size,
@@ -85,18 +90,14 @@ const VenueTechnicalDetailsForm = ({
         fileLocation: file.fileLocation,
         fileId: file.id,
       };
-      console.log(widget);
       newFileWidgets.push(widget);
     }
 
-    // Set the state once with the accumulated widgets
     setFileWidgets(newFileWidgets);
   };
 
   const [fileWidgets, setFileWidgets] = useState<UploadedFile[]>([]);
-
-  // docs,spreadsheets
-  // 10mb
+  const buttonText = fileWidgets.length > 0 ? 'View/ Edit Tech Specs' : 'Upload Tech Specs';
 
   return (
     <>
@@ -104,20 +105,18 @@ const VenueTechnicalDetailsForm = ({
         <UploadModal
           title="Upload Tech Specs"
           visible={uploadVisible}
-          info=""
-          allowedFormats={['image/jpg', 'image/jpeg', 'document/pdf', 'image/png']}
+          info="Upload or view this venues tech specs. You can upload a maximum of 30 files each with a maxiumum file size of 15MB."
+          allowedFormats={techSpecsFileFormats}
           onClose={() => {
             setUploadVisible(false);
           }}
           onSave={onSave}
           value={fileWidgets}
           isMultiple={true}
-          maxFiles={20}
-          maxFileSize={10240 * 1024}
+          maxFiles={30}
+          maxFileSize={15360 * 1024}
           customHandleFileDelete={async (file) => {
-            console.log(file);
             if (file?.fileLocation && file?.fileId) {
-              console.log('already uploaded');
               setFilesToDelete((prevFilesToDelete) => [...prevFilesToDelete, file]);
             } else {
               const fileIndex = fileList.findIndex((files) => {
@@ -125,16 +124,11 @@ const VenueTechnicalDetailsForm = ({
                 return tempFile.name === file.name;
               });
               if (fileIndex !== -1) {
-                console.log('found');
                 const updatedFileList = [...fileList];
                 updatedFileList.splice(fileIndex, 1);
                 setFileList(updatedFileList);
-                console.log(updatedFileList);
               }
             }
-            setTimeout(() => {
-              console.log(filesToDelete); // Check the updated state here
-            }, 0);
           }}
         />
       )}
@@ -157,7 +151,7 @@ const VenueTechnicalDetailsForm = ({
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
         <Button
-          text="Upload Venue Tech Spec"
+          text={buttonText}
           onClick={async () => {
             setFileWidgets([]);
             await makeWidgets();

@@ -96,12 +96,10 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleFileDelete = (file) => {
-    console.log(file);
     const fileName = file?.name;
     if (customHandleFileDelete) {
       customHandleFileDelete(file);
     }
-    console.log(fileName);
     const filesList = selectedFiles.filter((file) => file?.name !== fileName);
     setSelectedFiles(filesList);
     onChange?.(filesList);
@@ -120,8 +118,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    console.log(files);
-    console.log(selectedFiles);
     setIsUploading(false);
     if (!files || files?.length === 0) {
       setError('No file selected');
@@ -129,7 +125,6 @@ const UploadModal: React.FC<UploadModalProps> = ({
       onChange?.([]);
       return;
     }
-    console.log(maxFiles);
     if (maxFiles && files.length > maxFiles) {
       setError(`You can upload up to ${maxFiles} files.`);
       setSelectedFiles([]);
