@@ -9,17 +9,33 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    const data = await prisma.$queryRaw`select 
-                                SaleTypeName,
-                                Seats, 
-                                Value, 
-                                SetSalesFiguresDate, 
-                                SetProductionWeekDate, 
-                                SetIsFinalFigures,
-                                SetFinalSalesApprovedByUser
-                            from SalesView
-                            where BookingId = ${bookingId}
-                            AND SetIsFinalFigures = TRUE `;
+    const data = await prisma.$queryRaw`
+      SELECT
+        SaleTypeName,
+        Seats,
+        Value,
+        SetSalesFiguresDate,
+        SetProductionWeekDate,
+        SetIsFinalFigures,
+        SetFinalSalesApprovedByUser,
+        SetId
+      FROM (
+        SELECT
+          SaleTypeName,
+          Seats,
+          Value,
+          SetSalesFiguresDate,
+          SetProductionWeekDate,
+          SetIsFinalFigures,
+          SetFinalSalesApprovedByUser,
+          SetId,
+          ROW_NUMBER() OVER (PARTITION BY SaleTypeName ORDER BY SetSalesFiguresDate DESC) AS row_num
+        FROM SalesView
+        WHERE BookingId = ${bookingId}
+          AND SetIsFinalFigures = TRUE
+      ) subquery
+      WHERE row_num = 1;
+    `;
 
     if (data.length > 0) {
       const schoolSales = data.find((sale) => sale.SaleTypeName === 'School Sales');
@@ -34,7 +50,8 @@ export default async function handle(req, res) {
           seatsSold: generalSales?.Seats === undefined ? '' : generalSales.Seats,
           seatsSoldVal: generalSales?.Value === undefined ? '' : generalSales.Value,
         },
-        user: null,
+        user: '',
+        setId: generalSales?.SetId,
       };
 
       if ('SetFinalSalesApprovedByUser' in generalSales) {
