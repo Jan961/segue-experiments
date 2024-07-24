@@ -23,6 +23,7 @@ import { priorityOptions } from 'utils/tasks';
 import { productionJumpState } from '../../../state/booking/productionJumpState';
 import { addDurationToDate, addOneMonth } from '../../../services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
+import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 
 interface AddTaskProps {
   visible: boolean;
@@ -88,6 +89,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       TaskRepeatFromWeekNum?: string;
       TaskRepeatToWeekNum?: string;
       ProductionTaskRepeat?: any;
+      PRTId?: number;
     }
   >(
     task ||
@@ -95,6 +97,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         ProductionTaskRepeat: task?.ProductionTaskRepeat.Interval,
         TaskRepeatFromWeekNum: task?.ProductionTaskRepeat?.FromWeekNum,
         TaskRepeatToWeekNum: task?.ProductionTaskRepeat?.ToWeekNum,
+        PRTId: task?.ProductionTaskRepeat?.PRTId,
       },
   );
   inputs.RepeatInterval = inputs?.RepeatInterval || inputs.ProductionTaskRepeat?.Interval;
@@ -106,7 +109,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   useEffect(() => {
     setInputs(task);
   }, [task]);
-  const [confirm, setConfirm] = useState<boolean>(false);
 
   const [status, setStatus] = useState({ submitted: true, submitting: false });
   const [loading, setLoading] = useState<boolean>(false);
@@ -115,6 +117,8 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   const [isRecurring, setIsRecurring] = useState<boolean>(false);
   const [showRecurringConfirmation, setShowRecurringConfirmation] = useState<boolean>(false);
   const [taskRecurringInfo, setTaskRecurringInfo] = useState(null);
+  const [showRecurringDelete, setShowRecurringDelete] = useState<boolean>(false);
+  const [showSingleDelete, setShowSingleDelete] = useState<boolean>(false);
   const priorityOptionList = useMemo(
     () => priorityOptions.map((option) => ({ ...option, text: `${option.value} - ${option.text}` })),
     [],
@@ -198,7 +202,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const getNewTasksNum = (prodStartDate: Date, taskRepeatFromWeekNum, taskRepeatToWeekNum, repeatInterval): number => {
-    console.log(repeatInterval);
     let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
     const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
 
@@ -216,9 +219,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const checkIfRecurringModal = async (isRecurring: boolean, previousInfo, newInfo) => {
-    console.log(previousInfo);
-    console.log(newInfo);
-
     if (previousInfo === null) {
       await handleOnSubmit();
       onClose();
@@ -234,11 +234,9 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     });
 
     if (!differenceInObj) {
-      console.log('diff');
       await handleOnSubmit();
       onClose();
     } else if (previousInfo?.Name === undefined) {
-      console.log('Name null');
       await handleOnSubmit();
       onClose();
     } else {
@@ -275,7 +273,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
   const handleMasterTask = async () => {
     try {
-      console.log(inputs);
       omit(inputs, ['DueDate', 'Progress', 'ProductionId']);
       if (inputs.Id) {
         await axios.post('/api/tasks/master/update', inputs);
@@ -298,15 +295,13 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
 
   const handleOnSubmit = async () => {
     setLoading(false);
-    console.log(isMasterTask);
     if (isMasterTask) {
       await handleMasterTask();
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
-      console.log(inputs);
       if (inputs.Id) {
         try {
-          await axios.post(`/api/tasks/update${!isRecurring ? '/recurring' : ''}`, inputs);
+          await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
           setLoading(false);
           handleClose();
         } catch (error) {
@@ -314,7 +309,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         }
       } else {
         try {
-          const endpoint = `/api/tasks/create/${!isRecurring ? 'recurring' : 'single'}/`;
+          const endpoint = `/api/tasks/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
           await axios.post(endpoint, inputs);
           setLoading(false);
           if (isChecked) {
@@ -340,12 +335,32 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     setIsCloned(true);
   };
 
-  const handleConfirm = () => {
-    setConfirm(true);
+  const handleDeletePress = () => {
+    console.log(inputs?.PRTId);
+    if (!isNullOrEmpty(inputs?.PRTId)) {
+      setShowRecurringDelete(true);
+    } else {
+      setShowSingleDelete(true);
+    }
   };
 
-  const handleDelete = async () => {
-    setConfirm(false);
+  const handleRecurringDelete = async (selectOption) => {
+    try {
+      console.log(inputs);
+      await axios.post(`/api/tasks/delete/recurring`, {
+        selectOption,
+        taskId: inputs.Id,
+        PRTId: inputs.PRTId,
+        weekStart: inputs.StartByWeekNum,
+      });
+      setLoading(false);
+      onClose();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSingleDelete = async () => {
     setLoading(true);
     if (isMasterTask) {
       try {
@@ -364,6 +379,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         setLoading(false);
       }
     }
+    setShowSingleDelete(false);
   };
 
   console.log(taskRecurringInfo);
@@ -542,7 +558,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
               <>
-                <Button variant="tertiary" onClick={handleConfirm} className="mr-4 w-[132px]" text="Delete" />
+                <Button variant="tertiary" onClick={handleDeletePress} className="mr-4 w-[132px]" text="Delete" />
                 <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
               </>
             )}
@@ -573,11 +589,19 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
         )}
       </form>
 
+      <DeleteRecurringPopup
+        visible={showRecurringDelete}
+        onClose={() => {
+          setShowRecurringDelete(false);
+        }}
+        onSubmit={handleRecurringDelete}
+      />
+
       <ConfirmationDialog
         variant="delete"
-        show={confirm}
-        onYesClick={handleDelete}
-        onNoClick={() => setConfirm(false)}
+        show={showSingleDelete}
+        onYesClick={handleSingleDelete}
+        onNoClick={() => setShowSingleDelete(false)}
         hasOverlay={false}
       />
     </PopupModal>
