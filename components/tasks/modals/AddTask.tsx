@@ -275,7 +275,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
     if (inputs.Id) {
       try {
-        await axios.post(`/api/tasks/master/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
+        await axios.post(`/api/tasks/master/update/${inputs?.RepeatInterval ? 'recurring' : 'single'}`, inputs);
         setLoading(false);
         handleClose();
       } catch (error) {

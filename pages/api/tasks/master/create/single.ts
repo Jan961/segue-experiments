@@ -21,7 +21,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         AccountId,
         Code: Code + 1,
         Name: task.Name,
-        Priority: task.Priority,
         Notes: task.Notes,
         AssignedToUserId: task.AssignedToUserId,
         StartByWeekNum: task.StartByWeekNum,
