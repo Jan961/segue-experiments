@@ -1,9 +1,9 @@
 import ExcelJS from 'exceljs';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getPerformanceCompAllocationsByBookingId } from 'pages/api/marketing/promoterHolds/[BookingId]';
 import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'services/marketing/reports';
 import { addWidthAsPerContent } from 'services/reportsService';
+import { getPerformanceCompAllocationsByBookingId } from 'services/marketing/promoterHoldsService';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
