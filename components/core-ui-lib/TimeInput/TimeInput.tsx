@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import Label from '../Label';
 import classNames from 'classnames';
+import { isNullOrEmpty } from 'utils';
 
 export type Time = {
   hrs?: string;
@@ -20,7 +21,7 @@ export interface TimeInputProps {
 
 const baseClass =
   'h-comp-height flex items-center justify-around text-sm p-1 text-primary-input-text rounded-md border border-primary-border focus:ring-2 focus:ring-primary-input-text ring-inset';
-const DEFAULT_TIME = { hrs: '00', min: '00', sec: '00' };
+const DEFAULT_TIME = { hrs: '', min: '', sec: '' };
 
 const isOfTypTime = (t: any): t is Time => t.hrs !== undefined && t.min !== undefined;
 
@@ -30,6 +31,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
     const disabledClass = disabled ? `!bg-disabled-input !cursor-not-allowed !pointer-events-none` : '';
     const hrsRef = useRef(null);
     const minsRef = useRef(null);
+
     const handleInputChange = (e) => {
       const { name, value } = e.target;
       const v = value.replace(/^\D/, '');
@@ -49,10 +51,16 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           minsRef.current.select();
         }
         const currValue = time[name];
-        if (currValue.length === 0) {
-          setTime((prev) => ({ ...prev, [name]: '00' }));
-        } else if (currValue.length === 1) {
-          setTime((prev) => ({ ...prev, [name]: `0${currValue}` }));
+
+        // if null, don't change
+        if (isNullOrEmpty(currValue)) {
+          setTime((prev) => ({ ...prev, [name]: '' }));
+        } else {
+          if (currValue.length === 0) {
+            setTime((prev) => ({ ...prev, [name]: '' }));
+          } else if (currValue.length === 1) {
+            setTime((prev) => ({ ...prev, [name]: `0${currValue}` }));
+          }
         }
       }
     };
@@ -74,7 +82,7 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           setTime(value);
         } else if (typeof value === 'string') {
           const parts = value.split(':');
-          setTime({ hrs: parts[0] || '00', min: parts[1] || '00', sec: parts[1] || '00' });
+          setTime({ hrs: parts[0], min: parts[1], sec: parts[2] });
         }
       } else {
         setTime(DEFAULT_TIME);

@@ -309,7 +309,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
           <Label text="Running Time (inc Intervals)" />
           <TimeInput
             className="w-28 placeholder-primary"
-            onChange={({ hrs, min }) => onChange('runningTime', `${hrs || 0}:${min || 0}`)}
+            onChange={({ hrs, min }) => onChange('runningTime', `${hrs || ''}:${min || ''}`)}
             value={runningTime}
           />
         </div>
