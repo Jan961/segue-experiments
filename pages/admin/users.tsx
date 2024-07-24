@@ -6,11 +6,6 @@ import { useEffect, useState } from 'react';
 
 export default function Users() {
   const [userRowData, setUserRowData] = useState([]);
-  const [pgRowData, setPgRowData] = useState([]);
-  const [fullLicences, setFullLicences] = useState(0);
-  const [fullLicencesUsed, setFullLicencesUsed] = useState(0);
-  const [touringLicences, setTouringLicences] = useState(0);
-  const [touringLicencesUsed, setTouringLicencesUsed] = useState(0);
 
   const populateUserTable = async () => {
     try {
@@ -60,14 +55,14 @@ export default function Users() {
           <div className="text-base primary-dark-blue">Total Number of Full Licences:</div>
         </div>
         <div className="flex flex-col mr-[60px]">
-          <div className="text-base primary-dark-blue font-bold">{fullLicences}</div>
+          <div className="text-base primary-dark-blue font-bold">0</div>
         </div>
 
         <div className="flex flex-col mr-2">
           <div className="text-base primary-dark-blue">Total Number of Touring Management Licences:</div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base primary-dark-blue font-bold">{touringLicences}</div>
+          <div className="text-base primary-dark-blue font-bold">0</div>
         </div>
       </div>
 
@@ -76,14 +71,14 @@ export default function Users() {
           <div className="text-base primary-dark-blue">Total Number of Full Licences Used:</div>
         </div>
         <div className="flex flex-col mr-[24px]">
-          <div className="text-base primary-dark-blue font-bold">{fullLicencesUsed}</div>
+          <div className="text-base primary-dark-blue font-bold">0</div>
         </div>
 
         <div className="flex flex-col mr-2">
           <div className="text-base primary-dark-blue">Total Number of Touring Management Licences Used:</div>
         </div>
         <div className="flex flex-col">
-          <div className="text-base primary-dark-blue font-bold">{touringLicencesUsed}</div>
+          <div className="text-base primary-dark-blue font-bold">0</div>
         </div>
       </div>
 
@@ -115,7 +110,7 @@ export default function Users() {
           <Table
             testId="admin-permission-group-table"
             columnDefs={permissionGroupColDef(null)}
-            rowData={pgRowData}
+            rowData={[]}
             styleProps={styleProps}
             tableHeight={300}
           />
