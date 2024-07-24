@@ -8,6 +8,7 @@ import { TasksFilterType } from 'state/tasks/tasksFilterState';
 import { group } from 'radash';
 import { ProductionTask } from '@prisma/client';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
+import { convertToPDF } from 'utils/report';
 
 const getTaskStatusFromProgress = (progress: number) => {
   if (progress === 0) {
@@ -21,8 +22,8 @@ const getTaskStatusFromProgress = (progress: number) => {
 };
 
 const handler = async (req, res) => {
-  const { production, assignee, taskText, status, startDueDate, endDueDate } = (JSON.parse(req.body) ||
-    {}) as TasksFilterType;
+  const { production, assignee, taskText, status, startDueDate, endDueDate, format } = (JSON.parse(req.body) ||
+    {}) as TasksFilterType & { format?: string };
   let where = {};
   if (status) {
     if (status === 'todo') {
@@ -144,7 +145,10 @@ const handler = async (req, res) => {
     const task = taskList?.[0];
     const ShowName = `${task?.Production?.Show?.Name}`;
     const { StartDate, EndDate } = task.Production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
-    const weekNumsList = taskList.flatMap((ProductionTask) => [ProductionTask.CompleteByWeekNum, ProductionTask.StartByWeekNum]);
+    const weekNumsList = taskList.flatMap((ProductionTask) => [
+      ProductionTask.CompleteByWeekNum,
+      ProductionTask.StartByWeekNum,
+    ]);
     const weekNumToDateMap = getWeekNumsToDateMap(StartDate, EndDate, Array.from(new Set(weekNumsList)));
     taskList = taskList.filter((task) => {
       const taskDueDate = weekNumToDateMap?.[task.CompleteByWeekNum];
@@ -206,6 +210,25 @@ const handler = async (req, res) => {
   worksheet.getColumn('E').width = 5;
   worksheet.getColumn('G').alignment = { horizontal: 'center' };
   const filename = `Tasks.xlsx`;
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   workbook.xlsx.write(res).then(() => {

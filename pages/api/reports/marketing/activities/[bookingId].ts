@@ -6,6 +6,7 @@ import { sum } from 'radash';
 import { createHeaderRow } from 'services/marketing/reports';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE, applyFormattingToRange } from 'services/salesSummaryService';
+import { convertToPDF } from 'utils/report';
 
 interface ActivityType {
   Name: string;
@@ -39,7 +40,7 @@ interface ResponseData {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const { bookingId } = req.query || {};
+  const { bookingId, format } = req.query || {};
 
   if (req.method !== 'POST') {
     throw new Error('the method is not allowed');
@@ -135,9 +136,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     rowsToIgnore: 3,
     maxColWidth: Infinity,
   });
-
+  const filename = `marketing_activities`;
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename=marketing_activities.xlsx');
+  res.setHeader('Content-Disposition', `attachment; filename=${filename}.xlsx`);
 
   return workbook.xlsx.write(res).then(() => {
     res.status(200).end();
