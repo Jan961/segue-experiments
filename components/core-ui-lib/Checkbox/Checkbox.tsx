@@ -13,6 +13,7 @@ interface CheckboxProps {
   testId?: string;
   className?: string;
   labelClassName?: string;
+  required?: boolean;
 }
 
 const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
@@ -29,6 +30,7 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       className,
       label,
       labelClassName,
+      required = false,
     }: CheckboxProps,
     ref,
   ) => {
@@ -58,7 +60,15 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           className="peer relative appearance-none shrink-0 w-[1.1875rem] h-[1.1875rem] rounded-sm focus:ring-transparent  focus:checked:bg-primary-input-text checked:hover:bg-primary-input-text  checked:bg-primary-input-text border-2"
         />
 
-        {label && <Label data-testid={`${testId}-label`} text={label} className={labelClassName} variant="sm" />}
+        {label && (
+          <Label
+            data-testid={`${testId}-label`}
+            text={label}
+            className={labelClassName}
+            variant="sm"
+            required={required}
+          />
+        )}
 
         {showIntermediate && (
           <svg
