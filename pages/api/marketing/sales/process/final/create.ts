@@ -21,7 +21,7 @@ export default async function handle(req, res) {
 
     const sales = [];
 
-    if (general) {
+    if (!isNullOrEmpty(general)) {
       sales.push({
         SaleSaleTypeId: 1,
         SaleSeats: general.seatsSold,

@@ -56,6 +56,7 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
   const productionJump = useRecoilValue(productionJumpState);
   const [formData, setFormData] = useState(defaultFormData);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
+  const [loading, setLoading] = useState(false);
   const { production, status, fromDate, toDate, venue, selection } = formData;
   const productionsOptions = useMemo(() => {
     const options = productionJump.productions.map((production) => ({
@@ -93,33 +94,43 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
     setFormData((data) => ({ ...data, [key]: value }));
   }, []);
 
-  const onExport = useCallback(() => {
-    const selectedProduction = productionJump.productions?.find((prod) => prod.Id === parseInt(production));
-    const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
-    let promise;
-    switch (activeModal) {
-      case 'promotorHolds': {
-        promise = exportPromoterHoldsReport({ ...formData, productionCode }).then(() => onClose());
-        break;
+  const onExport = useCallback(
+    (format: string) => {
+      const selectedProduction = productionJump.productions?.find((prod) => prod.Id === parseInt(production));
+      const productionCode = selectedProduction ? `${selectedProduction?.ShowCode}${selectedProduction?.Code}` : null;
+      setLoading(true);
+      let promise;
+      switch (activeModal) {
+        case 'promotorHolds': {
+          promise = exportPromoterHoldsReport({ ...formData, productionCode, format }).then(() => onClose());
+          break;
+        }
+        case 'totalGrossSales':
+          promise = exportProductionGrossSales({ ...formData, format }).then(() => onClose());
+          break;
+        case 'holdsAndComps':
+          promise = exportHoldsComps({ ...formData, productionCode, format }).then(() => onClose());
+          break;
+        case 'selectedVenues':
+          promise = exportSelectedVenues({
+            ...formData,
+            productionCode,
+            showId: selectedProduction?.ShowId,
+            format,
+          }).then(() => onClose());
+          break;
       }
-      case 'totalGrossSales':
-        promise = exportProductionGrossSales({ ...formData }).then(() => onClose());
-        break;
-      case 'holdsAndComps':
-        promise = exportHoldsComps({ ...formData, productionCode }).then(() => onClose());
-        break;
-      case 'selectedVenues':
-        promise = exportSelectedVenues({ ...formData, productionCode, showId: selectedProduction?.ShowId }).then(() =>
-          onClose(),
-        );
-        break;
-    }
-    notify.promise(promise, {
-      loading: `Generating ${title}`,
-      success: `${title} downloaded successfully`,
-      error: `Error generating ${title}`,
-    });
-  }, [activeModal, formData, onClose, production, productionJump.productions, title]);
+      notify.promise(
+        promise.finally(() => setLoading(false)),
+        {
+          loading: `Generating ${title}`,
+          success: `${title} downloaded successfully`,
+          error: `Error generating ${title}`,
+        },
+      );
+    },
+    [activeModal, formData, onClose, production, productionJump.productions, title],
+  );
 
   return (
     <PopupModal
@@ -192,7 +203,17 @@ const GrossVenuesPromotorHoldsAndCompsModal = ({
             sufixIconName="excel"
             iconProps={{ className: 'h-4 w-3' }}
             text="Create Report"
-            onClick={onExport}
+            disabled={loading}
+            onClick={() => onExport('excel')}
+          />
+          <Button
+            onClick={() => onExport('pdf')}
+            className="float-right px-4 font-normal w-33 text-center"
+            variant="primary"
+            sufixIconName="document-solid"
+            iconProps={{ className: 'h-4 w-3' }}
+            text="Export to PDF"
+            disabled={loading}
           />
         </div>
       </form>

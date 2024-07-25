@@ -17,6 +17,7 @@ import useProcessPayment from 'hooks/useProcessPayment';
 import { notify } from 'components/core-ui-lib/Notifications';
 import { useRecoilValue } from 'recoil';
 import { globalState } from 'state/global/globalState';
+import { Checkbox } from 'components/core-ui-lib';
 
 const baseClass = `w-full block bg-primary-white p-1.5 h-[1.9375rem] !border text-sm shadow-input-shadow text-primary-input-text rounded-md outline-none focus:ring-2 focus:ring-primary-input-text ring-inset border-primary-border`;
 
@@ -118,10 +119,10 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
   }, [plan]);
 
   return (
-    <div className="mx-auto w-[32rem] flex flex-col gap-4">
+    <div className="mx-auto w-[40rem] flex flex-col gap-4">
       <h1 className="text-2xl font-bold text-center text-primary-input-text">Payment Details</h1>
       <div className="w-full flex justify-between mt-4 gap-5">
-        <section className="max-h-96 w-60 flex flex-col items-center rounded-md p-4 bg-primary-white border border-primary-border text-primary-input-text">
+        <section className="max-h-96 w-72 flex flex-col items-center rounded-md p-4 bg-primary-white border border-primary-border text-primary-input-text">
           <Icon iconName="price-plan" fill={plan.color} />
           <div className="flex gap-2  justify-center items-center">
             <h2 className="font-bold text-center text-responsive-2xl">{plan.planName}</h2>
@@ -137,7 +138,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
           </div>
           <Button text="Change Plan" onClick={previousStep} className="w-32" />
         </section>
-        <form onSubmit={handleFormSubmit} className="w-60 space-y-3 text-primary-input-text">
+        <form onSubmit={handleFormSubmit} className="w-72 space-y-2 text-primary-input-text">
           <div className="w-full flex items-center">
             <Label text="Pay Monthly" />
             <Toggle
@@ -158,7 +159,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
             }`}
           />
           <div>
-            <Label htmlFor="cardHolderName" text="Cardholder Name" />
+            <Label htmlFor="cardHolderName" text="Cardholder Name" required />
             <TextInput
               testId="payment-details-form-cardholdername"
               id="cardHolderName"
@@ -171,23 +172,23 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
           </div>
 
           <div data-testid="payment-details-form-cardnumber">
-            <Label htmlFor="cardNumber" text="Card Number" />
+            <Label htmlFor="cardNumber" text="Card Number" required />
             <CardNumberElement id="cardNumber" className={baseClass} />
           </div>
 
           <div className="flex gap-2 w-full items-center">
             <div data-testid="payment-details-form-cardexpiry" className="w-1/2">
-              <Label htmlFor="cardExpiry" text="Expiry Date" />
+              <Label htmlFor="cardExpiry" text="Expiry Date" required />
               <CardExpiryElement id="cardExpiry" className={classNames(baseClass, 'w-full')} />
             </div>
             <div data-testid="payment-details-form-cardcvc" className="w-1/2">
-              <Label htmlFor="cardCVC" text="CVC" />
+              <Label htmlFor="cardCVC" text="CVC" required />
               <CardCvcElement id="cardCVC" className={classNames(baseClass, 'w-full')} />
             </div>
           </div>
 
           <div>
-            <Label htmlFor="postcode" text="Postcode" />
+            <Label htmlFor="postcode" text="Postcode" required />
             <TextInput
               testId="payment-details-form-postcode"
               id="postcode"
@@ -197,7 +198,7 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
             />
           </div>
           <div>
-            <Label htmlFor="email" text="Email" />
+            <Label htmlFor="email" text="Email" required />
             <TextInput
               testId="payment-details-form-email"
               className="flex w-full"
@@ -206,6 +207,19 @@ const PaymentDetailsForm = ({ plan, accountDetails }: PaymentDetailsFormProps) =
               name="email"
               value={paymentDetails.email}
               onChange={handleFormChange}
+            />
+          </div>
+          <div className="relative pt-2">
+            <a href="#" onClick={null} className="text-md ml-6 relative mt-3 underline">
+              VIEW SOFTWARE LICENCE AGREEMENT
+            </a>
+            <Checkbox
+              testId="payment-details-form-licence-agreement"
+              id="licence-agreement"
+              name="licence-agreement"
+              onChange={handleFormChange}
+              label="I have read and agree to the terms"
+              required
             />
           </div>
 

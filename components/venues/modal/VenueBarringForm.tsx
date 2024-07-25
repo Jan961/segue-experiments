@@ -66,6 +66,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
       <label className="grid grid-cols-[100px_minmax(100px,350px)]  gap-10   w-full">
         <p className="text-primary-input-text">Barring Clause</p>
         <TextArea
+          testId="barring-clause"
           id="barringClause"
           placeholder="Enter Barring Clause"
           className="w-full max-h-32 min-h-[50px]  justify-between"
@@ -80,6 +81,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
             <label htmlFor="" className="grid grid-cols-[100px_minmax(200px,30px)] gap-10 justify-items-start  w-full">
               <p className="text-primary-input-text">Pre Show</p>
               <TextInput
+                testId="barring-preshow-weeks"
                 id="preShow"
                 placeholder="Enter Pre Show Weeks"
                 type="number"
@@ -94,6 +96,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
             <label htmlFor="" className="grid grid-cols-[100px_minmax(200px,30px)] gap-10 justify-items-start  w-full">
               <p className="text-primary-input-text">Post Show</p>
               <TextInput
+                testId="barring-postshow-weeks"
                 id="address2"
                 placeholder="Enter Post Show Weeks"
                 type="number"
@@ -108,6 +111,7 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
             <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
               <p className="text-primary-input-text">Barring Miles</p>
               <TextInput
+                testId="barring-miles"
                 id="barringMiles"
                 placeholder="Enter Barring Miles"
                 type="number"
@@ -124,9 +128,15 @@ const VenueBarringForm = ({ venue, onChange, validationErrors, updateValidationE
         </div>
         <div className=" ">
           <div className="flex justify-end pb-3">
-            <Button onClick={addNewBarredVenue} text="Add Barred Venue" className="w-32" />
+            <Button
+              onClick={addNewBarredVenue}
+              testId="add-barred-venue-btn"
+              text="Add Barred Venue"
+              className="w-32"
+            />
           </div>
           <Table
+            testId="barred-venues-table"
             onCellClicked={onCellClicked}
             styleProps={styleProps}
             columnDefs={columnDefs}

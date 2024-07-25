@@ -83,6 +83,7 @@ const SelectCellRenderer = ({
         ref={selectRef}
         isSearchable={isSearchable}
         renderOption={(option) => <CustomOption option={option} isMulti={isMulti} {...props} />}
+        menuPlacement="auto"
         {...props}
       />
     </BaseCellRenderer>

@@ -34,7 +34,7 @@ const ContractFilters = () => {
             searchFilter={filter.contractText}
             setSearchFilter={(contractText) => setFilter({ contractText })}
             titleClassName="text-primary-blue"
-            title={'Venue Contracts'}
+            title="Venue Contracts"
           >
             <TextInput
               id="contractText"

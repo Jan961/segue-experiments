@@ -50,6 +50,7 @@ const MainVenueForm = ({
             body="Venue Code is the first three letters of the town followed by the first three letters of the venue. eg. King's Theatre, Glasgow would have the code GLAKIN."
           >
             <TextInput
+              testId="main-venue-code"
               id="venueCode"
               type="text"
               maxlength={6}
@@ -67,6 +68,7 @@ const MainVenueForm = ({
       </div>
       <div className="flex flex-col">
         <Select
+          testId="main-venue-status"
           label="Venue Status"
           options={venueStatusOptions}
           onChange={(value) => handleInputChange('venueStatus', value)}
@@ -82,6 +84,7 @@ const MainVenueForm = ({
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <p className="text-primary-input-text">Venue Name</p>
           <TextInput
+            testId="main-venue-name"
             placeholder="Enter Venue Name"
             className="w-[364px]"
             value={formData.venueName}
@@ -93,12 +96,14 @@ const MainVenueForm = ({
       </div>
       <div className="flex flex-row justify-between pl-20">
         <Checkbox
+          testId="main-venue-vat-checkbox"
           label="VAT Indicator"
           id="vatIndicator"
           checked={formData.vatIndicator}
           onChange={(e) => handleInputChange('vatIndicator', e.target.value)}
         />
         <Checkbox
+          testId="main-venue-culturallyExempt-checkbox"
           label="Culturally Exempt Venue"
           id="culturallyExempt"
           checked={formData.culturallyExempt}
@@ -109,6 +114,7 @@ const MainVenueForm = ({
         <label className="flex flex-row gap-5 justify-between">
           <p className="text-primary-input-text">Venue Family</p>
           <Select
+            testId="main-venue-family"
             name="venueFamily"
             placeholder="Venue Family Dropdown"
             className="w-[364px] font-bold"
@@ -122,6 +128,7 @@ const MainVenueForm = ({
       <label htmlFor="" className="flex flex-row gap-5 justify-between ">
         <p className="text-primary-input-text">Town Population</p>
         <TextInput
+          testId="main-venue-town-population"
           placeholder="Enter Town Population"
           type="number"
           className="w-[364px]"
@@ -134,6 +141,7 @@ const MainVenueForm = ({
         <label htmlFor="" className="flex flex-row gap-5 justify-between ">
           <p className="text-primary-input-text">Capacity</p>
           <TextInput
+            testId="main-venue-capacity"
             placeholder="Enter Capacity"
             type="number"
             className="w-[364px]"
@@ -150,6 +158,7 @@ const MainVenueForm = ({
       >
         <p className="text-primary-input-text">Website</p>
         <TextInput
+          testId="main-venue-website"
           placeholder="Enter Venue Website"
           className="w-full justify-between"
           inputClassName="w-full"
@@ -163,6 +172,7 @@ const MainVenueForm = ({
       >
         <p className="text-primary-input-text">Notes</p>
         <TextArea
+          testId="main-venue-notes"
           placeholder="Notes Field"
           className="w-full max-h-40 min-h-[50px]  justify-between"
           value={formData.notes}
@@ -180,6 +190,7 @@ const MainVenueForm = ({
           <Icon iconName="info-circle-solid" />
         </Tooltip>
         <Checkbox
+          testId="main-venue-exclude-barring-and-gap-suggestions-checkbox"
           id="excludeFromChecks"
           checked={formData.excludeFromChecks}
           onChange={(e) => handleInputChange('excludeFromChecks', e.target.value)}
