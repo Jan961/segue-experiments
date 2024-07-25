@@ -132,10 +132,17 @@ const VenueContactForm = ({
     <div className="block mb-4">
       <div className="flex flex-row items-center justify-between  pb-5">
         <h2 className="text-xl text-primary-navy font-bold ">{title}</h2>
-        <Button disabled={createMode} onClick={onAddNewVenueContact} variant="primary" text="Add New Contact" />
+        <Button
+          disabled={createMode}
+          onClick={onAddNewVenueContact}
+          variant="primary"
+          testId="add-new-contract-btn"
+          text="Add New Contact"
+        />
       </div>
       <div className="min-h-52">
         <Table
+          testId="venue-contracts-table"
           columnDefs={venueContactDefs(venueRoleOptionList)}
           rowData={venueContacts}
           styleProps={tableStyleProps}
