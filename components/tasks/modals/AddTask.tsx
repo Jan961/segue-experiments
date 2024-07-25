@@ -342,11 +342,14 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const handleDeletePress = () => {
-    console.log(inputs?.PRTId);
-    if (!isNullOrEmpty(inputs?.PRTId)) {
-      setShowRecurringDelete(true);
-    } else {
+    if (isMasterTask) {
       setShowSingleDelete(true);
+    } else {
+      if (!isNullOrEmpty(inputs?.PRTId)) {
+        setShowRecurringDelete(true);
+      } else {
+        setShowSingleDelete(true);
+      }
     }
   };
 

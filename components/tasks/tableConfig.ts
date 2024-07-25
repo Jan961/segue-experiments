@@ -8,6 +8,7 @@ import getTaskDateStatusColor, { getWeekOptions } from 'utils/getTaskDateStatus'
 import { calculateTaskStatus } from 'utils/tasks';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRenderer from 'components/bookings/table/IconRenderer';
+import MasterTaskNameRenderer from './modals/renderers/MasterTaskNameRenderer';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
@@ -180,7 +181,7 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerName: 'Task Name',
       field: 'Name',
-      cellRenderer: DefaultCellRenderer,
+      cellRenderer: MasterTaskNameRenderer,
       width: 445,
       flex: 1,
     },

@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
-import { generateRecurringMasterTasks } from 'services/TaskService';
+import { generateSingleRecurringMasterTask } from 'services/TaskService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -22,24 +22,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    console.log(
-      'NEW TASK LIST -------------------------------------------------------------------------------------------------------------',
-    );
-    console.log(req.body);
-    const taskList: any[] = await generateRecurringMasterTasks(req.body, recurringTask.Id);
+    const task = await generateSingleRecurringMasterTask(req.body, recurringTask.Id);
 
-    const createdTasks = await Promise.all(
-      taskList.map(
-        async (task) =>
-          await prisma.MasterTask.create({
-            data: {
-              ...task,
-              AccountId,
-            },
-          }),
-      ),
-    );
-    res.json(createdTasks);
+    const createdTask = await prisma.MasterTask.create({
+      data: {
+        ...task,
+        AccountId,
+      },
+    });
+
+    res.json(createdTask);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Error creating Recurring ProductionTask' });

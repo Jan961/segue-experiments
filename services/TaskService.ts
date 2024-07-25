@@ -101,6 +101,51 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
   return tasksToCreate;
 };
 
+export const generateSingleRecurringMasterTask = async (requestBody, MTRId: number) => {
+  const {
+    Name,
+    StartByWeekNum,
+    CompleteByWeekNum,
+    Priority,
+    Progress,
+    TaskRepeatFromWeekNum,
+    TaskCompletedDate,
+    AssignedToUserId,
+    Notes,
+  } = requestBody;
+
+  const maxTaskCode =
+    (
+      await prisma.MasterTask.findFirst({
+        select: {
+          Code: true,
+        },
+        orderBy: {
+          Code: 'desc',
+        },
+      })
+    )?.Code + 1 || 0;
+
+  const taskAllowance = CompleteByWeekNum - StartByWeekNum;
+  const taskStartDate = TaskRepeatFromWeekNum;
+
+  const completeBy = taskStartDate + taskAllowance;
+  return {
+    Code: maxTaskCode,
+    Name,
+    Priority,
+    Notes,
+    Progress,
+    AssignedToUserId,
+    TaskStartByIsPostProduction: false,
+    StartByWeekNum: taskStartDate,
+    TaskCompleteByIsPostProduction: false,
+    CompleteByWeekNum: completeBy,
+    TaskCompletedDate,
+    MTRId,
+  };
+};
+
 export const generateRecurringProductionTasks = async (requestBody, prodBlock, prodStartDate, PRTId) => {
   const {
     Name,
