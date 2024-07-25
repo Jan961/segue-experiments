@@ -167,6 +167,7 @@ export default forwardRef(function Select(
         height: COMP_HEIGHT,
       }),
       menu: (styles) => ({ ...styles, zIndex: 20 }),
+      menuPortal: (styles) => ({ ...styles, zIndex: 999999 }),
       ...customStyles,
     }),
     [customStyles, variant],
@@ -232,6 +233,17 @@ export default forwardRef(function Select(
     MultiValue,
   };
 
+  const getGridViewportElement = (): HTMLElement | null => {
+    return document.body;
+  };
+
+  const [menuPortalTarget, setMenuPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const gridViewportElement = getGridViewportElement();
+    setMenuPortalTarget(gridViewportElement);
+  }, []);
+
   return (
     <div
       className={classNames(
@@ -272,6 +284,9 @@ export default forwardRef(function Select(
           hideSelectedOptions={false}
           onBlur={onBlur}
           menuPlacement={menuPlacement}
+          menuPortalTarget={menuPortalTarget}
+          menuPosition="fixed" // Ensure the menu is positioned correctly
+          menuShouldScrollIntoView={false} // Prevent auto scrolling
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
               return true;

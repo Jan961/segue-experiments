@@ -65,7 +65,7 @@ const GridStyles = createGlobalStyle<StyleProps>`
 .popupModal .ag-center-cols-clipper, 
 .popupModal .ag-center-cols-viewport,
 .popupModal .ag-body-viewport-wrapper {
-    overflow: visible !important;
+    overflow-x: hidden !important;
 }
 
 .ag-checkbox-cell{
