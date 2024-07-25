@@ -724,8 +724,8 @@ model ProductionTask {
   ProductionId               Int
   Code                       Int                   @map("TaskCode") @db.SmallInt
   Name                       String                @map("TaskName") @db.VarChar(80)
-  CopiedFrom             String?                   @map("TaskCopiedFrom")@db.Char(1)
-  CopiedId               Int?                      @map("TaskCopiedId")
+  CopiedFrom                 String?               @map("TaskCopiedFrom") @db.Char(1)
+  CopiedId                   Int?                  @map("TaskCopiedId")
   Priority                   Int                   @default(0) @map("TaskPriority") @db.TinyInt
   Notes                      String?               @map("TaskNotes") @db.VarChar(500)
   Progress                   Int                   @default(0) @map("TaskProgress") @db.TinyInt
@@ -735,8 +735,8 @@ model ProductionTask {
   StartByIsPostProduction    Boolean               @default(dbgenerated("(b'0')")) @map("TaskStartByIsPostProduction") @db.Bit(1)
   CompleteByWeekNum          Int?                  @map("TaskCompleteByWeekNum") @db.SmallInt
   TaskCompletedDate          DateTime?             @db.Date
-  PRTId                  Int?                      @map("TaskPRTId")
-  ProductionTaskRepeat       ProductionTaskRepeat? @relation(fields: [Id], references: [Id], onDelete: Cascade, map: "ProductionTaskRepeat_ProductionTask")
+  PRTId                      Int?                  @map("TaskPRTId")
+  ProductionTaskRepeat       ProductionTaskRepeat? @relation(fields: [PRTId], references: [Id], onDelete: Cascade, map: "ProductionTaskRepeat_ProductionTask")
   Production                 Production            @relation(fields: [ProductionId], references: [Id], onDelete: Cascade, map: "Production_ProductionTask")
   User                       User?                 @relation(fields: [AssignedToUserId], references: [Id], onDelete: NoAction, map: "User_ProductionTask_Assigned")
   TaskWatcher                TaskWatcher[]
@@ -746,6 +746,7 @@ model ProductionTask {
   @@index([AssignedToUserId], map: "User_ProductionTask_Assigned")
   @@index([PRTId], map: "ProductionTaskRepeat_ProductionTask")
 }
+
 
 model AccountContact {
   AccContId        Int        @id @default(autoincrement())
@@ -1145,10 +1146,10 @@ model PersonRole {
 model MasterTaskRepeat {
   Id                             Int          @map("MTRId")@id @default(autoincrement())
   FromWeekNum                    Int          @map("MTRFromWeekNum")@db.SmallInt
-  MTRFromWeekNumIsPostProduction Boolean      @map("MTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  MTRToWeekNum                   Int          @map("MTRToWeekNum")@db.SmallInt
-  MTRToWeekNumIsPostProduction   Boolean      @map("MTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  MTRInterval                    String       @map("MTRInterval")@db.VarChar(20)
+  FromWeekNumIsPostProduction Boolean      @map("MTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
+  ToWeekNum                   Int          @map("MTRToWeekNum")@db.SmallInt
+  ToWeekNumIsPostProduction   Boolean      @map("MTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
+  Interval                    String       @map("MTRInterval")@db.VarChar(20)
   MasterTask                     MasterTask[]
 }
 

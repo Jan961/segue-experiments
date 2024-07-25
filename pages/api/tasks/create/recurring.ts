@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { generateRecurringTasks } from 'services/TaskService';
+import { generateRecurringProductionTasks } from 'services/TaskService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -33,7 +33,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     console.log(
       'NEW TASK LIST -------------------------------------------------------------------------------------------------------------',
     );
-    const taskList: any[] = await generateRecurringTasks(req.body, prodBlock, prodBlock?.StartDate, recurringTask.Id);
+    const taskList: any[] = await generateRecurringProductionTasks(
+      req.body,
+      prodBlock,
+      prodBlock?.StartDate,
+      recurringTask.Id,
+    );
 
     const createdTasks = await Promise.all(
       taskList.map(

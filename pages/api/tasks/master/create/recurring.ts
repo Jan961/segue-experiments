@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getEmailFromReq, checkAccess } from 'services/userService';
-import { generateRecurringTasks } from 'services/TaskService';
+import { getEmailFromReq, checkAccess, getAccountIdFromReq } from 'services/userService';
+import { generateRecurringMasterTasks } from 'services/TaskService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -9,15 +9,10 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const email = await getEmailFromReq(req);
     const access = await checkAccess(email, { ProductionId });
+    const AccountId = await getAccountIdFromReq(req);
     if (!access) return res.status(401).end();
 
-    const productionWeeks = await prisma.DateBlock.findMany({
-      where: {
-        ProductionId: parseInt(ProductionId),
-      },
-    });
-
-    const recurringTask = await prisma.ProductionTaskRepeat.create({
+    const recurringTask = await prisma.MasterTaskRepeat.create({
       data: {
         FromWeekNum: TaskRepeatFromWeekNum,
         ToWeekNum: TaskRepeatToWeekNum,
@@ -27,20 +22,19 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    const prodBlock = productionWeeks.find((dateBlock) => {
-      return dateBlock.Name === 'Production';
-    });
     console.log(
       'NEW TASK LIST -------------------------------------------------------------------------------------------------------------',
     );
-    const taskList: any[] = await generateRecurringTasks(req.body, prodBlock, prodBlock?.StartDate, recurringTask.Id);
+    console.log(req.body);
+    const taskList: any[] = await generateRecurringMasterTasks(req.body, recurringTask.Id);
 
     const createdTasks = await Promise.all(
       taskList.map(
         async (task) =>
-          await prisma.productionTask.create({
+          await prisma.MasterTask.create({
             data: {
               ...task,
+              AccountId,
             },
           }),
       ),
