@@ -90,7 +90,11 @@ const TimeInput = forwardRef<HTMLInputElement, TimeInputProps>(
           setTime({ ...value, sec: value.sec || '' });
         } else if (typeof value === 'string') {
           const parts = value.split(':');
-          setTime({ hrs: parts[0], min: parts[1], sec: parts[2] || '' });
+          setTime({
+            hrs: parts[0] === undefined ? '00' : parts[0],
+            min: parts[1] === undefined ? '00' : parts[1],
+            sec: parts[2] === undefined ? '00' : parts[2],
+          });
         }
       } else {
         setTime(DEFAULT_TIME);
