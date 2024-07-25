@@ -3,7 +3,6 @@ import Table from 'components/core-ui-lib/Table';
 import ContactNoteModal, { ContactNoteModalVariant } from '../modal/ContactNoteModal';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { BookingContactNoteDTO } from 'interfaces';
-import useAxios from 'hooks/useAxios';
 import { contactNoteColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { productionJumpState } from 'state/booking/productionJumpState';
@@ -13,6 +12,7 @@ import { Spinner } from 'components/global/Spinner';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
+import axios from 'axios';
 
 interface ContactNotesTabProps {
   bookingId: string;
@@ -23,8 +23,6 @@ export interface ContactNoteTabRef {
 }
 
 const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((props, ref) => {
-  const { fetchData } = useAxios();
-
   const [showContactNoteModal, setShowContactNoteModal] = useState<boolean>(false);
   const [contactModalVariant, setContactModalVariant] = useState<ContactNoteModalVariant>();
   const [contactNoteRows, setContactNoteRows] = useState<Array<BookingContactNoteDTO>>();
@@ -46,13 +44,10 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
   const getContactNotes = async (bookingId: string, users) => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/contactNotes/' + bookingId,
-        method: 'POST',
-      });
+      const contactNoteResponse = await axios.get('/api/marketing/contactNotes/' + bookingId);
 
-      if (typeof data === 'object') {
-        const contactNoteList = data as Array<BookingContactNoteDTO>;
+      if (typeof contactNoteResponse.data === 'object') {
+        const contactNoteList = contactNoteResponse.data as Array<BookingContactNoteDTO>;
 
         const sortedContactNotes = contactNoteList.sort(
           (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
@@ -80,11 +75,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
   const saveContactNote = async (variant: ContactNoteModalVariant, data) => {
     if (variant === 'add') {
-      await fetchData({
-        url: '/api/marketing/contactNotes/create',
-        data,
-        method: 'POST',
-      });
+      await axios.post('/api/marketing/contactNotes/create', data);
 
       const conNoteData = [...contactNoteRows, data];
 
@@ -96,11 +87,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       setContactNoteRows(sortedContactNotes);
       setShowContactNoteModal(false);
     } else if (variant === 'edit') {
-      await fetchData({
-        url: '/api/marketing/contactNotes/update',
-        method: 'POST',
-        data,
-      });
+      await axios.post('/api/marketing/contactNotes/update', data);
 
       const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
       const newRows = [...contactNoteRows];
@@ -113,11 +100,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       setContactNoteRows(sortedContactNotes);
       setShowContactNoteModal(false);
     } else if (variant === 'delete') {
-      await fetchData({
-        url: '/api/marketing/contactNotes/delete',
-        method: 'POST',
-        data,
-      });
+      await axios.post('/api/marketing/contactNotes/delete', data);
 
       const rowIndex = contactNoteRows.findIndex((conNote) => conNote.Id === data.Id);
       const newRows = [...contactNoteRows];

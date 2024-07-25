@@ -3,7 +3,6 @@ import Button from 'components/core-ui-lib/Button';
 import AllocatedSeatsModal from '../modal/AllocatedSeatsModal';
 import AvailableSeatsModal from '../modal/AvailableSeatsModal';
 import Checkbox from 'components/core-ui-lib/Checkbox';
-import useAxios from 'hooks/useAxios';
 import Table from 'components/core-ui-lib/Table';
 import { allocSeatsColDefs, styleProps } from '../table/tableConfig';
 import { AllocatedHoldDTO } from 'interfaces';
@@ -18,6 +17,7 @@ import { Spinner } from 'components/global/Spinner';
 import { exportExcelReport } from 'components/bookings/modal/request';
 import { notify } from 'components/core-ui-lib';
 import { productionJumpState } from 'state/booking/productionJumpState';
+import axios from 'axios';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
@@ -58,8 +58,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     },
   }));
 
-  const { fetchData } = useAxios();
-
   const editAvailSeats = (holdRec) => {
     setAvailData(holdRec);
     setShowAvailSeatModal(true);
@@ -67,11 +65,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const saveAvailSeats = async (data) => {
     try {
-      await fetchData({
-        url: '/api/marketing/availableSeats/update',
-        method: 'POST',
-        data,
-      });
+      await axios.post('/api/marketing/availableSeats/update', data);
 
       getPromoterHoldData(bookingIdVal);
       setShowAvailSeatModal(false);
@@ -82,13 +76,10 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const getPromoterHoldData = async (bookingId) => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/promoterHolds/' + bookingId,
-        method: 'POST',
-      });
+      const response = await axios.get('/api/marketing/promoterHolds/' + bookingId);
 
-      if (typeof data === 'object') {
-        const promData = data as PromoterData;
+      if (typeof response.data === 'object') {
+        const promData = response.data as PromoterData;
         setHoldList(promData.holds);
 
         setAllocRows(
@@ -147,33 +138,14 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     const holdRec = holdList.find((hold) => hold.info.Id === perfId);
     const recData = { AvailableCompId: holdRec.availableCompId, ...data };
 
-    if (type === 'new') {
-      await fetchData({
-        url: '/api/marketing/allocatedSeats/create',
-        method: 'POST',
-        data: recData,
-      });
+    const apiRoute = {
+      new: 'create',
+      edit: 'update',
+      delete: 'delete',
+    };
 
-      getPromoterHoldData(bookingIdVal);
-      setShowAllocSeatsModal(false);
-    } else if (type === 'edit') {
-      await fetchData({
-        url: '/api/marketing/allocatedSeats/update',
-        method: 'POST',
-        data: recData,
-      });
-
-      getPromoterHoldData(bookingIdVal);
-    } else if (type === 'delete') {
-      await fetchData({
-        url: '/api/marketing/allocatedSeats/delete',
-        method: 'POST',
-        data: recData,
-      });
-
-      getPromoterHoldData(bookingIdVal);
-    }
-
+    await axios.post(`/api/marketing/allocatedSeats/${apiRoute[type]}`, recData);
+    getPromoterHoldData(bookingIdVal);
     setShowAllocSeatsModal(false);
   };
 
@@ -186,11 +158,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     }
 
     // update in the database
-    await fetchData({
-      url: '/api/bookings/update/' + bookingIdVal,
-      method: 'POST',
-      data: updObj,
-    });
+    await axios.post('/api/bookings/update/' + bookingIdVal, updObj);
   };
 
   const triggerEdit = (e) => {

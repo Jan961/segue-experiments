@@ -2,7 +2,6 @@ import axios from 'axios';
 import Button from 'components/core-ui-lib/Button';
 import Table from 'components/core-ui-lib/Table';
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import useAxios from 'hooks/useAxios';
 import { attachmentsColDefs, styleProps } from '../table/tableConfig';
 import UploadModal from 'components/core-ui-lib/UploadModal';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
@@ -19,8 +18,6 @@ export interface AttachmentsTabRef {
 }
 
 const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props, ref) => {
-  const { fetchData } = useAxios();
-
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
   const [venueAttachRows, setVenueAttachRows] = useState([]);
   const [prodAttachRows, setProdAttachRows] = useState([]);
@@ -82,11 +79,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
       };
 
       // update in the database
-      await fetchData({
-        url: '/api/marketing/attachments/create',
-        method: 'POST',
-        data: fileRec,
-      });
+      await axios.post('/api/marketing/attachments/create', fileRec);
 
       // append to table to prevent the need for an API call to get new data
       if (attachType === 'Production') {
@@ -102,18 +95,15 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
 
   const getAttachments = async (bookingId) => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/attachments/' + bookingId,
-        method: 'POST',
-      });
+      const response = await axios.get('/api/marketing/attachments/' + bookingId);
 
-      if (Array.isArray(data)) {
-        if ('error' in data) {
+      if (Array.isArray(response.data)) {
+        if ('error' in response.data) {
           return;
         }
 
-        const venueAttach = data.filter((attach) => attach.FileDescription === 'Venue');
-        const prodAttach = data.filter((attach) => attach.FileDescription === 'Production');
+        const venueAttach = response.data.filter((attach) => attach.FileDescription === 'Venue');
+        const prodAttach = response.data.filter((attach) => attach.FileDescription === 'Production');
 
         setVenueAttachRows(venueAttach);
         setProdAttachRows(prodAttach);
@@ -145,35 +135,31 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
   };
 
   const deleteAttachment = async (data, rowIndex) => {
-    await fetchData({
-      url: '/api/marketing/attachments/delete',
-      method: 'POST',
-      data,
-    });
+    try {
+      await axios.post('/api/marketing/attachments/delete', data);
 
-    if (data.FileDescription === 'Venue') {
-      const newRows = [...venueAttachRows];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
+      if (data.FileDescription === 'Venue') {
+        const newRows = [...venueAttachRows];
+        if (rowIndex !== -1) {
+          newRows.splice(rowIndex, 1);
+        }
+        setVenueAttachRows(newRows);
+      } else if (data.FileDescription === 'Production') {
+        const newRows = [...prodAttachRows];
+        if (rowIndex !== -1) {
+          newRows.splice(rowIndex, 1);
+        }
+        setProdAttachRows(newRows);
       }
-      setVenueAttachRows(newRows);
-    } else if (data.FileDescription === 'Production') {
-      const newRows = [...prodAttachRows];
-      if (rowIndex !== -1) {
-        newRows.splice(rowIndex, 1);
-      }
-      setProdAttachRows(newRows);
+
+      setShowConfirm(false);
+    } catch (error) {
+      console.log(error);
     }
-
-    setShowConfirm(false);
   };
 
   const handleCellValueChange = async (event) => {
-    await fetchData({
-      url: '/api/marketing/attachments/update',
-      method: 'POST',
-      data: event.data,
-    });
+    await axios.post('/api/marketing/attachments/update', event.data);
   };
 
   useEffect(() => {

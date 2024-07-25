@@ -5,9 +5,9 @@ import VenueContactForm from 'components/venues/modal/VenueContactsForm';
 import { styleProps } from '../table/tableConfig';
 import { UiVenueContact, mapVenueContactToPrisma } from 'utils/venue';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
-import useAxios from 'hooks/useAxios';
 import { VenueContactDTO } from 'interfaces';
 import { Spinner } from 'components/global/Spinner';
+import axios from 'axios';
 
 interface VenueContactsProps {
   bookingId: string;
@@ -28,8 +28,6 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
     ...venueRoles.filter((vr) => vr.Standard === true).map((vr) => vr.Standard && { text: vr.Name, value: vr.Id }),
   ];
 
-  const { fetchData } = useAxios();
-
   useImperativeHandle(ref, () => ({
     resetData: () => {
       setDataAvailable(false);
@@ -49,14 +47,12 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
 
       // create a new role if it doesn't exist in the standard list - the api also does this check
       if (roleIndex === -1) {
-        venueRole = await fetchData({
-          url: '/api/venue/role/upsert',
-          method: 'POST',
-          data: {
-            name: newContact.roleName,
-            isStandard: false,
-          },
+        const response = await axios.post('/api/venue/role/upsert', {
+          name: newContact.roleName,
+          isStandard: false,
         });
+
+        venueRole = response.data;
 
         setVenueRoles([...venueRoles, venueRole]);
       }
@@ -71,11 +67,8 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
         VenueId: booking.VenueId,
       };
 
-      const newVenueContact = await fetchData({
-        url: '/api/marketing/venueContacts/create',
-        method: 'POST',
-        data: newVc,
-      });
+      const response = await axios.post('/api/marketing/venueContacts/create', newVc);
+      const newVenueContact = response.data;
 
       if (typeof newVenueContact === 'object') {
         const newRole = newVenueContact as VenueContactDTO;
@@ -101,20 +94,12 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
       const dataToUpdate = { ...updatedRow, VenueId: booking.VenueId, Id: vcId, VenueRoleId: role.Id };
 
-      await fetchData({
-        url: '/api/marketing/venueContacts/update',
-        method: 'POST',
-        data: dataToUpdate,
-      });
+      await axios.post('/api/marketing/venueContacts/update', dataToUpdate);
 
       // delete venue contact
     } else if (variant === 'delete') {
       const updatedRow = mapVenueContactToPrisma(data.updatedFormData);
-      await fetchData({
-        url: '/api/marketing/venueContacts/delete',
-        method: 'POST',
-        data: updatedRow,
-      });
+      await axios.post('/api/marketing/venueContacts/delete', updatedRow);
     }
   };
 
@@ -122,13 +107,10 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
     try {
       setVenueContacts([]);
 
-      const data = await fetchData({
-        url: '/api/marketing/venueContacts/' + venueId,
-        method: 'POST',
-      });
+      const response = await axios.get('/api/marketing/venueContacts/' + venueId);
 
-      if (typeof data === 'object') {
-        const venueContactList = data as Array<VenueContactDTO>;
+      if (typeof response.data === 'object') {
+        const venueContactList = response.data as Array<VenueContactDTO>;
         const venueContactUiList: Array<UiVenueContact> = [];
 
         venueContactList.forEach((vc) => {
