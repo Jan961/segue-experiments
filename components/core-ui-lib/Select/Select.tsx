@@ -167,7 +167,7 @@ export default forwardRef(function Select(
         height: COMP_HEIGHT,
       }),
       menu: (styles) => ({ ...styles, zIndex: 20 }),
-      menuPortal: (styles) => ({ ...styles, zIndex: 999999 }),
+      menuPortal: (styles) => ({ ...styles, zIndex: 50 }),
       ...customStyles,
     }),
     [customStyles, variant],
@@ -285,8 +285,8 @@ export default forwardRef(function Select(
           onBlur={onBlur}
           menuPlacement={menuPlacement}
           menuPortalTarget={menuPortalTarget}
-          menuPosition="fixed" // Ensure the menu is positioned correctly
-          menuShouldScrollIntoView={false} // Prevent auto scrolling
+          menuPosition="fixed"
+          menuShouldScrollIntoView={false}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
               return true;
