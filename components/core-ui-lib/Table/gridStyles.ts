@@ -60,11 +60,11 @@ const GridStyles = createGlobalStyle<StyleProps>`
     overflow: visible;
 }
 
-.ag-root,
-.ag-root-wrapper, 
-.ag-center-cols-clipper, 
-.ag-center-cols-viewport,
-.ag-body-viewport-wrapper {
+.popupModal .ag-root,
+.popupModal .ag-root-wrapper, 
+.popupModal .ag-center-cols-clipper, 
+.popupModal .ag-center-cols-viewport,
+.popupModal .ag-body-viewport-wrapper {
     overflow: visible !important;
 }
 

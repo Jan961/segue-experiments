@@ -94,7 +94,7 @@ export default function PopupModal({
                   {title}
                 </Dialog.Title>
 
-                <div className="mt-1">{children}</div>
+                <div className="mt-1 popupModal">{children}</div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
