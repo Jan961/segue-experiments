@@ -39,7 +39,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const [castRateArranged, setCastRateArranged] = useState<boolean>(false);
   const [allocRows, setAllocRows] = useState([]);
   const [castRateNotes, setCastRateNotes] = useState('');
-  const [availSeatsCont, setAvailSeatsCont] = useState(null);
   const [holdList, setHoldList] = useState(null);
   const [bookingIdVal, setBookingIdVal] = useState(null);
   const [allocatedRow, setAllocatedRow] = useState(null);
@@ -93,39 +92,6 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
         // process the available seats data
         setTableHeight(120 * promData.allocations.length);
-        const tempAvailSeats = [];
-        promData.holds.forEach((holdRec) => {
-          const splitNotes = holdRec.note.split('\r\n');
-          tempAvailSeats.push(
-            <div>
-              <Icon color="#fff" className="float-right mt-3" iconName="edit" onClick={() => editAvailSeats(holdRec)} />
-              <div className="w-[1045px] bg-white mb-1 rounded-md border border-primary-border">
-                <div className="text-base text-primary-navy font-bold ml-2">
-                  {formatInputDate(holdRec.info.Date)} | {holdRec.info.Time.substring(0, 5)} | Seats Allocated:{' '}
-                  {holdRec.totalAllocated > holdRec.totalAvailable ? (
-                    <span className="text-primary-red">
-                      {holdRec.totalAllocated} / {holdRec.totalAvailable}
-                    </span>
-                  ) : (
-                    <span>
-                      {holdRec.totalAllocated} / {holdRec.totalAvailable}
-                    </span>
-                  )}
-                </div>
-                <div className="text-sm text-primary-navy ml-2 overflow-y-auto">
-                  {splitNotes.map((line, index) => (
-                    <React.Fragment key={index}>
-                      {line}
-                      {index < splitNotes.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              </div>
-            </div>,
-          );
-        });
-
-        setAvailSeatsCont(tempAvailSeats);
 
         setIsLoading(false);
       }
@@ -253,7 +219,42 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
           <div className="text-xl text-primary-navy font-bold -mb-4 mt-2">Available Seats</div>
 
-          <div className="my-5">{availSeatsCont}</div>
+          <div className="my-5">
+            {holdList.map((holdRec, index) => {
+              return (
+                <div key={index}>
+                  <Icon
+                    color="#fff"
+                    className="float-right mt-3"
+                    iconName="edit"
+                    onClick={() => editAvailSeats(holdRec)}
+                  />
+                  <div className="w-[1045px] bg-white mb-1 rounded-md border border-primary-border">
+                    <div className="text-base text-primary-navy font-bold ml-2">
+                      {formatInputDate(holdRec.info.Date)} | {holdRec.info.Time.substring(0, 5)} | Seats Allocated:{' '}
+                      {holdRec.totalAllocated > holdRec.totalAvailable ? (
+                        <span className="text-primary-red">
+                          {holdRec.totalAllocated} / {holdRec.totalAvailable}
+                        </span>
+                      ) : (
+                        <span>
+                          {holdRec.totalAllocated} / {holdRec.totalAvailable}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-primary-navy ml-2 overflow-y-auto">
+                      {holdRec.note.split('\r\n').map((line, index) => (
+                        <React.Fragment key={index}>
+                          {line}
+                          {index < holdRec.note.split('\r\n').length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
           <div className="flex flex-row justify-between items-center mb-4">
             <div className="text-xl text-primary-navy font-bold">Allocated Seats</div>

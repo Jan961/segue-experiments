@@ -1,5 +1,5 @@
 import Button from 'components/core-ui-lib/Button';
-import { ReactNode, forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import ArchSalesDialog, { ArchSalesDialogVariant } from '../modal/ArchivedSalesDialog';
 import { DataList, VenueDetail } from '../MarketingHome';
 import SalesTable from 'components/global/salesTable';
@@ -27,7 +27,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const [archSaleVariant, setArchSaleVariant] = useState<ArchSalesDialogVariant>('venue');
   const [archivedDataAvail, setArchivedDataAvail] = useState<boolean>(false);
   const [archivedData, setArchivedData] = useState<VenueDetail | DataList>();
-  const [archivedSalesTable, setArchivedSalesTable] = useState<ReactNode>();
+  const [tableData, setTableData] = useState(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const townList = useRecoilValue(townState);
   const venueDict = useRecoilValue(venueState);
@@ -35,9 +35,11 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const [bookingsSelection, setBookingsSelection] = useState([]);
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const { selectedBooking } = props;
+  const [showData, setShowData] = useState(false);
+
   useImperativeHandle(ref, () => ({
     resetData: () => {
-      setArchivedSalesTable(<div />);
+      setShowData(false);
     },
   }));
 
@@ -70,7 +72,8 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   };
 
   const showArchivedSales = async (selection) => {
-    setArchivedSalesTable(<div />);
+    setTableData(null);
+    setShowData(false);
 
     try {
       const selectedBookings = selection.map((obj) => obj.bookingId);
@@ -80,19 +83,10 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
         const salesComp = data as Array<SalesComparison>;
         const result = { tableData: salesComp, bookingIds: selection };
 
-        setArchivedSalesTable(
-          <div className="w-[1200px] overflow-x-auto pb-5">
-            <SalesTable
-              containerHeight="h-[1000px]"
-              containerWidth="w-auto"
-              module="marketing"
-              variant="salesComparison"
-              data={result}
-              tableHeight={580}
-            />
-          </div>,
-        );
+        setTableData(result);
+
         setArchivedDataAvail(true);
+        setShowData(true);
         setShowArchSalesModal(false);
       } else {
         setErrorMessage('There are no sales data available for this particular selection.');
@@ -159,9 +153,24 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
             />
           </div>
 
-          <div className="flex flex-row">{archivedSalesTable}</div>
+          {showData && (
+            <div>
+              <div className="flex flex-row">
+                <div className="w-[1200px] overflow-x-auto pb-5">
+                  <SalesTable
+                    containerHeight="h-[1000px]"
+                    containerWidth="w-auto"
+                    module="marketing"
+                    variant="salesComparison"
+                    data={tableData}
+                    tableHeight={580}
+                  />
+                </div>
+              </div>
 
-          <div className="flex flex-row w-full h-32" />
+              <div className="flex flex-row w-full h-32" />
+            </div>
+          )}
         </div>
       </div>
     );

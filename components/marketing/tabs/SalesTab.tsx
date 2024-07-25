@@ -13,9 +13,10 @@ export interface SalesTabRef {
 }
 
 const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
-  const [salesTable, setSalesTable] = useState(<div />);
+  const [rowData, setRowData] = useState([]);
   const [dataAvailable, setDataAvailable] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [bookingIdVal, setBookingIdVal] = useState(null);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -29,19 +30,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
 
       if (Array.isArray(data) && data.length > 0) {
         const tempSales = data as Array<SalesSnapshot>;
-        setSalesTable(
-          <SalesTable
-            containerHeight="h-auto"
-            containerWidth="w-[1465px]"
-            module="marketing"
-            variant="salesSnapshot"
-            data={tempSales}
-            booking={bookingId}
-            tableHeight={640}
-          />,
-        );
-
-        setDataAvailable(true);
+        setRowData(tempSales);
         setIsLoading(false);
       }
     } catch (exception) {
@@ -50,9 +39,11 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
   };
 
   useEffect(() => {
-    setSalesTable(<div />);
+    setDataAvailable(true);
+    setRowData([]);
     if (props.bookingId !== null && props.bookingId !== undefined) {
       retrieveSalesData(props.bookingId.toString());
+      setBookingIdVal(props.bookingId.toString());
     }
   }, [props.bookingId]);
 
@@ -64,7 +55,17 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
         </div>
       );
     } else {
-      return <div>{salesTable}</div>;
+      return (
+        <SalesTable
+          containerHeight="h-auto"
+          containerWidth="w-[1465px]"
+          module="marketing"
+          variant="salesSnapshot"
+          data={rowData}
+          booking={bookingIdVal}
+          tableHeight={640}
+        />
+      );
     }
   }
 });
