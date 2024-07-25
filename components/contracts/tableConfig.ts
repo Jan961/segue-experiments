@@ -67,6 +67,52 @@ export const contractsColumnDefs = [
   },
 ];
 
+export const companyContractsColumnDefs = [
+  {
+    headerName: 'First Name',
+    field: 'Last Name',
+    cellRenderer: DefaultCellRenderer,
+    width: 120,
+    minWidth: 120,
+  },
+  {
+    headerName: 'Last Name',
+    field: 'date',
+    cellRenderer: DateColumnRenderer,
+    width: 120,
+    minWidth: 120,
+    cellClassRules: {
+      isMonday: (params) => params.value.includes('Mon'),
+    },
+  },
+  { headerName: 'Role', field: 'week', cellRenderer: DefaultCellRenderer, width: 140 },
+  {
+    headerName: 'Contract Status',
+    field: 'venue',
+    cellRenderer: VenueColumnRenderer,
+    width: 100,
+    minWidth: 100,
+  },
+  { headerName: '', field: 'town', cellRenderer: DefaultCellRenderer, minWidth: 100, flex: 1 },
+  { headerName: 'Completed By', field: 'capacity', cellRenderer: DefaultCellRenderer, width: 150 },
+  { headerName: 'Checked By', field: 'performanceCount', cellRenderer: DefaultCellRenderer, width: 90 },
+  { headerName: 'Date Issued', field: 'contractStatus', cellRenderer: ContractStatusCellRenderer, width: 180 },
+  {
+    headerName: 'Date Returned',
+    field: 'contractStatus',
+    cellRenderer: ContractStatusCellRenderer,
+    resizable: false,
+    width: 180,
+  },
+  {
+    headerName: 'Notes',
+    field: 'contractStatus',
+    cellRenderer: ContractStatusCellRenderer,
+    resizable: false,
+    width: 80,
+  },
+];
+
 export const standardSeatKillsColumnDefs = (onChangeData, holdValue) => [
   {
     headerName: 'Type',

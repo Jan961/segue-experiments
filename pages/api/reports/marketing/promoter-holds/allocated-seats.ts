@@ -1,9 +1,11 @@
 import ExcelJS from 'exceljs';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getPerformanceCompAllocationsByBookingId } from 'pages/api/marketing/promoterHolds/[BookingId]';
 import { createHeaderRow, getProductionAndVenueDetailsFromBookingId } from 'services/marketing/reports';
 import { addWidthAsPerContent } from 'services/reportsService';
+import { getAccountId, getEmailFromReq, getUsers } from 'services/userService';
+import { objectify } from 'radash';
+import { getPerformanceCompAllocationsByBookingId } from 'services/marketing/promoterHoldsService';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method !== 'POST') {
@@ -15,9 +17,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!bookingId || !productionName || !venueAndDate) {
     throw new Error('Required params are missing');
   }
+  const email = await getEmailFromReq(req);
+  const accountId = await getAccountId(email);
   const { prodCode, showName, venueName } = await getProductionAndVenueDetailsFromBookingId(
     parseInt(bookingId as string, 10),
   );
+  const users = await getUsers(accountId);
+  const usersMap = objectify(users, (user) => user.Id);
   const { allocations: data } = await getPerformanceCompAllocationsByBookingId(parseInt(bookingId as string, 10));
   const fileName = `${prodCode} ${showName} ${venueName} Allocated Seats`;
   const workbook = new ExcelJS.Workbook();
@@ -53,7 +59,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       cell.alignment = { horizontal: 'center', wrapText: true };
     }
   });
-
   data.forEach(
     ({
       date,
@@ -61,19 +66,21 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       TicketHolderEmail,
       TicketHolderName,
       Comments,
-      RequestedBy,
+      ArrangedById,
       Seats,
-      Allocated,
+      SeatsAllocated,
       VenueConfirmationNotes,
     }) => {
+      const { FirstName = '', LastName = '' } = usersMap[ArrangedById] || {};
+      const arrangedBy = `${FirstName || ''} ${LastName || ''}`;
       const row = worksheet.addRow([
         date,
         time,
         `${TicketHolderEmail} \r\n ${TicketHolderName}`,
+        arrangedBy,
         Comments,
-        RequestedBy,
         Seats,
-        Allocated,
+        SeatsAllocated,
         VenueConfirmationNotes,
       ]);
       row.eachCell((cell, colNumber) => {

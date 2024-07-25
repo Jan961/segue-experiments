@@ -10,6 +10,7 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getExportedAtTitle } from 'utils/export';
+import { convertToPDF } from 'utils/report';
 
 type TPromoter = {
   ProductionId: number;
@@ -82,7 +83,7 @@ type ProductionDetails = {
 // TODO - Issue with Performance Time
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-  let { productionCode = '', fromDate, toDate, venue, productionId } = req.body || {};
+  let { productionCode = '', fromDate, toDate, venue, productionId, format } = req.body || {};
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
   if (!access) return res.status(401).end();
@@ -107,7 +108,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     getProductionWithContent(productionId),
   ]);
   const showName = (productionDetails as ProductionDetails)?.Show?.Name || '';
-  const fileName = `${productionCode} ${showName} Promoter Holds`;
+  const filename = `${productionCode} ${showName} Promoter Holds`;
   const worksheet = workbook.addWorksheet('Promoter Holds', {
     pageSetup: { fitToPage: true, fitToHeight: 5, fitToWidth: 7 },
     views: [{ state: 'frozen', xSplit: 5, ySplit: 4 }],
@@ -212,8 +213,28 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   // const filename = `Promoter_Holds_${productionCode || productionId ? '_' + (productionCode || productionId) : ''}${
   //   fromDate && toDate ? '_' + (fromDate + '_' + toDate) : ''
   // }.xlsx`;
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+    return;
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', `attachment; filename="${fileName}.xlsx"`);
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 
   workbook.xlsx.write(res).then(() => {
     res.end();

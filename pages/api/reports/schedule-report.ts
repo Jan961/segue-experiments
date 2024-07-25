@@ -12,6 +12,7 @@ import {
 } from 'services/salesSummaryService';
 import { addWidthAsPerContent } from 'services/reportsService';
 import { makeRowTextBoldAndAllignLeft } from './promoter-holds';
+import { convertToPDF } from 'utils/report';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -84,7 +85,7 @@ const getKey = ({ FullProductionCode, ShowName, EntryDate }) => `${FullProductio
 // const formatDate = (date) => moment(date).format('DD/MM/YY')
 
 const handler = async (req, res) => {
-  const { ProductionId, from, to } = req.body;
+  const { ProductionId, from, to, format } = req.body;
 
   //   const formatedFromDate = formatDate(from)
   //   const formatedToDate = formatDate(to)
@@ -332,6 +333,26 @@ const handler = async (req, res) => {
   worksheet.getColumn('L').width = 7;
   worksheet.getColumn('M').width = 7;
   const filename = `${title}.xlsx`;
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+    return;
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
   workbook.xlsx.write(res).then(() => {
