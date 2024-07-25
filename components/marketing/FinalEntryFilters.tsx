@@ -7,10 +7,10 @@ import { bookingJumpState } from 'state/marketing/bookingJumpState';
 import { ProductionJumpMenu } from 'components/global/nav/ProductionJumpMenu';
 import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
-import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
 import { isNullOrEmpty } from 'utils';
+import { LastPerfDate } from 'types/MarketingTypes';
 
 const FinalEntryFilters = () => {
   const { selected: productionId } = useRecoilValue(productionJumpState);

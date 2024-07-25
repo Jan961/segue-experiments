@@ -9,9 +9,9 @@ import useAxios from 'hooks/useAxios';
 import { SelectOption } from './MarketingHome';
 import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
-import { LastPerfDate } from 'pages/api/marketing/sales/tourWeeks/[ProductionId]';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
+import { LastPerfDate } from 'types/MarketingTypes';
 
 type TourResponse = {
   data: Array<SelectOption>;

@@ -14,15 +14,11 @@ import { reverseDate } from './utils';
 import { DATE_PATTERN, getWeekDayShort } from 'services/dateService';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
+import { LastPerfDate } from 'types/MarketingTypes';
 
 type FutureBooking = {
   hasFutureBooking: boolean;
   nextBooking: any;
-};
-
-type LastPerfDate = {
-  BookingId: number;
-  LastPerformanaceDate: string;
 };
 
 const Filters = () => {
