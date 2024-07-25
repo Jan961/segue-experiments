@@ -52,13 +52,13 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { styleHeader } from './masterplan';
 import { currencyCodeToSymbolMap } from 'config/Reports';
+import { convertToPDF } from 'utils/report';
 
 // TODO
 // Decimal upto 2 places fix
 // Production row height fix
-
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
-  const { productionId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired } = req.body || {};
+  const { productionId, fromWeek, toWeek, isWeeklyReport, isSeatsDataRequired, format } = req.body || {};
 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ProductionId: productionId });
@@ -587,6 +587,28 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
+  console.log(worksheet.rowCount);
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(columns.length).letter}${row}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    console.log(worksheet.pageSetup);
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${showTitle} ${title}.pdf"`);
+    res.end(pdf);
+    return;
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${showTitle} ${title}.xlsx"`);
 

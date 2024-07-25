@@ -240,9 +240,9 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     };
 
     notify.promise(exportExcelReport(urlPath, payload), {
-      loading: 'Generating contact notes report',
-      success: 'Contact notes report downloaded successfully',
-      error: 'Error generating contact notes report',
+      loading: 'Generating Allocated Seats report',
+      success: 'Allocated Seats  report downloaded successfully',
+      error: 'Error generating Allocated Seats report',
     });
   };
 
