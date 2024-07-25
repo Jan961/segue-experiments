@@ -44,6 +44,7 @@ const VenueAddressForm = ({
           <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className=" text-primary-input-text">Address 1</p>
             <TextInput
+              testId="primary-address-1"
               placeholder="Enter Address 1"
               className="w-full justify-between"
               inputClassName="w-full"
@@ -59,6 +60,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 2</p>
           <TextInput
+            testId="primary-address-2"
             placeholder="Enter Address 2"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -69,6 +71,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 3</p>
           <TextInput
+            testId="primary-address-3"
             placeholder="Enter Address 3"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -79,6 +82,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Town</p>
           <TextInput
+            testId="primary-address-town"
             placeholder="Enter Town"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -89,6 +93,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Postcode</p>
           <TextInput
+            testId="primary-address-postcode"
             placeholder="Enter Postcode"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -108,6 +113,7 @@ const VenueAddressForm = ({
             </Tooltip>
 
             <Select
+              testId="primary-country"
               name="primaryCountry"
               className="w-full font-bold"
               placeholder="Country"
@@ -124,6 +130,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Phone</p>
           <TextInput
+            testId="primary-phone-no"
             placeholder="Enter Phone Number"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -134,6 +141,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Email</p>
           <TextInput
+            testId="primary-email"
             placeholder="Enter Email"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -144,6 +152,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Stage Door</p>
           <TextInput
+            testId="primary-what-three-words"
             placeholder="what.three.words"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -157,6 +166,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 1</p>
           <TextInput
+            testId="delivery-address-1"
             placeholder="Enter Address 1"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -167,6 +177,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 2</p>
           <TextInput
+            testId="delivery-address-2"
             placeholder="Enter Address 2"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -177,6 +188,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Address 3</p>
           <TextInput
+            testId="delivery-address-3"
             placeholder="Enter Address 3"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -187,6 +199,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Town</p>
           <TextInput
+            testId="delivery-town"
             placeholder="Enter Town"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -197,6 +210,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Postcode</p>
           <TextInput
+            testId="delivery-postcode"
             placeholder="Enter Postcode"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -215,6 +229,7 @@ const VenueAddressForm = ({
             <Icon iconName="info-circle-solid" />
           </Tooltip>
           <Select
+            testId="delivery-country"
             name="deliveryCountry"
             className="w-full font-bold"
             placeholder="Country"
@@ -227,6 +242,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Phone</p>
           <TextInput
+            testId="delivery-phone-no"
             placeholder="Enter Phone Number"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -237,6 +253,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[90px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Email</p>
           <TextInput
+            testId="delivery-email"
             placeholder="Enter Email"
             className="w-full justify-between"
             inputClassName="w-full"
@@ -248,6 +265,7 @@ const VenueAddressForm = ({
         <label htmlFor="" className="grid grid-cols-[170px_minmax(100px,_1fr)] gap-10 justify-between  w-full">
           <p className="text-primary-input-text">What3Words Loading</p>
           <TextInput
+            testId="delivery-what-three-words"
             placeholder="what.three.words"
             className="w-full justify-between"
             inputClassName="w-full"
