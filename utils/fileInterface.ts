@@ -4,4 +4,5 @@ export default interface fileInterface {
   imageUrl: string;
   MediaType: string;
   fileLocation: string;
+  FileUrl?: string;
 }
