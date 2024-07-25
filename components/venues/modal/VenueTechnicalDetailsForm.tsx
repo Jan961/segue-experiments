@@ -90,7 +90,6 @@ const VenueTechnicalDetailsForm = ({
       };
       newFileWidgets.push(widget);
     }
-
     setFileWidgets(newFileWidgets);
   };
 
