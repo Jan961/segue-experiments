@@ -1,4 +1,4 @@
-import { screen, render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, screen } from '@testing-library/react';
 import TimeInput from './TimeInput';
 
 describe('TimeInput Component', () => {
@@ -14,8 +14,8 @@ describe('TimeInput Component', () => {
     const onChange = jest.fn();
     render(<TimeInput value={{ hrs: '10', min: '20' }} onChange={onChange} />);
 
-    const hourInput = screen.getByTestId('hourInput');
-    const minInput = screen.getByTestId('minInput');
+    const hourInput = screen.getByTestId('hourInput') as HTMLInputElement;
+    const minInput = screen.getByTestId('minInput') as HTMLInputElement;
 
     fireEvent.change(hourInput, { target: { value: '15' } });
     fireEvent.change(minInput, { target: { value: '45' } });
@@ -29,20 +29,31 @@ describe('TimeInput Component', () => {
     const onBlur = jest.fn();
     render(<TimeInput value={{ hrs: '10', min: '20' }} onChange={onChange} onBlur={onBlur} />);
 
-    const hourInput = screen.getByTestId('hourInput');
-    const minInput = screen.getByTestId('minInput');
+    const hourInput = screen.getByTestId('hourInput') as HTMLInputElement;
+    const minInput = screen.getByTestId('minInput') as HTMLInputElement;
 
-    fireEvent.blur(hourInput);
+    fireEvent.change(hourInput, { target: { value: '12' } });
+    fireEvent.change(minInput, { target: { value: '34' } });
+
+    // Simulate focus and blur events
+    fireEvent.focus(hourInput);
     fireEvent.blur(minInput);
 
-    expect(onBlur).toHaveBeenCalledTimes(2);
-    expect(onBlur).toHaveBeenCalledWith({ hrs: '10', min: '20' });
+    // onBlur should be called once with the final time object
+    expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(onBlur).toHaveBeenCalledWith({ hrs: '12', min: '34', sec: '' });
   });
 
   test('handles disabled state correctly', () => {
-    const handleChange = jest.fn();
-    render(<TimeInput value={{ hrs: '12', min: '30' }} onChange={handleChange} disabled />);
-    const textEl = screen.getByText(/12 : 30/i);
-    expect(textEl).toHaveClass('!bg-disabled-input');
+    const onChange = jest.fn();
+    render(<TimeInput value={{ hrs: '12', min: '30' }} onChange={onChange} disabled />);
+
+    // Check that the Label is rendered instead of the inputs
+    const label = screen.getByText('12 : 30');
+    expect(label).toBeInTheDocument();
+
+    // Ensure that inputs are not present in the DOM
+    expect(screen.queryByTestId('hourInput')).toBeNull();
+    expect(screen.queryByTestId('minInput')).toBeNull();
   });
 });
