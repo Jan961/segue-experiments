@@ -23,7 +23,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     });
 
     const task = await generateSingleRecurringMasterTask(req.body, recurringTask.Id);
-
+    console.log(task);
     const createdTask = await prisma.MasterTask.create({
       data: {
         ...task,
@@ -31,7 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    res.json(createdTask);
+    res.status(200).json(createdTask);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Error creating Recurring ProductionTask' });

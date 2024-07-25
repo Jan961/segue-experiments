@@ -111,6 +111,8 @@ export type MasterTaskDTO = {
   CompleteByWeekNum?: number;
   AssignedToUserId?: number;
   MasterTaskRepeat?: any;
+  MTRId?: number;
+  RepeatInterval?: string;
 };
 
 // Existing Production interface for old schema. Remove eventually

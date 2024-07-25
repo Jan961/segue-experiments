@@ -2,13 +2,32 @@ import prisma from 'lib/prisma';
 import { addDurationToDate, addOneMonth, calculateWeekNumber } from './dateService';
 
 export const getMasterTasksList = async (AccountId: number) => {
-  return await prisma.masterTask.findMany({
+  const masterTaskList = await prisma.MasterTask.findMany({
     where: {
       AccountId,
     },
     orderBy: {
       StartByWeekNum: 'asc',
     },
+    include: {
+      MasterTaskRepeat: {
+        select: {
+          Interval: true,
+          FromWeekNum: true,
+          ToWeekNum: true,
+          Id: true,
+        },
+      },
+    },
+  });
+
+  return masterTaskList.map((task) => {
+    return {
+      ...task,
+      RepeatInterval: task?.MasterTaskRepeat?.RepeatInterval || null,
+      TaskRepeatFromWeekNum: task?.MasterTaskRepeat?.TaskRepeatFromWeekNum || null,
+      TaskRepeatToWeekNum: task?.MasterTaskRepeat?.TaskRepeatToWeekNum || null,
+    };
   });
 };
 
@@ -102,17 +121,8 @@ export const generateRecurringMasterTasks = async (requestBody, MTRId: number) =
 };
 
 export const generateSingleRecurringMasterTask = async (requestBody, MTRId: number) => {
-  const {
-    Name,
-    StartByWeekNum,
-    CompleteByWeekNum,
-    Priority,
-    Progress,
-    TaskRepeatFromWeekNum,
-    TaskCompletedDate,
-    AssignedToUserId,
-    Notes,
-  } = requestBody;
+  const { Name, StartByWeekNum, CompleteByWeekNum, Priority, TaskRepeatFromWeekNum, AssignedToUserId, Notes } =
+    requestBody;
 
   const maxTaskCode =
     (
@@ -135,13 +145,11 @@ export const generateSingleRecurringMasterTask = async (requestBody, MTRId: numb
     Name,
     Priority,
     Notes,
-    Progress,
     AssignedToUserId,
     TaskStartByIsPostProduction: false,
     StartByWeekNum: taskStartDate,
     TaskCompleteByIsPostProduction: false,
     CompleteByWeekNum: completeBy,
-    TaskCompletedDate,
     MTRId,
   };
 };

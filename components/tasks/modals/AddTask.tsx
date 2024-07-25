@@ -219,10 +219,18 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const checkIfRecurringModal = async (isRecurring: boolean, previousInfo, newInfo) => {
-    if (previousInfo === null) {
+    if (isMasterTask) {
       await handleOnSubmit();
       onClose();
+      setInputs(DEFAULT_MASTER_TASK);
       return;
+    } else {
+      if (previousInfo === null) {
+        await handleOnSubmit();
+        onClose();
+        setInputs(DEFAULT_MASTER_TASK);
+        return;
+      }
     }
 
     const fieldsToCheck = ['TaskRepeatToWeekNum', 'TaskRepeatFromWeekNum', 'RepeatInterval'];
@@ -273,6 +281,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
   const handleMasterTask = async () => {
     omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
+    console.log(inputs);
     if (inputs.Id) {
       try {
         await axios.post(`/api/tasks/master/update/${inputs?.RepeatInterval ? 'recurring' : 'single'}`, inputs);
