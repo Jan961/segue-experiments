@@ -80,9 +80,9 @@ const prepareUpdateData = async ({
   }
 
   if (!isUndefined(dateBlockList)) {
-    const existingDateBlockIds = dateBlockList.filter((db) => db.Id).map((db) => db.Id);
-    const existingDateBlocks = dateBlockList.filter((db) => db.Id);
-    const newDateBlocks = dateBlockList.filter((db) => !db.Id);
+    const existingDateBlockIds = dateBlockList.filter((db) => db.id).map((db) => db.id);
+    const existingDateBlocks = dateBlockList.filter((db) => db.id);
+    const newDateBlocks = dateBlockList.filter((db) => !db.id);
     updateData.DateBlock = {
       // Remove DateBlocks not in the DTO
       deleteMany: {

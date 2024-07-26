@@ -26,6 +26,7 @@ export const productionSchema = (isCreate = false) =>
       .array()
       .of(
         yup.object().shape({
+          id: yup.number().optional(),
           name: yup.string().optional(),
           startDate: yup.string().optional(),
           endDate: yup.string().optional(),
