@@ -20,8 +20,8 @@ import { currentProductionSelector } from 'state/booking/selectors/currentProduc
 import { isNullOrEmpty } from 'utils';
 import { getWeekOptions } from 'utils/getTaskDateStatus';
 import { priorityOptions } from 'utils/tasks';
-import { productionJumpState } from '../../../state/booking/productionJumpState';
-import { addDurationToDate, addOneMonth } from '../../../services/dateService';
+import { productionJumpState } from 'state/booking/productionJumpState';
+import { addDurationToDate, addOneMonth } from 'services/dateService';
 import { RecurringTasksPopup } from './RecurringTasksPopup';
 import { DeleteRecurringPopup } from './DeleteRecurringPopup';
 
