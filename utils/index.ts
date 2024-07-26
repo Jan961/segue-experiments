@@ -100,3 +100,9 @@ export const getStatusFromProgress = (progress?: number) => {
     return 'Uploaded';
   }
 };
+
+export const isNull = (value: unknown): boolean => value === null;
+
+export const isUndefined = (value: unknown): boolean => value === undefined;
+
+export const isNullOrUndefined = (value: unknown): boolean => isNull(value) || isUndefined(value);
