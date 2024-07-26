@@ -157,8 +157,8 @@ export const formatTime = (timestamp) => {
 };
 
 export const addOneMonth = (date: Date) => {
-  const newDate = new Date(date); // Create a new Date object to avoid mutating the original date
-  newDate.setMonth(newDate.getMonth() + 1); // Add one month to the new date
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + 1);
   return newDate;
 };
 

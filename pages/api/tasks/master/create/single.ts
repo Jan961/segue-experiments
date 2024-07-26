@@ -13,7 +13,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    console.log(task);
     const { Code } = await getMaxMasterTaskCode();
 
     const createResult = await prisma.MasterTask.create({
@@ -28,7 +27,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    res.json(createResult);
+    res.status(200).json(createResult);
   } catch (err) {
     if (err.code === 'P2002' && err.meta && err.meta.target.includes('SECONDARY')) {
       res.status(409).json({ error: 'A show with the specified AccountId and Code already exists.' });

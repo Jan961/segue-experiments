@@ -59,7 +59,6 @@ export default function TasksTable({
       });
       setRows(updatedRowData);
       setIsLoading(false);
-      console.log('not loading ');
       router.replace(router.asPath);
     } catch (error) {
       setIsLoading(false);

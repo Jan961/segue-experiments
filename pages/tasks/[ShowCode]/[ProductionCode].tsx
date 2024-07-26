@@ -52,18 +52,12 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
   const [showNewProduction, setShowNewProduction] = useState<boolean>(false);
   const [isMasterTaskList, setIsMasterTaskList] = useState<boolean>(false);
   const [isProductionTaskList, setIsProductionTaskList] = useState<boolean>(false);
-  const [currentTopModal, setCurrentTopModal] = useState<string>('');
 
   const { selected: ProductionId } = useRecoilValue(productionJumpState);
 
   const handleShowTask = () => {
     setShowAddTask(false);
-
-    // use this with a hasOverlay = {!currentTopModal==" blah "}
-    console.log(currentTopModal);
-    setCurrentTopModal('');
-    //  This was making the loading spinner stick
-    //  router.replace(router.asPath);
+    router.replace(router.asPath);
   };
 
   const isFilterMatchingInitialState = () => {
@@ -124,7 +118,6 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
     }
   };
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);
-  console.log(isProductionTaskList);
 
   return (
     <Layout title="Tasks | Segue" flush>
@@ -176,7 +169,6 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const AccountId = await getAccountIdFromReq(ctx.req);
   const productionJump = await getProductionJumpState(ctx, 'tasks', AccountId);
   const ProductionId = productionJump.selected;
-  // ProductionJumpState is checking if it's valid to access by accountId
   if (!ProductionId) return { notFound: true };
   const users = await getUsers(AccountId);
   const productionsWithTasks = await getProductionsAndTasks(AccountId, ProductionId);

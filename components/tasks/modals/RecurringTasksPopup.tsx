@@ -1,4 +1,4 @@
-import Button from '../../core-ui-lib/Button';
+import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 
 interface RecurringTasksProps {
@@ -10,8 +10,6 @@ interface RecurringTasksProps {
 }
 
 export const RecurringTasksPopup = ({ visible, onClose, numTaskChange, onSubmit, isNewTask }: RecurringTasksProps) => {
-  console.log(isNewTask);
-
   if (isNewTask) {
     return (
       <PopupModal show={visible} onClose={onClose}>

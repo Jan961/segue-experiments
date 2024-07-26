@@ -221,7 +221,6 @@ export const getNewTasksNum = (
   taskRepeatToWeekNum,
   repeatInterval,
 ): number => {
-  console.log(repeatInterval);
   let taskStartDate = addDurationToDate(prodStartDate, taskRepeatFromWeekNum * 7, true);
   const taskEndDate = addDurationToDate(prodStartDate, taskRepeatToWeekNum * 7, true);
 

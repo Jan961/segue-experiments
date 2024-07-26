@@ -14,7 +14,7 @@ import { userState } from 'state/account/userState';
 import { useMemo } from 'react';
 import { getColumnDefs } from 'components/tasks/tableConfig';
 import { mapToProductionTasksDTO } from 'mappers/tasks';
-import { productionJumpState } from '../../state/booking/productionJumpState';
+import { productionJumpState } from 'state/booking/productionJumpState';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {

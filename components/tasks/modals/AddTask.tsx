@@ -254,9 +254,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const getNumTaskDifference = (previousTaskInfo, updatedTaskInfo, production) => {
-    console.log(previousTaskInfo);
-    console.log(updatedTaskInfo);
-    console.log(previousTaskInfo?.Name);
     if (previousTaskInfo?.Name === null) {
       setShowRecurringConfirmation(false);
       handleOnSubmit();
@@ -278,11 +275,8 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     return updatedTasks - previousTasks;
   };
 
-  // NEED TO REPLACE THIS WITH THE NEW CODE REFERENCING THE NEW TABLE
-  // const repeatInterval: boolean = inputs?.RepeatInterval === 'once';
   const handleMasterTask = async () => {
     omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
-    console.log(inputs);
     if (inputs.Id) {
       try {
         await axios.post(`/api/tasks/master/update/${inputs?.RepeatInterval ? 'recurring' : 'single'}`, inputs);
@@ -293,7 +287,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
       }
     } else {
       try {
-        console.log(inputs);
         const endpoint = `/api/tasks/master/create/${inputs?.RepeatInterval ? 'recurring' : 'single'}/`;
         await axios.post(endpoint, inputs);
         setLoading(false);
@@ -311,7 +304,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   const handleOnSubmit = async () => {
     setLoading(false);
     if (isMasterTask) {
-      console.log('Is master task');
       await handleMasterTask();
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
@@ -365,7 +357,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
 
   const handleRecurringDelete = async (selectOption) => {
     try {
-      console.log(inputs);
       await axios.post(`/api/tasks/delete/recurring`, {
         selectOption,
         taskId: inputs.Id,
@@ -400,9 +391,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     }
     setShowSingleDelete(false);
   };
-
-  console.log(taskRecurringInfo);
-  console.log(inputs);
 
   return (
     <PopupModal
@@ -585,7 +573,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               variant="primary"
               className="w-[132px]"
               onClick={() => {
-                console.log(isRecurring);
                 return checkIfRecurringModal(isRecurring, taskRecurringInfo, inputs);
               }}
               text={inputs.Id ? 'Save' : 'Create New Task'}
@@ -600,7 +587,6 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             }}
             numTaskChange={getNumTaskDifference(taskRecurringInfo, inputs, production)}
             onSubmit={() => {
-              console.log('update');
               handleOnSubmit();
             }}
             isNewTask={inputs?.Id === undefined}

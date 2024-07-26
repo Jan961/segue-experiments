@@ -2,7 +2,7 @@ import { ProductionTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { generateRecurringTasks, getNewTasksNum } from 'services/TaskService';
+import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -29,8 +29,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       });
 
       if (fieldDifference) {
-        console.log(taskObj);
-
         const productionDateBlock = taskObj.Production.DateBlock;
 
         const prodStartDate = new Date(
@@ -50,12 +48,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               include: { ProductionTask: true },
             })
           )?.ProductionTask || [];
-        console.log(numTasksExist);
-        console.log(numTasksByCalc);
 
         if (numTasksExist !== numTasksByCalc) {
-          const newTasks = await generateRecurringTasks(req.body, productionDateBlock, prodStartDate, PRTId);
-          console.log(newTasks);
+          const newTasks = await generateRecurringProductionTasks(req.body, productionDateBlock, prodStartDate, PRTId);
           const tasksToKeep = [];
           const tasksToDelete = [];
           const fieldList = [
@@ -67,9 +62,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             'CompleteByWeekNum',
             'TaskCompletedDate',
           ];
+
           // this is to find tasks that already exist and match the newly generated tasks so they wont be deleted
           numTasksExist.forEach((task) => {
-            console.log(task);
             let taskFound = false;
             newTasks.forEach((newTask) => {
               let fieldMisMatch = false;
@@ -86,12 +81,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               tasksToDelete.push(task);
             }
           });
-          console.log('DELETING');
-          tasksToDelete.forEach((task) => {
-            console.log(task);
-          });
-          console.log(tasksToDelete.map((task) => task.Id));
-          console.log('RAHHHHhhh');
+
           await prisma.ProductionTask.deleteMany({ where: { Id: { in: tasksToDelete.map((task) => task.Id) } } });
 
           const createdTasks = await Promise.all(

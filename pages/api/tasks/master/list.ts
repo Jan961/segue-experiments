@@ -8,7 +8,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const email = await getEmailFromReq(req);
     const AccountId = await getAccountId(email);
     const result = await getMasterTasksList(AccountId);
-    console.log(result);
     res.status(200).json(result);
   } catch (err) {
     await loggingService.logError(err);

@@ -30,9 +30,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const prodBlock = productionWeeks.find((dateBlock) => {
       return dateBlock.Name === 'Production';
     });
-    console.log(
-      'NEW TASK LIST -------------------------------------------------------------------------------------------------------------',
-    );
     const taskList: any[] = await generateRecurringProductionTasks(
       req.body,
       prodBlock,
