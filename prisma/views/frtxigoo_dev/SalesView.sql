@@ -29,6 +29,10 @@ SELECT
     `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`,
     `ProductionView`.`ProductionStartDate`
   ) AS `SetProductionWeekNum`,
+  `CalculateDayNum`(
+    `frtxigoo_dev`.`SalesSet`.`SetSalesFiguresDate`,
+    `frtxigoo_dev`.`Booking`.`BookingFirstDate`
+  ) AS `SetShowDayNum`,
   `frtxigoo_dev`.`SalesSet`.`SetNotOnSale` AS `SetNotOnSale`,
   `frtxigoo_dev`.`SalesSet`.`SetIsFinalFigures` AS `SetIsFinalFigures`,
   `frtxigoo_dev`.`SalesSet`.`SetFinalSalesApprovedByUser` AS `SetFinalSalesApprovedByUser`,

@@ -48,6 +48,7 @@ import {
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
 import StandardSeatKillsTable from '../table/StandardSeatKillsTable';
 import LoadingOverlay from 'components/shows/LoadingOverlay';
+import { CustomOption } from 'components/core-ui-lib/Table/renderers/SelectCellRenderer';
 
 export const EditDealMemoContractModal = ({
   visible,
@@ -78,6 +79,8 @@ export const EditDealMemoContractModal = ({
   const [formEdited, setFormEdited] = useState<boolean>(false);
   const [disableDate, setDisableDate] = useState<boolean>(true);
   const [seatKillsData, setSeatKillsData] = useState([]);
+  const [sendTo, setSendTo] = useState([]);
+
   const venueUserList = useMemo(
     () =>
       venueData && venueData.VenueContact
@@ -307,12 +310,15 @@ export const EditDealMemoContractModal = ({
   };
 
   const handleStandardSeatsTableData = (value) => {
-    const updatedFormData = {
-      ...formData,
-      DealMemoHold: Object.values(value) as unknown as DealMemoHold[],
-    };
+    const data = [...(Object.values(value) as unknown as DealMemoHold[])];
+    setFormData((prevDealMemo) => ({
+      ...prevDealMemo,
+      DealMemoHold: data,
+    }));
+  };
 
-    setFormData({ ...updatedFormData });
+  const setSendToData = (value) => {
+    setSendTo((prevState) => [...prevState, ...value]);
   };
   return (
     <PopupModal
@@ -495,31 +501,37 @@ export const EditDealMemoContractModal = ({
             <TimeInput
               data-testid="runningTime"
               className="w-fit h-[31px] [&>input]:!h-[25px] [&>input]:!w-11 !justify-center shadow-input-shadow"
-              value={formData && formData.DeMoRunningTime ? dateToTimeString(formData.DeMoRunningTime) : null}
-              disabled={disableDate}
-              onChange={(value) =>
-                editDemoModalData('DeMoRunningTime', convertTimeToTodayDateFormat(value), 'dealMemo')
+              value={
+                productionJumpState && productionJumpState.RunningTime
+                  ? dateToTimeString(productionJumpState.RunningTime)
+                  : null
               }
+              disabled={disableDate}
+              onChange={() => {
+                return null;
+              }}
             />
             <div className=" text-primary-input-text font-bold ml-8 mr-4">Notes</div>
 
             <TextInput
               data-testid="runningNote"
               className="w-[51vw]"
-              value={formData.DeMoRunningTimeNotes}
-              onChange={(value) => editDemoModalData('DeMoRunningTimeNotes', value.target.value, 'dealMemo')}
+              value={productionJumpState.RunningTimeNote}
+              disabled
             />
           </div>
         </div>
         <div className="flex mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Pre / Post Show Events</div>
           <div className="w-4/5 flex">
-            <TextArea
-              data-testid="prePostShow"
-              className="w-[65vw]"
-              value={formData.DeMoPrePostShowEvents}
-              onChange={(value) => editDemoModalData('DeMoPrePostShowEvents', value.target.value, 'dealMemo')}
-            />
+            <div className="w-[65vw]">
+              <TextArea
+                data-testid="prePostShow"
+                className="w-full h-auto"
+                value={formData.DeMoPrePostShowEvents}
+                onChange={(value) => editDemoModalData('DeMoPrePostShowEvents', value.target.value, 'dealMemo')}
+              />
+            </div>
           </div>
         </div>
         <div className="flex items-center mt-4">
@@ -539,8 +551,8 @@ export const EditDealMemoContractModal = ({
             <TextInput
               data-testid="notes"
               className="w-[51vw]"
-              // value={formData.DeMoPerformanceNotes}
-              // onChange={(value) => editDemoModalData('DeMoPerformanceNotes', value.target.value, 'dealMemo')}
+              value={formData.DeMoRunningTimeNotes}
+              onChange={(value) => editDemoModalData('DeMoRunningTimeNotes', value.target.value, 'dealMemo')}
             />
           </div>
         </div>
@@ -673,7 +685,7 @@ export const EditDealMemoContractModal = ({
               onChange={(value) =>
                 editDemoModalData('DeMoGuaranteeAmount', filterCurrencyNum(parseFloat(value.target.value)), 'dealMemo')
               }
-              placeholder="Value / %"
+              placeholder="00.00"
               disabled={!formData.DeMoGuarantee}
             />
           </div>
@@ -734,7 +746,7 @@ export const EditDealMemoContractModal = ({
                       className="w-[140px] ml-2"
                       type="number"
                       value={dealCall[index].DMCValue}
-                      placeholder="Value / %"
+                      placeholder="00.00"
                       disabled={!formData.DeMoHasCalls}
                       onChange={(value) =>
                         editDemoCallModalData('DMCValue', filterCurrencyNum(parseFloat(value.target.value)), index)
@@ -748,7 +760,7 @@ export const EditDealMemoContractModal = ({
                         <Icon
                           className="ml-2"
                           iconName="plus-circle-solid"
-                          onClick={() => handleCall(true, index)}
+                          onClick={() => formData.DeMoHasCalls && handleCall(true, index)}
                           variant="lg"
                         />
                       )}
@@ -757,7 +769,7 @@ export const EditDealMemoContractModal = ({
                         <Icon
                           className="ml-2"
                           iconName="minus-circle-solid"
-                          onClick={() => handleCall(false, index)}
+                          onClick={() => formData.DeMoHasCalls && handleCall(false, index)}
                           variant="lg"
                         />
                       )}
@@ -954,7 +966,12 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">Venue Capacity</div>
           <div className="w-4/5 flex items-center">
-            <TextInput data-testid="venueCapacityText" className="w-auto" value={venueData ? venueData.Seats : null} />
+            <TextInput
+              data-testid="venueCapacityText"
+              className="w-auto text-primary-input-text font-bold"
+              value={venueData ? venueData.Seats : null}
+              disabled
+            />
             <div className="text-primary-input-text font-bold ml-8 mr-2">Sellable Capacity</div>
 
             <TextInput
@@ -965,22 +982,8 @@ export const EditDealMemoContractModal = ({
             />
           </div>
         </div>
-        <div className="flex items-center mt-4">
-          <div className="w-1/5 text-primary-input-text font-bold">Mixer Desk Position</div>
-          <div className="w-4/5 flex">
-            <TextInput
-              data-testid="mixerDeskText"
-              className="w-[40vw]"
-              value={formData.DeMoMixerDeskPosition}
-              onChange={(value) => editDemoModalData('DeMoMixerDeskPosition', value.target.value, 'dealMemo')}
-            />
-            <div className="text-primary-input-text font-bold ml-8 mr-4">No. of Seats</div>
-
-            <TextInput data-testid="mixerDeskSeatsText" className="w-[15vw]" value={venueData.Seats} disabled />
-          </div>
-        </div>
         <div className="flex mt-4">
-          <div className="w-1/5 text-primary-input-text font-bold">Standard Seat Skills</div>
+          <div className="w-1/5 text-primary-input-text font-bold">Standard Seat kills</div>
           <div className="w-4/5 flex">
             <div className="w-[394px]">
               <div>
@@ -992,10 +995,11 @@ export const EditDealMemoContractModal = ({
             </div>
             <div className="ml-16">
               <div className="text-primary-input-text font-bold">Hold Notes</div>
-              <TextInput
+              <TextArea
                 data-testid="holdNotesText"
-                className="w-[18vw]"
+                className="mt-2 mb-2 w-full h-auto"
                 value={formData.DeMoOtherHolds}
+                placeholder="Notes Field"
                 onChange={(value) => editDemoModalData('DeMoOtherHolds', value.target.value, 'dealMemo')}
               />
             </div>
@@ -1358,15 +1362,15 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-4">
           <div className="w-1/5 text-primary-input-text font-bold">to be sent to</div>
           <div className="w-4/5">
-            <TextInput data-testid="sentToText" className="w-full" />
+            <TextInput data-testid="sentToText" className="w-full" placeholder="Add to Production Details" disabled />
           </div>
         </div>
         <div className="flex items-center mt-4">
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex">
             <Select
-              onChange={() => {
-                // editDemoModalData('DeMoMMVenueContactId1', value, 'dealMemo');
+              onChange={(value) => {
+                setSendToData(value);
               }}
               isMulti
               className="bg-primary-white w-full"
@@ -1374,7 +1378,8 @@ export const EditDealMemoContractModal = ({
               options={[{ text: 'Select Assignee', value: null }, ...userList]}
               isClearable
               isSearchable
-              // value={formData.DeMoMMVenueContactId}
+              renderOption={(option) => <CustomOption option={option} isMulti={true} />}
+              value={sendTo}
             />
           </div>
         </div>
@@ -1453,7 +1458,7 @@ export const EditDealMemoContractModal = ({
           <div className="w-1/5 text-primary-input-text font-bold">Print Requirements</div>
           <div className="w-4/5">
             <TextArea
-              className=" w-full"
+              className=" w-full h-auto"
               value={formData.DeMoPrintReqs}
               onChange={(value) => editDemoModalData('DeMoPrintReqs', value.target.value, 'dealMemo')}
             />
@@ -1472,8 +1477,15 @@ export const EditDealMemoContractModal = ({
                 label="Same as Venue Address"
               />
             </div>
+
             <div className="w-3/4">
-              <TextInput data-testid="printDeliveryText" className="w-3/4" disabled />
+              <TextInput
+                data-testid="printDeliveryText"
+                className="w-3/4"
+                disabled={formData.DeMoPrintDelUseVenueAddress}
+                value={formData.DeMoVatCode}
+                onChange={(value) => editDemoModalData('DeMoVatCode', value.target.value, 'dealMemo')}
+              />
             </div>
           </div>
         </div>
@@ -1517,7 +1529,7 @@ export const EditDealMemoContractModal = ({
         <div className="flex items-center mt-2">
           <div className="w-1/5"> </div>
           <div className="w-4/5 flex text-primary-input-text text-sm">
-            Any expenditure needs pre-approval from {`${productionJumpState.ShowName}`}
+            Any expenditure needs pre-approval from {`${productionJumpState.ProductionCompany.Name}`}
           </div>
         </div>
         <hr className="bg-primary h-[3px] mt-2 mb-4" />
@@ -1694,6 +1706,7 @@ export const EditDealMemoContractModal = ({
               data-testid="stageDoorText"
               className="w-[25vw] text-primary-input-text font-bold"
               disabled
+              placeholder={venueData.AddressStageDoorW3W ? '' : 'Add details to Venue Database'}
               value={venueData ? venueData.AddressStageDoorW3W : null}
             />
             <div className="w-1/5 text-primary-input-text font-bold ml-8">Loading Bay What3Words</div>
@@ -1702,6 +1715,7 @@ export const EditDealMemoContractModal = ({
               data-testid="loadingBayText"
               className="w-[25vw] text-primary-input-text font-bold"
               disabled
+              placeholder={venueData.AddressLoadingW3W ? '' : 'Add details to Venue Database'}
               value={venueData ? venueData.AddressLoadingW3W : null}
             />
           </div>
@@ -1750,7 +1764,6 @@ export const EditDealMemoContractModal = ({
             <div className="w-full">
               <TextInput
                 data-testid="dressingRoomText"
-                type="number"
                 className="w-full"
                 value={formData.DeMoDressingRooms}
                 onChange={(value) => editDemoModalData('DeMoDressingRooms', value.target.value, 'dealMemo')}
@@ -1900,7 +1913,12 @@ export const EditDealMemoContractModal = ({
           </div>
           <div className="w-4/5 flex">
             <div className="w-full">
-              <TextInput data-testid="vatText" className="w-full" />
+              <TextInput
+                data-testid="vatText"
+                className="w-full"
+                value={productionJumpState.ProductionCompany.ProdCoVATCode}
+                disabled
+              />
             </div>
           </div>
         </div>
