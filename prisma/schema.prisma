@@ -344,7 +344,7 @@ model Account {
   AccountLogo                Bytes?                @map("AccountLogo")
   AccountMainEmail           String?               @map("AccountMainEmail") @db.VarChar(120)
   AccountNumPeople           Int?                  @map("AccountNumPeople") @db.TinyInt
-  AccountOrganisationId      Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
+  AccountOrganisationId      String?               @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId") @db.Char(8)
   AccountTermsAgreedBy       String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
   AccountTermsAgreedDate     DateTime?             @map("AccountTermsAgreedDate") @db.Date
   AccountWebsite             String?               @map("AccountWebsite") @db.VarChar(255)
@@ -575,8 +575,8 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserIdUnique") @map("AccUserUserId")
+  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
+  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
   AccountId             Int                     @map("AccUserAccountId")
   AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
   AccUserPIN            String?                 @db.VarChar(4)
@@ -658,8 +658,8 @@ model MasterTask {
   AccountId                      Int               @map("TaskAccountId")
   Code                           Int               @unique(map: "MasterTask_TaskCode_Unique") @map("TaskCode") @db.SmallInt
   Name                           String            @map("TaskName") @db.VarChar(80)
-  CopiedFrom                 String?               @map("TaskCopiedFrom") @db.Char(1)
-  CopiedId                   Int?                  @map("TaskCopiedId")
+  CopiedFrom                     String?           @map("TaskCopiedFrom") @db.Char(1)
+  CopiedId                       Int?              @map("TaskCopiedId")
   Priority                       Int               @default(0) @map("TaskPriority") @db.TinyInt
   Notes                          String?           @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?              @map("TaskAssignedToUserId")
@@ -667,7 +667,7 @@ model MasterTask {
   TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
   TaskCompleteByIsPostProduction Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
-  MTRId                      Int?                  @map("TaskMTRId")
+  MTRId                          Int?              @map("TaskMTRId")
   Account                        Account           @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
   MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [Id], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
   User                           User?             @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
@@ -746,7 +746,6 @@ model ProductionTask {
   @@index([AssignedToUserId], map: "User_ProductionTask_Assigned")
   @@index([PRTId], map: "ProductionTaskRepeat_ProductionTask")
 }
-
 
 model AccountContact {
   AccContId        Int        @id @default(autoincrement())
@@ -1154,22 +1153,22 @@ model MasterTaskRepeat {
 }
 
 model ProductionTaskRepeat {
-  Id                          Int              @map("PTRId")@id @default(autoincrement())
-  FromWeekNum                 Int              @map("PTRFromWeekNum")@db.SmallInt
-  FromWeekNumIsPostProduction Boolean          @map("PTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  ToWeekNum                   Int              @map("PTRToWeekNum")@db.SmallInt
-  ToWeekNumIsPostProduction   Boolean          @map("PTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  Interval                    String           @map("PRTInterval")@db.VarChar(20)
-  ProductionTask                 ProductionTask[]
+  Id                          Int              @id @default(autoincrement()) @map("PTRId")
+  FromWeekNum                 Int              @map("PTRFromWeekNum") @db.SmallInt
+  FromWeekNumIsPostProduction Boolean          @default(dbgenerated("(b'0')")) @map("PTRFromWeekNumIsPostProduction") @db.Bit(1)
+  ToWeekNum                   Int              @map("PTRToWeekNum") @db.SmallInt
+  ToWeekNumIsPostProduction   Boolean          @default(dbgenerated("(b'0')")) @map("PTRToWeekNumIsPostProduction") @db.Bit(1)
+  Interval                    String           @map("PRTInterval") @db.VarChar(20)
+  ProductionTask              ProductionTask[]
 }
 
 model VenueFile {
-  Id          Int              @map("VenueFileId")@id @default(autoincrement())
-  VenueId     Int              @map("VenueFileVenueId")
-  FileId      Int              @map("VenueFileFileId")
-  Type        String?          @map("VenueFileType")@db.VarChar(20)
-  Description String?          @map("VenueFileDescription")@db.VarChar(80)
-  Venue                Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueFile")
+  Id          Int     @id @default(autoincrement()) @map("VenueFileId")
+  VenueId     Int     @map("VenueFileVenueId")
+  FileId      Int     @map("VenueFileFileId")
+  Type        String? @map("VenueFileType") @db.VarChar(20)
+  Description String? @map("VenueFileDescription") @db.VarChar(80)
+  Venue       Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueFile")
 
   @@index([VenueId], map: "Venue_VenueFile")
 }
@@ -1547,6 +1546,19 @@ view SalesSummaryView {
   SaleTypeName               String?   @db.VarChar(45)
   SetSalesFiguresDate        DateTime? @db.Date
   FinalSetSalesFiguresDate   DateTime? @db.Date
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view AccountUserPermissionsView {
+  AccountId      Int
+  UserId         Int     @default(0)
+  AccUserId      Int     @default(0)
+  UserFirstName  String  @db.VarChar(50)
+  UserLastName   String? @db.VarChar(50)
+  UserEmail      String  @db.VarChar(120)
+  AllPermissions String? @db.MediumText
 
   @@ignore
 }

@@ -1,9 +1,10 @@
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import TextInput from 'components/core-ui-lib/TextInput';
-import React, { useMemo } from 'react';
+import React, { useState } from 'react';
 import { useWizard } from 'react-use-wizard';
 import Select from 'components/core-ui-lib/Select';
+import schema from './schema/accountDetailsFormSchema';
 
 export type Account = {
   accountId?: number;
@@ -25,31 +26,36 @@ export type Account = {
 interface AccountDetailsFormProps {
   accountDetails: Account;
   onChange: (v: Account) => void;
-  onSave: () => void;
+  onSave: (callBack: () => void) => void;
 }
 
 const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetailsFormProps) => {
   const { nextStep } = useWizard();
-
-  const isValidEmail = useMemo(() => {
-    return /^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(accountDetails.email);
-  }, [accountDetails.email]);
-
-  const canProceedToNextStep = useMemo(() => {
-    return (
-      isValidEmail &&
-      accountDetails.accountId &&
-      accountDetails.companyName &&
-      accountDetails.firstName &&
-      accountDetails.lastName &&
-      accountDetails.phoneNumber &&
-      accountDetails.email &&
-      accountDetails.postcode
-    );
-  }, [accountDetails, isValidEmail]);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const handleAccountDetailsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...accountDetails, [e.target.name]: e.target.value });
+  };
+
+  async function validateForm(data: Account) {
+    try {
+      await schema.validate({ ...data }, { abortEarly: false });
+      return true;
+    } catch (validationErrors) {
+      const errors = {};
+      validationErrors.inner.forEach((error) => {
+        errors[error.path] = error.message;
+      });
+      setValidationErrors(errors);
+      console.log('validation Errors', errors);
+      return false;
+    }
+  }
+
+  const handleNextClick = async () => {
+    if (await validateForm(accountDetails)) {
+      onSave(() => nextStep());
+    }
   };
 
   return (
@@ -58,7 +64,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
       <div className="w-full flex gap-10">
         <section className="w-1/2">
           <div className="mb-2">
-            <Label text="First Name" />
+            <Label text="First Name" required />
             <TextInput
               data-testid="first-name"
               name="firstName"
@@ -67,9 +73,12 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.firstName}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.firstName && (
+              <small className="text-primary-red mt-1">{validationErrors.firstName}</small>
+            )}
           </div>
           <div className="mb-2">
-            <Label text="Last Name" />
+            <Label text="Last Name" required />
             <TextInput
               data-testid="last-name"
               name="lastName"
@@ -78,9 +87,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.lastName}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.lastName && <small className="text-primary-red mt-1">{validationErrors.lastName}</small>}
           </div>
           <div className="mb-2">
-            <Label text="Company" />
+            <Label text="Company" required />
             <TextInput
               data-testid="company-name"
               name="companyName"
@@ -89,9 +99,12 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.companyName}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.companyName && (
+              <small className="text-primary-red mt-1">{validationErrors.companyName}</small>
+            )}
           </div>
           <div className="mb-2">
-            <Label text="Phone Number" />
+            <Label text="Phone Number" required />
             <TextInput
               data-testid="phone-number"
               name="phoneNumber"
@@ -100,9 +113,12 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.phoneNumber}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.phoneNumber && (
+              <small className="text-primary-red mt-1">{validationErrors.phoneNumber}</small>
+            )}
           </div>
           <div className="mb-2">
-            <Label text="Address line 1" />
+            <Label text="Address line 1" required />
             <TextInput
               data-testid="address-line1"
               name="addressLine1"
@@ -111,9 +127,12 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.addressLine1}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.addressLine1 && (
+              <small className="text-primary-red mt-1">{validationErrors.addressLine1}</small>
+            )}
           </div>
           <div className="mb-2">
-            <Label text="Address line 2" />
+            <Label text="Address line 2" required />
             <TextInput
               data-testid="address-line2"
               name="addressLine2"
@@ -122,6 +141,9 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.addressLine2}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.addressLine2 && (
+              <small className="text-primary-red mt-1">{validationErrors.addressLine2}</small>
+            )}
           </div>
           <div className="mb-2">
             <Label text="Address line 3" />
@@ -137,7 +159,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
         </section>
         <section className="w-1/2">
           <div className="mb-2">
-            <Label text="Town" />
+            <Label text="Town" required />
             <TextInput
               data-testid="town"
               name="town"
@@ -146,9 +168,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.town}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.town && <small className="text-primary-red mt-1">{validationErrors.town}</small>}
           </div>
           <div className="mb-2">
-            <Label text="Postcode" />
+            <Label text="Postcode" required />
             <TextInput
               data-testid="post-code"
               name="postcode"
@@ -157,9 +180,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.postcode}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.postcode && <small className="text-primary-red mt-1">{validationErrors.postcode}</small>}
           </div>
           <div className="mb-2">
-            <Label text="Country" />
+            <Label text="Country" required />
             <Select
               name="country"
               placeholder="Select country"
@@ -169,9 +193,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               onChange={(value) => onChange({ ...accountDetails, country: value.toString() })}
               isClearable={false}
             />
+            {validationErrors.country && <small className="text-primary-red mt-1">{validationErrors.country}</small>}
           </div>
           <div className="mb-2">
-            <Label text="Company Email Address" />
+            <Label text="Company Email Address" required />
             <TextInput
               data-testid="company-email"
               name="email"
@@ -180,9 +205,10 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               value={accountDetails.email}
               onChange={handleAccountDetailsChange}
             />
+            {validationErrors.email && <small className="text-primary-red mt-1">{validationErrors.email}</small>}
           </div>
           <div className="mb-2">
-            <Label text="Currency for Payment" />
+            <Label text="Currency for Payment" required />
             <Select
               name="currency"
               placeholder="Select currency"
@@ -192,6 +218,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
               onChange={(value) => onChange({ ...accountDetails, currency: value.toString() })}
               isClearable={false}
             />
+            {validationErrors.currency && <small className="text-primary-red mt-1">{validationErrors.currency}</small>}
           </div>
           <div className="mb-2">
             <Label text="VAT Number" />
@@ -205,8 +232,7 @@ const AccountDetailsForm = ({ accountDetails, onChange, onSave }: AccountDetails
             />
           </div>
           <div className="w-full flex gap-2  items-center justify-end mt-10">
-            <Button text="Save" onClick={onSave} className="w-32" />
-            <Button text="Next" onClick={nextStep} className="w-32" disabled={!canProceedToNextStep} />
+            <Button text="Next" onClick={handleNextClick} className="w-32" />
           </div>
         </section>
       </div>

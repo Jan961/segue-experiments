@@ -101,9 +101,11 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   DeMoAdvancePaymentDueBy: null,
   DeMoSettlementDays: null,
   DeMoContractClause: '',
+  DeMoPrintDelUseVenueAddress: false,
   DealMemoPrice: [],
   DealMemoTechProvision: [],
   DealMemoCall: [],
+  DealMemoHold: [],
 };
 
 export const dealMemoInitialState = atom({

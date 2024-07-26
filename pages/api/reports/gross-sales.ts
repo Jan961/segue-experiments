@@ -7,6 +7,7 @@ import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { ALIGNMENT, alignCellText, styleHeader } from './masterplan';
 import { getExportedAtTitle } from 'utils/export';
 import { currencyCodeToSymbolMap } from 'config/Reports';
+import { convertToPDF } from 'utils/report';
 
 type SALES_SUMMARY = {
   ProductionId: number;
@@ -96,7 +97,7 @@ const getTotalInPound = ({ totalOfCurrency, conversionRate }) => {
 
 const handler = async (req, res) => {
   const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-  const { productionId } = req.body || {};
+  const { productionId, format } = req.body || {};
 
   if (!productionId) {
     throw new Error('Params are missing');
@@ -333,6 +334,25 @@ const handler = async (req, res) => {
   alignCellText({ worksheet, row: 1, col: 1, align: ALIGNMENT.LEFT });
   alignCellText({ worksheet, row: 2, col: 1, align: ALIGNMENT.LEFT });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${worksheet.rowCount}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);
 

@@ -19,7 +19,7 @@ export default function Label({ text, variant = 'sm', className = '', htmlFor, r
   const basClass = `text-primary-label font-calibri ${labelClassMap[variant]}`;
   return (
     <label htmlFor={htmlFor} data-testid={testId} className={`${basClass} ${className}`}>
-      {text} {required && <sup className="">*</sup>}
+      {text} {required && <sup style={{ color: '#D41818' }}>*</sup>}
     </label>
   );
 }

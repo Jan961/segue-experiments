@@ -44,9 +44,9 @@ export default function ActivityModal({
   const [visible, setVisible] = useState<boolean>(show);
   const [actName, setActName] = useState<string>(null);
   const [actType, setActType] = useState<number>(null);
-  const [actDate, setActDate] = useState<Date>();
+  const [actDate, setActDate] = useState<Date>(null);
   const [actFollowUp, setActFollowUp] = useState<boolean>(false);
-  const [followUpDt, setFollowUpDt] = useState<Date>();
+  const [followUpDt, setFollowUpDt] = useState<Date>(null);
   const [companyCost, setCompanyCost] = useState<string>();
   const [venueCost, setVenueCost] = useState<string>();
   const [actNotes, setActNotes] = useState<string>();
@@ -68,9 +68,9 @@ export default function ActivityModal({
     } else if (variant === 'edit') {
       setActName(data.Name);
       setActType(data.ActivityTypeId);
-      setActDate(startOfDay(new Date(data.Date)));
+      setActDate(!data.Date ? null : startOfDay(new Date(data.Date)));
       setActFollowUp(data.FollowUpRequired);
-      setFollowUpDt(data.DueByDate === null ? null : startOfDay(new Date(data.DueByDate)));
+      setFollowUpDt(!data.DueByDate ? null : startOfDay(new Date(data.DueByDate)));
       setCompanyCost(data.CompanyCost.toString());
       setVenueCost(data.VenueCost.toString());
       setActNotes(data.Notes);
@@ -94,7 +94,7 @@ export default function ActivityModal({
       FollowUpRequired: actFollowUp,
       Name: actName,
       Notes: actNotes,
-      DueByDate: actFollowUp ? (followUpDt === null ? null : startOfDay(new Date(followUpDt))) : null,
+      DueByDate: actFollowUp ? (!followUpDt ? null : startOfDay(new Date(followUpDt))) : null,
     };
 
     // only add iD if not adding

@@ -10,7 +10,7 @@ export default function index() {
     },
     {
       title: 'Users',
-      route: '/users',
+      route: '/admin/users',
       color: 'bg-primary-pink',
     },
     {

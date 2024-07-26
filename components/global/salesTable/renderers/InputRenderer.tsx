@@ -1,16 +1,18 @@
-import { SelectProps } from 'components/core-ui-lib/Select/Select';
 import { TextInput } from 'components/core-ui-lib';
 import { VENUE_CURRENCY_SYMBOLS } from 'types/MarketingTypes';
-
+import { ChangeEvent } from 'react';
+import { isNullOrEmpty } from 'utils';
 interface Standard {
   field: string;
 }
-
-interface SelectRendererProps extends SelectProps {
+interface SelectRendererProps {
+  onChange(value: ChangeEvent<HTMLInputElement>, holdValue: any, HoldTypeName: any, field: string): void;
   id?: string;
   eGridCell: HTMLElement;
   hasSalesData: boolean;
   colDef?: Standard;
+  holdValue?: any;
+  data?: any;
 }
 
 const InputRenderer = (props: SelectRendererProps) => {
@@ -19,7 +21,13 @@ const InputRenderer = (props: SelectRendererProps) => {
       {props.colDef.field === 'value' && (
         <div className="text-primary-input-text mr-2">{VENUE_CURRENCY_SYMBOLS.POUND}</div>
       )}
-      <TextInput id="venueText" className="w-full text-primary-input-text font-bold" />
+      <TextInput
+        id="venueText"
+        type="number"
+        className="w-full text-primary-input-text font-bold"
+        value={!isNullOrEmpty(props.holdValue) ? props.holdValue[props.data.HoldTypeName][props.colDef.field] : 0}
+        onChange={(value) => props.onChange(value, props.holdValue, props.data.HoldTypeName, props.colDef.field)}
+      />
     </div>
   );
 };
