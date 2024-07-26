@@ -11,6 +11,17 @@ export type GlobalActivitiesResponse = {
 };
 
 export const getActivitiesByVenueId = async (VenueId: number) => {
+  // activity types
+  const activityTypes = await prisma.activityType.findMany({
+    select: {
+      Name: true,
+      Id: true,
+    },
+    orderBy: {
+      Name: 'asc',
+    },
+  });
+
   // First fetch the GlobalActivityIds related to the given VenueId
   const activityIdsResult = await prisma.globalBookingActivityVenue.findMany({
     where: {
@@ -48,6 +59,7 @@ export const getActivitiesByVenueId = async (VenueId: number) => {
   // Map fields to the required format
   const result = {
     activities: activitiesWithVenueList.map((activity) => fieldsMapper(activity)),
+    activityTypes,
   };
 
   return result;

@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState, useMemo } from 'react';
 import { SelectOption } from '../MarketingHome';
-import { ActivityDTO, ActivityTypeDTO, GlobalActivityDTO } from 'interfaces';
+import { ActivityDTO, GlobalActivityDTO } from 'interfaces';
 import ActivityModal, { ActivityModalVariant } from '../modal/ActivityModal';
 import { startOfDay } from 'date-fns';
 import { activityColDefs, globalActivityTabColDefs, styleProps } from '../table/tableConfig';
@@ -30,15 +30,6 @@ interface ActivitiesTabProps {
 export interface ActivityTabRef {
   resetData: () => void;
 }
-
-type ActivityList = {
-  activities: Array<ActivityDTO>;
-  activityTypes: Array<ActivityTypeDTO>;
-};
-
-type GlobalActivityList = {
-  activities: Array<GlobalActivity>;
-};
 
 const approvalStatusList = [
   { text: 'Pending Approval', value: 'P' },
@@ -107,63 +98,62 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       const { data } = await axios.get('/api/marketing/activities/' + bookingId);
 
-      if (typeof data !== 'object') {
-        return;
+      if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
+        const actTypes = data.activityTypes.map((type) => ({
+          text: type.Name,
+          value: type.Id,
+        }));
+
+        setActTypeList(actTypes);
+
+        const sortedActivities = data.activities.sort(
+          (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
+        );
+
+        const tempRows = sortedActivities.map((act) => ({
+          actName: act.Name,
+          actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+          actDate: !act.Date ? null : startOfDay(new Date(act.Date)),
+          followUpCheck: act.FollowUpRequired,
+          followUpDt: !act.DueByDate ? null : startOfDay(new Date(act.DueByDate)),
+          companyCost: act.CompanyCost,
+          venueCost: act.VenueCost,
+          notes: act.Notes,
+          bookingId: act.BookingId,
+          id: act.Id,
+        }));
+
+        calculateActivityTotals(tempRows);
+        setActRowData(tempRows);
       }
-
-      const activityData = data as ActivityList;
-      const actTypes = activityData.activityTypes.map((type) => ({
-        text: type.Name,
-        value: type.Id,
-      }));
-
-      setActTypeList(actTypes);
-
-      const sortedActivities = activityData.activities.sort(
-        (a, b) => new Date(a.Date).getTime() - new Date(b.Date).getTime(),
-      );
-
-      const tempRows = sortedActivities.map((act) => ({
-        actName: act.Name,
-        actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: !act.Date ? null : startOfDay(new Date(act.Date)),
-        followUpCheck: act.FollowUpRequired,
-        followUpDt: !act.DueByDate ? null : startOfDay(new Date(act.DueByDate)),
-        companyCost: act.CompanyCost,
-        venueCost: act.VenueCost,
-        notes: act.Notes,
-        bookingId: act.BookingId,
-        id: act.Id,
-      }));
-
-      calculateActivityTotals(tempRows);
-      setActRowData(tempRows);
 
       const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
 
       const response = await axios.get('/api/marketing/globalActivities/venue/' + venueId);
+      const globalActivities = response.data;
 
-      if (typeof response.data !== 'object') {
-        return;
+      if (
+        globalActivities &&
+        Array.isArray(globalActivities.activities) &&
+        globalActivities.activities.length > 0 &&
+        Array.isArray(globalActivities.activityTypes)
+      ) {
+        const tempGlobList = globalActivities.activities.map((act) => ({
+          actName: act.Name,
+          actType: globalActivities.activityTypes.find((type) => type.value === act.ActivityTypeId)?.text,
+          actDate: startOfDay(new Date(act.Date)),
+          followUpCheck: act.FollowUpRequired,
+          followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
+          cost: act.Cost,
+          id: act.Id,
+          notes: act.Notes,
+          venueIds: act.VenueIds,
+        }));
+
+        setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
+
+        setGlobalRowData(tempGlobList);
       }
-
-      const globalActivities = response.data as GlobalActivityList;
-
-      const tempGlobList = globalActivities.activities.map((act) => ({
-        actName: act.Name,
-        actType: actTypes.find((type) => type.value === act.ActivityTypeId)?.text,
-        actDate: startOfDay(new Date(act.Date)),
-        followUpCheck: act.FollowUpRequired,
-        followUpDt: act.DueByDate === '' ? null : startOfDay(new Date(act.DueByDate)),
-        cost: act.Cost,
-        id: act.Id,
-        notes: act.Notes,
-        venueIds: act.VenueIds,
-      }));
-
-      setGlobalTotalCost(globalActivities.activities.reduce((sum, item) => sum + item.Cost, 0));
-
-      setGlobalRowData(tempGlobList);
 
       setDataAvailable(true);
     } catch (error) {
@@ -173,31 +163,30 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
   const viewGlobalActivity = async (data) => {
     const accTypeResponse = await axios.get('/api/marketing/activities/' + bookings.selected.toString());
+    const activityData = accTypeResponse.data;
 
-    if (typeof accTypeResponse.data !== 'object') {
-      return;
+    if (activityData && Array.isArray(activityData.activityTypes) && activityData.activityTypes.length > 0) {
+      const actTypes = activityData.activityTypes.map((type) => ({
+        text: type.Name,
+        value: type.Id,
+      }));
+
+      const tempGlobAct: GlobalActivity = {
+        ActivityTypeId: actTypes.find((type) => type.text === data.actType).value,
+        Cost: data.cost,
+        Date: data.actDate,
+        FollowUpRequired: data.followUpCheck,
+        Name: data.actName,
+        Notes: data.notes,
+        DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
+        Id: data.id,
+        ProductionId: productionId,
+        VenueIds: data.venueIds,
+      };
+
+      setGlobalActRow(tempGlobAct);
     }
 
-    const activityData = accTypeResponse.data as ActivityList;
-    const actTypes = activityData.activityTypes.map((type) => ({
-      text: type.Name,
-      value: type.Id,
-    }));
-
-    const tempGlobAct: GlobalActivity = {
-      ActivityTypeId: actTypes.find((type) => type.text === data.actType).value,
-      Cost: data.cost,
-      Date: data.actDate,
-      FollowUpRequired: data.followUpCheck,
-      Name: data.actName,
-      Notes: data.notes,
-      DueByDate: data.followUpCheck ? new Date(data.followUpDt) : null,
-      Id: data.id,
-      ProductionId: productionId,
-      VenueIds: data.venueIds,
-    };
-
-    setGlobalActRow(tempGlobAct);
     setShowGlobalActivityModal(true);
   };
 
@@ -231,35 +220,33 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     setActModalVariant(variant);
 
     try {
-      const actData = await axios.get('/api/marketing/activities/' + props.bookingId.toString());
+      const accTypeResponse = await axios.get('/api/marketing/activities/' + props.bookingId.toString());
+      const activityData = accTypeResponse.data;
 
-      if (typeof actData.data !== 'object') {
-        return;
-      }
+      if (activityData && Array.isArray(activityData.activityTypes) && activityData.activityTypes.length > 0) {
+        const actTypes = activityData.activityTypes;
 
-      const activityData = actData.data as ActivityList;
-      const actTypes = activityData.activityTypes;
+        const tempAct: ActivityDTO = {
+          ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
+          BookingId: data.bookingId,
+          CompanyCost: data.companyCost,
+          VenueCost: data.venueCost,
+          Date: data.actDate,
+          FollowUpRequired: data.followUpCheck,
+          Name: data.actName,
+          Notes: data.notes,
+          DueByDate: data.followUpCheck ? (!data.followUpDt ? null : new Date(data.followUpDt)) : null,
+          Id: data.id,
+        };
 
-      const tempAct: ActivityDTO = {
-        ActivityTypeId: actTypes.find((type) => type.Name === data.actType).Id,
-        BookingId: data.bookingId,
-        CompanyCost: data.companyCost,
-        VenueCost: data.venueCost,
-        Date: data.actDate,
-        FollowUpRequired: data.followUpCheck,
-        Name: data.actName,
-        Notes: data.notes,
-        DueByDate: data.followUpCheck ? (!data.followUpDt ? null : new Date(data.followUpDt)) : null,
-        Id: data.id,
-      };
+        setActRow(tempAct);
 
-      setActRow(tempAct);
-
-      if (variant === 'edit') {
-        setShowActivityModal(true);
-      } else if (variant === 'delete') {
-        setConfVariant('delete');
-        setShowConfirm(true);
+        if (variant === 'edit') {
+          setShowActivityModal(true);
+        } else if (variant === 'delete') {
+          setConfVariant('delete');
+          setShowConfirm(true);
+        }
       }
     } catch (error) {
       console.log(error);

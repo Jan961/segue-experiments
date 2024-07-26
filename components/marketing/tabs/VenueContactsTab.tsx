@@ -71,13 +71,14 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       const newVenueContact = response.data;
 
       if (typeof newVenueContact === 'object') {
-        const newRole = newVenueContact as VenueContactDTO;
+        const { Id } = newVenueContact;
+
         const tempVenueContactUi: UiVenueContact = {
           ...newContact,
           venueId: parseInt(newVc.VenueId),
           roleName: newContact.roleName,
           venueRoleId: newVc.VenueRoleId,
-          id: newRole.Id,
+          id: Id,
         };
 
         setVenueContacts([...venueContacts, tempVenueContactUi]);
@@ -108,8 +109,9 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
       setVenueContacts([]);
 
       const response = await axios.get('/api/marketing/venueContacts/' + venueId);
+      const venueContacts = response.data;
 
-      if (typeof response.data === 'object') {
+      if (venueContacts && Array.isArray(venueContacts) && venueContacts.length > 0) {
         const venueContactList = response.data as Array<VenueContactDTO>;
         const venueContactUiList: Array<UiVenueContact> = [];
 

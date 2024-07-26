@@ -5,7 +5,6 @@ import AvailableSeatsModal from '../modal/AvailableSeatsModal';
 import Checkbox from 'components/core-ui-lib/Checkbox';
 import Table from 'components/core-ui-lib/Table';
 import { allocSeatsColDefs, styleProps } from '../table/tableConfig';
-import { AllocatedHoldDTO } from 'interfaces';
 import TextArea from 'components/core-ui-lib/TextArea/TextArea';
 import formatInputDate from 'utils/dateInputFormat';
 import Icon from 'components/core-ui-lib/Icon';
@@ -21,11 +20,6 @@ import axios from 'axios';
 
 interface PromotorHoldsTabProps {
   bookingId: string;
-}
-
-interface PromoterData {
-  allocations: Array<AllocatedHoldDTO>;
-  holds: Array<any>;
 }
 
 export interface PromoterHoldTabRef {
@@ -76,9 +70,14 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
   const getPromoterHoldData = async (bookingId) => {
     try {
       const response = await axios.get('/api/marketing/promoterHolds/' + bookingId);
+      const promData = response.data;
 
-      if (typeof response.data === 'object') {
-        const promData = response.data as PromoterData;
+      if (
+        promData.allocations &&
+        Array.isArray(promData.allocations) &&
+        promData.allocations.length > 0 &&
+        Array.isArray(promData.holds)
+      ) {
         setHoldList(promData.holds);
 
         setAllocRows(

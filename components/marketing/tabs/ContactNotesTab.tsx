@@ -45,11 +45,10 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
   const getContactNotes = async (bookingId: string, users) => {
     try {
       const contactNoteResponse = await axios.get('/api/marketing/contactNotes/' + bookingId);
+      const contactNotes = contactNoteResponse.data;
 
-      if (typeof contactNoteResponse.data === 'object') {
-        const contactNoteList = contactNoteResponse.data as Array<BookingContactNoteDTO>;
-
-        const sortedContactNotes = contactNoteList.sort(
+      if (contactNotes && Array.isArray(contactNotes) && contactNotes.length > 0) {
+        const sortedContactNotes = contactNotes.sort(
           (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
         );
 
