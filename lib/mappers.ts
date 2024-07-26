@@ -45,7 +45,7 @@ import {
   CountryDTO,
   GlobalActivityDTO,
 } from 'interfaces';
-import { ShowWithProductions } from 'services/ShowService';
+import { ShowWithProductions } from 'services/showService';
 import { ProductionWithDateblocks } from 'services/productionService';
 import { BookingsWithPerformances } from 'services/bookingService';
 import { dateTimeToTime, toISO } from 'services/dateService';
