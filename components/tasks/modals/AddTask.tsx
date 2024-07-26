@@ -207,6 +207,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
 
     const multiplier = repeatInterval === 'biweekly' ? 2 : 1;
     let counter = 0;
+
     while (taskStartDate <= taskEndDate) {
       counter++;
       taskStartDate =
