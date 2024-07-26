@@ -96,7 +96,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
       setActColDefs(activityColDefs(activityUpdate, currency.symbol));
       setGlobalColDefs(globalActivityTabColDefs(viewGlobalActivity, currency.symbol));
 
-      const { data } = await axios.get('/api/marketing/activities/' + bookingId);
+      const { data } = await axios.get(`/api/marketing/activities/${bookingId}`);
 
       if (data && Array.isArray(data.activities) && data.activities.length > 0 && Array.isArray(data.activityTypes)) {
         const actTypes = data.activityTypes.map((type) => ({
@@ -129,7 +129,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
 
       const venueId = bookings.bookings.find((booking) => booking.Id === bookings.selected)?.Venue?.Id;
 
-      const response = await axios.get('/api/marketing/globalActivities/venue/' + venueId);
+      const response = await axios.get(`/api/marketing/globalActivities/venue/${venueId}`);
       const globalActivities = response.data;
 
       if (
@@ -162,7 +162,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
   };
 
   const viewGlobalActivity = async (data) => {
-    const accTypeResponse = await axios.get('/api/marketing/activities/' + bookings.selected.toString());
+    const accTypeResponse = await axios.get(`/api/marketing/activities/${bookings.selected.toString()}`);
     const activityData = accTypeResponse.data;
 
     if (activityData && Array.isArray(activityData.activityTypes) && activityData.activityTypes.length > 0) {
@@ -220,7 +220,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     setActModalVariant(variant);
 
     try {
-      const accTypeResponse = await axios.get('/api/marketing/activities/' + props.bookingId.toString());
+      const accTypeResponse = await axios.get(`/api/marketing/activities/${props.bookingId.toString()}`);
       const activityData = accTypeResponse.data;
 
       if (activityData && Array.isArray(activityData.activityTypes) && activityData.activityTypes.length > 0) {
@@ -384,7 +384,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
     setBookings({ bookings: newBookings, selected: bookings.selected });
 
     // Update in the database
-    await axios.post('/api/bookings/update/' + props.bookingId.toString(), { [field]: value });
+    await axios.post(`/api/bookings/update/${props.bookingId.toString()}`, { [field]: value });
   };
 
   useEffect(() => {
@@ -549,7 +549,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
                   <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {currency.symbol + totalCost.toFixed(2)}
+                    {`${currency.symbol}${totalCost.toFixed(2)}`}
                   </div>
                 </div>
               </div>
@@ -558,7 +558,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="text-base font-bold text-primary-input-text">Company</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
                   <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {currency.symbol + totalCompanyCost.toFixed(2)}
+                    {`${currency.symbol}${totalCompanyCost.toFixed(2)}`}
                   </div>
                 </div>
               </div>
@@ -567,7 +567,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="text-base font-bold text-primary-input-text">Venue</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
                   <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {currency.symbol + totalVenueCost.toFixed(2)}
+                    {`${currency.symbol}${totalVenueCost.toFixed(2)}`}
                   </div>
                 </div>
               </div>
@@ -591,7 +591,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="text-base font-bold text-primary-input-text">Total Cost</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px] ml-2">
                   <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {currency.symbol + globalTotalCost.toFixed(2)}
+                    {`${currency.symbol}${globalTotalCost.toFixed(2)}`}
                   </div>
                 </div>
               </div>
@@ -600,7 +600,7 @@ const ActivitiesTab = forwardRef<ActivityTabRef, ActivitiesTabProps>((props, ref
                 <div className="text-base font-bold text-primary-input-text">Venue Share</div>
                 <div className="bg-primary-white h-7 w-[140px] rounded mt-[2px]">
                   <div className="text text-base text-left pl-2 text-primary-input-text">
-                    {currency.symbol + globalVenueShareCost.toFixed(2)}
+                    {`${currency.symbol}${globalVenueShareCost.toFixed(2)}`}
                   </div>
                 </div>
               </div>

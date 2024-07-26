@@ -11,7 +11,6 @@ import { getWeekDayShort, DATE_PATTERN } from 'services/dateService';
 import formatInputDate from 'utils/dateInputFormat';
 import { currencyState } from 'state/marketing/currencyState';
 import axios from 'axios';
-import { LastPerfDate } from 'types/MarketingTypes';
 
 type TourResponse = {
   data: Array<SelectOption>;
@@ -80,14 +79,10 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
 
   const fetchLastDates = async () => {
     try {
-      const data = await fetchData({
-        url: '/api/performances/lastDate/' + productionId,
-        method: 'POST',
-      });
+      const response = await axios.get(`/api/performances/lastDate/${productionId}`);
 
-      if (Array.isArray(data)) {
-        const lastDates = data as Array<LastPerfDate>;
-        setLastDates(lastDates || []);
+      if (Array.isArray(response.data)) {
+        setLastDates(response.data || []);
       }
     } catch (error) {
       console.log(error);
@@ -112,7 +107,7 @@ const SalesEntryFilters: React.FC<Props> = ({ onDateChanged }) => {
         } else {
           return {
             ...option,
-            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase() + ' ' + endDateStr}`),
+            text: option.text.replace(DATE_PATTERN, `$1 to ${endDateDay.toUpperCase()} ${endDateStr}`),
           };
         }
       } else {

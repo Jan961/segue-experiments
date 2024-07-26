@@ -108,7 +108,7 @@ const VenueContactsTab = forwardRef<VenueContactTabRef, VenueContactsProps>((pro
     try {
       setVenueContacts([]);
 
-      const response = await axios.get('/api/marketing/venueContacts/' + venueId);
+      const response = await axios.get(`/api/marketing/venueContacts/${venueId}`);
       const venueContacts = response.data;
 
       if (venueContacts && Array.isArray(venueContacts) && venueContacts.length > 0) {

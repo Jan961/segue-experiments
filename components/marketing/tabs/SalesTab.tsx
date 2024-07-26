@@ -26,7 +26,7 @@ const SalesTab = forwardRef<SalesTabRef, SalesTabProps>((props, ref) => {
 
   const retrieveSalesData = async (bookingId: string) => {
     try {
-      const { data } = await axios.post('/api/marketing/sales/read/' + bookingId);
+      const { data } = await axios.post(`/api/marketing/sales/read/${bookingId}`);
 
       if (Array.isArray(data) && data.length > 0) {
         const tempSales = data as Array<SalesSnapshot>;

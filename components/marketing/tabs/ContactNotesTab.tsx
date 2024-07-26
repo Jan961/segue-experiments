@@ -44,7 +44,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
 
   const getContactNotes = async (bookingId: string, users) => {
     try {
-      const contactNoteResponse = await axios.get('/api/marketing/contactNotes/' + bookingId);
+      const contactNoteResponse = await axios.get(`/api/marketing/contactNotes/${bookingId}`);
       const contactNotes = contactNoteResponse.data;
 
       if (contactNotes && Array.isArray(contactNotes) && contactNotes.length > 0) {

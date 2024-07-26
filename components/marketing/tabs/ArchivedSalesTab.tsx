@@ -42,7 +42,7 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
         return { text: town.Town, value: town.Town };
       }),
       venueList: Object.values(venueDict).map((venue) => {
-        return { text: venue.Code + ' ' + venue.Name, value: venue };
+        return { text: `${venue.Code} ${venue.Name}`, value: venue };
       }),
     };
   }, [townList, venueDict]);

@@ -21,7 +21,7 @@ const FinalEntryFilters = () => {
 
   const getCurrency = async (bookingId) => {
     try {
-      const response = await axios.get('/api/marketing/currency/' + bookingId);
+      const response = await axios.get(`/api/marketing/currency/${bookingId}`);
 
       if (response.data) {
         const { currency } = response.data;
@@ -48,7 +48,7 @@ const FinalEntryFilters = () => {
 
   const fetchLastDates = async () => {
     try {
-      const data = await axios.get('/api/performances/lastDate/' + productionId);
+      const data = await axios.get(`/api/performances/lastDate/${productionId}`);
 
       if (Array.isArray(data)) {
         const lastDates = data as Array<LastPerfDate>;

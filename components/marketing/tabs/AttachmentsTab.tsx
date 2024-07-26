@@ -95,7 +95,7 @@ const AttachmentsTab = forwardRef<AttachmentsTabRef, AttachmentsTabProps>((props
 
   const getAttachments = async (bookingId) => {
     try {
-      const response = await axios.get('/api/marketing/attachments/' + bookingId);
+      const response = await axios.get(`/api/marketing/attachments/${bookingId}`);
 
       if (Array.isArray(response.data)) {
         if ('error' in response.data) {

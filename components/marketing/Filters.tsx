@@ -61,7 +61,7 @@ const Filters = () => {
 
   const getCurrency = async (bookingId) => {
     try {
-      const response = await axios.post('/api/marketing/currency/' + bookingId, {});
+      const response = await axios.get(`/api/marketing/currency/${bookingId}`);
 
       if (response.data && typeof response.data === 'object') {
         const currencyObject = response.data as { currency: string };

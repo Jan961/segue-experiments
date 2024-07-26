@@ -69,7 +69,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
 
   const getPromoterHoldData = async (bookingId) => {
     try {
-      const response = await axios.get('/api/marketing/promoterHolds/' + bookingId);
+      const response = await axios.get(`/api/marketing/promoterHolds/${bookingId}`);
       const promData = response.data;
 
       if (
@@ -123,7 +123,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
     }
 
     // update in the database
-    await axios.post('/api/bookings/update/' + bookingIdVal, updObj);
+    await axios.post(`/api/bookings/update/${bookingIdVal}`, updObj);
   };
 
   const triggerEdit = (e) => {
