@@ -54,6 +54,8 @@ export type SeatsInfo = {
   BookingId: number;
   DataFound: boolean;
   SetSalesFiguresDate: string;
+  Value: number;
+  currencySymbol: string;
 };
 
 export type SalesComparison = {

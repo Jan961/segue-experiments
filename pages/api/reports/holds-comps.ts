@@ -10,6 +10,7 @@ import { addWidthAsPerContent } from 'services/reportsService';
 import { COLOR_HEXCODE } from 'services/salesSummaryService';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { getExportedAtTitle } from 'utils/export';
+import { convertToPDF } from 'utils/report';
 
 enum HOLD_OR_COMP {
   HOLD = 'Hold',
@@ -202,7 +203,7 @@ const makeCellTextBold = ({ worksheet, row, col }: { worksheet: any; row: number
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const timezoneOffset = parseInt(req.headers.timezoneoffset as string, 10) || 0;
-  let { productionId, productionCode = '', fromDate, toDate, venue, status } = req.body;
+  let { productionId, productionCode = '', fromDate, toDate, venue, status, format } = req.body;
 
   // This doesn't check productionCode
   const email = await getEmailFromReq(req);
@@ -409,6 +410,26 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     rowsToIgnore: 4,
     maxColWidth: Infinity,
   });
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${row}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+    return;
+  }
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}.xlsx"`);

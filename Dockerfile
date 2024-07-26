@@ -2,6 +2,7 @@
 #FROM node:alpine
 FROM node:16-slim
 RUN apt-get update
+RUN apt-get install -y libreoffice
 RUN apt-get install -y openssl
 # Set working directory
 WORKDIR /usr/app

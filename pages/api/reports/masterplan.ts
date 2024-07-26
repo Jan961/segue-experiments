@@ -5,6 +5,7 @@ import moment from 'moment';
 import Decimal from 'decimal.js';
 import { COLOR_HEXCODE, colorCell, colorTextAndBGCell, fillRowBGColorAndTextColor } from 'services/salesSummaryService';
 import { formatDateWithTimezoneOffset } from 'services/dateService';
+import { convertToPDF } from 'utils/report';
 
 type SCHEDULE_VIEW = {
   ProductionId: number;
@@ -86,10 +87,11 @@ type ReqBody = {
   fromDate: string;
   toDate: string;
   timezoneOffset: number;
+  format?: string;
 };
 
 const handler = async (req, res) => {
-  const { fromDate, toDate, timezoneOffset }: ReqBody = req.body || {};
+  const { fromDate, toDate, timezoneOffset, format }: ReqBody = req.body || {};
 
   const formatedFromDate = formatDateWithTimezoneOffset({ date: fromDate, timezoneOffset });
   const formatedToDate = formatDateWithTimezoneOffset({ date: toDate, timezoneOffset });
@@ -321,6 +323,26 @@ const handler = async (req, res) => {
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
 
   const filename = `${title}.xlsx`;
+  if (format === 'pdf') {
+    worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(11).letter}${rowNo}`;
+    worksheet.pageSetup.fitToWidth = 1;
+    worksheet.pageSetup.fitToHeight = 1;
+    worksheet.pageSetup.orientation = 'landscape';
+    worksheet.pageSetup.fitToPage = true;
+    worksheet.pageSetup.margins = {
+      left: 0.25,
+      right: 0.25,
+      top: 0.25,
+      bottom: 0.25,
+      header: 0.3,
+      footer: 0.3,
+    };
+    const pdf = await convertToPDF(workbook);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.pdf"`);
+    res.end(pdf);
+    return;
+  }
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
 

@@ -9,6 +9,8 @@ import { getCurrencyFromBookingId } from 'services/venueCurrencyService';
 const getSeatsRelatedInfo = (param: TSalesView, currencySymbol: string): SeatsInfo => ({
   Seats: param.Seats,
   ValueWithCurrencySymbol: param.Value ? `${currencySymbol} ${numeral(param.Value).format('0,0.00')}` : '',
+  Value: param.Value || 0,
+  currencySymbol,
   BookingId: param.BookingId,
   DataFound: true,
   SetSalesFiguresDate: param.SetSalesFiguresDate,
@@ -17,9 +19,11 @@ const getSeatsRelatedInfo = (param: TSalesView, currencySymbol: string): SeatsIn
 const getSeatsRelatedInfoAsNull = (bookingId: number): SeatsInfo => ({
   Seats: null,
   ValueWithCurrencySymbol: '',
+  Value: 0,
   BookingId: bookingId,
   DataFound: false,
   SetSalesFiguresDate: '',
+  currencySymbol: '',
 });
 
 const rearrangeArray = ({
