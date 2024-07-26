@@ -36,8 +36,12 @@ export default async function handle(req, res) {
     if (!access) return res.status(401).end();
     const currencySymbol = (await getCurrencyFromBookingId(BookingId)) || '';
 
-    const data =
-      await prisma.$queryRaw`select * from SalesView where BookingId=${BookingId} order by BookingFirstDate, SetSalesFiguresDate`;
+    // Fetch data using Prisma Client
+    const data = await prisma.salesView.findMany({
+      where: { BookingId },
+      orderBy: [{ BookingFirstDate: 'asc' }, { SetSalesFiguresDate: 'asc' }],
+    });
+
     const groupedData = data.reduce((acc, sale) => {
       const key = getMapKey(sale);
       const val = acc[key];
