@@ -43,15 +43,17 @@ export const getMaxTaskCode = async () => {
 };
 
 export const getMaxProductionTaskCode = async (prodId: number) => {
-  return await prisma.ProductionTask.findFirst({
-    where: { ProductionId: prodId },
-    orderBy: {
-      Code: 'desc',
-    },
-    select: {
-      Code: true,
-    },
-  });
+  return (
+    (await prisma.ProductionTask.findFirst({
+      where: { ProductionId: prodId },
+      orderBy: {
+        Code: 'desc',
+      },
+      select: {
+        Code: true,
+      },
+    })?.Code) || 0
+  );
 };
 
 export const getMaxMasterTaskCode = async () => {

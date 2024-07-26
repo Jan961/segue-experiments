@@ -13,12 +13,12 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const access = await checkAccess(email, { ProductionId });
     if (!access) return res.status(401).end();
 
-    const { Code } = await getMaxProductionTaskCode(ProductionId);
+    const code = await getMaxProductionTaskCode(ProductionId);
 
     const createResult = await prisma.productionTask.create({
       data: {
         ProductionId: task.ProductionId,
-        Code: Code + 1,
+        Code: code + 1,
         Name: task.Name,
         Priority: task.Priority,
         Notes: task.Notes,
@@ -31,7 +31,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       },
     });
 
-    res.json(createResult);
+    res.status(200).json(createResult);
   } catch (err) {
     if (err.code === 'P2002' && err.meta && err.meta.target.includes('SECONDARY')) {
       res.status(409).json({ error: 'A show with the specified AccountId and Code already exists.' });
