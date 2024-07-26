@@ -8,11 +8,12 @@ import { exportSalesSummaryReport, fetchProductionWeek } from './request';
 import { transformToOptions } from 'utils';
 import { dateToSimple } from 'services/dateService';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
-import { MAX_WEEK, MIN_WEEK, getWeekOptions, salesSummarySortOptions } from 'config/Reports';
+import { MAX_WEEK, MIN_WEEK, salesSummarySortOptions } from 'config/Reports';
 import Button from 'components/core-ui-lib/Button';
 import Label from 'components/core-ui-lib/Label';
 import { getCurrentMondayDate } from 'services/reportsService';
 import { notify } from 'components/core-ui-lib/Notifications';
+import { TextInput } from 'components/core-ui-lib';
 
 interface SalesSummaryReportModalProps {
   visible: boolean;
@@ -24,7 +25,7 @@ const defaultFormData = {
   production: null,
   productionWeek: null,
   numberOfWeeks: 2,
-  order: null,
+  order: 'date',
   productionStartDate: null,
   productionEndDate: null,
 };
@@ -41,8 +42,9 @@ const getModalTitle = (activeModal: string): string => {
 };
 
 const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummaryReportModalProps) => {
-  const productionJump = useRecoilValue(productionJumpState);
-  const [formData, setFormData] = useState(defaultFormData);
+  const { selected, productions } = useRecoilValue(productionJumpState);
+  const [formData, setFormData] = useState({ ...defaultFormData, production: selected });
+  const [loading, setLoading] = useState(false);
   const title = useMemo(() => getModalTitle(activeModal), [activeModal]);
   const { production, productionWeek, numberOfWeeks, order } = formData;
   const updateProductionWeek = useCallback(() => {
@@ -69,22 +71,20 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
     () =>
       transformToOptions(
         weeks,
-        'productionWeekNum',
+        null,
         'mondayDate',
         (week) => ` Wk ${week.productionWeekNum} | ${dateToSimple(week?.mondayDate)}`,
       ),
     [weeks],
   );
 
-  const weekOptions = useMemo(() => getWeekOptions(MIN_WEEK, MAX_WEEK), []);
-
   const productionsOptions = useMemo(
     () =>
-      productionJump.productions.map((production) => ({
+      productions.map((production) => ({
         text: `${production.ShowCode}${production.Code} ${production.ShowName} ${production.IsArchived ? ' (A)' : ''}`,
         value: production.Id,
       })),
-    [productionJump],
+    [productions],
   );
 
   const onChange = useCallback(
@@ -94,20 +94,27 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
     [setFormData],
   );
 
-  const onExport = useCallback(() => {
-    notify.promise(
-      exportSalesSummaryReport({
-        ...formData,
-        ...(activeModal === 'salesSummaryAndWeeklyTotals' && { isWeeklyReport: true }),
-        ...(activeModal === 'salesVsCapacity' && { isSeatsDataRequired: true }),
-      }).then(() => onClose()),
-      {
-        loading: `'Generating ${title}`,
-        success: `${title}downloaded successfully`,
-        error: `Error generating ${title}`,
-      },
-    );
-  }, [formData, activeModal, title, onClose]);
+  const onExport = useCallback(
+    (format: string) => {
+      setLoading(true);
+      notify.promise(
+        exportSalesSummaryReport({
+          ...formData,
+          ...(activeModal === 'salesSummaryAndWeeklyTotals' && { isWeeklyReport: true }),
+          ...(activeModal === 'salesVsCapacity' && { isSeatsDataRequired: true }),
+          format,
+        })
+          .then(() => onClose())
+          .finally(() => setLoading(false)),
+        {
+          loading: `'Generating ${title}...`,
+          success: `${title} downloaded successfully`,
+          error: `Error generating ${title}`,
+        },
+      );
+    },
+    [formData, activeModal, title, onClose],
+  );
 
   return (
     <PopupModal
@@ -124,11 +131,11 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
           options={productionsOptions}
           value={production}
         />
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
+        <div className="flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2 flex-1">
             <Label text="Tour Week" />
             <Select
-              className=""
+              className="flex-1"
               onChange={(value) => onChange('productionWeek', value as number)}
               options={prodweekOptions}
               value={productionWeek}
@@ -137,10 +144,12 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
           </div>
           <div className="flex items-center gap-2">
             <Label text="No. Weeks" />
-            <Select
-              onChange={(value) => onChange('numberOfWeeks', value as number)}
-              options={weekOptions}
+            <TextInput
+              type="number"
+              onChange={(e) => onChange('numberOfWeeks', parseInt(e.target.value, 10))}
               value={numberOfWeeks}
+              min={MIN_WEEK}
+              max={MAX_WEEK}
             />
           </div>
         </div>
@@ -158,12 +167,22 @@ const SalesSummaryReportModal = ({ visible, onClose, activeModal }: SalesSummary
         <div className="pt-3 w-full flex items-center justify-end gap-2">
           <Button onClick={onClose} className="float-right px-4 w-33 font-normal" variant="secondary" text="Cancel" />
           <Button
-            onClick={onExport}
+            onClick={() => onExport('excel')}
             className="float-right px-4 font-normal w-33 text-center"
             variant="primary"
             sufixIconName="excel"
             iconProps={{ className: 'h-4 w-3' }}
-            text="Create Report"
+            text="Export to Excel"
+            disabled={loading}
+          />
+          <Button
+            onClick={() => onExport('pdf')}
+            className="float-right px-4 font-normal w-33 text-center"
+            variant="primary"
+            sufixIconName="document-solid"
+            iconProps={{ className: 'h-4 w-3' }}
+            text="Export to PDF"
+            disabled={loading}
           />
         </div>
       </form>

@@ -15,6 +15,7 @@ const VenueTable = ({ items, onSelectVenue }: Props) => {
   return (
     <div className="w-full h-[calc(100%-140px)] min-h-[150px]">
       <Table
+        testId="venue-table"
         onCellClicked={handleCellClick}
         columnDefs={items === null ? null : venueColumnDefs}
         rowData={items}

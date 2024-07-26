@@ -26,6 +26,7 @@ export const exportSalesSummaryReport = async ({
   numberOfWeeks,
   isWeeklyReport = false,
   isSeatsDataRequired = false,
+  format = 'excel',
 }) => {
   const toWeek = productionWeek?.split('T')?.[0];
   const fromWeek = moment(productionWeek)
@@ -38,6 +39,7 @@ export const exportSalesSummaryReport = async ({
     toWeek,
     isWeeklyReport,
     isSeatsDataRequired,
+    format,
   };
   const response = await axios.post('/api/reports/sales-summary-simple', payload, { responseType: 'blob' });
 
@@ -64,13 +66,21 @@ export const exportSalesSummaryReport = async ({
   }
 };
 
-export const exportPromoterHoldsReport = async ({ production, fromDate, toDate, venue, productionCode }: any) => {
+export const exportPromoterHoldsReport = async ({
+  production,
+  fromDate,
+  toDate,
+  venue,
+  productionCode,
+  format,
+}: any) => {
   const payload = {
     productionId: parseInt(production, 10),
     productionCode,
     fromDate,
     toDate,
     venue,
+    format,
   };
 
   const response = await axios.post('/api/reports/promoter-holds', payload, { responseType: 'blob' });
@@ -99,9 +109,10 @@ export const exportPromoterHoldsReport = async ({ production, fromDate, toDate, 
   return response;
 };
 
-export const exportProductionGrossSales = async ({ production }) => {
+export const exportProductionGrossSales = async ({ production, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
+    format,
   };
   const response = await axios.post('/api/reports/gross-sales', payload, { responseType: 'blob' });
 
@@ -129,7 +140,7 @@ export const exportProductionGrossSales = async ({ production }) => {
   return response;
 };
 
-export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate, status }) => {
+export const exportHoldsComps = async ({ production, productionCode, venue, fromDate, toDate, status, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
     productionCode,
@@ -137,6 +148,7 @@ export const exportHoldsComps = async ({ production, productionCode, venue, from
     fromDate,
     toDate,
     status,
+    format,
   };
   const response = await axios.post('/api/reports/holds-comps', payload, { responseType: 'blob' });
 
@@ -164,12 +176,13 @@ export const exportHoldsComps = async ({ production, productionCode, venue, from
   return response;
 };
 
-export const exportSelectedVenues = async ({ production, productionCode, showId, selection }) => {
+export const exportSelectedVenues = async ({ production, productionCode, showId, selection, format }) => {
   const payload = {
     productionId: parseInt(production, 10),
     productionCode,
     showId,
     selection,
+    format,
   };
   const response = await axios.post('/api/reports/venues', payload, { responseType: 'blob' });
 
