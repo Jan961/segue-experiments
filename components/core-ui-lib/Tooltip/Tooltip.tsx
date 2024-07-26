@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useMemo, useRef } from 'react';
+import React, { useState, ReactNode, useMemo, useRef, useEffect } from 'react';
 import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
@@ -38,13 +38,10 @@ const Tooltip: React.FC<TooltipProps> = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
+  const componentRef = useRef(null);
+  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 });
 
   const toggleTooltip = () => {
-    if (componentRef.current) {
-      const rect = componentRef.current.getBoundingClientRect();
-      setIconPosition({ x: rect.left, y: rect.top });
-    }
-
     const tpContentAvail = title.trim() !== '' || body.trim() !== '';
     if (!tpContentAvail) {
       return null;
@@ -55,8 +52,12 @@ const Tooltip: React.FC<TooltipProps> = ({
     }
   };
 
-  const componentRef = useRef(null);
-  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 });
+  useEffect(() => {
+    if (componentRef.current) {
+      const rect = componentRef.current.getBoundingClientRect();
+      setIconPosition({ x: rect.left, y: rect.top });
+    }
+  });
 
   return (
     <div ref={componentRef} className={classNames('relative', { 'z-[9999]': showTooltip })}>

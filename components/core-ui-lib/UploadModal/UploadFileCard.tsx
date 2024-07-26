@@ -28,7 +28,7 @@ const FileCard = ({ fileName, fileSize, onDelete, progress, errorMessage, imageU
             <p className="text-primary-navy font-bold text-[15px] flex justify-between items-center">{status}</p>
             <div className="flex flex-row w-full justify-between items-center">
               <div className="float-left">
-                <Tooltip title={fileName} body={fileName?.length > 30 ? fileName : ''}>
+                <Tooltip title={fileName} body={fileName?.length > 30 ? fileName : ''} offset={{ x: 30, y: 70 }}>
                   <p className="text-secondary text-sm">
                     {fileName?.length > 30 ? fileName?.slice(0, 30) + '...' : fileName}
                   </p>

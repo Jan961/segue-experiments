@@ -19,14 +19,14 @@ export default function AddDeleteRowRenderer({ value, node, api, addRow, deleteR
     <div className="w-full px-2 flex items-center justify-between">
       {(node.rowIndex === 0 || node.rowIndex === api.getDisplayedRowCount() - 1) && (
         <div className={classNames('flex items-center gap-1', { 'flex-col': api.getDisplayedRowCount() === 1 })}>
-          <Tooltip body={node.rowIndex === 0 ? 'Add Previous Day' : ''} position="right">
+          <Tooltip body={node.rowIndex === 0 ? 'Add Previous Day' : ''} position="right" offset={{ x: -30, y: 20 }}>
             <Icon iconName="plus-circle-solid" onClick={() => handleAddRow(node.rowIndex === 0 ? 'before' : 'after')} />
           </Tooltip>
 
           {api.getDisplayedRowCount() > 1 ? (
             <Icon iconName="minus-circle-solid" onClick={() => deleteRow(data)} />
           ) : (
-            <Tooltip body="Add Next Day" position="right">
+            <Tooltip body="Add Next Day" position="right" offset={{ x: -30, y: 20 }}>
               <Icon iconName="plus-circle-solid" onClick={() => handleAddRow('after')} />
             </Tooltip>
           )}
