@@ -57,7 +57,7 @@ const Tooltip: React.FC<TooltipProps> = ({
       const rect = componentRef.current.getBoundingClientRect();
       setIconPosition({ x: rect.left, y: rect.top });
     }
-  });
+  }, [componentRef.current]);
 
   return (
     <div ref={componentRef} className={classNames('relative', { 'z-[9999]': showTooltip })}>
