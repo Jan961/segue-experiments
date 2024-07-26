@@ -15,8 +15,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     const result = await prisma.show.create({
       data: { ...validatedData, AccountId },
     });
-    console.log('Show Created Successfully', result);
-    res.status(200).end();
+    res.status(200).json(result);
   } catch (error) {
     if (error instanceof yup.ValidationError) {
       return res.status(400).json({ message: 'Validation error', errors: error.errors });
