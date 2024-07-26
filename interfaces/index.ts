@@ -113,6 +113,8 @@ export type MasterTaskDTO = {
   MasterTaskRepeat?: any;
   MTRId?: number;
   RepeatInterval?: string;
+  TaskRepeatFromWeekNum?: number;
+  TaskRepeatToWeekNum?: number;
 };
 
 // Existing Production interface for old schema. Remove eventually

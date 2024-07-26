@@ -24,9 +24,9 @@ export const getMasterTasksList = async (AccountId: number) => {
   return masterTaskList.map((task) => {
     return {
       ...task,
-      RepeatInterval: task?.MasterTaskRepeat?.RepeatInterval || null,
-      TaskRepeatFromWeekNum: task?.MasterTaskRepeat?.TaskRepeatFromWeekNum || null,
-      TaskRepeatToWeekNum: task?.MasterTaskRepeat?.TaskRepeatToWeekNum || null,
+      RepeatInterval: task?.MasterTaskRepeat?.Interval || null,
+      TaskRepeatFromWeekNum: task?.MasterTaskRepeat?.FromWeekNum || null,
+      TaskRepeatToWeekNum: task?.MasterTaskRepeat?.ToWeekNum || null,
     };
   });
 };
@@ -156,7 +156,7 @@ export const generateSingleRecurringMasterTask = async (requestBody, MTRId: numb
   };
 };
 
-export const generateRecurringProductionTasks = async (requestBody, prodBlock, prodStartDate, PRTId) => {
+export const generateRecurringProductionTasks = async (requestBody, prodBlock, prodStartDate, PRTId, counter = 1) => {
   const {
     Name,
     StartByWeekNum,
@@ -183,7 +183,7 @@ export const generateRecurringProductionTasks = async (requestBody, prodBlock, p
           Code: 'desc',
         },
       })
-    )?.Code + 1 || 0;
+    )?.Code + counter || counter;
 
   const tasksToCreate = [];
 
@@ -195,7 +195,7 @@ export const generateRecurringProductionTasks = async (requestBody, prodBlock, p
   while (taskStartDate <= taskEndDate) {
     tasksToCreate.push({
       ProductionId: parseInt(ProductionId),
-      Code: maxTaskCode,
+      Code: maxTaskCode + counter,
       Name,
       Priority,
       Notes,

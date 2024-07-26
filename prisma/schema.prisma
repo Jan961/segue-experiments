@@ -664,18 +664,19 @@ model MasterTask {
   Notes                          String?           @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?              @map("TaskAssignedToUserId")
   StartByWeekNum                 Int?              @map("TaskStartByWeekNum") @db.SmallInt
-  TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TaskStartByIsPostProduction    Boolean           @default(false) @db.Bit(1)
   CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskCompleteByIsPostProduction Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TaskCompleteByIsPostProduction Boolean           @default(false) @db.Bit(1)
   MTRId                          Int?              @map("TaskMTRId")
   Account                        Account           @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
-  MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [Id], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
+  MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [MTRId], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
   User                           User?             @relation(fields: [AssignedToUserId], references: [Id], onDelete: Cascade, map: "User_MasterTask_Assigned")
 
   @@index([AccountId], map: "Account_MasterTask")
   @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
   @@index([MTRId], map: "MasterTaskRepeat_MasterTask")
 }
+
 
 model AccountUserProduction {
   AUPId           Int         @id @default(autoincrement())

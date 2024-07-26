@@ -8,7 +8,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { tileColors } from 'config/global';
 import axios from 'axios';
 import ConfirmationDialog from 'components/core-ui-lib/ConfirmationDialog';
-import { MasterTask } from '@prisma/client';
 import Loader from 'components/core-ui-lib/Loader';
 
 interface MasterTaskListProps {
@@ -24,7 +23,7 @@ const LoadingOverlay = () => (
   </div>
 );
 
-const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: MasterTaskListProps) => {
+const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps) => {
   const { users } = useRecoilValue(userState);
 
   const styleProps = { headerColor: tileColors.tasks };
@@ -46,7 +45,7 @@ const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: Ma
 
   useEffect(() => {
     handleFetchTasks();
-  }, []);
+  }, [users]);
 
   const usersList = useMemo(() => {
     return Object.values(users).map(({ Id, FirstName = '', LastName = '' }) => ({
@@ -81,58 +80,18 @@ const MasterTaskList = ({ visible, onClose, productionId, isMaster = false }: Ma
   const handleSubmit = async () => {
     setLoading(true);
 
-    if (isMaster) {
-      try {
-        const tasksData = selectedRows.map((task: MasterTask) => {
-          return {
-            Code: task.Code,
-            Name: task.Name,
-            CompleteByIsPostProduction: false,
-            StartByIsPostProduction: false,
-            StartByWeekNum: task.StartByWeekNum,
-            CompleteByWeekNum: task.CompleteByWeekNum,
-            AssignedToUserId: task.AssignedToUserId,
-            Priority: task.Priority,
-            Notes: task.Notes,
-            TaskStartByIsPostProduction: false,
-            TaskCompleteByIsPostProduction: false,
-          };
-        });
-
-        const endpoint = '/api/tasks/master/multiple';
-        await axios.post(endpoint, tasksData);
-        setLoading(false);
-        onClose('data-added');
-      } catch (error) {
-        setLoading(false);
-        onClose();
-      }
-    } else {
-      try {
-        const endpoint = '/api/tasks/create/multiple/';
-        const tasksData = selectedRows.map((task: MasterTask) => {
-          return {
-            ProductionId: productionId,
-            Code: task.Code,
-            Name: task.Name,
-            CompleteByIsPostProduction: false,
-            StartByIsPostProduction: false,
-            StartByWeekNum: task.StartByWeekNum,
-            CompleteByWeekNum: task.CompleteByWeekNum,
-            AssignedToUserId: task.AssignedToUserId,
-            Progress: 0,
-            Priority: task.Priority,
-          };
-        });
-        await axios.post(endpoint, tasksData);
-        setLoading(false);
-        onClose('data-added');
-      } catch (error) {
-        setLoading(false);
-        console.error(error);
-      }
+    try {
+      const endpoint = '/api/tasks/addfrom/master';
+      await axios.post(endpoint, { selectedTaskList: selectedRows, ProductionId: productionId });
+      setLoading(false);
+      onClose('data-added');
+    } catch (error) {
+      setLoading(false);
+      onClose();
+      console.error(error);
     }
   };
+
   return (
     <PopupModal show={visible} onClose={onClose} title="Add Master Task" titleClass="text-primary-navy text-xl mb-2">
       <div className=" w-[750px] lg:w-[1386px] h-[606px] flex flex-col ">
