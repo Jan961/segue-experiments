@@ -1,7 +1,7 @@
 import Button from 'components/core-ui-lib/Button';
 import PopupModal from 'components/core-ui-lib/PopupModal';
 import Table from 'components/core-ui-lib/Table';
-import { getMasterTasksColumnDefs } from './tableConfig';
+import { getProductionTasksColumnDefs } from './tableConfig';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { useEffect, useMemo, useState } from 'react';
@@ -80,7 +80,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
     }));
   }, [users]);
 
-  const columnDefs = getMasterTasksColumnDefs(usersList);
+  const columnDefs = getProductionTasksColumnDefs(usersList);
 
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -93,7 +93,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
   const handleFetchTasks = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`/api/tasks/list/${selected}`);
+      const response = await axios.get(`/api/tasks/addfrom/production/list/${selected}`);
       setRowData(response.data[0].Tasks || []);
       setLoading(false);
     } catch (error) {

@@ -92,6 +92,7 @@ export type ProductionTaskDTO = {
   CompleteDate?: string;
   TaskCompletedDate: Date;
   ProductionTaskRepeat?: any;
+  PRTId?: number;
 };
 
 export type MasterTaskDTO = {
