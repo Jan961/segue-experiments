@@ -60,29 +60,31 @@ export const getDealMemoCall = (dealMemoCall) => {
 export const getDealMemoHold = (dealMemoHold, demoId) => {
   const updateHold = [];
   const createHold = [];
+  if (dealMemoHold && dealMemoHold.length > 0) {
+    dealMemoHold.forEach((hold) => {
+      if (hold.DMHoldDeMoId) {
+        const holdData = {
+          DMHoldValue: hold.value ? parseInt(hold.value) : 0,
+          DMHoldSeats: hold.seats ? parseInt(hold.seats) : 0,
+          DMHoldHoldTypeId: hold.HoldTypeId,
+        };
+        const price = {
+          where: { DMHoldHoldTypeId: hold.HoldTypeId, DMHoldDeMoId: demoId },
+          data: holdData,
+        };
+        updateHold.push(price);
+      } else {
+        const holdData = {
+          DMHoldValue: hold.value ? parseInt(hold.value) : 0,
+          DMHoldSeats: hold.seats ? parseInt(hold.seats) : 0,
+          DMHoldHoldTypeId: hold.HoldTypeId,
+        };
 
-  dealMemoHold.forEach((hold) => {
-    if (hold.DMHoldDeMoId) {
-      const holdData = {
-        DMHoldValue: hold.value ? parseInt(hold.value) : 0,
-        DMHoldSeats: hold.seats ? parseInt(hold.seats) : 0,
-        DMHoldHoldTypeId: hold.HoldTypeId,
-      };
-      const price = {
-        where: { DMHoldHoldTypeId: hold.HoldTypeId, DMHoldDeMoId: demoId },
-        data: holdData,
-      };
-      updateHold.push(price);
-    } else {
-      const holdData = {
-        DMHoldValue: hold.value ? parseInt(hold.value) : 0,
-        DMHoldSeats: hold.seats ? parseInt(hold.seats) : 0,
-        DMHoldHoldTypeId: hold.HoldTypeId,
-      };
+        createHold.push(holdData);
+      }
+    });
+  }
 
-      createHold.push(holdData);
-    }
-  });
   return [updateHold, createHold];
 };
 

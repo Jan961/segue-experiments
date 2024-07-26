@@ -1487,6 +1487,7 @@ view SalesView {
   SetBookingWeekNum           Int?      @db.SmallInt
   SetProductionWeekDate       DateTime? @db.Date
   SetProductionWeekNum        Int?      @db.SmallInt
+  SetShowDayNum               Int?      @db.SmallInt
   SetNotOnSale                Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetIsFinalFigures           Boolean?  @default(dbgenerated("(b'0')")) @db.Bit(1)
   SetFinalSalesApprovedByUser String?   @db.VarChar(100)

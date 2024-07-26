@@ -36,6 +36,7 @@ export const initialDealMemoDataState: DealMemoContractFormData = {
   DeMoAccContId: null,
   DeMoRunningTime: null,
   DeMoRunningTimeNotes: '',
+  DeMoVatCode: '',
   DeMoPrePostShowEvents: '',
   DeMoDressingRooms: '',
   DeMoVenueCurfewTime: null,
