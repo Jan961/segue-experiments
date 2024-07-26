@@ -13,7 +13,7 @@ export default function NotesRenderer({ value, tpActive }: CellRendererParams) {
     <div className="flex justify-center w-full">
       <span className="w-5.5">
         {tpActive ? (
-          <Tooltip body={tpValue} position="left">
+          <Tooltip body={tpValue} position="left" offset={{ x: 110, y: 15 }}>
             {value ? (
               <Icon iconName="note-filled" variant="lg" fill="#D41818" stroke="#FFF" />
             ) : (

@@ -14,7 +14,14 @@ const IconRenderer = (props: CellRendererParams) => {
 
   return (
     <div className="w-full h-full flex items-center justify-center cursor-pointer">
-      <Tooltip body={value} position={tooltipPosition} height="h-auto" width="w-32" disabled={!value}>
+      <Tooltip
+        body={value}
+        position={tooltipPosition}
+        height="h-auto"
+        width="w-32"
+        disabled={!value}
+        offset={{ x: -27, y: 18 }}
+      >
         <Icon {...iconProps} />
       </Tooltip>
     </div>

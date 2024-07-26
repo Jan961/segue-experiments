@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useMemo } from 'react';
+import React, { useState, ReactNode, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
@@ -13,6 +13,7 @@ export interface TooltipProps {
   txtColorClass?: string;
   disabled?: boolean;
   testId?: string;
+  offset?: { x: number; y: number };
 }
 
 const getArrowStyle = (bgColorClass: string) => ({
@@ -33,13 +34,17 @@ const Tooltip: React.FC<TooltipProps> = ({
   txtColorClass = 'text-white',
   disabled = false,
   testId = 'core-ui-lib-tooltip',
+  offset = { x: 0, y: 0 },
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
 
-  const toggleTooltip = (e) => {
-    setMousePosition({ x: e.clientX, y: e.clientY });
-    console.log({ x: e.clientX, y: e.clientY });
+  const toggleTooltip = () => {
+    if (componentRef.current) {
+      const rect = componentRef.current.getBoundingClientRect();
+      setIconPosition({ x: rect.left, y: rect.top });
+    }
+
     const tpContentAvail = title.trim() !== '' || body.trim() !== '';
     if (!tpContentAvail) {
       return null;
@@ -50,10 +55,11 @@ const Tooltip: React.FC<TooltipProps> = ({
     }
   };
 
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const componentRef = useRef(null);
+  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 });
 
   return (
-    <div className={classNames('relative', { 'z-[9999]': showTooltip })}>
+    <div ref={componentRef} className={classNames('relative', { 'z-[9999]': showTooltip })}>
       <div onMouseEnter={toggleTooltip} onMouseLeave={toggleTooltip}>
         {children}
       </div>
@@ -62,7 +68,12 @@ const Tooltip: React.FC<TooltipProps> = ({
         createPortal(
           <div
             data-testid={testId}
-            style={{ left: `${mousePosition.x - 110}px`, top: `${mousePosition.y - 30}px`, position: 'absolute' }}
+            style={{
+              left: `${iconPosition.x - offset.x}px`,
+              top: `${iconPosition.y - offset.y}px`,
+              position: 'fixed',
+              zIndex: '99999',
+            }}
           >
             <div
               className={`z-[10000] relative flex flex-col justify-center p-4 ${txtColorClass} bg-${bgColorClass} rounded-md ${height} ${width} max-w-[300px]`}
