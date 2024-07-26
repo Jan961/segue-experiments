@@ -48,12 +48,8 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
       const contactNotes = contactNoteResponse.data;
 
       if (contactNotes && Array.isArray(contactNotes) && contactNotes.length > 0) {
-        const sortedContactNotes = contactNotes.sort(
-          (a, b) => new Date(b.ContactDate).getTime() - new Date(a.ContactDate).getTime(),
-        );
-
         setContNoteColDefs(contactNoteColDefs(contactNoteUpdate, users));
-        setContactNoteRows(sortedContactNotes);
+        setContactNoteRows(contactNotes);
         setIsLoading(false);
       }
     } catch (error) {

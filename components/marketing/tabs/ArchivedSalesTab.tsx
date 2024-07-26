@@ -1,5 +1,5 @@
 import Button from 'components/core-ui-lib/Button';
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useMemo, useState } from 'react';
 import ArchSalesDialog, { ArchSalesDialogVariant } from '../modal/ArchivedSalesDialog';
 import { DataList, VenueDetail } from '../MarketingHome';
 import SalesTable from 'components/global/salesTable';
@@ -36,6 +36,16 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const { selected: productionId, productions } = useRecoilValue(productionJumpState);
   const { selectedBooking } = props;
   const [showData, setShowData] = useState(false);
+  const venueTownData = useMemo(() => {
+    return {
+      townList: Object.values(townList).map((town) => {
+        return { text: town.Town, value: town.Town };
+      }),
+      venueList: Object.values(venueDict).map((venue) => {
+        return { text: venue.Code + ' ' + venue.Name, value: venue };
+      }),
+    };
+  }, [townList, venueDict]);
 
   useImperativeHandle(ref, () => ({
     resetData: () => {
@@ -46,15 +56,6 @@ const ArchivedSalesTab = forwardRef<ArchSalesTabRef, ArchSalesProps>((props, ref
   const showArchSalesComp = (variant: ArchSalesDialogVariant) => {
     setArchSaleVariant(variant);
     if (variant === 'both') {
-      // get venue list
-      const venueTownData = {
-        townList: Object.values(townList).map((town) => {
-          return { text: town.Town, value: town.Town };
-        }),
-        venueList: Object.values(venueDict).map((venue) => {
-          return { text: venue.Code + ' ' + venue.Name, value: venue };
-        }),
-      };
       setArchivedData(venueTownData);
     } else {
       const selectedBooking = bookings.bookings.find((booking) => booking.Id === bookings.selected);
