@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useMemo, useRef, useEffect } from 'react';
+import React, { useState, ReactNode, useMemo, useRef } from 'react';
 import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
@@ -13,8 +13,14 @@ export interface TooltipProps {
   txtColorClass?: string;
   disabled?: boolean;
   testId?: string;
-  offset?: { x: number; y: number };
 }
+
+const positionStyle = {
+  top: 'transform -translate-y-full -translate-x-1/2',
+  bottom: 'transform -translate-x-1/2',
+  left: 'transform -translate-x-full -translate-y-1/2',
+  right: 'transform -translate-y-1/2',
+};
 
 const getArrowStyle = (bgColorClass: string) => ({
   top: `absolute bottom-0 left-1/2 w-[20px] h-[20px] transform rotate-45 -translate-x-1/2 translate-y-2 bg-${bgColorClass}`,
@@ -34,14 +40,17 @@ const Tooltip: React.FC<TooltipProps> = ({
   txtColorClass = 'text-white',
   disabled = false,
   testId = 'core-ui-lib-tooltip',
-  offset = { x: 0, y: 0 },
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
   const componentRef = useRef(null);
-  const [iconPosition, setIconPosition] = useState({ x: 0, y: 0 });
+  const [iconDimensions, setIconDimensions] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   const toggleTooltip = () => {
+    if (componentRef.current) {
+      const rect = componentRef.current.getBoundingClientRect();
+      setIconDimensions({ x: rect.x, y: rect.y, width: rect.width, height: rect.height });
+    }
     const tpContentAvail = title.trim() !== '' || body.trim() !== '';
     if (!tpContentAvail) {
       return null;
@@ -51,13 +60,6 @@ const Tooltip: React.FC<TooltipProps> = ({
       setShowTooltip(!showTooltip);
     }
   };
-
-  useEffect(() => {
-    if (componentRef.current) {
-      const rect = componentRef.current.getBoundingClientRect();
-      setIconPosition({ x: rect.left, y: rect.top });
-    }
-  }, [componentRef.current]);
 
   return (
     <div ref={componentRef} className={classNames('relative', { 'z-[9999]': showTooltip })}>
@@ -69,9 +71,28 @@ const Tooltip: React.FC<TooltipProps> = ({
         createPortal(
           <div
             data-testid={testId}
+            className={classNames('z-[99999] fixed ', positionStyle[position])}
             style={{
-              left: `${iconPosition.x - offset.x}px`,
-              top: `${iconPosition.y - offset.y}px`,
+              left: `${
+                iconDimensions.x +
+                (position === 'top'
+                  ? iconDimensions.width / 2
+                  : position === 'bottom'
+                  ? iconDimensions.width / 2
+                  : position === 'right'
+                  ? iconDimensions.width
+                  : 0)
+              }px`,
+              top: `${
+                iconDimensions.y +
+                (position === 'left'
+                  ? iconDimensions.height / 2
+                  : position === 'bottom'
+                  ? iconDimensions.height
+                  : position === 'right'
+                  ? iconDimensions.height / 2
+                  : 0)
+              }px`,
               position: 'fixed',
               zIndex: '99999',
             }}

@@ -23,7 +23,7 @@ export default function NoteColumnRenderer({
       {isNoteVisible ? (
         <span data-testid={testId} className="w-5.5">
           {tpActive ? (
-            <Tooltip body={tpValue} position="left" offset={{ x: 90, y: 25 }} width="w-20">
+            <Tooltip body={tpValue} position="left" width="w-20">
               {value ? (
                 <Icon data-testid={testId + 'icon'} iconName="note-filled" variant="lg" fill="#D41818" stroke="#FFF" />
               ) : (
