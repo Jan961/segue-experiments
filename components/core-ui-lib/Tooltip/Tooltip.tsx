@@ -80,7 +80,9 @@ const Tooltip: React.FC<TooltipProps> = ({
                   : position === 'bottom'
                   ? iconDimensions.width / 2
                   : position === 'right'
-                  ? iconDimensions.width
+                  ? iconDimensions.width * 1.5
+                  : position === 'left'
+                  ? -iconDimensions.width / 2
                   : 0)
               }px`,
               top: `${
@@ -88,9 +90,11 @@ const Tooltip: React.FC<TooltipProps> = ({
                 (position === 'left'
                   ? iconDimensions.height / 2
                   : position === 'bottom'
-                  ? iconDimensions.height
+                  ? iconDimensions.height * 1.5
                   : position === 'right'
                   ? iconDimensions.height / 2
+                  : position === 'top'
+                  ? -iconDimensions.height / 2
                   : 0)
               }px`,
               position: 'fixed',
