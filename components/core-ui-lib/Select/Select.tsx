@@ -169,6 +169,7 @@ export default forwardRef(function Select(
         height: COMP_HEIGHT,
       }),
       menu: (styles) => ({ ...styles, zIndex: 20 }),
+      menuPortal: (styles) => ({ ...styles, zIndex: 50 }),
       ...customStyles,
     }),
     [customStyles, variant],
@@ -236,6 +237,17 @@ export default forwardRef(function Select(
 
   const inputClass = error ? 'border-primary-red' : 'border-primary-border';
 
+  const getGridViewportElement = (): HTMLElement | null => {
+    return document.body;
+  };
+
+  const [menuPortalTarget, setMenuPortalTarget] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const gridViewportElement = getGridViewportElement();
+    setMenuPortalTarget(gridViewportElement);
+  }, []);
+
   return (
     <div
       className={classNames(
@@ -277,6 +289,9 @@ export default forwardRef(function Select(
           hideSelectedOptions={false}
           onBlur={onBlur}
           menuPlacement={menuPlacement}
+          menuPortalTarget={menuPortalTarget}
+          menuPosition="fixed"
+          menuShouldScrollIntoView={false}
           filterOption={(option, _inputValue) => {
             if (filteredOptions === null) {
               return true;

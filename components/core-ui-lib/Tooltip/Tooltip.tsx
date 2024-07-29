@@ -1,5 +1,6 @@
-import React, { useState, ReactNode, useMemo } from 'react';
+import React, { useState, ReactNode, useMemo, useRef } from 'react';
 import classNames from 'classnames';
+import { createPortal } from 'react-dom';
 
 export interface TooltipProps {
   title?: string;
@@ -15,10 +16,10 @@ export interface TooltipProps {
 }
 
 const positionStyle = {
-  top: 'bottom-full left-1/2 transform -translate-x-1/2 -translate-y-3',
-  bottom: 'top-full left-1/2 transform -translate-x-1/2 translate-y-3',
-  left: 'top-1/2 right-full transform -translate-y-1/2 -translate-x-3',
-  right: 'top-1/2 left-full transform -translate-y-1/2 translate-x-3',
+  top: 'transform -translate-y-full -translate-x-1/2',
+  bottom: 'transform -translate-x-1/2',
+  left: 'transform -translate-x-full -translate-y-1/2',
+  right: 'transform -translate-y-1/2',
 };
 
 const getArrowStyle = (bgColorClass: string) => ({
@@ -42,8 +43,14 @@ const Tooltip: React.FC<TooltipProps> = ({
 }) => {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   const arrowStyle = useMemo(() => getArrowStyle(bgColorClass), [bgColorClass]);
+  const componentRef = useRef(null);
+  const [iconDimensions, setIconDimensions] = useState({ x: 0, y: 0, width: 0, height: 0 });
 
   const toggleTooltip = () => {
+    if (componentRef.current) {
+      const rect = componentRef.current.getBoundingClientRect();
+      setIconDimensions({ x: rect.x, y: rect.y, width: rect.width, height: rect.height });
+    }
     const tpContentAvail = title.trim() !== '' || body.trim() !== '';
     if (!tpContentAvail) {
       return null;
@@ -55,37 +62,71 @@ const Tooltip: React.FC<TooltipProps> = ({
   };
 
   return (
-    <div className={classNames('relative', { 'z-[9999]': showTooltip })}>
+    <div ref={componentRef} className={classNames('relative', { 'z-[9999]': showTooltip })}>
       <div onMouseEnter={toggleTooltip} onMouseLeave={toggleTooltip}>
         {children}
       </div>
-      {showTooltip && (
-        <div data-testid={testId} className={classNames('absolute', positionStyle[position])}>
+
+      {showTooltip &&
+        createPortal(
           <div
-            className={`z-[10000] relative flex flex-col justify-center p-4 ${txtColorClass} bg-${bgColorClass} rounded-md ${height} ${width} max-w-[300px]`}
+            data-testid={testId}
+            className={classNames('z-[99999] fixed ', positionStyle[position])}
+            style={{
+              left: `${
+                iconDimensions.x +
+                (position === 'top'
+                  ? iconDimensions.width / 2
+                  : position === 'bottom'
+                  ? iconDimensions.width / 2
+                  : position === 'right'
+                  ? iconDimensions.width + 10
+                  : position === 'left'
+                  ? -10
+                  : 0)
+              }px`,
+              top: `${
+                iconDimensions.y +
+                (position === 'left'
+                  ? iconDimensions.height / 2
+                  : position === 'bottom'
+                  ? iconDimensions.height + 10
+                  : position === 'right'
+                  ? iconDimensions.height / 2
+                  : position === 'top'
+                  ? -10
+                  : 0)
+              }px`,
+              position: 'fixed',
+              zIndex: '99999',
+            }}
           >
-            <div className={`${arrowStyle[position]}`} />
-            <div className="text-center">
-              {title && (
-                <div
-                  data-testid={`${testId}-title`}
-                  className="font-bold leading-[1.125] break-words whitespace-normal not-italic"
-                >
-                  {title}
-                </div>
-              )}
-              {body && (
-                <div
-                  data-testid={`${testId}-body`}
-                  className="leading-[1.125] break-words whitespace-normal not-italic"
-                >
-                  {body}
-                </div>
-              )}
+            <div
+              className={`z-[10000] relative flex flex-col justify-center p-4 ${txtColorClass} bg-${bgColorClass} rounded-md ${height} ${width} max-w-[300px]`}
+            >
+              <div className={`${arrowStyle[position]}`} />
+              <div className="text-center">
+                {title && (
+                  <div
+                    data-testid={`${testId}-title`}
+                    className="font-bold leading-[1.125] break-words whitespace-normal not-italic"
+                  >
+                    {title}
+                  </div>
+                )}
+                {body && (
+                  <div
+                    data-testid={`${testId}-body`}
+                    className="leading-[1.125] break-words whitespace-normal not-italic"
+                  >
+                    {body}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };
