@@ -25,16 +25,12 @@ const accountDetailsSchema = Yup.object().shape({
     .required('Company Email is a required field.')
     .matches(emailRegex, 'Company Email must be a valid email')
     .max(120, 'Company Email can be at most 120 characters long'),
-  currencyForPayment: Yup.string()
-    .required('Payment Currency is a required field')
-    .matches(/^[A-Za-z]{3}$/, 'Payment Currency must be exactly 3 letters and only contain letters.'),
+  currencyForPayment: Yup.string().required('Currency is a required field'),
   vatNumber: Yup.string().max(20, 'VAT Number can be at most 20 characters long'),
   companyNumber: Yup.string().max(20, 'Company Number can be at most 20 characters long'),
   companyWebsite: Yup.string().max(255, 'Company Website can be at most 255 characters long'),
   typeOfCompany: Yup.string().max(30, 'Type of Company can be at most 30 characters long'),
-  currency: Yup.string()
-    .required('Currency is a required field')
-    .matches(/^[A-Za-z]{3}$/, 'Currency must be exactly 3 letters and only contain letters.'),
+  currency: Yup.string().required('Currency is a required field'),
 });
 
 export default accountDetailsSchema;
