@@ -1,6 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Button, Checkbox, Table, TextArea, TextInput } from 'components/core-ui-lib';
-import useAxios from 'hooks/useAxios';
 import { salesEntryColDefs, styleProps } from '../table/tableConfig';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { bookingJumpState } from 'state/marketing/bookingJumpState';
@@ -11,6 +10,7 @@ import { isNullOrEmpty } from 'utils';
 import { Spinner } from 'components/global/Spinner';
 import { currencyState } from 'state/marketing/currencyState';
 import { UpdateWarningModal } from '../modal/UpdateWarning';
+import axios from 'axios';
 
 export type TourResponse = {
   data: Array<SelectOption>;
@@ -71,8 +71,6 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
   const [generalErrors, setGeneralErrors] = useState([]);
   const [warningIssued, setWarningIssued] = useState<boolean>(false);
   const currency = useRecoilValue(currencyState);
-
-  const { fetchData } = useAxios();
 
   const compareSalesFigures = (prev: SalesFigure, curr: SalesFigure) => {
     // If prev is null, there are no errors.
@@ -141,14 +139,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         data = { ...data, schools: currSalesFigureSet.schools };
       }
 
-      const response = await fetchData({
-        url: '/api/marketing/sales/process/entry/sales',
-        method: 'POST',
-        data,
-      });
+      const response = await axios.post('/api/marketing/sales/process/entry/sales', data);
 
-      if (typeof response === 'object') {
-        const setIdObj = response as { setId: number; transaction: string };
+      if (typeof response.data === 'object') {
+        const setIdObj = response.data as { setId: number; transaction: string };
         setSetId(setIdObj.setId);
         setWarningIssued(false);
         setSchoolErrors([]);
@@ -169,17 +163,17 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       // first check for future data - we may need to batch update other fields
       const fieldType = type === 'Holds' ? 'Hold' : 'Comp';
       setWarnFieldType(fieldType);
-      const futureData: any = await fetchData({
-        url: '/api/marketing/sales/read/checkFuture',
-        method: 'POST',
-        data: {
-          bookingId: bookings.selected,
-          type: fieldType,
-          saleDate: toISO(salesDate).substring(0, 10),
-          typeId: data.id,
-          field,
-        },
-      });
+
+      const futureaCheckData = {
+        bookingId: bookings.selected,
+        type: fieldType,
+        saleDate: toISO(salesDate).substring(0, 10),
+        typeId: data.id,
+        field,
+      };
+
+      const checkFutureResponse = await axios.post('/api/marketing/sales/read/checkFuture', futureaCheckData);
+      const futureData = checkFutureResponse.data;
 
       const inputData = {
         value,
@@ -191,14 +185,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         bookingId: bookings.selected,
       };
 
-      const response = await fetchData({
-        url: '/api/marketing/sales/process/entry/compHold',
-        method: 'POST',
-        data: inputData,
-      });
+      const response = await axios.post('/api/marketing/sales/process/entry/compHold', inputData);
 
-      if (typeof response === 'object') {
-        const setIdObj = response as { setId: number };
+      if (typeof response.data === 'object') {
+        const setIdObj = response.data as { setId: number };
         setSetId(setIdObj.setId);
       }
 
@@ -243,12 +233,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const batchUpdate = async () => {
     try {
-      await fetchData({
-        url: '/api/marketing/sales/process/entry/batchUpdate',
-        method: 'POST',
-        data: batchUpdateData,
-      });
-
+      await axios.post('/api/marketing/sales/process/entry/batchUpdate', batchUpdateData);
       setShowWarning(false);
     } catch (error) {
       console.log(error);
@@ -273,13 +258,10 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
 
   const getSalesFrequency = async () => {
     try {
-      const data = await fetchData({
-        url: '/api/marketing/sales/tourWeeks/' + productionId.toString(),
-        method: 'POST',
-      });
+      const response = await axios.get(`/api/marketing/sales/tourWeeks/${productionId.toString()}`);
 
-      if (typeof data === 'object') {
-        const tourData = data as TourResponse;
+      if (typeof response.data === 'object') {
+        const tourData = response.data as TourResponse;
         if (tourData.frequency === undefined) {
           return;
         }
@@ -334,16 +316,15 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         salesDate = addDurationToDate(salesDate, duration, false);
       }
 
+      const salesReadInput = {
+        bookingId: bookings.selected,
+        salesDate,
+        frequency,
+      };
+
       // get the salesFigures for the selected date/week if they exist
-      const sales = await fetchData({
-        url: '/api/marketing/sales/current/read',
-        method: 'POST',
-        data: {
-          bookingId: bookings.selected,
-          salesDate,
-          frequency,
-        },
-      });
+      const salesResponse = await axios.post('/api/marketing/sales/current/read', salesReadInput);
+      const sales = salesResponse.data;
 
       if (typeof sales === 'object' && !isNullOrEmpty(sales)) {
         const salesFigures = sales as SalesFigureSet;
@@ -373,14 +354,14 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       }
 
       // holds and comps
-      const holdCompList = await fetchData({
-        url: '/api/marketing/sales/read/holdComp',
-        method: 'POST',
-        data: {
-          bookingId: bookings.selected,
-          salesDate,
-        },
+      const response = await axios.post('/api/marketing/sales/read/holdComp', {
+        bookingId: bookings.selected,
+        salesDate,
       });
+
+      const holdCompList = response.data;
+
+      console.log(holdCompList);
 
       if (typeof holdCompList === 'object') {
         const holdCompData = holdCompList as HoldCompSet;
@@ -455,11 +436,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
       setBookings({ ...bookings, bookings: newBookings });
 
       // update in the database
-      await fetchData({
-        url: '/api/bookings/update/' + bookings.selected.toString(),
-        method: 'POST',
-        data: updObj,
-      });
+      await axios.post(`/api/bookings/update/${bookings.selected.toString()}`, updObj);
     } catch (error) {
       console.log(error);
     }
@@ -487,7 +464,7 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
     if (bookings.selected !== undefined && bookings.selected !== null) {
       initForm();
     }
-  }, [fetchData, bookings.selected]);
+  }, [bookings.selected]);
 
   // functionality to send data to the db when the return key is pressed - using an event listener so the other set functions are interfered with.
   // Temp commented out because state for current field is not processed therefore new value is not sent to DB

@@ -21,110 +21,147 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    let holdDataResult = [];
-    let compDataResult = [];
     let setId = -1;
 
-    const holdData = await prisma.$queryRaw`
-        SELECT 
-            SalesSet.SetSalesFiguresDate, 
-            HoldType.HoldTypeId, 
-            HoldType.HoldTypeCode, 
-            HoldType.HoldTypeName, 
-            SetHold.SetHoldSeats, 
-            SetHold.SetHoldValue,
-            SetHold.SetHoldId,
-            SalesSet.SetId
-        FROM 
-            SalesSet
-        CROSS JOIN 
-            HoldType
-        LEFT OUTER JOIN 
-            SetHold 
-        ON 
-            HoldType.HoldTypeId = SetHold.SetHoldHoldTypeId 
-            AND SalesSet.SetId = SetHold.SetHoldSetId
-        WHERE 
-            SalesSet.SetBookingId = ${bookingId}
-        ORDER BY 
-            HoldTypeSeqNo
-    `;
+    const holdTypes = await prisma.holdType.findMany({
+      orderBy: {
+        HoldTypeSeqNo: 'asc',
+      },
+    });
 
-    const compData = await prisma.$queryRaw`
-        SELECT
-            SalesSet.SetSalesFiguresDate,
-            CompType.CompTypeId,
-            CompType.CompTypeCode,
-            CompType.CompTypeName,
-            SetComp.SetCompSeats,
-            SetComp.SetCompId,
-            SalesSet.SetId
-        FROM
-            SalesSet
-        CROSS JOIN
-            CompType
-        LEFT OUTER JOIN
-            SetComp
-        ON
-            CompType.CompTypeId = SetComp.SetCompCompTypeId
-            AND SalesSet.SetId = SetComp.SetCompSetId
-        WHERE
-            SalesSet.SetBookingId = ${bookingId}
-        ORDER BY
-            CompTypeSeqNo
-    `;
+    const compTypes = await prisma.compType.findMany({
+      orderBy: {
+        CompTypeSeqNo: 'asc',
+      },
+    });
 
-    const filteredHolds = holdData.filter(
-      (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
-    );
+    // Date without time for comparison
+    const salesDateWithoutTime = removeTime(salesDate);
 
-    const filteredComps = compData.filter(
-      (sale) => removeTime(sale.SetSalesFiguresDate).getTime() === removeTime(salesDate).getTime(),
-    );
+    const rawHoldData = await prisma.salesSet.findMany({
+      where: {
+        SetBookingId: bookingId,
+      },
+      select: {
+        SetSalesFiguresDate: true,
+        SetId: true,
+        SetHold: {
+          select: {
+            SetHoldSeats: true,
+            SetHoldValue: true,
+            HoldType: {
+              select: {
+                HoldTypeId: true,
+                HoldTypeName: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
-    // if filteredHolds is [], populate with the hold types
-    if (filteredHolds.length === 0) {
-      const holdTypes = await prisma.$queryRaw`select * from HoldType order by HoldTypeSeqNo`;
-      holdDataResult = holdTypes.map((hold) => {
-        return { name: hold.HoldTypeName, seats: 0, value: 0, id: hold.HoldTypeId, recId: null };
-      });
-      // else map the db fields to nicer field names to be handled in the UI
-    } else {
-      holdDataResult = filteredHolds.map((hold) => {
+    // Filter the data to include only the dates without time
+    const holdData = rawHoldData.reduce((acc, salesSet) => {
+      if (removeTime(salesSet.SetSalesFiguresDate).getTime() === salesDateWithoutTime.getTime()) {
+        salesSet.SetHold.forEach((setHold) => {
+          acc.push({
+            SetSalesFiguresDate: salesSet.SetSalesFiguresDate,
+            SetId: salesSet.SetId,
+            SetHoldSeats: setHold.SetHoldSeats,
+            SetHoldValue: setHold.SetHoldValue,
+            HoldTypeId: setHold.HoldType.HoldTypeId,
+            HoldTypeName: setHold.HoldType.HoldTypeName,
+          });
+        });
+      }
+      return acc;
+    }, []);
+
+    const rawCompData = await prisma.salesSet.findMany({
+      where: {
+        SetBookingId: bookingId,
+      },
+      select: {
+        SetSalesFiguresDate: true,
+        SetId: true,
+        SetComp: {
+          select: {
+            SetCompSeats: true,
+            SetCompId: true,
+            CompType: {
+              select: {
+                CompTypeId: true,
+                CompTypeCode: true,
+                CompTypeName: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const compData = rawCompData.reduce((acc, salesSet) => {
+      if (removeTime(salesSet.SetSalesFiguresDate).getTime() === salesDateWithoutTime.getTime()) {
+        const { SetSalesFiguresDate, SetId, SetComp } = salesSet;
+        SetComp.forEach((setComp) => {
+          const { SetCompSeats, SetCompId, CompType } = setComp;
+          const { CompTypeId, CompTypeName } = CompType;
+          acc.push({
+            SetSalesFiguresDate,
+            SetId,
+            SetCompSeats,
+            SetCompId,
+            CompTypeId,
+            CompTypeName,
+          });
+        });
+      }
+      return acc;
+    }, []);
+
+    const holdResult = holdTypes.map((hold) => {
+      const holdRecIndex = holdData.findIndex((rec) => rec.HoldTypeId === hold.HoldTypeId);
+      if (holdRecIndex === -1) {
         return {
-          name: hold.HoldTypeName,
-          seats: hold.SetHoldSeats,
-          value: hold.SetHoldValue,
-          id: hold.HoldTypeId,
-          recId: hold.SetHoldId,
+          ...hold,
+          SetHoldSeats: 0,
+          SetHoldValue: 0,
         };
-      });
-    }
-
-    // if filteredComps is [], populate with the comp types
-    if (filteredHolds.length === 0) {
-      const compTypes = await prisma.$queryRaw`select * from CompType order by CompTypeSeqNo`;
-      compDataResult = compTypes.map((comp) => {
-        return { name: comp.CompTypeName, seats: 0, id: comp.CompTypeId, recId: null };
-      });
-      // else map the db fields to nicer field names to be handled in the UI
-    } else {
-      compDataResult = filteredComps.map((comp) => {
-        return { name: comp.CompTypeName, seats: comp.SetCompSeats, id: comp.CompTypeId, recId: comp.SetCompId };
-      });
-    }
-
-    if (filteredHolds.length > 0 || filteredComps.length > 0) {
-      if ('SetId' in filteredHolds[0]) {
-        setId = filteredHolds[0].SetId;
       } else {
-        setId = filteredComps[0].SetId;
+        return {
+          ...hold,
+          SetHoldSeats: holdData[holdRecIndex].SetHoldSeats,
+          SetHoldValue: holdData[holdRecIndex].SetHoldValue,
+        };
+      }
+    });
+
+    const compResult = compTypes.map((comp) => {
+      const compRecIndex = compData.findIndex((rec) => rec.CompTypeId === comp.CompTypeId);
+      if (compRecIndex === -1) {
+        return {
+          ...comp,
+          SetCompSeats: 0,
+        };
+      } else {
+        return {
+          ...comp,
+          SetCompSeats: compData[compRecIndex].SetCompSeats,
+        };
+      }
+    });
+
+    if (holdData.length > 0 || compData.length > 0) {
+      if ('SetId' in holdData[0]) {
+        setId = holdData[0].SetId;
+      } else {
+        setId = compData[0].SetId;
       }
     }
 
     const result = {
-      holds: holdDataResult,
-      comps: compDataResult,
+      holds: holdResult,
+      comps: compResult,
       setId,
     };
 

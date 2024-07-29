@@ -30,6 +30,9 @@ export default async function handle(req, res) {
         },
       });
 
+      console.log(currentHold);
+      console.log(setId);
+
       if (currentHold !== null) {
         await prisma.setHold.update({
           where: { SetHoldId: currentHold.SetHoldId },
