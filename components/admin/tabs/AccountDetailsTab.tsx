@@ -201,37 +201,38 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.postcode}
           />
-          <div className="w-fit flex gap-x-2 items-center">
-            <div className="flex gap-x-1">
-              <p className="text-primary-input-text">Country</p>
-              <p className="text-red-600">*</p>
-              {validationErrors.country && (
-                <small className="text-primary-red self-center">{validationErrors.country}</small>
-              )}
+          <div>
+            <div className="w-fit flex gap-x-2 items-center">
+              <div className="flex gap-x-1">
+                <p className="text-primary-input-text">Country</p>
+                <p className="text-red-600">*</p>
+                {validationErrors.country && (
+                  <small className="text-primary-red self-center">{validationErrors.country}</small>
+                )}
+              </div>
+              <Tooltip
+                body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+                width="w-[200px]"
+              >
+                <Icon iconName="info-circle-solid" />
+              </Tooltip>
             </div>
-            <Tooltip
-              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
-              width="w-[200px]"
-            >
-              <Icon iconName="info-circle-solid" />
-            </Tooltip>
+            <Select
+              name="country"
+              className="w-full font-bold"
+              placeholder="Country"
+              value={selectedCountry}
+              onChange={(value) => {
+                handleInputChange('country', countryOptions.find((option) => value === option.value)?.text);
+              }}
+              options={countryOptions}
+              isSearchable
+              onBlur={handleBlur}
+              menuPlacement="top"
+              error={validationErrors.country && true}
+            />
           </div>
-          <Select
-            name="country"
-            className="w-full font-bold"
-            placeholder="Country"
-            value={selectedCountry}
-            onChange={(value) => {
-              handleInputChange('country', countryOptions.find((option) => value === option.value)?.text);
-            }}
-            options={countryOptions}
-            isSearchable
-            onBlur={handleBlur}
-            menuPlacement="top"
-            error={validationErrors.country && true}
-          />
         </div>
-
         <div className="flex flex-col gap-3 w-1/2">
           <div className="h-[190px] overflow-y-hidden overflow-x-hidden">
             <div className="flex items-center justify-end gap-x-3 mt-[24px]">
