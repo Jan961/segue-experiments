@@ -4,7 +4,7 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
-import getTaskDateStatusColor, { getWeekOptions } from 'utils/getTaskDateStatus';
+import getTaskDateStatusColor, { getWeekOptions } from 'utils/taskDate';
 import { calculateTaskStatus } from 'utils/tasks';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRenderer from 'components/bookings/table/IconRenderer';

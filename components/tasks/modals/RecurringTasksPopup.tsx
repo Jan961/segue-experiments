@@ -17,10 +17,10 @@ export const RecurringTasksPopup = ({ visible, onClose, numTaskChange, onSubmit,
           <h1>This task is set to repeat</h1>
           <p>This task is set to repeat. There will be {numTaskChange} new tasks added</p>
         </div>
-        <Button variant="primary" className="bg-primary-red" onClick={onClose}>
+        <Button variant="primary" className="bg-primary-red" onClick={onClose} testId="btn-cancel-add-recurring">
           Cancel
         </Button>
-        <Button variant="secondary" onClick={onSubmit}>
+        <Button variant="secondary" onClick={onSubmit} testId="btn-continue-add-recurring">
           Continue
         </Button>
       </PopupModal>
@@ -35,10 +35,10 @@ export const RecurringTasksPopup = ({ visible, onClose, numTaskChange, onSubmit,
             {Math.abs(numTaskChange)} tasks will be {numTaskChange > 0 ? `added to` : `removed from`} the task list.
           </p>
         </div>
-        <Button variant="primary" className="bg-primary-red" onClick={onClose}>
+        <Button variant="primary" className="bg-primary-red" onClick={onClose} testId="btn-recurring-cancel-changes">
           Cancel
         </Button>
-        <Button variant="secondary" onClick={onSubmit}>
+        <Button variant="secondary" onClick={onSubmit} testId="btn-recurring-accept-changes">
           Continue
         </Button>
       </PopupModal>

@@ -18,7 +18,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
 import { currentProductionSelector } from 'state/booking/selectors/currentProductionSelector';
 import { isNullOrEmpty } from 'utils';
-import { getWeekOptions } from 'utils/getTaskDateStatus';
+import { getWeekOptions } from 'utils/taskDate';
 import { priorityOptions } from 'utils/tasks';
 import { productionJumpState } from 'state/booking/productionJumpState';
 import { addDurationToDate, addOneMonth } from 'services/dateService';
@@ -409,6 +409,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             id="Name"
             onChange={handleOnChange}
             value={inputs?.Name}
+            testId="txt-task-name"
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center justify-between">
@@ -420,6 +421,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             placeholder="Code is assigned when task is created"
             onChange={handleOnChange}
             value={isMasterTask ? inputs?.Code?.toString() : showCode}
+            testId="txt-task-code"
           />
         </div>
         <div className="col-span-2 col-start-4 flex items-center">
@@ -432,6 +434,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               onChange={(value) => handleOnChange({ target: { id: 'StartByWeekNum', value } })}
               className="w-52"
               isSearchable={true}
+              testId="sel-task-start-week"
             />
           </div>
           <div className="flex ml-10">
@@ -443,6 +446,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               placeholder="Week No."
               className="w-52"
               isSearchable={true}
+              testId="sel-task-complete-week"
             />
           </div>
         </div>
@@ -455,6 +459,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               className="w-32"
               placeholder="Priority"
               options={priorityOptionList}
+              testId="sel-task-priority"
             />
           </div>
           <div className="flex ml-2">
@@ -467,6 +472,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               isSearchable
               className="w-32"
               options={generatePercentageOptions}
+              testId="sel-task-progress"
             />
           </div>
           <div className="flex ml-2">
@@ -475,6 +481,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               disabled={isMasterTask || !inputs.Progress || inputs.Progress < 100}
               value={inputs?.TaskCompletedDate}
               onChange={(value) => handleOnChange({ target: { id: 'TaskCompletedDate', value } })}
+              testId="dat-task-complete-date"
             />
           </div>
         </div>
@@ -486,6 +493,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
               id="isRecurring"
               checked={isRecurring}
               onChange={(event) => handleOnChange({ target: { id: 'isRecurring', checked: event.target.checked } })}
+              testId="chk-task-is-recurring"
             />
           </div>
           {!isRecurring && (
@@ -497,6 +505,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
                 className="w-44"
                 options={RepeatOptions}
                 placeholder="Select..."
+                testId="sel-task-repeat-interval"
               />
             </div>
           )}
@@ -510,6 +519,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
                 className="w-32"
                 placeholder="Week No."
                 isSearchable={true}
+                testId="sel-task-repeat-from"
               />
             </div>
           )}
@@ -523,6 +533,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
                 placeholder="Week No."
                 className="w-32"
                 isSearchable={true}
+                testId="sel-task-repeat-to"
               />
             </div>
           )}
@@ -535,6 +546,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             options={usersList}
             placeholder="Select Assignee"
             className="w-64"
+            testId="sel-task-assigned-to"
           />
         </div>
         <div>
@@ -545,6 +557,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             value={inputs?.Notes}
             className="w-full min-h-14"
             id="Notes"
+            testId="txt-task-notes"
           />
         </div>
         {!inputs.Id && (
@@ -554,7 +567,12 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             {!isMasterTask && (
               <div className="flex">
                 <Label className="!text-secondary pr-2" text="Add to Master Task List" />
-                <Checkbox id="addToMasterTask" checked={isChecked} onChange={() => setIsChecked(!isChecked)} />
+                <Checkbox
+                  id="addToMasterTask"
+                  checked={isChecked}
+                  onChange={() => setIsChecked(!isChecked)}
+                  testId="chk-task-add-master"
+                />
               </div>
             )}
           </div>
@@ -565,8 +583,20 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
             {inputs.Id && (
               <>
-                <Button variant="tertiary" onClick={handleDeletePress} className="mr-4 w-[132px]" text="Delete" />
-                <Button variant="primary" onClick={handleClone} className="mr-4 w-[132px]" text="Clone this Task" />
+                <Button
+                  variant="tertiary"
+                  onClick={handleDeletePress}
+                  className="mr-4 w-[132px]"
+                  text="Delete"
+                  testId="btn-task-delete"
+                />
+                <Button
+                  variant="primary"
+                  onClick={handleClone}
+                  className="mr-4 w-[132px]"
+                  text="Clone this Task"
+                  testId="btn-task-clone"
+                />
               </>
             )}
             <Button
@@ -576,6 +606,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
                 return checkIfRecurringModal(isRecurring, taskRecurringInfo, inputs);
               }}
               text={inputs.Id ? 'Save' : 'Create New Task'}
+              testId="btn-task-save"
             />
           </div>
         </div>

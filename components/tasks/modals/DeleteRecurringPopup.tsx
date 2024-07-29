@@ -32,6 +32,7 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
       <div>
         <h1>This is a repeating task. Do you want to:</h1>
         <Select
+          testId="select-recurring-delete"
           options={optionList}
           value={selectedOption}
           onChange={(option: number) => {
@@ -39,10 +40,11 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
           }}
         />
       </div>
-      <Button variant="primary" className="bg-primary-red" onClick={onClose}>
+      <Button variant="primary" className="bg-primary-red" onClick={onClose} testId="btn-delete-cancel">
         Cancel
       </Button>
       <Button
+        testId="btn-delete-confirm"
         variant="secondary"
         disabled={selectedOption === null}
         onClick={() => {

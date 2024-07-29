@@ -40,13 +40,20 @@ const NewProductionTask = ({ visible, onClose, handleNewProductionTaskSubmit }: 
           onChange={handleOnChange}
           value={newProductionTask}
           options={ADD_TASK_OPTIONS}
-          placeholder="Select Assignee"
+          placeholder="Select option"
           className="w-64"
           isClearable={false}
+          testId="sel-task-source"
         />
         <div className="flex mt-2">
-          <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
-          <Button variant="primary" className="w-[132px]" onClick={handleSubmit} text="OK" />
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="mr-4 w-[132px]"
+            text="Cancel"
+            testId="btn-task-cancel"
+          />
+          <Button variant="primary" className="w-[132px]" onClick={handleSubmit} text="OK" testId="btn-task-create" />
         </div>
       </form>
     </PopupModal>

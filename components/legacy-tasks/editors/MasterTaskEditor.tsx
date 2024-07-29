@@ -5,7 +5,7 @@ import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 import { FormInputText } from 'components/global/forms/FormInputText';
 import { useRecoilValue } from 'recoil';
 import { userState } from 'state/account/userState';
-import { weekOptions } from 'utils/getTaskDateStatus';
+import { weekOptions } from 'utils/taskDate';
 import { Spinner } from 'components/global/Spinner';
 import { priorityOptions } from 'utils/tasks';
 
