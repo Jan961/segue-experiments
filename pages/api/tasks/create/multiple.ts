@@ -25,9 +25,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       }
     }
 
-    const { Code } = await getMaxProductionTaskCode(ProductionId);
-
-    let updatedCode = Code;
+    let updatedCode = (await getMaxProductionTaskCode(ProductionId))?.Code || 0;
 
     const createData = tasks.map((task) => {
       updatedCode += 1;

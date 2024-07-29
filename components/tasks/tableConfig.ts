@@ -4,10 +4,11 @@ import SelectCellRenderer from 'components/core-ui-lib/Table/renderers/SelectCel
 import { tileColors } from 'config/global';
 import { TaskStatusLabelMap } from 'config/tasks';
 import { format } from 'date-fns';
-import getTaskDateStatusColor, { getWeekOptions } from 'utils/getTaskDateStatus';
+import getTaskDateStatusColor, { getWeekOptions } from 'utils/taskDate';
 import { calculateTaskStatus } from 'utils/tasks';
 import ButtonRenderer from 'components/core-ui-lib/Table/renderers/ButtonRenderer';
 import IconRenderer from 'components/bookings/table/IconRenderer';
+import MasterTaskNameRenderer from './modals/renderers/MasterTaskNameRenderer';
 
 export const styleProps = { headerColor: tileColors.tasks };
 
@@ -17,6 +18,7 @@ const generatePercentageOptions = Array.from({ length: 101 }, (_, index) => ({
 }));
 
 export const getColumnDefs = (usersList = [], production) => {
+  const weekOptions = getWeekOptions(production, false, false);
   return [
     {
       headerName: 'Code',
@@ -166,8 +168,6 @@ export const getColumnDefs = (usersList = [], production) => {
   ];
 };
 
-const weekOptions = getWeekOptions('');
-
 export const getMasterTasksColumnDefs = (usersList = []) => {
   return [
     {
@@ -179,7 +179,7 @@ export const getMasterTasksColumnDefs = (usersList = []) => {
     {
       headerName: 'Task Name',
       field: 'Name',
-      cellRenderer: DefaultCellRenderer,
+      cellRenderer: MasterTaskNameRenderer,
       width: 445,
       flex: 1,
     },
