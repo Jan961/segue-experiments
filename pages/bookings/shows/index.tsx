@@ -3,7 +3,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { getProductionJumpState } from 'utils/getProductionJumpState';
 import { getAccountIdFromReq } from 'services/userService';
 import { InitialState } from 'lib/recoil';
-import { getAllProductionCompanyList, getShowsByAccountId } from 'services/ShowService';
+import { getAllProductionCompanyList, getShowsByAccountId } from 'services/showService';
 import ShowsTable from 'components/shows/ShowsTable';
 import { showMapper, showProductionMapper } from 'lib/mappers';
 import Checkbox from 'components/core-ui-lib/Checkbox';

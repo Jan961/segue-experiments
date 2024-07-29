@@ -2,7 +2,7 @@ import * as yup from 'yup';
 
 export const productionFormSchema = yup.object().shape({
   currency: yup.string().required('Currency is required').nullable(),
-  region: yup.array().of(yup.number()).required('Region is required').nullable(),
+  region: yup.array().of(yup.number()).min(1, 'Region is required'),
   productionDateBlock: yup
     .object()
     .shape({
