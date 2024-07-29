@@ -102,11 +102,24 @@ const MasterTaskList = ({ visible, onClose, productionId }: MasterTaskListProps)
           styleProps={styleProps}
           rowSelection="multiple"
           onSelectionChanged={onSelectionChanged}
+          testId="table-add-from-master"
         />
       </div>
       <div className="flex mt-4 justify-end">
-        <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={handleCancel} />
-        <Button text="Add" className="w-[132px]" onClick={handleSubmit} disabled={selectedRows.length === 0} />
+        <Button
+          variant="secondary"
+          text="Cancel"
+          className="w-[132px] mr-3"
+          onClick={handleCancel}
+          testId="btn-master-cancel"
+        />
+        <Button
+          text="Add"
+          className="w-[132px]"
+          onClick={handleSubmit}
+          disabled={selectedRows.length === 0}
+          testId="btn-master-add-from"
+        />
       </div>
       <ConfirmationDialog
         variant="delete"

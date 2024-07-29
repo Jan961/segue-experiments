@@ -26,7 +26,6 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
 
     return dropDownOptions;
   };
-
   const optionList = createOptions();
   return (
     <PopupModal
@@ -39,12 +38,14 @@ export const DeleteRecurringPopup = ({ visible, onClose, onSubmit }: DeleteRecur
       <form className="flex flex-col gap-2">
         <p>Would you like to...</p>
         <Select
+          testId="select-recurring-delete"
           options={optionList}
           value={selectedOption}
           onChange={(option: number) => {
             setSelectedOption(option);
           }}
         />
+
         <div className="flex mt-2">
           <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
           <Button

@@ -129,6 +129,7 @@ export default function TasksTable({
           onCellClicked={handleCellClick}
           onRowDoubleClicked={onRowDoubleClicked}
           ref={tableRef}
+          testId="table-tasks"
         />
       </div>
       <NotesPopup

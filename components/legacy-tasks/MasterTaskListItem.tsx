@@ -13,7 +13,7 @@ import axios from 'axios';
 import { omit } from 'radash';
 import { loggingService } from 'services/loggingService';
 import { Spinner } from 'components/global/Spinner';
-import { getWeekOptions } from 'utils/getTaskDateStatus';
+import { getWeekOptions } from 'utils/taskDate';
 import { FormInputSelect } from 'components/global/forms/FormInputSelect';
 
 interface TaskListItemProps {

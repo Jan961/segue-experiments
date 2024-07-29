@@ -158,6 +158,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         rowData={filteredTasks}
         styleProps={styleProps}
         onRowDoubleClicked={onRowDoubleClicked}
+        testId="table-master-tasks"
       />
 
       <ConfirmationDialog

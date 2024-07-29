@@ -206,6 +206,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           onChange={handleChange}
           isSearchable
           isClearable={false}
+          testId="sel-production"
         />
         <div className="flex  items-center ml-1 mr-4">
           <Checkbox
@@ -214,6 +215,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
             checked={includeArchived}
             onChange={onIncludeArchiveChange}
             className=""
+            testId="chk-task-name"
           />
         </div>
       </div>
@@ -225,11 +227,24 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
           styleProps={styleProps}
           rowSelection="multiple"
           onSelectionChanged={onSelectionChanged}
+          testId="table-prod-tasks"
         />
       </div>
       <div className="flex mt-4 justify-end">
-        <Button variant="secondary" text="Cancel" className="w-[132px] mr-3" onClick={handleCancel} />
-        <Button text="Add" className="w-[132px]" onClick={handleSubmit} disabled={selectedRows.length === 0} />
+        <Button
+          variant="secondary"
+          text="Cancel"
+          className="w-[132px] mr-3"
+          onClick={handleCancel}
+          testId="btn-task-cancel"
+        />
+        <Button
+          text="Add"
+          className="w-[132px]"
+          onClick={handleSubmit}
+          disabled={selectedRows.length === 0}
+          testId="btn-task-save"
+        />
       </div>
       <ConfirmationDialog
         variant="delete"

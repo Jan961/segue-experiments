@@ -8,6 +8,7 @@ interface RecurringTasksProps {
   onSubmit: () => void;
   isNewTask: any;
 }
+
 export const RecurringTasksPopup = ({ visible, onClose, numTaskChange, onSubmit, isNewTask }: RecurringTasksProps) => {
   if (isNewTask) {
     return (
@@ -16,8 +17,20 @@ export const RecurringTasksPopup = ({ visible, onClose, numTaskChange, onSubmit,
           <p>This task is set to repeat. There will be {numTaskChange} new tasks added</p>
         </div>
         <div className="flex mt-2 justify-items-center items-center justify-center">
-          <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
-          <Button variant="primary" className="w-[132px]" onClick={onSubmit} text="OK" />
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="mr-4 w-[132px]"
+            text="Cancel"
+            testId="btn-cancel-add-recurring"
+          />
+          <Button
+            variant="primary"
+            className="w-[132px]"
+            onClick={onSubmit}
+            text="OK"
+            testId="btn-continue-add-recurring"
+          />
         </div>
       </PopupModal>
     );
@@ -31,8 +44,20 @@ export const RecurringTasksPopup = ({ visible, onClose, numTaskChange, onSubmit,
           </p>
         </div>
         <div className="flex mt-2 justify-items-center items-center justify-center">
-          <Button variant="secondary" onClick={onClose} className="mr-4 w-[132px]" text="Cancel" />
-          <Button variant="primary" className="w-[132px]" onClick={onSubmit} text="OK" />
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            className="mr-4 w-[132px]"
+            text="Cancel"
+            testId="btn-recurring-cancel-changes"
+          />
+          <Button
+            variant="primary"
+            className="w-[132px]"
+            onClick={onSubmit}
+            text="OK"
+            testId="btn-recurring-accept-changes"
+          />
         </div>
       </PopupModal>
     );
