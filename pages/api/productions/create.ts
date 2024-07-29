@@ -1,12 +1,15 @@
-import { ProductionDTO } from 'interfaces';
-import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { pick } from 'radash';
+import * as yup from 'yup';
+import { ProductionDTO } from 'interfaces';
+import prisma from 'lib/prisma';
 import { getEmailFromReq, checkAccess } from 'services/userService';
+import { isUndefined } from 'utils';
+import { productionSchema } from 'validators/production';
 
 export const mapToPrismaFields = ({
   code: Code,
-  isArchived: IsArchived,
+  isArchived: IsArchived = false,
   showId: ShowId,
   salesFrequency: SalesFrequency,
   salesEmail: SalesEmail,
@@ -49,7 +52,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const email = await getEmailFromReq(req);
   const access = await checkAccess(email, { ShowId });
   if (!access) return res.status(401).end();
-
+  await productionSchema(true).validate(req.body, { abortEarly: false });
   try {
     await prisma.production.create({
       data: {
@@ -67,7 +70,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             IsPrimary: dateBlock.IsPrimary,
           })),
         },
-        ...(Image?.id && {
+        ...(!isUndefined(Image) && {
           File: {
             connect: {
               Id: Image?.id,
@@ -94,10 +97,11 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     res.status(200).end();
   } catch (error) {
-    console.log(error);
     if (error.code === 'P2002' && error.meta && error.meta.target.includes('SECONDARY')) {
       // The target might not exactly match 'SECONDARY', depending on Prisma version and database
       res.status(409).json({ error: 'A Production with the specified ShowId and Code already exists.', ok: false });
+    } else if (error instanceof yup.ValidationError) {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
     } else {
       res.status(500).json({ err: 'Error occurred while creating production.', ok: false });
     }
