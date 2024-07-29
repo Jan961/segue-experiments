@@ -28,7 +28,12 @@ export default function AccountDetailsTab() {
 
         setCountryOptions(transformToOptions(data.countryList, 'Name', 'Id'));
 
-        setCurrencyOptions(transformToOptions(data.currencyList, 'Code', 'Code'));
+        setCurrencyOptions(
+          data.currencyList.map((currency) => {
+            return { text: currency.Code + ' | ' + currency.Name, value: currency.Code };
+          }),
+        );
+
         const companyDetails = data?.companyDetails;
         const {
           FirstName,
@@ -276,7 +281,10 @@ export default function AccountDetailsTab() {
               placeholder="Currency For Payment"
               value={formData.currencyForPayment}
               onChange={(value) => {
-                handleInputChange('currencyForPayment', currencyOptions.find((option) => value === option.value)?.text);
+                handleInputChange(
+                  'currencyForPayment',
+                  currencyOptions.find((option) => value === option.value)?.value,
+                );
               }}
               options={currencyOptions}
               isSearchable
@@ -332,7 +340,7 @@ export default function AccountDetailsTab() {
               placeholder="Currency"
               value={formData.currency}
               onChange={(value) => {
-                handleInputChange('currency', currencyOptions.find((option) => value === option.value)?.text);
+                handleInputChange('currency', currencyOptions.find((option) => value === option.value)?.value);
               }}
               options={currencyOptions}
               isSearchable
