@@ -11,6 +11,7 @@ import { ProductionDTO } from 'interfaces';
 import LoadingOverlay from './LoadingOverlay';
 import { showsTableConfig } from './table/tableConfig';
 import ProductionsView from './modal/Views/ProductionsView';
+import { notify } from 'components/core-ui-lib';
 
 const rowClassRules = {
   'custom-red-row': (params) => {
@@ -49,9 +50,6 @@ const ShowsTable = ({
 }) => {
   const tableRef = useRef(null);
   const router = useRouter();
-
-  const [isError, setIsError] = useState<boolean>(false);
-
   const [confirm, setConfirm] = useState<boolean>(false);
   const [showId, setShowId] = useState<number>(0);
   const [currentShow, setCurrentShow] = useState(intShowData);
@@ -116,24 +114,22 @@ const ShowsTable = ({
       }
     } else if (
       isAddRow &&
-      e.column.colId === 'editId' &&
+      e.column.colId === 'EditId' &&
       currentShow?.Name.length > 2 &&
       currentShow?.Code.length > 1
     ) {
       setIsLoading(true);
       try {
         const data = { ...intShowData, Code: currentShow.Code, Name: currentShow.Name };
-        delete data.Id;
-        await axios.post(`/api/shows/create`, data);
+        await axios.post(`/api/shows/create`, omit(data, ['productions', 'Id']));
         handleEdit();
         setCurrentShow(intShowData);
         addNewRow();
         router.replace(router.asPath);
         setIsLoading(false);
-        setIsError(false);
       } catch (error) {
+        notify.error('Error Creating Show. Please try again');
         setIsLoading(false);
-        setIsError(true);
       }
     }
   };
@@ -160,7 +156,7 @@ const ShowsTable = ({
   };
 
   return (
-    <>
+    <div className="relative">
       <Table
         columnDefs={showsTableConfig}
         ref={tableRef}
@@ -187,13 +183,7 @@ const ShowsTable = ({
           showData={currentShow}
         />
       )}
-      {isError && (
-        <p className="text-red-600 absolute right-[4%] top-[21%] w-[9%]">
-          This Show Code is already in use.
-          <br /> Please change to a unique Show Code.
-        </p>
-      )}
-    </>
+    </div>
   );
 };
 

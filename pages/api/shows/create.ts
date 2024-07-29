@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from 'lib/prisma';
+import * as yup from 'yup';
 import { ShowDTO } from 'interfaces';
 import { getAccountId, getEmailFromReq } from 'services/userService';
+import { showSchema } from 'validators/show';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   const show: ShowDTO = req.body;
@@ -9,14 +11,15 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   const AccountId = await getAccountId(email);
 
   try {
-    await prisma.show.create({
-      data: { ...show, AccountId },
+    const validatedData = await showSchema.validate(show, { abortEarly: true });
+    const result = await prisma.show.create({
+      data: { ...validatedData, AccountId },
     });
-
-    res.status(200).end();
+    res.status(200).json(result);
   } catch (error) {
-    console.log(error);
-    if (error.code === 'P2002' && error.meta && error.meta.target.includes('SECONDARY')) {
+    if (error instanceof yup.ValidationError) {
+      return res.status(400).json({ message: 'Validation error', errors: error.errors });
+    } else if (error.code === 'P2002' && error.meta && error.meta.target.includes('SECONDARY')) {
       // The target might not exactly match 'SECONDARY', depending on Prisma version and database
       res.status(409).json({ error: 'A show with the specified AccountId and Code already exists.' });
     } else {
