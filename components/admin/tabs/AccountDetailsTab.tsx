@@ -133,7 +133,6 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.firstName}
           />
-
           <FormField
             currentValue={formData.lastName}
             displayText="Last Name"
@@ -143,7 +142,6 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.lastName}
           />
-
           <FormField
             currentValue={formData.companyName}
             displayText="Company Name"
@@ -153,7 +151,6 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.companyName}
           />
-
           <FormField
             currentValue={formData.phoneNumber}
             displayText="Phone Number"
@@ -162,7 +159,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.phoneNumber}
           />
-
           <FormField
             currentValue={formData.addressLine1}
             displayText="Address Line 1"
@@ -172,7 +168,6 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.addressLine1}
           />
-
           <FormField
             currentValue={formData.addressLine2}
             displayText="Address Line 2"
@@ -181,7 +176,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.addressLine2}
           />
-
           <FormField
             currentValue={formData.addressLine3}
             displayText="Address Line 3"
@@ -190,7 +184,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.addressLine3}
           />
-
           <FormField
             currentValue={formData.townName}
             displayText="Town"
@@ -199,7 +192,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.townName}
           />
-
           <FormField
             currentValue={formData.postcode}
             displayText="Postcode"
@@ -209,39 +201,35 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.postcode}
           />
-
-          <div>
-            <div className="w-fit flex gap-x-2 items-center">
-              <div className="flex gap-x-1">
-                <p className="text-primary-input-text">Country</p>
-                <p className="text-red-600">*</p>
-                {validationErrors.country && (
-                  <small className="text-primary-red self-center">{validationErrors.country}</small>
-                )}
-              </div>
-              <Tooltip
-                body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
-                width="w-[200px]"
-              >
-                <Icon iconName="info-circle-solid" />
-              </Tooltip>
+          <div className="w-fit flex gap-x-2 items-center">
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Country</p>
+              <p className="text-red-600">*</p>
+              {validationErrors.country && (
+                <small className="text-primary-red self-center">{validationErrors.country}</small>
+              )}
             </div>
-
-            <Select
-              name="country"
-              className="w-full font-bold"
-              placeholder="Country"
-              value={selectedCountry}
-              onChange={(value) => {
-                handleInputChange('country', countryOptions.find((option) => value === option.value)?.text);
-              }}
-              options={countryOptions}
-              isSearchable
-              onBlur={handleBlur}
-              menuPlacement="top"
-              error={validationErrors.country && true}
-            />
+            <Tooltip
+              body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
+              width="w-[200px]"
+            >
+              <Icon iconName="info-circle-solid" />
+            </Tooltip>
           </div>
+          <Select
+            name="country"
+            className="w-full font-bold"
+            placeholder="Country"
+            value={selectedCountry}
+            onChange={(value) => {
+              handleInputChange('country', countryOptions.find((option) => value === option.value)?.text);
+            }}
+            options={countryOptions}
+            isSearchable
+            onBlur={handleBlur}
+            menuPlacement="top"
+            error={validationErrors.country && true}
+          />
         </div>
 
         <div className="flex flex-col gap-3 w-1/2">
@@ -268,7 +256,6 @@ export default function AccountDetailsTab() {
               />
             </div>
           </div>
-
           <FormField
             currentValue={formData.companyEmail}
             displayText="Email Address"
@@ -278,7 +265,6 @@ export default function AccountDetailsTab() {
             required={true}
             validationCheck={validationErrors.companyEmail}
           />
-
           <div>
             <div className="flex gap-x-1">
               <p className="text-primary-input-text">Currency for Payment</p>
@@ -304,7 +290,6 @@ export default function AccountDetailsTab() {
               error={validationErrors.currencyForPayment && true}
             />
           </div>
-
           <FormField
             currentValue={formData.vatNumber}
             displayText="VAT Number"
@@ -313,7 +298,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.vatNumber}
           />
-
           <FormField
             currentValue={formData.companyNumber}
             displayText="Company Number"
@@ -322,7 +306,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.companyNumber}
           />
-
           <FormField
             currentValue={formData.companyWebsite}
             displayText="Website"
@@ -331,7 +314,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.Website}
           />
-
           <FormField
             currentValue={formData.typeOfCompany}
             displayText="Type of Company"
@@ -340,7 +322,6 @@ export default function AccountDetailsTab() {
             onBlur={handleBlur}
             validationCheck={validationErrors.typeOfCompany}
           />
-
           <div>
             <div className="flex gap-x-1">
               <p className="text-primary-input-text">Company Currency</p>
