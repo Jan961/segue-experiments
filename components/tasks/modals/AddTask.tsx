@@ -478,11 +478,12 @@ const AddTask = ({
             <Select
               disabled={isMasterTask}
               onChange={(value) => handleOnChange({ target: { id: 'Progress', value } })}
-              value={inputs?.Progress?.toString()}
+              value={inputs?.Progress?.toString().length > 0 ? inputs?.Progress?.toString() : '0'}
               placeholder="Progress"
               isSearchable
               className="w-32"
               options={generatePercentageOptions}
+              isClearable={false}
             />
           </div>
           <div className="flex ml-2">

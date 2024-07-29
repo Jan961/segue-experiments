@@ -2,6 +2,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateRecurringProductionTasks } from 'services/TaskService';
+import { recurringProductionTaskSchema } from 'validators/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -38,16 +39,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     );
 
     const createdTasks = await Promise.all(
-      taskList.map(
-        async (task) =>
-          await prisma.productionTask.create({
-            data: {
-              ...task,
-            },
-          }),
-      ),
+      taskList.map(async (task) => {
+        await recurringProductionTaskSchema.validate(task);
+        await prisma.productionTask.create({
+          data: {
+            ...task,
+          },
+        });
+      }),
     );
-    res.json(createdTasks);
+    res.status(200).json(createdTasks);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Error creating Recurring ProductionTask' });
