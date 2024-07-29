@@ -1021,39 +1021,39 @@ model GlobalBookingActivity {
 }
 
 model ACCContract {
-  ACCContractId                                                 Int                 @map("ACCContractId") @id @default(autoincrement())
-  ACCCPersonId                                                  Int                 @map("ACCCPersonId") 
-  ACCCRoleName                                                  String              @map("ACCCRoleName") @db.VarChar(50)
-  ACCCContractStatus                                            String              @map("ACCCContractStatus") @db.VarChar(4)
-  ACCCCompletedByAccUserId                                      Int?                @map("ACCCCompletedByAccUserId") 
-  ACCCCheckedByAccUserId                                        Int?                @map("ACCCCheckedByAccUserId") 
-  ACCCDateIssued                                                DateTime?           @map("ACCCDateIssued") @db.Date
-  ACCCDateReturned                                              DateTime?           @map("ACCCDateReturned") @db.Date
-  ACCCNotes                                                     String?             @map("ACCCNotes") @db.LongText
-  ACCCCurrencyCode                                              String?             @map("ACCCCurrencyCode") @db.VarChar(3)
-  ACCCFirstDay                                                  DateTime?           @map("ACCCFirstDay") @db.Date
-  ACCCLastDay                                                   DateTime?           @map("ACCCLastDay") @db.Date
-  ACCCAvailability                                              String?             @map("ACCCAvailability") @db.LongText
-  ACCCRehearsalLocation                                         String?             @map("ACCCRehearsalLocation") @db.VarChar(30)
-  ACCCRehearsalVenueId                                          Int?                @map("ACCCRehearsalVenueId") 
-  ACCCRehearsalVenueNotes                                       String?             @map("ACCCRehearsalVenueNotes") @db.LongText
-  ACCCIsAccomProvided                                           Boolean             @map("ACCCIsAccomProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ACCCAccomNotes                                                String?             @map("ACCCAccomNotes") @db.LongText
-  ACCCIsTransportProvided                                       Boolean             @map("ACCCIsTransportProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ACCCTransportNotes                                            String?             @map("ACCCTransportNotes") @db.LongText
-  ACCCIsNominatedDriver                                         Boolean             @map("ACCCIsNominatedDriver") @default(dbgenerated("(b'0')")) @db.Bit(1)
-  ACCCNominatedDriverNotes                                      String?             @map("ACCCNominatedDriverNotes") @db.LongText
-  ACCCPaymentType                                               String?             @map("ACCCPaymentType") @db.VarChar(1)
-  ACCCWeeklyRehFee                                              Decimal?            @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
-  ACCCWeeklyRehHolPay                                           Decimal?            @map("ACCCWeeklyRehHolPay") @db.Decimal(10, 2)
-  ACCCWeeklyPerfFee                                             Decimal?            @map("ACCCWeeklyPerfFee") @db.Decimal(10, 2)
-  ACCCWeeklyPerfHolPay                                          Decimal?            @map("ACCCWeeklyPerfHolPay") @db.Decimal(10, 2)
-  ACCCWeeklySubs                                                Decimal?            @map("ACCCWeeklySubs") @db.Decimal(10, 2)
-  ACCCWeeklySubsNotes                                           String?             @map("ACCCWeeklySubsNotes") @db.LongText
-  ACCCTotalFee                                                  Decimal?            @map("ACCCTotalFee") @db.Decimal(10, 2)
-  ACCCTotalHolPay                                               Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
-  ACCCTotalFeeNotes                                             String?             @map("ACCCTotalFeeNotes") @db.LongText
-  ACCCCancelFee                                                 Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
+  ContractId                                                    Int                 @map("ACCContractId") @id @default(autoincrement())
+  PersonId                                                      Int                 @map("ACCCPersonId") 
+  RoleName                                                      String              @map("ACCCRoleName") @db.VarChar(50)
+  ContractStatus                                                String              @map("ACCCContractStatus") @db.VarChar(4)
+  CompletedByAccUserId                                          Int?                @map("ACCCCompletedByAccUserId") 
+  CheckedByAccUserId                                            Int?                @map("ACCCCheckedByAccUserId") 
+  DateIssued                                                    DateTime?           @map("ACCCDateIssued") @db.Date
+  DateReturned                                                  DateTime?           @map("ACCCDateReturned") @db.Date
+  Notes                                                         String?             @map("ACCCNotes") @db.LongText
+  CurrencyCode                                                  String?             @map("ACCCCurrencyCode") @db.VarChar(3)
+  FirstDay                                                      DateTime?           @map("ACCCFirstDay") @db.Date
+  LastDay                                                       DateTime?           @map("ACCCLastDay") @db.Date
+  Availability                                                  String?             @map("ACCCAvailability") @db.LongText
+  RehearsalLocation                                             String?             @map("ACCCRehearsalLocation") @db.VarChar(30)
+  RehearsalVenueId                                              Int?                @map("ACCCRehearsalVenueId") 
+  RehearsalVenueNotes                                           String?             @map("ACCCRehearsalVenueNotes") @db.LongText
+  IsAccomProvided                                               Boolean             @map("ACCCIsAccomProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccomNotes                                                    String?             @map("ACCCAccomNotes") @db.LongText
+  IsTransportProvided                                           Boolean             @map("ACCCIsTransportProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  TransportNotes                                                String?             @map("ACCCTransportNotes") @db.LongText
+  IsNominatedDriver                                             Boolean             @map("ACCCIsNominatedDriver") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  NominatedDriverNotes                                          String?             @map("ACCCNominatedDriverNotes") @db.LongText
+  PaymentType                                                   String?             @map("ACCCPaymentType") @db.VarChar(1)
+  WeeklyRehFee                                                  Decimal?            @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
+  WeeklyRehHolPay                                               Decimal?            @map("ACCCWeeklyRehHolPay") @db.Decimal(10, 2)
+  WeeklyPerfFee                                                 Decimal?            @map("ACCCWeeklyPerfFee") @db.Decimal(10, 2)
+  WeeklyPerfHolPay                                              Decimal?            @map("ACCCWeeklyPerfHolPay") @db.Decimal(10, 2)
+  WeeklySubs                                                    Decimal?            @map("ACCCWeeklySubs") @db.Decimal(10, 2)
+  WeeklySubsNotes                                               String?             @map("ACCCWeeklySubsNotes") @db.LongText
+  TotalFee                                                      Decimal?            @map("ACCCTotalFee") @db.Decimal(10, 2)
+  TotalHolPay                                                   Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
+  TotalFeeNotes                                                 String?             @map("ACCCTotalFeeNotes") @db.LongText
+  CancelFee                                                     Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
   AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [ACCCCheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
   AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [ACCCCompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
   Currency                                                      Currency?           @relation(fields: [ACCCCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
