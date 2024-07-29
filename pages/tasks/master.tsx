@@ -127,15 +127,23 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     }
   };
 
-  const updateTableData = async (task: any) => {
-    const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
-    const updatedRowData = filteredTasks.map((row) => {
-      if (row.Id === task.Id) return updatedTask;
-      return row;
-    });
-    setIsLoading(false);
-    filteredTasks = updatedRowData;
-    await router.push(router.asPath);
+  const updateTableData = async (task: any, isAdding: boolean) => {
+    if (isAdding) {
+      const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
+      const updatedRowData = filteredTasks.map((row) => {
+        if (row.Id === task.Id) return updatedTask;
+        return row;
+      });
+      setIsLoading(false);
+      filteredTasks = updatedRowData;
+      await router.push(router.asPath);
+    } else {
+      const updatedRowData = filteredTasks.filter((row) => row.Id !== task.Id);
+      setIsLoading(false);
+      filteredTasks = updatedRowData;
+
+      await router.push(router.asPath);
+    }
   };
 
   return (

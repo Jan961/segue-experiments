@@ -31,7 +31,7 @@ interface AddTaskProps {
   onClose: () => void;
   task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
   productionId?: number;
-  updateTableData: (task: any) => Promise<void>;
+  updateTableData: (task: any, isAdding: boolean) => Promise<void>;
 }
 
 const RepeatOptions = [
@@ -233,7 +233,7 @@ const AddTask = ({
       await handleOnSubmit();
       onClose();
       setInputs(DEFAULT_MASTER_TASK);
-      await updateTableData(newInfo);
+      await updateTableData(newInfo, true);
       return;
     } else {
       console.log(previousInfo === null);
@@ -241,7 +241,7 @@ const AddTask = ({
         console.log('im in here');
         await handleOnSubmit();
         onClose();
-        await updateTableData(newInfo);
+        await updateTableData(newInfo, true);
         setInputs(DEFAULT_MASTER_TASK);
 
         return;
@@ -319,7 +319,7 @@ const AddTask = ({
     setLoading(false);
     if (isMasterTask) {
       await handleMasterTask();
-      await updateTableData(inputs);
+      await updateTableData(inputs, true);
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
       if (inputs.Id) {
@@ -327,7 +327,7 @@ const AddTask = ({
           await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
           setLoading(false);
           handleClose();
-          await updateTableData(inputs);
+          await updateTableData(inputs, true);
         } catch (error) {
           setLoading(false);
         }
@@ -340,7 +340,7 @@ const AddTask = ({
             await handleMasterTask();
           }
           onClose();
-          await updateTableData(inputs);
+          await updateTableData(inputs, true);
         } catch (error) {
           setLoading(false);
           console.error(error);
@@ -394,6 +394,7 @@ const AddTask = ({
         await axios.delete(`/api/tasks/master/delete/${inputs?.Id}`);
         setLoading(false);
         onClose();
+        await updateTableData(inputs, false);
       } finally {
         setLoading(false);
       }
@@ -402,6 +403,7 @@ const AddTask = ({
         await axios.delete(`/api/tasks/delete/${inputs?.Id}`);
         setLoading(false);
         onClose();
+        await updateTableData(inputs, false);
       } finally {
         setLoading(false);
       }

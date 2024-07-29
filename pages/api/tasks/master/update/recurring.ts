@@ -23,7 +23,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
             Id: task.Id,
           },
         });
-      } else {
+      } else if (task.RepeatInterval) {
         const {
           RepeatInterval,
           TaskRepeatFromWeekNum,
