@@ -147,6 +147,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         rowData={filteredTasks}
         styleProps={styleProps}
         onRowDoubleClicked={onRowDoubleClicked}
+        testId="table-master-tasks"
       />
 
       <ConfirmationDialog
@@ -157,7 +158,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
-      <AddTask visible={showAddTask} isMasterTask onClose={handleShowTask} task={currentTask} />
+      <AddTask visible={showAddTask} isMasterTask={true} onClose={handleShowTask} task={currentTask} />
       <NewProductionTask
         visible={showNewProduction}
         onClose={handleNewProductionTaskModal}

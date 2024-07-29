@@ -6,6 +6,7 @@ import { getAccountId, getEmailFromReq } from './userService';
 import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
 import { getWeekNumsToDateMap } from 'utils/getDateFromWeekNum';
+import { omit } from 'radash';
 
 // Edit Production Page
 const productionDateBlockInclude = Prisma.validator<Prisma.ProductionSelect>()({
@@ -238,7 +239,7 @@ export const getProductionById = async (Id: number) => {
 };
 
 export const getProductionsAndTasks = async (AccountId: number, ProductionId?: number) => {
-  let productionsWithTasks = await prisma.production.findMany({
+  let productionsWithTasks = await prisma.Production.findMany({
     where: {
       IsArchived: false,
       ...(ProductionId && { Id: ProductionId }),
@@ -255,9 +256,35 @@ export const getProductionsAndTasks = async (AccountId: number, ProductionId?: n
         orderBy: {
           StartByWeekNum: 'asc',
         },
+        include: {
+          ProductionTaskRepeat: {
+            select: {
+              Id: true,
+              FromWeekNum: true,
+              ToWeekNum: true,
+              Interval: true,
+            },
+          },
+        },
       },
     },
   });
+  productionsWithTasks = productionsWithTasks.map((production) => {
+    return {
+      ...production,
+      ProductionTask: production.ProductionTask.map((task) => {
+        const tempTask = {
+          ...task,
+          TaskCompletedDate: task.TaskCompletedDate != null ? task.TaskCompletedDate.toISOString() : null,
+          TaskRepeatFromWeekNum: task.ProductionTaskRepeat?.FromWeekNum || null,
+          TaskRepeatToWeekNum: task.ProductionTaskRepeat?.ToWeekNum || null,
+          RepeatInterval: task.ProductionTaskRepeat?.Interval || null,
+        };
+        return omit(tempTask, ['ProductionTaskRepeat']);
+      }),
+    };
+  });
+
   productionsWithTasks = productionsWithTasks.map((production) => {
     const { StartDate, EndDate } = production.DateBlock.find((DateBlock) => DateBlock.Name === 'Production') || {};
     const weekNumsList = production.ProductionTask.map((ProductionTask) => [

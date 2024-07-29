@@ -156,15 +156,24 @@ export const formatTime = (timestamp) => {
   return today.toLocaleTimeString();
 };
 
+export const addOneMonth = (date: Date) => {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + 1);
+  return newDate;
+};
+
 export const timeFormat = (mins?: number) => {
   if (!mins) return '';
   return `${Math.floor(mins / 60)}:${String(mins % 60).padStart(2, '0')}`;
 };
 
 export const formatDateUK = (date) => {
-  // This will ignre date
   const today = new Date(date);
   return today.toLocaleDateString('en-GB');
+};
+
+export const formatShortDateUK = (date) => {
+  return format(new Date(date), 'dd/MM/yy');
 };
 
 export const getMonday = (inputDate) => {

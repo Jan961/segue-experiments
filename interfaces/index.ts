@@ -90,6 +90,31 @@ export type ProductionTaskDTO = {
   AssignedToUserId?: number;
   StartDate?: string;
   CompleteDate?: string;
+  TaskCompletedDate: Date;
+  ProductionTaskRepeat?: any;
+};
+
+export type MasterTaskDTO = {
+  TaskName?: any;
+  Id?: number;
+  Code?: number;
+  Name: string;
+  Priority?: number;
+  Notes?: string;
+  DueDate?: string;
+  FollowUp?: string;
+  CreatedDate?: string;
+  Status?: string;
+  AssignedBy?: string;
+  AssignedTo?: string;
+  StartByWeekNum?: number;
+  CompleteByWeekNum?: number;
+  AssignedToUserId?: number;
+  MasterTaskRepeat?: any;
+  MTRId?: number;
+  RepeatInterval?: string;
+  TaskRepeatFromWeekNum?: number;
+  TaskRepeatToWeekNum?: number;
 };
 
 // Existing Production interface for old schema. Remove eventually
