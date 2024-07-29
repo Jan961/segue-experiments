@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { checkAccess, getEmailFromReq } from 'services/userService';
 import { MasterTaskDTO } from 'interfaces';
 import { omit } from 'radash';
-import { isNullOrEmpty } from '../../../../../utils';
+import { isNullOrEmpty } from 'utils';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {

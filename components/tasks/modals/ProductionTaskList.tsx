@@ -142,6 +142,7 @@ const ProductionTaskList = ({ visible, onClose, productionId, isMaster = false }
         const endpoint = '/api/tasks/create/multiple/';
         const tasksData = selectedRows.map((task: MasterTask) => {
           return {
+            Id: task.Id,
             ProductionId: productionId,
             Code: task.Code,
             Name: task.Name,
