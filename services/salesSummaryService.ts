@@ -355,7 +355,7 @@ export const handleAddingWeeklyTotalRowForOneCurrencyOnly = ({
         })
       : []),
   ];
-  if (rowData.slice(5, rowData.length).filter((x) => x !== 0)?.length) {
+  if (rowData.slice(5, rowData.length).filter((x) => x && x !== 0)?.length) {
     worksheet.addRow(rowData);
     applyFormattingToRange({
       worksheet,

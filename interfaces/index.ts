@@ -659,6 +659,7 @@ export interface DealMemoContractFormData {
   DeMoAccContId?: number;
   DeMoRunningTime?: Date;
   DeMoDateIssued?: Date;
+  DeMoVatCode?: string;
   DeMoRunningTimeNotes?: string;
   DeMoPrePostShowEvents?: string;
   DeMoDressingRooms?: string;
