@@ -5,6 +5,7 @@ interface FormFieldProps {
   displayText: string;
   fieldName: string;
   required?: boolean;
+  validationCheck?: string;
   handleInputChange: (field: string, value: string) => void;
   onBlur: () => void;
 }
@@ -14,14 +15,18 @@ export const FormField = ({
   displayText,
   fieldName,
   required = false,
+  validationCheck,
   handleInputChange,
   onBlur,
 }: FormFieldProps) => {
+  console.log(validationCheck);
+
   return (
     <label htmlFor="" className="grid w-full">
       <div className="flex gap-x-1">
         <p className="text-primary-input-text">{displayText}</p>
         {required && <p className="text-red-600">*</p>}
+        {validationCheck && <small className="text-primary-red ">{validationCheck}</small>}
       </div>
       <TextInput
         placeholder={`Enter ${displayText}`}
@@ -32,6 +37,7 @@ export const FormField = ({
         onBlur={async () => {
           await onBlur();
         }}
+        error={validationCheck && 'true'}
       />
     </label>
   );
