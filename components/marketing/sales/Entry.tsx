@@ -130,7 +130,14 @@ const Entry = forwardRef<SalesEntryRef>((_, ref) => {
         schools: {},
       };
 
-      if (currSalesFigureSet.schools !== null) {
+      const emptySchools = {
+        seatsReserved: 0,
+        seatsReservedVal: 0,
+        seatsSold: 0,
+        seatsSoldVal: 0,
+      };
+
+      if (JSON.stringify(currSalesFigureSet.schools) !== JSON.stringify(emptySchools)) {
         data = { ...data, schools: currSalesFigureSet.schools };
       }
 
