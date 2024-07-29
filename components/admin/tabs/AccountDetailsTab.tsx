@@ -36,8 +36,7 @@ export default function AccountDetailsTab() {
 
         const companyDetails = data?.companyDetails;
         const {
-          FirstName,
-          LastName,
+          AccountContact,
           AccountName,
           AccountPhone,
           AccountAddress1,
@@ -55,8 +54,8 @@ export default function AccountDetailsTab() {
           AccountCurrencyCode,
         } = companyDetails;
         setFormData({
-          firstName: FirstName || '',
-          lastName: LastName || '',
+          firstName: AccountContact.AccContFirstName || '',
+          lastName: AccountContact.AccContLastName || '',
           companyName: AccountName || '',
           phoneNumber: AccountPhone || '',
           addressLine1: AccountAddress1 || '',
@@ -243,7 +242,7 @@ export default function AccountDetailsTab() {
                 }}
                 text="Upload"
                 variant="secondary"
-                className="w-[132px]"
+                className="w-[132px] mr-1"
               />
               <UploadModal
                 title="Upload Company Logo"
