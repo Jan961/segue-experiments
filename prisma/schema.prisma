@@ -1054,25 +1054,25 @@ model ACCContract {
   TotalHolPay                                                   Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
   TotalFeeNotes                                                 String?             @map("ACCCTotalFeeNotes") @db.LongText
   CancelFee                                                     Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
-  AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [ACCCCheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
-  AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [ACCCCompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
-  Currency                                                      Currency?           @relation(fields: [ACCCCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
-  Venue                                                         Venue?              @relation(fields: [ACCCRehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
+  AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [CheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
+  AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [CompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
+  Currency                                                      Currency?           @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
+  Venue                                                         Venue?              @relation(fields: [RehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
   ACCContractPerson                                             ACCContractPerson[]
   ACCPayment                                                    ACCPayment[]
   ACCPubEvent                                                   ACCPubEvent[]
 
-  @@index([ACCCCheckedByAccUserId], map: "AccountUser_AccContract_Checker")
-  @@index([ACCCCompletedByAccUserId], map: "AccountUser_AccContract_Completer")
-  @@index([ACCCCurrencyCode], map: "Currency_ACCContract")
-  @@index([ACCCRehearsalVenueId], map: "Venue_ACCContract")
+  @@index([CheckedByAccUserId], map: "AccountUser_AccContract_Checker")
+  @@index([CompletedByAccUserId], map: "AccountUser_AccContract_Completer")
+  @@index([CurrencyCode], map: "Currency_ACCContract")
+  @@index([RehearsalVenueId], map: "Venue_ACCContract")
 }
 
 model ACCContractPerson {
   ACCCPersonId       Int          @id @default(autoincrement())
   ACCCPersonPersonId Int?
   ACCCPersonType     String?      @db.VarChar(3)
-  ACCContract        ACCContract? @relation(fields: [ACCCPersonPersonId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_ACCContractPerson")
+  ACCContract        ACCContract? @relation(fields: [ACCCPersonPersonId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCContractPerson")
 
   @@index([ACCCPersonPersonId], map: "ACCContract_ACCContractPerson")
 }
@@ -1228,9 +1228,9 @@ model ACCPayment {
   Date          DateTime?   @map("PayDate") @db.Date
   Amount        Decimal?    @map("PayAmount") @db.Decimal(10, 2)
   Notes         String?     @map("PayNotes") @db.LongText
-  ACCContract      ACCContract @relation(fields: [PayACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_AACCPayment")
+  ACCContract      ACCContract @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_AACCPayment")
 
-  @@index([PayACCContractId], map: "ACCContract_AACCPayment")
+  @@index([ACCContractId], map: "ACCContract_AACCPayment")
 }
 
 model ACCPubEvent {
@@ -1238,9 +1238,9 @@ model ACCPubEvent {
   ACCContractId Int         @map("PEACCContractId") 
   Date          DateTime?   @map("PEDate") @db.Date
   Notes         String?     @map("PENotes") @db.LongText
-  ACCContract     ACCContract @relation(fields: [PEACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_ACCPubEvent")
+  ACCContract     ACCContract @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCPubEvent")
 
-  @@index([PEACCContractId], map: "ACCContract_ACCPubEvent")
+  @@index([ACCContractId], map: "ACCContract_ACCPubEvent")
 }
 
 model ACCStandardClause {
