@@ -60,14 +60,6 @@ const GridStyles = createGlobalStyle<StyleProps>`
     overflow: visible;
 }
 
-.popupModal .ag-root,
-.popupModal .ag-root-wrapper, 
-.popupModal .ag-center-cols-clipper, 
-.popupModal .ag-center-cols-viewport,
-.popupModal .ag-body-viewport-wrapper {
-    overflow-x: hidden !important;
-}
-
 .ag-checkbox-cell{
     justify-content: center !important;
 }
