@@ -118,6 +118,7 @@ model Currency {
   Code                                                               String           @id @map("CurrencyCode") @db.VarChar(3)
   Name                                                               String           @map("CurrencyName") @db.VarChar(30)
   SymbolUnicode                                                      String?          @map("CurrencySymbolUnicode") @db.VarChar(30)
+  ACCContract                                                        ACCContract[]
   Account                                                            Account[]
   ConversionRate_ConversionRate_ConversionFromCurrencyCodeToCurrency ConversionRate[] @relation("ConversionRate_ConversionFromCurrencyCodeToCurrency")
   ConversionRate_ConversionRate_ConversionToCurrencyCodeToCurrency   ConversionRate[] @relation("ConversionRate_ConversionToCurrencyCodeToCurrency")
@@ -177,6 +178,7 @@ model Venue {
   FamilyId                                                  Int?                         @map("VenueVenueFamilyId")
   AddressStageDoorW3W                                       String?                      @map("VenueAddressStageDoorW3W") @db.VarChar(70)
   AddressLoadingW3W                                         String?                      @map("VenueAddressLoadingW3W") @db.VarChar(70)
+  ACCContract                                               ACCContract[]
   BookedVenueHistory                                        BookedVenueHistory[]
   Booking                                                   Booking[]
   GetInFitUp                                                GetInFitUp[]
@@ -344,7 +346,7 @@ model Account {
   AccountLogo                Bytes?                @map("AccountLogo")
   AccountMainEmail           String?               @map("AccountMainEmail") @db.VarChar(120)
   AccountNumPeople           Int?                  @map("AccountNumPeople") @db.TinyInt
-  AccountOrganisationId      String?               @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId") @db.Char(8)
+  AccountOrganisationId      Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
   AccountTermsAgreedBy       String?               @map("AccountTermsAgreedBy") @db.VarChar(100)
   AccountTermsAgreedDate     DateTime?             @map("AccountTermsAgreedDate") @db.Date
   AccountWebsite             String?               @map("AccountWebsite") @db.VarChar(255)
@@ -575,17 +577,19 @@ model User {
 }
 
 model AccountUser {
-  Id                    Int                     @id @unique(map: "AccUserIdUnique") @default(autoincrement()) @map("AccUserId")
-  UserId                Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
-  AccountId             Int                     @map("AccUserAccountId")
-  AccUserIsAdmin        Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
-  AccUserPIN            String?                 @db.VarChar(4)
-  Account               Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
-  User                  User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
-  AccountUserPermission AccountUserPermission[]
-  AccountUserProduction AccountUserProduction[]
-  BookingContactNotes   BookingContactNotes[]
-  CompAllocation        CompAllocation[]
+  Id                                                            Int                     @id @default(autoincrement()) @map("AccUserId")
+  UserId                                                        Int                     @unique(map: "AccUserUserId_UNIQUE") @map("AccUserUserId")
+  AccountId                                                     Int                     @map("AccUserAccountId")
+  AccUserIsAdmin                                                Boolean                 @default(dbgenerated("(b'0')")) @db.Bit(1)
+  AccUserPIN                                                    String?                 @db.VarChar(4)
+  ACCContract_ACCContract_ACCCCheckedByAccUserIdToAccountUser   ACCContract[]           @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser")
+  ACCContract_ACCContract_ACCCCompletedByAccUserIdToAccountUser ACCContract[]           @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser")
+  Account                                                       Account                 @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_AccountUser")
+  User                                                          User                    @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "User_AccountUser")
+  AccountUserPermission                                         AccountUserPermission[]
+  AccountUserProduction                                         AccountUserProduction[]
+  BookingContactNotes                                           BookingContactNotes[]
+  CompAllocation                                                CompAllocation[]
 
   @@index([AccountId], map: "Account_AccountUser")
 }
@@ -706,8 +710,8 @@ model Production {
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
   Currency              Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
+  File                  File?                   @relation(fields: [ImageFileId], references: [Id], map: "FK_Production_File")
   ProductionCompany     ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
-  File                  File?                   @relation(fields: [ImageFileId], references: [Id], onDelete: Cascade, map: "FK_Production_File")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
@@ -1017,8 +1021,51 @@ model GlobalBookingActivity {
 }
 
 model ACCContract {
-  ACCContractId     Int                 @id @default(autoincrement())
-  ACCContractPerson ACCContractPerson[]
+  ACCContractId                                                 Int                 @map("ACCContractId") @id @default(autoincrement())
+  ACCCPersonId                                                  Int                 @map("ACCCPersonId") 
+  ACCCRoleName                                                  String              @map("ACCCRoleName") @db.VarChar(50)
+  ACCCContractStatus                                            String              @map("ACCCContractStatus") @db.VarChar(4)
+  ACCCCompletedByAccUserId                                      Int?                @map("ACCCCompletedByAccUserId") 
+  ACCCCheckedByAccUserId                                        Int?                @map("ACCCCheckedByAccUserId") 
+  ACCCDateIssued                                                DateTime?           @map("ACCCDateIssued") @db.Date
+  ACCCDateReturned                                              DateTime?           @map("ACCCDateReturned") @db.Date
+  ACCCNotes                                                     String?             @map("ACCCNotes") @db.LongText
+  ACCCCurrencyCode                                              String?             @map("ACCCCurrencyCode") @db.VarChar(3)
+  ACCCFirstDay                                                  DateTime?           @map("ACCCFirstDay") @db.Date
+  ACCCLastDay                                                   DateTime?           @map("ACCCLastDay") @db.Date
+  ACCCAvailability                                              String?             @map("ACCCAvailability") @db.LongText
+  ACCCRehearsalLocation                                         String?             @map("ACCCRehearsalLocation") @db.VarChar(30)
+  ACCCRehearsalVenueId                                          Int?                @map("ACCCRehearsalVenueId") 
+  ACCCRehearsalVenueNotes                                       String?             @map("ACCCRehearsalVenueNotes") @db.LongText
+  ACCCIsAccomProvided                                           Boolean             @map("ACCCIsAccomProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ACCCAccomNotes                                                String?             @map("ACCCAccomNotes") @db.LongText
+  ACCCIsTransportProvided                                       Boolean             @map("ACCCIsTransportProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ACCCTransportNotes                                            String?             @map("ACCCTransportNotes") @db.LongText
+  ACCCIsNominatedDriver                                         Boolean             @map("ACCCIsNominatedDriver") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  ACCCNominatedDriverNotes                                      String?             @map("ACCCNominatedDriverNotes") @db.LongText
+  ACCCPaymentType                                               String?             @map("ACCCPaymentType") @db.VarChar(1)
+  ACCCWeeklyRehFee                                              Decimal?            @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
+  ACCCWeeklyRehHolPay                                           Decimal?            @map("ACCCWeeklyRehHolPay") @db.Decimal(10, 2)
+  ACCCWeeklyPerfFee                                             Decimal?            @map("ACCCWeeklyPerfFee") @db.Decimal(10, 2)
+  ACCCWeeklyPerfHolPay                                          Decimal?            @map("ACCCWeeklyPerfHolPay") @db.Decimal(10, 2)
+  ACCCWeeklySubs                                                Decimal?            @map("ACCCWeeklySubs") @db.Decimal(10, 2)
+  ACCCWeeklySubsNotes                                           String?             @map("ACCCWeeklySubsNotes") @db.LongText
+  ACCCTotalFee                                                  Decimal?            @map("ACCCTotalFee") @db.Decimal(10, 2)
+  ACCCTotalHolPay                                               Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
+  ACCCTotalFeeNotes                                             String?             @map("ACCCTotalFeeNotes") @db.LongText
+  ACCCCancelFee                                                 Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
+  AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [ACCCCheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
+  AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [ACCCCompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
+  Currency                                                      Currency?           @relation(fields: [ACCCCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
+  Venue                                                         Venue?              @relation(fields: [ACCCRehearsalVenueId], references: [Id], onDelete: Cascade, map: "Venue_ACCContract")
+  ACCContractPerson                                             ACCContractPerson[]
+  ACCPayment                                                    ACCPayment[]
+  ACCPubEvent                                                   ACCPubEvent[]
+
+  @@index([ACCCCheckedByAccUserId], map: "AccountUser_AccContract_Checker")
+  @@index([ACCCCompletedByAccUserId], map: "AccountUser_AccContract_Completer")
+  @@index([ACCCCurrencyCode], map: "Currency_ACCContract")
+  @@index([ACCCRehearsalVenueId], map: "Venue_ACCContract")
 }
 
 model ACCContractPerson {
@@ -1112,6 +1159,8 @@ model Person {
   Country_Person_PersonPaymentBankCountryIdToCountry   Country?           @relation("Person_PersonPaymentBankCountryIdToCountry", fields: [PersonPaymentBankCountryId], references: [Id], onDelete: Cascade, map: "Country_Person_PaymentBank")
   Organisation_Person_PersonAgencyOrgIdToOrganisation  Organisation?      @relation("Person_PersonAgencyOrgIdToOrganisation", fields: [PersonAgencyOrgId], references: [OrgId], onDelete: NoAction, map: "Organisation_Person_Agent")
   PersonOtherRole                                      PersonOtherRole[]
+  PersonPerson_PersonPerson_PPPersonIdToPerson         PersonPerson[]     @relation("PersonPerson_PPPersonIdToPerson")
+  PersonPerson_PersonPerson_PPRolePersonIdToPerson     PersonPerson[]     @relation("PersonPerson_PPRolePersonIdToPerson")
   PersonPersonRole                                     PersonPersonRole[]
 
   @@index([PersonAddressId], map: "Address_Person")
@@ -1171,6 +1220,81 @@ model VenueFile {
   Venue       Venue   @relation(fields: [VenueId], references: [Id], onDelete: Cascade, map: "Venue_VenueFile")
 
   @@index([VenueId], map: "Venue_VenueFile")
+}
+
+model ACCPayment {
+  Id            Int         @map("PayId") @id @default(autoincrement())
+  ACCContractId Int         @map("PayACCContractId") 
+  Date          DateTime?   @map("PayDate") @db.Date
+  Amount        Decimal?    @map("PayAmount") @db.Decimal(10, 2)
+  Notes         String?     @map("PayNotes") @db.LongText
+  ACCContract      ACCContract @relation(fields: [PayACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_AACCPayment")
+
+  @@index([PayACCContractId], map: "ACCContract_AACCPayment")
+}
+
+model ACCPubEvent {
+  Id            Int         @map("PEId") @id @default(autoincrement())
+  ACCContractId Int         @map("PEACCContractId") 
+  Date          DateTime?   @map("PEDate") @db.Date
+  Notes         String?     @map("PENotes") @db.LongText
+  ACCContract     ACCContract @relation(fields: [PEACCContractId], references: [ACCContractId], onDelete: Cascade, map: "ACCContract_ACCPubEvent")
+
+  @@index([PEACCContractId], map: "ACCContract_ACCPubEvent")
+}
+
+model ACCStandardClause {
+  Id   Int     @map("StdClauseId")   @id @default(autoincrement())
+  Text String? @map("StdClauseText") @db.LongText
+}
+
+model PersonPerson {
+  PPId                                       Int    @id @default(autoincrement())
+  PPPersonId                                 Int
+  PPRoleType                                 Int
+  PPRolePersonId                             Int
+  Person_PersonPerson_PPPersonIdToPerson     Person @relation("PersonPerson_PPPersonIdToPerson", fields: [PPPersonId], references: [PersonId], onDelete: Cascade, map: "Person_Person")
+  Person_PersonPerson_PPRolePersonIdToPerson Person @relation("PersonPerson_PPRolePersonIdToPerson", fields: [PPRolePersonId], references: [PersonId], onDelete: Cascade, map: "Person_Person_InRole")
+
+  @@index([PPPersonId], map: "Person_Person")
+  @@index([PPRolePersonId], map: "Person_Person_InRole")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model Person_Log {
+  Timestamp                   DateTime  @default(now()) @db.Timestamp(0)
+  DMLAction                   String    @db.Char(1)
+  PersonId                    Int?
+  PersonFirstName             String    @db.VarChar(50)
+  PersonLastName              String?   @db.VarChar(50)
+  PersonEmail                 String    @db.VarChar(120)
+  PersonAddressId             Int?
+  PersonPhone                 String?   @db.VarChar(30)
+  PersonMobile                String?   @db.VarChar(30)
+  PersonPassportName          String?   @db.VarChar(100)
+  PersonPassportExpiryDate    DateTime? @db.Date
+  PersonEligibleToWork        Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  PersonFEURequired           Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
+  PersonFEUCheckByUserId      Int?
+  PersonNotes                 String?   @db.LongText
+  PersonHealthNotes           String?   @db.LongText
+  PersonAdvisoryNotes         String?   @db.LongText
+  PersonRoleNotes             String?   @db.LongText
+  PersonAgencyOrgId           Int?
+  PersonPaymentTo             String?   @db.VarChar(1)
+  PersonPaymentAccount        String?   @db.VarChar(8)
+  PersonPaymentSortCode       String?   @db.VarChar(8)
+  PersonPaymentSWIFTBIC       String?   @db.VarChar(11)
+  PersonPaymentIBAN           String?   @db.VarChar(34)
+  PersonPaymentBankCountryId  Int?
+  PersonExpensesTo            String?   @db.VarChar(1)
+  PersonExpensesAccount       String?   @db.VarChar(8)
+  PersonExpensesSortCode      String?   @db.VarChar(8)
+  PersonExpensesSWIFTBIC      String?   @db.VarChar(11)
+  PersonExpensesIBAN          String?   @db.VarChar(34)
+  PersonExpensesBankCountryId Int?
+
+  @@ignore
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1552,14 +1676,18 @@ view SalesSummaryView {
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-view AccountUserPermissionsView {
-  AccountId      Int
-  UserId         Int     @default(0)
-  AccUserId      Int     @default(0)
-  UserFirstName  String  @db.VarChar(50)
-  UserLastName   String? @db.VarChar(50)
-  UserEmail      String  @db.VarChar(120)
-  AllPermissions String? @db.MediumText
+view ACCContractListView {
+  PersonFirstName          String    @db.VarChar(50)
+  PersonLastName           String?   @db.VarChar(50)
+  RoleName                 String    @db.VarChar(50)
+  StatusCode               String    @db.VarChar(4)
+  CompletedByUserFirstName String    @db.VarChar(50)
+  CompletedByUserLastName  String?   @db.VarChar(50)
+  CheckedByUserFirstName   String?   @db.VarChar(50)
+  CheckedByUserLastName    String?   @db.VarChar(50)
+  DateIssued               DateTime? @db.Date
+  DateReturned             DateTime? @db.Date
+  ACCCNotes                String?   @db.LongText
 
   @@ignore
 }
