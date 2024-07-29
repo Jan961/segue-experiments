@@ -116,6 +116,9 @@ export type MasterTaskDTO = {
   RepeatInterval?: string;
   TaskRepeatFromWeekNum?: number;
   TaskRepeatToWeekNum?: number;
+  AccountId?: number;
+  TaskStartByIsPostProduction?: boolean;
+  TaskEndByIsPostProduction?: boolean;
 };
 
 // Existing Production interface for old schema. Remove eventually

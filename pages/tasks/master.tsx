@@ -37,7 +37,7 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const columnDefs = getMasterTasksColumnDefs(usersList);
 
-  const { filteredTasks = [] } = useMasterTasksFilter(masterTask);
+  let { filteredTasks = [] } = useMasterTasksFilter(masterTask);
 
   const [confirm, setConfirm] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -96,22 +96,15 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
 
   const handleShowTask = () => {
     setShowAddTask(false);
-    router.replace(router.asPath);
   };
 
-  const handleMasterListClose = (val: string) => {
+  const handleMasterListClose = (_val: string) => {
     setIsMasterTaskList(false);
-    if (val === 'data-added') {
-      router.replace(router.asPath);
-    }
   };
 
-  const handleProductionListClose = (val: string) => {
+  const handleProductionListClose = (_val: string) => {
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
-    if (val === 'data-added') {
-      router.replace(router.asPath);
-    }
   };
 
   const onRowDoubleClicked = (e) => {
@@ -129,10 +122,20 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
     setIsLoading(true);
     try {
       await axios.put(`/api/tasks/master/update/`, updatedTask);
-      router.replace(router.asPath);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const updateTableData = async (task: any) => {
+    const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
+    const updatedRowData = filteredTasks.map((row) => {
+      if (row.Id === task.Id) return updatedTask;
+      return row;
+    });
+    setIsLoading(false);
+    filteredTasks = updatedRowData;
+    await router.push(router.asPath);
   };
 
   return (
@@ -157,7 +160,13 @@ const MasterTasks = (props: InferGetServerSidePropsType<typeof getServerSideProp
         hasOverlay={false}
       />
       {isLoading && <LoadingOverlay />}
-      <AddTask visible={showAddTask} isMasterTask={true} onClose={handleShowTask} task={currentTask} />
+      <AddTask
+        visible={showAddTask}
+        isMasterTask={true}
+        onClose={handleShowTask}
+        task={currentTask}
+        updateTableData={updateTableData}
+      />
       <NewProductionTask
         visible={showNewProduction}
         onClose={handleNewProductionTaskModal}
