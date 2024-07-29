@@ -19,8 +19,6 @@ export const FormField = ({
   handleInputChange,
   onBlur,
 }: FormFieldProps) => {
-  console.log(validationCheck);
-
   return (
     <label htmlFor="" className="grid w-full">
       <div className="flex gap-x-1">
@@ -31,7 +29,7 @@ export const FormField = ({
       <TextInput
         testId="company-info-input"
         placeholder={`Enter ${displayText}`}
-        className="w-full justify-between h-8"
+        className="w-full justify-between"
         inputClassName="w-full"
         value={currentValue}
         onChange={(e) => handleInputChange(fieldName, e.target.value)}
