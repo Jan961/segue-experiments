@@ -49,25 +49,29 @@ export default function TasksTable({
   };
 
   const handleUpdateTask = async (task: ProductionTaskDTOWithStringProgress) => {
-    setIsLoading(true);
     try {
+      console.log('updating');
+      setIsLoading(true);
+
       const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
-      await axios.post('/api/tasks/update', updatedTask);
       const updatedRowData = rowData.map((row) => {
         if (row.Id === task.Id) return updatedTask;
         return row;
       });
-      setRows(updatedRowData);
       setIsLoading(false);
-      router.replace(router.asPath);
+      console.log(updatedRowData);
+      setRows(updatedRowData);
+      await axios.post('/api/tasks/update', updatedTask);
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
       loggingService.logError(error);
     }
   };
 
-  const onCellValueChange = (e) => {
-    handleUpdateTask(e.data);
+  const onCellValueChange = async (e) => {
+    console.log('cell change');
+    await handleUpdateTask(e.data);
   };
 
   const handleSaveNote = async (value: string) => {
@@ -101,7 +105,19 @@ export default function TasksTable({
     setIsLoading(false);
     if (isEdit) setIsEdit(false);
     else handleShowTask();
-    router.replace(router.asPath);
+  };
+
+  const updateTableData = async (task: any) => {
+    console.log(task);
+    const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
+    const updatedRowData = rowData.map((row) => {
+      if (row.Id === task.Id) return updatedTask;
+      return row;
+    });
+    setIsLoading(false);
+    console.log(updatedRowData);
+    setRows(updatedRowData);
+    await router.push(router.asPath);
   };
 
   const modalData = isEdit ? { ...currentTask, ProductionId: productionId } : { ProductionId: productionId };
@@ -131,7 +147,13 @@ export default function TasksTable({
           <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />
         </div>
       )}
-      <AddTask visible={isEdit || showAddTask} onClose={handleClose} task={modalData} productionId={productionId} />
+      <AddTask
+        visible={isEdit || showAddTask}
+        onClose={handleClose}
+        task={modalData}
+        productionId={productionId}
+        updateTableData={updateTableData}
+      />
     </>
   );
 }

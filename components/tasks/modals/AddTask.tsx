@@ -31,6 +31,7 @@ interface AddTaskProps {
   onClose: () => void;
   task?: Partial<MasterTask> & { ProductionId?: number; ProductionTaskRepeat?: any };
   productionId?: number;
+  updateTableData: (task: any) => Promise<void>;
 }
 
 const RepeatOptions = [
@@ -78,7 +79,14 @@ const DEFAULT_MASTER_TASK: Partial<MasterTask> & {
   TaskCompletedDate: '',
 };
 
-const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = null }: AddTaskProps) => {
+const AddTask = ({
+  visible,
+  onClose,
+  task,
+  isMasterTask = false,
+  productionId = null,
+  updateTableData,
+}: AddTaskProps) => {
   const [inputs, setInputs] = useState<
     Partial<MasterTask> & {
       Progress?: number;
@@ -220,16 +228,22 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
   };
 
   const checkIfRecurringModal = async (isRecurring: boolean, previousInfo, newInfo) => {
+    console.log('blah');
     if (isMasterTask) {
       await handleOnSubmit();
       onClose();
       setInputs(DEFAULT_MASTER_TASK);
+      await updateTableData(newInfo);
       return;
     } else {
+      console.log(previousInfo === null);
       if (previousInfo === null) {
+        console.log('im in here');
         await handleOnSubmit();
         onClose();
+        await updateTableData(newInfo);
         setInputs(DEFAULT_MASTER_TASK);
+
         return;
       }
     }
@@ -305,6 +319,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
     setLoading(false);
     if (isMasterTask) {
       await handleMasterTask();
+      await updateTableData(inputs);
     } else {
       omit(inputs, ['TaskCompleteByIsPostProduction', 'TaskStartByIsPostProduction', 'ProductionTaskRepeat']);
       if (inputs.Id) {
@@ -312,6 +327,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
           await axios.post(`/api/tasks/update${inputs?.RepeatInterval ? '/recurring' : ''}`, inputs);
           setLoading(false);
           handleClose();
+          await updateTableData(inputs);
         } catch (error) {
           setLoading(false);
         }
@@ -324,6 +340,7 @@ const AddTask = ({ visible, onClose, task, isMasterTask = false, productionId = 
             await handleMasterTask();
           }
           onClose();
+          await updateTableData(inputs);
         } catch (error) {
           setLoading(false);
           console.error(error);

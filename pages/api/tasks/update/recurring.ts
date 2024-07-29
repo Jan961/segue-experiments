@@ -3,6 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
+import { calculateWeekNumber } from '../../../../services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
@@ -34,6 +35,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const prodStartDate = new Date(
           productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.StartDate,
         );
+
+        const prodEndDate = new Date(productionDateBlock.find((dateBlock) => dateBlock.Name === 'Production')?.EndDate);
 
         const numTasksByCalc = getNewTasksNum(
           prodStartDate,
@@ -105,6 +108,16 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
               }
             }),
           );
+          await prisma.ProductionTaskRepeat.update({
+            where: { Id: PRTId },
+            data: {
+              Interval: RepeatInterval,
+              FromWeekNum: TaskRepeatFromWeekNum,
+              FromWeekNumIsPostProduction: TaskRepeatFromWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+              ToWeekNum: TaskRepeatToWeekNum,
+              ToWeekNumIsPostProduction: TaskRepeatToWeekNum > calculateWeekNumber(prodStartDate, prodEndDate),
+            },
+          });
 
           return res.status(201).json(createdTasks);
         }
