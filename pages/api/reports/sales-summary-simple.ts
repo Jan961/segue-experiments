@@ -587,7 +587,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   styleHeader({ worksheet, row: 3, bgColor: COLOR_HEXCODE.DARK_GREEN });
   styleHeader({ worksheet, row: 4, bgColor: COLOR_HEXCODE.DARK_GREEN });
   worksheet.getCell(1, 1).font = { size: 16, color: { argb: COLOR_HEXCODE.WHITE }, bold: true };
-  console.log(worksheet.rowCount);
   if (format === 'pdf') {
     worksheet.pageSetup.printArea = `A1:${worksheet.getColumn(columns.length).letter}${row}`;
     worksheet.pageSetup.fitToWidth = 1;
@@ -602,7 +601,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       header: 0.3,
       footer: 0.3,
     };
-    console.log(worksheet.pageSetup);
     const pdf = await convertToPDF(workbook);
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${showTitle} ${title}.pdf"`);

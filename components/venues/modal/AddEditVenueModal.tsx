@@ -240,6 +240,7 @@ export default function AddEditVenueModal({
             <div className="pt-7">
               <h2 className="text-xl text-primary-navy font-bold  pb-2">Confidential Warning Notes</h2>
               <TextArea
+                testId="confidential-warning-notes"
                 id="confidentialNotes"
                 placeholder="Notes Field"
                 className="w-full max-h-40 min-h-[50px] justify-between"
@@ -248,7 +249,13 @@ export default function AddEditVenueModal({
               />
             </div>
             <div className="flex gap-4 pt-4 float-right">
-              <Button onClick={onClose} variant="secondary" text="Cancel" className="w-32" />
+              <Button
+                onClick={onClose}
+                variant="secondary"
+                testId="add-venues-cancel-btn"
+                text="Cancel"
+                className="w-32"
+              />
               <Button
                 disabled={!venue?.id || isDeleting || isSaving}
                 onClick={toggleDeleteConfirmation}
@@ -259,6 +266,7 @@ export default function AddEditVenueModal({
                 {isDeleting && <Loader variant="lg" iconProps={{ stroke: '#FFF' }} />}
               </Button>
               <Button
+                testId="add-venues-save-and-close-btn"
                 disabled={isSaving || isDeleting}
                 text={isSaving ? 'Saving...' : 'Save and Close'}
                 className="w-32"

@@ -111,11 +111,20 @@ export const getShowsByAccountId = async (AccountId: number) => {
   const shows = await prisma.show.findMany({
     where: {
       AccountId,
-      Production: {
-        some: {
-          IsDeleted: false,
+      OR: [
+        {
+          Production: {
+            some: {
+              IsDeleted: false,
+            },
+          },
         },
-      },
+        {
+          Production: {
+            none: {},
+          },
+        },
+      ],
     },
     include: showInclude,
   });

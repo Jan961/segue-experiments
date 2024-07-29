@@ -134,6 +134,7 @@ const VenueTechnicalDetailsForm = ({
           >
             <div className="text-primary-input-text text-no-wrap whitespace-normal">Tech Specs URL</div>
             <TextInput
+              testId="technical-techSpecsUrl"
               id="techSpecsUrl"
               placeholder="Enter Tech Specs URL"
               className="w-full justify-between"
@@ -145,6 +146,7 @@ const VenueTechnicalDetailsForm = ({
           {validationErrors.techSpecsUrl && <small className="text-primary-red">{validationErrors.techSpecsUrl}</small>}
         </div>
         <Button
+          testId="upload-venue-tech-spec-btn"
           text={fileWidgets.length > 0 ? 'View/ Edit Tech Specs' : 'Upload Tech Specs'}
           onClick={async () => {
             setFileWidgets([]);
@@ -158,6 +160,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">LX Desk</p>
             <TextInput
+              testId="technical-lx-desk"
               placeholder="Enter LX Desk"
               className="w-full justify-between"
               inputClassName="w-full"
@@ -168,6 +171,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">LX Notes</p>
             <TextArea
+              testId="technical-lx-notes"
               placeholder="Notes Field"
               className="!w-full max-h-40 min-h-[50px]  justify-between"
               value={formData.techLXNotes}
@@ -177,6 +181,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Stage Size</p>
             <TextInput
+              testId="technical-stage-size"
               placeholder="Enter Stage Size"
               className="w-full justify-between"
               inputClassName="w-full"
@@ -189,6 +194,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Sound Desk</p>
             <TextInput
+              testId="technical-sound-desk"
               id="soundDesk"
               placeholder="Enter Sound Desk"
               className="w-full justify-between"
@@ -200,6 +206,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Sound Notes</p>
             <TextArea
+              testId="technical-sound-notes"
               id="soundNotes"
               placeholder="Notes Field"
               className="!w-full max-h-40 min-h-[50px]  justify-between"
@@ -210,6 +217,7 @@ const VenueTechnicalDetailsForm = ({
           <label htmlFor="" className="grid grid-cols-[100px_minmax(300px,_1fr)] gap-10 justify-between  w-full">
             <p className="text-primary-input-text">Grid Height</p>
             <TextInput
+              testId="technical-grid-height"
               id="gridHeight"
               placeholder="Enter Grid Height"
               className="w-full justify-between"
@@ -222,6 +230,7 @@ const VenueTechnicalDetailsForm = ({
         <label className="grid grid-cols-[100px_minmax(100px,_1fr)] col-span-2 gap-10 justify-between  w-full">
           <p className="text-primary-input-text">Flags</p>
           <TextArea
+            testId="technical-flags-notes"
             id="flags"
             placeholder="Notes Field"
             className="w-full max-h-40 min-h-[50px]  justify-between"
