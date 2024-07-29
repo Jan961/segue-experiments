@@ -2,7 +2,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateRecurringProductionTasks } from 'services/TaskService';
-import { recurringProductionTaskSchema } from 'validators/tasks';
+import { productionTaskSchema, recurringProductionTaskSchema } from 'validators/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -17,14 +17,17 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         ProductionId: parseInt(ProductionId),
       },
     });
-
+    const recurringTaskRecord = {
+      FromWeekNum: TaskRepeatFromWeekNum,
+      ToWeekNum: TaskRepeatToWeekNum,
+      Interval: RepeatInterval,
+      FromWeekNumIsPostProduction: TaskRepeatFromWeekNum < 0,
+      ToWeekNumIsPostProduction: TaskRepeatToWeekNum < 0,
+    };
+    await recurringProductionTaskSchema.validate(recurringTaskRecord);
     const recurringTask = await prisma.ProductionTaskRepeat.create({
       data: {
-        FromWeekNum: TaskRepeatFromWeekNum,
-        ToWeekNum: TaskRepeatToWeekNum,
-        Interval: RepeatInterval,
-        FromWeekNumIsPostProduction: TaskRepeatFromWeekNum < 0,
-        ToWeekNumIsPostProduction: TaskRepeatToWeekNum < 0,
+        ...recurringTaskRecord,
       },
     });
 
@@ -40,7 +43,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
 
     const createdTasks = await Promise.all(
       taskList.map(async (task) => {
-        await recurringProductionTaskSchema.validate(task);
+        await productionTaskSchema.validate(task);
         await prisma.productionTask.create({
           data: {
             ...task,

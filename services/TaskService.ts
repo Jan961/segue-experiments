@@ -198,7 +198,7 @@ export const generateRecurringProductionTasks = async (requestBody, prodBlock, p
       Name,
       Priority,
       Notes,
-      Progress,
+      Progress: Progress || 0,
       AssignedToUserId,
       CompleteByIsPostProduction: CompleteByWeekNum > calculateWeekNumber(prodStartDate, prodBlock?.EndDate),
       StartByWeekNum: calculateWeekNumber(prodStartDate, taskStartDate),
