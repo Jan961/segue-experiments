@@ -228,7 +228,6 @@ const AddTask = ({
   };
 
   const checkIfRecurringModal = async (isRecurring: boolean, previousInfo, newInfo) => {
-    console.log('blah');
     if (isMasterTask) {
       await handleOnSubmit();
       onClose();
@@ -236,9 +235,7 @@ const AddTask = ({
       await updateTableData(newInfo, true);
       return;
     } else {
-      console.log(previousInfo === null);
       if (previousInfo === null) {
-        console.log('im in here');
         await handleOnSubmit();
         onClose();
         await updateTableData(newInfo, true);

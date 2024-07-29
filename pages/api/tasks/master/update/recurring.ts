@@ -9,7 +9,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
   if (req.method === 'POST') {
     try {
       const task = req.body as MasterTaskDTO;
-      console.log(task);
       const email = await getEmailFromReq(req);
       const access = await checkAccess(email, { TaskId: task.Id });
       if (!access) return res.status(401).end();
@@ -45,7 +44,6 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         const mtrId = repeatingTask?.Id;
         let masterTaskData: any = await generateSingleRecurringMasterTask(req.body, repeatingTask.Id);
         masterTaskData = omit(masterTaskData, ['AssignedToUserId', 'MTRId']);
-        console.log(masterTaskData);
         const createdTask = await prisma.MasterTask.update({
           data: {
             ...masterTaskData,

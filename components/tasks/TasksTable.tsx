@@ -50,7 +50,6 @@ export default function TasksTable({
 
   const handleUpdateTask = async (task: ProductionTaskDTOWithStringProgress) => {
     try {
-      console.log('updating');
       setIsLoading(true);
 
       const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
@@ -59,7 +58,6 @@ export default function TasksTable({
         return row;
       });
       setIsLoading(false);
-      console.log(updatedRowData);
       setRows(updatedRowData);
       await axios.post('/api/tasks/update', updatedTask);
     } catch (error) {
@@ -70,7 +68,6 @@ export default function TasksTable({
   };
 
   const onCellValueChange = async (e) => {
-    console.log('cell change');
     await handleUpdateTask(e.data);
   };
 
@@ -108,14 +105,12 @@ export default function TasksTable({
   };
 
   const updateTableData = async (task: any) => {
-    console.log(task);
     const updatedTask = { ...task, Progress: parseInt(task.Progress), Notes: task.Notes };
     const updatedRowData = rowData.map((row) => {
       if (row.Id === task.Id) return updatedTask;
       return row;
     });
     setIsLoading(false);
-    console.log(updatedRowData);
     setRows(updatedRowData);
     await router.push(router.asPath);
   };
