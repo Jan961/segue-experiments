@@ -4,6 +4,7 @@ import { checkAccess, getEmailFromReq } from 'services/userService';
 import { MasterTaskDTO } from 'interfaces';
 import { omit } from 'radash';
 import { isNullOrEmpty } from 'utils';
+import { masterTaskSchema } from 'validators/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -13,6 +14,7 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
     if (!access) return res.status(401).end();
     const { Id, AssignedToUserId, MTRId } = task;
     if (isNullOrEmpty(MTRId)) {
+      await masterTaskSchema.validate(task);
       task = omit(task, ['Id', 'AccountId', 'AssignedToUserId', 'MTRId', 'MasterTaskRepeat']);
       const createResult = await prisma.MasterTask.update({
         data: {
