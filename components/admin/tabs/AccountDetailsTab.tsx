@@ -124,29 +124,31 @@ export default function AccountDetailsTab() {
       <h2 className="text-2xl text-primary font-bold pt-3 mb-4">Account Holder Details</h2>
       <div className="flex flex-row gap-8 w-full">
         <div className="flex flex-col gap-3 w-1/2">
-          <div className="">
+          <div>
             <FormField
               currentValue={formData.firstName}
               displayText="First Name"
               fieldName="firstName"
               handleInputChange={handleInputChange}
               onBlur={handleBlur}
+              required={true}
             />
             {validationErrors.firstName && (
               <small className="text-primary-red flex absolute -mt-1">{validationErrors.firstName}</small>
             )}
           </div>
 
-          <div className="">
+          <div>
             <FormField
               currentValue={formData.lastName}
               displayText="Last Name"
               fieldName="lastName"
               handleInputChange={handleInputChange}
               onBlur={handleBlur}
+              required={true}
             />
             {validationErrors.lastName && (
-              <small className="text-primary-red flex absolute -mt-1">{validationErrors.lastName}</small>
+              <small className="text-primary-red flex absolute ">{validationErrors.lastName}</small>
             )}
           </div>
 
@@ -157,6 +159,7 @@ export default function AccountDetailsTab() {
               fieldName="companyName"
               handleInputChange={handleInputChange}
               onBlur={handleBlur}
+              required={true}
             />
             {validationErrors.companyName && (
               <small className="text-primary-red flex absolute -mt-1">{validationErrors.companyName}</small>
@@ -183,6 +186,7 @@ export default function AccountDetailsTab() {
               fieldName="addressLine1"
               handleInputChange={handleInputChange}
               onBlur={handleBlur}
+              required={true}
             />
             {validationErrors.addressLine1 && (
               <small className="text-primary-red flex absolute -mt-1">{validationErrors.addressLine1}</small>
@@ -235,6 +239,7 @@ export default function AccountDetailsTab() {
               fieldName="postcode"
               handleInputChange={handleInputChange}
               onBlur={handleBlur}
+              required={true}
             />
             {validationErrors.postcode && (
               <small className="text-primary-red flex absolute -mt-1">{validationErrors.postcode}</small>
@@ -243,7 +248,10 @@ export default function AccountDetailsTab() {
 
           <div>
             <div className="w-fit flex gap-x-2 items-center">
-              <p className="text-primary-input-text">Country</p>
+              <div className="flex gap-x-1">
+                <p className="text-primary-input-text">Country</p>
+                <p className="text-red-600">*</p>
+              </div>
               <Tooltip
                 body="For venues in the United Kingdom: Please select Scotland, England, Wales or Northern Ireland as the Country"
                 width="w-[200px]"
@@ -303,6 +311,7 @@ export default function AccountDetailsTab() {
               fieldName="companyEmail"
               handleInputChange={handleInputChange}
               onBlur={handleBlur}
+              required={true}
             />
             {validationErrors.companyEmail && (
               <small className="text-primary-red flex absolute -mt-1">{validationErrors.companyEmail}</small>
@@ -310,7 +319,10 @@ export default function AccountDetailsTab() {
           </div>
 
           <div>
-            <p className="text-primary-input-text">Currency for Payment</p>
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Currency for Payment</p>
+              <p className="text-red-600">*</p>
+            </div>
             <Select
               name="currencyForPayment"
               className="w-full font-bold"
@@ -384,7 +396,10 @@ export default function AccountDetailsTab() {
           </div>
 
           <div>
-            <p className="text-primary-input-text">Company Currency</p>
+            <div className="flex gap-x-1">
+              <p className="text-primary-input-text">Company Currency</p>
+              <p className="text-red-600">*</p>
+            </div>
             <Select
               name="currency"
               className="w-full font-bold"
