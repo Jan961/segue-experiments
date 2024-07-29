@@ -1,7 +1,7 @@
 import prisma from 'lib/prisma';
 import { Prisma } from '@prisma/client';
 import { showProductionMapper, productionEditorMapper } from 'lib/mappers';
-import { getShowWithProductionsById } from './ShowService';
+import { getShowWithProductionsById } from './showService';
 import { getAccountId, getEmailFromReq } from './userService';
 import { ProductionDTO, UICurrency } from 'interfaces';
 import { getProductionsByStartDate } from 'utils/getProductionsByStartDate';
