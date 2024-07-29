@@ -158,8 +158,10 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
               iconProps={{ className: 'h-4 w-3' }}
               sufixIconName="excel"
               onClick={() => onExport()}
+              testId="btnExportConNotes"
             />
-            <Button text="Add New" className="w-[160px]" onClick={addContactNote} />
+
+            <Button text="Add New" className="w-[160px]" onClick={addContactNote} testId="btnAddConNote" />
           </div>
         </div>
 
@@ -170,7 +172,12 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
         ) : (
           <div className="flex flex-row">
             <div className="w-[1086px] h-[500px]">
-              <Table columnDefs={contNoteColDefs} rowData={contactNoteRows} styleProps={styleProps} />
+              <Table
+                columnDefs={contNoteColDefs}
+                rowData={contactNoteRows}
+                styleProps={styleProps}
+                testId="tableContactNotes"
+              />
             </div>
           </div>
         )}
@@ -190,6 +197,7 @@ const ContactNotesTab = forwardRef<ContactNoteTabRef, ContactNotesTabProps>((pro
           onYesClick={() => saveContactNote('delete', contactNoteRow)}
           onNoClick={() => setShowConfirm(false)}
           hasOverlay={false}
+          testId="confDialog"
         />
       </div>
     );

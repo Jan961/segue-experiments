@@ -197,6 +197,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 checked={castRateArranged}
                 onChange={(e) => updateBooking('castRateTicketsArranged', e.target.checked)}
                 className="w-[19px] h-[19px] mt-[2px]"
+                testId="checkCastRateArr"
               />
             </div>
 
@@ -212,6 +213,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 onChange={(e) => setCastRateNotes(e.target.value)}
                 ref={textAreaRef}
                 onBlur={(e) => updateBooking('castRateTicketsNotes', e.target.value)}
+                testId="textAreaCastRateNotes"
               />
             )}
           </div>
@@ -227,6 +229,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                     className="float-right mt-3"
                     iconName="edit"
                     onClick={() => editAvailSeats(holdRec)}
+                    testId="iconEditAvailSeats"
                   />
                   <div className="w-[1045px] bg-white mb-1 rounded-md border border-primary-border">
                     <div className="text-base text-primary-navy font-bold ml-2">
@@ -264,8 +267,15 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
                 iconProps={{ className: 'h-4 w-3' }}
                 sufixIconName="excel"
                 onClick={onExport}
+                testId="btnExportAllocSeats"
               />
-              <Button text="Add New" className="w-[160px]" onClick={() => newAllocatedSeats()} />
+
+              <Button
+                text="Add New"
+                className="w-[160px]"
+                onClick={() => newAllocatedSeats()}
+                testId="btnAddNewAllocSeats"
+              />
             </div>
           </div>
 
@@ -275,6 +285,7 @@ const PromotorHoldsTab = forwardRef<PromoterHoldTabRef, PromotorHoldsTabProps>((
             columnDefs={allocSeatsColDefs}
             tableHeight={tableHeight}
             onRowDoubleClicked={triggerEdit}
+            testId="tableAllocSeats"
           />
 
           <AllocatedSeatsModal
