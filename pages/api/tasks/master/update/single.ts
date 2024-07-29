@@ -56,6 +56,8 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
         where: { Id },
       });
 
+      await prisma.MasterTaskRepeat.delete({ where: { Id: MTRId } });
+
       res.status(200).json({ updatedTask });
     }
   } catch (err) {
