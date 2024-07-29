@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { UiAccountType, initialUiAccountDetails } from 'config/account';
-import { FormField } from 'components/account/Form/FormField';
+import { FormField } from 'components/account/form/FormField';
 import Tooltip from 'components/core-ui-lib/Tooltip';
 import Icon from 'components/core-ui-lib/Icon';
 import Select from 'components/core-ui-lib/Select';
 import { SelectOption } from 'components/core-ui-lib/Select/Select';
 import { transformToOptions } from 'utils';
-import { Button, UploadModal } from 'components/core-ui-lib';
+import { Button, UploadModal , Label } from 'components/core-ui-lib';
 import schema from './AccountDetailsValidationSchema';
 
 export default function AccountDetailsTab() {
@@ -202,11 +202,13 @@ export default function AccountDetailsTab() {
           />
           <div>
             <div className="w-fit flex gap-x-2 items-center">
-              <div className="flex gap-x-1">
+              <div className="flex gap-x-1 mr-1">
                 <p className="text-primary-input-text">Country</p>
-                <p className="text-red-600">*</p>
+                <div>
+                  <Label required={true} text="" className=" absolute" />
+                </div>
                 {validationErrors.country && (
-                  <small className="text-primary-red self-center">{validationErrors.country}</small>
+                  <small className="text-primary-red self-center ml-1">{validationErrors.country}</small>
                 )}
               </div>
               <Tooltip
@@ -268,9 +270,11 @@ export default function AccountDetailsTab() {
           <div>
             <div className="flex gap-x-1">
               <p className="text-primary-input-text">Currency for Payment</p>
-              <p className="text-red-600">*</p>
+              <div>
+                <Label required={true} text="" className=" absolute" />
+              </div>
               {validationErrors.currencyForPayment && (
-                <small className="text-primary-red self-center">{validationErrors.currencyForPayment}</small>
+                <small className="text-primary-red self-center ml-1">{validationErrors.currencyForPayment}</small>
               )}
             </div>
             <Select
@@ -325,9 +329,11 @@ export default function AccountDetailsTab() {
           <div>
             <div className="flex gap-x-1">
               <p className="text-primary-input-text">Company Currency</p>
-              <p className="text-red-600">*</p>
+              <div>
+                <Label required={true} text="" className=" absolute" />
+              </div>
               {validationErrors.currency && (
-                <small className="text-primary-red self-center">{validationErrors.currency}</small>
+                <small className="text-primary-red self-center ml-1">{validationErrors.currency}</small>
               )}
             </div>
             <Select
