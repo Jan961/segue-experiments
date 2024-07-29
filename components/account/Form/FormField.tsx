@@ -25,12 +25,13 @@ export const FormField = ({
     <label htmlFor="" className="grid w-full">
       <div className="flex gap-x-1">
         <p className="text-primary-input-text">{displayText}</p>
-        {required && <p className="text-red-600">*</p>}
-        {validationCheck && <small className="text-primary-red ">{validationCheck}</small>}
+        {required && <p className="text-primary-red">*</p>}
+        {validationCheck && <small className="text-primary-red self-center">{validationCheck}</small>}
       </div>
       <TextInput
+        testId="company-info-input"
         placeholder={`Enter ${displayText}`}
-        className="w-full justify-between"
+        className="w-full justify-between h-8"
         inputClassName="w-full"
         value={currentValue}
         onChange={(e) => handleInputChange(fieldName, e.target.value)}
