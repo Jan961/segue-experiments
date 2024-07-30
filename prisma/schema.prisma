@@ -343,7 +343,7 @@ model Account {
   AccountVATNumber           String?               @map("AccountVATNumber") @db.VarChar(20)
   AccountCurrencyCode        String                @map("AccountCurrencyCode") @db.VarChar(3)
   AccountCompanyNumber       String?               @map("AccountCompanyNumber") @db.VarChar(20)
-  AccountLogo                Bytes?                @map("AccountLogo")
+  AccountLogoFileId          Int?                  @map("AccountLogoFileId")
   AccountMainEmail           String?               @map("AccountMainEmail") @db.VarChar(120)
   AccountNumPeople           Int?                  @map("AccountNumPeople") @db.TinyInt
   AccountOrganisationId      Int?                  @unique(map: "Account_AccountOrganisationId_Unique") @map("AccountOrganisationId")
@@ -354,6 +354,7 @@ model Account {
   AccountPhone               String?               @map("AccountPhone") @db.VarChar(30)
   AccountPaymentCurrencyCode String?               @map("AccountPaymentCurrencyCode") @db.VarChar(3)
   Currency                   Currency?             @relation(fields: [AccountPaymentCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Account_Payment")
+  File                       File?                 @relation(fields: [AccountLogoFileId], references: [Id], map: "File_Account")
   AccountContact             AccountContact?
   AccountSubscription        AccountSubscription[]
   AccountUser                AccountUser[]
@@ -362,6 +363,7 @@ model Account {
   Show                       Show[]
 
   @@index([AccountPaymentCurrencyCode], map: "Currency_Account_Payment")
+  @@index([AccountLogoFileId], map: "File_Account")
 }
 
 model AvailableComp {
@@ -699,25 +701,24 @@ model Production {
   SalesEmail            String?                 @map("ProductionSalesEmail") @db.VarChar(80)
   IsArchived            Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsArchived") @db.Bit(1)
   IsDeleted             Boolean                 @default(dbgenerated("(b'0')")) @map("ProductionIsDeleted") @db.Bit(1)
-  Logo                  Bytes?                  @map("ProductionLogo")
   SalesFrequency        String                  @default("W") @map("ProductionSalesFrequency") @db.Char(1)
   RunningTime           DateTime?               @map("ProductionRunningTime") @db.Time(0)
   RunningTimeNote       String?                 @map("ProductionRunningTimeNote") @db.VarChar(80)
-  ImageFileId           Int?                    @map("ProductionImageFileId")
+  LogoFileId            Int?                    @map("ProductionLogoFileId")
   ReportCurrencyCode    String                  @map("ProductionReportCurrencyCode") @db.VarChar(3)
   ProdCoId              Int?                    @map("ProductionProdCoId")
   AccountUserProduction AccountUserProduction[]
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
   Currency              Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
-  File                  File?                   @relation(fields: [ImageFileId], references: [Id], map: "FK_Production_File")
+  File                  File?                   @relation(fields: [ProductionLogoFileId], references: [Id], map: "File_Production")
   ProductionCompany     ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
   ProductionTask        ProductionTask[]
 
   @@unique([Code, ShowId], map: "SECONDARY")
-  @@index([ImageFileId], map: "Production_File")
+  @@index([LogoFileId], map: "Production_File")
   @@index([ShowId], map: "Show_Production")
   @@index([ReportCurrencyCode], map: "Currency_Production")
   @@index([ProdCoId], map: "ProductionCompany_Production")
@@ -963,6 +964,7 @@ model File {
   Location          String              @map("FileLocation") @db.VarChar(512)
   UploadDateTime    DateTime            @map("FileUploadDateTime") @db.DateTime(0)
   UploadUserId      Int                 @map("FileUploadUserId")
+  Account           Account[]
   User              User                @relation(fields: [UploadUserId], references: [Id], onDelete: NoAction, map: "UserAttachedFile")
   Production        Production[]
   ProductionCompany ProductionCompany[]
@@ -1054,6 +1056,7 @@ model ACCContract {
   TotalHolPay                                                   Decimal?            @map("ACCCTotalHolPay") @db.Decimal(10, 2)
   TotalFeeNotes                                                 String?             @map("ACCCTotalFeeNotes") @db.LongText
   CancelFee                                                     Decimal?            @map("ACCCCancelFee") @db.Decimal(10, 2)
+  ACCClause                                                     ACCClause[]
   AccountUser_ACCContract_ACCCCheckedByAccUserIdToAccountUser   AccountUser?        @relation("ACCContract_ACCCCheckedByAccUserIdToAccountUser", fields: [CheckedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Checker")
   AccountUser_ACCContract_ACCCCompletedByAccUserIdToAccountUser AccountUser?        @relation("ACCContract_ACCCCompletedByAccUserIdToAccountUser", fields: [CompletedByAccUserId], references: [Id], onDelete: Cascade, map: "AccountUser_AccContract_Completer")
   Currency                                                      Currency?           @relation(fields: [CurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_ACCContract")
@@ -1244,8 +1247,9 @@ model ACCPubEvent {
 }
 
 model ACCStandardClause {
-  Id   Int     @id @default(autoincrement()) @map("StdClauseId")
-  Text String? @map("StdClauseText") @db.LongText
+  Id        Int         @id @default(autoincrement()) @map("StdClauseId")
+  Text      String?     @map("StdClauseText") @db.LongText
+  ACCClause ACCClause[]
 }
 
 model PersonPerson {
@@ -1258,6 +1262,18 @@ model PersonPerson {
 
   @@index([PPPersonId], map: "Person_Person")
   @@index([PPRolePersonId], map: "Person_Person_InRole")
+}
+
+model ACCClause {
+  Id                  Int                @map("ClauseId") @id @default(autoincrement())
+  ACCContractId       Int                @map("ClauseACCContractId")
+  StdClauseId         Int?               @map("ClauseStdClauseId")
+  Text                String?            @map("ClauseText") @db.LongText
+  ACCContract         ACCContract        @relation(fields: [ClauseACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCClause")
+  ACCStandardClause   ACCStandardClause? @relation(fields: [ClauseStdClauseId], references: [Id], onDelete: Cascade, map: "ACCStandardClause_ACCClause")
+
+  @@index([ClauseACCContractId], map: "ACCContract_ACCClause")
+  @@index([ClauseStdClauseId], map: "ACCStandardClause_ACCClause")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -1483,7 +1499,7 @@ view ProductionView {
   ShowCode             String    @db.VarChar(10)
   ShowName             String    @db.VarChar(80)
   ShowType             String?   @db.VarChar(1)
-  ProductionLogo       Bytes?
+  ProductionLogoFileId Int?
   RehearsalStartDate   DateTime? @db.Date
   RehearsalEndDate     DateTime? @db.Date
   ProductionStartDate  DateTime? @db.Date
@@ -1651,6 +1667,19 @@ view ACCContractListView {
   DateIssued               DateTime? @db.Date
   DateReturned             DateTime? @db.Date
   ACCCNotes                String?   @db.LongText
+
+  @@ignore
+}
+
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+view AccountUserPermissionsView {
+  AccountId      Int
+  UserId         Int     @default(0)
+  AccUserId      Int     @default(0)
+  UserFirstName  String  @db.VarChar(50)
+  UserLastName   String? @db.VarChar(50)
+  UserEmail      String  @db.VarChar(120)
+  AllPermissions String? @db.MediumText
 
   @@ignore
 }
