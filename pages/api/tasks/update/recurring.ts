@@ -3,7 +3,7 @@ import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
 import { generateRecurringProductionTasks, getNewTasksNum } from 'services/TaskService';
-import { calculateWeekNumber } from '../../../../services/dateService';
+import { calculateWeekNumber } from 'services/dateService';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

@@ -100,15 +100,11 @@ const TasksPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>
 
   const handleMasterListClose = (_val: string) => {
     setIsMasterTaskList(false);
-    // if (val === 'data-added') {
-    // }
   };
 
   const handleProductionListClose = (_val: string) => {
     setIsProductionTaskList(false);
     setIsMasterTaskList(false);
-    // if (val === 'data-added') {
-    // }
   };
 
   const currentProductionObj = useRecoilValue(productionJumpState).productions.find((item) => item.Id === ProductionId);

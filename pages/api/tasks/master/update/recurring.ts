@@ -2,9 +2,9 @@ import { MasterTaskDTO } from 'interfaces';
 import prisma from 'lib/prisma';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getEmailFromReq, checkAccess } from 'services/userService';
-import { generateSingleRecurringMasterTask } from '../../../../../services/TaskService';
+import { generateSingleRecurringMasterTask } from 'services/TaskService';
 import { omit } from 'radash';
-import { masterTaskSchema, recurringMasterTaskSchema } from '../../../../../validators/tasks';
+import { masterTaskSchema, recurringMasterTaskSchema } from 'validators/tasks';
 
 export default async function handle(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
