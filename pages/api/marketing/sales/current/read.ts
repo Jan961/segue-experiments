@@ -24,8 +24,17 @@ export default async function handle(req, res) {
     const access = await checkAccess(email);
     if (!access) return res.status(401).end();
 
-    const data =
-      await prisma.$queryRaw`select SaleTypeName, Seats, Value, SetSalesFiguresDate, SetProductionWeekDate, SetId from SalesView where BookingId = ${bookingId}`;
+    const data = await prisma.salesView.findMany({
+      where: { BookingId: bookingId },
+      select: {
+        SaleTypeName: true,
+        Seats: true,
+        Value: true,
+        SetSalesFiguresDate: true,
+        SetProductionWeekDate: true,
+        SetId: true,
+      },
+    });
 
     if (data.length === 0) {
       res.status(200).json({});
