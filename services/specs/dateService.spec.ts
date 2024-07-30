@@ -1,4 +1,4 @@
-import { getNextMondayDateString, getTimeFromDateAndTime, addDurationToDate } from '../dateService';
+import { getNextMondayDateString, getTimeFromDateAndTime, addDurationToDate, isValidDate } from '../dateService';
 
 // ----------------- getNextMondayDateString -----------------
 describe('getNextMondayDateString Utility Function', () => {
@@ -125,5 +125,40 @@ describe('addDurationToDate', () => {
     expect(result.getFullYear()).toBe(expectedDate.getFullYear());
     expect(result.getMonth()).toBe(expectedDate.getMonth());
     expect(result.getDate()).toBe(expectedDate.getDate());
+  });
+});
+
+// ----------------- isValidDate -----------------
+describe('isValidDate', () => {
+  test('returns false for null', () => {
+    expect(isValidDate(null)).toBe(false);
+  });
+
+  test('returns true for valid date string', () => {
+    expect(isValidDate('2023-07-30')).toBe(true);
+  });
+
+  test('returns true for valid date object', () => {
+    expect(isValidDate(new Date())).toBe(true);
+  });
+
+  test('returns true for valid Unix timestamp in milliseconds', () => {
+    expect(isValidDate(1627696800000)).toBe(true);
+  });
+
+  test('returns false for invalid date string', () => {
+    expect(isValidDate('Invalid date string')).toBe(false);
+  });
+
+  test('returns false for undefined', () => {
+    expect(isValidDate(undefined)).toBe(false);
+  });
+
+  test('returns false for empty string', () => {
+    expect(isValidDate('')).toBe(false);
+  });
+
+  test('returns true for date object as a string', () => {
+    expect(isValidDate(new Date().toString())).toBe(true);
   });
 });
