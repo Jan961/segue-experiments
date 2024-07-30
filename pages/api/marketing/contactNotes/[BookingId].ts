@@ -15,6 +15,9 @@ export default async function handle(req: NextApiRequest, res: NextApiResponse) 
       where: {
         BookingId,
       },
+      orderBy: {
+        ContactDate: 'desc',
+      },
     });
 
     res.json(results.map(bookingContactNoteMapper));

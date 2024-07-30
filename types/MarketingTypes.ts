@@ -113,3 +113,8 @@ export type SalesTabs =
   | 'promoter holds'
   | 'attachments'
   | '';
+
+export type LastPerfDate = {
+  BookingId: number;
+  LastPerformanaceDate: string;
+};

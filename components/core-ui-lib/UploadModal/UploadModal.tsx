@@ -96,8 +96,9 @@ const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   const handleFileDelete = (fileName) => {
+    const deletedFile = selectedFiles.find((file) => file?.name === fileName);
     if (customHandleFileDelete) {
-      customHandleFileDelete();
+      customHandleFileDelete(deletedFile);
     }
 
     const filesList = selectedFiles.filter((file) => file?.name !== fileName);

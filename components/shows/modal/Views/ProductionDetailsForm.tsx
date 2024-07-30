@@ -110,18 +110,19 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
       setFormData((prev) => ({
         ...prev,
         imageUrl,
-        image: { id, imageUrl, name: originalFilename, size: null } as UploadedFile,
+        location,
+        image: { id, imageUrl, name: originalFilename, size: null, location } as UploadedFile,
       }));
     } catch (error) {
       onError(file[0].file, error.message);
     }
   };
 
-  const onFileUploadChange = (selectedFiles) => {
-    if (Array.isArray(selectedFiles) && selectedFiles.length === 0 && image?.location) {
+  const onFileUploadChange = async (file: UploadedFile) => {
+    if (file.location) {
       notify.promise(
         axios
-          .delete(`/api/file/delete?location=${image?.location}`)
+          .delete(`/api/file/delete?location=${file?.location}`)
           .then(() => setFormData((prev) => ({ ...prev, imageUrl: '', image: null }))),
         {
           success: 'Image deleted successfully',
@@ -175,7 +176,9 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
               onClick={() => setIsUploadOpen(true)}
             >
               {imageUrl ? (
-                <img className="h-full w-full" src={imageUrl} />
+                <div className="flex overflow-hidden justify-center items-center">
+                  <img className="max-h-full max-w-full object-fit-contain" src={imageUrl} />
+                </div>
               ) : (
                 <Icon iconName="camera-solid" variant="2xl" />
               )}
@@ -211,7 +214,7 @@ const ProductionDetailsForm = ({ visible, onClose, title, onSave, production }: 
             onClose={() => setIsUploadOpen(false)}
             onSave={onSaveUpload}
             maxFileSize={500 * 1024} // 500kb
-            onChange={onFileUploadChange}
+            customHandleFileDelete={onFileUploadChange}
             value={image}
           />
         )}
