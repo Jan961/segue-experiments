@@ -668,9 +668,9 @@ model MasterTask {
   Notes                          String?           @map("TaskNotes") @db.VarChar(500)
   AssignedToUserId               Int?              @map("TaskAssignedToUserId")
   StartByWeekNum                 Int?              @map("TaskStartByWeekNum") @db.SmallInt
-  TaskStartByIsPostProduction    Boolean           @default(false) @db.Bit(1)
+  TaskStartByIsPostProduction    Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   CompleteByWeekNum              Int?              @map("TaskCompleteByWeekNum") @db.SmallInt
-  TaskCompleteByIsPostProduction Boolean           @default(false) @db.Bit(1)
+  TaskCompleteByIsPostProduction Boolean           @default(dbgenerated("(b'0')")) @db.Bit(1)
   MTRId                          Int?              @map("TaskMTRId")
   Account                        Account           @relation(fields: [AccountId], references: [AccountId], onDelete: Cascade, map: "Account_MasterTask")
   MasterTaskRepeat               MasterTaskRepeat? @relation(fields: [MTRId], references: [Id], onDelete: Cascade, map: "MasterTaskRepeat_MasterTask")
@@ -680,7 +680,6 @@ model MasterTask {
   @@index([AssignedToUserId], map: "User_MasterTask_Assigned")
   @@index([MTRId], map: "MasterTaskRepeat_MasterTask")
 }
-
 
 model AccountUserProduction {
   AUPId           Int         @id @default(autoincrement())
@@ -1022,12 +1021,12 @@ model GlobalBookingActivity {
 }
 
 model ACCContract {
-  ContractId                                                    Int                 @map("ACCContractId") @id @default(autoincrement())
-  PersonId                                                      Int                 @map("ACCCPersonId") 
+  ContractId                                                    Int                 @id @default(autoincrement()) @map("ACCContractId")
+  PersonId                                                      Int                 @map("ACCCPersonId")
   RoleName                                                      String              @map("ACCCRoleName") @db.VarChar(50)
   ContractStatus                                                String              @map("ACCCContractStatus") @db.VarChar(4)
-  CompletedByAccUserId                                          Int?                @map("ACCCCompletedByAccUserId") 
-  CheckedByAccUserId                                            Int?                @map("ACCCCheckedByAccUserId") 
+  CompletedByAccUserId                                          Int?                @map("ACCCCompletedByAccUserId")
+  CheckedByAccUserId                                            Int?                @map("ACCCCheckedByAccUserId")
   DateIssued                                                    DateTime?           @map("ACCCDateIssued") @db.Date
   DateReturned                                                  DateTime?           @map("ACCCDateReturned") @db.Date
   Notes                                                         String?             @map("ACCCNotes") @db.LongText
@@ -1036,13 +1035,13 @@ model ACCContract {
   LastDay                                                       DateTime?           @map("ACCCLastDay") @db.Date
   Availability                                                  String?             @map("ACCCAvailability") @db.LongText
   RehearsalLocation                                             String?             @map("ACCCRehearsalLocation") @db.VarChar(30)
-  RehearsalVenueId                                              Int?                @map("ACCCRehearsalVenueId") 
+  RehearsalVenueId                                              Int?                @map("ACCCRehearsalVenueId")
   RehearsalVenueNotes                                           String?             @map("ACCCRehearsalVenueNotes") @db.LongText
-  IsAccomProvided                                               Boolean             @map("ACCCIsAccomProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsAccomProvided                                               Boolean             @default(dbgenerated("(b'0')")) @map("ACCCIsAccomProvided") @db.Bit(1)
   AccomNotes                                                    String?             @map("ACCCAccomNotes") @db.LongText
-  IsTransportProvided                                           Boolean             @map("ACCCIsTransportProvided") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsTransportProvided                                           Boolean             @default(dbgenerated("(b'0')")) @map("ACCCIsTransportProvided") @db.Bit(1)
   TransportNotes                                                String?             @map("ACCCTransportNotes") @db.LongText
-  IsNominatedDriver                                             Boolean             @map("ACCCIsNominatedDriver") @default(dbgenerated("(b'0')")) @db.Bit(1)
+  IsNominatedDriver                                             Boolean             @default(dbgenerated("(b'0')")) @map("ACCCIsNominatedDriver") @db.Bit(1)
   NominatedDriverNotes                                          String?             @map("ACCCNominatedDriverNotes") @db.LongText
   PaymentType                                                   String?             @map("ACCCPaymentType") @db.VarChar(1)
   WeeklyRehFee                                                  Decimal?            @map("ACCCWeeklyRehFee") @db.Decimal(10, 2)
@@ -1193,13 +1192,13 @@ model PersonRole {
 }
 
 model MasterTaskRepeat {
-  Id                             Int          @map("MTRId")@id @default(autoincrement())
-  FromWeekNum                    Int          @map("MTRFromWeekNum")@db.SmallInt
-  FromWeekNumIsPostProduction Boolean      @map("MTRFromWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  ToWeekNum                   Int          @map("MTRToWeekNum")@db.SmallInt
-  ToWeekNumIsPostProduction   Boolean      @map("MTRToWeekNumIsPostProduction")@default(dbgenerated("(b'0')")) @db.Bit(1)
-  Interval                    String       @map("MTRInterval")@db.VarChar(20)
-  MasterTask                     MasterTask[]
+  Id                          Int          @id @default(autoincrement()) @map("MTRId")
+  FromWeekNum                 Int          @map("MTRFromWeekNum") @db.SmallInt
+  FromWeekNumIsPostProduction Boolean      @default(dbgenerated("(b'0')")) @map("MTRFromWeekNumIsPostProduction") @db.Bit(1)
+  ToWeekNum                   Int          @map("MTRToWeekNum") @db.SmallInt
+  ToWeekNumIsPostProduction   Boolean      @default(dbgenerated("(b'0')")) @map("MTRToWeekNumIsPostProduction") @db.Bit(1)
+  Interval                    String       @map("MTRInterval") @db.VarChar(20)
+  MasterTask                  MasterTask[]
 }
 
 model ProductionTaskRepeat {
@@ -1224,28 +1223,28 @@ model VenueFile {
 }
 
 model ACCPayment {
-  Id            Int         @map("PayId") @id @default(autoincrement())
-  ACCContractId Int         @map("PayACCContractId") 
+  Id            Int         @id @default(autoincrement()) @map("PayId")
+  ACCContractId Int         @map("PayACCContractId")
   Date          DateTime?   @map("PayDate") @db.Date
   Amount        Decimal?    @map("PayAmount") @db.Decimal(10, 2)
   Notes         String?     @map("PayNotes") @db.LongText
-  ACCContract      ACCContract @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_AACCPayment")
+  ACCContract   ACCContract @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_AACCPayment")
 
   @@index([ACCContractId], map: "ACCContract_AACCPayment")
 }
 
 model ACCPubEvent {
-  Id            Int         @map("PEId") @id @default(autoincrement())
-  ACCContractId Int         @map("PEACCContractId") 
+  Id            Int         @id @default(autoincrement()) @map("PEId")
+  ACCContractId Int         @map("PEACCContractId")
   Date          DateTime?   @map("PEDate") @db.Date
   Notes         String?     @map("PENotes") @db.LongText
-  ACCContract     ACCContract @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCPubEvent")
+  ACCContract   ACCContract @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCPubEvent")
 
   @@index([ACCContractId], map: "ACCContract_ACCPubEvent")
 }
 
 model ACCStandardClause {
-  Id   Int     @map("StdClauseId")   @id @default(autoincrement())
+  Id   Int     @id @default(autoincrement()) @map("StdClauseId")
   Text String? @map("StdClauseText") @db.LongText
 }
 
@@ -1259,43 +1258,6 @@ model PersonPerson {
 
   @@index([PPPersonId], map: "Person_Person")
   @@index([PPRolePersonId], map: "Person_Person_InRole")
-}
-
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model Person_Log {
-  Timestamp                   DateTime  @default(now()) @db.Timestamp(0)
-  DMLAction                   String    @db.Char(1)
-  PersonId                    Int?
-  PersonFirstName             String    @db.VarChar(50)
-  PersonLastName              String?   @db.VarChar(50)
-  PersonEmail                 String    @db.VarChar(120)
-  PersonAddressId             Int?
-  PersonPhone                 String?   @db.VarChar(30)
-  PersonMobile                String?   @db.VarChar(30)
-  PersonPassportName          String?   @db.VarChar(100)
-  PersonPassportExpiryDate    DateTime? @db.Date
-  PersonEligibleToWork        Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PersonFEURequired           Boolean   @default(dbgenerated("(b'0')")) @db.Bit(1)
-  PersonFEUCheckByUserId      Int?
-  PersonNotes                 String?   @db.LongText
-  PersonHealthNotes           String?   @db.LongText
-  PersonAdvisoryNotes         String?   @db.LongText
-  PersonRoleNotes             String?   @db.LongText
-  PersonAgencyOrgId           Int?
-  PersonPaymentTo             String?   @db.VarChar(1)
-  PersonPaymentAccount        String?   @db.VarChar(8)
-  PersonPaymentSortCode       String?   @db.VarChar(8)
-  PersonPaymentSWIFTBIC       String?   @db.VarChar(11)
-  PersonPaymentIBAN           String?   @db.VarChar(34)
-  PersonPaymentBankCountryId  Int?
-  PersonExpensesTo            String?   @db.VarChar(1)
-  PersonExpensesAccount       String?   @db.VarChar(8)
-  PersonExpensesSortCode      String?   @db.VarChar(8)
-  PersonExpensesSWIFTBIC      String?   @db.VarChar(11)
-  PersonExpensesIBAN          String?   @db.VarChar(34)
-  PersonExpensesBankCountryId Int?
-
-  @@ignore
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
