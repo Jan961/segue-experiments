@@ -18,6 +18,7 @@ import { ConfVariant } from 'components/core-ui-lib/ConfirmationDialog/Confirmat
 import Loader from 'components/core-ui-lib/Loader';
 import useAxiosCancelToken from 'hooks/useCancelToken';
 import { isNullOrEmpty } from 'utils';
+import { uploadMultipleFiles } from 'utils/uploadFile';
 
 interface AddEditVenueModalProps {
   visible: boolean;
@@ -44,7 +45,7 @@ export default function AddEditVenueModal({
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const [fileList, setFileList] = useState<any>([]);
+  const [fileList, setFileList] = useState<FormData[]>([]);
   const [filesToDelete, setFilesToDelete] = useState<any>([]);
   const cancelToken = useAxiosCancelToken();
   const handleInputChange = (field: string, value: any) => {
@@ -141,42 +142,17 @@ export default function AddEditVenueModal({
   };
 
   const saveFiles = async (venueResponse: any) => {
-    let progress = 0; // to track overall progress
-    let slowProgressInterval; // interval for slow progress simulation
-    await Promise.all(
-      fileList.map(async (file) => {
-        if (isNullOrEmpty(file.get('file'))) {
-          const response = await axios.post('/api/upload', file, {
-            onUploadProgress: (progressEvent) => {
-              const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              if (percentCompleted <= 50) {
-                progress = percentCompleted;
-              } else if (percentCompleted === 100) {
-                progress = 50;
-                clearInterval(slowProgressInterval);
-                slowProgressInterval = setInterval(() => {
-                  if (progress < 95) {
-                    progress += 0.5;
-                  } else {
-                    clearInterval(slowProgressInterval);
-                  }
-                }, 100);
-              }
-            },
-          });
-
-          progress = 100;
-          clearInterval(slowProgressInterval);
-          const fileRec = {
-            FileId: response.data.id,
-            VenueId: venueResponse.data.Id,
-            Description: 'Tech Spec',
-          };
-
-          await axios.post('/api/venue/techSpecs/create', fileRec);
-        }
-      }),
-    );
+    const callBack = async (response) => {
+      if (!isNullOrEmpty(response)) {
+        const fileRec = {
+          FileId: response.data.id,
+          VenueId: venueResponse.data.Id,
+          Description: 'Tech Spec',
+        };
+        await axios.post('/api/venue/techSpecs/create', fileRec);
+      }
+    };
+    await uploadMultipleFiles(fileList, callBack);
   };
   return (
     <>
