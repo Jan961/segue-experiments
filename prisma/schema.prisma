@@ -711,7 +711,7 @@ model Production {
   ConversionRate        ConversionRate[]
   DateBlock             DateBlock[]
   Currency              Currency                @relation(fields: [ReportCurrencyCode], references: [Code], onDelete: NoAction, map: "Currency_Production")
-  File                  File?                   @relation(fields: [ProductionLogoFileId], references: [Id], map: "File_Production")
+  File                  File?                   @relation(fields: [LogoFileId], references: [Id], map: "File_Production")
   ProductionCompany     ProductionCompany?      @relation(fields: [ProdCoId], references: [Id], onDelete: NoAction, map: "ProductionCompany_Production")
   Show                  Show                    @relation(fields: [ShowId], references: [Id], onDelete: NoAction, map: "ShowMayHaveProduction")
   ProductionRegion      ProductionRegion[]
@@ -1269,11 +1269,11 @@ model ACCClause {
   ACCContractId       Int                @map("ClauseACCContractId")
   StdClauseId         Int?               @map("ClauseStdClauseId")
   Text                String?            @map("ClauseText") @db.LongText
-  ACCContract         ACCContract        @relation(fields: [ClauseACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCClause")
-  ACCStandardClause   ACCStandardClause? @relation(fields: [ClauseStdClauseId], references: [Id], onDelete: Cascade, map: "ACCStandardClause_ACCClause")
+  ACCContract         ACCContract        @relation(fields: [ACCContractId], references: [ContractId], onDelete: Cascade, map: "ACCContract_ACCClause")
+  ACCStandardClause   ACCStandardClause? @relation(fields: [StdClauseId], references: [Id], onDelete: Cascade, map: "ACCStandardClause_ACCClause")
 
-  @@index([ClauseACCContractId], map: "ACCContract_ACCClause")
-  @@index([ClauseStdClauseId], map: "ACCStandardClause_ACCClause")
+  @@index([ACCContractId], map: "ACCContract_ACCClause")
+  @@index([StdClauseId], map: "ACCStandardClause_ACCClause")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
